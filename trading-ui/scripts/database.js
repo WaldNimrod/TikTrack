@@ -78,20 +78,11 @@ function extractAmount(amountString) {
 function updateSummaryStats(data = null) {
   console.log('=== updateSummaryStats called ===');
   console.log('Input data:', data);
-  console.log('window.rowData:', window.rowData);
-  console.log('window.gridApi exists:', !!window.gridApi);
   
   let statsData;
   
-  // אם לא הועברו נתונים, השתמש בנתונים המוצגים בגריד (כמו בדף התכנונים)
-  if (!data && window.gridApi) {
-    const displayedRows = [];
-    window.gridApi.forEachNodeAfterFilter(node => {
-      displayedRows.push(node.data);
-    });
-    statsData = displayedRows;
-    console.log('Using displayed rows from grid:', statsData);
-  } else if (!data) {
+  // אם לא הועברו נתונים, השתמש בנתונים הגלובליים
+  if (!data) {
     statsData = window.rowData || [];
     console.log('Using window.rowData:', statsData);
   } else {
@@ -171,7 +162,7 @@ function formatCurrency(amount) {
 
 // ===== GRID CORE FUNCTIONS =====
 // משתנים גלובליים
-let externalFilterPresent = false;
+// externalFilterPresent מוגדר ב-tables.js - לא מגדירים כאן
 
 // פונקציית API כללית
 async function apiCall(endpoint, options = {}) {
@@ -217,196 +208,22 @@ async function apiCall(endpoint, options = {}) {
 }
 
 // הגדרת עמודות הגריד הסטנדרטיות
-const getDefaultColumnDefs = () => [
-  { 
-    headerName: "המרה", 
-    field: "action", 
-    width: 60,
-    minWidth: 50,
-    maxWidth: 80,
-    cellRenderer: params => `<span style="cursor: pointer; font-size: 1.2rem;">${params.value}</span>`
-  },
-  { 
-    headerName: "סטטוס", 
-    field: "status", 
-    width: 80,
-    minWidth: 70,
-    maxWidth: 100, 
-    cellClass: params => `badge-status ${params.value}`,
-    filter: true,
-    filterParams: {
-      filterOptions: ['equals', 'notEqual'],
-      defaultOption: 'equals'
-    }
-  },
-  { 
-    headerName: "נוכחי", 
-    field: "current", 
-    width: 120,
-    minWidth: 100,
-    maxWidth: 150, 
-    cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
-  },
-  { 
-    headerName: "סטופ", 
-    field: "stop", 
-    width: 120,
-    minWidth: 100,
-    maxWidth: 150, 
-    cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
-  },
-  { 
-    headerName: "יעד", 
-    field: "target", 
-    width: 120,
-    minWidth: 100,
-    maxWidth: 150, 
-    cellClass: params => params.value.includes("(+") ? 'positive' : params.value.includes("(-") ? 'negative' : '' 
-  },
-  { 
-    headerName: "סכום/כמות", 
-    field: "amount", 
-    width: 140,
-    minWidth: 120,
-    maxWidth: 160
-  },
-  { 
-    headerName: "סוג", 
-    field: "type", 
-    width: 100,
-    minWidth: 80,
-    maxWidth: 120,
-    filter: true,
-    filterParams: {
-      filterOptions: ['equals', 'notEqual'],
-      defaultOption: 'equals'
-    }
-  },
-  { 
-    headerName: "תאריך", 
-    field: "date", 
-    width: 100,
-    minWidth: 80,
-    maxWidth: 120,
-    filter: true,
-    filterParams: {
-      filterOptions: ['equals', 'notEqual', 'greaterThan', 'lessThan'],
-      defaultOption: 'equals'
-    }
-  },
-  { 
-    headerName: "טיקר", 
-    field: "ticker", 
-    width: 80,
-    minWidth: 60,
-    maxWidth: 100,
-    filter: true,
-    filterParams: {
-      filterOptions: ['equals', 'notEqual', 'contains'],
-      defaultOption: 'equals'
-    }
-  },
-  { 
-    headerName: "חשבון", 
-    field: "account", 
-    width: 120,
-    minWidth: 100,
-    maxWidth: 140,
-    filter: true,
-    filterParams: {
-      filterOptions: ['equals', 'notEqual'],
-      defaultOption: 'equals'
-    }
-  }
-];
+// getDefaultColumnDefs מוגדר ב-tables.js - לא מגדירים כאן
 
-// פונקציה ליצירת גריד
+// פונקציה ליצירת גריד - לא בשימוש (ag-grid לא נטען)
 function createGrid(containerId, columnDefs = null, rowData = null) {
-  const container = document.getElementById(containerId);
-  if (!container) {
-    console.error(`Container ${containerId} not found`);
-    return null;
-  }
-
-  const gridOptions = {
-    columnDefs: columnDefs || getDefaultColumnDefs(),
-    rowData: rowData || getDefaultRowData(),
-    defaultColDef: {
-      sortable: true,
-      filter: true,
-      resizable: true,
-      minWidth: 50
-    },
-    pagination: true,
-    paginationPageSize: 20,
-    domLayout: 'autoHeight',
-    suppressRowClickSelection: true,
-    enableRangeSelection: true,
-    enableFillHandle: true,
-    animateRows: true,
-    onGridReady: (params) => {
-      console.log('Grid ready:', containerId);
-      window.gridApi = params.api;
-      window.columnApi = params.columnApi;
-      
-      // עדכון סטטיסטיקות
-      updateSummaryStats();
-    },
-    onFilterChanged: (params) => {
-      console.log('Filter changed');
-      updateSummaryStats();
-    },
-    onSortChanged: (params) => {
-      console.log('Sort changed');
-    }
-  };
-
-  new agGrid.Grid(container, gridOptions);
-  return gridOptions;
+  console.log('⚠️ createGrid לא נתמך - ag-grid לא נטען');
+  return null;
 }
 
-// פונקציה לעדכון נתונים בגריד
+// פונקציה לעדכון נתונים בגריד - לא בשימוש (ag-grid לא נטען)
 function updateGridData(newData) {
-  if (window.gridApi) {
-    window.gridApi.setRowData(newData);
-    updateSummaryStats(newData);
-  }
+  console.log('⚠️ updateGridData לא נתמך - ag-grid לא נטען');
 }
 
-// פונקציה לייצוא נתונים
+// פונקציה לייצוא נתונים - לא בשימוש (ag-grid לא נטען)
 function exportGridData(format = 'csv') {
-  if (!window.gridApi) {
-    console.error('Grid API not available');
-    return;
-  }
-
-  try {
-    let result;
-    switch (format.toLowerCase()) {
-      case 'csv':
-        result = window.gridApi.getDataAsCsv();
-        break;
-      case 'excel':
-        result = window.gridApi.getDataAsExcel();
-        break;
-      default:
-        console.error('Unsupported export format:', format);
-        return;
-    }
-
-    // יצירת קובץ להורדה
-    const blob = new Blob([result], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `grid_data_${new Date().toISOString().split('T')[0]}.${format}`;
-    a.click();
-    window.URL.revokeObjectURL(url);
-
-    console.log(`Data exported as ${format}`);
-  } catch (error) {
-    console.error('Export error:', error);
-  }
+  console.log('⚠️ exportGridData לא נתמך - ag-grid לא נטען');
 }
 
 // משתנים גלובליים
@@ -579,6 +396,7 @@ function restoreDatabaseSectionState() {
 
 // פונקציה לטעינת נתונים מכל הטבלאות
 async function loadAllDatabaseData() {
+  console.log('🔄 loadAllDatabaseData נקראה');
   console.log('🔄 טוען נתונים מכל הטבלאות...');
   
   try {
@@ -681,6 +499,7 @@ function updateAllTables() {
 
 // פונקציה לעדכון טבלה ספציפית
 function updateTable(tableType, data) {
+  console.log(`🔄 updateTable נקראה עבור ${tableType} עם ${data?.length || 0} רשומות`);
   const table = document.querySelector(`[data-table-type="${tableType}"]`);
   if (!table) {
     console.warn(`⚠️ לא נמצאה טבלה מסוג: ${tableType}`);
@@ -840,7 +659,7 @@ window.updateSummaryStats = updateSummaryStats;
 window.updateStatsDisplay = updateStatsDisplay;
 window.formatCurrency = formatCurrency;
 window.apiCall = apiCall;
-window.getDefaultColumnDefs = getDefaultColumnDefs;
+// getDefaultColumnDefs מוגדר ב-tables.js - לא מייצאים כאן
 window.createGrid = createGrid;
 window.updateGridData = updateGridData;
 window.exportGridData = exportGridData;

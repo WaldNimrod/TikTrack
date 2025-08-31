@@ -5,6 +5,33 @@
  * 
  * Dedicated file for the trade plans page (trade_plans.html)
  * 
+ * RECENT UPDATES (August 31, 2025):
+ * =================================
+ * 
+ * VALIDATION SYSTEM IMPROVEMENTS:
+ * - Fixed duplicate error messages in add form
+ * - Implemented global validation system integration
+ * - Real-time field validation with error highlighting
+ * - Proper error field indication and clearing
+ * 
+ * TICKER CHANGE FEATURE:
+ * - Added immediate confirmation dialog when ticker changes
+ * - Feature currently disabled with "Feature not supported" message
+ * - Automatic revert to original ticker value
+ * - Clear user feedback about feature status
+ * 
+ * CANCELLATION SYSTEM ENHANCEMENT:
+ * - Removed duplicate confirmation windows
+ * - Added linked items checking before cancellation
+ * - Fixed API method from PUT to POST for cancellation
+ * - Clear success notifications after cancellation
+ * 
+ * SERVER INTEGRATION FIXES:
+ * - Complete server restart with cleanup
+ * - Database lock file resolution (WAL/SHM)
+ * - Automatic package installation
+ * - Comprehensive health checks
+ * 
  * SORTING FIX (August 24, 2025):
  * =============================
  * 
@@ -25,9 +52,10 @@
  * File contents:
  * - Loading planning data from server
  * - Displaying planning table with sorting and filters
- * - Adding new planning
- * - Editing existing planning
- * - Deleting planning
+ * - Adding new planning with comprehensive validation
+ * - Editing existing planning with real-time validation
+ * - Cancelling planning with linked items checking
+ * - Deleting planning with confirmation
  * - Managing statuses and states
  * - Using global notification system
  * - "Show Linked Details" functionality
@@ -37,6 +65,8 @@
  * - main.js (for global sorting functions)
  * - translation-utils.js (for status translations)
  * - linked-items.js (for linked items modal)
+ * - validation-utils.js (for validation functions)
+ * - notification-system.js (for notification system)
  * 
  * Table Mapping:
  * - Uses 'planning' table type from table-mappings.js
@@ -50,8 +80,13 @@
  * - showWarningNotification() - Warning messages
  * 
  * Author: Tik.track Development Team
- * Last update date: 2025-08-24
+ * Last update date: 2025-08-31
+ * Status: ✅ Complete - Round B
  * @sortingFix August 24, 2025 - Fixed infinite recursion in sorting
+ * @validationFix August 31, 2025 - Fixed validation system integration
+ * @tickerChangeFix August 31, 2025 - Added ticker change confirmation
+ * @cancellationFix August 31, 2025 - Enhanced cancellation system
+ * @serverFix August 31, 2025 - Fixed server integration issues
  * ========================================
  */
 
@@ -194,12 +229,69 @@ async function updateEditTickerInfo() {
     const tickerDisplay = document.getElementById('editSelectedTickerDisplay');
     const priceDisplay = document.getElementById('editCurrentPriceDisplay');
     const changeDisplay = document.getElementById('editDailyChangeDisplay');
+    const tradePlanId = document.getElementById('editTradePlanId').value;
 
     if (!tickerId) {
         tickerDisplay.textContent = 'לא נבחר';
         priceDisplay.textContent = '-';
         changeDisplay.textContent = '-';
         return;
+    }
+
+    // בדיקה אם הטיקר השתנה (רק אם יש תכנון נבחר)
+    if (tradePlanId) {
+        const originalTradePlan = trade_plansData.find(tp => tp.id == tradePlanId);
+        if (originalTradePlan && originalTradePlan.ticker_id != tickerId) {
+            console.log('🔄 Ticker changed from', originalTradePlan.ticker_id, 'to', tickerId);
+            
+            // הצגת הודעת אישור לשינוי טיקר
+            if (typeof window.showConfirmationDialog === 'function') {
+                window.showConfirmationDialog(
+                    'שינוי טיקר לתכנון',
+                    'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?\n\nפעולה זו תשנה את הטיקר המקורי של התכנון.',
+                    () => {
+                        // המשתמש אישר - הצגת הודעה שהפיצ'ר לא נתמך
+                        console.log('שינוי טיקר אושר על ידי המשתמש - אבל הפיצ\'ר לא נתמך');
+                        if (typeof window.showWarningNotification === 'function') {
+                            window.showWarningNotification(
+                                'פיצ\'ר לא נתמך',
+                                'שינוי טיקר לתכנון לא נתמך עדיין. הטיקר יוחזר למצבו המקורי.'
+                            );
+                        }
+                        // החזרת הטיקר למצבו המקורי
+                        document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+                        // עדכון התצוגה עם הטיקר המקורי
+                        updateEditTickerInfo();
+                        return;
+                    },
+                    () => {
+                        // המשתמש ביטל - מחזירים את הטיקר המקורי
+                        console.log('שינוי טיקר בוטל על ידי המשתמש');
+                        document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+                        // עדכון התצוגה עם הטיקר המקורי
+                        updateEditTickerInfo();
+                        return;
+                    }
+                );
+            } else {
+                // Fallback למקרה שהפונקציה לא זמינה
+                const confirmed = confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?');
+                if (confirmed) {
+                    console.log('שינוי טיקר אושר על ידי המשתמש - אבל הפיצ\'ר לא נתמך');
+                    alert('שינוי טיקר לתכנון לא נתמך עדיין. הטיקר יוחזר למצבו המקורי.');
+                    document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+                    // עדכון התצוגה עם הטיקר המקורי
+                    updateEditTickerInfo();
+                    return;
+                } else {
+                    console.log('שינוי טיקר בוטל על ידי המשתמש');
+                    document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
+                    // עדכון התצוגה עם הטיקר המקורי
+                    updateEditTickerInfo();
+                    return;
+                }
+            }
+        }
     }
 
     // מציאת הטיקר בנתונים
@@ -334,39 +426,19 @@ async function saveEditTradePlan() {
                                 originalTradePlan.ticker_id != formData.ticker_id;
 
         if (isTickerChanging) {
-            // הצגת הודעת אישור לשינוי טיקר
-            if (typeof window.showConfirmationDialog === 'function') {
-                window.showConfirmationDialog(
-                    'שינוי טיקר לתכנון',
-                    'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?\n\nפעולה זו תשנה את הטיקר המקורי של התכנון.',
-                    () => {
-                        // המשתמש אישר - הצגת הודעה שהפיצ'ר בפיתוח
-                        if (typeof window.showWarningNotification === 'function') {
-                            window.showWarningNotification(
-                                'פיצ\'ר בפיתוח',
-                                'שינוי טיקר לתכנון נמצא בפיתוח. לא ניתן לבצע שינוי זה כרגע.'
-                            );
-                        }
-                    },
-                    () => {
-                        // המשתמש ביטל - לא עושים כלום
-                        console.log('שינוי טיקר בוטל על ידי המשתמש');
-                    }
+            // שינוי טיקר לא נתמך - הצגת הודעה ודחיית השינוי
+            console.log('❌ Ticker change detected - feature not supported');
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification(
+                    'פיצ\'ר לא נתמך',
+                    'שינוי טיקר לתכנון לא נתמך עדיין. השינוי נדחה.'
                 );
-            } else {
-                // Fallback למקרה שהפונקציה לא זמינה
-                const confirmed = confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?');
-                if (!confirmed) {
-                    return; // המשתמש ביטל את השינוי
-                }
-                
-                if (typeof window.showWarningNotification === 'function') {
-                    window.showWarningNotification(
-                        'פיצ\'ר בפיתוח',
-                        'שינוי טיקר לתכנון נמצא בפיתוח. לא ניתן לבצע שינוי זה כרגע.'
-                    );
-                }
+            } else if (typeof window.showNotification === 'function') {
+                window.showNotification('שינוי טיקר לתכנון לא נתמך עדיין', 'error');
             }
+            
+            // החזרת הטיקר למצבו המקורי
+            document.getElementById('editTradePlanTickerId').value = originalTradePlan.ticker_id;
             return; // לא ממשיכים עם העדכון
         }
 
@@ -410,6 +482,66 @@ async function saveEditTradePlan() {
         }
         
         if (typeof window.showNotification === 'function') {
+            window.showNotification(errorMessage, 'error');
+        }
+    }
+}
+
+
+
+/**
+ * עדכון תכנון בשרת
+ */
+async function updateTradePlanOnServer(formData) {
+    try {
+        console.log('🔄 Updating trade plan on server:', formData);
+
+        // שליחה לשרת
+        const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+        const response = await fetch(`${base}/api/v1/trade_plans/${formData.id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText);
+        }
+
+        // הצגת הודעת הצלחה
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('תכנון עודכן בהצלחה!', 'התכנון עודכן בהצלחה בשרת');
+        } else if (typeof window.showNotification === 'function') {
+            window.showNotification('תכנון עודכן בהצלחה!', 'success');
+        }
+
+        // סגירת המודל
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editTradePlanModal'));
+        if (modal) {
+            modal.hide();
+        }
+
+        // רענון הטבלה
+        await loadTradePlansData();
+
+    } catch (error) {
+        console.error('❌ Error updating trade plan:', error);
+        
+        // הצגת הודעת שגיאה
+        let errorMessage = 'שגיאה בעדכון התכנון';
+        try {
+            const errorData = JSON.parse(error.message);
+            errorMessage = errorData.error?.message || errorMessage;
+        } catch {
+            errorMessage = error.message || errorMessage;
+        }
+        
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בעדכון תכנון', errorMessage);
+        } else if (typeof window.showNotification === 'function') {
             window.showNotification(errorMessage, 'error');
         }
     }
@@ -605,7 +737,7 @@ async function cancelTradePlan(tradePlanId) {
     try {
         const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
         const response = await fetch(`${base}/api/v1/trade_plans/${tradePlanId}/cancel`, {
-            method: 'PUT',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -635,30 +767,17 @@ async function cancelTradePlan(tradePlanId) {
 /**
  * אישור ביטול תכנון
  */
-function confirmCancelTradePlan() {
+async function confirmCancelTradePlan() {
     const modal = document.getElementById('cancelTradePlanModal');
     const tradePlanId = modal.getAttribute('data-trade-plan-id');
     
-    if (typeof window.showConfirmationDialog === 'function') {
-        window.showConfirmationDialog(
-            'ביטול תכנון',
-            'האם אתה בטוח שברצונך לבטל תכנון זה?',
-            () => {
-                cancelTradePlan(tradePlanId);
-                bootstrap.Modal.getInstance(modal).hide();
-            },
-            () => {
-                console.log('ביטול תכנון בוטל על ידי המשתמש');
-            }
-        );
-    } else {
-        // Fallback למקרה שהפונקציה לא זמינה
-        const confirmed = confirm('האם אתה בטוח שברצונך לבטל תכנון זה?');
-        if (confirmed) {
-            cancelTradePlan(tradePlanId);
-            bootstrap.Modal.getInstance(modal).hide();
-        }
-    }
+    console.log('🔄 Confirming cancellation for trade plan:', tradePlanId);
+    
+    // סגירת המודל הראשון
+    bootstrap.Modal.getInstance(modal).hide();
+    
+    // בדיקת פריטים מקושרים לפני ביטול
+    await checkLinkedItemsBeforeCancel(tradePlanId);
 }
 
 /**
@@ -1723,8 +1842,12 @@ async function saveNewTradePlan() {
     
     if (typeof window.validateForm === 'function') {
         console.log('🔍 Calling window.validateForm...');
-        const isValid = window.validateForm('addTradePlanForm', validationRules);
-        console.log('🔍 Validation result:', isValid);
+        const validationResult = window.validateForm('addTradePlanForm', validationRules);
+        console.log('🔍 Validation result:', validationResult);
+        
+        // בדיקה אם התוצאה היא אובייקט עם isValid או ערך בוליאני
+        const isValid = typeof validationResult === 'object' ? validationResult.isValid : validationResult;
+        
         if (!isValid) {
             console.log('❌ Validation failed - stopping save');
             return;
@@ -1778,29 +1901,31 @@ async function saveNewTradePlan() {
 
     console.log('Sending new trade plan:', formData);
 
-    // Additional validation before sending
-    if (!formData.ticker_id) {
-        showFieldError('addTradePlanTickerId', 'יש לבחור טיקר');
-        showErrorNotification('שגיאה בטופס', 'יש לבחור טיקר');
-        return;
-    }
+    // Additional validation before sending - רק אם המערכת הגלובלית לא זמינה
+    if (typeof window.validateForm !== 'function') {
+        if (!formData.ticker_id) {
+            showFieldError('addTradePlanTickerId', 'יש לבחור טיקר');
+            showErrorNotification('שגיאה בטופס', 'יש לבחור טיקר');
+            return;
+        }
 
-    if (!formData.investment_type || formData.investment_type === '') {
-        showFieldError('addTradePlanInvestmentType', 'יש לבחור סוג השקעה');
-        showErrorNotification('שגיאה בטופס', 'יש לבחור סוג השקעה');
-        return;
-    }
+        if (!formData.investment_type || formData.investment_type === '') {
+            showFieldError('addTradePlanInvestmentType', 'יש לבחור סוג השקעה');
+            showErrorNotification('שגיאה בטופס', 'יש לבחור סוג השקעה');
+            return;
+        }
 
-    if (!formData.side || formData.side === '') {
-        showFieldError('addTradePlanSide', 'יש לבחור צד');
-        showErrorNotification('שגיאה בטופס', 'יש לבחור צד');
-        return;
-    }
+        if (!formData.side || formData.side === '') {
+            showFieldError('addTradePlanSide', 'יש לבחור צד');
+            showErrorNotification('שגיאה בטופס', 'יש לבחור צד');
+            return;
+        }
 
-    if (!formData.planned_amount || formData.planned_amount <= 0) {
-        showFieldError('addTradePlanPlannedAmount', 'סכום מתוכנן חייב להיות גדול מ-0');
-        showErrorNotification('שגיאה בטופס', 'סכום מתוכנן חייב להיות גדול מ-0');
-        return;
+        if (!formData.planned_amount || formData.planned_amount <= 0) {
+            showFieldError('addTradePlanPlannedAmount', 'סכום מתוכנן חייב להיות גדול מ-0');
+            showErrorNotification('שגיאה בטופס', 'סכום מתוכנן חייב להיות גדול מ-0');
+            return;
+        }
     }
 
     try {

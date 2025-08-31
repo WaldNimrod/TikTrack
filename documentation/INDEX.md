@@ -43,6 +43,9 @@ This index provides quick access to all documentation files in the TikTrack proj
 #### 💰 **Currencies** (`features/currencies/`)
 - [SUMMARY.md](features/currencies/SUMMARY.md) - Currency system summary
 
+#### 📋 **Trade Plans** (`features/trade_plans/`)
+- [README.md](features/trade_plans/README.md) - Trade plans system overview
+
 #### ⚙️ **Preferences** (`features/preferences/`)
 - [README.md](features/preferences/README.md) - Preferences system overview
 - [API.md](features/preferences/API.md) - Preferences API documentation

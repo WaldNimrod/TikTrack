@@ -229,10 +229,12 @@ function updateTradesTable(trades) {
         <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
           ${createLinkButton(`viewLinkedItemsForTrade(${trade.id})`)}
           ${createEditButton(`editTradeRecord('${trade.id}')`)}
-          ${trade.status === 'cancelled' || trade.status === 'canceled' ?
-        `<button class="btn btn-sm btn-cancel-disabled" disabled title="לא ניתן לבטל טרייד מבוטל"><span class="cancel-icon">X</span></button>` :
-        createButton('CANCEL', `cancelTradeRecord('${trade.id}')`)
-      }
+          ${window.uiUtils ? window.uiUtils.createCancelButton('trade', trade.id, trade.status, 'sm') : 
+            (trade.status === 'cancelled' || trade.status === 'canceled' ?
+              createButton('REACTIVATE', `reactivateTrade('${trade.id}')`) :
+              createButton('CANCEL', `cancelTradeRecord('${trade.id}')`)
+            )
+          }
           ${createDeleteButton(`deleteTradeRecord('${trade.id}')`)}
         </div>
       </td>
@@ -297,26 +299,31 @@ function editTradeRecord(tradeId) {
 }
 
 /**
- * ביטול טרייד - גרסה פשוטה
+ * ביטול טרייד - גרסה משופרת
  */
 async function cancelTradeRecord(tradeId) {
   try {
-    // בדיקה אם יש פריטים מקושרים לפני ביטול
-    if (typeof window.checkLinkedItemsBeforeDelete === 'function') {
-      const hasLinkedItems = await window.checkLinkedItemsBeforeDelete('trade', tradeId);
-      if (hasLinkedItems) {
-        return; // הפונקציה תטפל בהצגת המודול
+    // קבלת פרטי הטרייד לצורך הודעת האישור
+    let tradeDetails = '';
+    try {
+      const response = await fetch(`/api/v1/trades/${tradeId}`);
+      if (response.ok) {
+        const tradeData = await response.json();
+        const trade = tradeData.data;
+        tradeDetails = `\n\nפרטי הטרייד:\n• טיקר: ${trade.ticker_symbol || 'לא מוגדר'}\n• צד: ${trade.side || 'לא מוגדר'}\n• סטטוס: ${trade.status || 'לא מוגדר'}`;
       }
+    } catch (error) {
+      console.warn('לא ניתן לטעון פרטי טרייד:', error);
     }
 
     // אישור מהמשתמש באמצעות המערכת הגלובלית
     if (typeof window.showConfirmationDialog === 'function') {
       window.showConfirmationDialog(
         'ביטול טרייד',
-        'האם אתה בטוח שברצונך לבטל טרייד זה?',
+        `האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`,
         async () => {
-          // המשתמש אישר - ביצוע הביטול
-          await performTradeCancellation(tradeId);
+          // המשתמש אישר - בדיקת מקושרים ואז ביצוע הביטול
+          await checkLinkedItemsAndCancel(tradeId);
         },
         () => {
           // המשתמש ביטל - לא עושים כלום
@@ -324,14 +331,36 @@ async function cancelTradeRecord(tradeId) {
       );
     } else {
       // Fallback למקרה שהמערכת הגלובלית לא זמינה
-      if (!confirm('האם אתה בטוח שברצונך לבטל טרייד זה?')) {
+      if (!confirm(`האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`)) {
         return;
       }
-      await performTradeCancellation(tradeId);
+      await checkLinkedItemsAndCancel(tradeId);
     }
 
   } catch (error) {
     console.error('❌ שגיאה בביטול טרייד:', error);
+    window.showErrorNotification('שגיאה', error.message);
+  }
+}
+
+/**
+ * בדיקת מקושרים וביצוע ביטול
+ */
+async function checkLinkedItemsAndCancel(tradeId) {
+  try {
+    // בדיקה אם יש פריטים מקושרים לפני ביטול
+    if (typeof window.checkLinkedItemsBeforeCancel === 'function') {
+      const hasLinkedItems = await window.checkLinkedItemsBeforeCancel(tradeId);
+      if (hasLinkedItems) {
+        return; // הפונקציה תטפל בהצגת המודול
+      }
+    }
+
+    // אין מקושרים - ביצוע הביטול
+    await performTradeCancellation(tradeId);
+
+  } catch (error) {
+    console.error('❌ שגיאה בבדיקת מקושרים:', error);
     window.showErrorNotification('שגיאה', error.message);
   }
 }
@@ -372,7 +401,7 @@ async function deleteTradeRecord(tradeId) {
   try {
     // בדיקה אם יש פריטים מקושרים לפני מחיקה
     if (typeof window.checkLinkedItemsBeforeDelete === 'function') {
-      const hasLinkedItems = await window.checkLinkedItemsBeforeDelete('trade', tradeId);
+      const hasLinkedItems = await window.checkLinkedItemsBeforeDelete(tradeId);
       if (hasLinkedItems) {
         return; // הפונקציה תטפל בהצגת המודול
       }
@@ -456,10 +485,11 @@ async function showEditTradeModal(trade) {
     window.clearValidation('editTradeForm');
   }
 
-  // ניקוי סימון החזרה למצב מקורי
+  // ניקוי סימונים
   const tradePlanSelect = document.getElementById('editTradeTradePlanId');
   if (tradePlanSelect) {
     tradePlanSelect.removeAttribute('data-restored');
+    tradePlanSelect.removeAttribute('data-cleared');
   }
 
   // טעינת נתונים למודל עריכת טרייד
@@ -552,8 +582,9 @@ async function loadEditTradeModalData(trade) {
     const tradePlanSelect = document.getElementById('editTradeTradePlanId');
     if (tradePlanSelect) {
       tradePlanSelect.innerHTML = '<option value="">בחר תוכנית טרייד</option>';
-      // ניקוי סימון החזרה למצב מקורי
+      // ניקוי סימונים
       tradePlanSelect.removeAttribute('data-restored');
+      tradePlanSelect.removeAttribute('data-cleared');
       // לכלול גם תוכניות סגורות לעריכה
       const allPlans = tradePlans.data;
       allPlans.forEach(plan => {
@@ -609,25 +640,65 @@ async function loadEditTradeModalData(trade) {
         const editTradeNotes = document.getElementById('editTradeNotes');
         if (editTradeNotes) editTradeNotes.value = trade.notes || '';
 
-        // Set ticker display and ID
+        // Set ticker display and ID - הטרייד מקבל את הטיקר של התוכנית שלו
         const tickerDisplay = document.getElementById('editTradeTickerDisplay');
         const tickerIdInput = document.getElementById('editTradeTickerId');
+        
+        // אם יש תוכנית, הטרייד מקבל את הטיקר של התוכנית
+        let displayTickerSymbol = 'לא מוגדר';
+        let displayTickerId = '';
+        
+        if (trade.trade_plan_id) {
+          // חיפוש הטיקר של התוכנית
+          const tradePlanSelect = document.getElementById('editTradeTradePlanId');
+          if (tradePlanSelect) {
+            const selectedOption = tradePlanSelect.querySelector(`option[value="${trade.trade_plan_id}"]`);
+            if (selectedOption) {
+              const planTickerId = selectedOption.getAttribute('data-ticker-id');
+              const planTickerSymbol = selectedOption.getAttribute('data-ticker-symbol');
+              if (planTickerId && planTickerSymbol) {
+                displayTickerId = planTickerId;
+                displayTickerSymbol = planTickerSymbol;
+              }
+            }
+          }
+        }
+        
         if (tickerDisplay) {
-          tickerDisplay.textContent = trade.ticker_symbol || 'לא מוגדר';
+          tickerDisplay.textContent = displayTickerSymbol;
         }
         if (tickerIdInput) {
-          tickerIdInput.value = trade.ticker_id || '';
+          tickerIdInput.value = displayTickerId;
           
-          // טעינת מחיר נוכחי ושינוי יומי לטיקר הנוכחי
-          if (trade.ticker_id) {
-            updateEditTradePriceFromTicker(trade.ticker_id);
+          // טעינת מחיר נוכחי ושינוי יומי לטיקר
+          if (displayTickerId) {
+            updateEditTradePriceFromTicker(displayTickerId);
           }
         }
 
         // Set trade plan ID - חשוב מאוד!
         const tradePlanSelect = document.getElementById('editTradeTradePlanId');
         if (tradePlanSelect) {
-          tradePlanSelect.value = trade.trade_plan_id || '';
+          if (trade.trade_plan_id) {
+            const selectedOption = tradePlanSelect.querySelector(`option[value="${trade.trade_plan_id}"]`);
+            if (selectedOption) {
+              // התוכנית נמצאת ברשימה - הכל תקין
+              tradePlanSelect.value = trade.trade_plan_id;
+            } else {
+              // התוכנית לא נמצאת ברשימה (כנראה סגורה או מבוטלת)
+              console.warn('⚠️ Trade plan not found in list - clearing plan link');
+              tradePlanSelect.setAttribute('data-cleared', 'true');
+              tradePlanSelect.value = '';
+              
+              // הצגת הודעת אזהרה למשתמש
+              window.showErrorNotification(
+                'נתונים לא תקינים', 
+                'התוכנית המקושרת לטרייד לא נמצאת ברשימה. הקישור לתוכנית הוסר.'
+              );
+            }
+          } else {
+            tradePlanSelect.value = '';
+          }
         }
 
         // Set dates if they exist - שימוש ב-created_at במקום opened_at
@@ -739,6 +810,22 @@ async function saveEditTradeData() {
       ticker_symbol: document.getElementById('editTradeTickerDisplay').textContent
     };
 
+    // עדכון הטיקר לפי התוכנית הנבחרת
+    if (formData.trade_plan_id) {
+      const tradePlanSelect = document.getElementById('editTradeTradePlanId');
+      const selectedOption = tradePlanSelect.options[tradePlanSelect.selectedIndex];
+      
+      if (selectedOption) {
+        const planTickerId = selectedOption.getAttribute('data-ticker-id');
+        const planTickerSymbol = selectedOption.getAttribute('data-ticker-symbol');
+        
+        if (planTickerId && planTickerSymbol) {
+          formData.ticker_id = planTickerId;
+          formData.ticker_symbol = planTickerSymbol;
+        }
+      }
+    }
+
     // בדיקת שינוי תוכנית עם טיקר שונה - רק אם השדה באמת השתנה
     const originalTrade = window.currentEditTrade;
     const newTradePlanId = formData.trade_plan_id;
@@ -754,10 +841,10 @@ async function saveEditTradeData() {
       
       if (selectedOption) {
         const newTickerId = selectedOption.getAttribute('data-ticker-id');
-        const currentTickerId = formData.ticker_id;
+        const currentTickerId = originalTrade?.ticker_id;
         
         // בדיקה אם יש טיקר נוכחי והטיקר של התוכנית החדשה שונה
-        if (currentTickerId && newTickerId && newTickerId !== currentTickerId) {
+        if (currentTickerId && newTickerId && newTickerId !== currentTickerId.toString()) {
           // שינוי תוכנית עם טיקר שונה - לא נתמך
           window.showErrorNotification(
             'פיצר לא נתמך', 
@@ -777,6 +864,11 @@ async function saveEditTradeData() {
           return; // עצירת התהליך
         }
       }
+    }
+
+    // ניקוי סימון החזרה למצב מקורי
+    if (tradePlanSelect) {
+      tradePlanSelect.removeAttribute('data-restored');
     }
     
     // ניקוי הסימון אם השדה לא הוחזר
@@ -1272,11 +1364,14 @@ async function updateTickerFromTradePlan(tradePlanId) {
 
       // טעינת מחיר נוכחי ושינוי יומי מהשרת
       if (tickerId) {
+        console.log('🔍 טוען מחיר לטיקר ID:', tickerId);
         try {
           const tickerResponse = await fetch(`/api/v1/tickers/${tickerId}`);
+          console.log('🔍 תגובת API:', tickerResponse.status, tickerResponse.ok);
           if (tickerResponse.ok) {
             const tickerData = await tickerResponse.json();
             const ticker = tickerData.data;
+            console.log('🔍 נתוני טיקר:', ticker);
             
             // עדכון מחיר נוכחי
             const currentPriceElement = document.getElementById('addTradeCurrentPrice');
@@ -1567,9 +1662,10 @@ async function checkLinkedItemsBeforeDelete(tradeId) {
         const linkedItemsData = await response.json();
         const childEntities = linkedItemsData.child_entities || [];
         const parentEntities = linkedItemsData.parent_entities || [];
-        const allEntities = [...childEntities, ...parentEntities];
-
-        if (allEntities.length > 0) {
+        
+        // בדיקה רק אם יש פריטים שמקושרים אל הטרייד (child entities)
+        // parent entities הם פריטים שהטרייד מקושר אליהם (חשבון, טיקר, תוכנית) - לא רלוונטי למחיקה
+        if (childEntities.length > 0) {
             // יש פריטים מקושרים - הצגת חלון מקושרים
             if (typeof window.showLinkedItemsModal === 'function') {
                 window.showLinkedItemsModal(linkedItemsData, 'trade', tradeId);
@@ -1604,9 +1700,10 @@ async function checkLinkedItemsBeforeCancel(tradeId) {
         const linkedItemsData = await response.json();
         const childEntities = linkedItemsData.child_entities || [];
         const parentEntities = linkedItemsData.parent_entities || [];
-        const allEntities = [...childEntities, ...parentEntities];
-
-        if (allEntities.length > 0) {
+        
+        // בדיקה רק אם יש פריטים שמקושרים אל הטרייד (child entities)
+        // parent entities הם פריטים שהטרייד מקושר אליהם (חשבון, טיקר, תוכנית) - לא רלוונטי לביטול
+        if (childEntities.length > 0) {
             // יש פריטים מקושרים - הצגת חלון מקושרים
             if (typeof window.showLinkedItemsModal === 'function') {
                 window.showLinkedItemsModal(linkedItemsData, 'trade', tradeId);
@@ -1628,6 +1725,7 @@ async function checkLinkedItemsBeforeCancel(tradeId) {
 
 window.checkLinkedItemsBeforeDelete = checkLinkedItemsBeforeDelete;  // בדיקת אובייקטים מקושרים למחיקה
 window.checkLinkedItemsBeforeCancel = checkLinkedItemsBeforeCancel;  // בדיקת אובייקטים מקושרים לביטול
+window.checkLinkedItemsAndCancel = checkLinkedItemsAndCancel;  // בדיקת מקושרים וביצוע ביטול
 window.performTradeCancellation = performTradeCancellation;  // ביצוע ביטול
 
 // פונקציות מודלים:
@@ -2350,6 +2448,14 @@ async function updateEditTradeTickerFromPlan(tradePlanId) {
     return;
   }
 
+  // בדיקה אם השדה נוקה על ידי המערכת
+  const tradePlanSelect = document.getElementById('editTradeTradePlanId');
+  if (tradePlanSelect && tradePlanSelect.getAttribute('data-cleared') === 'true') {
+    // השדה נוקה על ידי המערכת - לא לבצע עדכון
+    tradePlanSelect.removeAttribute('data-cleared');
+    return;
+  }
+
   try {
     // קבלת פרטי התוכנית
     const response = await fetch(`/api/v1/trade_plans/${tradePlanId}`);
@@ -2360,12 +2466,14 @@ async function updateEditTradeTickerFromPlan(tradePlanId) {
     const tradePlan = await response.json();
     const plan = tradePlan.data;
 
-    // בדיקה אם הטיקר שונה מהנוכחי
-    const currentTickerId = document.getElementById('editTradeTickerId')?.value;
+    // בדיקה אם הטיקר שונה מהמקורי
     const originalTrade = window.currentEditTrade;
+    const originalTickerId = originalTrade?.ticker_id;
     
-    // בדיקה אם יש טיקר נוכחי והטיקר של התוכנית החדשה שונה
-    if (currentTickerId && plan.ticker_id && plan.ticker_id !== currentTickerId) {
+
+    
+    // בדיקה אם יש טיקר מקורי והטיקר של התוכנית החדשה שונה
+    if (originalTickerId && plan.ticker_id && plan.ticker_id.toString() !== originalTickerId.toString()) {
       // שינוי תוכנית עם טיקר שונה - לא נתמך
       window.showErrorNotification(
         'פיצר לא נתמך', 
@@ -2388,16 +2496,15 @@ async function updateEditTradeTickerFromPlan(tradePlanId) {
       return; // עצירת התהליך
     }
 
-    // עדכון שדות הטיקר - מותר אם הטיקר זהה או אם אין טיקר נוכחי
+    // עדכון שדות הטיקר - רק אם הטיקר זהה או אם אין טיקר נוכחי
     const tickerDisplay = document.getElementById('editTradeTickerDisplay');
     const tickerIdInput = document.getElementById('editTradeTickerId');
     
-    // עדכון הטיקר רק אם אין טיקר נוכחי (טרייד חדש)
-    if (!currentTickerId && tickerDisplay && plan.ticker_symbol) {
+    if (tickerDisplay && plan.ticker_symbol) {
       tickerDisplay.textContent = plan.ticker_symbol;
     }
     
-    if (!currentTickerId && tickerIdInput && plan.ticker_id) {
+    if (tickerIdInput && plan.ticker_id) {
       tickerIdInput.value = plan.ticker_id;
       
       // עדכון מחיר מהטיקר החדש

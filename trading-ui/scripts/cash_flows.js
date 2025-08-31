@@ -463,8 +463,15 @@ function clearEditValidationErrors() {
  * הצגת חלון אישור למחיקת תזרים מזומנים
  */
 function showDeleteCashFlowWarning(id) {
-    // בדיקה אם יש פריטים מקושרים
-    showLinkedItemsWarning('cash_flow', id);
+    // תזרימי מזומנים לא צריכים בדיקת מקושרים - אין להם ילדים
+    if (typeof window.showDeleteWarning === 'function') {
+        window.showDeleteWarning('cash_flow', id, 'תזרים מזומנים');
+    } else {
+        // Fallback למקרה שהמערכת הגלובלית לא זמינה
+        if (confirm('האם אתה בטוח שברצונך למחוק תזרים מזומנים זה?')) {
+            confirmDeleteCashFlow(id);
+        }
+    }
 }
 
 /**

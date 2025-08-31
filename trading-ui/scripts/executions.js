@@ -1195,15 +1195,8 @@ async function confirmDeleteExecution(id) {
         console.log('🔧 Got id from form:', id);
     }
 
-    // בדיקת פריטים מקושרים לפני מחיקה
-    if (typeof window.checkLinkedItemsBeforeDelete === 'function') {
-        console.log('🔧 Checking linked items before delete');
-        const hasLinkedItems = await window.checkLinkedItemsBeforeDelete('executions', id);
-        if (hasLinkedItems) {
-            console.log('🔧 Has linked items, returning');
-            return; // הפונקציה הגלובלית תטפל בהצגת המודל
-        }
-    }
+    // ביצועים לא צריכים בדיקת מקושרים - אין להם ילדים
+    console.log('🔧 Executions do not require linked items check - no children');
 
     try {
         console.log('🔧 Making DELETE request to:', `/api/v1/executions/${id}`);

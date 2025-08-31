@@ -8,9 +8,16 @@
  * 📖 דוקומנטציה מפורטת: VALIDATION_SYSTEM_DOCUMENTATION.md
  * 
  * קובץ: trading-ui/scripts/validation-utils.js
- * גרסה: 2.1
- * עדכון אחרון: אוגוסט 27, 2025
+ * גרסה: 2.2
+ * עדכון אחרון: אוגוסט 31, 2025
  * מחבר: TikTrack Development Team
+ * 
+ * תיקונים אחרונים (31 באוגוסט 2025):
+ * - תיקון פונקציות showFieldError, showFieldSuccess, clearFieldError, clearFieldValidation
+ * - תמיכה ב-ID מחרוזת או אלמנט DOM
+ * - בדיקת קיום אלמנט לפני פעולה
+ * - הוספת הודעות אזהרה לקונסול
+ * - שיפור תאימות עם קובץ trade_plans.js
  */
 
 // ===== קבועים =====
@@ -134,24 +141,41 @@ function showFieldError(input, message) {
  * הצגת הצלחה בשדה
  */
 function showFieldSuccess(input) {
+    // אם input הוא מחרוזת (ID), נקבל את האלמנט
+    const element = typeof input === 'string' ? document.getElementById(input) : input;
+    
+    // בדיקה שהאלמנט קיים
+    if (!element) {
+        console.warn(`showFieldSuccess: Element not found for input: ${input}`);
+        return;
+    }
+    
     // הסרת סימון קודם
-    input.classList.remove('is-invalid');
-    input.classList.add('is-valid');
+    element.classList.remove('is-invalid');
+    element.classList.add('is-valid');
     
     // הסרת הודעת שגיאה
-    const existingError = input.parentNode.querySelector('.invalid-feedback');
+    const existingError = element.parentNode.querySelector('.invalid-feedback');
     if (existingError) {
         existingError.remove();
     }
-    
-    }
+}
 
 /**
  * ניקוי שגיאה משדה
  */
 function clearFieldError(input) {
-    input.classList.remove('is-invalid');
-    const existingError = input.parentNode.querySelector('.invalid-feedback');
+    // אם input הוא מחרוזת (ID), נקבל את האלמנט
+    const element = typeof input === 'string' ? document.getElementById(input) : input;
+    
+    // בדיקה שהאלמנט קיים
+    if (!element) {
+        console.warn(`clearFieldError: Element not found for input: ${input}`);
+        return;
+    }
+    
+    element.classList.remove('is-invalid');
+    const existingError = element.parentNode.querySelector('.invalid-feedback');
     if (existingError) {
         existingError.remove();
     }
@@ -161,8 +185,17 @@ function clearFieldError(input) {
  * ניקוי ולידציה משדה
  */
 function clearFieldValidation(input) {
-    input.classList.remove('is-valid', 'is-invalid');
-    const existingError = input.parentNode.querySelector('.invalid-feedback');
+    // אם input הוא מחרוזת (ID), נקבל את האלמנט
+    const element = typeof input === 'string' ? document.getElementById(input) : input;
+    
+    // בדיקה שהאלמנט קיים
+    if (!element) {
+        console.warn(`clearFieldValidation: Element not found for input: ${input}`);
+        return;
+    }
+    
+    element.classList.remove('is-valid', 'is-invalid');
+    const existingError = element.parentNode.querySelector('.invalid-feedback');
     if (existingError) {
         existingError.remove();
     }

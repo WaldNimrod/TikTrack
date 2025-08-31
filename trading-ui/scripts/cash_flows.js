@@ -1447,8 +1447,6 @@ async function updateCashFlow() {
             external_id: externalIdValue || '0'
         };
 
-        .value);
-
         // בדיקת תקינות מקיפה
         if (window.validateForm) {
             if (!window.validateForm('editCashFlowForm')) {
@@ -1565,5 +1563,5 @@ window.setupSourceFieldListeners = setupSourceFieldListeners;
 window.initializeExternalIdFields = initializeExternalIdFields;
 window.showDeleteCashFlowWarning = showDeleteCashFlowWarning;
 window.showDeleteCashFlowModal = showDeleteCashFlowModal;
-window.showLinkedItemsWarning = showLinkedItemsWarning;
+// window.showLinkedItemsWarning = showLinkedItemsWarning; // הוחלף ב-showLinkedItemsModal
 window.checkLinkedItemsForCashFlow = checkLinkedItemsForCashFlow;

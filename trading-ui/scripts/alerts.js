@@ -341,17 +341,13 @@ function updateAlertsTable(alerts) {
       } else {
         switch (alert.related_type_id) {
           case 1: // חשבון
-            console.log(`🔍 Looking for account with ID: ${alert.related_id}`);
-            console.log(`🔍 Available accounts:`, accounts.map(a => ({ id: a.id, name: a.name || a.account_name })));
             const account = accounts.find(a => a.id === alert.related_id);
             if (account) {
               const name = account.name || account.account_name || 'לא מוגדר';
               const currency = account.currency || 'ILS';
               relatedDisplay = `${name} (${currency})`;
-              console.log(`✅ Found account: ${name} (${currency})`);
             } else {
               relatedDisplay = `חשבון ${alert.related_id}`;
-              console.log(`❌ Account not found for ID: ${alert.related_id}`);
             }
             relatedIcon = '🏦';
             relatedClass = 'related-account';

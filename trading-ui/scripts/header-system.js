@@ -3830,25 +3830,7 @@ function applySearchFilter(searchTerm) {
   }
 }
 
-/**
- * הפעלת פילטר טיפוס
- */
-function applyTypeFilter() {
-  // applyTypeFilter called
-
-  // איסוף כל סוגי ההשקעה הנבחרים
-  const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
-  const selectedTypes = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
-
-  // Selected types check
-
-  // הפעלת הפילטר הכללי
-  applyFilter('type', selectedTypes);
-
-  if (window.filterSystem) {
-  window.filterSystem.applyTypeFilter(selectedTypes);
-  }
-}
+// הפונקציה הוסרה - קיימת כבר בשורה 3775
 
 /**
  * הפעלת פילטר חשבון

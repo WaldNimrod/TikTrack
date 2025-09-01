@@ -4,20 +4,20 @@
  * ========================================
  * דף ההתראות - Alerts Page
  * ========================================
- * 
+ *
  * קובץ ייעודי לדף ההתראות (alerts.html) בלבד
- * 
+ *
  * Dependencies:
  * - table-mappings.js (for column mappings and sorting)
  * - main.js (global utilities and sorting functions)
  * - translation-utils.js (translation functions)
  * - alert-service.js (general alert service functions)
- * 
+ *
  * Table Mapping:
  * - Uses 'alerts' table type from table-mappings.js
  * - Column mappings are centralized in table-mappings.js
  * - Sorting uses global window.sortTableData() function
- * 
+ *
  * תכולת הקובץ:
  * - טעינת נתוני התראות מהשרת
  * - הצגת טבלת התראות עם מיון ופילטרים
@@ -25,18 +25,18 @@
  * - עריכת התראה קיימת (editAlert)
  * - ניהול סטטוסים ומצבי הפעלה
  * - שימוש במערכת התראות גלובלית
- * 
+ *
  * פונקציות שהועברו ל-alert-service.js:
  * - formatAlertCondition - פונקציה לתרגום תנאי התראה
  * - parseAlertCondition - פונקציה לפרסור תנאי התראה
  * - deleteAlert - פונקציה למחיקת התראה
- * 
+ *
  * מערכת התראות:
  * - כל הודעות המשתמש משתמשות במערכת ההתראות הגלובלית מ-main.js
  * - showSuccessNotification() - הודעות הצלחה
  * - showErrorNotification() - הודעות שגיאה
  * - showWarningNotification() - הודעות אזהרה
- * 
+ *
  * מחבר: Tik.track Development Team
  * תאריך עדכון אחרון: 2025
  * ========================================
@@ -48,44 +48,41 @@ let alertsData = [];
 // בדיקה שהפונקציות הגלובליות זמינות
 
 
-
-
 // נתוני דמה
 const demoAlerts = [
   {
     id: 1,
-    title: "התראה על מחיר AAPL",
-    type: "price_alert",
-    status: "open",
+    title: 'התראה על מחיר AAPL',
+    type: 'price_alert',
+    status: 'open',
     related_type_id: 4, // ticker
     related_id: 1,
-    condition: "מחיר > 210$",
-    message: "AAPL הגיע ליעד מחיר",
-    created_at: "2024-01-15",
-    is_triggered: false
+    condition: 'מחיר > 210$',
+    message: 'AAPL הגיע ליעד מחיר',
+    created_at: '2024-01-15',
+    is_triggered: false,
   },
   {
     id: 2,
-    title: "סטופ לוס TSLA",
-    type: "stop_loss",
-    status: "open",
+    title: 'סטופ לוס TSLA',
+    type: 'stop_loss',
+    status: 'open',
     related_type_id: 2, // trade
     related_id: 1,
-    condition: "מחיר < 690$",
-    message: "TSLA מתחת לסטופ",
-    created_at: "2024-01-14",
-    is_triggered: true
-  }
+    condition: 'מחיר < 690$',
+    message: 'TSLA מתחת לסטופ',
+    created_at: '2024-01-14',
+    is_triggered: true,
+  },
 ];
-
 
 
 /**
  * טעינת נתוני התראות מהשרת
- * 
+ *
  * פונקציה זו טוענת את כל ההתראות מהשרת ומעדכנת את הטבלה
  * אם השרת לא זמין, משתמשת בנתוני דמו
- * 
+ *
  * @returns {Array} מערך של התראות
  */
 async function loadAlertsData() {
@@ -112,7 +109,7 @@ async function loadAlertsData() {
       condition_number: alert.condition_number,
       message: alert.message,
       created_at: alert.created_at,
-      is_triggered: alert.is_triggered
+      is_triggered: alert.is_triggered,
     }));
 
     // עדכון הטבלה
@@ -159,11 +156,11 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
       const statusTranslations = {
         'פתוח': 'open',
         'סגור': 'closed',
-        'מבוטל': 'cancelled'
+        'מבוטל': 'cancelled',
       };
 
       const translatedSelectedStatuses = selectedStatuses.map(status =>
-        statusTranslations[status] || status
+        statusTranslations[status] || status,
       );
 
       const isMatch = translatedSelectedStatuses.includes(alert.status);
@@ -179,11 +176,11 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
         'התראה על מחיר': 'price_alert',
         'סטופ לוס': 'stop_loss',
         'התראה על נפח': 'volume_alert',
-        'התראה מותאמת': 'custom_alert'
+        'התראה מותאמת': 'custom_alert',
       };
 
       const translatedSelectedTypes = selectedTypes.map(type =>
-        typeTranslations[type] || type
+        typeTranslations[type] || type,
       );
 
       // הסרת פילטור לפי סוג התראה - השדה type הוסר
@@ -195,7 +192,7 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
   // Filtering by dates
   if (startDate && endDate) {
     filteredAlerts = filteredAlerts.filter(alert => {
-      if (!alert.created_at) return false;
+      if (!alert.created_at) {return false;}
 
       const alertDate = new Date(alert.created_at);
       const start = new Date(startDate);
@@ -232,7 +229,7 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
       'price_alert': 'price_alert',
       'stop_loss': 'stop_loss',
       'volume_alert': 'volume_alert',
-      'custom_alert': 'custom_alert'
+      'custom_alert': 'custom_alert',
     };
 
     // Creating an array of search terms including translations
@@ -253,22 +250,22 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
     filteredAlerts = filteredAlerts.filter(alert => {
       // Searching in all relevant fields
       const titleMatch = alert.title && searchTerms.some(term =>
-        alert.title.toLowerCase().includes(term)
+        alert.title.toLowerCase().includes(term),
       );
 
       // הסרת חיפוש לפי סוג התראה - השדה type הוסר
       const typeMatch = false;
 
       const statusMatch = alert.status && searchTerms.some(term =>
-        alert.status.toLowerCase().includes(term)
+        alert.status.toLowerCase().includes(term),
       );
 
       const conditionMatch = alert.condition && searchTerms.some(term =>
-        alert.condition.toLowerCase().includes(term)
+        alert.condition.toLowerCase().includes(term),
       );
 
       const messageMatch = alert.message && searchTerms.some(term =>
-        alert.message.toLowerCase().includes(term)
+        alert.message.toLowerCase().includes(term),
       );
 
       const isMatch = titleMatch || typeMatch || statusMatch || conditionMatch || messageMatch;
@@ -282,10 +279,10 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
 
 /**
  * עדכון טבלת התראות
- * 
+ *
  * פונקציה זו מעדכנת את הטבלה עם הנתונים החדשים
  * כולל המרת ערכים לעברית ועיצוב תאים
- * 
+ *
  * @param {Array} alerts - מערך של התראות לעדכון
  */
 function updateAlertsTable(alerts) {
@@ -308,7 +305,7 @@ function updateAlertsTable(alerts) {
         fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
         fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
         fetch('/api/v1/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
-        fetch('/api/v1/tickers/').then(r => r.json()).catch(() => ({ data: [] }))
+        fetch('/api/v1/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
       ]);
 
       accounts = (accountsResponse.data || accountsResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
@@ -339,14 +336,14 @@ function updateAlertsTable(alerts) {
         id: alert.id,
         related_type_id: alert.related_type_id,
         related_id: alert.related_id,
-        status: alert.status
+        status: alert.status,
       });
-    
+
       console.log('📊 Related data counts:', {
         accounts: accounts.length,
         trades: trades.length,
         tradePlans: tradePlans.length,
-        tickers: tickers.length
+        tickers: tickers.length,
       });
 
       // טיפול במקרים שבהם related_type_id הוא null
@@ -354,80 +351,80 @@ function updateAlertsTable(alerts) {
         relatedDisplay = 'כללי';
         relatedIcon = '🌐';
         relatedClass = 'related-general';
-      
+
       } else {
         switch (alert.related_type_id) {
-          case 1: // חשבון
-            console.log(`🔍 Looking for account with ID: ${alert.related_id}`);
-            console.log(`🔍 Available accounts:`, accounts.map(a => ({ id: a.id, name: a.name || a.account_name })));
-            const account = accounts.find(a => a.id === alert.related_id);
-            if (account) {
-              const name = account.name || account.account_name || 'לא מוגדר';
-              const currency = account.currency || 'ILS';
-              relatedDisplay = `${name} (${currency})`;
-              console.log(`✅ Found account: ${name} (${currency})`);
-            } else {
-              relatedDisplay = `חשבון ${alert.related_id}`;
-              console.log(`❌ Account not found for ID: ${alert.related_id}`);
-            }
-            relatedIcon = '🏦';
-            relatedClass = 'related-account';
-            break;
-          case 2: // טרייד
-            console.log(`🔍 Looking for trade with ID: ${alert.related_id}`);
-            console.log(`🔍 Available trades:`, trades.map(t => ({ id: t.id, created_at: t.created_at, date: t.date, side: t.side, investment_type: t.investment_type })));
-            const trade = trades.find(t => t.id === alert.related_id);
-            if (trade) {
-              const date = trade.created_at || trade.date;
-              const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
-              const side = trade.side || 'לא מוגדר';
-              const investmentType = trade.investment_type || 'לא מוגדר';
-              relatedDisplay = `טרייד | ${side} | ${investmentType} | ${formattedDate}`;
-              console.log(`✅ Found trade: ${relatedDisplay}`);
-            } else {
-              relatedDisplay = `טרייד ${alert.related_id}`;
-              console.log(`❌ Trade not found for ID: ${alert.related_id}`);
-            }
-            relatedIcon = '📈';
-            relatedClass = 'related-trade';
-            break;
-          case 3: // תוכנית
-            console.log(`🔍 Looking for trade plan with ID: ${alert.related_id}`);
-            console.log(`🔍 Available trade plans:`, tradePlans.map(p => ({ id: p.id, created_at: p.created_at, date: p.date, side: p.side, investment_type: p.investment_type })));
-            const plan = tradePlans.find(p => p.id === alert.related_id);
-            if (plan) {
-              const date = plan.created_at || plan.date;
-              const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
-              const side = plan.side || 'לא מוגדר';
-              const investmentType = plan.investment_type || 'לא מוגדר';
-              relatedDisplay = `תוכנית | ${side} | ${investmentType} | ${formattedDate}`;
-              console.log(`✅ Found trade plan: ${relatedDisplay}`);
-            } else {
-              relatedDisplay = `תוכנית ${alert.related_id}`;
-              console.log(`❌ Trade plan not found for ID: ${alert.related_id}`);
-            }
-            relatedIcon = '📋';
-            relatedClass = 'related-plan';
-            break;
-          case 4: // טיקר
-            console.log(`🔍 Looking for ticker with ID: ${alert.related_id}`);
-            console.log(`🔍 Available tickers:`, tickers.map(t => ({ id: t.id, symbol: t.symbol })));
-            const ticker = tickers.find(t => t.id === alert.related_id);
-            if (ticker) {
-              relatedDisplay = ticker.symbol;
-              console.log(`✅ Found ticker: ${ticker.symbol}`);
-            } else {
-              relatedDisplay = `טיקר ${alert.related_id}`;
-              console.log(`❌ Ticker not found for ID: ${alert.related_id}`);
-            }
-            relatedIcon = '📊';
-            relatedClass = 'related-ticker';
-            break;
-          default:
-            relatedDisplay = `אובייקט ${alert.related_id}`;
-            relatedIcon = '❓';
-            relatedClass = 'related-other';
-            console.log(`❓ Unknown related_type_id: ${alert.related_type_id}`);
+        case 1: // חשבון
+          console.log(`🔍 Looking for account with ID: ${alert.related_id}`);
+          console.log('🔍 Available accounts:', accounts.map(a => ({ id: a.id, name: a.name || a.account_name })));
+          const account = accounts.find(a => a.id === alert.related_id);
+          if (account) {
+            const name = account.name || account.account_name || 'לא מוגדר';
+            const currency = account.currency || 'ILS';
+            relatedDisplay = `${name} (${currency})`;
+            console.log(`✅ Found account: ${name} (${currency})`);
+          } else {
+            relatedDisplay = `חשבון ${alert.related_id}`;
+            console.log(`❌ Account not found for ID: ${alert.related_id}`);
+          }
+          relatedIcon = '🏦';
+          relatedClass = 'related-account';
+          break;
+        case 2: // טרייד
+          console.log(`🔍 Looking for trade with ID: ${alert.related_id}`);
+          console.log('🔍 Available trades:', trades.map(t => ({ id: t.id, created_at: t.created_at, date: t.date, side: t.side, investment_type: t.investment_type })));
+          const trade = trades.find(t => t.id === alert.related_id);
+          if (trade) {
+            const date = trade.created_at || trade.date;
+            const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+            const side = trade.side || 'לא מוגדר';
+            const investmentType = trade.investment_type || 'לא מוגדר';
+            relatedDisplay = `טרייד | ${side} | ${investmentType} | ${formattedDate}`;
+            console.log(`✅ Found trade: ${relatedDisplay}`);
+          } else {
+            relatedDisplay = `טרייד ${alert.related_id}`;
+            console.log(`❌ Trade not found for ID: ${alert.related_id}`);
+          }
+          relatedIcon = '📈';
+          relatedClass = 'related-trade';
+          break;
+        case 3: // תוכנית
+          console.log(`🔍 Looking for trade plan with ID: ${alert.related_id}`);
+          console.log('🔍 Available trade plans:', tradePlans.map(p => ({ id: p.id, created_at: p.created_at, date: p.date, side: p.side, investment_type: p.investment_type })));
+          const plan = tradePlans.find(p => p.id === alert.related_id);
+          if (plan) {
+            const date = plan.created_at || plan.date;
+            const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+            const side = plan.side || 'לא מוגדר';
+            const investmentType = plan.investment_type || 'לא מוגדר';
+            relatedDisplay = `תוכנית | ${side} | ${investmentType} | ${formattedDate}`;
+            console.log(`✅ Found trade plan: ${relatedDisplay}`);
+          } else {
+            relatedDisplay = `תוכנית ${alert.related_id}`;
+            console.log(`❌ Trade plan not found for ID: ${alert.related_id}`);
+          }
+          relatedIcon = '📋';
+          relatedClass = 'related-plan';
+          break;
+        case 4: // טיקר
+          console.log(`🔍 Looking for ticker with ID: ${alert.related_id}`);
+          console.log('🔍 Available tickers:', tickers.map(t => ({ id: t.id, symbol: t.symbol })));
+          const ticker = tickers.find(t => t.id === alert.related_id);
+          if (ticker) {
+            relatedDisplay = ticker.symbol;
+            console.log(`✅ Found ticker: ${ticker.symbol}`);
+          } else {
+            relatedDisplay = `טיקר ${alert.related_id}`;
+            console.log(`❌ Ticker not found for ID: ${alert.related_id}`);
+          }
+          relatedIcon = '📊';
+          relatedClass = 'related-ticker';
+          break;
+        default:
+          relatedDisplay = `אובייקט ${alert.related_id}`;
+          relatedIcon = '❓';
+          relatedClass = 'related-other';
+          console.log(`❓ Unknown related_type_id: ${alert.related_type_id}`);
         }
       }
 
@@ -464,19 +461,18 @@ function updateAlertsTable(alerts) {
       const createdAt = alert.created_at ? new Date(alert.created_at).toLocaleDateString('he-IL', {
         year: 'numeric',
         month: '2-digit',
-        day: '2-digit'
+        day: '2-digit',
       }) : 'לא מוגדר';
 
       // המרת סטטוס לעברית להצגה
       // לפי הדוקומנטציה: open=פעיל, closed=הופעל, cancelled=בוטל
       let statusDisplay;
       switch (alert.status) {
-        case 'open': statusDisplay = 'פתוח'; break;
-        case 'closed': statusDisplay = 'סגור'; break;
-        case 'cancelled': statusDisplay = 'מבוטל'; break;
-        default: statusDisplay = alert.status;
+      case 'open': statusDisplay = 'פתוח'; break;
+      case 'closed': statusDisplay = 'סגור'; break;
+      case 'cancelled': statusDisplay = 'מבוטל'; break;
+      default: statusDisplay = alert.status;
       }
-
 
 
       // המרת מצב הפעלה לעברית להצגה
@@ -504,11 +500,11 @@ function updateAlertsTable(alerts) {
             <span class="symbol-text">${symbolDisplay}</span>
           </td>
           <td><span class="condition-text">${(() => {
-          if (alert.condition_attribute && alert.condition_operator && alert.condition_number && window.translateConditionFields) {
-            return window.translateConditionFields(alert.condition_attribute, alert.condition_operator, alert.condition_number);
-          }
-          return alert.condition || '-';
-        })()}</span></td>
+    if (alert.condition_attribute && alert.condition_operator && alert.condition_number && window.translateConditionFields) {
+      return window.translateConditionFields(alert.condition_attribute, alert.condition_operator, alert.condition_number);
+    }
+    return alert.condition || '-';
+  })()}</span></td>
           <td class="status-cell" data-status="${alert.status || ''}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
           <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
           <td style="padding: 0;">
@@ -577,7 +573,6 @@ function updatePageSummaryStats() {
 }
 
 
-
 /**
  * הצגת מודל הוספת התראה
  */
@@ -621,7 +616,7 @@ function showAddAlertModal() {
     if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
       const modal = new bootstrap.Modal(modalElement, {
         backdrop: 'static',
-        keyboard: false
+        keyboard: false,
       });
       modal.show();
 
@@ -667,7 +662,7 @@ function clearAlertValidation() {
     'conditionAttribute',
     'conditionOperator',
     'conditionNumber',
-    'alertMessage'
+    'alertMessage',
   ];
 
   addFormFields.forEach(fieldId => {
@@ -686,7 +681,7 @@ function clearAlertValidation() {
     'editConditionAttribute',
     'editConditionOperator',
     'editConditionNumber',
-    'editAlertMessage'
+    'editAlertMessage',
   ];
 
   editFormFields.forEach(fieldId => {
@@ -711,18 +706,18 @@ async function loadModalData() {
       fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
       fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
       fetch('/api/v1/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/tickers/').then(r => r.json()).catch(() => ({ data: [] }))
+      fetch('/api/v1/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
     ]);
 
     // וידוא שהנתונים הם מערכים
-    const accounts = Array.isArray(accountsResponse?.data) ? accountsResponse.data : 
-                   Array.isArray(accountsResponse) ? accountsResponse : [];
-    const trades = Array.isArray(tradesResponse?.data) ? tradesResponse.data : 
-                  Array.isArray(tradesResponse) ? tradesResponse : [];
-    const tradePlans = Array.isArray(tradePlansResponse?.data) ? tradePlansResponse.data : 
-                      Array.isArray(tradePlansResponse) ? tradePlansResponse : [];
-    const tickers = Array.isArray(tickersResponse?.data) ? tickersResponse.data : 
-                   Array.isArray(tickersResponse) ? tickersResponse : [];
+    const accounts = Array.isArray(accountsResponse?.data) ? accountsResponse.data :
+      Array.isArray(accountsResponse) ? accountsResponse : [];
+    const trades = Array.isArray(tradesResponse?.data) ? tradesResponse.data :
+      Array.isArray(tradesResponse) ? tradesResponse : [];
+    const tradePlans = Array.isArray(tradePlansResponse?.data) ? tradePlansResponse.data :
+      Array.isArray(tradePlansResponse) ? tradePlansResponse : [];
+    const tickers = Array.isArray(tickersResponse?.data) ? tickersResponse.data :
+      Array.isArray(tickersResponse) ? tickersResponse : [];
 
     console.log('🔧 Modal data loaded:');
     console.log('🔧 Accounts:', accounts.length);
@@ -909,7 +904,6 @@ function closeModal(modalId) {
 }
 
 
-
 /**
  * טיפול בשינוי סוג שיוך
  * @param {HTMLInputElement} radioElement - אלמנט הרדיו שנבחר
@@ -943,7 +937,6 @@ function onRelatedObjectChange(selectElement) {
     disableConditionFields();
   }
 }
-
 
 
 /**
@@ -1010,28 +1003,28 @@ function disableConditionFields() {
  */
 function populateRelatedObjects(relationTypeId) {
   const selectElement = document.getElementById('alertRelatedObjectSelect');
-  if (!selectElement) return;
+  if (!selectElement) {return;}
 
   // ניקוי הרשימה
   selectElement.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
 
   // מילוי לפי סוג השיוך
   switch (relationTypeId) {
-    case 1: // חשבון
-      populateSelect('alertRelatedObjectSelect', window.accountsData || [], 'name', 'חשבון');
-      break;
+  case 1: // חשבון
+    populateSelect('alertRelatedObjectSelect', window.accountsData || [], 'name', 'חשבון');
+    break;
 
-    case 2: // טרייד
-      populateSelect('alertRelatedObjectSelect', window.tradesData || [], 'id', 'טרייד');
-      break;
+  case 2: // טרייד
+    populateSelect('alertRelatedObjectSelect', window.tradesData || [], 'id', 'טרייד');
+    break;
 
-    case 3: // תכנון טרייד
-      populateSelect('alertRelatedObjectSelect', window.tradePlansData || [], 'id', 'תכנון');
-      break;
+  case 3: // תכנון טרייד
+    populateSelect('alertRelatedObjectSelect', window.tradePlansData || [], 'id', 'תכנון');
+    break;
 
-    case 4: // טיקר
-      populateSelect('alertRelatedObjectSelect', window.tickersData || [], 'symbol', '');
-      break;
+  case 4: // טיקר
+    populateSelect('alertRelatedObjectSelect', window.tickersData || [], 'symbol', '');
+    break;
   }
 }
 
@@ -1041,28 +1034,28 @@ function populateRelatedObjects(relationTypeId) {
  */
 function populateEditRelatedObjects(relationTypeId) {
   const selectElement = document.getElementById('editAlertRelatedObjectSelect');
-  if (!selectElement) return;
+  if (!selectElement) {return;}
 
   // ניקוי הרשימה
   selectElement.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
 
   // מילוי לפי סוג השיוך
   switch (relationTypeId) {
-    case 1: // חשבון
-      populateSelect('editAlertRelatedObjectSelect', window.accountsData || [], 'name', 'חשבון');
-      break;
+  case 1: // חשבון
+    populateSelect('editAlertRelatedObjectSelect', window.accountsData || [], 'name', 'חשבון');
+    break;
 
-    case 2: // טרייד
-      populateSelect('editAlertRelatedObjectSelect', window.tradesData || [], 'id', 'טרייד');
-      break;
+  case 2: // טרייד
+    populateSelect('editAlertRelatedObjectSelect', window.tradesData || [], 'id', 'טרייד');
+    break;
 
-    case 3: // תכנון טרייד
-      populateSelect('editAlertRelatedObjectSelect', window.tradePlansData || [], 'id', 'תכנון');
-      break;
+  case 3: // תכנון טרייד
+    populateSelect('editAlertRelatedObjectSelect', window.tradePlansData || [], 'id', 'תכנון');
+    break;
 
-    case 4: // טיקר
-      populateSelect('editAlertRelatedObjectSelect', window.tickersData || [], 'symbol', '');
-      break;
+  case 4: // טיקר
+    populateSelect('editAlertRelatedObjectSelect', window.tickersData || [], 'symbol', '');
+    break;
   }
 }
 
@@ -1153,10 +1146,10 @@ function disableEditConditionFields() {
 
 /**
  * בדיקת משתנה התראה
- * 
+ *
  * פונקציה זו בודקת אם המשתנה שנבחר נתמך
  * כרגע נתמך רק 'price' (מחיר)
- * 
+ *
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
  * @returns {boolean} true אם נתמך, false אם לא
  */
@@ -1179,10 +1172,10 @@ function checkAlertVariable(selectElement) {
 
 /**
  * בדיקת אופרטור התראה
- * 
+ *
  * פונקציה זו בודקת אם האופרטור שנבחר נתמך
  * כרגע נתמכים רק 'greater_than' ו-'less_than'
- * 
+ *
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
  * @returns {boolean} true אם נתמך, false אם לא
  */
@@ -1205,10 +1198,10 @@ function checkAlertOperator(selectElement) {
 
 /**
  * בניית מחרוזת תנאי התראה
- * 
+ *
  * פונקציה זו בונה מחרוזת תנאי מהמשתנה, האופרטור והערך
  * המחרוזת נשמרת בפורמט: "variable|operator|value"
- * 
+ *
  * @param {string} variable - המשתנה (price, daily_change, etc.)
  * @param {string} operator - האופרטור (greater_than, less_than, etc.)
  * @param {string} value - הערך
@@ -1220,9 +1213,9 @@ function buildAlertCondition(variable, operator, value) {
 
 /**
  * פירוק מחרוזת תנאי התראה
- * 
+ *
  * פונקציה זו מפרקת מחרוזת תנאי למשתנה, אופרטור וערך
- * 
+ *
  * @param {string} condition - מחרוזת התנאי בפורמט "variable|operator|value"
  * @returns {object} אובייקט עם variable, operator, value
  */
@@ -1235,13 +1228,13 @@ function parseAlertCondition(condition) {
   return {
     variable: parts[0] || 'price',
     operator: parts[1] || 'moreThen',
-    value: parts[2] || ''
+    value: parts[2] || '',
   };
 }
 
 /**
  * שמירת התראה חדשה
- * 
+ *
  * פונקציה זו אוספת נתונים מהטופס ושולחת אותם לשרת
  * כולל בדיקת תקינות וטיפול בשגיאות
  * משתמשת במערכת ההתראות הגלובלית להודעות
@@ -1252,7 +1245,6 @@ async function saveAlert() {
     console.warn('⚠️ Form element not found - skipping save operation');
     return;
   }
-
 
 
   // בדיקת תקינות הטופס
@@ -1372,7 +1364,7 @@ async function saveAlert() {
     condition_number: conditionNumber,
     message: document.getElementById('alertMessage').value || null,
     status: 'open',
-    is_triggered: 'false'
+    is_triggered: 'false',
   };
 
   // שולח התראה חדשה
@@ -1388,7 +1380,7 @@ async function saveAlert() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(alertData)
+      body: JSON.stringify(alertData),
     });
 
     console.log('🔧 Response status:', response.status);
@@ -1425,10 +1417,10 @@ async function saveAlert() {
 
 /**
  * עריכת התראה
- * 
+ *
  * פונקציה זו פותחת את מודל העריכה עם הנתונים של ההתראה הנבחרת
  * כולל טעינת נתונים מקושרים (חשבונות, טריידים, תכנונים, טיקרים)
- * 
+ *
  * @param {number} alertId - מזהה ההתראה לעריכה
  */
 function editAlert(alertId) {
@@ -1454,26 +1446,25 @@ function editAlert(alertId) {
   const editAlertIsTriggered = document.getElementById('editAlertIsTriggered');
   const editAlertState = document.getElementById('editAlertState');
 
-  if (editAlertId) editAlertId.value = alert.id;
+  if (editAlertId) {editAlertId.value = alert.id;}
 
 
-
-  if (editAlertMessage) editAlertMessage.value = alert.message || '';
-  if (editAlertStatus) editAlertStatus.value = alert.status || 'open';
-  if (editAlertIsTriggered) editAlertIsTriggered.value = alert.is_triggered || 'false';
+  if (editAlertMessage) {editAlertMessage.value = alert.message || '';}
+  if (editAlertStatus) {editAlertStatus.value = alert.status || 'open';}
+  if (editAlertIsTriggered) {editAlertIsTriggered.value = alert.is_triggered || 'false';}
 
   // מילוי תנאי התראה
   const editConditionAttribute = document.getElementById('editConditionAttribute');
   const editConditionOperator = document.getElementById('editConditionOperator');
   const editConditionNumber = document.getElementById('editConditionNumber');
 
-  if (editConditionAttribute) editConditionAttribute.value = alert.condition_attribute || 'price';
-  if (editConditionOperator) editConditionOperator.value = alert.condition_operator || 'more_than';
-  if (editConditionNumber) editConditionNumber.value = alert.condition_number || '0';
+  if (editConditionAttribute) {editConditionAttribute.value = alert.condition_attribute || 'price';}
+  if (editConditionOperator) {editConditionOperator.value = alert.condition_operator || 'more_than';}
+  if (editConditionNumber) {editConditionNumber.value = alert.condition_number || '0';}
 
   // קביעת המצב הנכון לפי status ו-is_triggered
   const currentState = getAlertState(alert.status, alert.is_triggered);
-  if (editAlertState) editAlertState.value = currentState;
+  if (editAlertState) {editAlertState.value = currentState;}
 
   // בחירת סוג הקשר
   const relationType = alert.related_type_id;
@@ -1526,7 +1517,7 @@ function editAlert(alertId) {
     if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
       const modal = new bootstrap.Modal(modalElement, {
         backdrop: 'static',
-        keyboard: false
+        keyboard: false,
       });
       modal.show();
 
@@ -1563,10 +1554,10 @@ function editAlert(alertId) {
 
 /**
  * קביעת מצב התראה לפי status ו-is_triggered
- * 
+ *
  * פונקציה זו ממירה את שילוב status ו-is_triggered למצב עברי
  * משמשת למילוי המודל בעריכת התראה
- * 
+ *
  * @param {string} status - סטטוס ההתראה (open, closed, cancelled)
  * @param {string} isTriggered - מצב הפעלה (false, new, true)
  * @returns {string} מצב ההתראה בעברית (new, active, unread, read, cancelled)
@@ -1594,16 +1585,16 @@ function getAlertState(status, isTriggered) {
 
 /**
  * בדיקת תקינות שילוב status ו-is_triggered
- * 
+ *
  * פונקציה זו בודקת שהשילוב בין status ו-is_triggered תקין
  * לפי הדוקומנטציה של מערכת ההתראות
- * 
+ *
  * כללים תקינים:
  * - status='open' + is_triggered='false' - חדש
  * - status='closed' + is_triggered='new' - לא נקרא
  * - status='closed' + is_triggered='true' - נקרא
  * - status='cancelled' + is_triggered='false' - מבוטל
- * 
+ *
  * @param {string} status - סטטוס ההתראה
  * @param {string} isTriggered - מצב הפעלה
  * @returns {boolean} true אם השילוב תקין, false אחרת
@@ -1611,7 +1602,7 @@ function getAlertState(status, isTriggered) {
 function validateAlertStatusCombination(status, isTriggered) {
   // כללים לפי הדוקומנטציה:
   // 1. status='open' + is_triggered='false' - תקין
-  // 2. status='closed' + is_triggered='new' - תקין  
+  // 2. status='closed' + is_triggered='new' - תקין
   // 3. status='closed' + is_triggered='true' - תקין
   // 4. status='cancelled' + is_triggered='false' - תקין (תוקן!)
 
@@ -1630,10 +1621,10 @@ function validateAlertStatusCombination(status, isTriggered) {
 
 /**
  * עדכון status ו-is_triggered בהתאם למצב הנבחר
- * 
+ *
  * פונקציה זו מעדכנת את השדות הנסתרים status ו-is_triggered
  * בהתאם למצב שנבחר ב-select של מצב ההתראה
- * 
+ *
  * מצבים:
  * - new: status='open', is_triggered='false'
  * - active: status='open', is_triggered=שמירה על הערך הנוכחי
@@ -1646,43 +1637,43 @@ function updateStatusAndTriggered() {
   const statusHidden = document.getElementById('editAlertStatus');
   const triggeredHidden = document.getElementById('editAlertIsTriggered');
 
-  if (!stateSelect || !statusHidden || !triggeredHidden) return;
+  if (!stateSelect || !statusHidden || !triggeredHidden) {return;}
 
   const state = stateSelect.value;
   const currentTriggered = triggeredHidden.value; // שמירת הערך הנוכחי
 
   // מיפוי המצב לערכי status ו-is_triggered
   switch (state) {
-    case 'new':
-      statusHidden.value = 'open';
-      triggeredHidden.value = 'false';
-      break;
-    case 'active':
-      statusHidden.value = 'open';
-      // שמירה על הערך הנוכחי של is_triggered
-      triggeredHidden.value = currentTriggered;
-      break;
-    case 'unread':
-      statusHidden.value = 'closed';
-      triggeredHidden.value = 'new';
-      break;
-    case 'read':
-      statusHidden.value = 'closed';
-      triggeredHidden.value = 'true';
-      break;
-    case 'cancelled':
-      statusHidden.value = 'cancelled';
-      triggeredHidden.value = 'false';
-      break;
-    default:
-      statusHidden.value = 'open';
-      triggeredHidden.value = 'false';
+  case 'new':
+    statusHidden.value = 'open';
+    triggeredHidden.value = 'false';
+    break;
+  case 'active':
+    statusHidden.value = 'open';
+    // שמירה על הערך הנוכחי של is_triggered
+    triggeredHidden.value = currentTriggered;
+    break;
+  case 'unread':
+    statusHidden.value = 'closed';
+    triggeredHidden.value = 'new';
+    break;
+  case 'read':
+    statusHidden.value = 'closed';
+    triggeredHidden.value = 'true';
+    break;
+  case 'cancelled':
+    statusHidden.value = 'cancelled';
+    triggeredHidden.value = 'false';
+    break;
+  default:
+    statusHidden.value = 'open';
+    triggeredHidden.value = 'false';
   }
 }
 
 /**
  * עדכון התראה קיימת
- * 
+ *
  * פונקציה זו מעדכנת התראה קיימת עם הנתונים החדשים מהטופס
  * כולל בדיקת תקינות, אימות שילוב סטטוס/הפעלה, ושליחה לשרת
  * משתמשת במערכת ההתראות הגלובלית להודעות
@@ -1693,7 +1684,6 @@ async function updateAlert() {
     console.warn('⚠️ Form element not found - skipping update operation');
     return;
   }
-
 
 
   // עדכון status ו-is_triggered לפי המצב הנבחר
@@ -1809,7 +1799,7 @@ async function updateAlert() {
     condition_number: conditionNumber,
     message: document.getElementById('editAlertMessage').value || null,
     status: document.getElementById('editAlertStatus').value,
-    is_triggered: document.getElementById('editAlertIsTriggered').value
+    is_triggered: document.getElementById('editAlertIsTriggered').value,
   };
 
   // מעדכן התראה
@@ -1825,7 +1815,7 @@ async function updateAlert() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(alertData)
+      body: JSON.stringify(alertData),
     });
 
     if (response.ok) {
@@ -1873,7 +1863,7 @@ async function deleteAlert(alertId) {
         },
         () => {
           console.log('מחיקה בוטלה');
-        }
+        },
       );
     } else {
       // fallback אחרון - confirm רגיל
@@ -1894,11 +1884,11 @@ async function confirmDeleteAlert(alertId) {
 
   try {
     const response = await fetch(`/api/v1/alerts/${alertId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
     });
 
     const result = await response.json();
-    
+
     if (response.ok && result.status === 'success') {
       console.log('✅ התראה נמחקה בהצלחה');
       if (window.showSuccessNotification) {
@@ -1907,11 +1897,11 @@ async function confirmDeleteAlert(alertId) {
       loadAlertsData();
     } else {
       console.error('❌ שגיאה במחיקת התראה:', result);
-      
+
       // טיפול בשגיאות מהשרת
       if (result.error && result.error.message) {
         const serverMessage = result.error.message;
-        
+
         if (serverMessage.includes('has linked items')) {
           if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה במחיקה', 'לא ניתן למחוק התראה זו - יש פריטים מקושרים אליה');
@@ -1937,15 +1927,15 @@ async function confirmDeleteAlert(alertId) {
 
 /**
  * פונקציה לסידור טבלת התראות
- * 
+ *
  * פונקציה זו מטפלת בסידור טבלת ההתראות לפי עמודה
  * משתמשת ב-sortTableData הגלובלית
- * 
+ *
  * דוגמאות שימוש:
  * sortTable(0); // סידור לפי עמודת סימבול
  * sortTable(1); // סידור לפי עמודת אובייקט משיוך
  * sortTable(7); // סידור לפי עמודת תאריך יצירה
- * 
+ *
  * @param {number} columnIndex - אינדקס העמודה לסידור
  * @requires window.sortTableData - פונקציה גלובלית מ-main.js
  * @requires updateAlertsTable - פונקציה לעדכון הטבלה
@@ -1959,7 +1949,7 @@ function sortTable(columnIndex) {
       columnIndex,
       window.filteredAlertsData || alertsData,
       'alerts',
-      updateAlertsTable
+      updateAlertsTable,
     );
   } else {
     console.error('❌ sortTableData function not found in tables.js');
@@ -1971,39 +1961,37 @@ function sortTable(columnIndex) {
  */
 function getStatusClass(status) {
   switch (status) {
-    case 'open': return 'status-open';
-    case 'closed': return 'status-closed';
-    case 'cancelled': return 'status-cancelled';
-    default: return 'status-cancelled';
+  case 'open': return 'status-open';
+  case 'closed': return 'status-closed';
+  case 'cancelled': return 'status-cancelled';
+  default: return 'status-cancelled';
   }
 }
 
 
-
 /**
  * קבלת מחלקת CSS לאובייקט מקושר
- * 
+ *
  * פונקציה זו מחזירה את שם המחלקה CSS המתאימה לסוג האובייקט המקושר
  * משמשת לעיצוב התאים בטבלה
- * 
+ *
  * @param {number} relatedType - מזהה סוג האובייקט (1=חשבון, 2=טרייד, 3=תכנון, 4=טיקר)
  * @returns {string} שם המחלקה CSS
  */
 function getRelatedClass(relatedType) {
   switch (relatedType) {
-    case 4: return 'related-ticker'; // ticker
-    case 2: return 'related-trade'; // trade
-    case 3: return 'related-plan'; // trade_plan
-    case 1: return 'related-account'; // account
-    default: return 'related-other';
+  case 4: return 'related-ticker'; // ticker
+  case 2: return 'related-trade'; // trade
+  case 3: return 'related-plan'; // trade_plan
+  case 1: return 'related-account'; // account
+  default: return 'related-other';
   }
 }
 
 
-
 /**
  * שחזור מצב הסקשנים
- * 
+ *
  * פונקציה זו משחזרת את המצב השמור של הסקשנים (top-section ו-main-section)
  * כולל מצב פתוח/סגור ומיקום האייקונים
  * משתמשת ב-localStorage לשמירת המצב
@@ -2088,14 +2076,14 @@ document.addEventListener('DOMContentLoaded', function () {
   console.log('showErrorNotification:', typeof window.showErrorNotification);
   console.log('showValidationWarning:', typeof window.showValidationWarning);
   console.log('showDeleteWarning:', typeof window.showDeleteWarning);
-  
+
   // בדיקה שהמערכת זמינה
   if (typeof window.showSuccessNotification !== 'function') {
     console.error('❌ מערכת התראות לא זמינה!');
     alert('שגיאה: מערכת התראות לא זמינה. בדוק את טעינת הקבצים.');
     return;
   }
-  
+
   console.log('✅ מערכת התראות זמינה');
 
   // שחזור מצב הסגירה
@@ -2143,7 +2131,7 @@ window.filterAlertsLocally = filterAlertsLocally;
  */
 function filterAlertsByRelatedObjectType(type) {
   console.log('🔧 פילטר התראות לפי סוג אובייקט מקושר - סוג:', type);
-  
+
   // עדכון מצב הכפתורים
   const buttons = document.querySelectorAll('[data-type]');
   buttons.forEach(btn => {
@@ -2161,36 +2149,34 @@ function filterAlertsByRelatedObjectType(type) {
       btn.style.borderColor = '';
     }
   });
-  
+
   // מיפוי סוגים ל-ID
   const typeMapping = {
     'all': null,
     'account': 1,
     'trade': 2,
     'trade_plan': 3,
-    'ticker': 4
+    'ticker': 4,
   };
-  
+
   const targetTypeId = typeMapping[type];
-  
+
   // פילטור הנתונים
   let filteredAlerts = alertsData;
-  
+
   if (type !== 'all') {
-    filteredAlerts = alertsData.filter(alert => {
-      return alert.related_type_id === targetTypeId;
-    });
+    filteredAlerts = alertsData.filter(alert => alert.related_type_id === targetTypeId);
   }
-  
+
   // עדכון הטבלה עם הנתונים המסוננים
   updateAlertsTable(filteredAlerts);
-  
+
   // עדכון ספירת רשומות
   const countElement = document.querySelector('.table-count');
   if (countElement) {
     countElement.textContent = `${filteredAlerts.length} התראות`;
   }
-  
+
   console.log(`✅ Filtered alerts by type '${type}': ${filteredAlerts.length} alerts found`);
 }
 
@@ -2260,15 +2246,15 @@ setTimeout(() => {
 async function reactivateAlert(alertId) {
   // אישור מהמשתמש
   if (typeof window.showConfirmationDialog === 'function') {
-    const confirmed = await new Promise((resolve) => {
+    const confirmed = await new Promise(resolve => {
       window.showConfirmationDialog(
         'הפעלה מחדש של התראה',
         'האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?',
         () => resolve(true),
-        () => resolve(false)
+        () => resolve(false),
       );
     });
-    if (!confirmed) return;
+    if (!confirmed) {return;}
   } else {
     if (!confirm('האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?')) {
       return;
@@ -2279,11 +2265,11 @@ async function reactivateAlert(alertId) {
     const response = await fetch(`/api/v1/alerts/${alertId}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        status: 'open'
-      })
+        status: 'open',
+      }),
     });
 
     if (response.ok) {

@@ -1,14 +1,14 @@
 /**
  * Data Utils - TikTrack Frontend
  * ==============================
- * 
+ *
  * Shared data utilities for all pages
- * 
+ *
  * Features:
  * - Currency loading and management
  * - Account data utilities
  * - Common data fetching functions
- * 
+ *
  * @author TikTrack Development Team
  * @version 1.9.9
  * @lastUpdated August 26, 2025
@@ -41,7 +41,7 @@ async function loadCurrenciesFromServer() {
   try {
     const token = localStorage.getItem('authToken');
     const headers = {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     };
 
     if (token) {
@@ -50,7 +50,7 @@ async function loadCurrenciesFromServer() {
 
     const response = await fetch('http://127.0.0.1:8080/api/v1/currencies/', {
       method: 'GET',
-      headers: headers
+      headers,
     });
 
     if (response.ok) {
@@ -58,15 +58,15 @@ async function loadCurrenciesFromServer() {
       const currencies = responseData.data || responseData;
       window.currenciesData = currencies;
       window.currenciesLoaded = true;
-      
+
       return currencies;
     } else {
       // טעינת מטבעות ברירת מחדל
       window.currenciesData = [
-        { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
+        { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' },
       ];
       window.currenciesLoaded = true;
-      
+
       return window.currenciesData;
     }
 
@@ -74,10 +74,10 @@ async function loadCurrenciesFromServer() {
     // Error loading currencies
     // טעינת מטבעות ברירת מחדל
     window.currenciesData = [
-      { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
+      { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' },
     ];
     window.currenciesLoaded = true;
-    
+
     return window.currenciesData;
   }
 }
@@ -92,32 +92,32 @@ function getCurrencyDisplay(account) {
     // אם יש פרטי מטבע מלאים
     const symbol = account.currency.symbol;
     switch (symbol) {
-      case 'USD': return '$';
-      case 'ILS': return '₪';
-      case 'EUR': return '€';
-      case 'GBP': return '£';
-      default: return symbol;
+    case 'USD': return '$';
+    case 'ILS': return '₪';
+    case 'EUR': return '€';
+    case 'GBP': return '£';
+    default: return symbol;
     }
   } else if (account.currency_id && window.currenciesData && window.currenciesData.length > 0) {
     // אם יש רק currency_id, נחפש את המטבע
     const currency = window.currenciesData.find(c => c.id === account.currency_id);
     if (currency) {
       switch (currency.symbol) {
-        case 'USD': return '$';
-        case 'ILS': return '₪';
-        case 'EUR': return '€';
-        case 'GBP': return '£';
-        default: return currency.symbol;
+      case 'USD': return '$';
+      case 'ILS': return '₪';
+      case 'EUR': return '€';
+      case 'GBP': return '£';
+      default: return currency.symbol;
       }
     }
   } else if (account.currency) {
     // fallback למטבע הישן
     switch (account.currency) {
-      case 'USD': return '$';
-      case 'ILS': return '₪';
-      case 'EUR': return '€';
-      case 'GBP': return '£';
-      default: return account.currency;
+    case 'USD': return '$';
+    case 'ILS': return '₪';
+    case 'EUR': return '€';
+    case 'GBP': return '£';
+    default: return account.currency;
     }
   }
   return '-';
@@ -132,16 +132,16 @@ function generateCurrencyOptions(account = null) {
   if (!window.currenciesData || window.currenciesData.length === 0) {
     // אם אין מטבעות, נחזיר ברירת מחדל
     return `
-      <option value="USD" ${account && (account.currency_id === 1 || (account.currency && account.currency.symbol === 'USD') || (account.currency === 'USD')) ? 'selected' : ''}>דולר אמריקאי (USD)</option>
+      <option value="USD" ${account && (account.currency_id === 1 || account.currency && account.currency.symbol === 'USD' || account.currency === 'USD') ? 'selected' : ''}>דולר אמריקאי (USD)</option>
     `;
   }
 
   return window.currenciesData.map(currency => {
     const isSelected = account && (
       account.currency_id === currency.id ||
-      (account.currency && account.currency.symbol === currency.symbol) ||
-      (account.currency === currency.symbol) ||
-      (account.currency_id && account.currency_id === currency.id)
+      account.currency && account.currency.symbol === currency.symbol ||
+      account.currency === currency.symbol ||
+      account.currency_id && account.currency_id === currency.id
     );
 
     return `<option value="${currency.symbol}" ${isSelected ? 'selected' : ''}>${currency.name} (${currency.symbol})</option>`;
@@ -161,7 +161,7 @@ async function apiCall(url, options = {}) {
     const token = localStorage.getItem('authToken');
     const headers = {
       'Content-Type': 'application/json',
-      ...options.headers
+      ...options.headers,
     };
 
     if (token) {
@@ -170,7 +170,7 @@ async function apiCall(url, options = {}) {
 
     const response = await fetch(url, {
       ...options,
-      headers
+      headers,
     });
 
     if (!response.ok) {
@@ -248,15 +248,13 @@ function filterDataBySearch(data, searchTerm, searchFields = []) {
 
   const term = searchTerm.toLowerCase().trim();
 
-  return data.filter(item => {
-    return searchFields.some(field => {
-      const value = item[field];
-      if (value && typeof value === 'string') {
-        return value.toLowerCase().includes(term);
-      }
-      return false;
-    });
-  });
+  return data.filter(item => searchFields.some(field => {
+    const value = item[field];
+    if (value && typeof value === 'string') {
+      return value.toLowerCase().includes(term);
+    }
+    return false;
+  }));
 }
 
 // ===== Validation Functions =====
@@ -266,15 +264,15 @@ function filterDataBySearch(data, searchTerm, searchFields = []) {
  * Validate required field
  */
 function validateRequired(value, fieldName) {
-    if (!value || value.trim() === '') {
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', `שדה ${fieldName} הוא שדה חובה`);
-        } else {
-            // שדה הוא שדה חובה
-        }
-        return false;
+  if (!value || value.trim() === '') {
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', `שדה ${fieldName} הוא שדה חובה`);
+    } else {
+      // שדה הוא שדה חובה
     }
-    return true;
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -282,35 +280,35 @@ function validateRequired(value, fieldName) {
  * Validate number
  */
 function validateNumber(value, fieldName, min = null, max = null) {
-    const num = parseFloat(value);
-    if (isNaN(num)) {
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', `שדה ${fieldName} חייב להיות מספר`);
-        } else {
-            // שדה חייב להיות מספר
-        }
-        return false;
+  const num = parseFloat(value);
+  if (isNaN(num)) {
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', `שדה ${fieldName} חייב להיות מספר`);
+    } else {
+      // שדה חייב להיות מספר
     }
+    return false;
+  }
 
-    if (min !== null && num < min) {
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', `שדה ${fieldName} חייב להיות לפחות ${min}`);
-        } else {
-            // שדה חייב להיות לפחות מינימום
-        }
-        return false;
+  if (min !== null && num < min) {
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', `שדה ${fieldName} חייב להיות לפחות ${min}`);
+    } else {
+      // שדה חייב להיות לפחות מינימום
     }
+    return false;
+  }
 
-    if (max !== null && num > max) {
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', `שדה ${fieldName} חייב להיות לכל היותר ${max}`);
-        } else {
-            // שדה חייב להיות לכל היותר מקסימום
-        }
-        return false;
+  if (max !== null && num > max) {
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', `שדה ${fieldName} חייב להיות לכל היותר ${max}`);
+    } else {
+      // שדה חייב להיות לכל היותר מקסימום
     }
+    return false;
+  }
 
-    return true;
+  return true;
 }
 
 /**
@@ -318,16 +316,16 @@ function validateNumber(value, fieldName, min = null, max = null) {
  * Validate date
  */
 function validateDate(value, fieldName) {
-    const date = new Date(value);
-    if (isNaN(date.getTime())) {
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', `שדה ${fieldName} חייב להיות תאריך תקין`);
-        } else {
-            // שדה חייב להיות תאריך תקין
-        }
-        return false;
+  const date = new Date(value);
+  if (isNaN(date.getTime())) {
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', `שדה ${fieldName} חייב להיות תאריך תקין`);
+    } else {
+      // שדה חייב להיות תאריך תקין
     }
-    return true;
+    return false;
+  }
+  return true;
 }
 
 // ===== Price Calculation Functions =====
@@ -339,18 +337,18 @@ function validateDate(value, fieldName) {
  * @returns {object} Stop and target prices
  */
 function calculateDefaultPrices(currentPrice, options = {}) {
-    const {
-        defaultStopPercent = 5,
-        defaultTargetPercent = 10
-    } = options;
+  const {
+    defaultStopPercent = 5,
+    defaultTargetPercent = 10,
+  } = options;
 
-    const stopPrice = currentPrice * (1 - defaultStopPercent / 100);
-    const targetPrice = currentPrice * (1 + defaultTargetPercent / 100);
+  const stopPrice = currentPrice * (1 - defaultStopPercent / 100);
+  const targetPrice = currentPrice * (1 + defaultTargetPercent / 100);
 
-    return {
-        stopPrice: parseFloat(stopPrice.toFixed(2)),
-        targetPrice: parseFloat(targetPrice.toFixed(2))
-    };
+  return {
+    stopPrice: parseFloat(stopPrice.toFixed(2)),
+    targetPrice: parseFloat(targetPrice.toFixed(2)),
+  };
 }
 
 /**
@@ -361,31 +359,31 @@ function calculateDefaultPrices(currentPrice, options = {}) {
  * @returns {object} Shares and adjusted amount
  */
 function convertAmountToShares(amount, price, allowFractionalShares = null) {
-    if (!amount || !price || price <= 0) {
-        console.warn('Invalid amount or price for conversion:', { amount, price });
-        return { shares: 0, adjustedAmount: 0 };
-    }
+  if (!amount || !price || price <= 0) {
+    console.warn('Invalid amount or price for conversion:', { amount, price });
+    return { shares: 0, adjustedAmount: 0 };
+  }
 
-    // Get user preference for fractional shares if not specified
-    if (allowFractionalShares === null) {
-        allowFractionalShares = getUserPreference('allowFractionalShares', false);
-    }
+  // Get user preference for fractional shares if not specified
+  if (allowFractionalShares === null) {
+    allowFractionalShares = getUserPreference('allowFractionalShares', false);
+  }
 
-    let shares;
-    if (allowFractionalShares) {
-        // Allow fractional shares
-        shares = amount / price;
-    } else {
-        // Only whole shares
-        shares = Math.floor(amount / price);
-    }
+  let shares;
+  if (allowFractionalShares) {
+    // Allow fractional shares
+    shares = amount / price;
+  } else {
+    // Only whole shares
+    shares = Math.floor(amount / price);
+  }
 
-    const adjustedAmount = shares * price;
+  const adjustedAmount = shares * price;
 
-    return {
-        shares: parseFloat(shares.toFixed(4)),
-        adjustedAmount: parseFloat(adjustedAmount.toFixed(2))
-    };
+  return {
+    shares: parseFloat(shares.toFixed(4)),
+    adjustedAmount: parseFloat(adjustedAmount.toFixed(2)),
+  };
 }
 
 /**
@@ -395,13 +393,13 @@ function convertAmountToShares(amount, price, allowFractionalShares = null) {
  * @returns {number} Total amount
  */
 function convertSharesToAmount(shares, price) {
-    if (!shares || !price || price <= 0) {
-        console.warn('Invalid shares or price for conversion:', { shares, price });
-        return 0;
-    }
+  if (!shares || !price || price <= 0) {
+    console.warn('Invalid shares or price for conversion:', { shares, price });
+    return 0;
+  }
 
-    const amount = shares * price;
-    return parseFloat(amount.toFixed(2));
+  const amount = shares * price;
+  return parseFloat(amount.toFixed(2));
 }
 
 /**
@@ -411,13 +409,13 @@ function convertSharesToAmount(shares, price) {
  * @returns {*} User preference value
  */
 function getUserPreference(key, defaultValue = null) {
-    try {
-        const preferences = JSON.parse(localStorage.getItem('userPreferences') || '{}');
-        return preferences[key] !== undefined ? preferences[key] : defaultValue;
-    } catch (error) {
-        console.warn('Error reading user preference:', error);
-        return defaultValue;
-    }
+  try {
+    const preferences = JSON.parse(localStorage.getItem('userPreferences') || '{}');
+    return preferences[key] !== undefined ? preferences[key] : defaultValue;
+  } catch (error) {
+    console.warn('Error reading user preference:', error);
+    return defaultValue;
+  }
 }
 
 // ===== Export Functions =====
@@ -440,19 +438,19 @@ window.validateDate = validateDate;
 
 // Export module
 window.dataUtils = {
-    validateRequired,
-    validateNumber,
-    validateDate,
-    loadCurrenciesFromServer,
-    getCurrencyDisplay,
-    generateCurrencyOptions,
-    apiCall,
-    calculateDefaultPrices,
-    convertAmountToShares,
-    convertSharesToAmount,
-    getUserPreference,
-    loadDataFromAPI,
-    validateDataStructure,
-    filterDataBySearch
+  validateRequired,
+  validateNumber,
+  validateDate,
+  loadCurrenciesFromServer,
+  getCurrencyDisplay,
+  generateCurrencyOptions,
+  apiCall,
+  calculateDefaultPrices,
+  convertAmountToShares,
+  convertSharesToAmount,
+  getUserPreference,
+  loadDataFromAPI,
+  validateDataStructure,
+  filterDataBySearch,
 };
 

@@ -2162,78 +2162,9 @@ function clearDateValidationMessages() {
   closedAtField.classList.remove('is-invalid', 'is-valid');
 }
 
-/**
- * ביצוע ביטול טרייד
- */
-function performTradeCancellation(tradeId) {
-  fetch(`/api/v1/trades/${tradeId}/cancel`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      cancel_reason: 'בוטל על ידי המשתמש'
-    })
-  })
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error('שגיאה בביטול הטרייד');
-    })
-    .then(data => {
-      // טרייד בוטל בהצלחה
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('הצלחה', 'טרייד בוטל בהצלחה');
-      }
-      loadTradesData(); // Reload the table
-    })
-    .catch(error => {
-      if (typeof handleSaveError === 'function') {
-        handleSaveError(error, 'ביטול טרייד');
-      } else {
-        console.error('Error canceling trade:', error);
-      }
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה', 'שגיאה בביטול הטרייד');
-      }
-    });
-}
+// הפונקציה הוסרה - קיימת כבר בשורה 558
 
-/**
- * ביצוע מחיקת טרייד
- */
-function performTradeDeletion(tradeId) {
-  fetch(`/api/v1/trades/${tradeId}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    }
-  })
-    .then(response => {
-      if (response.ok) {
-        return response.json();
-      }
-      throw new Error('שגיאה במחיקת הטרייד');
-    })
-    .then(data => {
-      // טרייד נמחק בהצלחה
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('הצלחה', 'טרייד נמחק בהצלחה');
-      }
-      loadTradesData(); // Reload the table
-    })
-    .catch(error => {
-      if (typeof handleDeleteError === 'function') {
-        handleDeleteError(error, 'טרייד');
-      } else {
-        console.error('Error deleting trade:', error);
-      }
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה', 'שגיאה במחיקת הטרייד');
-      }
-    });
-}
+// הפונקציה הוסרה - קיימת כבר בשורה 657
 
 /**
  * פונקציות עזר למודל העריכה

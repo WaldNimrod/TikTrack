@@ -1281,50 +1281,7 @@ async function reactivateTicker(tickerId) {
     }
 }
 
-/**
- * מחיקת טיקר עם בדיקת מקושרים
- */
-async function deleteTicker(id) {
-    try {
-
-        // מציאת הטיקר לפני מחיקה כדי להציג פרטים בהודעה
-        const ticker = (window.tickersData || []).find(t => t.id == id);
-        if (!ticker) {
-            handleElementNotFound('deleteTicker', `טיקר לא נמצא: ${id}`);
-            return;
-        }
-
-        const tickerDetails = ticker ? `\n\nפרטי הטיקר:\n• סמל: ${ticker.symbol}\n• שם: ${ticker.name}\n• סטטוס: ${ticker.status}` : '';
-
-        // אישור מהמשתמש באמצעות המערכת הגלובלית
-        if (typeof window.showConfirmationDialog === 'function') {
-            window.showConfirmationDialog(
-                'מחיקת טיקר',
-                `האם אתה בטוח שברצונך למחוק טיקר זה?${tickerDetails}`,
-                async () => {
-                    // המשתמש אישר - בדיקת מקושרים ואז ביצוע המחיקה
-                    await checkLinkedItemsAndDeleteTicker(id);
-                },
-                () => {
-                    // המשתמש ביטל - לא עושים כלום
-                },
-                'danger' // צבע אדום לחלון האישור
-            );
-        } else {
-            // Fallback למקרה שהמערכת הגלובלית לא זמינה
-            if (!confirm(`האם אתה בטוח שברצונך למחוק טיקר זה?${tickerDetails}`)) {
-                return;
-            }
-            await checkLinkedItemsAndDeleteTicker(id);
-        }
-
-    } catch (error) {
-        handleSystemError(error, 'מחיקת טיקר');
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה', error.message);
-        }
-    }
-}
+// הפונקציה הוסרה - קיימת כבר בשורה 417
 
 /**
  * בדיקת מקושרים וביצוע מחיקת טיקר

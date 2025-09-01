@@ -2,13 +2,13 @@
 /*
  * Error-Handlers.js - Error Handling Utilities
  * ===========================================
- * 
+ *
  * This file contains utility functions for handling errors throughout the TikTrack application.
  * It provides centralized error handling and logging functionality.
- * 
+ *
  * Dependencies:
  * - notification-system.js (for user notifications)
- * 
+ *
  * File: trading-ui/scripts/error-handlers.js
  * Version: 1.0
  * Last Updated: August 31, 2025
@@ -23,17 +23,17 @@
  * @param {string} userMessage - הודעה למשתמש
  */
 function handleApiError(error, context = 'API_CALL', userMessage = null) {
-    // לוג מפורט למפתחים
-    console.warn(`🔧 API Error in ${context}:`, error);
-    
-    // הודעה למשתמש
-    const message = userMessage || `שגיאה ב${context} - נסה שוב מאוחר יותר`;
-    
-    if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה', message);
-    } else {
-        // showErrorNotification לא זמינה
-    }
+  // לוג מפורט למפתחים
+  console.warn(`🔧 API Error in ${context}:`, error);
+
+  // הודעה למשתמש
+  const message = userMessage || `שגיאה ב${context} - נסה שוב מאוחר יותר`;
+
+  if (typeof window.showErrorNotification === 'function') {
+    window.showErrorNotification('שגיאה', message);
+  } else {
+    // showErrorNotification לא זמינה
+  }
 }
 
 /**
@@ -42,14 +42,14 @@ function handleApiError(error, context = 'API_CALL', userMessage = null) {
  * @param {string} fallback - פעולה חלופית
  */
 function handleElementNotFound(elementId, fallback = 'ELEMENT_NOT_FOUND') {
-    console.warn(`🔧 Element not found: ${elementId} - ${fallback}`);
-    
-    // הודעה למשתמש רק אם זה קריטי
-    if (fallback === 'CRITICAL') {
-        if (typeof window.showWarningNotification === 'function') {
-            window.showWarningNotification('אזהרה', 'אלמנט לא נמצא - ייתכן שהדף לא נטען כראוי');
-        }
+  console.warn(`🔧 Element not found: ${elementId} - ${fallback}`);
+
+  // הודעה למשתמש רק אם זה קריטי
+  if (fallback === 'CRITICAL') {
+    if (typeof window.showWarningNotification === 'function') {
+      window.showWarningNotification('אזהרה', 'אלמנט לא נמצא - ייתכן שהדף לא נטען כראוי');
     }
+  }
 }
 
 /**
@@ -58,14 +58,14 @@ function handleElementNotFound(elementId, fallback = 'ELEMENT_NOT_FOUND') {
  * @param {string} fallback - פעולה חלופית
  */
 function handleFunctionNotFound(functionName, fallback = 'FUNCTION_NOT_FOUND') {
-    console.warn(`🔧 Function not found: ${functionName} - ${fallback}`);
-    
-    // הודעה למשתמש רק אם זה קריטי
-    if (fallback === 'CRITICAL') {
-        if (typeof window.showWarningNotification === 'function') {
-            window.showWarningNotification('אזהרה', 'פונקציה לא זמינה - ייתכן שהדף לא נטען כראוי');
-        }
+  console.warn(`🔧 Function not found: ${functionName} - ${fallback}`);
+
+  // הודעה למשתמש רק אם זה קריטי
+  if (fallback === 'CRITICAL') {
+    if (typeof window.showWarningNotification === 'function') {
+      window.showWarningNotification('אזהרה', 'פונקציה לא זמינה - ייתכן שהדף לא נטען כראוי');
     }
+  }
 }
 
 /**
@@ -74,14 +74,14 @@ function handleFunctionNotFound(functionName, fallback = 'FUNCTION_NOT_FOUND') {
  * @param {string} message - הודעת השגיאה
  */
 function handleValidationError(field, message) {
-    console.warn(`🔧 Validation error in ${field}: ${message}`);
-    
-    // הצגת שגיאה בשדה הספציפי
-    if (typeof window.showValidationWarning === 'function') {
-        window.showValidationWarning(field, message);
-    } else if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאת וולידציה', message);
-    }
+  console.warn(`🔧 Validation error in ${field}: ${message}`);
+
+  // הצגת שגיאה בשדה הספציפי
+  if (typeof window.showValidationWarning === 'function') {
+    window.showValidationWarning(field, message);
+  } else if (typeof window.showErrorNotification === 'function') {
+    window.showErrorNotification('שגיאת וולידציה', message);
+  }
 }
 
 /**
@@ -90,13 +90,13 @@ function handleValidationError(field, message) {
  * @param {string} dataType - סוג הנתונים
  */
 function handleDataLoadError(error, dataType) {
-    console.warn(`🔧 Data load error for ${dataType}:`, error);
-    
-    const message = `שגיאה בטעינת ${dataType} - נסה לרענן את הדף`;
-    
-    if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה', message);
-    }
+  console.warn(`🔧 Data load error for ${dataType}:`, error);
+
+  const message = `שגיאה בטעינת ${dataType} - נסה לרענן את הדף`;
+
+  if (typeof window.showErrorNotification === 'function') {
+    window.showErrorNotification('שגיאה', message);
+  }
 }
 
 /**
@@ -105,13 +105,13 @@ function handleDataLoadError(error, dataType) {
  * @param {string} operation - סוג הפעולה
  */
 function handleSaveError(error, operation) {
-    console.warn(`🔧 Save error for ${operation}:`, error);
-    
-    const message = `שגיאה ב${operation} - נסה שוב`;
-    
-    if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה', message);
-    }
+  console.warn(`🔧 Save error for ${operation}:`, error);
+
+  const message = `שגיאה ב${operation} - נסה שוב`;
+
+  if (typeof window.showErrorNotification === 'function') {
+    window.showErrorNotification('שגיאה', message);
+  }
 }
 
 /**
@@ -120,13 +120,13 @@ function handleSaveError(error, operation) {
  * @param {string} itemType - סוג הפריט
  */
 function handleDeleteError(error, itemType) {
-    console.warn(`🔧 Delete error for ${itemType}:`, error);
-    
-    const message = `שגיאה במחיקת ${itemType} - נסה שוב`;
-    
-    if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה', message);
-    }
+  console.warn(`🔧 Delete error for ${itemType}:`, error);
+
+  const message = `שגיאה במחיקת ${itemType} - נסה שוב`;
+
+  if (typeof window.showErrorNotification === 'function') {
+    window.showErrorNotification('שגיאה', message);
+  }
 }
 
 /**
@@ -135,13 +135,13 @@ function handleDeleteError(error, itemType) {
  * @param {string} system - שם המערכת
  */
 function handleSystemError(error, system) {
-    console.warn(`🔧 System error in ${system}:`, error);
-    
-    const message = `שגיאה במערכת ${system} - נסה לרענן את הדף`;
-    
-    if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה', message);
-    }
+  console.warn(`🔧 System error in ${system}:`, error);
+
+  const message = `שגיאה במערכת ${system} - נסה לרענן את הדף`;
+
+  if (typeof window.showErrorNotification === 'function') {
+    window.showErrorNotification('שגיאה', message);
+  }
 }
 
 // ===== ייצוא פונקציות גלובליות =====
@@ -159,7 +159,7 @@ window.handleSystemError = handleSystemError;
 // ===== אינדקס פונקציות =====
 /*
  * אינדקס פונקציות בקובץ זה:
- * 
+ *
  * 1. handleApiError(error, context, userMessage) - טיפול בשגיאות API
  * 2. handleElementNotFound(elementId, fallback) - טיפול באלמנטים לא נמצאו
  * 3. handleFunctionNotFound(functionName, fallback) - טיפול בפונקציות לא נמצאו
@@ -168,6 +168,6 @@ window.handleSystemError = handleSystemError;
  * 6. handleSaveError(error, operation) - טיפול בשגיאות שמירה
  * 7. handleDeleteError(error, itemType) - טיפול בשגיאות מחיקה
  * 8. handleSystemError(error, system) - טיפול בשגיאות מערכת
- * 
+ *
  * כל הפונקציות מיוצאת ל-global scope וזמינות בכל הפרויקט.
  */

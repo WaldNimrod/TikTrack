@@ -632,86 +632,9 @@ body {
   content: none !important;
 }
 
-/* כותרות מודולים צבעוניות */
-.modal-header-colored {
-  background: linear-gradient(135deg, #29a6a8, #1f8a8c) !important;
-  color: white !important;
-  border-radius: 6px 6px 0 0;
-  border-bottom: none;
-}
 
-.modal-header-danger {
-  background: linear-gradient(135deg, #dc3545, #c82333) !important;
-  color: white !important;
-  border-radius: 6px 6px 0 0;
-  border-bottom: none;
-}
 
-/* צבעי מודולים ספציפיים לעמודים */
-/* עמוד חשבונות - כחול */
-.accounts-page .modal-header-colored {
-  background: linear-gradient(135deg, #007bff, #0056b3) !important;
-}
 
-/* עמוד מעקב טריידים - כתום */
-.tracking-page .modal-header-colored {
-  background: linear-gradient(135deg, #ff9c05, #e68900) !important;
-}
-
-/* עמוד תכנון טריידים - ירוק */
-.planning-page .modal-header-colored {
-  background: linear-gradient(135deg, #28a745, #1e7e34) !important;
-}
-
-/* עמוד התראות - אדום */
-.alerts-page .modal-header-colored {
-  background: linear-gradient(135deg, #dc3545, #c82333) !important;
-}
-
-/* עמוד תזרים מזומנים - סגול */
-.cash-flows-page .modal-header-colored {
-  background: linear-gradient(135deg, #6f42c1, #5a32a3) !important;
-}
-
-/* עמוד עסקאות - כחול כהה */
-.executions-page .modal-header-colored {
-  background: linear-gradient(135deg, #17a2b8, #138496) !important;
-}
-
-/* עמוד טיקרים - אדום */
-.tickers-page .modal-header-colored {
-  background: linear-gradient(135deg, #dc3545, #c82333) !important;
-}
-
-/* עמוד הערות - כתום */
-.notes-page .modal-header-colored {
-  background: linear-gradient(135deg, #fd7e14, #e55a00) !important;
-}
-
-/* עמוד בסיס נתונים - כחול כהה */
-.db-display-page .modal-header-colored {
-  background: linear-gradient(135deg, #495057, #343a40) !important;
-}
-
-/* עמוד טבלאות עזר - אפור */
-.extra-data-page .modal-header-colored {
-  background: linear-gradient(135deg, #6c757d, #545b62) !important;
-}
-
-/* עמוד אילוצים - כתום כהה */
-.constraints-page .modal-header-colored {
-  background: linear-gradient(135deg, #fd7e14, #e55a00) !important;
-}
-
-/* עמוד עיצובים - ירוק כהה */
-.designs-page .modal-header-colored {
-  background: linear-gradient(135deg, #20c997, #17a085) !important;
-}
-
-/* עמוד מחקר - כחול בהיר */
-.research-page .modal-header-colored {
-  background: linear-gradient(135deg, #0dcaf0, #0aa2c0) !important;
-}
 
 /* כפתורי קישור ירוקים */
 .btn-outline-success.link-button {

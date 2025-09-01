@@ -1659,16 +1659,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // Export Functions
 // ========================================
 
-// פונקציות לפתיחה/סגירה של סקשנים
-    const totalRecordsElement = document.getElementById('totalRecords');
-    if (totalRecordsElement) {
-        const currentTotal = parseInt(totalRecordsElement.textContent) || 0;
-        // חישוב הסכום החדש (מחסירים את הספירה הקודמת ומוסיפים את החדשה)
-        const oldTriggerCount = 0; // אם יש ספירה קודמת
-        totalRecordsElement.textContent = currentTotal - oldTriggerCount + totalTriggers;
-    }
-}
-
 // ===== פונקציות לכפתורי פעולה בכרטיסי טריגרים =====
 
 // פונקציה להצגת פרטי טריגר
@@ -1749,8 +1739,7 @@ function testTrigger(triggerId) {
 
     if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('בדיקה', `בדיקת טריגר ${triggerInfo.name} בוצעה בהצלחה`);
-    } else {
-        }
+    }
 }
 
 // פונקציה להפעלת טריגר

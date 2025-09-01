@@ -8,13 +8,13 @@
  */
 function editRecord(tableType, id, data) {
 
-    // קריאה לפונקציה הספציפית של הטבלה
-    const editFunction = window[`edit${tableType.charAt(0).toUpperCase() + tableType.slice(1)}Record`];
-    if (typeof editFunction === 'function') {
-        editFunction(id, data);
-    } else {
-        // editRecord function not found
-    }
+  // קריאה לפונקציה הספציפית של הטבלה
+  const editFunction = window[`edit${tableType.charAt(0).toUpperCase() + tableType.slice(1)}Record`];
+  if (typeof editFunction === 'function') {
+    editFunction(id, data);
+  } else {
+    // editRecord function not found
+  }
 }
 
 /**
@@ -24,13 +24,13 @@ function editRecord(tableType, id, data) {
  */
 function deleteRecord(tableType, id) {
 
-    // קריאה לפונקציה הספציפית של הטבלה
-    const deleteFunction = window[`delete${tableType.charAt(0).toUpperCase() + tableType.slice(1)}Record`];
-    if (typeof deleteFunction === 'function') {
-        deleteFunction(id);
-    } else {
-        // deleteRecord function not found
-    }
+  // קריאה לפונקציה הספציפית של הטבלה
+  const deleteFunction = window[`delete${tableType.charAt(0).toUpperCase() + tableType.slice(1)}Record`];
+  if (typeof deleteFunction === 'function') {
+    deleteFunction(id);
+  } else {
+    // deleteRecord function not found
+  }
 }
 
 /**
@@ -40,13 +40,13 @@ function deleteRecord(tableType, id) {
  */
 function cancelRecord(tableType, id) {
 
-    // קריאה לפונקציה הספציפית של הטבלה
-    const cancelFunction = window[`cancel${tableType.charAt(0).toUpperCase() + tableType.slice(1)}Record`];
-    if (typeof cancelFunction === 'function') {
-        cancelFunction(id);
-    } else {
-        // cancelRecord function not found
-    }
+  // קריאה לפונקציה הספציפית של הטבלה
+  const cancelFunction = window[`cancel${tableType.charAt(0).toUpperCase() + tableType.slice(1)}Record`];
+  if (typeof cancelFunction === 'function') {
+    cancelFunction(id);
+  } else {
+    // cancelRecord function not found
+  }
 }
 
 // ייצוא פונקציות גלובליות

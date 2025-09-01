@@ -138,8 +138,7 @@ class JsMapSystem {
                 );
 
                 // Log some sample data
-                  
-                }
+                console.log('Functions data loaded successfully');
             } else {
                 // Fallback to local scanning
                 console.warn('⚠️ Server response not ok, using local scan');

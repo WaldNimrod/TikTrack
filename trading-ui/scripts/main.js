@@ -1,21 +1,21 @@
 /**
  * Main.js - TikTrack Frontend Core
  * =================================
- * 
+ *
  * REFACTORING HISTORY & ARCHITECTURE:
  * ====================================
- * 
+ *
  * This file has undergone significant refactoring to improve code organization:
- * 
+ *
  * ORIGINAL STATE (v2.2):
  * - 2153 lines of mixed functionality
  * - Duplicate functions across multiple files
  * - Difficult to maintain and debug
  * - All utilities centralized in one massive file
- * 
+ *
  * REFACTORING PHASES:
  * ===================
- * 
+ *
  * PHASE 1: Function Consolidation (August 2025)
  * - Moved showNotification, formatDate, formatDateTime, formatDateOnly, loadAccountsData to main.js
  * - Moved createAccountModal, showAddAccountModal to accounts.js
@@ -23,28 +23,28 @@
  * - Moved toggleSection, toggleAllSections to main.js
  * - Moved apiCall to data-utils.js
  * - Moved colorAmount to ui-utils.js
- * 
+ *
  * PHASE 2: Date Functions Centralization
  * - Consolidated date formatting functions (formatDate, formatDateTime, formatDateOnly) into main.js
  * - Removed duplicates from cash_flows.js, tickers.js, currencies.js
- * 
+ *
  * PHASE 3: Table Functions Analysis
  * - Analyzed update*Table functions for 100% identity
  * - Confirmed page-specific versions differ from database.js versions
  * - Page-specific versions accept data parameters and include complex logic
  * - Database.js versions are simpler and operate on global allData
- * 
+ *
  * PHASE 4: loadAccountsData Unification
  * - Found three versions: loadAccountsData, loadAccountsDataFromAPI, loadAccountsDataForAccountsPage
  * - Kept loadAccountsDataForAccountsPage as most advanced
  * - Commented out other two versions
  * - Updated all references to use loadAccountsDataForAccountsPage
- * 
+ *
  * PHASE 5: Modal Functions Consolidation
  * - Removed showModalNotification from main.js
  * - Removed showSecondConfirmationModal from accounts.js
  * - All calls updated to use versions in ui-utils.js
- * 
+ *
  * PHASE 6: Main.js Modular Split (August 24, 2025)
  * - Split main.js into topic-based modules:
  *   * tables.js - All table-related functionality (sorting, grid operations)
@@ -52,53 +52,53 @@
  *   * linked-items.js - Linked items viewing, loading, display management
  *   * page-utils.js - Page-specific utilities, initialization, state management
  * - New main.js serves as core initializer and dependency checker
- * 
+ *
  * CURRENT ARCHITECTURE:
  * ====================
- * 
+ *
  * main.js (THIS FILE):
  * - Global initialization logic
  * - Dependency checks and system validation
  * - Auto-initialization on page load
  * - Core utility functions that must remain global
- * 
+ *
  * tables.js:
  * - Table sorting system (sortTableData, sortAnyTable, etc.)
  * - Grid core functions
  * - Sort state management
  * - Table-specific utilities
- * 
+ *
  * date-utils.js:
  * - Date formatting functions (formatDate, formatDateTime, etc.)
  * - Date conversion utilities
  * - Date validation functions
  * - Date calculation helpers
- * 
+ *
  * linked-items.js:
  * - Linked items viewing system
  * - Modal creation for linked items
  * - Item type management
  * - Export functionality
- * 
+ *
  * page-utils.js:
  * - Page initialization functions
  * - Page state management
 
  * - Navigation utilities
- * 
+ *
  * DEPENDENCIES:
  * ============
  * - All modular files must be loaded before main.js
  * - Functions are exported to global scope (window object)
  * - Backward compatibility maintained for existing function calls
- * 
+ *
  * RECENT UPDATES (August 31, 2025):
  * =================================
  * - Enhanced support for trade plans page
  * - Improved validation system integration
  * - Better error handling and user feedback
  * - Updated function exports for new features
- * 
+ *
  * HTML SCRIPT LOADING ORDER:
  * =========================
  * 1. header-system.js
@@ -114,7 +114,7 @@
  * 11. page-utils.js
  * 12. main.js (THIS FILE)
  * 13. Page-specific files (alerts.js, accounts.js, etc.)
- * 
+ *
  * @version 3.0
  * @lastUpdated August 24, 2025
  * @refactoringPhase 6 - Modular Architecture
@@ -124,7 +124,7 @@
 /**
  * Main application initialization function
  * Called automatically when DOM is ready
- * 
+ *
  * Responsibilities:
  * - Check all dependencies are loaded
  * - Initialize core systems
@@ -149,7 +149,7 @@ function initializeApplication() {
 
 /**
  * Check if all required modules and functions are available
- * 
+ *
  * @returns {boolean} True if all dependencies are satisfied
  */
 function checkDependencies() {
@@ -161,14 +161,14 @@ function checkDependencies() {
     'dateUtils',
     'tables',
     'linkedItems',
-    'pageUtils'
+    'pageUtils',
   ];
 
   const missingModules = requiredModules.filter(module => !window[module]);
 
   if (missingModules.length > 0) {
     console.warn('⚠️ Missing modules:', missingModules);
-    
+
     // לא נחזיר false כדי לא לעצור את האתחול
     return true;
   }
@@ -189,7 +189,6 @@ function initializeCoreSystems() {
   }
 
 
-
   // Set up global error handlers
   window.addEventListener('error', handleGlobalError);
   window.addEventListener('unhandledrejection', handleUnhandledRejection);
@@ -203,35 +202,35 @@ function initializeCoreSystems() {
  */
 function setupGlobalModalConfigurations() {
 
-  
+
   // Find all modals and configure them
   const modals = document.querySelectorAll('.modal');
-  
+
   modals.forEach(modalElement => {
     const modalId = modalElement.id;
     const existingBackdrop = modalElement.getAttribute('data-bs-backdrop');
     const existingKeyboard = modalElement.getAttribute('data-bs-keyboard');
-    
+
     // If modal already has specific backdrop settings, respect them
     if (existingBackdrop && existingKeyboard) {
-    
+
       return;
     }
-    
+
     // Default configuration for modals without specific settings
     modalElement.setAttribute('data-bs-backdrop', 'true');
     modalElement.setAttribute('data-bs-keyboard', 'true');
-    
+
     // Special handling for specific modals that should not close on backdrop click
     if (modalId && (
-      modalId.includes('delete') || 
-      modalId.includes('warning') || 
+      modalId.includes('delete') ||
+      modalId.includes('warning') ||
       modalId.includes('confirm') ||
-      (modalId.includes('linkedItems') && !modalId.includes('details'))
+      modalId.includes('linkedItems') && !modalId.includes('details')
     )) {
       modalElement.setAttribute('data-bs-backdrop', 'static');
       modalElement.setAttribute('data-bs-keyboard', 'false');
-      
+
       // Prevent closing on backdrop click for these modals
       modalElement.addEventListener('click', function(event) {
         if (event.target === modalElement) {
@@ -240,10 +239,10 @@ function setupGlobalModalConfigurations() {
           return false;
         }
       });
-      
-    
+
+
     } else {
-    
+
     }
   });
 }
@@ -274,7 +273,7 @@ function initializeCurrentPage() {
 // ===== GLOBAL HELPER FUNCTIONS =====
 /**
  * Check if a module and function are available
- * 
+ *
  * @param {string} moduleName - Name of the module to check
  * @param {string} functionName - Name of the function to check
  * @returns {boolean} True if both module and function exist
@@ -285,7 +284,7 @@ function isModuleAvailable(moduleName, functionName) {
 
 /**
  * Get system information for debugging
- * 
+ *
  * @returns {Object} System information object
  */
 function getSystemInfo() {
@@ -303,15 +302,15 @@ function getSystemInfo() {
       dateUtils: !!window.dateUtils,
       tables: !!window.tables,
       linkedItems: !!window.linkedItems,
-      pageUtils: !!window.pageUtils
-    }
+      pageUtils: !!window.pageUtils,
+    },
   };
 }
 
 // ===== ERROR HANDLING =====
 /**
  * Handle global JavaScript errors
- * 
+ *
  * @param {ErrorEvent} event - Error event object
  */
 function handleGlobalError(event) {
@@ -321,7 +320,7 @@ function handleGlobalError(event) {
 
 /**
  * Handle unhandled promise rejections
- * 
+ *
  * @param {PromiseRejectionEvent} event - Rejection event object
  */
 function handleUnhandledRejection(event) {
@@ -331,7 +330,7 @@ function handleUnhandledRejection(event) {
 
 /**
  * Show system error notification
- * 
+ *
  * @param {string} message - Error message to display
  */
 function showSystemError(message) {
@@ -394,7 +393,7 @@ function restoreAllSectionStates() {
         }
       });
 
-              // Restored database display page section states
+      // Restored database display page section states
       return;
     }
 
@@ -462,7 +461,7 @@ function restoreAllSectionStates() {
       savedState: topSectionCollapsed,
       topSectionFound: !!topSection,
       topToggleBtnFound: !!topToggleBtn,
-      topIconFound: !!topIcon
+      topIconFound: !!topIcon,
     });
 
     if (topSection && topIcon) {
@@ -524,10 +523,10 @@ window.toggleTopSectionGlobal = function () {
 
   // toggleTopSectionGlobal called
   console.log('🔄 toggleTopSectionGlobal called:', {
-    currentPath: currentPath,
+    currentPath,
     sectionFound: !!section,
     toggleBtnFound: !!toggleBtn,
-    iconFound: !!icon
+    iconFound: !!icon,
   });
 
   if (section) {
@@ -551,8 +550,8 @@ window.toggleTopSectionGlobal = function () {
 
     if (currentPath.includes('/alerts')) {
       storageKey = 'alertsTopSectionCollapsed';
-        } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
-        storageKey = 'planningTopSectionCollapsed';
+    } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
+      storageKey = 'planningTopSectionCollapsed';
     } else if (currentPath.includes('/trades')) {
       storageKey = 'tradesTopSectionCollapsed';
     } else if (currentPath.includes('/accounts')) {
@@ -619,7 +618,7 @@ window.toggleMainSection = function () {
     // Find the specific section that was clicked
     const clickedButton = window.event ? window.event.target.closest('button') : null;
     const currentSection = clickedButton ? clickedButton.closest('.content-section') : null;
-    
+
     if (currentSection) {
       const sectionBody = currentSection.querySelector('.section-body');
       const toggleBtn = currentSection.querySelector('button[onclick*="toggleMainSection"]');
@@ -631,10 +630,10 @@ window.toggleMainSection = function () {
 
         if (isCollapsed) {
           sectionBody.style.display = 'block';
-          if (icon) icon.textContent = '▲';
+          if (icon) {icon.textContent = '▲';}
         } else {
           sectionBody.style.display = 'none';
-          if (icon) icon.textContent = '▼';
+          if (icon) {icon.textContent = '▼';}
         }
 
         // Save state for this specific section
@@ -671,8 +670,8 @@ window.toggleMainSection = function () {
 
     if (currentPath.includes('/alerts')) {
       storageKey = 'alertsMainSectionCollapsed';
-        } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
-        storageKey = 'planningMainSectionCollapsed';
+    } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
+      storageKey = 'planningMainSectionCollapsed';
     } else if (currentPath.includes('/trades')) {
       storageKey = 'tradesMainSectionCollapsed';
     } else if (currentPath.includes('/accounts')) {
@@ -712,8 +711,8 @@ window.restoreAllSectionStates = function () {
   let topSectionKey = 'topSectionCollapsed';
   if (currentPath.includes('/alerts')) {
     topSectionKey = 'alertsTopSectionCollapsed';
-      } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
-        topSectionKey = 'planningTopSectionCollapsed';
+  } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
+    topSectionKey = 'planningTopSectionCollapsed';
   } else if (currentPath.includes('/trades')) {
     topSectionKey = 'tradesTopSectionCollapsed';
   } else if (currentPath.includes('/accounts')) {
@@ -736,34 +735,34 @@ window.restoreAllSectionStates = function () {
   }
 
   const topSectionCollapsed = localStorage.getItem(topSectionKey) === 'true';
-          // Restoring top section state
+  // Restoring top section state
   const topSection = document.querySelector('.top-section .section-body');
   const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
   const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
 
   if (topSection && topToggleBtn && topIcon) {
-            // Found top section elements, applying state
+    // Found top section elements, applying state
     if (topSectionCollapsed) {
       topSection.classList.add('collapsed');
       topSection.style.display = 'none';
       topIcon.textContent = '▼';
-              // Top section collapsed
+      // Top section collapsed
     } else {
       topSection.classList.remove('collapsed');
       topSection.style.display = 'block';
       topIcon.textContent = '▲';
-              // Top section expanded
+      // Top section expanded
     }
   } else {
-          // Top section elements not found
+    // Top section elements not found
   }
 
   // Restore main section state
   let mainSectionKey = 'mainSectionCollapsed';
   if (currentPath.includes('/alerts')) {
     mainSectionKey = 'alertsMainSectionCollapsed';
-      } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
-        mainSectionKey = 'planningMainSectionCollapsed';
+  } else if (currentPath.includes('/planning') || currentPath.includes('/trade_plans')) {
+    mainSectionKey = 'planningMainSectionCollapsed';
   } else if (currentPath.includes('/trades')) {
     mainSectionKey = 'tradesMainSectionCollapsed';
   } else if (currentPath.includes('/accounts')) {
@@ -937,21 +936,21 @@ window.restoreSectionStates = function () {
  * @param {string} modalId - Modal ID to close
  */
 function closeModalGlobal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-        const bootstrapModal = bootstrap.Modal.getInstance(modal);
-        if (bootstrapModal) {
-            bootstrapModal.hide();
-        } else {
-            // Fallback if Bootstrap modal not found
-            modal.style.display = 'none';
-            modal.classList.remove('show');
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) {
-                backdrop.remove();
-            }
-        }
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    const bootstrapModal = bootstrap.Modal.getInstance(modal);
+    if (bootstrapModal) {
+      bootstrapModal.hide();
+    } else {
+      // Fallback if Bootstrap modal not found
+      modal.style.display = 'none';
+      modal.classList.remove('show');
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) {
+        backdrop.remove();
+      }
     }
+  }
 }
 
 // ===== FILTER FUNCTIONS =====
@@ -970,7 +969,7 @@ function getTableType(pageName) {
     'trades': 'trades',
     'accounts': 'accounts',
     'notes': 'notes',
-    'alerts': 'alerts'
+    'alerts': 'alerts',
   };
 
   return tableTypeMap[pageName] || pageName;
@@ -981,8 +980,8 @@ function getTableType(pageName) {
  * פונקציה גלובלית שמשותפת לכל הדפים
  */
 function filterDataByFilters(data, pageName) {
-      // === FILTER DATA BY FILTERS ===
-      // Original data length
+  // === FILTER DATA BY FILTERS ===
+  // Original data length
 
   if (!data || data.length === 0) {
     // No data to filter
@@ -1001,8 +1000,8 @@ function filterDataByFilters(data, pageName) {
   const selectedDateRange = window.selectedDateRangeForFilter || null;
   const searchTerm = window.searchTermForFilter || '';
 
-      // Filters to apply
-          // selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm
+  // Filters to apply
+  // selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm
 
   // פילטר לפי סטטוס (לא חל על הערות)
   if (tableType !== 'notes' && selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
@@ -1068,40 +1067,40 @@ function filterDataByFilters(data, pageName) {
         // מיפוי סוגים לדף התכנון
         let typeDisplay;
         switch (item.type || item.investment_type) {
-          case 'swing':
-            typeDisplay = 'סווינג';
-            break;
-          case 'investment':
-            typeDisplay = 'השקעה';
-            break;
-          case 'passive':
-            typeDisplay = 'פאסיבי';
-            break;
-          default:
-            typeDisplay = item.type || item.investment_type;
+        case 'swing':
+          typeDisplay = 'סווינג';
+          break;
+        case 'investment':
+          typeDisplay = 'השקעה';
+          break;
+        case 'passive':
+          typeDisplay = 'פאסיבי';
+          break;
+        default:
+          typeDisplay = item.type || item.investment_type;
         }
         typeMatch = selectedTypes.includes(typeDisplay);
       } else if (pageName === 'tracking' || pageName === 'trades') {
         // מיפוי סוגים לדף המעקב
         let typeDisplay;
         switch (item.type) {
-          case 'swing':
-            typeDisplay = 'סווינג';
-            break;
-          case 'investment':
-            typeDisplay = 'השקעה';
-            break;
-          case 'passive':
-            typeDisplay = 'פאסיבי';
-            break;
-          case 'buy':
-            typeDisplay = 'קנייה';
-            break;
-          case 'sell':
-            typeDisplay = 'מכירה';
-            break;
-          default:
-            typeDisplay = item.type;
+        case 'swing':
+          typeDisplay = 'סווינג';
+          break;
+        case 'investment':
+          typeDisplay = 'השקעה';
+          break;
+        case 'passive':
+          typeDisplay = 'פאסיבי';
+          break;
+        case 'buy':
+          typeDisplay = 'קנייה';
+          break;
+        case 'sell':
+          typeDisplay = 'מכירה';
+          break;
+        default:
+          typeDisplay = item.type;
         }
         typeMatch = selectedTypes.includes(typeDisplay);
       } else {
@@ -1129,24 +1128,24 @@ function filterDataByFilters(data, pageName) {
     filteredData = filteredData.filter(item => {
       const itemDate = new Date(item.created_at);
       const now = new Date();
-      
+
       switch (selectedDateRange) {
-        case 'היום':
-          return itemDate.toDateString() === now.toDateString();
-        case 'אתמול':
-          const yesterday = new Date(now);
-          yesterday.setDate(yesterday.getDate() - 1);
-          return itemDate.toDateString() === yesterday.toDateString();
-        case 'השבוע':
-          const weekAgo = new Date(now);
-          weekAgo.setDate(weekAgo.getDate() - 7);
-          return itemDate >= weekAgo;
-        case 'החודש':
-          return itemDate.getMonth() === now.getMonth() && itemDate.getFullYear() === now.getFullYear();
-        case 'השנה':
-          return itemDate.getFullYear() === now.getFullYear();
-        default:
-          return true;
+      case 'היום':
+        return itemDate.toDateString() === now.toDateString();
+      case 'אתמול':
+        const yesterday = new Date(now);
+        yesterday.setDate(yesterday.getDate() - 1);
+        return itemDate.toDateString() === yesterday.toDateString();
+      case 'השבוע':
+        const weekAgo = new Date(now);
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return itemDate >= weekAgo;
+      case 'החודש':
+        return itemDate.getMonth() === now.getMonth() && itemDate.getFullYear() === now.getFullYear();
+      case 'השנה':
+        return itemDate.getFullYear() === now.getFullYear();
+      default:
+        return true;
       }
     });
     // After date range filter
@@ -1156,7 +1155,7 @@ function filterDataByFilters(data, pageName) {
   if (searchTerm && searchTerm.trim() !== '') {
     // Filtering by search term
     const searchTerms = searchTerm.toLowerCase().split(' ').filter(term => term.length > 0);
-    
+
     filteredData = filteredData.filter(item => {
       const searchableText = [
         item.name || '',
@@ -1167,15 +1166,15 @@ function filterDataByFilters(data, pageName) {
         item.ticker?.name || '',
         item.account?.name || '',
         item.status || '',
-        item.type || ''
+        item.type || '',
       ].join(' ').toLowerCase();
-      
+
       return searchTerms.every(term => searchableText.includes(term));
     });
     // After search filter
   }
 
-      // Final filtered data length
+  // Final filtered data length
   return filteredData;
 }
 
@@ -1205,7 +1204,7 @@ if (document.readyState === 'loading') {
 // ===== SORT ICONS FUNCTIONS =====
 /**
  * Update sort icons for table headers
- * 
+ *
  * @param {string} tableType - Type of table
  * @param {number} activeColumnIndex - Active column index
  * @param {string} direction - Sort direction (asc/desc)
@@ -1220,7 +1219,7 @@ window.updateSortIcons = function (tableType, activeColumnIndex, direction) {
     }
 
     const headers = table.querySelectorAll('th[data-sortable="true"]');
-    
+
     headers.forEach((header, index) => {
       const icon = header.querySelector('.sort-icon');
       if (icon) {
@@ -1239,5 +1238,4 @@ window.updateSortIcons = function (tableType, activeColumnIndex, direction) {
     console.warn('⚠️ Error updating sort icons:', error);
   }
 };
-
 

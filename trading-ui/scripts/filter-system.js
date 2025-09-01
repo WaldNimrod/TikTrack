@@ -2,28 +2,28 @@
  * ========================================
  * מערכת פילטרים חכמה גלובלית
  * ========================================
- * 
+ *
  * מערכת פילטרים מאוחדת שמתאימה את עצמה לכל טבלה
- * 
+ *
  * Dependencies:
  * - table-mappings.js (for column mappings)
  * - main.js (global utilities)
  * - translation-utils.js (translation functions)
- * 
+ *
  * Table Mapping:
  * - Uses table types from table-mappings.js
  * - Column mappings are centralized in table-mappings.js
- * 
+ *
  * תכונות:
  * - פילטר אחד עובד על כל הטבלאות
  * - שמירת מצב בין עמודים
  * - התאמה אוטומטית לכל טבלה
  * - תרגום תאריכים חכם
- * 
+ *
  * File: trading-ui/scripts/filter-system.js
  * Version: 2.2
  * Last Updated: August 23, 2025
- * 
+ *
  * מחבר: TikTrack Development Team
  * תאריך: 2025
  * ========================================
@@ -38,14 +38,14 @@ class FilterSystem {
       dateRange: 'כל זמן',
       status: [],
       type: [],
-      account: []
+      account: [],
     };
 
     this.initialized = false;
   }
 
   initialize() {
-    if (this.initialized) return;
+    if (this.initialized) {return;}
 
     // המתן לטעינת DOM
     if (document.readyState === 'loading') {
@@ -70,7 +70,7 @@ class FilterSystem {
       filteredData: [],
       fields: config.fields || [],
       renderFunction: config.renderFunction,
-      ...config
+      ...config,
     };
 
     this.tables.set(tableId, table);
@@ -84,7 +84,7 @@ class FilterSystem {
   // טעינת נתונים מטבלה HTML
   loadTableData(tableId) {
     const table = this.tables.get(tableId);
-    if (!table || !table.element) return;
+    if (!table || !table.element) {return;}
 
     const rows = table.element.querySelectorAll('tbody tr');
     const data = [];
@@ -97,7 +97,7 @@ class FilterSystem {
         if (cells[index]) {
           const value = cells[index].textContent.trim();
           rowData[field] = value;
-          }
+        }
       });
 
       data.push(rowData);
@@ -105,19 +105,19 @@ class FilterSystem {
 
     table.data = data;
     table.filteredData = [...data];
-    }
+  }
 
   // רישום פילטר חדש
   registerFilter(filterName, filterConfig) {
     this.filters.set(filterName, filterConfig);
-    }
+  }
 
   // עדכון פילטר
   updateFilter(filterName, value) {
     this.currentFilters[filterName] = value;
     this.saveFilters();
     this.applyAllFilters();
-    }
+  }
 
   // הפעלת כל הפילטרים על כל הטבלאות
   applyAllFilters() {
@@ -129,36 +129,36 @@ class FilterSystem {
   // הפעלת פילטרים על טבלה ספציפית
   applyFiltersToTable(tableId) {
     const table = this.tables.get(tableId);
-    if (!table) return;
+    if (!table) {return;}
 
     let filteredData = [...table.data];
     // פילטר חיפוש (סטטי)
     if (this.currentFilters.search && table.fields.some(field =>
       ['name', 'description', 'title', 'symbol', 'account_name'].includes(field))) {
       filteredData = this.applySearchFilter(filteredData, this.currentFilters.search);
-      }
+    }
 
     // פילטר תאריכים (סטטי)
     if (this.currentFilters.dateRange && this.currentFilters.dateRange !== 'כל זמן' &&
       table.fields.includes('date')) {
       const dateRange = this.getDateRangeFromText(this.currentFilters.dateRange);
       filteredData = this.applyDateFilter(filteredData, dateRange);
-      }
+    }
 
     // פילטר סטטוס (דינמי)
     if (this.currentFilters.status.length > 0 && table.fields.includes('status')) {
       filteredData = this.applyStatusFilter(filteredData, this.currentFilters.status);
-      }
+    }
 
     // פילטר סוג (דינמי)
     if (this.currentFilters.type.length > 0 && table.fields.includes('type')) {
       filteredData = this.applyTypeFilter(filteredData, this.currentFilters.type);
-      }
+    }
 
     // פילטר חשבון (דינמי)
     if (this.currentFilters.account.length > 0 && table.fields.includes('account_id')) {
       filteredData = this.applyAccountFilter(filteredData, this.currentFilters.account);
-      }
+    }
 
     table.filteredData = filteredData;
 
@@ -169,10 +169,10 @@ class FilterSystem {
   // עדכון תצוגת הטבלה
   updateTableDisplay(tableId, filteredData) {
     const table = this.tables.get(tableId);
-    if (!table || !table.element) return;
+    if (!table || !table.element) {return;}
 
     const tbody = table.element.querySelector('tbody');
-    if (!tbody) return;
+    if (!tbody) {return;}
 
     // הסתרת כל השורות
     const rows = tbody.querySelectorAll('tr');
@@ -187,11 +187,11 @@ class FilterSystem {
       }
     });
 
-    }
+  }
 
   // פילטר חיפוש
   applySearchFilter(data, searchTerm) {
-    if (!searchTerm || searchTerm.trim() === '') return data;
+    if (!searchTerm || searchTerm.trim() === '') {return data;}
 
     const searchLower = searchTerm.toLowerCase().trim();
 
@@ -202,21 +202,21 @@ class FilterSystem {
         item.type || '',
         item.status || '',
         item.account_name || '',
-        item.notes || ''
+        item.notes || '',
       ];
 
       return searchableFields.some(field =>
-        field.toString().toLowerCase().includes(searchLower)
+        field.toString().toLowerCase().includes(searchLower),
       );
     });
   }
 
   // פילטר תאריכים
   applyDateFilter(data, dateRange) {
-    if (!dateRange || !dateRange.start || !dateRange.end) return data;
+    if (!dateRange || !dateRange.start || !dateRange.end) {return data;}
 
     return data.filter(item => {
-      if (!item.date) return false;
+      if (!item.date) {return false;}
       const itemDate = new Date(item.date);
       const startDate = new Date(dateRange.start);
       const endDate = new Date(dateRange.end);
@@ -229,7 +229,7 @@ class FilterSystem {
     const statusMap = {
       'פתוח': 'open',
       'סגור': 'closed',
-      'מבוטל': 'cancelled'
+      'מבוטל': 'cancelled',
     };
     return statusMap[hebrewStatus] || hebrewStatus;
   }
@@ -239,14 +239,14 @@ class FilterSystem {
     const statusMap = {
       'open': 'פתוח',
       'closed': 'סגור',
-      'cancelled': 'מבוטל'
+      'cancelled': 'מבוטל',
     };
     return statusMap[englishStatus] || englishStatus;
   }
 
   // פילטר סטטוס
   applyStatusFilter(data, selectedStatuses) {
-    if (selectedStatuses.length === 0) return data;
+    if (selectedStatuses.length === 0) {return data;}
 
     // תרגום הסטטוסים הנבחרים לאנגלית
     const translatedStatuses = selectedStatuses.map(status => this.translateStatusToEnglish(status));
@@ -261,20 +261,16 @@ class FilterSystem {
 
   // פילטר סוג
   applyTypeFilter(data, selectedTypes) {
-    if (selectedTypes.length === 0) return data;
+    if (selectedTypes.length === 0) {return data;}
 
-    return data.filter(item => {
-      return selectedTypes.includes(item.type);
-    });
+    return data.filter(item => selectedTypes.includes(item.type));
   }
 
   // פילטר חשבון
   applyAccountFilter(data, selectedAccounts) {
-    if (selectedAccounts.length === 0) return data;
+    if (selectedAccounts.length === 0) {return data;}
 
-    return data.filter(item => {
-      return selectedAccounts.includes(item.account_id);
-    });
+    return data.filter(item => selectedAccounts.includes(item.account_id));
   }
 
   // תרגום טקסט תאריכים לטווח תאריכים
@@ -285,92 +281,92 @@ class FilterSystem {
     let startDate, endDate;
 
     switch (dateRangeText) {
-      case 'היום':
-        startDate = todayStr;
-        endDate = todayStr;
-        break;
+    case 'היום':
+      startDate = todayStr;
+      endDate = todayStr;
+      break;
 
-      case 'אתמול':
-        const yesterday = new Date(today);
-        yesterday.setDate(today.getDate() - 1);
-        startDate = yesterday.toISOString().split('T')[0];
-        endDate = startDate;
-        break;
+    case 'אתמול':
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      startDate = yesterday.toISOString().split('T')[0];
+      endDate = startDate;
+      break;
 
-      case 'השבוע':
-        const startOfWeek = new Date(today);
-        const dayOfWeek = today.getDay();
-        startOfWeek.setDate(today.getDate() - dayOfWeek);
-        startDate = startOfWeek.toISOString().split('T')[0];
-        endDate = todayStr;
-        break;
+    case 'השבוע':
+      const startOfWeek = new Date(today);
+      const dayOfWeek = today.getDay();
+      startOfWeek.setDate(today.getDate() - dayOfWeek);
+      startDate = startOfWeek.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
 
-      case 'שבוע אחרון':
-        const weekAgo = new Date(today);
-        weekAgo.setDate(today.getDate() - 7);
-        startDate = weekAgo.toISOString().split('T')[0];
-        endDate = todayStr;
-        break;
+    case 'שבוע אחרון':
+      const weekAgo = new Date(today);
+      weekAgo.setDate(today.getDate() - 7);
+      startDate = weekAgo.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
 
-      case 'חודש אחרון':
-        const monthAgo = new Date(today);
-        monthAgo.setMonth(today.getMonth() - 1);
-        startDate = monthAgo.toISOString().split('T')[0];
-        endDate = todayStr;
-        break;
+    case 'חודש אחרון':
+      const monthAgo = new Date(today);
+      monthAgo.setMonth(today.getMonth() - 1);
+      startDate = monthAgo.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
 
-      case '3 חודשים':
-        const threeMonthsAgo = new Date(today);
-        threeMonthsAgo.setMonth(today.getMonth() - 3);
-        startDate = threeMonthsAgo.toISOString().split('T')[0];
-        endDate = todayStr;
-        break;
+    case '3 חודשים':
+      const threeMonthsAgo = new Date(today);
+      threeMonthsAgo.setMonth(today.getMonth() - 3);
+      startDate = threeMonthsAgo.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
 
-      case 'MTD':
-        startDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
-        endDate = todayStr;
-        break;
+    case 'MTD':
+      startDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
 
-      case 'YTD':
-        startDate = new Date(today.getFullYear(), 0, 1).toISOString().split('T')[0];
-        endDate = todayStr;
-        break;
+    case 'YTD':
+      startDate = new Date(today.getFullYear(), 0, 1).toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
 
-      case '30 יום':
-        const thirtyDaysAgo = new Date(today);
-        thirtyDaysAgo.setDate(today.getDate() - 30);
-        startDate = thirtyDaysAgo.toISOString().split('T')[0];
-        endDate = todayStr;
-        break;
+    case '30 יום':
+      const thirtyDaysAgo = new Date(today);
+      thirtyDaysAgo.setDate(today.getDate() - 30);
+      startDate = thirtyDaysAgo.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
 
-      case '60 יום':
-        const sixtyDaysAgo = new Date(today);
-        sixtyDaysAgo.setDate(today.getDate() - 60);
-        startDate = sixtyDaysAgo.toISOString().split('T')[0];
-        endDate = todayStr;
-        break;
+    case '60 יום':
+      const sixtyDaysAgo = new Date(today);
+      sixtyDaysAgo.setDate(today.getDate() - 60);
+      startDate = sixtyDaysAgo.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
 
-      case '90 יום':
-        const ninetyDaysAgo = new Date(today);
-        ninetyDaysAgo.setDate(today.getDate() - 90);
-        startDate = ninetyDaysAgo.toISOString().split('T')[0];
-        endDate = todayStr;
-        break;
+    case '90 יום':
+      const ninetyDaysAgo = new Date(today);
+      ninetyDaysAgo.setDate(today.getDate() - 90);
+      startDate = ninetyDaysAgo.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
 
-      case 'שנה':
-        const yearAgo = new Date(today);
-        yearAgo.setFullYear(today.getFullYear() - 1);
-        startDate = yearAgo.toISOString().split('T')[0];
-        endDate = todayStr;
-        break;
+    case 'שנה':
+      const yearAgo = new Date(today);
+      yearAgo.setFullYear(today.getFullYear() - 1);
+      startDate = yearAgo.toISOString().split('T')[0];
+      endDate = todayStr;
+      break;
 
-      case 'שנה קודמת':
-        startDate = new Date(today.getFullYear() - 1, 0, 1).toISOString().split('T')[0];
-        endDate = new Date(today.getFullYear() - 1, 11, 31).toISOString().split('T')[0];
-        break;
+    case 'שנה קודמת':
+      startDate = new Date(today.getFullYear() - 1, 0, 1).toISOString().split('T')[0];
+      endDate = new Date(today.getFullYear() - 1, 11, 31).toISOString().split('T')[0];
+      break;
 
-      default:
-        return null;
+    default:
+      return null;
     }
 
     return { start: startDate, end: endDate };
@@ -386,7 +382,7 @@ class FilterSystem {
     const saved = localStorage.getItem('globalFilters');
     if (saved) {
       this.currentFilters = { ...this.currentFilters, ...JSON.parse(saved) };
-      }
+    }
   }
 
   // איפוס פילטרים
@@ -396,23 +392,23 @@ class FilterSystem {
       dateRange: 'כל זמן',
       status: [],
       type: [],
-      account: []
+      account: [],
     };
     this.saveFilters();
     this.applyAllFilters();
-    }
+  }
 
   // הגדרת event listeners גלובליים
   setupGlobalEventListeners() {
     // Event listener לפילטר חיפוש
-    document.addEventListener('input', (e) => {
+    document.addEventListener('input', e => {
       if (e.target.id === 'searchFilterInput') {
         this.updateFilter('search', e.target.value);
       }
     });
 
     // Event listener לפילטר תאריכים
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', e => {
       if (e.target.closest('.date-range-filter-item')) {
         const text = e.target.closest('.date-range-filter-item').querySelector('.option-text').textContent;
         this.updateFilter('dateRange', text);
@@ -420,7 +416,7 @@ class FilterSystem {
     });
 
     // Event listener לפילטר סטטוס
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', e => {
       if (e.target.closest('.status-filter-item')) {
         const text = e.target.closest('.status-filter-item').querySelector('.option-text').textContent;
         const currentStatuses = [...this.currentFilters.status];
@@ -437,7 +433,7 @@ class FilterSystem {
     });
 
     // Event listener לפילטר סוג
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', e => {
       if (e.target.closest('.type-filter-item')) {
         const text = e.target.closest('.type-filter-item').querySelector('.option-text').textContent;
         const currentTypes = [...this.currentFilters.type];
@@ -454,7 +450,7 @@ class FilterSystem {
     });
 
     // Event listener לפילטר חשבון
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', e => {
       if (e.target.closest('.account-filter-item')) {
         const accountId = e.target.closest('.account-filter-item').getAttribute('data-account-id');
         const currentAccounts = [...this.currentFilters.account];
@@ -479,29 +475,28 @@ class FilterSystem {
   // בדיקה אם פילטר רלוונטי לטבלה
   isFilterRelevant(filterName, tableId) {
     const table = this.tables.get(tableId);
-    if (!table) return false;
+    if (!table) {return false;}
 
     switch (filterName) {
-      case 'search':
-        return table.fields.some(field =>
-          ['name', 'description', 'title', 'symbol', 'account_name'].includes(field));
-      case 'dateRange':
-        return table.fields.includes('date');
-      case 'status':
-        return table.fields.includes('status');
-      case 'type':
-        return table.fields.includes('type');
-      case 'account':
-        return table.fields.includes('account_id');
-      default:
-        return false;
+    case 'search':
+      return table.fields.some(field =>
+        ['name', 'description', 'title', 'symbol', 'account_name'].includes(field));
+    case 'dateRange':
+      return table.fields.includes('date');
+    case 'status':
+      return table.fields.includes('status');
+    case 'type':
+      return table.fields.includes('type');
+    case 'account':
+      return table.fields.includes('account_id');
+    default:
+      return false;
     }
   }
   // החזרת טבלאות רשומות
   getRegisteredTables() {
     return Object.fromEntries(this.tables);
   }
-
 
 
   // עדכון אפשרויות חשבונות

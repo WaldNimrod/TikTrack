@@ -1,11 +1,11 @@
 /**
  * TikTrack Authentication System
  * מערכת התחברות גלובלית לאתר
- * 
+ *
  * Dependencies:
  * - main.js (global utilities)
  * - translation-utils.js (translation functions)
- * 
+ *
  * File: trading-ui/scripts/auth.js
  * Version: 2.2
  * Last Updated: August 23, 2025
@@ -21,9 +21,9 @@ async function login(username, password) {
     const response = await fetch('http://127.0.0.1:8080/api/v1/auth/login', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username, password })
+      body: JSON.stringify({ username, password }),
     });
 
     const data = await response.json();
@@ -110,9 +110,9 @@ function loadSavedCredentials(usernameId = 'username', passwordId = 'password', 
       const passwordField = document.getElementById(passwordId);
       const rememberMeField = document.getElementById(rememberMeId);
 
-      if (usernameField) usernameField.value = savedUsername;
-      if (passwordField) passwordField.value = savedPassword;
-      if (rememberMeField) rememberMeField.checked = true;
+      if (usernameField) {usernameField.value = savedUsername;}
+      if (passwordField) {passwordField.value = savedPassword;}
+      if (rememberMeField) {rememberMeField.checked = true;}
     }
   }
 }
@@ -121,8 +121,8 @@ function showDashboard(loginSectionId = 'loginSection', dashboardSectionId = 'da
   const loginSection = document.getElementById(loginSectionId);
   const dashboardSection = document.getElementById(dashboardSectionId);
 
-  if (loginSection) loginSection.style.display = 'none';
-  if (dashboardSection) dashboardSection.style.display = 'block';
+  if (loginSection) {loginSection.style.display = 'none';}
+  if (dashboardSection) {dashboardSection.style.display = 'block';}
 
   // הפעלת פונקציה גלובלית לטעינת הדשבורד אם קיימת
   if (typeof loadDashboardData === 'function') {
@@ -134,8 +134,8 @@ function showLogin(loginSectionId = 'loginSection', dashboardSectionId = 'dashbo
   const loginSection = document.getElementById(loginSectionId);
   const dashboardSection = document.getElementById(dashboardSectionId);
 
-  if (loginSection) loginSection.style.display = 'block';
-  if (dashboardSection) dashboardSection.style.display = 'none';
+  if (loginSection) {loginSection.style.display = 'block';}
+  if (dashboardSection) {dashboardSection.style.display = 'none';}
 }
 
 function logout() {
@@ -167,7 +167,7 @@ function getCurrentUser() {
 // פונקציה גלובלית לטיפול בטופס התחברות
 function setupLoginForm(formId = 'loginForm', onSuccess = null) {
   const form = document.getElementById(formId);
-  if (!form) return;
+  if (!form) {return;}
 
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -247,7 +247,7 @@ function checkAuthentication(onAuthenticated = null, onNotAuthenticated = null) 
 // פונקציה ליצירת ממשק התחברות דינמי
 function createLoginInterface(containerId, onSuccess = null) {
   const container = document.getElementById(containerId);
-  if (!container) return;
+  if (!container) {return;}
 
   container.innerHTML = `
     <div class="login-container">
@@ -297,7 +297,7 @@ function createLoginInterface(containerId, onSuccess = null) {
 // פונקציה ליצירת כפתור התנתקות
 function createLogoutButton(containerId) {
   const container = document.getElementById(containerId);
-  if (!container) return;
+  if (!container) {return;}
 
   container.innerHTML = `
     <button class="btn btn-outline-danger" onclick="logout()">
@@ -308,7 +308,7 @@ function createLogoutButton(containerId) {
 
 // פונקציה לבדיקת הרשאות
 function hasPermission(permission) {
-  if (!currentUser || !currentUser.roles) return false;
+  if (!currentUser || !currentUser.roles) {return false;}
 
   // כאן אפשר להוסיף לוגיקה לבדיקת הרשאות
   // כרגע נחזיר true לכל משתמש מחובר
@@ -317,7 +317,7 @@ function hasPermission(permission) {
 
 // פונקציה לבדיקת תפקיד
 function hasRole(role) {
-  if (!currentUser || !currentUser.roles) return false;
+  if (!currentUser || !currentUser.roles) {return false;}
   return currentUser.roles.includes(role);
 }
 
@@ -337,5 +337,5 @@ window.TikTrackAuth = {
   showLogin,
   showDashboard,
   showLoginError,
-  showLoginSuccess
+  showLoginSuccess,
 };

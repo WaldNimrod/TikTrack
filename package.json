@@ -7,12 +7,18 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint trading-ui/scripts/*.js",
     "lint:fix": "eslint trading-ui/scripts/*.js --fix",
-    "format": "prettier --write trading-ui/scripts/*.js trading-ui/styles/*.css",
-    "format:check": "prettier --check trading-ui/scripts/*.js trading-ui/styles/*.css",
+    "lint:report": "eslint trading-ui/scripts/*.js --format=html --output-file=lint-report.html",
+    "format": "prettier --write trading-ui/scripts/*.js trading-ui/styles/*.css trading-ui/*.html",
+    "format:check": "prettier --check trading-ui/scripts/*.js trading-ui/styles/*.css trading-ui/*.html",
     "html:check": "htmlhint trading-ui/*.html",
     "css:check": "stylelint \"trading-ui/styles/*.css\"",
+    "css:fix": "stylelint \"trading-ui/styles/*.css\" --fix",
     "check:all": "npm run lint && npm run format:check && npm run html:check && npm run css:check",
-    "fix:all": "npm run lint:fix && npm run format"
+    "fix:all": "npm run lint:fix && npm run format && npm run css:fix",
+    "quality:report": "npm run lint:report && echo \"Quality report generated: lint-report.html\"",
+    "performance:check": "lighthouse http://localhost:8080 --output=html --output-path=./performance-report.html",
+    "bundle:analyze": "webpack-bundle-analyzer trading-ui/scripts/*.js",
+    "validate:all": "npm run check:all && npm run quality:report"
   },
   "repository": {
     "type": "git",
@@ -27,10 +33,23 @@
   },
   "homepage": "https://github.com/WaldNimrod/TikTrack#readme",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.41.0",
+    "@typescript-eslint/parser": "^8.41.0",
     "eslint": "^9.34.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsdoc": "^54.1.1",
+    "eslint-plugin-promise": "^7.2.1",
+    "eslint-plugin-security": "^3.0.1",
+    "eslint-plugin-unicorn": "^60.0.0",
     "htmlhint": "^1.6.3",
+    "htmlhint-stylish": "^1.0.3",
+    "lighthouse": "^12.8.2",
     "prettier": "^3.6.2",
+    "puppeteer": "^24.18.0",
     "stylelint": "^16.23.1",
-    "stylelint-config-standard": "^39.0.0"
+    "stylelint-config-standard": "^39.0.0",
+    "stylelint-order": "^7.0.0",
+    "stylelint-scss": "^6.12.1",
+    "webpack-bundle-analyzer": "^4.10.2"
   }
 }

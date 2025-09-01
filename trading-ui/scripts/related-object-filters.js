@@ -2,18 +2,18 @@
  * ========================================
  * פילטרים לפי סוג אובייקט מקושר
  * ========================================
- * 
+ *
  * קובץ זה מכיל פונקציות פילטר לפי סוג אובייקט מקושר
  * שניתן להשתמש בהן בעמודי התראות והודעות
  * בנוסף לפילטר הראשי של המערכת
- * 
+ *
  * חשוב: לא לגעת בפונקציונאליות הפילטר הראשי!
  * זהו פילטר נוסף שמפעיל פילטור ספציפי לפי סוג אובייקט מקושר
- * 
+ *
  * File: trading-ui/scripts/related-object-filters.js
  * Version: 1.0
  * Last Updated: September 1, 2025
- * 
+ *
  * מחבר: TikTrack Development Team
  * ========================================
  */
@@ -28,7 +28,7 @@
  */
 function filterByRelatedObjectType(type, data, updateFunction, countSelector, itemName) {
   console.log(`🔧 פילטר לפי סוג אובייקט מקושר - סוג: ${type}, כמות נתונים: ${data.length}`);
-  
+
   // עדכון מצב הכפתורים
   const buttons = document.querySelectorAll('[data-type]');
   buttons.forEach(btn => {
@@ -46,40 +46,38 @@ function filterByRelatedObjectType(type, data, updateFunction, countSelector, it
       btn.style.borderColor = '';
     }
   });
-  
+
   // מיפוי סוגים ל-ID
   const typeMapping = {
     'all': null,
     'account': 1,
     'trade': 2,
     'trade_plan': 3,
-    'ticker': 4
+    'ticker': 4,
   };
-  
+
   const targetTypeId = typeMapping[type];
-  
+
   // פילטור הנתונים
   let filteredData = data;
-  
+
   if (type !== 'all') {
-    filteredData = data.filter(item => {
-      return item.related_type_id === targetTypeId;
-    });
+    filteredData = data.filter(item => item.related_type_id === targetTypeId);
   }
-  
+
   // עדכון הטבלה עם הנתונים המסוננים
   if (typeof updateFunction === 'function') {
     updateFunction(filteredData);
   }
-  
+
   // עדכון ספירת רשומות
   const countElement = document.querySelector(countSelector);
   if (countElement) {
     countElement.textContent = `${filteredData.length} ${itemName}`;
   }
-  
+
   console.log(`✅ סוננו ${itemName} לפי סוג '${type}': נמצאו ${filteredData.length} פריטים`);
-  
+
   return filteredData;
 }
 
@@ -92,13 +90,13 @@ function filterAlertsByRelatedObjectType(type) {
     console.warn('⚠️ נתוני התראות לא זמינים');
     return;
   }
-  
+
   return filterByRelatedObjectType(
-    type, 
-    window.alertsData, 
-    window.updateAlertsTable, 
-    '.table-count', 
-    'התראות'
+    type,
+    window.alertsData,
+    window.updateAlertsTable,
+    '.table-count',
+    'התראות',
   );
 }
 
@@ -111,13 +109,13 @@ function filterNotesByRelatedObjectType(type) {
     console.warn('⚠️ נתוני הודעות לא זמינים');
     return;
   }
-  
+
   return filterByRelatedObjectType(
-    type, 
-    window.notesData, 
-    window.updateNotesTable, 
-    '.table-count', 
-    'הודעות'
+    type,
+    window.notesData,
+    window.updateNotesTable,
+    '.table-count',
+    'הודעות',
   );
 }
 

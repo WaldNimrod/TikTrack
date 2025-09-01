@@ -2,23 +2,23 @@
 /*
  * קובץ זה מכיל את כל הפונקציות הקשורות לניהול חשבונות
  * כולל טעינת נתונים, עדכון טבלאות, מודלים ופעולות CRUD
- * 
- * הערה חשובה: 
+ *
+ * הערה חשובה:
  * - פונקציות פילטר כלליות (updateAccountFilterMenu, updateAccountFilterText) הועברו לקובץ grid-filters.js
  * - פונקציות שירות (getAccounts, isAccountsLoaded) הועברו לקובץ account-service.js
  * - קובץ זה נועד לשרת רק את עמוד accounts.html
- * 
+ *
  * Dependencies:
  * - table-mappings.js (for column mappings and sorting)
  * - main.js (global utilities and sorting functions)
  * - translation-utils.js (translation functions)
  * - filter-system.js (filter functionality)
- * 
+ *
  * Table Mapping:
  * - Uses 'accounts' table type from table-mappings.js
  * - Column mappings are centralized in table-mappings.js
  * - Sorting uses global window.sortTableData() function
- * 
+ *
  * תכולת הקובץ:
  * - loadAccountsFromServer: טעינת חשבונות מהשרת
  * - updateAccountsTable: עדכון טבלת חשבונות
@@ -27,7 +27,7 @@
  * - updateAccountFromModal: עדכון חשבון קיים
  * - deleteAccount: מחיקת חשבון
  * - פונקציות ניהול חשבונות מלאות (CRUD, מודלים, מחיקה, ביטול)
- * 
+ *
  * שימוש: נטען רק בעמוד accounts.html לניהול חשבונות
  * תלויות: Bootstrap (למודלים), fetch API, grid-filters.js (לפונקציות פילטר)
  */
@@ -45,7 +45,7 @@ async function loadCurrenciesFromServer() {
   try {
     const token = localStorage.getItem('authToken');
     const headers = {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     };
 
     if (token) {
@@ -54,7 +54,7 @@ async function loadCurrenciesFromServer() {
 
     const response = await fetch('http://127.0.0.1:8080/api/v1/currencies/', {
       method: 'GET',
-      headers: headers
+      headers,
     });
 
     if (response.ok) {
@@ -66,7 +66,7 @@ async function loadCurrenciesFromServer() {
       const errorText = await response.text();
       // טעינת מטבעות ברירת מחדל
       window.currenciesData = [
-        { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
+        { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' },
       ];
       window.currenciesLoaded = true;
     }
@@ -74,7 +74,7 @@ async function loadCurrenciesFromServer() {
   } catch (error) {
     // טעינת מטבעות ברירת מחדל
     window.currenciesData = [
-      { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' }
+      { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' },
     ];
     window.currenciesLoaded = true;
   }
@@ -85,32 +85,32 @@ function getCurrencyDisplay(account) {
   if (account.currency_symbol) {
     // אם יש סמל מטבע מהשרת
     switch (account.currency_symbol) {
-      case 'USD': return '$';
-      case 'ILS': return '₪';
-      case 'EUR': return '€';
-      case 'GBP': return '£';
-      default: return account.currency_symbol;
+    case 'USD': return '$';
+    case 'ILS': return '₪';
+    case 'EUR': return '€';
+    case 'GBP': return '£';
+    default: return account.currency_symbol;
     }
   } else if (account.currency_id && window.currenciesData.length > 0) {
     // אם יש רק currency_id, נחפש את המטבע
     const currency = window.currenciesData.find(c => c.id === account.currency_id);
     if (currency) {
       switch (currency.symbol) {
-        case 'USD': return '$';
-        case 'ILS': return '₪';
-        case 'EUR': return '€';
-        case 'GBP': return '£';
-        default: return currency.symbol;
+      case 'USD': return '$';
+      case 'ILS': return '₪';
+      case 'EUR': return '€';
+      case 'GBP': return '£';
+      default: return currency.symbol;
       }
     }
   } else if (account.currency && account.currency.symbol) {
     // fallback למטבע הישן
     switch (account.currency.symbol) {
-      case 'USD': return '$';
-      case 'ILS': return '₪';
-      case 'EUR': return '€';
-      case 'GBP': return '£';
-      default: return account.currency.symbol;
+    case 'USD': return '$';
+    case 'ILS': return '₪';
+    case 'EUR': return '€';
+    case 'GBP': return '£';
+    default: return account.currency.symbol;
     }
   }
   return '$'; // ברירת מחדל
@@ -121,7 +121,7 @@ function generateCurrencyOptions(account = null) {
   // generateCurrencyOptions STARTED
   // Currencies data
   // Currencies loaded
-  
+
   if (!window.currenciesData || window.currenciesData.length === 0) {
     // No currencies data, using default
     // אם אין מטבעות, נחזיר ברירת מחדל
@@ -133,12 +133,12 @@ function generateCurrencyOptions(account = null) {
   const options = window.currenciesData.map(currency => {
     const isSelected = account && (
       account.currency_id === currency.id ||
-      (account.currency_symbol === currency.symbol)
+      account.currency_symbol === currency.symbol
     );
 
     return `<option value="${currency.id}" ${isSelected ? 'selected' : ''}>${currency.name} (${currency.symbol})</option>`;
   }).join('');
-  
+
   // Generated options
   // generateCurrencyOptions COMPLETED
   return options;
@@ -156,7 +156,7 @@ async function loadAccountsFromServer() {
 
     // Fetching accounts from server
     const headers = {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     };
 
     if (token) {
@@ -165,7 +165,7 @@ async function loadAccountsFromServer() {
 
     const response = await fetch('http://127.0.0.1:8080/api/v1/accounts/', {
       method: 'GET',
-      headers: headers
+      headers,
     });
 
     if (response.ok) {
@@ -201,7 +201,7 @@ async function loadAllAccountsFromServer() {
   try {
     const token = localStorage.getItem('authToken');
     const headers = {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     };
 
     if (token) {
@@ -210,7 +210,7 @@ async function loadAllAccountsFromServer() {
 
     const response = await fetch('http://127.0.0.1:8080/api/v1/accounts/', {
       method: 'GET',
-      headers: headers
+      headers,
     });
 
     if (response.ok) {
@@ -279,7 +279,7 @@ async function loadAccountsData() {
       return accounts;
     } else {
       // קריאה ישירה ל-API
-      const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+      const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const response = await fetch(`${base}/api/v1/accounts/`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -298,9 +298,9 @@ async function loadAccountsData() {
 /**
  * עדכון טבלת חשבונות בדף database.html
  * הפונקציה מעדכנת את הטבלה עם נתוני החשבונות
- * 
+ *
  * @param {Array} accounts - מערך של חשבונות
- * 
+ *
  * @example
  * updateAccountsTable(accounts);
  */
@@ -322,7 +322,7 @@ function updateAccountsTable(accounts) {
     // המרת סטטוס לעברית לפילטר
     const statusForFilter = account.status === 'open' ? 'פתוח' :
       account.status === 'closed' ? 'סגור' :
-        account.status === 'cancelled' ? 'מבוטל' : (account.status || '-');
+        account.status === 'cancelled' ? 'מבוטל' : account.status || '-';
 
     return `
     <tr data-account-id="${account.id}">
@@ -344,16 +344,16 @@ function updateAccountsTable(accounts) {
         <button class="btn btn-sm btn-secondary" onclick="showEditAccountModalById(${account.id})" title="ערוך חשבון">
           ✏️
         </button>
-        ${account.status === 'cancelled' ? 
-          `<button class="btn btn-sm btn-outline-success" onclick="restoreAccount(${account.id}, '${account.name || 'Unknown'}')" title="החזר חשבון"><span class="reactivate-icon">✓</span></button>` :
-          `<button class="btn btn-sm btn-warning" onclick="cancelAccountWithLinkedItemsCheck(${account.id}, '${account.name || 'Unknown'}')" title="בטל חשבון">❌</button>`
-        }
+        ${account.status === 'cancelled' ?
+    `<button class="btn btn-sm btn-outline-success" onclick="restoreAccount(${account.id}, '${account.name || 'Unknown'}')" title="החזר חשבון"><span class="reactivate-icon">✓</span></button>` :
+    `<button class="btn btn-sm btn-warning" onclick="cancelAccountWithLinkedItemsCheck(${account.id}, '${account.name || 'Unknown'}')" title="בטל חשבון">❌</button>`
+}
         <button class="btn btn-sm btn-danger" onclick="deleteAccountWithLinkedItemsCheck(${account.id}, '${account.name || 'Unknown'}')" title="מחק חשבון">
           🗑️
         </button>
       </td>
     </tr>
-  `}).join('');
+  `;}).join('');
 
   // עדכון ספירת רשומות
   const countElement = document.getElementById('accountsCount');
@@ -399,7 +399,7 @@ async function loadAccounts() {
 /**
  * עדכון טבלת חשבונות בדף designs.html
  * הפונקציה מעדכנת את הטבלה השנייה (חשבונות) בדף designs.html
- * 
+ *
  * @param {Array} accounts - מערך של חשבונות
  */
 
@@ -471,7 +471,7 @@ window.checkAccountsStatus = function () {
       // Account menu items count
       items.forEach((item, index) => {
         const accountName = item.getAttribute('data-account');
-                  // Item details
+        // Item details
       });
     } else {
       // Account menu not found in shadow DOM
@@ -534,9 +534,7 @@ window.debugAccountsFilter = function () {
 
   // בדיקה מהירה של השרת
   fetch('http://127.0.0.1:8080/api/v1/accounts/')
-    .then(response => {
-      return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
       const accounts = data.data || data;
       const openAccounts = accounts.filter(acc => acc.status === 'open');
@@ -552,9 +550,9 @@ window.debugAccountsFilter = function () {
 
   // ניסיון לטעון חשבונות
   if (typeof window.loadAllAccountsFromServer === 'function') {
-    window.loadAllAccountsFromServer().then((accounts) => {
+    window.loadAllAccountsFromServer().then(accounts => {
       window.checkAccountsStatus();
-    }).catch((error) => {
+    }).catch(error => {
       // Error loading accounts handled silently
     });
   }
@@ -606,7 +604,7 @@ function showAddAccountModal() {
       // הצגת המודל
       const bootstrapModal = new bootstrap.Modal(modal);
       bootstrapModal.show();
-      
+
       // אתחול וולידציה בפתיחת המודל
       if (window.initializeValidation) {
         window.initializeValidation('accountForm');
@@ -623,7 +621,7 @@ function showAddAccountModal() {
  * @param {Object} account - אובייקט החשבון לעריכה (רק במצב edit)
  */
 function createAccountModal(mode, account = null) {
-  
+
   const isEdit = mode === 'edit';
   const title = isEdit ? 'עריכת חשבון' : 'הוספת חשבון חדש';
   const buttonText = isEdit ? 'שמור שינויים' : 'הוסף חשבון';
@@ -714,7 +712,7 @@ function createAccountModal(mode, account = null) {
       const value = this.value.trim();
       const errorElement = modal.querySelector('#nameError');
 
-      if (!errorElement) return; // בדיקה שהאלמנט קיים
+      if (!errorElement) {return;} // בדיקה שהאלמנט קיים
 
       if (value === '') {
         this.classList.add('is-invalid');
@@ -735,7 +733,7 @@ function createAccountModal(mode, account = null) {
     currencySelect.addEventListener('change', function () {
       const errorElement = modal.querySelector('#currencyError');
 
-      if (!errorElement) return; // בדיקה שהאלמנט קיים
+      if (!errorElement) {return;} // בדיקה שהאלמנט קיים
 
       if (!this.value) {
         this.classList.add('is-invalid');
@@ -751,7 +749,7 @@ function createAccountModal(mode, account = null) {
       const value = parseFloat(this.value);
       const errorElement = modal.querySelector('#cashBalanceError');
 
-      if (!errorElement) return; // בדיקה שהאלמנט קיים
+      if (!errorElement) {return;} // בדיקה שהאלמנט קיים
 
       if (this.value !== '' && (isNaN(value) || value < 0)) {
         this.classList.add('is-invalid');
@@ -897,7 +895,7 @@ async function saveAccount(mode, accountId = null) {
       currency_id: parseInt(formData.get('currency_id')),
       status: formData.get('status'),
       cash_balance: parseFloat(formData.get('cash_balance')) || 0,
-      notes: formData.get('notes')
+      notes: formData.get('notes'),
     };
 
     // בדיקת תקינות
@@ -941,7 +939,7 @@ async function saveAccount(mode, accountId = null) {
       const message = mode === 'add' ? 'חשבון נוסף בהצלחה' : 'חשבון עודכן בהצלחה';
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('הצלחה', message);
-        } else {
+      } else {
         // Success message handled by notification system
       }
 
@@ -950,7 +948,7 @@ async function saveAccount(mode, accountId = null) {
       // אם יש שגיאה ברענון, לא סוגרים את המודל ומציגים הודעת שגיאה
       if (typeof window.showWarningNotification === 'function') {
         window.showWarningNotification('אזהרה', 'החשבון נשמר אך יש בעיה בעדכון הטבלה. אנא רענן את הדף.');
-        } else {
+      } else {
         console.warn('החשבון נשמר אך יש בעיה בעדכון הטבלה. אנא רענן את הדף.');
       }
     }
@@ -959,7 +957,7 @@ async function saveAccount(mode, accountId = null) {
     handleSaveError(error, 'שמירת חשבון');
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בשמירת החשבון');
-      } else {
+    } else {
       handleSystemError(new Error('שגיאה בשמירת החשבון'), 'שמירת חשבון');
     }
   }
@@ -974,9 +972,9 @@ async function addAccountToAPI(accountData) {
     const response = await fetch('/api/v1/accounts/', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(accountData)
+      body: JSON.stringify(accountData),
     });
 
     if (!response.ok) {
@@ -1003,9 +1001,9 @@ async function updateAccountInAPI(accountId, accountData) {
     const response = await fetch(`/api/v1/accounts/${accountId}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(accountData)
+      body: JSON.stringify(accountData),
     });
 
     if (!response.ok) {
@@ -1036,7 +1034,7 @@ async function showEditAccountModalById(accountId) {
     handleValidationError('showEditAccountModalById', 'מזהה חשבון לא תקין');
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'מזהה חשבון לא תקין');
-      } else {
+    } else {
       handleValidationError('showEditAccountModalById', 'מזהה חשבון לא תקין');
     }
     return;
@@ -1064,7 +1062,7 @@ async function showEditAccountModalById(accountId) {
     handleDataLoadError(error, 'טעינת נתוני חשבון');
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני החשבון: ' + error.message);
-      } else {
+    } else {
       handleDataLoadError(error, 'טעינת נתוני החשבון');
     }
   }
@@ -1076,7 +1074,7 @@ function showEditAccountModal(account) {
     handleValidationError('showEditAccountModal', 'פרמטר חשבון לא תקין');
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בפתיחת מודל העריכה');
-      } else {
+    } else {
       handleSystemError(new Error('שגיאה בפתיחת מודל העריכה'), 'פתיחת מודל עריכה');
     }
     return;
@@ -1089,12 +1087,12 @@ function showEditAccountModal(account) {
   // הצגת המודל
   const bootstrapModal = new bootstrap.Modal(modal);
   bootstrapModal.show();
-  
+
   // אתחול וולידציה בפתיחת המודל
   if (window.initializeValidation) {
     window.initializeValidation('accountForm');
   }
-  
+
 }
 
 /**
@@ -1126,17 +1124,17 @@ async function createAccount() {
     const response = await fetch('/api/v1/accounts/', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        name: name,
+        name,
         currency_id: parseInt(currency),
-        status: status,
+        status,
         cash_balance: cashBalance,
         total_value: totalValue,
         total_pl: totalPl,
-        notes: notes
-      })
+        notes,
+      }),
     });
 
     const data = await response.json();
@@ -1189,17 +1187,17 @@ async function updateAccountFromModal() {
     const response = await fetch(`/api/v1/accounts/${id}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        name: name,
+        name,
         currency_id: parseInt(currency),
-        status: status,
+        status,
         cash_balance: cashBalance,
         total_value: totalValue,
         total_pl: totalPl,
-        notes: notes
-      })
+        notes,
+      }),
     });
 
     const data = await response.json();
@@ -1260,7 +1258,7 @@ async function loadAccountsDataFromAPI() {
 async function deleteAccountFromAPI(accountId, accountName) {
   try {
     const response = await fetch(`/api/v1/accounts/${accountId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
     });
 
     if (response.ok) {
@@ -1291,14 +1289,14 @@ async function cancelAccount(accountId, accountName) {
 
   // בדיקה ראשונה
   if (window.showCancelWarning) {
-    await new Promise((resolve) => {
-      window.showCancelWarning('חשבון', accountName, 
+    await new Promise(resolve => {
+      window.showCancelWarning('חשבון', accountName,
         () => {
           // בדיקה שנייה
           if (window.showCancelWarning) {
-            window.showCancelWarning('חשבון', accountName, 
+            window.showCancelWarning('חשבון', accountName,
               () => resolve(true),
-              () => resolve(false)
+              () => resolve(false),
             );
           } else {
             if (typeof window.showSecondConfirmationModal === 'function') {
@@ -1306,57 +1304,57 @@ async function cancelAccount(accountId, accountName) {
                 'ביטול חשבון',
                 `הסטטוס ישתנה ל"מבוטל". האם אתה בטוח שברצונך להמשיך בביטול החשבון "${accountName}"?`,
                 () => resolve(true),
-                () => resolve(false)
+                () => resolve(false),
               );
             } else {
               resolve(false);
             }
           }
         },
-        () => resolve(false)
+        () => resolve(false),
       );
-    }).then((confirmed) => {
-      if (!confirmed) return;
+    }).then(confirmed => {
+      if (!confirmed) {return;}
     });
   } else {
     // גיבוי למערכת הישנה
     if (typeof window.showCancelWarning === 'function') {
-      const confirmed = await new Promise((resolve) => {
-        window.showCancelWarning('חשבון', accountName, 
+      const confirmed = await new Promise(resolve => {
+        window.showCancelWarning('חשבון', accountName,
           () => resolve(true),
-          () => resolve(false)
+          () => resolve(false),
         );
       });
-      if (!confirmed) return;
+      if (!confirmed) {return;}
     } else {
       if (typeof window.showConfirmationDialog === 'function') {
-          const confirmed = await new Promise((resolve) => {
-              window.showConfirmationDialog(
-                  'ביטול חשבון',
-                  `האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?\n\nהסטטוס ישתנה ל"מבוטל".`,
-                  () => resolve(true),
-                  () => resolve(false)
-              );
-          });
-          if (!confirmed) return;
+        const confirmed = await new Promise(resolve => {
+          window.showConfirmationDialog(
+            'ביטול חשבון',
+            `האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?\n\nהסטטוס ישתנה ל"מבוטל".`,
+            () => resolve(true),
+            () => resolve(false),
+          );
+        });
+        if (!confirmed) {return;}
       } else {
-                  if (typeof window.showConfirmationDialog === 'function') {
-            const confirmed = await new Promise((resolve) => {
-                window.showConfirmationDialog(
-                    'ביטול חשבון',
-                    `האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?\n\nהסטטוס ישתנה ל"מבוטל".`,
-                    () => resolve(true),
-                    () => resolve(false)
-                );
-            });
-            if (!confirmed) return;
+        if (typeof window.showConfirmationDialog === 'function') {
+          const confirmed = await new Promise(resolve => {
+            window.showConfirmationDialog(
+              'ביטול חשבון',
+              `האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?\n\nהסטטוס ישתנה ל"מבוטל".`,
+              () => resolve(true),
+              () => resolve(false),
+            );
+          });
+          if (!confirmed) {return;}
         } else {
-            if (!confirm(`האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`)) {
-                return;
-            }
-            if (!confirm(`הסטטוס ישתנה ל"מבוטל". האם אתה בטוח שברצונך להמשיך בביטול החשבון "${accountName}"?`)) {
-                return;
-            }
+          if (!confirm(`האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`)) {
+            return;
+          }
+          if (!confirm(`הסטטוס ישתנה ל"מבוטל". האם אתה בטוח שברצונך להמשיך בביטול החשבון "${accountName}"?`)) {
+            return;
+          }
         }
       }
     }
@@ -1378,11 +1376,11 @@ async function cancelAccount(accountId, accountName) {
     const response = await fetch(`/api/v1/accounts/${accountId}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        status: 'cancelled'
-      })
+        status: 'cancelled',
+      }),
     });
 
     if (response.ok) {
@@ -1424,44 +1422,44 @@ async function deleteAccount(accountId, accountName) {
 
   // אישור מהמשתמש
   if (typeof window.showDeleteWarning === 'function') {
-    const confirmed = await new Promise((resolve) => {
-      window.showDeleteWarning('account', accountId, 'חשבון', 
+    const confirmed = await new Promise(resolve => {
+      window.showDeleteWarning('account', accountId, 'חשבון',
         () => resolve(true),
-        () => resolve(false)
+        () => resolve(false),
       );
     });
-    if (!confirmed) return;
+    if (!confirmed) {return;}
   } else {
     // Fallback למערכת הישנה
     if (typeof window.showConfirmationDialog === 'function') {
-        const confirmed = await new Promise((resolve) => {
-            window.showConfirmationDialog(
-                'מחיקת חשבון',
-                `האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?\n\nפעולה זו אינה הפיכה.`,
-                () => resolve(true),
-                () => resolve(false)
-            );
-        });
-        if (!confirmed) return;
+      const confirmed = await new Promise(resolve => {
+        window.showConfirmationDialog(
+          'מחיקת חשבון',
+          `האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?\n\nפעולה זו אינה הפיכה.`,
+          () => resolve(true),
+          () => resolve(false),
+        );
+      });
+      if (!confirmed) {return;}
     } else {
-        if (typeof window.showConfirmationDialog === 'function') {
-            const confirmed = await new Promise((resolve) => {
-                window.showConfirmationDialog(
-                    'מחיקת חשבון',
-                    `האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?\n\nפעולה זו אינה הפיכה.`,
-                    () => resolve(true),
-                    () => resolve(false)
-                );
-            });
-            if (!confirmed) return;
-        } else {
-            if (!confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?`)) {
-                return;
-            }
-            if (!confirm(`פעולה זו אינה הפיכה. האם אתה בטוח שברצונך להמשיך במחיקת החשבון "${accountName}"?`)) {
-                return;
-            }
+      if (typeof window.showConfirmationDialog === 'function') {
+        const confirmed = await new Promise(resolve => {
+          window.showConfirmationDialog(
+            'מחיקת חשבון',
+            `האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?\n\nפעולה זו אינה הפיכה.`,
+            () => resolve(true),
+            () => resolve(false),
+          );
+        });
+        if (!confirmed) {return;}
+      } else {
+        if (!confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?`)) {
+          return;
         }
+        if (!confirm(`פעולה זו אינה הפיכה. האם אתה בטוח שברצונך להמשיך במחיקת החשבון "${accountName}"?`)) {
+          return;
+        }
+      }
     }
   }
 
@@ -1469,8 +1467,8 @@ async function deleteAccount(accountId, accountName) {
     const response = await fetch(`/api/v1/accounts/${accountId}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     });
 
     if (response.ok) {
@@ -1499,38 +1497,38 @@ async function deleteAccount(accountId, accountName) {
  * בדיקת פריטים מקושרים לפני מחיקה
  */
 async function checkLinkedItemsBeforeDelete(accountId) {
-    try {
-        const response = await fetch(`/api/v1/linked-items/account/${accountId}`);
-        
-        if (!response.ok) {
-            // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם המחיקה
-            return false;
-        }
+  try {
+    const response = await fetch(`/api/v1/linked-items/account/${accountId}`);
 
-        const linkedItemsData = await response.json();
-        const childEntities = linkedItemsData.child_entities || [];
-        const parentEntities = linkedItemsData.parent_entities || [];
-        
-        // בדיקה רק אם יש פריטים שמקושרים אל החשבון (child entities)
-        // parent entities הם פריטים שהחשבון מקושר אליהם (מטבע) - לא רלוונטי למחיקה
-        if (childEntities.length > 0) {
-            // יש פריטים מקושרים - הצגת חלון מקושרים
-            if (typeof window.showLinkedItemsModal === 'function') {
-                window.showLinkedItemsModal(linkedItemsData, 'account', accountId);
-                return true;
-            } else {
-                if (typeof window.showNotification === 'function') {
-                    window.showNotification('אזהרה', 'יש פריטים מקושרים לחשבון זה', 'warning');
-                }
-                return true;
-            }
-        }
-
-        return false;
-    } catch (error) {
-        handleSystemError(error, 'בדיקת פריטים מקושרים');
-        return false;
+    if (!response.ok) {
+      // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם המחיקה
+      return false;
     }
+
+    const linkedItemsData = await response.json();
+    const childEntities = linkedItemsData.child_entities || [];
+    const parentEntities = linkedItemsData.parent_entities || [];
+
+    // בדיקה רק אם יש פריטים שמקושרים אל החשבון (child entities)
+    // parent entities הם פריטים שהחשבון מקושר אליהם (מטבע) - לא רלוונטי למחיקה
+    if (childEntities.length > 0) {
+      // יש פריטים מקושרים - הצגת חלון מקושרים
+      if (typeof window.showLinkedItemsModal === 'function') {
+        window.showLinkedItemsModal(linkedItemsData, 'account', accountId);
+        return true;
+      } else {
+        if (typeof window.showNotification === 'function') {
+          window.showNotification('אזהרה', 'יש פריטים מקושרים לחשבון זה', 'warning');
+        }
+        return true;
+      }
+    }
+
+    return false;
+  } catch (error) {
+    handleSystemError(error, 'בדיקת פריטים מקושרים');
+    return false;
+  }
 }
 
 /**
@@ -1566,28 +1564,28 @@ function showSecondConfirmationModal(message, onConfirm) {
         'אישור פעולה',
         message,
         onConfirm,
-        () => {}
+        () => {},
       );
     } else {
-          if (typeof window.showConfirmationDialog === 'function') {
+      if (typeof window.showConfirmationDialog === 'function') {
         window.showConfirmationDialog(
+          'אישור',
+          message,
+          onConfirm,
+        );
+      } else {
+        if (typeof window.showConfirmationDialog === 'function') {
+          window.showConfirmationDialog(
             'אישור',
             message,
-            onConfirm
-        );
-    } else {
-            if (typeof window.showConfirmationDialog === 'function') {
-        window.showConfirmationDialog(
-            'אישור',
-            message,
-            onConfirm
-        );
-    } else {
-        if (confirm(message)) {
+            onConfirm,
+          );
+        } else {
+          if (confirm(message)) {
             onConfirm();
+          }
         }
-    }
-    }
+      }
     }
   }
 }
@@ -1707,10 +1705,10 @@ async function loadAccountsDataForAccountsPage() {
     let filteredAccounts = [...accounts];
 
     // בדיקה אם יש פילטרים פעילים
-    const hasActiveFilters = (window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0) ||
-      (window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0) ||
-      (window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן') ||
-      (window.searchTermForFilter && window.searchTermForFilter.trim() !== '');
+    const hasActiveFilters = window.selectedStatusesForFilter && window.selectedStatusesForFilter.length > 0 ||
+      window.selectedTypesForFilter && window.selectedTypesForFilter.length > 0 ||
+      window.selectedDateRangeForFilter && window.selectedDateRangeForFilter !== 'כל זמן' ||
+      window.searchTermForFilter && window.searchTermForFilter.trim() !== '';
 
     if (hasActiveFilters) {
       if (typeof window.filterDataByFilters === 'function') {
@@ -1755,7 +1753,6 @@ async function loadAccountsDataForAccountsPage() {
     }
   }
 }
-
 
 
 // פונקציה להגדרת כותרות למיון
@@ -1827,17 +1824,17 @@ function filterAccountsLocally(accounts, selectedStatuses, selectedTypes, select
     filteredAccounts = filteredAccounts.filter(account => {
       let typeDisplay;
       switch (account.type || account.account_type) {
-        case 'swing':
-          typeDisplay = 'סווינג';
-          break;
-        case 'investment':
-          typeDisplay = 'השקעה';
-          break;
-        case 'passive':
-          typeDisplay = 'פאסיבי';
-          break;
-        default:
-          typeDisplay = account.type || account.account_type;
+      case 'swing':
+        typeDisplay = 'סווינג';
+        break;
+      case 'investment':
+        typeDisplay = 'השקעה';
+        break;
+      case 'passive':
+        typeDisplay = 'פאסיבי';
+        break;
+      default:
+        typeDisplay = account.type || account.account_type;
       }
       const isMatch = selectedTypes.includes(typeDisplay);
       return isMatch;
@@ -1847,7 +1844,7 @@ function filterAccountsLocally(accounts, selectedStatuses, selectedTypes, select
   // פילטר לפי תאריכים
   if (startDate && endDate) {
     filteredAccounts = filteredAccounts.filter(account => {
-      if (!account.created_at) return false;
+      if (!account.created_at) {return false;}
 
       const accountDate = new Date(account.created_at);
       const start = new Date(startDate);
@@ -1952,7 +1949,6 @@ function restoreAccountsSectionState() {
 window.restoreAccountsSectionState = restoreAccountsSectionState;
 
 
-
 // פונקציות נוספות לטבלת החשבונות - הוסרו כדי למנוע התנגשות
 
 // אתחול הדף
@@ -2050,15 +2046,15 @@ async function deleteAccountWithLinkedItemsCheck(accountId, accountName) {
 async function restoreAccount(accountId, accountName) {
   // אישור מהמשתמש
   if (typeof window.showConfirmationDialog === 'function') {
-    const confirmed = await new Promise((resolve) => {
+    const confirmed = await new Promise(resolve => {
       window.showConfirmationDialog(
         'החזרת חשבון',
         `האם אתה בטוח שברצונך להחזיר את החשבון "${accountName}" לסטטוס סגור?`,
         () => resolve(true),
-        () => resolve(false)
+        () => resolve(false),
       );
     });
-    if (!confirmed) return;
+    if (!confirmed) {return;}
   } else {
     if (!confirm(`האם אתה בטוח שברצונך להחזיר את החשבון "${accountName}" לסטטוס סגור?`)) {
       return;
@@ -2069,11 +2065,11 @@ async function restoreAccount(accountId, accountName) {
     const response = await fetch(`/api/v1/accounts/${accountId}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        status: 'closed'
-      })
+        status: 'closed',
+      }),
     });
 
     if (response.ok) {
@@ -2097,5 +2093,4 @@ async function restoreAccount(accountId, accountName) {
     showErrorMessage('שגיאה בהחזרת חשבון');
   }
 }
-
 

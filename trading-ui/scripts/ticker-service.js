@@ -2,17 +2,17 @@
 /*
  * Ticker Service - Global Ticker Management
  * ========================================
- * 
+ *
  * שירות כללי לטיקרים שמספק פונקציות מתקדמות לקבלת טיקרים
  * לפי תנאים שונים. זמין לכל העמודים באפליקציה.
- * 
+ *
  * פונקציות עיקריות:
  * - getTickers() - קבלת כל הטיקרים
  * - getTickersWithTrades() - טיקרים עם טריידים
  * - getTickersWithPlans() - טיקרים עם תכנונים
  * - getTickersByStatus() - טיקרים לפי סטטוס
  * - getTickersByType() - טיקרים לפי סוג
- * 
+ *
  * File: trading-ui/scripts/ticker-service.js
  * Version: 1.0
  * Created: August 25, 2025
@@ -29,18 +29,18 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 דקות
  * בדיקה אם ה-cache עדכני
  */
 function isCacheValid() {
-    return lastCacheUpdate && (Date.now() - lastCacheUpdate) < CACHE_DURATION;
+  return lastCacheUpdate && Date.now() - lastCacheUpdate < CACHE_DURATION;
 }
 
 /**
  * ניקוי ה-cache
  */
 function clearCache() {
-    tickersCache = null;
-    tradesCache = null;
-    plansCache = null;
-    lastCacheUpdate = null;
-  
+  tickersCache = null;
+  tradesCache = null;
+  plansCache = null;
+  lastCacheUpdate = null;
+
 }
 
 /**
@@ -48,21 +48,21 @@ function clearCache() {
  * @returns {Promise<Array>} מערך של טיקרים
  */
 async function getTickers() {
-    try {
-        const response = await fetch('/api/v1/tickers/');
-        if (response.ok) {
-            const data = await response.json();
-            const tickers = data.data || data || [];
-          
-            return tickers;
-        } else {
-            // Failed to fetch tickers
-            return [];
-        }
-    } catch (error) {
-        // Error fetching tickers
-        return [];
+  try {
+    const response = await fetch('/api/v1/tickers/');
+    if (response.ok) {
+      const data = await response.json();
+      const tickers = data.data || data || [];
+
+      return tickers;
+    } else {
+      // Failed to fetch tickers
+      return [];
     }
+  } catch (error) {
+    // Error fetching tickers
+    return [];
+  }
 }
 
 /**
@@ -70,21 +70,21 @@ async function getTickers() {
  * @returns {Promise<Array>} מערך של טריידים
  */
 async function getTrades() {
-    try {
-        const response = await fetch('/api/v1/trades/');
-        if (response.ok) {
-            const data = await response.json();
-            const trades = data.data || data || [];
-          
-            return trades;
-        } else {
-            // Failed to fetch trades
-            return [];
-        }
-    } catch (error) {
-        // Error fetching trades
-        return [];
+  try {
+    const response = await fetch('/api/v1/trades/');
+    if (response.ok) {
+      const data = await response.json();
+      const trades = data.data || data || [];
+
+      return trades;
+    } else {
+      // Failed to fetch trades
+      return [];
     }
+  } catch (error) {
+    // Error fetching trades
+    return [];
+  }
 }
 
 /**
@@ -92,48 +92,48 @@ async function getTrades() {
  * @returns {Promise<Array>} מערך של תכנונים
  */
 async function getTradePlans() {
-    try {
-        const response = await fetch('/api/v1/trade_plans/');
-        if (response.ok) {
-            const data = await response.json();
-            const plans = data.data || data || [];
-          
-            return plans;
-        } else {
-          
-            return [];
-        }
-    } catch (error) {
-      
-            return [];
+  try {
+    const response = await fetch('/api/v1/trade_plans/');
+    if (response.ok) {
+      const data = await response.json();
+      const plans = data.data || data || [];
+
+      return plans;
+    } else {
+
+      return [];
     }
+  } catch (error) {
+
+    return [];
+  }
 }
 
 /**
  * טעינת נתונים ל-cache
  */
 async function loadCache() {
-    if (isCacheValid()) {
-      
-        return;
-    }
+  if (isCacheValid()) {
 
-    try {
-        const [tickers, trades, plans] = await Promise.all([
-            getTickers(),
-            getTrades(),
-            getTradePlans()
-        ]);
+    return;
+  }
 
-        tickersCache = tickers;
-        tradesCache = trades;
-        plansCache = plans;
-        lastCacheUpdate = Date.now();
+  try {
+    const [tickers, trades, plans] = await Promise.all([
+      getTickers(),
+      getTrades(),
+      getTradePlans(),
+    ]);
 
-        } catch (error) {
-        // Error loading cache
-        clearCache();
-    }
+    tickersCache = tickers;
+    tradesCache = trades;
+    plansCache = plans;
+    lastCacheUpdate = Date.now();
+
+  } catch (error) {
+    // Error loading cache
+    clearCache();
+  }
 }
 
 /**
@@ -144,26 +144,24 @@ async function loadCache() {
  * @returns {Promise<Array>} מערך של טיקרים עם טריידים
  */
 async function getTickersWithTrades(options = {}) {
-    const { tradeStatuses = ['active', 'closed', 'open', 'cancelled'], useCache = true } = options;
+  const { tradeStatuses = ['active', 'closed', 'open', 'cancelled'], useCache = true } = options;
 
-    if (useCache) {
-        await loadCache();
-    } else {
-        clearCache();
-        await loadCache();
-    }
+  if (useCache) {
+    await loadCache();
+  } else {
+    clearCache();
+    await loadCache();
+  }
 
-    const tickers = tickersCache || await getTickers();
-    const trades = tradesCache || await getTrades();
+  const tickers = tickersCache || await getTickers();
+  const trades = tradesCache || await getTrades();
 
-    const relevantTickers = tickers.filter(ticker => {
-        return trades.some(trade =>
-            trade.ticker_id === ticker.id &&
-            tradeStatuses.includes(trade.status)
-        );
-    });
+  const relevantTickers = tickers.filter(ticker => trades.some(trade =>
+    trade.ticker_id === ticker.id &&
+            tradeStatuses.includes(trade.status),
+  ));
 
-    return relevantTickers;
+  return relevantTickers;
 }
 
 /**
@@ -174,31 +172,29 @@ async function getTickersWithTrades(options = {}) {
  * @returns {Promise<Array>} מערך של טיקרים עם תכנונים
  */
 async function getTickersWithPlans(options = {}) {
-    const { planStatuses = [], useCache = true } = options;
+  const { planStatuses = [], useCache = true } = options;
 
-    if (useCache) {
-        await loadCache();
-    } else {
-        clearCache();
-        await loadCache();
-    }
+  if (useCache) {
+    await loadCache();
+  } else {
+    clearCache();
+    await loadCache();
+  }
 
-    const tickers = tickersCache || await getTickers();
-    const plans = plansCache || await getTradePlans();
+  const tickers = tickersCache || await getTickers();
+  const plans = plansCache || await getTradePlans();
 
-    if (plans.length === 0) {
-      
-        return [];
-    }
+  if (plans.length === 0) {
 
-    const relevantTickers = tickers.filter(ticker => {
-        return plans.some(plan =>
-            plan.ticker_id === ticker.id &&
-            (planStatuses.length === 0 || planStatuses.includes(plan.status))
-        );
-    });
+    return [];
+  }
 
-    return relevantTickers;
+  const relevantTickers = tickers.filter(ticker => plans.some(plan =>
+    plan.ticker_id === ticker.id &&
+            (planStatuses.length === 0 || planStatuses.includes(plan.status)),
+  ));
+
+  return relevantTickers;
 }
 
 /**
@@ -210,42 +206,42 @@ async function getTickersWithPlans(options = {}) {
  * @returns {Promise<Array>} מערך של טיקרים רלוונטיים
  */
 async function getRelevantTickers(options = {}) {
-    const {
-        tradeStatuses = ['active', 'closed', 'open', 'cancelled'],
-        planStatuses = [],
-        useCache = true
-    } = options;
+  const {
+    tradeStatuses = ['active', 'closed', 'open', 'cancelled'],
+    planStatuses = [],
+    useCache = true,
+  } = options;
 
-    if (useCache) {
-        await loadCache();
-    } else {
-        clearCache();
-        await loadCache();
+  if (useCache) {
+    await loadCache();
+  } else {
+    clearCache();
+    await loadCache();
+  }
+
+  const tickers = tickersCache || await getTickers();
+  const trades = tradesCache || await getTrades();
+  const plans = plansCache || await getTradePlans();
+
+  const relevantTickers = tickers.filter(ticker => {
+    const hasTrades = trades.some(trade =>
+      trade.ticker_id === ticker.id &&
+            tradeStatuses.includes(trade.status),
+    );
+
+    const hasPlans = plans.length > 0 && plans.some(plan =>
+      plan.ticker_id === ticker.id &&
+            (planStatuses.length === 0 || planStatuses.includes(plan.status)),
+    );
+
+    if (hasTrades || hasPlans) {
+
     }
 
-    const tickers = tickersCache || await getTickers();
-    const trades = tradesCache || await getTrades();
-    const plans = plansCache || await getTradePlans();
+    return hasTrades || hasPlans;
+  });
 
-    const relevantTickers = tickers.filter(ticker => {
-        const hasTrades = trades.some(trade =>
-            trade.ticker_id === ticker.id &&
-            tradeStatuses.includes(trade.status)
-        );
-
-        const hasPlans = plans.length > 0 && plans.some(plan =>
-            plan.ticker_id === ticker.id &&
-            (planStatuses.length === 0 || planStatuses.includes(plan.status))
-        );
-
-        if (hasTrades || hasPlans) {
-          
-        }
-
-        return hasTrades || hasPlans;
-    });
-
-    return relevantTickers;
+  return relevantTickers;
 }
 
 /**
@@ -255,40 +251,40 @@ async function getRelevantTickers(options = {}) {
  * @returns {Promise<Array>} מערך של טיקרים עם טריידים ותכנונים פתוחים/סגורים
  */
 async function getTickersWithOpenOrClosedTradesAndPlans(options = {}) {
-    const { useCache = true } = options;
+  const { useCache = true } = options;
 
-    if (useCache) {
-        await loadCache();
-    } else {
-        clearCache();
-        await loadCache();
+  if (useCache) {
+    await loadCache();
+  } else {
+    clearCache();
+    await loadCache();
+  }
+
+  const tickers = tickersCache || await getTickers();
+  const trades = tradesCache || await getTrades();
+  const plans = plansCache || await getTradePlans();
+
+  const relevantTickers = tickers.filter(ticker => {
+    // בדיקת טריידים בסטטוס פתוח או סגור
+    const hasOpenOrClosedTrades = trades.some(trade =>
+      trade.ticker_id === ticker.id &&
+            (trade.status === 'open' || trade.status === 'closed'),
+    );
+
+    // בדיקת תכנונים בסטטוס פתוח או סגור
+    const hasOpenOrClosedPlans = plans.length > 0 && plans.some(plan =>
+      plan.ticker_id === ticker.id &&
+            (plan.status === 'open' || plan.status === 'closed'),
+    );
+
+    if (hasOpenOrClosedTrades || hasOpenOrClosedPlans) {
+
     }
 
-    const tickers = tickersCache || await getTickers();
-    const trades = tradesCache || await getTrades();
-    const plans = plansCache || await getTradePlans();
+    return hasOpenOrClosedTrades || hasOpenOrClosedPlans;
+  });
 
-    const relevantTickers = tickers.filter(ticker => {
-        // בדיקת טריידים בסטטוס פתוח או סגור
-        const hasOpenOrClosedTrades = trades.some(trade =>
-            trade.ticker_id === ticker.id &&
-            (trade.status === 'open' || trade.status === 'closed')
-        );
-
-        // בדיקת תכנונים בסטטוס פתוח או סגור
-        const hasOpenOrClosedPlans = plans.length > 0 && plans.some(plan =>
-            plan.ticker_id === ticker.id &&
-            (plan.status === 'open' || plan.status === 'closed')
-        );
-
-        if (hasOpenOrClosedTrades || hasOpenOrClosedPlans) {
-          
-        }
-
-        return hasOpenOrClosedTrades || hasOpenOrClosedPlans;
-    });
-
-    return relevantTickers;
+  return relevantTickers;
 }
 
 /**
@@ -298,24 +294,24 @@ async function getTickersWithOpenOrClosedTradesAndPlans(options = {}) {
  * @returns {Promise<Array>} מערך של טיקרים
  */
 async function getTickersByType(types = [], useCache = true) {
-    if (useCache) {
-        await loadCache();
-    } else {
-        clearCache();
-        await loadCache();
-    }
+  if (useCache) {
+    await loadCache();
+  } else {
+    clearCache();
+    await loadCache();
+  }
 
-    const tickers = tickersCache || await getTickers();
+  const tickers = tickersCache || await getTickers();
 
-    if (types.length === 0) {
-        return tickers;
-    }
+  if (types.length === 0) {
+    return tickers;
+  }
 
-    const filteredTickers = tickers.filter(ticker =>
-        types.includes(ticker.type)
-    );
+  const filteredTickers = tickers.filter(ticker =>
+    types.includes(ticker.type),
+  );
 
-    return filteredTickers;
+  return filteredTickers;
 }
 
 /**
@@ -325,28 +321,26 @@ async function getTickersByType(types = [], useCache = true) {
  * @returns {Promise<Array>} מערך של טיקרים
  */
 async function getTickersByActivity(activeOnly = true, useCache = true) {
-    if (useCache) {
-        await loadCache();
-    } else {
-        clearCache();
-        await loadCache();
-    }
+  if (useCache) {
+    await loadCache();
+  } else {
+    clearCache();
+    await loadCache();
+  }
 
-    const tickers = tickersCache || await getTickers();
-    const trades = tradesCache || await getTrades();
+  const tickers = tickersCache || await getTickers();
+  const trades = tradesCache || await getTrades();
 
-    if (!activeOnly) {
-        return tickers;
-    }
+  if (!activeOnly) {
+    return tickers;
+  }
 
-    const activeTickers = tickers.filter(ticker => {
-        return trades.some(trade =>
-            trade.ticker_id === ticker.id &&
-            trade.status === 'active'
-        );
-    });
+  const activeTickers = tickers.filter(ticker => trades.some(trade =>
+    trade.ticker_id === ticker.id &&
+            trade.status === 'active',
+  ));
 
-    return activeTickers;
+  return activeTickers;
 }
 
 /**
@@ -356,20 +350,20 @@ async function getTickersByActivity(activeOnly = true, useCache = true) {
  * @param {string} placeholder - טקסט ברירת מחדל
  */
 function updateTickerSelect(selectId, tickers, placeholder = 'בחר טיקר...') {
-    const select = document.getElementById(selectId);
-    if (!select) {
-        console.warn(`⚠️ Select element with id '${selectId}' not found`);
-        return;
-    }
+  const select = document.getElementById(selectId);
+  if (!select) {
+    console.warn(`⚠️ Select element with id '${selectId}' not found`);
+    return;
+  }
 
-    select.innerHTML = `<option value="">${placeholder}</option>`;
+  select.innerHTML = `<option value="">${placeholder}</option>`;
 
-    tickers.forEach(ticker => {
-        const option = document.createElement('option');
-        option.value = ticker.id;
-        option.textContent = `${ticker.symbol} - ${ticker.name}`;
-        select.appendChild(option);
-    });
+  tickers.forEach(ticker => {
+    const option = document.createElement('option');
+    option.value = ticker.id;
+    option.textContent = `${ticker.symbol} - ${ticker.name}`;
+    select.appendChild(option);
+  });
 
 }
 
@@ -379,65 +373,65 @@ function updateTickerSelect(selectId, tickers, placeholder = 'בחר טיקר...
  * @returns {Promise<void>}
  */
 async function loadTickersForTradePlan() {
-    try {
-        const response = await fetch('/api/v1/tickers/');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        const tickers = data.data || data;
-        
-        // סינון טיקרים - רק פתוח או סגור
-        const activeTickers = tickers.filter(ticker => 
-            ticker.status === 'open' || ticker.status === 'closed'
-        );
-        
-        // Loaded active tickers
-        
-        // עדכון רשימת הטיקרים
-        const tickerSelect = document.getElementById('addTradePlanTickerId');
-        if (tickerSelect) {
-            // שמירת האופציה הראשונה (בחר טיקר)
-            const defaultOption = tickerSelect.querySelector('option[value=""]');
-            tickerSelect.innerHTML = '';
-            
-            if (defaultOption) {
-                tickerSelect.appendChild(defaultOption);
-            }
-            
-            // הוספת טיקרים פעילים
-            activeTickers.forEach(ticker => {
-                const option = document.createElement('option');
-                option.value = ticker.id;
-                option.textContent = ticker.symbol;
-                tickerSelect.appendChild(option);
-            });
-            
-            } else {
-            // Ticker select element not found
-        }
-        
-    } catch (error) {
-        // Error loading tickers
-        // Fallback to static options if API fails
-        }
+  try {
+    const response = await fetch('/api/v1/tickers/');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const tickers = data.data || data;
+
+    // סינון טיקרים - רק פתוח או סגור
+    const activeTickers = tickers.filter(ticker =>
+      ticker.status === 'open' || ticker.status === 'closed',
+    );
+
+    // Loaded active tickers
+
+    // עדכון רשימת הטיקרים
+    const tickerSelect = document.getElementById('addTradePlanTickerId');
+    if (tickerSelect) {
+      // שמירת האופציה הראשונה (בחר טיקר)
+      const defaultOption = tickerSelect.querySelector('option[value=""]');
+      tickerSelect.innerHTML = '';
+
+      if (defaultOption) {
+        tickerSelect.appendChild(defaultOption);
+      }
+
+      // הוספת טיקרים פעילים
+      activeTickers.forEach(ticker => {
+        const option = document.createElement('option');
+        option.value = ticker.id;
+        option.textContent = ticker.symbol;
+        tickerSelect.appendChild(option);
+      });
+
+    } else {
+      // Ticker select element not found
+    }
+
+  } catch (error) {
+    // Error loading tickers
+    // Fallback to static options if API fails
+  }
 }
 
 // הגדרת הפונקציות כגלובליות
 window.tickerService = {
-    getTickers,
-    getTrades,
-    getTradePlans,
-    getTickersWithTrades,
-    getTickersWithPlans,
-    getRelevantTickers,
-    getTickersWithOpenOrClosedTradesAndPlans,
-    getTickersByType,
-    getTickersByActivity,
-    updateTickerSelect,
-    loadTickersForTradePlan,
-    clearCache,
-    loadCache
+  getTickers,
+  getTrades,
+  getTradePlans,
+  getTickersWithTrades,
+  getTickersWithPlans,
+  getRelevantTickers,
+  getTickersWithOpenOrClosedTradesAndPlans,
+  getTickersByType,
+  getTickersByActivity,
+  updateTickerSelect,
+  loadTickersForTradePlan,
+  clearCache,
+  loadCache,
 };
 

@@ -175,12 +175,8 @@ function viewLinkedItems(itemId, itemType = null) {
     else if (currentPath.includes('/executions')) {itemType = 'execution';}
   }
 
-  // Load linked items data and show in view mode
-  loadLinkedItemsData(itemType, itemId).then(data => {
-    if (data) {
-      showLinkedItemsModal(data, itemType, itemId, 'view');
-    }
-  });
+  // Load linked items data
+  loadLinkedItemsData(itemId, itemType);
 }
 
 /**
@@ -194,10 +190,10 @@ function viewLinkedItems(itemId, itemType = null) {
  * @param {string} itemType - Type of the item
  * @param {string|number} itemId - ID of the item
  */
-function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
+function showLinkedItemsModal(data, itemType, itemId) {
 
-  // Create modal content based on mode
-  const modalContent = createLinkedItemsModalContent(data, itemType, itemId, mode);
+  // Create modal content
+  const modalContent = createLinkedItemsModalContent(data, itemType, itemId);
 
   // Create and show modal
   const modalId = 'linkedItemsModal';
@@ -211,14 +207,7 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
     modalTitle = `פריטים מקושרים ל-${getItemTypeDisplayName(itemType)}`;
   }
 
-  // Add mode indicator to title
-  if (mode === 'warningBlock') {
-    modalTitle += ' - ⚠️ אזהרה';
-  } else if (mode === 'view') {
-    modalTitle += ' - 👁️ תצוגה';
-  }
-
-  createModal(modalId, modalTitle, modalContent, mode);
+  createModal(modalId, modalTitle, modalContent);
 
   // Show the modal
   const modal = new bootstrap.Modal(document.getElementById(modalId));
@@ -236,7 +225,7 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
  * @param {string|number} itemId - ID of the item
  * @returns {string} HTML content for the modal
  */
-function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
+function createLinkedItemsModalContent(data, itemType, itemId) {
 
   // יצירת כותרת מותאמת לפי סוג האלמנט
   let headerTitle = '';
@@ -284,8 +273,8 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
     itemName = `רשומה ${itemId}`;
   }
 
-  // קבלת הסבר על הכללים לפי סוג האובייקט והפעולה (רק ב-warningBlock mode)
-  const rulesExplanation = (mode === 'warningBlock') ? getRulesExplanation(itemType, data) : null;
+  // קבלת הסבר על הכללים לפי סוג האובייקט והפעולה
+  const rulesExplanation = getRulesExplanation(itemType, data);
 
   let content = `
     <div class="linked-items-container">
@@ -318,11 +307,11 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
         .linked-item-row.trade_plan { border-left: 4px solid #007bff; }
         .linked-item-row.execution { border-left: 4px solid #28a745; }
         
-        /* כותרת המודול עם רקע צבעוני לפי mode */
+        /* כותרת המודול עם רקע צבעוני */
         .modal-header {
-          background: linear-gradient(135deg, ${mode === 'warningBlock' ? '#dc3545, #c82333' : '#28a745, #20c997'});
+          background: linear-gradient(135deg, #ff9c05, #ff8c00);
           color: white;
-          border-bottom: 2px solid ${mode === 'warningBlock' ? '#c82333' : '#20c997'};
+          border-bottom: 2px solid #ff8c00;
           position: relative;
           padding-left: 60px;
           min-height: 60px;
@@ -330,15 +319,15 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
           align-items: center;
         }
         
-        /* כפתור סגירה מיושר לשמאל עם עיצוב מתאים */
+        /* כפתור סגירה מיושר לשמאל עם עיצוב כתום */
         .modal-header .btn-close-custom {
           position: absolute;
           left: 15px;
           top: 50%;
           transform: translateY(-50%);
           background-color: white;
-          color: ${mode === 'warningBlock' ? '#dc3545' : '#28a745'};
-          border: 2px solid ${mode === 'warningBlock' ? '#dc3545' : '#28a745'};
+          color: #ff9c05;
+          border: 2px solid #ff9c05;
           border-radius: 6px;
           padding: 6px 12px;
           font-size: 14px;
@@ -348,7 +337,7 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
           z-index: 1056;
         }
         .modal-header .btn-close-custom:hover {
-          background-color: ${mode === 'warningBlock' ? '#dc3545' : '#28a745'};
+          background-color: #ff9c05;
           color: white;
         }
         
@@ -448,7 +437,6 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
       <div class="alert alert-info">
         <strong>📋 סקירת אלמנטים מקושרים</strong><br>
         מציג את כל האלמנטים המקושרים ל-${itemName}
-        ${mode === 'warningBlock' ? '<br><strong style="color: #dc3545;">⚠️ לא ניתן לבצע פעולה זו עד לטיפול בפריטים המקושרים</strong>' : ''}
       </div>
       
       ${rulesExplanation ? `
@@ -465,7 +453,7 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
   const allEntities = [...childEntities, ...parentEntities];
 
   if (allEntities.length > 0) {
-    content += createLinkedItemsList(allEntities, mode);
+    content += createLinkedItemsList(allEntities);
   } else {
     content += `
       <div class="alert alert-warning">
@@ -497,7 +485,7 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
  * @param {Array} items - Array of linked items
  * @returns {string} HTML content for the linked items list
  */
-function createLinkedItemsList(items, mode = 'view') {
+function createLinkedItemsList(items) {
   let listHtml = '<div class="linked-items-list">';
 
   items.forEach(item => {
@@ -521,7 +509,6 @@ function createLinkedItemsList(items, mode = 'view') {
         </div>
         <div class="linked-item-col">
           <div class="linked-item-basic-details">${basicInfo}</div>
-          ${mode === 'warningBlock' ? '' : `
           <div class="linked-item-actions">
             <div class="btn-group btn-group-sm" role="group">
               <button class="btn btn-outline-primary" onclick="viewItemDetails('${item.type}', ${item.id})" title="צפה בפרטים">
@@ -538,7 +525,6 @@ function createLinkedItemsList(items, mode = 'view') {
               </button>
             </div>
           </div>
-          `}
         </div>
       </div>
     `;
@@ -717,56 +703,17 @@ function getTradePlanDetails(planId, data = null) {
     if (window.trade_plansData && Array.isArray(window.trade_plansData)) {
       const plan = window.trade_plansData.find(p => p.id == planId);
       if (plan) {
-        // נסה לקבל את הסימבול מהטיקר
-        let symbol = 'לא מוגדר';
-        if (plan.ticker_symbol) {
-          symbol = plan.ticker_symbol;
-        } else if (plan.ticker && plan.ticker.symbol) {
-          symbol = plan.ticker.symbol;
-        } else if (plan.symbol) {
-          symbol = plan.symbol;
-        }
-        
+        const symbol = plan.ticker_symbol || plan.symbol || 'לא מוגדר';
         const date = plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
-        return `${symbol} מתאריך ${date}`;
+        return `תוכנית ${symbol} מתאריך ${date}`;
       }
     }
 
     // נסה לקבל מהנתונים שהתקבלו מה-API
     if (data && data.entity_details) {
-      let symbol = 'לא מוגדר';
-      if (data.entity_details.ticker_symbol) {
-        symbol = data.entity_details.ticker_symbol;
-      } else if (data.entity_details.ticker && data.entity_details.ticker.symbol) {
-        symbol = data.entity_details.ticker.symbol;
-      } else if (data.entity_details.symbol) {
-        symbol = data.entity_details.symbol;
-      }
-      
+      const symbol = data.entity_details.ticker_symbol || data.entity_details.symbol || 'לא מוגדר';
       const date = data.entity_details.created_at ? new Date(data.entity_details.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
-      return `${symbol} מתאריך ${date}`;
-    }
-
-    // נסה לקבל מהנתונים הראשיים של ה-API
-    if (data && data.ticker_symbol) {
-      let symbol = data.ticker_symbol;
-      if (data.ticker && data.ticker.symbol) {
-        symbol = data.ticker.symbol;
-      }
-      const date = data.created_at ? new Date(data.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
-      return `${symbol} מתאריך ${date}`;
-    }
-
-    // נסה לקבל מהנתונים הגלובליים של הטיקר
-    if (window.tickersData && Array.isArray(window.tickersData)) {
-      const plan = window.trade_plansData?.find(p => p.id == planId);
-      if (plan && plan.ticker_id) {
-        const ticker = window.tickersData.find(t => t.id == plan.ticker_id);
-        if (ticker && ticker.symbol) {
-          const date = plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
-          return `${ticker.symbol} מתאריך ${date}`;
-        }
-      }
+      return `תוכנית ${symbol} מתאריך ${date}`;
     }
 
     // אם לא נמצא, נסה לקבל מהטבלה
@@ -776,12 +723,12 @@ function getTradePlanDetails(planId, data = null) {
       const dateCell = planRow.querySelector('[data-column="created_at"]');
       const symbol = symbolCell ? symbolCell.textContent.trim() : 'לא מוגדר';
       const date = dateCell ? new Date(dateCell.textContent.trim()).toLocaleDateString('he-IL') : 'לא מוגדר';
-      return `${symbol} מתאריך ${date}`;
+      return `תוכנית ${symbol} מתאריך ${date}`;
     }
 
     return `תוכנית ${planId}`;
   } catch (error) {
-    console.error('Error getting trade plan details:', error);
+    // Error getting trade plan details
     return `תוכנית ${planId}`;
   }
 }
@@ -863,20 +810,20 @@ function createBasicItemInfo(item) {
  * @param {string} title - Modal title
  * @param {string} content - Modal content
  */
-function createModal(id, title, content, mode = 'view') {
+function createModal(id, title, content) {
   // Remove existing modal if it exists
   const existingModal = document.getElementById(id);
   if (existingModal) {
     existingModal.remove();
   }
 
-  // Create new modal with mode-specific styling
+  // Create new modal
   const modalHtml = `
     <div class="modal fade" id="${id}" tabindex="-1" aria-labelledby="${id}Label" aria-hidden="true">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
-          <div class="modal-header modal-header-colored modal-header-${mode}">
-            <button type="button" class="btn-close-custom btn-close-${mode}" data-bs-dismiss="modal" aria-label="Close">
+          <div class="modal-header modal-header-colored">
+            <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
               ✕
             </button>
             <h5 class="modal-title" id="${id}Label">${title}</h5>
@@ -1574,10 +1521,10 @@ function getStatusBadge(status) {
 
 /**
  * Load linked items data from server
- * 
+ *
  * @param {string} itemType - Type of the item
  * @param {number|string} itemId - ID of the item
- * @returns {Promise<Object>} Promise resolving to linked items data
+ * @returns {Object} Linked items data
  */
 async function loadLinkedItemsData(itemType, itemId) {
   try {
@@ -1590,18 +1537,68 @@ async function loadLinkedItemsData(itemType, itemId) {
     return await response.json();
 
   } catch (error) {
-    console.error('Error loading linked items data:', error);
-    return null;
+    throw error;
   }
 }
 
+/**
+ * Show linked items warning modal
+ *
+ * This function shows a warning when trying to delete/cancel an item that has linked items
+ *
+ * @param {string} itemType - Type of the item (ticker, trade, account, etc.)
+ * @param {number|string} itemId - ID of the item
+ * @param {Function} onConfirm - Callback function to execute on confirmation
+ * @param {Function} onCancel - Callback function to execute on cancellation
+ */
+async function showLinkedItemsWarning(itemType, itemId, onConfirm = null, onCancel = null) {
+  // showLinkedItemsWarning called with
 
+  try {
+    // Load linked items data
+    const linkedItemsData = await loadLinkedItemsData(itemType, itemId);
+
+    if (!linkedItemsData) {
+      console.warn('⚠️ No linked items data received');
+      return;
+    }
+
+    // Check if there are any linked items
+    const hasLinkedItems = linkedItemsData.child_entities && linkedItemsData.child_entities.length > 0 ||
+                              linkedItemsData.parent_entities && linkedItemsData.parent_entities.length > 0;
+
+    if (!hasLinkedItems) {
+      // No linked items found - proceeding with action
+      if (onConfirm) {
+        onConfirm();
+      }
+      return;
+    }
+
+    // Show linked items modal
+    // Showing linked items modal for warning
+    showLinkedItemsModal(itemType, itemId);
+
+    // Store callbacks for later use
+    window._linkedItemsWarningCallbacks = {
+      onConfirm,
+      onCancel,
+    };
+
+  } catch (error) {
+    handleSystemError(error, 'LINKED_ITEMS_WARNING');
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', 'שגיאה בבדיקת פריטים מקושרים');
+    }
+  }
+}
 
 
 // ===== EXPORT FUNCTIONS TO GLOBAL SCOPE =====
 // Generic functions (for backward compatibility)
 window.viewLinkedItems = viewLinkedItems;
 window.showLinkedItemsModal = showLinkedItemsModal;
+window.showLinkedItemsWarning = showLinkedItemsWarning;
 window.loadLinkedItemsData = loadLinkedItemsData;
 window.createLinkedItemsModalContent = createLinkedItemsModalContent;
 window.checkLinkedItems = checkLinkedItems;
@@ -1633,6 +1630,7 @@ window.viewLinkedItemsForExecution = viewLinkedItemsForExecution;
 window.linkedItems = {
   viewLinkedItems,
   showLinkedItemsModal,
+  showLinkedItemsWarning,
   loadLinkedItemsData,
   createLinkedItemsModalContent,
   checkLinkedItems,

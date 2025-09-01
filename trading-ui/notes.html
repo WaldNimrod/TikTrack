@@ -570,17 +570,18 @@
     <script src="scripts/trade-plan-service.js"></script>
     <script src="scripts/notes.js?v=20250831_2"></script>
     <script>
-      // אתחול מערכת הכותרת החדשה
-      document.addEventListener("DOMContentLoaded", () => {
-        console.log("🔄 Initializing unified header system...");
-        if (window.headerSystem) {
-          window.headerSystem.init();
-        }
-        if (window.filterSystem) {
-          window.filterSystem.initialize();
-        }
-      });
-    </script>
+              // אתחול מערכת הכותרת החדשה
+        document.addEventListener("DOMContentLoaded", () => {
+          console.log("🔄 Initializing unified header system...");
+          if (window.headerSystem) {
+            window.headerSystem.init();
+          }
+          if (window.filterSystem) {
+            window.filterSystem.initialize();
+          }
+        });
+      </script>
+    </div> <!-- End background-wrapper -->
 </body>
 
 </html>

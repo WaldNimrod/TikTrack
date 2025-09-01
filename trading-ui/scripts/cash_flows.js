@@ -1576,25 +1576,7 @@ async function updateCashFlow() {
     }
 }
 
-// עדכון פונקציית initializeCashFlowsPage
-async function initializeCashFlowsPage() {
-    // טעינת מטבעות מהשרת
-    await loadCurrenciesFromServer();
-
-    // טעינת נתונים
-    await loadCashFlows();
-
-    // שחזור מצב הסגירה
-    if (typeof window.restoreAllSectionStates === 'function') {
-        window.restoreAllSectionStates();
-    }
-
-    // שחזור מצב סידור
-    restoreSortState();
-
-    // הגדרת event listeners לשדות מקור
-    setupSourceFieldListeners();
-}
+// הפונקציה הוסרה - קיימת כבר בשורה 909
 
 // ייצוא פונקציות גלובליות נוספות
 window.manageExternalIdField = manageExternalIdField;

@@ -2,16 +2,16 @@
  * Active Alerts Component (Light DOM)
  * קומפוננטה להצגת התראות פעילות שמשתמשת בסגנונות הכלליים של האתר
  * שימוש: <active-alerts></active-alerts>
- * 
+ *
  * Dependencies:
  * - main.js (global utilities and alert functions)
  * - translation-utils.js (translation functions)
  * - alerts.js (formatAlertCondition and parseAlertCondition functions)
- * 
+ *
  * File: trading-ui/scripts/active-alerts-component.js
  * Version: 1.9.9
  * Last Updated: August 26, 2025
- * 
+ *
  * Features:
  * - מציג איקון פעמון עם מספר אדום בכותרת הסקשן כשיש התראות חדשות
  * - עובד גם בסקשן סגור
@@ -28,24 +28,24 @@
  * - לחיצה על אובייקט מקושר פותחת מודל (בפיתוח)
  * - תמיכה במבנה מורכב של תנאים: variable | operator | value
  * - תמיכה בערכים פשוטים: price_target, stop_loss, וכו'
- * 
+ *
  * Color Scheme by Related Object Type:
  * - 💰 חשבון (type=1): צבע טורקיז #29a6a8 / #1f8a8c
- * - 📈 טרייד (type=2): צבע ירוק #28a745 / #1e7e34  
+ * - 📈 טרייד (type=2): צבע ירוק #28a745 / #1e7e34
  * - 📋 תוכנית טרייד (type=3): צבע כתום #ff9500 / #e67e00
  * - 📊 טיקר (type=4): צבע אדום #dc3545 / #c82333
- * 
+ *
  * Database Constraints:
  * - שדה condition מוגבל לאילוץ CHECK
  * - מבנה מורכב: variable | operator | value
  * - ערכים פשוטים: above, below, price_target, stop_loss, וכו'
- * 
+ *
  * Related Object Display Format:
  * - טרייד: "🔗 טרייד | סווינג | Long | 24.3.25"
  * - תוכנית: "🔗 תוכנית | השקעה | Short | 24.3.25"
  * - חשבון: "🔗 חשבון מעודכן (USD)"
  * - טיקר: "🔗 טיקר: AAPL"
- * 
+ *
  * Styling Features:
  * - רקע שקוף 10% (0.1) לפי סוג האובייקט
  * - קו שמאלי צבעוני 4px
@@ -92,7 +92,7 @@ class ActiveAlertsComponent extends HTMLElement {
     setTimeout(() => {
       // בדיקה אם יש הרבה הודעות בקונסולה
       if (this._checkAttempts > 3) {
-      
+
         if (console.clear) {
           console.clear();
         }
@@ -118,7 +118,7 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   render() {
-  
+
 
     this.innerHTML = `
       <div class="alerts-container">
@@ -160,7 +160,7 @@ class ActiveAlertsComponent extends HTMLElement {
       </div>
     `;
 
-  
+
     this.loadActiveAlerts();
   }
 
@@ -214,12 +214,12 @@ class ActiveAlertsComponent extends HTMLElement {
 
     this.isLoading = true;
     try {
-      const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+      const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const response = await fetch(`${base}/api/v1/alerts/unread`);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) {throw new Error(`HTTP ${response.status}`);}
 
       const apiData = await response.json();
-      this.alerts = (apiData && apiData.status === 'success' && Array.isArray(apiData.data)) ? apiData.data : [];
+      this.alerts = apiData && apiData.status === 'success' && Array.isArray(apiData.data) ? apiData.data : [];
 
       this.renderAlerts();
       this.updateCount(); // עדכון הכותרת והסקשן
@@ -324,7 +324,7 @@ class ActiveAlertsComponent extends HTMLElement {
   renderAlerts() {
     const container = this.querySelector('#alertsCards');
     const legendHeader = this.querySelector('.alerts-color-legend-header');
-    
+
     if (!container) {
       return;
     }
@@ -431,7 +431,7 @@ class ActiveAlertsComponent extends HTMLElement {
 
   setupCardEventListeners() {
     this.querySelectorAll('.btn-mark-read-icon').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', e => {
         const id = parseInt(e.currentTarget.dataset.alertId);
         this.markAlertAsRead(id);
       });
@@ -440,16 +440,16 @@ class ActiveAlertsComponent extends HTMLElement {
 
   async markAlertAsRead(alertId) {
     const btn = this.querySelector(`.btn-mark-read-icon[data-alert-id="${alertId}"]`);
-    if (btn) { 
-      btn.disabled = true; 
-            btn.textContent = window.BUTTON_ICONS ? window.BUTTON_ICONS.READ : '✓';
-      btn.style.opacity = '0.5'; 
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = window.BUTTON_ICONS ? window.BUTTON_ICONS.READ : '✓';
+      btn.style.opacity = '0.5';
     }
     try {
-      const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+      const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const res = await fetch(`${base}/api/v1/alerts/${alertId}/mark-read`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' } });
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {throw new Error(`HTTP ${res.status}`);}
       const card = this.querySelector(`[data-alert-id="${alertId}"]`);
       if (card) {
         card.style.opacity = '0.5';
@@ -459,15 +459,15 @@ class ActiveAlertsComponent extends HTMLElement {
           this.alerts = this.alerts.filter(a => a.id !== alertId);
           this.updateCount();
           this.updateSectionHeaderAlertIcon(); // עדכון איקון ההתראות בכותרת הסקשן
-          if (!this.alerts.length) this.renderAlerts();
+          if (!this.alerts.length) {this.renderAlerts();}
           setTimeout(() => this.loadActiveAlerts(), 400);
         }, 220);
       }
     } catch (err) {
-      if (btn) { 
-        btn.disabled = false; 
-        btn.textContent = window.BUTTON_ICONS ? window.BUTTON_ICONS.APPROVE : '✓'; 
-        btn.style.opacity = '1'; 
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = window.BUTTON_ICONS ? window.BUTTON_ICONS.APPROVE : '✓';
+        btn.style.opacity = '1';
       }
     }
   }
@@ -479,10 +479,10 @@ class ActiveAlertsComponent extends HTMLElement {
     const mins = Math.floor((now - d) / 60000);
     const hours = Math.floor(mins / 60);
     const days = Math.floor(hours / 24);
-    if (mins < 1) return 'עכשיו';
-    if (mins < 60) return `לפני ${mins} דקות`;
-    if (hours < 24) return `לפני ${hours} שעות`;
-    if (days < 7) return `לפני ${days} ימים`;
+    if (mins < 1) {return 'עכשיו';}
+    if (mins < 60) {return `לפני ${mins} דקות`;}
+    if (hours < 24) {return `לפני ${hours} שעות`;}
+    if (days < 7) {return `לפני ${days} ימים`;}
     return d.toLocaleDateString('he-IL');
   }
 
@@ -520,7 +520,7 @@ class ActiveAlertsComponent extends HTMLElement {
       return date.toLocaleTimeString('he-IL', {
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false
+        hour12: false,
       });
     }
 
@@ -529,7 +529,7 @@ class ActiveAlertsComponent extends HTMLElement {
       return `אתמול ${date.toLocaleTimeString('he-IL', {
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false
+        hour12: false,
       })}`;
     }
 
@@ -540,7 +540,7 @@ class ActiveAlertsComponent extends HTMLElement {
       return `${dayName} ${date.toLocaleTimeString('he-IL', {
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false
+        hour12: false,
       })}`;
     }
 
@@ -548,7 +548,7 @@ class ActiveAlertsComponent extends HTMLElement {
     return `${date.toLocaleDateString('he-IL')} ${date.toLocaleTimeString('he-IL', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: false
+      hour12: false,
     })}`;
   }
 
@@ -572,13 +572,13 @@ class ActiveAlertsComponent extends HTMLElement {
       1: 'account',
       2: 'trade',
       3: 'trade_plan',
-      4: 'ticker'
+      4: 'ticker',
     };
     return typeMap[typeId] || 'unknown';
   }
 
   extractTickerFromCondition(c) {
-    if (!c) return '';
+    if (!c) {return '';}
     const m = c.match(/\b(AAPL|GOOGL|MSFT|TSLA|NVDA|SPY|QQQ|IWM|AMZN|META|NFLX|AMD|INTC|ORCL|CRM|ADBE)\b/i);
     return m ? m[1].toUpperCase() : '';
   }
@@ -587,7 +587,6 @@ class ActiveAlertsComponent extends HTMLElement {
     const tickers = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA', 'SPY', 'QQQ', 'IWM', 'AMZN', 'META', 'NFLX', 'AMD', 'INTC', 'ORCL', 'CRM', 'ADBE'];
     return tickers[Math.floor(Math.random() * tickers.length)];
   }
-
 
 
   /**
@@ -601,7 +600,7 @@ class ActiveAlertsComponent extends HTMLElement {
     }
 
     // גרסה מקומית כגיבוי
-    if (!condition) return '-';
+    if (!condition) {return '-';}
 
     // מגוון תנאי התראות לדוגמה
     const conditionExamples = {
@@ -621,7 +620,7 @@ class ActiveAlertsComponent extends HTMLElement {
       'rsi_oversold': 'RSI < 30',
       'macd_signal': 'MACD חוצה אות',
       'bollinger_upper': 'מחיר מגיע לגבול עליון',
-      'bollinger_lower': 'מחיר מגיע לגבול תחתון'
+      'bollinger_lower': 'מחיר מגיע לגבול תחתון',
     };
 
     // אם יש תנאי מוכן, נחזיר אותו
@@ -636,7 +635,7 @@ class ActiveAlertsComponent extends HTMLElement {
       'price': 'מחיר',
       'daily_change': 'שינוי יומי',
       'moving_average': 'ממוצע נע',
-      'volume': 'נפח מסחר'
+      'volume': 'נפח מסחר',
     };
 
     // המרת אופרטור לעברית
@@ -649,7 +648,7 @@ class ActiveAlertsComponent extends HTMLElement {
       'increases_by': 'עולה ב',
       'decreases_by': 'יורד ב',
       'increases_by_percent': 'עולה ב%',
-      'decreases_by_percent': 'יורד ב%'
+      'decreases_by_percent': 'יורד ב%',
     };
 
     const variableDisplay = variableLabels[parsed.variable] || parsed.variable;
@@ -675,26 +674,26 @@ class ActiveAlertsComponent extends HTMLElement {
     }
 
     // גרסה מקומית כגיבוי
-    if (!condition) return { variable: '', operator: '', value: '' };
+    if (!condition) {return { variable: '', operator: '', value: '' };}
 
     const parts = condition.split('|');
     if (parts.length >= 3) {
       return {
         variable: parts[0] || '',
         operator: parts[1] || '',
-        value: parts[2] || ''
+        value: parts[2] || '',
       };
     } else if (parts.length === 2) {
       return {
         variable: parts[0] || '',
         operator: parts[1] || '',
-        value: ''
+        value: '',
       };
     } else if (parts.length === 1) {
       return {
         variable: parts[0] || '',
         operator: '',
-        value: ''
+        value: '',
       };
     }
 
@@ -737,7 +736,7 @@ class ActiveAlertsComponent extends HTMLElement {
    * יצירת איקון התראות בכותרת הסקשן
    */
   createAlertIcon() {
-    if (!this._sectionHeader) return;
+    if (!this._sectionHeader) {return;}
 
     // הסרת איקון קיים אם יש
     this.removeSectionHeaderAlertIcon();
@@ -945,37 +944,37 @@ class ActiveAlertsComponent extends HTMLElement {
     let relatedDisplay = '';
 
     switch (relatedTypeId) {
-      case 1: // חשבון
-        // נציג שם חשבון עם מטבע
-        const accountNames = ['חשבון מעודכן (USD)', 'חשבון השקעות (ILS)', 'חשבון מסחר (USD)', 'חשבון פנסיה (ILS)'];
-        const accountName = accountNames[relatedObjectId % accountNames.length];
-        relatedDisplay = accountName;
-        break;
-      case 2: // טרייד
-        // נציג טרייד עם סוג השקעה, צד ותאריך בפורמט: טרייד | סווינג | Long | 24.3.25
-        const investmentTypes = ['סווינג', 'השקעה', 'פסיבי'];
-        const sides = ['Long', 'Short'];
-        const investmentType = investmentTypes[relatedObjectId % investmentTypes.length];
-        const side = sides[relatedObjectId % sides.length];
-        const tradeDate = new Date().toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.');
+    case 1: // חשבון
+      // נציג שם חשבון עם מטבע
+      const accountNames = ['חשבון מעודכן (USD)', 'חשבון השקעות (ILS)', 'חשבון מסחר (USD)', 'חשבון פנסיה (ILS)'];
+      const accountName = accountNames[relatedObjectId % accountNames.length];
+      relatedDisplay = accountName;
+      break;
+    case 2: // טרייד
+      // נציג טרייד עם סוג השקעה, צד ותאריך בפורמט: טרייד | סווינג | Long | 24.3.25
+      const investmentTypes = ['סווינג', 'השקעה', 'פסיבי'];
+      const sides = ['Long', 'Short'];
+      const investmentType = investmentTypes[relatedObjectId % investmentTypes.length];
+      const side = sides[relatedObjectId % sides.length];
+      const tradeDate = new Date().toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.');
 
-        relatedDisplay = `טרייד | ${investmentType} | ${side} | ${tradeDate}`;
-        break;
-      case 3: // תוכנית
-        // נציג תוכנית עם סוג השקעה, צד ותאריך בפורמט: תוכנית | סווינג | Long | 24.3.25
-        const planTypes = ['סווינג', 'השקעה', 'פסיבי'];
-        const planSides = ['Long', 'Short'];
-        const planType = planTypes[relatedObjectId % planTypes.length];
-        const planSide = planSides[relatedObjectId % planSides.length];
-        const planDate = new Date().toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.');
-        relatedDisplay = `תוכנית | ${planType} | ${planSide} | ${planDate}`;
-        break;
-      case 4: // טיקר - נציג את הסימבול עם המילה "טיקר:"
-        const symbol = this.getSymbolFromRelatedObject(relatedTypeId, relatedObjectId);
-        relatedDisplay = symbol ? `טיקר: ${symbol}` : `טיקר ${relatedObjectId}`;
-        break;
-      default:
-        relatedDisplay = `אובייקט ${relatedObjectId}`;
+      relatedDisplay = `טרייד | ${investmentType} | ${side} | ${tradeDate}`;
+      break;
+    case 3: // תוכנית
+      // נציג תוכנית עם סוג השקעה, צד ותאריך בפורמט: תוכנית | סווינג | Long | 24.3.25
+      const planTypes = ['סווינג', 'השקעה', 'פסיבי'];
+      const planSides = ['Long', 'Short'];
+      const planType = planTypes[relatedObjectId % planTypes.length];
+      const planSide = planSides[relatedObjectId % planSides.length];
+      const planDate = new Date().toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.');
+      relatedDisplay = `תוכנית | ${planType} | ${planSide} | ${planDate}`;
+      break;
+    case 4: // טיקר - נציג את הסימבול עם המילה "טיקר:"
+      const symbol = this.getSymbolFromRelatedObject(relatedTypeId, relatedObjectId);
+      relatedDisplay = symbol ? `טיקר: ${symbol}` : `טיקר ${relatedObjectId}`;
+      break;
+    default:
+      relatedDisplay = `אובייקט ${relatedObjectId}`;
     }
 
     // החזרת הטקסט עם איקון קישור קטן - קישור לאובייקטים מקושרים
@@ -989,9 +988,9 @@ class ActiveAlertsComponent extends HTMLElement {
     if (window.showInfoNotification) {
       window.showInfoNotification('קישור לאובייקט נמצא בפיתוח', 'info');
     } else {
-              if (typeof window.showInfoNotification === 'function') {
-            window.showInfoNotification('פיתוח', 'קישור לאובייקט נמצא בפיתוח');
-        }
+      if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('פיתוח', 'קישור לאובייקט נמצא בפיתוח');
+      }
     }
   }
 
@@ -1013,25 +1012,25 @@ class ActiveAlertsComponent extends HTMLElement {
     // כרגע נחזיר סימבול דמה - בהמשך יטען מהשרת
     // בהתבסס על סוג האובייקט המקושר
     switch (relatedType) {
-      case 'ticker':
-        // אם זה טיקר, נחזיר סימבול אקראי
-        const tickerSymbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA', 'SPY', 'QQQ', 'IWM', 'AMZN', 'META', 'NFLX', 'AMD', 'INTC', 'ORCL', 'CRM', 'ADBE'];
-        const symbol = tickerSymbols[relatedObjectId % tickerSymbols.length];
-        return symbol;
-      case 'trade':
-        // אם זה טרייד, נחזיר סימבול דמה
-        const tradeSymbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA'];
-        return tradeSymbols[relatedObjectId % tradeSymbols.length];
-      case 'trade_plan':
-        // אם זה תכנון טרייד, נחזיר סימבול דמה
-        const planSymbols = ['SPY', 'QQQ', 'IWM', 'AMZN', 'META'];
-        return planSymbols[relatedObjectId % planSymbols.length];
-      case 'account':
-        // אם זה חשבון, נחזיר שם החשבון
-        const accountNames = ['חשבון מעודכן', 'חשבון השקעות', 'חשבון מסחר', 'חשבון פנסיה'];
-        return accountNames[relatedObjectId % accountNames.length];
-      default:
-        return 'התראה';
+    case 'ticker':
+      // אם זה טיקר, נחזיר סימבול אקראי
+      const tickerSymbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA', 'SPY', 'QQQ', 'IWM', 'AMZN', 'META', 'NFLX', 'AMD', 'INTC', 'ORCL', 'CRM', 'ADBE'];
+      const symbol = tickerSymbols[relatedObjectId % tickerSymbols.length];
+      return symbol;
+    case 'trade':
+      // אם זה טרייד, נחזיר סימבול דמה
+      const tradeSymbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA'];
+      return tradeSymbols[relatedObjectId % tradeSymbols.length];
+    case 'trade_plan':
+      // אם זה תכנון טרייד, נחזיר סימבול דמה
+      const planSymbols = ['SPY', 'QQQ', 'IWM', 'AMZN', 'META'];
+      return planSymbols[relatedObjectId % planSymbols.length];
+    case 'account':
+      // אם זה חשבון, נחזיר שם החשבון
+      const accountNames = ['חשבון מעודכן', 'חשבון השקעות', 'חשבון מסחר', 'חשבון פנסיה'];
+      return accountNames[relatedObjectId % accountNames.length];
+    default:
+      return 'התראה';
     }
   }
 
@@ -1039,7 +1038,7 @@ class ActiveAlertsComponent extends HTMLElement {
    * קבלת מחיר נוכחי (נתוני דמה)
    */
   getCurrentPrice(symbol) {
-    if (!symbol) return 'N/A';
+    if (!symbol) {return 'N/A';}
 
     // נתוני דמה - בהמשך יטען מהשרת
     const prices = {
@@ -1058,7 +1057,7 @@ class ActiveAlertsComponent extends HTMLElement {
       'INTC': '$45.80',
       'ORCL': '$125.40',
       'CRM': '$280.90',
-      'ADBE': '$520.60'
+      'ADBE': '$520.60',
     };
 
     return prices[symbol] || '$100.00';
@@ -1068,7 +1067,7 @@ class ActiveAlertsComponent extends HTMLElement {
    * קבלת שינוי יומי (נתוני דמה)
    */
   getDailyChange(symbol) {
-    if (!symbol) return 'N/A';
+    if (!symbol) {return 'N/A';}
 
     // נתוני דמה - בהמשך יטען מהשרת
     const changes = {
@@ -1087,7 +1086,7 @@ class ActiveAlertsComponent extends HTMLElement {
       'INTC': '-1.5%',
       'ORCL': '+0.9%',
       'CRM': '+2.4%',
-      'ADBE': '-0.7%'
+      'ADBE': '-0.7%',
     };
 
     return changes[symbol] || '+0.0%';
@@ -1101,7 +1100,7 @@ class ActiveAlertsComponent extends HTMLElement {
       'price_alert': 'alert-card-price',
       'stop_loss': 'alert-card-stop-loss',
       'volume_alert': 'alert-card-volume',
-      'custom_alert': 'alert-card-custom'
+      'custom_alert': 'alert-card-custom',
     };
     return typeClasses[alertType] || 'alert-card-default';
   }
@@ -1115,7 +1114,7 @@ class ActiveAlertsComponent extends HTMLElement {
       1: '<img src="images/icons/accounts.svg" alt="חשבון" style="width: 16px; height: 16px; vertical-align: middle;">', // חשבון
       2: '<img src="images/icons/trades.svg" alt="טרייד" style="width: 16px; height: 16px; vertical-align: middle;">', // טרייד
       3: '<img src="images/icons/trade_plans.svg" alt="תוכנית טרייד" style="width: 16px; height: 16px; vertical-align: middle;">', // תוכנית טרייד
-      4: '<img src="images/icons/tickers.svg" alt="טיקר" style="width: 16px; height: 16px; vertical-align: middle;">'  // טיקר
+      4: '<img src="images/icons/tickers.svg" alt="טיקר" style="width: 16px; height: 16px; vertical-align: middle;">',  // טיקר
     };
     const icon = objectIcons[relatedTypeId] || objectIcons[4]; // ברירת מחדל לטיקר
     return icon;
@@ -1193,9 +1192,9 @@ window.showLinkedObjectMessage = function () {
   if (window.showInfoNotification) {
     window.showInfoNotification('אובייקט מקושר', 'הקישור לאובייקט המקושר יופעל בהמשך');
   } else {
-            if (typeof window.showInfoNotification === 'function') {
-            window.showInfoNotification('פיתוח', 'הקישור לאובייקט המקושר יופעל בהמשך');
-        }
+    if (typeof window.showInfoNotification === 'function') {
+      window.showInfoNotification('פיתוח', 'הקישור לאובייקט המקושר יופעל בהמשך');
+    }
   }
 };
 
@@ -1204,9 +1203,9 @@ window.showTickerPage = function (symbol) {
   if (window.showInfoNotification) {
     window.showInfoNotification('דף טיקר', `דף הטיקר עבור ${symbol} ייפתח בקרוב`);
   } else {
-            if (typeof window.showInfoNotification === 'function') {
-            window.showInfoNotification('פיתוח', `דף הטיקר עבור ${symbol} ייפתח בקרוב`);
-        }
+    if (typeof window.showInfoNotification === 'function') {
+      window.showInfoNotification('פיתוח', `דף הטיקר עבור ${symbol} ייפתח בקרוב`);
+    }
   }
 };
 
@@ -1215,9 +1214,9 @@ window.showRelatedObjectModal = function (relatedTypeId, relatedObjectId) {
   if (window.showInfoNotification) {
     window.showInfoNotification('אובייקט מקושר', `פתיחת אובייקט מסוג ${relatedTypeId} עם מזהה ${relatedObjectId} - ייפתח בקרוב`);
   } else {
-            if (typeof window.showInfoNotification === 'function') {
-            window.showInfoNotification('פיתוח', `פתיחת אובייקט מסוג ${relatedTypeId} עם מזהה ${relatedObjectId} - ייפתח בקרוב`);
-        }
+    if (typeof window.showInfoNotification === 'function') {
+      window.showInfoNotification('פיתוח', `פתיחת אובייקט מסוג ${relatedTypeId} עם מזהה ${relatedObjectId} - ייפתח בקרוב`);
+    }
   }
 };
 

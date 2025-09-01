@@ -25,7 +25,7 @@ const DEFAULT_PREFERENCES = {
   retryAttempts: 2,
   retryDelay: 5,
   autoRefresh: false,
-  verboseLogging: false
+  verboseLogging: false,
 };
 
 // העדפות נוכחיות
@@ -60,7 +60,7 @@ async function loadPreferences() {
     console.error('שגיאה בטעינת העדפות:', error);
     currentPreferences = { ...DEFAULT_PREFERENCES };
   }
-  
+
   // עדכון הממשק
   updateUI();
 }
@@ -72,7 +72,7 @@ function updatePreference(key, value) {
   try {
     // עדכן את הזיכרון הזמני מיד
     currentPreferences[key] = value;
-    
+
     // הצג הודעת מידע שהערך עודכן
     const label = getPreferenceLabel(key);
     const message = `${label} עודכן (לא נשמר עדיין)`;
@@ -91,11 +91,11 @@ async function saveAllPreferences() {
     const response = await fetch('/api/v1/preferences/', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify(requestBody),
     });
-    
+
     if (response.ok) {
       const responseData = await response.json();
       showPreferencesSuccess('הצלחה', 'כל ההעדפות נשמרו בהצלחה');
@@ -122,21 +122,21 @@ async function resetToDefaults() {
         async () => {
           currentPreferences = { ...DEFAULT_PREFERENCES };
           updateUI();
-          
+
           try {
             await saveAllPreferences();
             showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
           } catch (error) {
             showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
           }
-        }
+        },
       );
     } else {
       // Fallback to browser confirm
       if (confirm('האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?')) {
         currentPreferences = { ...DEFAULT_PREFERENCES };
         updateUI();
-        
+
         try {
           await saveAllPreferences();
           showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
@@ -157,112 +157,112 @@ async function resetToDefaults() {
 function updateUI() {
   // בדוק אם אנחנו בעמוד העדפות
   const isPreferencesPage = document.getElementById('primaryCurrency') !== null;
-  
+
   if (!isPreferencesPage) {
     // לא אנחנו בעמוד העדפות, לא ננסה לטעון אלמנטים
     return;
   }
-  
+
   // מטבע ראשי
   const primaryCurrencySelect = document.getElementById('primaryCurrency');
   if (primaryCurrencySelect) {
     primaryCurrencySelect.value = currentPreferences.primaryCurrency || 'USD';
   }
-  
+
   // אזור זמן
   const timezoneSelect = document.getElementById('timezone');
   if (timezoneSelect) {
     timezoneSelect.value = currentPreferences.timezone || 'Asia/Jerusalem';
   }
-  
+
   // סטופ לוס
   const stopLossInput = document.getElementById('defaultStopLoss');
   if (stopLossInput) {
     stopLossInput.value = currentPreferences.defaultStopLoss || 5;
   }
-  
+
   // יעד
   const targetPriceInput = document.getElementById('defaultTargetPrice');
   if (targetPriceInput) {
     targetPriceInput.value = currentPreferences.defaultTargetPrice || 10;
   }
-  
+
   // עמלה
   const commissionInput = document.getElementById('defaultCommission');
   if (commissionInput) {
     commissionInput.value = currentPreferences.defaultCommission || 1.0;
   }
-  
+
   // פילטר סטטוס
   const statusFilterSelect = document.getElementById('defaultStatusFilter');
   if (statusFilterSelect) {
     statusFilterSelect.value = currentPreferences.defaultStatusFilter || 'all';
   }
-  
+
   // פילטר סוג
   const typeFilterSelect = document.getElementById('defaultTypeFilter');
   if (typeFilterSelect) {
     typeFilterSelect.value = currentPreferences.defaultTypeFilter || 'all';
   }
-  
+
   // פילטר חשבון
   const accountFilterSelect = document.getElementById('defaultAccountFilter');
   if (accountFilterSelect) {
     accountFilterSelect.value = currentPreferences.defaultAccountFilter || 'all';
   }
-  
+
   // פילטר טווח תאריכים
   const dateRangeFilterSelect = document.getElementById('defaultDateRangeFilter');
   if (dateRangeFilterSelect) {
     dateRangeFilterSelect.value = currentPreferences.defaultDateRangeFilter || 'all';
   }
-  
+
   // הגדרות נתונים חיצוניים
   const dataRefreshIntervalInput = document.getElementById('dataRefreshInterval');
   if (dataRefreshIntervalInput) {
     dataRefreshIntervalInput.value = currentPreferences.dataRefreshInterval || 5;
   }
-  
+
   const primaryDataProviderSelect = document.getElementById('primaryDataProvider');
   if (primaryDataProviderSelect) {
     primaryDataProviderSelect.value = currentPreferences.primaryDataProvider || 'yahoo';
   }
-  
+
   const secondaryDataProviderSelect = document.getElementById('secondaryDataProvider');
   if (secondaryDataProviderSelect) {
     secondaryDataProviderSelect.value = currentPreferences.secondaryDataProvider || 'google';
   }
-  
+
   const cacheTTLInput = document.getElementById('cacheTTL');
   if (cacheTTLInput) {
     cacheTTLInput.value = currentPreferences.cacheTTL || 5;
   }
-  
+
   const maxBatchSizeInput = document.getElementById('maxBatchSize');
   if (maxBatchSizeInput) {
     maxBatchSizeInput.value = currentPreferences.maxBatchSize || 25;
   }
-  
+
   const requestDelayInput = document.getElementById('requestDelay');
   if (requestDelayInput) {
     requestDelayInput.value = currentPreferences.requestDelay || 200;
   }
-  
+
   const retryAttemptsInput = document.getElementById('retryAttempts');
   if (retryAttemptsInput) {
     retryAttemptsInput.value = currentPreferences.retryAttempts || 2;
   }
-  
+
   const retryDelayInput = document.getElementById('retryDelay');
   if (retryDelayInput) {
     retryDelayInput.value = currentPreferences.retryDelay || 5;
   }
-  
+
   const autoRefreshCheckbox = document.getElementById('autoRefresh');
   if (autoRefreshCheckbox) {
     autoRefreshCheckbox.checked = currentPreferences.autoRefresh || false;
   }
-  
+
   const verboseLoggingCheckbox = document.getElementById('verboseLogging');
   if (verboseLoggingCheckbox) {
     verboseLoggingCheckbox.checked = currentPreferences.verboseLogging || false;
@@ -298,9 +298,9 @@ function loadLocalAccounts() {
   const localAccounts = [
     { id: 1, name: 'חשבון ראשי' },
     { id: 2, name: 'חשבון משני' },
-    { id: 3, name: 'חשבון השקעות' }
+    { id: 3, name: 'חשבון השקעות' },
   ];
-  
+
   updateAccountFilter(localAccounts);
 }
 
@@ -310,23 +310,23 @@ function loadLocalAccounts() {
 function updateAccountFilter(accounts) {
   // בדוק אם אנחנו בעמוד העדפות
   const isPreferencesPage = document.getElementById('primaryCurrency') !== null;
-  
+
   if (!isPreferencesPage) {
     // לא אנחנו בעמוד העדפות, לא ננסה לטעון אלמנטים
     return;
   }
-  
+
   const accountFilterSelect = document.getElementById('defaultAccountFilter');
   if (!accountFilterSelect) {
     console.warn('לא נמצא אלמנט פילטר חשבונות');
     return;
   }
-  
+
   // שמור את הבחירה הנוכחית
   const currentValue = accountFilterSelect.value;
   // נקה אפשרויות קיימות (חוץ מ"הכול")
   accountFilterSelect.innerHTML = '<option value="all">הכול</option>';
-  
+
   // הוסף חשבונות
   if (accounts && accounts.length > 0) {
     accounts.forEach((account, index) => {
@@ -338,7 +338,7 @@ function updateAccountFilter(accounts) {
   } else {
     console.warn('⚠️ אין חשבונות להוספה');
   }
-  
+
   // החזר את הבחירה הקודמת אם היא עדיין קיימת
   if (currentValue && Array.from(accountFilterSelect.options).some(opt => opt.value === currentValue)) {
     accountFilterSelect.value = currentValue;
@@ -369,9 +369,9 @@ function getPreferenceLabel(key) {
     retryAttempts: 'מספר ניסיונות חוזרים',
     retryDelay: 'זמן פסקה בין ניסיונות',
     autoRefresh: 'רענון אוטומטי',
-    verboseLogging: 'לוגים מפורטים'
+    verboseLogging: 'לוגים מפורטים',
   };
-  
+
   return labels[key] || key;
 }
 
@@ -441,10 +441,10 @@ async function initializePreferences() {
 
     // טען העדפות
     await loadPreferences();
-    
+
     // טען חשבונות
     await loadAccountsToFilter();
-    
+
     console.log('✅ דף העדפות אותחל בהצלחה');
   } catch (error) {
     console.error('שגיאה באתחול דף העדפות:', error);

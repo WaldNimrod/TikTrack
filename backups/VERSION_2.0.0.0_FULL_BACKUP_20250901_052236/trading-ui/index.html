@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>דף הבית - TikTrack</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles/apple-theme.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/header-system.css">
+    <link rel="stylesheet" href="styles/typography.css">
+    <link rel="stylesheet" href="styles/table.css">
+    <link rel="stylesheet" href="styles/notification-system.css">
+    <link rel="stylesheet" href="styles/index.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="page-body">
+        <!-- באנר עיצובי עליון -->
+        <div class="hero-banner">
+            <div class="hero-bg-illustration">
+                <!-- איור רקע - דוגמה 1: סוחר מודרני -->
+                <svg width="100%" height="100%" viewBox="0 0 1200 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- רקע -->
+                    <rect width="1200" height="400" fill="rgba(40,167,69,0.02)" />
+
+                    <!-- חלון בית מודרני -->
+                    <rect x="200" y="80" width="800" height="240" rx="20" fill="rgba(255,255,255,0.08)"
+                        stroke="rgba(255,255,255,0.15)" stroke-width="2" />
+
+                    <!-- שולחן עבודה -->
+                    <rect x="150" y="320" width="900" height="30" rx="15" fill="rgba(0,123,255,0.12)" />
+
+                    <!-- כיסא גיימינג -->
+                    <rect x="300" y="240" width="80" height="100" rx="20" fill="rgba(0,123,255,0.18)" />
+
+                    <!-- דמות -->
+                    <circle cx="340" cy="180" r="25" fill="rgba(255,255,255,0.25)" />
+                    <rect x="320" y="205" width="40" height="60" rx="20" fill="rgba(255,255,255,0.25)" />
+
+                    <!-- מסך מחשב -->
+                    <rect x="250" y="140" width="300" height="180" rx="10" fill="rgba(40,167,69,0.12)"
+                        stroke="rgba(40,167,69,0.25)" stroke-width="2" />
+
+                    <!-- גרף על המסך -->
+                    <path d="M270 280 L290 270 L310 275 L330 265 L350 260 L370 255 L390 250 L410 245 L430 240"
+                        stroke="rgba(0,123,255,0.5)" stroke-width="3" fill="none" />
+
+                    <!-- אלמנטים צפים -->
+                    <circle cx="800" cy="120" r="20" fill="rgba(40,167,69,0.18)" />
+                    <circle cx="850" cy="160" r="15" fill="rgba(0,123,255,0.18)" />
+                    <circle cx="900" cy="140" r="25" fill="rgba(40,167,69,0.18)" />
+
+                    <!-- קווים דקורטיביים -->
+                    <path d="M100 100 L150 150" stroke="rgba(255,255,255,0.15)" stroke-width="2"
+                        stroke-dasharray="5,5" />
+                    <path d="M1100 300 L1050 250" stroke="rgba(255,255,255,0.15)" stroke-width="2"
+                        stroke-dasharray="5,5" />
+                </svg>
+            </div>
+
+            <div class="hero-content">
+                <div class="hero-text">
+                    <div class="hero-quick-links">
+                        <a href="#" class="quick-link-icon" title="הגדרות">⚙️</a>
+                        <a href="#" class="quick-link-icon" title="עזרה">❓</a>
+                        <a href="#" class="quick-link-icon" title="הודעות">🔔</a>
+                        <a href="#" class="quick-link-icon" title="פרופיל">👤</a>
+                    </div>
+                    <h1 class="hero-title">ברוכים הבאים ל-TikTrack</h1>
+                    <p class="hero-subtitle">המערכת המתקדמת לניהול תיק השקעות אישי</p>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <div class="hero-stat-number">₪1,250,000</div>
+                            <div class="hero-stat-label">שווי תיק</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-number positive">+5.6%</div>
+                            <div class="hero-stat-label">תשואה</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-number">15</div>
+                            <div class="hero-stat-label">טריידים</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-number">8</div>
+                            <div class="hero-stat-label">התראות</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-number positive">+₪12,500</div>
+                            <div class="hero-stat-label">היום</div>
+                        </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-number">78.5%</div>
+                            <div class="hero-stat-label">הצלחה</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="background-wrapper">
+            <div class="dashboard-container">
+
+                <!-- סקשן ראשון - סקירה כללית צבעונית -->
+                <div class="overview-section">
+                    <div class="overview-header">
+                        <h2 class="overview-title">📊 סקירה כללית</h2>
+                        <div class="overview-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="refreshOverview()">
+                                <i class="bi bi-arrow-clockwise"></i> רענן
+                            </button>
+                            <button class="btn btn-sm btn-outline-success" onclick="exportOverview()">
+                                <i class="bi bi-download"></i> ייצוא
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overview-grid">
+                        <div class="overview-card primary">
+                            <div class="overview-card-icon">💰</div>
+                            <div class="overview-card-content">
+                                <div class="overview-card-number">₪1,250,000</div>
+                                <div class="overview-card-label">שווי תיק כולל</div>
+                                <div class="overview-card-change positive">+₪12,500 היום</div>
+                            </div>
+                        </div>
+
+                        <div class="overview-card success">
+                            <div class="overview-card-icon">📈</div>
+                            <div class="overview-card-content">
+                                <div class="overview-card-number positive">+₪70,000</div>
+                                <div class="overview-card-label">רווח כולל</div>
+                                <div class="overview-card-change positive">+5.6% השנה</div>
+                            </div>
+                        </div>
+
+                        <div class="overview-card info">
+                            <div class="overview-card-icon">🎯</div>
+                            <div class="overview-card-content">
+                                <div class="overview-card-number">15</div>
+                                <div class="overview-card-label">טריידים פעילים</div>
+                                <div class="overview-card-change">8 רווחיים</div>
+                            </div>
+                        </div>
+
+                        <div class="overview-card warning">
+                            <div class="overview-card-icon">🔔</div>
+                            <div class="overview-card-content">
+                                <div class="overview-card-number">8</div>
+                                <div class="overview-card-label">התראות פעילות</div>
+                                <div class="overview-card-change">3 דורשות תשומת לב</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- סקשן שני - גרפים מתקדמים -->
+                <div class="charts-section">
+                    <div class="charts-header">
+                        <h2 class="charts-title">📈 ניתוח ויזואלי</h2>
+                        <div class="charts-controls">
+                            <select class="charts-select" onchange="updateChartPeriod(this.value)">
+                                <option value="7">7 ימים</option>
+                                <option value="30" selected>30 ימים</option>
+                                <option value="90">90 ימים</option>
+                                <option value="365">שנה</option>
+                            </select>
+                            <button class="btn btn-sm btn-outline-primary" onclick="refreshCharts()">
+                                <i class="bi bi-arrow-clockwise"></i> רענן
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <h3 class="chart-title">📈 ביצועי תיק מול מדד תל אביב 35</h3>
+                            <div class="chart-container">
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <h3 class="chart-title">🥧 חלוקת נכסים לפי סקטורים</h3>
+                            <div class="chart-container">
+                                <canvas id="allocationChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <h3 class="chart-title">📊 השוואת ביצועים בין חשבונות</h3>
+                            <div class="chart-container">
+                                <canvas id="accountsChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card">
+                            <h3 class="chart-title">🔄 ניתוח סיכון מול תשואה לפי מניות</h3>
+                            <div class="chart-container">
+                                <canvas id="riskChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- סקשן שלישי - טבלאות מפורטות -->
+                <div class="tables-section">
+                    <div class="tables-header">
+                        <h2 class="tables-title">📋 נתונים מפורטים</h2>
+                        <div class="tables-tabs">
+                            <button class="table-tab active" onclick="switchTableTab('trades')">טריידים</button>
+                            <button class="table-tab" onclick="switchTableTab('alerts')">התראות</button>
+                            <button class="table-tab" onclick="switchTableTab('accounts')">חשבונות</button>
+                        </div>
+                    </div>
+
+                    <!-- טבלת טריידים -->
+                    <div class="table-content" id="tradesContainer">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>טיקר</th>
+                                        <th>סוג</th>
+                                        <th>כמות</th>
+                                        <th>מחיר ממוצע</th>
+                                        <th>מחיר נוכחי</th>
+                                        <th>רווח/הפסד</th>
+                                        <th>אחוז</th>
+                                        <th>סטטוס</th>
+                                        <th>פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>AAPL</strong></td>
+                                        <td>מניות</td>
+                                        <td>100</td>
+                                        <td>₪175.50</td>
+                                        <td>₪183.50</td>
+                                        <td class="text-success">+₪8,500</td>
+                                        <td class="text-success">+4.8%</td>
+                                        <td><span class="badge bg-success">פתוח</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary">ערוך</button>
+                                            <button class="btn btn-sm btn-outline-success">סגור</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>NVDA</strong></td>
+                                        <td>מניות</td>
+                                        <td>75</td>
+                                        <td>₪450.00</td>
+                                        <td>₪495.00</td>
+                                        <td class="text-success">+₪12,200</td>
+                                        <td class="text-success">+15.2%</td>
+                                        <td><span class="badge bg-success">פתוח</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary">ערוך</button>
+                                            <button class="btn btn-sm btn-outline-success">סגור</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>TSLA</strong></td>
+                                        <td>מניות</td>
+                                        <td>50</td>
+                                        <td>₪720.00</td>
+                                        <td>₪695.00</td>
+                                        <td class="text-danger">-₪2,100</td>
+                                        <td class="text-danger">-3.3%</td>
+                                        <td><span class="badge bg-success">פתוח</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary">ערוך</button>
+                                            <button class="btn btn-sm btn-outline-success">סגור</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- טבלת התראות -->
+                    <div class="table-content" id="alertsContainer" style="display: none;">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>טיקר</th>
+                                        <th>סוג התראה</th>
+                                        <th>ערך יעד</th>
+                                        <th>ערך נוכחי</th>
+                                        <th>סטטוס</th>
+                                        <th>תאריך יצירה</th>
+                                        <th>פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>AAPL</strong></td>
+                                        <td>מחיר עליון</td>
+                                        <td>₪180.00</td>
+                                        <td>₪183.50</td>
+                                        <td><span class="badge bg-success">פעיל</span></td>
+                                        <td>2025-08-23</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-warning">ערוך</button>
+                                            <button class="btn btn-sm btn-outline-danger">מחק</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>TSLA</strong></td>
+                                        <td>מחיר תחתון</td>
+                                        <td>₪700.00</td>
+                                        <td>₪695.00</td>
+                                        <td><span class="badge bg-warning">ממתין</span></td>
+                                        <td>2025-08-22</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-warning">ערוך</button>
+                                            <button class="btn btn-sm btn-outline-danger">מחק</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- טבלת חשבונות -->
+                    <div class="table-content" id="accountsContainer" style="display: none;">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>שם חשבון</th>
+                                        <th>סוג</th>
+                                        <th>שווי כולל</th>
+                                        <th>רווח/הפסד</th>
+                                        <th>אחוז רווח</th>
+                                        <th>טריידים פעילים</th>
+                                        <th>פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>חשבון ראשי</strong></td>
+                                        <td>מניות</td>
+                                        <td>₪850,000</td>
+                                        <td class="text-success">+₪45,000</td>
+                                        <td class="text-success">+5.6%</td>
+                                        <td>10</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary">צפה</button>
+                                            <button class="btn btn-sm btn-outline-success">ערוך</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>חשבון משני</strong></td>
+                                        <td>ETF</td>
+                                        <td>₪400,000</td>
+                                        <td class="text-success">+₪25,000</td>
+                                        <td class="text-success">+6.7%</td>
+                                        <td>5</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary">צפה</button>
+                                            <button class="btn btn-sm btn-outline-success">ערוך</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- סקשן רביעי - פעולות מהירות -->
+                <div class="actions-section">
+                    <div class="actions-header">
+                        <h2 class="actions-title">⚡ פעולות מהירות</h2>
+                    </div>
+
+                    <div class="actions-row">
+                        <button class="action-btn" onclick="quickAction('new-trade')">
+                            <div class="action-btn-icon">➕</div>
+                            <div class="action-btn-text">טרייד חדש</div>
+                        </button>
+
+                        <button class="action-btn" onclick="quickAction('new-alert')">
+                            <div class="action-btn-icon">🔔</div>
+                            <div class="action-btn-text">התראה חדשה</div>
+                        </button>
+
+                        <button class="action-btn" onclick="quickAction('new-account')">
+                            <div class="action-btn-icon">💰</div>
+                            <div class="action-btn-text">חשבון חדש</div>
+                        </button>
+
+                        <button class="action-btn" onclick="quickAction('export-data')">
+                            <div class="action-btn-icon">📊</div>
+                            <div class="action-btn-text">ייצוא נתונים</div>
+                        </button>
+
+                        <button class="action-btn" onclick="quickAction('reports')">
+                            <div class="action-btn-icon">📋</div>
+                            <div class="action-btn-text">דוחות</div>
+                        </button>
+
+                        <button class="action-btn" onclick="quickAction('settings')">
+                            <div class="action-btn-icon">⚙️</div>
+                            <div class="action-btn-text">הגדרות</div>
+                        </button>
+
+                        <button class="action-btn" onclick="quickAction('documentation')">
+                            <div class="action-btn-icon">📚</div>
+                            <div class="action-btn-text">דוקומנטציה</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- סקשן חמישי - סטטיסטיקות נוספות -->
+                <div class="stats-section">
+                    <div class="stats-header">
+                        <h2 class="stats-title">📈 סטטיסטיקות מתקדמות</h2>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">ביצועים לפי תקופה</h3>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-row">
+                                    <span>היום</span>
+                                    <span class="text-success">+₪12,500</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>השבוע</span>
+                                    <span class="text-success">+₪45,200</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>החודש</span>
+                                    <span class="text-success">+₪78,900</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>השנה</span>
+                                    <span class="text-success">+₪125,400</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">סטטיסטיקות טריידים</h3>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-row">
+                                    <span>טריידים סגורים</span>
+                                    <span>42</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>אחוז הצלחה</span>
+                                    <span class="text-success">78.5%</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>רווח ממוצע</span>
+                                    <span class="text-success">₪2,450</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>הפסד ממוצע</span>
+                                    <span class="text-danger">₪1,200</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-header">
+                                <h3 class="stat-title">ניתוח סיכונים</h3>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-row">
+                                    <span>יחס רווח/הפסד</span>
+                                    <span class="text-success">2.04</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>תנודתיות ממוצעת</span>
+                                    <span>3.2%</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>מקסימום ירידה</span>
+                                    <span class="text-danger">-8.5%</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span>שרפיין רייטיו</span>
+                                    <span class="text-success">1.85</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- סקשן התראות פעילות -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">🔔 התראות פעילות</h2>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleMainSection()">
+                                <span class="filter-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <active-alerts></active-alerts>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- פוטר -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>מפת מערכת</h4>
+                <ul class="footer-links">
+                    <li><a href="#">דף הבית</a></li>
+                    <li><a href="#">טריידים</a></li>
+                    <li><a href="#">התראות</a></li>
+                    <li><a href="#">חשבונות</a></li>
+                    <li><a href="#">דוחות</a></li>
+                    <li><a href="#">הגדרות</a></li>
+                    <li><a href="#">ניתוח</a></li>
+                    <li><a href="#">תיק השקעות</a></li>
+                    <li><a href="#">לוח שנה</a></li>
+                    <li><a href="#">חדשות</a></li>
+                    <li><a href="#">עזרה</a></li>
+                    <li><a href="#">צור קשר</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>יצירת קשר</h4>
+                <div class="contact-info">
+                    <p><i class="bi bi-envelope"></i> info@tiktrack.co.il</p>
+                    <p><i class="bi bi-telephone"></i> 03-1234567</p>
+                    <p><i class="bi bi-geo-alt"></i> תל אביב, ישראל</p>
+                    <p><i class="bi bi-clock"></i> א'-ה' 9:00-18:00</p>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h4>שיתופי פעולה</h4>
+                <div class="partners-logos">
+                    <div class="partner-logo">
+                        <svg width="100%" height="100%" viewBox="0 0 120 60" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <!-- רקע גרדיאנט -->
+                            <defs>
+                                <linearGradient id="stockshub-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#ff9c05;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#ff6b35;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+
+                            <!-- רקע מעוצב -->
+                            <rect width="120" height="60" rx="12" fill="url(#stockshub-gradient)" />
+
+                            <!-- אייקון גרף עולה -->
+                            <path d="M25 45 L35 35 L45 40 L55 30 L65 25 L75 20" stroke="white" stroke-width="3"
+                                fill="none" stroke-linecap="round" />
+
+                            <!-- נקודות על הגרף -->
+                            <circle cx="25" cy="45" r="2" fill="white" />
+                            <circle cx="35" cy="35" r="2" fill="white" />
+                            <circle cx="45" cy="40" r="2" fill="white" />
+                            <circle cx="55" cy="30" r="2" fill="white" />
+                            <circle cx="65" cy="25" r="2" fill="white" />
+                            <circle cx="75" cy="20" r="2" fill="white" />
+
+                            <!-- טקסט מעוצב -->
+                            <text x="60" y="50" text-anchor="middle" fill="white" font-family="Arial, sans-serif"
+                                font-size="8" font-weight="bold" letter-spacing="1">StocksHub</text>
+                        </svg>
+                    </div>
+                    <div class="partner-logo">
+                        <svg width="100%" height="100%" viewBox="0 0 120 60" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <!-- רקע גרדיאנט -->
+                            <defs>
+                                <linearGradient id="agent-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#28a745;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#20c997;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+
+                            <!-- רקע מעוצב -->
+                            <rect width="120" height="60" rx="12" fill="url(#agent-gradient)" />
+
+                            <!-- אייקון מוח/אינטליגנציה -->
+                            <path d="M30 25 Q40 15 50 25 Q60 35 50 45 Q40 55 30 45 Q20 35 30 25" stroke="white"
+                                stroke-width="2" fill="none" />
+                            <path d="M35 30 Q40 25 45 30" stroke="white" stroke-width="1.5" fill="none" />
+                            <path d="M35 35 Q40 30 45 35" stroke="white" stroke-width="1.5" fill="none" />
+                            <path d="M35 40 Q40 35 45 40" stroke="white" stroke-width="1.5" fill="none" />
+
+                            <!-- נקודות זוהרות -->
+                            <circle cx="25" cy="20" r="1" fill="white" opacity="0.8" />
+                            <circle cx="55" cy="20" r="1" fill="white" opacity="0.8" />
+                            <circle cx="25" cy="50" r="1" fill="white" opacity="0.8" />
+                            <circle cx="55" cy="50" r="1" fill="white" opacity="0.8" />
+
+                            <!-- טקסט מעוצב -->
+                            <text x="60" y="50" text-anchor="middle" fill="white" font-family="Arial, sans-serif"
+                                font-size="7" font-weight="bold">הסוכן החכם</text>
+                        </svg>
+                    </div>
+                    <div class="partner-logo">
+                        <svg width="100%" height="100%" viewBox="0 0 120 60" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <!-- רקע גרדיאנט -->
+                            <defs>
+                                <linearGradient id="thg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#007bff;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#6610f2;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+
+                            <!-- רקע מעוצב -->
+                            <rect width="120" height="60" rx="12" fill="url(#thg-gradient)" />
+
+                            <!-- אייקון טכנולוגיה מתקדמת -->
+                            <rect x="25" y="20" width="20" height="20" rx="3" stroke="white" stroke-width="2"
+                                fill="none" />
+                            <circle cx="35" cy="30" r="3" fill="white" />
+                            <path d="M30 35 L40 35" stroke="white" stroke-width="1.5" />
+                            <path d="M30 38 L38 38" stroke="white" stroke-width="1.5" />
+
+                            <!-- אלמנטים טכנולוגיים -->
+                            <path d="M50 25 L55 20 L60 25" stroke="white" stroke-width="2" fill="none" />
+                            <path d="M50 35 L55 30 L60 35" stroke="white" stroke-width="2" fill="none" />
+                            <path d="M50 45 L55 40 L60 45" stroke="white" stroke-width="2" fill="none" />
+
+                            <!-- טקסט מעוצב -->
+                            <text x="60" y="50" text-anchor="middle" fill="white" font-family="Arial, sans-serif"
+                                font-size="12" font-weight="bold" letter-spacing="2">THG</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p>&copy; 2025 TikTrack. כל הזכויות שמורות.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/table-mappings.js"></script>
+    <script src="scripts/date-utils.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/linked-items.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/header-system.js?v=20250830_2"></script>    <script src="scripts/alerts.js?v=20250830_1"></script>
+    <script src="scripts/active-alerts-component.js?v=20250830_1"></script>
+
+    <script>
+        // נתונים לגרפים
+        const performanceData = {
+            labels: ['ינו', 'פבר', 'מרץ', 'אפר', 'מאי', 'יוני', 'יולי', 'אוג', 'ספט', 'אוק', 'נוב', 'דצמ'],
+            datasets: [{
+                label: 'תיק השקעות',
+                data: [100, 105, 108, 112, 115, 118, 122, 125, 128, 132, 135, 140],
+                borderColor: '#ff9c05',
+                backgroundColor: 'rgba(255, 156, 5, 0.1)',
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'מדד תל אביב 35',
+                data: [100, 102, 104, 106, 108, 110, 112, 114, 116, 118, 120, 122],
+                borderColor: '#28a745',
+                backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                tension: 0.4,
+                fill: false
+            }]
+        };
+
+        const allocationData = {
+            labels: ['טכנולוגיה', 'פיננסים', 'בריאות', 'אנרגיה', 'צריכה', 'תשתיות'],
+            datasets: [{
+                label: 'חלוקת נכסים',
+                data: [35, 25, 15, 10, 10, 5],
+                backgroundColor: [
+                    '#ff9c05',
+                    '#28a745',
+                    '#007bff',
+                    '#dc3545',
+                    '#6f42c1',
+                    '#fd7e14'
+                ]
+            }]
+        };
+
+        const accountsData = {
+            labels: ['חשבון ראשי', 'חשבון משני', 'חשבון חיסכון', 'חשבון גמל'],
+            datasets: [{
+                label: 'שווי נוכחי (אלפי ₪)',
+                data: [850, 400, 250, 150],
+                backgroundColor: [
+                    'rgba(255, 156, 5, 0.8)',
+                    'rgba(40, 167, 69, 0.8)',
+                    'rgba(0, 123, 255, 0.8)',
+                    'rgba(220, 53, 69, 0.8)'
+                ]
+            }]
+        };
+
+        const riskData = {
+            labels: ['Apple', 'Microsoft', 'Tesla', 'Amazon', 'Google', 'Netflix', 'Meta', 'NVIDIA'],
+            datasets: [{
+                label: 'תשואה שנתית (%)',
+                data: [12.5, 8.2, 25.3, 15.7, 10.1, 18.9, 22.4, 35.2],
+                backgroundColor: [
+                    'rgba(255, 156, 5, 0.8)',
+                    'rgba(40, 167, 69, 0.8)',
+                    'rgba(220, 53, 69, 0.8)',
+                    'rgba(0, 123, 255, 0.8)',
+                    'rgba(255, 193, 7, 0.8)',
+                    'rgba(108, 117, 125, 0.8)',
+                    'rgba(23, 162, 184, 0.8)',
+                    'rgba(40, 167, 69, 0.8)'
+                ]
+            }]
+        };
+
+        // יצירת הגרפים
+        const performanceChart = new Chart(document.getElementById('performanceChart'), {
+            type: 'line',
+            data: performanceData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: function (value) {
+                                return '₪' + (value / 1000) + 'K';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        const allocationChart = new Chart(document.getElementById('allocationChart'), {
+            type: 'doughnut',
+            data: allocationData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        const accountsChart = new Chart(document.getElementById('accountsChart'), {
+            type: 'bar',
+            data: accountsData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'שווי (אלפי ₪)'
+                        }
+                    }
+                }
+            }
+        });
+
+        const riskChart = new Chart(document.getElementById('riskChart'), {
+            type: 'bar',
+            data: riskData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'תשואה שנתית (%)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // פונקציות
+        function switchTableTab(tabName) {
+            // הסתרת כל הטבלאות
+            document.querySelectorAll('.table-content').forEach(table => {
+                table.style.display = 'none';
+            });
+
+            // הסרת active מכל הטאבים
+            document.querySelectorAll('.table-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // הצגת הטבלה הנבחרת
+            document.getElementById(tabName + '-table').style.display = 'block';
+
+            // הוספת active לטאב הנבחר
+            event.target.classList.add('active');
+        }
+
+        function updateChartPeriod(period) {
+            console.log('עדכון תקופה:', period);
+        }
+
+        function refreshCharts() {
+            console.log('רענון גרפים');
+        }
+
+        function refreshOverview() {
+            console.log('רענון סקירה כללית');
+        }
+
+        function exportOverview() {
+            console.log('ייצוא סקירה כללית');
+        }
+
+        function quickAction(action) {
+            switch (action) {
+                case 'new-trade':
+                    console.log('יצירת טרייד חדש');
+                    break;
+                case 'new-alert':
+                    console.log('יצירת התראה חדשה');
+                    break;
+                case 'new-account':
+                    console.log('יצירת חשבון חדש');
+                    break;
+                case 'export-data':
+                    console.log('ייצוא נתונים');
+                    break;
+                case 'reports':
+                    console.log('פתיחת דוחות');
+                    break;
+                case 'settings':
+                    console.log('פתיחת הגדרות');
+                    break;
+                case 'documentation':
+                    window.open('../JAVASCRIPT_SCRIPTS_ARCHITECTURE.md', '_blank');
+                    break;
+            }
+        }
+
+        // אתחול HeaderSystem
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.headerSystem && !window.headerSystem.isInitialized) {
+                window.headerSystem.init();
+            }
+        });
+    </script>
+</body>
+
+</html>

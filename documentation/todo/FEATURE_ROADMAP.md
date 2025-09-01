@@ -368,7 +368,7 @@
 - [ ] Test validation
 - [ ] Test history tracking
 
-**Location:** `tests.js:339`
+**Location:** Removed - tests functionality deleted
 
 ---
 

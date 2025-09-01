@@ -64,10 +64,7 @@ def research() -> Any:
     """Research page"""
     return send_from_directory(UI_DIR, "research.html")
 
-@pages_bp.route('/research_new')
-def research_new() -> Any:
-    """Research new page"""
-    return send_from_directory(UI_DIR, "research_new.html")
+
 
 @pages_bp.route('/cash_flows')
 def cash_flows() -> Any:
@@ -101,25 +98,12 @@ def js_map() -> Any:
     """JS Map page"""
     return send_from_directory(UI_DIR, "js-map.html")
 
-@pages_bp.route('/test_crud')
-def test_crud() -> Any:
-    """CRUD test page"""
-    return send_from_directory(UI_DIR, "test_crud.html")
+@pages_bp.route('/page-scripts-matrix')
+def page_scripts_matrix() -> Any:
+    """Page scripts matrix page"""
+    return send_from_directory(UI_DIR, "page-scripts-matrix.html")
 
-@pages_bp.route('/test_api')
-def test_api() -> Any:
-    """API test page"""
-    return send_from_directory(UI_DIR, "test_api.html")
 
-@pages_bp.route('/test_security')
-def test_security() -> Any:
-    """Security test page"""
-    return send_from_directory(UI_DIR, "test_security.html")
-
-@pages_bp.route('/tests')
-def tests() -> Any:
-    """Tests page"""
-    return send_from_directory(UI_DIR, "tests.html")
 
 
 

@@ -127,7 +127,7 @@ def get_page_mapping():
             'db_display.html': ['database.js', 'db-extradata.js', 'header-system.js', 'simple-filter.js'],
             'db_extradata.html': ['db-extradata.js', 'header-system.js', 'simple-filter.js'],
             'constraints.html': ['constraint-manager.js', 'header-system.js', 'simple-filter.js'],
-            'tests.html': ['tests.js', 'header-system.js', 'simple-filter.js'],
+        
             'styles.html': ['header-system.js', 'simple-filter.js']
         }
         
@@ -199,7 +199,7 @@ def sort_js_files_by_generality(js_files):
         'research.js', 'executions.js', 'tickers.js', 'ticker-service.js',
         'accounts.js', 'cash_flows.js', 'notes.js', 'preferences.js',
         'database.js', 'db-extradata.js', 'constraint-manager.js',
-        'tests.js', 'currencies.js', 'auth.js'
+        'currencies.js', 'auth.js'
     ]
     
     # Sort files according to generality order

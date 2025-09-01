@@ -68,8 +68,8 @@ from routes.api.notes import notes_bp
 from routes.api.executions import executions_bp
 from routes.api.preferences import preferences_bp
 from routes.api.users import users_bp
-from routes.api.tests import tests_bp
-from routes.api.test_suite import test_suite_bp
+
+
 from routes.api.constraints import constraints_bp
 from routes.api.currencies import currencies_bp
 from routes.api.linked_items import linked_items_bp
@@ -119,8 +119,8 @@ app.register_blueprint(notes_bp)
 app.register_blueprint(executions_bp)
 app.register_blueprint(preferences_bp)
 app.register_blueprint(users_bp)
-app.register_blueprint(tests_bp)
-app.register_blueprint(test_suite_bp)
+
+
 app.register_blueprint(constraints_bp)
 app.register_blueprint(currencies_bp)
 app.register_blueprint(linked_items_bp)

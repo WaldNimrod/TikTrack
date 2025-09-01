@@ -337,8 +337,11 @@ function handleUnhandledRejection(event) {
 function showSystemError(message) {
   if (typeof window.showErrorNotification === 'function') {
     window.showErrorNotification('שגיאת מערכת', message);
+  } else if (typeof window.showNotification === 'function') {
+    window.showNotification(message, 'error', 'שגיאת מערכת');
   } else {
-    // System Error
+    console.error('❌ שגיאת מערכת:', message);
+    alert(`שגיאת מערכת: ${message}`);
   }
 }
 
@@ -439,8 +442,7 @@ function restoreAllSectionStates() {
       topSectionStorageKey = 'researchTopSectionCollapsed';
     } else if (currentPath.includes('/constraints')) {
       topSectionStorageKey = 'constraintsTopSectionCollapsed';
-    } else if (currentPath.includes('/tests')) {
-      topSectionStorageKey = 'testsTopSectionCollapsed';
+
     } else if (currentPath.includes('/db_display')) {
       topSectionStorageKey = 'dbDisplayTopSectionCollapsed';
     } else if (currentPath.includes('/db_extradata')) {
@@ -565,8 +567,7 @@ window.toggleTopSectionGlobal = function () {
       storageKey = 'researchTopSectionCollapsed';
     } else if (currentPath.includes('/constraints')) {
       storageKey = 'constraintsTopSectionCollapsed';
-    } else if (currentPath.includes('/tests')) {
-      storageKey = 'testsTopSectionCollapsed';
+
     } else if (currentPath.includes('/db_display')) {
       storageKey = 'dbDisplayTopSectionCollapsed';
       // Database display page detected, using storage key
@@ -686,8 +687,7 @@ window.toggleMainSection = function () {
       storageKey = 'researchMainSectionCollapsed';
     } else if (currentPath.includes('/constraints')) {
       storageKey = 'constraintsMainSectionCollapsed';
-    } else if (currentPath.includes('/tests')) {
-      storageKey = 'testsMainSectionCollapsed';
+
     } else if (currentPath.includes('/db_display')) {
       storageKey = 'dbDisplayMainSectionCollapsed';
     } else if (currentPath.includes('/db_extradata')) {
@@ -728,8 +728,7 @@ window.restoreAllSectionStates = function () {
     topSectionKey = 'researchTopSectionCollapsed';
   } else if (currentPath.includes('/constraints')) {
     topSectionKey = 'constraintsTopSectionCollapsed';
-  } else if (currentPath.includes('/tests')) {
-    topSectionKey = 'testsTopSectionCollapsed';
+
   } else if (currentPath.includes('/db_display')) {
     topSectionKey = 'dbDisplayTopSectionCollapsed';
   } else if (currentPath.includes('/db_extradata')) {
@@ -779,8 +778,7 @@ window.restoreAllSectionStates = function () {
     mainSectionKey = 'researchMainSectionCollapsed';
   } else if (currentPath.includes('/constraints')) {
     mainSectionKey = 'constraintsMainSectionCollapsed';
-  } else if (currentPath.includes('/tests')) {
-    mainSectionKey = 'testsMainSectionCollapsed';
+
   } else if (currentPath.includes('/db_display')) {
     mainSectionKey = 'dbDisplayMainSectionCollapsed';
   } else if (currentPath.includes('/db_extradata')) {

@@ -626,18 +626,8 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/constraints">אילוצים</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="/tests">בדיקות</a>
-                          <ul class="submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/tests#settings">הגדרות בדיקות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/tests#crud">בדיקות CRUD</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/tests#server">בדיקות שרת</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/tests#results">תוצאות בדיקות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/tests#crud-results">תוצאות CRUD</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">מיפוי סקריפטים</a></li>
-                          </ul>
-                        </li>
+                        <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">מיפוי סקריפטים</a></li>
                         <li class="dropdown-submenu">
                           <a class="tiktrack-dropdown-item" href="#">נתונים חיצוניים</a>
                           <ul class="submenu">
@@ -651,6 +641,8 @@ class HeaderSystem {
                           </ul>
                         </li>
                         <li><a class="tiktrack-dropdown-item" href="/style_demonstration">הדגמת סגנונות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/designs">עיצובים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">מטריקס פונקציות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/js-map">מפת JS</a></li>
                       </ul>
                     </li>
@@ -851,11 +843,32 @@ class HeaderSystem {
 
     // Event listeners for dropdown menus
     document.addEventListener('click', (e) => {
-      const dropdownToggle = e.target.closest('.tiktrack-dropdown-toggle');
-      if (dropdownToggle) {
-        const dropdownMenu = dropdownToggle.nextElementSibling;
-        if (dropdownMenu && dropdownMenu.classList.contains('tiktrack-dropdown-menu')) {
-          this.toggleDropdown(dropdownMenu);
+      if (e.target && typeof e.target.closest === 'function') {
+        const dropdownToggle = e.target.closest('.tiktrack-dropdown-toggle');
+        if (dropdownToggle) {
+          const dropdownMenu = dropdownToggle.nextElementSibling;
+          if (dropdownMenu && dropdownMenu.classList.contains('tiktrack-dropdown-menu')) {
+            this.toggleDropdown(dropdownMenu);
+          }
+        }
+      }
+    });
+
+    // Event listeners for dropdown hover behavior
+    document.addEventListener('mouseenter', (e) => {
+      if (e.target && typeof e.target.closest === 'function') {
+        const dropdownMenu = e.target.closest('.tiktrack-dropdown-menu');
+        if (dropdownMenu && dropdownMenu.classList.contains('show')) {
+          this.handleDropdownMouseEnter(dropdownMenu);
+        }
+      }
+    });
+
+    document.addEventListener('mouseleave', (e) => {
+      if (e.target && typeof e.target.closest === 'function') {
+        const dropdownMenu = e.target.closest('.tiktrack-dropdown-menu');
+        if (dropdownMenu && dropdownMenu.classList.contains('show')) {
+          this.handleDropdownMouseLeave(dropdownMenu);
         }
       }
     });
@@ -867,6 +880,12 @@ class HeaderSystem {
         if (submenuItem) {
           this.showSubmenu(submenuItem);
         }
+        
+        // טיפול בתפריטי משנה (submenu)
+        const submenu = e.target.closest('.submenu');
+        if (submenu && submenu.classList.contains('show')) {
+          this.handleSubmenuMouseEnter(submenu);
+        }
       }
     });
 
@@ -875,6 +894,12 @@ class HeaderSystem {
         const submenuItem = e.target.closest('.dropdown-submenu');
         if (submenuItem) {
           this.hideSubmenu(submenuItem);
+        }
+        
+        // טיפול בתפריטי משנה (submenu)
+        const submenu = e.target.closest('.submenu');
+        if (submenu && submenu.classList.contains('show')) {
+          this.handleSubmenuMouseLeave(submenu);
         }
       }
     });
@@ -903,41 +928,43 @@ class HeaderSystem {
 
     // Event listeners לכפתורי איפוס וניקוי
     document.addEventListener('click', (e) => {
-      if (e.target.closest('#resetFiltersBtn')) {
-        e.preventDefault();
-        e.stopPropagation();
-      
-        if (window.resetAllFilters) {
-          window.resetAllFilters();
+      if (e.target && typeof e.target.closest === 'function') {
+        if (e.target.closest('#resetFiltersBtn')) {
+          e.preventDefault();
+          e.stopPropagation();
+        
+          if (window.resetAllFilters) {
+            window.resetAllFilters();
+          }
+          return;
         }
-        return;
-      }
 
-      if (e.target.closest('#clearFiltersBtn')) {
-        e.preventDefault();
-        e.stopPropagation();
-      
-        if (window.clearAllFilters) {
-          window.clearAllFilters();
+        if (e.target.closest('#clearFiltersBtn')) {
+          e.preventDefault();
+          e.stopPropagation();
+        
+          if (window.clearAllFilters) {
+            window.clearAllFilters();
+          }
+          return;
         }
-        return;
-      }
 
-      if (e.target.closest('#searchClearBtn')) {
-        e.preventDefault();
-        e.stopPropagation();
-      
-        const searchInput = document.getElementById('searchFilterInput');
-        if (searchInput) {
-          searchInput.value = '';
-          // הפעלת פילטר חיפוש ריק
-                  if (window.simpleFilter) {
-          window.simpleFilter.applySearchFilter('');
-        } else {
-          window.applySearchFilter('');
+        if (e.target.closest('#searchClearBtn')) {
+          e.preventDefault();
+          e.stopPropagation();
+        
+          const searchInput = document.getElementById('searchFilterInput');
+          if (searchInput) {
+            searchInput.value = '';
+            // הפעלת פילטר חיפוש ריק
+            if (window.simpleFilter) {
+              window.simpleFilter.applySearchFilter('');
+            } else {
+              window.applySearchFilter('');
+            }
+          }
+          return;
         }
-        }
-        return;
       }
     });
 
@@ -956,48 +983,58 @@ class HeaderSystem {
 
     // סגירת תפריטים בלחיצה מחוץ לאזור התפריט
     document.addEventListener('click', (e) => {
-      // בדיקה אם הלחיצה הייתה מחוץ לכל תפריטי הפילטרים והתפריט הראשי
-      const isClickInsideMenu = e.target.closest('.filter-menu') ||
-        e.target.closest('.filter-toggle') ||
-        e.target.closest('#searchFilterInput') ||
-        e.target.closest('#searchClearBtn') ||
-        e.target.closest('.tiktrack-dropdown-menu') ||
-        e.target.closest('.tiktrack-dropdown-toggle') ||
-        e.target.closest('.submenu');
+      if (e.target && typeof e.target.closest === 'function') {
+        // בדיקה אם הלחיצה הייתה מחוץ לכל תפריטי הפילטרים והתפריט הראשי
+        const isClickInsideMenu = e.target.closest('.filter-menu') ||
+          e.target.closest('.filter-toggle') ||
+          e.target.closest('#searchFilterInput') ||
+          e.target.closest('#searchClearBtn') ||
+          e.target.closest('.tiktrack-dropdown-menu') ||
+          e.target.closest('.tiktrack-dropdown-toggle') ||
+          e.target.closest('.submenu');
 
-      if (!isClickInsideMenu) {
-        // סגירת כל התפריטים
-        this.closeAllMenus();
+        if (!isClickInsideMenu) {
+          // סגירת כל התפריטים
+          this.closeAllMenus();
+        }
       }
     });
 
     // כפתור הצג/הסתר פילטרים
     document.addEventListener('click', (e) => {
-      if (e.target.closest('#filterToggleBtn')) {
-        this.toggleFiltersNew();
-        // סגירת התפריט הראשי כשפותחים פילטרים
-        this.closeMainMenu();
+      if (e.target && typeof e.target.closest === 'function') {
+        if (e.target.closest('#filterToggleBtn')) {
+          this.toggleFiltersNew();
+          // סגירת התפריט הראשי כשפותחים פילטרים
+          this.closeMainMenu();
+        }
       }
     });
 
     // כפתור איפוס פילטרים
     document.addEventListener('click', (e) => {
-      if (e.target.closest('#resetFiltersBtn')) {
-        this.resetAllFilters();
+      if (e.target && typeof e.target.closest === 'function') {
+        if (e.target.closest('#resetFiltersBtn')) {
+          this.resetAllFilters();
+        }
       }
     });
 
     // כפתור ניקוי פילטרים
     document.addEventListener('click', (e) => {
-      if (e.target.closest('#clearFiltersBtn')) {
-        this.clearAllFilters();
+      if (e.target && typeof e.target.closest === 'function') {
+        if (e.target.closest('#clearFiltersBtn')) {
+          this.clearAllFilters();
+        }
       }
     });
 
     // כפתור נקה חיפוש
     document.addEventListener('click', (e) => {
-      if (e.target.closest('#searchClearBtn')) {
-        this.clearSearchFilter();
+      if (e.target && typeof e.target.closest === 'function') {
+        if (e.target.closest('#searchClearBtn')) {
+          this.clearSearchFilter();
+        }
       }
     });
 
@@ -1046,6 +1083,8 @@ class HeaderSystem {
     if (submenu) {
       submenu.style.display = 'block';
       submenu.classList.add('show');
+      // ביטול טיימר סגירה של התפריט הראשי
+      this.clearDropdownTimer();
     }
   }
 
@@ -1057,20 +1096,44 @@ class HeaderSystem {
     }
   }
 
+  handleSubmenuMouseEnter(submenu) {
+    // ביטול טיימר סגירה כשהעכבר נכנס לתפריט משנה
+    this.clearDropdownTimer();
+  }
+
+  handleSubmenuMouseLeave(submenu) {
+    // הפעלת טיימר לסגירה אחרי יציאת העכבר מתפריט משנה
+    this.startMenuTimer('dropdown', 500); // זמן קצר לסגירה אחרי יציאת העכבר
+  }
+
   toggleDropdown(dropdownMenu) {
     const isVisible = dropdownMenu.classList.contains('show');
 
     if (isVisible) {
       dropdownMenu.classList.remove('show');
       // ניקוי טיימר
-      if (this.menuTimers && this.menuTimers['dropdown']) {
-        clearTimeout(this.menuTimers['dropdown']);
-        delete this.menuTimers['dropdown'];
-      }
+      this.clearDropdownTimer();
     } else {
       dropdownMenu.classList.add('show');
       // הפעלת טיימר לסגירה אוטומטית
-      this.startMenuTimer('dropdown', 3000);
+      this.startMenuTimer('dropdown', 10000); // זמן ארוך יותר לסגירה אוטומטית
+    }
+  }
+
+  handleDropdownMouseEnter(dropdownMenu) {
+    // ביטול טיימר סגירה כשהעכבר נכנס לתפריט
+    this.clearDropdownTimer();
+  }
+
+  handleDropdownMouseLeave(dropdownMenu) {
+    // הפעלת טיימר לסגירה אחרי יציאת העכבר
+    this.startMenuTimer('dropdown', 500); // זמן קצר לסגירה אחרי יציאת העכבר
+  }
+
+  clearDropdownTimer() {
+    if (this.menuTimers && this.menuTimers['dropdown']) {
+      clearTimeout(this.menuTimers['dropdown']);
+      delete this.menuTimers['dropdown'];
     }
   }
 
@@ -1087,10 +1150,7 @@ class HeaderSystem {
     });
 
     // ניקוי טיימר דרופדאון
-    if (this.menuTimers && this.menuTimers['dropdown']) {
-      clearTimeout(this.menuTimers['dropdown']);
-      delete this.menuTimers['dropdown'];
-    }
+    this.clearDropdownTimer();
   }
 
   // פונקציה לסגירת כל התפריטים
@@ -1777,12 +1837,14 @@ class HeaderSystem {
 
     // סגירת דרופדאונים בלחיצה מחוץ
     document.addEventListener('click', (e) => {
-      if (!e.target.closest('.tiktrack-nav-item.dropdown')) {
-        const navMenus = document.querySelectorAll('.tiktrack-nav-item.dropdown .tiktrack-dropdown-menu');
-        navMenus.forEach(menu => {
-          menu.classList.remove('show');
-          this.clearMenuTimers(menu);
-        });
+      if (e.target && typeof e.target.closest === 'function') {
+        if (!e.target.closest('.tiktrack-nav-item.dropdown')) {
+          const navMenus = document.querySelectorAll('.tiktrack-nav-item.dropdown .tiktrack-dropdown-menu');
+          navMenus.forEach(menu => {
+            menu.classList.remove('show');
+            this.clearMenuTimers(menu);
+          });
+        }
       }
     });
   }
@@ -2094,8 +2156,8 @@ class HeaderSystem {
     this.saveFilterStates();
 
     // טעינת חשבונות מחדש
-    if (typeof window.loadAccountsFromServer === 'function') {
-      window.loadAccountsFromServer().then(accounts => {
+    if (typeof window.getAccounts === 'function') {
+      window.getAccounts().then(accounts => {
         if (accounts && accounts.length > 0) {
           this.updateAccountFilter(accounts);
         }
@@ -2256,17 +2318,10 @@ class HeaderSystem {
 
     // Handle different navigation types
     if (href.includes('#')) {
-      // Handle anchor navigation (e.g., /tests#settings)
+      // Handle anchor navigation for other pages if needed
       const [path, anchor] = href.split('#');
-      if (path === '/tests') {
-        // Navigate to tests page and scroll to specific section
-        window.location.href = '/tests';
-
-        // Wait for page load and scroll to section
-        setTimeout(() => {
-          this.scrollToSection(anchor);
-        }, 500);
-      }
+      // Regular navigation for anchor links
+      window.location.href = href;
     } else {
       // Regular navigation
       window.location.href = href;

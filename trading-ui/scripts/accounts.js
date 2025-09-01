@@ -3,8 +3,10 @@
  * קובץ זה מכיל את כל הפונקציות הקשורות לניהול חשבונות
  * כולל טעינת נתונים, עדכון טבלאות, מודלים ופעולות CRUD
  * 
- * הערה חשובה: פונקציות פילטר כלליות (updateAccountFilterMenu, updateAccountFilterText)
- * הועברו לקובץ grid-filters.js כדי להיות משותפות לכל הדפים
+ * הערה חשובה: 
+ * - פונקציות פילטר כלליות (updateAccountFilterMenu, updateAccountFilterText) הועברו לקובץ grid-filters.js
+ * - פונקציות שירות (getAccounts, isAccountsLoaded) הועברו לקובץ account-service.js
+ * - קובץ זה נועד לשרת רק את עמוד accounts.html
  * 
  * Dependencies:
  * - table-mappings.js (for column mappings and sorting)
@@ -24,9 +26,9 @@
  * - createAccount: יצירת חשבון חדש
  * - updateAccountFromModal: עדכון חשבון קיים
  * - deleteAccount: מחיקת חשבון
- * - getAccounts, isAccountsLoaded: פונקציות עזר ספציפיות לחשבונות
+ * - פונקציות ניהול חשבונות מלאות (CRUD, מודלים, מחיקה, ביטול)
  * 
- * שימוש: נטען בדפים שצריכים ניהול חשבונות
+ * שימוש: נטען רק בעמוד accounts.html לניהול חשבונות
  * תלויות: Bootstrap (למודלים), fetch API, grid-filters.js (לפונקציות פילטר)
  */
 
@@ -254,15 +256,15 @@ function loadDefaultAccounts() {
 
 // הפונקציות הכלליות לפילטר חשבונות הועברו ל-grid-filters.js
 
-// פונקציה לקבלת חשבונות נטענים
-function getAccounts() {
-  return window.accountsData || [];
-}
+// פונקציה לקבלת חשבונות נטענים - הועברה ל-account-service.js
+// function getAccounts() {
+//   return window.accountsData || [];
+// }
 
-// פונקציה לבדיקה אם החשבונות נטענו
-function isAccountsLoaded() {
-  return window.accountsLoaded || false;
-}
+// פונקציה לבדיקה אם החשבונות נטענו - הועברה ל-account-service.js
+// function isAccountsLoaded() {
+//   return window.accountsLoaded || false;
+// }
 
 // פונקציה לטעינת נתוני חשבונות מהשרת
 async function loadAccountsData() {
@@ -441,8 +443,8 @@ window.loadAllAccountsFromServer = loadAllAccountsFromServer;
 window.loadDefaultAccounts = loadDefaultAccounts;
 // הערה: updateAccountFilterMenu מיוצאת מ-grid-filters.js
 window.updateAccountFilterDisplayText = updateAccountFilterDisplayText;
-window.getAccounts = getAccounts;
-window.isAccountsLoaded = isAccountsLoaded;
+// window.getAccounts = getAccounts; // הועבר ל-account-service.js
+// window.isAccountsLoaded = isAccountsLoaded; // הועבר ל-account-service.js
 window.loadAccountsData = loadAccountsData;
 window.updateAccountsTable = updateAccountsTable;
 window.loadAccounts = loadAccounts;

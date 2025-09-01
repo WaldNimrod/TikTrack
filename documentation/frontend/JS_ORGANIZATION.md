@@ -28,7 +28,7 @@ trading-ui/scripts/
 ├── designs.js                # Designs page functionality
 ├── research.js               # Research page functionality
 ├── preferences.js            # Preferences management
-└── tests.js                  # Testing functionality
+
 ```
 
 ### Module Categories
@@ -44,7 +44,7 @@ trading-ui/scripts/
 - **CRUD Modules**: `accounts.js`, `alerts.js`, `cash_flows.js`, `notes.js`
 - **Trading Modules**: `executions.js`, `tickers.js`, `trades.js`, `planning.js`
 - **System Modules**: `database.js`, `db-extradata.js`, `constraints.js`
-- **Utility Modules**: `designs.js`, `research.js`, `preferences.js`, `tests.js`
+- **Utility Modules**: `designs.js`, `research.js`, `preferences.js`
 
 #### 3. Support Modules
 - **`table-mappings.js`**: Column mappings for table rendering

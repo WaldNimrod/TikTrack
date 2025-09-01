@@ -7,7 +7,7 @@ from .api.cash_flows import cash_flows_bp
 from .api.notes import notes_bp
 from .api.executions import executions_bp
 from .api.preferences import preferences_bp
-from .api.tests import tests_bp
+
 
 from .pages import pages_bp
 
@@ -21,7 +21,7 @@ __all__ = [
     'notes_bp',
     'executions_bp',
     'preferences_bp',
-    'tests_bp',
+
 
     'pages_bp'
 ]

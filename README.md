@@ -227,5 +227,5 @@ console.log('❌ Error loading data:', error);
 ---
 
 **תאריך עדכון אחרון**: 29 באוגוסט 2025  
-**גרסה**: 2.0  
+**גרסה**: 2.0.0.0  
 **מפתח**: TikTrack Development Team

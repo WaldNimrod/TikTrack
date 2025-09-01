@@ -1,4 +1,4 @@
-# TikTrack - External Data Integration Specification v2.0.0
+# TikTrack - External Data Integration Specification v2.0.0.0
 
 ## 📋 תוכן עניינים
 1. [מבנה כללי](#מבנה-כללי)
@@ -9,7 +9,7 @@
 6. [תהליכי פיתוח](#תהליכי-פיתוח)
 7. [שלבי ביצוע](#שלבי-ביצוע)
 8. [Roadmap](#roadmap)
-9. [Changelog v2.0.0](#changelog-v200)
+9. [Changelog v2.0.0.0](#changelog-v2000)
 
 ---
 
@@ -740,7 +740,7 @@ trading-ui/
 
 ---
 
-## 📋 Changelog v2.0.0
+## 📋 Changelog v2.0.0.0
 
 ### 🎉 MILESTONE ACHIEVED: Refactoring Complete!
 
@@ -794,6 +794,6 @@ Utils (utils.js)
 ---
 
 **מסמך זה נוצר ב**: 15 בינואר 2026  
-**גרסה**: 2.0.0  
+**גרסה**: 2.0.0.0  
 **מחבר**: TikTrack Development Team
 

@@ -1,10 +1,31 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>בדיקת API - TikTrack</title>
-    
+
+    <!-- 
+        ===== דף בדיקת API - TikTrack =====
+        
+        דף זה מכיל:
+        1. בדיקת endpoints בסיסיים
+        2. בדיקת בקשת POST
+        3. בדיקת אימות
+        4. בדיקת הגבלת קצב
+        5. בדיקת טיפול בשגיאות
+        6. בדיקת ביצועי API
+        7. בדיקת בקשות מקבילות
+        8. בדיקת בקשה מותאמת
+        
+        מבנה הדף:
+        - unified-header: כותרת האפליקציה החדשה עם ניווט ופילטרים מאוחדים
+        - page-body: תוכן ראשי מוגבל ברוחב (1400px)
+          - top-section: כותרת בדיקת API
+          - content-section: טופסי בדיקה ותוצאות
+    -->
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -15,9 +36,10 @@
     <link rel="stylesheet" href="/styles/header-system.css">
     <link rel="stylesheet" href="/styles/apple-theme.css">
     <link rel="stylesheet" href="/external_data_integration_client/styles/external_data_test.css">
-    
+
     <!-- Modular grid files -->
     <script src="/scripts/console-cleanup.js"></script>
+    <script src="/scripts/button-icons.js"></script>
     <script src="/scripts/translation-utils.js"></script>
     <script src="/scripts/data-utils.js"></script>
     <script src="/scripts/ui-utils.js"></script>
@@ -31,7 +53,7 @@
     <script src="/scripts/alerts.js"></script>
     <script src="/scripts/active-alerts-component.js"></script>
 
-    <!-- API test script -->
+    <!-- External data test script -->
     <!-- Functions embedded directly in page -->
 </head>
 
@@ -75,7 +97,7 @@
                             בדיקות
                         </div>
                         <div class="table-actions">
-                            <button class="refresh-btn" onclick="clearApiLogs()" title="נקה לוגים">
+                            <button class="refresh-btn" onclick="clearTestLogs()" title="נקה לוגים">
                                 <img src="/images/icons/development.svg" alt="נקה" class="action-icon" style="width: 16px; height: 16px;"> נקה
                             </button>
 
@@ -87,216 +109,97 @@
                     </div>
 
                     <!-- תוכן בדיקות -->
-                    <div class="section-body">
-                        <!-- Loading Indicator -->
-                        <div id="loading-indicator" class="loading-overlay" style="display: none;">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">טוען...</span>
-                            </div>
-                        </div>
-
-                        <!-- Error Display -->
-                        <div id="error-display" class="alert alert-danger" style="display: none;">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            <span id="error-message"></span>
-                        </div>
-
-                        <!-- Current Time Display -->
-                        <div class="text-muted mb-3">
-                            <i class="fas fa-clock me-1"></i>
-                            <span id="current-time">טוען זמן...</span>
-                        </div>
-
-                        <!-- Two Column Layout -->
+                    <div class="content-body">
                         <div class="row">
-                            <!-- Left Column - Tests -->
+                            <!-- עמודה שמאלית - טופסי בדיקה -->
                             <div class="col-md-6">
-                                <h6 class="mb-3"><i class="fas fa-flask me-2"></i>בדיקות</h6>
-                                
-                                <!-- API Tests -->
-                                <div class="row">
-                                    <!-- Endpoint Test -->
-                                    <div class="col-6 mb-2">
-                                        <div class="card test-card">
-                                            <div class="card-header py-1">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-link me-1"></i>
-                                                    בדיקת נקודת קצה
-                                                </h6>
-                                            </div>
-                                            <div class="card-body py-1">
-                                                <div class="mb-1">
-                                                    <div class="d-flex align-items-center mb-1">
-                                                        <label class="form-label small mb-0 me-2">URL:</label>
-                                                        <button class="btn btn-outline-secondary btn-sm" onclick="editEndpointUrl()" title="ערוך">
-                                                            <i class="fas fa-edit" style="font-size: 10px;"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div class="data-label" id="endpoint-url-label" style="font-size: 11px; line-height: 1.2; max-height: 30px; overflow: hidden; background: #f8f9fa; padding: 4px; border-radius: 3px;">/api/v1/tickers</div>
-                                                    <textarea class="form-control form-control-sm" id="endpoint-url" rows="2" style="display: none; font-size: 10px;">/api/v1/tickers</textarea>
-                                                </div>
-                                                <div class="d-grid gap-1">
-                                                    <button class="btn btn-primary btn-sm" id="test-get" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-download me-1"></i>GET
-                                                    </button>
-                                                    <button class="btn btn-success btn-sm" id="test-post" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-upload me-1"></i>POST
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <div class="test-controls">
+                                    <h5>בקרת בדיקות API</h5>
+                                    
+                                    <!-- בדיקת endpoint בסיסי -->
+                                    <div class="test-group">
+                                        <h6>בדיקת endpoint בסיסי</h6>
+                                        <button id="test-endpoint" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-link"></i> בדוק endpoint
+                                        </button>
                                     </div>
 
-                                    <!-- Authentication Test -->
-                                    <div class="col-6 mb-2">
-                                        <div class="card test-card">
-                                            <div class="card-header py-1">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-key me-1"></i>
-                                                    אימות
-                                                </h6>
-                                            </div>
-                                            <div class="card-body py-1">
-                                                <div class="d-grid gap-1">
-                                                    <button class="btn btn-outline-info btn-sm" id="test-auth" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-user-check me-1"></i>בדוק אימות
-                                                    </button>
-                                                    <button class="btn btn-outline-warning btn-sm" id="test-token" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-token me-1"></i>בדוק טוקן
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <!-- בדיקת בקשת POST -->
+                                    <div class="test-group">
+                                        <h6>בדיקת בקשת POST</h6>
+                                        <button id="test-post-request" class="btn btn-info btn-sm">
+                                            <i class="fas fa-paper-plane"></i> בדוק POST
+                                        </button>
                                     </div>
 
-                                    <!-- Rate Limiting Test -->
-                                    <div class="col-6 mb-2">
-                                        <div class="card test-card">
-                                            <div class="card-header py-1">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-tachometer-alt me-1"></i>
-                                                    הגבלת קצב
-                                                </h6>
-                                            </div>
-                                            <div class="card-body py-1">
-                                                <div class="d-grid gap-1">
-                                                    <button class="btn btn-outline-secondary btn-sm" id="test-rate-limit" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-stopwatch me-1"></i>בדוק הגבלה
-                                                    </button>
-                                                    <button class="btn btn-outline-danger btn-sm" id="test-burst" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-bolt me-1"></i>בדיקת פרץ
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <!-- בדיקת אימות -->
+                                    <div class="test-group">
+                                        <h6>בדיקת אימות</h6>
+                                        <button id="test-authentication" class="btn btn-success btn-sm">
+                                            <i class="fas fa-key"></i> בדוק אימות
+                                        </button>
                                     </div>
 
-                                    <!-- Error Handling Test -->
-                                    <div class="col-6 mb-2">
-                                        <div class="card test-card">
-                                            <div class="card-header py-1">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-exclamation-triangle me-1"></i>
-                                                    טיפול שגיאות
-                                                </h6>
-                                            </div>
-                                            <div class="card-body py-1">
-                                                <div class="d-grid gap-1">
-                                                    <button class="btn btn-outline-warning btn-sm" id="test-404" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-search me-1"></i>404
-                                                    </button>
-                                                    <button class="btn btn-outline-danger btn-sm" id="test-500" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-server me-1"></i>500
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <!-- בדיקת הגבלת קצב -->
+                                    <div class="test-group">
+                                        <h6>בדיקת הגבלת קצב</h6>
+                                        <button id="test-rate-limiting" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-tachometer-alt"></i> בדוק קצב
+                                        </button>
                                     </div>
 
-                                    <!-- Performance Test -->
-                                    <div class="col-6 mb-2">
-                                        <div class="card test-card">
-                                            <div class="card-header py-1">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-stopwatch me-1"></i>
-                                                    ביצועים
-                                                </h6>
-                                            </div>
-                                            <div class="card-body py-1">
-                                                <div class="d-grid gap-1">
-                                                    <button class="btn btn-outline-success btn-sm" id="test-response-time" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-clock me-1"></i>זמן תגובה
-                                                    </button>
-                                                    <button class="btn btn-outline-info btn-sm" id="test-throughput" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-chart-line me-1"></i>תפוקה
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <!-- בדיקת טיפול בשגיאות -->
+                                    <div class="test-group">
+                                        <h6>בדיקת טיפול בשגיאות</h6>
+                                        <button id="test-error-handling" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-exclamation-triangle"></i> בדוק שגיאות
+                                        </button>
                                     </div>
 
-                                    <!-- Custom Request Test -->
-                                    <div class="col-6 mb-2">
-                                        <div class="card test-card">
-                                            <div class="card-header py-1">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-cog me-1"></i>
-                                                    בקשה מותאמת
-                                                </h6>
-                                            </div>
-                                            <div class="card-body py-1">
-                                                <div class="mb-1">
-                                                    <div class="d-flex align-items-center mb-1">
-                                                        <label class="form-label small mb-0 me-2">JSON:</label>
-                                                        <button class="btn btn-outline-secondary btn-sm" onclick="editCustomJson()" title="ערוך">
-                                                            <i class="fas fa-edit" style="font-size: 10px;"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div class="data-label" id="custom-json-label" style="font-size: 11px; line-height: 1.2; max-height: 30px; overflow: hidden; background: #f8f9fa; padding: 4px; border-radius: 3px;">{"test": "data"}</div>
-                                                    <textarea class="form-control form-control-sm" id="custom-json" rows="2" style="display: none; font-size: 10px;">{"test": "data"}</textarea>
-                                                </div>
-                                                <button class="btn btn-warning btn-sm w-100" id="test-custom-request" style="font-size: 10px; padding: 2px 8px;">
-                                                    <i class="fas fa-paper-plane me-1"></i>שלח
-                                                </button>
-                                            </div>
+                                    <!-- בדיקת ביצועי API -->
+                                    <div class="test-group">
+                                        <h6>בדיקת ביצועי API</h6>
+                                        <button id="test-performance" class="btn btn-dark btn-sm">
+                                            <i class="fas fa-stopwatch"></i> בדוק ביצועים
+                                        </button>
+                                    </div>
+
+                                    <!-- בדיקת בקשות מקבילות -->
+                                    <div class="test-group">
+                                        <h6>בדיקת בקשות מקבילות</h6>
+                                        <button id="test-concurrent-requests" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-layer-group"></i> בדוק מקבילות
+                                        </button>
+                                    </div>
+
+                                    <!-- בדיקת בקשה מותאמת -->
+                                    <div class="test-group">
+                                        <h6>בדיקת בקשה מותאמת</h6>
+                                        <div class="input-group mb-2">
+                                            <input type="text" id="custom-request" class="form-control" placeholder="הזן URL או נתונים" value="/api/v1/health">
+                                            <button id="test-custom-request" class="btn btn-outline-secondary btn-sm">
+                                                <i class="fas fa-terminal"></i> הרץ
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Right Column - Feedback -->
+                            <!-- עמודה ימנית - לוגים ותוצאות -->
                             <div class="col-md-6">
-                                <h6 class="mb-3"><i class="fas fa-comments me-2"></i>משוב</h6>
-                                
-                                <!-- API Results -->
-                                <div class="card result-card mb-3">
-                                    <div class="card-header py-2">
-                                        <h6 class="card-title mb-0">
-                                            <i class="fas fa-chart-bar me-2"></i>
-                                            תוצאות API
-                                        </h6>
-                                    </div>
-                                    <div class="card-body py-2">
-                                        <div id="api-results" style="max-height: 200px; overflow-y: auto;">
-                                            <!-- תוצאות יוצגו כאן -->
+                                <div class="test-results">
+                                    <h5>לוגים</h5>
+                                    <div id="test-logs" class="logs-container">
+                                        <div class="log-entry">
+                                            <small class="text-muted">[ממתין לבדיקות...]</small>
                                         </div>
                                     </div>
-                                </div>
 
-                                <!-- API Logs -->
-                                <div class="card log-card">
-                                    <div class="card-header py-2">
-                                        <h6 class="card-title mb-0">
-                                            <i class="fas fa-file-alt me-2"></i>
-                                            לוג בדיקות
-                                            <button class="btn btn-sm btn-outline-secondary float-start" onclick="clearApiLogs()">
-                                                <i class="fas fa-trash me-1"></i>נקה
-                                            </button>
-                                        </h6>
-                                    </div>
-                                    <div class="card-body py-2">
-                                        <div class="log-container" id="api-test-logs" style="max-height: 300px; overflow-y: auto;">
-                                            <!-- לוגים יוצגו כאן -->
+                                    <h5>תוצאות בדיקות</h5>
+                                    <div id="test-results" class="results-container">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle"></i>
+                                            לחץ על כפתורי הבדיקה כדי לראות תוצאות
                                         </div>
                                     </div>
                                 </div>
@@ -308,481 +211,602 @@
         </div> <!-- סוף page-body -->
     </div> <!-- סוף background-wrapper -->
 
-    <!-- JavaScript Files -->
-    <script src="/scripts/header-system.js"></script>
-    
     <script>
-        // אתחול HeaderSystem
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.headerSystem && !window.headerSystem.isInitialized) {
-                window.headerSystem.init();
-            }
-        });
-
-        // ===== פונקציות בדיקת API =====
-        
-        // משתנים גלובליים
-        let apiTestResults = [];
-
-        // פונקציה לבדיקת GET
-        function testGetRequest() {
-            console.log('🔗 Testing GET request...');
+        // פונקציה לבדיקת endpoint בסיסי
+        async function testEndpoint() {
+            addLog('info', 'בודק endpoint בסיסי...');
             
-            const endpoints = [
-                '/api/v1/tickers/',
-                '/api/v1/accounts/',
-                '/api/v1/trades/',
-                '/api/v1/alerts/',
-                '/api/v1/cash_flows/'
-            ];
-
-            const results = {};
-            let successCount = 0;
-            
-            endpoints.forEach(endpoint => {
-                fetch(endpoint)
-                    .then(response => {
-                        results[endpoint] = {
+            try {
+                const startTime = performance.now();
+                const response = await fetch('/api/v1/tickers/');
+                const endTime = performance.now();
+                const responseTime = endTime - startTime;
+                
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    addLog('success', `Endpoint תקין - זמן תגובה: ${responseTime.toFixed(2)}ms`);
+                    displayResults('בדיקת endpoint בסיסי', {
+                        status: 'success',
+                        message: 'Endpoint תקין ומגיב',
+                        response: {
                             status: response.status,
-                            ok: response.ok,
-                            timestamp: new Date().toISOString()
-                        };
-                        
-                        if (response.ok) {
-                            successCount++;
-                        }
-                        
-                        // בדיקה אם כל הבדיקות הושלמו
-                        if (Object.keys(results).length === endpoints.length) {
-                            const allSuccess = successCount === endpoints.length;
-                            addApiResult('GET Request', allSuccess ? 'success' : 'warning', 
-                                `${successCount}/${endpoints.length} נקודות קצה פעילות`, 
-                                results
-                            );
-                        }
-                    })
-                    .catch(error => {
-                        results[endpoint] = {
-                            status: 'error',
-                            ok: false,
-                            error: error.message,
-                            timestamp: new Date().toISOString()
-                        };
-                        
-                        // בדיקה אם כל הבדיקות הושלמו
-                        if (Object.keys(results).length === endpoints.length) {
-                            const allSuccess = successCount === endpoints.length;
-                            addApiResult('GET Request', allSuccess ? 'success' : 'warning', 
-                                `${successCount}/${endpoints.length} נקודות קצה פעילות`, 
-                                results
-                            );
+                            statusText: response.statusText,
+                            responseTime: `${responseTime.toFixed(2)}ms`,
+                            data: data
+                        },
+                        headers: Object.fromEntries(response.headers.entries())
+                    });
+                } else {
+                    addLog('error', `Endpoint נכשל - סטטוס: ${response.status}`);
+                    displayResults('שגיאה ב-endpoint', {
+                        status: 'error',
+                        message: `Endpoint נכשל עם סטטוס ${response.status}`,
+                        response: {
+                            status: response.status,
+                            statusText: response.statusText,
+                            data: data
                         }
                     });
-            });
-        }
-
-        // פונקציה לבדיקת POST
-        function testPostRequest() {
-            console.log('📤 Testing POST request...');
-            
-            const testData = {
-                test: 'data',
-                timestamp: new Date().toISOString()
-            };
-
-            fetch('/api/v1/test/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(testData)
-            })
-            .then(response => {
-                const result = {
-                    status: response.status,
-                    ok: response.ok,
-                    timestamp: new Date().toISOString()
-                };
+                }
                 
-                addApiResult('POST Request', result.ok ? 'success' : 'warning', 
-                    `POST request completed with status ${response.status}`, 
-                    result
-                );
-            })
-            .catch(error => {
-                addApiResult('POST Request', 'error', 
-                    `POST request failed: ${error.message}`, 
-                    { error: error.message, timestamp: new Date().toISOString() }
-                );
-            });
-        }
-
-        // פונקציה לבדיקת אימות
-        function testAuthentication() {
-            console.log('🔐 Testing authentication...');
-            
-            const token = localStorage.getItem('authToken');
-            const headers = {
-                'Content-Type': 'application/json'
-            };
-
-            if (token) {
-                headers['Authorization'] = `Bearer ${token}`;
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת endpoint: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
             }
-
-            fetch('/api/v1/accounts/', {
-                method: 'GET',
-                headers: headers
-            })
-            .then(response => {
-                const result = {
-                    status: response.status,
-                    ok: response.ok,
-                    hasToken: !!token,
-                    timestamp: new Date().toISOString()
-                };
-                
-                addApiResult('Authentication', result.ok ? 'success' : 'warning', 
-                    `Authentication test completed - Token: ${result.hasToken ? 'Yes' : 'No'}`, 
-                    result
-                );
-            })
-            .catch(error => {
-                addApiResult('Authentication', 'error', 
-                    `Authentication test failed: ${error.message}`, 
-                    { error: error.message, timestamp: new Date().toISOString() }
-                );
-            });
         }
 
-        // פונקציה לבדיקת הגבלת קצב
-        function testRateLimiting() {
-            console.log('⏱️ Testing rate limiting...');
+        // פונקציה לבדיקת בקשת POST
+        async function testPostRequest() {
+            addLog('info', 'בודק בקשת POST...');
             
-            const requests = [];
-            const maxRequests = 10;
-            
-            for (let i = 0; i < maxRequests; i++) {
-                requests.push(
-                    fetch('/api/v1/tickers/')
-                        .then(response => ({
-                            request: i + 1,
-                            status: response.status,
-                            ok: response.ok,
-                            timestamp: new Date().toISOString()
-                        }))
-                        .catch(error => ({
-                            request: i + 1,
-                            status: 'error',
-                            ok: false,
-                            error: error.message,
-                            timestamp: new Date().toISOString()
-                        }))
-                );
-            }
-            
-            Promise.all(requests)
-                .then(results => {
-                    const successCount = results.filter(r => r.ok).length;
-                    const rateLimited = results.some(r => r.status === 429);
-                    
-                    addApiResult('Rate Limiting', rateLimited ? 'warning' : 'success', 
-                        `${successCount}/${maxRequests} בקשות הצליחו${rateLimited ? ' - הגבלת קצב זוהתה' : ''}`, 
-                        results
-                    );
-                });
-        }
-
-        // פונקציה לבדיקת טיפול בשגיאות
-        function testErrorHandling() {
-            console.log('⚠️ Testing error handling...');
-            
-            // בדיקת נקודת קצה לא קיימת
-            fetch('/api/v1/nonexistent/')
-                .then(response => {
-                    const result = {
-                        status: response.status,
-                        ok: response.ok,
-                        expected: '404',
-                        timestamp: new Date().toISOString()
-                    };
-                    
-                    addApiResult('Error Handling', result.status === 404 ? 'success' : 'warning', 
-                        `Error handling test - Status: ${response.status}`, 
-                        result
-                    );
-                })
-                .catch(error => {
-                    addApiResult('Error Handling', 'error', 
-                        `Error handling test failed: ${error.message}`, 
-                        { error: error.message, timestamp: new Date().toISOString() }
-                    );
-                });
-        }
-
-        // פונקציה לבדיקת ביצועים
-        function testPerformance() {
-            console.log('⚡ Testing performance...');
-            
-            const startTime = performance.now();
-            
-            fetch('/api/v1/tickers/')
-                .then(response => response.json())
-                .then(data => {
-                    const endTime = performance.now();
-                    const duration = endTime - startTime;
-                    
-                    const result = {
-                        duration: duration.toFixed(2),
-                        dataSize: JSON.stringify(data).length,
-                        timestamp: new Date().toISOString()
-                    };
-                    
-                    const status = duration < 1000 ? 'success' : duration < 3000 ? 'warning' : 'error';
-                    
-                    addApiResult('Performance', status, 
-                        `בקשה הושלמה תוך ${duration.toFixed(2)}ms`, 
-                        result
-                    );
-                })
-                .catch(error => {
-                    addApiResult('Performance', 'error', 
-                        `Performance test failed: ${error.message}`, 
-                        { error: error.message, timestamp: new Date().toISOString() }
-                    );
-                });
-        }
-
-        // פונקציה לבדיקת תפוקה
-        function testThroughput() {
-            console.log('📊 Testing throughput...');
-            
-            const startTime = performance.now();
-            const requests = [];
-            const maxRequests = 5;
-            
-            for (let i = 0; i < maxRequests; i++) {
-                requests.push(
-                    fetch('/api/v1/tickers/')
-                        .then(response => response.json())
-                        .then(data => ({
-                            request: i + 1,
-                            success: true,
-                            dataSize: JSON.stringify(data).length
-                        }))
-                        .catch(error => ({
-                            request: i + 1,
-                            success: false,
-                            error: error.message
-                        }))
-                );
-            }
-            
-            Promise.all(requests)
-                .then(results => {
-                    const endTime = performance.now();
-                    const duration = endTime - startTime;
-                    const successCount = results.filter(r => r.success).length;
-                    const totalDataSize = results.reduce((sum, r) => sum + (r.dataSize || 0), 0);
-                    
-                    const result = {
-                        duration: duration.toFixed(2),
-                        requests: maxRequests,
-                        successCount: successCount,
-                        totalDataSize: totalDataSize,
-                        requestsPerSecond: (maxRequests / (duration / 1000)).toFixed(2),
-                        timestamp: new Date().toISOString()
-                    };
-                    
-                    addApiResult('Throughput', successCount === maxRequests ? 'success' : 'warning', 
-                        `${successCount}/${maxRequests} בקשות הצליחו - ${result.requestsPerSecond} בקשות/שנייה`, 
-                        result
-                    );
-                });
-        }
-
-        // פונקציה לבדיקת בקשה מותאמת
-        function testCustomRequest() {
-            console.log('🔧 Testing custom request...');
-            
-            const customJsonElement = document.getElementById('custom-json');
-            if (!customJsonElement) {
-                addApiResult('Custom Request', 'error', 'אלמנט JSON מותאם לא נמצא');
-                return;
-            }
-
-            const customData = customJsonElement.value.trim();
-            if (!customData) {
-                addApiResult('Custom Request', 'warning', 'אין נתוני JSON מותאמים');
-                return;
-            }
-
             try {
-                const parsedData = JSON.parse(customData);
+                const testData = {
+                    test: true,
+                    timestamp: new Date().toISOString(),
+                    message: 'בדיקת POST request'
+                };
                 
-                fetch('/api/v1/test/', {
+                const startTime = performance.now();
+                const response = await fetch('/api/v1/tickers/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(parsedData)
-                })
-                .then(response => {
-                    const result = {
-                        status: response.status,
-                        ok: response.ok,
-                        dataSize: customData.length,
-                        timestamp: new Date().toISOString()
-                    };
-                    
-                    addApiResult('Custom Request', result.ok ? 'success' : 'warning', 
-                        `בקשה מותאמת הושלמה עם סטטוס ${response.status}`, 
-                        result
-                    );
-                })
-                .catch(error => {
-                    addApiResult('Custom Request', 'error', 
-                        `בקשה מותאמת נכשלה: ${error.message}`, 
-                        { error: error.message, timestamp: new Date().toISOString() }
-                    );
+                    body: JSON.stringify(testData)
                 });
+                const endTime = performance.now();
+                const responseTime = endTime - startTime;
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    addLog('success', `בקשת POST הצליחה - זמן תגובה: ${responseTime.toFixed(2)}ms`);
+                    displayResults('בדיקת בקשת POST', {
+                        status: 'success',
+                        message: 'בקשת POST הצליחה',
+                        request: {
+                            method: 'POST',
+                            data: testData
+                        },
+                        response: {
+                            status: response.status,
+                            statusText: response.statusText,
+                            responseTime: `${responseTime.toFixed(2)}ms`,
+                            data: data
+                        }
+                    });
+                } else {
+                    addLog('warning', `בקשת POST נכשלה - סטטוס: ${response.status}`);
+                    displayResults('בקשת POST נכשלה', {
+                        status: 'warning',
+                        message: `בקשת POST נכשלה עם סטטוס ${response.status}`,
+                        request: {
+                            method: 'POST',
+                            data: testData
+                        },
+                        response: {
+                            status: response.status,
+                            statusText: response.statusText,
+                            data: data
+                        }
+                    });
+                }
+                
             } catch (error) {
-                addApiResult('Custom Request', 'error', 
-                    `JSON לא תקין: ${error.message}`, 
-                    { error: error.message, timestamp: new Date().toISOString() }
-                );
+                addLog('error', `שגיאה בבדיקת POST: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
             }
         }
 
-        // פונקציה להוספת תוצאה
-        function addApiResult(test, status, message, data = null) {
-            console.log('📝 Adding API result:', { test, status, message });
+        // פונקציה לבדיקת אימות
+        async function testAuthentication() {
+            addLog('info', 'בודק אימות...');
             
-            const result = {
-                timestamp: new Date().toLocaleTimeString('he-IL'),
-                test: test,
-                status: status,
-                message: message,
-                data: data
-            };
-            
-            apiTestResults.push(result);
-            displayApiResult(result);
+            try {
+                // בדיקה ללא token
+                const response1 = await fetch('/api/v1/tickers/');
+                const data1 = await response1.json();
+                
+                // בדיקה עם token לא תקין
+                const response2 = await fetch('/api/v1/tickers/', {
+                    headers: {
+                        'Authorization': 'Bearer invalid-token'
+                    }
+                });
+                const data2 = await response2.json();
+                
+                const authStatus = {
+                    noToken: {
+                        status: response1.status,
+                        allowed: response1.status === 200
+                    },
+                    invalidToken: {
+                        status: response2.status,
+                        allowed: response2.status === 401
+                    }
+                };
+                
+                const isSecure = !authStatus.noToken.allowed && authStatus.invalidToken.allowed;
+                const status = isSecure ? 'success' : 'warning';
+                const message = isSecure ? 'אימות מוגדר נכון' : 'אימות דורש הגדרה';
+                
+                addLog(status, message);
+                displayResults('בדיקת אימות', {
+                    status: status,
+                    message: message,
+                    authentication: authStatus,
+                    recommendations: isSecure ? 
+                        ['אימות מוגדר נכון', 'המערכת מאובטחת'] : 
+                        ['שקול הוספת אימות', 'הגדר middleware לאימות']
+                });
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת אימות: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
         }
 
-        // פונקציה לתצוגת תוצאה
-        function displayApiResult(result) {
-            const resultsContainer = document.getElementById('api-results');
-            if (!resultsContainer) {
-                console.error('❌ Results container not found');
+        // פונקציה לבדיקת הגבלת קצב
+        async function testRateLimiting() {
+            addLog('info', 'בודק הגבלת קצב...');
+            
+            try {
+                const requests = [];
+                const startTime = performance.now();
+                
+                // שליחת 10 בקשות ברצף
+                for (let i = 0; i < 10; i++) {
+                    const requestStart = performance.now();
+                    const response = await fetch('/api/v1/health');
+                    const requestEnd = performance.now();
+                    
+                    requests.push({
+                        request: i + 1,
+                        status: response.status,
+                        responseTime: requestEnd - requestStart,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    // עיכוב קצר בין בקשות
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                }
+                
+                const endTime = performance.now();
+                const totalTime = endTime - startTime;
+                
+                const successfulRequests = requests.filter(r => r.status === 200).length;
+                const failedRequests = requests.filter(r => r.status === 429).length;
+                const otherFailures = requests.filter(r => r.status !== 200 && r.status !== 429).length;
+                
+                const hasRateLimit = failedRequests > 0;
+                const status = hasRateLimit ? 'success' : 'warning';
+                const message = hasRateLimit ? 
+                    'הגבלת קצב פעילה' : 'הגבלת קצב לא מוגדרת';
+                
+                addLog(status, message);
+                displayResults('בדיקת הגבלת קצב', {
+                    status: status,
+                    message: message,
+                    summary: {
+                        totalRequests: requests.length,
+                        successful: successfulRequests,
+                        rateLimited: failedRequests,
+                        otherFailures: otherFailures,
+                        totalTime: `${totalTime.toFixed(2)}ms`,
+                        averageTime: `${(totalTime / requests.length).toFixed(2)}ms`
+                    },
+                    requests: requests,
+                    recommendations: hasRateLimit ? 
+                        ['הגבלת קצב פעילה', 'המערכת מוגנת'] : 
+                        ['שקול הוספת הגבלת קצב', 'הגדר rate limiting']
+                });
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת הגבלת קצב: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
+        }
+
+        // פונקציה לבדיקת טיפול בשגיאות
+        async function testErrorHandling() {
+            addLog('info', 'בודק טיפול בשגיאות...');
+            
+            try {
+                const errorTests = [
+                    {
+                        name: 'Endpoint לא קיים',
+                        url: '/api/v1/nonexistent',
+                        expectedStatus: 404
+                    },
+                    {
+                        name: 'בקשת POST עם נתונים לא תקינים',
+                        url: '/api/v1/preferences',
+                        method: 'POST',
+                        body: 'invalid-json',
+                        expectedStatus: 400
+                    },
+                    {
+                        name: 'בקשת GET עם פרמטרים לא תקינים',
+                        url: '/api/v1/tickers?invalid=param',
+                        expectedStatus: 200 // או 400 תלוי בולידציה
+                    }
+                ];
+                
+                const results = [];
+                
+                for (const test of errorTests) {
+                    try {
+                        const options = {
+                            method: test.method || 'GET'
+                        };
+                        
+                        if (test.body) {
+                            options.body = test.body;
+                            options.headers = {
+                                'Content-Type': 'application/json'
+                            };
+                        }
+                        
+                        const response = await fetch(test.url, options);
+                        const data = await response.json();
+                        
+                        results.push({
+                            test: test.name,
+                            expectedStatus: test.expectedStatus,
+                            actualStatus: response.status,
+                            passed: response.status === test.expectedStatus,
+                            data: data
+                        });
+                        
+                    } catch (error) {
+                        results.push({
+                            test: test.name,
+                            expectedStatus: test.expectedStatus,
+                            actualStatus: 'error',
+                            passed: false,
+                            error: error.message
+                        });
+                    }
+                }
+                
+                const passedTests = results.filter(r => r.passed).length;
+                const totalTests = results.length;
+                
+                const status = passedTests === totalTests ? 'success' : 'warning';
+                const message = passedTests === totalTests ? 
+                    'כל בדיקות השגיאות עברו' : `${passedTests}/${totalTests} בדיקות עברו`;
+                
+                addLog(status, message);
+                displayResults('בדיקת טיפול בשגיאות', {
+                    status: status,
+                    message: message,
+                    results: results,
+                    summary: {
+                        total: totalTests,
+                        passed: passedTests,
+                        failed: totalTests - passedTests
+                    },
+                    recommendations: passedTests === totalTests ? 
+                        ['טיפול בשגיאות תקין', 'המערכת יציבה'] : 
+                        ['שפר טיפול בשגיאות', 'הוסף ולידציה']
+                });
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת טיפול בשגיאות: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
+        }
+
+        // פונקציה לבדיקת ביצועי API
+        async function testPerformance() {
+            addLog('info', 'בודק ביצועי API...');
+            
+            try {
+                const performanceTests = [
+                    { name: 'Health Check', url: '/api/v1/health' },
+                    { name: 'Tickers List', url: '/api/v1/tickers' },
+                    { name: 'Accounts List', url: '/api/v1/accounts' }
+                ];
+                
+                const results = [];
+                
+                for (const test of performanceTests) {
+                    const times = [];
+                    
+                    // 5 בדיקות לכל endpoint
+                    for (let i = 0; i < 5; i++) {
+                        const startTime = performance.now();
+                        const response = await fetch(test.url);
+                        const endTime = performance.now();
+                        
+                        times.push(endTime - startTime);
+                        
+                        // עיכוב קצר בין בדיקות
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                    
+                    const avgTime = times.reduce((a, b) => a + b, 0) / times.length;
+                    const minTime = Math.min(...times);
+                    const maxTime = Math.max(...times);
+                    
+                    results.push({
+                        endpoint: test.name,
+                        url: test.url,
+                        averageTime: avgTime,
+                        minTime: minTime,
+                        maxTime: maxTime,
+                        times: times,
+                        performance: avgTime < 100 ? 'excellent' : 
+                                   avgTime < 300 ? 'good' : 
+                                   avgTime < 500 ? 'acceptable' : 'poor'
+                    });
+                }
+                
+                const excellentCount = results.filter(r => r.performance === 'excellent').length;
+                const goodCount = results.filter(r => r.performance === 'good').length;
+                const acceptableCount = results.filter(r => r.performance === 'acceptable').length;
+                const poorCount = results.filter(r => r.performance === 'poor').length;
+                
+                const overallPerformance = poorCount > 0 ? 'poor' : 
+                                         acceptableCount > 0 ? 'acceptable' : 
+                                         goodCount > 0 ? 'good' : 'excellent';
+                
+                const status = overallPerformance === 'excellent' || overallPerformance === 'good' ? 'success' : 'warning';
+                const message = `ביצועי API: ${overallPerformance}`;
+                
+                addLog(status, message);
+                displayResults('בדיקת ביצועי API', {
+                    status: status,
+                    message: message,
+                    results: results,
+                    summary: {
+                        excellent: excellentCount,
+                        good: goodCount,
+                        acceptable: acceptableCount,
+                        poor: poorCount,
+                        overall: overallPerformance
+                    },
+                    recommendations: overallPerformance === 'excellent' ? 
+                        ['ביצועים מעולים', 'שמור על המצב הנוכחי'] : 
+                        ['שקול אופטימיזציה', 'בדוק bottlenecks']
+                });
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת ביצועים: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
+        }
+
+        // פונקציה לבדיקת בקשות מקבילות
+        async function testConcurrentRequests() {
+            addLog('info', 'בודק בקשות מקבילות...');
+            
+            try {
+                const concurrentCount = 5;
+                const startTime = performance.now();
+                
+                // שליחת בקשות מקבילות
+                const promises = [];
+                for (let i = 0; i < concurrentCount; i++) {
+                    promises.push(
+                        fetch('/api/v1/health').then(async response => {
+                            const data = await response.json();
+                            return {
+                                request: i + 1,
+                                status: response.status,
+                                data: data,
+                                timestamp: new Date().toISOString()
+                            };
+                        })
+                    );
+                }
+                
+                const results = await Promise.all(promises);
+                const endTime = performance.now();
+                const totalTime = endTime - startTime;
+                
+                const successfulRequests = results.filter(r => r.status === 200).length;
+                const failedRequests = results.filter(r => r.status !== 200).length;
+                
+                const isConcurrent = totalTime < (concurrentCount * 100); // פחות מ-100ms לכל בקשה
+                const status = isConcurrent ? 'success' : 'warning';
+                const message = isConcurrent ? 
+                    'בקשות מקבילות נתמכות' : 'בקשות מקבילות איטיות';
+                
+                addLog(status, message);
+                displayResults('בדיקת בקשות מקבילות', {
+                    status: status,
+                    message: message,
+                    summary: {
+                        concurrentRequests: concurrentCount,
+                        successful: successfulRequests,
+                        failed: failedRequests,
+                        totalTime: `${totalTime.toFixed(2)}ms`,
+                        averageTime: `${(totalTime / concurrentCount).toFixed(2)}ms`,
+                        concurrent: isConcurrent
+                    },
+                    results: results,
+                    recommendations: isConcurrent ? 
+                        ['בקשות מקבילות נתמכות', 'המערכת יעילה'] : 
+                        ['שקול אופטימיזציה', 'בדוק bottlenecks']
+                });
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת בקשות מקבילות: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
+        }
+
+        // פונקציה לבדיקת בקשה מותאמת
+        async function testCustomRequest() {
+            const request = document.getElementById('custom-request').value.trim();
+            if (!request) {
+                addLog('warning', 'נא להזין URL או נתונים');
                 return;
             }
-
-            const resultElement = document.createElement('div');
-            resultElement.className = `alert alert-${getStatusClass(result.status)} mb-2 fade-in`;
             
-            let content = `
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <strong>${result.test}</strong> - ${result.message}
-                        <br><small class="text-muted">${result.timestamp}</small>
-                    </div>
-                    <span class="badge bg-${getStatusClass(result.status)}">
-                        ${getStatusText(result.status)}
-                    </span>
+            addLog('info', `מריץ בקשה מותאמת: ${request}`);
+            
+            try {
+                let url, method, body;
+                
+                // בדיקה אם זה URL או נתונים
+                if (request.startsWith('/') || request.startsWith('http')) {
+                    url = request;
+                    method = 'GET';
+                } else {
+                    // נסה לפרסר כנתונים
+                    try {
+                        const parsed = JSON.parse(request);
+                        url = parsed.url || '/api/v1/health';
+                        method = parsed.method || 'GET';
+                        body = parsed.body;
+                    } catch {
+                        url = request;
+                        method = 'GET';
+                    }
+                }
+                
+                const startTime = performance.now();
+                const options = {
+                    method: method
+                };
+                
+                if (body) {
+                    options.body = JSON.stringify(body);
+                    options.headers = {
+                        'Content-Type': 'application/json'
+                    };
+                }
+                
+                const response = await fetch(url, options);
+                const endTime = performance.now();
+                const responseTime = endTime - startTime;
+                
+                const data = await response.json();
+                
+                const status = response.ok ? 'success' : 'warning';
+                const message = response.ok ? 
+                    'בקשה מותאמת הצליחה' : 'בקשה מותאמת נכשלה';
+                
+                addLog(status, message);
+                displayResults('בדיקת בקשה מותאמת', {
+                    status: status,
+                    message: message,
+                    request: {
+                        url: url,
+                        method: method,
+                        body: body
+                    },
+                    response: {
+                        status: response.status,
+                        statusText: response.statusText,
+                        responseTime: `${responseTime.toFixed(2)}ms`,
+                        data: data
+                    }
+                });
+                
+            } catch (error) {
+                addLog('error', `שגיאה בביצוע בקשה מותאמת: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
+        }
+
+        // פונקציה לתצוגת תוצאות
+        function displayResults(title, data) {
+            const resultsContainer = document.getElementById('test-results');
+            if (!resultsContainer) return;
+            
+            const resultHtml = `
+                <div class="alert alert-info mb-2">
+                    <h6>${title}</h6>
+                    <pre class="mb-0"><code>${JSON.stringify(data, null, 2)}</code></pre>
                 </div>
             `;
             
-            if (result.data) {
-                content += `
-                    <details class="mt-2">
-                        <summary>פרטי הנתונים</summary>
-                        <pre class="mt-2 bg-light p-2 rounded"><code>${JSON.stringify(result.data, null, 2)}</code></pre>
-                    </details>
-                `;
-            }
-            
-            resultElement.innerHTML = content;
-            resultsContainer.appendChild(resultElement);
-            
-            // Scroll to bottom
-            resultsContainer.scrollTop = resultsContainer.scrollHeight;
-            
-            console.log('✅ API result displayed');
+            resultsContainer.innerHTML = resultHtml;
         }
 
-        // פונקציה לקבלת מחלקת סטטוס
-        function getStatusClass(status) {
-            switch (status) {
-                case 'success': return 'success';
-                case 'error': return 'danger';
-                case 'warning': return 'warning';
-                case 'info': return 'info';
-                default: return 'secondary';
-            }
-        }
-
-        // פונקציה לקבלת טקסט סטטוס
-        function getStatusText(status) {
-            switch (status) {
-                case 'success': return 'הצלחה';
-                case 'error': return 'שגיאה';
-                case 'warning': return 'אזהרה';
-                case 'info': return 'מידע';
-                default: return 'לא ידוע';
-            }
+        // פונקציה להוספת לוג
+        function addLog(level, message) {
+            const logContainer = document.getElementById('test-logs');
+            if (!logContainer) return;
+            
+            const timestamp = new Date().toLocaleTimeString('he-IL');
+            const levelClass = level === 'error' ? 'text-danger' : 
+                              level === 'warning' ? 'text-warning' : 
+                              level === 'success' ? 'text-success' : 'text-info';
+            
+            const logHtml = `
+                <div class="log-entry mb-1">
+                    <small class="text-muted">[${timestamp}]</small>
+                    <span class="${levelClass}">[${level.toUpperCase()}]</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            logContainer.innerHTML = logHtml + logContainer.innerHTML;
+            logContainer.scrollTop = 0;
         }
 
         // פונקציה לניקוי לוגים
-        function clearApiLogs() {
-            const resultsContainer = document.getElementById('api-results');
-            const logsContainer = document.getElementById('api-test-logs');
-            if (resultsContainer) {
-                resultsContainer.innerHTML = '';
-                apiTestResults = [];
-                console.log('🧹 API logs cleared');
-            }
-            if (logsContainer) {
-                logsContainer.innerHTML = '';
-            }
-        }
-
-        // פונקציה לעריכת JSON מותאם
-        function editCustomJson() {
-            const label = document.getElementById('custom-json-label');
-            const textarea = document.getElementById('custom-json');
-            if (label && textarea) {
-                label.style.display = 'none';
-                textarea.style.display = 'block';
-                textarea.focus();
-            }
+        function clearTestLogs() {
+            const logContainer = document.getElementById('test-logs');
+            const resultsContainer = document.getElementById('test-results');
+            
+            if (logContainer) logContainer.innerHTML = '';
+            if (resultsContainer) resultsContainer.innerHTML = '';
+            
+            addLog('info', 'לוגים נוקו');
         }
 
         // אתחול event listeners
         document.addEventListener('DOMContentLoaded', function() {
-            // אתחול עריכת JSON מותאם
-            const customTextarea = document.getElementById('custom-json');
-            const customLabel = document.getElementById('custom-json-label');
-            if (customTextarea && customLabel) {
-                customTextarea.addEventListener('blur', function() {
-                    customLabel.textContent = this.value || 'אין נתונים';
-                    customLabel.style.display = 'block';
-                    this.style.display = 'none';
-                });
-            }
-
             // הוספת event listeners לכפתורים
-            document.getElementById('test-get')?.addEventListener('click', testGetRequest);
-            document.getElementById('test-post')?.addEventListener('click', testPostRequest);
-            document.getElementById('test-auth')?.addEventListener('click', testAuthentication);
-            document.getElementById('test-rate-limit')?.addEventListener('click', testRateLimiting);
+            document.getElementById('test-endpoint')?.addEventListener('click', testEndpoint);
+            document.getElementById('test-post-request')?.addEventListener('click', testPostRequest);
+            document.getElementById('test-authentication')?.addEventListener('click', testAuthentication);
+            document.getElementById('test-rate-limiting')?.addEventListener('click', testRateLimiting);
             document.getElementById('test-error-handling')?.addEventListener('click', testErrorHandling);
             document.getElementById('test-performance')?.addEventListener('click', testPerformance);
-            document.getElementById('test-throughput')?.addEventListener('click', testThroughput);
+            document.getElementById('test-concurrent-requests')?.addEventListener('click', testConcurrentRequests);
             document.getElementById('test-custom-request')?.addEventListener('click', testCustomRequest);
 
+            // הוספת event listener למקש Enter בשדה הבקשה המותאמת
+            document.getElementById('custom-request')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    testCustomRequest();
+                }
+            });
+
             // הוספת הודעה ראשונית
-            addApiResult('System', 'info', 'דף בדיקת API נטען בהצלחה');
+            addLog('info', 'דף בדיקת API נטען בהצלחה');
+            
+            // בדיקה אוטומטית של endpoint בסיסי
+            setTimeout(() => {
+                testEndpoint();
+            }, 1000);
         });
     </script>
 </body>

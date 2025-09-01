@@ -2192,7 +2192,7 @@ function filterAlertsByRelatedObjectType(type) {
 window.filterAlertsByRelatedObjectType = filterAlertsByRelatedObjectType;
 window.showAddAlertModal = showAddAlertModal;
 window.editAlert = editAlert;
-window.deleteAlert = deleteAlert;
+// window.deleteAlert - הועבר ל-alert-service.js
 window.saveAlert = saveAlert;
 window.updateAlert = updateAlert;
 window.updateStatusAndTriggered = updateStatusAndTriggered;
@@ -2239,95 +2239,14 @@ setTimeout(() => {
  * @param {string} condition - תנאי ההתראה בפורמט: variable|operator|value
  * @returns {string} - התנאי מתורגם לעברית
  */
-window.formatAlertCondition = function (condition) {
-  if (!condition) return '-';
-
-  // Use the new global translation function
-  if (window.translateLegacyCondition) {
-    return window.translateLegacyCondition(condition);
-  }
-
-  // Fallback to old format if new function not available
-  const parts = condition.split(' | ');
-  if (parts.length >= 3) {
-    const variable = parts[0] || '';
-    const operator = parts[1] || '';
-    const value = parts[2] || '';
-
-    // המרת משתנה לעברית
-    const variableLabels = {
-      'price': 'מחיר',
-      'change': 'שינוי',
-      'ma': 'ממוצע נע',
-      'volume': 'נפח מסחר'
-    };
-
-    // המרת אופרטור לעברית עם סימנים חשבונאיים
-    const operatorLabels = {
-      'lessThen': '<',
-      'moreThen': '>',
-      'cross': '=',
-      'crossUp': '↗',
-      'crossDown': '↘',
-      'upBy': '+',
-      'downBy': '-',
-      'changeBy': '±',
-      'upByPre': '+%',
-      'downByPre': '-%',
-      'changeByPre': '±%'
-    };
-
-    const variableDisplay = variableLabels[variable] || variable;
-    const operatorDisplay = operatorLabels[operator] || operator;
-
-    if (operator && value) {
-      // פורמט מיוחד לאופרטורים חשבונאיים
-      if (['upBy', 'downBy', 'changeBy', 'upByPre', 'downByPre', 'changeByPre'].includes(operator)) {
-        return `${variableDisplay} ${operatorDisplay}${value}`;
-      } else {
-        return `${variableDisplay} ${operatorDisplay} ${value}`;
-      }
-    } else if (variable) {
-      return variable;
-    } else {
-      return condition;
-    }
-  }
-
-  return condition;
-};
+// window.formatAlertCondition - הועבר ל-alert-service.js
 
 /**
  * פונקציה לפרסור תנאי התראה
  * @param {string} condition - תנאי ההתראה בפורמט: variable|operator|value
  * @returns {object} - אובייקט עם המשתנה, האופרטור והערך
  */
-window.parseAlertCondition = function (condition) {
-  if (!condition) return { variable: '', operator: '', value: '' };
-
-  const parts = condition.split(' | ');
-  if (parts.length >= 3) {
-    return {
-      variable: parts[0] || '',
-      operator: parts[1] || '',
-      value: parts[2] || ''
-    };
-  } else if (parts.length === 2) {
-    return {
-      variable: parts[0] || '',
-      operator: parts[1] || '',
-      value: ''
-    };
-  } else if (parts.length === 1) {
-    return {
-      variable: parts[0] || '',
-      operator: '',
-      value: ''
-    };
-  }
-
-  return { variable: '', operator: '', value: '' };
-};
+// window.parseAlertCondition - הועבר ל-alert-service.js
 
 /**
  * הפעלה מחדש של התראה מבוטלת

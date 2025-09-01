@@ -1,10 +1,31 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>בדיקת אינטגרציה - TikTrack</title>
-    
+
+    <!-- 
+        ===== דף בדיקת אינטגרציה - TikTrack =====
+        
+        דף זה מכיל:
+        1. בדיקת אינטגרציה עם בסיס נתונים
+        2. בדיקת אינטגרציה עם API
+        3. בדיקת אינטגרציה עם מערכת התראות
+        4. בדיקת אינטגרציה עם מערכת פילטרים
+        5. בדיקת אינטגרציה עם מערכת תרגום
+        6. בדיקת אינטגרציה עם מערכת UI
+        7. בדיקת אינטגרציה עם מערכת נתונים חיצוניים
+        8. בדיקת אינטגרציה מותאמת
+        
+        מבנה הדף:
+        - unified-header: כותרת האפליקציה החדשה עם ניווט ופילטרים מאוחדים
+        - page-body: תוכן ראשי מוגבל ברוחב (1400px)
+          - top-section: כותרת בדיקת אינטגרציה
+          - content-section: טופסי בדיקה ותוצאות
+    -->
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -15,9 +36,10 @@
     <link rel="stylesheet" href="/styles/header-system.css">
     <link rel="stylesheet" href="/styles/apple-theme.css">
     <link rel="stylesheet" href="/external_data_integration_client/styles/external_data_test.css">
-    
+
     <!-- Modular grid files -->
     <script src="/scripts/console-cleanup.js"></script>
+    <script src="/scripts/button-icons.js"></script>
     <script src="/scripts/translation-utils.js"></script>
     <script src="/scripts/data-utils.js"></script>
     <script src="/scripts/ui-utils.js"></script>
@@ -31,7 +53,7 @@
     <script src="/scripts/alerts.js"></script>
     <script src="/scripts/active-alerts-component.js"></script>
 
-    <!-- Integration test script -->
+    <!-- External data test script -->
     <!-- Functions embedded directly in page -->
 </head>
 
@@ -75,7 +97,7 @@
                             בדיקות
                         </div>
                         <div class="table-actions">
-                            <button class="refresh-btn" onclick="clearIntegrationLogs()" title="נקה לוגים">
+                            <button class="refresh-btn" onclick="clearTestLogs()" title="נקה לוגים">
                                 <img src="/images/icons/development.svg" alt="נקה" class="action-icon" style="width: 16px; height: 16px;"> נקה
                             </button>
 
@@ -87,206 +109,97 @@
                     </div>
 
                     <!-- תוכן בדיקות -->
-                    <div class="section-body">
-                        <!-- Loading Indicator -->
-                        <div id="loading-indicator" class="loading-overlay" style="display: none;">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">טוען...</span>
-                            </div>
-                        </div>
-
-                        <!-- Error Display -->
-                        <div id="error-display" class="alert alert-danger" style="display: none;">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            <span id="error-message"></span>
-                        </div>
-
-                        <!-- Current Time Display -->
-                        <div class="text-muted mb-3">
-                            <i class="fas fa-clock me-1"></i>
-                            <span id="current-time">טוען זמן...</span>
-                        </div>
-
-                        <!-- Two Column Layout -->
+                    <div class="content-body">
                         <div class="row">
-                            <!-- Left Column - Tests -->
+                            <!-- עמודה שמאלית - טופסי בדיקה -->
                             <div class="col-md-6">
-                                <h6 class="mb-3"><i class="fas fa-flask me-2"></i>בדיקות</h6>
-                                
-                                <!-- Integration Tests -->
-                                <div class="row">
-                                    <!-- End-to-End Testing -->
-                                    <div class="col-6 mb-2">
-                                        <div class="card test-card">
-                                            <div class="card-header py-1">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-route me-1"></i>
-                                                    בדיקה מלאה
-                                                </h6>
-                                            </div>
-                                            <div class="card-body py-1">
-                                                <div class="d-grid gap-1">
-                                                    <button class="btn btn-outline-primary btn-sm" id="test-end-to-end" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-play me-1"></i>בדיקה מלאה
-                                                    </button>
-                                                    <button class="btn btn-outline-success btn-sm" id="test-user-flow" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-user me-1"></i>זרימת משתמש
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <div class="test-controls">
+                                    <h5>בקרת בדיקות אינטגרציה</h5>
+                                    
+                                    <!-- בדיקת אינטגרציה עם בסיס נתונים -->
+                                    <div class="test-group">
+                                        <h6>בדיקת אינטגרציה עם בסיס נתונים</h6>
+                                        <button id="test-database-integration" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-database"></i> בדוק DB
+                                        </button>
                                     </div>
 
-                                    <!-- Data Flow Testing -->
-                                    <div class="col-6 mb-2">
-                                        <div class="card test-card">
-                                            <div class="card-header py-1">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-exchange-alt me-1"></i>
-                                                    זרימת נתונים
-                                                </h6>
-                                            </div>
-                                            <div class="card-body py-1">
-                                                <div class="d-grid gap-1">
-                                                    <button class="btn btn-outline-info btn-sm" id="test-data-flow" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-arrow-right me-1"></i>זרימת נתונים
-                                                    </button>
-                                                    <button class="btn btn-outline-warning btn-sm" id="test-data-validation" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-check me-1"></i>אימות נתונים
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <!-- בדיקת אינטגרציה עם API -->
+                                    <div class="test-group">
+                                        <h6>בדיקת אינטגרציה עם API</h6>
+                                        <button id="test-api-integration" class="btn btn-info btn-sm">
+                                            <i class="fas fa-link"></i> בדוק API
+                                        </button>
                                     </div>
 
-                                    <!-- Component Integration -->
-                                    <div class="col-6 mb-2">
-                                        <div class="card test-card">
-                                            <div class="card-header py-1">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-puzzle-piece me-1"></i>
-                                                    אינטגרציה רכיבים
-                                                </h6>
-                                            </div>
-                                            <div class="card-body py-1">
-                                                <div class="d-grid gap-1">
-                                                    <button class="btn btn-outline-secondary btn-sm" id="test-component-integration" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-cogs me-1"></i>אינטגרציה רכיבים
-                                                    </button>
-                                                    <button class="btn btn-outline-danger btn-sm" id="test-api-integration" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-plug me-1"></i>אינטגרציה API
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <!-- בדיקת אינטגרציה עם מערכת התראות -->
+                                    <div class="test-group">
+                                        <h6>בדיקת אינטגרציה עם מערכת התראות</h6>
+                                        <button id="test-notifications-integration" class="btn btn-success btn-sm">
+                                            <i class="fas fa-bell"></i> בדוק התראות
+                                        </button>
                                     </div>
 
-                                    <!-- System Integration -->
-                                    <div class="col-6 mb-2">
-                                        <div class="card test-card">
-                                            <div class="card-header py-1">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-server me-1"></i>
-                                                    אינטגרציה מערכת
-                                                </h6>
-                                            </div>
-                                            <div class="card-body py-1">
-                                                <div class="d-grid gap-1">
-                                                    <button class="btn btn-outline-primary btn-sm" id="test-system-integration" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-network-wired me-1"></i>אינטגרציה מערכת
-                                                    </button>
-                                                    <button class="btn btn-outline-success btn-sm" id="test-database-integration" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-database me-1"></i>אינטגרציה DB
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <!-- בדיקת אינטגרציה עם מערכת פילטרים -->
+                                    <div class="test-group">
+                                        <h6>בדיקת אינטגרציה עם מערכת פילטרים</h6>
+                                        <button id="test-filters-integration" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-filter"></i> בדוק פילטרים
+                                        </button>
                                     </div>
 
-                                    <!-- External Services -->
-                                    <div class="col-6 mb-2">
-                                        <div class="card test-card">
-                                            <div class="card-header py-1">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-globe me-1"></i>
-                                                    שירותים חיצוניים
-                                                </h6>
-                                            </div>
-                                            <div class="card-body py-1">
-                                                <div class="d-grid gap-1">
-                                                    <button class="btn btn-outline-warning btn-sm" id="test-external-services" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-cloud me-1"></i>שירותים חיצוניים
-                                                    </button>
-                                                    <button class="btn btn-outline-info btn-sm" id="test-third-party" style="font-size: 10px; padding: 2px 8px;">
-                                                        <i class="fas fa-link me-1"></i>שירותי צד שלישי
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <!-- בדיקת אינטגרציה עם מערכת תרגום -->
+                                    <div class="test-group">
+                                        <h6>בדיקת אינטגרציה עם מערכת תרגום</h6>
+                                        <button id="test-translation-integration" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-language"></i> בדוק תרגום
+                                        </button>
                                     </div>
 
-                                    <!-- Custom Integration Test -->
-                                    <div class="col-6 mb-2">
-                                        <div class="card test-card">
-                                            <div class="card-header py-1">
-                                                <h6 class="card-title mb-0">
-                                                    <i class="fas fa-cog me-1"></i>
-                                                    בדיקה מותאמת
-                                                </h6>
-                                            </div>
-                                            <div class="card-body py-1">
-                                                <div class="mb-1">
-                                                    <div class="d-flex align-items-center mb-1">
-                                                        <label class="form-label small mb-0 me-2">נתיב:</label>
-                                                        <button class="btn btn-outline-secondary btn-sm" onclick="editCustomIntegrationPath()" title="ערוך">
-                                                            <i class="fas fa-edit" style="font-size: 10px;"></i>
-                                                        </button>
-                                                    </div>
-                                                    <div class="data-label" id="custom-integration-path-label" style="font-size: 11px; line-height: 1.2; max-height: 30px; overflow: hidden; background: #f8f9fa; padding: 4px; border-radius: 3px;">/api/v1/tickers/</div>
-                                                    <textarea class="form-control form-control-sm" id="custom-integration-path" rows="2" style="display: none; font-size: 10px;">/api/v1/tickers/</textarea>
-                                                </div>
-                                                <button class="btn btn-warning btn-sm w-100" id="test-custom-integration" style="font-size: 10px; padding: 2px 8px;">
-                                                    <i class="fas fa-play me-1"></i>הרץ
-                                                </button>
-                                            </div>
+                                    <!-- בדיקת אינטגרציה עם מערכת UI -->
+                                    <div class="test-group">
+                                        <h6>בדיקת אינטגרציה עם מערכת UI</h6>
+                                        <button id="test-ui-integration" class="btn btn-dark btn-sm">
+                                            <i class="fas fa-desktop"></i> בדוק UI
+                                        </button>
+                                    </div>
+
+                                    <!-- בדיקת אינטגרציה עם מערכת נתונים חיצוניים -->
+                                    <div class="test-group">
+                                        <h6>בדיקת אינטגרציה עם מערכת נתונים חיצוניים</h6>
+                                        <button id="test-external-data-integration" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-cloud"></i> בדוק נתונים חיצוניים
+                                        </button>
+                                    </div>
+
+                                    <!-- בדיקת אינטגרציה מותאמת -->
+                                    <div class="test-group">
+                                        <h6>בדיקת אינטגרציה מותאמת</h6>
+                                        <div class="input-group mb-2">
+                                            <input type="text" id="custom-integration-test" class="form-control" placeholder="הזן שם מודול לבדיקה" value="header-system">
+                                            <button id="test-custom-integration" class="btn btn-outline-secondary btn-sm">
+                                                <i class="fas fa-terminal"></i> הרץ
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Right Column - Feedback -->
+                            <!-- עמודה ימנית - לוגים ותוצאות -->
                             <div class="col-md-6">
-                                <h6 class="mb-3"><i class="fas fa-comments me-2"></i>משוב</h6>
-                                
-                                <!-- Integration Results -->
-                                <div class="card result-card mb-3">
-                                    <div class="card-header py-2">
-                                        <h6 class="card-title mb-0">
-                                            <i class="fas fa-chart-bar me-2"></i>
-                                            תוצאות אינטגרציה
-                                        </h6>
-                                    </div>
-                                    <div class="card-body py-2">
-                                        <div id="integration-results" style="max-height: 200px; overflow-y: auto;">
-                                            <!-- תוצאות יוצגו כאן -->
+                                <div class="test-results">
+                                    <h5>לוגים</h5>
+                                    <div id="test-logs" class="logs-container">
+                                        <div class="log-entry">
+                                            <small class="text-muted">[ממתין לבדיקות...]</small>
                                         </div>
                                     </div>
-                                </div>
 
-                                <!-- Integration Logs -->
-                                <div class="card log-card">
-                                    <div class="card-header py-2">
-                                        <h6 class="card-title mb-0">
-                                            <i class="fas fa-file-alt me-2"></i>
-                                            לוג בדיקות
-                                            <button class="btn btn-sm btn-outline-secondary float-start" onclick="clearIntegrationLogs()">
-                                                <i class="fas fa-trash me-1"></i>נקה
-                                            </button>
-                                        </h6>
-                                    </div>
-                                    <div class="card-body py-2">
-                                        <div class="log-container" id="integration-test-logs" style="max-height: 300px; overflow-y: auto;">
-                                            <!-- לוגים יוצגו כאן -->
+                                    <h5>תוצאות בדיקות</h5>
+                                    <div id="test-results" class="results-container">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle"></i>
+                                            לחץ על כפתורי הבדיקה כדי לראות תוצאות
                                         </div>
                                     </div>
                                 </div>
@@ -298,441 +211,739 @@
         </div> <!-- סוף page-body -->
     </div> <!-- סוף background-wrapper -->
 
-    <!-- JavaScript Files -->
-    <script src="/scripts/header-system.js"></script>
-    
     <script>
-        // אתחול HeaderSystem
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.headerSystem && !window.headerSystem.isInitialized) {
-                window.headerSystem.init();
-            }
-        });
-
-        // ===== פונקציות בדיקת אינטגרציה =====
-        
-        // משתנים גלובליים
-        let integrationTestResults = [];
-
-        // פונקציה לבדיקת חיבור API
-        function testApiConnection() {
-            console.log('🔗 Testing API connection...');
+        // פונקציה לבדיקת אינטגרציה עם בסיס נתונים
+        async function testDatabaseIntegration() {
+            addLog('info', 'בודק אינטגרציה עם בסיס נתונים...');
             
-            const endpoints = [
-                '/api/v1/tickers/',
-                '/api/v1/accounts/',
-                '/api/v1/trades/',
-                '/api/v1/alerts/',
-                '/api/v1/cash_flows/'
-            ];
-
-            const results = {};
-            let successCount = 0;
-            
-            endpoints.forEach(endpoint => {
-                fetch(endpoint)
-                    .then(response => {
-                        results[endpoint] = {
-                            status: response.status,
-                            ok: response.ok,
-                            timestamp: new Date().toISOString()
-                        };
-                        
-                        if (response.ok) {
-                            successCount++;
-                        }
-                        
-                        // בדיקה אם כל הבדיקות הושלמו
-                        if (Object.keys(results).length === endpoints.length) {
-                            const allSuccess = successCount === endpoints.length;
-                            addResult('API Connection', allSuccess ? 'success' : 'warning', 
-                                `${successCount}/${endpoints.length} נקודות קצה פעילות`, 
-                                results
-                            );
-                        }
-                    })
-                    .catch(error => {
-                        results[endpoint] = {
-                            status: 'error',
-                            ok: false,
-                            error: error.message,
-                            timestamp: new Date().toISOString()
-                        };
-                        
-                        // בדיקה אם כל הבדיקות הושלמו
-                        if (Object.keys(results).length === endpoints.length) {
-                            const allSuccess = successCount === endpoints.length;
-                            addResult('API Connection', allSuccess ? 'success' : 'warning', 
-                                `${successCount}/${endpoints.length} נקודות קצה פעילות`, 
-                                results
-                            );
-                        }
-                    });
-            });
-        }
-
-        // פונקציה לבדיקת אינטגרציה בסיס נתונים
-        function testDatabaseIntegration() {
-            console.log('🗄️ Testing database integration...');
-            
-            const testQueries = [
-                { name: 'Tickers', endpoint: '/api/v1/tickers/' },
-                { name: 'Accounts', endpoint: '/api/v1/accounts/' },
-                { name: 'Trades', endpoint: '/api/v1/trades/' },
-                { name: 'Alerts', endpoint: '/api/v1/alerts/' },
-                { name: 'Cash Flows', endpoint: '/api/v1/cash_flows/' }
-            ];
-
-            const results = {};
-            let completedQueries = 0;
-            
-            testQueries.forEach(query => {
-                fetch(query.endpoint)
-                    .then(response => response.json())
-                    .then(data => {
-                        results[query.name] = {
-                            count: Array.isArray(data) ? data.length : 1,
-                            hasData: Array.isArray(data) ? data.length > 0 : true,
-                            sample: Array.isArray(data) && data.length > 0 ? data[0] : data,
-                            timestamp: new Date().toISOString()
-                        };
-                        
-                        completedQueries++;
-                        
-                        if (completedQueries === testQueries.length) {
-                            const totalRecords = Object.values(results).reduce((sum, result) => sum + result.count, 0);
-                            const hasData = Object.values(results).every(result => result.hasData);
-                            
-                            addResult('Database Integration', hasData ? 'success' : 'warning', 
-                                `${totalRecords} רשומות נמצאו ב-${testQueries.length} טבלאות`, 
-                                results
-                            );
-                        }
-                    })
-                    .catch(error => {
-                        results[query.name] = {
-                            count: 0,
-                            hasData: false,
-                            error: error.message,
-                            timestamp: new Date().toISOString()
-                        };
-                        
-                        completedQueries++;
-                        
-                        if (completedQueries === testQueries.length) {
-                            const totalRecords = Object.values(results).reduce((sum, result) => sum + result.count, 0);
-                            const hasData = Object.values(results).every(result => result.hasData);
-                            
-                            addResult('Database Integration', hasData ? 'success' : 'warning', 
-                                `${totalRecords} רשומות נמצאו ב-${testQueries.length} טבלאות`, 
-                                results
-                            );
-                        }
-                    });
-            });
-        }
-
-        // פונקציה לבדיקת אינטגרציה UI
-        function testUiIntegration() {
-            console.log('🎨 Testing UI integration...');
-            
-            const uiElements = [
-                'unified-header',
-                'page-body',
-                'top-section',
-                'content-section',
-                'main-content'
-            ];
-
-            const results = {};
-            let foundElements = 0;
-            
-            uiElements.forEach(elementId => {
-                const element = document.getElementById(elementId);
-                results[elementId] = {
-                    exists: !!element,
-                    visible: element ? element.offsetParent !== null : false,
-                    timestamp: new Date().toISOString()
-                };
-                
-                if (element) {
-                    foundElements++;
-                }
-            });
-            
-            const allFound = foundElements === uiElements.length;
-            
-            addResult('UI Integration', allFound ? 'success' : 'warning', 
-                `${foundElements}/${uiElements.length} אלמנטי UI נמצאו`, 
-                results
-            );
-        }
-
-        // פונקציה לבדיקת אינטגרציה פונקציות
-        function testFunctionIntegration() {
-            console.log('⚙️ Testing function integration...');
-            
-            const requiredFunctions = [
-                'loadAccountsFromServer',
-                'updateAccountsTable',
-                'loadTradesFromServer',
-                'updateTradesTable',
-                'loadAlertsFromServer',
-                'updateAlertsTable'
-            ];
-
-            const results = {};
-            let foundFunctions = 0;
-            
-            requiredFunctions.forEach(funcName => {
-                const exists = typeof window[funcName] === 'function';
-                results[funcName] = {
-                    exists: exists,
-                    type: typeof window[funcName],
-                    timestamp: new Date().toISOString()
-                };
-                
-                if (exists) {
-                    foundFunctions++;
-                }
-            });
-            
-            const allFound = foundFunctions === requiredFunctions.length;
-            
-            addResult('Function Integration', allFound ? 'success' : 'warning', 
-                `${foundFunctions}/${requiredFunctions.length} פונקציות נמצאו`, 
-                results
-            );
-        }
-
-        // פונקציה לבדיקת אינטגרציה סגנונות
-        function testStyleIntegration() {
-            console.log('🎨 Testing style integration...');
-            
-            const requiredStyles = [
-                'apple-theme.css',
-                'styles.css',
-                'header-system.css',
-                'table.css',
-                'typography.css'
-            ];
-
-            const results = {};
-            let foundStyles = 0;
-            
-            requiredStyles.forEach(styleName => {
-                const linkElement = document.querySelector(`link[href*="${styleName}"]`);
-                const exists = !!linkElement;
-                
-                results[styleName] = {
-                    exists: exists,
-                    href: linkElement ? linkElement.href : null,
-                    timestamp: new Date().toISOString()
-                };
-                
-                if (exists) {
-                    foundStyles++;
-                }
-            });
-            
-            const allFound = foundStyles === requiredStyles.length;
-            
-            addResult('Style Integration', allFound ? 'success' : 'warning', 
-                `${foundStyles}/${requiredStyles.length} קבצי סגנון נטענו`, 
-                results
-            );
-        }
-
-        // פונקציה לבדיקת אינטגרציה סקריפטים
-        function testScriptIntegration() {
-            console.log('📜 Testing script integration...');
-            
-            const requiredScripts = [
-                'header-system.js',
-                'main.js',
-                'tables.js',
-                'translation-utils.js',
-                'data-utils.js'
-            ];
-
-            const results = {};
-            let foundScripts = 0;
-            
-            requiredScripts.forEach(scriptName => {
-                const scriptElement = document.querySelector(`script[src*="${scriptName}"]`);
-                const exists = !!scriptElement;
-                
-                results[scriptName] = {
-                    exists: exists,
-                    src: scriptElement ? scriptElement.src : null,
-                    timestamp: new Date().toISOString()
-                };
-                
-                if (exists) {
-                    foundScripts++;
-                }
-            });
-            
-            const allFound = foundScripts === requiredScripts.length;
-            
-            addResult('Script Integration', allFound ? 'success' : 'warning', 
-                `${foundScripts}/${requiredScripts.length} קבצי סקריפט נטענו`, 
-                results
-            );
-        }
-
-        // פונקציה לבדיקת אינטגרציה מלאה
-        function testFullIntegration() {
-            console.log('🔍 Testing full integration...');
-            
-            // הרצת כל הבדיקות
-            testApiConnection();
-            
-            setTimeout(() => {
-                testDatabaseIntegration();
-            }, 500);
-            
-            setTimeout(() => {
-                testUiIntegration();
-            }, 1000);
-            
-            setTimeout(() => {
-                testFunctionIntegration();
-            }, 1500);
-            
-            setTimeout(() => {
-                testStyleIntegration();
-            }, 2000);
-            
-            setTimeout(() => {
-                testScriptIntegration();
-            }, 2500);
-            
-            setTimeout(() => {
-                // סיכום כל הבדיקות
-                const totalTests = integrationTestResults.length;
-                const successTests = integrationTestResults.filter(r => r.status === 'success').length;
-                const warningTests = integrationTestResults.filter(r => r.status === 'warning').length;
-                const errorTests = integrationTestResults.filter(r => r.status === 'error').length;
-                
-                const overallStatus = errorTests > 0 ? 'error' : 
-                                     warningTests > 0 ? 'warning' : 'success';
-                
-                addResult('Full Integration', overallStatus, 
-                    `סיכום: ${successTests} הצלחות, ${warningTests} אזהרות, ${errorTests} שגיאות מתוך ${totalTests} בדיקות`, 
+            try {
+                const tests = [
                     {
-                        total: totalTests,
-                        success: successTests,
-                        warning: warningTests,
-                        error: errorTests,
-                        percentage: totalTests > 0 ? ((successTests / totalTests) * 100).toFixed(1) : 0
+                        name: 'חיבור לבסיס נתונים',
+                        test: async () => {
+                            const response = await fetch('/api/v1/tickers/');
+                            const data = await response.json();
+                            return response.ok && data.status === 'success';
+                        }
+                    },
+                    {
+                        name: 'קריאת טיקרים',
+                        test: async () => {
+                            const response = await fetch('/api/v1/tickers/');
+                            const data = await response.json();
+                            return response.ok && data.data && Array.isArray(data.data);
+                        }
+                    },
+                    {
+                        name: 'קריאת חשבונות',
+                        test: async () => {
+                            const response = await fetch('/api/v1/accounts/');
+                            const data = await response.json();
+                            return response.ok && data.data && Array.isArray(data.data);
+                        }
+                    },
+                    {
+                        name: 'קריאת עסקאות',
+                        test: async () => {
+                            const response = await fetch('/api/v1/trades/');
+                            const data = await response.json();
+                            return response.ok && data.data && Array.isArray(data.data);
+                        }
                     }
-                );
-            }, 3000);
+                ];
+                
+                const results = [];
+                let passedTests = 0;
+                
+                for (const test of tests) {
+                    try {
+                        const passed = await test.test();
+                        results.push({
+                            test: test.name,
+                            passed: passed,
+                            message: passed ? 'הצלחה' : 'כישלון'
+                        });
+                        if (passed) passedTests++;
+                    } catch (error) {
+                        results.push({
+                            test: test.name,
+                            passed: false,
+                            message: `שגיאה: ${error.message}`
+                        });
+                    }
+                }
+                
+                const status = passedTests === tests.length ? 'success' : 'warning';
+                const message = `${passedTests}/${tests.length} בדיקות עברו`;
+                
+                addLog(status, message);
+                displayResults('בדיקת אינטגרציה עם בסיס נתונים', {
+                    status: status,
+                    message: message,
+                    results: results,
+                    summary: {
+                        total: tests.length,
+                        passed: passedTests,
+                        failed: tests.length - passedTests
+                    },
+                    recommendations: passedTests === tests.length ? 
+                        ['אינטגרציה תקינה', 'כל הבדיקות עברו'] : 
+                        ['בדוק חיבור לבסיס נתונים', 'בדוק endpoints']
+                });
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת אינטגרציה עם בסיס נתונים: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
         }
 
-        // פונקציה להוספת תוצאה
-        function addResult(test, status, message, data = null) {
-            console.log('📝 Adding result:', { test, status, message });
+        // פונקציה לבדיקת אינטגרציה עם API
+        async function testApiIntegration() {
+            addLog('info', 'בודק אינטגרציה עם API...');
             
-            const result = {
-                timestamp: new Date().toLocaleTimeString('he-IL'),
-                test: test,
-                status: status,
-                message: message,
-                data: data
-            };
-            
-            integrationTestResults.push(result);
-            displayResult(result);
+            try {
+                const tests = [
+                    {
+                        name: 'Health Check',
+                        test: async () => {
+                            const response = await fetch('/api/v1/tickers/');
+                            const data = await response.json();
+                            return response.ok && data.status === 'success';
+                        }
+                    },
+                    {
+                        name: 'Content-Type JSON',
+                        test: async () => {
+                            const response = await fetch('/api/v1/tickers/');
+                            return response.headers.get('content-type')?.includes('application/json');
+                        }
+                    },
+                    {
+                        name: 'CORS Headers',
+                        test: async () => {
+                            const response = await fetch('/api/v1/tickers/');
+                            return response.headers.get('access-control-allow-origin') !== null;
+                        }
+                    },
+                    {
+                        name: 'Error Handling',
+                        test: async () => {
+                            const response = await fetch('/api/v1/nonexistent');
+                            return response.status === 404;
+                        }
+                    }
+                ];
+                
+                const results = [];
+                let passedTests = 0;
+                
+                for (const test of tests) {
+                    try {
+                        const passed = await test.test();
+                        results.push({
+                            test: test.name,
+                            passed: passed,
+                            message: passed ? 'הצלחה' : 'כישלון'
+                        });
+                        if (passed) passedTests++;
+                    } catch (error) {
+                        results.push({
+                            test: test.name,
+                            passed: false,
+                            message: `שגיאה: ${error.message}`
+                        });
+                    }
+                }
+                
+                const status = passedTests === tests.length ? 'success' : 'warning';
+                const message = `${passedTests}/${tests.length} בדיקות עברו`;
+                
+                addLog(status, message);
+                displayResults('בדיקת אינטגרציה עם API', {
+                    status: status,
+                    message: message,
+                    results: results,
+                    summary: {
+                        total: tests.length,
+                        passed: passedTests,
+                        failed: tests.length - passedTests
+                    },
+                    recommendations: passedTests === tests.length ? 
+                        ['API תקין', 'כל הבדיקות עברו'] : 
+                        ['בדוק הגדרות API', 'בדוק headers']
+                });
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת אינטגרציה עם API: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
         }
 
-        // פונקציה לתצוגת תוצאה
-        function displayResult(result) {
-            const resultsContainer = document.getElementById('integration-results');
-            if (!resultsContainer) {
-                console.error('❌ Results container not found');
+        // פונקציה לבדיקת אינטגרציה עם מערכת התראות
+        async function testNotificationsIntegration() {
+            addLog('info', 'בודק אינטגרציה עם מערכת התראות...');
+            
+            try {
+                const tests = [
+                    {
+                        name: 'מערכת התראות זמינה',
+                        test: () => {
+                            return typeof window.showNotification === 'function' || 
+                                   typeof window.notificationSystem !== 'undefined';
+                        }
+                    },
+                    {
+                        name: 'הצגת התראה',
+                        test: () => {
+                            try {
+                                if (typeof window.showNotification === 'function') {
+                                    window.showNotification('בדיקת אינטגרציה', 'success');
+                                    return true;
+                                }
+                                return false;
+                            } catch (error) {
+                                return false;
+                            }
+                        }
+                    },
+                    {
+                        name: 'סוגי התראות',
+                        test: () => {
+                            const types = ['success', 'error', 'warning', 'info'];
+                            return types.every(type => {
+                                try {
+                                    if (typeof window.showNotification === 'function') {
+                                        window.showNotification(`בדיקת ${type}`, type);
+                                        return true;
+                                    }
+                                    return false;
+                                } catch (error) {
+                                    return false;
+                                }
+                            });
+                        }
+                    }
+                ];
+                
+                const results = [];
+                let passedTests = 0;
+                
+                for (const test of tests) {
+                    try {
+                        const passed = test.test();
+                        results.push({
+                            test: test.name,
+                            passed: passed,
+                            message: passed ? 'הצלחה' : 'כישלון'
+                        });
+                        if (passed) passedTests++;
+                    } catch (error) {
+                        results.push({
+                            test: test.name,
+                            passed: false,
+                            message: `שגיאה: ${error.message}`
+                        });
+                    }
+                }
+                
+                const status = passedTests === tests.length ? 'success' : 'warning';
+                const message = `${passedTests}/${tests.length} בדיקות עברו`;
+                
+                addLog(status, message);
+                displayResults('בדיקת אינטגרציה עם מערכת התראות', {
+                    status: status,
+                    message: message,
+                    results: results,
+                    summary: {
+                        total: tests.length,
+                        passed: passedTests,
+                        failed: tests.length - passedTests
+                    },
+                    recommendations: passedTests === tests.length ? 
+                        ['מערכת התראות תקינה', 'כל הבדיקות עברו'] : 
+                        ['בדוק מערכת התראות', 'בדוק פונקציות']
+                });
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת אינטגרציה עם מערכת התראות: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
+        }
+
+        // פונקציה לבדיקת אינטגרציה עם מערכת פילטרים
+        async function testFiltersIntegration() {
+            addLog('info', 'בודק אינטגרציה עם מערכת פילטרים...');
+            
+            try {
+                const tests = [
+                    {
+                        name: 'מערכת פילטרים זמינה',
+                        test: () => {
+                            return typeof window.filterSystem !== 'undefined' || 
+                                   typeof window.applyFilters === 'function';
+                        }
+                    },
+                    {
+                        name: 'פונקציות פילטרים',
+                        test: () => {
+                            const functions = ['applyFilters', 'clearFilters', 'getActiveFilters'];
+                            return functions.some(func => typeof window[func] === 'function');
+                        }
+                    },
+                    {
+                        name: 'אלמנטי פילטרים',
+                        test: () => {
+                            const filterElements = document.querySelectorAll('.filter-control, .filter-toggle, [data-filter]');
+                            return filterElements.length > 0;
+                        }
+                    }
+                ];
+                
+                const results = [];
+                let passedTests = 0;
+                
+                for (const test of tests) {
+                    try {
+                        const passed = test.test();
+                        results.push({
+                            test: test.name,
+                            passed: passed,
+                            message: passed ? 'הצלחה' : 'כישלון'
+                        });
+                        if (passed) passedTests++;
+                    } catch (error) {
+                        results.push({
+                            test: test.name,
+                            passed: false,
+                            message: `שגיאה: ${error.message}`
+                        });
+                    }
+                }
+                
+                const status = passedTests === tests.length ? 'success' : 'warning';
+                const message = `${passedTests}/${tests.length} בדיקות עברו`;
+                
+                addLog(status, message);
+                displayResults('בדיקת אינטגרציה עם מערכת פילטרים', {
+                    status: status,
+                    message: message,
+                    results: results,
+                    summary: {
+                        total: tests.length,
+                        passed: passedTests,
+                        failed: tests.length - passedTests
+                    },
+                    recommendations: passedTests === tests.length ? 
+                        ['מערכת פילטרים תקינה', 'כל הבדיקות עברו'] : 
+                        ['בדוק מערכת פילטרים', 'בדוק אלמנטים']
+                });
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת אינטגרציה עם מערכת פילטרים: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
+        }
+
+        // פונקציה לבדיקת אינטגרציה עם מערכת תרגום
+        async function testTranslationIntegration() {
+            addLog('info', 'בודק אינטגרציה עם מערכת תרגום...');
+            
+            try {
+                const tests = [
+                    {
+                        name: 'מערכת תרגום זמינה',
+                        test: () => {
+                            return typeof window.translateText === 'function' || 
+                                   typeof window.translationSystem !== 'undefined';
+                        }
+                    },
+                    {
+                        name: 'תרגום טקסט',
+                        test: () => {
+                            try {
+                                if (typeof window.translateText === 'function') {
+                                    const translated = window.translateText('test');
+                                    return translated !== 'test' || translated !== undefined;
+                                }
+                                return false;
+                            } catch (error) {
+                                return false;
+                            }
+                        }
+                    },
+                    {
+                        name: 'אלמנטי תרגום',
+                        test: () => {
+                            const translationElements = document.querySelectorAll('[data-translate], .translatable');
+                            return translationElements.length > 0;
+                        }
+                    }
+                ];
+                
+                const results = [];
+                let passedTests = 0;
+                
+                for (const test of tests) {
+                    try {
+                        const passed = test.test();
+                        results.push({
+                            test: test.name,
+                            passed: passed,
+                            message: passed ? 'הצלחה' : 'כישלון'
+                        });
+                        if (passed) passedTests++;
+                    } catch (error) {
+                        results.push({
+                            test: test.name,
+                            passed: false,
+                            message: `שגיאה: ${error.message}`
+                        });
+                    }
+                }
+                
+                const status = passedTests === tests.length ? 'success' : 'warning';
+                const message = `${passedTests}/${tests.length} בדיקות עברו`;
+                
+                addLog(status, message);
+                displayResults('בדיקת אינטגרציה עם מערכת תרגום', {
+                    status: status,
+                    message: message,
+                    results: results,
+                    summary: {
+                        total: tests.length,
+                        passed: passedTests,
+                        failed: tests.length - passedTests
+                    },
+                    recommendations: passedTests === tests.length ? 
+                        ['מערכת תרגום תקינה', 'כל הבדיקות עברו'] : 
+                        ['בדוק מערכת תרגום', 'בדוק פונקציות']
+                });
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת אינטגרציה עם מערכת תרגום: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
+        }
+
+        // פונקציה לבדיקת אינטגרציה עם מערכת UI
+        async function testUiIntegration() {
+            addLog('info', 'בודק אינטגרציה עם מערכת UI...');
+            
+            try {
+                const tests = [
+                    {
+                        name: 'Header System',
+                        test: () => {
+                            return typeof window.headerSystem !== 'undefined' || 
+                                   document.querySelector('.unified-header') !== null;
+                        }
+                    },
+                    {
+                        name: 'Bootstrap CSS',
+                        test: () => {
+                            const bootstrapLinks = document.querySelectorAll('link[href*="bootstrap"]');
+                            return bootstrapLinks.length > 0;
+                        }
+                    },
+                    {
+                        name: 'Font Awesome',
+                        test: () => {
+                            const fontAwesomeLinks = document.querySelectorAll('link[href*="font-awesome"]');
+                            return fontAwesomeLinks.length > 0;
+                        }
+                    },
+                    {
+                        name: 'RTL Support',
+                        test: () => {
+                            return document.documentElement.dir === 'rtl' || 
+                                   document.documentElement.lang === 'he';
+                        }
+                    }
+                ];
+                
+                const results = [];
+                let passedTests = 0;
+                
+                for (const test of tests) {
+                    try {
+                        const passed = test.test();
+                        results.push({
+                            test: test.name,
+                            passed: passed,
+                            message: passed ? 'הצלחה' : 'כישלון'
+                        });
+                        if (passed) passedTests++;
+                    } catch (error) {
+                        results.push({
+                            test: test.name,
+                            passed: false,
+                            message: `שגיאה: ${error.message}`
+                        });
+                    }
+                }
+                
+                const status = passedTests === tests.length ? 'success' : 'warning';
+                const message = `${passedTests}/${tests.length} בדיקות עברו`;
+                
+                addLog(status, message);
+                displayResults('בדיקת אינטגרציה עם מערכת UI', {
+                    status: status,
+                    message: message,
+                    results: results,
+                    summary: {
+                        total: tests.length,
+                        passed: passedTests,
+                        failed: tests.length - passedTests
+                    },
+                    recommendations: passedTests === tests.length ? 
+                        ['מערכת UI תקינה', 'כל הבדיקות עברו'] : 
+                        ['בדוק מערכת UI', 'בדוק CSS ו-JavaScript']
+                });
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת אינטגרציה עם מערכת UI: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
+        }
+
+        // פונקציה לבדיקת אינטגרציה עם מערכת נתונים חיצוניים
+        async function testExternalDataIntegration() {
+            addLog('info', 'בודק אינטגרציה עם מערכת נתונים חיצוניים...');
+            
+            try {
+                const tests = [
+                    {
+                        name: 'מודול נתונים חיצוניים',
+                        test: () => {
+                            return typeof window.externalDataModule !== 'undefined' || 
+                                   typeof window.fetchExternalData === 'function';
+                        }
+                    },
+                    {
+                        name: 'API Endpoints',
+                        test: async () => {
+                            try {
+                                const response = await fetch('/api/v1/tickers/');
+                                return response.ok;
+                            } catch (error) {
+                                return false;
+                            }
+                        }
+                    },
+                    {
+                        name: 'Data Providers',
+                        test: () => {
+                            const providers = ['yahoo_finance', 'google_finance', 'alpha_vantage'];
+                            return providers.some(provider => {
+                                return typeof window[`${provider}Provider`] !== 'undefined';
+                            });
+                        }
+                    }
+                ];
+                
+                const results = [];
+                let passedTests = 0;
+                
+                for (const test of tests) {
+                    try {
+                        const passed = await test.test();
+                        results.push({
+                            test: test.name,
+                            passed: passed,
+                            message: passed ? 'הצלחה' : 'כישלון'
+                        });
+                        if (passed) passedTests++;
+                    } catch (error) {
+                        results.push({
+                            test: test.name,
+                            passed: false,
+                            message: `שגיאה: ${error.message}`
+                        });
+                    }
+                }
+                
+                const status = passedTests === tests.length ? 'success' : 'warning';
+                const message = `${passedTests}/${tests.length} בדיקות עברו`;
+                
+                addLog(status, message);
+                displayResults('בדיקת אינטגרציה עם מערכת נתונים חיצוניים', {
+                    status: status,
+                    message: message,
+                    results: results,
+                    summary: {
+                        total: tests.length,
+                        passed: passedTests,
+                        failed: tests.length - passedTests
+                    },
+                    recommendations: passedTests === tests.length ? 
+                        ['מערכת נתונים חיצוניים תקינה', 'כל הבדיקות עברו'] : 
+                        ['בדוק מערכת נתונים חיצוניים', 'בדוק providers']
+                });
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת אינטגרציה עם מערכת נתונים חיצוניים: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
+        }
+
+        // פונקציה לבדיקת אינטגרציה מותאמת
+        async function testCustomIntegration() {
+            const moduleName = document.getElementById('custom-integration-test').value.trim();
+            if (!moduleName) {
+                addLog('warning', 'נא להזין שם מודול לבדיקה');
                 return;
             }
-
-            const resultElement = document.createElement('div');
-            resultElement.className = `alert alert-${getStatusClass(result.status)} mb-2 fade-in`;
             
-            let content = `
-                <div class="d-flex justify-content-between align-items-start">
-                    <div>
-                        <strong>${result.test}</strong> - ${result.message}
-                        <br><small class="text-muted">${result.timestamp}</small>
-                    </div>
-                    <span class="badge bg-${getStatusClass(result.status)}">
-                        ${getStatusText(result.status)}
-                    </span>
+            addLog('info', `בודק אינטגרציה מותאמת עבור: ${moduleName}`);
+            
+            try {
+                const tests = [
+                    {
+                        name: `מודול ${moduleName} זמין`,
+                        test: () => {
+                            return typeof window[moduleName] !== 'undefined' || 
+                                   typeof window[`${moduleName}System`] !== 'undefined';
+                        }
+                    },
+                    {
+                        name: `פונקציות ${moduleName}`,
+                        test: () => {
+                            const functions = ['init', 'start', 'load', 'test'];
+                            return functions.some(func => {
+                                const fullName = `${moduleName}${func.charAt(0).toUpperCase() + func.slice(1)}`;
+                                return typeof window[fullName] === 'function';
+                            });
+                        }
+                    },
+                    {
+                        name: `אלמנטי ${moduleName}`,
+                        test: () => {
+                            const elements = document.querySelectorAll(`[data-${moduleName}], .${moduleName}-element`);
+                            return elements.length > 0;
+                        }
+                    }
+                ];
+                
+                const results = [];
+                let passedTests = 0;
+                
+                for (const test of tests) {
+                    try {
+                        const passed = test.test();
+                        results.push({
+                            test: test.name,
+                            passed: passed,
+                            message: passed ? 'הצלחה' : 'כישלון'
+                        });
+                        if (passed) passedTests++;
+                    } catch (error) {
+                        results.push({
+                            test: test.name,
+                            passed: false,
+                            message: `שגיאה: ${error.message}`
+                        });
+                    }
+                }
+                
+                const status = passedTests === tests.length ? 'success' : 'warning';
+                const message = `${passedTests}/${tests.length} בדיקות עברו עבור ${moduleName}`;
+                
+                addLog(status, message);
+                displayResults(`בדיקת אינטגרציה מותאמת - ${moduleName}`, {
+                    status: status,
+                    message: message,
+                    module: moduleName,
+                    results: results,
+                    summary: {
+                        total: tests.length,
+                        passed: passedTests,
+                        failed: tests.length - passedTests
+                    },
+                    recommendations: passedTests === tests.length ? 
+                        [`מודול ${moduleName} תקין`, 'כל הבדיקות עברו'] : 
+                        [`בדוק מודול ${moduleName}`, 'בדוק פונקציות ואלמנטים']
+                });
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת אינטגרציה מותאמת: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
+        }
+
+        // פונקציה לתצוגת תוצאות
+        function displayResults(title, data) {
+            const resultsContainer = document.getElementById('test-results');
+            if (!resultsContainer) return;
+            
+            const resultHtml = `
+                <div class="alert alert-info mb-2">
+                    <h6>${title}</h6>
+                    <pre class="mb-0"><code>${JSON.stringify(data, null, 2)}</code></pre>
                 </div>
             `;
             
-            if (result.data) {
-                content += `
-                    <details class="mt-2">
-                        <summary>פרטי הנתונים</summary>
-                        <pre class="mt-2 bg-light p-2 rounded"><code>${JSON.stringify(result.data, null, 2)}</code></pre>
-                    </details>
-                `;
-            }
-            
-            resultElement.innerHTML = content;
-            resultsContainer.appendChild(resultElement);
-            
-            // Scroll to bottom
-            resultsContainer.scrollTop = resultsContainer.scrollHeight;
-            
-            console.log('✅ Result displayed');
+            resultsContainer.innerHTML = resultHtml;
         }
 
-        // פונקציה לקבלת מחלקת סטטוס
-        function getStatusClass(status) {
-            switch (status) {
-                case 'success': return 'success';
-                case 'error': return 'danger';
-                case 'warning': return 'warning';
-                case 'info': return 'info';
-                default: return 'secondary';
-            }
-        }
-
-        // פונקציה לקבלת טקסט סטטוס
-        function getStatusText(status) {
-            switch (status) {
-                case 'success': return 'הצלחה';
-                case 'error': return 'שגיאה';
-                case 'warning': return 'אזהרה';
-                case 'info': return 'מידע';
-                default: return 'לא ידוע';
-            }
+        // פונקציה להוספת לוג
+        function addLog(level, message) {
+            const logContainer = document.getElementById('test-logs');
+            if (!logContainer) return;
+            
+            const timestamp = new Date().toLocaleTimeString('he-IL');
+            const levelClass = level === 'error' ? 'text-danger' : 
+                              level === 'warning' ? 'text-warning' : 
+                              level === 'success' ? 'text-success' : 'text-info';
+            
+            const logHtml = `
+                <div class="log-entry mb-1">
+                    <small class="text-muted">[${timestamp}]</small>
+                    <span class="${levelClass}">[${level.toUpperCase()}]</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            logContainer.innerHTML = logHtml + logContainer.innerHTML;
+            logContainer.scrollTop = 0;
         }
 
         // פונקציה לניקוי לוגים
-        function clearIntegrationLogs() {
-            const resultsContainer = document.getElementById('integration-results');
-            if (resultsContainer) {
-                resultsContainer.innerHTML = '';
-                integrationTestResults = [];
-                console.log('🧹 Integration logs cleared');
-            }
+        function clearTestLogs() {
+            const logContainer = document.getElementById('test-logs');
+            const resultsContainer = document.getElementById('test-results');
+            
+            if (logContainer) logContainer.innerHTML = '';
+            if (resultsContainer) resultsContainer.innerHTML = '';
+            
+            addLog('info', 'לוגים נוקו');
         }
 
         // אתחול event listeners
         document.addEventListener('DOMContentLoaded', function() {
             // הוספת event listeners לכפתורים
-            document.getElementById('test-api-connection')?.addEventListener('click', testApiConnection);
             document.getElementById('test-database-integration')?.addEventListener('click', testDatabaseIntegration);
+            document.getElementById('test-api-integration')?.addEventListener('click', testApiIntegration);
+            document.getElementById('test-notifications-integration')?.addEventListener('click', testNotificationsIntegration);
+            document.getElementById('test-filters-integration')?.addEventListener('click', testFiltersIntegration);
+            document.getElementById('test-translation-integration')?.addEventListener('click', testTranslationIntegration);
             document.getElementById('test-ui-integration')?.addEventListener('click', testUiIntegration);
-            document.getElementById('test-function-integration')?.addEventListener('click', testFunctionIntegration);
-            document.getElementById('test-style-integration')?.addEventListener('click', testStyleIntegration);
-            document.getElementById('test-script-integration')?.addEventListener('click', testScriptIntegration);
-            document.getElementById('test-full-integration')?.addEventListener('click', testFullIntegration);
+            document.getElementById('test-external-data-integration')?.addEventListener('click', testExternalDataIntegration);
+            document.getElementById('test-custom-integration')?.addEventListener('click', testCustomIntegration);
+
+            // הוספת event listener למקש Enter בשדה האינטגרציה המותאמת
+            document.getElementById('custom-integration-test')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    testCustomIntegration();
+                }
+            });
 
             // הוספת הודעה ראשונית
-            addResult('System', 'info', 'דף בדיקת אינטגרציה נטען בהצלחה');
+            addLog('info', 'דף בדיקת אינטגרציה נטען בהצלחה');
+            
+            // בדיקה אוטומטית של אינטגרציה עם UI
+            setTimeout(() => {
+                testUiIntegration();
+            }, 1000);
         });
     </script>
 </body>

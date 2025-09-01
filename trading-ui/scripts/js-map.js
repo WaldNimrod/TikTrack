@@ -282,7 +282,7 @@ class JsMapSystem {
             'database.js': 20,       // Database functions
             'db-extradata.js': 15,   // Extra data functions
             'constraint-manager.js': 8, // Constraint functions
-            'tests.js': 6,           // Test functions
+            
             'currencies.js': 8,      // Currency functions
             'auth.js': 5,            // Auth functions
             'js-map.js': 3,          // JS map functions
@@ -434,7 +434,7 @@ class JsMapSystem {
             'research.js', 'executions.js', 'tickers.js', 'ticker-service.js',
             'accounts.js', 'cash_flows.js', 'notes.js', 'preferences.js',
             'database.js', 'db-extradata.js', 'constraint-manager.js',
-            'tests.js', 'currencies.js', 'auth.js'
+            'currencies.js', 'auth.js'
         ];
 
         return generalityOrder.filter(file => this.jsFiles.includes(file));

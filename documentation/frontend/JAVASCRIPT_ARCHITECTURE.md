@@ -41,7 +41,7 @@ trading-ui/scripts/
 │   ├── currencies.js              # Currency management
 │   ├── preferences.js             # Preference management
 │   ├── research.js                # Research management
-│   ├── tests.js                   # System testing
+
 │   ├── database.js                # Database management
 │   ├── auth.js                    # User authentication
 │   ├── active-alerts-component.js # Active alerts component

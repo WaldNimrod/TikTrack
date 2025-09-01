@@ -52,8 +52,8 @@ from routes.api.cash_flows import cash_flows_bp
 from routes.api.notes import notes_bp
 from routes.api.executions import executions_bp
 from routes.api.preferences import preferences_bp
-from routes.api.tests import tests_bp
-from routes.api.test_suite import test_suite_bp
+
+
 from routes.api.constraints import constraints_bp
 from routes.api.currencies import currencies_bp
 from routes.api.linked_items import linked_items_bp

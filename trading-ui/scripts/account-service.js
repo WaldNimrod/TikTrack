@@ -170,4 +170,16 @@ window.reactivateAccount = reactivateAccount;
 window.getAccountById = getAccountById;
 window.clearAccountsCache = clearCache;
 
+// הוספת פונקציות נוספות שנדרשות
+/**
+ * פונקציה לבדיקה אם החשבונות נטענו
+ * @returns {boolean} האם החשבונות נטענו
+ */
+function isAccountsLoaded() {
+    return accountsCache !== null && lastCacheUpdate !== null;
+}
+
+// ייצוא הפונקציה הנוספת
+window.isAccountsLoaded = isAccountsLoaded;
+
 

@@ -382,12 +382,7 @@ function updateTradesTable(trades) {
         <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
           ${createLinkButton(`viewLinkedItemsForTrade(${trade.id})`)}
           ${createEditButton(`editTradeRecord('${trade.id}')`)}
-          ${window.createCancelButton ? window.createCancelButton('trade', trade.id, trade.status, 'sm') : 
-            (trade.status === 'cancelled' ?
-              `<button class="btn btn-sm btn-outline-secondary" onclick="reactivateTrade('${trade.id}')" title="הפעל מחדש טרייד"><span class="reactivate-icon">✓</span></button>` :
-              `<button class="btn btn-sm btn-warning" onclick="cancelTradeRecord('${trade.id}')" title="בטל טרייד">❌</button>`
-            )
-          }
+          ${createCancelButton('trade', trade.id, trade.status, 'sm')}
           ${createDeleteButton(`deleteTradeRecord('${trade.id}')`)}
         </div>
       </td>

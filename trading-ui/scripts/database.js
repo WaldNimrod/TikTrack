@@ -776,15 +776,15 @@ function updateTable(tableType, data) {
     const actionsCell = document.createElement('td');
     actionsCell.className = 'actions-cell';
     let actionsHtml = `
-      ${window.createEditButton ? window.createEditButton(`editRecord('${tableType}', ${item.id})`) : `<button class="btn btn-sm btn-secondary" onclick="editRecord('${tableType}', ${item.id})" title="ערוך">✏️</button>`}
-      ${window.createDeleteButton ? window.createDeleteButton(`deleteRecord('${tableType}', ${item.id})`) : `<button class="btn btn-sm btn-danger" onclick="deleteRecord('${tableType}', ${item.id})" title="מחק">🗑️</button>`}
+      ${createEditButton(`editRecord('${tableType}', ${item.id})`)}
+      ${createDeleteButton(`deleteRecord('${tableType}', ${item.id})`)}
     `;
     
     // הוספת כפתור ביטול/הפעלה מחדש לטבלאות עם שדה סטטוס
     if (item.status) {
       // שימוש בפונקציה הכללית ליצירת כפתור ביטול/הפעלה מחדש
-      if (window.uiUtils && window.uiUtils.createCancelButton) {
-        actionsHtml += window.uiUtils.createCancelButton(tableType, item.id, item.status, 'sm');
+      if (window.createCancelButton) {
+        actionsHtml += createCancelButton(tableType, item.id, item.status, 'sm');
       } else {
         // fallback אם הפונקציה הכללית לא זמינה
         const isCancelled = item.status === 'cancelled' || item.status === 'canceled';

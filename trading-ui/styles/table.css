@@ -2008,12 +2008,11 @@ th {
 
 /* ===== טבלת ביצועים - רוחב יחסי באחוזים ===== */
 
-/* טבלת ביצועים - רוחב קבוע עם עמודות יחסיות */
+/* טבלת ביצועים - הגדרות כללית */
 #executionsTable {
-  width: 100% !important;
   table-layout: fixed !important;
-  min-width: 1200px !important;
-  max-width: 100% !important;
+  width: 85% !important;
+  max-width: 85% !important;
 }
 
 #executionsContainer {
@@ -2021,70 +2020,70 @@ th {
   overflow-y: hidden !important;
 }
 
-/* עמודת סימבול - 8% */
+/* עמודת סימבול - 6% */
 #executionsTable th:nth-child(1),
 #executionsTable td:nth-child(1) {
-  width: 8% !important;
-}
-
-/* עמודת טרייד - 12% */
-#executionsTable th:nth-child(2),
-#executionsTable td:nth-child(2) {
-  width: 12% !important;
-}
-
-/* עמודת פעולה - 8% */
-#executionsTable th:nth-child(3),
-#executionsTable td:nth-child(3) {
-  width: 8% !important;
-}
-
-/* עמודת חשבון - 10% */
-#executionsTable th:nth-child(4),
-#executionsTable td:nth-child(4) {
-  width: 10% !important;
-}
-
-/* עמודת כמות - 8% */
-#executionsTable th:nth-child(5),
-#executionsTable td:nth-child(5) {
-  width: 8% !important;
-}
-
-/* עמודת מחיר - 8% */
-#executionsTable th:nth-child(6),
-#executionsTable td:nth-child(6) {
-  width: 8% !important;
-}
-
-/* עמודת עמלה - 6% */
-#executionsTable th:nth-child(7),
-#executionsTable td:nth-child(7) {
   width: 6% !important;
 }
 
-/* עמודת רווח/הפסד - 8% */
+/* עמודת טרייד - 6% */
+#executionsTable th:nth-child(2),
+#executionsTable td:nth-child(2) {
+  width: 6% !important;
+}
+
+/* עמודת פעולה - 6% */
+#executionsTable th:nth-child(3),
+#executionsTable td:nth-child(3) {
+  width: 6% !important;
+}
+
+/* עמודת חשבון - 6% */
+#executionsTable th:nth-child(4),
+#executionsTable td:nth-child(4) {
+  width: 6% !important;
+}
+
+/* עמודת כמות - 5% */
+#executionsTable th:nth-child(5),
+#executionsTable td:nth-child(5) {
+  width: 5% !important;
+}
+
+/* עמודת מחיר - 5% */
+#executionsTable th:nth-child(6),
+#executionsTable td:nth-child(6) {
+  width: 5% !important;
+}
+
+/* עמודת עמלה - 4% */
+#executionsTable th:nth-child(7),
+#executionsTable td:nth-child(7) {
+  width: 4% !important;
+}
+
+/* עמודת רווח/הפסד - 6% */
 #executionsTable th:nth-child(8),
 #executionsTable td:nth-child(8) {
-  width: 8% !important;
+  width: 6% !important;
 }
 
-/* עמודת הערות - 8% */
+/* עמודת הערות - 5% */
 #executionsTable th:nth-child(9),
 #executionsTable td:nth-child(9) {
-  width: 8% !important;
+  width: 5% !important;
 }
 
-/* עמודת נוצר ב - 8% */
+/* עמודת נוצר ב - 6% */
 #executionsTable th:nth-child(10),
 #executionsTable td:nth-child(10) {
-  width: 8% !important;
+  width: 6% !important;
 }
 
-/* עמודת תאריך ביצוע - 8% */
+/* עמודת תאריך ביצוע - 6% */
 #executionsTable th:nth-child(11),
 #executionsTable td:nth-child(11) {
-  width: 8% !important;
+  width: 6% !important;
 }
 
 /* עמודת מקור - 6% */
@@ -2093,10 +2092,10 @@ th {
   width: 6% !important;
 }
 
-/* עמודת פעולות - 14% */
+/* עמודת פעולות - 18% */
 #executionsTable th:nth-child(13),
 #executionsTable td:nth-child(13) {
-  width: 14% !important;
+  width: 18% !important;
 }
 
 /* עיצוב כפתורי פעולה בטבלת ביצועים */
@@ -2129,7 +2128,7 @@ th {
   max-width: none !important;
 }
 
-/* סה"כ: 8+12+8+10+8+8+6+8+8+8+8+6+14 = 102% (מאוזן היטב) */
+/* סה"כ: 6+6+6+6+5+5+4+6+5+6+6+6+18 = 79% (מאוזן היטב) */
 
 /* סגנונות ספציפיים לטבלת ההתראות */
 #alertsTable {

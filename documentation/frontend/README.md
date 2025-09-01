@@ -27,7 +27,33 @@
 - **תפקיד**: ניהול טבלאות נתונים
 - **תכונות**: מיון, עדכון, תצוגה מותאמת
 
-### 4. מערכת חיבור מידע חיצוני (External Data Integration)
+### 4. מערכת הכפתורים המרוכזת (Button System)
+- **קובץ**: `scripts/button-icons.js`
+- **תפקיד**: ניהול מרכזי של כל כפתורי הפעולה במערכת
+- **תכונות**: כפתורי עריכה, מחיקה, ביטול, קישור עם מערכת איקונים מרכזית
+
+#### פונקציות מרכזיות:
+- **`createEditButton(onClick, additionalClasses)`** - כפתור עריכה (✏️)
+- **`createDeleteButton(onClick, additionalClasses)`** - כפתור מחיקה (🗑️)
+- **`createCancelButton(itemType, itemId, status, size, additionalClasses)`** - כפתור ביטול/הפעלה מחדש (❌/✓)
+- **`createLinkButton(onClick, additionalClasses)`** - כפתור קישור (🔗)
+- **`createDeleteButtonByType(itemType, itemId, size, additionalClasses)`** - כפתור מחיקה עם itemType
+
+#### יתרונות המערכת:
+- **ריכוז מלא**: כל הפונקציונליות במקום אחד
+- **עקביות**: אותו סגנון בכל העמודים
+- **תחזוקה קלה**: שינוי אחד משפיע על הכל
+- **בדיקת קיום**: פונקציות בודקות אם הפונקציות קיימות
+- **גיבוי**: fallback לכל פונקציה
+
+#### שימוש בכל העמודים:
+- **`trades.js`**: עריכה, מחיקה, ביטול, קישור
+- **`cash_flows.js`**: עריכה, מחיקה, קישור
+- **`trade_plans.js`**: עריכה, מחיקה, ביטול
+- **`database.js`**: עריכה, מחיקה, ביטול
+- **כל העמודים האחרים**: שימוש בפונקציות המרכזיות
+
+### 5. מערכת חיבור מידע חיצוני (External Data Integration)
 - **תיקייה**: `external_data_integration_client/`
 - **תפקיד**: חיבור למקורות מידע חיצוניים
 - **תכונות**: בדיקות API, מודלים, סטטיסטיקות מערכת, אינטגרציה

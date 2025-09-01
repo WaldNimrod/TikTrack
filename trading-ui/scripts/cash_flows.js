@@ -747,7 +747,7 @@ function renderCashFlowsTable() {
             <td class="actions-cell">
                 ${createLinkButton(`window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`)}
                 ${createEditButton(`showEditCashFlowModal(${cashFlow.id})`)}
-                ${window.createDeleteButton ? window.createDeleteButton(`deleteCashFlow(${cashFlow.id})`) : `<button class="btn btn-sm btn-danger" onclick="deleteCashFlow(${cashFlow.id})" title="מחק">🗑️</button>`}
+                ${createDeleteButton(`deleteCashFlow(${cashFlow.id})`)}
 
             </td>
         `;

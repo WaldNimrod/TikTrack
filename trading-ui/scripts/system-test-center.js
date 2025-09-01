@@ -14,7 +14,7 @@ class SimpleTestCenter {
   init() {
     console.log('=== init התחיל ===');
     this.setupEventListeners();
-    this.loadAllData();
+    // לא נטען נתונים אוטומטית - רק כשהמשתמש לוחץ על כפתורים
     console.log('=== init הושלם ===');
   }
 

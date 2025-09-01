@@ -398,6 +398,137 @@
       <div class="preference-control">
         <div class="input-group">
           <input type="number" id="requestDelay" class="form-control" min="0" max="5000" step="100" 
+                 onchange="updatePreference('requestDelay', this.value)" placeholder="1000">
+          <span class="input-group-text">מ"ש</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ===== סולמות צבעים ===== -->
+    <div class="preference-item" style="border-top: 2px solid #ff9c05; margin-top: 20px; padding-top: 20px;">
+      <div class="preference-label">
+        <h4>🎨 סולמות צבעים</h4>
+        <p>הגדרת צבעים לערכים מספריים במערכת</p>
+      </div>
+      <div class="preference-control">
+        <!-- Placeholder for section header -->
+      </div>
+    </div>
+    
+    <!-- ערכים חיוביים -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🟢 ערכים חיוביים</h4>
+        <p>צבעים לערכים חיוביים (רווחים, עליות)</p>
+      </div>
+      <div class="preference-control">
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <label class="form-label small">צבע טקסט</label>
+            <div class="input-group">
+              <input type="color" id="positiveTextColor" class="form-control form-control-color" 
+                     onchange="updateNumericValueColor('positive', 'medium', this.value)" 
+                     value="#28a745" title="בחר צבע טקסט לערכים חיוביים">
+              <input type="text" id="positiveTextColorHex" class="form-control" 
+                     placeholder="#28a745" maxlength="7"
+                     onchange="updateNumericValueColorFromHex('positive', 'medium', this.value)">
+            </div>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label small">צבע רקע</label>
+            <div class="input-group">
+              <input type="color" id="positiveBackgroundColor" class="form-control form-control-color" 
+                     onchange="updateNumericValueColor('positive', 'light', this.value)" 
+                     value="#d4edda" title="בחר צבע רקע לערכים חיוביים">
+              <input type="text" id="positiveBackgroundColorHex" class="form-control" 
+                     placeholder="#d4edda" maxlength="7"
+                     onchange="updateNumericValueColorFromHex('positive', 'light', this.value)">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ערכים שליליים -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🔴 ערכים שליליים</h4>
+        <p>צבעים לערכים שליליים (הפסדים, ירידות)</p>
+      </div>
+      <div class="preference-control">
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <label class="form-label small">צבע טקסט</label>
+            <div class="input-group">
+              <input type="color" id="negativeTextColor" class="form-control form-control-color" 
+                     onchange="updateNumericValueColor('negative', 'medium', this.value)" 
+                     value="#dc3545" title="בחר צבע טקסט לערכים שליליים">
+              <input type="text" id="negativeTextColorHex" class="form-control" 
+                     placeholder="#dc3545" maxlength="7"
+                     onchange="updateNumericValueColorFromHex('negative', 'medium', this.value)">
+            </div>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label small">צבע רקע</label>
+            <div class="input-group">
+              <input type="color" id="negativeBackgroundColor" class="form-control form-control-color" 
+                     onchange="updateNumericValueColor('negative', 'light', this.value)" 
+                     value="#f8d7da" title="בחר צבע רקע לערכים שליליים">
+              <input type="text" id="negativeBackgroundColorHex" class="form-control" 
+                     placeholder="#f8d7da" maxlength="7"
+                     onchange="updateNumericValueColorFromHex('negative', 'light', this.value)">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ערך אפס -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>⚪ ערך אפס</h4>
+        <p>צבעים לערך אפס (אין שינוי)</p>
+      </div>
+      <div class="preference-control">
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <label class="form-label small">צבע טקסט</label>
+            <div class="input-group">
+              <input type="color" id="zeroTextColor" class="form-control form-control-color" 
+                     onchange="updateNumericValueColor('zero', 'medium', this.value)" 
+                     value="#6c757d" title="בחר צבע טקסט לערך אפס">
+              <input type="text" id="zeroTextColorHex" class="form-control" 
+                     placeholder="#6c757d" maxlength="7"
+                     onchange="updateNumericValueColorFromHex('zero', 'medium', this.value)">
+            </div>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label small">צבע רקע</label>
+            <div class="input-group">
+              <input type="color" id="zeroBackgroundColor" class="form-control form-control-color" 
+                     onchange="updateNumericValueColor('zero', 'light', this.value)" 
+                     value="#e2e3e5" title="בחר צבע רקע לערך אפס">
+              <input type="text" id="zeroBackgroundColorHex" class="form-control" 
+                     placeholder="#e2e3e5" maxlength="7"
+                     onchange="updateNumericValueColorFromHex('zero', 'light', this.value)">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- כפתור איפוס צבעים -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🔄 איפוס צבעים</h4>
+        <p>איפוס צבעים לברירת המחדל</p>
+      </div>
+      <div class="preference-control">
+        <button type="button" class="btn btn-outline-secondary" onclick="resetNumericValueColors()">
+          איפוס לברירת מחדל
+        </button>
+      </div>
+    </div>
                  onchange="updatePreference('requestDelay', this.value)" placeholder="200">
           <span class="input-group-text">מ"ש</span>
         </div>

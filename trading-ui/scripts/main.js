@@ -242,7 +242,7 @@ function setupGlobalModalConfigurations() {
 
 
     } else {
-
+      // No specific page initialization needed
     }
   });
 }
@@ -419,7 +419,7 @@ function restoreAllSectionStates() {
     });
 
     // Restore top section state for all pages
-    const currentPath = window.location.pathname;
+    // currentPath is already defined above
     let topSectionStorageKey = 'topSectionCollapsed';
 
     if (currentPath.includes('/alerts')) {
@@ -1135,12 +1135,14 @@ function filterDataByFilters(data, pageName) {
         const yesterday = new Date(now);
         yesterday.setDate(yesterday.getDate() - 1);
         return itemDate.toDateString() === yesterday.toDateString();
-      case 'השבוע':
+      case 'השבוע': {
         const weekAgo = new Date(now);
         weekAgo.setDate(weekAgo.getDate() - 7);
         return itemDate >= weekAgo;
-      case 'החודש':
+      }
+      case 'החודש': {
         return itemDate.getMonth() === now.getMonth() && itemDate.getFullYear() === now.getFullYear();
+      }
       case 'השנה':
         return itemDate.getFullYear() === now.getFullYear();
       default:

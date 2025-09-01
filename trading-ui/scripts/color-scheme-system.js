@@ -577,6 +577,265 @@ function createInvestmentTypeLegend(options = {}) {
   });
 }
 
+// ========================================
+// 🎨 מערכת צבעים מאוחדת לערכים מספריים
+// ========================================
+
+/**
+ * צבעים ברירת מחדל לערכים מספריים
+ */
+const NUMERIC_VALUE_COLORS = {
+    positive: {
+        light: '#d4edda',      // רקע בהיר לערכים חיוביים
+        medium: '#28a745',     // טקסט לערכים חיוביים
+        dark: '#155724',       // טקסט כהה לערכים חיוביים
+        border: '#c3e6cb'      // גבול לערכים חיוביים
+    },
+    negative: {
+        light: '#f8d7da',      // רקע בהיר לערכים שליליים
+        medium: '#dc3545',     // טקסט לערכים שליליים
+        dark: '#721c24',       // טקסט כהה לערכים שליליים
+        border: '#f5c6cb'      // גבול לערכים שליליים
+    },
+    zero: {
+        light: '#e2e3e5',      // רקע לערך אפס
+        medium: '#6c757d',     // טקסט לערך אפס
+        dark: '#383d41',       // טקסט כהה לערך אפס
+        border: '#d6d8db'      // גבול לערך אפס
+    }
+};
+
+/**
+ * קבלת צבע לערך מספרי
+ * @param {number} value - הערך המספרי
+ * @param {string} colorType - סוג הצבע (light, medium, dark, border)
+ * @returns {string} קוד הצבע
+ */
+function getNumericValueColor(value, colorType = 'medium') {
+    if (value > 0) {
+        return NUMERIC_VALUE_COLORS.positive[colorType] || NUMERIC_VALUE_COLORS.positive.medium;
+    } else if (value < 0) {
+        return NUMERIC_VALUE_COLORS.negative[colorType] || NUMERIC_VALUE_COLORS.negative.medium;
+    } else {
+        return NUMERIC_VALUE_COLORS.zero[colorType] || NUMERIC_VALUE_COLORS.zero.medium;
+    }
+}
+
+/**
+ * קבלת צבע רקע לערך מספרי
+ * @param {number} value - הערך המספרי
+ * @returns {string} קוד הצבע
+ */
+function getNumericValueBackgroundColor(value) {
+    return getNumericValueColor(value, 'light');
+}
+
+/**
+ * קבלת צבע טקסט לערך מספרי
+ * @param {number} value - הערך המספרי
+ * @returns {string} קוד הצבע
+ */
+function getNumericValueTextColor(value) {
+    return getNumericValueColor(value, 'medium');
+}
+
+/**
+ * קבלת צבע גבול לערך מספרי
+ * @param {number} value - הערך המספרי
+ * @returns {string} קוד הצבע
+ */
+function getNumericValueBorderColor(value) {
+    return getNumericValueColor(value, 'border');
+}
+
+/**
+ * קבלת צבע כהה לערך מספרי
+ * @param {number} value - הערך המספרי
+ * @returns {string} קוד הצבע
+ */
+function getNumericValueDarkColor(value) {
+    return getNumericValueColor(value, 'dark');
+}
+
+/**
+ * בדיקה אם ערך הוא חיובי
+ * @param {number} value - הערך לבדיקה
+ * @returns {boolean} true אם חיובי
+ */
+function isPositiveValue(value) {
+    return value > 0;
+}
+
+/**
+ * בדיקה אם ערך הוא שלילי
+ * @param {number} value - הערך לבדיקה
+ * @returns {boolean} true אם שלילי
+ */
+function isNegativeValue(value) {
+    return value < 0;
+}
+
+/**
+ * בדיקה אם ערך הוא אפס
+ * @param {number} value - הערך לבדיקה
+ * @returns {boolean} true אם אפס
+ */
+function isZeroValue(value) {
+    return value === 0;
+}
+
+/**
+ * קבלת סוג הערך (positive, negative, zero)
+ * @param {number} value - הערך המספרי
+ * @returns {string} סוג הערך
+ */
+function getValueType(value) {
+    if (value > 0) return 'positive';
+    if (value < 0) return 'negative';
+    return 'zero';
+}
+
+/**
+ * קבלת CSS class לערך מספרי
+ * @param {number} value - הערך המספרי
+ * @returns {string} שם ה-CSS class
+ */
+function getNumericValueCSSClass(value) {
+    const type = getValueType(value);
+    return `numeric-value-${type}`;
+}
+
+/**
+ * יצירת CSS דינמי לערכים מספריים
+ * @returns {string} CSS דינמי
+ */
+function generateNumericValueCSS() {
+    const css = `
+        /* ערכים חיוביים */
+        .numeric-value-positive {
+            color: ${NUMERIC_VALUE_COLORS.positive.medium} !important;
+            background-color: ${NUMERIC_VALUE_COLORS.positive.light} !important;
+            border-color: ${NUMERIC_VALUE_COLORS.positive.border} !important;
+        }
+        
+        .numeric-value-positive.text-only {
+            color: ${NUMERIC_VALUE_COLORS.positive.medium} !important;
+        }
+        
+        .numeric-value-positive.background-only {
+            background-color: ${NUMERIC_VALUE_COLORS.positive.light} !important;
+        }
+        
+        .numeric-value-positive.border-only {
+            border-color: ${NUMERIC_VALUE_COLORS.positive.border} !important;
+        }
+        
+        /* ערכים שליליים */
+        .numeric-value-negative {
+            color: ${NUMERIC_VALUE_COLORS.negative.medium} !important;
+            background-color: ${NUMERIC_VALUE_COLORS.negative.light} !important;
+            border-color: ${NUMERIC_VALUE_COLORS.negative.border} !important;
+        }
+        
+        .numeric-value-negative.text-only {
+            color: ${NUMERIC_VALUE_COLORS.negative.medium} !important;
+        }
+        
+        .numeric-value-negative.background-only {
+            background-color: ${NUMERIC_VALUE_COLORS.negative.light} !important;
+        }
+        
+        .numeric-value-negative.border-only {
+            border-color: ${NUMERIC_VALUE_COLORS.negative.border} !important;
+        }
+        
+        /* ערך אפס */
+        .numeric-value-zero {
+            color: ${NUMERIC_VALUE_COLORS.zero.medium} !important;
+            background-color: ${NUMERIC_VALUE_COLORS.zero.light} !important;
+            border-color: ${NUMERIC_VALUE_COLORS.zero.border} !important;
+        }
+        
+        .numeric-value-zero.text-only {
+            color: ${NUMERIC_VALUE_COLORS.zero.medium} !important;
+        }
+        
+        .numeric-value-zero.background-only {
+            background-color: ${NUMERIC_VALUE_COLORS.zero.light} !important;
+        }
+        
+        .numeric-value-zero.border-only {
+            border-color: ${NUMERIC_VALUE_COLORS.zero.border} !important;
+        }
+    `;
+    
+    return css;
+}
+
+/**
+ * עדכון צבעים לערכים מספריים
+ * @param {Object} newColors - צבעים חדשים
+ */
+function updateNumericValueColors(newColors) {
+    // עדכון הצבעים הגלובליים
+    Object.assign(NUMERIC_VALUE_COLORS, newColors);
+    
+    // יצירת CSS חדש
+    const newCSS = generateNumericValueCSS();
+    
+    // עדכון או יצירת style element
+    let styleElement = document.getElementById('numeric-value-colors');
+    if (!styleElement) {
+        styleElement = document.createElement('style');
+        styleElement.id = 'numeric-value-colors';
+        document.head.appendChild(styleElement);
+    }
+    
+    styleElement.textContent = newCSS;
+}
+
+// ========================================
+// 📤 ייצוא פונקציות לערכים מספריים
+// ========================================
+
+// ייצוא לפונקציות ערכים מספריים
+window.getNumericValueColor = getNumericValueColor;
+window.getNumericValueBackgroundColor = getNumericValueBackgroundColor;
+window.getNumericValueTextColor = getNumericValueTextColor;
+window.getNumericValueBorderColor = getNumericValueBorderColor;
+window.getNumericValueDarkColor = getNumericValueDarkColor;
+window.isPositiveValue = isPositiveValue;
+window.isNegativeValue = isNegativeValue;
+window.isZeroValue = isZeroValue;
+window.getValueType = getValueType;
+window.getNumericValueCSSClass = getNumericValueCSSClass;
+window.generateNumericValueCSS = generateNumericValueCSS;
+window.updateNumericValueColors = updateNumericValueColors;
+
+// ייצוא לקבועים
+window.NUMERIC_VALUE_COLORS = NUMERIC_VALUE_COLORS;
+
+// ייצוא לאובייקט הגלובלי
+window.colorSchemeSystem = {
+    ...window.colorSchemeSystem,
+    // פונקציות ערכים מספריים
+    getNumericValueColor,
+    getNumericValueBackgroundColor,
+    getNumericValueTextColor,
+    getNumericValueBorderColor,
+    getNumericValueDarkColor,
+    isPositiveValue,
+    isNegativeValue,
+    isZeroValue,
+    getValueType,
+    getNumericValueCSSClass,
+    generateNumericValueCSS,
+    updateNumericValueColors,
+    
+    // קבועים
+    NUMERIC_VALUE_COLORS
+};
+
 // ===== EXPORTS =====
 // ייצוא הפונקציות
 
@@ -628,6 +887,20 @@ window.colorSchemeSystem = {
   getInvestmentTypeBorderColor,
   createInvestmentTypeLegend,
 
+  // Numeric value functions
+  getNumericValueColor,
+  getNumericValueBackgroundColor,
+  getNumericValueTextColor,
+  getNumericValueBorderColor,
+  getNumericValueDarkColor,
+  isPositiveValue,
+  isNegativeValue,
+  isZeroValue,
+  getValueType,
+  getNumericValueCSSClass,
+  generateNumericValueCSS,
+  updateNumericValueColors,
+
   // Constants
   VALID_ENTITY_TYPES,
   ENTITY_COLORS,
@@ -639,6 +912,8 @@ window.colorSchemeSystem = {
   INVESTMENT_TYPE_LABELS,
   INVESTMENT_TYPE_DESCRIPTIONS,
   INVESTMENT_TYPE_COLORS,
+
+  NUMERIC_VALUE_COLORS
 };
 
 console.log('🎨 Unified Color Scheme System loaded successfully!');

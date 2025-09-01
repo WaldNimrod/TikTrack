@@ -855,7 +855,119 @@ Monitoring Layer
 
 ---
 
-## 📋 Changelog v2.0.2
+## 🔔 Real-time Notifications System
+
+### סקירה כללית
+מערכת התראות בזמן אמת המבוססת על WebSockets (Flask-SocketIO) ומשתלבת עם מערכת ההודעות הקיימת בממשק המשתמש.
+
+### ארכיטקטורה
+```
+WebSocket Server (Flask-SocketIO) → Event Broadcasting → Frontend Clients
+                    ↓
+            Background Tasks Integration
+                    ↓
+            Database Change Monitoring
+                    ↓
+            User-specific Notifications
+```
+
+### תכונות עיקריות
+
+#### 1. WebSocket Server
+- **Flask-SocketIO** - שרת WebSocket מתקדם
+- **Event Broadcasting** - שידור אירועים לכל המשתמשים
+- **Room Management** - ניהול חדרים למשתמשים ספציפיים
+- **Connection Monitoring** - מעקב אחר חיבורים פעילים
+
+#### 2. Integration Points
+- **Background Tasks** - התראות על התחלה/סיום/שגיאות משימות
+- **Database Operations** - התראות על שינויים בנתונים
+- **System Events** - התראות על אירועי מערכת
+- **External Data Updates** - התראות על עדכוני נתונים חיצוניים
+
+#### 3. Frontend Integration
+- **Real-time Connection** - חיבור אוטומטי לשרת
+- **Event Listeners** - האזנה לאירועים בזמן אמת
+- **Existing Notification System** - שימוש במערכת ההודעות הקיימת
+- **Notification Queue** - ניהול התראות מרובות
+- **User Preferences** - הגדרות התראות אישיות
+
+### מערכת ההודעות הקיימת בממשק המשתמש
+
+#### פונקציות זמינות:
+- `showNotification(message, type, title, duration)` - הודעות בסיסיות
+- `showSuccessNotification(title, message, duration)` - הודעות הצלחה
+- `showErrorNotification(title, message, duration)` - הודעות שגיאה
+- `showWarningNotification(title, message, duration)` - הודעות אזהרה
+- `showInfoNotification(title, message, duration)` - הודעות מידע
+- `showValidationWarning(fieldId, message, duration)` - הודעות וולידציה
+- `showConfirmationDialog(title, message, actions)` - דיאלוגי אישור
+- `showDeleteWarning(itemType, itemName)` - אזהרות מחיקה
+
+#### סוגי הודעות:
+- **success** - הצלחה (ירוק עם ✅)
+- **error** - שגיאה (אדום עם ❌)
+- **warning** - אזהרה (צהוב עם ⚠️)
+- **info** - מידע (כחול עם ℹ️)
+
+### אירועי WebSocket
+
+#### 1. System Events
+```javascript
+// התראות על משימות ברקע
+socket.on('background_task_started', (data) => {
+  showInfoNotification('משימה ברקע', `התחילה: ${data.task_name}`);
+});
+
+socket.on('background_task_completed', (data) => {
+  showSuccessNotification('משימה הושלמה', `${data.task_name} הושלמה בהצלחה`);
+});
+
+socket.on('background_task_failed', (data) => {
+  showErrorNotification('שגיאה במשימה', `${data.task_name} נכשלה: ${data.error}`);
+});
+```
+
+#### 2. Database Events
+```javascript
+// התראות על שינויים בנתונים
+socket.on('data_updated', (data) => {
+  showInfoNotification('נתונים עודכנו', `${data.table} עודכן בהצלחה`);
+});
+
+socket.on('data_error', (data) => {
+  showErrorNotification('שגיאת נתונים', `שגיאה ב-${data.table}: ${data.error}`);
+});
+```
+
+#### 3. External Data Events
+```javascript
+// התראות על עדכוני נתונים חיצוניים
+socket.on('external_data_update', (data) => {
+  showSuccessNotification('נתונים חיצוניים', `${data.provider} עודכן: ${data.ticker_count} טיקרים`);
+});
+
+socket.on('external_data_error', (data) => {
+  showErrorNotification('שגיאת נתונים חיצוניים', `${data.provider}: ${data.error}`);
+});
+```
+
+### תצורת משתמש
+- **התראות בזמן אמת** - הפעלה/כיבוי
+- **סוגי התראות** - בחירת סוגי התראות לקבל
+- **זמן הצגה** - משך זמן הצגת הודעות
+- **צלילים** - הפעלת צלילי התראה
+- **דחיסה** - דחיסת התראות דומות
+
+### אבטחה
+- **Authentication** - אימות משתמשים לחיבורי WebSocket
+- **Rate Limiting** - הגבלת קצב שליחת התראות
+- **Event Validation** - אימות אירועים לפני עיבוד
+- **Connection Encryption** - הצפנת חיבורי WebSocket
+
+---
+
+## 📝 Changelog v2.0.2
 
 ### 🎉 MILESTONE ACHIEVED: Server Performance & Security Complete!
 

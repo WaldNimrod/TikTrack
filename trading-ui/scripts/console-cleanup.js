@@ -6,7 +6,6 @@
 // פונקציה לניקוי console
 function clearConsole() {
   if (typeof console !== 'undefined') {
-    console.log('🚨 clearConsole נקראה - מי קורא לה?', new Error().stack);
     console.clear();
   }
 }
@@ -46,9 +45,7 @@ function enableConsoleMessages() {
 
 // פונקציה לניקוי אוטומטי לפי הגדרות
 function autoClearConsole() {
-  console.log('🔍 autoClearConsole נקראה - מי קורא לה?', new Error().stack);
   const settings = getConsoleSettings();
-  console.log('🔍 הגדרות שנמצאו:', settings);
   if (settings.autoClear && settings.clearInterval > 0) {
     // עצור טיימר קיים אם יש
     if (window.consoleClearTimer) {

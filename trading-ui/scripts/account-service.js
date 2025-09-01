@@ -84,29 +84,23 @@ async function getAccountsByStatus(status) {
  * @returns {Promise<boolean>} האם הביטול הצליח
  */
 async function cancelAccount(accountId) {
-  try {
-    // ביטול חשבון
+  // ביטול חשבון
 
-    const response = await fetch(`/api/v1/accounts/${accountId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'cancelled' }),
-    });
+  const response = await fetch(`/api/v1/accounts/${accountId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: 'cancelled' }),
+  });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'שגיאה בביטול החשבון');
-    }
-
-    // ניקוי ה-cache
-    clearCache();
-
-    return true;
-
-  } catch (error) {
-    // שגיאה בביטול חשבון
-    throw error;
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error?.message || 'שגיאה בביטול החשבון');
   }
+
+  // ניקוי ה-cache
+  clearCache();
+
+  return true;
 }
 
 /**
@@ -115,29 +109,23 @@ async function cancelAccount(accountId) {
  * @returns {Promise<boolean>} האם ההפעלה מחדש הצליחה
  */
 async function reactivateAccount(accountId) {
-  try {
-    // הפעלה מחדש של חשבון
+  // הפעלה מחדש של חשבון
 
-    const response = await fetch(`/api/v1/accounts/${accountId}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'open' }),
-    });
+  const response = await fetch(`/api/v1/accounts/${accountId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: 'open' }),
+  });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error?.message || 'שגיאה בהפעלה מחדש של החשבון');
-    }
-
-    // ניקוי ה-cache
-    clearCache();
-
-    return true;
-
-  } catch (error) {
-    // שגיאה בהפעלה מחדש של חשבון
-    throw error;
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error?.message || 'שגיאה בהפעלה מחדש של החשבון');
   }
+
+  // ניקוי ה-cache
+  clearCache();
+
+  return true;
 }
 
 /**

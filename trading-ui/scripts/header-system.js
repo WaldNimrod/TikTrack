@@ -628,18 +628,7 @@ class HeaderSystem {
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">מיפוי סקריפטים</a></li>
-                        <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">נתונים חיצוניים</a>
-                          <ul class="submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/external-data-test">בדיקת מידע חיצוני</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/models-test">בדיקת מודלים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/system-stats-test">בדיקת סטטיסטיקות</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="tiktrack-dropdown-item" href="/api-test">בדיקת API</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/performance-test">בדיקת ביצועים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/integration-test">בדיקת אינטגרציה</a></li>
-                          </ul>
-                        </li>
+                        <li><a class="tiktrack-dropdown-item" href="/system-test-center">נתונים חיצוניים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/style_demonstration">הדגמת סגנונות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/designs">עיצובים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">מטריקס פונקציות</a></li>

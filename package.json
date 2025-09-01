@@ -1,0 +1,36 @@
+{
+  "name": "tiktrackapp",
+  "version": "1.0.0",
+  "description": "> 📋 **משימות מרכזיות**: [CENTRAL_TASKS_TODO.md](CENTRAL_TASKS_TODO.md)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint trading-ui/scripts/*.js",
+    "lint:fix": "eslint trading-ui/scripts/*.js --fix",
+    "format": "prettier --write trading-ui/scripts/*.js trading-ui/styles/*.css",
+    "format:check": "prettier --check trading-ui/scripts/*.js trading-ui/styles/*.css",
+    "html:check": "htmlhint trading-ui/*.html",
+    "css:check": "stylelint \"trading-ui/styles/*.css\"",
+    "check:all": "npm run lint && npm run format:check && npm run html:check && npm run css:check",
+    "fix:all": "npm run lint:fix && npm run format"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WaldNimrod/TikTrack.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/WaldNimrod/TikTrack/issues"
+  },
+  "homepage": "https://github.com/WaldNimrod/TikTrack#readme",
+  "devDependencies": {
+    "eslint": "^9.34.0",
+    "htmlhint": "^1.6.3",
+    "prettier": "^3.6.2",
+    "stylelint": "^16.23.1",
+    "stylelint-config-standard": "^39.0.0"
+  }
+}

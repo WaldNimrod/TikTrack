@@ -98,10 +98,10 @@ def js_map() -> Any:
     """JS Map page"""
     return send_from_directory(UI_DIR, "js-map.html")
 
-@pages_bp.route('/cache-test')
-def cache_test() -> Any:
-    """Cache test page"""
-    return send_from_directory(UI_DIR, "cache-test.html")
+@pages_bp.route('/system-test-center')
+def system_test_center() -> Any:
+    """Unified system test center page"""
+    return send_from_directory(UI_DIR, "system-test-center.html")
 
 @pages_bp.route('/page-scripts-matrix')
 def page_scripts_matrix() -> Any:
@@ -117,35 +117,7 @@ def test_header_only() -> Any:
     """Test header only page"""
     return send_from_directory(UI_DIR, "test-header-only.html")
 
-@pages_bp.route('/external-data-test')
-def external_data_test() -> Any:
-    """External data integration test page"""
-    return send_from_directory(UI_DIR / "external_data_integration_client/pages", "test_external_data.html")
-
-@pages_bp.route('/models-test')
-def models_test() -> Any:
-    """Models test page"""
-    return send_from_directory(UI_DIR / "external_data_integration_client/pages", "test_models.html")
-
-@pages_bp.route('/system-stats-test')
-def system_stats_test() -> Any:
-    """System statistics test page"""
-    return send_from_directory(UI_DIR / "external_data_integration_client/pages", "test_system_stats.html")
-
-@pages_bp.route('/api-test')
-def api_test() -> Any:
-    """API test page"""
-    return send_from_directory(UI_DIR / "external_data_integration_client/pages", "test_api.html")
-
-@pages_bp.route('/performance-test')
-def performance_test() -> Any:
-    """Performance test page"""
-    return send_from_directory(UI_DIR / "external_data_integration_client/pages", "test_performance.html")
-
-@pages_bp.route('/integration-test')
-def integration_test() -> Any:
-    """Integration test page"""
-    return send_from_directory(UI_DIR / "external_data_integration_client/pages", "test_integration.html")
+# Old external data test routes removed - now using /system-test-center
 
 @pages_bp.route('/<path:filename>')
 def static_files(filename: str) -> Any:

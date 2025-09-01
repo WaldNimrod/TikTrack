@@ -608,7 +608,7 @@ async function checkLinkedItemsBeforeCancel(tradePlanId) {
       // יש פריטים מקושרים - הצגת חלון מקושרים
       if (typeof window.showLinkedItemsModal === 'function') {
         // הצגת המודל וחכייה לתשובה מהמשתמש
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
           // שמירת ה-callback לביטול
           window._linkedItemsWarningCallbacks = {
             onConfirm: async () => {
@@ -617,9 +617,9 @@ async function checkLinkedItemsBeforeCancel(tradePlanId) {
             },
             onCancel: () => {
               resolve();
-            }
+            },
           };
-          
+
           // הצגת המודל ב-warningBlock mode עם כל המידע הדרוש
           window.showLinkedItemsModal(linkedItemsData, 'trade_plan', tradePlanId, 'warningBlock');
         });

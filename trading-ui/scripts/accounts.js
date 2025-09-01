@@ -637,7 +637,7 @@ function createAccountModal(mode, account = null) {
   modal.innerHTML = `
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-header modal-header-colored">
+        <div class="modal-header linkedItems_modal-header-colored">
           <h5 class="modal-title" id="accountModalLabel">${title}</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -1553,42 +1553,7 @@ function showErrorMessage(message) {
   }
 }
 
-// פונקציות עזר חסרות
-function showSecondConfirmationModal(message, onConfirm) {
-  if (window.showConfirmationDialog) {
-    window.showConfirmationDialog('אישור', message, onConfirm, () => {});
-  } else {
-    // גיבוי למערכת הישנה
-    if (typeof window.showSecondConfirmationModal === 'function') {
-      window.showSecondConfirmationModal(
-        'אישור פעולה',
-        message,
-        onConfirm,
-        () => {},
-      );
-    } else {
-      if (typeof window.showConfirmationDialog === 'function') {
-        window.showConfirmationDialog(
-          'אישור',
-          message,
-          onConfirm,
-        );
-      } else {
-        if (typeof window.showConfirmationDialog === 'function') {
-          window.showConfirmationDialog(
-            'אישור',
-            message,
-            onConfirm,
-          );
-        } else {
-          if (confirm(message)) {
-            onConfirm();
-          }
-        }
-      }
-    }
-  }
-}
+// פונקציות עזר - הועברו ל-ui-utils.js
 
 function confirmDeleteAccount(accountId, accountName) {
   deleteAccount(accountId, accountName);
@@ -1607,13 +1572,7 @@ function showOpenTradesWarning(accountId, accountName) {
   }
 }
 
-function createWarningModal(message) {
-  if (typeof window.showWarningNotification === 'function') {
-    window.showWarningNotification('אזהרה', message);
-  } else {
-    console.warn('אזהרה:', message);
-  }
-}
+// createWarningModal הועברה ל-ui-utils.js
 
 // ייצוא הפונקציות הנוספות
 window.showAddAccountModal = showAddAccountModal;
@@ -1791,7 +1750,7 @@ function setupSortableHeaders() {
 
 }
 
-// פונקציה לפילטור מקומי של חשבונות
+// פונקציה לפילטור מקומי של חשבונות - ספציפית לחשבונות
 function filterAccountsLocally(accounts, selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
   let filteredAccounts = [...accounts];
 

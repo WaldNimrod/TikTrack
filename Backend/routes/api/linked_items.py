@@ -54,6 +54,83 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+@linked_items_bp.route('/types', methods=['GET'])
+def get_entity_types():
+    """Get all available entity types and their mappings"""
+    try:
+        entity_types = {
+            'account': {
+                'id': 1,
+                'name': 'Account',
+                'description': 'Trading accounts',
+                'can_have_children': True,
+                'can_have_parents': False
+            },
+            'trade': {
+                'id': 2,
+                'name': 'Trade',
+                'description': 'Individual trades',
+                'can_have_children': True,
+                'can_have_parents': True
+            },
+            'trade_plan': {
+                'id': 3,
+                'name': 'Trade Plan',
+                'description': 'Trading strategies and plans',
+                'can_have_children': True,
+                'can_have_parents': False
+            },
+            'ticker': {
+                'id': 4,
+                'name': 'Ticker',
+                'description': 'Stock symbols and instruments',
+                'can_have_children': True,
+                'can_have_parents': False
+            },
+            'alert': {
+                'id': 5,
+                'name': 'Alert',
+                'description': 'Trading alerts and notifications',
+                'can_have_children': True,
+                'can_have_parents': True
+            },
+            'cash_flow': {
+                'id': 6,
+                'name': 'Cash Flow',
+                'description': 'Money movements and transactions',
+                'can_have_children': True,
+                'can_have_parents': True
+            },
+            'execution': {
+                'id': 7,
+                'name': 'Execution',
+                'description': 'Trade executions and fills',
+                'can_have_children': True,
+                'can_have_parents': True
+            },
+            'note': {
+                'id': 8,
+                'name': 'Note',
+                'description': 'General notes and comments',
+                'can_have_children': True,
+                'can_have_parents': True
+            }
+        }
+        
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'entity_types': entity_types,
+                'total_types': len(entity_types),
+                'timestamp': '2025-09-01T23:18:00.000000'
+            }
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting entity types: {str(e)}")
+        return jsonify({'error': f'Failed to get entity types: {str(e)}'}), 500
+
+
 @linked_items_bp.route('/<entity_type>/<int:entity_id>', methods=['GET'])
 def get_linked_items(entity_type: str, entity_id: int) -> Dict[str, Any]:
     """

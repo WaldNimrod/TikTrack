@@ -1194,11 +1194,39 @@ window.filterDataByFilters = filterDataByFilters;
 // window.restoreAllSectionStates = restoreAllSectionStates;
 // window.restoreDesignsSectionState = restoreDesignsSectionState;
 
+// ===== DEVELOPMENT SHORTCUTS =====
+/**
+ * Add keyboard shortcuts for development
+ */
+function initializeDevelopmentShortcuts() {
+  // קיצור מקלדת לניקוי Cache: Ctrl+Shift+C (או Cmd+Shift+C במק)
+  document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+      e.preventDefault();
+      console.log('🔧 קיצור מקלדת: ניקוי Cache');
+      if (window.clearDevelopmentCache) {
+        // יצירת event מזויף עבור הפונקציה
+        const fakeEvent = { 
+          target: { 
+            innerHTML: '<i class="fas fa-trash"></i> נקה Cache', 
+            disabled: false 
+          } 
+        };
+        window.clearDevelopmentCache.call(fakeEvent);
+      }
+    }
+  });
+}
+
 // ===== AUTO-INITIALIZATION =====
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeApplication);
+  document.addEventListener('DOMContentLoaded', function() {
+    initializeApplication();
+    initializeDevelopmentShortcuts();
+  });
 } else {
   initializeApplication();
+  initializeDevelopmentShortcuts();
 }
 
 // ===== SORT ICONS FUNCTIONS =====

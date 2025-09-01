@@ -172,9 +172,24 @@ start_server() {
         return 1
     fi
     
-    # Start server in background
+    # Start server in background with environment variables
     cd Backend
+    
+    # Pass development environment variables
+    if [ "$TIKTRACK_DEV_MODE" = "true" ]; then
+        log_info "Starting server in development mode"
+        if [ "$TIKTRACK_CACHE_DISABLED" = "true" ]; then
+            log_info "Cache is disabled for development"
+        else
+            log_info "Cache TTL reduced to 10 seconds for development"
+        fi
+    fi
+    
+    # Start server with environment variables
+    TIKTRACK_DEV_MODE="$TIKTRACK_DEV_MODE" \
+    TIKTRACK_CACHE_DISABLED="$TIKTRACK_CACHE_DISABLED" \
     python3 dev_server.py &
+    
     local server_pid=$!
     cd ..
     

@@ -633,6 +633,10 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/designs">עיצובים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">מטריקס פונקציות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/js-map">מפת JS</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="tiktrack-dropdown-item" href="#" onclick="clearDevelopmentCache()" style="color: #ff6b6b;">
+                          <i class="fas fa-trash"></i> נקה Cache (פיתוח)
+                        </a></li>
                       </ul>
                     </li>
                   </ul>
@@ -3832,51 +3836,7 @@ function applySearchFilter(searchTerm) {
 
 // הפונקציה הוסרה - קיימת כבר בשורה 3775
 
-/**
- * הפעלת פילטר חשבון
- */
-function applyAccountFilter() {
-  // applyAccountFilter called
-
-  // איסוף כל החשבונות הנבחרים
-  const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
-  const selectedAccounts = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
-
-  // Selected accounts check
-
-  // הפעלת הפילטר הכללי
-  applyFilter('account', selectedAccounts);
-
-  if (window.filterSystem) {
-  window.filterSystem.applyAccountFilter(selectedAccounts);
-  }
-  
-  // קריאה לפונקציות הפילטר שלנו אם אנחנו בדף חשבונות
-  if (window.filterAccountsByAccount) {
-    // Calling filterAccountsByAccount for accounts page
-    window.filterAccountsByAccount(selectedAccounts);
-  }
-  
-  // קריאה לפונקציות הפילטר שלנו אם אנחנו בדף ביצועים
-  if (window.filterExecutionsByAccount) {
-    // Calling filterExecutionsByAccount for executions page
-    window.filterExecutionsByAccount(selectedAccounts);
-  }
-}
-
-/**
- * הפעלת פילטר תאריכים
- */
-function applyDateRangeFilter(dateRange) {
-  // applyDateRangeFilter called with
-
-  // הפעלת הפילטר הכללי
-  applyTableFilter('date', [dateRange]);
-
-  if (window.filterSystem) {
-  window.filterSystem.applyDateRangeFilter(dateRange);
-  }
-}
+// פונקציה applyDateRangeFilter כבר מוגדרת בשורה 3797
 
 // ייצוא פונקציות בחירה לגלובל
 window.selectStatusOption = selectStatusOption;
@@ -4647,5 +4607,52 @@ window.updateAccountFilterDisplayText = updateAccountFilterDisplayText;
 
 // ייצוא הפונקציה החדשה
 window.applyFilter = applyFilter;
+
+// ===== פונקציות פיתוח =====
+
+/**
+ * ניקוי Cache מהיר לפיתוח
+ */
+async function clearDevelopmentCache() {
+    try {
+        console.log('🔄 מנקה Cache...');
+        
+        // הצגת הודעת טעינה
+        const originalText = event.target.innerHTML;
+        event.target.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מנקה...';
+        event.target.disabled = true;
+        
+        const response = await fetch('/api/v1/cache/clear', {
+            method: 'POST'
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Cache נוקה בהצלחה:', result);
+            
+            // הצגת הודעת הצלחה
+            if (window.showNotification) {
+                window.showNotification('Cache נוקה בהצלחה', 'success');
+            } else {
+                alert('Cache נוקה בהצלחה!');
+            }
+        } else {
+            console.error('❌ שגיאה בניקוי Cache:', response.status);
+            alert('שגיאה בניקוי Cache');
+        }
+    } catch (error) {
+        console.error('❌ שגיאה בניקוי Cache:', error);
+        alert('שגיאה בניקוי Cache');
+    } finally {
+        // החזרת הכפתור למצב רגיל
+        if (event.target) {
+            event.target.innerHTML = '<i class="fas fa-trash"></i> נקה Cache';
+            event.target.disabled = false;
+        }
+    }
+}
+
+// ייצוא פונקציות פיתוח
+window.clearDevelopmentCache = clearDevelopmentCache;
 
 // Header System JS loaded completely

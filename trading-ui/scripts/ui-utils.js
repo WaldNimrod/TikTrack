@@ -534,51 +534,7 @@ window.uiUtils = {
  * @param {string|number} itemId - ID of the item
  * @param {Function} onConfirm - Callback function when user confirms deletion
  */
-function showLinkedItemsWarningModal(data, itemType, itemId, onConfirm) {
 
-  // Create modal content
-  const modalContent = createLinkedItemsWarningContent(data, itemType, itemId, onConfirm);
-
-  // Create and show modal
-  const modalId = 'linkedItemsWarningModal';
-  const modalTitle = `⚠️ אזהרה: לא ניתן למחוק ${getItemTypeDisplayName(itemType)} #${itemId}`;
-
-  // Remove existing modal if it exists
-  const existingModal = document.getElementById(modalId);
-  if (existingModal) {
-    existingModal.remove();
-  }
-
-  // Create new modal with linked-items-modal class
-  const modalHtml = `
-    <div class="modal fade linked-items-modal" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header modal-header-colored">
-            <h5 class="modal-title" id="${modalId}Label">${modalTitle}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            ${modalContent}
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
-            <button type="button" class="btn btn-danger" onclick="forceDeleteWithLinkedItems('${itemType}', ${itemId}, ${onConfirm})">
-              מחק בכל זאת
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Add modal to page
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-  // Show the modal
-  const modal = new bootstrap.Modal(document.getElementById(modalId));
-  modal.show();
-}
 
 /**
  * Create linked items warning modal content
@@ -592,92 +548,7 @@ function showLinkedItemsWarningModal(data, itemType, itemId, onConfirm) {
  * @param {Function} onConfirm - Callback function when user confirms deletion
  * @returns {string} HTML content for the modal
  */
-function createLinkedItemsWarningContent(data, itemType, itemId, onConfirm) {
 
-  // יצירת כותרת מותאמת לפי סוג האלמנט
-  let headerTitle = '';
-  let itemName = '';
-
-  switch (itemType) {
-  case 'account':
-    headerTitle = 'לא ניתן למחוק חשבון:';
-    itemName = data.accountName || `חשבון ${itemId}`;
-    break;
-  case 'trade':
-    headerTitle = 'לא ניתן למחוק טרייד:';
-    itemName = data.tradeSymbol || `טרייד ${itemId}`;
-    break;
-  case 'ticker':
-    headerTitle = 'לא ניתן למחוק טיקר:';
-    itemName = data.tickerSymbol || `טיקר ${itemId}`;
-    break;
-  case 'alert':
-    headerTitle = 'לא ניתן למחוק התראה:';
-    itemName = data.alertName || `התראה ${itemId}`;
-    break;
-  case 'cash_flow':
-    headerTitle = 'לא ניתן למחוק תזרים מזומנים:';
-    itemName = data.cashFlowName || `תזרים ${itemId}`;
-    break;
-  case 'note':
-    headerTitle = 'לא ניתן למחוק הערה:';
-    itemName = data.noteTitle || `הערה ${itemId}`;
-    break;
-  case 'trade_plan':
-    headerTitle = 'לא ניתן למחוק תוכנית טרייד:';
-    itemName = data.planName || `תוכנית ${itemId}`;
-    break;
-  case 'execution':
-    headerTitle = 'לא ניתן למחוק ביצוע:';
-    itemName = data.executionName || `ביצוע ${itemId}`;
-    break;
-  default:
-    headerTitle = 'לא ניתן למחוק רשומה:';
-    itemName = `רשומה ${itemId}`;
-  }
-
-  let content = `
-    <div class="linked-items-container">
-      <div class="alert alert-warning">
-        <strong>⚠️ ${headerTitle} <span class="text-danger">${itemName}</span></strong>
-        <br>
-        ${getItemTypeDisplayName(itemType)} זה מקושר לפריטים הבאים במערכת. יש לטפל בהם תחילה:
-      </div>
-
-      <div class="linked-items-section">
-        <h6>📋 פריטים מקושרים (${data && data.linkedItems ? data.linkedItems.length : 0})</h6>
-        <div class="linked-items-list">
-  `;
-
-  // Add linked items list
-  if (data && data.linkedItems && data.linkedItems.length > 0) {
-    content += createLinkedItemsWarningList(data.linkedItems);
-  } else {
-    content += `
-          <div class="no-linked-items">
-            <strong>ℹ️ לא נמצאו אובייקטים מקושרים</strong><br>
-            למרות זאת, לא ניתן למחוק ${getItemTypeDisplayName(itemType)} זה.
-          </div>
-        `;
-  }
-
-  content += `
-        </div>
-      </div>
-
-      <div class="alert alert-info">
-        <strong>💡 מה ניתן לעשות:</strong>
-        <ul class="mb-0">
-          <li>בטל את הקישור לפריטים המקושרים</li>
-          <li>מחק את הפריטים המקושרים תחילה</li>
-          <li>או בחר "מחק בכל זאת" (זהירות!)</li>
-        </ul>
-      </div>
-    </div>
-  `;
-
-  return content;
-}
 
 /**
  * Create linked items warning list
@@ -687,109 +558,11 @@ function createLinkedItemsWarningContent(data, itemType, itemId, onConfirm) {
  * @param {Array} linkedItems - Array of linked items
  * @returns {string} HTML content for the linked items list
  */
-function createLinkedItemsWarningList(linkedItems) {
-  if (!linkedItems || linkedItems.length === 0) {
-    return '<div class="alert alert-info">אין אובייקטים מקושרים</div>';
-  }
 
-  let content = '';
-  linkedItems.forEach(item => {
-    content += `
-        <div class="linked-item-card">
-          <div class="linked-item-header">
-            <span class="linked-item-type">${getItemTypeIcon(item.type)} ${getItemTypeDisplayName(item.type)}</span>
-            <span class="linked-item-id">#${item.id}</span>
-          </div>
-          <div class="linked-item-content">
-            <div class="linked-item-title">${item.title || item.name || `#${item.id}`}</div>
-            <div class="linked-item-details">
-              ${createBasicItemInfo(item)}
-            </div>
-          </div>
-          <div class="linked-item-actions">
-            <button class="btn btn-outline-primary" onclick="viewItemDetails('${item.type}', ${item.id})">
-              <i class="fas fa-eye"></i> צפייה
-            </button>
-            <button class="btn btn-outline-warning" onclick="unlinkItem('${item.type}', ${item.id})">
-              <i class="fas fa-unlink"></i> נתק
-            </button>
-            <button class="btn btn-outline-info" onclick="openItemPage('${item.type}', ${item.id})">
-              <i class="fas fa-cog"></i> עבור לניהול פרטים
-            </button>
-          </div>
-        </div>
-      `;
-  });
-  return content;
-}
 
-/**
- * Force delete with linked items
- *
- * Handles the force deletion when user clicks "מחק בכל זאת"
- *
- * @param {string} itemType - Type of the item
- * @param {string|number} itemId - ID of the item
- * @param {Function} onConfirm - Callback function when user confirms deletion
- */
-function forceDeleteWithLinkedItems(itemType, itemId, onConfirm) {
-  // Close the warning modal
-  const modal = bootstrap.Modal.getInstance(document.getElementById('linkedItemsWarningModal'));
-  if (modal) {
-    modal.hide();
-  }
 
-  // Show final confirmation
-  if (typeof window.showConfirmationDialog === 'function') {
-    window.showConfirmationDialog(
-      'מחיקה עם פריטים מקושרים',
-      `האם אתה בטוח שברצונך למחוק ${getItemTypeDisplayName(itemType)} #${itemId} יחד עם כל האובייקטים המקושרים אליו?`,
-      () => {
-        if (onConfirm && typeof onConfirm === 'function') {
-          onConfirm();
-        }
-      },
-    );
-  } else {
-    if (typeof window.showConfirmationDialog === 'function') {
-      window.showConfirmationDialog(
-        'מחיקה עם פריטים מקושרים',
-        `האם אתה בטוח שברצונך למחוק ${getItemTypeDisplayName(itemType)} #${itemId} יחד עם כל האובייקטים המקושרים אליו?`,
-        () => {
-          if (onConfirm && typeof onConfirm === 'function') {
-            onConfirm();
-          }
-        },
-      );
-    } else {
-      if (confirm(`האם אתה בטוח שברצונך למחוק ${getItemTypeDisplayName(itemType)} #${itemId} יחד עם כל האובייקטים המקושרים אליו?`)) {
-        if (onConfirm && typeof onConfirm === 'function') {
-          onConfirm();
-        }
-      }
-    }
-  }
-}
 
-/**
- * Get item type icon
- *
- * @param {string} itemType - Type of the item
- * @returns {string} Icon HTML
- */
-function getItemTypeIcon(itemType) {
-  const icons = {
-    'account': '<img src="/images/icons/accounts.svg" alt="חשבון" style="width: 16px; height: 16px; vertical-align: middle;">',
-    'trade': '<img src="/images/icons/trades.svg" alt="טרייד" style="width: 16px; height: 16px; vertical-align: middle;">',
-    'ticker': '<img src="/images/icons/tickers.svg" alt="טיקר" style="width: 16px; height: 16px; vertical-align: middle;">',
-    'alert': '<img src="/images/icons/alerts.svg" alt="התראה" style="width: 16px; height: 16px; vertical-align: middle;">',
-    'cash_flow': '<img src="/images/icons/cash_flows.svg" alt="תזרים מזומנים" style="width: 16px; height: 16px; vertical-align: middle;">',
-    'note': '<img src="/images/icons/notes.svg" alt="הערה" style="width: 16px; height: 16px; vertical-align: middle;">',
-    'trade_plan': '<img src="/images/icons/trade_plans.svg" alt="תכנון טרייד" style="width: 16px; height: 16px; vertical-align: middle;">',
-    'execution': '<img src="/images/icons/executions.svg" alt="ביצוע" style="width: 16px; height: 16px; vertical-align: middle;">',
-  };
-  return icons[itemType] || '<img src="/images/icons/home.svg" alt="דף הבית" style="width: 16px; height: 16px; vertical-align: middle;">';
-}
+
 
 
 /**
@@ -951,45 +724,9 @@ async function performItemCancellation(itemType, itemId, itemName) {
  * @param {string} itemType - Type of the item
  * @returns {string} Display name
  */
-function getItemTypeDisplayName(itemType) {
-  const names = {
-    'account': 'חשבון',
-    'trade': 'טרייד',
-    'ticker': 'טיקר',
-    'alert': 'התראה',
-    'cash_flow': 'תזרים מזומנים',
-    'note': 'הערה',
-    'trade_plan': 'תוכנית טרייד',
-    'execution': 'ביצוע',
-  };
-  return names[itemType] || 'אובייקט';
-}
 
-/**
- * Create basic item info
- *
- * @param {Object} item - Item data
- * @returns {string} HTML content
- */
-function createBasicItemInfo(item) {
-  let info = '';
 
-  if (item.status) {
-    const statusClass = item.status === 'open' ? 'text-success' :
-      item.status === 'closed' ? 'text-warning' : 'text-danger';
-    info += `<div class="item-status ${statusClass}">סטטוס: ${item.status}</div>`;
-  }
 
-  if (item.created_at) {
-    info += `<div class="item-date">נוצר: ${item.created_at}</div>`;
-  }
-
-  if (item.notes) {
-    info += `<div class="item-notes">הערות: ${item.notes.substring(0, 50)}${item.notes.length > 50 ? '...' : ''}</div>`;
-  }
-
-  return info || '<div class="item-no-info">אין מידע נוסף</div>';
-}
 
 // אתחול UI Utils
 function initializeUIUtils() {
@@ -1003,17 +740,8 @@ window.uiUtils = {
   showInfoNotification,
   createToastContainer,
   showNotification,
-  showLinkedItemsWarningModal,
-  createLinkedItemsWarningContent,
-  createLinkedItemsWarningList,
-  forceDeleteWithLinkedItems,
-  showLinkedItemsBlockingModal,
-  createLinkedItemsBlockingContent,
-  createLinkedItemsDetailedList,
-  createDetailedItemInfo,
-  getItemTypeIcon,
-  getItemTypeDisplayName,
-  createBasicItemInfo,
+
+
   cancelItem,
   performItemCancellation,
   createCancelButton,
@@ -1609,17 +1337,11 @@ function showValidationWarningLegacy(field, message) {
 }
 
 // Export individual functions to global scope
-window.showLinkedItemsWarningModal = showLinkedItemsWarningModal;
-window.createLinkedItemsWarningContent = createLinkedItemsWarningContent;
-window.createLinkedItemsWarningList = createLinkedItemsWarningList;
-window.forceDeleteWithLinkedItems = forceDeleteWithLinkedItems;
-window.showLinkedItemsBlockingModal = showLinkedItemsBlockingModal;
-window.createLinkedItemsBlockingContent = createLinkedItemsBlockingContent;
-window.createLinkedItemsDetailedList = createLinkedItemsDetailedList;
-window.createDetailedItemInfo = createDetailedItemInfo;
-window.getItemTypeIcon = getItemTypeIcon;
-window.getItemTypeDisplayName = getItemTypeDisplayName;
-window.createBasicItemInfo = createBasicItemInfo;
+
+
+
+
+
 
 // Export warning system functions
 window.showWarning = showWarning;
@@ -1648,49 +1370,7 @@ window.handleWarningAction = handleWarningAction;
  * @param {string|number} itemId - ID of the item
  * @param {string} actionType - Type of action being blocked ('delete' or 'cancel')
  */
-function showLinkedItemsBlockingModal(data, itemType, itemId, actionType = 'delete') {
 
-  // Create modal content
-  const modalContent = createLinkedItemsBlockingContent(data, itemType, itemId, actionType);
-
-  // Create and show modal
-  const modalId = 'linkedItemsBlockingModal';
-  const actionText = actionType === 'cancel' ? 'ביטול' : 'מחיקה';
-  const modalTitle = `⚠️ לא ניתן לבצע ${actionText}: ${getItemTypeDisplayName(itemType)} #${itemId}`;
-
-  // Remove existing modal if it exists
-  const existingModal = document.getElementById(modalId);
-  if (existingModal) {
-    existingModal.remove();
-  }
-
-  // Create new modal with linked-items-modal class
-  const modalHtml = `
-    <div class="modal fade linked-items-modal" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-          <div class="modal-header modal-header-colored">
-            <h5 class="modal-title" id="${modalId}Label">${modalTitle}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            ${modalContent}
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Add modal to page
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-  // Show the modal
-  const modal = new bootstrap.Modal(document.getElementById(modalId));
-  modal.show();
-}
 
 /**
  * Create linked items blocking modal content
@@ -1704,93 +1384,7 @@ function showLinkedItemsBlockingModal(data, itemType, itemId, actionType = 'dele
  * @param {string} actionType - Type of action being blocked
  * @returns {string} HTML content for the modal
  */
-function createLinkedItemsBlockingContent(data, itemType, itemId, actionType) {
 
-  // יצירת כותרת מותאמת לפי סוג האלמנט והפעולה
-  let headerTitle = '';
-  let itemName = '';
-  const actionText = actionType === 'cancel' ? 'ביטול' : 'מחיקה';
-
-  switch (itemType) {
-  case 'account':
-    headerTitle = `לא ניתן לבצע ${actionText} חשבון:`;
-    itemName = data.accountName || `חשבון ${itemId}`;
-    break;
-  case 'trade':
-    headerTitle = `לא ניתן לבצע ${actionText} טרייד:`;
-    itemName = data.tradeSymbol || `טרייד ${itemId}`;
-    break;
-  case 'ticker':
-    headerTitle = `לא ניתן לבצע ${actionText} טיקר:`;
-    itemName = data.tickerSymbol || `טיקר ${itemId}`;
-    break;
-  case 'alert':
-    headerTitle = `לא ניתן לבצע ${actionText} התראה:`;
-    itemName = data.alertName || `התראה ${itemId}`;
-    break;
-  case 'cash_flow':
-    headerTitle = `לא ניתן לבצע ${actionText} תזרים מזומנים:`;
-    itemName = data.cashFlowName || `תזרים ${itemId}`;
-    break;
-  case 'note':
-    headerTitle = `לא ניתן לבצע ${actionText} הערה:`;
-    itemName = data.noteTitle || `הערה ${itemId}`;
-    break;
-  case 'trade_plan':
-    headerTitle = `לא ניתן לבצע ${actionText} תוכנית טרייד:`;
-    itemName = data.planName || `תוכנית ${itemId}`;
-    break;
-  case 'execution':
-    headerTitle = `לא ניתן לבצע ${actionText} ביצוע:`;
-    itemName = data.executionName || `ביצוע ${itemId}`;
-    break;
-  default:
-    headerTitle = `לא ניתן לבצע ${actionText} רשומה:`;
-    itemName = `רשומה ${itemId}`;
-  }
-
-  let content = `
-    <div class="linked-items-container">
-      <div class="alert alert-danger">
-        <strong>🚫 ${headerTitle} <span class="text-danger">${itemName}</span></strong>
-        <br>
-        ${getItemTypeDisplayName(itemType)} זה מקושר לפריטים הבאים במערכת. יש לטפל בהם תחילה לפני ${actionText}:
-      </div>
-
-      <div class="linked-items-section">
-        <h6>📋 פריטים מקושרים (${data && data.linkedItems ? data.linkedItems.length : 0})</h6>
-        <div class="linked-items-list">
-  `;
-
-  // Add linked items list with detailed information
-  if (data && data.linkedItems && data.linkedItems.length > 0) {
-    content += createLinkedItemsDetailedList(data.linkedItems);
-  } else {
-    content += `
-          <div class="no-linked-items">
-            <strong>ℹ️ לא נמצאו אובייקטים מקושרים</strong><br>
-            למרות זאת, לא ניתן לבצע ${actionText} ${getItemTypeDisplayName(itemType)} זה.
-          </div>
-        `;
-  }
-
-  content += `
-        </div>
-      </div>
-
-      <div class="alert alert-info">
-        <strong>💡 מה ניתן לעשות:</strong>
-        <ul class="mb-0">
-          <li>בטל את הקישור לפריטים המקושרים</li>
-          <li>מחק את הפריטים המקושרים תחילה</li>
-          <li>או פנה למנהל המערכת</li>
-        </ul>
-      </div>
-    </div>
-  `;
-
-  return content;
-}
 
 /**
  * Create detailed linked items list
@@ -1800,40 +1394,7 @@ function createLinkedItemsBlockingContent(data, itemType, itemId, actionType) {
  * @param {Array} linkedItems - Array of linked items
  * @returns {string} HTML content for the detailed linked items list
  */
-function createLinkedItemsDetailedList(linkedItems) {
-  if (!linkedItems || linkedItems.length === 0) {
-    return '<div class="alert alert-info">אין אובייקטים מקושרים</div>';
-  }
 
-  let content = '';
-
-  linkedItems.forEach(item => {
-    content += `
-        <div class="linked-item-card">
-          <div class="linked-item-header">
-            <span class="linked-item-type">${getItemTypeIcon(item.type)} ${getItemTypeDisplayName(item.type)}</span>
-            <span class="linked-item-id">#${item.id}</span>
-          </div>
-          <div class="linked-item-content">
-            <div class="linked-item-title">${item.title || item.name || `#${item.id}`}</div>
-            <div class="linked-item-details">
-              ${createDetailedItemInfo(item)}
-            </div>
-          </div>
-          <div class="linked-item-actions">
-            <button class="btn btn-outline-primary" onclick="viewItemDetails('${item.type}', ${item.id})">
-              <i class="fas fa-eye"></i> צפייה
-            </button>
-            <button class="btn btn-outline-warning" onclick="unlinkItem('${item.type}', ${item.id})">
-              <i class="fas fa-unlink"></i> נתק
-            </button>
-          </div>
-        </div>
-      `;
-  });
-
-  return content;
-}
 
 /**
  * Create detailed item information
@@ -1841,43 +1402,7 @@ function createLinkedItemsDetailedList(linkedItems) {
  * @param {Object} item - Item data
  * @returns {string} HTML content for detailed item info
  */
-function createDetailedItemInfo(item) {
-  let info = '';
 
-  // Common fields
-  if (item.status) {
-    const statusClass = item.status === 'open' ? 'text-success' :
-      item.status === 'closed' ? 'text-warning' : 'text-danger';
-    info += `<div class="item-status ${statusClass}">סטטוס: ${item.status}</div>`;
-  }
-
-  if (item.created_at) {
-    info += `<div class="item-date">נוצר: ${item.created_at}</div>`;
-  }
-
-  // Type-specific fields
-  if (item.type === 'execution') {
-    if (item.action) {info += `<div class="item-action">פעולה: ${item.action}</div>`;}
-    if (item.quantity) {info += `<div class="item-quantity">כמות: ${item.quantity}</div>`;}
-    if (item.price) {info += `<div class="item-price">מחיר: $${item.price}</div>`;}
-  }
-
-  if (item.type === 'note') {
-    if (item.content) {
-      const shortContent = item.content.length > 100 ?
-        item.content.substring(0, 100) + '...' : item.content;
-      info += `<div class="item-content">תוכן: ${shortContent}</div>`;
-    }
-  }
-
-  if (item.notes) {
-    const shortNotes = item.notes.length > 50 ?
-      item.notes.substring(0, 50) + '...' : item.notes;
-    info += `<div class="item-notes">הערות: ${shortNotes}</div>`;
-  }
-
-  return info || '<div class="item-no-info">אין מידע נוסף</div>';
-}
 
 // ===== MODAL UTILITIES =====
 
@@ -1915,6 +1440,56 @@ function initializeModalBackdrop() {
 
   // Modal backdrop functionality initialized
 }
+
+// ===== ACCOUNT UTILITIES =====
+
+/**
+ * Show second confirmation modal
+ * @param {string} message - הודעת האישור
+ * @param {Function} onConfirm - פונקציה לביצוע אם אושר
+ */
+function showSecondConfirmationModal(message, onConfirm) {
+  if (window.showConfirmationDialog) {
+    window.showConfirmationDialog('אישור', message, onConfirm, () => {});
+  } else {
+    // גיבוי למערכת הישנה
+    if (typeof window.showSecondConfirmationModal === 'function') {
+      window.showSecondConfirmationModal(
+        'אישור פעולה',
+        message,
+        onConfirm,
+        () => {},
+      );
+    } else {
+      if (typeof window.showConfirmationDialog === 'function') {
+        window.showConfirmationDialog(
+          'אישור',
+          message,
+          onConfirm,
+        );
+      } else {
+        if (typeof window.showConfirmationDialog === 'function') {
+          window.showConfirmationDialog(
+            'אישור',
+            message,
+            onConfirm,
+          );
+        } else {
+          if (confirm(message)) {
+            onConfirm();
+          }
+        }
+      }
+    }
+  }
+}
+
+// פונקציה createWarningModal כבר מוגדרת בשורה 1041
+
+// ===== EXPORTS =====
+
+// Export account utility functions
+window.showSecondConfirmationModal = showSecondConfirmationModal;
 
 // Initialize modal backdrop when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {

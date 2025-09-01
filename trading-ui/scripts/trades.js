@@ -2166,20 +2166,9 @@ function clearDateValidationMessages() {
 
 // הפונקציה הוסרה - קיימת כבר בשורה 657
 
-/**
- * פונקציות עזר למודל העריכה
- */
-function addEditImportantNote() {
-  if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('מידע', 'המודול יאפשר בקרוב לייצר הערות עשירות לטרייד');
-  }
-}
+// פונקציה addEditImportantNote כבר מוגדרת בשורה 689
 
-function addEditReminder() {
-  if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('מידע', 'המודול יאפשר בקרוב לייצר התראות לטרייד');
-  }
-}
+// פונקציה addEditReminder כבר מוגדרת בשורה 695
 
 function addEditBuySell() {
   if (typeof window.showInfoNotification === 'function') {

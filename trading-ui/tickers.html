@@ -482,17 +482,18 @@
     <script src="scripts/filter-system.js"></script>
     <script src="scripts/tickers.js?v=20250830_1?v=20250828_044"></script>
     <script>
-      // אתחול מערכת הכותרת החדשה
-      document.addEventListener("DOMContentLoaded", () => {
-        console.log("🔄 Initializing unified header system...");
-        if (window.headerSystem) {
-          window.headerSystem.init();
-        }
-        if (window.filterSystem) {
-          window.filterSystem.initialize();
-        }
-      });
-    </script>
+              // אתחול מערכת הכותרת החדשה
+        document.addEventListener("DOMContentLoaded", () => {
+          console.log("🔄 Initializing unified header system...");
+          if (window.headerSystem) {
+            window.headerSystem.init();
+          }
+          if (window.filterSystem) {
+            window.filterSystem.initialize();
+          }
+        });
+      </script>
+  </div> <!-- End background-wrapper -->
 </body>
 
 </html>

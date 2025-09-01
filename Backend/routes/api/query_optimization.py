@@ -22,11 +22,40 @@ from services.smart_query_optimizer import (
 import logging
 import tempfile
 import os
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 # Create blueprint
 query_optimization_bp = Blueprint('query_optimization', __name__, url_prefix='/api/v1/query-optimization')
+
+
+@query_optimization_bp.route('/', methods=['GET'])
+def get_query_optimization_status():
+    """Get query optimization system status"""
+    try:
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'system': 'Query Optimization System',
+                'version': '2.0.0',
+                'status': 'active',
+                'endpoints': [
+                    '/performance-report',
+                    '/slow-queries', 
+                    '/optimization-opportunities',
+                    '/stats',
+                    '/info'
+                ],
+                'timestamp': datetime.now().isoformat()
+            }
+        }), 200
+    except Exception as e:
+        logger.error(f"Failed to get status: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Failed to get status: {str(e)}'
+        }), 500
 
 
 @query_optimization_bp.route('/performance-report', methods=['GET'])

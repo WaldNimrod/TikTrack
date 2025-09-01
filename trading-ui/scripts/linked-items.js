@@ -285,7 +285,7 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
   }
 
   // קבלת הסבר על הכללים לפי סוג האובייקט והפעולה (רק ב-warningBlock mode)
-  const rulesExplanation = (mode === 'warningBlock') ? getRulesExplanation(itemType, data) : null;
+  const rulesExplanation = mode === 'warningBlock' ? getRulesExplanation(itemType, data) : null;
 
   let content = `
     <div class="linked-items-container">
@@ -726,7 +726,7 @@ function getTradePlanDetails(planId, data = null) {
         } else if (plan.symbol) {
           symbol = plan.symbol;
         }
-        
+
         const date = plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
         return `${symbol} מתאריך ${date}`;
       }
@@ -742,7 +742,7 @@ function getTradePlanDetails(planId, data = null) {
       } else if (data.entity_details.symbol) {
         symbol = data.entity_details.symbol;
       }
-      
+
       const date = data.entity_details.created_at ? new Date(data.entity_details.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
       return `${symbol} מתאריך ${date}`;
     }
@@ -875,7 +875,7 @@ function createModal(id, title, content, mode = 'view') {
     <div class="modal fade" id="${id}" tabindex="-1" aria-labelledby="${id}Label" aria-hidden="true">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
-          <div class="modal-header modal-header-colored modal-header-${mode}">
+                          <div class="modal-header linkedItems_modal-header-colored modal-header-${mode}">
             <button type="button" class="btn-close-custom btn-close-${mode}" data-bs-dismiss="modal" aria-label="Close">
               ✕
             </button>
@@ -1574,7 +1574,7 @@ function getStatusBadge(status) {
 
 /**
  * Load linked items data from server
- * 
+ *
  * @param {string} itemType - Type of the item
  * @param {number|string} itemId - ID of the item
  * @returns {Promise<Object>} Promise resolving to linked items data
@@ -1594,8 +1594,6 @@ async function loadLinkedItemsData(itemType, itemId) {
     return null;
   }
 }
-
-
 
 
 // ===== EXPORT FUNCTIONS TO GLOBAL SCOPE =====

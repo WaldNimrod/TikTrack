@@ -22,6 +22,7 @@ import json
 from typing import Dict, Any, Optional, Callable
 from utils.performance_monitor import monitor_performance
 import logging
+from config.settings import DEFAULT_CACHE_TTL, CACHE_ENABLED
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +36,8 @@ class CacheService:
     
     def __init__(self):
         self._cache: Dict[str, Dict[str, Any]] = {}
-        self._default_ttl = 300  # 5 minutes default
+        self._default_ttl = DEFAULT_CACHE_TTL  # Dynamic TTL based on environment
+        self._cache_enabled = CACHE_ENABLED
     
     def get(self, key: str) -> Optional[Any]:
         """
@@ -47,6 +49,10 @@ class CacheService:
         Returns:
             Optional[Any]: Cached value or None if not found/expired
         """
+        # אם Cache מבוטל במצב פיתוח, החזר None
+        if not self._cache_enabled:
+            return None
+            
         if key not in self._cache:
             return None
         
@@ -68,6 +74,10 @@ class CacheService:
             value (Any): Value to cache
             ttl (Optional[int]): Time to live in seconds
         """
+        # אם Cache מבוטל במצב פיתוח, אל תשמור
+        if not self._cache_enabled:
+            return
+            
         ttl = ttl or self._default_ttl
         expires_at = time.time() + ttl
         

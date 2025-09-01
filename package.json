@@ -18,7 +18,11 @@
     "quality:report": "npm run lint:report && echo \"Quality report generated: lint-report.html\"",
     "performance:check": "lighthouse http://localhost:8080 --output=html --output-path=./performance-report.html",
     "bundle:analyze": "webpack-bundle-analyzer trading-ui/scripts/*.js",
-    "validate:all": "npm run check:all && npm run quality:report"
+    "validate:all": "npm run check:all && npm run quality:report",
+    "dev:normal": "TIKTRACK_DEV_MODE=true TIKTRACK_CACHE_DISABLED=false ./restart quick",
+    "dev:no-cache": "TIKTRACK_DEV_MODE=true TIKTRACK_CACHE_DISABLED=true ./restart quick",
+    "dev:production": "TIKTRACK_DEV_MODE=false TIKTRACK_CACHE_DISABLED=false ./restart quick",
+    "cache:clear": "curl -X POST http://localhost:8080/api/v1/cache/clear"
   },
   "repository": {
     "type": "git",

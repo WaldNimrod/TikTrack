@@ -20,6 +20,79 @@ module.exports = [
         'bootstrap': 'readonly', // Bootstrap framework
         'jQuery': 'readonly', // jQuery if used
         '$': 'readonly', // jQuery alias
+        // Error handler functions from error-handlers.js
+        'handleApiError': 'readonly',
+        'handleElementNotFound': 'readonly',
+        'handleFunctionNotFound': 'readonly',
+        'handleValidationError': 'readonly',
+        'handleDataLoadError': 'readonly',
+        'handleSaveError': 'readonly',
+        'handleDeleteError': 'readonly',
+        'handleSystemError': 'readonly',
+        // UI utility functions from ui-utils.js
+        'showSecondConfirmationModal': 'readonly',
+        'createWarningModal': 'readonly',
+        // Account functions from accounts.js
+        'showSuccessMessage': 'readonly',
+        'showErrorMessage': 'readonly',
+        // Date utility functions from date-utils.js
+        'formatDate': 'readonly',
+        'formatDateTime': 'readonly',
+        'formatDateOnly': 'readonly',
+        'formatShortDate': 'readonly',
+        'formatLongDate': 'readonly',
+        'formatTimeOnly': 'readonly',
+        // Data loading functions
+        'loadDashboardData': 'readonly',
+        'onLogout': 'readonly',
+        'getCashFlowTypeText': 'readonly',
+        // Button functions from button-icons.js
+        'createLinkButton': 'readonly',
+        'createEditButton': 'readonly',
+        'createDeleteButton': 'readonly',
+        'createCancelButton': 'readonly',
+        'createDeleteButtonByType': 'readonly',
+        // Cash flow functions
+        'confirmDeleteCashFlow': 'readonly',
+        // DB extradata functions
+        'showAddCurrencyModal': 'readonly',
+        'restoreCurrenciesSectionState': 'readonly',
+        'toggleCurrenciesSection': 'readonly',
+        'updateTriggerButtonsCount': 'readonly',
+        // Validation functions from validation-utils.js
+        'validateForm': 'readonly',
+        'showFieldError': 'readonly',
+        'showFieldSuccess': 'readonly',
+        'clearFieldError': 'readonly',
+        'clearFieldValidation': 'readonly',
+        // Notification functions from notification-system.js
+        'showErrorNotification': 'readonly',
+        'showSuccessNotification': 'readonly',
+        'showWarningNotification': 'readonly',
+        'showInfoNotification': 'readonly',
+        'showValidationWarning': 'readonly',
+        'showConfirmationDialog': 'readonly',
+        'showDeleteWarning': 'readonly',
+        // Translation/formatting functions from translation-utils.js
+        'formatCurrency': 'readonly',
+        'formatCurrencyWithCommas': 'readonly',
+        'formatNumber': 'readonly',
+        'formatNumberWithCommas': 'readonly',
+        // Page utility functions from page-utils.js
+        'getCurrentPageName': 'readonly',
+        'restoreDesignsSectionState': 'readonly',
+        // Data utility functions from data-utils.js  
+        'convertAmountToShares': 'readonly',
+        'convertSharesToAmount': 'readonly',
+        'getUserPreference': 'readonly',
+        'calculateDefaultPrices': 'readonly',
+        // Global data variables
+        'tickersData': 'readonly',
+        'trade_plansData': 'readonly',
+        'tickerId': 'readonly',
+        // UI functions
+        'openFunctionModal': 'readonly',
+        'updateSortIcons': 'readonly'
       },
     },
     rules: {

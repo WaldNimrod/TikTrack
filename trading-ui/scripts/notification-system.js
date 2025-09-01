@@ -83,6 +83,235 @@ function markAlertAsRead(alertId) {
 // ===== NOTIFICATION SYSTEM FUNCTIONS =====
 // These functions handle system messages for user feedback
 
+/**
+ * Create notification container
+ * NOTIFICATION SYSTEM - Creates the main notification container
+ *
+ * @returns {HTMLElement} The created notification container
+ */
+function createNotificationContainer() {
+  // Create notification container if it doesn't exist
+  let container = document.getElementById('notificationContainer');
+  
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'notificationContainer';
+    container.className = 'notification-container position-fixed top-0 end-0 p-3';
+    container.style.zIndex = '9999';
+    document.body.appendChild(container);
+  }
+  
+  return container;
+}
+
+/**
+ * Show notification message
+ * NOTIFICATION SYSTEM - Displays notification message to user
+ *
+ * @param {string} message - Notification message
+ * @param {string} type - Notification type: 'success', 'error', 'warning', 'info'
+ * @param {string} title - Notification title
+ * @param {number} duration - Display duration in milliseconds
+ */
+function showNotification(message, type = 'info', title = 'התראה', duration = 4000) {
+  // showNotification called
+  // showNotification calling createNotificationContainer
+  
+  const container = createNotificationContainer();
+  
+  // Validate notification type
+  const validTypes = ['success', 'error', 'warning', 'info'];
+  if (!validTypes.includes(type)) {
+    type = 'info';
+  }
+  
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `alert alert-${type} alert-dismissible fade show`;
+  notification.role = 'alert';
+  
+  // Set notification content
+  notification.innerHTML = `
+    <strong>${title}:</strong> ${message}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  `;
+  
+  // Add to container
+  container.appendChild(notification);
+  
+  // Auto-hide after duration
+  if (duration > 0) {
+    setTimeout(() => {
+      hideNotification(notification);
+    }, duration);
+  }
+  
+  // showNotification calling hideNotification
+}
+
+/**
+ * Hide notification
+ * NOTIFICATION SYSTEM - Hides and removes notification element
+ *
+ * @param {HTMLElement} notification - Notification element to hide
+ */
+function hideNotification(notification) {
+  // hideNotification called
+  
+  if (notification && notification.parentNode) {
+    notification.classList.remove('show');
+    notification.classList.add('fade');
+    
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 150);
+  }
+}
+
+/**
+ * Get notification icon by type
+ * NOTIFICATION SYSTEM - Returns appropriate icon for notification type
+ *
+ * @param {string} type - Notification type
+ * @returns {string} Icon HTML
+ */
+function getNotificationIcon(type) {
+  const icons = {
+    success: '✅',
+    error: '❌',
+    warning: '⚠️',
+    info: 'ℹ️',
+  };
+  
+  return icons[type] || icons.info;
+}
+
+// These are convenience functions for different notification types
+
+/**
+ * Show success notification
+ * NOTIFICATION SYSTEM - Displays success message to user
+ *
+ * @param {string} title - Success notification title
+ * @param {string} message - Success notification message
+ * @param {number} duration - Display duration in milliseconds
+ */
+function showSuccessNotification(title, message, duration = 4000) {
+  // showSuccessNotification called
+  // showSuccessNotification calling showNotification
+  showNotification(message, 'success', title, duration);
+}
+
+/**
+ * Show error notification
+ * NOTIFICATION SYSTEM - Displays error message to user
+ *
+ * @param {string} title - Error notification title
+ * @param {string} message - Error notification message
+ * @param {number} duration - Display duration in milliseconds
+ */
+function showErrorNotification(title, message, duration = 6000) {
+  // showErrorNotification called
+  // showErrorNotification calling showNotification
+  showNotification(message, 'error', title, duration);
+}
+
+/**
+ * Show warning notification
+ * NOTIFICATION SYSTEM - Displays warning message to user
+ *
+ * @param {string} title - Warning notification title
+ * @param {string} message - Warning notification message
+ * @param {number} duration - Display duration in milliseconds
+ */
+function showWarningNotification(title, message, duration = 5000) {
+  // showWarningNotification called
+  // showWarningNotification calling showNotification
+  showNotification(message, 'warning', title, duration);
+}
+
+/**
+ * Show info notification
+ * NOTIFICATION SYSTEM - Displays info message to user
+ *
+ * @param {string} title - Info notification title
+ * @param {string} message - Info notification message
+ * @param {number} duration - Display duration in milliseconds
+ */
+function showInfoNotification(title, message, duration = 4000) {
+  // showInfoNotification called
+  // showInfoNotification calling showNotification
+  showNotification(message, 'info', title, duration);
+}
+
+/**
+ * Show notification in modal
+ * NOTIFICATION SYSTEM - Shows notification in modal format
+ *
+ * @param {string} type - Notification type
+ * @param {string} title - Notification title
+ * @param {string} message - Notification message
+ * @param {string} modalId - Modal ID to use
+ */
+function showModalNotification(type, title, message, modalId = 'notificationModal') {
+  // Showing notification in modal
+  
+  const modal = document.getElementById(modalId);
+  if (!modal) {
+    console.warn(`Modal ${modalId} not found`);
+    return;
+  }
+  
+  // Update modal content
+  const titleElement = modal.querySelector('.modal-title');
+  const messageElement = modal.querySelector('.modal-body');
+  const iconElement = modal.querySelector('.notification-icon');
+  
+  if (titleElement) titleElement.textContent = title;
+  if (messageElement) messageElement.textContent = message;
+  
+  // Update icon by type
+  if (iconElement) {
+    iconElement.className = `notification-icon ${type}`;
+    iconElement.innerHTML = getNotificationIcon(type);
+  }
+  
+  // Show modal
+  const bootstrapModal = new bootstrap.Modal(modal);
+  bootstrapModal.show();
+}
+
+/**
+ * Create toast container
+ * NOTIFICATION SYSTEM - Creates toast container for notifications
+ *
+ * @returns {HTMLElement} The created toast container
+ */
+function createToastContainer() {
+  const container = document.createElement('div');
+  container.id = 'toastContainer';
+  container.className = 'toast-container position-fixed top-0 end-0 p-3';
+  container.style.zIndex = '9999';
+  document.body.appendChild(container);
+  return container;
+}
+
+/**
+ * Color amount function
+ * NOTIFICATION SYSTEM - Colors amounts (positive/negative)
+ *
+ * @param {number} amount - Amount to color
+ * @param {string} displayText - Optional display text
+ * @returns {string} HTML with colored amount
+ */
+function colorAmount(amount, displayText = null) {
+  const text = displayText || (amount >= 0 ? `+$${amount.toFixed(2)}` : `-$${Math.abs(amount).toFixed(2)}`);
+  const className = amount >= 0 ? 'profit-positive' : 'profit-negative';
+  return `<span class="${className}">${text}</span>`;
+}
+
 // ===== LINKED ITEMS SYSTEM FUNCTIONS =====
 // These functions handle linked items display and management
 
@@ -107,253 +336,6 @@ async function loadLinkedItemsData(itemType, itemId) {
 
   } catch (error) {
     throw error;
-  }
-}
-
-/**
- * Create notification container if not exists
- * NOTIFICATION SYSTEM - Creates container for system notifications
- *
- * @returns {HTMLElement} Notification container element
- */
-function createNotificationContainer() {
-  let container = document.getElementById('notification-container');
-
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'notification-container';
-    container.className = 'notification-container';
-    document.body.appendChild(container);
-  }
-
-  return container;
-}
-
-/**
- * Show notification to user
- * NOTIFICATION SYSTEM - Displays system message to user
- *
- * @param {string} message - Notification message
- * @param {string} type - Notification type: 'success', 'error', 'warning', 'info'
- * @param {string} title - Notification title
- * @param {number} duration - Display duration in milliseconds (default: 4000)
- */
-function showNotification(message, type = 'info', title = 'התראה', duration = 4000) {
-  // showNotification called
-  // Parameter types:
-  // Parameter types check
-  // Raw parameters check
-
-  // Validate and sanitize parameters
-  const validTypes = ['success', 'error', 'warning', 'info'];
-  const sanitizedType = validTypes.includes(type) ? type : 'info';
-  const sanitizedTitle = title || 'הודעה';
-  const sanitizedMessage = message || '';
-
-  // Sanitized parameters check
-
-  // Create notification container
-  const container = createNotificationContainer();
-
-  // Create notification element
-  const notification = document.createElement('div');
-  notification.className = `notification ${sanitizedType}`;
-
-  // Get icon for notification type
-  const icon = getNotificationIcon(sanitizedType);
-
-  // Create notification content
-  notification.innerHTML = `
-        <div class="notification-icon">${icon}</div>
-        <div class="notification-content">
-            <div class="notification-title">${sanitizedTitle}</div>
-            <div class="notification-message">${sanitizedMessage}</div>
-        </div>
-        <button class="notification-close" onclick="this.parentElement.remove()">×</button>
-    `;
-
-  // Created notification element
-
-  // Add to container
-  container.appendChild(notification);
-
-  // Show notification with animation
-  setTimeout(() => {
-    notification.classList.add('show');
-    // Notification shown
-  }, 100);
-
-  // Auto-remove after duration
-  setTimeout(() => {
-    hideNotification(notification);
-  }, duration);
-}
-
-/**
- * Hide notification with animation
- * NOTIFICATION SYSTEM - Hides system notification with smooth animation
- *
- * @param {HTMLElement} notification - Notification element to hide
- */
-function hideNotification(notification) {
-  if (notification && notification.parentElement) {
-    notification.classList.add('hide');
-
-    // Remove from DOM after animation
-    setTimeout(() => {
-      if (notification.parentElement) {
-        notification.remove();
-      }
-    }, 300);
-  }
-}
-
-/**
- * Get notification icon by type
- * NOTIFICATION SYSTEM - Returns appropriate icon for notification type
- *
- * @param {string} type - Notification type
- * @returns {string} Icon HTML
- */
-function getNotificationIcon(type) {
-  const icons = {
-    success: '✅',
-    error: '❌',
-    warning: '⚠️',
-    info: 'ℹ️',
-  };
-
-  return icons[type] || icons.info;
-}
-
-// ===== SPECIFIC NOTIFICATION FUNCTIONS =====
-// These are convenience functions for different notification types
-
-/**
- * Show success notification
- * NOTIFICATION SYSTEM - Displays success message to user
- *
- * @param {string} title - Success notification title
- * @param {string} message - Success notification message
- * @param {number} duration - Display duration in milliseconds (default: 4000)
- */
-function showSuccessNotification(title, message, duration = 4000) {
-  // showSuccessNotification called with
-
-  // Ensure title and message are provided
-  const finalTitle = title || 'הצלחה';
-  const finalMessage = message || 'הפעולה הושלמה בהצלחה';
-
-  // showSuccessNotification calling showNotification with
-  showNotification(finalMessage, 'success', finalTitle, duration);
-}
-
-/**
- * Show error notification
- * NOTIFICATION SYSTEM - Displays error message to user
- *
- * @param {string} title - Error notification title
- * @param {string} message - Error notification message
- * @param {number} duration - Display duration in milliseconds (default: 6000)
- */
-function showErrorNotification(title, message, duration = 6000) {
-  // showErrorNotification called with
-  // showErrorNotification calling showNotification with
-  showNotification(message, 'error', title, duration);
-}
-
-/**
- * Show warning notification
- * NOTIFICATION SYSTEM - Displays warning message to user
- *
- * @param {string} title - Warning notification title
- * @param {string} message - Warning notification message
- * @param {number} duration - Display duration in milliseconds (default: 5000)
- */
-function showWarningNotification(title, message, duration = 5000) {
-  // showWarningNotification called
-  // showWarningNotification calling showNotification
-  showNotification(message, 'warning', title, duration);
-}
-
-/**
- * Show info notification
- * NOTIFICATION SYSTEM - Displays info message to user
- *
- * @param {string} title - Info notification title
- * @param {string} message - Info notification message
- * @param {number} duration - Display duration in milliseconds (default: 4000)
- */
-function showInfoNotification(title, message, duration = 4000) {
-  // showInfoNotification called
-  // showInfoNotification calling showNotification
-  showNotification(message, 'info', title, duration);
-}
-
-/**
- * Show validation warning with field highlighting
- * NOTIFICATION SYSTEM - Displays validation error with field highlighting
- *
- * @param {string} fieldId - ID of the problematic field
- * @param {string} message - Validation error message
- * @param {number} duration - Display duration in milliseconds (default: 6000)
- */
-function showValidationWarning(fieldId, message, duration = 6000) {
-  // showValidationWarning called
-
-  // Get field name for better error message
-  const field = document.getElementById(fieldId);
-  let fieldName = fieldId;
-
-  if (field) {
-    // Try to get a human-readable field name
-    const label = document.querySelector(`label[for="${fieldId}"]`);
-    if (label) {
-      fieldName = label.textContent.trim();
-    } else if (field.placeholder) {
-      fieldName = field.placeholder;
-    } else if (field.name) {
-      fieldName = field.name.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-    }
-  }
-
-  // Create detailed error message
-  const detailedMessage = `${fieldName}: ${message}`;
-
-  // Show error notification (red)
-  // showValidationWarning calling showErrorNotification
-  showErrorNotification('שגיאת וולידציה', detailedMessage, duration);
-
-  // Highlight the problematic field
-  // Field element found
-
-  if (field) {
-    // Add error styling
-    field.classList.add('is-invalid');
-    field.classList.remove('is-valid');
-
-    // Add red border
-    field.style.borderColor = '#dc3545';
-    field.style.boxShadow = '0 0 0 0.2rem rgba(220, 53, 69, 0.25)';
-
-    // Scroll to field
-    field.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-    // Focus on field
-    field.focus();
-
-    // Field styling applied
-
-    // Remove styling after 3 seconds
-    setTimeout(() => {
-      field.classList.remove('is-invalid');
-      field.style.borderColor = '';
-      field.style.boxShadow = '';
-      // Field styling removed
-    }, 3000);
-  } else {
-    // Field not found
-    console.warn(`⚠️ Field not found: ${fieldId}`);
   }
 }
 
@@ -551,6 +533,9 @@ window.showSuccessNotification = showSuccessNotification;
 window.showErrorNotification = showErrorNotification;
 window.showWarningNotification = showWarningNotification;
 window.showInfoNotification = showInfoNotification;
+window.showModalNotification = showModalNotification;
+window.createToastContainer = createToastContainer;
+window.colorAmount = colorAmount;
 window.showValidationWarning = showValidationWarning;
 window.showConfirmationDialog = showConfirmationDialog;
 window.showDeleteWarning = showDeleteWarning;
@@ -579,6 +564,9 @@ window.notificationSystem = {
   showValidationWarning,
   showConfirmationDialog,
   showDeleteWarning,
+  showModalNotification,
+  createToastContainer,
+  colorAmount,
 
   // LINKED ITEMS SYSTEM functions
   loadLinkedItemsData,

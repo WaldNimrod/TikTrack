@@ -1,4 +1,4 @@
-/**
+/**לכן בבק
  * Constraint Manager - JavaScript for managing database constraints
  * Date: August 23, 2025
  * Description: Frontend JavaScript for the constraints management interface
@@ -541,7 +541,7 @@ function showAddConstraintModal() {
     modal.innerHTML = `
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header modal-header-colored">
+                    <div class="modal-header linkedItems_modal-header-colored">
                         <h5 class="modal-title">הוספת אילוץ חדש</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>

@@ -1,0 +1,29 @@
+{
+  "defaults": {
+    "primaryCurrency": "USD",
+    "timezone": "Asia/Jerusalem",
+    "defaultStopLoss": 5,
+    "defaultTargetPrice": 10,
+    "defaultCommission": 1.0,
+    "defaultStatusFilter": "all",
+    "defaultTypeFilter": "all",
+    "defaultAccountFilter": "all",
+    "defaultDateRangeFilter": "all",
+    "defaultSearchFilter": ""
+  },
+  "users": {
+    "nimrod": {
+      "consoleCleanupInterval": 60000,
+      "defaultAccountFilter": "all",
+      "defaultCommission": 1,
+      "defaultDateRangeFilter": "all",
+      "defaultSearchFilter": "",
+      "defaultStatusFilter": "open",
+      "defaultStopLoss": 5,
+      "defaultTargetPrice": 10,
+      "defaultTypeFilter": "all",
+      "primaryCurrency": "USD",
+      "timezone": "Asia/Jerusalem"
+    }
+  }
+}

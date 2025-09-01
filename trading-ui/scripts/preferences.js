@@ -99,7 +99,7 @@ async function saveAllPreferences() {
     if (response.ok) {
       const responseData = await response.json();
       showPreferencesSuccess('הצלחה', 'כל ההעדפות נשמרו בהצלחה');
-      
+
       // הפעל הגדרות קונסול אחרי שמירה מוצלחת
       if (typeof applyConsoleSettings === 'function') {
         applyConsoleSettings();

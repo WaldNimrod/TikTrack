@@ -690,6 +690,7 @@ function getRulesExplanation(itemType, data) {
       }
       return explanation;
     }
+  }
 
   case 'trade': {
     const linkedExecutions = childEntities.filter(entity => entity.type === 'execution');

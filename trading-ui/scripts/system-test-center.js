@@ -20,7 +20,7 @@ class SimpleTestCenter {
 
   setupEventListeners() {
     console.log('=== setupEventListeners התחיל ===');
-    
+
     // Cache buttons
     const clearCacheBtn = document.getElementById('clear-cache-btn');
     if (clearCacheBtn) {
@@ -66,13 +66,13 @@ class SimpleTestCenter {
 
   async loadAllData() {
     console.log('=== loadAllData התחיל ===');
-    
+
     try {
       await Promise.all([
         this.loadCacheData(),
         this.loadQueryData(),
         this.loadExternalData(),
-        this.loadPerformanceData()
+        this.loadPerformanceData(),
       ]);
       console.log('=== כל הנתונים נטענו בהצלחה ===');
     } catch (error) {
@@ -82,13 +82,13 @@ class SimpleTestCenter {
 
   async loadCacheData() {
     console.log('=== loadCacheData התחיל ===');
-    
+
     // Cache Stats
     this.displayCacheStats({
       total_entries: 1250,
       memory_usage_mb: 45.2,
       hit_rate: 87.5,
-      miss_rate: 12.5
+      miss_rate: 12.5,
     });
 
     // Cache Health
@@ -97,16 +97,16 @@ class SimpleTestCenter {
       checks: {
         memory_usage: 'OK',
         connection: 'OK',
-        performance: 'OK'
+        performance: 'OK',
       },
-      message: 'מערכת Cache פועלת כרגיל'
+      message: 'מערכת Cache פועלת כרגיל',
     });
 
     // Cache Info
     this.displayCacheInfo({
       version: '2.1.0',
       uptime_hours: 48,
-      last_cleanup: '2025-01-01 10:00:00'
+      last_cleanup: '2025-01-01 10:00:00',
     });
 
     console.log('=== loadCacheData הושלם ===');
@@ -114,24 +114,24 @@ class SimpleTestCenter {
 
   async loadQueryData() {
     console.log('=== loadQueryData התחיל ===');
-    
+
     // Query Stats
     this.displayQueryStats({
       total_queries: 12500,
       avg_response_time: 0.15,
-      slow_queries_count: 23
+      slow_queries_count: 23,
     });
 
     // Query Opportunities
     this.displayQueryOpportunities([
       { query: 'SELECT * FROM trades', impact: 'high', description: 'N+1 query detected' },
-      { query: 'SELECT * FROM executions', impact: 'medium', description: 'Missing index' }
+      { query: 'SELECT * FROM executions', impact: 'medium', description: 'Missing index' },
     ]);
 
     // Slow Queries
     this.displaySlowQueries([
       { query: 'SELECT * FROM trades WHERE date > ?', execution_time: 2.5, frequency: 15 },
-      { query: 'SELECT * FROM executions JOIN trades', execution_time: 1.8, frequency: 8 }
+      { query: 'SELECT * FROM executions JOIN trades', execution_time: 1.8, frequency: 8 },
     ]);
 
     console.log('=== loadQueryData הושלם ===');
@@ -139,18 +139,18 @@ class SimpleTestCenter {
 
   async loadExternalData() {
     console.log('=== loadExternalData התחיל ===');
-    
+
     // External Data Status
     this.displayExternalDataStatus({
       yahoo_finance: 'connected',
       alpha_vantage: 'disconnected',
-      last_update: '2025-01-01 12:00:00'
+      last_update: '2025-01-01 12:00:00',
     });
 
     // External Data Test
     this.displayExternalDataTest({
       status: 'success',
-      message: 'בדיקת חיבור לנתונים חיצוניים הושלמה בהצלחה'
+      message: 'בדיקת חיבור לנתונים חיצוניים הושלמה בהצלחה',
     });
 
     console.log('=== loadExternalData הושלם ===');
@@ -158,20 +158,20 @@ class SimpleTestCenter {
 
   async loadPerformanceData() {
     console.log('=== loadPerformanceData התחיל ===');
-    
+
     // Performance Metrics
     this.displayPerformanceMetrics({
       cpu_usage: 35,
       memory_usage: 68,
       disk_usage: 45,
-      response_time: 0.12
+      response_time: 0.12,
     });
 
     // Performance Test
     this.displayPerformanceTest({
       status: 'success',
       score: 85,
-      recommendations: ['Optimize database queries', 'Enable caching']
+      recommendations: ['Optimize database queries', 'Enable caching'],
     });
 
     console.log('=== loadPerformanceData הושלם ===');
@@ -419,7 +419,7 @@ class SimpleTestCenter {
     }
 
     const recommendationsHtml = test.recommendations.map(rec => `<li>${rec}</li>`).join('');
-    
+
     element.innerHTML = `
       <div class="alert alert-${test.status === 'success' ? 'success' : 'danger'}">
         <h6>תוצאות בדיקת ביצועים</h6>
@@ -458,20 +458,20 @@ class SimpleTestCenter {
 
   async runQueryTest() {
     console.log('=== runQueryTest התחיל ===');
-    
+
     const queryType = document.getElementById('test-query-type')?.value || 'tickers';
     console.log(`סוג Query: ${queryType}`);
-    
+
     this.showLoading('query-test-results', 'מבצע בדיקה...');
     await this.delay(800);
-    
+
     const results = {
       query_type: queryType,
       execution_time: (Math.random() * 2 + 0.5).toFixed(2),
       status: 'success',
-      message: `בדיקת ${queryType} הושלמה בהצלחה`
+      message: `בדיקת ${queryType} הושלמה בהצלחה`,
     };
-    
+
     this.displayQueryTestResults(results);
     console.log('=== runQueryTest הושלם ===');
   }

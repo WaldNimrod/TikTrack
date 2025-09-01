@@ -1169,5 +1169,3 @@ window.notificationSystem = {
 // showConfirmationDialog קיים
 // window.showDeleteWarning קיים
 // window.showConfirmationDialog קיים
-
-בו

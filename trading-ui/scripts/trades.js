@@ -1811,14 +1811,14 @@ function validateTradeStatusChange(newStatus, tradeData) {
                 () => { secondWarning = true; },
                 () => { secondWarning = false; },
               );
-                          } else {
-                // Fallback למקרה שמערכת התראות לא זמינה
-                secondWarning = confirm(
-                  '🔒 ממשק הסגירה המלא כולל סגירת פוזיציה נמצא בפיתוח.\n\n' +
+            } else {
+              // Fallback למקרה שמערכת התראות לא זמינה
+              secondWarning = confirm(
+                '🔒 ממשק הסגירה המלא כולל סגירת פוזיציה נמצא בפיתוח.\n\n' +
                           'כרגע ניתן לסגור את הטרייד אך יש לזכור לעדכן עסקה לסגירת פוזיציה.\n\n' +
                           'האם אתה בטוח שברצונך להמשיך?',
-                );
-              }
+              );
+            }
           }
         }
 

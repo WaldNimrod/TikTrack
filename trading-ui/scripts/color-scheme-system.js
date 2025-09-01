@@ -1,10 +1,10 @@
 /**
  * Unified Color Scheme System
  * מערכת מפתח צבעים מאוחדת
- * 
+ *
  * קובץ זה מגדיר את כל מפתחות הצבעים במערכת בצורה מאוחדת
  * ומאפשר שימוש עקבי בכל העמודים והמודולים
- * 
+ *
  * @author TikTrack System
  * @version 2.0.0
  * @since 2025-01-09
@@ -22,23 +22,23 @@ const VALID_ENTITY_TYPES = [
   'trade',           // טריידים
   'trade_plan',      // תכנוני השקעה
   'execution',       // עסקאות
-  
+
   // Financial
   'account',         // חשבונות
   'cash_flow',       // תזרים מזומנים
-  
+
   // Market Data
   'ticker',          // טיקרים
   'alert',           // התראות
-  
+
   // Documentation
   'note',            // הערות
-  
+
   // System
   'constraint',      // אילוצים
   'design',          // עיצובים
   'research',        // מחקר
-  'preference'       // העדפות
+  'preference',       // העדפות
 ];
 
 // ===== UNIFIED COLOR SCHEME =====
@@ -53,23 +53,23 @@ const ENTITY_COLORS = {
   'trade': '#007bff',           // כחול בהיר
   'trade_plan': '#0056b3',      // כחול כהה
   'execution': '#17a2b8',       // כחול טורקיז
-  
+
   // Financial - ירוקים
   'account': '#28a745',         // ירוק בהיר
   'cash_flow': '#20c997',       // ירוק טורקיז
-  
+
   // Market Data - אדומים וכתומים
   'ticker': '#dc3545',          // אדום
   'alert': '#ff9c05',           // כתום לוגו
-  
+
   // Documentation - סגולים
   'note': '#6f42c1',            // סגול
-  
+
   // System - אפורים
   'constraint': '#6c757d',      // אפור
   'design': '#495057',          // אפור כהה
   'research': '#343a40',        // אפור כהה מאוד
-  'preference': '#adb5bd'       // אפור בהיר
+  'preference': '#adb5bd',       // אפור בהיר
 };
 
 /**
@@ -88,7 +88,7 @@ const ENTITY_BACKGROUND_COLORS = {
   'constraint': 'rgba(108, 117, 125, 0.1)',
   'design': 'rgba(73, 80, 87, 0.1)',
   'research': 'rgba(52, 58, 64, 0.1)',
-  'preference': 'rgba(173, 181, 189, 0.1)'
+  'preference': 'rgba(173, 181, 189, 0.1)',
 };
 
 /**
@@ -107,7 +107,7 @@ const ENTITY_TEXT_COLORS = {
   'constraint': '#495057',
   'design': '#343a40',
   'research': '#212529',
-  'preference': '#6c757d'
+  'preference': '#6c757d',
 };
 
 /**
@@ -126,7 +126,7 @@ const ENTITY_BORDER_COLORS = {
   'constraint': 'rgba(108, 117, 125, 0.3)',
   'design': 'rgba(73, 80, 87, 0.3)',
   'research': 'rgba(52, 58, 64, 0.3)',
-  'preference': 'rgba(173, 181, 189, 0.3)'
+  'preference': 'rgba(173, 181, 189, 0.3)',
 };
 
 // ===== INVESTMENT TYPE SPECIFIC COLORS =====
@@ -139,7 +139,7 @@ const ENTITY_BORDER_COLORS = {
 const VALID_INVESTMENT_TYPES = [
   'swing',      // השקעות סווינג - Swing Trading
   'investment', // השקעות ארוכות טווח - Long-term Investment
-  'passive'     // השקעות פאסיביות - Passive Investment
+  'passive',     // השקעות פאסיביות - Passive Investment
 ];
 
 /**
@@ -149,7 +149,7 @@ const VALID_INVESTMENT_TYPES = [
 const INVESTMENT_TYPE_LABELS = {
   'swing': 'סווינג',
   'investment': 'השקעה',
-  'passive': 'פאסיבי'
+  'passive': 'פאסיבי',
 };
 
 /**
@@ -159,7 +159,7 @@ const INVESTMENT_TYPE_LABELS = {
 const INVESTMENT_TYPE_DESCRIPTIONS = {
   'swing': 'מסחר לטווח קצר עד בינוני',
   'investment': 'השקעה ארוכת טווח',
-  'passive': 'השקעה פאסיבית ללא פעילות מסחרית'
+  'passive': 'השקעה פאסיבית ללא פעילות מסחרית',
 };
 
 /**
@@ -169,7 +169,7 @@ const INVESTMENT_TYPE_DESCRIPTIONS = {
 const INVESTMENT_TYPE_COLORS = {
   'swing': ENTITY_COLORS.trade,        // כחול - כמו טריידים
   'investment': ENTITY_COLORS.account, // ירוק - כמו חשבונות
-  'passive': ENTITY_COLORS.note        // סגול - כמו הערות
+  'passive': ENTITY_COLORS.note,        // סגול - כמו הערות
 };
 
 // ===== UTILITY FUNCTIONS =====
@@ -178,7 +178,7 @@ const INVESTMENT_TYPE_COLORS = {
 /**
  * קבלת צבע לישות
  * Get color for entity
- * 
+ *
  * @param {string} entityType - סוג הישות
  * @returns {string} קוד הצבע
  */
@@ -194,7 +194,7 @@ function getEntityColor(entityType) {
 /**
  * קבלת צבע רקע לישות
  * Get background color for entity
- * 
+ *
  * @param {string} entityType - סוג הישות
  * @returns {string} קוד הצבע
  */
@@ -210,7 +210,7 @@ function getEntityBackgroundColor(entityType) {
 /**
  * קבלת צבע טקסט לישות
  * Get text color for entity
- * 
+ *
  * @param {string} entityType - סוג הישות
  * @returns {string} קוד הצבע
  */
@@ -226,7 +226,7 @@ function getEntityTextColor(entityType) {
 /**
  * קבלת צבע גבול לישות
  * Get border color for entity
- * 
+ *
  * @param {string} entityType - סוג הישות
  * @returns {string} קוד הצבע
  */
@@ -242,7 +242,7 @@ function getEntityBorderColor(entityType) {
 /**
  * בדיקה אם סוג ישות תקף
  * Check if entity type is valid
- * 
+ *
  * @param {string} entityType - סוג הישות
  * @returns {boolean} האם תקף
  */
@@ -258,7 +258,7 @@ function isValidEntityType(entityType) {
 /**
  * קבלת תרגום עברי לישות
  * Get Hebrew translation for entity
- * 
+ *
  * @param {string} entityType - סוג הישות
  * @returns {string} התרגום העברי
  */
@@ -268,7 +268,7 @@ function getEntityLabel(entityType) {
   }
 
   const normalizedType = entityType.toLowerCase().trim();
-  
+
   // תרגומים ספציפיים
   const labels = {
     'trade': 'טרייד',
@@ -282,9 +282,9 @@ function getEntityLabel(entityType) {
     'constraint': 'אילוץ',
     'design': 'עיצוב',
     'research': 'מחקר',
-    'preference': 'העדפה'
+    'preference': 'העדפה',
   };
-  
+
   return labels[normalizedType] || entityType;
 }
 
@@ -294,7 +294,7 @@ function getEntityLabel(entityType) {
 /**
  * קבלת צבע לסוג השקעה (תאימות לאחור)
  * Get color for investment type (backward compatibility)
- * 
+ *
  * @param {string} investmentType - סוג ההשקעה
  * @returns {string} קוד הצבע
  */
@@ -310,7 +310,7 @@ function getInvestmentTypeColor(investmentType) {
 /**
  * קבלת צבע רקע לסוג השקעה (תאימות לאחור)
  * Get background color for investment type (backward compatibility)
- * 
+ *
  * @param {string} investmentType - סוג ההשקעה
  * @returns {string} קוד הצבע
  */
@@ -327,7 +327,7 @@ function getInvestmentTypeBackgroundColor(investmentType) {
 /**
  * קבלת צבע טקסט לסוג השקעה (תאימות לאחור)
  * Get text color for investment type (backward compatibility)
- * 
+ *
  * @param {string} investmentType - סוג ההשקעה
  * @returns {string} קוד הצבע
  */
@@ -344,7 +344,7 @@ function getInvestmentTypeTextColor(investmentType) {
 /**
  * קבלת צבע גבול לסוג השקעה (תאימות לאחור)
  * Get border color for investment type (backward compatibility)
- * 
+ *
  * @param {string} investmentType - סוג ההשקעה
  * @returns {string} קוד הצבע
  */
@@ -361,7 +361,7 @@ function getInvestmentTypeBorderColor(investmentType) {
 /**
  * מיפוי סוג השקעה לישות
  * Map investment type to entity type
- * 
+ *
  * @param {string} investmentType - סוג ההשקעה
  * @returns {string} סוג הישות
  */
@@ -369,9 +369,9 @@ function getInvestmentTypeEntityType(investmentType) {
   const mapping = {
     'swing': 'trade',
     'investment': 'account',
-    'passive': 'note'
+    'passive': 'note',
   };
-  
+
   return mapping[investmentType] || 'trade';
 }
 
@@ -381,18 +381,18 @@ function getInvestmentTypeEntityType(investmentType) {
 /**
  * יצירת מחלקות CSS לכל סוגי הישויות
  * Generate CSS classes for all entity types
- * 
+ *
  * @returns {string} CSS classes
  */
 function generateEntityCSS() {
   let css = '';
-  
+
   VALID_ENTITY_TYPES.forEach(type => {
     const color = ENTITY_COLORS[type];
     const bgColor = ENTITY_BACKGROUND_COLORS[type];
     const borderColor = ENTITY_BORDER_COLORS[type];
     const textColor = ENTITY_TEXT_COLORS[type];
-    
+
     css += `
 .entity-${type} {
   background-color: ${bgColor} !important;
@@ -421,7 +421,7 @@ function generateEntityCSS() {
 }
 `;
   });
-  
+
   // מחלקות לסוגי השקעה (תאימות לאחור)
   VALID_INVESTMENT_TYPES.forEach(type => {
     const entityType = getInvestmentTypeEntityType(type);
@@ -429,7 +429,7 @@ function generateEntityCSS() {
     const bgColor = ENTITY_BACKGROUND_COLORS[entityType];
     const borderColor = ENTITY_BORDER_COLORS[entityType];
     const textColor = ENTITY_TEXT_COLORS[entityType];
-    
+
     css += `
 .investment-type-${type} {
   background-color: ${bgColor} !important;
@@ -452,14 +452,14 @@ function generateEntityCSS() {
 }
 `;
   });
-  
+
   return css;
 }
 
 /**
  * הכהת צבע
  * Darken color
- * 
+ *
  * @param {string} color - קוד הצבע
  * @param {number} percent - אחוז הכהה
  * @returns {string} צבע מוכהה
@@ -481,7 +481,7 @@ function darkenColor(color, percent) {
 /**
  * יצירת אלמנט סולם צבעים לכל הישויות
  * Create color legend element for all entities
- * 
+ *
  * @param {Object} options - אפשרויות עיצוב
  * @returns {HTMLElement} אלמנט הסולם
  */
@@ -491,7 +491,7 @@ function createEntityLegend(options = {}) {
     containerClass = 'entity-color-legend',
     showDescriptions = false,
     compact = false,
-    entityTypes = VALID_ENTITY_TYPES
+    entityTypes = VALID_ENTITY_TYPES,
   } = options;
 
   const legendContainer = document.createElement('div');
@@ -564,7 +564,7 @@ function createEntityLegend(options = {}) {
 /**
  * יצירת אלמנט סולם צבעים לסוגי השקעה (תאימות לאחור)
  * Create color legend element for investment types (backward compatibility)
- * 
+ *
  * @param {Object} options - אפשרויות עיצוב
  * @returns {HTMLElement} אלמנט הסולם
  */
@@ -573,7 +573,7 @@ function createInvestmentTypeLegend(options = {}) {
     title: '🎨 סולם צבעים - סוגי השקעה:',
     containerClass: 'investment-type-legend',
     entityTypes: VALID_INVESTMENT_TYPES,
-    ...options
+    ...options,
   });
 }
 
@@ -620,25 +620,25 @@ window.colorSchemeSystem = {
   getLabel: getEntityLabel,
   createLegend: createEntityLegend,
   generateCSS: generateEntityCSS,
-  
+
   // Investment type functions (backward compatibility)
-  getInvestmentTypeColor: getInvestmentTypeColor,
-  getInvestmentTypeBackgroundColor: getInvestmentTypeBackgroundColor,
-  getInvestmentTypeTextColor: getInvestmentTypeTextColor,
-  getInvestmentTypeBorderColor: getInvestmentTypeBorderColor,
-  createInvestmentTypeLegend: createInvestmentTypeLegend,
-  
+  getInvestmentTypeColor,
+  getInvestmentTypeBackgroundColor,
+  getInvestmentTypeTextColor,
+  getInvestmentTypeBorderColor,
+  createInvestmentTypeLegend,
+
   // Constants
-  VALID_ENTITY_TYPES: VALID_ENTITY_TYPES,
-  ENTITY_COLORS: ENTITY_COLORS,
-  ENTITY_BACKGROUND_COLORS: ENTITY_BACKGROUND_COLORS,
-  ENTITY_TEXT_COLORS: ENTITY_TEXT_COLORS,
-  ENTITY_BORDER_COLORS: ENTITY_BORDER_COLORS,
-  
-  VALID_INVESTMENT_TYPES: VALID_INVESTMENT_TYPES,
-  INVESTMENT_TYPE_LABELS: INVESTMENT_TYPE_LABELS,
-  INVESTMENT_TYPE_DESCRIPTIONS: INVESTMENT_TYPE_DESCRIPTIONS,
-  INVESTMENT_TYPE_COLORS: INVESTMENT_TYPE_COLORS
+  VALID_ENTITY_TYPES,
+  ENTITY_COLORS,
+  ENTITY_BACKGROUND_COLORS,
+  ENTITY_TEXT_COLORS,
+  ENTITY_BORDER_COLORS,
+
+  VALID_INVESTMENT_TYPES,
+  INVESTMENT_TYPE_LABELS,
+  INVESTMENT_TYPE_DESCRIPTIONS,
+  INVESTMENT_TYPE_COLORS,
 };
 
 console.log('🎨 Unified Color Scheme System loaded successfully!');

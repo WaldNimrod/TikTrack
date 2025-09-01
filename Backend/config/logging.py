@@ -12,7 +12,7 @@ def setup_logging() -> logging.Logger:
     log_dir = Path("logs")
     log_dir.mkdir(exist_ok=True)
     
-    # Set log format
+    # Set log format without correlation ID
     log_format = logging.Formatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
@@ -51,6 +51,26 @@ def setup_logging() -> logging.Logger:
     if os.getenv('FLASK_ENV') == 'development':
         sql_logger = logging.getLogger('sqlalchemy.engine')
         sql_logger.setLevel(logging.INFO)
+    
+    # Performance monitoring log
+    perf_handler = logging.handlers.RotatingFileHandler(
+        log_dir / "performance.log",
+        maxBytes=10*1024*1024,  # 10MB
+        backupCount=3
+    )
+    perf_handler.setLevel(logging.INFO)
+    perf_handler.setFormatter(log_format)
+    logger.addHandler(perf_handler)
+    
+    # Database operations log
+    db_handler = logging.handlers.RotatingFileHandler(
+        log_dir / "database.log",
+        maxBytes=10*1024*1024,  # 10MB
+        backupCount=3
+    )
+    db_handler.setLevel(logging.INFO)
+    db_handler.setFormatter(log_format)
+    logger.addHandler(db_handler)
     
     return logger
 

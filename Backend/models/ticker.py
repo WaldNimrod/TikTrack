@@ -75,6 +75,10 @@ class Ticker(BaseModel):
     trade_plans = relationship("TradePlan", back_populates="ticker", 
                               cascade="all, delete-orphan")
     alerts = relationship("Alert", back_populates="ticker")
+    notes = relationship("Note", 
+                        primaryjoin="and_(Ticker.id == Note.related_id, Note.related_type_id == 4)",
+                        foreign_keys="Note.related_id",
+                        viewonly=True)
     
     def __repr__(self) -> str:
         """String representation of the ticker"""

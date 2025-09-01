@@ -218,8 +218,8 @@
             
             try {
                 const endpoints = [
-                    '/api/v1/health',
-                    '/api/v1/tickers',
+                    '/api/health',
+                    '/api/v1/tickers/',
                     '/api/v1/accounts'
                 ];
                 
@@ -303,7 +303,7 @@
                 const promises = [];
                 for (let i = 0; i < concurrentCount; i++) {
                     promises.push(
-                        fetch('/api/v1/health').then(async response => {
+                        fetch('/api/health').then(async response => {
                             const data = await response.json();
                             return {
                                 request: i + 1,

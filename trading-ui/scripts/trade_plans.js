@@ -90,8 +90,8 @@
  * ========================================
  */
 
-// Global variables
-let trade_plansData = [];
+// Global variables - now using trade-plan-service
+// trade_plansData is now managed by trade-plan-service
 
 // ===== CRUD Modal Functions =====
 
@@ -996,57 +996,22 @@ function getDemoTradePlansData() {
  * @returns {Array} Array of planning
  */
 async function loadTradePlansData() {
-    
-    
     try {
-        // Loading trade_plans from server...
-
-        // Setting base URL
-        const base = (location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
-        const url = `${base}/api/v1/trade_plans/`;
-        // Fetching from URL
-        
-        const response = await fetch(url);
-            // Response status check
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const responseData = await response.json();
-
-
-        // Check if response has data property
-        if (!responseData.data) {
-            handleValidationError('response data', 'תגובת השרת לא מכילה שדה data');
-            trade_plansData = [];
+        // Use trade-plan-service to load data
+        if (typeof window.tradePlanService?.loadTradePlansData === 'function') {
+            const data = await window.tradePlanService.loadTradePlansData();
+            
+            // Update the table
+            updateTradePlansTable(data);
+            
+            return data;
+        } else {
+            console.error('❌ Trade Plan Service not available');
             return [];
         }
-
-        // Check if data is an array
-        if (!Array.isArray(responseData.data)) {
-            handleValidationError('response data', 'נתוני השרת אינם מערך');
-            trade_plansData = [];
-            return [];
-        }
-
-        trade_plansData = responseData.data;
-
-        // Update the table
-        // === UPDATE TRADE PLANS TABLE FUNCTION CALLED ===
-        
-        updateTradePlansTable(trade_plansData);
-
-        return trade_plansData;
-
     } catch (error) {
         handleDataLoadError(error, 'נתוני תכנונים');
-        
-        // Use demo data as fallback
-        // Using demo data as fallback
-        trade_plansData = getDemoTradePlansData();
-        updateTradePlansTable(trade_plansData);
-        return trade_plansData;
+        return [];
     }
 }
 
@@ -1115,10 +1080,15 @@ function filterDesignsLocally(trade_plans, selectedStatuses, selectedTypes, sele
  * פילטור נתוני תכנונים
  */
 function filterTradePlansData(filters) {
-
-
+    // Use trade-plan-service for filtering
+    if (typeof window.tradePlanService?.filterTradePlans === 'function') {
+        const filteredData = window.tradePlanService.filterTradePlans(filters);
+        updateTradePlansTable(filteredData);
+        return;
+    }
+    
+    // Fallback to local filtering
     if (!window.tradePlansData || !Array.isArray(window.tradePlansData)) {
-
         return;
     }
 
@@ -1197,7 +1167,7 @@ function updateTradePlansTable(trade_plans) {
         // No trade plans to display
         
         // Checking if it's because of filters or if there are no data at all
-        const hasOriginalData = trade_plansData && trade_plansData.length > 0;
+        const hasOriginalData = window.tradePlanService?.getTradePlans()?.length > 0 || (trade_plansData && trade_plansData.length > 0);
         // Has original data check
 
         // Checking if there are active filters

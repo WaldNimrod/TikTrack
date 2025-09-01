@@ -50,7 +50,7 @@
 <body class="db-display-page">
   <!-- Web Component of the header -->
   <!-- Unified Header System -->
-  <div id="unified-header-container"></div>
+  <!-- Unified Header System will create header automatically -->
 
   <div class="background-wrapper">
 
@@ -592,6 +592,7 @@
   <script src="scripts/filter-system.js"></script>
   <script src="scripts/crud-utils.js"></script>
   <!-- alerts.js הוסר - לא נחוץ בעמוד זה -->
+    <script src="scripts/alert-service.js"></script>
 
   <!-- Modular files -->
   <script src="scripts/button-icons.js"></script>
@@ -607,28 +608,9 @@
   <script src="scripts/main.js"></script>
   <script src="scripts/header-system.js?v=20250830_2"></script>
   <!-- alerts.js הוסר - לא נחוץ בעמוד זה -->
-      <script src="scripts/database.js?v=20250831_11"></script>
+    <script src="scripts/alert-service.js"></script>
+      <script src="scripts/db_display.js"></script>
   <script src="scripts/active-alerts-component.js?v=20250830_1"></script>
-
-  <!-- Page initialization -->
-  <script>
-    // Page initialization
-    document.addEventListener('DOMContentLoaded', function () {
-      console.log('➕ Initializing database display page...');
-    });
-  </script>
-  <script>
-    // אתחול מערכת הכותרת החדשה
-    document.addEventListener("DOMContentLoaded", () => {
-      console.log("🔄 Initializing unified header system...");
-      if (window.headerSystem) {
-        window.headerSystem.init();
-      }
-      if (window.simpleFilter) {
-        window.simpleFilter.init();
-      }
-    });
-  </script>
 </body>
 
 </html>

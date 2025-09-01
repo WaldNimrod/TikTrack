@@ -176,7 +176,7 @@
                                     <div class="test-group">
                                         <h6>בדיקת בקשה מותאמת</h6>
                                         <div class="input-group mb-2">
-                                            <input type="text" id="custom-request" class="form-control" placeholder="הזן URL או נתונים" value="/api/v1/health">
+                                            <input type="text" id="custom-request" class="form-control" placeholder="הזן URL או נתונים" value="/api/health">
                                             <button id="test-custom-request" class="btn btn-outline-secondary btn-sm">
                                                 <i class="fas fa-terminal"></i> הרץ
                                             </button>
@@ -222,7 +222,19 @@
                 const endTime = performance.now();
                 const responseTime = endTime - startTime;
                 
-                const data = await response.json();
+                let data = null;
+                
+                // קריאה אחת בלבד של ה-response body
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    try {
+                        data = await response.json();
+                    } catch (jsonError) {
+                        data = { error: 'Invalid JSON response' };
+                    }
+                } else {
+                    data = await response.text();
+                }
                 
                 if (response.ok && data.status === 'success') {
                     addLog('success', `Endpoint תקין - זמן תגובה: ${responseTime.toFixed(2)}ms`);
@@ -261,10 +273,14 @@
             addLog('info', 'בודק בקשת POST...');
             
             try {
+                // יצירת סמל ייחודי עם timestamp (מוגבל ל-10 תווים)
+                const timestamp = Date.now().toString().slice(-6); // רק 6 ספרות אחרונות
                 const testData = {
-                    test: true,
-                    timestamp: new Date().toISOString(),
-                    message: 'בדיקת POST request'
+                    symbol: `T${timestamp}`, // T + 6 ספרות = 7 תווים
+                    name: 'Test Ticker',
+                    type: 'stock',
+                    currency_id: 1,
+                    remarks: 'בדיקת POST request'
                 };
                 
                 const startTime = performance.now();
@@ -375,10 +391,10 @@
                 const requests = [];
                 const startTime = performance.now();
                 
-                // שליחת 10 בקשות ברצף
-                for (let i = 0; i < 10; i++) {
+                // שליחת 15 בקשות ברצף (יותר מהגבול של 10 לדקה)
+                for (let i = 0; i < 15; i++) {
                     const requestStart = performance.now();
-                    const response = await fetch('/api/v1/health');
+                    const response = await fetch('/api/health');
                     const requestEnd = performance.now();
                     
                     requests.push({
@@ -389,7 +405,7 @@
                     });
                     
                     // עיכוב קצר בין בקשות
-                    await new Promise(resolve => setTimeout(resolve, 50));
+                    await new Promise(resolve => setTimeout(resolve, 10));
                 }
                 
                 const endTime = performance.now();
@@ -441,7 +457,7 @@
                     },
                     {
                         name: 'בקשת POST עם נתונים לא תקינים',
-                        url: '/api/v1/preferences',
+                        url: '/api/v1/tickers/',
                         method: 'POST',
                         body: 'invalid-json',
                         expectedStatus: 400
@@ -469,7 +485,19 @@
                         }
                         
                         const response = await fetch(test.url, options);
-                        const data = await response.json();
+                        let data = null;
+                        
+                        // קריאה אחת בלבד של ה-response body
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('application/json')) {
+                            try {
+                                data = await response.json();
+                            } catch (jsonError) {
+                                data = { error: 'Invalid JSON response' };
+                            }
+                        } else {
+                            data = await response.text();
+                        }
                         
                         results.push({
                             test: test.name,
@@ -524,9 +552,9 @@
             
             try {
                 const performanceTests = [
-                    { name: 'Health Check', url: '/api/v1/health' },
-                    { name: 'Tickers List', url: '/api/v1/tickers' },
-                    { name: 'Accounts List', url: '/api/v1/accounts' }
+                    { name: 'Health Check', url: '/api/health' },
+                    { name: 'Tickers List', url: '/api/v1/tickers/' },
+                    { name: 'Accounts List', url: '/api/v1/accounts/' }
                 ];
                 
                 const results = [];
@@ -610,8 +638,21 @@
                 const promises = [];
                 for (let i = 0; i < concurrentCount; i++) {
                     promises.push(
-                        fetch('/api/v1/health').then(async response => {
-                            const data = await response.json();
+                        fetch('/api/health').then(async response => {
+                            let data = null;
+                            
+                            // קריאה אחת בלבד של ה-response body
+                            const contentType = response.headers.get('content-type');
+                            if (contentType && contentType.includes('application/json')) {
+                                try {
+                                    data = await response.json();
+                                } catch (jsonError) {
+                                    data = { error: 'Invalid JSON response' };
+                                }
+                            } else {
+                                data = await response.text();
+                            }
+                            
                             return {
                                 request: i + 1,
                                 status: response.status,
@@ -679,7 +720,7 @@
                     // נסה לפרסר כנתונים
                     try {
                         const parsed = JSON.parse(request);
-                        url = parsed.url || '/api/v1/health';
+                        url = parsed.url || '/api/health';
                         method = parsed.method || 'GET';
                         body = parsed.body;
                     } catch {
@@ -704,7 +745,19 @@
                 const endTime = performance.now();
                 const responseTime = endTime - startTime;
                 
-                const data = await response.json();
+                let data = null;
+                
+                // קריאה אחת בלבד של ה-response body
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    try {
+                        data = await response.json();
+                    } catch (jsonError) {
+                        data = { error: 'Invalid JSON response' };
+                    }
+                } else {
+                    data = await response.text();
+                }
                 
                 const status = response.ok ? 'success' : 'warning';
                 const message = response.ok ? 

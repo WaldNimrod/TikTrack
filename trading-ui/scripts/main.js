@@ -1206,11 +1206,11 @@ function initializeDevelopmentShortcuts() {
       console.log('🔧 קיצור מקלדת: ניקוי Cache');
       if (window.clearDevelopmentCache) {
         // יצירת event מזויף עבור הפונקציה
-        const fakeEvent = { 
-          target: { 
-            innerHTML: '<i class="fas fa-trash"></i> נקה Cache', 
-            disabled: false 
-          } 
+        const fakeEvent = {
+          target: {
+            innerHTML: '<i class="fas fa-trash"></i> נקה Cache',
+            disabled: false,
+          },
         };
         window.clearDevelopmentCache.call(fakeEvent);
       }

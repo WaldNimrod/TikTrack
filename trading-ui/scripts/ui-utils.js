@@ -404,11 +404,6 @@ window.uiUtils = {
  */
 
 
-
-
-
-
-
 /**
  * Global cancel function - unified cancel behavior across all pages
  *
@@ -570,8 +565,6 @@ async function performItemCancellation(itemType, itemId, itemName) {
  */
 
 
-
-
 // אתחול UI Utils
 function initializeUIUtils() {
   // UI Utils loaded successfully
@@ -609,10 +602,6 @@ window.performItemCancellation = performItemCancellation;
 // This function is now moved to notification-system.js
 
 // Export individual functions to global scope
-
-
-
-
 
 
 // These functions are now moved to notification-system.js

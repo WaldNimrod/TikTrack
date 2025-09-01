@@ -301,7 +301,28 @@ set_cache_environment() {
         preserve)
             # Detect and preserve current state
             local current_state=$(detect_current_cache_state)
-            set_cache_environment "$current_state"
+            log_info "Preserving current cache state: $current_state"
+            # Avoid infinite recursion by calling the specific case directly
+            case $current_state in
+                development)
+                    export TIKTRACK_DEV_MODE="true"
+                    export TIKTRACK_CACHE_DISABLED="false"
+                    log_info "Cache mode preserved as: DEVELOPMENT (10 seconds TTL)"
+                    ;;
+                no-cache)
+                    export TIKTRACK_DEV_MODE="true"
+                    export TIKTRACK_CACHE_DISABLED="true"
+                    log_info "Cache mode preserved as: NO-CACHE (disabled)"
+                    ;;
+                production)
+                    export TIKTRACK_DEV_MODE="false"
+                    export TIKTRACK_CACHE_DISABLED="false"
+                    log_info "Cache mode preserved as: PRODUCTION (5 minutes TTL)"
+                    ;;
+                custom)
+                    log_info "Cache mode preserved as: CUSTOM (unknown TTL)"
+                    ;;
+            esac
             ;;
         *)
             log_error "Invalid cache mode: $cache_mode"

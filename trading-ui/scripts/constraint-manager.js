@@ -1,4 +1,4 @@
-/**לכן בבק
+/** לכן בבק
  * Constraint Manager - JavaScript for managing database constraints
  * Date: August 23, 2025
  * Description: Frontend JavaScript for the constraints management interface

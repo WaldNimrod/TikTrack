@@ -68,9 +68,11 @@ const utils = {
         // Use existing notification system if available
         if (window.notificationSystem) {
             window.notificationSystem.show(message, type);
+        } else if (typeof window.showNotification === 'function') {
+            window.showNotification(message, type);
         } else {
-            // Fallback to alert
-            alert(`${type.toUpperCase()}: ${message}`);
+            // Fallback למקרה שמערכת התראות לא זמינה
+            console.log(`${type.toUpperCase()}: ${message}`);
         }
     },
 

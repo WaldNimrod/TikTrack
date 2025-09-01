@@ -1,4 +1,24 @@
-# TikTrack - מערכת ניהול טריידים
+# TikTrack Trading Management System
+
+## 📅 תאריך עדכון
+31 באוגוסט 2025
+
+## 🎯 תיאור המערכת
+מערכת ניהול מסחר מתקדמת הכוללת מעקב אחר עסקאות, התראות, וניתוח ביצועים.
+
+## 🚀 שינויים אחרונים
+
+### **החלפת הודעות למערכת התראות (31 באוגוסט 2025):**
+- ✅ הוחלפו כל הודעות `alert()` ו-`confirm()` במערכת התראות המתקדמת
+- ✅ הוספת fallback למקרה שמערכת התראות לא זמינה
+- ✅ תיקון ניקוי קונסול אוטומטי בטעינת הדף
+- ✅ עדכון דוקומנטציה מקיפה
+
+### **קבצים שעודכנו:**
+- `alerts.js`, `trades.js`, `preferences.js`, `notes.js`
+- `trade_plans.js`, `cash_flows.js`, `constraint-manager.js`
+- `notification-system.js`, `header-system.js`, `main.js`, `ui-utils.js`
+- `console-cleanup.js` - תיקון ניקוי אוטומטי
 
 ## 📋 **משימות מרכזיות**
 

@@ -84,12 +84,7 @@ function getConsoleSettings() {
   };
 
   const savedSettings = localStorage.getItem('consoleSettings');
-  const finalSettings = savedSettings ? { ...defaultSettings, ...JSON.parse(savedSettings) } : defaultSettings;
-  
-  // לוג זמני לבדיקה
-  console.log('🔍 getConsoleSettings נקראה:', finalSettings);
-  
-  return finalSettings;
+  return savedSettings ? { ...defaultSettings, ...JSON.parse(savedSettings) } : defaultSettings;
 }
 
 // פונקציה לשמירת הגדרות console
@@ -107,6 +102,9 @@ document.addEventListener('DOMContentLoaded', function() {
   window.stopAutoClearConsole = stopAutoClearConsole;
   window.getConsoleSettings = getConsoleSettings;
   window.saveConsoleSettings = saveConsoleSettings;
+
+  // עצור כל ניקוי אוטומטי קיים בטעינת הדף
+  stopAutoClearConsole();
 
   // אל תפעיל ניקוי אוטומטי בטעינת הדף - רק אם המשתמש מפעיל במפורש
   console.log('Console cleanup utility loaded - manual control only');

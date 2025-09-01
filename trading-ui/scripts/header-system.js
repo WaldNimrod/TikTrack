@@ -633,6 +633,15 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">מטריקס פונקציות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/js-map">מפת JS</a></li>
                         <li><hr class="dropdown-divider"></li>
+                        <li><a class="tiktrack-dropdown-item" href="/background-tasks">ניהול משימות ברקע</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/cache-test">בדיקת Cache</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/test_api">בדיקת API</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/test_performance">בדיקת ביצועים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/test_system_stats">סטטיסטיקות מערכת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/test_models">בדיקת מודלים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/test_external_data">בדיקת נתונים חיצוניים</a></li>
+                        <li><hr class="dropdown-divider"></li>
                         <li><a class="tiktrack-dropdown-item" href="#" onclick="clearDevelopmentCache(event)" style="color: #ff6b6b;">
                           <i class="fas fa-trash"></i> נקה Cache (פיתוח)
                         </a></li>

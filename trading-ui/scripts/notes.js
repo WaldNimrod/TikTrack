@@ -365,7 +365,7 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
 
     if (note.related_type_id && note.related_id) {
       switch (note.related_type_id) {
-      case 1: // חשבון
+      case 1: { // חשבון
         const account = accounts.find(a => a.id === note.related_id);
         if (account) {
           const name = account.name || account.account_name || 'לא מוגדר';
@@ -377,7 +377,8 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
         relatedClass = 'related-account';
         symbolDisplay = ''; // חשבון - ריק לחלוטין
         break;
-      case 2: // טרייד
+      }
+      case 2: { // טרייד
         const trade = trades.find(t => t.id === note.related_id);
         if (trade) {
           const date = trade.created_at || trade.date;
@@ -398,7 +399,8 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
         relatedIcon = '📈';
         relatedClass = 'related-trade';
         break;
-      case 3: // תוכנית
+      }
+      case 3: { // תוכנית
         const plan = tradePlans.find(p => p.id === note.related_id);
         if (plan) {
           const date = plan.created_at || plan.date;
@@ -419,7 +421,8 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
         relatedIcon = '📋';
         relatedClass = 'related-plan';
         break;
-      case 4: // טיקר
+      }
+      case 4: { // טיקר
         const ticker = tickers.find(t => t.id === note.related_id);
         if (ticker) {
           relatedDisplay = ticker.symbol;
@@ -431,6 +434,7 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
         relatedIcon = '📊';
         relatedClass = 'related-ticker';
         break;
+      }
       default:
         symbolDisplay = `אובייקט ${note.related_id}`;
         relatedDisplay = `אובייקט ${note.related_id}`;
@@ -746,6 +750,7 @@ function populateSelect(selectId, data, field, prefix = '') {
   if (!select) {return;}
 
   if (data.length > 0) {
+    // Data available for population
   }
 
   select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
@@ -797,34 +802,38 @@ async function populateEditSelectByType(relationType, selectedId) {
     let placeholder = '';
 
     switch (parseInt(relationType)) {
-    case 1: // חשבון
+    case 1: { // חשבון
       const accountsResponse = await fetch('/api/v1/accounts/');
       const accountsData = await accountsResponse.json();
       data = Array.isArray(accountsData.data) ? accountsData.data : [];
       displayField = 'name';
       placeholder = 'חשבון';
       break;
-    case 2: // טרייד
+    }
+    case 2: { // טרייד
       const tradesResponse = await fetch('/api/v1/trades/');
       const tradesData = await tradesResponse.json();
       data = Array.isArray(tradesData.data) ? tradesData.data : [];
       displayField = 'id';
       placeholder = 'טרייד';
       break;
-    case 3: // תוכנית
+    }
+    case 3: { // תוכנית
       const plansResponse = await fetch('/api/v1/trade_plans/');
       const plansData = await plansResponse.json();
       data = Array.isArray(plansData.data) ? plansData.data : [];
       displayField = 'id';
       placeholder = 'תוכנית';
       break;
-    case 4: // טיקר
+    }
+    case 4: { // טיקר
       const tickersResponse = await fetch('/api/v1/tickers/');
       const tickersData = await tickersResponse.json();
       data = Array.isArray(tickersData.data) ? tickersData.data : [];
       displayField = 'symbol';
       placeholder = 'טיקר';
       break;
+    }
     }
 
     // מילוי הרשימה
@@ -870,6 +879,7 @@ function validateNoteForm(content, relationType, relatedId, attachment) {
     window.showValidationWarning('contentError', 'תוכן ההערה ארוך מדי (מקסימום 10,000 תווים)');
     isValid = false;
   } else {
+    // Content validation passed
   }
 
   // וולידציה של סוג קשר
@@ -1536,6 +1546,7 @@ function showTickerPage(symbol) {
   if (typeof window.showInfoNotification === 'function') {
     window.showInfoNotification('מידע', `דף הטיקר ${symbol} נמצא בפיתוח`);
   } else {
+    // Fallback notification
   }
 }
 
@@ -1589,12 +1600,13 @@ function formatText(command, mode = 'add') {
   case 'ol':
     document.execCommand('insertOrderedList', false, null);
     break;
-  case 'link':
+  case 'link': {
     const url = prompt('הכנס כתובת URL:', 'http://');
     if (url) {
       document.execCommand('createLink', false, url);
     }
     break;
+  }
   default:
     console.warn(`⚠️ פקודה לא מוכרת: ${command}`);
   }
@@ -1915,6 +1927,7 @@ function removeCurrentAttachment() {
   if (typeof window.showInfoNotification === 'function') {
     window.showInfoNotification('מידע', 'הקובץ המצורף יימחק בעת שמירת ההערה');
   } else {
+    // Fallback notification
   }
 }
 

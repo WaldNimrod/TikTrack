@@ -343,30 +343,12 @@ table[data-table-type="executions"] .actions-cell .btn {
 
 /* סגנונות לטבלת התראות */
 table[data-table-type="alerts"] .actions-cell {
-    width: 140px !important;
-    min-width: 140px !important;
-    max-width: 140px !important;
-}
-
-table[data-table-type="alerts"] .actions-cell .btn {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 0.7rem !important;
-    margin: 0 1px !important;
+    text-align: center !important;
 }
 
 /* סגנונות לטבלת הערות */
 table[data-table-type="notes"] .actions-cell {
-    width: 140px !important;
-    min-width: 140px !important;
-    max-width: 140px !important;
-}
-
-table[data-table-type="notes"] .actions-cell .btn {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 0.7rem !important;
-    margin: 0 1px !important;
+    text-align: center !important;
 }
 
 /* רוחב קבוע לעמודת הפעולות - כפתורים בשורה אחת */

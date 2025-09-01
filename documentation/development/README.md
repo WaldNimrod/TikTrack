@@ -604,12 +604,7 @@ app.config['SQLALCHEMY_ECHO'] = True
 6. **Submit Pull Request**: Create pull request for review
 
 ### Code Review Checklist
-- [ ] Code follows style guidelines
-- [ ] Tests are included and passing
-- [ ] Documentation is updated
-- [ ] No security vulnerabilities
-- [ ] Performance impact is considered
-- [ ] Error handling is implemented
+> 📋 **כל הבדיקות הועברו ל**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md)
 
 ### Commit Message Format
 ```

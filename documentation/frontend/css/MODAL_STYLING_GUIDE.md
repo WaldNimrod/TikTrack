@@ -232,24 +232,13 @@ Select appropriate header styling based on modal purpose:
 ## Testing Checklist
 
 ### Visual Testing
-- [ ] No white gaps between modal components
-- [ ] Consistent border radius across all modals
-- [ ] Proper color gradients for different modal types
-- [ ] Correct z-index layering
-- [ ] Responsive behavior on different screen sizes
+> 📋 **כל הבדיקות הועברו ל**: [../../../CENTRAL_TASKS_TODO.md](../../../CENTRAL_TASKS_TODO.md)
 
 ### Functional Testing
-- [ ] Modals open and close properly
-- [ ] Backdrop click closes modal
-- [ ] Escape key closes modal
-- [ ] Focus management works correctly
-- [ ] No JavaScript errors in console
+> 📋 **כל הבדיקות הועברו ל**: [../../../CENTRAL_TASKS_TODO.md](../../../CENTRAL_TASKS_TODO.md)
 
 ### Cross-Browser Testing
-- [ ] Chrome (latest)
-- [ ] Firefox (latest)
-- [ ] Safari (latest)
-- [ ] Edge (latest)
+> 📋 **כל הבדיקות הועברו ל**: [../../../CENTRAL_TASKS_TODO.md](../../../CENTRAL_TASKS_TODO.md)
 
 ## Version History
 

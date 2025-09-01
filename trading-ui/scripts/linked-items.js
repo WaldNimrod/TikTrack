@@ -822,7 +822,7 @@ function createModal(id, title, content) {
     <div class="modal fade" id="${id}" tabindex="-1" aria-labelledby="${id}Label" aria-hidden="true">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
-          <div class="modal-header">
+          <div class="modal-header modal-header-colored">
             <button type="button" class="btn-close-custom" data-bs-dismiss="modal" aria-label="Close">
               ✕
             </button>

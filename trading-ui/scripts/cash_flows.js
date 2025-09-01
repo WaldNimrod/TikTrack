@@ -134,19 +134,73 @@ function restoreCashFlowsSectionState() {
 
 // פונקציה להצגת מודל מחיקה נפרד
 function showDeleteCashFlowModal(id) {
-    const cashFlow = cashFlowsData.find(cf => cf.id === id);
-    if (!cashFlow) {
-        return;
+    console.log('🔧 showDeleteCashFlowModal called with id:', id);
+    
+    try {
+        // בדיקה שהנתונים קיימים
+        if (!window.cashFlowsData || !Array.isArray(window.cashFlowsData)) {
+            console.error('❌ cashFlowsData is not available');
+            console.log('🔧 window.cashFlowsData:', window.cashFlowsData);
+            return;
+        }
+
+        const cashFlow = window.cashFlowsData ? window.cashFlowsData.find(cf => cf.id === id) : null;
+        if (!cashFlow) {
+            console.error('❌ Cash flow not found with id:', id);
+            console.log('🔧 Available cash flows:', window.cashFlowsData ? window.cashFlowsData.map(cf => ({ id: cf.id, description: cf.description })) : 'No data');
+            return;
+        }
+
+        console.log('🔧 Found cash flow:', cashFlow);
+
+        // מילוי פרטי המחיקה
+        const deleteCashFlowId = document.getElementById('deleteCashFlowId');
+        const deleteCashFlowName = document.getElementById('deleteCashFlowName');
+        
+        console.log('🔧 Modal elements:', { deleteCashFlowId, deleteCashFlowName });
+        
+        if (deleteCashFlowId && deleteCashFlowName) {
+            deleteCashFlowId.value = cashFlow.id;
+            deleteCashFlowName.textContent = `${cashFlow.description || 'תזרים מזומנים'} - ${cashFlow.amount}`;
+
+            // הצגת המודל
+            const modalElement = document.getElementById('deleteCashFlowModal');
+            console.log('🔧 Modal element:', modalElement);
+            
+            if (modalElement) {
+                // בדיקה אם Bootstrap זמין
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    const modal = new bootstrap.Modal(modalElement);
+                    modal.show();
+                    console.log('✅ Delete modal shown successfully');
+                } else {
+                    console.error('❌ Bootstrap Modal not available');
+                    // ניסיון להציג את המודל באופן ידני
+                    modalElement.style.display = 'block';
+                    modalElement.classList.add('show');
+                    document.body.classList.add('modal-open');
+                    console.log('✅ Delete modal shown manually');
+                }
+            } else {
+                console.error('❌ Delete modal element not found');
+            }
+        } else {
+            console.error('❌ Delete modal elements not found');
+        }
+    } catch (error) {
+        console.error('❌ Error in showDeleteCashFlowModal:', error);
     }
-
-    // מילוי פרטי המחיקה
-    document.getElementById('deleteCashFlowId').value = cashFlow.id;
-    document.getElementById('deleteCashFlowName').textContent = `${cashFlow.description || 'תזרים מזומנים'} - ${cashFlow.amount}`;
-
-    // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById('deleteCashFlowModal'));
-    modal.show();
 }
+
+// פונקציה גלובלית למחיקה - גיבוי
+window.deleteCashFlow = function(id) {
+    console.log('🔧 Global deleteCashFlow called with id:', id);
+    if (window.showDeleteCashFlowModal) {
+        window.showDeleteCashFlowModal(id);
+    } else {
+        console.error('❌ showDeleteCashFlowModal not available');
+    }
+};
 
 // פונקציות אלו הוסרו - תזרימי מזומנים לא צריכים בדיקת מקושרים
 // הפונקציה showDeleteCashFlowWarning משתמשת ישירות ב-window.showDeleteWarning
@@ -467,18 +521,26 @@ function showDeleteCashFlowWarning(id) {
  * מחיקת תזרים מזומנים
  */
 async function confirmDeleteCashFlow(id) {
+    console.log('🔧 confirmDeleteCashFlow called with id:', id);
+    
     try {
         // אם לא הועבר id, נקח אותו מהשדה הנסתר
         if (!id) {
-            id = document.getElementById('deleteCashFlowId').value;
+            const deleteCashFlowId = document.getElementById('deleteCashFlowId');
+            if (deleteCashFlowId) {
+                id = deleteCashFlowId.value;
+                console.log('🔧 Got id from hidden field:', id);
+            }
         }
         
         if (!id) {
+            console.error('❌ No ID provided for deletion');
             handleValidationError('deleteCashFlow', 'לא נמצא מזהה למחיקה');
             window.showErrorNotification('שגיאה', 'לא נמצא מזהה למחיקה');
             return;
         }
 
+        console.log('🔧 Sending DELETE request for cash flow id:', id);
         const response = await fetch(`http://localhost:8080/api/v1/cash_flows/${id}`, {
             method: 'DELETE'
         });
@@ -488,24 +550,34 @@ async function confirmDeleteCashFlow(id) {
         }
 
         const result = await response.json();
+        console.log('🔧 Delete response:', result);
 
         if (result.status === 'success') {
             // סגירת המודל
-            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteCashFlowModal'));
-            modal.hide();
+            const modalElement = document.getElementById('deleteCashFlowModal');
+            if (modalElement) {
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) {
+                    modal.hide();
+                    console.log('✅ Delete modal closed successfully');
+                }
+            }
 
             // הצגת הודעת הצלחה
             window.showSuccessNotification('הצלחה', 'תזרים המזומנים נמחק בהצלחה');
 
             // טעינה מחדש של הנתונים
             await loadCashFlows();
+            console.log('✅ Cash flows reloaded after deletion');
         } else {
+            console.error('❌ Delete failed:', result.error);
             handleApiError('שגיאה במחיקת תזרים מזומנים', result.error);
 
             // הצגת הודעת שגיאה
             window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת תזרים מזומנים - ייתכן שיש פריטים מקושרים');
         }
     } catch (error) {
+        console.error('❌ Delete error:', error);
         handleDeleteError(error, 'מחיקת תזרים מזומנים');
 
         // הצגת הודעת שגיאה
@@ -780,9 +852,9 @@ function renderCashFlowsTable() {
             <td>${cashFlow.external_id || '0'}</td>
             <td style="text-align: center;">${formatDateOnly(cashFlow.created_at)}</td>
             <td class="actions-cell">
-                ${createEditButton(`showEditCashFlowModal(${cashFlow.id})`)}
                 ${createLinkButton(`window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`)}
-                ${createDeleteButton(`showDeleteCashFlowModal(${cashFlow.id})`)}
+                ${createEditButton(`showEditCashFlowModal(${cashFlow.id})`)}
+                ${createDeleteButton(`console.log('Delete button clicked for id: ${cashFlow.id}'); if(window.showDeleteCashFlowModal) { window.showDeleteCashFlowModal(${cashFlow.id}); } else { console.error('showDeleteCashFlowModal not found'); }`)}
             </td>
         `;
         tbody.appendChild(row);
@@ -1498,9 +1570,6 @@ async function saveCashFlow() {
         }
     } catch (error) {
         handleSaveError(error, 'שמירת תזרים מזומנים');
-
-        // הצגת הודעת שגיאה
-        window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת תזרים מזומנים - בדוק את הנתונים שהוזנו');
     }
 }
 
@@ -1610,9 +1679,6 @@ async function updateCashFlow() {
         }
     } catch (error) {
         handleSaveError(error, 'עדכון תזרים מזומנים');
-
-        // הצגת הודעת שגיאה
-        window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון תזרים מזומנים - בדוק את הנתונים שהוזנו');
     }
 }
 
@@ -1642,5 +1708,11 @@ window.setupSourceFieldListeners = setupSourceFieldListeners;
 window.initializeExternalIdFields = initializeExternalIdFields;
 window.showDeleteCashFlowWarning = showDeleteCashFlowWarning;
 window.showDeleteCashFlowModal = showDeleteCashFlowModal;
+window.confirmDeleteCashFlow = confirmDeleteCashFlow;
+
+// ייצוא נוסף לפונקציות מחיקה
+window.deleteCashFlow = showDeleteCashFlowModal;
+window.deleteCashFlowModal = showDeleteCashFlowModal;
+
 // window.showLinkedItemsWarning = showLinkedItemsWarning; // הוסר - הוחלף ב-showLinkedItemsModal
 // window.checkLinkedItemsForCashFlow = checkLinkedItemsForCashFlow; // הוסר - לא נחוץ יותר

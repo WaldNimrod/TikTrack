@@ -64,7 +64,12 @@ function createButton(type, onClick, additionalClasses = '', additionalAttribute
     const icon = BUTTON_ICONS[type.toUpperCase()] || '';
     const text = BUTTON_TEXTS[type.toUpperCase()] || '';
 
-    return `<button class="btn btn-sm ${getButtonClass(type)}" onclick="${onClick}" title="${text}" ${additionalAttributes}>${icon}</button>`;
+    console.log('🔧 createButton called with:', { type, onClick, additionalClasses, additionalAttributes });
+    
+    const buttonHtml = `<button class="btn btn-sm ${getButtonClass(type)}" onclick="${onClick}" title="${text}" ${additionalAttributes}>${icon}</button>`;
+    console.log('🔧 Generated button HTML:', buttonHtml);
+    
+    return buttonHtml;
 }
 
 // פונקציה לקבלת מחלקת CSS לכפתור
@@ -104,6 +109,7 @@ function createEditButton(onClick, additionalClasses = '') {
 
 // פונקציה ליצירת כפתור מחיקה
 function createDeleteButton(onClick, additionalClasses = '') {
+    console.log('🔧 createDeleteButton called with onClick:', onClick);
     return createButton('DELETE', onClick, additionalClasses);
 }
 

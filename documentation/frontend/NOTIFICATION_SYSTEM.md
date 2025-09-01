@@ -1,232 +1,218 @@
-# מערכת ההתראות - TikTrack
+# מערכת התראות והודעות - TikTrack
 
-## סקירה כללית
+## 📅 תאריך עדכון
+29 באוגוסט 2025
 
-מערכת ההתראות של TikTrack מספקת פתרון מרכזי להצגת הודעות למשתמשים בממשק המשתמש. המערכת מחליפה את השימוש ב-`alert()` ו-`confirm()` הרגילים ומספקת חוויית משתמש עקבית ומקצועית.
+## 🎯 מטרת הדוקומנטציה
+תיעוד מדויק של מערכת ההתראות וההודעות, כולל פונקציות זמינות, סדר פרמטרים, ודרך הקריאה הנכונה לכל פונקציה.
 
-## קבצים עיקריים
+## 📁 קבצים מרכזיים
+- `trading-ui/scripts/notification-system.js` - מערכת ההתראות הראשית
+- `trading-ui/scripts/ui-utils.js` - פונקציות עזר למערכת ההתראות
+- `trading-ui/styles/styles.css` - עיצוב ההתראות
 
-- **קובץ מערכת**: `trading-ui/scripts/notification-system.js`
-- **תלויות**: `linked-items.js`, Bootstrap 5.3.0
-- **גרסה**: 3.0
-- **עדכון אחרון**: 29 באוגוסט 2025
+## 🔧 פונקציות זמינות
 
-## פונקציות עיקריות
+### **1. פונקציות התראות בסיסיות**
 
-### 1. הודעות הצלחה
+#### **`window.showNotification(message, type, title, duration)`**
+**תיאור**: פונקציה בסיסית להצגת התראה
+**פרמטרים**:
+- `message` (string) - תוכן ההודעה
+- `type` (string) - סוג ההתראה: 'success', 'error', 'warning', 'info'
+- `title` (string) - כותרת ההתראה (ברירת מחדל: 'התראה')
+- `duration` (number) - משך הצגה במילישניות (ברירת מחדל: 4000)
+
+**דוגמה**:
 ```javascript
-window.showSuccessNotification('כותרת', 'הודעה', משך_במילישניות);
+window.showNotification('הנתונים נשמרו בהצלחה', 'success', 'הצלחה', 5000);
 ```
 
-**דוגמאות שימוש:**
+#### **`window.showSuccessNotification(title, message, duration)`**
+**תיאור**: התראה ירוקה להצלחה
+**פרמטרים**:
+- `title` (string) - כותרת ההתראה
+- `message` (string) - תוכן ההודעה
+- `duration` (number) - משך הצגה (ברירת מחדל: 4000)
+
+**דוגמה**:
 ```javascript
-window.showSuccessNotification('הצלחה', 'עסקה נשמרה בהצלחה', 5000);
-window.showSuccessNotification('שמירה הושלמה', 'הנתונים נשמרו במערכת');
+window.showSuccessNotification('הצלחה', 'מטבע נוסף בהצלחה למערכת');
 ```
 
-### 2. הודעות שגיאה
+#### **`window.showErrorNotification(title, message, duration)`**
+**תיאור**: התראה אדומה לשגיאה
+**פרמטרים**:
+- `title` (string) - כותרת ההתראה
+- `message` (string) - תוכן ההודעה
+- `duration` (number) - משך הצגה (ברירת מחדל: 6000)
+
+**דוגמה**:
 ```javascript
-window.showErrorNotification('כותרת', 'הודעה', משך_במילישניות);
+window.showErrorNotification('שגיאה', 'שגיאה בשמירת המטבע');
 ```
 
-**דוגמאות שימוש:**
+#### **`window.showWarningNotification(title, message, duration)`**
+**תיאור**: התראה כתומה לאזהרה
+**פרמטרים**:
+- `title` (string) - כותרת ההתראה
+- `message` (string) - תוכן ההודעה
+- `duration` (number) - משך הצגה (ברירת מחדל: 5000)
+
+**דוגמה**:
 ```javascript
-window.showErrorNotification('שגיאה', 'שגיאה בשמירת הנתונים', 3000);
-window.showErrorNotification('שגיאה', 'יש לתקן את השגיאות בטופס');
+window.showWarningNotification('אזהרה', 'המטבע כבר קיים במערכת');
 ```
 
-### 3. הודעות אזהרה
+#### **`window.showInfoNotification(title, message, duration)`**
+**תיאור**: התראה כחולה למידע
+**פרמטרים**:
+- `title` (string) - כותרת ההתראה
+- `message` (string) - תוכן ההודעה
+- `duration` (number) - משך הצגה (ברירת מחדל: 4000)
+
+**דוגמה**:
 ```javascript
-window.showWarningNotification('כותרת', 'הודעה', משך_במילישניות);
+window.showInfoNotification('מידע', 'המערכת מתעדכנת...');
 ```
 
-**דוגמאות שימוש:**
+### **2. פונקציות וולידציה**
+
+#### **`window.showValidationWarning(fieldId, message, duration)`**
+**תיאור**: התראה אדומה עם סימון שדה ספציפי
+**פרמטרים**:
+- `fieldId` (string) - מזהה השדה הבעייתי
+- `message` (string) - הודעת השגיאה
+- `duration` (number) - משך הצגה (ברירת מחדל: 6000)
+
+**תכונות**:
+- מציג התראה אדומה
+- מסמן את השדה הבעייתי באדום
+- מגליל לשדה הבעייתי
+- מסיר את הסימון אחרי 3 שניות
+
+**דוגמה**:
 ```javascript
-window.showWarningNotification('אזהרה', 'יש לבדוק את הנתונים');
-window.showWarningNotification('אזהרה', 'הפעולה אינה ניתנת לביטול');
+window.showValidationWarning('currencyName', 'שם המטבע הוא שדה חובה');
 ```
 
-### 4. הודעות מידע
-```javascript
-window.showInfoNotification('כותרת', 'הודעה', משך_במילישניות);
-```
+### **3. פונקציות אישור ומחיקה**
 
-**דוגמאות שימוש:**
-```javascript
-window.showInfoNotification('מידע', 'המערכת מתעדכנת', 2000);
-window.showInfoNotification('מידע', 'הנתונים נטענים...');
-```
+#### **`window.showDeleteWarning(itemType, itemId, displayName, onConfirm, onCancel)`**
+**תיאור**: חלון אישור אדום למחיקה
+**פרמטרים**:
+- `itemType` (string) - סוג הפריט (למשל: 'currency', 'account')
+- `itemId` (string/number) - מזהה הפריט
+- `displayName` (string) - שם הפריט להצגה
+- `onConfirm` (function) - פונקציה לביצוע המחיקה
+- `onCancel` (function) - פונקציה לביטול (אופציונלי)
 
-### 5. הודעות ולידציה
-```javascript
-window.showValidationWarning('מזהה_שדה', 'הודעת שגיאה');
-```
+**תכונות**:
+- חלון מודל אדום עם `data-bs-backdrop="static"`
+- כותרת: "מחיקת [סוג פריט]"
+- תוכן: "האם אתה בטוח שברצונך למחוק את [שם פריט]?"
+- כפתורים: "מחק" (אדום) ו"ביטול"
 
-**דוגמאות שימוש:**
+**דוגמה**:
 ```javascript
-window.showValidationWarning('addExecutionQuantity', 'כמות חייבת להיות חיובית');
-window.showValidationWarning('addExecutionPrice', 'מחיר חייב להיות גדול מ-0');
-```
-
-### 6. דיאלוגי אישור
-```javascript
-window.showConfirmationDialog('כותרת', 'הודעה', פונקציית_אישור, פונקציית_ביטול);
-```
-
-**דוגמאות שימוש:**
-```javascript
-window.showConfirmationDialog(
-    'אישור פעולה',
-    'האם אתה בטוח שברצונך לבצע פעולה זו?',
-    () => { console.log('אושר'); },
-    () => { console.log('בוטל'); }
+window.showDeleteWarning('currency', 'USD', 'דולר אמריקאי', 
+    () => deleteCurrency('USD'),
+    () => console.log('מחיקה בוטלה')
 );
 ```
 
-### 7. אזהרות מחיקה
-```javascript
-window.showDeleteWarning('סוג_פריט', 'מזהה_פריט', 'שם_תצוגה', פונקציית_אישור, פונקציית_ביטול);
-```
+#### **`window.showConfirmationDialog(title, message, onConfirm, onCancel)`**
+**תיאור**: חלון אישור כללי
+**פרמטרים**:
+- `title` (string) - כותרת החלון
+- `message` (string) - תוכן ההודעה
+- `onConfirm` (function) - פונקציה לאישור
+- `onCancel` (function) - פונקציה לביטול (אופציונלי)
 
-**דוגמאות שימוש:**
+**דוגמה**:
 ```javascript
-window.showDeleteWarning('executions', 8, 'עסקה', 
-    async () => { await confirmDeleteExecution(8); },
-    () => { console.log('מחיקה בוטלה'); }
+window.showConfirmationDialog('אישור פעולה', 'האם אתה בטוח?', 
+    () => performAction(),
+    () => console.log('פעולה בוטלה')
 );
 ```
 
-### 8. אזהרות פריטים מקושרים
-```javascript
-window.showLinkedItemsWarning('סוג_פריט', מספר_פריטים_מקושרים, פונקציית_אישור, פונקציית_ביטול);
-```
+## 🎨 עיצוב התראות
 
-**דוגמאות שימוש:**
-```javascript
-window.showLinkedItemsWarning('חשבון', 5, 
-    () => { console.log('מחיקה אושרה'); },
-    () => { console.log('מחיקה בוטלה'); }
-);
-```
+### **סגנונות CSS**
+```css
+/* רקע 80% שקיפות אחיד לכל סוגי ההתראות */
+.notification {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+}
 
-## כללי שימוש חשובים
+/* צבעי גבול שמאלי נכונים לכל סוג התראה */
+.notification.success {
+    border-left: 4px solid #28a745;
+}
 
-### 1. לעולם אל תשתמש ב-`alert()` או `confirm()`
-```javascript
-// ❌ שגוי
-alert('הודעת שגיאה');
-confirm('האם אתה בטוח?');
+.notification.error {
+    border-left: 4px solid #dc3545;
+}
 
-// ✅ נכון
-window.showErrorNotification('שגיאה', 'הודעת שגיאה');
-window.showDeleteWarning('פריט', 'מזהה', 'שם', onConfirm, onCancel);
-```
+.notification.warning {
+    border-left: 4px solid #ffc107;
+}
 
-### 2. תמיד השתמש בפונקציות הגלובליות מ-`window`
-```javascript
-// ✅ נכון
-window.showSuccessNotification('הצלחה', 'הפעולה הושלמה');
-window.showErrorNotification('שגיאה', 'שגיאה בפעולה');
-```
-
-### 3. הוסף fallback ל-`console.error` אם הפונקציה לא זמינה
-```javascript
-if (typeof window.showErrorNotification === 'function') {
-    window.showErrorNotification('שגיאה', 'הודעת שגיאה');
-} else {
-    console.error('הודעת שגיאה');
+.notification.info {
+    border-left: 4px solid #17a2b8;
 }
 ```
 
-### 4. השתמש בסדר הפרמטרים הנכון לכל פונקציה
-```javascript
-// ✅ נכון - סדר פרמטרים נכון
-window.showSuccessNotification('כותרת', 'הודעה', 5000);
-window.showValidationWarning('fieldId', 'הודעת שגיאה');
+## 🔧 שימוש נכון במערכת
+
+### **1. טעינת מערכת התראות**
+**חובה** לכלול `notification-system.js` לפני קובץ העמוד:
+```html
+<script src="scripts/notification-system.js"></script>
+<script src="scripts/[PAGE].js"></script>
 ```
 
-### 5. למודלים של מחיקה - השתמש ברקע אדום לכותרת
-המערכת אוטומטית מציגה רקע אדום לכותרת במודלי מחיקה עם כפתור סגירה לבן.
-
-### 6. לוולידציה - השתמש בסימון שדה ספציפי
+### **2. בדיקת זמינות פונקציות**
 ```javascript
-// ✅ נכון - סימון שדה ספציפי
-window.showValidationWarning('addExecutionQuantity', 'כמות חייבת להיות חיובית');
+// תמיד לבדוק זמינות לפני שימוש
+if (typeof window.showSuccessNotification === 'function') {
+    window.showSuccessNotification('הצלחה', 'פעולה הושלמה בהצלחה');
+} else {
+    console.error('showSuccessNotification לא זמינה');
+}
 ```
 
-## עיצוב ויזואלי
-
-### צבעי התראות
-- **הצלחה**: ירוק (#28a745)
-- **שגיאה**: אדום (#dc3545)
-- **אזהרה**: צהוב (#ffc107)
-- **מידע**: כחול (#17a2b8)
-
-### אנימציות
-- **כניסה**: slide-in מימין
-- **יציאה**: fade-out
-- **משך ברירת מחדל**: 4000ms
-
-### מיקום
-- **מיקום**: פינה ימנית עליונה
-- **שכבה**: z-index גבוה
-- **רקע**: 80% שקיפות
-
-## פתרון בעיות נפוצות
-
-### בעיה: הודעות לא מוצגות
-**פתרון**: בדוק שהקובץ `notification-system.js` נטען לפני השימוש
-
-### בעיה: צבעים שגויים
-**פתרון**: בדוק סדר הפרמטרים - `(title, message, duration)`
-
-### בעיה: קריאה רקורסיבית
-**פתרון**: אל תגדיר פונקציות מקומיות עם אותו שם כמו הפונקציות הגלובליות
-
-### בעיה: מודלים לא נסגרים
-**פתרון**: השתמש ב-`data-bs-dismiss="modal"` לכפתורי סגירה
-
-## דוגמאות שימוש מלאות
-
-### עמוד עסקעות
+### **3. טיפול בשגיאות מהשרת**
 ```javascript
-// הוספת עסקה
-window.showSuccessNotification('הצלחה', 'עסקה חדשה נוספה בהצלחה למערכת');
+const result = await response.json();
 
-// מחיקת עסקה
-window.showDeleteWarning('executions', id, 'עסקה', 
-    async () => { await confirmDeleteExecution(id); }
-);
-
-// ולידציה
-window.showValidationWarning('addExecutionQuantity', 'כמות חייבת להיות חיובית');
+if (response.ok && result.status === 'success') {
+    window.showSuccessNotification('הצלחה', 'הפריט נשמר בהצלחה!');
+} else {
+    if (result.error && result.error.message) {
+        window.showErrorNotification('שגיאה', result.error.message);
+    } else {
+        window.showErrorNotification('שגיאה', 'שגיאה לא ידועה');
+    }
+}
 ```
 
-### עמוד חשבונות
-```javascript
-// שמירת חשבון
-window.showSuccessNotification('הצלחה', 'חשבון נשמר בהצלחה');
+## 🚨 בעיות נפוצות ופתרונות
 
-// מחיקת חשבון עם פריטים מקושרים
-window.showLinkedItemsWarning('חשבון', linkedCount, 
-    () => { deleteAccount(accountId); }
-);
-```
+### **1. מערכת התראות לא זמינה**
+**בעיה**: `window.showSuccessNotification is not a function`
+**פתרון**: וידוא ש-`notification-system.js` נטען לפני קבצי העמוד
 
-## עדכונים אחרונים
+### **2. פרמטרים שגויים**
+**בעיה**: הודעות מופיעות בצבע שגוי
+**פתרון**: שימוש בסדר פרמטרים נכון: `(title, message, duration)`
 
-### גרסה 3.0 (29 באוגוסט 2025)
-- הוספת מודלי אישור דינמיים במקום `confirm()`
-- שיפור עיצוב עם רקע אדום למודלי מחיקה
-- הוספת fallback ל-`console.error`
-- שיפור ביצועים וניקוי קוד
+### **3. התראות לא מופיעות**
+**בעיה**: התראות לא מוצגות
+**פתרון**: בדיקת זמינות פונקציות וטעינת קבצים
 
-### גרסה 2.0 (26 באוגוסט 2025)
-- הוספת מערכת ולידציה
-- שיפור אנימציות
-- הוספת תמיכה בפריטים מקושרים
+## 📋 קריטריונים לבדיקה
 
-### גרסה 1.0 (24 באוגוסט 2025)
-- יצירת מערכת התראות בסיסית
-- החלפת `alert()` ו-`confirm()`
-- הוספת עיצוב אחיד
+> 📋 **כל הבדיקות הועברו ל**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md)

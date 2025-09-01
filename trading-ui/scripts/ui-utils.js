@@ -555,7 +555,7 @@ function showLinkedItemsWarningModal(data, itemType, itemId, onConfirm) {
     <div class="modal fade linked-items-modal" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
-          <div class="modal-header">
+          <div class="modal-header modal-header-colored">
             <h5 class="modal-title" id="${modalId}Label">${modalTitle}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
@@ -1785,7 +1785,7 @@ function showLinkedItemsBlockingModal(data, itemType, itemId, actionType = 'dele
     <div class="modal fade linked-items-modal" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
-          <div class="modal-header">
+          <div class="modal-header modal-header-colored">
             <h5 class="modal-title" id="${modalId}Label">${modalTitle}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>

@@ -3,11 +3,14 @@
  * קובץ הסגנונות למערכת ראש הדף החדשה
  * 
  * File: trading-ui/styles/header-system.css
- * Version: 2.4.1
- * Last Updated: August 24, 2025
+ * Version: 2.4.2
+ * Last Updated: September 1, 2025
+ * 
+ * IMPORTANT: כל הסגנונות בקובץ זה חייבים להיות מוגבלים לאלמנט #unified-header
+ * כדי למנוע התנגשויות עם סגנונות כלליים במערכת.
  * 
  * Features:
- * - עיצוב אלמנט unified-header
+ * - עיצוב אלמנט unified-header בלבד
  * - סגנונות לוגו וניווט
  * - מערכת פילטרים מתקדמת
  * - אנימציות וטרנזיציות
@@ -31,6 +34,8 @@
  * - Desktop: תצוגה מלאה עם פילטרים
  * - Tablet: תצוגה מותאמת
  * - Mobile: תצוגה מקוצרת
+ * 
+ * SCOPE RULE: כל selector חייב להתחיל ב-#unified-header
  */
 
 /* ===== סגנונות אלמנט ראש הדף החדש ===== */
@@ -1045,39 +1050,39 @@
     }
 }
 
-/* רקע צבעוני לכרטיסי התראות עם שקיפות 30% */
-.alert-card-price {
+/* ===== סגנונות כרטיסי התראות - רק בתוך ראש הדף ===== */
+#unified-header .alert-card-price {
     background-color: rgba(255, 193, 7, 0.3) !important;
     /* צהוב - התראת מחיר */
     border-left: 4px solid #ffc107;
 }
 
-.alert-card-stop-loss {
+#unified-header .alert-card-stop-loss {
     background-color: rgba(220, 53, 69, 0.3) !important;
     /* אדום - עצירת הפסד */
     border-left: 4px solid #dc3545;
 }
 
-.alert-card-volume {
+#unified-header .alert-card-volume {
     background-color: rgba(40, 167, 69, 0.3) !important;
     /* ירוק - התראת נפח */
     border-left: 4px solid #28a745;
 }
 
-.alert-card-custom {
+#unified-header .alert-card-custom {
     background-color: rgba(108, 117, 125, 0.3) !important;
     /* אפור - התראה מותאמת */
     border-left: 4px solid #6c757d;
 }
 
-.alert-card-default {
+#unified-header .alert-card-default {
     background-color: rgba(0, 123, 255, 0.3) !important;
     /* כחול - ברירת מחדל */
     border-left: 4px solid #007bff;
 }
 
-/* הוספת hover effect לכרטיסים */
-.alert-card:hover {
+/* הוספת hover effect לכרטיסים - רק בתוך ראש הדף */
+#unified-header .alert-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;

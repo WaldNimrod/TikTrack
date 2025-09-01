@@ -621,7 +621,12 @@ async function checkLinkedItemsBeforeCancel(tradePlanId) {
         }
 
     } catch (error) {
-        handleSystemError(error, 'בדיקת פריטים מקושרים');
+        console.error('❌ שגיאה בבדיקת פריטים מקושרים:', error);
+        if (typeof window.handleSystemError === 'function') {
+            window.handleSystemError(error, 'בדיקת פריטים מקושרים');
+        } else if (typeof window.handleDataLoadError === 'function') {
+            window.handleDataLoadError(error, 'בדיקת פריטים מקושרים');
+        }
         // במקרה של שגיאה - ממשיכים עם הביטול
         await cancelTradePlan(tradePlanId);
     }
@@ -1320,9 +1325,9 @@ function updateTradePlansTable(trade_plans) {
             🔗
           </button>
           ${window.uiUtils ? window.uiUtils.createCancelButton('trade_plan', design.id, design.status, 'sm') : 
-            `<button class="btn btn-sm ${design.status === 'cancelled' ? 'btn-secondary' : 'btn-danger'}" 
+            `<button class="btn btn-sm ${design.status === 'cancelled' ? 'btn-outline-success' : 'btn-danger'}" 
                      onclick="window.${design.status === 'cancelled' ? 'reactivateTradePlan' : 'openCancelTradePlanModal'}(${design.id})" 
-                     title="${design.status === 'cancelled' ? 'הפעל מחדש' : 'בטל'}"><span class="cancel-icon">X</span></button>`
+                     title="${design.status === 'cancelled' ? 'הפעל מחדש' : 'בטל'}"><span class="${design.status === 'cancelled' ? 'reactivate-icon' : 'cancel-icon'}">${design.status === 'cancelled' ? '✓' : 'X'}</span></button>`
           }
           <button class="btn btn-sm btn-secondary" onclick="window.openEditTradePlanModal(${design.id})" title="ערוך">
             ✏️

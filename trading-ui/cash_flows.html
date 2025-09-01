@@ -53,7 +53,7 @@
     <!-- Modular grid files - loaded at end of file -->
 </head>
 
-<body>
+<body class="cash-flows-page">
     <!-- General background -->
     <div class="background-wrapper">
 
@@ -458,7 +458,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                    <button type="button" class="btn btn-danger btn-danger-outline" onclick="confirmDeleteCashFlow()">
+                    <button type="button" class="btn btn-danger btn-danger-outline" onclick="window.confirmDeleteCashFlow && window.confirmDeleteCashFlow()">
                         מחק תזרים
                     </button>
                 </div>
@@ -471,7 +471,7 @@
         aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header modal-header-colored">
                     <h5 class="modal-title" id="linkedItemsModalLabel">פרטים מקושרים</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -496,6 +496,7 @@
     <script src="scripts/ui-utils.js"></script>
     <script src="scripts/validation-utils.js"></script>
     <script src="scripts/notification-system.js"></script>
+    <script src="scripts/error-handlers.js"></script>
     <script src="scripts/crud-utils.js"></script>
     <script src="scripts/table-mappings.js"></script>
     <script src="scripts/date-utils.js"></script>

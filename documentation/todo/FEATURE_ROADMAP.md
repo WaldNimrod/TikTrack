@@ -1,50 +1,10 @@
 # Feature Roadmap - TikTrack
 
-## 🎯 Planned Features
+> 📋 **כל התכונות המתוכננות הועברו ל**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md)
 
-### 1. Trade Plan & Trade Duplication
-**Status:** 🟡 Planned  
-**Priority:** High  
-**Description:** Ability to duplicate existing trade plans and trades to create new ones
+## 🎯 Planned Features (Moved to Central Tasks)
 
-**Requirements:**
-- [ ] Add "Duplicate" button to trade plan actions
-- [ ] Add "Duplicate" button to trade actions  
-- [ ] Implement duplication logic that copies all relevant fields
-- [ ] Allow user to modify duplicated items before saving
-- [ ] Maintain relationships between duplicated items
-- [ ] Add confirmation dialog for duplication
-
-**Technical Considerations:**
-- Handle foreign key relationships properly
-- Ensure unique constraints are maintained
-- Consider whether to copy or reset certain fields (dates, status, etc.)
-
----
-
-### 2. Trade Plan & Trade Templates
-**Status:** 🟡 Planned  
-**Priority:** High  
-**Description:** Pre-defined templates for trade plans and trades with default values
-
-**Requirements:**
-- [ ] Create template system for trade plans
-- [ ] Create template system for trades
-- [ ] Allow users to save current items as templates
-- [ ] Provide quick-apply template functionality
-- [ ] Template management interface (create, edit, delete)
-- [ ] Default templates for common scenarios
-
-**Template Features:**
-- [ ] Template categories (e.g., "Day Trading", "Swing Trading", "Options")
-- [ ] Editable template fields
-- [ ] Template preview before application
-- [ ] Bulk template application
-
-**Technical Considerations:**
-- Store templates in database or configuration files
-- Template versioning system
-- Template sharing between users (future feature)
+**כל התכונות המתוכננות הועברו לקובץ המשימות המרכזי.**
 
 ---
 

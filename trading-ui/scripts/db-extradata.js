@@ -539,7 +539,7 @@ function showDeleteCurrencyModal(id) {
         <div class="modal fade" id="deleteCurrencyModal" tabindex="-1" aria-labelledby="deleteCurrencyModalLabel" aria-hidden="true" data-bs-backdrop="static">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header" style="background-color: #dc3545; color: white;">
+                    <div class="modal-header modal-header-danger">
                         <h5 class="modal-title text-white" id="deleteCurrencyModalLabel">מחק מטבע</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -854,7 +854,7 @@ function showDeleteNoteRelationTypeModal(id) {
         <div class="modal fade" id="deleteNoteRelationTypeModal" tabindex="-1" aria-labelledby="deleteNoteRelationTypeModalLabel" aria-hidden="true" data-bs-backdrop="static">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header" style="background-color: #dc3545; color: white;">
+                    <div class="modal-header modal-header-danger">
                         <h5 class="modal-title text-white" id="deleteNoteRelationTypeModalLabel">מחק סוג קישור</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -1179,7 +1179,7 @@ function showDeleteTriggerButtonModal(id) {
         <div class="modal fade" id="deleteTriggerButtonModal" tabindex="-1" aria-labelledby="deleteTriggerButtonModalLabel" aria-hidden="true" data-bs-backdrop="static">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header" style="background-color: #dc3545; color: white;">
+                    <div class="modal-header modal-header-danger">
                         <h5 class="modal-title text-white" id="deleteTriggerButtonModalLabel">מחק כפתור טריגר</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -1685,7 +1685,7 @@ function showTriggerDetails(triggerId) {
         <div class="modal fade" id="triggerDetailsModal" tabindex="-1" aria-labelledby="triggerDetailsModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="modal-header modal-header-colored">
                         <h5 class="modal-title" id="triggerDetailsModalLabel">פרטי טריגר: ${triggerInfo.name}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>

@@ -133,8 +133,9 @@ async function showAddExecutionModal() {
         document.getElementById('addExecutionCommission').value = 9.99;
     }
 
-    // טעינת טיקרים עם טריידים ותכנונים בסטטוס פתוח או סגור
-    await loadTickersWithOpenOrClosedTradesAndPlans();
+    // טעינת טיקרים לפי הצ'קבוקס
+    const showClosedTrades = document.getElementById('addExecutionShowClosedTrades')?.checked || false;
+    await updateTickersList('add', showClosedTrades);
 
     // חישוב ערכים מחושבים
     calculateAddExecutionValues();
@@ -192,8 +193,9 @@ async function showEditExecutionModal(id) {
         return;
     }
 
-    // טעינת טיקרים עם טריידים ותכנונים בסטטוס פתוח או סגור
-    await loadTickersWithOpenOrClosedTradesAndPlans();
+    // טעינת טיקרים לפי הצ'קבוקס
+    const showClosedTrades = document.getElementById('editExecutionShowClosedTrades')?.checked || false;
+    await updateTickersList('edit', showClosedTrades);
 
     // טעינת פרטי הטרייד/תכנון המקושר
     let linkedObject = null;
@@ -2071,6 +2073,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // שחזור מצב סידור
     restoreSortState();
+    
+    // אתחול רשימת טיקרים לפי הצ'קבוקס (ברירת מחדל: לא מסומן)
+    updateTickersList('add', false);
+    updateTickersList('edit', false);
 });
 
 /**
@@ -2165,27 +2171,28 @@ function enableAllFields(mode = 'add') {
 }
 
 /**
- * טעינת טריידים ותכנונים לטיקר שנבחר
- * @param {string} mode - 'add' או 'edit'
+ * טעינת טריידים לטיקר שנבחר
+ * @param {string} mode - מצב ('add' או 'edit')
+ * @param {boolean} showClosedTrades - האם להציג טריידים סגורים
  */
-async function loadActiveTradesForTicker(mode = 'add') {
-    // Loading trades and plans for ticker, mode
+async function loadActiveTradesForTicker(mode = 'add', showClosedTrades = false) {
+    console.log('🔄 טעינת טריידים לטיקר, מצב:', mode, 'הצג טריידים סגורים:', showClosedTrades);
 
     const tickerId = mode === 'add'
         ? document.getElementById('addExecutionTicker').value
         : document.getElementById('editExecutionTicker').value;
 
     if (!tickerId) {
-        // No ticker selected
+        console.log('🔄 אין טיקר נבחר');
         return;
     }
 
-    // בדיקת הצ'קבוקס
-    const showClosedTrades = mode === 'add'
-        ? document.getElementById('addExecutionShowClosedTrades')?.checked || false
-        : document.getElementById('editExecutionShowClosedTrades')?.checked || false;
-
-            // Show closed trades
+    // בדיקת הצ'קבוקס (אם לא הועבר כפרמטר)
+    if (showClosedTrades === undefined) {
+        showClosedTrades = mode === 'add'
+            ? document.getElementById('addExecutionShowClosedTrades')?.checked || false
+            : document.getElementById('editExecutionShowClosedTrades')?.checked || false;
+    }
 
     try {
         // טעינת טריידים
@@ -2193,32 +2200,41 @@ async function loadActiveTradesForTicker(mode = 'add') {
         const tradesData = await tradesResponse.json();
         const trades = tradesData.data || tradesData || [];
 
-        // טעינת תכנונים
-        let plans = [];
-        try {
-            const plansResponse = await fetch('/api/v1/trade_plans/');
-            if (plansResponse.ok) {
-                const plansData = await plansResponse.json();
-                plans = plansData.data || plansData || [];
-            }
-        } catch (error) {
-            console.warn('⚠️ לא ניתן לטעון תכנונים:', error);
+        // סינון טריידים לטיקר שנבחר
+        let filteredTrades;
+        
+        if (showClosedTrades) {
+            // הצג טריידים פעילים + טריידים סגורים
+            const activeTrades = trades.filter(trade => 
+                trade.ticker_id == tickerId && (trade.status === 'active' || trade.status === 'open')
+            );
+            
+            const closedTrades = trades.filter(trade => 
+                trade.ticker_id == tickerId && trade.status === 'closed'
+            );
+            
+            filteredTrades = [...activeTrades, ...closedTrades];
+            
+            console.log('🔄 טריידים פעילים לטיקר:', activeTrades.length);
+            console.log('🔄 טריידים סגורים לטיקר:', closedTrades.length);
+            console.log('🔄 סה"כ טריידים רלוונטיים:', filteredTrades.length);
+        } else {
+            // הצג רק טריידים פעילים
+            filteredTrades = trades.filter(trade => 
+                trade.ticker_id == tickerId && (trade.status === 'active' || trade.status === 'open')
+            );
+            console.log('🔄 טריידים פעילים בלבד לטיקר:', filteredTrades.length);
         }
 
-        // סינון טריידים ותכנונים לטיקר שנבחר
-        const filteredTrades = trades.filter(trade => trade.ticker_id == tickerId);
-        const filteredPlans = plans.filter(plan => plan.ticker_id == tickerId);
+        console.log('🔄 נמצאו טריידים:', filteredTrades.length);
 
-            // Found trades for ticker
-    // Found plans for ticker
-
-        // עדכון שדה הטרייד/תכנון
+        // עדכון שדה הטרייד
         const tradeSelect = mode === 'add'
             ? document.getElementById('addExecutionTradeId')
             : document.getElementById('editExecutionTradeId');
 
         if (tradeSelect) {
-            tradeSelect.innerHTML = '<option value="">בחר טרייד או תכנון...</option>';
+            tradeSelect.innerHTML = '<option value="">בחר טרייד...</option>';
 
             // הוספת טריידים
             filteredTrades.forEach(trade => {
@@ -2243,43 +2259,14 @@ async function loadActiveTradesForTicker(mode = 'add') {
                 tradeSelect.appendChild(option);
             });
 
-            // הוספת תכנונים
-            filteredPlans.forEach(plan => {
-                const option = document.createElement('option');
-                option.value = plan.id; // מספר ישיר
-                const statusText = plan.status === 'open' ? 'פתוח' :
-                    plan.status === 'closed' ? 'סגור' :
-                        plan.status === 'cancelled' ? 'בוטל' : plan.status;
-
-                // עיבוד תאריך היצירה
-                let creationDate = 'תאריך לא ידוע';
-                if (plan.created_at) {
-                    try {
-                        const date = new Date(plan.created_at);
-                        creationDate = date.toLocaleDateString('he-IL');
-                    } catch (e) {
-                        console.warn('⚠️ לא ניתן לעבד תאריך יצירה:', plan.created_at);
-                    }
-                }
-
-                option.textContent = `תכנון: ${plan.side} ${plan.investment_type} - ${creationDate} (${statusText})`;
-                tradeSelect.appendChild(option);
-            });
-
-            // הצגת כפתור קישור לטרייד/תכנון
-            const tradeLinkButton = mode === 'add'
-                ? document.getElementById('addExecutionTradeLink')
-                : document.getElementById('editExecutionTradeLink');
-            if (tradeLinkButton) {
-                tradeLinkButton.style.display = 'block';
-            }
-
-            // הפעלת שדה בחירת טרייד/תכנון
+            // הפעלת השדה
             tradeSelect.disabled = false;
+            console.log('✅ שדה טרייד עודכן:', filteredTrades.length, 'אפשרויות');
         }
 
     } catch (error) {
-        handleDataLoadError(error, 'טריידים ותכנונים לטיקר');
+        console.error('❌ שגיאה בטעינת טריידים:', error);
+        handleDataLoadError(error, 'טעינת טריידים לטיקר');
     }
 }
 
@@ -2321,18 +2308,7 @@ async function loadTickersWithClosedTrades() {
  * @param {string} mode - 'add' או 'edit'
  */
 async function updateTradesOnCheckboxChange(mode = 'add') {
-    // Updating trades due to checkbox change, mode
-
-    // הצגת הודעת "בפיתוח"
-    if (typeof window.showInfoNotification === 'function') {
-                    window.showInfoNotification('מידע', 'פיצ\'ר "הצג טריידים סגורים" - בפיתוח');
-    } else {
-        if (typeof window.showInfoNotification === 'function') {
-            window.showInfoNotification('מידע', 'פיצ\'ר "הצג טריידים סגורים" - בפיתוח');
-        } else {
-            // פיצ'ר "הצג טריידים סגורים" - בפיתוח
-        }
-    }
+    console.log('🔄 עדכון טריידים לפי צ\'קבוקס, מצב:', mode);
 
     try {
         // בדיקת הצ'קבוקס
@@ -2340,53 +2316,50 @@ async function updateTradesOnCheckboxChange(mode = 'add') {
             ? document.getElementById('addExecutionShowClosedTrades')?.checked || false
             : document.getElementById('editExecutionShowClosedTrades')?.checked || false;
 
-        // Show closed trades
+        console.log('🔄 הצג טריידים סגורים:', showClosedTrades);
 
-        let tickers;
-        if (showClosedTrades) {
-            tickers = await loadTickersWithClosedTrades();
-        } else {
-            // טעינת טיקרים עם טריידים פעילים בלבד
-            const tickersResponse = await fetch('/api/v1/tickers/');
-            const tickersData = await tickersResponse.json();
-            const allTickers = tickersData.data || tickersData || [];
-
-            const tradesResponse = await fetch('/api/v1/trades/');
-            const tradesData = await tradesResponse.json();
-            const trades = tradesData.data || tradesData || [];
-
-            tickers = allTickers.filter(ticker => {
-                return trades.some(trade =>
-                    trade.ticker_id === ticker.id &&
-                    trade.status === 'active'
-                );
-            });
-        }
-
-        // עדכון שדה הטיקר
+        // קבלת הטיקר הנבחר
         const tickerSelect = mode === 'add'
             ? document.getElementById('addExecutionTicker')
             : document.getElementById('editExecutionTicker');
-
-        if (tickerSelect) {
-            tickerSelect.innerHTML = '<option value="">בחר טיקר...</option>';
-            tickers.forEach(ticker => {
-                const option = document.createElement('option');
-                option.value = ticker.id;
-                option.textContent = `${ticker.symbol} - ${ticker.name}`;
-                tickerSelect.appendChild(option);
-            });
-            // Updated ticker select with options
-        }
-
-        // אם יש טיקר נבחר, עדכן את הטריידים
+            
         const tickerId = tickerSelect?.value;
+        
+        // תמיד עדכן את רשימת הטיקרים כשהצ'קבוקס משתנה
+        await updateTickersList(mode, showClosedTrades);
+        
         if (tickerId) {
-            await loadActiveTradesForTicker(mode);
+            // עדכון הטריידים לטיקר הנבחר
+            await loadActiveTradesForTicker(mode, showClosedTrades);
         }
 
     } catch (error) {
+        console.error('❌ שגיאה בעדכון טריידים:', error);
         handleDataLoadError(error, 'עדכון טריידים לפי צ\'קבוקס');
+    }
+}
+
+/**
+ * עדכון טריידים כאשר הטיקר משתנה
+ * @param {string} mode - 'add' או 'edit'
+ */
+async function updateTradesOnTickerChange(mode = 'add') {
+    console.log('🔄 עדכון טריידים לפי שינוי טיקר, מצב:', mode);
+
+    try {
+        // בדיקת הצ'קבוקס הנוכחי
+        const showClosedTrades = mode === 'add'
+            ? document.getElementById('addExecutionShowClosedTrades')?.checked || false
+            : document.getElementById('editExecutionShowClosedTrades')?.checked || false;
+
+        console.log('🔄 הצג טריידים סגורים:', showClosedTrades);
+
+        // עדכון הטריידים לטיקר הנבחר
+        await loadActiveTradesForTicker(mode, showClosedTrades);
+
+    } catch (error) {
+        console.error('❌ שגיאה בעדכון טריידים:', error);
+        handleDataLoadError(error, 'עדכון טריידים לפי שינוי טיקר');
     }
 }
 
@@ -2561,12 +2534,13 @@ function updateExecutionsSummary(executions) {
 // הגדרת הפונקציות כגלובליות
 window.loadTickersWithOpenOrClosedTradesAndPlans = loadTickersWithOpenOrClosedTradesAndPlans;
 // window.loadTickersWithClosedTrades = loadTickersWithClosedTrades; // פונקציה לא קיימת
-// window.loadActiveTradesForTicker = loadActiveTradesForTicker; // פונקציה לא קיימת
+window.loadActiveTradesForTicker = loadActiveTradesForTicker;
 window.enableAllFields = enableAllFields;
 // window.toggleExternalIdField = toggleExternalIdField; // פונקציה לא קיימת
 window.resetAddExecutionForm = resetAddExecutionForm;
 window.resetEditExecutionForm = resetEditExecutionForm;
-// window.updateTradesOnCheckboxChange = updateTradesOnCheckboxChange; // פונקציה לא קיימת
+window.updateTradesOnCheckboxChange = updateTradesOnCheckboxChange;
+window.updateTradesOnTickerChange = updateTradesOnTickerChange;
 window.goToTickerPage = goToTickerPage;
 window.updateExecutionsSummary = updateExecutionsSummary;
 window.showTickerHelp = showTickerHelp;
@@ -3101,6 +3075,16 @@ window.loadExecutionsData = async function() {
     
     setupExecutionsFilterFunctions();
   }
+  
+  // טעינת טבלת טיקרים חלקית
+  try {
+    const tickers = await loadTickersSummaryData();
+    updateTickersSummaryTable(tickers);
+    console.log('✅ טבלת טיקרים חלקית נטענה בהצלחה');
+  } catch (error) {
+    console.error('❌ שגיאה בטעינת טבלת טיקרים חלקית:', error);
+    handleDataLoadError(error, 'טבלת טיקרים חלקית');
+  }
 };
 
 // הוספת פונקציות CRUD גלובליות
@@ -3187,3 +3171,321 @@ function toggleExternalIdField(mode) {
 
 // ייצוא הפונקציה
 window.toggleExternalIdField = toggleExternalIdField;
+
+// ========================================
+// פונקציות לטבלת טיקרים חלקית
+// ========================================
+
+// משתנים לטבלת טיקרים
+let tickersSummaryData = [];
+
+/**
+ * טעינת נתוני טיקרים חלקיים
+ */
+async function loadTickersSummaryData() {
+    console.log('🔄 טעינת נתוני טיקרים חלקיים...');
+
+    try {
+        // טעינת טיקרים
+        const tickersResponse = await fetch('/api/v1/tickers/');
+        const tickersData = await tickersResponse.json();
+        const allTickers = tickersData.data || tickersData || [];
+
+        // טעינת טריידים
+        const tradesResponse = await fetch('/api/v1/trades/');
+        const tradesData = await tradesResponse.json();
+        const trades = tradesData.data || tradesData || [];
+
+        // סינון טיקרים עם טריידים פעילים או סגורים
+        const relevantTickers = allTickers.filter(ticker => {
+            const tickerTrades = trades.filter(trade => trade.ticker_id === ticker.id);
+            return tickerTrades.some(trade => 
+                trade.status === 'active' || trade.status === 'open' || trade.status === 'closed'
+            );
+        });
+
+        // עיבוד נתונים לכל טיקר
+        const processedTickers = relevantTickers.map(ticker => {
+            const tickerTrades = trades.filter(trade => trade.ticker_id === ticker.id);
+            const activeTrades = tickerTrades.filter(trade => 
+                trade.status === 'active' || trade.status === 'open'
+            );
+            const closedTrades = tickerTrades.filter(trade => trade.status === 'closed');
+
+            // קביעת סטטוס
+            let status = 'אין טריידים';
+            if (activeTrades.length > 0 && closedTrades.length > 0) {
+                status = 'פעיל + סגור';
+            } else if (activeTrades.length > 0) {
+                status = 'פעיל';
+            } else if (closedTrades.length > 0) {
+                status = 'סגור';
+            }
+
+            return {
+                id: ticker.id,
+                symbol: ticker.symbol,
+                name: ticker.name,
+                status: status,
+                totalTrades: tickerTrades.length,
+                activeTrades: activeTrades.length,
+                closedTrades: closedTrades.length,
+                created_at: ticker.created_at
+            };
+        });
+
+        tickersSummaryData = processedTickers;
+        window.tickersSummaryData = processedTickers;
+
+        console.log('✅ טעינת טיקרים חלקיים הושלמה:', processedTickers.length, 'טיקרים');
+        return processedTickers;
+
+    } catch (error) {
+        console.error('❌ שגיאה בטעינת טיקרים חלקיים:', error);
+        handleDataLoadError(error, 'טעינת טיקרים חלקיים');
+        return [];
+    }
+}
+
+/**
+ * עדכון טבלת טיקרים חלקית
+ */
+function updateTickersSummaryTable(tickers = null) {
+    console.log('🔄 עדכון טבלת טיקרים חלקית...');
+
+    const tableBody = document.querySelector('#tickersTable tbody');
+    if (!tableBody) {
+        console.warn('⚠️ טבלת טיקרים לא נמצאה');
+        return;
+    }
+
+    const dataToShow = tickers || tickersSummaryData;
+    
+    if (!dataToShow || dataToShow.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" class="text-center">לא נמצאו טיקרים רלוונטיים</td></tr>';
+        document.getElementById('tickersCount').textContent = '0 טיקרים';
+        return;
+    }
+
+    // עדכון מונה
+    document.getElementById('tickersCount').textContent = `${dataToShow.length} טיקרים`;
+
+    // ניקוי הטבלה
+    tableBody.innerHTML = '';
+
+    // הוספת שורות
+    dataToShow.forEach(ticker => {
+        const row = document.createElement('tr');
+        
+        // עיבוד תאריך יצירה
+        let creationDate = 'תאריך לא ידוע';
+        if (ticker.created_at) {
+            try {
+                const date = new Date(ticker.created_at);
+                creationDate = date.toLocaleDateString('he-IL');
+            } catch (e) {
+                console.warn('⚠️ לא ניתן לעבד תאריך יצירה:', ticker.created_at);
+            }
+        }
+
+        // קביעת צבע סטטוס
+        let statusClass = '';
+        if (ticker.status === 'פעיל') {
+            statusClass = 'text-success';
+        } else if (ticker.status === 'סגור') {
+            statusClass = 'text-secondary';
+        } else if (ticker.status === 'פעיל + סגור') {
+            statusClass = 'text-primary';
+        }
+
+        row.innerHTML = `
+            <td><strong>${ticker.symbol}</strong></td>
+            <td>${ticker.name}</td>
+            <td><span class="${statusClass}">${ticker.status}</span></td>
+            <td>${ticker.totalTrades} (${ticker.activeTrades} פעיל, ${ticker.closedTrades} סגור)</td>
+            <td>${creationDate}</td>
+            <td class="actions-cell">
+                <button class="btn btn-sm btn-outline-primary" onclick="viewTickerDetails(${ticker.id})" title="צפה בפרטים">
+                    <img src="images/icons/tickers.svg" alt="צפה" class="action-icon" style="width: 14px; height: 14px;">
+                </button>
+                <button class="btn btn-sm btn-outline-success" onclick="addExecutionForTicker(${ticker.id})" title="הוסף עסקה">
+                    <img src="images/icons/executions.svg" alt="הוסף" class="action-icon" style="width: 14px; height: 14px;">
+                </button>
+            </td>
+        `;
+        
+        tableBody.appendChild(row);
+    });
+
+    console.log('✅ טבלת טיקרים חלקית עודכנה:', dataToShow.length, 'שורות');
+}
+
+/**
+ * רענון רשימת טיקרים
+ */
+async function refreshTickersSummary() {
+    console.log('🔄 רענון רשימת טיקרים...');
+    
+    try {
+        const tickers = await loadTickersSummaryData();
+        updateTickersSummaryTable(tickers);
+        
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('רענון הושלם', `נטענו ${tickers.length} טיקרים`);
+        }
+    } catch (error) {
+        console.error('❌ שגיאה ברענון טיקרים:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה ברענון', 'לא ניתן לרענן את רשימת הטיקרים');
+        }
+    }
+}
+
+/**
+ * צפייה בפרטי טיקר
+ */
+function viewTickerDetails(tickerId) {
+    console.log('🔄 צפייה בפרטי טיקר:', tickerId);
+    
+    // מציאת הטיקר
+    const ticker = tickersSummaryData.find(t => t.id === tickerId);
+    if (!ticker) {
+        console.warn('⚠️ טיקר לא נמצא:', tickerId);
+        return;
+    }
+
+    // הצגת פרטי טיקר (בפיתוח)
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('פרטי טיקר', `טיקר: ${ticker.symbol} - ${ticker.name}\nסטטוס: ${ticker.status}\nטריידים: ${ticker.totalTrades}`);
+    }
+}
+
+/**
+ * הוספת עסקה לטיקר
+ */
+function addExecutionForTicker(tickerId) {
+    console.log('🔄 הוספת עסקה לטיקר:', tickerId);
+    
+    // מציאת הטיקר
+    const ticker = tickersSummaryData.find(t => t.id === tickerId);
+    if (!ticker) {
+        console.warn('⚠️ טיקר לא נמצא:', tickerId);
+        return;
+    }
+
+    // פתיחת מודל הוספת עסקה
+    showAddExecutionModal();
+    
+    // בחירת הטיקר במודל
+    setTimeout(() => {
+        const tickerSelect = document.getElementById('addExecutionTicker');
+        if (tickerSelect) {
+            tickerSelect.value = tickerId;
+            // הפעלת שינוי הטיקר
+            if (typeof updateTradesOnTickerChange === 'function') {
+                updateTradesOnTickerChange('add');
+            }
+        }
+    }, 100);
+}
+
+/**
+ * הצגה/הסתרה של סקשן הטיקרים
+ */
+function toggleTickersSection() {
+    const section = document.querySelector('.content-section:has(#tickersContainer)');
+    if (section) {
+        const body = section.querySelector('.section-body');
+        const icon = section.querySelector('.filter-icon');
+        
+        if (body.style.display === 'none') {
+            body.style.display = 'block';
+            icon.textContent = '▲';
+        } else {
+            body.style.display = 'none';
+            icon.textContent = '▼';
+        }
+    }
+}
+
+// ייצוא פונקציות
+window.loadTickersSummaryData = loadTickersSummaryData;
+window.updateTickersSummaryTable = updateTickersSummaryTable;
+window.refreshTickersSummary = refreshTickersSummary;
+window.viewTickerDetails = viewTickerDetails;
+window.addExecutionForTicker = addExecutionForTicker;
+window.toggleTickersSection = toggleTickersSection;
+
+/**
+ * עדכון רשימת הטיקרים לפי הצ'קבוקס
+ * @param {string} mode - מצב ('add' או 'edit')
+ * @param {boolean} showClosedTrades - האם להציג טריידים סגורים
+ */
+async function updateTickersList(mode, showClosedTrades = false) {
+    console.log('🔄 עדכון רשימת טיקרים:', { mode, showClosedTrades });
+
+    try {
+        // טעינת כל הטיקרים
+        const tickersResponse = await fetch('/api/v1/tickers/');
+        const tickersData = await tickersResponse.json();
+        const allTickers = tickersData.data || tickersData || [];
+
+        // טעינת טריידים
+        const tradesResponse = await fetch('/api/v1/trades/');
+        const tradesData = await tradesResponse.json();
+        const trades = tradesData.data || tradesData || [];
+
+        // סינון טיקרים לפי הקריטריונים
+        let filteredTickers;
+        
+        if (showClosedTrades) {
+            // הצג טיקרים עם טריידים פעילים + טיקרים עם טריידים סגורים
+            const tickersWithActiveTrades = allTickers.filter(ticker => 
+                trades.some(trade => trade.ticker_id === ticker.id && (trade.status === 'active' || trade.status === 'open'))
+            );
+            
+            const tickersWithClosedTrades = allTickers.filter(ticker => 
+                trades.some(trade => trade.ticker_id === ticker.id && trade.status === 'closed')
+            );
+            
+            // איחוד ללא כפילויות
+            const allRelevantTickers = [...tickersWithActiveTrades, ...tickersWithClosedTrades];
+            filteredTickers = allRelevantTickers.filter((ticker, index, self) => 
+                index === self.findIndex(t => t.id === ticker.id)
+            );
+            
+            console.log('🔄 טיקרים עם טריידים פעילים:', tickersWithActiveTrades.map(t => t.symbol));
+            console.log('🔄 טיקרים עם טריידים סגורים:', tickersWithClosedTrades.map(t => t.symbol));
+            console.log('🔄 סה"כ טיקרים רלוונטיים:', filteredTickers.map(t => t.symbol));
+        } else {
+            // הצג רק טיקרים עם טריידים פעילים
+            filteredTickers = allTickers.filter(ticker => 
+                trades.some(trade => trade.ticker_id === ticker.id && (trade.status === 'active' || trade.status === 'open'))
+            );
+            console.log('🔄 טיקרים עם טריידים פעילים בלבד:', filteredTickers.map(t => t.symbol));
+        }
+
+        // עדכון שדה הטיקר
+        const tickerSelect = mode === 'add'
+            ? document.getElementById('addExecutionTicker')
+            : document.getElementById('editExecutionTicker');
+
+        if (tickerSelect) {
+            tickerSelect.innerHTML = '<option value="">בחר טיקר...</option>';
+            filteredTickers.forEach(ticker => {
+                const option = document.createElement('option');
+                option.value = ticker.id;
+                option.textContent = `${ticker.symbol} - ${ticker.name}`;
+                tickerSelect.appendChild(option);
+            });
+            console.log('✅ רשימת טיקרים עודכנה:', filteredTickers.length, 'טיקרים');
+        console.log('🔄 טיקרים שנבחרו:', filteredTickers.map(t => t.symbol));
+        }
+
+    } catch (error) {
+        console.error('❌ שגיאה בעדכון רשימת טיקרים:', error);
+        handleDataLoadError(error, 'עדכון רשימת טיקרים');
+    }
+}
+
+window.updateTickersList = updateTickersList;

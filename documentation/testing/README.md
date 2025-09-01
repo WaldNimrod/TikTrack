@@ -107,29 +107,16 @@ def test_trade_constraints():
 ## 📋 Testing Checklist
 
 ### **Pre-Development**
-- [ ] Define test requirements
-- [ ] Set up testing environment
-- [ ] Configure testing tools
-- [ ] Create test data
+> 📋 **כל הבדיקות הועברו ל**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md)
 
 ### **During Development**
-- [ ] Write unit tests for new functions
-- [ ] Test component interactions
-- [ ] Verify API endpoints
-- [ ] Test database operations
+> 📋 **כל הבדיקות הועברו ל**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md)
 
 ### **Before Deployment**
-- [ ] Run full test suite
-- [ ] Verify integration tests
-- [ ] Execute E2E tests
-- [ ] Performance testing
-- [ ] Security testing
+> 📋 **כל הבדיקות הועברו ל**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md)
 
 ### **Post-Deployment**
-- [ ] Monitor system performance
-- [ ] Track error rates
-- [ ] User acceptance testing
-- [ ] Regression testing
+> 📋 **כל הבדיקות הועברו ל**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md)
 
 ## 🔧 Testing Environment
 

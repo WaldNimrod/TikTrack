@@ -102,33 +102,38 @@ class Trade(BaseModel):
 # SQLAlchemy Event Listeners for Automatic active_trades Updates
 # ========================================
 
-def update_ticker_active_trades(session, ticker_id: int) -> None:
+def update_ticker_active_trades(connection, ticker_id: int) -> None:
     """
     Update the active_trades field for a specific ticker based on open trades
     
     Args:
-        session: SQLAlchemy session
+        connection: SQLAlchemy connection
         ticker_id: ID of the ticker to update
     """
     try:
-        from .ticker import Ticker
+        from sqlalchemy import text
         
         # Count open trades for this ticker
-        open_trades_count = session.query(Trade).filter(
-            Trade.ticker_id == ticker_id,
-            Trade.status == 'open'
-        ).count()
+        open_trades_result = connection.execute(
+            text("SELECT COUNT(*) FROM trades WHERE ticker_id = :ticker_id AND status = 'open'"),
+            {'ticker_id': ticker_id}
+        ).fetchone()
+        open_trades_count = open_trades_result[0] if open_trades_result else 0
         
         # Update the ticker's active_trades field
-        ticker = session.query(Ticker).filter(Ticker.id == ticker_id).first()
-        if ticker:
-            ticker.active_trades = open_trades_count > 0
-            ticker.updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            session.flush()  # Flush to ensure the change is applied
-            
+        active_trades_value = 1 if open_trades_count > 0 else 0
+        connection.execute(
+            text("UPDATE tickers SET active_trades = :active_trades, updated_at = :updated_at WHERE id = :ticker_id"),
+            {
+                'active_trades': active_trades_value,
+                'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'ticker_id': ticker_id
+            }
+        )
         
     except Exception as e:
-        session.rollback()
+        logger.error(f"Error in update_ticker_active_trades: {e}")
+        connection.rollback()
 
 
 @event.listens_for(Trade, 'after_insert')
@@ -138,16 +143,9 @@ def trade_inserted(mapper, connection, target):
     Updates the active_trades field of the related ticker
     """
     try:
-        from .ticker import Ticker
-        from sqlalchemy.orm import Session
+        # Update ticker active_trades field using connection directly
+        update_ticker_active_trades(connection, target.ticker_id)
         
-        # Get session from connection
-        session = Session(bind=connection)
-        
-        # Update ticker status
-        Ticker.update_ticker_status_from_linked_items(session, target.ticker_id)
-        
-        session.close()
     except Exception as e:
         logger.error(f"Error in trade_inserted event: {e}")
         pass
@@ -160,16 +158,9 @@ def trade_updated(mapper, connection, target):
     Updates the active_trades field of the related ticker
     """
     try:
-        from .ticker import Ticker
-        from sqlalchemy.orm import Session
+        # Update ticker active_trades field using connection directly
+        update_ticker_active_trades(connection, target.ticker_id)
         
-        # Get session from connection
-        session = Session(bind=connection)
-        
-        # Update ticker status
-        Ticker.update_ticker_status_from_linked_items(session, target.ticker_id)
-        
-        session.close()
     except Exception as e:
         logger.error(f"Error in trade_updated event: {e}")
         pass
@@ -182,16 +173,9 @@ def trade_deleted(mapper, connection, target):
     Updates the active_trades field of the related ticker
     """
     try:
-        from .ticker import Ticker
-        from sqlalchemy.orm import Session
+        # Update ticker active_trades field using connection directly
+        update_ticker_active_trades(connection, target.ticker_id)
         
-        # Get session from connection
-        session = Session(bind=connection)
-        
-        # Update ticker status
-        Ticker.update_ticker_status_from_linked_items(session, target.ticker_id)
-        
-        session.close()
     except Exception as e:
         logger.error(f"Error in trade_deleted event: {e}")
         pass

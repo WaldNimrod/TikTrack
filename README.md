@@ -1,6 +1,12 @@
 # TikTrack - מערכת ניהול טריידים
 
+## 📋 **משימות מרכזיות**
+
+> 📋 **משימות מרכזיות**: [CENTRAL_TASKS_TODO.md](CENTRAL_TASKS_TODO.md)
+
 > 📋 **אפיון מפורט**: [EXTERNAL_DATA_INTEGRATION_SPECIFICATION_v1.3.1.md](EXTERNAL_DATA_INTEGRATION_SPECIFICATION_v1.3.1.md)
+
+> 📋 **מדריך RTL לעברית**: [documentation/RTL_HEBREW_GUIDE.md](documentation/RTL_HEBREW_GUIDE.md)
 
 ## סקירה כללית
 
@@ -63,6 +69,7 @@ TikTrack היא מערכת ניהול טריידים מתקדמת המאפשרת
 - **Bootstrap 5**: עיצוב רספונסיבי
 - **ארכיטקטורה מאוחדת**: פונקציות מוטמעות בעמודים
 - **מערכת פילטרים**: סינון ומיון מתקדם
+- **תמיכה מלאה ב-RTL**: עברית עם CSS Logical Properties
 
 ## מערכת חיבור מידע חיצוני
 

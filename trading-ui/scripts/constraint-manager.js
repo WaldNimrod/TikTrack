@@ -589,7 +589,7 @@ function showAddConstraintModal() {
         modal.innerHTML = `
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="modal-header modal-header-colored">
                         <h5 class="modal-title">הוספת אילוץ חדש</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>

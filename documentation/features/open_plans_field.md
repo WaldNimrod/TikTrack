@@ -100,30 +100,19 @@ def trade_plan_deleted(mapper, connection, target):
 ## 🔧 Implementation Steps
 
 ### 1. Database Migration
-- [ ] Create migration script for schema changes
-- [ ] Add open_plans field to tickers table
-- [ ] Create database triggers
-- [ ] Update existing data
+> 📋 **כל המשימות הועברו ל**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md)
 
 ### 2. Model Updates
-- [ ] Update Ticker model with open_plans field
-- [ ] Add SQLAlchemy event listeners to TradePlan model
-- [ ] Create helper functions for field updates
+> 📋 **כל המשימות הועברו ל**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md)
 
 ### 3. API Updates
-- [ ] Include open_plans in ticker API responses
-- [ ] Add filtering by open_plans status
-- [ ] Update ticker creation/update endpoints
+> 📋 **כל המשימות הועברו ל**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md)
 
 ### 4. UI Updates
-- [ ] Display open_plans status in ticker lists
-- [ ] Add filtering options for open plans
-- [ ] Update ticker detail views
+> 📋 **כל המשימות הועברו ל**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md)
 
 ### 5. Testing
-- [ ] Unit tests for triggers and event listeners
-- [ ] Integration tests for API endpoints
-- [ ] UI tests for display and filtering
+> 📋 **כל המשימות הועברו ל**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md)
 
 ## 📊 Data Flow
 

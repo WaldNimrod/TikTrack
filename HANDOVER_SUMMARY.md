@@ -167,10 +167,8 @@ TikTrack is a comprehensive trading management system with a Flask backend and H
 - [x] Translation system enhancement ✅
 - [x] Page styling enhancement ✅
 - [x] Database constraint enhancement ✅
-- [ ] Advanced filtering system
-- [ ] Real-time notifications
-- [ ] Export functionality
-- [ ] Advanced analytics
+
+> 📋 **משימות נוספות הועברו ל**: [CENTRAL_TASKS_TODO.md](CENTRAL_TASKS_TODO.md)
 
 ## Available Tools and Scripts
 

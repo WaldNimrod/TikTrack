@@ -36,9 +36,9 @@
   <!-- 2. Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- 3. General styles -->
-  <link rel="stylesheet" href="styles/styles.css">
-    <link rel="stylesheet" href="styles/header-system.css">
+  <!-- 3. Header system -->
+  <link rel="stylesheet" href="styles/header-system.css">
+
   <!-- 4. Typography -->
   <link rel="stylesheet" href="styles/typography.css">
 
@@ -51,13 +51,16 @@
   <!-- 7. Linked items modal styles -->
   <link rel="stylesheet" href="styles/linked-items.css">
 
+  <!-- 8. General styles (highest priority - drops everything) -->
+  <link rel="stylesheet" href="styles/styles.css">
+
   <!-- UI Utils - Global UI utilities -->
   <script src="scripts/ui-utils.js"></script>
 
   <!-- Modular grid files - loaded at end of file -->
 </head>
 
-<body>
+<body class="executions-page">
   <!-- General background -->
   <div class="background-wrapper">
 
@@ -102,7 +105,83 @@
       <!-- Main content -->
       <div class="main-content">
 
-        <!-- Designs area - content-section -->
+        <!-- Tickers Summary Section -->
+        <div class="content-section executions-page">
+          <!-- Tickers header -->
+          <div class="section-header">
+            <div class="table-title">
+              <img src="images/icons/tickers.svg" alt="טיקרים"
+                style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+              רשימת טיקרים חלקית
+            </div>
+            <div class="table-count" id="tickersCount">0 טיקרים</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="refreshTickersSummary()" title="רענן רשימת טיקרים">
+                <img src="images/icons/tickers.svg" alt="רענן" class="action-icon"
+                  style="width: 16px; height: 16px;"> רענן
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleTickersSection()" title="הצג/הסתר אזור טיקרים">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tickers summary table -->
+          <div class="section-body">
+            <div class="table-responsive" id="tickersContainer">
+              <table class="table" id="tickersTable" data-table-type="tickers">
+                <thead>
+                  <tr>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('tickers_summary', 0, window.tickersSummaryData || [], updateTickersSummaryTable); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        סימבול <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('tickers_summary', 1, window.tickersSummaryData || [], updateTickersSummaryTable); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        שם <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('tickers_summary', 2, window.tickersSummaryData || [], updateTickersSummaryTable); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        סטטוס טריידים <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('tickers_summary', 3, window.tickersSummaryData || [], updateTickersSummaryTable); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        כמות טריידים <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('tickers_summary', 4, window.tickersSummaryData || [], updateTickersSummaryTable); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        נוצר ב <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th class="actions-cell">פעולות</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="6" class="text-center">טוען טיקרים...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Executions area - content-section -->
         <div class="content-section executions-page">
           <!-- Designs header -->
           <div class="section-header">
@@ -255,7 +334,7 @@
                   <div class="mb-3">
                     <label for="addExecutionTicker" class="form-label">טיקר *</label>
                     <select class="form-select" id="addExecutionTicker" required
-                      onchange="loadActiveTradesForTicker('add')">
+                      onchange="updateTradesOnTickerChange('add')">
                       <option value="">בחר טיקר...</option>
                     </select>
                     <div class="invalid-feedback" id="addExecutionTickerError"></div>
@@ -263,11 +342,11 @@
                 </div>
                 <div class="col-md-6">
                   <div class="mb-3">
-                    <label for="addExecutionTradeId" class="form-label">בחירת טרייד או תכנון *</label>
+                    <label for="addExecutionTradeId" class="form-label">בחר טרייד *</label>
                     <div class="input-group">
                       <select class="form-select" id="addExecutionTradeId" required disabled
                         onchange="validateExecutionTradeId(this); enableAllFields('add');">
-                        <option value="">בחר טרייד או תכנון...</option>
+                        <option value="">בחר טרייד...</option>
                       </select>
                       <button type="button" class="btn btn-outline-success link-button" id="addExecutionTradeLink"
                         onclick="goToLinkedTrade('add')" title="עבור לטרייד" style="display: none;">
@@ -278,14 +357,14 @@
                   </div>
                 </div>
               </div>
-              <div class="row">
+                            <div class="row">
                 <div class="col-md-12">
                   <div class="mb-3">
                     <div class="form-check">
                       <input class="form-check-input" type="checkbox" id="addExecutionShowClosedTrades"
                         onchange="updateTradesOnCheckboxChange('add')">
                       <label class="form-check-label" for="addExecutionShowClosedTrades">
-                        הצג טריידים סגורים
+                        הצג גם טריידים סגורים
                       </label>
                     </div>
                   </div>
@@ -462,7 +541,7 @@
                   <div class="mb-3">
                     <label for="editExecutionTicker" class="form-label">טיקר *</label>
                     <select class="form-select" id="editExecutionTicker" required
-                      onchange="loadActiveTradesForTicker('edit')">
+                      onchange="updateTradesOnTickerChange('edit')">
                       <option value="">בחר טיקר...</option>
                     </select>
                     <div class="invalid-feedback" id="editExecutionTickerError"></div>
@@ -470,11 +549,11 @@
                 </div>
                 <div class="col-md-6">
                   <div class="mb-3">
-                    <label for="editExecutionTradeId" class="form-label">בחירת טרייד או תכנון *</label>
+                    <label for="editExecutionTradeId" class="form-label">בחר טרייד *</label>
                     <div class="input-group">
                       <select class="form-select" id="editExecutionTradeId" required
                         onchange="validateExecutionTradeId(this); enableAllFields('edit');">
-                        <option value="">בחר טרייד או תכנון...</option>
+                        <option value="">בחר טרייד...</option>
                       </select>
                       <button type="button" class="btn btn-outline-success link-button" id="editExecutionTradeLink"
                         onclick="goToLinkedTrade()" title="עבור לטרייד" style="display: none;">
@@ -485,14 +564,14 @@
                   </div>
                 </div>
               </div>
-              <div class="row">
+                            <div class="row">
                 <div class="col-md-12">
                   <div class="mb-3">
                     <div class="form-check">
                       <input class="form-check-input" type="checkbox" id="editExecutionShowClosedTrades"
                         onchange="updateTradesOnCheckboxChange('edit')">
                       <label class="form-check-label" for="editExecutionShowClosedTrades">
-                        הצג טריידים סגורים
+                        הצג גם טריידים סגורים
                       </label>
                     </div>
                   </div>
@@ -685,7 +764,7 @@
       aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
-          <div class="modal-header">
+          <div class="modal-header modal-header-colored">
             <h5 class="modal-title" id="linkedItemsModalLabel">פרטים מקושרים</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>

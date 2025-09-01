@@ -4394,7 +4394,7 @@ function resetFiltersToDefaults(defaultStatus, defaultType, defaultAccount, defa
   const selectedTypeItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === typeValue);
   if (selectedTypeItem) {
     selectedTypeItem.classList.add('selected');
-    console.log('✅ Found and selected type item:', typeValue);
+    // Found and selected type item
   } else {
     // אם לא נמצא, בחר "הכול"
     const allTypeItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === 'הכול');
@@ -4412,11 +4412,11 @@ function resetFiltersToDefaults(defaultStatus, defaultType, defaultAccount, defa
   dateRangeItems.forEach(item => item.classList.remove('selected'));
   
   let dateRangeValue = dateRangeTranslation[defaultDateRange] || 'כל זמן';
-  console.log('🔍 Looking for date range value:', dateRangeValue);
+  // Looking for date range value
   const selectedDateRangeItem = Array.from(dateRangeItems).find(item => item.getAttribute('data-value') === dateRangeValue);
   if (selectedDateRangeItem) {
     selectedDateRangeItem.classList.add('selected');
-    console.log('✅ Found and selected date range item:', dateRangeValue);
+    // Found and selected date range item
   } else {
     // אם לא נמצא, בחר "כל זמן"
     const allDateRangeItem = Array.from(dateRangeItems).find(item => item.getAttribute('data-value') === 'כל זמן');
@@ -4560,7 +4560,7 @@ function getAccountsFromStorage() {
     const accountsData = localStorage.getItem('tiktrack_accounts');
     if (accountsData) {
       const accounts = JSON.parse(accountsData);
-      console.log('📦 Retrieved accounts from localStorage:', accounts.length, 'accounts');
+      // Retrieved accounts from localStorage
       return accounts;
     }
     return null;
@@ -4574,28 +4574,28 @@ function getAccountsFromStorage() {
  * טיפול באיפוס פילטר חשבונות
  */
 function processAccountFilterReset(accountItems, defaultAccount) {
-  console.log('🔍 Processing account filter reset with defaultAccount:', defaultAccount);
-  console.log('🔍 Account items to process:', accountItems.length);
+  // Processing account filter reset with defaultAccount
+  // Account items to process
   
   // הדפסת כל החשבונות הזמינים
   // Available account items
   accountItems.forEach((item, index) => {
     const value = item.getAttribute('data-value');
     const id = item.getAttribute('data-account-id');
-    console.log(`  ${index}: value="${value}", id="${id}"`);
+    // Account item details
   });
   
   accountItems.forEach(item => item.classList.remove('selected'));
   
   let accountValue = defaultAccount === 'all' ? 'הכול' : defaultAccount;
-  console.log('🔍 Looking for account value:', accountValue);
+  // Looking for account value
   
   const selectedAccountItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === accountValue);
   if (selectedAccountItem) {
     selectedAccountItem.classList.add('selected');
-    console.log('✅ Found and selected account item:', accountValue);
+    // Found and selected account item
   } else {
-    console.log('❌ Account item not found for value:', accountValue);
+    // Account item not found for value
     // אם לא נמצא, בחר "הכול"
     const allAccountItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === 'הכול');
     if (allAccountItem) {

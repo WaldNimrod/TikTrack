@@ -336,15 +336,18 @@ function updateAccountsTable(accounts) {
       <td>${account.total_pl ? `$${account.total_pl.toLocaleString()}` : '$0'}</td>
       <td>${account.notes || '-'}</td>
       <td class="actions-cell">
+        <button class="btn btn-sm btn-info" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'account', ${account.id})" title="צפה באלמנטים מקושרים">
+          🔗
+        </button>
         <button class="btn btn-sm btn-secondary" onclick="showEditAccountModalById(${account.id})" title="ערוך חשבון">
           ✏️
         </button>
-        ${account.status !== 'cancelled' ? `<button class="btn btn-sm btn-secondary" onclick="cancelAccount(${account.id}, '${account.name || 'Unknown'}')" title="בטל חשבון">❌</button>` : ''}
-        <button class="btn btn-sm btn-danger" onclick="deleteAccount(${account.id}, '${account.name || 'Unknown'}')" title="מחק חשבון">
+        ${account.status === 'cancelled' ? 
+          `<button class="btn btn-sm btn-outline-success" onclick="restoreAccount(${account.id}, '${account.name || 'Unknown'}')" title="החזר חשבון"><span class="reactivate-icon">✓</span></button>` :
+          `<button class="btn btn-sm btn-warning" onclick="cancelAccountWithLinkedItemsCheck(${account.id}, '${account.name || 'Unknown'}')" title="בטל חשבון">❌</button>`
+        }
+        <button class="btn btn-sm btn-danger" onclick="deleteAccountWithLinkedItemsCheck(${account.id}, '${account.name || 'Unknown'}')" title="מחק חשבון">
           🗑️
-        </button>
-        <button class="btn btn-sm btn-info" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'account', ${account.id})" title="צפה באלמנטים מקושרים">
-          🔗
         </button>
       </td>
     </tr>
@@ -634,7 +637,7 @@ function createAccountModal(mode, account = null) {
   modal.innerHTML = `
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header modal-header-colored">
           <h5 class="modal-title" id="accountModalLabel">${title}</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -668,7 +671,6 @@ function createAccountModal(mode, account = null) {
                   <select class="form-select" id="accountStatus" name="status">
                     <option value="open" ${account && account.status === 'open' ? 'selected' : ''}>פתוח</option>
                     <option value="closed" ${account && account.status === 'closed' ? 'selected' : ''}>סגור</option>
-                    <option value="cancelled" ${account && account.status === 'cancelled' ? 'selected' : ''}>מבוטל</option>
                   </select>
                 </div>
               </div>
@@ -710,6 +712,8 @@ function createAccountModal(mode, account = null) {
       const value = this.value.trim();
       const errorElement = modal.querySelector('#nameError');
 
+      if (!errorElement) return; // בדיקה שהאלמנט קיים
+
       if (value === '') {
         this.classList.add('is-invalid');
         errorElement.textContent = 'שם החשבון הוא שדה חובה';
@@ -729,6 +733,8 @@ function createAccountModal(mode, account = null) {
     currencySelect.addEventListener('change', function () {
       const errorElement = modal.querySelector('#currencyError');
 
+      if (!errorElement) return; // בדיקה שהאלמנט קיים
+
       if (!this.value) {
         this.classList.add('is-invalid');
         errorElement.textContent = 'יש לבחור מטבע';
@@ -742,6 +748,8 @@ function createAccountModal(mode, account = null) {
     cashBalanceInput.addEventListener('input', function () {
       const value = parseFloat(this.value);
       const errorElement = modal.querySelector('#cashBalanceError');
+
+      if (!errorElement) return; // בדיקה שהאלמנט קיים
 
       if (this.value !== '' && (isNaN(value) || value < 0)) {
         this.classList.add('is-invalid');
@@ -802,8 +810,8 @@ function validateAccountData(accountData) {
   }
 
   // בדיקת סטטוס
-  if (accountData.status && !['open', 'closed', 'cancelled'].includes(accountData.status)) {
-    return { isValid: false, message: 'סטטוס חשבון לא תקין' };
+  if (accountData.status && !['open', 'closed'].includes(accountData.status)) {
+    return { isValid: false, message: 'סטטוס חשבון לא תקין - רק פתוח או סגור מותרים' };
   }
 
   // בדיקת יתרת מזומן
@@ -1631,6 +1639,9 @@ window.validateAccountData = validateAccountData;
 window.showFormError = showFormError;
 window.loadCurrenciesFromServer = loadCurrenciesFromServer;
 window.generateCurrencyOptions = generateCurrencyOptions;
+window.cancelAccountWithLinkedItemsCheck = cancelAccountWithLinkedItemsCheck;
+window.deleteAccountWithLinkedItemsCheck = deleteAccountWithLinkedItemsCheck;
+window.restoreAccount = restoreAccount;
 
 // הגדרת הפונקציה updateGridFromComponent לדף החשבונות
 // וידוא שהפונקציה מוגדרת רק בדף החשבונות
@@ -1799,9 +1810,7 @@ function filterAccountsLocally(accounts, selectedStatuses, selectedTypes, select
   if (selectedStatuses && selectedStatuses.length > 0 && !selectedStatuses.includes('all')) {
     filteredAccounts = filteredAccounts.filter(account => {
       let itemStatus;
-      if (account.status === 'cancelled') {
-        itemStatus = 'מבוטל';
-      } else if (account.status === 'closed') {
+      if (account.status === 'closed') {
         itemStatus = 'סגור';
       } else {
         itemStatus = 'פתוח';
@@ -1966,3 +1975,125 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 });
+
+/**
+ * ביטול חשבון עם בדיקת פריטים מקושרים
+ * @param {number} accountId - מזהה החשבון
+ * @param {string} accountName - שם החשבון
+ */
+async function cancelAccountWithLinkedItemsCheck(accountId, accountName) {
+  try {
+    // בדיקת פריטים מקושרים
+    const linkedItemsResponse = await fetch(`/api/v1/linked-items/account/${accountId}`);
+    if (linkedItemsResponse.ok) {
+      const linkedItemsData = await linkedItemsResponse.json();
+      const linkedItems = linkedItemsData.data || linkedItemsData || [];
+
+      if (linkedItems.length > 0) {
+        // הצגת מודול פריטים מקושרים
+        if (typeof window.showLinkedItemsModal === 'function') {
+          window.showLinkedItemsModal(linkedItems, 'account', accountId);
+        } else {
+          showErrorMessage('לא ניתן להציג פריטים מקושרים - פונקציה לא זמינה');
+        }
+        return;
+      }
+    }
+
+    // אם אין פריטים מקושרים, המשך לביטול
+    await cancelAccount(accountId, accountName);
+  } catch (error) {
+    handleSystemError(error, 'בדיקת פריטים מקושרים לביטול חשבון');
+    showErrorMessage('שגיאה בבדיקת פריטים מקושרים');
+  }
+}
+
+/**
+ * מחיקת חשבון עם בדיקת פריטים מקושרים
+ * @param {number} accountId - מזהה החשבון
+ * @param {string} accountName - שם החשבון
+ */
+async function deleteAccountWithLinkedItemsCheck(accountId, accountName) {
+  try {
+    // בדיקת פריטים מקושרים
+    const linkedItemsResponse = await fetch(`/api/v1/linked-items/account/${accountId}`);
+    if (linkedItemsResponse.ok) {
+      const linkedItemsData = await linkedItemsResponse.json();
+      const linkedItems = linkedItemsData.data || linkedItemsData || [];
+
+      if (linkedItems.length > 0) {
+        // הצגת מודול פריטים מקושרים
+        if (typeof window.showLinkedItemsModal === 'function') {
+          window.showLinkedItemsModal(linkedItems, 'account', accountId);
+        } else {
+          showErrorMessage('לא ניתן להציג פריטים מקושרים - פונקציה לא זמינה');
+        }
+        return;
+      }
+    }
+
+    // אם אין פריטים מקושרים, המשך למחיקה
+    await deleteAccount(accountId, accountName);
+  } catch (error) {
+    handleSystemError(error, 'בדיקת פריטים מקושרים למחיקת חשבון');
+    showErrorMessage('שגיאה בבדיקת פריטים מקושרים');
+  }
+}
+
+/**
+ * החזרת חשבון מבוטל לסטטוס סגור
+ * @param {number} accountId - מזהה החשבון
+ * @param {string} accountName - שם החשבון
+ */
+async function restoreAccount(accountId, accountName) {
+  // אישור מהמשתמש
+  if (typeof window.showConfirmationDialog === 'function') {
+    const confirmed = await new Promise((resolve) => {
+      window.showConfirmationDialog(
+        'החזרת חשבון',
+        `האם אתה בטוח שברצונך להחזיר את החשבון "${accountName}" לסטטוס סגור?`,
+        () => resolve(true),
+        () => resolve(false)
+      );
+    });
+    if (!confirmed) return;
+  } else {
+    if (!confirm(`האם אתה בטוח שברצונך להחזיר את החשבון "${accountName}" לסטטוס סגור?`)) {
+      return;
+    }
+  }
+
+  try {
+    const response = await fetch(`/api/v1/accounts/${accountId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        status: 'closed'
+      })
+    });
+
+    if (response.ok) {
+      showSuccessMessage('חשבון הוחזר בהצלחה לסטטוס סגור!');
+
+      // רענון הטבלה
+      if (typeof window.loadAccountsDataForAccountsPage === 'function') {
+        await window.loadAccountsDataForAccountsPage();
+      } else if (typeof window.loadAccountsData === 'function') {
+        const accounts = await window.loadAccountsData();
+        if (typeof window.updateAccountsTable === 'function') {
+          window.updateAccountsTable(accounts);
+        }
+      }
+    } else {
+      const data = await response.json();
+      showErrorMessage(data.message || 'שגיאה בהחזרת חשבון');
+    }
+  } catch (error) {
+    handleSystemError(error, 'החזרת חשבון');
+    showErrorMessage('שגיאה בהחזרת חשבון');
+  }
+}
+
+

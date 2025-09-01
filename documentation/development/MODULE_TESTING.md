@@ -60,187 +60,183 @@ trading-ui/
 ## 📊 Module Testing Checklist
 
 ### 🔐 **Authentication Module**
-- [ ] **User Registration**
-  - [ ] Valid user registration
-  - [ ] Duplicate username handling
-  - [ ] Password strength validation
-  - [ ] Email format validation
-  - [ ] Registration confirmation
+> 📋 **כל הבדיקות הועברו ל**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md)
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Registration confirmation
 
-- [ ] **User Login**
-  - [ ] Valid credentials login
-  - [ ] Invalid credentials handling
-  - [ ] Password reset functionality
-  - [ ] Session management
-  - [ ] Logout functionality
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **User Login**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Valid credentials login
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Invalid credentials handling
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Password reset functionality
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Session management
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Logout functionality
 
-- [ ] **Access Control**
-  - [ ] Protected route access
-  - [ ] Role-based permissions
-  - [ ] Session timeout handling
-  - [ ] Concurrent session management
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Access Control**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Protected route access
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Role-based permissions
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Session timeout handling
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Concurrent session management
 
 ### 💰 **Accounts Module**
-- [ ] **Account CRUD Operations**
-  - [ ] Create new account
-  - [ ] Read account details
-  - [ ] Update account information
-  - [ ] Delete account (with validation)
-  - [ ] Account list retrieval
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Account CRUD Operations**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Create new account
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Read account details
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Update account information
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Delete account (with validation)
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Account list retrieval
 
-- [ ] **Account Validation**
-  - [ ] Required field validation
-  - [ ] Account name uniqueness
-  - [ ] Account type validation
-  - [ ] Currency validation
-  - [ ] Balance calculations
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Account Validation**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Required field validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Account name uniqueness
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Account type validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Currency validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Balance calculations
 
-- [ ] **Account Relationships**
-  - [ ] Account-trade relationships
-  - [ ] Account-cash flow relationships
-  - [ ] Account-note relationships
-  - [ ] Cascade delete handling
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Account Relationships**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Account-trade relationships
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Account-cash flow relationships
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Account-note relationships
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Cascade delete handling
 
 ### 📈 **Trades Module**
-- [ ] **Trade CRUD Operations**
-  - [ ] Create new trade
-  - [ ] Read trade details
-  - [ ] Update trade information
-  - [ ] Delete trade (with validation)
-  - [ ] Trade list retrieval
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Trade CRUD Operations**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Create new trade
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Read trade details
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Update trade information
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Delete trade (with validation)
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Trade list retrieval
 
-- [ ] **Trade Validation**
-  - [ ] Required field validation
-  - [ ] Investment type validation
-  - [ ] Amount validation (positive values)
-  - [ ] Date validation
-  - [ ] Account and ticker relationships
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Trade Validation**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Required field validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Investment type validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Amount validation (positive values)
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Date validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Account and ticker relationships
 
-- [ ] **Trade Calculations**
-  - [ ] Profit/loss calculations
-  - [ ] Total trade amounts
-  - [ ] Trade statistics
-  - [ ] Performance metrics
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Trade Calculations**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Profit/loss calculations
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Total trade amounts
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Trade statistics
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Performance metrics
 
 ### 🎯 **Tickers Module**
-- [ ] **Ticker CRUD Operations**
-  - [ ] Create new ticker
-  - [ ] Read ticker details
-  - [ ] Update ticker information
-  - [ ] Delete ticker (with validation)
-  - [ ] Ticker list retrieval
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Ticker CRUD Operations**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Create new ticker
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Read ticker details
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Update ticker information
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Delete ticker (with validation)
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Ticker list retrieval
 
-- [ ] **Ticker Validation**
-  - [ ] Symbol uniqueness
-  - [ ] Name validation (2-25 characters)
-  - [ ] Type validation
-  - [ ] Currency validation
-  - [ ] Active trades status
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Ticker Validation**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Symbol uniqueness
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Name validation (2-25 characters)
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Type validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Currency validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Active trades status
 
-- [ ] **Ticker Relationships**
-  - [ ] Ticker-trade relationships
-  - [ ] Ticker-alert relationships
-  - [ ] Linked items counting
-  - [ ] Cascade operations
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Ticker Relationships**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Ticker-trade relationships
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Ticker-alert relationships
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Linked items counting
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Cascade operations
 
 ### 🔔 **Alerts Module**
-- [ ] **Alert CRUD Operations**
-  - [ ] Create new alert
-  - [ ] Read alert details
-  - [ ] Update alert information
-  - [ ] Delete alert
-  - [ ] Alert list retrieval
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Alert CRUD Operations**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Create new alert
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Read alert details
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Update alert information
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Delete alert
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Alert list retrieval
 
-- [ ] **Alert Validation**
-  - [ ] Condition type validation
-  - [ ] Threshold value validation
-  - [ ] Ticker relationship validation
-  - [ ] Alert status management
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Alert Validation**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Condition type validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Threshold value validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Ticker relationship validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Alert status management
 
-- [ ] **Alert Functionality**
-  - [ ] Alert triggering logic
-  - [ ] Alert notification system
-  - [ ] Alert history tracking
-  - [ ] Alert deactivation
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Alert Functionality**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Alert triggering logic
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Alert notification system
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Alert history tracking
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Alert deactivation
 
 ### 📝 **Notes Module**
-- [ ] **Note CRUD Operations**
-  - [ ] Create new note
-  - [ ] Read note details
-  - [ ] Update note content
-  - [ ] Delete note
-  - [ ] Note list retrieval
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Note CRUD Operations**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Create new note
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Read note details
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Update note content
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Delete note
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Note list retrieval
 
-- [ ] **Note Validation**
-  - [ ] Content validation
-  - [ ] Relationship validation
-  - [ ] Date validation
-  - [ ] User association
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Note Validation**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Content validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Relationship validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Date validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) User association
 
-- [ ] **Note Relationships**
-  - [ ] Note-trade relationships
-  - [ ] Note-account relationships
-  - [ ] Note-ticker relationships
-  - [ ] Note filtering
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Note Relationships**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Note-trade relationships
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Note-account relationships
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Note-ticker relationships
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Note filtering
 
 ### 💸 **Cash Flows Module**
-- [ ] **Cash Flow CRUD Operations**
-  - [ ] Create new cash flow
-  - [ ] Read cash flow details
-  - [ ] Update cash flow information
-  - [ ] Delete cash flow
-  - [ ] Cash flow list retrieval
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Cash Flow CRUD Operations**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Create new cash flow
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Read cash flow details
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Update cash flow information
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Delete cash flow
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Cash flow list retrieval
 
-- [ ] **Cash Flow Validation**
-  - [ ] Amount validation
-  - [ ] Type validation (income/expense)
-  - [ ] Date validation
-  - [ ] Account relationship validation
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Cash Flow Validation**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Amount validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Type validation (income/expense)
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Date validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Account relationship validation
 
-- [ ] **Cash Flow Calculations**
-  - [ ] Total income calculations
-  - [ ] Total expense calculations
-  - [ ] Net cash flow calculations
-  - [ ] Period-based summaries
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Cash Flow Calculations**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Total income calculations
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Total expense calculations
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Net cash flow calculations
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Period-based summaries
 
 ### ⚙️ **Preferences Module**
-- [ ] **Preferences CRUD Operations**
-  - [ ] Create user preferences
-  - [ ] Read preference settings
-  - [ ] Update preference values
-  - [ ] Delete preferences
-  - [ ] Default preferences
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Preferences CRUD Operations**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Create user preferences
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Read preference settings
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Update preference values
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Delete preferences
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Default preferences
 
-- [ ] **Preferences Validation**
-  - [ ] Preference key validation
-  - [ ] Value type validation
-  - [ ] User association validation
-  - [ ] Default value handling
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Preferences Validation**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Preference key validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Value type validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) User association validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Default value handling
 
-- [ ] **Preferences Integration**
-  - [ ] UI preference application
-  - [ ] System preference loading
-  - [ ] Preference persistence
-  - [ ] Multi-user support
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Preferences Integration**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) UI preference application
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) System preference loading
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Preference persistence
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Multi-user support
 
 ### 🗄️ **Database Module**
-- [ ] **Database Operations**
-  - [ ] Connection management
-  - [ ] Transaction handling
-  - [ ] Query optimization
-  - [ ] Data integrity checks
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Database Operations**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Connection management
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Transaction handling
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Query optimization
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Data integrity checks
 
-- [ ] **Migration Testing**
-  - [ ] Schema migration validation
-  - [ ] Data migration testing
-  - [ ] Rollback functionality
-  - [ ] Migration logging
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Migration Testing**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Schema migration validation
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Data migration testing
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Rollback functionality
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Migration logging
 
-- [ ] **Constraint Testing**
-  - [ ] Foreign key constraints
-  - [ ] Unique constraints
-  - [ ] Check constraints
-  - [ ] Default values
+> 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Constraint Testing**
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Foreign key constraints
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Unique constraints
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Check constraints
+  > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Default values
 
 ## 🧪 Testing Implementation
 

@@ -108,6 +108,16 @@ const TABLE_COLUMN_MAPPINGS = {
         'updated_at'             // 10 - Updated At
     ],
 
+    // טבלת טיקרים חלקית (Tickers Summary) - Executions Page Structure
+    'tickers_summary': [
+        'symbol',                // 0 - סימבול
+        'name',                  // 1 - שם
+        'status',                // 2 - סטטוס טריידים
+        'totalTrades',           // 3 - כמות טריידים
+        'created_at',            // 4 - נוצר ב
+        'actions'                // 5 - פעולות
+    ],
+
     // טבלת ביצועים (Executions) - Database Display Page Structure
     'executions': [
         'id',                    // 0 - ID
@@ -329,6 +339,21 @@ function getColumnValue(item, columnIndex, tableType) {
         tableType === 'executions' || tableType === 'cash_flows') {
 
         // Return the field value directly from the item
+        return item[fieldName] || '';
+    }
+
+    // Tickers Summary table - special handling for status and trade counts
+    if (tableType === 'tickers_summary') {
+        if (fieldName === 'status') {
+            return item.status || '';
+        }
+        if (fieldName === 'totalTrades') {
+            return item.totalTrades || 0;
+        }
+        if (fieldName === 'actions') {
+            return ''; // לא ממיינים לפי עמודת פעולות
+        }
+        // For other fields, return directly
         return item[fieldName] || '';
     }
 

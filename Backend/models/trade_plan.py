@@ -147,6 +147,9 @@ def trade_plan_deleted(mapper, connection, target):
         # Get session from connection
         session = Session(bind=connection)
         
+        # Update ticker status
+        Ticker.update_ticker_status_from_linked_items(session, target.ticker_id)
+        
         session.close()
     except Exception as e:
         logger.error(f"Error in trade_plan_deleted event: {e}")

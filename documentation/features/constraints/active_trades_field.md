@@ -286,16 +286,10 @@ HAVING t.active_trades != (open_trades_count > 0);
 ## 🎯 Future Enhancements
 
 ### Planned Improvements
-- [ ] Add active_trades_count field (not just boolean)
-- [ ] Add last trade update timestamp
-- [ ] Implement batch updates for performance
-- [ ] Add caching layer for frequently accessed data
+> 📋 **כל השיפורים הועברו ל**: [../../../CENTRAL_TASKS_TODO.md](../../../CENTRAL_TASKS_TODO.md)
 
 ### Performance Optimizations
-- [ ] Index optimization for large datasets
-- [ ] Trigger execution time monitoring
-- [ ] Batch update strategies
-- [ ] Query optimization
+> 📋 **כל האופטימיזציות הועברו ל**: [../../../CENTRAL_TASKS_TODO.md](../../../CENTRAL_TASKS_TODO.md)
 
 ---
 

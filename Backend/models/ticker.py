@@ -190,7 +190,9 @@ class Ticker(BaseModel):
             if ticker.status != new_status:
                 ticker.status = new_status
                 ticker.updated_at = datetime.now()
-                session.flush()
+            
+            # Flush changes to ensure they are applied
+            session.flush()
                 
                 
         except Exception as e:

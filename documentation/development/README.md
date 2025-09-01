@@ -2,7 +2,34 @@
 
 ## 🚀 Latest Updates
 
-**Version 3.2** - *August 26, 2025*
+**Version 4.0** - *September 1, 2025*
+
+### ✅ **Advanced Development Infrastructure - Complete Implementation**
+
+#### **New Development Infrastructure**
+- **Advanced Caching System**: Smart cache with TTL, dependencies, and memory optimization
+- **Query Optimization**: Automatic query analysis and optimization
+- **Performance Monitoring**: Real-time performance tracking and health checks
+- **Background Tasks**: Automated background processes
+- **Rate Limiting**: Advanced request throttling
+- **Error Handling**: Comprehensive error handling with correlation IDs
+
+#### **Development Modes & Cache Management**
+- **Multiple Development Modes**: Normal, No-Cache, and Production modes
+- **Smart Cache Management**: Environment-based cache configuration
+- **Quick Cache Clear**: UI button and keyboard shortcuts for cache clearing
+- **Unified Restart System**: Centralized server management with environment variables
+- **Performance Optimization**: Database indexing and query optimization
+
+#### **Current Status**
+- ✅ **Advanced caching system operational**
+- ✅ **Query optimization system working**
+- ✅ **Performance monitoring active**
+- ✅ **Development modes implemented**
+- ✅ **Cache management UI complete**
+- ✅ **Unified restart system operational**
+
+### ✅ **Previous: Code Cleanup & Modular Architecture - Complete Implementation**
 
 ### ✅ **Code Cleanup & Modular Architecture - Complete Implementation**
 
@@ -64,9 +91,15 @@ This guide provides comprehensive information for developers working on the TikT
 
 ### Backend (Python Flask)
 - **Framework**: Flask with SQLAlchemy ORM
-- **Database**: SQLite with WAL mode
-- **API**: RESTful API design
+- **Database**: SQLite with WAL mode and advanced indexing
+- **API**: RESTful API design with versioning
 - **Authentication**: Session-based authentication
+- **Advanced Caching**: Smart cache with TTL and dependencies
+- **Query Optimization**: Automatic query analysis and optimization
+- **Performance Monitoring**: Real-time performance tracking
+- **Background Tasks**: Automated background processes
+- **Rate Limiting**: Advanced request throttling
+- **Error Handling**: Comprehensive error handling with correlation IDs
 
 ### Frontend (JavaScript)
 - **Framework**: Vanilla JavaScript with modular architecture
@@ -75,10 +108,18 @@ This guide provides comprehensive information for developers working on the TikT
 - **Header System**: Unified navigation and filtering interface
 
 ### Core Components
-1. **Header System** (`header-system.js`): Navigation and filter interface
+1. **Header System** (`header-system.js`): Navigation, filter interface, and cache management
 2. **Filter System** (`simple-filter.js`): Advanced filtering across all tables
 3. **Warning System** (`warning-system.js`): Centralized modal management
 4. **Translation System** (`translation-utils.js`): Hebrew/English translation utilities
+
+### Advanced Development Systems
+1. **Cache Management System**: Smart caching with TTL and dependencies
+2. **Query Optimization System**: Automatic query analysis and optimization
+3. **Performance Monitoring**: Real-time performance tracking and health checks
+4. **Background Task System**: Automated background processes
+5. **Rate Limiting System**: Advanced request throttling
+6. **Error Handling System**: Comprehensive error handling with correlation IDs
 
 ## 🚀 Quick Start
 
@@ -87,6 +128,64 @@ This guide provides comprehensive information for developers working on the TikT
 - Node.js (for frontend development)
 - SQLite (included)
 - Modern web browser
+
+## 🎯 Development Modes & Cache Management
+
+### Available Development Modes
+
+#### **1. No-Cache Mode** (Recommended for Active Development)
+```bash
+npm run dev:no-cache
+```
+- Cache completely disabled
+- All code changes visible immediately
+- Best for active development
+- Lower performance
+
+#### **2. Normal Development Mode** (Cache: 10 seconds)
+```bash
+npm run dev:normal
+```
+- Cache enabled with 10-second TTL
+- Good for testing
+- Still see changes quickly
+- Balanced performance
+
+#### **3. Production Mode** (Cache: 5 minutes)
+```bash
+npm run dev:production
+```
+- Cache enabled with 5-minute TTL
+- Maximum performance
+- Good for pre-deployment testing
+
+### Quick Cache Management
+
+#### **UI Button:**
+- Menu "Settings" → "Clear Cache (Development)"
+- Red button with trash icon
+
+#### **Keyboard Shortcuts:**
+- `Cmd+Shift+C` (Mac)
+- `Ctrl+Shift+C` (Windows/Linux)
+
+#### **Manual Commands:**
+```bash
+npm run cache:clear
+curl -X POST http://localhost:8080/api/v1/cache/clear
+```
+
+### Environment Configuration
+```bash
+# Development mode
+export TIKTRACK_DEV_MODE=true
+
+# Disable cache
+export TIKTRACK_CACHE_DISABLED=true
+
+# Start server
+./restart quick
+```
 
 ### Installation
 ```bash

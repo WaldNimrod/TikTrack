@@ -4613,14 +4613,17 @@ window.applyFilter = applyFilter;
 /**
  * ניקוי Cache מהיר לפיתוח
  */
-async function clearDevelopmentCache() {
+async function clearDevelopmentCache(event) {
     try {
         console.log('🔄 מנקה Cache...');
         
         // הצגת הודעת טעינה
-        const originalText = event.target.innerHTML;
-        event.target.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מנקה...';
-        event.target.disabled = true;
+        const button = event?.target || document.querySelector('[onclick*="clearDevelopmentCache"]');
+        if (button) {
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מנקה...';
+            button.disabled = true;
+        }
         
         const response = await fetch('/api/v1/cache/clear', {
             method: 'POST'
@@ -4645,9 +4648,10 @@ async function clearDevelopmentCache() {
         alert('שגיאה בניקוי Cache');
     } finally {
         // החזרת הכפתור למצב רגיל
-        if (event.target) {
-            event.target.innerHTML = '<i class="fas fa-trash"></i> נקה Cache';
-            event.target.disabled = false;
+        const button = event?.target || document.querySelector('[onclick*="clearDevelopmentCache"]');
+        if (button) {
+            button.innerHTML = '<i class="fas fa-trash"></i> נקה Cache (פיתוח)';
+            button.disabled = false;
         }
     }
 }

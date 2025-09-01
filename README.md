@@ -56,13 +56,35 @@ TikTrack היא מערכת ניהול טריידים מתקדמת המאפשרת
 - בדיקות מערכת מקיפות
 - אינטגרציה מלאה
 
+### 7. מערכות פיתוח מתקדמות
+- **מערכת Cache חכמה**: עם TTL, dependencies ו-memory optimization
+- **Query Optimization**: אופטימיזציה אוטומטית של queries
+- **Performance Monitoring**: מעקב ביצועים בזמן אמת
+- **Background Tasks**: משימות רקע אוטומטיות
+- **Rate Limiting**: הגבלת בקשות מתקדמת
+- **Error Handling**: טיפול שגיאות מתקדם
+- **Health Monitoring**: בדיקות בריאות מערכת
+- **Logging מתקדם**: עם correlation IDs ו-rotating logs
+
 ## ארכיטקטורה
 
 ### Backend
-- **Python Flask**: שרת API
-- **SQLite**: בסיס נתונים
-- **SQLAlchemy**: ORM
-- **RESTful API**: ממשק תקשורת
+- **Python Flask**: שרת API מתקדם עם מערכות מובנות
+- **SQLite**: בסיס נתונים עם אופטימיזציות
+- **SQLAlchemy**: ORM עם Query Optimization
+- **RESTful API**: ממשק תקשורת עם versioning
+- **Advanced Caching**: מערכת Cache חכמה עם TTL ו-dependencies
+- **Performance Monitoring**: מעקב ביצועים בזמן אמת
+- **Background Tasks**: משימות רקע אוטומטיות
+- **Rate Limiting**: הגבלת בקשות מתקדמת
+- **Error Handling**: טיפול שגיאות מתקדם עם correlation IDs
+
+### Development Infrastructure
+- **Unified Restart System**: מערכת הפעלה מאוחדת עם מצבי פיתוח שונים
+- **Cache Management**: ניהול Cache מתקדם עם מצבי פיתוח
+- **Development Modes**: מצבי פיתוח שונים (רגיל, ללא Cache, ייצור)
+- **Quick Cache Clear**: ניקוי Cache מהיר דרך UI ומקלדת
+- **Environment Configuration**: הגדרות סביבה דינמיות
 
 ### Frontend
 - **HTML5/CSS3/JavaScript**: ממשק משתמש
@@ -70,6 +92,66 @@ TikTrack היא מערכת ניהול טריידים מתקדמת המאפשרת
 - **ארכיטקטורה מאוחדת**: פונקציות מוטמעות בעמודים
 - **מערכת פילטרים**: סינון ומיון מתקדם
 - **תמיכה מלאה ב-RTL**: עברית עם CSS Logical Properties
+
+## מצבי פיתוח וניהול Cache
+
+### סקירה כללית
+המערכת כוללת מערכת מתקדמת לניהול מצבי פיתוח שונים עם ניהול Cache חכם.
+
+### מצבי פיתוח זמינים
+
+#### 1. **מצב פיתוח ללא Cache** (מומלץ לפיתוח פעיל)
+```bash
+npm run dev:no-cache
+```
+- Cache מבוטל לחלוטין
+- כל שינוי בקוד נראה מיד
+- מתאים לפיתוח פעיל
+- ביצועים נמוכים יותר
+
+#### 2. **מצב פיתוח רגיל** (Cache: 10 שניות)
+```bash
+npm run dev:normal
+```
+- Cache מופעל עם TTL של 10 שניות
+- מתאים לבדיקות מהירות
+- עדיין יש Cache אבל הוא מתנקה מהר
+
+#### 3. **מצב ייצור** (Cache: 5 דקות)
+```bash
+npm run dev:production
+```
+- Cache מופעל עם TTL של 5 דקות
+- ביצועים מקסימליים
+- מתאים לבדיקות לפני deploy
+
+### ניהול Cache מהיר
+
+#### **כפתור ב-UI:**
+- תפריט "הגדרות" → "נקה Cache (פיתוח)"
+- כפתור אדום עם אייקון פח אשפה
+
+#### **קיצור מקלדת:**
+- `Cmd+Shift+C` (במק)
+- `Ctrl+Shift+C` (בווינדוס)
+
+#### **ניקוי ידני:**
+```bash
+npm run cache:clear
+curl -X POST http://localhost:8080/api/v1/cache/clear
+```
+
+### הגדרות סביבה
+```bash
+# מצב פיתוח
+export TIKTRACK_DEV_MODE=true
+
+# ביטול Cache
+export TIKTRACK_CACHE_DISABLED=true
+
+# הפעלת השרת
+./restart quick
+```
 
 ## מערכת חיבור מידע חיצוני
 

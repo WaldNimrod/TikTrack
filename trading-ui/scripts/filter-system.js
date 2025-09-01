@@ -502,10 +502,7 @@ class FilterSystem {
     return Object.fromEntries(this.tables);
   }
 
-  // החזרת פילטרים נוכחיים
-  getCurrentFilters() {
-    return { ...this.currentFilters };
-  }
+
 
   // עדכון אפשרויות חשבונות
   updateAccountOptions(accounts) {

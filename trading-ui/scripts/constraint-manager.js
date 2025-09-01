@@ -318,33 +318,9 @@ class ConstraintManager {
             });
             if (!confirmed) return;
         } else {
-                    if (typeof window.showConfirmationDialog === 'function') {
-            const confirmed = await new Promise((resolve) => {
-                window.showConfirmationDialog(
-                    'מחיקת אילוץ',
-                    'האם אתה בטוח שברצונך למחוק את האילוץ הזה?',
-                    () => resolve(true),
-                    () => resolve(false)
-                );
-            });
-            if (!confirmed) return;
-        } else {
-                    if (typeof window.showConfirmationDialog === 'function') {
-            const confirmed = await new Promise((resolve) => {
-                window.showConfirmationDialog(
-                    'מחיקת אילוץ',
-                    'האם אתה בטוח שברצונך למחוק את האילוץ הזה?',
-                    () => resolve(true),
-                    () => resolve(false)
-                );
-            });
-            if (!confirmed) return;
-        } else {
             if (!confirm('האם אתה בטוח שברצונך למחוק את האילוץ הזה?')) {
                 return;
             }
-        }
-        }
         }
 
         try {
@@ -372,30 +348,7 @@ class ConstraintManager {
         }
     }
 
-    async addConstraint(formData) {
-        try {
-            const response = await fetch(this.apiBase, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
 
-            const data = await response.json();
-
-            if (data.status === 'success') {
-                this.showMessage('האילוץ נוסף בהצלחה', 'success');
-                document.getElementById('add-constraint-form').reset();
-                document.getElementById('enum-values-section').style.display = 'none';
-                await this.loadConstraints();
-            } else {
-                this.showMessage(data.message || 'שגיאה בהוספת האילוץ', 'error');
-            }
-        } catch (error) {
-            this.showMessage('שגיאה בהוספת האילוץ', 'error');
-        }
-    }
 
     setupEventListeners() {
         // Table filter

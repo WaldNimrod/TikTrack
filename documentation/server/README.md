@@ -21,19 +21,23 @@ This directory contains all server-related documentation for the TikTrack system
 
 ## 🖥️ Server Architecture
 
-### Technology Stack
-- **Framework**: Flask (Python)
-- **WSGI Server**: Flask development server
-- **Database**: SQLite
+### Technology Stack ✅ **ENHANCED**
+- **Framework**: Flask (Python) עם שיפורי ביצועים מתקדמים
+- **WSGI Server**: Flask development server עם Connection Pool
+- **Database**: SQLite עם 24 אינדקסים ו-Query Optimization
 - **Static Files**: Served directly by Flask
-- **API**: RESTful API with JSON responses
+- **API**: RESTful API with JSON responses ו-Rate Limiting
+- **Performance**: Cache System, Metrics Collection, Health Checks
+- **Security**: Response Headers, Error Handling, Background Tasks
 
-### Server Components
-- **Main Application**: `Backend/app.py`
-- **API Routes**: `Backend/routes/`
-- **Services**: `Backend/services/`
-- **Models**: `Backend/models/`
-- **Database**: `simpleTrade_new.db`
+### Server Components ✅ **ENHANCED**
+- **Main Application**: `Backend/app.py` עם שיפורי ביצועים
+- **API Routes**: `Backend/routes/` עם Rate Limiting
+- **Services**: `Backend/services/` עם Cache, Health, Metrics
+- **Models**: `Backend/models/` עם Query Optimization
+- **Database**: `simpleTrade_new.db` עם Connection Pool ו-Indexes
+- **Utils**: `Backend/utils/` עם Performance Monitor, Error Handlers
+- **Config**: `Backend/config/` עם Logging מתקדם
 
 ## 🚀 Server Management
 
@@ -135,17 +139,23 @@ python3 Backend/server_health_check.py
 - **Threads**: 4 (production)
 - **Timeout**: 30 seconds
 
-## 🔍 Monitoring and Logging
+## 🔍 Monitoring and Logging ✅ **ENHANCED**
 
 ### Log Files
-- **Server Logs**: `logs/server.log`
-- **Error Logs**: `logs/error.log`
+- **Server Logs**: `logs/app.log` (580KB)
+- **Error Logs**: `logs/errors.log` (132KB)
+- **Performance Logs**: `logs/performance.log` (452KB)
+- **Database Logs**: `logs/database.log` (452KB)
 - **Access Logs**: Console output
 
-### Health Monitoring
-- Built-in health check endpoint: `/health`
-- Server status monitoring scripts
-- Automatic restart capabilities
+### Health Monitoring ✅ **ADVANCED**
+- **Health Check**: `/api/health` - בדיקה בסיסית
+- **Detailed Health**: `/api/health/detailed` - בדיקה מפורטת
+- **Metrics Collection**: `/api/metrics/collect` - איסוף מדדי ביצועים
+- **Cache Monitoring**: `/api/cache/stats` - ניטור cache
+- **Rate Limiting**: `/api/rate-limits/stats` - ניטור מגבלות
+- **Database Analysis**: `/api/database/analyze` - ניתוח בסיס נתונים
+- **Background Tasks**: `/api/tasks/status` - ניטור משימות רקע
 
 ## ⚠️ Common Issues
 
@@ -172,11 +182,14 @@ python3 Backend/server_health_check.py
 - Update dependencies
 - Backup database
 
-### Performance Optimization
-- Use production WSGI server
-- Enable gzip compression
-- Optimize database queries
-- Monitor response times
+### Performance Optimization ✅ **IMPLEMENTED**
+- **Connection Pool**: QueuePool עם 30 חיבורים במקביל
+- **Database Indexes**: 24 אינדקסים לשיפור ביצועים
+- **Query Optimization**: QueryOptimizer עם lazy loading
+- **Cache System**: In-memory caching עם TTL
+- **Response Headers**: אופטימיזציה לביצועי דפדפן
+- **Background Tasks**: תחזוקה אוטומטית
+- **Metrics Collection**: ניטור ביצועים מתקדם
 
 ## 🔗 Related Documentation
 - [Database Documentation](../database/README.md)
@@ -185,5 +198,6 @@ python3 Backend/server_health_check.py
 
 ---
 
-**Last Updated:** August 22, 2025  
+**Last Updated:** September 1, 2025  
+**Version:** 2.0.2  
 **Maintainer:** TikTrack Development Team

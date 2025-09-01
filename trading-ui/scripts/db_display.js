@@ -380,3 +380,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 console.log('✅ DB Display script loaded successfully');
+
+

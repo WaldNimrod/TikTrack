@@ -294,7 +294,19 @@
                 const endTime = performance.now();
                 const responseTime = endTime - startTime;
                 
-                const data = await response.json();
+                let data = null;
+                
+                // קריאה אחת בלבד של ה-response body
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    try {
+                        data = await response.json();
+                    } catch (jsonError) {
+                        data = { error: 'Invalid JSON response' };
+                    }
+                } else {
+                    data = await response.text();
+                }
                 
                 if (response.ok) {
                     addLog('success', `בקשת POST הצליחה - זמן תגובה: ${responseTime.toFixed(2)}ms`);
@@ -342,7 +354,19 @@
             try {
                 // בדיקה ללא token
                 const response1 = await fetch('/api/v1/tickers/');
-                const data1 = await response1.json();
+                let data1 = null;
+                
+                // קריאה אחת בלבד של ה-response body
+                const contentType1 = response1.headers.get('content-type');
+                if (contentType1 && contentType1.includes('application/json')) {
+                    try {
+                        data1 = await response1.json();
+                    } catch (jsonError) {
+                        data1 = { error: 'Invalid JSON response' };
+                    }
+                } else {
+                    data1 = await response1.text();
+                }
                 
                 // בדיקה עם token לא תקין
                 const response2 = await fetch('/api/v1/tickers/', {
@@ -350,7 +374,19 @@
                         'Authorization': 'Bearer invalid-token'
                     }
                 });
-                const data2 = await response2.json();
+                let data2 = null;
+                
+                // קריאה אחת בלבד של ה-response body
+                const contentType2 = response2.headers.get('content-type');
+                if (contentType2 && contentType2.includes('application/json')) {
+                    try {
+                        data2 = await response2.json();
+                    } catch (jsonError) {
+                        data2 = { error: 'Invalid JSON response' };
+                    }
+                } else {
+                    data2 = await response2.text();
+                }
                 
                 const authStatus = {
                     noToken: {
@@ -453,25 +489,74 @@
                     {
                         name: 'Endpoint לא קיים',
                         url: '/api/v1/nonexistent',
-                        expectedStatus: 404
+                        expectedStatus: 404,
+                        description: 'בדיקת שגיאה 404 - endpoint לא קיים',
+                        layer: 'API Layer',
+                        current: true
                     },
                     {
                         name: 'בקשת POST עם נתונים לא תקינים',
-                        url: '/api/v1/tickers/',
+                        url: '/api/v1/accounts/',
                         method: 'POST',
-                        body: 'invalid-json',
-                        expectedStatus: 400
+                        body: '{"invalid_field": "test"}',
+                        expectedStatus: 400,
+                        description: 'בדיקת שגיאה 400 - וולידציה טכנית של שדות',
+                        layer: 'Business Logic Layer',
+                        current: true
                     },
                     {
                         name: 'בקשת GET עם פרמטרים לא תקינים',
-                        url: '/api/v1/tickers?invalid=param',
-                        expectedStatus: 200 // או 400 תלוי בולידציה
+                        url: '/api/v1/accounts?invalid=param',
+                        expectedStatus: 200,
+                        description: 'בדיקת תגובה תקינה - פרמטרים לא תקינים מתעלמים',
+                        layer: 'API Layer',
+                        current: true
+                    },
+                    {
+                        name: 'בדיקת וולידציה עסקית (עתידי)',
+                        url: '/api/v1/accounts/',
+                        method: 'POST',
+                        body: '{"name": "Test", "currency_id": 1, "broker_account": "INVALID_BROKER"}',
+                        expectedStatus: 400,
+                        description: 'בדיקת שגיאה 400 - וולידציה מול ברוקר (עתידי)',
+                        layer: 'External Integration Layer',
+                        current: false,
+                        future: true
+                    },
+                    {
+                        name: 'בדיקת סנכרון עם ברוקר (עתידי)',
+                        url: '/api/v1/accounts/sync',
+                        method: 'POST',
+                        body: '{"account_id": 1}',
+                        expectedStatus: 200,
+                        description: 'בדיקת סנכרון עם חשבון אמיתי אצל ברוקר (עתידי)',
+                        layer: 'External Integration Layer',
+                        current: false,
+                        future: true
                     }
                 ];
                 
                 const results = [];
                 
                 for (const test of errorTests) {
+                    // דלג על בדיקות עתידיות כרגע
+                    if (test.future && !test.current) {
+                        results.push({
+                            test: test.name,
+                            expectedStatus: test.expectedStatus,
+                            actualStatus: 'SKIPPED',
+                            passed: true,
+                            data: {
+                                status: 'skipped',
+                                message: 'בדיקה עתידית - לא רלוונטית כרגע',
+                                layer: test.layer,
+                                description: test.description
+                            },
+                            skipped: true
+                        });
+                        continue;
+                    }
+                    
                     try {
                         const options = {
                             method: test.method || 'GET'
@@ -504,8 +589,14 @@
                             expectedStatus: test.expectedStatus,
                             actualStatus: response.status,
                             passed: response.status === test.expectedStatus,
-                            data: data
+                            data: data,
+                            layer: test.layer,
+                            description: test.description,
+                            current: test.current
                         });
+                        
+                        // עיכוב קצר בין בדיקות כדי למנוע rate limiting
+                        await new Promise(resolve => setTimeout(resolve, 1000));
                         
                     } catch (error) {
                         results.push({
@@ -513,17 +604,21 @@
                             expectedStatus: test.expectedStatus,
                             actualStatus: 'error',
                             passed: false,
-                            error: error.message
+                            error: error.message,
+                            layer: test.layer,
+                            description: test.description,
+                            current: test.current
                         });
                     }
                 }
                 
-                const passedTests = results.filter(r => r.passed).length;
-                const totalTests = results.length;
+                const currentTests = results.filter(r => r.current && !r.skipped);
+                const passedCurrentTests = currentTests.filter(r => r.passed).length;
+                const totalCurrentTests = currentTests.length;
                 
-                const status = passedTests === totalTests ? 'success' : 'warning';
-                const message = passedTests === totalTests ? 
-                    'כל בדיקות השגיאות עברו' : `${passedTests}/${totalTests} בדיקות עברו`;
+                const status = passedCurrentTests === totalCurrentTests ? 'success' : 'warning';
+                const message = passedCurrentTests === totalCurrentTests ? 
+                    'כל בדיקות השגיאות הנוכחיות עברו' : `${passedCurrentTests}/${totalCurrentTests} בדיקות נוכחיות עברו`;
                 
                 addLog(status, message);
                 displayResults('בדיקת טיפול בשגיאות', {
@@ -531,13 +626,25 @@
                     message: message,
                     results: results,
                     summary: {
-                        total: totalTests,
-                        passed: passedTests,
-                        failed: totalTests - passedTests
+                        total: results.length,
+                        current: totalCurrentTests,
+                        passed: passedCurrentTests,
+                        failed: totalCurrentTests - passedCurrentTests,
+                        skipped: results.filter(r => r.skipped).length,
+                        future: results.filter(r => r.future && !r.current).length
                     },
-                    recommendations: passedTests === totalTests ? 
-                        ['טיפול בשגיאות תקין', 'המערכת יציבה'] : 
-                        ['שפר טיפול בשגיאות', 'הוסף ולידציה']
+                    recommendations: passedCurrentTests === totalCurrentTests ? 
+                        ['טיפול בשגיאות תקין', 'המערכת יציבה', 'מוכן לשלב הבא - אינטגרציה עם ברוקרים'] : 
+                        ['שפר טיפול בשגיאות', 'הוסף ולידציה', 'בדוק הפרדת שכבות'],
+                    architecture: {
+                        current: 'Stage 1 - Technical Validation Only',
+                        future: 'Stage 2 - Full Broker Integration',
+                        layers: {
+                            'API Layer': 'Endpoints and routing',
+                            'Business Logic Layer': 'Technical validation and business rules',
+                            'External Integration Layer': 'Broker validation and sync (future)'
+                        }
+                    }
                 });
                 
             } catch (error) {

@@ -561,6 +561,7 @@
     <script src="scripts/header-system.js?v=20250830_2"></script>
   <script src="scripts/notification-system.js"></script>
   <script src="scripts/validation-utils.js"></script>
+  <script src="scripts/filter-system.js"></script>
     <script src="scripts/alerts.js?v=20250830_1"></script>
     <script src="scripts/active-alerts-component.js?v=20250830_1"></script>
     <!-- accounts.js הוסר - לא נחוץ בעמוד זה -->
@@ -575,8 +576,8 @@
         if (window.headerSystem) {
           window.headerSystem.init();
         }
-        if (window.simpleFilter) {
-          window.simpleFilter.init();
+        if (window.filterSystem) {
+          window.filterSystem.initialize();
         }
       });
     </script>

@@ -219,3 +219,74 @@ update_all_tickers_open_status()
 - גיבוי אוטומטי לפני שינויים משמעותיים
 - אפשרות שחזור לסטטוסים קודמים
 - תיעוד שינויים בהיסטוריית גרסאות
+
+---
+
+## 🏗️ **Layer Separation & Architecture Principles**
+
+### **Critical Layer Separation**
+
+**IMPORTANT**: Clear separation between system layers is critical for proper architecture and future scalability.
+
+#### **Data Layer (Models)**
+- **Purpose**: Data structure definition only
+- **Ticker Model**: Represents financial instrument (stock, ETF, crypto, etc.)
+- **No Business Logic**: Only technical structure and relationships
+- **No Validation**: No business rules or market-specific validation
+
+#### **Business Logic Layer (Services)**
+- **TickerService**: Technical validation only (field existence, database constraints)
+- **ValidationService**: Database constraint validation only
+- **No Market Validation**: No connection to external market systems
+
+#### **External Integration Layer (Future - Stage 2)**
+- **MarketValidationService**: Validate tickers against real market data
+- **TickerSyncService**: Sync with actual market data
+- **Real-time Validation**: Live market connection for ticker verification
+
+### **Account vs User Clarification**
+
+#### **Account (Trading Account)**
+- **Definition**: Trading account at a specific broker
+- **Purpose**: Financial trading and portfolio management
+- **Ownership**: Belongs to a User in the system
+- **Validation**: Technical validation only in current stage
+
+#### **User (System User)**
+- **Definition**: Person using the TikTrack system
+- **Purpose**: System access and account management
+- **Current State**: Single default user (nimrod, ID: 1)
+- **Future**: Multiple users with authentication
+
+#### **Relationship**
+```
+User (nimrod) 
+  ├── Account 1 (Interactive Brokers)
+  │   ├── Ticker: AAPL (Apple)
+  │   ├── Ticker: GOOGL (Google)
+  │   └── Ticker: TSLA (Tesla)
+  ├── Account 2 (eToro)
+  │   ├── Ticker: MSFT (Microsoft)
+  │   └── Ticker: AMZN (Amazon)
+  └── Account 3 (Binance)
+      ├── Ticker: BTC (Bitcoin)
+      └── Ticker: ETH (Ethereum)
+```
+
+### **Current vs Future Validation**
+
+#### **Stage 1 (Current) - Technical Validation Only**
+- ✅ **Field Validation**: Ensure fields exist in Ticker model
+- ✅ **Database Constraints**: NOT NULL, UNIQUE, FOREIGN KEY
+- ✅ **Data Type Validation**: Correct data types and formats
+- ❌ **No Market Validation**: No external market connection
+- ❌ **No Business Rules**: No trading-specific validation
+
+#### **Stage 2 (Future) - Full Market Integration**
+- ✅ **Technical Validation**: All Stage 1 validations
+- ✅ **Market Validation**: Verify ticker exists in market
+- ✅ **Real-time Sync**: Live data from market systems
+- ✅ **Business Rules**: Trading-specific validation rules
+- ✅ **Ticker Verification**: Confirm ticker availability and status
+
+---

@@ -34,11 +34,11 @@ class RateLimiter:
     def __init__(self):
         self.rate_limits: Dict[str, deque] = defaultdict(deque)
         self.endpoint_limits: Dict[str, Dict[str, int]] = {
-            'default': {'requests': 10, 'window': 60},  # 10 requests per minute
-            'api': {'requests': 10, 'window': 60},      # 10 requests per minute
-            'auth': {'requests': 5, 'window': 60},      # 5 requests per minute
-            'upload': {'requests': 10, 'window': 60},   # 10 requests per minute
-            'admin': {'requests': 20, 'window': 60},    # 20 requests per minute
+            'default': {'requests': 1000, 'window': 60},  # 1000 requests per minute (was 10)
+            'api': {'requests': 1000, 'window': 60},      # 1000 requests per minute (was 10)
+            'auth': {'requests': 100, 'window': 60},      # 100 requests per minute (was 5)
+            'upload': {'requests': 200, 'window': 60},    # 200 requests per minute (was 10)
+            'admin': {'requests': 2000, 'window': 60},    # 2000 requests per minute (was 20)
         }
         self.last_cleanup = time.time()
         self.cleanup_interval = 300  # 5 minutes

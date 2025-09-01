@@ -19,8 +19,11 @@ from models.trade_plan import TradePlan
 from models.note import Note
 from models.alert import Alert
 from services.validation_service import ValidationService
+from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
+from services.smart_query_optimizer import optimize_query, profile_query
 from typing import List, Optional, Dict, Any, Union
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +62,7 @@ class TickerService:
     MAX_REMARKS_LENGTH: int = 500
     # CURRENCY_LENGTH: int = 3  # Removed - now using currency_id
     @staticmethod
+    @cache_for(ttl=300)  # Cache for 5 minutes
     def get_all(db: Session) -> List[Ticker]:
         """
         Get all tickers from the system
@@ -72,14 +76,43 @@ class TickerService:
         Example:
             >>> tickers = TickerService.get_all(db_session)
         """
-        # Use optimized query with lazy loading
+        # Create base query
+        base_query = db.query(Ticker)
+        
+        # Optimize query using smart query optimizer
         try:
-            from services.query_optimizer import QueryOptimizer
-            return QueryOptimizer.get_tickers_with_related_data(db)
-        except ImportError:
-            # Fallback to original query if optimizer not available
-            logger.warning("QueryOptimizer not available, using fallback query")
-            return db.query(Ticker).all()
+            optimization_result = optimize_query(
+                base_query, 
+                expected_usage='read', 
+                context='ticker_queries'
+            )
+            
+            # Use optimized query
+            optimized_query = optimization_result.optimized_query
+            
+            # Execute and profile the query
+            start_time = time.time()
+            result = optimized_query.all()
+            execution_time = time.time() - start_time
+            
+            # Profile the query for performance monitoring
+            profile_query(
+                base_query, 
+                execution_time, 
+                row_count=len(result),
+                memory_usage=0.0  # Will be calculated by the optimizer
+            )
+            
+            # Log optimization results if significant
+            if optimization_result.estimated_improvement > 0.1:
+                logger.info(f"Query optimized with {optimization_result.estimated_improvement:.1%} estimated improvement")
+            
+            return result
+            
+        except Exception as e:
+            logger.warning(f"Query optimization failed, using fallback: {e}")
+            # Fallback to original query
+            return base_query.all()
     
     @staticmethod
     def get_by_id(db: Session, ticker_id: int) -> Optional[Ticker]:

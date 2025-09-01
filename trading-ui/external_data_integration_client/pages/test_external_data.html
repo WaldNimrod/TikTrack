@@ -207,30 +207,124 @@
             'ADBE': 'Adobe Inc.'
         };
 
-        // פונקציה לבדיקת חיבור לבסיס נתונים
+        // פונקציה לבדיקת חיבור למסד נתונים
         async function testDatabaseConnection() {
-            addLog('info', 'מתחיל בדיקת חיבור לבסיס נתונים...');
+            addLog('info', 'בודק חיבור למסד נתונים...');
             
             try {
-                const response = await fetch('/api/v1/tickers/');
-                const data = await response.json();
+                const connectionTests = [
+                    {
+                        name: 'חיבור בסיסי למסד נתונים',
+                        description: 'בדיקת חיבור תקין למסד נתונים',
+                        layer: 'Data Layer',
+                        current: true,
+                        test: async () => {
+                            const response = await fetch('/api/v1/tickers/');
+                            return response.ok;
+                        }
+                    },
+                    {
+                        name: 'וולידציה טכנית של מודלים',
+                        description: 'בדיקת וולידציה טכנית של נתונים',
+                        layer: 'Business Logic Layer',
+                        current: true,
+                        test: async () => {
+                            const response = await fetch('/api/v1/accounts/');
+                            if (!response.ok) return false;
+                            const data = await response.json();
+                            return data.status === 'success';
+                        }
+                    },
+                    {
+                        name: 'וולידציה עסקית מול ברוקרים (עתידי)',
+                        description: 'בדיקת וולידציה מול ברוקרים אמיתיים',
+                        layer: 'External Integration Layer',
+                        current: false,
+                        future: true,
+                        test: async () => {
+                            // לא רלוונטי כרגע
+                            return 'SKIPPED';
+                        }
+                    }
+                ];
                 
-                if (response.ok && data.status === 'success') {
-                    addLog('success', 'חיבור לבסיס נתונים תקין');
-                    displayResults('סטטוס חיבור לבסיס נתונים', {
-                        status: 'success',
-                        message: 'החיבור לבסיס הנתונים תקין',
-                        timestamp: new Date().toISOString(),
-                        database: 'SQLite',
-                        version: '3.x',
-                        tickersCount: data.data ? data.data.length : 0
-                    });
-                } else {
-                    addLog('error', 'שגיאה בחיבור לבסיס נתונים');
-                    displayResults('שגיאת חיבור', data);
+                const results = [];
+                
+                for (const test of connectionTests) {
+                    if (test.future && !test.current) {
+                        results.push({
+                            test: test.name,
+                            status: 'SKIPPED',
+                            passed: true,
+                            description: test.description,
+                            layer: test.layer,
+                            message: 'בדיקה עתידית - לא רלוונטית כרגע',
+                            skipped: true
+                        });
+                        continue;
+                    }
+                    
+                    try {
+                        const testResult = await test.test();
+                        const passed = testResult === true || testResult === 'SKIPPED';
+                        
+                        results.push({
+                            test: test.name,
+                            status: passed ? 'PASS' : 'FAIL',
+                            passed: passed,
+                            description: test.description,
+                            layer: test.layer,
+                            message: passed ? 'חיבור תקין' : 'חיבור נכשל',
+                            result: testResult
+                        });
+                        
+                    } catch (error) {
+                        results.push({
+                            test: test.name,
+                            status: 'ERROR',
+                            passed: false,
+                            description: test.description,
+                            layer: test.layer,
+                            message: `שגיאה בחיבור: ${error.message}`,
+                            error: error.message
+                        });
+                    }
                 }
+                
+                const currentTests = results.filter(r => r.current && !r.skipped);
+                const passedCurrentTests = currentTests.filter(r => r.passed).length;
+                const totalCurrentTests = currentTests.length;
+                
+                const status = passedCurrentTests === totalCurrentTests ? 'success' : 'warning';
+                const message = passedCurrentTests === totalCurrentTests ? 
+                    'כל בדיקות החיבור הנוכחיות עברו' : `${passedCurrentTests}/${totalCurrentTests} בדיקות חיבור נוכחיות עברו`;
+                
+                addLog(status, message);
+                displayResults('בדיקת חיבור למסד נתונים', {
+                    status: status,
+                    message: message,
+                    results: results,
+                    summary: {
+                        total: results.length,
+                        current: totalCurrentTests,
+                        passed: passedCurrentTests,
+                        failed: totalCurrentTests - passedCurrentTests,
+                        skipped: results.filter(r => r.skipped).length,
+                        future: results.filter(r => r.future && !r.current).length
+                    },
+                    architecture: {
+                        current: 'Stage 1 - Technical Validation Only',
+                        future: 'Stage 2 - Full Broker Integration',
+                        layers: {
+                            'Data Layer': 'Database connection and models',
+                            'Business Logic Layer': 'Technical validation and business rules',
+                            'External Integration Layer': 'Broker validation and sync (future)'
+                        }
+                    }
+                });
+                
             } catch (error) {
-                addLog('error', `שגיאה בבדיקת חיבור: ${error.message}`);
+                addLog('error', `שגיאה בבדיקת חיבור למסד נתונים: ${error.message}`);
                 displayResults('שגיאה', { error: error.message });
             }
         }

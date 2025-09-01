@@ -20,6 +20,12 @@ class AccountService:
     @staticmethod
     def create(db: Session, data: Dict[str, Any]) -> Account:
         """Create new account"""
+        # Validate that all fields exist in the Account model
+        allowed_fields = {'name', 'currency_id', 'status', 'cash_balance', 'total_value', 'total_pl', 'notes'}
+        invalid_fields = set(data.keys()) - allowed_fields
+        if invalid_fields:
+            raise ValueError(f"Invalid fields: {', '.join(invalid_fields)}. Allowed fields: {', '.join(allowed_fields)}")
+        
         # Validate data against dynamic constraints
         is_valid, errors = ValidationService.validate_data(db, 'accounts', data)
         if not is_valid:

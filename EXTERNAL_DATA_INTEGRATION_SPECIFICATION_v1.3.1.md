@@ -630,3 +630,118 @@ ALTER TABLE tickers ADD COLUMN active_trades INTEGER DEFAULT 0;
 - **Error Rate**: 0% critical errors in recent testing
 
 **🎯 System Status: PRODUCTION READY ✅**
+
+---
+
+## 11) Layer Separation & Architecture Principles
+
+### 11.1 **Critical Layer Separation**
+
+**IMPORTANT**: Clear separation between system layers is critical for proper architecture and future scalability.
+
+#### **Data Layer (Models)**
+- **Purpose**: Data structure definition only
+- **Account Model**: Represents trading account at broker (Interactive Brokers, eToro, etc.)
+- **No Business Logic**: Only technical structure and relationships
+- **No Validation**: No business rules or broker-specific validation
+
+#### **Business Logic Layer (Services)**
+- **AccountService**: Technical validation only (field existence, database constraints)
+- **ValidationService**: Database constraint validation only
+- **No Broker Validation**: No connection to external broker systems
+
+#### **External Integration Layer (Future - Stage 2)**
+- **BrokerValidationService**: Validate accounts against real broker data
+- **AccountSyncService**: Sync with actual broker accounts
+- **Real-time Validation**: Live broker connection for account verification
+
+### 11.2 **Account vs User Clarification**
+
+#### **Account (Trading Account)**
+- **Definition**: Trading account at a specific broker
+- **Purpose**: Financial trading and portfolio management
+- **Ownership**: Belongs to a User in the system
+- **Validation**: Technical validation only in current stage
+
+#### **User (System User)**
+- **Definition**: Person using the TikTrack system
+- **Purpose**: System access and account management
+- **Current State**: Single default user (nimrod, ID: 1)
+- **Future**: Multiple users with authentication
+
+#### **Relationship**
+```
+User (nimrod) 
+  ├── Account 1 (Interactive Brokers)
+  ├── Account 2 (eToro) 
+  └── Account 3 (Binance)
+```
+
+### 11.3 **Current vs Future Validation**
+
+#### **Stage 1 (Current) - Technical Validation Only**
+- ✅ **Field Validation**: Ensure fields exist in Account model
+- ✅ **Database Constraints**: NOT NULL, UNIQUE, FOREIGN KEY
+- ✅ **Data Type Validation**: Correct data types and formats
+- ❌ **No Broker Validation**: No external system connection
+- ❌ **No Business Rules**: No trading-specific validation
+
+#### **Stage 2 (Future) - Full Broker Integration**
+- ✅ **Technical Validation**: All Stage 1 validations
+- ✅ **Broker Validation**: Verify account exists at broker
+- ✅ **Real-time Sync**: Live data from broker systems
+- ✅ **Business Rules**: Trading-specific validation rules
+- ✅ **Account Verification**: Confirm account ownership and status
+
+### 11.4 **Implementation Guidelines**
+
+#### **Current Implementation (Stage 1)**
+```python
+# ✅ CORRECT - Technical validation only
+allowed_fields = {'name', 'currency_id', 'status', 'cash_balance', 'total_value', 'total_pl', 'notes'}
+invalid_fields = set(data.keys()) - allowed_fields
+if invalid_fields:
+    raise ValueError(f"Invalid fields: {', '.join(invalid_fields)}")
+
+# ❌ INCORRECT - Don't add broker validation here
+# broker_validation = BrokerService.validate_account(account_data)  # Future Stage 2
+```
+
+#### **Future Implementation (Stage 2)**
+```python
+# ✅ CORRECT - Full validation pipeline
+# 1. Technical validation (Stage 1)
+allowed_fields = {'name', 'currency_id', 'status', 'cash_balance', 'total_value', 'total_pl', 'notes'}
+invalid_fields = set(data.keys()) - allowed_fields
+if invalid_fields:
+    raise ValueError(f"Invalid fields: {', '.join(invalid_fields)}")
+
+# 2. Database constraint validation (Stage 1)
+is_valid, errors = ValidationService.validate_data(db, 'accounts', data)
+if not is_valid:
+    raise ValueError(f"Validation failed: {'; '.join(errors)}")
+
+# 3. Broker validation (Stage 2)
+broker_validation = BrokerValidationService.validate_account(data)
+if not broker_validation['valid']:
+    raise ValueError(f"Broker validation failed: {broker_validation['error']}")
+
+# 4. Create account
+account = Account(**data)
+```
+
+### 11.5 **Documentation Updates Required**
+
+#### **Files to Update:**
+1. **Account Model Documentation**: Clarify purpose and limitations
+2. **AccountService Documentation**: Document validation scope
+3. **External Data Integration**: Add broker validation roadmap
+4. **Architecture Documentation**: Document layer separation
+
+#### **Key Points to Document:**
+- Account = Trading account at broker, not system user
+- Current validation = Technical only, no broker connection
+- Future validation = Full broker integration
+- Clear separation between system layers
+
+---

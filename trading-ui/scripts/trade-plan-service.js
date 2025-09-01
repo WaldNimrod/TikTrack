@@ -302,3 +302,5 @@ Object.defineProperty(window, 'trade_plansData', {
 });
 
 console.log('✅ Trade Plan Service loaded successfully');
+
+

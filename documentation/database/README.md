@@ -304,5 +304,6 @@ Database constraints are dynamically displayed under each table:
 
 ---
 
-**Last Updated**: 2025-01-26  
+**Last Updated**: 2025-09-01  
+**Version**: 2.0.2  
 **Maintainer**: TikTrack Development Team

@@ -98,6 +98,11 @@ def js_map() -> Any:
     """JS Map page"""
     return send_from_directory(UI_DIR, "js-map.html")
 
+@pages_bp.route('/cache-test')
+def cache_test() -> Any:
+    """Cache test page"""
+    return send_from_directory(UI_DIR, "cache-test.html")
+
 @pages_bp.route('/page-scripts-matrix')
 def page_scripts_matrix() -> Any:
     """Page scripts matrix page"""

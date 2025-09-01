@@ -957,8 +957,8 @@ class HeaderSystem {
           if (searchInput) {
             searchInput.value = '';
             // הפעלת פילטר חיפוש ריק
-            if (window.simpleFilter) {
-              window.simpleFilter.applySearchFilter('');
+            if (window.filterSystem) {
+  window.filterSystem.applySearchFilter('');
             } else {
               window.applySearchFilter('');
             }
@@ -973,8 +973,8 @@ class HeaderSystem {
       if (e.target.id === 'searchFilterInput') {
         const searchTerm = e.target.value;
       
-        if (window.simpleFilter) {
-          window.simpleFilter.applySearchFilter(searchTerm);
+        if (window.filterSystem) {
+  window.filterSystem.applySearchFilter(searchTerm);
         } else {
           window.applySearchFilter(searchTerm);
         }
@@ -1720,9 +1720,9 @@ class HeaderSystem {
         }
 
         // עדכון הפילטר במערכת
-        if (window.simpleFilter) {
-          window.simpleFilter.currentFilters.status = selectedStatuses;
-          window.simpleFilter.applyFilters();
+        if (window.filterSystem) {
+  window.filterSystem.currentFilters.status = selectedStatuses;
+  window.filterSystem.applyFilters();
         }
 
         // לא סוגרים את הדרופדאון - מאפשרים בחירה מרובה
@@ -1754,9 +1754,9 @@ class HeaderSystem {
         }
 
         // עדכון הפילטר במערכת
-        if (window.simpleFilter) {
-          window.simpleFilter.currentFilters.type = selectedTypes;
-          window.simpleFilter.applyFilters();
+        if (window.filterSystem) {
+  window.filterSystem.currentFilters.type = selectedTypes;
+  window.filterSystem.applyFilters();
         }
 
         // לא סוגרים את הדרופדאון - מאפשרים בחירה מרובה
@@ -1788,9 +1788,9 @@ class HeaderSystem {
         }
 
         // עדכון הפילטר במערכת
-        if (window.simpleFilter) {
-          window.simpleFilter.currentFilters.account = selectedAccounts;
-          window.simpleFilter.applyFilters();
+        if (window.filterSystem) {
+  window.filterSystem.currentFilters.account = selectedAccounts;
+  window.filterSystem.applyFilters();
         }
 
         // לא סוגרים את הדרופדאון - מאפשרים בחירה מרובה
@@ -1979,9 +1979,9 @@ class HeaderSystem {
     }
 
     // הפעלת פילטר
-    if (window.simpleFilter) {
+    if (window.filterSystem) {
     
-      window.simpleFilter.applyAccountFilter(accountName === 'הכול' ? [] : [accountName]);
+      window.filterSystem.applyAccountFilter(accountName === 'הכול' ? [] : [accountName]);
     } else if (window.filterSystem) {
     
       window.filterSystem.updateFilter('account', accountName === 'הכול' ? [] : [accountName]);
@@ -3856,8 +3856,8 @@ function applyTypeFilter() {
   // הפעלת הפילטר הכללי
   applyFilter('type', selectedTypes);
 
-  if (window.simpleFilter) {
-    window.simpleFilter.applyTypeFilter(selectedTypes);
+  if (window.filterSystem) {
+  window.filterSystem.applyTypeFilter(selectedTypes);
   }
 }
 
@@ -3876,8 +3876,8 @@ function applyAccountFilter() {
   // הפעלת הפילטר הכללי
   applyFilter('account', selectedAccounts);
 
-  if (window.simpleFilter) {
-    window.simpleFilter.applyAccountFilter(selectedAccounts);
+  if (window.filterSystem) {
+  window.filterSystem.applyAccountFilter(selectedAccounts);
   }
   
   // קריאה לפונקציות הפילטר שלנו אם אנחנו בדף חשבונות
@@ -3902,8 +3902,8 @@ function applyDateRangeFilter(dateRange) {
   // הפעלת הפילטר הכללי
   applyTableFilter('date', [dateRange]);
 
-  if (window.simpleFilter) {
-    window.simpleFilter.applyDateRangeFilter(dateRange);
+  if (window.filterSystem) {
+  window.filterSystem.applyDateRangeFilter(dateRange);
   }
 }
 
@@ -4227,13 +4227,13 @@ function filterAlertsByType(type) {
   // הפעלת הפילטר
   if (type === 'all') {
     // הצג את כל ההתראות
-    if (window.simpleFilter) {
-      window.simpleFilter.clearTypeFilter();
+    if (window.filterSystem) {
+  window.filterSystem.clearTypeFilter();
     }
   } else {
     // הפעל פילטר לפי הטיפוס
-    if (window.simpleFilter) {
-      window.simpleFilter.applyTypeFilter([type]);
+    if (window.filterSystem) {
+  window.filterSystem.applyTypeFilter([type]);
     }
   }
 }
@@ -4336,10 +4336,10 @@ function clearAllFilters() {
   // clearAllFilters called - showing all records
 
   // קריאה לפונקציה החדשה שמנקה את כל הפילטרים
-  if (window.simpleFilter) {
-    window.simpleFilter.clearFilters();
-  } else {
-    console.warn('⚠️ simpleFilter not available, using fallback');
+  if (window.filterSystem) {
+  window.filterSystem.clearFilters();
+} else {
+  console.warn('⚠️ filterSystem not available, using fallback');
     // Fallback - ניקוי ידני
     clearFiltersManually();
   }

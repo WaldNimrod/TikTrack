@@ -304,7 +304,20 @@
                 for (let i = 0; i < concurrentCount; i++) {
                     promises.push(
                         fetch('/api/health').then(async response => {
-                            const data = await response.json();
+                            let data = null;
+                            
+                            // קריאה אחת בלבד של ה-response body
+                            const contentType = response.headers.get('content-type');
+                            if (contentType && contentType.includes('application/json')) {
+                                try {
+                                    data = await response.json();
+                                } catch (jsonError) {
+                                    data = { error: 'Invalid JSON response' };
+                                }
+                            } else {
+                                data = await response.text();
+                            }
+                            
                             return {
                                 request: i + 1,
                                 status: response.status,

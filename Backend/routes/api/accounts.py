@@ -71,13 +71,26 @@ def create_account():
             "message": "Account created successfully",
             "version": "v1"
         }), 201
-    except Exception as e:
-        logger.error(f"Error creating account: {str(e)}")
+    except ValueError as e:
+        # Validation errors - return 400 Bad Request
+        logger.warning(f"Validation error creating account: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": str(e)},
+            "error_code": "VALIDATION_ERROR",
+            "message": str(e),
+            "details": "The provided data is invalid",
             "version": "v1"
         }), 400
+    except Exception as e:
+        # Server errors - return 500 Internal Server Error
+        logger.error(f"Server error creating account: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error_code": "INTERNAL_ERROR",
+            "message": "An internal error occurred",
+            "details": "The server encountered an unexpected error",
+            "version": "v1"
+        }), 500
     finally:
         db.close()
 
@@ -100,13 +113,26 @@ def update_account(account_id: int):
             "error": {"message": "Account not found"},
             "version": "v1"
         }), 404
-    except Exception as e:
-        logger.error(f"Error updating account {account_id}: {str(e)}")
+    except ValueError as e:
+        # Validation errors - return 400 Bad Request
+        logger.warning(f"Validation error updating account {account_id}: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": str(e)},
+            "error_code": "VALIDATION_ERROR",
+            "message": str(e),
+            "details": "The provided data is invalid",
             "version": "v1"
         }), 400
+    except Exception as e:
+        # Server errors - return 500 Internal Server Error
+        logger.error(f"Server error updating account {account_id}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error_code": "INTERNAL_ERROR",
+            "message": "An internal error occurred",
+            "details": "The server encountered an unexpected error",
+            "version": "v1"
+        }), 500
     finally:
         db.close()
 

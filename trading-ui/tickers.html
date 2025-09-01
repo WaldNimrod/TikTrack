@@ -479,6 +479,7 @@
     <script src="scripts/alert-service.js"></script>
     <script src="scripts/active-alerts-component.js?v=20250830_1"></script>
     <script src="scripts/notification-system.js"></script>
+    <script src="scripts/filter-system.js"></script>
     <script src="scripts/tickers.js?v=20250830_1?v=20250828_044"></script>
     <script>
       // אתחול מערכת הכותרת החדשה
@@ -487,8 +488,8 @@
         if (window.headerSystem) {
           window.headerSystem.init();
         }
-        if (window.simpleFilter) {
-          window.simpleFilter.init();
+        if (window.filterSystem) {
+          window.filterSystem.initialize();
         }
       });
     </script>

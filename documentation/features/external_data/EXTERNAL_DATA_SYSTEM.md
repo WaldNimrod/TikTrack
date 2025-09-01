@@ -6,6 +6,68 @@ The external data integration system allows receiving current information about 
 
 ---
 
+## 🏗️ **Layer Separation & Architecture Principles**
+
+### **Critical Layer Separation**
+
+**IMPORTANT**: Clear separation between system layers is critical for proper architecture and future scalability.
+
+#### **Data Layer (Models)**
+- **Purpose**: Data structure definition only
+- **Account Model**: Represents trading account at broker (Interactive Brokers, eToro, etc.)
+- **No Business Logic**: Only technical structure and relationships
+- **No Validation**: No business rules or broker-specific validation
+
+#### **Business Logic Layer (Services)**
+- **AccountService**: Technical validation only (field existence, database constraints)
+- **ValidationService**: Database constraint validation only
+- **No Broker Validation**: No connection to external broker systems
+
+#### **External Integration Layer (Future - Stage 2)**
+- **BrokerValidationService**: Validate accounts against real broker data
+- **AccountSyncService**: Sync with actual broker accounts
+- **Real-time Validation**: Live broker connection for account verification
+
+### **Account vs User Clarification**
+
+#### **Account (Trading Account)**
+- **Definition**: Trading account at a specific broker
+- **Purpose**: Financial trading and portfolio management
+- **Ownership**: Belongs to a User in the system
+- **Validation**: Technical validation only in current stage
+
+#### **User (System User)**
+- **Definition**: Person using the TikTrack system
+- **Purpose**: System access and account management
+- **Current State**: Single default user (nimrod, ID: 1)
+- **Future**: Multiple users with authentication
+
+#### **Relationship**
+```
+User (nimrod) 
+  ├── Account 1 (Interactive Brokers)
+  ├── Account 2 (eToro) 
+  └── Account 3 (Binance)
+```
+
+### **Current vs Future Validation**
+
+#### **Stage 1 (Current) - Technical Validation Only**
+- ✅ **Field Validation**: Ensure fields exist in Account model
+- ✅ **Database Constraints**: NOT NULL, UNIQUE, FOREIGN KEY
+- ✅ **Data Type Validation**: Correct data types and formats
+- ❌ **No Broker Validation**: No external system connection
+- ❌ **No Business Rules**: No trading-specific validation
+
+#### **Stage 2 (Future) - Full Broker Integration**
+- ✅ **Technical Validation**: All Stage 1 validations
+- ✅ **Broker Validation**: Verify account exists at broker
+- ✅ **Real-time Sync**: Live data from broker systems
+- ✅ **Business Rules**: Trading-specific validation rules
+- ✅ **Account Verification**: Confirm account ownership and status
+
+---
+
 ## 🏗️ **Architecture**
 
 ### **System Structure**

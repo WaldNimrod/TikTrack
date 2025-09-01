@@ -852,115 +852,7 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
     await performItemCancellation(itemType, itemId, itemName);
 }
 
-/**
- * Create unified cancel button for any item type
- * 
- * @param {string} itemType - Type of the item ('trade', 'ticker', 'alert', 'account', 'trade_plan', etc.)
- * @param {number} itemId - ID of the item
- * @param {string} status - Current status of the item
- * @param {string} size - Button size (sm, lg, etc.)
- * @param {boolean} useGlobalCancel - Whether to use the global cancel function (default: false)
- * @returns {string} HTML for cancel button
- */
-function createCancelButton(itemType, itemId, status = 'open', size = 'sm', useGlobalCancel = false) {
-    const isCancelled = status === 'cancelled';
-    const buttonClass = isCancelled ? 'btn-success' : 'btn-danger';
-    const title = isCancelled ? 'הפעל מחדש' : 'בטל';
-    const icon = isCancelled ? '✓' : 'X';
-    
-    // יצירת onclick בהתאם לסטטוס וסוג האובייקט
-    let onclick = '';
-    if (itemId) {
-        if (isCancelled) {
-            // הפעלה מחדש - פונקציות שונות לכל סוג
-            switch (itemType) {
-                case 'trade_plan':
-                    onclick = `onclick="window.reactivateTradePlan(${itemId})"`;
-                    break;
-                case 'trade':
-                    onclick = `onclick="window.reactivateTrade(${itemId})"`;
-                    break;
-                case 'ticker':
-                    onclick = `onclick="window.reactivateTicker(${itemId})"`;
-                    break;
-                case 'alert':
-                    onclick = `onclick="window.reactivateAlert(${itemId})"`;
-                    break;
-                case 'account':
-                    onclick = `onclick="window.reactivateAccount(${itemId})"`;
-                    break;
-                default:
-                    onclick = `onclick="window.reactivate${itemType.charAt(0).toUpperCase() + itemType.slice(1)}(${itemId})"`;
-            }
-        } else {
-            // ביטול - פונקציות שונות לכל סוג
-            switch (itemType) {
-                case 'trade_plan':
-                    onclick = `onclick="window.openCancelTradePlanModal(${itemId})"`;
-                    break;
-                case 'trade':
-                    onclick = `onclick="window.cancelTradeRecord(${itemId})"`;
-                    break;
-                case 'ticker':
-                    onclick = `onclick="window.cancelTicker(${itemId})"`;
-                    break;
-                case 'alert':
-                    onclick = `onclick="window.cancelAlert(${itemId})"`;
-                    break;
-                case 'account':
-                    onclick = `onclick="window.cancelAccount(${itemId})"`;
-                    break;
-                default:
-                    onclick = `onclick="window.cancel${itemType.charAt(0).toUpperCase() + itemType.slice(1)}(${itemId})"`;
-            }
-        }
-    }
-    
-    return `<button class="btn btn-${size} ${buttonClass}" ${onclick} title="${title}"><span class="cancel-icon">${icon}</span></button>`;
-}
 
-/**
- * Create unified delete button for any item type
- * 
- * @param {string} itemType - Type of the item ('trade', 'ticker', 'alert', 'account', 'trade_plan', etc.)
- * @param {number} itemId - ID of the item
- * @param {string} size - Button size (sm, lg, etc.)
- * @returns {string} HTML for delete button
- */
-function createDeleteButton(itemType, itemId, size = 'sm') {
-    const buttonClass = 'btn-danger';
-    const title = 'מחק';
-    const icon = '🗑️';
-    
-    // יצירת onclick בהתאם לסוג האובייקט
-    let onclick = '';
-    if (itemId) {
-        switch (itemType) {
-            case 'trade_plan':
-                onclick = `onclick="window.deleteTradePlan(${itemId})"`;
-                break;
-            case 'trade':
-                onclick = `onclick="window.deleteTrade(${itemId})"`;
-                break;
-            case 'ticker':
-                onclick = `onclick="window.deleteTicker(${itemId})"`;
-                break;
-            case 'alert':
-                onclick = `onclick="window.deleteAlert(${itemId})"`;
-                break;
-            case 'account':
-                onclick = `onclick="window.deleteAccount(${itemId})"`;
-                break;
-            case 'execution':
-                onclick = `onclick="window.deleteExecution(${itemId})"`;
-                break;
-            default:
-                onclick = `onclick="window.delete${itemType.charAt(0).toUpperCase() + itemType.slice(1)}(${itemId})"`;
-        }
-    }
-    
-    return `<button class="btn btn-${size} ${buttonClass}" ${onclick} title="${title}"><span class="delete-icon">${icon}</span></button>`;
-}
 
 /**
  * Perform the actual cancellation based on item type
@@ -1134,8 +1026,6 @@ window.uiUtils = {
 // Export global cancel functions
 window.cancelItem = cancelItem;
 window.performItemCancellation = performItemCancellation;
-window.createCancelButton = createCancelButton;
-window.createDeleteButton = createDeleteButton;
 
 // ===== WARNING SYSTEM FUNCTIONS =====
 

@@ -442,29 +442,7 @@
         </div>
     </div>
 
-    <!-- Delete Cash Flow Modal -->
-    <div class="modal fade" id="deleteCashFlowModal" tabindex="-1" aria-labelledby="deleteCashFlowModalLabel"
-        aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header modal-header-colored">
-                    <h5 class="modal-title" id="deleteCashFlowModalLabel">מחיקת תזרים מזומנים</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>האם אתה בטוח שברצונך למחוק את תזרים המזומנים <strong id="deleteCashFlowName"></strong>?</p>
-                    <p class="text-danger">פעולה זו אינה הפיכה!</p>
-                    <input type="hidden" id="deleteCashFlowId">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                    <button type="button" class="btn btn-danger btn-danger-outline" onclick="window.confirmDeleteCashFlow && window.confirmDeleteCashFlow()">
-                        מחק תזרים
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- מודל הצגת פריטים מקושרים -->
     <div class="modal fade" id="linkedItemsModal" tabindex="-1" aria-labelledby="linkedItemsModalLabel"
@@ -539,13 +517,7 @@
                 });
             }
             
-            // תיקון למודל מחיקה
-            const deleteModal = document.getElementById('deleteCashFlowModal');
-            if (deleteModal) {
-                deleteModal.addEventListener('hidden.bs.modal', function() {
-                    this.removeAttribute('aria-hidden');
-                });
-            }
+
         });
     </script>
 </body>

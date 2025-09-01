@@ -64,12 +64,7 @@ function createButton(type, onClick, additionalClasses = '', additionalAttribute
     const icon = BUTTON_ICONS[type.toUpperCase()] || '';
     const text = BUTTON_TEXTS[type.toUpperCase()] || '';
 
-    console.log('🔧 createButton called with:', { type, onClick, additionalClasses, additionalAttributes });
-    
-    const buttonHtml = `<button class="btn btn-sm ${getButtonClass(type)}" onclick="${onClick}" title="${text}" ${additionalAttributes}>${icon}</button>`;
-    console.log('🔧 Generated button HTML:', buttonHtml);
-    
-    return buttonHtml;
+    return `<button class="btn btn-sm ${getButtonClass(type)}" onclick="${onClick}" title="${text}" ${additionalAttributes}>${icon}</button>`;
 }
 
 // פונקציה לקבלת מחלקת CSS לכפתור
@@ -109,13 +104,121 @@ function createEditButton(onClick, additionalClasses = '') {
 
 // פונקציה ליצירת כפתור מחיקה
 function createDeleteButton(onClick, additionalClasses = '') {
-    console.log('🔧 createDeleteButton called with onClick:', onClick);
     return createButton('DELETE', onClick, additionalClasses);
 }
 
 // פונקציה ליצירת כפתור קישור
 function createLinkButton(onClick, additionalClasses = '') {
     return createButton('LINK', onClick, additionalClasses);
+}
+
+// פונקציה ליצירת כפתור ביטול/הפעלה מחדש
+function createCancelButton(itemType, itemId, status = 'open', size = 'sm', additionalClasses = '') {
+    const isCancelled = status === 'cancelled' || status === 'canceled';
+    const buttonClass = isCancelled ? 'btn-success' : 'btn-warning';
+    const title = isCancelled ? 'הפעל מחדש' : 'בטל';
+    const icon = isCancelled ? '✓' : '❌';
+    
+    // יצירת onclick בהתאם לסטטוס וסוג האובייקט
+    let onclick = '';
+    if (itemId) {
+        if (isCancelled) {
+            // הפעלה מחדש - פונקציות שונות לכל סוג
+            switch (itemType) {
+                case 'trade_plan':
+                    onclick = `onclick="window.reactivateTradePlan && window.reactivateTradePlan(${itemId})"`;
+                    break;
+                case 'trade':
+                    onclick = `onclick="window.reactivateTrade && window.reactivateTrade(${itemId})"`;
+                    break;
+                case 'ticker':
+                    onclick = `onclick="window.reactivateTicker && window.reactivateTicker(${itemId})"`;
+                    break;
+                case 'alert':
+                    onclick = `onclick="window.reactivateAlert && window.reactivateAlert(${itemId})"`;
+                    break;
+                case 'account':
+                    onclick = `onclick="window.reactivateAccount && window.reactivateAccount(${itemId})"`;
+                    break;
+                case 'cash_flow':
+                    onclick = `onclick="window.reactivateCashFlow && window.reactivateCashFlow(${itemId})"`;
+                    break;
+                case 'execution':
+                    onclick = `onclick="window.reactivateExecution && window.reactivateExecution(${itemId})"`;
+                    break;
+                default:
+                    onclick = `onclick="window.reactivate${itemType.charAt(0).toUpperCase() + itemType.slice(1)} && window.reactivate${itemType.charAt(0).toUpperCase() + itemType.slice(1)}(${itemId})"`;
+            }
+        } else {
+            // ביטול - פונקציות שונות לכל סוג
+            switch (itemType) {
+                case 'trade_plan':
+                    onclick = `onclick="window.openCancelTradePlanModal && window.openCancelTradePlanModal(${itemId})"`;
+                    break;
+                case 'trade':
+                    onclick = `onclick="window.cancelTradeRecord && window.cancelTradeRecord(${itemId})"`;
+                    break;
+                case 'ticker':
+                    onclick = `onclick="window.cancelTicker && window.cancelTicker(${itemId})"`;
+                    break;
+                case 'alert':
+                    onclick = `onclick="window.cancelAlert && window.cancelAlert(${itemId})"`;
+                    break;
+                case 'account':
+                    onclick = `onclick="window.cancelAccount && window.cancelAccount(${itemId})"`;
+                    break;
+                case 'cash_flow':
+                    onclick = `onclick="window.cancelCashFlow && window.cancelCashFlow(${itemId})"`;
+                    break;
+                case 'execution':
+                    onclick = `onclick="window.cancelExecution && window.cancelExecution(${itemId})"`;
+                    break;
+                default:
+                    onclick = `onclick="window.cancel${itemType.charAt(0).toUpperCase() + itemType.slice(1)} && window.cancel${itemType.charAt(0).toUpperCase() + itemType.slice(1)}(${itemId})"`;
+            }
+        }
+    }
+    
+    return `<button class="btn btn-${size} ${buttonClass} ${additionalClasses}" ${onclick} title="${title}"><span class="cancel-icon">${icon}</span></button>`;
+}
+
+// פונקציה ליצירת כפתור מחיקה עם itemType (גיבוי לפונקציה המקורית)
+function createDeleteButtonByType(itemType, itemId, size = 'sm', additionalClasses = '') {
+    const buttonClass = 'btn-danger';
+    const title = 'מחק';
+    const icon = '🗑️';
+    
+    // יצירת onclick בהתאם לסוג האובייקט
+    let onclick = '';
+    if (itemId) {
+        switch (itemType) {
+            case 'trade_plan':
+                onclick = `onclick="window.deleteTradePlan && window.deleteTradePlan(${itemId})"`;
+                break;
+            case 'trade':
+                onclick = `onclick="window.deleteTrade && window.deleteTrade(${itemId})"`;
+                break;
+            case 'ticker':
+                onclick = `onclick="window.deleteTicker && window.deleteTicker(${itemId})"`;
+                break;
+            case 'alert':
+                onclick = `onclick="window.deleteAlert && window.deleteAlert(${itemId})"`;
+                break;
+            case 'account':
+                onclick = `onclick="window.deleteAccount && window.deleteAccount(${itemId})"`;
+                break;
+            case 'cash_flow':
+                onclick = `onclick="window.deleteCashFlow && window.deleteCashFlow(${itemId})"`;
+                break;
+            case 'execution':
+                onclick = `onclick="window.deleteExecution && window.deleteExecution(${itemId})"`;
+                break;
+            default:
+                onclick = `onclick="window.delete${itemType.charAt(0).toUpperCase() + itemType.slice(1)} && window.delete${itemType.charAt(0).toUpperCase() + itemType.slice(1)}(${itemId})"`;
+        }
+    }
+    
+    return `<button class="btn btn-${size} ${buttonClass} ${additionalClasses}" ${onclick} title="${title}"><span class="delete-icon">${icon}</span></button>`;
 }
 
 // ייצוא לפונקציות גלובליות
@@ -125,4 +228,6 @@ window.createButton = createButton;
 window.createEditButton = createEditButton;
 window.createDeleteButton = createDeleteButton;
 window.createLinkButton = createLinkButton;
+window.createCancelButton = createCancelButton;
+window.createDeleteButtonByType = createDeleteButtonByType;
 window.getButtonClass = getButtonClass;

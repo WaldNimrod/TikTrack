@@ -203,9 +203,9 @@
 }
 
 /* כפתורי ביטול בטבלאות - צבע אדום */
-.cancel-icon {
+/* .cancel-icon {
     color: #dc3545 !important;
-}
+} */
 
 .actions-cell .btn-outline-danger[onclick*="cancelTicker"] {
     background: #ffffff !important;

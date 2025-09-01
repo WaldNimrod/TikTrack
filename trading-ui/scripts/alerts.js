@@ -519,9 +519,9 @@ function updateAlertsTable(alerts) {
               <button class="btn btn-info" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה באלמנטים מקושרים">🔗</button>
               <button class="btn btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">✏️</button>
               ${alert.status === 'cancelled' || alert.status === 'canceled' ? `
-              <button class="btn btn-outline-success" onclick="reactivateAlert(${alert.id})" title="הפעל מחדש התראה"><span class="reactivate-icon">✓</span></button>
+              <button class="btn btn-outline-secondary" onclick="reactivateAlert(${alert.id})" title="הפעל מחדש התראה"><span class="reactivate-icon">✓</span></button>
               ` : `
-              <button class="btn btn-secondary" onclick="cancelAlert(${alert.id})" title="ביטול"><span class="cancel-icon">X</span></button>
+              <button class="btn btn-danger" onclick="cancelAlert(${alert.id})" title="ביטול"><span class="cancel-icon">X</span></button>
               `}
               <button class="btn btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">🗑️</button>
             </div>

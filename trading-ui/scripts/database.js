@@ -260,15 +260,7 @@ function formatNumber(value) {
   });
 }
 
-// פונקציה ליצירת כפתור עריכה
-function createEditButton(onClick) {
-  return `<button class="btn btn-sm btn-secondary" onclick="${onClick}" title="ערוך">✏️</button>`;
-}
 
-// פונקציה ליצירת כפתור מחיקה
-function createDeleteButton(onClick) {
-  return `<button class="btn btn-sm btn-danger" onclick="${onClick}" title="מחק">🗑️</button>`;
-}
 
 // פונקציה להפעלה מחדש של רשומה מבוטלת
 async function reactivateRecord(tableType, recordId) {
@@ -784,8 +776,8 @@ function updateTable(tableType, data) {
     const actionsCell = document.createElement('td');
     actionsCell.className = 'actions-cell';
     let actionsHtml = `
-      ${createEditButton(`editRecord('${tableType}', ${item.id})`)}
-      ${createDeleteButton(`deleteRecord('${tableType}', ${item.id})`)}
+      ${window.createEditButton ? window.createEditButton(`editRecord('${tableType}', ${item.id})`) : `<button class="btn btn-sm btn-secondary" onclick="editRecord('${tableType}', ${item.id})" title="ערוך">✏️</button>`}
+      ${window.createDeleteButton ? window.createDeleteButton(`deleteRecord('${tableType}', ${item.id})`) : `<button class="btn btn-sm btn-danger" onclick="deleteRecord('${tableType}', ${item.id})" title="מחק">🗑️</button>`}
     `;
     
     // הוספת כפתור ביטול/הפעלה מחדש לטבלאות עם שדה סטטוס

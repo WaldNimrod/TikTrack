@@ -1324,14 +1324,14 @@ function updateTradePlansTable(trade_plans) {
           <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTradePlan(${design.id})" title="צפה באלמנטים מקושרים">
             🔗
           </button>
-          ${window.uiUtils ? window.uiUtils.createCancelButton('trade_plan', design.id, design.status, 'sm') : 
-            `<button class="btn btn-sm ${design.status === 'cancelled' ? 'btn-outline-success' : 'btn-danger'}" 
-                     onclick="window.${design.status === 'cancelled' ? 'reactivateTradePlan' : 'openCancelTradePlanModal'}(${design.id})" 
-                     title="${design.status === 'cancelled' ? 'הפעל מחדש' : 'בטל'}"><span class="${design.status === 'cancelled' ? 'reactivate-icon' : 'cancel-icon'}">${design.status === 'cancelled' ? '✓' : 'X'}</span></button>`
-          }
           <button class="btn btn-sm btn-secondary" onclick="window.openEditTradePlanModal(${design.id})" title="ערוך">
             ✏️
           </button>
+          ${window.uiUtils ? window.uiUtils.createCancelButton('trade_plan', design.id, design.status, 'sm') : 
+            `<button class="btn btn-sm ${design.status === 'cancelled' ? 'btn-outline-secondary' : 'btn-danger'}" 
+                     onclick="window.${design.status === 'cancelled' ? 'reactivateTradePlan' : 'openCancelTradePlanModal'}(${design.id})" 
+                     title="${design.status === 'cancelled' ? 'הפעל מחדש' : 'בטל'}"><span class="${design.status === 'cancelled' ? 'reactivate-icon' : 'cancel-icon'}">${design.status === 'cancelled' ? '✓' : 'X'}</span></button>`
+          }
           <button class="btn btn-sm btn-danger" onclick="window.openDeleteTradePlanModal(${design.id})" title="מחק">
             🗑️
           </button>

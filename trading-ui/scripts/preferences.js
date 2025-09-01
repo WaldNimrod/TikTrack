@@ -99,6 +99,11 @@ async function saveAllPreferences() {
     if (response.ok) {
       const responseData = await response.json();
       showPreferencesSuccess('הצלחה', 'כל ההעדפות נשמרו בהצלחה');
+      
+      // הפעל הגדרות קונסול אחרי שמירה מוצלחת
+      if (typeof applyConsoleSettings === 'function') {
+        applyConsoleSettings();
+      }
     } else {
       const errorText = await response.text();
       console.error('שגיאה בשמירת העדפות:', errorText);
@@ -132,7 +137,7 @@ async function resetToDefaults() {
         },
       );
     } else {
-      // Fallback to browser confirm
+      // Fallback למקרה שמערכת התראות לא זמינה
       if (confirm('האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?')) {
         currentPreferences = { ...DEFAULT_PREFERENCES };
         updateUI();
@@ -445,6 +450,9 @@ async function initializePreferences() {
     // טען חשבונות
     await loadAccountsToFilter();
 
+    // טען הגדרות קונסול לממשק
+    loadConsoleSettingsToUI();
+
     console.log('✅ דף העדפות אותחל בהצלחה');
   } catch (error) {
     console.error('שגיאה באתחול דף העדפות:', error);
@@ -484,3 +492,113 @@ window.toggleTopSection = function() {
     console.warn('פונקציית toggleTopSectionGlobal לא נמצאה ב-main.js');
   }
 };
+
+// ========================================
+// Console Management Functions
+// ========================================
+
+/**
+ * מעדכן הגדרת קונסול
+ */
+function updateConsolePreference(key, value) {
+  try {
+    // עדכן את הזיכרון הזמני מיד
+    if (!currentPreferences.consoleSettings) {
+      currentPreferences.consoleSettings = {};
+    }
+    currentPreferences.consoleSettings[key] = value;
+
+    // הצג הודעת מידע שהערך עודכן
+    const label = getConsolePreferenceLabel(key);
+    const message = `${label} עודכן (לא נשמר עדיין)`;
+    showPreferencesInfo('הגדרות קונסול', message);
+
+    // אל תפעיל את ההגדרות עד שהמשתמש לוחץ על "שמור שינויים"
+    // applyConsoleSettings();
+  } catch (error) {
+    console.error('שגיאה בעדכון הגדרת קונסול:', error);
+  }
+}
+
+/**
+ * מחזיר תווית להגדרת קונסול
+ */
+function getConsolePreferenceLabel(key) {
+  const labels = {
+    autoClear: 'ניקוי אוטומטי',
+    clearInterval: 'מרווח ניקוי',
+    suppressMessages: 'הסתרת הודעות',
+    suppressDuration: 'משך הסתרה',
+  };
+  return labels[key] || key;
+}
+
+/**
+ * מפעיל את הגדרות הקונסול
+ */
+function applyConsoleSettings() {
+  try {
+    if (typeof window.saveConsoleSettings === 'function') {
+      const settings = currentPreferences.consoleSettings || {};
+      window.saveConsoleSettings(settings);
+
+      // הפעל ניקוי אוטומטי רק אם מופעל במפורש
+      if (settings.autoClear && typeof window.autoClearConsole === 'function') {
+        window.autoClearConsole();
+      }
+
+      // הפעל הסתרת הודעות רק אם מופעל במפורש
+      if (settings.suppressMessages && typeof window.suppressConsoleMessages === 'function') {
+        window.suppressConsoleMessages();
+      }
+    }
+  } catch (error) {
+    console.error('שגיאה בהפעלת הגדרות קונסול:', error);
+  }
+}
+
+/**
+ * ניקוי ידני של הקונסול
+ */
+function manualClearConsole() {
+  try {
+    if (typeof window.clearConsole === 'function') {
+      window.clearConsole();
+      showPreferencesSuccess('ניקוי קונסול', 'הקונסול נוקה בהצלחה');
+    } else {
+      showPreferencesError('שגיאה', 'פונקציית ניקוי קונסול לא זמינה');
+    }
+  } catch (error) {
+    console.error('שגיאה בניקוי קונסול:', error);
+    showPreferencesError('שגיאה', 'שגיאה בניקוי הקונסול');
+  }
+}
+
+/**
+ * טוען הגדרות קונסול לממשק
+ */
+function loadConsoleSettingsToUI() {
+  try {
+    if (typeof window.getConsoleSettings === 'function') {
+      const settings = window.getConsoleSettings();
+
+      // עדכן את הממשק
+      const autoClearCheckbox = document.getElementById('consoleAutoClear');
+      const clearIntervalInput = document.getElementById('consoleClearInterval');
+      const suppressMessagesCheckbox = document.getElementById('consoleSuppressMessages');
+      const suppressDurationInput = document.getElementById('consoleSuppressDuration');
+
+      if (autoClearCheckbox) {autoClearCheckbox.checked = settings.autoClear || false;}
+      if (clearIntervalInput) {clearIntervalInput.value = settings.clearInterval || 60;}
+      if (suppressMessagesCheckbox) {suppressMessagesCheckbox.checked = settings.suppressMessages || false;}
+      if (suppressDurationInput) {suppressDurationInput.value = settings.suppressDuration || 5;}
+    }
+  } catch (error) {
+    console.error('שגיאה בטעינת הגדרות קונסול לממשק:', error);
+  }
+}
+
+// Export console management functions
+window.updateConsolePreference = updateConsolePreference;
+window.manualClearConsole = manualClearConsole;
+window.loadConsoleSettingsToUI = loadConsoleSettingsToUI;

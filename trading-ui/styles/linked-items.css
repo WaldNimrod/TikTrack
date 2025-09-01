@@ -206,9 +206,9 @@
 }
 
 .modal-header-view {
-    background: linear-gradient(135deg, #28a745, #20c997);
+    background: linear-gradient(135deg, #ff9c05, #ff8c00);
     color: white;
-    border-bottom: 2px solid #20c997;
+    border-bottom: 2px solid #ff8c00;
 }
 
 /* Page-specific border colors - מסגרת לפי העמוד */
@@ -361,12 +361,12 @@
 
 .btn-close-view {
     background-color: white;
-    color: #28a745;
-    border: 2px solid #28a745;
+    color: #ff9c05;
+    border: 2px solid #ff9c05;
 }
 
 .btn-close-view:hover {
-    background-color: #28a745;
+    background-color: #ff9c05;
     color: white;
 }
 
@@ -395,4 +395,141 @@
 .alert-info {
     background: linear-gradient(135deg, rgba(23, 162, 184, 0.1), rgba(23, 162, 184, 0.05));
     border-left: 4px solid #17a2b8;
+}
+
+/* Section headers for view mode */
+.section-header {
+    margin: 2rem 0 1rem 0;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(255, 156, 5, 0.1), rgba(255, 156, 5, 0.05));
+    border-left: 4px solid #ff9c05;
+    border-radius: 8px;
+}
+
+.section-title {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.section-description {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Larger icons for linked items */
+.linked-item-icon-img {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 8px;
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Color-coded item cards based on type */
+.linked-item-row {
+    margin: 1rem 0;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.linked-item-row:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Trade items - Blue */
+.linked-item-trade {
+    background: linear-gradient(135deg, rgba(0, 123, 255, 0.1), rgba(0, 123, 255, 0.05));
+    border-color: rgba(0, 123, 255, 0.3);
+}
+
+.linked-item-trade:hover {
+    border-color: rgba(0, 123, 255, 0.6);
+}
+
+/* Account items - Green */
+.linked-item-account {
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(40, 167, 69, 0.05));
+    border-color: rgba(40, 167, 69, 0.3);
+}
+
+.linked-item-account:hover {
+    border-color: rgba(40, 167, 69, 0.6);
+}
+
+/* Ticker items - Red */
+.linked-item-ticker {
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(220, 53, 69, 0.05));
+    border-color: rgba(220, 53, 69, 0.3);
+}
+
+.linked-item-ticker:hover {
+    border-color: rgba(220, 53, 69, 0.6);
+}
+
+/* Alert items - Orange */
+.linked-item-alert {
+    background: linear-gradient(135deg, rgba(255, 156, 5, 0.1), rgba(255, 156, 5, 0.05));
+    border-color: rgba(255, 156, 5, 0.3);
+}
+
+.linked-item-alert:hover {
+    border-color: rgba(255, 156, 5, 0.6);
+}
+
+/* Cash flow items - Purple */
+.linked-item-cash_flow {
+    background: linear-gradient(135deg, rgba(111, 66, 193, 0.1), rgba(111, 66, 193, 0.05));
+    border-color: rgba(111, 66, 193, 0.3);
+}
+
+.linked-item-cash_flow:hover {
+    border-color: rgba(111, 66, 193, 0.6);
+}
+
+/* Note items - Orange */
+.linked-item-note {
+    background: linear-gradient(135deg, rgba(253, 126, 20, 0.1), rgba(253, 126, 20, 0.05));
+    border-color: rgba(253, 126, 20, 0.3);
+}
+
+.linked-item-note:hover {
+    border-color: rgba(253, 126, 20, 0.6);
+}
+
+/* Trade plan items - Teal */
+.linked-item-trade_plan {
+    background: linear-gradient(135deg, rgba(32, 201, 151, 0.1), rgba(32, 201, 151, 0.05));
+    border-color: rgba(32, 201, 151, 0.3);
+}
+
+.linked-item-trade_plan:hover {
+    border-color: rgba(32, 201, 151, 0.6);
+}
+
+/* Execution items - Dark blue */
+.linked-item-execution {
+    background: linear-gradient(135deg, rgba(23, 162, 184, 0.1), rgba(23, 162, 184, 0.05));
+    border-color: rgba(23, 162, 184, 0.3);
+}
+
+.linked-item-execution:hover {
+    border-color: rgba(23, 162, 184, 0.6);
+}
+
+/* Default item style */
+.linked-item-row:not([class*="linked-item-"]) {
+    background: linear-gradient(135deg, rgba(108, 117, 125, 0.1), rgba(108, 117, 125, 0.05));
+    border-color: rgba(108, 117, 125, 0.3);
+}
+
+.linked-item-row:not([class*="linked-item-"]):hover {
+    border-color: rgba(108, 117, 125, 0.6);
 }

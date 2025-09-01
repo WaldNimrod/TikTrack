@@ -340,7 +340,6 @@ function showSystemError(message) {
     window.showNotification(message, 'error', 'שגיאת מערכת');
   } else {
     console.error('❌ שגיאת מערכת:', message);
-    alert(`שגיאת מערכת: ${message}`);
   }
 }
 

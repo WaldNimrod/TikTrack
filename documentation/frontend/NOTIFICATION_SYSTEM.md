@@ -1,7 +1,7 @@
 # מערכת התראות והודעות - TikTrack
 
 ## 📅 תאריך עדכון
-29 באוגוסט 2025
+31 באוגוסט 2025
 
 ## 🎯 מטרת הדוקומנטציה
 תיעוד מדויק של מערכת ההתראות וההודעות, כולל פונקציות זמינות, סדר פרמטרים, ודרך הקריאה הנכונה לכל פונקציה.
@@ -137,6 +137,47 @@ window.showConfirmationDialog('אישור פעולה', 'האם אתה בטוח?'
 );
 ```
 
+## 🚫 הודעות שלא להשתמש בהן
+
+### **אל תשתמש ב:**
+- `alert()` - השתמש ב-`window.showErrorNotification` או `window.showInfoNotification`
+- `confirm()` - השתמש ב-`window.showConfirmationDialog` או `window.showDeleteWarning`
+
+### **דוגמאות להחלפה:**
+
+#### **לפני (לא נכון):**
+```javascript
+// ❌ לא להשתמש
+alert('שגיאה: מערכת התראות לא זמינה');
+const confirmed = confirm('האם אתה בטוח שברצונך למחוק?');
+```
+
+#### **אחרי (נכון):**
+```javascript
+// ✅ השתמש בזה
+if (typeof window.showErrorNotification === 'function') {
+  window.showErrorNotification('שגיאה', 'מערכת התראות לא זמינה');
+} else {
+  console.error('מערכת התראות לא זמינה');
+}
+
+// ✅ השתמש בזה
+if (typeof window.showConfirmationDialog === 'function') {
+  window.showConfirmationDialog(
+    'אישור מחיקה',
+    'האם אתה בטוח שברצונך למחוק?',
+    () => deleteItem(),
+    () => console.log('מחיקה בוטלה')
+  );
+} else {
+  // Fallback למקרה שמערכת התראות לא זמינה
+  const confirmed = confirm('האם אתה בטוח שברצונך למחוק?');
+  if (confirmed) {
+    deleteItem();
+  }
+}
+```
+
 ## 🎨 עיצוב התראות
 
 ### **סגנונות CSS**
@@ -178,9 +219,9 @@ window.showConfirmationDialog('אישור פעולה', 'האם אתה בטוח?'
 ```javascript
 // תמיד לבדוק זמינות לפני שימוש
 if (typeof window.showSuccessNotification === 'function') {
-    window.showSuccessNotification('הצלחה', 'פעולה הושלמה בהצלחה');
+  window.showSuccessNotification('הצלחה', 'פעולה הושלמה בהצלחה');
 } else {
-    console.error('showSuccessNotification לא זמינה');
+  console.error('showSuccessNotification לא זמינה');
 }
 ```
 
@@ -189,13 +230,32 @@ if (typeof window.showSuccessNotification === 'function') {
 const result = await response.json();
 
 if (response.ok && result.status === 'success') {
-    window.showSuccessNotification('הצלחה', 'הפריט נשמר בהצלחה!');
+  window.showSuccessNotification('הצלחה', 'הפריט נשמר בהצלחה!');
 } else {
-    if (result.error && result.error.message) {
-        window.showErrorNotification('שגיאה', result.error.message);
-    } else {
-        window.showErrorNotification('שגיאה', 'שגיאה לא ידועה');
-    }
+  if (result.error && result.error.message) {
+    window.showErrorNotification('שגיאה', result.error.message);
+  } else {
+    window.showErrorNotification('שגיאה', 'שגיאה לא ידועה');
+  }
+}
+```
+
+### **4. Fallback למקרה שמערכת התראות לא זמינה**
+```javascript
+// תמיד לספק fallback
+if (typeof window.showConfirmationDialog === 'function') {
+  window.showConfirmationDialog(
+    'אישור פעולה',
+    'האם אתה בטוח?',
+    () => performAction(),
+    () => console.log('פעולה בוטלה')
+  );
+} else {
+  // Fallback למקרה שמערכת התראות לא זמינה
+  const confirmed = confirm('האם אתה בטוח?');
+  if (confirmed) {
+    performAction();
+  }
 }
 ```
 
@@ -213,6 +273,33 @@ if (response.ok && result.status === 'success') {
 **בעיה**: התראות לא מוצגות
 **פתרון**: בדיקת זמינות פונקציות וטעינת קבצים
 
+### **4. הודעות alert/confirm עדיין מופיעות**
+**בעיה**: עדיין יש הודעות `alert()` או `confirm()` בקוד
+**פתרון**: החלפת כל ההודעות במערכת ההתראות החדשה
+
 ## 📋 קריטריונים לבדיקה
 
 > 📋 **כל הבדיקות הועברו ל**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md)
+
+## 🔄 שינויים אחרונים (31 באוגוסט 2025)
+
+### **החלפת הודעות alert/confirm:**
+- ✅ `alerts.js` - הוחלפו כל הודעות `alert()` ו-`confirm()`
+- ✅ `trades.js` - הוחלפו כל הודעות `confirm()`
+- ✅ `preferences.js` - הוחלפו כל הודעות `confirm()`
+- ✅ `notes.js` - הוחלפו כל הודעות `confirm()`
+- ✅ `trade_plans.js` - הוחלפו כל הודעות `confirm()`
+- ✅ `cash_flows.js` - הוחלפו כל הודעות `confirm()`
+- ✅ `constraint-manager.js` - הוחלפו כל הודעות `confirm()`
+- ✅ `notification-system.js` - הוחלפו כל הודעות `confirm()`
+
+### **הוספת Fallback:**
+- כל הפונקציות כוללות fallback למקרה שמערכת התראות לא זמינה
+- Fallback משתמש ב-`console.error` או `confirm()` רגיל
+- הודעות ברורות על כך שזה fallback
+
+### **עדכון דוקומנטציה:**
+- הוספת סקשן "הודעות שלא להשתמש בהן"
+- דוגמאות להחלפה נכונה
+- הנחיות ל-Fallback
+- עדכון תאריך עדכון

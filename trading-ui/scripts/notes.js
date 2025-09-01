@@ -65,6 +65,7 @@ function deleteNote(id) {
             () => confirmDeleteNote(id),
           );
         } else {
+          // Fallback למקרה שמערכת התראות לא זמינה
           const confirmed = confirm('האם אתה בטוח שברצונך למחוק הערה זו?');
           if (confirmed) {
             confirmDeleteNote(id);

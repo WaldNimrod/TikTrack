@@ -445,8 +445,24 @@ async function deleteCashFlow(id) {
 
 ⚠️  פעולה זו אינה הפיכה!`;
 
-    if (!confirm(confirmMessage)) {
-      return;
+    // אישור מהמשתמש
+    if (typeof window.showConfirmationDialog === 'function') {
+      const confirmed = await new Promise(resolve => {
+        window.showConfirmationDialog(
+          'מחיקת תזרים מזומנים',
+          confirmMessage,
+          () => resolve(true),
+          () => resolve(false),
+        );
+      });
+      if (!confirmed) {
+        return;
+      }
+    } else {
+      // Fallback למקרה שמערכת התראות לא זמינה
+      if (!confirm(confirmMessage)) {
+        return;
+      }
     }
 
     // שליחת בקשת מחיקה
@@ -1204,7 +1220,7 @@ function validateField(fieldId, value, formType) {
       return false;
     }
     break;
-  case 'ExternalId':
+  case 'ExternalId': {
     // וולידציה של מזהה חיצוני תלויה במקור
     const sourceFieldId = fieldId.includes('edit') ? 'editCashFlowSource' : 'cashFlowSource';
     const sourceField = document.getElementById(sourceFieldId);
@@ -1219,6 +1235,7 @@ function validateField(fieldId, value, formType) {
       return false;
     }
     break;
+  }
   }
 
   // הצגת סימון ירוק כשהערך תקין

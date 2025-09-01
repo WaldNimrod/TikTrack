@@ -313,6 +313,7 @@ async function updateEditTickerInfo() {
               },
             );
           } else {
+            // Fallback למקרה שמערכת התראות לא זמינה
             const confirmed = confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?');
             if (confirmed) {
               if (typeof window.showWarningNotification === 'function') {

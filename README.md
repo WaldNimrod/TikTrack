@@ -85,6 +85,9 @@ TikTrack היא מערכת ניהול טריידים מתקדמת המאפשרת
 - **Development Modes**: מצבי פיתוח שונים (רגיל, ללא Cache, ייצור)
 - **Quick Cache Clear**: ניקוי Cache מהיר דרך UI ומקלדת
 - **Environment Configuration**: הגדרות סביבה דינמיות
+- **Smart Cache Preservation**: שמירה אוטומטית על מצב Cache בין restarts
+- **Interactive Restart Modes**: מצבים אינטראקטיביים עם בחירת משתמש
+- **Automatic Cache Detection**: זיהוי אוטומטי של מצב Cache נוכחי
 
 ### Frontend
 - **HTML5/CSS3/JavaScript**: ממשק משתמש
@@ -125,11 +128,37 @@ npm run dev:production
 - ביצועים מקסימליים
 - מתאים לבדיקות לפני deploy
 
+### מערכת Restart חכמה
+
+#### **Restart רגיל (ברירת מחדל):**
+```bash
+./restart                    # Quick mode + שומר על מצב Cache נוכחי
+./restart quick             # Quick mode + שומר על מצב Cache נוכחי
+./restart complete          # Complete mode + שומר על מצב Cache נוכחי
+```
+
+#### **שינוי מצב Cache מפורש:**
+```bash
+./restart --cache-mode=development    # Quick + Cache TTL: 10 שניות
+./restart --cache-mode=no-cache       # Quick + Cache מבוטל
+./restart --cache-mode=production     # Quick + Cache TTL: 5 דקות
+./restart --preserve-cache            # שומר על מצב Cache נוכחי
+```
+
+#### **מצב אינטראקטיבי:**
+```bash
+./restart --interactive               # תפריט עם בחירות משתמש
+./restart --status                    # מצב המערכת הנוכחי
+./restart --info                      # מידע על המצבים הזמינים
+```
+
 ### ניהול Cache מהיר
 
 #### **כפתור ב-UI:**
 - תפריט "הגדרות" → "נקה Cache (פיתוח)"
 - כפתור אדום עם אייקון פח אשפה
+- מציג הודעת טעינה בזמן הניקוי
+- חוזר למצב רגיל אחרי הניקוי
 
 #### **קיצור מקלדת:**
 - `Cmd+Shift+C` (במק)
@@ -139,6 +168,12 @@ npm run dev:production
 ```bash
 npm run cache:clear
 curl -X POST http://localhost:8080/api/v1/cache/clear
+```
+
+#### **ניקוי דרך Restart:**
+```bash
+./restart --cache-mode=no-cache        # Restart עם Cache מבוטל
+./restart --cache-mode=development     # Restart עם Cache TTL: 10 שניות
 ```
 
 ### הגדרות סביבה
@@ -151,6 +186,25 @@ export TIKTRACK_CACHE_DISABLED=true
 
 # הפעלת השרת
 ./restart quick
+```
+
+### הגדרות אוטומטיות
+המערכת מזהה אוטומטית את מצב ה-Cache הנוכחי ושומרת עליו בין restarts:
+
+- **Cache TTL: 0** → מצב NO-CACHE
+- **Cache TTL: 10** → מצב DEVELOPMENT  
+- **Cache TTL: 300** → מצב PRODUCTION
+- **Cache TTL: אחר** → מצב CUSTOM
+
+### שמירת מצב Cache
+```bash
+# שמירה אוטומטית (ברירת מחדל)
+./restart                    # שומר על מצב Cache נוכחי
+
+# שינוי מפורש
+./restart --cache-mode=development    # משנה ל-10 שניות
+./restart --cache-mode=no-cache       # מבטל Cache
+./restart --cache-mode=production     # משנה ל-5 דקות
 ```
 
 ## מערכת חיבור מידע חיצוני
@@ -212,6 +266,21 @@ pip install -r requirements.txt
 ./start_dev.sh
 ```
 
+### הפעלת השרת
+```bash
+# הפעלה מהירה (מומלץ לפיתוח)
+./restart quick
+
+# הפעלה מלאה (מומלץ לבעיות)
+./restart complete
+
+# הפעלה אינטראקטיבית
+./restart --interactive
+
+# בדיקת מצב
+./restart --status
+```
+
 ### גישה למערכת
 - **ממשק משתמש**: http://127.0.0.1:8080
 - **API**: http://127.0.0.1:8080/api/v1/
@@ -225,6 +294,7 @@ TikTrackApp/
 │   ├── models/                # מודלים של בסיס הנתונים
 │   ├── routes/                # נתיבי API
 │   ├── services/              # שירותים עסקיים
+│   ├── config/                # הגדרות מערכת
 │   └── db/                    # בסיס הנתונים
 ├── trading-ui/                # ממשק משתמש
 │   ├── *.html                 # עמודי HTML
@@ -232,6 +302,10 @@ TikTrackApp/
 │   ├── styles/                # קבצי CSS
 │   └── external_data_integration_client/  # מערכת מידע חיצוני
 ├── documentation/             # דוקומנטציה
+├── scripts/                   # סקריפטי הפעלה
+│   ├── restart                # מערכת restart מאוחדת
+│   ├── restart_server_quick.sh    # restart מהיר
+│   └── restart_server_complete.sh # restart מלא
 └── backups/                   # גיבויים
 ```
 
@@ -277,6 +351,26 @@ TikTrackApp/
 3. הוסף לוגים לניטור
 4. בדוק שהפונקציה עובדת
 
+### ניהול מצבי פיתוח
+1. **בחירת מצב Cache:**
+   ```bash
+   npm run dev:development    # Cache TTL: 10 שניות
+   npm run dev:no-cache       # Cache מבוטל
+   npm run dev:production     # Cache TTL: 5 דקות
+   ```
+
+2. **Restart עם שמירת מצב:**
+   ```bash
+   ./restart                   # שומר על מצב Cache נוכחי
+   ./restart --cache-mode=development  # משנה למצב פיתוח
+   ```
+
+3. **בדיקת מצב:**
+   ```bash
+   ./restart --status          # מצב המערכת
+   ./restart --info            # מידע על מצבים
+   ```
+
 ## בדיקות ואיכות
 
 ### בדיקות אוטומטיות
@@ -303,11 +397,22 @@ console.log('❌ Error loading data:', error);
 - ✅ **אין כפילויות** בפונקציות
 - ✅ **בדיקות מקיפות** בכל עמוד
 - ✅ **לוגים מפורטים** לניטור
+- ✅ **מערכת Cache חכמה** עם שמירה אוטומטית על מצב
+- ✅ **מערכת Restart מאוחדת** עם שמירת מצב Cache
+- ✅ **מצבי פיתוח גמישים** עם מעבר קל בין מצבים
+- ✅ **ניהול Cache מתקדם** דרך UI, מקלדת ו-command line
+
+### תכונות חדשות נוספו:
+- 🧠 **שמירה אוטומטית על מצב Cache** בין restarts
+- 🔄 **מערכת Restart חכמה** עם זיהוי אוטומטי של מצב
+- 🎮 **מצב אינטראקטיבי** לבחירת משתמש
+- ⚡ **ניקוי Cache מהיר** דרך UI ומקלדת
+- 🔧 **ניהול סביבה דינמי** עם environment variables
 
 המערכת מוכנה לשימוש ולפיתוח עתידי!
 
 ---
 
-**תאריך עדכון אחרון**: 29 באוגוסט 2025  
-**גרסה**: 2.0.0.0  
+**תאריך עדכון אחרון**: 1 בספטמבר 2025  
+**גרסה**: 2.0.1.0  
 **מפתח**: TikTrack Development Team

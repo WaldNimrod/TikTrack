@@ -2,7 +2,7 @@
 
 ## 🚀 Latest Updates
 
-**Version 4.0** - *September 1, 2025*
+**Version 4.1** - *September 1, 2025*
 
 ### ✅ **Advanced Development Infrastructure - Complete Implementation**
 
@@ -20,6 +20,9 @@
 - **Quick Cache Clear**: UI button and keyboard shortcuts for cache clearing
 - **Unified Restart System**: Centralized server management with environment variables
 - **Performance Optimization**: Database indexing and query optimization
+- **Smart Cache Preservation**: Automatic cache state preservation across restarts
+- **Interactive Restart Modes**: User-guided restart with cache mode selection
+- **Automatic Cache Detection**: Intelligent detection of current cache state
 
 #### **Current Status**
 - ✅ **Advanced caching system operational**
@@ -28,6 +31,10 @@
 - ✅ **Development modes implemented**
 - ✅ **Cache management UI complete**
 - ✅ **Unified restart system operational**
+- ✅ **Smart cache preservation working**
+- ✅ **Interactive restart modes functional**
+- ✅ **Automatic cache detection operational**
+- ✅ **Cache state persistence across restarts**
 
 ### ✅ **Previous: Code Cleanup & Modular Architecture - Complete Implementation**
 
@@ -100,18 +107,25 @@ This guide provides comprehensive information for developers working on the TikT
 - **Background Tasks**: Automated background processes
 - **Rate Limiting**: Advanced request throttling
 - **Error Handling**: Comprehensive error handling with correlation IDs
+- **Smart Cache Preservation**: Automatic cache state preservation across restarts
+- **Environment Configuration**: Dynamic environment-based cache settings
+- **Unified Restart System**: Centralized server management with cache state preservation
 
 ### Frontend (JavaScript)
 - **Framework**: Vanilla JavaScript with modular architecture
 - **UI Framework**: Custom CSS with responsive design
 - **Filter System**: Advanced multi-table filtering with preference management
 - **Header System**: Unified navigation and filtering interface
+- **Cache Management UI**: Quick cache clearing button with loading states
+- **Development Tools**: Keyboard shortcuts and UI indicators for cache management
 
 ### Core Components
 1. **Header System** (`header-system.js`): Navigation, filter interface, and cache management
 2. **Filter System** (`simple-filter.js`): Advanced filtering across all tables
 3. **Warning System** (`warning-system.js`): Centralized modal management
 4. **Translation System** (`translation-utils.js`): Hebrew/English translation utilities
+5. **Cache Management UI** (`header-system.js`): Quick cache clearing with loading states
+6. **Development Shortcuts** (`main.js`): Keyboard shortcuts for cache management
 
 ### Advanced Development Systems
 1. **Cache Management System**: Smart caching with TTL and dependencies
@@ -120,6 +134,10 @@ This guide provides comprehensive information for developers working on the TikT
 4. **Background Task System**: Automated background processes
 5. **Rate Limiting System**: Advanced request throttling
 6. **Error Handling System**: Comprehensive error handling with correlation IDs
+7. **Smart Cache Preservation**: Automatic cache state preservation across restarts
+8. **Interactive Restart System**: User-guided restart with cache mode selection
+9. **Automatic Cache Detection**: Intelligent detection of current cache state
+10. **Unified Restart Management**: Centralized server management with environment variables
 
 ## 🚀 Quick Start
 
@@ -159,11 +177,37 @@ npm run dev:production
 - Maximum performance
 - Good for pre-deployment testing
 
+### Smart Restart System
+
+#### **Automatic Cache Preservation (Default):**
+```bash
+./restart                    # Quick mode + preserves current cache state
+./restart quick             # Quick mode + preserves current cache state
+./restart complete          # Complete mode + preserves current cache state
+```
+
+#### **Explicit Cache Mode Changes:**
+```bash
+./restart --cache-mode=development    # Quick + development cache (10s TTL)
+./restart --cache-mode=no-cache       # Quick + no-cache (disabled)
+./restart --cache-mode=production     # Quick + production cache (5min TTL)
+./restart --preserve-cache            # Preserves current cache state
+```
+
+#### **Interactive Mode:**
+```bash
+./restart --interactive               # User-guided restart with choices
+./restart --status                    # Current system status
+./restart --info                      # Information about available modes
+```
+
 ### Quick Cache Management
 
 #### **UI Button:**
 - Menu "Settings" → "Clear Cache (Development)"
 - Red button with trash icon
+- Shows loading state during cache clearing
+- Returns to normal state after completion
 
 #### **Keyboard Shortcuts:**
 - `Cmd+Shift+C` (Mac)
@@ -173,6 +217,12 @@ npm run dev:production
 ```bash
 npm run cache:clear
 curl -X POST http://localhost:8080/api/v1/cache/clear
+```
+
+#### **Cache Management via Restart:**
+```bash
+./restart --cache-mode=no-cache        # Restart with cache disabled
+./restart --cache-mode=development     # Restart with development cache
 ```
 
 ### Environment Configuration
@@ -185,6 +235,25 @@ export TIKTRACK_CACHE_DISABLED=true
 
 # Start server
 ./restart quick
+```
+
+### Automatic Cache State Detection
+The system automatically detects and preserves your current cache configuration:
+
+- **Cache TTL: 0** → NO-CACHE mode
+- **Cache TTL: 10** → DEVELOPMENT mode  
+- **Cache TTL: 300** → PRODUCTION mode
+- **Cache TTL: other** → CUSTOM mode
+
+### Cache State Persistence
+```bash
+# Automatic preservation (default)
+./restart                    # Keeps current cache state
+
+# Explicit changes
+./restart --cache-mode=development    # Changes to 10 seconds
+./restart --cache-mode=no-cache       # Disables cache
+./restart --cache-mode=production     # Changes to 5 minutes
 ```
 
 ### Installation
@@ -204,10 +273,28 @@ python -c "from app import db; db.create_all()"
 python3 create_fresh_database.py
 
 # Start development server
-python dev_server.py
+./restart quick
 
 # Access application
 # Open http://localhost:8080 in browser
+```
+
+### Server Management
+```bash
+# Quick restart (recommended for development)
+./restart quick
+
+# Complete restart (for troubleshooting)
+./restart complete
+
+# Interactive restart with user choices
+./restart --interactive
+
+# Check system status
+./restart --status
+
+# Show restart mode information
+./restart --info
 ```
 
 ### Development Environment Setup
@@ -224,7 +311,7 @@ export FLASK_ENV=development
 export FLASK_DEBUG=1
 
 # Start development server
-python dev_server.py
+./restart quick
 ```
 
 ## 📁 Project Structure
@@ -251,6 +338,7 @@ TikTrackApp/
 │   ├── config/                # Configuration
 │   │   ├── __init__.py
 │   │   ├── database.py
+│   │   ├── settings.py        # Environment-based cache settings
 │   │   └── logging.py
 │   ├── db/                    # Database files
 │   ├── migrations/            # Database migrations
@@ -274,6 +362,10 @@ TikTrackApp/
 │       │   ├── warning-system.css
 │       │   └── ...
 │       └── *.html            # HTML pages
+├── scripts/                   # Server management scripts
+│   ├── restart                # Unified restart system
+│   ├── restart_server_quick.sh    # Quick restart script
+│   └── restart_server_complete.sh # Complete restart script
 ├── documentation/             # System documentation
 └── backups/                  # System backups
 ```
@@ -284,6 +376,9 @@ TikTrackApp/
 ```bash
 # Create feature branch
 git checkout -b feature/new-feature
+
+# Set development mode
+npm run dev:development
 
 # Make changes
 # Test thoroughly
@@ -299,10 +394,25 @@ git push origin feature/new-feature
 # Create pull request
 ```
 
+### 2. Active Development (No Cache)
+```bash
+# Switch to no-cache mode for immediate feedback
+npm run dev:no-cache
+
+# Or use restart with cache mode
+./restart --cache-mode=no-cache
+
+# Make rapid changes and see immediate results
+# Use quick cache clear button for testing
+```
+
 ### 2. Bug Fixes
 ```bash
 # Create bug fix branch
 git checkout -b fix/bug-description
+
+# Set no-cache mode for debugging
+npm run dev:no-cache
 
 # Fix the bug
 # Add tests
@@ -314,12 +424,26 @@ git commit -m "Fix: description of the fix"
 # Push and create pull request
 ```
 
+### 3. Performance Testing
+```bash
+# Switch to production mode for performance testing
+npm run dev:production
+
+# Or use restart with production cache
+./restart --cache-mode=production
+
+# Test performance with full cache enabled
+# Monitor cache hit rates and response times
+```
+
 ### 3. Code Review Process
 1. **Self Review**: Review your own code before submitting
 2. **Peer Review**: Have another developer review your code
 3. **Testing**: Ensure all tests pass
 4. **Documentation**: Update relevant documentation
-5. **Merge**: Merge after approval
+5. **Cache Testing**: Test cache functionality and performance
+6. **Restart Testing**: Test server restart with cache preservation
+7. **Merge**: Merge after approval
 
 ## 🧪 Testing
 
@@ -329,6 +453,14 @@ git commit -m "Fix: description of the fix"
 cd Backend
 # Manual testing - no automated test suite currently
 # Test all functionality manually through the web interface
+
+# Test cache management
+curl -s http://localhost:8080/api/v1/cache/status
+curl -s http://localhost:8080/api/v1/cache/stats
+curl -X POST http://localhost:8080/api/v1/cache/clear
+
+# Test server health
+curl -s http://localhost:8080/api/health
 ```
 
 ### Frontend Testing
@@ -341,6 +473,95 @@ cd Backend
 # Test navigation system
 # Test warning system
 # Test translation system
+
+# Test cache management UI
+# Test cache clearing button
+# Test keyboard shortcuts (Cmd+Shift+C)
+# Test loading states and error handling
+```
+
+### UI Cache Testing
+```bash
+# Test cache button visibility
+# Check if button appears in menu
+# Verify button styling and text
+
+# Test cache clearing functionality
+# Click button and verify loading state
+# Check console for success/error messages
+# Verify button returns to normal state
+
+# Test keyboard shortcuts
+# Press Cmd+Shift+C (Mac) or Ctrl+Shift+C (Windows)
+# Verify cache clearing action
+# Check console for feedback
+```
+
+### Environment Testing
+```bash
+# Test environment variable setting
+export TIKTRACK_DEV_MODE=true
+export TIKTRACK_CACHE_DISABLED=true
+
+# Test npm scripts
+npm run dev:no-cache
+npm run dev:development
+npm run dev:production
+
+# Test restart with environment variables
+./restart --cache-mode=development
+./restart --cache-mode=no-cache
+./restart --cache-mode=production
+
+# Verify environment variables are applied
+env | grep TIKTRACK
+curl -s http://localhost:8080/api/v1/cache/stats
+```
+
+### Performance Testing
+```bash
+# Test cache performance
+curl -s http://localhost:8080/api/v1/cache/health | jq '.data.performance'
+
+# Test query optimization
+curl -s http://localhost:8080/api/v1/query-optimization/stats | jq '.data'
+
+# Test system health
+curl -s http://localhost:8080/api/health | jq '.components.cache.performance'
+
+# Monitor cache hit rates
+curl -s http://localhost:8080/api/v1/cache/stats | jq '.data.hit_rate_percent'
+```
+
+### Integration Testing
+```bash
+# Test complete cache workflow
+./restart --cache-mode=development
+# Make some API calls to populate cache
+curl -s http://localhost:8080/api/v1/accounts/
+curl -s http://localhost:8080/api/v1/cache/stats
+# Clear cache via UI or API
+curl -X POST http://localhost:8080/api/v1/cache/clear
+# Verify cache is cleared
+curl -s http://localhost:8080/api/v1/cache/stats
+```
+
+### Error Testing
+```bash
+# Test cache service errors
+# Stop cache service and test error handling
+# Test invalid cache operations
+# Test cache timeout scenarios
+
+# Test restart script errors
+# Test with invalid cache modes
+# Test with missing environment variables
+# Test with server already running
+
+# Test UI error handling
+# Test cache button with server down
+# Test keyboard shortcuts with errors
+# Test loading state timeouts
 ```
 
 ### Test Structure
@@ -352,6 +573,43 @@ Backend/
 │   ├── test_alerts.py
 │   ├── test_api.py
 │   └── ...
+```
+
+### Cache Testing
+```bash
+# Test cache functionality
+curl -s http://localhost:8080/api/v1/cache/status
+curl -s http://localhost:8080/api/v1/cache/stats
+curl -X POST http://localhost:8080/api/v1/cache/clear
+
+# Test cache performance
+curl -s http://localhost:8080/api/v1/cache/health | jq '.data'
+
+# Test cache state preservation
+./restart --cache-mode=development
+./restart  # Should preserve development mode
+curl -s http://localhost:8080/api/v1/cache/stats | jq '.data'
+```
+
+### Restart Testing
+```bash
+# Test quick restart
+./restart quick
+
+# Test complete restart
+./restart complete
+
+# Test interactive restart
+./restart --interactive
+
+# Test cache mode changes
+./restart --cache-mode=no-cache
+./restart --cache-mode=development
+./restart --cache-mode=production
+
+# Test status and info
+./restart --status
+./restart --info
 ```
 
 ## 📊 Filter System Development
@@ -576,6 +834,15 @@ def get_trades_with_accounts():
     return Trade.query.options(
         joinedload(Trade.account)
     ).all()
+
+# Cache optimization
+from services.cache_service import CacheService
+
+cache_service = CacheService()
+
+@cache_service.cached(timeout=300)
+def get_accounts():
+    return Account.query.all()
 ```
 
 ### Frontend Optimization
@@ -592,14 +859,21 @@ searchInput.addEventListener('input', (e) => {
 
 ### Caching
 ```python
-# Redis caching (if implemented)
-from flask_caching import Cache
+# Smart caching with TTL and dependencies
+from services.cache_service import CacheService
 
-cache = Cache()
+cache_service = CacheService()
 
-@cache.memoize(timeout=300)
+@cache_service.cached(timeout=300, dependencies=['accounts'])
 def get_accounts():
     return Account.query.all()
+
+# Environment-based cache configuration
+import os
+if os.getenv('TIKTRACK_DEV_MODE') == 'true':
+    CACHE_TTL = 10  # 10 seconds for development
+else:
+    CACHE_TTL = 300  # 5 minutes for production
 ```
 
 ## 🚀 Deployment
@@ -608,7 +882,11 @@ def get_accounts():
 ```bash
 # Start development server
 cd Backend
-python dev_server.py
+./restart quick
+
+# Or with specific cache mode
+./restart --cache-mode=development
+./restart --cache-mode=no-cache
 ```
 
 ### Production Deployment
@@ -618,7 +896,7 @@ export FLASK_ENV=production
 export SECRET_KEY=your-secret-key
 
 # Start production server
-python dev_server.py
+./restart --cache-mode=production
 ```
 
 ### Docker Deployment
@@ -632,7 +910,8 @@ RUN pip install -r requirements.txt
 COPY . .
 EXPOSE 8080
 
-CMD ["python", "dev_server.py"]
+# Use the unified restart system
+CMD ["./restart", "--cache-mode=production"]
 ```
 
 ## 🐛 Debugging
@@ -645,6 +924,14 @@ app.config['DEBUG'] = True
 # Add logging
 import logging
 logging.basicConfig(level=logging.DEBUG)
+
+# Cache debugging
+from services.cache_service import CacheService
+cache_service = CacheService()
+
+# Check cache status
+print(f"Cache enabled: {cache_service.is_enabled()}")
+print(f"Cache TTL: {cache_service.get_ttl()}")
 ```
 
 ### Frontend Debugging
@@ -658,12 +945,24 @@ try {
 } catch (error) {
     console.error('❌ Error:', error);
 }
+
+// Cache debugging
+console.log('Cache button found:', document.querySelector('[onclick*="clearDevelopmentCache"]'));
+console.log('Cache status:', await fetch('/api/v1/cache/status').then(r => r.json()));
 ```
 
 ### Database Debugging
 ```python
 # Enable SQL logging
 app.config['SQLALCHEMY_ECHO'] = True
+
+# Cache debugging
+from services.cache_service import CacheService
+cache_service = CacheService()
+
+# Check cache performance
+print(f"Cache hit rate: {cache_service.get_hit_rate()}")
+print(f"Cache memory usage: {cache_service.get_memory_usage()}")
 ```
 
 ## 📚 Best Practices
@@ -685,12 +984,24 @@ app.config['SQLALCHEMY_ECHO'] = True
 2. **Integration Tests**: Test component interactions
 3. **End-to-End Tests**: Test complete workflows
 4. **Performance Tests**: Test system performance
+5. **Cache Tests**: Test cache functionality and performance
+6. **Restart Tests**: Test server restart with cache preservation
 
 ### Documentation
 1. **Inline Comments**: Comment complex logic
 2. **Function Documentation**: Document function parameters and return values
 3. **API Documentation**: Document API endpoints
 4. **User Documentation**: Document user-facing features
+5. **Cache Management**: Document cache modes and restart procedures
+6. **Development Modes**: Document development environment setup
+
+### Cache Management Best Practices
+1. **Development Mode Selection**: Choose appropriate cache mode for your development phase
+2. **Cache State Preservation**: Use automatic cache preservation for consistent development
+3. **Quick Cache Clearing**: Use UI button or keyboard shortcuts for immediate cache clearing
+4. **Restart Strategy**: Use quick restart for development, complete restart for troubleshooting
+5. **Environment Configuration**: Set appropriate environment variables for your development needs
+6. **Cache Performance Monitoring**: Monitor cache hit rates and memory usage
 
 ## 🤝 Contributing
 
@@ -723,6 +1034,47 @@ type(scope): description
 - `test`: Test changes
 - `chore`: Build process changes
 
+## 🛠️ Troubleshooting
+
+### Common Cache Issues
+1. **Cache Not Clearing**: Check if cache service is running and accessible
+2. **Cache State Not Preserved**: Verify restart script is using correct environment variables
+3. **Cache Button Not Working**: Check browser console for JavaScript errors
+4. **Cache Performance Issues**: Monitor cache hit rates and memory usage
+
+### Common Restart Issues
+1. **Server Not Starting**: Check logs and port availability
+2. **Cache Mode Not Applied**: Verify environment variables are set correctly
+3. **Restart Script Errors**: Check script permissions and dependencies
+4. **Cache State Detection Failed**: Verify cache API endpoints are accessible
+
+### Debugging Steps
+```bash
+# Check server status
+./restart --status
+
+# Check cache status
+curl -s http://localhost:8080/api/v1/cache/status
+
+# Check environment variables
+env | grep TIKTRACK
+
+# Check server logs
+tail -f Backend/logs/server_detailed.log
+```
+
+### Performance Monitoring
+```bash
+# Monitor cache performance
+curl -s http://localhost:8080/api/v1/cache/stats | jq '.data'
+
+# Monitor system health
+curl -s http://localhost:8080/api/health | jq '.components'
+
+# Monitor database performance
+curl -s http://localhost:8080/api/v1/query-optimization/stats | jq '.data'
+```
+
 ## 📞 Support
 
 ### Getting Help
@@ -739,6 +1091,6 @@ type(scope): description
 
 ---
 
-**Last Updated**: August 26, 2025  
-**Version**: 3.1 (Enhanced Filter System)  
+**Last Updated**: September 1, 2025  
+**Version**: 4.1 (Advanced Development Infrastructure & Smart Cache Management)  
 **Maintainer**: TikTrack Development Team

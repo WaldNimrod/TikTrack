@@ -604,7 +604,6 @@ async function saveCurrencyRecord() {
     if (result.status === 'success') {
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('הצלחה', `מטבע ${currencyData.symbol} נוסף בהצלחה למערכת`);
-      } else {
       }
       bootstrap.Modal.getInstance(document.getElementById('addCurrencyModal')).hide();
       loadCurrenciesData(); // טעינה מחדש של הנתונים
@@ -666,7 +665,6 @@ async function updateCurrencyRecord() {
     if (result.status === 'success') {
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('הצלחה', `מטבע ${currencyData.symbol} עודכן בהצלחה במערכת`);
-      } else {
       }
       bootstrap.Modal.getInstance(document.getElementById('editCurrencyModal')).hide();
       loadCurrenciesData(); // טעינה מחדש של הנתונים
@@ -701,7 +699,7 @@ async function updateCurrencyRecord() {
 // פונקציה לאישור מחיקת מטבע
 async function confirmDeleteCurrencyRecord(id) {
   // מציאת המטבע לפני מחיקה כדי להציג פרטים בהודעה
-  const currency = currenciesData.find(c => c.id == id);
+  const currency = currenciesData.find(c => c.id === id);
   const currencyInfo = currency ? `${currency.symbol} - ${currency.name}` : `מטבע ${id}`;
 
   try {
@@ -714,7 +712,6 @@ async function confirmDeleteCurrencyRecord(id) {
     if (result.status === 'success') {
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('הצלחה', `מטבע ${currencyInfo} נמחק בהצלחה מהמערכת`);
-      } else {
       }
       bootstrap.Modal.getInstance(document.getElementById('deleteCurrencyModal')).hide();
       loadCurrenciesData(); // טעינה מחדש של הנתונים
@@ -917,7 +914,6 @@ async function saveNoteRelationTypeRecord() {
     if (result.status === 'success') {
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('הצלחה', `סוג קישור ${noteTypeData.note_relation_type} נוסף בהצלחה למערכת`);
-      } else {
       }
       bootstrap.Modal.getInstance(document.getElementById('addNoteRelationTypeModal')).hide();
       loadNoteRelationTypesData(); // טעינה מחדש של הנתונים
@@ -963,7 +959,6 @@ async function updateNoteRelationTypeRecord() {
     if (result.status === 'success') {
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('הצלחה', `סוג קישור ${noteTypeData.note_relation_type} עודכן בהצלחה במערכת`);
-      } else {
       }
       bootstrap.Modal.getInstance(document.getElementById('editNoteRelationTypeModal')).hide();
       loadNoteRelationTypesData(); // טעינה מחדש של הנתונים
@@ -982,7 +977,7 @@ async function updateNoteRelationTypeRecord() {
 // פונקציה לאישור מחיקת סוג קישור
 async function confirmDeleteNoteRelationTypeRecord(id) {
   // מציאת סוג הקישור לפני מחיקה כדי להציג פרטים בהודעה
-  const noteType = noteRelationTypesData.find(n => n.id == id);
+  const noteType = noteRelationTypesData.find(n => n.id === id);
   const noteTypeInfo = noteType ? noteType.note_relation_type : `סוג קישור ${id}`;
 
   try {
@@ -995,7 +990,6 @@ async function confirmDeleteNoteRelationTypeRecord(id) {
     if (result.status === 'success') {
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('הצלחה', `סוג קישור ${noteTypeInfo} נמחק בהצלחה מהמערכת`);
-      } else {
       }
       bootstrap.Modal.getInstance(document.getElementById('deleteNoteRelationTypeModal')).hide();
       loadNoteRelationTypesData(); // טעינה מחדש של הנתונים

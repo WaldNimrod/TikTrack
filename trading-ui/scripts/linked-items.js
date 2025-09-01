@@ -207,6 +207,8 @@ function showLinkedItemsModal(data, itemType, itemId, mode = 'view') {
   if (itemType === 'ticker') {
     const tickerSymbol = data.tickerSymbol || (window.getTickerSymbol ? window.getTickerSymbol(itemId) : `טיקר ${itemId}`) || `טיקר ${itemId}`;
     modalTitle = `פריטים מקושרים לטיקר ${tickerSymbol}`;
+  } else if (itemType === 'trade_plan') {
+    modalTitle = 'פריטים מקושרים לתוכנית השקעה';
   } else {
     modalTitle = `פריטים מקושרים ל-${getItemTypeDisplayName(itemType)}`;
   }
@@ -251,12 +253,13 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
     headerTitle = 'מה קשור לטרייד:';
     itemName = data.tradeSymbol || `טרייד ${itemId}`;
     break;
-  case 'ticker':
+  case 'ticker': {
     headerTitle = 'מה קשור לטיקר:';
     // נסה לקבל את הסימבול מהנתונים או מהטבלה
     const tickerSymbol = data.tickerSymbol || (window.getTickerSymbol ? window.getTickerSymbol(itemId) : `טיקר ${itemId}`) || `טיקר ${itemId}`;
     itemName = tickerSymbol;
     break;
+  }
   case 'alert':
     headerTitle = 'מה קשור להתראה:';
     itemName = data.alertName || `התראה ${itemId}`;
@@ -269,12 +272,13 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
     headerTitle = 'מה קשור להערה:';
     itemName = data.noteTitle || `הערה ${itemId}`;
     break;
-  case 'trade_plan':
-    headerTitle = 'מה קשור לתוכנית טרייד:';
+  case 'trade_plan': {
+    headerTitle = 'מה קשור לתוכנית השקעה:';
     // נסה לקבל את פרטי התכנון מהנתונים הגלובליים או מהנתונים שהתקבלו
     const planDetails = getTradePlanDetails(itemId, data);
-    itemName = planDetails || `תוכנית ${itemId}`;
+    itemName = planDetails || `תוכנית השקעה ${itemId}`;
     break;
+  }
   case 'execution':
     headerTitle = 'מה קשור לביצוע:';
     itemName = data.executionName || `ביצוע ${itemId}`;
@@ -459,20 +463,52 @@ function createLinkedItemsModalContent(data, itemType, itemId, mode = 'view') {
       ` : ''}
   `;
 
-  // Add linked items list
+  // Add linked items lists with separation
   const childEntities = data.child_entities || [];
   const parentEntities = data.parent_entities || [];
-  const allEntities = [...childEntities, ...parentEntities];
 
-  if (allEntities.length > 0) {
-    content += createLinkedItemsList(allEntities, mode);
+  if (mode === 'view') {
+    // In view mode, show parents first, then children with separate headers
+    if (parentEntities.length > 0) {
+      content += `
+        <div class="section-header">
+          <h6 class="section-title">📋 אובייקטים אם (Parent Objects)</h6>
+          <p class="section-description">אובייקטים שמכילים או מפנים לאובייקט הנוכחי</p>
+        </div>
+      `;
+      content += createLinkedItemsList(parentEntities, mode);
+    }
+
+    if (childEntities.length > 0) {
+      content += `
+        <div class="section-header">
+          <h6 class="section-title">🔗 אובייקטים ילדים (Child Objects)</h6>
+          <p class="section-description">אובייקטים שמקושרים לאובייקט הנוכחי</p>
+        </div>
+      `;
+      content += createLinkedItemsList(childEntities, mode);
+    }
+
+    if (parentEntities.length === 0 && childEntities.length === 0) {
+      content += `
+        <div class="alert alert-warning">
+          <strong>ℹ️ לא נמצאו פריטים מקושרים</strong><br>
+          ל-${getItemTypeDisplayName(itemType)} זה אין פריטים מקושרים במערכת.
+        </div>
+      `;
+    }
   } else {
-    content += `
-      <div class="alert alert-warning">
-        <strong>ℹ️ לא נמצאו פריטים מקושרים</strong><br>
-        ל-${getItemTypeDisplayName(itemType)} זה אין פריטים מקושרים במערכת.
-      </div>
-    `;
+    // In warningBlock mode, show only children (existing behavior)
+    if (childEntities.length > 0) {
+      content += createLinkedItemsList(childEntities, mode);
+    } else {
+      content += `
+        <div class="alert alert-warning">
+          <strong>ℹ️ לא נמצאו פריטים מקושרים</strong><br>
+          ל-${getItemTypeDisplayName(itemType)} זה אין פריטים מקושרים במערכת.
+        </div>
+      `;
+    }
   }
 
   content += `
@@ -507,7 +543,7 @@ function createLinkedItemsList(items, mode = 'view') {
     const statusBadge = getStatusBadge(item.status);
 
     listHtml += `
-      <div class="linked-item-row ${item.type}">
+      <div class="linked-item-row ${item.type} linked-item-${item.type}">
         <div class="linked-item-col">
           <div class="linked-item-icon">${icon}</div>
           <div class="linked-item-type">
@@ -605,7 +641,7 @@ function getRulesExplanation(itemType, data) {
   // הוספת כללים ספציפיים לפי סוג האלמנט
 
   switch (itemType) {
-  case 'trade_plan':
+  case 'trade_plan': {
     const activeTrades = childEntities.filter(entity => entity.type === 'trade' && entity.status === 'open');
     const closedTrades = childEntities.filter(entity => entity.type === 'trade' && entity.status === 'closed');
     const notes = childEntities.filter(entity => entity.type === 'note');
@@ -655,7 +691,7 @@ function getRulesExplanation(itemType, data) {
       return explanation;
     }
 
-  case 'trade':
+  case 'trade': {
     const linkedExecutions = childEntities.filter(entity => entity.type === 'execution');
     const linkedNotes = childEntities.filter(entity => entity.type === 'note');
     const linkedAlerts = childEntities.filter(entity => entity.type === 'alert');
@@ -671,8 +707,9 @@ function getRulesExplanation(itemType, data) {
       explanation += `<br>• ${linkedAlerts.length} התראה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
     }
     return explanation;
+  }
 
-  case 'ticker':
+  case 'ticker': {
     const linkedTrades = childEntities.filter(entity => entity.type === 'trade');
     const linkedPlans = childEntities.filter(entity => entity.type === 'trade_plan');
     const tickerNotes = childEntities.filter(entity => entity.type === 'note');
@@ -696,6 +733,7 @@ function getRulesExplanation(itemType, data) {
       explanation += `<br>• ${tickerAlerts.length} התראה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
     }
     return explanation;
+  }
 
   default:
     return 'יש פריטים מקושרים שמונעים ביטול/מחיקה של פריט זה. יש לטפל בפריטים המקושרים קודם.';
@@ -728,7 +766,7 @@ function getTradePlanDetails(planId, data = null) {
         }
 
         const date = plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
-        return `${symbol} מתאריך ${date}`;
+        return `לתוכנית השקעה ב${symbol} מתאריך ${date}`;
       }
     }
 
@@ -744,7 +782,7 @@ function getTradePlanDetails(planId, data = null) {
       }
 
       const date = data.entity_details.created_at ? new Date(data.entity_details.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
-      return `${symbol} מתאריך ${date}`;
+      return `לתוכנית השקעה ב${symbol} מתאריך ${date}`;
     }
 
     // נסה לקבל מהנתונים הראשיים של ה-API
@@ -754,7 +792,7 @@ function getTradePlanDetails(planId, data = null) {
         symbol = data.ticker.symbol;
       }
       const date = data.created_at ? new Date(data.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
-      return `${symbol} מתאריך ${date}`;
+      return `לתוכנית השקעה ב${symbol} מתאריך ${date}`;
     }
 
     // נסה לקבל מהנתונים הגלובליים של הטיקר
@@ -764,7 +802,7 @@ function getTradePlanDetails(planId, data = null) {
         const ticker = window.tickersData.find(t => t.id == plan.ticker_id);
         if (ticker && ticker.symbol) {
           const date = plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
-          return `${ticker.symbol} מתאריך ${date}`;
+          return `לתוכנית השקעה ב${ticker.symbol} מתאריך ${date}`;
         }
       }
     }
@@ -776,7 +814,7 @@ function getTradePlanDetails(planId, data = null) {
       const dateCell = planRow.querySelector('[data-column="created_at"]');
       const symbol = symbolCell ? symbolCell.textContent.trim() : 'לא מוגדר';
       const date = dateCell ? new Date(dateCell.textContent.trim()).toLocaleDateString('he-IL') : 'לא מוגדר';
-      return `${symbol} מתאריך ${date}`;
+      return `לתוכנית השקעה ב${symbol} מתאריך ${date}`;
     }
 
     return `תוכנית ${planId}`;
@@ -798,22 +836,22 @@ function getItemTypeIcon(type) {
   // השתמש בפונקציה הגלובלית אם היא זמינה
   if (window.uiUtils && window.uiUtils.getItemTypeIcon) {
     const globalIcon = window.uiUtils.getItemTypeIcon(type);
-    // החלף את הגודל ל-24px עבור חלון המקושרים
-    return globalIcon.replace('width: 16px; height: 16px;', 'width: 24px; height: 24px;').replace('class="', 'class="linked-item-icon-img ');
+    // החלף את הגודל ל-48px עבור חלון המקושרים (פי 2 מהמקורי)
+    return globalIcon.replace('width: 16px; height: 16px;', 'width: 48px; height: 48px;').replace('class="', 'class="linked-item-icon-img ');
   }
 
   // ברירת מחדל אם הפונקציה הגלובלית לא זמינה
   const icons = {
-    'trade': '<img src="/images/icons/trades.svg" alt="טרייד" class="linked-item-icon-img" width="24" height="24">',
-    'account': '<img src="/images/icons/accounts.svg" alt="חשבון" class="linked-item-icon-img" width="24" height="24">',
-    'ticker': '<img src="/images/icons/tickers.svg" alt="טיקר" class="linked-item-icon-img" width="24" height="24">',
-    'alert': '<img src="/images/icons/alerts.svg" alt="התראה" class="linked-item-icon-img" width="24" height="24">',
-    'cash_flow': '<img src="/images/icons/cash_flows.svg" alt="תזרים מזומנים" class="linked-item-icon-img" width="24" height="24">',
-    'note': '<img src="/images/icons/notes.svg" alt="הערה" class="linked-item-icon-img" width="24" height="24">',
-    'trade_plan': '<img src="/images/icons/trade_plans.svg" alt="תכנון טרייד" class="linked-item-icon-img" width="24" height="24">',
-    'execution': '<img src="/images/icons/executions.svg" alt="ביצוע" class="linked-item-icon-img" width="24" height="24">',
+    'trade': '<img src="/images/icons/trades.svg" alt="טרייד" class="linked-item-icon-img" width="48" height="48">',
+    'account': '<img src="/images/icons/accounts.svg" alt="חשבון" class="linked-item-icon-img" width="48" height="48">',
+    'ticker': '<img src="/images/icons/tickers.svg" alt="טיקר" class="linked-item-icon-img" width="48" height="48">',
+    'alert': '<img src="/images/icons/alerts.svg" alt="התראה" class="linked-item-icon-img" width="48" height="48">',
+    'cash_flow': '<img src="/images/icons/cash_flows.svg" alt="תזרים מזומנים" class="linked-item-icon-img" width="48" height="48">',
+    'note': '<img src="/images/icons/notes.svg" alt="הערה" class="linked-item-icon-img" width="48" height="48">',
+    'trade_plan': '<img src="/images/icons/trade_plans.svg" alt="תכנון טרייד" class="linked-item-icon-img" width="48" height="48">',
+    'execution': '<img src="/images/icons/executions.svg" alt="ביצוע" class="linked-item-icon-img" width="48" height="48">',
   };
-  return icons[type] || '<img src="/images/icons/home.svg" alt="דף הבית" class="linked-item-icon-img" width="24" height="24">';
+  return icons[type] || '<img src="/images/icons/home.svg" alt="דף הבית" class="linked-item-icon-img" width="48" height="48">';
 }
 
 /**
@@ -832,7 +870,7 @@ function getItemTypeDisplayName(type) {
     'alert': 'Alert',
     'cash_flow': 'Cash Flow',
     'note': 'Note',
-    'trade_plan': 'Trade Plan',
+    'trade_plan': 'תוכנית השקעה',
     'execution': 'Execution',
   };
   return names[type] || 'Item';

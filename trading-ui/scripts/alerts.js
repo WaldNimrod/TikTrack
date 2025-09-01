@@ -1866,7 +1866,7 @@ async function deleteAlert(alertId) {
         },
       );
     } else {
-      // fallback אחרון - confirm רגיל
+      // fallback אחרון - confirm רגיל (אם מערכת התראות לא זמינה)
       const confirmed = confirm('האם אתה בטוח שברצונך למחוק התראה זו?');
       if (confirmed) {
         await confirmDeleteAlert(alertId);
@@ -2080,7 +2080,11 @@ document.addEventListener('DOMContentLoaded', function () {
   // בדיקה שהמערכת זמינה
   if (typeof window.showSuccessNotification !== 'function') {
     console.error('❌ מערכת התראות לא זמינה!');
-    alert('שגיאה: מערכת התראות לא זמינה. בדוק את טעינת הקבצים.');
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'מערכת התראות לא זמינה. בדוק את טעינת הקבצים.');
+    } else {
+      console.error('שגיאה: מערכת התראות לא זמינה. בדוק את טעינת הקבצים.');
+    }
     return;
   }
 
@@ -2213,12 +2217,9 @@ window.loadAlerts = loadAlerts;
 
 // פונקציות התראה מיובאות מ-main.js - אין צורך בייצוא כפול
 
-// ניקוי הודעות קונסולה אחרי זמן קצר
+// בדיקת זמינות פונקציות (ללא ניקוי אוטומטי)
 setTimeout(() => {
-  // Clearing console messages
-  if (console.clear) {
-    console.clear();
-  }
+  console.log('🔍 בדיקת זמינות פונקציות alerts.js - ' + new Date().toLocaleTimeString());
 }, 18000);
 
 // ========================================
@@ -2256,6 +2257,7 @@ async function reactivateAlert(alertId) {
     });
     if (!confirmed) {return;}
   } else {
+    // Fallback למקרה שמערכת התראות לא זמינה
     if (!confirm('האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?')) {
       return;
     }

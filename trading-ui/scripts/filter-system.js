@@ -286,84 +286,96 @@ class FilterSystem {
       endDate = todayStr;
       break;
 
-    case 'אתמול':
+    case 'אתמול': {
       const yesterday = new Date(today);
       yesterday.setDate(today.getDate() - 1);
       startDate = yesterday.toISOString().split('T')[0];
       endDate = startDate;
       break;
+    }
 
-    case 'השבוע':
+    case 'השבוע': {
       const startOfWeek = new Date(today);
       const dayOfWeek = today.getDay();
       startOfWeek.setDate(today.getDate() - dayOfWeek);
       startDate = startOfWeek.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case 'שבוע אחרון':
+    case 'שבוע אחרון': {
       const weekAgo = new Date(today);
       weekAgo.setDate(today.getDate() - 7);
       startDate = weekAgo.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case 'חודש אחרון':
+    case 'חודש אחרון': {
       const monthAgo = new Date(today);
       monthAgo.setMonth(today.getMonth() - 1);
       startDate = monthAgo.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case '3 חודשים':
+    case '3 חודשים': {
       const threeMonthsAgo = new Date(today);
       threeMonthsAgo.setMonth(today.getMonth() - 3);
       startDate = threeMonthsAgo.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case 'MTD':
+    case 'MTD': {
       startDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case 'YTD':
+    case 'YTD': {
       startDate = new Date(today.getFullYear(), 0, 1).toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case '30 יום':
+    case '30 יום': {
       const thirtyDaysAgo = new Date(today);
       thirtyDaysAgo.setDate(today.getDate() - 30);
       startDate = thirtyDaysAgo.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case '60 יום':
+    case '60 יום': {
       const sixtyDaysAgo = new Date(today);
       sixtyDaysAgo.setDate(today.getDate() - 60);
       startDate = sixtyDaysAgo.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case '90 יום':
+    case '90 יום': {
       const ninetyDaysAgo = new Date(today);
       ninetyDaysAgo.setDate(today.getDate() - 90);
       startDate = ninetyDaysAgo.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case 'שנה':
+    case 'שנה': {
       const yearAgo = new Date(today);
       yearAgo.setFullYear(today.getFullYear() - 1);
       startDate = yearAgo.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case 'שנה קודמת':
+    case 'שנה קודמת': {
       startDate = new Date(today.getFullYear() - 1, 0, 1).toISOString().split('T')[0];
       endDate = new Date(today.getFullYear() - 1, 11, 31).toISOString().split('T')[0];
       break;
+    }
 
     default:
       return null;

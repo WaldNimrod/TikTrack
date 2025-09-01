@@ -62,6 +62,56 @@ def check_cache_health():
         }), 500
 
 
+@cache_management_bp.route('/status', methods=['GET'])
+def get_cache_status():
+    """Get cache system status"""
+    try:
+        stats = get_cache_stats()
+        health = cache_health_check()
+        
+        # Determine overall status
+        if health['status'] == 'healthy':
+            overall_status = 'active'
+        elif health['status'] == 'warning':
+            overall_status = 'degraded'
+        else:
+            overall_status = 'inactive'
+        
+        status_info = {
+            'system': 'Advanced Cache System',
+            'version': '2.0.0',
+            'status': overall_status,
+            'health': health['status'],
+            'memory_usage_mb': stats['estimated_memory_mb'],
+            'memory_usage_percent': stats['memory_usage_percent'],
+            'total_entries': stats['total_entries'],
+            'hit_rate_percent': stats['hit_rate_percent'],
+            'endpoints': [
+                '/stats',
+                '/health',
+                '/clear',
+                '/invalidate'
+            ],
+            'features': [
+                'Dependency-based invalidation',
+                'TTL management',
+                'Memory optimization',
+                'Performance monitoring'
+            ]
+        }
+        
+        return jsonify({
+            'status': 'success',
+            'data': status_info
+        }), 200
+    except Exception as e:
+        logger.error(f"Failed to get cache status: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Failed to get cache status: {str(e)}'
+        }), 500
+
+
 @cache_management_bp.route('/clear', methods=['POST'])
 def clear_all_cache():
     """Clear all cache entries"""

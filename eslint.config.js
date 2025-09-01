@@ -89,10 +89,26 @@ module.exports = [
         // Global data variables
         'tickersData': 'readonly',
         'trade_plansData': 'readonly',
+        'tradesData': 'readonly',
         'tickerId': 'readonly',
         // UI functions
         'openFunctionModal': 'readonly',
-        'updateSortIcons': 'readonly'
+        'updateSortIcons': 'readonly',
+        // Header system functions
+        'updateStatusFilterDisplayText': 'readonly',
+        'updateTypeFilterDisplayText': 'readonly',
+        'updateDateRangeFilterDisplayText': 'readonly',
+        // Linked items functions
+        'getItemTypeDisplayName': 'readonly',
+        // Ticker functions from tickers.js
+        'getTickerSymbol': 'readonly',
+        // Notification system functions from notification-system.js
+        'showModalNotification': 'readonly',
+        'createToastContainer': 'readonly',
+        // Sort state functions from tables.js
+        'loadTradesSortState': 'readonly',
+        // Confirmation dialog functions
+        'confirmed': 'readonly'
       },
     },
     rules: {

@@ -1349,6 +1349,7 @@ async function cancelAccount(accountId, accountName) {
           });
           if (!confirmed) {return;}
         } else {
+          // Fallback למקרה שמערכת התראות לא זמינה
           if (!confirm(`האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`)) {
             return;
           }

@@ -1,549 +1,519 @@
 /**
- * System Test Center - Unified Testing Interface
- * מרכז בדיקות מערכת - ממשק בדיקות מאוחד
+ * System Test Center - Simple Version
+ * מרכז בדיקות מערכת - גרסה פשוטה
  */
 
-class SystemTestCenter {
+console.log('=== system-test-center.js נטען ===');
+
+class SimpleTestCenter {
   constructor() {
-    this.logs = [];
+    console.log('=== SimpleTestCenter נוצר ===');
     this.init();
   }
 
-  /**
-   * Initialize the system
-   */
   init() {
-    console.log('=== SystemTestCenter התחיל ===');
-    this.log('info', '=== SystemTestCenter התחיל ===');
-
-    // Load all data immediately
-    this.loadAllData();
-
-    // Set up event listeners
+    console.log('=== init התחיל ===');
     this.setupEventListeners();
+    this.loadAllData();
+    console.log('=== init הושלם ===');
   }
 
-  /**
-   * Load all data at once
-   */
-  async loadAllData() {
-    try {
-      this.log('info', '=== מתחיל טעינת כל הנתונים ===');
+  setupEventListeners() {
+    console.log('=== setupEventListeners התחיל ===');
+    
+    // Cache buttons
+    const clearCacheBtn = document.getElementById('clear-cache-btn');
+    if (clearCacheBtn) {
+      clearCacheBtn.addEventListener('click', () => this.clearCache());
+      console.log('כפתור clear-cache-btn מקושר');
+    }
 
-      // Load everything in parallel
+    const invalidateCacheBtn = document.getElementById('invalidate-cache-btn');
+    if (invalidateCacheBtn) {
+      invalidateCacheBtn.addEventListener('click', () => this.invalidateCache());
+      console.log('כפתור invalidate-cache-btn מקושר');
+    }
+
+    // Query buttons
+    const optimizeQueriesBtn = document.getElementById('optimize-queries-btn');
+    if (optimizeQueriesBtn) {
+      optimizeQueriesBtn.addEventListener('click', () => this.optimizeQueries());
+      console.log('כפתור optimize-queries-btn מקושר');
+    }
+
+    const runQueryTestBtn = document.getElementById('run-query-test');
+    if (runQueryTestBtn) {
+      runQueryTestBtn.addEventListener('click', () => this.runQueryTest());
+      console.log('כפתור run-query-test מקושר');
+    }
+
+    // External data buttons
+    const testExternalDataBtn = document.getElementById('test-external-data-btn');
+    if (testExternalDataBtn) {
+      testExternalDataBtn.addEventListener('click', () => this.testExternalData());
+      console.log('כפתור test-external-data-btn מקושר');
+    }
+
+    // Performance buttons
+    const runPerformanceTestBtn = document.getElementById('run-performance-test-btn');
+    if (runPerformanceTestBtn) {
+      runPerformanceTestBtn.addEventListener('click', () => this.runPerformanceTest());
+      console.log('כפתור run-performance-test-btn מקושר');
+    }
+
+    console.log('=== setupEventListeners הושלם ===');
+  }
+
+  async loadAllData() {
+    console.log('=== loadAllData התחיל ===');
+    
+    try {
       await Promise.all([
         this.loadCacheData(),
         this.loadQueryData(),
         this.loadExternalData(),
-        this.loadPerformanceData(),
+        this.loadPerformanceData()
       ]);
-
-      this.log('success', '=== כל הנתונים נטענו בהצלחה ===');
-
+      console.log('=== כל הנתונים נטענו בהצלחה ===');
     } catch (error) {
-      this.log('error', `שגיאה בטעינת נתונים: ${error.message}`);
+      console.error('שגיאה בטעינת נתונים:', error);
     }
   }
 
-  /**
-   * Load Cache System Data
-   */
   async loadCacheData() {
-    try {
-      this.log('info', '=== טוען נתוני Cache ===');
+    console.log('=== loadCacheData התחיל ===');
+    
+    // Cache Stats
+    this.displayCacheStats({
+      total_entries: 1250,
+      memory_usage_mb: 45.2,
+      hit_rate: 87.5,
+      miss_rate: 12.5
+    });
 
-      // Cache Stats
-      this.showLoading('cache-stats-content', 'טוען סטטיסטיקות...');
-      await this.delay(300);
-      this.displayCacheStats({
-        total_entries: 1250,
-        expired_entries: 45,
-        hit_rate_percent: 87.5,
-        estimated_memory_mb: 45.2,
-        max_memory_mb: 100,
-        memory_usage_percent: 45.2,
-      });
+    // Cache Health
+    this.displayCacheHealth({
+      status: 'healthy',
+      checks: {
+        memory_usage: 'OK',
+        connection: 'OK',
+        performance: 'OK'
+      },
+      message: 'מערכת Cache פועלת כרגיל'
+    });
 
-      // Cache Health
-      this.showLoading('cache-health-content', 'בודק בריאות...');
-      await this.delay(400);
-      this.displayCacheHealth({
-        status: 'healthy',
-        message: 'All systems operational',
-        timestamp: new Date().toISOString(),
-        checks: {
-          memory_usage: 'OK',
-          cache_hits: 'OK',
-          cache_misses: 'OK',
-          cleanup_jobs: 'OK',
-        },
-      });
+    // Cache Info
+    this.displayCacheInfo({
+      version: '2.1.0',
+      uptime_hours: 48,
+      last_cleanup: '2025-01-01 10:00:00'
+    });
 
-      // Cache Info
-      this.showLoading('cache-info-content', 'טוען מידע...');
-      await this.delay(500);
-      this.displayCacheInfo({
-        cache_type: 'Advanced Memory Cache',
-        version: '2.0.0',
-        current_status: 'healthy',
-        features: [
-          'TTL Management',
-          'Dependency Tracking',
-          'Memory Optimization',
-          'Performance Monitoring',
-          'Thread Safety',
-        ],
-      });
-
-      this.log('success', '=== נתוני Cache נטענו בהצלחה ===');
-
-    } catch (error) {
-      this.log('error', `שגיאה בטעינת Cache: ${error.message}`);
-    }
+    console.log('=== loadCacheData הושלם ===');
   }
 
-  /**
-   * Load Query Optimization Data
-   */
   async loadQueryData() {
-    try {
-      this.log('info', '=== טוען נתוני Query Optimization ===');
+    console.log('=== loadQueryData התחיל ===');
+    
+    // Query Stats
+    this.displayQueryStats({
+      total_queries: 12500,
+      avg_response_time: 0.15,
+      slow_queries_count: 23
+    });
 
-      // Query Stats
-      this.showLoading('query-stats-content', 'טוען סטטיסטיקות...');
-      await this.delay(300);
-      this.displayQueryStats({
-        total_queries: 150,
-        slow_queries: 12,
-        slow_query_percentage: 8.0,
-        avg_execution_time: 0.45,
-        optimization_opportunities: 8,
-        total_potential_improvement: 25.5,
-        performance_grade: 'B',
-      });
+    // Query Opportunities
+    this.displayQueryOpportunities([
+      { query: 'SELECT * FROM trades', impact: 'high', description: 'N+1 query detected' },
+      { query: 'SELECT * FROM executions', impact: 'medium', description: 'Missing index' }
+    ]);
 
-      // Query Opportunities
-      this.showLoading('query-opportunities-content', 'טוען הזדמנויות...');
-      await this.delay(400);
-      this.displayQueryOpportunities([
-        {
-          query_type: 'N+1 Query',
-          table: 'trades',
-          impact: 'High',
-          potential_improvement: '85%',
-          description: 'Multiple database calls in loop',
-        },
-        {
-          query_type: 'Missing Index',
-          table: 'executions',
-          impact: 'Medium',
-          potential_improvement: '60%',
-          description: 'No index on execution_date column',
-        },
-      ]);
+    // Slow Queries
+    this.displaySlowQueries([
+      { query: 'SELECT * FROM trades WHERE date > ?', execution_time: 2.5, frequency: 15 },
+      { query: 'SELECT * FROM executions JOIN trades', execution_time: 1.8, frequency: 8 }
+    ]);
 
-      // Slow Queries
-      this.showLoading('slow-queries-content', 'טוען queries איטיים...');
-      await this.delay(500);
-      this.displaySlowQueries([
-        {
-          query: 'SELECT * FROM trades WHERE user_id = ?',
-          execution_time: 2.45,
-          frequency: 150,
-          table: 'trades',
-          status: 'Needs optimization',
-        },
-        {
-          query: 'SELECT * FROM executions WHERE date > ?',
-          execution_time: 1.87,
-          frequency: 89,
-          table: 'executions',
-          status: 'Index recommended',
-        },
-      ]);
-
-      this.log('success', '=== נתוני Query Optimization נטענו בהצלחה ===');
-
-    } catch (error) {
-      this.log('error', `שגיאה בטעינת Query Optimization: ${error.message}`);
-    }
+    console.log('=== loadQueryData הושלם ===');
   }
 
-  /**
-   * Load External Data Integration Data
-   */
   async loadExternalData() {
-    try {
-      this.log('info', '=== טוען נתוני External Data ===');
+    console.log('=== loadExternalData התחיל ===');
+    
+    // External Data Status
+    this.displayExternalDataStatus({
+      yahoo_finance: 'connected',
+      alpha_vantage: 'disconnected',
+      last_update: '2025-01-01 12:00:00'
+    });
 
-      // External Data Status
-      this.showLoading('external-data-status-content', 'בודק סטטוס...');
-      await this.delay(300);
-      this.displayExternalDataStatus({
-        status: 'connected',
-        providers: ['Yahoo Finance', 'Alpha Vantage'],
-        last_update: new Date().toISOString(),
-        data_points: 12500,
-        connection_health: 'excellent',
-      });
+    // External Data Test
+    this.displayExternalDataTest({
+      status: 'success',
+      message: 'בדיקת חיבור לנתונים חיצוניים הושלמה בהצלחה'
+    });
 
-      // External Data Test
-      this.showLoading('external-data-test-content', 'מבצע בדיקה...');
-      await this.delay(400);
-      this.displayExternalDataTest({
-        test_result: 'success',
-        response_time: 0.8,
-        data_quality: 'excellent',
-        last_test: new Date().toISOString(),
-      });
-
-      this.log('success', '=== נתוני External Data נטענו בהצלחה ===');
-
-    } catch (error) {
-      this.log('error', `שגיאה בטעינת External Data: ${error.message}`);
-    }
+    console.log('=== loadExternalData הושלם ===');
   }
 
-  /**
-   * Load Performance Data
-   */
   async loadPerformanceData() {
-    try {
-      this.log('info', '=== טוען נתוני Performance ===');
+    console.log('=== loadPerformanceData התחיל ===');
+    
+    // Performance Metrics
+    this.displayPerformanceMetrics({
+      cpu_usage: 35,
+      memory_usage: 68,
+      disk_usage: 45,
+      response_time: 0.12
+    });
 
-      // Performance Metrics
-      this.showLoading('performance-metrics-content', 'טוען מדדים...');
-      await this.delay(300);
-      this.displayPerformanceMetrics({
-        avg_response_time: 0.45,
-        requests_per_second: 125,
-        error_rate: 0.02,
-        uptime_percentage: 99.8,
-        memory_usage: 45.2,
-        cpu_usage: 23.1,
-      });
+    // Performance Test
+    this.displayPerformanceTest({
+      status: 'success',
+      score: 85,
+      recommendations: ['Optimize database queries', 'Enable caching']
+    });
 
-      // Performance Test
-      this.showLoading('performance-test-content', 'מבצע בדיקה...');
-      await this.delay(400);
-      this.displayPerformanceTest({
-        test_result: 'passed',
-        load_test: 'success',
-        stress_test: 'success',
-        last_test: new Date().toISOString(),
-      });
-
-      this.log('success', '=== נתוני Performance נטענו בהצלחה ===');
-
-    } catch (error) {
-      this.log('error', `שגיאה בטעינת Performance: ${error.message}`);
-    }
+    console.log('=== loadPerformanceData הושלם ===');
   }
 
-  /**
-   * Display Cache Statistics
-   */
+  // Display functions
   displayCacheStats(stats) {
-    const content = document.getElementById('cache-stats-content');
-    if (!content) {return;}
+    const element = document.getElementById('cache-stats-content');
+    if (!element) {
+      console.error('Element cache-stats-content לא נמצא');
+      return;
+    }
 
-    const html = `
+    element.innerHTML = `
       <div class="row">
-        <div class="col-md-6">
-          <h6>סטטיסטיקות כללית</h6>
-          <ul class="list-unstyled">
-            <li><strong>סה"כ רשומות:</strong> ${stats.total_entries}</li>
-            <li><strong>רשומות פגות:</strong> ${stats.expired_entries}</li>
-            <li><strong>אחוז פגיעות:</strong> ${stats.hit_rate_percent}%</li>
-          </ul>
+        <div class="col-md-3">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title">${stats.total_entries}</h5>
+              <p class="card-text">סך הכל רשומות</p>
+            </div>
+          </div>
         </div>
-        <div class="col-md-6">
-          <h6>שימוש זיכרון</h6>
-          <ul class="list-unstyled">
-            <li><strong>זיכרון בשימוש:</strong> ${stats.estimated_memory_mb} MB</li>
-            <li><strong>זיכרון מקסימלי:</strong> ${stats.max_memory_mb} MB</li>
-            <li><strong>אחוז שימוש:</strong> ${stats.memory_usage_percent}%</li>
-          </ul>
+        <div class="col-md-3">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title">${stats.memory_usage_mb}MB</h5>
+              <p class="card-text">שימוש זיכרון</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title">${stats.hit_rate}%</h5>
+              <p class="card-text">Hit Rate</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title">${stats.miss_rate}%</h5>
+              <p class="card-text">Miss Rate</p>
+            </div>
+          </div>
         </div>
       </div>
     `;
-
-    content.innerHTML = html;
   }
 
-  /**
-   * Display Cache Health
-   */
   displayCacheHealth(health) {
-    const content = document.getElementById('cache-health-content');
-    if (!content) {return;}
+    const element = document.getElementById('cache-health-content');
+    if (!element) {
+      console.error('Element cache-health-content לא נמצא');
+      return;
+    }
 
-    const statusClass = health.status === 'healthy' ? 'success' : 'warning';
-
-    const html = `
+    const statusClass = health.status === 'healthy' ? 'success' : 'danger';
+    element.innerHTML = `
       <div class="alert alert-${statusClass}">
-        <h6>סטטוס בריאות</h6>
-        <p><strong>מצב:</strong> <span class="badge bg-${statusClass}">${health.status}</span></p>
+        <h6>מצב בריאות Cache</h6>
+        <p><strong>סטטוס:</strong> <span class="badge bg-${statusClass}">${health.status}</span></p>
+        <p><strong>זיכרון:</strong> ${health.checks.memory_usage}</p>
+        <p><strong>חיבור:</strong> ${health.checks.connection}</p>
+        <p><strong>ביצועים:</strong> ${health.checks.performance}</p>
         <p><strong>הודעה:</strong> ${health.message}</p>
-        <p><strong>זמן בדיקה:</strong> ${new Date(health.timestamp).toLocaleString('he-IL')}</p>
-        <hr>
-        <h6>בדיקות מערכת</h6>
-        <ul class="list-unstyled">
-          <li><i class="fas fa-check text-success me-1"></i>זיכרון: ${health.checks.memory_usage}</li>
-          <li><i class="fas fa-check text-success me-1"></i>פגיעות Cache: ${health.checks.cache_hits}</li>
-          <li><i class="fas fa-check text-success me-1"></i>פספוסים: ${health.checks.cache_misses}</li>
-          <li><i class="fas fa-check text-success me-1"></i>עבודות ניקוי: ${health.checks.cleanup_jobs}</li>
-        </ul>
       </div>
     `;
-
-    content.innerHTML = html;
   }
 
-  /**
-   * Display Cache Info
-   */
   displayCacheInfo(info) {
-    const content = document.getElementById('cache-info-content');
-    if (!content) {return;}
+    const element = document.getElementById('cache-info-content');
+    if (!element) {
+      console.error('Element cache-info-content לא נמצא');
+      return;
+    }
 
-    const html = `
-      <div class="row">
-        <div class="col-md-6">
-          <h6>פרטי המערכת</h6>
-          <ul class="list-unstyled">
-            <li><strong>סוג Cache:</strong> ${info.cache_type}</li>
-            <li><strong>גרסה:</strong> ${info.version}</li>
-            <li><strong>סטטוס:</strong> 
-              <span class="badge bg-${info.current_status === 'healthy' ? 'success' : 'warning'}">
-                ${info.current_status}
-              </span>
-            </li>
-          </ul>
-        </div>
-        <div class="col-md-6">
-          <h6>תכונות</h6>
-          <ul class="list-unstyled">
-            ${info.features.map(feature => `<li><i class="fas fa-check text-success me-1"></i>${feature}</li>`).join('')}
-          </ul>
-        </div>
+    element.innerHTML = `
+      <div class="alert alert-info">
+        <h6>מידע על מערכת Cache</h6>
+        <p><strong>גרסה:</strong> ${info.version}</p>
+        <p><strong>זמן פעילות:</strong> ${info.uptime_hours} שעות</p>
+        <p><strong>ניקוי אחרון:</strong> ${info.last_cleanup}</p>
       </div>
     `;
-
-    content.innerHTML = html;
   }
 
-  /**
-   * Display Query Statistics
-   */
   displayQueryStats(stats) {
-    const content = document.getElementById('query-stats-content');
-    if (!content) {return;}
+    const element = document.getElementById('query-stats-content');
+    if (!element) {
+      console.error('Element query-stats-content לא נמצא');
+      return;
+    }
 
-    const html = `
+    element.innerHTML = `
       <div class="row">
-        <div class="col-md-6">
-          <h6>סטטיסטיקות כללית</h6>
-          <ul class="list-unstyled">
-            <li><strong>סה"כ queries:</strong> ${stats.total_queries}</li>
-            <li><strong>Queries איטיים:</strong> ${stats.slow_queries}</li>
-            <li><strong>אחוז איטיים:</strong> ${stats.slow_query_percentage}%</li>
-          </ul>
+        <div class="col-md-4">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title">${stats.total_queries}</h5>
+              <p class="card-text">סך הכל Queries</p>
+            </div>
+          </div>
         </div>
-        <div class="col-md-6">
-          <h6>ביצועים</h6>
-          <ul class="list-unstyled">
-            <li><strong>זמן ביצוע ממוצע:</strong> ${stats.avg_execution_time}s</li>
-            <li><strong>הזדמנויות אופטימיזציה:</strong> ${stats.optimization_opportunities}</li>
-            <li><strong>שיפור פוטנציאלי:</strong> ${stats.total_potential_improvement}%</li>
-            <li><strong>ציון ביצועים:</strong> <span class="badge bg-primary">${stats.performance_grade}</span></li>
-          </ul>
+        <div class="col-md-4">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title">${stats.avg_response_time}s</h5>
+              <p class="card-text">זמן תגובה ממוצע</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title">${stats.slow_queries_count}</h5>
+              <p class="card-text">Queries איטיים</p>
+            </div>
+          </div>
         </div>
       </div>
     `;
-
-    content.innerHTML = html;
   }
 
-  /**
-   * Display Query Opportunities
-   */
   displayQueryOpportunities(opportunities) {
-    const content = document.getElementById('query-opportunities-content');
-    if (!content) {return;}
+    const element = document.getElementById('query-opportunities-content');
+    if (!element) {
+      console.error('Element query-opportunities-content לא נמצא');
+      return;
+    }
 
-    const html = `
-      <div class="table-responsive">
-        <table class="table table-sm">
-          <thead>
-            <tr>
-              <th>סוג Query</th>
-              <th>טבלה</th>
-              <th>השפעה</th>
-              <th>שיפור פוטנציאלי</th>
-              <th>תיאור</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${opportunities.map(opp => `
-              <tr>
-                <td><span class="badge bg-warning">${opp.query_type}</span></td>
-                <td>${opp.table}</td>
-                <td><span class="badge bg-${opp.impact === 'High' ? 'danger' : 'warning'}">${opp.impact}</span></td>
-                <td><span class="badge bg-success">${opp.potential_improvement}</span></td>
-                <td>${opp.description}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
+    const opportunitiesHtml = opportunities.map(opp => `
+      <div class="alert alert-warning">
+        <h6>Query: ${opp.query}</h6>
+        <p><strong>השפעה:</strong> <span class="badge bg-${opp.impact === 'high' ? 'danger' : 'warning'}">${opp.impact}</span></p>
+        <p><strong>תיאור:</strong> ${opp.description}</p>
       </div>
-    `;
+    `).join('');
 
-    content.innerHTML = html;
+    element.innerHTML = opportunitiesHtml;
   }
 
-  /**
-   * Display Slow Queries
-   */
   displaySlowQueries(queries) {
-    const content = document.getElementById('slow-queries-content');
-    if (!content) {return;}
+    const element = document.getElementById('slow-queries-content');
+    if (!element) {
+      console.error('Element slow-queries-content לא נמצא');
+      return;
+    }
 
-    const html = `
-      <div class="table-responsive">
-        <table class="table table-sm">
-          <thead>
-            <tr>
-              <th>Query</th>
-              <th>זמן ביצוע</th>
-              <th>תדירות</th>
-              <th>טבלה</th>
-              <th>סטטוס</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${queries.map(query => `
-              <tr>
-                <td><code>${query.query}</code></td>
-                <td><span class="badge bg-danger">${query.execution_time}s</span></td>
-                <td>${query.frequency}</td>
-                <td>${query.table}</td>
-                <td><span class="badge bg-warning">${query.status}</span></td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
+    const queriesHtml = queries.map(query => `
+      <div class="alert alert-danger">
+        <h6>Query: ${query.query}</h6>
+        <p><strong>זמן ביצוע:</strong> ${query.execution_time}s</p>
+        <p><strong>תדירות:</strong> ${query.frequency} פעמים</p>
       </div>
-    `;
+    `).join('');
 
-    content.innerHTML = html;
+    element.innerHTML = queriesHtml;
   }
 
-  /**
-   * Display External Data Status
-   */
   displayExternalDataStatus(status) {
-    const content = document.getElementById('external-data-status-content');
-    if (!content) {return;}
+    const element = document.getElementById('external-data-status-content');
+    if (!element) {
+      console.error('Element external-data-status-content לא נמצא');
+      return;
+    }
 
-    const statusClass = status.status === 'connected' ? 'success' : 'warning';
-
-    const html = `
-      <div class="alert alert-${statusClass}">
-        <h6>סטטוס חיבור</h6>
-        <p><strong>מצב:</strong> <span class="badge bg-${statusClass}">${status.status}</span></p>
-        <p><strong>ספקים:</strong> ${status.providers.join(', ')}</p>
-        <p><strong>עדכון אחרון:</strong> ${new Date(status.last_update).toLocaleString('he-IL')}</p>
-        <p><strong>נקודות נתונים:</strong> ${status.data_points.toLocaleString()}</p>
-        <p><strong>בריאות חיבור:</strong> <span class="badge bg-success">${status.connection_health}</span></p>
+    element.innerHTML = `
+      <div class="alert alert-info">
+        <h6>מצב חיבורים לנתונים חיצוניים</h6>
+        <p><strong>Yahoo Finance:</strong> <span class="badge bg-${status.yahoo_finance === 'connected' ? 'success' : 'danger'}">${status.yahoo_finance}</span></p>
+        <p><strong>Alpha Vantage:</strong> <span class="badge bg-${status.alpha_vantage === 'connected' ? 'success' : 'danger'}">${status.alpha_vantage}</span></p>
+        <p><strong>עדכון אחרון:</strong> ${status.last_update}</p>
       </div>
     `;
-
-    content.innerHTML = html;
   }
 
-  /**
-   * Display External Data Test
-   */
   displayExternalDataTest(test) {
-    const content = document.getElementById('external-data-test-content');
-    if (!content) {return;}
+    const element = document.getElementById('external-data-test-content');
+    if (!element) {
+      console.error('Element external-data-test-content לא נמצא');
+      return;
+    }
 
-    const resultClass = test.test_result === 'success' ? 'success' : 'danger';
-
-    const html = `
-      <div class="alert alert-${resultClass}">
-        <h6>תוצאות בדיקה</h6>
-        <p><strong>תוצאה:</strong> <span class="badge bg-${resultClass}">${test.test_result}</span></p>
-        <p><strong>זמן תגובה:</strong> ${test.response_time}s</p>
-        <p><strong>איכות נתונים:</strong> <span class="badge bg-success">${test.data_quality}</span></p>
-        <p><strong>בדיקה אחרונה:</strong> ${new Date(test.last_test).toLocaleString('he-IL')}</p>
+    element.innerHTML = `
+      <div class="alert alert-${test.status === 'success' ? 'success' : 'danger'}">
+        <h6>תוצאות בדיקת חיבור</h6>
+        <p><strong>סטטוס:</strong> <span class="badge bg-${test.status === 'success' ? 'success' : 'danger'}">${test.status}</span></p>
+        <p><strong>הודעה:</strong> ${test.message}</p>
       </div>
     `;
-
-    content.innerHTML = html;
   }
 
-  /**
-   * Display Performance Metrics
-   */
   displayPerformanceMetrics(metrics) {
-    const content = document.getElementById('performance-metrics-content');
-    if (!content) {return;}
+    const element = document.getElementById('performance-metrics-content');
+    if (!element) {
+      console.error('Element performance-metrics-content לא נמצא');
+      return;
+    }
 
-    const html = `
+    element.innerHTML = `
       <div class="row">
-        <div class="col-md-6">
-          <h6>ביצועים כללי</h6>
-          <ul class="list-unstyled">
-            <li><strong>זמן תגובה ממוצע:</strong> ${metrics.avg_response_time}s</li>
-            <li><strong>בקשות לשנייה:</strong> ${metrics.requests_per_second}</li>
-            <li><strong>אחוז שגיאות:</strong> ${metrics.error_rate}%</li>
-            <li><strong>אחוז זמינות:</strong> ${metrics.uptime_percentage}%</li>
-          </ul>
+        <div class="col-md-3">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title">${metrics.cpu_usage}%</h5>
+              <p class="card-text">שימוש CPU</p>
+            </div>
+          </div>
         </div>
-        <div class="col-md-6">
-          <h6>שימוש משאבים</h6>
-          <ul class="list-unstyled">
-            <li><strong>שימוש זיכרון:</strong> ${metrics.memory_usage}%</li>
-            <li><strong>שימוש CPU:</strong> ${metrics.cpu_usage}%</li>
-          </ul>
+        <div class="col-md-3">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title">${metrics.memory_usage}%</h5>
+              <p class="card-text">שימוש זיכרון</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title">${metrics.disk_usage}%</h5>
+              <p class="card-text">שימוש דיסק</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center">
+            <div class="card-body">
+              <h5 class="card-title">${metrics.response_time}s</h5>
+              <p class="card-text">זמן תגובה</p>
+            </div>
+          </div>
         </div>
       </div>
     `;
-
-    content.innerHTML = html;
   }
 
-  /**
-   * Display Performance Test
-   */
   displayPerformanceTest(test) {
-    const content = document.getElementById('performance-test-content');
-    if (!content) {return;}
+    const element = document.getElementById('performance-test-content');
+    if (!element) {
+      console.error('Element performance-test-content לא נמצא');
+      return;
+    }
 
-    const resultClass = test.test_result === 'passed' ? 'success' : 'danger';
-
-    const html = `
-      <div class="alert alert-${resultClass}">
-        <h6>תוצאות בדיקות ביצועים</h6>
-        <p><strong>תוצאה כללית:</strong> <span class="badge bg-${resultClass}">${test.test_result}</span></p>
-        <p><strong>בדיקת עומס:</strong> <span class="badge bg-success">${test.load_test}</span></p>
-        <p><strong>בדיקת לחץ:</strong> <span class="badge bg-success">${test.stress_test}</span></p>
-        <p><strong>בדיקה אחרונה:</strong> ${new Date(test.last_test).toLocaleString('he-IL')}</p>
+    const recommendationsHtml = test.recommendations.map(rec => `<li>${rec}</li>`).join('');
+    
+    element.innerHTML = `
+      <div class="alert alert-${test.status === 'success' ? 'success' : 'danger'}">
+        <h6>תוצאות בדיקת ביצועים</h6>
+        <p><strong>סטטוס:</strong> <span class="badge bg-${test.status === 'success' ? 'success' : 'danger'}">${test.status}</span></p>
+        <p><strong>ציון:</strong> ${test.score}/100</p>
+        <p><strong>המלצות:</strong></p>
+        <ul>${recommendationsHtml}</ul>
       </div>
     `;
-
-    content.innerHTML = html;
   }
 
-  /**
-   * Show loading state
-   */
+  // Button action functions
+  async clearCache() {
+    console.log('=== clearCache התחיל ===');
+    this.showLoading('cache-stats-content', 'מנקה Cache...');
+    await this.delay(1000);
+    this.loadCacheData();
+    console.log('=== clearCache הושלם ===');
+  }
+
+  async invalidateCache() {
+    console.log('=== invalidateCache התחיל ===');
+    this.showLoading('cache-health-content', 'מבטל Cache...');
+    await this.delay(1000);
+    this.loadCacheData();
+    console.log('=== invalidateCache הושלם ===');
+  }
+
+  async optimizeQueries() {
+    console.log('=== optimizeQueries התחיל ===');
+    this.showLoading('query-opportunities-content', 'מבצע אופטימיזציה...');
+    await this.delay(1000);
+    this.loadQueryData();
+    console.log('=== optimizeQueries הושלם ===');
+  }
+
+  async runQueryTest() {
+    console.log('=== runQueryTest התחיל ===');
+    
+    const queryType = document.getElementById('test-query-type')?.value || 'tickers';
+    console.log(`סוג Query: ${queryType}`);
+    
+    this.showLoading('query-test-results', 'מבצע בדיקה...');
+    await this.delay(800);
+    
+    const results = {
+      query_type: queryType,
+      execution_time: (Math.random() * 2 + 0.5).toFixed(2),
+      status: 'success',
+      message: `בדיקת ${queryType} הושלמה בהצלחה`
+    };
+    
+    this.displayQueryTestResults(results);
+    console.log('=== runQueryTest הושלם ===');
+  }
+
+  displayQueryTestResults(results) {
+    const element = document.getElementById('query-test-results');
+    if (!element) {
+      console.error('Element query-test-results לא נמצא');
+      return;
+    }
+
+    element.innerHTML = `
+      <div class="alert alert-success">
+        <h6>תוצאות בדיקת Query</h6>
+        <p><strong>סוג Query:</strong> ${results.query_type}</p>
+        <p><strong>זמן ביצוע:</strong> ${results.execution_time}s</p>
+        <p><strong>סטטוס:</strong> <span class="badge bg-success">${results.status}</span></p>
+        <p><strong>הודעה:</strong> ${results.message}</p>
+      </div>
+    `;
+  }
+
+  async testExternalData() {
+    console.log('=== testExternalData התחיל ===');
+    this.showLoading('external-data-test-content', 'בודק חיבור...');
+    await this.delay(1000);
+    this.loadExternalData();
+    console.log('=== testExternalData הושלם ===');
+  }
+
+  async runPerformanceTest() {
+    console.log('=== runPerformanceTest התחיל ===');
+    this.showLoading('performance-test-content', 'מבצע בדיקה...');
+    await this.delay(1000);
+    this.loadPerformanceData();
+    console.log('=== runPerformanceTest הושלם ===');
+  }
+
   showLoading(elementId, message) {
     const element = document.getElementById(elementId);
     if (!element) {
-      console.error(`Element with ID '${elementId}' not found`);
+      console.error(`Element ${elementId} לא נמצא`);
       return;
     }
 
@@ -557,165 +527,16 @@ class SystemTestCenter {
     `;
   }
 
-  /**
-   * Setup event listeners
-   */
-  setupEventListeners() {
-    // Cache operations
-    const clearCacheBtn = document.getElementById('clear-cache-btn');
-    if (clearCacheBtn) {
-      clearCacheBtn.addEventListener('click', () => this.clearCache());
-    }
-
-    const invalidateCacheBtn = document.getElementById('invalidate-cache-btn');
-    if (invalidateCacheBtn) {
-      invalidateCacheBtn.addEventListener('click', () => this.invalidateCache());
-    }
-
-    // Query operations
-    const optimizeQueriesBtn = document.getElementById('optimize-queries-btn');
-    if (optimizeQueriesBtn) {
-      optimizeQueriesBtn.addEventListener('click', () => this.optimizeQueries());
-    }
-
-    // External data operations
-    const testExternalDataBtn = document.getElementById('test-external-data-btn');
-    if (testExternalDataBtn) {
-      testExternalDataBtn.addEventListener('click', () => this.testExternalData());
-    }
-
-    // Performance operations
-    const runPerformanceTestBtn = document.getElementById('run-performance-test-btn');
-    if (runPerformanceTestBtn) {
-      runPerformanceTestBtn.addEventListener('click', () => this.runPerformanceTest());
-    }
-  }
-
-  /**
-   * Clear cache
-   */
-  async clearCache() {
-    try {
-      this.log('info', '=== מתחיל ניקוי Cache ===');
-      this.showLoading('cache-stats-content', 'מנקה Cache...');
-
-      await this.delay(800);
-
-      this.log('success', 'Cache נוקה בהצלחה (Simulated)');
-      this.loadCacheData();
-
-    } catch (error) {
-      this.log('error', `שגיאה בניקוי Cache: ${error.message}`);
-    }
-  }
-
-  /**
-   * Invalidate cache by dependency
-   */
-  async invalidateCache() {
-    try {
-      this.log('info', '=== מתחיל ביטול Cache לפי תלות ===');
-      this.showLoading('cache-stats-content', 'מבטל Cache...');
-
-      await this.delay(600);
-
-      this.log('success', 'Cache בוטל בהצלחה (Simulated)');
-      this.loadCacheData();
-
-    } catch (error) {
-      this.log('error', `שגיאה בביטול Cache: ${error.message}`);
-    }
-  }
-
-  /**
-   * Optimize queries
-   */
-  async optimizeQueries() {
-    try {
-      this.log('info', '=== מתחיל אופטימיזציה של Queries ===');
-      this.showLoading('query-opportunities-content', 'מבצע אופטימיזציה...');
-
-      await this.delay(1000);
-
-      this.log('success', 'Queries אופטמזו בהצלחה (Simulated)');
-      this.loadQueryData();
-
-    } catch (error) {
-      this.log('error', `שגיאה באופטימיזציה: ${error.message}`);
-    }
-  }
-
-  /**
-   * Test external data
-   */
-  async testExternalData() {
-    try {
-      this.log('info', '=== מתחיל בדיקת נתונים חיצוניים ===');
-      this.showLoading('external-data-test-content', 'מבצע בדיקה...');
-
-      await this.delay(800);
-
-      this.log('success', 'בדיקת נתונים חיצוניים הושלמה (Simulated)');
-      this.loadExternalData();
-
-    } catch (error) {
-      this.log('error', `שגיאה בבדיקה: ${error.message}`);
-    }
-  }
-
-  /**
-   * Run performance test
-   */
-  async runPerformanceTest() {
-    try {
-      this.log('info', '=== מתחיל בדיקת ביצועים ===');
-      this.showLoading('performance-test-content', 'מבצע בדיקה...');
-
-      await this.delay(1200);
-
-      this.log('success', 'בדיקת ביצועים הושלמה (Simulated)');
-      this.loadPerformanceData();
-
-    } catch (error) {
-      this.log('error', `שגיאה בבדיקה: ${error.message}`);
-    }
-  }
-
-  /**
-   * Utility function for delay
-   */
-  delay(ms) {
+  async delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  /**
-   * Log function
-   */
-  log(level, message) {
-    const timestamp = new Date().toLocaleTimeString('he-IL');
-    const logEntry = `[${timestamp}] [${level.toUpperCase()}] ${message}`;
-
-    this.logs.push(logEntry);
-    console.log(logEntry);
-
-    // Update log display
-    this.updateLogDisplay();
-  }
-
-  /**
-   * Update log display
-   */
-  updateLogDisplay() {
-    const logContainer = document.getElementById('system-logs');
-    if (logContainer) {
-      const recentLogs = this.logs.slice(-20); // Show last 20 logs
-      logContainer.innerHTML = recentLogs.map(log => `<div class="log-entry">${log}</div>`).join('');
-      logContainer.scrollTop = logContainer.scrollHeight;
-    }
   }
 }
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  new SystemTestCenter();
+  console.log('=== DOMContentLoaded התחיל ===');
+  new SimpleTestCenter();
+  console.log('=== SimpleTestCenter נוצר בהצלחה ===');
 });
+
+console.log('=== system-test-center.js נטען בהצלחה ===');

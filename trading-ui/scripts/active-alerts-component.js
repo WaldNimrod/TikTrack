@@ -88,14 +88,11 @@ class ActiveAlertsComponent extends HTMLElement {
     // בדיקה שהסגנונות נטענו
     this.checkStylesLoaded();
 
-    // ניקוי הודעות קונסולה ישנות אחרי 10 שניות (רק אם יש הרבה הודעות)
+    // בדיקה אם יש הרבה הודעות בקונסולה (ללא ניקוי אוטומטי)
     setTimeout(() => {
       // בדיקה אם יש הרבה הודעות בקונסולה
       if (this._checkAttempts > 3) {
-
-        if (console.clear) {
-          console.clear();
-        }
+        console.log('⚠️ הרבה ניסיונות טעינה - בדוק את הקונסול');
       }
     }, 10000);
   }

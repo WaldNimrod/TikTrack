@@ -633,7 +633,7 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">מטריקס פונקציות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/js-map">מפת JS</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="tiktrack-dropdown-item" href="#" onclick="clearDevelopmentCache()" style="color: #ff6b6b;">
+                        <li><a class="tiktrack-dropdown-item" href="#" onclick="clearDevelopmentCache(event)" style="color: #ff6b6b;">
                           <i class="fas fa-trash"></i> נקה Cache (פיתוח)
                         </a></li>
                       </ul>
@@ -1507,23 +1507,6 @@ class HeaderSystem {
     this.saveState();
   }
 
-  toggleDropdown(menuId) {
-    // DISABLED - Using global toggle functions instead
-    // const menu = document.getElementById(menuId);
-    // const isVisible = menu.classList.contains('show');
-
-    // this.closeAllDropdowns();
-
-    // if (!isVisible) {
-    //   menu.classList.add('show');
-    // }
-  }
-
-  closeAllDropdowns() {
-    // DISABLED - Using global toggle functions instead
-    // const menus = document.querySelectorAll('.filter-menu');
-    // menus.forEach(menu => menu.classList.remove('show'));
-  }
 
   loadSavedState() {
     const savedState = localStorage.getItem('headerState');
@@ -1648,23 +1631,6 @@ class HeaderSystem {
     this.saveState();
   }
 
-  toggleDropdown(menuId) {
-    // DISABLED - Using global toggle functions instead (duplicate function)
-    // const menu = document.getElementById(menuId);
-    // const isVisible = menu.classList.contains('show');
-
-    // this.closeAllDropdowns();
-
-    // if (!isVisible) {
-    //   menu.classList.add('show');
-    // }
-  }
-
-  closeAllDropdowns() {
-    // DISABLED - Using global toggle functions instead (duplicate function)
-    // const menus = document.querySelectorAll('.filter-menu');
-    // menus.forEach(menu => menu.classList.remove('show'));
-  }
 
   setupFilterItemEventListeners() {
     // Event listeners לפריטי פילטר תאריכים
@@ -1971,11 +1937,7 @@ class HeaderSystem {
 
     // הפעלת פילטר
     if (window.filterSystem) {
-
       window.filterSystem.applyAccountFilter(accountName === 'הכול' ? [] : [accountName]);
-    } else if (window.filterSystem) {
-
-      window.filterSystem.updateFilter('account', accountName === 'הכול' ? [] : [accountName]);
     } else {
       console.warn('⚠️ No filter system found');
     }
@@ -4609,15 +4571,29 @@ window.applyFilter = applyFilter;
  * ניקוי Cache מהיר לפיתוח
  */
 async function clearDevelopmentCache(event) {
+  // הגדרת המשתנה button בתחילת הפונקציה
+  let button = null;
+
   try {
     console.log('🔄 מנקה Cache...');
 
+    // מציאת הכפתור - קודם מנסה event.target, אחרת מחפש ב-DOM
+    if (event && event.target) {
+      button = event.target;
+    } else {
+      // חיפוש אחר הכפתור ב-DOM
+      button = document.querySelector('[onclick*="clearDevelopmentCache"]') ||
+               document.querySelector('a[onclick*="clearDevelopmentCache"]');
+    }
+
     // הצגת הודעת טעינה
-    const button = event?.target || document.querySelector('[onclick*="clearDevelopmentCache"]');
     if (button) {
       const originalText = button.innerHTML;
       button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מנקה...';
       button.disabled = true;
+
+      // שמירת הטקסט המקורי כדי להחזיר אותו
+      button.dataset.originalText = originalText;
     }
 
     const response = await fetch('/api/v1/cache/clear', {
@@ -4629,23 +4605,33 @@ async function clearDevelopmentCache(event) {
       console.log('✅ Cache נוקה בהצלחה:', result);
 
       // הצגת הודעת הצלחה
-      if (window.showNotification) {
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('הצלחה', 'Cache נוקה בהצלחה');
+      } else if (typeof window.showNotification === 'function') {
         window.showNotification('Cache נוקה בהצלחה', 'success');
       } else {
-        alert('Cache נוקה בהצלחה!');
+        console.log('✅ Cache נוקה בהצלחה');
       }
     } else {
       console.error('❌ שגיאה בניקוי Cache:', response.status);
-      alert('שגיאה בניקוי Cache');
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה', 'שגיאה בניקוי Cache');
+      } else {
+        console.error('❌ שגיאה בניקוי Cache');
+      }
     }
   } catch (error) {
     console.error('❌ שגיאה בניקוי Cache:', error);
-    alert('שגיאה בניקוי Cache');
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה בניקוי Cache');
+    } else {
+      console.error('❌ שגיאה בניקוי Cache');
+    }
   } finally {
     // החזרת הכפתור למצב רגיל
-    const button = event?.target || document.querySelector('[onclick*="clearDevelopmentCache"]');
     if (button) {
-      button.innerHTML = '<i class="fas fa-trash"></i> נקה Cache (פיתוח)';
+      const originalText = button.dataset.originalText || '<i class="fas fa-trash"></i> נקה Cache (פיתוח)';
+      button.innerHTML = originalText;
       button.disabled = false;
     }
   }

@@ -468,6 +468,94 @@
       </div>
     </div>
     
+    <!-- ===== הגדרות ניהול קונסול ===== -->
+    <div class="preference-item" style="border-top: 2px solid #ff9c05; margin-top: 20px; padding-top: 20px;">
+      <div class="preference-label">
+        <h4>🖥️ ניהול קונסול</h4>
+        <p>הגדרות לניקוי וניהול הודעות קונסול</p>
+      </div>
+      <div class="preference-control">
+        <!-- Placeholder for section header -->
+      </div>
+    </div>
+    
+    <!-- ניקוי אוטומטי של קונסול -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🧹 ניקוי אוטומטי של קונסול</h4>
+        <p>הפעלת ניקוי אוטומטי של הודעות קונסול</p>
+      </div>
+      <div class="preference-control">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="consoleAutoClear" 
+                 onchange="updateConsolePreference('autoClear', this.checked)" style="transform: scale(1.2);">
+          <label class="form-check-label" for="consoleAutoClear">
+            הפעל ניקוי אוטומטי
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <!-- מרווח ניקוי קונסול -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>⏱️ מרווח ניקוי קונסול</h4>
+        <p>מרווח זמן בין ניקויי קונסול אוטומטיים (בשניות)</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="consoleClearInterval" class="form-control" min="10" max="3600" step="10" 
+                 onchange="updateConsolePreference('clearInterval', this.value)" placeholder="60">
+          <span class="input-group-text">שניות</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- הסתרת הודעות קונסול -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🔇 הסתרת הודעות קונסול</h4>
+        <p>הסתרת הודעות קונסול זמנית</p>
+      </div>
+      <div class="preference-control">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="consoleSuppressMessages" 
+                 onchange="updateConsolePreference('suppressMessages', this.checked)" style="transform: scale(1.2);">
+          <label class="form-check-label" for="consoleSuppressMessages">
+            הסתר הודעות זמנית
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <!-- משך הסתרת הודעות -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>⏳ משך הסתרת הודעות</h4>
+        <p>משך זמן הסתרת הודעות קונסול (בשניות)</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="consoleSuppressDuration" class="form-control" min="1" max="60" step="1" 
+                 onchange="updateConsolePreference('suppressDuration', this.value)" placeholder="5">
+          <span class="input-group-text">שניות</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- כפתור ניקוי ידני -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🧹 ניקוי ידני</h4>
+        <p>ניקוי מיידי של הקונסול</p>
+      </div>
+      <div class="preference-control">
+        <button class="btn btn-outline-warning" onclick="manualClearConsole()">
+          🧹 נקה קונסול עכשיו
+        </button>
+      </div>
+    </div>
+    
     <!-- כפתורי פעולה -->
     <div class="d-flex justify-content-between mt-4 pt-4 border-top">
       <button class="btn btn-outline-secondary" onclick="resetToDefaults()">
@@ -505,6 +593,7 @@
   <script src="scripts/date-utils.js"></script>
   
   <!-- Scripts -->
+  <script src="scripts/console-cleanup.js"></script>
   <script src="scripts/notification-system.js"></script>
   <script src="scripts/error-handlers.js"></script>
   <script src="scripts/linked-items.js"></script>
@@ -516,7 +605,7 @@
   <script src="scripts/preferences.js"></script>
   
   <!-- Header System Scripts -->
-  <script src="scripts/header-system.js?v=20250830_2"></script>
+  <script src="scripts/header-system.js?v=20250901_3"></script>
   <!-- alerts.js הוסר - לא נחוץ בעמוד זה -->
     <script src="scripts/alert-service.js"></script>
   <script src="scripts/active-alerts-component.js?v=20250830_1"></script>

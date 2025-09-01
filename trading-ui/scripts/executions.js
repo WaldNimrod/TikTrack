@@ -187,7 +187,7 @@ async function showEditExecutionModal(id) {
 
 
   // מציאת העסקה לפי ID
-  const execution = executionsData.find(e => e.id == id);
+  const execution = executionsData.find(e => e.id === id);
   if (!execution) {
     handleElementNotFound('execution', 'CRITICAL');
     return;
@@ -208,7 +208,7 @@ async function showEditExecutionModal(id) {
       const tradesData = await tradesResponse.json();
       const trades = tradesData.data || tradesData || [];
 
-      const trade = trades.find(t => t.id == execution.trade_id);
+      const trade = trades.find(t => t.id === execution.trade_id);
       if (trade) {
         linkedObject = { type: 'trade', data: trade };
         tickerId = trade.ticker_id;
@@ -224,7 +224,7 @@ async function showEditExecutionModal(id) {
           const plansData = await plansResponse.json();
           const plans = plansData.data || plansData || [];
 
-          const plan = plans.find(p => p.id == execution.trade_id);
+          const plan = plans.find(p => p.id === execution.trade_id);
           if (plan) {
             linkedObject = { type: 'plan', data: plan };
             tickerId = plan.ticker_id;
@@ -1788,12 +1788,13 @@ function isDateInRange(dateString, dateRange) {
   // Today
 
   switch (dateRange) {
-  case 'היום':
+  case 'היום': {
     const startOfDay = new Date(today);
     startOfDay.setHours(0, 0, 0, 0);
     return date >= startOfDay && date <= today;
+  }
 
-  case 'אתמול':
+  case 'אתמול': {
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
     const startOfYesterday = new Date(yesterday);
@@ -1801,31 +1802,37 @@ function isDateInRange(dateString, dateRange) {
     const endOfYesterday = new Date(yesterday);
     endOfYesterday.setHours(23, 59, 59, 999);
     return date >= startOfYesterday && date <= endOfYesterday;
+  }
 
-  case 'שבוע':
+  case 'שבוע': {
     const weekAgo = new Date(today);
     weekAgo.setDate(weekAgo.getDate() - 7);
     return date >= weekAgo && date <= today;
+  }
 
-  case 'השבוע':
+  case 'השבוע': {
     const startOfWeek = new Date(today);
     const dayOfWeek = startOfWeek.getDay();
     startOfWeek.setDate(startOfWeek.getDate() - dayOfWeek);
     startOfWeek.setHours(0, 0, 0, 0);
     return date >= startOfWeek && date <= today;
+  }
 
-  case 'MTD':
+  case 'MTD': {
     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     return date >= startOfMonth && date <= today;
+  }
 
-  case 'YTD':
+  case 'YTD': {
     const startOfYear = new Date(today.getFullYear(), 0, 1);
     return date >= startOfYear && date <= today;
+  }
 
-  case 'שנה':
+  case 'שנה': {
     const yearAgo = new Date(today);
     yearAgo.setDate(yearAgo.getDate() - 365);
     return date >= yearAgo && date <= today;
+  }
 
   default:
     return true;

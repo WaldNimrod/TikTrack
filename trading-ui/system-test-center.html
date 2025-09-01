@@ -11,6 +11,9 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/apple-theme.css">
+    <link rel="stylesheet" href="styles/header-system.css">
+    <link rel="stylesheet" href="styles/table.css">
+    <link rel="stylesheet" href="styles/notification-system.css">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -97,67 +100,8 @@
 <body>
     <div class="background-wrapper">
         <!-- unified-header auto-generated -->
+        <div id="unified-header"></div>
         <div class="page-body">
-            <!-- Main Navigation Menu -->
-            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-                <div class="container-fluid">
-                    <a class="navbar-brand" href="/">
-                        <img src="/images/logo.svg" alt="TikTrack" width="30" height="30" class="d-inline-block align-text-top">
-                        TikTrack
-                    </a>
-                    
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav me-auto">
-                            <li class="nav-item">
-                                <a class="nav-link" href="/trades">טריידים</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/trade_plans">תכניות מסחר</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/tickers">טיקרים</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/accounts">חשבונות</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/alerts">התראות</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/cash_flows">תזרימי מזומנים</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/notes">הערות</a>
-                            </li>
-                        </ul>
-                        
-                        <ul class="navbar-nav">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                                    הגדרות
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="/preferences">העדפות</a></li>
-                                    <li><a class="dropdown-item" href="/db_display">בסיס נתונים</a></li>
-                                    <li><a class="dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
-                                    <li><a class="dropdown-item" href="/constraints">אילוצים</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
-                                    <li><a class="dropdown-item" href="/page-scripts-matrix">מיפוי סקריפטים</a></li>
-                                    <li><a class="dropdown-item" href="/system-test-center">נתונים חיצוניים</a></li>
-                                    <li><a class="dropdown-item" href="/style_demonstration">הדגמת סגנונות</a></li>
-                                    <li><a class="dropdown-item" href="/designs">עיצובים</a></li>
-                                    <li><a class="dropdown-item" href="/js-map">מפת JS</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
             <div class="top-section">
                 <div class="section-header">
                     <div class="table-title">
@@ -277,14 +221,11 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="d-grid gap-2">
-                                            <button class="btn btn-warning" id="clear-cache">
+                                            <button class="btn btn-warning" id="clear-cache-btn">
                                                 <i class="fas fa-trash me-1"></i>נקה Cache
                                             </button>
-                                            <button class="btn btn-info" id="invalidate-tickers">
-                                                <i class="fas fa-ban me-1"></i>בטל Cache טיקרים
-                                            </button>
-                                            <button class="btn btn-secondary" id="invalidate-trades">
-                                                <i class="fas fa-ban me-1"></i>בטל Cache טריידים
+                                            <button class="btn btn-info" id="invalidate-cache-btn">
+                                                <i class="fas fa-ban me-1"></i>בטל Cache לפי תלות
                                             </button>
                                         </div>
                                     </div>
@@ -338,7 +279,7 @@
                                 <div class="card">
                                     <div class="card-header">
                                         <h6><i class="fas fa-lightbulb me-2"></i>הזדמנויות אופטימיזציה</h6>
-                                        <button class="btn btn-sm btn-success float-start" id="get-query-opportunities">
+                                        <button class="btn btn-sm btn-success float-start" id="optimize-queries-btn">
                                             <i class="fas fa-search me-1"></i>חפש
                                         </button>
                                     </div>
@@ -426,16 +367,16 @@
                             <div class="col-md-6">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h6><i class="fas fa-chart-line me-2"></i>סטטוס API</h6>
-                                        <button class="btn btn-sm btn-primary float-start" id="check-api-status">
+                                        <h6><i class="fas fa-chart-line me-2"></i>סטטוס חיבור</h6>
+                                        <button class="btn btn-sm btn-primary float-start" id="test-external-data-btn">
                                             <i class="fas fa-sync me-1"></i>בדוק
                                         </button>
                                     </div>
                                     <div class="card-body">
-                                        <div id="api-status-content">
+                                        <div id="external-data-status-content">
                                             <div class="text-center">
                                                 <div class="spinner-border text-primary" role="status"></div>
-                                                <p class="mt-2">בודק סטטוס API...</p>
+                                                <p class="mt-2">בודק סטטוס...</p>
                                             </div>
                                         </div>
                                     </div>
@@ -445,58 +386,16 @@
                             <div class="col-md-6">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h6><i class="fas fa-database me-2"></i>בדיקת מודלים</h6>
-                                        <button class="btn btn-sm btn-success float-start" id="test-models">
+                                        <h6><i class="fas fa-database me-2"></i>בדיקת נתונים</h6>
+                                        <button class="btn btn-sm btn-success float-start" id="test-external-data-data-btn">
                                             <i class="fas fa-check me-1"></i>בדוק
                                         </button>
                                     </div>
                                     <div class="card-body">
-                                        <div id="models-test-content">
+                                        <div id="external-data-test-content">
                                             <div class="text-center">
                                                 <div class="spinner-border text-success" role="status"></div>
-                                                <p class="mt-2">בודק מודלים...</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h6><i class="fas fa-cloud-download-alt me-2"></i>בדיקת נתונים</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="d-grid gap-2">
-                                            <button class="btn btn-primary" id="fetch-single-quote">
-                                                <i class="fas fa-download me-1"></i>קבל ציטוט בודד
-                                            </button>
-                                            <button class="btn btn-info" id="fetch-batch-quotes">
-                                                <i class="fas fa-list me-1"></i>קבל ציטוטים מרובים
-                                            </button>
-                                            <button class="btn btn-success" id="refresh-all-prices">
-                                                <i class="fas fa-sync me-1"></i>רענן כל המחירים
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h6><i class="fas fa-server me-2"></i>בדיקת ספקים</h6>
-                                        <button class="btn btn-sm btn-outline-secondary float-start" id="check-providers">
-                                            <i class="fas fa-search me-1"></i>בדוק
-                                        </button>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="providers-test-content">
-                                            <div class="text-center">
-                                                <div class="spinner-border text-info" role="status"></div>
-                                                <p class="mt-2">בודק ספקים...</p>
+                                                <p class="mt-2">מבצע בדיקה...</p>
                                             </div>
                                         </div>
                                     </div>
@@ -511,18 +410,17 @@
                             <div class="col-md-6">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h6><i class="fas fa-tachometer-alt me-2"></i>בדיקת ביצועים כללית</h6>
-                                        <button class="btn btn-sm btn-primary float-start" id="run-performance-test">
+                                        <h6><i class="fas fa-tachometer-alt me-2"></i>מדדי ביצועים</h6>
+                                        <button class="btn btn-sm btn-primary float-start" id="run-performance-test-btn">
                                             <i class="fas fa-play me-1"></i>הרץ בדיקה
                                         </button>
                                     </div>
                                     <div class="card-body">
-                                        <div class="mb-3">
-                                            <label for="test-iterations" class="form-label">מספר איטרציות:</label>
-                                            <input type="number" class="form-control" id="test-iterations" value="50" min="1" max="200">
-                                        </div>
-                                        <div id="performance-results">
-                                            <p class="text-muted">תוצאות בדיקת הביצועים יופיעו כאן</p>
+                                        <div id="performance-metrics-content">
+                                            <div class="text-center">
+                                                <div class="spinner-border text-primary" role="status"></div>
+                                                <p class="mt-2">טוען מדדים...</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -531,54 +429,17 @@
                             <div class="col-md-6">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h6><i class="fas fa-chart-area me-2"></i>מדדי מערכת</h6>
-                                        <button class="btn btn-sm btn-success float-start" id="get-system-metrics">
-                                            <i class="fas fa-chart-bar me-1"></i>קבל מדדים
+                                        <h6><i class="fas fa-chart-area me-2"></i>בדיקת ביצועים</h6>
+                                        <button class="btn btn-sm btn-success float-start" id="run-performance-test-check-btn">
+                                            <i class="fas fa-check me-1"></i>בדוק
                                         </button>
                                     </div>
                                     <div class="card-body">
-                                        <div id="system-metrics-content">
+                                        <div id="performance-test-content">
                                             <div class="text-center">
                                                 <div class="spinner-border text-success" role="status"></div>
-                                                <p class="mt-2">טוען מדדי מערכת...</p>
+                                                <p class="mt-2">מבצע בדיקה...</p>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h6><i class="fas fa-clock me-2"></i>בדיקת זמני תגובה</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-3">
-                                                <button class="btn btn-outline-primary w-100" id="test-cache-response">
-                                                    Cache API
-                                                </button>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <button class="btn btn-outline-success w-100" id="test-query-response">
-                                                    Query API
-                                                </button>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <button class="btn btn-outline-info w-100" id="test-external-response">
-                                                    External API
-                                                </button>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <button class="btn btn-outline-warning w-100" id="test-db-response">
-                                                    Database
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div id="response-time-results" class="mt-3">
-                                            <p class="text-muted">תוצאות זמני התגובה יופיעו כאן</p>
                                         </div>
                                     </div>
                                 </div>
@@ -616,7 +477,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Custom JS -->
+    <script src="scripts/console-cleanup.js"></script>
     <script src="scripts/error-handlers.js"></script>
+    <script src="scripts/header-system.js"></script>
     <script src="scripts/system-test-center.js"></script>
 </body>
 </html>

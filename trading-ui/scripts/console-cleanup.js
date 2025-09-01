@@ -46,7 +46,9 @@ function enableConsoleMessages() {
 
 // פונקציה לניקוי אוטומטי לפי הגדרות
 function autoClearConsole() {
+  console.log('🔍 autoClearConsole נקראה - מי קורא לה?', new Error().stack);
   const settings = getConsoleSettings();
+  console.log('🔍 הגדרות שנמצאו:', settings);
   if (settings.autoClear && settings.clearInterval > 0) {
     // עצור טיימר קיים אם יש
     if (window.consoleClearTimer) {
@@ -85,7 +87,12 @@ function getConsoleSettings() {
   };
 
   const savedSettings = localStorage.getItem('consoleSettings');
-  return savedSettings ? { ...defaultSettings, ...JSON.parse(savedSettings) } : defaultSettings;
+  const finalSettings = savedSettings ? { ...defaultSettings, ...JSON.parse(savedSettings) } : defaultSettings;
+  
+  // לוג זמני לבדיקה
+  console.log('🔍 getConsoleSettings נקראה:', finalSettings);
+  
+  return finalSettings;
 }
 
 // פונקציה לשמירת הגדרות console

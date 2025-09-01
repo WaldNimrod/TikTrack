@@ -369,6 +369,135 @@ window.showLinkedItemsBlockingModal(blockingData, 'ticker', 1, 'cancel');
 5. **תחזוקה קלה**: שינויים במרכז אחד
 6. **UI משופר**: חלון חסימה מפורט וברור
 
+## 🎨 מערכת מפתח צבעים מאוחדת (Unified Color Scheme System)
+
+### סקירה כללית
+מערכת מפתח הצבעים המאוחדת היא מערכת מרכזית שמגדירה את כל הצבעים במערכת בצורה עקבית ומאוחדת. המערכת מאפשרת שימוש עקבי בצבעים בכל העמודים והמודולים, עם תמיכה מלאה בתאימות לאחור.
+
+### ארכיטקטורה
+- **קובץ מרכזי**: `scripts/color-scheme-system.js`
+- **מטרה**: ריכוז כל מפתחות הצבעים במערכת
+- **תאימות**: תמיכה מלאה בקוד קיים
+- **גמישות**: הוספת ישויות חדשות בקלות
+
+### סוגי ישויות נתמכים
+
+#### Trading & Investment (כחולים)
+- **`trade`**: `#007bff` - טריידים
+- **`trade_plan`**: `#0056b3` - תכנוני השקעה  
+- **`execution`**: `#17a2b8` - עסקאות
+
+#### Financial (ירוקים)
+- **`account`**: `#28a745` - חשבונות
+- **`cash_flow`**: `#20c997` - תזרים מזומנים
+
+#### Market Data (אדומים וכתומים)
+- **`ticker`**: `#dc3545` - טיקרים
+- **`alert`**: `#ff9c05` - התראות (צבע לוגו)
+
+#### Documentation (סגולים)
+- **`note`**: `#6f42c1` - הערות
+
+#### System (אפורים)
+- **`constraint`**: `#6c757d` - אילוצים
+- **`design`**: `#495057` - עיצובים
+- **`research`**: `#343a40` - מחקר
+- **`preference`**: `#adb5bd` - העדפות
+
+### שילוב עם CSS קיים
+
+#### עקרונות השילוב
+1. **לא דורס CSS קיים**: המערכת מוסיפה מחלקות חדשות עם שמות ייחודיים
+2. **משלים CSS קיים**: מוסיפה צבעים עקביים למחלקות קיימות
+3. **משתמשת ב-CSS קיים**: משתמשת במחלקות קיימות כמו `.modal-header`
+
+#### דוגמאות לשילוב
+```css
+/* CSS קיים - לא משתנה */
+.modal-header {
+  position: relative;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+/* המערכת החדשה מוסיפה צבעים */
+.entity-trade-header {
+  background: linear-gradient(135deg, #007bff, #0056b3) !important;
+  color: white !important;
+}
+
+/* CSS קיים - לא משתנה */
+.linkedItems_modal-header-colored {
+  border-left: 6px solid;
+  position: relative;
+  padding-left: 60px;
+}
+
+/* המערכת החדשה מוסיפה צבעים ספציפיים */
+.planning-page .linkedItems_modal-header-colored {
+  border-left-color: #28a745; /* ירוק - לא משתנה */
+}
+```
+
+### פונקציות המערכת
+
+#### פונקציות חדשות
+```javascript
+// קבלת צבע לישות
+const tradeColor = window.getEntityColor('trade');           // #007bff
+const accountBg = window.getEntityBackgroundColor('account'); // rgba(40, 167, 69, 0.1)
+const alertText = window.getEntityTextColor('alert');        // #e55a00
+
+// יצירת סולם צבעים לכל הישויות
+const legend = window.createEntityLegend({
+  title: '🎨 מפתח צבעים - סוגי ישויות:',
+  compact: true
+});
+
+// יצירת מחלקות CSS
+const css = window.generateEntityCSS();
+```
+
+#### פונקציות תאימות לאחור
+```javascript
+// פונקציות ישנות שעדיין עובדות
+const swingColor = window.getInvestmentTypeColor('swing');
+const investmentBg = window.getInvestmentTypeBackgroundColor('investment');
+const legend = window.createInvestmentTypeLegend();
+```
+
+### יתרונות המערכת החדשה
+
+1. **ריכוזיות**: כל הצבעים מוגדרים במקום אחד
+2. **עקביות**: אותו צבע לכל ישות בכל מקום במערכת
+3. **תחזוקה**: עדכון צבע אחד משנה אותו בכל המערכת
+4. **גמישות**: תמיכה בסוגי ישויות חדשים בקלות
+5. **תאימות**: כל הקוד הקיים עובד ללא שינויים
+
+### שימוש במערכת
+
+#### הוספת עמוד חדש
+```html
+<!-- הוספת הסקריפט החדש -->
+<script src="scripts/color-scheme-system.js"></script>
+
+<!-- שימוש בצבעים עקביים -->
+<div class="entity-trade-header">
+  <h2>עמוד טריידים חדש</h2>
+</div>
+```
+
+#### הוספת ישות חדשה
+```javascript
+// הוספת צבע לישות חדשה
+window.ENTITY_COLORS['new_entity'] = '#ff6b6b';
+window.ENTITY_BACKGROUND_COLORS['new_entity'] = 'rgba(255, 107, 107, 0.1)';
+
+// שימוש בצבע החדש
+const newColor = window.getEntityColor('new_entity');
+```
+
 ## 📚 קבצים רלוונטיים
 
 - **Backend**: `Backend/routes/api/linked_items.py`

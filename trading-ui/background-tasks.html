@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ניהול משימות ברקע - TikTrack</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/background-tasks.css">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header System -->
+    <div id="unified-header-container"></div>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1><i class="fas fa-tasks"></i> ניהול משימות ברקע</h1>
+                <p class="page-description">ניהול מתקדם של משימות אוטומטיות במערכת</p>
+            </div>
+            
+            <!-- System Status Card -->
+            <div class="status-card">
+                <div class="status-header">
+                    <h3><i class="fas fa-info-circle"></i> מצב המערכת</h3>
+                    <div class="status-actions">
+                        <button id="start-scheduler" class="btn btn-success">
+                            <i class="fas fa-play"></i> הפעל Scheduler
+                        </button>
+                        <button id="stop-scheduler" class="btn btn-danger">
+                            <i class="fas fa-stop"></i> עצור Scheduler
+                        </button>
+                        <button id="refresh-status" class="btn btn-primary">
+                            <i class="fas fa-sync-alt"></i> רענן
+                        </button>
+                    </div>
+                </div>
+                <div class="status-content">
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <span class="status-label">סטטוס Scheduler:</span>
+                            <span id="scheduler-status" class="status-value">טוען...</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">סה"כ משימות:</span>
+                            <span id="total-tasks" class="status-value">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">משימות פעילות:</span>
+                            <span id="enabled-tasks" class="status-value">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">משימות רצות:</span>
+                            <span id="running-tasks" class="status-value">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">אחוז הצלחה:</span>
+                            <span id="success-rate" class="status-value">-</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">סה"כ ביצועים:</span>
+                            <span id="total-executions" class="status-value">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tasks Management -->
+            <div class="tasks-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-list"></i> ניהול משימות</h3>
+                    <div class="section-actions">
+                        <button id="refresh-tasks" class="btn btn-secondary">
+                            <i class="fas fa-sync-alt"></i> רענן משימות
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="tasks-filters">
+                    <select id="status-filter" class="filter-select">
+                        <option value="">כל הסטטוסים</option>
+                        <option value="enabled">פעיל</option>
+                        <option value="disabled">לא פעיל</option>
+                    </select>
+                    <select id="type-filter" class="filter-select">
+                        <option value="">כל הסוגים</option>
+                        <option value="scheduled">מתוזמן</option>
+                        <option value="manual">ידני</option>
+                    </select>
+                </div>
+                
+                <div class="tasks-table-container">
+                    <table id="tasks-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>שם המשימה</th>
+                                <th>תיאור</th>
+                                <th>תזמון</th>
+                                <th>סטטוס</th>
+                                <th>ביצועים אחרונים</th>
+                                <th>אחוז הצלחה</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tasks-tbody">
+                            <tr>
+                                <td colspan="7" class="loading-message">
+                                    <i class="fas fa-spinner fa-spin"></i> טוען משימות...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Task Execution History -->
+            <div class="history-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-history"></i> היסטוריית ביצועים</h3>
+                    <div class="section-actions">
+                        <select id="history-hours" class="filter-select">
+                            <option value="24">24 שעות אחרונות</option>
+                            <option value="48">48 שעות אחרונות</option>
+                            <option value="168">שבוע אחרון</option>
+                        </select>
+                        <button id="refresh-history" class="btn btn-secondary">
+                            <i class="fas fa-sync-alt"></i> רענן היסטוריה
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="history-filters">
+                    <input type="text" id="task-name-filter" placeholder="סינון לפי שם משימה" class="filter-input">
+                    <select id="history-status-filter" class="filter-select">
+                        <option value="">כל הסטטוסים</option>
+                        <option value="success">הצלחה</option>
+                        <option value="error">שגיאה</option>
+                    </select>
+                </div>
+                
+                <div class="history-table-container">
+                    <table id="history-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>תאריך</th>
+                                <th>שם המשימה</th>
+                                <th>סטטוס</th>
+                                <th>משך זמן</th>
+                                <th>תוצאה</th>
+                                <th>פרטים</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-tbody">
+                            <tr>
+                                <td colspan="6" class="loading-message">
+                                    <i class="fas fa-spinner fa-spin"></i> טוען היסטוריה...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Analytics Section -->
+            <div class="analytics-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-chart-line"></i> ניתוח ביצועים</h3>
+                    <div class="section-actions">
+                        <select id="analytics-period" class="filter-select">
+                            <option value="1d">יום אחרון</option>
+                            <option value="7d" selected>שבוע אחרון</option>
+                            <option value="30d">חודש אחרון</option>
+                        </select>
+                        <button id="refresh-analytics" class="btn btn-secondary">
+                            <i class="fas fa-sync-alt"></i> רענן ניתוח
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h4>סטטיסטיקות כלליות</h4>
+                        <div class="analytics-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">סה"כ ביצועים:</span>
+                                <span id="analytics-total-executions" class="stat-value">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">אחוז הצלחה:</span>
+                                <span id="analytics-success-rate" class="stat-value">-</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">זמן ממוצע:</span>
+                                <span id="analytics-avg-duration" class="stat-value">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-card">
+                        <h4>ביצועי משימות</h4>
+                        <div id="task-performance-chart" class="chart-container">
+                            <div class="loading-message">
+                                <i class="fas fa-spinner fa-spin"></i> טוען נתונים...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Task Details Modal -->
+    <div id="task-details-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-task-name">פרטי משימה</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="modal-task-details">
+                    <div class="loading-message">
+                        <i class="fas fa-spinner fa-spin"></i> טוען פרטים...
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-execute-task" class="btn btn-success">
+                    <i class="fas fa-play"></i> הפעל משימה
+                </button>
+                <button id="modal-toggle-task" class="btn btn-warning">
+                    <i class="fas fa-toggle-on"></i> שנה סטטוס
+                </button>
+                <button class="btn btn-secondary" onclick="closeModal()">
+                    <i class="fas fa-times"></i> סגור
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="scripts/header-system.js"></script>
+    <script src="scripts/background-tasks.js"></script>
+</body>
+</html>

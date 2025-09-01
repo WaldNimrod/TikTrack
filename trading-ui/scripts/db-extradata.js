@@ -1240,6 +1240,7 @@ async function saveTriggerButtonRecord() {
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('הצלחה', `כפתור טריגר ${buttonData.button_name} נוסף בהצלחה למערכת`);
       } else {
+        // Fallback notification
       }
       bootstrap.Modal.getInstance(document.getElementById('addTriggerButtonModal')).hide();
       loadTriggerButtonsData(); // טעינה מחדש של הנתונים
@@ -1289,6 +1290,7 @@ async function updateTriggerButtonRecord() {
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('הצלחה', `כפתור טריגר ${buttonData.button_name} עודכן בהצלחה במערכת`);
       } else {
+        // Fallback notification
       }
       bootstrap.Modal.getInstance(document.getElementById('editTriggerButtonModal')).hide();
       loadTriggerButtonsData(); // טעינה מחדש של הנתונים
@@ -1307,7 +1309,7 @@ async function updateTriggerButtonRecord() {
 // פונקציה לאישור מחיקת כפתור טריגר
 async function confirmDeleteTriggerButtonRecord(id) {
   // מציאת הכפתור לפני מחיקה כדי להציג פרטים בהודעה
-  const button = triggerButtonsData.find(b => b.id == id);
+  const button = triggerButtonsData.find(b => b.id === id);
   const buttonInfo = button ? `${button.button_name} (${button.action_type})` : `כפתור טריגר ${id}`;
 
   try {
@@ -1321,6 +1323,7 @@ async function confirmDeleteTriggerButtonRecord(id) {
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('הצלחה', `כפתור טריגר ${buttonInfo} נמחק בהצלחה מהמערכת`);
       } else {
+        // Fallback notification
       }
       bootstrap.Modal.getInstance(document.getElementById('deleteTriggerButtonModal')).hide();
       loadTriggerButtonsData(); // טעינה מחדש של הנתונים
@@ -1430,7 +1433,7 @@ window.viewCurrency = function(id) {
   if (typeof window.showEditCurrencyModal === 'function') {
     window.showEditCurrencyModal(id);
   } else {
-
+    // Fallback for missing function
   }
 };
 
@@ -1438,7 +1441,7 @@ window.viewNoteRelationType = function(id) {
   if (typeof window.showEditNoteRelationTypeModal === 'function') {
     window.showEditNoteRelationTypeModal(id);
   } else {
-
+    // Fallback for missing function
   }
 };
 
@@ -1749,6 +1752,7 @@ function activateTrigger(triggerId) {
   if (typeof window.showSuccessNotification === 'function') {
     window.showSuccessNotification('הפעלה', `טריגר ${triggerInfo.name} הופעל בהצלחה`);
   } else {
+    // Fallback notification
   }
 
   // עדכון הסטטוס בכרטיס

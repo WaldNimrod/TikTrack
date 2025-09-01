@@ -2,7 +2,7 @@
 
 ## 📋 **משימות מרכזיות**
 
-> 📋 **משימות מרכזיות**: [CENTRAL_TASKS_TODO.md](CENTRAL_TASKS_TODO.md)
+> 📋 **משימות מערכת הנתונים החיצוניים**: [external_data_integration_server/EXTERNAL_DATA_TASKS_TODO.md](external_data_integration_server/EXTERNAL_DATA_TASKS_TODO.md)
 
 > 📋 **אפיון מפורט**: [EXTERNAL_DATA_INTEGRATION_SPECIFICATION_v1.3.1.md](EXTERNAL_DATA_INTEGRATION_SPECIFICATION_v1.3.1.md)
 

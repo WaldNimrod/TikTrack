@@ -426,7 +426,7 @@ function validateTickerSymbol(input) {
   // בדיקת ייחודיות
   const currentId = document.getElementById('editTickerId')?.value;
   const existingTicker = tickersData.find(t =>
-    t.symbol.toUpperCase() === symbol && t.id != currentId,
+    t.symbol.toUpperCase() === symbol && t.id !== currentId,
   );
 
   if (existingTicker) {
@@ -1218,7 +1218,7 @@ async function showExecutionLinkedItemsModal(executionId, errorData) {
 
 
   // מציאת העסקה לפי ID
-  const execution = executionsData.find(e => e.id == executionId);
+  const execution = executionsData.find(e => e.id === executionId);
   if (!execution) {
     handleElementNotFound('execution', 'CRITICAL');
     return;
@@ -3013,15 +3013,17 @@ function setupExecutionsFilterFunctions() {
         case 'אתמול':
           return executionDate.toDateString() === yesterday.toDateString();
         case 'week':
-        case 'שבוע':
+        case 'שבוע': {
           const weekAgo = new Date(today);
           weekAgo.setDate(weekAgo.getDate() - 7);
           return executionDate >= weekAgo;
+        }
         case 'month':
-        case 'חודש':
+        case 'חודש': {
           const monthAgo = new Date(today);
           monthAgo.setMonth(monthAgo.getMonth() - 1);
           return executionDate >= monthAgo;
+        }
         default:
           return true;
         }

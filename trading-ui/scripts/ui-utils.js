@@ -723,6 +723,7 @@ function showSecondConfirmationModal(message, onConfirm) {
             onConfirm,
           );
         } else {
+          // Fallback למקרה שמערכת התראות לא זמינה
           if (confirm(message)) {
             onConfirm();
           }

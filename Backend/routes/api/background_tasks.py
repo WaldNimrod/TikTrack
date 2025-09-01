@@ -21,15 +21,11 @@ import logging
 from services.background_tasks import background_task_manager
 from utils.performance_monitor import monitor_performance
 from utils.error_handlers import handle_database_error, handle_validation_error
-from utils.response_optimizer import ResponseOptimizer
 
 logger = logging.getLogger(__name__)
 
 # Create blueprint
 background_tasks_bp = Blueprint('background_tasks', __name__, url_prefix='/api/v1/background-tasks')
-
-# Response optimizer
-response_optimizer = ResponseOptimizer()
 
 @background_tasks_bp.route('/', methods=['GET'])
 @monitor_performance("background_tasks_status")
@@ -66,7 +62,7 @@ def get_background_tasks_status():
             'memory_usage': background_task_manager.get_memory_usage() if hasattr(background_task_manager, 'get_memory_usage') else 'N/A'
         }
         
-        return response_optimizer.optimize_response(status)
+        return jsonify(status)
         
     except Exception as e:
         logger.error(f"Error getting background tasks status: {e}")
@@ -125,7 +121,7 @@ def get_background_tasks():
             }
         }
         
-        return response_optimizer.optimize_response(result)
+        return jsonify(result)
         
     except Exception as e:
         logger.error(f"Error getting background tasks list: {e}")
@@ -184,7 +180,7 @@ def get_background_task_details(task_name: str):
         task_info['history'] = task_history
         task_info['performance_analytics'] = performance_analytics
         
-        return response_optimizer.optimize_response(task_info)
+        return jsonify(task_info)
         
     except Exception as e:
         logger.error(f"Error getting task details for {task_name}: {e}")
@@ -415,7 +411,7 @@ def get_background_tasks_history():
             }
         }
         
-        return response_optimizer.optimize_response(result)
+        return jsonify(result)
         
     except Exception as e:
         logger.error(f"Error getting background tasks history: {e}")
@@ -456,7 +452,7 @@ def get_background_tasks_analytics():
             return jsonify({
                 'error': 'Invalid group_by parameter',
                 'valid_groupings': valid_groupings,
-                'provided': group_by
+                'provided': period
             }), 400
         
         # Calculate hours based on period
@@ -510,7 +506,7 @@ def get_background_tasks_analytics():
                     'average_duration_ms': round(stats['total_duration'] / stats['executions'], 2) if stats['executions'] > 0 else 0
                 }
         
-        return response_optimizer.optimize_response(analytics)
+        return jsonify(analytics)
         
     except Exception as e:
         logger.error(f"Error getting background tasks analytics: {e}")

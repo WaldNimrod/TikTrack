@@ -116,7 +116,7 @@ function showFieldError(input, message) {
 
   // בדיקה שהאלמנט קיים
   if (!element) {
-    console.warn(`showFieldError: Element not found for input: ${input}`);
+    // showFieldError: Element not found for input
     return;
   }
 
@@ -146,7 +146,7 @@ function showFieldSuccess(input) {
 
   // בדיקה שהאלמנט קיים
   if (!element) {
-    console.warn(`showFieldSuccess: Element not found for input: ${input}`);
+    // showFieldSuccess: Element not found for input
     return;
   }
 
@@ -170,7 +170,7 @@ function clearFieldError(input) {
 
   // בדיקה שהאלמנט קיים
   if (!element) {
-    console.warn(`clearFieldError: Element not found for input: ${input}`);
+    // clearFieldError: Element not found for input
     return;
   }
 
@@ -190,7 +190,7 @@ function clearFieldValidation(input) {
 
   // בדיקה שהאלמנט קיים
   if (!element) {
-    console.warn(`clearFieldValidation: Element not found for input: ${input}`);
+    // clearFieldValidation: Element not found for input
     return;
   }
 
@@ -662,13 +662,13 @@ function validateForm(formId, validationRules = {}) {
 function initializeValidation(formId, validationRules = {}) {
   const form = document.getElementById(formId);
   if (!form) {
-    console.warn(`⚠️ Form ${formId} not found - skipping validation initialization`);
+    // Form ${formId} not found - skipping validation initialization
     return;
   }
 
   // מציאת כל השדות בטופס
   const inputs = form.querySelectorAll('input, select, textarea');
-  inputs.forEach((input, index) => {
+  inputs.forEach((input, _index) => {
     // הסרת event listeners קודמים
     if (input._validationHandler) {
       input.removeEventListener('input', input._validationHandler);
@@ -728,7 +728,7 @@ function initializeValidation(formId, validationRules = {}) {
 function clearValidation(formId) {
   const form = document.getElementById(formId);
   if (!form) {
-    console.warn(`⚠️ Form ${formId} not found - skipping validation clearing`);
+    // Form ${formId} not found - skipping validation clearing
     return;
   }
 

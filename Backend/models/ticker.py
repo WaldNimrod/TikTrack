@@ -79,6 +79,7 @@ class Ticker(BaseModel):
                         primaryjoin="and_(Ticker.id == Note.related_id, Note.related_type_id == 4)",
                         foreign_keys="Note.related_id",
                         viewonly=True)
+    market_quotes = relationship("MarketDataQuote", back_populates="ticker")
     
     def __repr__(self) -> str:
         """String representation of the ticker"""

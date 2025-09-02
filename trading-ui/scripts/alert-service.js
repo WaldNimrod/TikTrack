@@ -299,7 +299,7 @@ async function deleteAlert(alertId) {
       }
       return false;
     }
-  } catch (error) {
+  } catch {
     // שגיאה במחיקת התראה
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה', 'שגיאה במחיקת התראה - בדוק את חיבור השרת');

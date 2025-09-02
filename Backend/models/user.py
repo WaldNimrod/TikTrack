@@ -61,6 +61,7 @@ class User(BaseModel):
     # trades = relationship("Trade", back_populates="user")
     # alerts = relationship("Alert", back_populates="user")
     # notes = relationship("Note", back_populates="user")
+    data_preferences = relationship("UserDataPreferences", back_populates="user")
     
     def __repr__(self) -> str:
         """String representation of the user"""

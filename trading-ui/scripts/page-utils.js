@@ -101,7 +101,7 @@ function initializePageFilters(pageName) {
     setupFilterEventHandlers(pageName);
 
     // Filters initialized for page
-  } catch (error) {
+  } catch (_error) {
     // Error initializing filters
   }
 }
@@ -136,7 +136,7 @@ function setupSortableHeaders(pageName) {
     }
 
     // Sortable headers setup for page
-  } catch (error) {
+  } catch (_error) {
     // Error setting up sortable headers
   }
 }
@@ -155,18 +155,19 @@ function updateTableStats(pageName, data = null) {
 
   try {
     // Get current data if not provided
-    if (!data) {
-      data = getCurrentTableData(pageName);
+    let currentData = data;
+    if (!currentData) {
+      currentData = getCurrentTableData(pageName);
     }
 
     // Calculate statistics
-    const stats = calculateTableStats(data, pageName);
+    const stats = calculateTableStats(currentData, pageName);
 
     // Update display
     updateStatsDisplay(pageName, stats);
 
     // Table stats updated for page
-  } catch (error) {
+  } catch (_error) {
     // Error updating table stats
   }
 }
@@ -214,7 +215,7 @@ function restoreDesignsSectionState() {
     }
 
     // Designs section state restored
-  } catch (error) {
+  } catch (_error) {
     // Error restoring designs section state
   }
 }
@@ -259,7 +260,7 @@ function initializePage(pageName) {
     }
 
     // Page initialized successfully
-  } catch (error) {
+  } catch (_error) {
     // Error initializing page
   }
 }
@@ -285,7 +286,7 @@ function savePageState(pageName, state) {
 
     localStorage.setItem(key, JSON.stringify(stateToSave));
     // Page state saved for page
-  } catch (error) {
+  } catch (_error) {
     // Error saving page state
   }
 }
@@ -311,7 +312,7 @@ function loadPageState(pageName) {
     }
 
     return null;
-  } catch (error) {
+  } catch (_error) {
     // Error loading page state
     return null;
   }
@@ -329,7 +330,7 @@ function clearPageState(pageName) {
     const key = `pageState_${pageName}`;
     localStorage.removeItem(key);
     // Page state cleared for page
-  } catch (error) {
+  } catch (_error) {
     // Error clearing page state
   }
 }
@@ -413,7 +414,7 @@ function navigateToPage(pageName, options = {}) {
     // Navigate to page
     window.location.href = pageInfo.url;
 
-  } catch (error) {
+  } catch (_error) {
     // Error navigating to page
   }
 }

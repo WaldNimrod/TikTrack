@@ -10,6 +10,7 @@ from .note_relation_type import NoteRelationType
 from .execution import Execution
 from .currency import Currency
 from .user import User
+from .external_data import ExternalDataProvider, MarketDataQuote, UserDataPreferences, DataRefreshLog, IntradayDataSlot
 
 __all__ = [
     'BaseModel',
@@ -23,5 +24,10 @@ __all__ = [
     'NoteRelationType',
     'Execution',
     'Currency',
-    'User'
+    'User',
+    'ExternalDataProvider',
+    'MarketDataQuote',
+    'UserDataPreferences',
+    'DataRefreshLog',
+    'IntradayDataSlot'
 ]

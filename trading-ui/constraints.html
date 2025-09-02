@@ -15,12 +15,13 @@
     3. מערכת פילטרים ומיון מתקדמת
     
     מבנה הדף:
-    - app-header: כותרת האפליקציה עם ניווט
+    - unified-header: כותרת האפליקציה החדשה עם ניווט ופילטרים מאוחדים
     - page-body: תוכן ראשי מוגבל ברוחב (1400px)
       - top-section: כרטיסיות סטטיסטיקה
       - content-section: ממשק ניהול אילוצים
     
     שינויים אחרונים:
+    - החלפת app-header במערכת header-system החדשה
     - יצירת דף ניהול אילוצים חדש
     - שילוב כרטיסיות סטטיסטיקה בראש הדף
     - ממשק ניהול אילוצים מלא
@@ -36,14 +37,22 @@
 
   <!-- 3. General styles -->
   <link rel="stylesheet" href="styles/styles.css">
-    <link rel="stylesheet" href="styles/header-system.css">
+  <link rel="stylesheet" href="styles/header-system.css">
+  
   <!-- 4. Typography -->
   <link rel="stylesheet" href="styles/typography.css">
 
   <!-- 5. Table styles -->
   <link rel="stylesheet" href="styles/table.css">
 
-  <!-- 6. Header system styles (highest priority) -->
+  <!-- 6. Notification system styles -->
+  <link rel="stylesheet" href="styles/notification-system.css">
+
+  <!-- 7. Linked items styles -->
+  <link rel="stylesheet" href="styles/linked-items.css">
+
+  <!-- 8. Page specific styles -->
+  <link rel="stylesheet" href="styles/constraints.css">
 
   <!-- 7. Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -63,6 +72,9 @@
   <script src="scripts/page-utils.js"></script>
   <script src="scripts/main.js"></script>
   <script src="scripts/alert-service.js"></script>
+  <script src="scripts/header-system.js"></script>
+  <script src="scripts/active-alerts-component.js"></script>
+  <script src="scripts/constraint-manager.js"></script>
 
   <style>
     .constraints-container {
@@ -526,6 +538,14 @@
       loadConstraints();
     });
   </script>
+
+  <!-- Scripts -->
+  <script src="scripts/console-cleanup.js"></script>
+  <script src="scripts/header-system.js"></script>
+  <script src="scripts/notification-system.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/active-alerts-component.js"></script>
+  <script src="scripts/constraint-manager.js"></script>
 
 </body>
 

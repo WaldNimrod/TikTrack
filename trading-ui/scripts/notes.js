@@ -1717,7 +1717,13 @@ function filterNotesData(searchTerm) {
     return content.includes(searchLower) || relatedDisplay.includes(searchLower);
   });
 
-  updateNotesTable(filteredNotes, window.accountsData || [], window.tradesData || [], window.tradePlansData || [], window.tickersData || []);
+  updateNotesTable(
+    filteredNotes,
+    window.accountsData || [],
+    window.tradesData || [],
+    window.tradePlansData || [],
+    window.tickersData || [],
+  );
 }
 
 // פונקציה לסינון הערות לפי סוג
@@ -1771,7 +1777,13 @@ function filterNotesByType(type) {
     }
   }
 
-  updateNotesTable(filteredNotes, window.accountsData || [], window.tradesData || [], window.tradePlansData || [], window.tickersData || []);
+  updateNotesTable(
+    filteredNotes,
+    window.accountsData || [],
+    window.tradesData || [],
+    window.tradePlansData || [],
+    window.tickersData || [],
+  );
 }
 
 // פונקציה לקבלת שם תצוגה לסוג
@@ -1842,7 +1854,7 @@ async function loadNoteForViewing(noteId) {
       attachmentElement.textContent = 'אין קובץ מצורף';
     }
 
-  } catch (error) {
+  } catch {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני הערה');
     }
@@ -1907,7 +1919,10 @@ function displayCurrentAttachment(attachment) {
       <div style="display: flex; align-items: center; gap: 8px;">
         <span>${fileIcon}</span>
         <span>${fileName}</span>
-        <a href="/api/v1/notes/files/${fileName}" target="_blank" class="btn btn-sm btn-outline-primary" style="margin-right: auto;">
+        <a href="/api/v1/notes/files/${fileName}" 
+           target="_blank" 
+           class="btn btn-sm btn-outline-primary" 
+           style="margin-right: auto;">
           👁️ צפה
         </a>
       </div>

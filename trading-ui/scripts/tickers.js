@@ -1537,7 +1537,15 @@ function updateTickersTable(tickers) {
                     <td title="${ticker.symbol || 'N/A'}"><strong>${ticker.symbol || 'N/A'}</strong></td>
                     <td title="${ticker.active_trades ? 'יש טריידים פעילים' : 'אין טריידים פעילים'}">${ticker.active_trades ? '✅' : '❌'}</td>
                     <td title="${typeLabel}">
-                        <span style="background-color: ${typeStyle.backgroundColor}; color: ${typeStyle.color}; padding: ${typeStyle.padding}; border-radius: ${typeStyle.borderRadius}; font-size: ${typeStyle.fontSize}; font-weight: ${typeStyle.fontWeight}; display: ${typeStyle.display}; min-width: ${typeStyle.minWidth}; text-align: ${typeStyle.textAlign};">
+                        <span style="background-color: ${typeStyle.backgroundColor}; 
+                                     color: ${typeStyle.color}; 
+                                     padding: ${typeStyle.padding}; 
+                                     border-radius: ${typeStyle.borderRadius}; 
+                                     font-size: ${typeStyle.fontSize}; 
+                                     font-weight: ${typeStyle.fontWeight}; 
+                                     display: ${typeStyle.display}; 
+                                     min-width: ${typeStyle.minWidth}; 
+                                     text-align: ${typeStyle.textAlign};">
                             ${typeLabel}
                         </span>
                     </td>
@@ -1547,19 +1555,37 @@ function updateTickersTable(tickers) {
                     <td title="${ticker.created_at ? new Date(ticker.created_at).toLocaleDateString('he-IL') : 'N/A'}">${ticker.created_at ? new Date(ticker.created_at).toLocaleDateString('he-IL') : 'N/A'}</td>
                     <td title="${ticker.remarks || '-'}">${ticker.remarks || '-'}</td>
                     <td title="${statusLabel}">
-                        <span style="background-color: ${statusStyle.backgroundColor}; color: ${statusStyle.color}; padding: ${statusStyle.padding}; border-radius: ${statusStyle.borderRadius}; font-size: ${statusStyle.fontSize}; font-weight: ${statusStyle.fontWeight}; display: ${statusStyle.display}; min-width: ${statusStyle.minWidth}; text-align: ${statusStyle.textAlign};">
+                        <span style="background-color: ${statusStyle.backgroundColor}; 
+                                     color: ${statusStyle.color}; 
+                                     padding: ${statusStyle.padding}; 
+                                     border-radius: ${statusStyle.borderRadius}; 
+                                     font-size: ${statusStyle.fontSize}; 
+                                     font-weight: ${statusStyle.fontWeight}; 
+                                     display: ${statusStyle.display}; 
+                                     min-width: ${statusStyle.minWidth}; 
+                                     text-align: ${statusStyle.textAlign};">
                             ${statusLabel}
                         </span>
                     </td>
                     <td class="actions-cell">
                         <div class="btn-group btn-group-sm" role="group">
-                            <button class="btn btn-outline-info" onclick="window.showLinkedItemsWarning('ticker', ${ticker.id})" title="פריטים מקושרים">🔗</button>
-                            <button class="btn btn-outline-secondary" onclick="window.showEditTickerModal(${ticker.id})" title="ערוך">✏️</button>
+                            <button class="btn btn-outline-info" 
+                                    onclick="window.showLinkedItemsWarning('ticker', ${ticker.id})" 
+                                    title="פריטים מקושרים">🔗</button>
+                            <button class="btn btn-outline-secondary" 
+                                    onclick="window.showEditTickerModal(${ticker.id})" 
+                                    title="ערוך">✏️</button>
                             ${ticker.status === 'cancelled' ?
-    `<button class="btn btn-outline-success" onclick="window.reactivateTicker(${ticker.id})" title="הפעל מחדש טיקר"><span class="reactivate-icon">✓</span></button>` :
-    `<button class="btn btn-outline-danger" onclick="window.cancelTicker(${ticker.id})" title="בטל טיקר"><span class="cancel-icon">X</span></button>`
+    `<button class="btn btn-outline-success" 
+             onclick="window.reactivateTicker(${ticker.id})" 
+             title="הפעל מחדש טיקר"><span class="reactivate-icon">✓</span></button>` :
+    `<button class="btn btn-outline-danger" 
+             onclick="window.cancelTicker(${ticker.id})" 
+             title="בטל טיקר"><span class="cancel-icon">X</span></button>`
 }
-                            <button class="btn btn-outline-danger" onclick="window.deleteTicker(${ticker.id})" title="מחק טיקר"><span class="delete-icon">🗑️</span></button>
+                            <button class="btn btn-outline-danger" 
+                                    onclick="window.deleteTicker(${ticker.id})" 
+                                    title="מחק טיקר"><span class="delete-icon">🗑️</span></button>
                         </div>
                     </td>
                 </tr>
@@ -1710,9 +1736,6 @@ window.addEventListener('load', function () {
   function tryLoadData() {
 
     // בדיקה מפורטת יותר
-    const table = document.querySelector('table[data-table-type="tickers"]');
-
-    const container = document.getElementById('tickersContainer');
 
     const tbody = document.querySelector('table[data-table-type="tickers"] tbody') ||
                      document.getElementById('tickersContainer')?.querySelector('tbody');

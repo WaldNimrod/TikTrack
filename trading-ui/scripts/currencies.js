@@ -25,7 +25,7 @@ if (!window.currenciesData) {
 let currenciesData = window.currenciesData;
 
 // פונקציות בסיסיות
-function openCurrencyDetails(id) {
+function openCurrencyDetails(_id) {
 
   showAddCurrencyModal();
 }
@@ -125,110 +125,9 @@ async function loadCurrencies() {
   }
 }
 
-/**
- * שמירת מטבע חדש
- */
-async function saveCurrency() {
-  try {
+// saveCurrency function removed - not used
 
-    const symbol = document.getElementById('currencySymbol').value.trim();
-    const name = document.getElementById('currencyName').value.trim();
-    const usdRate = parseFloat(document.getElementById('currencyUsdRate').value);
-
-    // ולידציה
-    if (!symbol || !name || isNaN(usdRate)) {
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה בטופס', 'יש למלא את כל השדות');
-      }
-      return;
-    }
-
-    const data = {
-      symbol,
-      name,
-      usd_rate: usdRate,
-    };
-
-    const response = await fetch('http://localhost:8080/api/v1/currencies/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    const result = await response.json();
-
-    if (result.status === 'success') {
-
-      // סגירת המודל
-      const modal = bootstrap.Modal.getInstance(document.getElementById('addCurrencyModal'));
-      modal.hide();
-
-      // טעינה מחדש של הנתונים
-      await loadCurrencies();
-    } else {
-      handleApiError(new Error(result.error), 'שמירת מטבע');
-      window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת מטבע');
-    }
-  } catch (error) {
-    handleSaveError(error, 'שמירת מטבע');
-    window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת מטבע');
-  }
-}
-
-/**
- * עדכון מטבע
- */
-async function updateCurrency() {
-  try {
-
-    const id = parseInt(document.getElementById('editCurrencyId').value);
-    const symbol = document.getElementById('editCurrencySymbol').value.trim();
-    const name = document.getElementById('editCurrencyName').value.trim();
-    const usdRate = parseFloat(document.getElementById('editCurrencyUsdRate').value);
-
-    // ולידציה
-    if (!symbol || !name || isNaN(usdRate)) {
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה בטופס', 'יש למלא את כל השדות');
-      }
-      return;
-    }
-
-    const data = {
-      symbol,
-      name,
-      usd_rate: usdRate,
-    };
-
-    const response = await fetch(`http://localhost:8080/api/v1/currencies/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    const result = await response.json();
-
-    if (result.status === 'success') {
-
-      // סגירת המודל
-      const modal = bootstrap.Modal.getInstance(document.getElementById('editCurrencyModal'));
-      modal.hide();
-
-      // טעינה מחדש של הנתונים
-      await loadCurrencies();
-    } else {
-      handleApiError(new Error(result.error), 'עדכון מטבע');
-      window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון מטבע');
-    }
-  } catch (error) {
-    handleSaveError(error, 'עדכון מטבע');
-    window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון מטבע');
-  }
-}
+// updateCurrency function removed - not used
 
 /**
  * מחיקת מטבע
@@ -287,10 +186,9 @@ async function checkLinkedItemsBeforeDelete(currencyId) {
 
     const linkedItemsData = await response.json();
     const childEntities = linkedItemsData.child_entities || [];
-    const parentEntities = linkedItemsData.parent_entities || [];
+    // parent entities הם פריטים שהמטבע מקושר אליהם - לא רלוונטי למחיקה
 
     // בדיקה רק אם יש פריטים שמקושרים אל המטבע (child entities)
-    // parent entities הם פריטים שהמטבע מקושר אליהם - לא רלוונטי למחיקה
     if (childEntities.length > 0) {
       // יש פריטים מקושרים - הצגת חלון מקושרים
       if (typeof window.showLinkedItemsModal === 'function') {

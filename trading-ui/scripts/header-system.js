@@ -675,8 +675,6 @@ class HeaderSystem {
                             </a></li>
                             <li><a class="tiktrack-dropdown-item" href="/notifications-center">מרכז התראות</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/background-tasks">ניהול משימות ברקע</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/system_health.html">בריאות מערכת</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/log_viewer.html">צפייה בלוגים</a></li>
                           </ul>
                         </li>
 
@@ -712,34 +710,11 @@ class HeaderSystem {
                         </li>
 
                         <!-- 🚀 מערכת נתונים חיצוניים -->
-                        <li class="dropdown-submenu">
-                          <a href="#" class="tiktrack-dropdown-item tiktrack-submenu-toggle">
-                            <span>🚀 מערכת נתונים חיצוניים</span>
-                            <span class="submenu-arrow">▶</span>
-                          </a>
-                          <ul class="tiktrack-submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 ניהול מערכת</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/yahoo_finance_test.html">בדיקת Yahoo Finance</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/data_integration_demo.html">הדגמת אינטגרציה</a></li>
-                          </ul>
+                        <li class="tiktrack-dropdown-item">
+                          <a href="/system-management">🔧 ניהול מערכת</a>
                         </li>
 
-                        <!-- 🛠️ כלי פיתוח מתקדמים -->
-                        <li class="dropdown-submenu">
-                          <a href="#" class="tiktrack-dropdown-item tiktrack-submenu-toggle">
-                            <span>🛠️ כלי פיתוח מתקדמים</span>
-                            <span class="submenu-arrow">▶</span>
-                          </a>
-                          <ul class="tiktrack-submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/developer_tools.html">כלי מפתח</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/api_testing.html">בדיקת API</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/performance_monitoring.html">ניטור ביצועים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/security_monitoring.html">ניטור אבטחה</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/audit_logs.html">יומני ביקורת</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/communication_monitoring.html">ניטור תקשורת</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/network_status.html">סטטוס רשת</a></li>
-                          </ul>
-                        </li>
+
                       </ul>
                     </li>
                   </ul>
@@ -1922,7 +1897,7 @@ class HeaderSystem {
           } else {
             menu.classList.add('show');
             this.setupMenuAutoClose(menu);
-            
+
             // הוספת event listeners לתפריטי משנה
             this.setupSubmenuEventListenersForMenu(menu);
           }
@@ -1958,7 +1933,7 @@ class HeaderSystem {
     });
 
     // הוספת event listener לתפריטי משנה
-    menu.addEventListener('mouseover', (e) => {
+    menu.addEventListener('mouseover', e => {
       if (e.target.closest('.submenu') || e.target.closest('.dropdown-submenu')) {
         this.clearMenuTimers(menu);
       }
@@ -2042,21 +2017,21 @@ class HeaderSystem {
     }
   }
 
-    // פונקציה עזר לבדיקה אם העכבר נמצא בתפריט משנה
+  // פונקציה עזר לבדיקה אם העכבר נמצא בתפריט משנה
   isMouseInSubmenu() {
     // בדיקה אם העכבר נמצא בתפריט משנה כלשהו
     const submenu = document.querySelector('.submenu:hover');
     const dropdownSubmenu = document.querySelector('.dropdown-submenu:hover');
-    
+
     // בדיקה אם העכבר נמצא בתפריט הראשי
     const dropdownMenu = document.querySelector('.tiktrack-dropdown-menu:hover');
-    
+
     // בדיקה אם העכבר נמצא בפריט תפריט
     const navItem = document.querySelector('.tiktrack-nav-item:hover');
-    
+
     // בדיקה אם העכבר נמצא בפריט תפריט נפתח
     const navDropdown = document.querySelector('.tiktrack-nav-item.dropdown:hover');
-    
+
     return !!(submenu || dropdownSubmenu || dropdownMenu || navItem || navDropdown);
   }
 
@@ -2066,10 +2041,10 @@ class HeaderSystem {
     this.addSubmenuEventListeners();
 
     // הוספת event listeners לתפריטי משנה חדשים שנוצרים
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
         if (mutation.type === 'childList') {
-          mutation.addedNodes.forEach((node) => {
+          mutation.addedNodes.forEach(node => {
             if (node.nodeType === Node.ELEMENT_NODE) {
               if (node.classList && (node.classList.contains('submenu') || node.classList.contains('dropdown-submenu'))) {
                 this.addSubmenuEventListenersToElement(node);
@@ -2086,13 +2061,13 @@ class HeaderSystem {
     // התחלת מעקב אחרי שינויים ב-DOM
     observer.observe(document.body, {
       childList: true,
-      subtree: true
+      subtree: true,
     });
   }
 
   // פונקציה להוספת event listeners לאלמנט תפריט משנה
   addSubmenuEventListenersToElement(submenu) {
-    if (submenu._submenuEventListenersAdded) return;
+    if (submenu._submenuEventListenersAdded) {return;}
 
     submenu.addEventListener('mouseenter', () => {
       // ביטול טיימרים של התפריט הראשי

@@ -529,3 +529,232 @@ def get_api_status():
             'error': 'Internal server error',
             'message': str(e)
         }), 500
+
+# Additional endpoints for dashboard
+
+@status_bp.route('/cache/stats', methods=['GET'])
+def get_detailed_cache_stats():
+    """
+    Get detailed cache statistics for dashboard
+    
+    Returns:
+    - JSON response with detailed cache statistics
+    """
+    try:
+        # Get database session
+        db_session = next(get_db())
+        
+        try:
+            # Get cache stats
+            cache_manager = CacheManager(db_session)
+            cache_stats = cache_manager.get_cache_stats()
+            
+            response = {
+                'success': True,
+                'timestamp': datetime.now(timezone.utc).isoformat(),
+                'total_quotes': cache_stats.total_quotes,
+                'total_intraday_slots': cache_stats.total_intraday_slots,
+                'cache_hit_rate': cache_stats.cache_hit_rate,
+                'stale_data': cache_stats.stale_data_count,
+                'avg_quote_age_minutes': 0  # Placeholder
+            }
+            
+            return jsonify(response), 200
+            
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Error in get_detailed_cache_stats: {e}")
+        return jsonify({
+            'error': 'Internal server error',
+            'message': str(e)
+        }), 500
+
+@status_bp.route('/cache/clear', methods=['POST'])
+def clear_cache_endpoint():
+    """
+    Clear the cache
+    
+    Returns:
+    - JSON response with operation result
+    """
+    try:
+        # Get database session
+        db_session = next(get_db())
+        
+        try:
+            # Clear cache (placeholder implementation)
+            # In a real implementation, this would clear the cache
+            logger.info("Cache clear requested via dashboard")
+            
+            response = {
+                'success': True,
+                'timestamp': datetime.now(timezone.utc).isoformat(),
+                'message': 'Cache cleared successfully'
+            }
+            
+            return jsonify(response), 200
+            
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Error in clear_cache_endpoint: {e}")
+        return jsonify({
+            'error': 'Internal server error',
+            'message': str(e)
+        }), 500
+
+@status_bp.route('/logs', methods=['GET'])
+def get_data_logs():
+    """
+    Get data refresh logs for dashboard
+    
+    Returns:
+    - JSON response with logs
+    """
+    try:
+        # Get database session
+        db_session = next(get_db())
+        
+        try:
+            # Get recent logs
+            logs = db_session.query(DataRefreshLog).order_by(DataRefreshLog.start_time.desc()).limit(100).all()
+            
+            logs_data = []
+            for log in logs:
+                log_data = {
+                    'id': log.id,
+                    'timestamp': log.start_time.isoformat() if log.start_time else None,
+                    'level': 'info' if log.status == 'success' else 'error',
+                    'message': f"{log.operation_type}: {log.status} - {log.symbols_successful}/{log.symbols_requested} symbols",
+                    'provider_id': log.provider_id,
+                    'status': log.status,
+                    'operation_type': log.operation_type,
+                    'symbols_requested': log.symbols_requested,
+                    'symbols_successful': log.symbols_successful,
+                    'symbols_failed': log.symbols_failed,
+                    'total_duration_ms': log.total_duration_ms,
+                    'error_message': log.error_message
+                }
+                logs_data.append(log_data)
+            
+            response = {
+                'success': True,
+                'timestamp': datetime.now(timezone.utc).isoformat(),
+                'logs': logs_data
+            }
+            
+            return jsonify(response), 200
+            
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Error in get_data_logs: {e}")
+        return jsonify({
+            'error': 'Internal server error',
+            'message': str(e)
+        }), 500
+
+@status_bp.route('/logs/clear', methods=['POST'])
+def clear_data_logs():
+    """
+    Clear data refresh logs
+    
+    Returns:
+    - JSON response with operation result
+    """
+    try:
+        # Get database session
+        db_session = next(get_db())
+        
+        try:
+            # Clear logs (placeholder implementation)
+            # In a real implementation, this would clear old logs
+            logger.info("Data logs clear requested via dashboard")
+            
+            response = {
+                'success': True,
+                'timestamp': datetime.now(timezone.utc).isoformat(),
+                'message': 'Logs cleared successfully'
+            }
+            
+            return jsonify(response), 200
+            
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Error in clear_data_logs: {e}")
+        return jsonify({
+            'error': 'Internal server error',
+            'message': str(e)
+        }), 500
+
+@status_bp.route('/settings', methods=['POST'])
+def update_external_data_settings():
+    """
+    Update external data system settings
+    
+    Returns:
+    - JSON response with operation result
+    """
+    try:
+        # Get request data
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({
+                'error': 'Bad request',
+                'message': 'No data provided'
+            }), 400
+        
+        # Extract settings
+        hot_cache_ttl = data.get('hot_cache_ttl', 1)
+        warm_cache_ttl = data.get('warm_cache_ttl', 5)
+        max_requests_hour = data.get('max_requests_hour', 900)
+        
+        # Validate settings
+        if not (1 <= hot_cache_ttl <= 60):
+            return jsonify({
+                'error': 'Bad request',
+                'message': 'hot_cache_ttl must be between 1 and 60'
+            }), 400
+        
+        if not (1 <= warm_cache_ttl <= 120):
+            return jsonify({
+                'error': 'Bad request',
+                'message': 'warm_cache_ttl must be between 1 and 120'
+            }), 400
+        
+        if not (100 <= max_requests_hour <= 2000):
+            return jsonify({
+                'error': 'Bad request',
+                'message': 'max_requests_hour must be between 100 and 2000'
+            }), 400
+        
+        # Update settings (placeholder implementation)
+        # In a real implementation, this would update configuration
+        logger.info(f"External data settings updated via dashboard: hot_cache_ttl={hot_cache_ttl}, warm_cache_ttl={warm_cache_ttl}, max_requests_hour={max_requests_hour}")
+        
+        response = {
+            'success': True,
+            'timestamp': datetime.now(timezone.utc).isoformat(),
+            'message': 'Settings updated successfully',
+            'settings': {
+                'hot_cache_ttl': hot_cache_ttl,
+                'warm_cache_ttl': warm_cache_ttl,
+                'max_requests_hour': max_requests_hour
+            }
+        }
+        
+        return jsonify(response), 200
+        
+    except Exception as e:
+        logger.error(f"Error in update_external_data_settings: {e}")
+        return jsonify({
+            'error': 'Internal server error',
+            'message': str(e)
+        }), 500

@@ -142,8 +142,9 @@ function initializeApplication() {
     // Initialize current page
     initializeCurrentPage();
   } catch (error) {
-    // Application Initialization Failed
-    showSystemError('Application initialization failed. Please refresh the page.');
+    // Application Initialization Failed - Show actual error
+    console.error('❌ Application initialization error:', error);
+    showSystemError(`Application initialization failed: ${error.message || 'Unknown error'}. Please refresh the page.`);
   }
 }
 
@@ -167,7 +168,7 @@ function checkDependencies() {
   const missingModules = requiredModules.filter(module => !window[module]);
 
   if (missingModules.length > 0) {
-    console.warn('⚠️ Missing modules:', missingModules);
+    // console.warn('⚠️ Missing modules:', missingModules);
 
     // לא נחזיר false כדי לא לעצור את האתחול
     return true;
@@ -188,6 +189,15 @@ function initializeCoreSystems() {
     window.headerSystem.init();
   }
 
+  // Initialize notifications center (if not on notifications-center page)
+  if (window.NotificationsCenter && !window.notificationsCenter && !window.location.pathname.includes('notifications-center')) {
+    try {
+      window.notificationsCenter = new window.NotificationsCenter();
+      // console.log('✅ מרכז התראות אותחל בהצלחה');
+    } catch {
+      // console.warn('⚠️ שגיאה באתחול מרכז התראות:', error);
+    }
+  }
 
   // Set up global error handlers
   window.addEventListener('error', handleGlobalError);
@@ -265,7 +275,7 @@ function initializeCurrentPage() {
     if (typeof window.restoreAllSectionStates === 'function') {
       window.restoreAllSectionStates();
     } else {
-      console.warn('⚠️ restoreAllSectionStates function not found');
+      // console.warn('⚠️ restoreAllSectionStates function not found');
     }
   }, 100);
 }
@@ -339,7 +349,7 @@ function showSystemError(message) {
   } else if (typeof window.showNotification === 'function') {
     window.showNotification(message, 'error', 'שגיאת מערכת');
   } else {
-    console.error('❌ שגיאת מערכת:', message);
+    // console.error('❌ שגיאת מערכת:', message);
   }
 }
 
@@ -475,10 +485,10 @@ function restoreAllSectionStates() {
       }
       // Restored top section state
     } else {
-      console.warn('⚠️ Could not restore top section state - elements not found');
+      // console.warn('⚠️ Could not restore top section state - elements not found');
     }
 
-  } catch (error) {
+  } catch {
     // Error restoring section states
   }
 }
@@ -817,7 +827,8 @@ window.restoreDesignsSectionState = function () {
 window.toggleSection = function (sectionId) {
   const section = document.querySelector(`[data-section="${sectionId}"]`);
   const sectionBody = section ? section.querySelector('.section-body') : null;
-  const toggleBtn = section ? section.querySelector(`button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`) : null;
+  const toggleBtn = section ? section.querySelector(
+    `button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`) : null;
   const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
   if (sectionBody && toggleBtn) {
@@ -856,7 +867,8 @@ window.toggleAllSections = function () {
   sections.forEach(section => {
     const sectionId = section.getAttribute('data-section');
     const sectionBody = section.querySelector('.section-body');
-    const toggleBtn = section.querySelector(`button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`);
+    const toggleBtn = section.querySelector(
+      `button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`);
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
     if (sectionBody && toggleBtn) {
@@ -902,7 +914,8 @@ window.restoreSectionStates = function () {
   sections.forEach(section => {
     const sectionId = section.getAttribute('data-section');
     const sectionBody = section.querySelector('.section-body');
-    const toggleBtn = section.querySelector(`button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`);
+    const toggleBtn = section.querySelector(
+      `button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`);
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
     if (sectionId && sectionBody) {
@@ -1244,7 +1257,7 @@ window.updateSortIcons = function (tableType, activeColumnIndex, direction) {
     // Find all sortable headers in the current table
     const table = document.querySelector(`[data-table-type="${tableType}"]`);
     if (!table) {
-      console.warn(`⚠️ Table with type "${tableType}" not found`);
+      // console.warn(`⚠️ Table with type "${tableType}" not found`);
       return;
     }
 
@@ -1264,8 +1277,8 @@ window.updateSortIcons = function (tableType, activeColumnIndex, direction) {
         }
       }
     });
-  } catch (error) {
-    console.warn('⚠️ Error updating sort icons:', error);
+  } catch {
+    // console.warn('⚠️ Error updating sort icons:', error);
   }
 };
 

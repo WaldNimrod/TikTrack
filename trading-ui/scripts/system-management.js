@@ -20,22 +20,22 @@ class SystemManagement {
       return;
     }
 
-    console.log('⚙️ System Management - Initializing...');
+    // System Management - Initializing...
 
     // Initialize dashboard
-    this.initializeDashboard();
+    SystemManagement.initializeDashboard();
 
     // Setup auto-refresh
     this.setupAutoRefresh();
 
     // Setup event listeners
-    this.setupEventListeners();
+    SystemManagement.setupEventListeners();
 
     this.isInitialized = true;
-    console.log('✅ System Management - Initialized successfully');
+    // System Management - Initialized successfully
   }
 
-  initializeDashboard() {
+  static initializeDashboard() {
     // Initialize header system
     if (window.headerSystem) {
       window.headerSystem.init();
@@ -48,16 +48,16 @@ class SystemManagement {
   setupAutoRefresh() {
     // Refresh every 30 seconds
     this.refreshInterval = setInterval(() => {
-      this.refreshSystemHealth();
+      SystemManagement.refreshSystemHealth();
     }, 30000);
   }
 
-  setupEventListeners() {
+  static setupEventListeners() {
     // Log level filter
     const logLevelFilter = document.getElementById('log-level-filter');
     if (logLevelFilter) {
       logLevelFilter.addEventListener('change', () => {
-        this.filterLogs();
+        SystemManagement.filterLogs();
       });
     }
 
@@ -65,20 +65,18 @@ class SystemManagement {
     const logSearch = document.getElementById('log-search');
     if (logSearch) {
       logSearch.addEventListener('input', () => {
-        this.filterLogs();
+        SystemManagement.filterLogs();
       });
     }
   }
 
-  filterLogs() {
-    const levelFilter = document.getElementById('log-level-filter')?.value || 'all';
-    const searchTerm = document.getElementById('log-search')?.value || '';
-
-    console.log('🔍 Filtering logs:', { level: levelFilter, search: searchTerm });
+  static filterLogs() {
+    // Filtering logs with level and search term
+    // Implementation will be added when log filtering functionality is needed
   }
 
-  refreshSystemHealth() {
-    console.log('🔄 Refreshing system health...');
+  static refreshSystemHealth() {
+    // Refreshing system health...
     // Implementation for refreshing system health
   }
 

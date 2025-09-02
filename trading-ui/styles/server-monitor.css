@@ -23,6 +23,168 @@
     margin: 0;
 }
 
+/* Modal Styles for Mode Info */
+.mode-info-modal .modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.mode-info-modal .modal-header {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    border-bottom: none;
+}
+
+.mode-info-modal .modal-title {
+    font-weight: 600;
+}
+
+.mode-info-modal .modal-body {
+    padding: 2rem;
+}
+
+.mode-info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.mode-description-section h6,
+.mode-features-section h6,
+.mode-usecase-section h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.mode-description-section p {
+    color: #495057;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.mode-features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mode-features-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    color: #495057;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.mode-features-list li:last-child {
+    border-bottom: none;
+}
+
+.mode-features-list li i {
+    color: #27ae60;
+    width: 16px;
+}
+
+.mode-usecase-section p {
+    color: #495057;
+    line-height: 1.6;
+    margin: 0;
+    font-style: italic;
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+}
+
+/* Additional UI Enhancements */
+.mode-option-card .btn {
+    transition: all 0.2s ease;
+}
+
+.mode-option-card .btn:hover {
+    transform: translateY(-1px);
+}
+
+.mode-option-card .btn-primary {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    border: none;
+}
+
+.mode-option-card .btn-warning {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    border: none;
+}
+
+.mode-option-card .btn-success {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    border: none;
+}
+
+.mode-option-card .btn-secondary {
+    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+    border: none;
+}
+
+.mode-option-card .btn-outline-info {
+    border-color: #17a2b8;
+    color: #17a2b8;
+}
+
+.mode-option-card .btn-outline-info:hover {
+    background: #17a2b8;
+    border-color: #17a2b8;
+}
+
+/* Loading States */
+.mode-option-card.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.mode-option-card.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Error States */
+.mode-option-card.error {
+    border-color: #e74c3c;
+    background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+}
+
+.mode-option-card.error .mode-icon {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+/* Success States */
+.mode-option-card.success {
+    border-color: #27ae60;
+    background: linear-gradient(135deg, #f0fff4 0%, #dcfce7 100%);
+}
+
+.mode-option-card.success .mode-icon {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+}
+
 /* Status Overview */
 .status-overview {
     display: grid;

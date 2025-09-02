@@ -24,7 +24,7 @@ from typing import Dict, Any, List, Optional
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 from config.database import get_db
-from services.cache_service import cache_service
+from services.advanced_cache_service import advanced_cache_service
 from utils.performance_monitor import monitor_performance
 import logging
 
@@ -141,25 +141,25 @@ class HealthService:
         
         try:
             # Get cache statistics
-            stats = cache_service.get_stats()
+            stats = advanced_cache_service.get_stats()
             
             # Test cache operations
             test_key = f"health_check_{int(time.time())}"
             test_value = {"test": "data", "timestamp": datetime.now().isoformat()}
             
             # Test set operation
-            cache_service.set(test_key, test_value, ttl=10)
+            advanced_cache_service.set(test_key, test_value, ttl=10)
             
             # Test get operation
-            retrieved_value = cache_service.get(test_key)
+            retrieved_value = advanced_cache_service.get(test_key)
             
             # Test delete operation
-            cache_service.delete(test_key)
+            advanced_cache_service.delete(test_key)
             
             # Calculate hit rate (if we have historical data)
             hit_rate = 0.0
-            if hasattr(cache_service, '_cache') and cache_service._cache:
-                total_requests = len(cache_service._cache)
+            if hasattr(advanced_cache_service, 'cache') and advanced_cache_service.cache:
+                total_requests = len(advanced_cache_service.cache)
                 if total_requests > 0:
                     hit_rate = (total_requests - stats.get('expired_entries', 0)) / total_requests
             

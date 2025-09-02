@@ -121,7 +121,7 @@ async function loadAlertsData() {
 
     return alertsData;
 
-  } catch (_error) {
+  } catch {
     // משתמש בנתוני דמו
 
     // שימוש בנתוני דמו
@@ -171,15 +171,7 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
 
   // Filtering by type
   if (selectedTypes && selectedTypes.length > 0 && !selectedTypes.includes('all')) {
-    filteredAlerts = filteredAlerts.filter(alert => {
-      // המרת הערכים הנבחרים לאנגלית
-      const typeTranslations = {
-        'התראה על מחיר': 'price_alert',
-        'סטופ לוס': 'stop_loss',
-        'התראה על נפח': 'volume_alert',
-        'התראה מותאמת': 'custom_alert',
-      };
-
+    filteredAlerts = filteredAlerts.filter(() => {
       // הסרת פילטור לפי סוג התראה - השדה type הוסר
       const isMatch = true;
       return isMatch;
@@ -309,7 +301,7 @@ function updateAlertsTable(alerts) {
       trades = (tradesResponse.data || tradesResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
       tradePlans = (tradePlansResponse.data || tradePlansResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
       tickers = (tickersResponse.data || tickersResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
-    } catch (error) {
+    } catch {
       // // console.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error);
       // המשך עם מערכים ריקים
       accounts = [];
@@ -370,7 +362,10 @@ function updateAlertsTable(alerts) {
         }
         case 2: { // טרייד
           // console.log(`🔍 Looking for trade with ID: ${alert.related_id}`);
-          // console.log('🔍 Available trades:', trades.map(t => ({ id: t.id, created_at: t.created_at, date: t.date, side: t.side, investment_type: t.investment_type })));
+          // console.log('🔍 Available trades:', trades.map(t => ({
+          //   id: t.id, created_at: t.created_at, date: t.date,
+          //   side: t.side, investment_type: t.investment_type
+          // })));
           const trade = trades.find(t => t.id === alert.related_id);
           if (trade) {
             const date = trade.created_at || trade.date;
@@ -389,7 +384,10 @@ function updateAlertsTable(alerts) {
         }
         case 3: { // תוכנית
           // console.log(`🔍 Looking for trade plan with ID: ${alert.related_id}`);
-          // console.log('🔍 Available trade plans:', tradePlans.map(p => ({ id: p.id, created_at: p.created_at, date: p.date, side: p.side, investment_type: p.investment_type })));
+          // console.log('🔍 Available trade plans:', tradePlans.map(p => ({
+          //   id: p.id, created_at: p.created_at, date: p.date,
+          //   side: p.side, investment_type: p.investment_type
+          // })));
           const plan = tradePlans.find(p => p.id === alert.related_id);
           if (plan) {
             const date = plan.created_at || plan.date;

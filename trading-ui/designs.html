@@ -38,14 +38,25 @@
 
   <!-- 3. General styles -->
   <link rel="stylesheet" href="styles/styles.css">
-    <link rel="stylesheet" href="styles/header-system.css">
+  <link rel="stylesheet" href="styles/header-system.css">
+  
   <!-- 4. Typography -->
   <link rel="stylesheet" href="styles/typography.css">
 
   <!-- 5. Table styles -->
   <link rel="stylesheet" href="styles/table.css">
 
-  <!-- 6. Header system styles (highest priority) -->
+  <!-- 6. Notification system styles -->
+  <link rel="stylesheet" href="styles/notification-system.css">
+
+  <!-- 7. Linked items styles -->
+  <link rel="stylesheet" href="styles/linked-items.css">
+
+  <!-- 8. Page specific styles -->
+  <link rel="stylesheet" href="styles/designs.css">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
   <!-- Modular grid files - loaded at end of file -->
 </head>
@@ -54,9 +65,8 @@
   <!-- General background -->
   <div class="background-wrapper">
 
-    <!-- Application header -->
-    <!-- Unified Header System -->
-    <!-- Unified Header System will create header automatically -->
+    <!-- unified-header auto-generated -->
+    <div id="unified-header"></div>
 
     <!-- Page body - All content after header -->
     <div class="page-body">
@@ -349,18 +359,9 @@
 
     <!-- Modular files -->
     <script src="scripts/console-cleanup.js"></script>
-    <script src="scripts/translation-utils.js"></script>
-    <script src="scripts/data-utils.js"></script>
-    <script src="scripts/ui-utils.js"></script>
-    <script src="scripts/error-handlers.js"></script>
-    <script src="scripts/table-mappings.js"></script>
-    <script src="scripts/date-utils.js"></script>
-    <script src="scripts/tables.js"></script>
-    <script src="scripts/linked-items.js"></script>
-    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/header-system.js"></script>
+    <script src="scripts/notification-system.js"></script>
     <script src="scripts/main.js"></script>
-        <script src="scripts/header-system.js?v=20250901_3"></script>    <!-- הערה: designs.js הוחלף ב-trade_plans.js?v=20250830_1 -->
-    <script src="scripts/trade_plans.js?v=20250830_1"></script>
 
     <!-- Page initialization -->
     <script>

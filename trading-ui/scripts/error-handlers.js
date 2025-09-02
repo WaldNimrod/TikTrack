@@ -24,7 +24,7 @@
  */
 function handleApiError(error, context = 'API_CALL', userMessage = null) {
   // לוג מפורט למפתחים
-  console.warn(`🔧 API Error in ${context}:`, error);
+  // console.warn(`🔧 API Error in ${context}:`, error);
 
   // הודעה למשתמש
   const message = userMessage || `שגיאה ב${context} - נסה שוב מאוחר יותר`;
@@ -42,7 +42,7 @@ function handleApiError(error, context = 'API_CALL', userMessage = null) {
  * @param {string} fallback - פעולה חלופית
  */
 function handleElementNotFound(elementId, fallback = 'ELEMENT_NOT_FOUND') {
-  console.warn(`🔧 Element not found: ${elementId} - ${fallback}`);
+  // console.warn(`🔧 Element not found: ${elementId} - ${fallback}`);
 
   // הודעה למשתמש רק אם זה קריטי
   if (fallback === 'CRITICAL') {
@@ -58,7 +58,7 @@ function handleElementNotFound(elementId, fallback = 'ELEMENT_NOT_FOUND') {
  * @param {string} fallback - פעולה חלופית
  */
 function handleFunctionNotFound(functionName, fallback = 'FUNCTION_NOT_FOUND') {
-  console.warn(`🔧 Function not found: ${functionName} - ${fallback}`);
+  // console.warn(`🔧 Function not found: ${functionName} - ${fallback}`);
 
   // הודעה למשתמש רק אם זה קריטי
   if (fallback === 'CRITICAL') {
@@ -74,7 +74,7 @@ function handleFunctionNotFound(functionName, fallback = 'FUNCTION_NOT_FOUND') {
  * @param {string} message - הודעת השגיאה
  */
 function handleValidationError(field, message) {
-  console.warn(`🔧 Validation error in ${field}: ${message}`);
+  // console.warn(`🔧 Validation error in ${field}: ${message}`);
 
   // הצגת שגיאה בשדה הספציפי
   if (typeof window.showValidationWarning === 'function') {
@@ -90,7 +90,7 @@ function handleValidationError(field, message) {
  * @param {string} dataType - סוג הנתונים
  */
 function handleDataLoadError(error, dataType) {
-  console.warn(`🔧 Data load error for ${dataType}:`, error);
+  // console.warn(`🔧 Data load error for ${dataType}:`, error);
 
   const message = `שגיאה בטעינת ${dataType} - נסה לרענן את הדף`;
 
@@ -105,7 +105,7 @@ function handleDataLoadError(error, dataType) {
  * @param {string} operation - סוג הפעולה
  */
 function handleSaveError(error, operation) {
-  console.warn(`🔧 Save error for ${operation}:`, error);
+  // console.warn(`🔧 Save error for ${operation}:`, error);
 
   const message = `שגיאה ב${operation} - נסה שוב`;
 
@@ -120,7 +120,7 @@ function handleSaveError(error, operation) {
  * @param {string} itemType - סוג הפריט
  */
 function handleDeleteError(error, itemType) {
-  console.warn(`🔧 Delete error for ${itemType}:`, error);
+  // console.warn(`🔧 Delete error for ${itemType}:`, error);
 
   const message = `שגיאה במחיקת ${itemType} - נסה שוב`;
 
@@ -135,7 +135,7 @@ function handleDeleteError(error, itemType) {
  * @param {string} system - שם המערכת
  */
 function handleSystemError(error, system) {
-  console.warn(`🔧 System error in ${system}:`, error);
+  // console.warn(`🔧 System error in ${system}:`, error);
 
   const message = `שגיאה במערכת ${system} - נסה לרענן את הדף`;
 

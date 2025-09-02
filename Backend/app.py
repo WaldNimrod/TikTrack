@@ -60,7 +60,7 @@ from config.database import init_db
 from config.logging import setup_logging
 from utils.performance_monitor import log_system_metrics, PerformanceTracker
 from utils.error_handlers import ErrorHandler
-from services.cache_service import cache_service
+from services.advanced_cache_service import advanced_cache_service
 from services.health_service import health_service
 from services.metrics_collector import metrics_collector
 from services.database_optimizer import database_optimizer
@@ -88,6 +88,7 @@ from routes.api.note_relation_types import note_relation_types_bp
 from routes.api.js_map import js_map_bp
 from routes.api.cache_management import cache_management_bp
 from routes.api.query_optimization import query_optimization_bp
+from routes.api.server_management import server_management_bp
 
 # External Data Integration blueprints
 from routes.external_data.quotes import quotes_bp
@@ -161,6 +162,7 @@ app.register_blueprint(note_relation_types_bp)
 app.register_blueprint(js_map_bp)
 app.register_blueprint(cache_management_bp)
 app.register_blueprint(query_optimization_bp)
+app.register_blueprint(server_management_bp)
 
 # Register External Data Integration blueprints - DISABLED due to import issues
 # External Data Integration blueprints
@@ -256,7 +258,7 @@ def detailed_health_check() -> Any:
 def cache_stats() -> Any:
     """Get cache statistics"""
     try:
-        stats = cache_service.get_stats()
+        stats = advanced_cache_service.get_stats()
         return jsonify({
             "status": "success",
             "data": stats,
@@ -273,7 +275,7 @@ def cache_stats() -> Any:
 def clear_cache() -> Any:
     """Clear all cache"""
     try:
-        cache_service.clear()
+        advanced_cache_service.clear()
         return jsonify({
             "status": "success",
             "message": "Cache cleared successfully",

@@ -431,7 +431,7 @@ class ConstraintManager {
     }
   }
 
-  showMessage(message, type) {
+  static showMessage(message, type) {
     const messagesContainer = document.getElementById('messages');
     const messageDiv = document.createElement('div');
     messageDiv.className = type === 'error' ? 'error-message' : 'success-message';
@@ -508,14 +508,14 @@ class ConstraintManager {
       const data = await response.json();
 
       if (data.status === 'success') {
-        this.showMessage('האילוץ נוסף בהצלחה', 'success');
+        ConstraintManager.showMessage('האילוץ נוסף בהצלחה', 'success');
         await this.loadConstraints();
         this.updateStats();
       } else {
-        this.showMessage('שגיאה בהוספת האילוץ', 'error');
+        ConstraintManager.showMessage('שגיאה בהוספת האילוץ', 'error');
       }
-    } catch (_error) {
-      this.showMessage('שגיאה בהוספת האילוץ', 'error');
+    } catch {
+      ConstraintManager.showMessage('שגיאה בהוספת האילוץ', 'error');
     }
   }
 }
@@ -568,8 +568,11 @@ function showAddConstraintModal() {
                                     </div>
                                     <div class="mb-3">
                                         <label for="modal-constraint-definition" 
-                                               class="form-label">הגדרת האילוץ</label>
-                                        <input type="text" class="form-control" id="modal-constraint-definition" required>
+                                               class="form-label">
+                                           הגדרת האילוץ
+                                         </label>
+                                        <input type="text" class="form-control" 
+                                               id="modal-constraint-definition" required>
                                     </div>
                                 </div>
                             </div>
@@ -577,7 +580,10 @@ function showAddConstraintModal() {
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-primary" onclick="handleModalAddConstraint()">שמור</button>
+                        <button type="button" class="btn btn-primary" 
+                                onclick="handleModalAddConstraint()">
+                          שמור
+                        </button>
                     </div>
                 </div>
             </div>

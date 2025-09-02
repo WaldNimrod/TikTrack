@@ -23,7 +23,7 @@ from typing import Dict, Any, List, Optional
 from sqlalchemy import text, func
 from sqlalchemy.orm import Session
 from config.database import get_db
-from services.cache_service import cache_service
+from services.advanced_cache_service import advanced_cache_service
 from utils.performance_monitor import monitor_performance
 import logging
 import json
@@ -255,12 +255,12 @@ class MetricsCollector:
         start_time = time.time()
         
         try:
-            stats = cache_service.get_stats()
+            stats = advanced_cache_service.get_stats()
             
             # Calculate hit rate
             hit_rate = 0.0
-            if hasattr(cache_service, '_cache') and cache_service._cache:
-                total_requests = len(cache_service._cache)
+            if hasattr(advanced_cache_service, 'cache') and advanced_cache_service.cache:
+                total_requests = len(advanced_cache_service.cache)
                 if total_requests > 0:
                     hit_rate = (total_requests - stats.get('expired_entries', 0)) / total_requests
             

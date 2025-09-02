@@ -86,13 +86,13 @@ class ActiveAlertsComponent extends HTMLElement {
     this.setupSectionToggleListener();
 
     // בדיקה שהסגנונות נטענו
-    this.checkStylesLoaded();
+    ActiveAlertsComponent.checkStylesLoaded();
 
     // בדיקה אם יש הרבה הודעות בקונסולה (ללא ניקוי אוטומטי)
     setTimeout(() => {
       // בדיקה אם יש הרבה הודעות בקונסולה
       if (this._checkAttempts > 3) {
-        console.log('⚠️ הרבה ניסיונות טעינה - בדוק את הקונסול');
+        // console.log('⚠️ הרבה ניסיונות טעינה - בדוק את הקונסול');
       }
     }, 10000);
   }
@@ -119,31 +119,45 @@ class ActiveAlertsComponent extends HTMLElement {
 
     this.innerHTML = `
       <div class="alerts-container">
-        <div class="alerts-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4px;">
+        <div class="alerts-header" 
+             style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4px;">
           <h3 id="alertsTitle">🔔 התראות פעילות</h3>
           
           <!-- מפתח צבעים בכותרת מצד שמאל -->
-          <div class="alerts-color-legend-header" style="display: flex; gap: 8px; align-items: center; margin-bottom: 0px;">
+          <div class="alerts-color-legend-header" 
+               style="display: flex; gap: 8px; align-items: center; margin-bottom: 0px;">
             <div class="legend-item">
-              <div class="legend-color" style="background-color: rgba(220, 53, 69, 0.1); border-left: 4px solid #c82333; padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 6px; min-width: 80px;">
+              <div class="legend-color" 
+                   style="background-color: rgba(220, 53, 69, 0.1); border-left: 4px solid #c82333; 
+                          padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; 
+                          gap: 6px; min-width: 80px;">
                 <img src="images/icons/tickers.svg" alt="טיקר" style="width: 14px; height: 14px;">
                 <span style="color: #c82333; font-size: 0.8rem; font-weight: 500;">טיקר</span>
               </div>
             </div>
             <div class="legend-item">
-              <div class="legend-color" style="background-color: rgba(255, 149, 0, 0.1); border-left: 4px solid #e67e00; padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 6px; min-width: 80px;">
+              <div class="legend-color" 
+                   style="background-color: rgba(255, 149, 0, 0.1); border-left: 4px solid #e67e00; 
+                          padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; 
+                          gap: 6px; min-width: 80px;">
                 <img src="images/icons/trade_plans.svg" alt="תוכנית" style="width: 14px; height: 14px;">
                 <span style="color: #e67e00; font-size: 0.8rem; font-weight: 500;">תוכנית</span>
               </div>
             </div>
             <div class="legend-item">
-              <div class="legend-color" style="background-color: rgba(40, 167, 69, 0.1); border-left: 4px solid #1e7e34; padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 6px; min-width: 80px;">
+              <div class="legend-color" 
+                   style="background-color: rgba(40, 167, 69, 0.1); border-left: 4px solid #1e7e34; 
+                          padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; 
+                          gap: 6px; min-width: 80px;">
                 <img src="images/icons/trades.svg" alt="טרייד" style="width: 14px; height: 14px;">
                 <span style="color: #1e7e34; font-size: 0.8rem; font-weight: 500;">טרייד</span>
               </div>
             </div>
             <div class="legend-item">
-              <div class="legend-color" style="background-color: rgba(41, 166, 168, 0.1); border-left: 4px solid #1f8a8c; padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 6px; min-width: 80px;">
+              <div class="legend-color" 
+                   style="background-color: rgba(41, 166, 168, 0.1); border-left: 4px solid #1f8a8c; 
+                          padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; 
+                          gap: 6px; min-width: 80px;">
                 <img src="images/icons/accounts.svg" alt="חשבון" style="width: 14px; height: 14px;">
                 <span style="color: #1f8a8c; font-size: 0.8rem; font-weight: 500;">חשבון</span>
               </div>
@@ -221,7 +235,7 @@ class ActiveAlertsComponent extends HTMLElement {
       this.renderAlerts();
       this.updateCount(); // עדכון הכותרת והסקשן
       this.updateSectionHeaderAlertIcon(); // עדכון איקון ההתראות בכותרת הסקשן
-    } catch (err) {
+    } catch {
       this.alerts = [];
       this.renderAlerts();
       this.updateCount(); // עדכון הכותרת והסקשן
@@ -368,9 +382,7 @@ class ActiveAlertsComponent extends HTMLElement {
     // שמירת ההתראה הנוכחית לשימוש בפונקציות אחרות
     this.currentAlert = alert;
 
-    const timeAgo = this.getTimeAgo(alert.created_at);
     const triggeredTime = this.getTriggeredTime(alert);
-    const icon = this.getAlertIcon(alert.type);
 
     // קבלת הסימבול מהאובייקט המקושר
     // נסה לקבל סימבול מהטיקר ישירות
@@ -384,37 +396,39 @@ class ActiveAlertsComponent extends HTMLElement {
     }
 
     // שימוש בפונקציה formatAlertCondition לתרגום התנאי
-    const formattedCondition = window.formatAlertCondition ? window.formatAlertCondition(alert.condition) : this.formatAlertCondition(alert.condition);
+    // const formattedCondition = window.formatAlertCondition ? window.formatAlertCondition(alert.condition) : this.formatAlertCondition(alert.condition);
 
     // נתוני דמה לטיקר
-    const currentPrice = this.getCurrentPrice(symbol);
-    const dailyChange = this.getDailyChange(symbol);
+    const currentPrice = this.constructor.getCurrentPrice(symbol);
+    const dailyChange = this.constructor.getDailyChange(symbol);
     const changeClass = dailyChange.startsWith('+') ? 'positive' : 'negative';
 
     // טיפול בשדות undefined
     const message = alert.message || '';
-    const relatedType = this.getRelatedTypeFromId(alert.related_type_id);
     // נסה להשתמש ב-related_id אם related_object_id לא קיים
     const relatedObjectId = alert.related_id;
     const relatedObjectDetails = this.getRelatedObjectDetails(alert.related_type_id, relatedObjectId);
 
     // קביעת רקע צבעוני לפי סוג האובייקט המקושר (לא לפי סוג ההתראה)
     const relatedTypeId = alert.related_type_id || 4; // ברירת מחדל לטיקר
-    const objectIcon = this.getObjectTypeIcon(relatedTypeId);
+    const objectIcon = this.constructor.getObjectTypeIcon(relatedTypeId);
 
     const html = `
       <div class="alert-card" data-related-type="${relatedTypeId}" data-alert-id="${alert.id}">
         <div class="alert-card-header">
-          <h4 class="alert-card-title clickable" onclick="window.showTickerPage('${symbol}')">${objectIcon} ${symbol || 'התראה'}</h4>
+          <h4 class="alert-card-title clickable" 
+              onclick="window.showTickerPage('${symbol}')">${objectIcon} ${symbol || 'התראה'}</h4>
           <span class="alert-card-time">${triggeredTime}</span>
-          <button class="btn-mark-read-icon" data-alert-id="${alert.id}" title="${window.BUTTON_TEXTS ? window.BUTTON_TEXTS.READ : 'קראתי'}">${window.BUTTON_ICONS ? window.BUTTON_ICONS.READ : '✓'}</button>
+                      <button class="btn-mark-read-icon" data-alert-id="${alert.id}" 
+                    title="${window.BUTTON_TEXTS ? window.BUTTON_TEXTS.READ : 'קראתי'}">${window.BUTTON_ICONS ? window.BUTTON_ICONS.READ : '✓'}</button>
         </div>
         <div class="alert-card-related-object">
           ${relatedObjectDetails}
         </div>
         <div class="alert-card-content">
           <div class="alert-card-details">
-            <span class="alert-detail-item condition-item">${window.translateConditionFields(alert.condition_attribute, alert.condition_operator, alert.condition_number)}</span>
+            <span class="alert-detail-item condition-item">${window.translateConditionFields(
+    alert.condition_attribute, alert.condition_operator, alert.condition_number)}</span>
             <span class="alert-detail-item ${changeClass}">${currentPrice}</span>
             <span class="alert-detail-item ${changeClass}">${dailyChange}</span>
             ${message ? `<span class="alert-detail-item message-icon" title="${message}">${window.BUTTON_ICONS ? window.BUTTON_ICONS.SEARCH : '🔍'}</span>` : ''}
@@ -460,7 +474,7 @@ class ActiveAlertsComponent extends HTMLElement {
           setTimeout(() => this.loadActiveAlerts(), 400);
         }, 220);
       }
-    } catch (err) {
+    } catch {
       if (btn) {
         btn.disabled = false;
         btn.textContent = window.BUTTON_ICONS ? window.BUTTON_ICONS.APPROVE : '✓';
@@ -470,7 +484,7 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   // Helpers
-  getTimeAgo(s) {
+  static getTimeAgo(s) {
     const now = new Date();
     const d = new Date(s);
     const mins = Math.floor((now - d) / 60000);
@@ -489,22 +503,22 @@ class ActiveAlertsComponent extends HTMLElement {
   getTriggeredTime(alert) {
     // אם יש שדה triggered_at, נשתמש בו
     if (alert.triggered_at) {
-      return this.formatDateTime(alert.triggered_at);
+      return this.constructor.formatDateTime(alert.triggered_at);
     }
 
     // אם יש שדה is_triggered ויש created_at, נשתמש ב-created_at
     if (alert.is_triggered && alert.created_at) {
-      return this.formatDateTime(alert.created_at);
+      return this.constructor.formatDateTime(alert.created_at);
     }
 
     // אחרת נשתמש ב-created_at כרגיל
-    return this.getTimeAgo(alert.created_at);
+    return this.constructor.getTimeAgo(alert.created_at);
   }
 
   /**
    * עיצוב תאריך ושעה
    */
-  formatDateTime(dateString) {
+  static formatDateTime(dateString) {
     const date = new Date(dateString);
     const now = new Date();
     const diffMs = now - date;
@@ -549,22 +563,22 @@ class ActiveAlertsComponent extends HTMLElement {
     })}`;
   }
 
-  getAlertIcon(t) {
+  static getAlertIcon(t) {
     const m = { price_alert: '🎯', stop_loss: '⚠️', volume_alert: '📊', custom_alert: '🔔' };
     return m[t] || '🔔';
   }
 
-  getAlertTypeDisplay(t) {
+  static getAlertTypeDisplay(t) {
     const m = { price_alert: 'התראת מחיר', stop_loss: 'עצירת הפסד', volume_alert: 'התראת נפח', custom_alert: 'התראה מותאמת' };
     return m[t] || t;
   }
 
-  getEntityTypeDisplay(t) {
+  static getEntityTypeDisplay(t) {
     const m = { account: 'חשבון', trade: 'טרייד', trade_plan: 'תכנון', ticker: 'טיקר' };
     return m[t] || t;
   }
 
-  getRelatedTypeFromId(typeId) {
+  static getRelatedTypeFromId(typeId) {
     const typeMap = {
       1: 'account',
       2: 'trade',
@@ -574,14 +588,16 @@ class ActiveAlertsComponent extends HTMLElement {
     return typeMap[typeId] || 'unknown';
   }
 
-  extractTickerFromCondition(c) {
+  static extractTickerFromCondition(c) {
     if (!c) {return '';}
-    const m = c.match(/\b(AAPL|GOOGL|MSFT|TSLA|NVDA|SPY|QQQ|IWM|AMZN|META|NFLX|AMD|INTC|ORCL|CRM|ADBE)\b/i);
+    const m = c.match(
+      /\b(AAPL|GOOGL|MSFT|TSLA|NVDA|SPY|QQQ|IWM|AMZN|META|NFLX|AMD|INTC|ORCL|CRM|ADBE)\b/i);
     return m ? m[1].toUpperCase() : '';
   }
 
-  getRandomTicker() {
-    const tickers = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA', 'SPY', 'QQQ', 'IWM', 'AMZN', 'META', 'NFLX', 'AMD', 'INTC', 'ORCL', 'CRM', 'ADBE'];
+  static getRandomTicker() {
+    const tickers = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA', 'SPY', 'QQQ', 'IWM',
+      'AMZN', 'META', 'NFLX', 'AMD', 'INTC', 'ORCL', 'CRM', 'ADBE'];
     return tickers[Math.floor(Math.random() * tickers.length)];
   }
 
@@ -590,7 +606,7 @@ class ActiveAlertsComponent extends HTMLElement {
    * פונקציה לתרגום תנאי התראה לעברית
    * משתמשת בפונקציה הגלובלית אם זמינה, אחרת משתמשת בגרסה מקומית
    */
-  formatAlertCondition(condition) {
+  static formatAlertCondition(condition) {
     // בדיקה אם הפונקציה הגלובלית זמינה
     if (window.formatAlertCondition) {
       return window.formatAlertCondition(condition);
@@ -625,7 +641,7 @@ class ActiveAlertsComponent extends HTMLElement {
       return conditionExamples[condition];
     }
 
-    const parsed = this.parseAlertCondition(condition);
+    const parsed = this.constructor.parseAlertCondition(condition);
 
     // המרת משתנה לעברית
     const variableLabels = {
@@ -664,7 +680,7 @@ class ActiveAlertsComponent extends HTMLElement {
    * פונקציה לפרסור תנאי התראה
    * משתמשת בפונקציה הגלובלית אם זמינה, אחרת משתמשת בגרסה מקומית
    */
-  parseAlertCondition(condition) {
+  static parseAlertCondition(condition) {
     // בדיקה אם הפונקציה הגלובלית זמינה
     if (window.parseAlertCondition) {
       return window.parseAlertCondition(condition);
@@ -899,19 +915,19 @@ class ActiveAlertsComponent extends HTMLElement {
   /**
    * בדיקה שהסגנונות נטענו
    */
-  checkStylesLoaded() {
+  static checkStylesLoaded() {
     // בדיקה שהסגנונות שלנו נטענו
     const styleSheets = Array.from(document.styleSheets);
     const hasStyles = styleSheets.some(sheet => {
       try {
         return sheet.href && sheet.href.includes('styles.css');
-      } catch (e) {
+      } catch {
         return false;
       }
     });
 
     if (!hasStyles) {
-      console.warn('⚠️ Active Alerts Component: styles.css not found - icon may not display correctly');
+      // console.warn('⚠️ Active Alerts Component: styles.css not found - icon may not display correctly');
     }
   }
 
@@ -965,7 +981,8 @@ class ActiveAlertsComponent extends HTMLElement {
       const planSides = ['Long', 'Short'];
       const planType = planTypes[relatedObjectId % planTypes.length];
       const planSide = planSides[relatedObjectId % planSides.length];
-      const planDate = new Date().toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.');
+      const planDate = new Date().toLocaleDateString('he-IL',
+        { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.');
       relatedDisplay = `תוכנית | ${planType} | ${planSide} | ${planDate}`;
       break;
     }
@@ -979,7 +996,8 @@ class ActiveAlertsComponent extends HTMLElement {
     }
 
     // החזרת הטקסט עם איקון קישור קטן - קישור לאובייקטים מקושרים
-    return `<span class="linked-object-text linked-object-clickable" onclick="window.showRelatedObjectModal(${relatedTypeId}, ${relatedObjectId})">🔗 ${relatedDisplay}</span>`;
+    return `<span class="linked-object-text linked-object-clickable" 
+                onclick="window.showRelatedObjectModal(${relatedTypeId}, ${relatedObjectId})">🔗 ${relatedDisplay}</span>`;
   }
 
   /**
@@ -1008,14 +1026,15 @@ class ActiveAlertsComponent extends HTMLElement {
       return this.currentAlert.ticker_symbol;
     }
 
-    const relatedType = this.getRelatedTypeFromId(relatedTypeId);
+    const relatedType = this.constructor.getRelatedTypeFromId(relatedTypeId);
 
     // כרגע נחזיר סימבול דמה - בהמשך יטען מהשרת
     // בהתבסס על סוג האובייקט המקושר
     switch (relatedType) {
     case 'ticker': {
       // אם זה טיקר, נחזיר סימבול אקראי
-      const tickerSymbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA', 'SPY', 'QQQ', 'IWM', 'AMZN', 'META', 'NFLX', 'AMD', 'INTC', 'ORCL', 'CRM', 'ADBE'];
+      const tickerSymbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA', 'SPY', 'QQQ', 'IWM',
+        'AMZN', 'META', 'NFLX', 'AMD', 'INTC', 'ORCL', 'CRM', 'ADBE'];
       const symbol = tickerSymbols[relatedObjectId % tickerSymbols.length];
       return symbol;
     }
@@ -1031,7 +1050,8 @@ class ActiveAlertsComponent extends HTMLElement {
     }
     case 'account': {
       // אם זה חשבון, נחזיר שם החשבון
-      const accountNames = ['חשבון מעודכן', 'חשבון השקעות', 'חשבון מסחר', 'חשבון פנסיה'];
+      const accountNames = ['חשבון מעודכן', 'חשבון השקעות',
+        'חשבון מסחר', 'חשבון פנסיה'];
       return accountNames[relatedObjectId % accountNames.length];
     }
     default:
@@ -1042,7 +1062,7 @@ class ActiveAlertsComponent extends HTMLElement {
   /**
    * קבלת מחיר נוכחי (נתוני דמה)
    */
-  getCurrentPrice(symbol) {
+  static getCurrentPrice(symbol) {
     if (!symbol) {return 'N/A';}
 
     // נתוני דמה - בהמשך יטען מהשרת
@@ -1071,7 +1091,7 @@ class ActiveAlertsComponent extends HTMLElement {
   /**
    * קבלת שינוי יומי (נתוני דמה)
    */
-  getDailyChange(symbol) {
+  static getDailyChange(symbol) {
     if (!symbol) {return 'N/A';}
 
     // נתוני דמה - בהמשך יטען מהשרת
@@ -1100,7 +1120,7 @@ class ActiveAlertsComponent extends HTMLElement {
   /**
    * קביעת מחלקת CSS לפי סוג ההתראה
    */
-  getAlertTypeClass(alertType) {
+  static getAlertTypeClass(alertType) {
     const typeClasses = {
       'price_alert': 'alert-card-price',
       'stop_loss': 'alert-card-stop-loss',
@@ -1113,13 +1133,17 @@ class ActiveAlertsComponent extends HTMLElement {
   /**
    * קביעת איקון לפי סוג האובייקט המקושר - מעודכן לאיקונים של המערכת
    */
-  getObjectTypeIcon(relatedTypeId) {
+  static getObjectTypeIcon(relatedTypeId) {
     // איקונים עקביים עם המערכת - שימוש באיקונים SVG האמיתיים
     const objectIcons = {
-      1: '<img src="images/icons/accounts.svg" alt="חשבון" style="width: 16px; height: 16px; vertical-align: middle;">', // חשבון
-      2: '<img src="images/icons/trades.svg" alt="טרייד" style="width: 16px; height: 16px; vertical-align: middle;">', // טרייד
-      3: '<img src="images/icons/trade_plans.svg" alt="תוכנית טרייד" style="width: 16px; height: 16px; vertical-align: middle;">', // תוכנית טרייד
-      4: '<img src="images/icons/tickers.svg" alt="טיקר" style="width: 16px; height: 16px; vertical-align: middle;">',  // טיקר
+      1: '<img src="images/icons/accounts.svg" alt="חשבון" ' +
+         'style="width: 16px; height: 16px; vertical-align: middle;">', // חשבון
+      2: '<img src="images/icons/trades.svg" alt="טרייד" ' +
+         'style="width: 16px; height: 16px; vertical-align: middle;">', // טרייד
+      3: '<img src="images/icons/trade_plans.svg" alt="תוכנית טרייד" ' +
+         'style="width: 16px; height: 16px; vertical-align: middle;">', // תוכנית טרייד
+      4: '<img src="images/icons/tickers.svg" alt="טיקר" ' +
+         'style="width: 16px; height: 16px; vertical-align: middle;">',  // טיקר
     };
     const icon = objectIcons[relatedTypeId] || objectIcons[4]; // ברירת מחדל לטיקר
     return icon;

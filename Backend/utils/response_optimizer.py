@@ -52,6 +52,9 @@ class ResponseOptimizer:
             'Cache-Control': 'no-cache, no-store, must-revalidate, private',
             'Pragma': 'no-cache',
             'Expires': '0'
+        },
+        'cacheable_api': {
+            'Cache-Control': 'public, max-age=300, must-revalidate'  # 5 minutes cache for cacheable APIs
         }
     }
     
@@ -195,10 +198,6 @@ class ResponseOptimizer:
         Returns:
             str: Cache type
         """
-        # API endpoints - no cache
-        if request_path.startswith('/api/'):
-            return 'api'
-        
         # Static files - long cache
         if any(ext in request_path for ext in ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico']):
             return 'static'
@@ -206,6 +205,40 @@ class ResponseOptimizer:
         # Sensitive pages - no cache
         if any(path in request_path for path in ['/login', '/admin', '/settings']):
             return 'sensitive'
+        
+        # API endpoints that can be cached (read-only operations)
+        if request_path.startswith('/api/'):
+            # Cache-friendly API endpoints (GET requests for data that doesn't change frequently)
+            cacheable_endpoints = [
+                '/api/v1/accounts',
+                '/api/v1/tickers',
+                '/api/v1/currencies',
+                '/api/v1/constraints',
+                '/api/v1/note_relation_types',
+                '/api/v1/linked-items/types',
+                '/api/v1/preferences',
+                '/api/v1/users',
+                '/api/v1/query-optimization',
+                '/api/v1/js-map',
+                '/api/v1/cache',
+                '/api/v1/trades',
+                '/api/v1/trade_plans',
+                '/api/v1/cash_flows',
+                '/api/v1/notes',
+                '/api/v1/executions',
+                '/api/v1/alerts',
+                '/api/v1/background-tasks',
+                '/api/external-data/status',
+                '/api/external-data/quotes'
+            ]
+            
+            # Check if this is a cacheable endpoint
+            for endpoint in cacheable_endpoints:
+                if request_path.startswith(endpoint):
+                    return 'cacheable_api'
+            
+            # Other API endpoints - no cache (for real-time data like alerts, executions)
+            return 'api'
         
         # Default - dynamic cache
         return 'dynamic'

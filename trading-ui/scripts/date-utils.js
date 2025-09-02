@@ -100,8 +100,8 @@ function formatDate(dateString) {
       month: '2-digit',
       year: 'numeric',
     });
-  } catch (error) {
-    console.warn('⚠️ Error formatting date:', dateString, error);
+  } catch {
+    // console.warn('⚠️ Error formatting date:', dateString, error);
     return '-';
   }
 }
@@ -129,8 +129,8 @@ function formatDateTime(dateString) {
       hour: '2-digit',
       minute: '2-digit',
     });
-  } catch (error) {
-    console.warn('⚠️ Error formatting date time:', dateString, error);
+  } catch {
+    // console.warn('⚠️ Error formatting date time:', dateString, error);
     return '-';
   }
 }
@@ -156,8 +156,8 @@ function formatDateOnly(dateString) {
       month: '2-digit',
       year: 'numeric',
     });
-  } catch (error) {
-    console.warn('⚠️ Error formatting date only:', dateString, error);
+  } catch {
+    // console.warn('⚠️ Error formatting date only:', dateString, error);
     return '-';
   }
 }
@@ -181,8 +181,8 @@ function formatShortDate(dateString) {
       day: '2-digit',
       month: '2-digit',
     });
-  } catch (error) {
-    console.warn('⚠️ Error formatting short date:', dateString, error);
+  } catch {
+    // console.warn('⚠️ Error formatting short date:', dateString, error);
     return '-';
   }
 }
@@ -208,8 +208,8 @@ function formatLongDate(dateString) {
       month: 'long',
       year: 'numeric',
     });
-  } catch (error) {
-    console.warn('⚠️ Error formatting long date:', dateString, error);
+  } catch {
+    // console.warn('⚠️ Error formatting long date:', dateString, error);
     return '-';
   }
 }
@@ -234,8 +234,8 @@ function formatTimeOnly(dateString) {
       hour: '2-digit',
       minute: '2-digit',
     });
-  } catch (error) {
-    console.warn('⚠️ Error formatting time:', dateString, error);
+  } catch {
+    // console.warn('⚠️ Error formatting time:', dateString, error);
     return '-';
   }
 }
@@ -258,8 +258,8 @@ function toISOString(date) {
     if (isNaN(dateObj.getTime())) {return null;}
 
     return dateObj.toISOString();
-  } catch (error) {
-    console.warn('⚠️ Error converting to ISO string:', date, error);
+  } catch {
+    // console.warn('⚠️ Error converting to ISO string:', date, error);
     return null;
   }
 }
@@ -281,8 +281,8 @@ function toDate(date) {
     if (isNaN(dateObj.getTime())) {return null;}
 
     return dateObj;
-  } catch (error) {
-    console.warn('⚠️ Error converting to Date:', date, error);
+  } catch {
+    // console.warn('⚠️ Error converting to Date:', date, error);
     return null;
   }
 }
@@ -302,7 +302,7 @@ function isValidDate(dateString) {
   try {
     const date = new Date(dateString);
     return !isNaN(date.getTime());
-  } catch (error) {
+  } catch {
     return false;
   }
 }
@@ -323,8 +323,8 @@ function isPastDate(date) {
     if (isNaN(dateObj.getTime())) {return false;}
 
     return dateObj < new Date();
-  } catch (error) {
-    console.warn('⚠️ Error checking past date:', date, error);
+  } catch {
+    // console.warn('⚠️ Error checking past date:', date, error);
     return false;
   }
 }
@@ -345,8 +345,8 @@ function isFutureDate(date) {
     if (isNaN(dateObj.getTime())) {return false;}
 
     return dateObj > new Date();
-  } catch (error) {
-    console.warn('⚠️ Error checking future date:', date, error);
+  } catch {
+    // console.warn('⚠️ Error checking future date:', date, error);
     return false;
   }
 }
@@ -375,8 +375,8 @@ function daysDifference(startDate, endDate) {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     return diffDays;
-  } catch (error) {
-    console.warn('⚠️ Error calculating days difference:', error);
+  } catch {
+    // console.warn('⚠️ Error calculating days difference:', error);
     return null;
   }
 }
@@ -399,8 +399,8 @@ function addDays(date, days) {
 
     dateObj.setDate(dateObj.getDate() + days);
     return dateObj;
-  } catch (error) {
-    console.warn('⚠️ Error adding days:', error);
+  } catch {
+    // console.warn('⚠️ Error adding days:', error);
     return null;
   }
 }
@@ -423,8 +423,8 @@ function addMonths(date, months) {
 
     dateObj.setMonth(dateObj.getMonth() + months);
     return dateObj;
-  } catch (error) {
-    console.warn('⚠️ Error adding months:', error);
+  } catch {
+    // console.warn('⚠️ Error adding months:', error);
     return null;
   }
 }
@@ -446,9 +446,9 @@ window.addDays = addDays;
 window.addMonths = addMonths;
 
 // אתחול Date Utils
-function initializeDateUtils() {
-  // Date Utils loaded successfully
-}
+// function initializeDateUtils() {
+//   // Date Utils loaded successfully
+// }
 
 // ייצוא המודול עצמו
 window.dateUtils = {

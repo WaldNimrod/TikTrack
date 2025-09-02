@@ -187,10 +187,14 @@ function updateNoteRelationTypesTable(noteRelationTypes) {
           <tbody>
             <tr>
               <td class="p-0 pe-1">
-                <button class="btn btn-sm btn-secondary" onclick="editNoteRelationTypeRecord(${type.id})" title="ערוך">✏️</button>
+                <button class="btn btn-sm btn-secondary" 
+                        onclick="editNoteRelationTypeRecord(${type.id})" 
+                        title="ערוך">✏️</button>
               </td>
               <td class="p-0">
-                <button class="btn btn-sm btn-danger" onclick="deleteNoteRelationTypeRecord(${type.id})" title="מחק">🗑️</button>
+                <button class="btn btn-sm btn-danger" 
+                        onclick="deleteNoteRelationTypeRecord(${type.id})" 
+                        title="מחק">🗑️</button>
               </td>
             </tr>
           </tbody>
@@ -224,7 +228,7 @@ function updateNoteRelationTypesCount(count) {
 }
 
 // פונקציה לטעינת נתוני כפתורי טריגרים
-async function loadTriggerButtonsData() {
+function loadTriggerButtonsData() {
   try {
     // כרגע אין API לכפתורי טריגרים - נשתמש בנתונים ריקים
     triggerButtonsData = [];

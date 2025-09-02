@@ -27,7 +27,7 @@
  * @param {string} itemName - שם הפריטים (למשל: "התראות", "הודעות")
  */
 function filterByRelatedObjectType(type, data, updateFunction, countSelector, itemName) {
-  console.log(`🔧 פילטר לפי סוג אובייקט מקושר - סוג: ${type}, כמות נתונים: ${data.length}`);
+  // פילטר לפי סוג אובייקט מקושר - סוג: ${type}, כמות נתונים: ${data.length}
 
   // עדכון מצב הכפתורים
   const buttons = document.querySelectorAll('[data-type]');
@@ -76,7 +76,7 @@ function filterByRelatedObjectType(type, data, updateFunction, countSelector, it
     countElement.textContent = `${filteredData.length} ${itemName}`;
   }
 
-  console.log(`✅ סוננו ${itemName} לפי סוג '${type}': נמצאו ${filteredData.length} פריטים`);
+  // סוננו ${itemName} לפי סוג '${type}': נמצאו ${filteredData.length} פריטים
 
   return filteredData;
 }
@@ -87,7 +87,7 @@ function filterByRelatedObjectType(type, data, updateFunction, countSelector, it
  */
 function filterAlertsByRelatedObjectType(type) {
   if (typeof window.alertsData === 'undefined') {
-    console.warn('⚠️ נתוני התראות לא זמינים');
+    // נתוני התראות לא זמינים
     return;
   }
 
@@ -106,7 +106,7 @@ function filterAlertsByRelatedObjectType(type) {
  */
 function filterNotesByRelatedObjectType(type) {
   if (typeof window.notesData === 'undefined') {
-    console.warn('⚠️ נתוני הודעות לא זמינים');
+    // נתוני הודעות לא זמינים
     return;
   }
 

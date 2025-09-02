@@ -229,6 +229,9 @@ def execute_background_task(task_name: str):
         # Execute task
         execution_id = background_task_manager.run_task(task_name)
         
+        # Invalidate cache for background tasks
+        invalidate_cache('background_tasks')
+        
         return jsonify({
             'message': 'Task execution started',
             'task_name': task_name,
@@ -276,6 +279,9 @@ def toggle_background_task(task_name: str):
             # Fallback: update the task status directly
             tasks[task_name]['enabled'] = new_status
         
+        # Invalidate cache for background tasks
+        invalidate_cache('background_tasks')
+        
         return jsonify({
             'message': f'Task {task_name} {"enabled" if new_status else "disabled"}',
             'task_name': task_name,
@@ -311,6 +317,9 @@ def start_background_scheduler():
         
         background_task_manager.start_scheduler()
         
+        # Invalidate cache for background tasks
+        invalidate_cache('background_tasks')
+        
         return jsonify({
             'message': 'Background task scheduler started',
             'status': 'started',
@@ -343,6 +352,9 @@ def stop_background_scheduler():
         
         background_task_manager.stop_scheduler()
         
+        # Invalidate cache for background tasks
+        invalidate_cache('background_tasks')
+        
         return jsonify({
             'message': 'Background task scheduler stopped',
             'status': 'stopped',
@@ -358,6 +370,7 @@ def stop_background_scheduler():
 
 @background_tasks_bp.route('/history', methods=['GET'])
 @monitor_performance("background_tasks_history")
+@cache_for(ttl=60)  # Cache for 1 minute - history doesn't change frequently
 def get_background_tasks_history():
     """
     Get background tasks execution history
@@ -429,6 +442,7 @@ def get_background_tasks_history():
 
 @background_tasks_bp.route('/analytics', methods=['GET'])
 @monitor_performance("background_tasks_analytics")
+@cache_for(ttl=120)  # Cache for 2 minutes - analytics don't change frequently
 def get_background_tasks_analytics():
     """
     Get comprehensive analytics for background tasks

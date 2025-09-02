@@ -673,7 +673,7 @@ function getRulesExplanation(itemType, data) {
       return explanation;
     } else {
       // לביטול - רק טריידים פעילים מונעים ביטול
-      let explanation = 'ניתן לבטל רק תכנון ללא טרייד או מקושר לטריידים מבוטלים. לא ניתן לבטל תכנון זה כי יש:';
+      explanation = 'ניתן לבטל רק תכנון ללא טרייד או מקושר לטריידים מבוטלים. לא ניתן לבטל תכנון זה כי יש:';
       if (activeTrades.length > 0) {
         explanation += `<br>• ${activeTrades.length} טרייד(ים) פעיל(ים) - יש לבטל אותם קודם`;
       }
@@ -721,12 +721,14 @@ function getRulesExplanation(itemType, data) {
     if (linkedTrades.length > 0) {
       const openTrades = linkedTrades.filter(t => t.status === 'open');
       const closedTrades = linkedTrades.filter(t => t.status === 'closed');
-      explanation += `<br>• ${linkedTrades.length} טרייד(ים) (${openTrades.length} פעיל, ${closedTrades.length} סגור) - יש לבטל את הפעילים קודם`;
+      explanation += `<br>• ${linkedTrades.length} טרייד(ים) (${openTrades.length} פעיל, ` +
+        `${closedTrades.length} סגור) - יש לבטל את הפעילים קודם`;
     }
     if (linkedPlans.length > 0) {
       const openPlans = linkedPlans.filter(p => p.status === 'open');
       const closedPlans = linkedPlans.filter(p => p.status === 'closed');
-      explanation += `<br>• ${linkedPlans.length} תכנון(ים) (${openPlans.length} פעיל, ${closedPlans.length} סגור) - יש לבטל את הפעילים קודם`;
+      explanation += `<br>• ${linkedPlans.length} תכנון(ים) (${openPlans.length} פעיל, ` +
+        `${closedPlans.length} סגור) - יש לבטל את הפעילים קודם`;
     }
     if (tickerNotes.length > 0) {
       explanation += `<br>• ${tickerNotes.length} הערה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
@@ -747,7 +749,8 @@ function getRulesExplanation(itemType, data) {
     if (linkedTrades.length > 0) {
       const openTrades = linkedTrades.filter(t => t.status === 'open');
       const closedTrades = linkedTrades.filter(t => t.status === 'closed');
-      explanation += `<br>• ${linkedTrades.length} טרייד(ים) (${openTrades.length} פעיל, ${closedTrades.length} סגור) - יש לבטל את הפעילים קודם`;
+      explanation += `<br>• ${linkedTrades.length} טרייד(ים) (${openTrades.length} פעיל, ` +
+        `${closedTrades.length} סגור) - יש לבטל את הפעילים קודם`;
     }
     if (linkedExecutions.length > 0) {
       explanation += `<br>• ${linkedExecutions.length} ביצוע(ים) מקושר(ים) - יש למחוק אותם קודם`;
@@ -843,7 +846,7 @@ function getTradePlanDetails(planId, data = null) {
     }
 
     return `תוכנית ${planId}`;
-  } catch (error) {
+  } catch {
     // console.error('Error getting trade plan details:', error);
     return `תוכנית ${planId}`;
   }
@@ -1349,7 +1352,7 @@ function exportLinkedItemsData(itemType, itemId) {
           window.showErrorNotification('שגיאה בייצוא', 'שגיאה בייצוא הנתונים לקובץ CSV');
         }
       });
-  } catch (error) {
+  } catch {
     // שגיאה בייצוא נתונים
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה בייצוא', 'שגיאה בייצוא הנתונים לקובץ CSV');
@@ -1652,7 +1655,7 @@ async function loadLinkedItemsData(itemType, itemId) {
 
     return await response.json();
 
-  } catch (error) {
+  } catch {
     // console.error('Error loading linked items data:', error);
     return null;
   }

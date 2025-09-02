@@ -70,7 +70,7 @@ async function loadCurrenciesFromServer() {
       return window.currenciesData;
     }
 
-  } catch (error) {
+  } catch {
     // Error loading currencies
     // טעינת מטבעות ברירת מחדל
     window.currenciesData = [
@@ -195,10 +195,10 @@ async function loadDataFromAPI(endpoint, maxRetries = 3) {
 
         return data;
       } else {
-        console.warn('⚠️ Response is not an array:', typeof data);
+        // console.warn('⚠️ Response is not an array:', typeof data);
         return [];
       }
-    } catch (error) {
+    } catch {
       // Attempt failed for endpoint
 
       if (attempt === maxRetries) {
@@ -220,7 +220,7 @@ async function loadDataFromAPI(endpoint, maxRetries = 3) {
  * @param {string} type - Data type for logging
  * @returns {boolean} Is valid
  */
-function validateDataStructure(data, type = 'data') {
+function validateDataStructure(data, _type = 'data') {
   if (!Array.isArray(data)) {
     // Data is not an array
     return false;
@@ -355,17 +355,18 @@ function calculateDefaultPrices(currentPrice, options = {}) {
  */
 function convertAmountToShares(amount, price, allowFractionalShares = null) {
   if (!amount || !price || price <= 0) {
-    console.warn('Invalid amount or price for conversion:', { amount, price });
+    // console.warn('Invalid amount or price for conversion:', { amount, price });
     return { shares: 0, adjustedAmount: 0 };
   }
 
   // Get user preference for fractional shares if not specified
-  if (allowFractionalShares === null) {
-    allowFractionalShares = getUserPreference('allowFractionalShares', false);
+  let useFractionalShares = allowFractionalShares;
+  if (useFractionalShares === null) {
+    useFractionalShares = getUserPreference('allowFractionalShares', false);
   }
 
   let shares;
-  if (allowFractionalShares) {
+  if (useFractionalShares) {
     // Allow fractional shares
     shares = amount / price;
   } else {
@@ -389,7 +390,7 @@ function convertAmountToShares(amount, price, allowFractionalShares = null) {
  */
 function convertSharesToAmount(shares, price) {
   if (!shares || !price || price <= 0) {
-    console.warn('Invalid shares or price for conversion:', { shares, price });
+    // console.warn('Invalid shares or price for conversion:', { shares, price });
     return 0;
   }
 
@@ -407,8 +408,8 @@ function getUserPreference(key, defaultValue = null) {
   try {
     const preferences = JSON.parse(localStorage.getItem('userPreferences') || '{}');
     return preferences[key] !== undefined ? preferences[key] : defaultValue;
-  } catch (error) {
-    console.warn('Error reading user preference:', error);
+  } catch {
+    // console.warn('Error reading user preference:', error);
     return defaultValue;
   }
 }

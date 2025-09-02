@@ -1288,7 +1288,7 @@ function initializeExternalIdFields() {
 }
 
 // עדכון פונקציית showAddCashFlowModal
-async function showAddCashFlowModal() {
+async function _showAddCashFlowModal() {
   // איפוס הטופס
   document.getElementById('addCashFlowForm').reset();
 
@@ -1324,7 +1324,7 @@ async function showAddCashFlowModal() {
 }
 
 // עדכון פונקציית showEditCashFlowModal
-async function showEditCashFlowModal(id) {
+async function _showEditCashFlowModal(id) {
   const cashFlow = cashFlowsData.find(cf => cf.id === id);
   if (!cashFlow) {
     handleElementNotFound('showEditCashFlowModal', `תזרים מזומנים לא נמצא: ${id}`);
@@ -1430,7 +1430,7 @@ async function saveCashFlow() {
       handleApiError('שגיאה בשמירת תזרים מזומנים', result.error);
 
       // טיפול בשגיאות וולידציה מהשרת
-      const errorMessage = 'שגיאה בשמירת תזרים מזומנים';
+      // const errorMessage = 'שגיאה בשמירת תזרים מזומנים';
 
       if (result.error && result.error.message) {
         const serverMessage = result.error.message;

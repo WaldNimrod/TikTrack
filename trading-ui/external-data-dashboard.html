@@ -5,15 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>דשבורד נתונים חיצוניים - TikTrack</title>
     
-    <!-- Bootstrap CSS -->
+    <!-- CSS Files - Ordered by priority (weak to strong) -->
+    <!-- 1. Apple theme (base) -->
+    <link rel="stylesheet" href="styles/apple-theme.css">
+    
+    <!-- 2. Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- 3. General styles -->
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/header-system.css">
+    
+    <!-- 4. Typography -->
+    <link rel="stylesheet" href="styles/typography.css">
+    
+    <!-- 5. Table styles -->
+    <link rel="stylesheet" href="styles/table.css">
+    
+    <!-- 6. Notification system styles -->
+    <link rel="stylesheet" href="styles/notification-system.css">
+    
+    <!-- 7. Linked items styles -->
+    <link rel="stylesheet" href="styles/linked-items.css">
+    
+    <!-- 8. Page specific styles -->
+    <link rel="stylesheet" href="styles/external-data-dashboard.css">
     
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
-    <!-- TikTrack CSS Files -->
-    <link href="styles/main.css" rel="stylesheet">
-    <link href="styles/header-system.css" rel="stylesheet">
     
     <!-- Console Cleanup and Error Handlers -->
     <script src="scripts/console-cleanup.js"></script>
@@ -769,10 +788,9 @@
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- TikTrack JavaScript Files -->
-    <script src="scripts/main.js"></script>
-    <script src="scripts/notification-system.js"></script>
+    <!-- TikTrack JavaScript Files - Only essential for dashboard -->
     <script src="scripts/header-system.js"></script>
+    <script src="scripts/notification-system.js"></script>
     <script src="scripts/external-data-dashboard.js"></script>
 </body>
 </html>

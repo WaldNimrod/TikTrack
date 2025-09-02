@@ -230,22 +230,11 @@ class NotificationsCenter {
   }
 
   updateConnectionStatus(status = 'connecting') {
-    // בדיקה אם האלמנטים קיימים (רק בעמוד מרכז ההתראות)
-    const connectionStatusElement = document.getElementById('connectionStatus');
-    if (!connectionStatusElement) {
-      return; // לא בעמוד מרכז ההתראות
-    }
-
-    const statusDot = connectionStatusElement.querySelector('.status-dot');
-    const statusText = connectionStatusElement.querySelector('.status-text');
+    const statusDot = document.getElementById('connectionStatus').querySelector('.status-dot');
+    const statusText = document.getElementById('connectionStatus').querySelector('.status-text');
     const websocketStatus = document.getElementById('websocketStatus');
     const connectionTimeElement = document.getElementById('connectionTime');
     const messagesSentElement = document.getElementById('messagesSent');
-
-    // בדיקה שכל האלמנטים קיימים
-    if (!statusDot || !statusText || !websocketStatus || !connectionTimeElement || !messagesSentElement) {
-      return;
-    }
 
     // הסרת כל הקלאסים הקיימים
     statusDot.className = 'status-dot';
@@ -297,9 +286,6 @@ class NotificationsCenter {
 
   updateNotificationsUI() {
     const container = document.getElementById('liveNotifications');
-    if (!container) {
-      return; // לא בעמוד מרכז ההתראות
-    }
 
     if (this.notifications.length === 0) {
       container.innerHTML = `
@@ -316,9 +302,6 @@ class NotificationsCenter {
 
   updateHistoryUI() {
     const container = document.getElementById('notificationHistory');
-    if (!container) {
-      return; // לא בעמוד מרכז ההתראות
-    }
 
     if (this.history.length === 0) {
       container.innerHTML = `
@@ -331,15 +314,8 @@ class NotificationsCenter {
     }
 
     // פילטור לפי בחירת המשתמש
-    const filterElement = document.getElementById('historyFilter');
-    const periodElement = document.getElementById('historyPeriod');
-    
-    if (!filterElement || !periodElement) {
-      return; // אלמנטי פילטר לא קיימים
-    }
-    
-    const filter = filterElement.value;
-    const period = periodElement.value;
+    const filter = document.getElementById('historyFilter').value;
+    const period = document.getElementById('historyPeriod').value;
 
     let filteredHistory = this.history;
 
@@ -375,33 +351,19 @@ class NotificationsCenter {
   }
 
   updateStatsUI() {
-    // בדיקה אם האלמנטים קיימים (רק בעמוד מרכז ההתראות)
-    const successCount = document.getElementById('successCount');
-    const errorCount = document.getElementById('errorCount');
-    const warningCount = document.getElementById('warningCount');
-    const infoCount = document.getElementById('infoCount');
-
-    if (successCount) successCount.textContent = this.stats.success;
-    if (errorCount) errorCount.textContent = this.stats.error;
-    if (warningCount) warningCount.textContent = this.stats.warning;
-    if (infoCount) infoCount.textContent = this.stats.info;
+    document.getElementById('successCount').textContent = this.stats.success;
+    document.getElementById('errorCount').textContent = this.stats.error;
+    document.getElementById('warningCount').textContent = this.stats.warning;
+    document.getElementById('infoCount').textContent = this.stats.info;
   }
 
   updateSettingsUI() {
-    // בדיקה אם האלמנטים קיימים (רק בעמוד מרכז ההתראות)
-    const enableRealtime = document.getElementById('enableRealtime');
-    const enableSounds = document.getElementById('enableSounds');
-    const enableBackgroundTasks = document.getElementById('enableBackgroundTasks');
-    const enableDataUpdates = document.getElementById('enableDataUpdates');
-    const enableExternalData = document.getElementById('enableExternalData');
-    const enableSystemEvents = document.getElementById('enableSystemEvents');
-
-    if (enableRealtime) enableRealtime.checked = this.settings.enableRealtime;
-    if (enableSounds) enableSounds.checked = this.settings.enableSounds;
-    if (enableBackgroundTasks) enableBackgroundTasks.checked = this.settings.enableBackgroundTasks;
-    if (enableDataUpdates) enableDataUpdates.checked = this.settings.enableDataUpdates;
-    if (enableExternalData) enableExternalData.checked = this.settings.enableExternalData;
-    if (enableSystemEvents) enableSystemEvents.checked = this.settings.enableSystemEvents;
+    document.getElementById('enableRealtime').checked = this.settings.enableRealtime;
+    document.getElementById('enableSounds').checked = this.settings.enableSounds;
+    document.getElementById('enableBackgroundTasks').checked = this.settings.enableBackgroundTasks;
+    document.getElementById('enableDataUpdates').checked = this.settings.enableDataUpdates;
+    document.getElementById('enableExternalData').checked = this.settings.enableExternalData;
+    document.getElementById('enableSystemEvents').checked = this.settings.enableSystemEvents;
   }
 
   createNotificationHTML(notification) {
@@ -443,16 +405,6 @@ class NotificationsCenter {
   }
 
   getTimeAgo(date) {
-    // בדיקה שהפרמטר הוא אובייקט Date תקין
-    if (!date || !(date instanceof Date)) {
-      try {
-        date = new Date(date);
-      } catch (error) {
-        console.warn('שגיאה בהמרת תאריך:', error);
-        return 'לא ידוע';
-      }
-    }
-
     const now = new Date();
     const diff = Math.floor((now - date) / 1000);
 
@@ -654,11 +606,7 @@ class NotificationsCenter {
   updateConnectionTime() {
     try {
       const connectionTimeElement = document.getElementById('connectionTime');
-      if (!connectionTimeElement) {
-        return; // לא בעמוד מרכז ההתראות
-      }
-      
-      if (window.realtimeNotificationsClient) {
+      if (connectionTimeElement && window.realtimeNotificationsClient) {
         const stats = window.realtimeNotificationsClient.getConnectionStats();
         if (stats && stats.connectedAt) {
           const connectionTime = new Date(stats.connectedAt);
@@ -678,7 +626,7 @@ class NotificationsCenter {
       if (!statusDot) {
         return 'connecting'; // לא בעמוד מרכז ההתראות
       }
-      
+
       if (statusDot.querySelector('.connected')) {return 'connected';}
       if (statusDot.querySelector('.disconnected')) {return 'disconnected';}
       if (statusDot.querySelector('.connecting')) {return 'connecting';}
@@ -687,92 +635,36 @@ class NotificationsCenter {
     }
     return 'connecting';
   }
-}
 
-// פונקציה להעתקת התראות ללוח
-function copyNotificationsToClipboard() {
-  try {
-    if (!window.notificationsCenter) {
-      console.warn('מרכז התראות לא זמין');
-      return;
+  checkConnectionStatus() {
+    const currentStatus = this.getCurrentConnectionStatus();
+    const isConnected = window.realtimeNotificationsClient ? window.realtimeNotificationsClient.isConnected() : false;
+
+    if (isConnected && currentStatus !== 'connected') {
+      this.updateConnectionStatus('connected');
+    } else if (!isConnected && currentStatus !== 'disconnected') {
+      this.updateConnectionStatus('disconnected');
     }
-
-    const notifications = window.notificationsCenter.notifications;
-    const history = window.notificationsCenter.history;
-    const stats = window.notificationsCenter.stats;
-
-    let log = '=== לוג התראות TikTrack ===\n\n';
-    log += '📊 סטטיסטיקות:\n';
-    log += `✅ הצלחה: ${stats.success}\n`;
-    log += `❌ שגיאה: ${stats.error}\n`;
-    log += `⚠️ אזהרה: ${stats.warning}\n`;
-    log += `ℹ️ מידע: ${stats.info}\n\n`;
-
-    log += `🔔 התראות פעילות (${notifications.length}):\n`;
-    if (notifications.length > 0) {
-      notifications.forEach((notification, index) => {
-        log += `${index + 1}. [${notification.type.toUpperCase()}] ${notification.title}: ${notification.message}\n`;
-        log += `   זמן: ${new Date(notification.time).toLocaleString('he-IL')}\n\n`;
-      });
-    } else {
-      log += 'אין התראות פעילות\n\n';
-    }
-
-    log += `📚 היסטוריה (${history.length}):\n`;
-    if (history.length > 0) {
-      history.slice(-20).forEach((notification, index) => {
-        log += `${index + 1}. [${notification.type.toUpperCase()}] ${notification.title}: ${notification.message}\n`;
-        log += `   זמן: ${new Date(notification.time).toLocaleString('he-IL')}\n\n`;
-      });
-    } else {
-      log += 'אין היסטוריית התראות\n\n';
-    }
-
-    log += '🔗 חיבור WebSocket:\n';
-    log += `סטטוס: ${window.realtimeNotificationsClient?.socket?.connected ? 'מחובר' : 'לא מחובר'}\n`;
-    log += `זמן חיבור: ${document.getElementById('connectionTime')?.textContent || 'לא ידוע'}\n`;
-    log += '\n=== סוף לוג ===';
-
-    // העתקה ללוח
-    navigator.clipboard.writeText(log).then(() => {
-      console.log('✅ לוג התראות הועתק ללוח בהצלחה');
-    }).catch(err => {
-      console.error('❌ שגיאה בהעתקה ללוח:', err);
-      // גיבוי - הצגה בחלון
-      alert('לוג התראות:\n\n' + log);
-    });
-  } catch (error) {
-    console.error('❌ שגיאה ביצירת לוג התראות:', error);
   }
 }
 
 // פונקציות גלובליות
 function saveNotificationSettings() {
-  // בדיקה אם האלמנטים קיימים (רק בעמוד מרכז ההתראות)
-  const enableRealtime = document.getElementById('enableRealtime');
-  const enableSounds = document.getElementById('enableSounds');
-  const enableBackgroundTasks = document.getElementById('enableBackgroundTasks');
-  const enableDataUpdates = document.getElementById('enableDataUpdates');
-  const enableExternalData = document.getElementById('enableExternalData');
-  const enableSystemEvents = document.getElementById('enableSystemEvents');
-
-  if (!enableRealtime || !enableSounds || !enableBackgroundTasks || !enableDataUpdates || !enableExternalData || !enableSystemEvents) {
-    return; // לא בעמוד מרכז ההתראות
-  }
-
   const settings = {
-    enableRealtime: enableRealtime.checked,
-    enableSounds: enableSounds.checked,
-    enableBackgroundTasks: enableBackgroundTasks.checked,
-    enableDataUpdates: enableDataUpdates.checked,
-    enableExternalData: enableExternalData.checked,
-    enableSystemEvents: enableSystemEvents.checked,
+    enableRealtime: document.getElementById('enableRealtime').checked,
+    enableSounds: document.getElementById('enableSounds').checked,
+    enableBackgroundTasks: document.getElementById('enableBackgroundTasks').checked,
+    enableDataUpdates: document.getElementById('enableDataUpdates').checked,
+    enableExternalData: document.getElementById('enableExternalData').checked,
+    enableSystemEvents: document.getElementById('enableSystemEvents').checked,
   };
 
   if (window.notificationsCenter) {
     window.notificationsCenter.settings = settings;
     window.notificationsCenter.saveSettings();
   }
+
+  window.showSuccessNotification('מרכז התראות', 'הגדרות נשמרו בהצלחה');
 }
 
 function resetNotificationSettings() {
@@ -782,6 +674,8 @@ function resetNotificationSettings() {
       window.notificationsCenter.updateSettingsUI();
       window.notificationsCenter.saveSettings();
     }
+
+    window.showSuccessNotification('מרכז התראות', 'הגדרות אופסו בהצלחה');
   }
 }
 

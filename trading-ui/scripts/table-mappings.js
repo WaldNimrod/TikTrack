@@ -329,7 +329,7 @@ function getColumnValue(item, columnIndex, tableType) {
   const fieldName = columns[columnIndex];
 
   if (!fieldName) {
-    console.warn(`⚠️ No column mapping found for ${tableType} column ${columnIndex}`);
+    // No column mapping found for table type and column index
     return '';
   }
 
@@ -377,8 +377,15 @@ function getColumnValue(item, columnIndex, tableType) {
   // Alerts table - special handling for condition translation
   if (tableType === 'alerts') {
     if (fieldName === 'condition') {
-      if (item.condition_attribute && item.condition_operator && item.condition_number && window.translateConditionFields) {
-        return window.translateConditionFields(item.condition_attribute, item.condition_operator, item.condition_number);
+      if (item.condition_attribute &&
+          item.condition_operator &&
+          item.condition_number &&
+          window.translateConditionFields) {
+        return window.translateConditionFields(
+          item.condition_attribute,
+          item.condition_operator,
+          item.condition_number,
+        );
       }
       return item.condition || '-';
     }
@@ -485,8 +492,15 @@ function getColumnValue(item, columnIndex, tableType) {
       return item.ticker_symbol || item.ticker_id || '';
     }
     if (fieldName === 'condition') {
-      if (item.condition_attribute && item.condition_operator && item.condition_number && window.translateConditionFields) {
-        return window.translateConditionFields(item.condition_attribute, item.condition_operator, item.condition_number);
+      if (item.condition_attribute &&
+          item.condition_operator &&
+          item.condition_number &&
+          window.translateConditionFields) {
+        return window.translateConditionFields(
+          item.condition_attribute,
+          item.condition_operator,
+          item.condition_number,
+        );
       }
       return item.condition || '-';
     }
@@ -627,7 +641,4 @@ window.tableMappings = {
   isTableSupported,
 };
 
-// אתחול Table Mappings
-function initializeTableMappings() {
-  // Table Mappings loaded successfully
-}
+// Table Mappings loaded successfully

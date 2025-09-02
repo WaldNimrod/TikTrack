@@ -395,7 +395,7 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
         return;
       }
     }
-  } catch (_error) {
+  } catch {
     // Linked items check failed, proceeding with cancellation
   }
 
@@ -514,7 +514,6 @@ async function performItemCancellation(itemType, itemId, _itemName) {
 window.uiUtils = {
   cancelItem,
   performItemCancellation,
-  createDeleteButton,
 };
 
 // Export global cancel functions

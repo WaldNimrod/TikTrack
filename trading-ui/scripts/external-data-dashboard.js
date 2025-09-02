@@ -17,6 +17,59 @@
  * @lastUpdated September 2, 2025
  */
 
+// ===== GLOBAL INITIALIZATION FUNCTION =====
+// This function is called by main.js to initialize the page
+
+/**
+ * Initialize External Data Dashboard Page
+ * This function is called by main.js to initialize the page
+ */
+function initializeExternalDataDashboardPage() {
+  try {
+    console.log('🔧 External Data Dashboard Page - Initializing via main.js...');
+    
+    // Wait for DOM to be ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        initializeDashboard();
+      });
+    } else {
+      // DOM is already ready
+      initializeDashboard();
+    }
+    
+    console.log('✅ External Data Dashboard Page - Initialization setup completed');
+  } catch (error) {
+    console.error('❌ Error in initializeExternalDataDashboardPage:', error);
+  }
+}
+
+/**
+ * Initialize the dashboard
+ */
+function initializeDashboard() {
+  try {
+    // Create dashboard instance if it doesn't exist
+    if (!window.externalDataDashboard) {
+      window.externalDataDashboard = new ExternalDataDashboard();
+    }
+    
+    // Initialize the dashboard
+    if (window.externalDataDashboard && !window.externalDataDashboard.isInitialized) {
+      window.externalDataDashboard.init();
+    }
+    
+    console.log('✅ Dashboard initialization completed');
+  } catch (error) {
+    console.error('❌ Error in initializeDashboard:', error);
+  }
+}
+
+// Export the initialization function to global scope
+window.initializeExternalDataDashboardPage = initializeExternalDataDashboardPage;
+window.initializeDashboard = initializeDashboard;
+
+// ===== EXTERNAL DATA DASHBOARD CLASS =====
 class ExternalDataDashboard {
   constructor() {
     this.isInitialized = false;
@@ -240,9 +293,10 @@ class ExternalDataDashboard {
     try {
       console.log('📊 Loading providers...');
 
-      const response = await fetch('/api/external-data/providers');
+      const response = await fetch('/api/external-data/status/providers');
       if (response.ok) {
-        this.providers = await response.json();
+        const data = await response.json();
+        this.providers = data.providers || [];
         this.renderProviders();
       } else {
         console.error('❌ Error loading providers');
@@ -298,9 +352,10 @@ class ExternalDataDashboard {
     try {
       console.log('💾 Loading cache stats...');
 
-      const response = await fetch('/api/external-data/cache/stats');
+      const response = await fetch('/api/external-data/status/cache/stats');
       if (response.ok) {
-        this.cacheStats = await response.json();
+        const data = await response.json();
+        this.cacheStats = data;
         this.renderCacheStats();
       } else {
         console.error('❌ Error loading cache stats');
@@ -329,8 +384,8 @@ class ExternalDataDashboard {
                     <div class="stat-label">אחוז פגיעות</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">${(this.cacheStats.avg_quote_age_minutes || 0).toFixed(1)}</div>
-                    <div class="stat-label">גיל ממוצע (דקות)</div>
+                    <div class="stat-value">${(this.cacheStats.stale_data || 0)}</div>
+                    <div class="stat-label">נתונים פגי תוקף</div>
                 </div>
             </div>
         `;
@@ -340,15 +395,17 @@ class ExternalDataDashboard {
     try {
       console.log('📋 Loading logs...');
 
-      const response = await fetch('/api/external-data/logs');
+      const response = await fetch('/api/external-data/status/logs');
       if (response.ok) {
-        const logs = await response.json();
-        this.renderLogs(logs);
+        const data = await response.json();
+        this.renderLogs(data.logs || []);
       } else {
         console.error('❌ Error loading logs');
+        this.renderLogs([]);
       }
     } catch (error) {
       console.error('❌ Error loading logs:', error);
+      this.renderLogs([]);
     }
   }
 
@@ -419,7 +476,7 @@ class ExternalDataDashboard {
     try {
       console.log('🗑️ Clearing cache...');
 
-      const response = await fetch('/api/external-data/cache/clear', { method: 'POST' });
+      const response = await fetch('/api/external-data/status/cache/clear', { method: 'POST' });
       if (response.ok) {
         console.log('✅ Cache cleared successfully');
         await this.loadCacheStats();
@@ -472,7 +529,7 @@ class ExternalDataDashboard {
         max_requests_hour: document.getElementById('max-requests-hour')?.value || 900,
       };
 
-      const response = await fetch('/api/external-data/settings', {
+      const response = await fetch('/api/external-data/status/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings),
@@ -507,7 +564,7 @@ class ExternalDataDashboard {
     try {
       console.log('🗑️ Clearing logs...');
 
-      const response = await fetch('/api/external-data/logs/clear', { method: 'POST' });
+      const response = await fetch('/api/external-data/status/logs/clear', { method: 'POST' });
       if (response.ok) {
         console.log('✅ Logs cleared successfully');
         await this.loadLogs();

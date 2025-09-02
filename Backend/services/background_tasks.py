@@ -30,7 +30,7 @@ from typing import Dict, Any, List, Optional, Callable
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 from config.database import get_db
-from services.cache_service import cache_service
+from services.advanced_cache_service import advanced_cache_service
 from services.metrics_collector import metrics_collector
 from services.database_optimizer import database_optimizer
 from utils.performance_monitor import monitor_performance
@@ -187,10 +187,10 @@ class BackgroundTaskManager:
         
         try:
             # Clean up expired entries
-            cleaned_count = cache_service.cleanup_expired()
+            cleaned_count = advanced_cache_service.cleanup_expired()
             
             # Get cache stats
-            stats = cache_service.get_stats()
+            stats = advanced_cache_service.get_stats()
             
             results = {
                 'timestamp': datetime.now().isoformat(),

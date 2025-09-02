@@ -182,6 +182,15 @@ function showNotification(message, type = 'info', title = 'התראה', duration
   setTimeout(() => {
     hideNotification(notification);
   }, duration);
+
+  // שליחה למרכז ההתראות (אם זמין)
+  if (window.notificationsCenter && typeof window.notificationsCenter.addNotification === 'function') {
+    try {
+      window.notificationsCenter.addNotification(sanitizedType, sanitizedTitle, sanitizedMessage, 'now');
+    } catch (error) {
+      console.warn('שגיאה בשליחה למרכז ההתראות:', error);
+    }
+  }
 }
 
 /**

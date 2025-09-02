@@ -75,6 +75,11 @@ class RealtimeNotificationsClient {
       console.log('🔌 Connecting to WebSocket server...');
 
       // Create Socket.IO connection
+      if (typeof io === 'undefined') {
+        console.warn('Socket.IO not available, skipping connection');
+        return;
+      }
+      
       this.socket = io(this.serverUrl, {
         transports: ['websocket', 'polling'],
         timeout: 20000,

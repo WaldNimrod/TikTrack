@@ -1243,7 +1243,8 @@ async function deleteNoteFromServer(noteId) {
         window.showErrorNotification('שגיאה', `שגיאה במחיקת הערה לאחר ${maxRetries} ניסיונות. בדוק את חיבור השרת.`);
       } else {
         // המתנה לפני ניסיון נוסף
-        await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+        const currentRetryCount = retryCount;
+        await new Promise(resolve => setTimeout(resolve, 1000 * currentRetryCount));
       }
     }
   }

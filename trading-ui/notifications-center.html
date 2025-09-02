@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מרכז התראות - TikTrack</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/notifications-center.css">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header System -->
+    <div id="unified-header-container"></div>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <div class="page-header">
+                <h1><i class="fas fa-bell"></i> מרכז התראות</h1>
+                <p class="page-description">ניהול מרכזי של כל ההתראות והעדפות במערכת</p>
+            </div>
+            
+            <!-- Connection Status -->
+            <div class="connection-status-card">
+                <div class="status-header">
+                    <h3><i class="fas fa-wifi"></i> סטטוס חיבור</h3>
+                    <div class="status-indicator" id="connectionStatus">
+                        <span class="status-dot"></span>
+                        <span class="status-text">מתחבר...</span>
+                    </div>
+                </div>
+                <div class="connection-details">
+                    <div class="detail-item">
+                        <span class="label">חיבור WebSocket:</span>
+                        <span class="value" id="websocketStatus">מתחבר...</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">זמן חיבור:</span>
+                        <span class="value" id="connectionTime">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">הודעות נשלחו:</span>
+                        <span class="value" id="messagesSent">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Notification Settings -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-cog"></i> הגדרות התראות</h3>
+                </div>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="enableRealtime" checked>
+                            <span class="checkmark"></span>
+                            הפעל התראות בזמן אמת
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="enableSounds" checked>
+                            <span class="checkmark"></span>
+                            הפעל צלילי התראה
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="enableBackgroundTasks" checked>
+                            <span class="checkmark"></span>
+                            התראות משימות ברקע
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="enableDataUpdates" checked>
+                            <span class="checkmark"></span>
+                            התראות עדכוני נתונים
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="enableExternalData" checked>
+                            <span class="checkmark"></span>
+                            התראות נתונים חיצוניים
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="setting-label">
+                            <input type="checkbox" id="enableSystemEvents" checked>
+                            <span class="checkmark"></span>
+                            התראות אירועי מערכת
+                        </label>
+                    </div>
+                </div>
+                <div class="setting-controls">
+                    <button class="btn btn-primary" onclick="saveNotificationSettings()">
+                        <i class="fas fa-save"></i> שמור הגדרות
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetNotificationSettings()">
+                        <i class="fas fa-undo"></i> איפוס הגדרות
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Real-time Notifications -->
+            <div class="notifications-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-bolt"></i> התראות בזמן אמת</h3>
+                    <div class="section-actions">
+                        <button class="btn btn-sm btn-outline-primary" onclick="clearLiveNotifications()">
+                            <i class="fas fa-trash"></i> נקה התראות
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="refreshNotifications()">
+                            <i class="fas fa-sync"></i> רענן
+                        </button>
+                    </div>
+                </div>
+                <div class="notifications-container" id="liveNotifications">
+                    <div class="no-notifications">
+                        <i class="fas fa-bell-slash"></i>
+                        <p>אין התראות פעילות כרגע</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Notification History -->
+            <div class="history-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-history"></i> היסטוריית התראות</h3>
+                    <div class="section-actions">
+                        <select id="historyFilter" class="filter-select" onchange="filterHistory()">
+                            <option value="">כל ההתראות</option>
+                            <option value="success">הצלחה</option>
+                            <option value="error">שגיאה</option>
+                            <option value="warning">אזהרה</option>
+                            <option value="info">מידע</option>
+                        </select>
+                        <select id="historyPeriod" class="filter-select" onchange="filterHistory()">
+                            <option value="1h">שעה אחרונה</option>
+                            <option value="24h" selected>24 שעות אחרונות</option>
+                            <option value="7d">שבוע אחרון</option>
+                            <option value="30d">חודש אחרון</option>
+                        </select>
+                        <button class="btn btn-sm btn-outline-danger" onclick="clearHistory()">
+                            <i class="fas fa-trash"></i> נקה היסטוריה
+                        </button>
+                    </div>
+                </div>
+                <div class="history-container" id="notificationHistory">
+                    <div class="no-history">
+                        <i class="fas fa-history"></i>
+                        <p>אין היסטוריית התראות</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Notification Statistics -->
+            <div class="stats-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-chart-bar"></i> סטטיסטיקות התראות</h3>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="successCount">0</div>
+                            <div class="stat-label">הצלחות</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon error">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="errorCount">0</div>
+                            <div class="stat-label">שגיאות</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="warningCount">0</div>
+                            <div class="stat-label">אזהרות</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon info">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="infoCount">0</div>
+                            <div class="stat-label">הודעות מידע</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Scripts -->
+    <script src="scripts/header-system.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/realtime-notifications-client.js"></script>
+    <script src="scripts/notifications-center.js"></script>
+</body>
+</html>

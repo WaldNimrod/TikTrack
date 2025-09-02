@@ -634,7 +634,10 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/js-map">מפת JS</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="tiktrack-dropdown-item" href="/background-tasks">ניהול משימות ברקע</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/notifications-center">מרכז התראות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/cache-test">בדיקת Cache</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="tiktrack-dropdown-item" href="/server-monitor">ניטור שרת</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/test_api">בדיקת API</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/test_performance">בדיקת ביצועים</a></li>

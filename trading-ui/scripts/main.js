@@ -1131,10 +1131,11 @@ function filterDataByFilters(data, pageName) {
       switch (selectedDateRange) {
       case 'היום':
         return itemDate.toDateString() === now.toDateString();
-      case 'אתמול':
+      case 'אתמול': {
         const yesterday = new Date(now);
         yesterday.setDate(yesterday.getDate() - 1);
         return itemDate.toDateString() === yesterday.toDateString();
+      }
       case 'השבוע': {
         const weekAgo = new Date(now);
         weekAgo.setDate(weekAgo.getDate() - 7);

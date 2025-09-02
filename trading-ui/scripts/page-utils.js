@@ -429,7 +429,7 @@ function getCurrentPageName() {
   const path = window.location.pathname;
 
   // Extract page name from path
-  const pageMatch = path.match(/\/([^\/]+)$/);
+  const pageMatch = path.match(/\/([^/]+)$/);
   if (pageMatch) {
     return pageMatch[1];
   }

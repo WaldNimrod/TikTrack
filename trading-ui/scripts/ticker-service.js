@@ -235,7 +235,7 @@ async function getRelevantTickers(options = {}) {
     );
 
     if (hasTrades || hasPlans) {
-
+      // Ticker has trades or plans
     }
 
     return hasTrades || hasPlans;
@@ -278,7 +278,7 @@ async function getTickersWithOpenOrClosedTradesAndPlans(options = {}) {
     );
 
     if (hasOpenOrClosedTrades || hasOpenOrClosedPlans) {
-
+      // Ticker has open or closed trades/plans
     }
 
     return hasOpenOrClosedTrades || hasOpenOrClosedPlans;

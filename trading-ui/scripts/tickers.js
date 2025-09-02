@@ -85,7 +85,7 @@ function getCurrencySymbol(currencyId) {
     return currencyId || 'N/A';
   }
 
-  const currency = window.currenciesData.find(c => c.id == currencyId);
+  const currency = window.currenciesData.find(c => c.id === currencyId);
   return currency ? currency.symbol : currencyId || 'N/A';
 }
 
@@ -356,7 +356,7 @@ function showEditTickerModal(id) {
   // הצגת מודל עריכת טיקר
 
   // מציאת הטיקר לפי ID
-  const ticker = tickersData.find(t => t.id == id);
+  const ticker = tickersData.find(t => t.id === id);
   if (!ticker) {
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה', 'טיקר לא נמצא');
@@ -426,7 +426,7 @@ function showDeleteTickerModal(id) {
 
 
   // מציאת הטיקר לפי ID
-  const ticker = (window.tickersData || []).find(t => t.id == id);
+  const ticker = (window.tickersData || []).find(t => t.id === id);
   if (!ticker) {
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה', 'טיקר לא נמצא');
@@ -600,7 +600,7 @@ async function updateTicker() {
   // בדיקה אם הסמל כבר קיים בטיקרים אחרים (לא בטיקר הנוכחי)
   const existingTicker = (window.tickersData || []).find(t =>
     t.symbol.toUpperCase() === symbol.toUpperCase() &&
-        t.id != id,
+        t.id !== id,
   );
   if (existingTicker) {
     if (window.showErrorNotification) {
@@ -616,7 +616,7 @@ async function updateTicker() {
   let finalStatus = status;
   if (status === 'not_cancelled') {
     // בדיקה אם יש טריידים או תכנונים פתוחים לטיקר זה
-    const ticker = (window.tickersData || []).find(t => t.id == id);
+    const ticker = (window.tickersData || []).find(t => t.id === id);
     if (ticker) {
       // אם יש טריידים או תכנונים פתוחים - סטטוס "open", אחרת "closed"
       finalStatus = ticker.active_trades ? 'open' : 'closed';
@@ -626,7 +626,7 @@ async function updateTicker() {
   }
 
   // בדיקה אם הסטטוס השתנה ל"מבוטל" - אם כן, בדוק פריטים מקושרים
-  const originalTicker = tickersData.find(t => t.id == id);
+  const originalTicker = tickersData.find(t => t.id === id);
   if (originalTicker && status === 'cancelled' && originalTicker.status !== 'cancelled') {
 
     // בדיקת פריטים מקושרים באמצעות המערכת הכללית
@@ -980,7 +980,7 @@ async function checkLinkedItemsBeforeCancelTicker(tickerId) {
 function getTickerSymbol(tickerId) {
   // נסה למצוא בטיקרים שכבר נטענו
   if (window.tickersData) {
-    const ticker = window.tickersData.find(t => t.id == tickerId);
+    const ticker = window.tickersData.find(t => t.id === tickerId);
     if (ticker) {
       return ticker.symbol;
     }
@@ -1044,7 +1044,7 @@ async function updateAllTickerStatuses() {
 async function performCancelTickerWithLinkedItemsCheck(id) {
 
   // מציאת פרטי הטיקר
-  const ticker = (window.tickersData || []).find(t => t.id == id);
+  const ticker = (window.tickersData || []).find(t => t.id === id);
   if (!ticker) {
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה', 'טיקר לא נמצא');
@@ -1115,7 +1115,7 @@ async function performCancelTicker(id) {
 
 
   // מציאת פרטי הטיקר
-  const ticker = (window.tickersData || []).find(t => t.id == id);
+  const ticker = (window.tickersData || []).find(t => t.id === id);
   if (!ticker) {
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה', 'טיקר לא נמצא');
@@ -1205,7 +1205,7 @@ async function reactivateTicker(tickerId) {
   try {
 
     // מציאת הטיקר בנתונים
-    const ticker = (window.tickersData || []).find(t => t.id == tickerId);
+    const ticker = (window.tickersData || []).find(t => t.id === tickerId);
     if (!ticker) {
       handleElementNotFound('reactivateTicker', `טיקר לא נמצא: ${tickerId}`);
       throw new Error('טיקר לא נמצא');
@@ -1383,7 +1383,7 @@ async function confirmDeleteTicker(id) {
 
 
   // מציאת הטיקר לפני מחיקה כדי להציג פרטים בהודעה
-  const ticker = (window.tickersData || []).find(t => t.id == id);
+  const ticker = (window.tickersData || []).find(t => t.id === id);
   const tickerInfo = ticker ? `${ticker.symbol} - ${ticker.name}` : `טיקר ${id}`;
 
   try {

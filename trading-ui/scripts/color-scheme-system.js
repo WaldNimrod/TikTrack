@@ -585,24 +585,24 @@ function createInvestmentTypeLegend(options = {}) {
  * צבעים ברירת מחדל לערכים מספריים
  */
 const NUMERIC_VALUE_COLORS = {
-    positive: {
-        light: '#d4edda',      // רקע בהיר לערכים חיוביים
-        medium: '#28a745',     // טקסט לערכים חיוביים
-        dark: '#155724',       // טקסט כהה לערכים חיוביים
-        border: '#c3e6cb'      // גבול לערכים חיוביים
-    },
-    negative: {
-        light: '#f8d7da',      // רקע בהיר לערכים שליליים
-        medium: '#dc3545',     // טקסט לערכים שליליים
-        dark: '#721c24',       // טקסט כהה לערכים שליליים
-        border: '#f5c6cb'      // גבול לערכים שליליים
-    },
-    zero: {
-        light: '#e2e3e5',      // רקע לערך אפס
-        medium: '#6c757d',     // טקסט לערך אפס
-        dark: '#383d41',       // טקסט כהה לערך אפס
-        border: '#d6d8db'      // גבול לערך אפס
-    }
+  positive: {
+    light: '#d4edda',      // רקע בהיר לערכים חיוביים
+    medium: '#28a745',     // טקסט לערכים חיוביים
+    dark: '#155724',       // טקסט כהה לערכים חיוביים
+    border: '#c3e6cb',      // גבול לערכים חיוביים
+  },
+  negative: {
+    light: '#f8d7da',      // רקע בהיר לערכים שליליים
+    medium: '#dc3545',     // טקסט לערכים שליליים
+    dark: '#721c24',       // טקסט כהה לערכים שליליים
+    border: '#f5c6cb',      // גבול לערכים שליליים
+  },
+  zero: {
+    light: '#e2e3e5',      // רקע לערך אפס
+    medium: '#6c757d',     // טקסט לערך אפס
+    dark: '#383d41',       // טקסט כהה לערך אפס
+    border: '#d6d8db',      // גבול לערך אפס
+  },
 };
 
 /**
@@ -612,13 +612,13 @@ const NUMERIC_VALUE_COLORS = {
  * @returns {string} קוד הצבע
  */
 function getNumericValueColor(value, colorType = 'medium') {
-    if (value > 0) {
-        return NUMERIC_VALUE_COLORS.positive[colorType] || NUMERIC_VALUE_COLORS.positive.medium;
-    } else if (value < 0) {
-        return NUMERIC_VALUE_COLORS.negative[colorType] || NUMERIC_VALUE_COLORS.negative.medium;
-    } else {
-        return NUMERIC_VALUE_COLORS.zero[colorType] || NUMERIC_VALUE_COLORS.zero.medium;
-    }
+  if (value > 0) {
+    return NUMERIC_VALUE_COLORS.positive[colorType] || NUMERIC_VALUE_COLORS.positive.medium;
+  } else if (value < 0) {
+    return NUMERIC_VALUE_COLORS.negative[colorType] || NUMERIC_VALUE_COLORS.negative.medium;
+  } else {
+    return NUMERIC_VALUE_COLORS.zero[colorType] || NUMERIC_VALUE_COLORS.zero.medium;
+  }
 }
 
 /**
@@ -627,7 +627,7 @@ function getNumericValueColor(value, colorType = 'medium') {
  * @returns {string} קוד הצבע
  */
 function getNumericValueBackgroundColor(value) {
-    return getNumericValueColor(value, 'light');
+  return getNumericValueColor(value, 'light');
 }
 
 /**
@@ -636,7 +636,7 @@ function getNumericValueBackgroundColor(value) {
  * @returns {string} קוד הצבע
  */
 function getNumericValueTextColor(value) {
-    return getNumericValueColor(value, 'medium');
+  return getNumericValueColor(value, 'medium');
 }
 
 /**
@@ -645,7 +645,7 @@ function getNumericValueTextColor(value) {
  * @returns {string} קוד הצבע
  */
 function getNumericValueBorderColor(value) {
-    return getNumericValueColor(value, 'border');
+  return getNumericValueColor(value, 'border');
 }
 
 /**
@@ -654,7 +654,7 @@ function getNumericValueBorderColor(value) {
  * @returns {string} קוד הצבע
  */
 function getNumericValueDarkColor(value) {
-    return getNumericValueColor(value, 'dark');
+  return getNumericValueColor(value, 'dark');
 }
 
 /**
@@ -663,7 +663,7 @@ function getNumericValueDarkColor(value) {
  * @returns {boolean} true אם חיובי
  */
 function isPositiveValue(value) {
-    return value > 0;
+  return value > 0;
 }
 
 /**
@@ -672,7 +672,7 @@ function isPositiveValue(value) {
  * @returns {boolean} true אם שלילי
  */
 function isNegativeValue(value) {
-    return value < 0;
+  return value < 0;
 }
 
 /**
@@ -681,7 +681,7 @@ function isNegativeValue(value) {
  * @returns {boolean} true אם אפס
  */
 function isZeroValue(value) {
-    return value === 0;
+  return value === 0;
 }
 
 /**
@@ -690,9 +690,9 @@ function isZeroValue(value) {
  * @returns {string} סוג הערך
  */
 function getValueType(value) {
-    if (value > 0) return 'positive';
-    if (value < 0) return 'negative';
-    return 'zero';
+  if (value > 0) {return 'positive';}
+  if (value < 0) {return 'negative';}
+  return 'zero';
 }
 
 /**
@@ -701,8 +701,8 @@ function getValueType(value) {
  * @returns {string} שם ה-CSS class
  */
 function getNumericValueCSSClass(value) {
-    const type = getValueType(value);
-    return `numeric-value-${type}`;
+  const type = getValueType(value);
+  return `numeric-value-${type}`;
 }
 
 /**
@@ -710,7 +710,7 @@ function getNumericValueCSSClass(value) {
  * @returns {string} CSS דינמי
  */
 function generateNumericValueCSS() {
-    const css = `
+  const css = `
         /* ערכים חיוביים */
         .numeric-value-positive {
             color: ${NUMERIC_VALUE_COLORS.positive.medium} !important;
@@ -768,8 +768,8 @@ function generateNumericValueCSS() {
             border-color: ${NUMERIC_VALUE_COLORS.zero.border} !important;
         }
     `;
-    
-    return css;
+
+  return css;
 }
 
 /**
@@ -777,21 +777,21 @@ function generateNumericValueCSS() {
  * @param {Object} newColors - צבעים חדשים
  */
 function updateNumericValueColors(newColors) {
-    // עדכון הצבעים הגלובליים
-    Object.assign(NUMERIC_VALUE_COLORS, newColors);
-    
-    // יצירת CSS חדש
-    const newCSS = generateNumericValueCSS();
-    
-    // עדכון או יצירת style element
-    let styleElement = document.getElementById('numeric-value-colors');
-    if (!styleElement) {
-        styleElement = document.createElement('style');
-        styleElement.id = 'numeric-value-colors';
-        document.head.appendChild(styleElement);
-    }
-    
-    styleElement.textContent = newCSS;
+  // עדכון הצבעים הגלובליים
+  Object.assign(NUMERIC_VALUE_COLORS, newColors);
+
+  // יצירת CSS חדש
+  const newCSS = generateNumericValueCSS();
+
+  // עדכון או יצירת style element
+  let styleElement = document.getElementById('numeric-value-colors');
+  if (!styleElement) {
+    styleElement = document.createElement('style');
+    styleElement.id = 'numeric-value-colors';
+    document.head.appendChild(styleElement);
+  }
+
+  styleElement.textContent = newCSS;
 }
 
 // ========================================
@@ -817,23 +817,28 @@ window.NUMERIC_VALUE_COLORS = NUMERIC_VALUE_COLORS;
 
 // ייצוא לאובייקט הגלובלי
 window.colorSchemeSystem = {
-    ...window.colorSchemeSystem,
-    // פונקציות ערכים מספריים
-    getNumericValueColor,
-    getNumericValueBackgroundColor,
-    getNumericValueTextColor,
-    getNumericValueBorderColor,
-    getNumericValueDarkColor,
-    isPositiveValue,
-    isNegativeValue,
-    isZeroValue,
-    getValueType,
-    getNumericValueCSSClass,
-    generateNumericValueCSS,
-    updateNumericValueColors,
-    
-    // קבועים
-    NUMERIC_VALUE_COLORS
+  ...window.colorSchemeSystem,
+  // פונקציות ערכים מספריים
+  getNumericValueColor,
+  getNumericValueBackgroundColor,
+  getNumericValueTextColor,
+  getNumericValueBorderColor,
+  getNumericValueDarkColor,
+  isPositiveValue,
+  isNegativeValue,
+  isZeroValue,
+  getValueType,
+  getNumericValueCSSClass,
+  generateNumericValueCSS,
+  updateNumericValueColors,
+
+  // Entity color management functions
+  updateEntityColor,
+  updateEntityColorFromHex,
+  resetEntityColors,
+
+  // קבועים
+  NUMERIC_VALUE_COLORS,
 };
 
 // ===== EXPORTS =====
@@ -855,6 +860,11 @@ window.isValidEntityType = isValidEntityType;
 window.getEntityLabel = getEntityLabel;
 window.createEntityLegend = createEntityLegend;
 window.generateEntityCSS = generateEntityCSS;
+
+// Export entity color management functions
+window.updateEntityColor = updateEntityColor;
+window.updateEntityColorFromHex = updateEntityColorFromHex;
+window.resetEntityColors = resetEntityColors;
 
 // Export constants
 window.VALID_INVESTMENT_TYPES = VALID_INVESTMENT_TYPES;
@@ -913,7 +923,7 @@ window.colorSchemeSystem = {
   INVESTMENT_TYPE_DESCRIPTIONS,
   INVESTMENT_TYPE_COLORS,
 
-  NUMERIC_VALUE_COLORS
+  NUMERIC_VALUE_COLORS,
 };
 
 console.log('🎨 Unified Color Scheme System loaded successfully!');

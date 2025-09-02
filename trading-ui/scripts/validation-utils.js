@@ -102,7 +102,7 @@ function isValidEmail(email) {
  * בדיקה אם מספר טלפון תקין
  */
 function isValidPhone(phone) {
-  return /^[\d\s\-\+\(\)]+$/.test(phone);
+  return /^[\d\s\-+()]+$/.test(phone);
 }
 
 // ===== פונקציות ויזואליות =====

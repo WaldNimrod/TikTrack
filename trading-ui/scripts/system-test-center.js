@@ -145,7 +145,7 @@ class SimpleTestCenter {
     this.log('🔄 מתחיל רענון סטטוס כללי...');
     this.showLoading('system-status-overview', 'מרענן סטטוס כללי...');
     await this.delay(1000);
-    
+
     try {
       await Promise.all([
         this.loadCacheData(),
@@ -157,7 +157,7 @@ class SimpleTestCenter {
     } catch (error) {
       this.log('❌ שגיאה בעדכון סטטוס: ' + error.message);
     }
-    
+
     console.log('=== refreshAllStatus הושלם ===');
   }
 
@@ -223,7 +223,7 @@ class SimpleTestCenter {
 
   async runQueryTest() {
     console.log('=== runQueryTest התחיל ===');
-    
+
     const queryType = document.getElementById('test-query-type')?.value || 'tickers';
     console.log(`סוג Query: ${queryType}`);
     this.log(`🧪 מתחיל בדיקת Query: ${queryType}`);
@@ -282,7 +282,7 @@ class SimpleTestCenter {
   displayQueryTestResults(results) {
     console.log('=== displayQueryTestResults התחיל ===');
     console.log('תוצאות:', results);
-    
+
     const element = document.getElementById('query-test-results');
     if (!element) {
       console.error('Element query-test-results לא נמצא');
@@ -299,7 +299,7 @@ class SimpleTestCenter {
         <p><strong>הודעה:</strong> ${results.message}</p>
       </div>
     `;
-    
+
     this.log('✅ תוצאות בדיקת Query הוצגו בהצלחה');
     console.log('=== displayQueryTestResults הושלם ===');
   }
@@ -468,7 +468,7 @@ class SimpleTestCenter {
   // Display functions
   displayCacheStats(stats) {
     const element = document.getElementById('cache-stats-content');
-    if (!element) return;
+    if (!element) {return;}
 
     element.innerHTML = `
       <div class="row">
@@ -502,7 +502,7 @@ class SimpleTestCenter {
 
   displayCacheHealth(health) {
     const element = document.getElementById('cache-health-content');
-    if (!element) return;
+    if (!element) {return;}
 
     const statusColor = health.status === 'healthy' ? 'success' : 'danger';
     element.innerHTML = `
@@ -522,7 +522,7 @@ class SimpleTestCenter {
 
   displayCacheInfo(info) {
     const element = document.getElementById('cache-info-content');
-    if (!element) return;
+    if (!element) {return;}
 
     element.innerHTML = `
       <div class="alert alert-info">
@@ -536,7 +536,7 @@ class SimpleTestCenter {
 
   displayQueryStats(stats) {
     const element = document.getElementById('query-stats-content');
-    if (!element) return;
+    if (!element) {return;}
 
     element.innerHTML = `
       <div class="row">
@@ -564,7 +564,7 @@ class SimpleTestCenter {
 
   displayQueryOpportunities(opportunities) {
     const element = document.getElementById('query-opportunities-content');
-    if (!element) return;
+    if (!element) {return;}
 
     const opportunitiesHtml = opportunities.map(opp => `
       <li class="mb-2">
@@ -584,7 +584,7 @@ class SimpleTestCenter {
 
   displaySlowQueries(queries) {
     const element = document.getElementById('slow-queries-content');
-    if (!element) return;
+    if (!element) {return;}
 
     const queriesHtml = queries.map(query => `
       <li class="mb-2">
@@ -603,7 +603,7 @@ class SimpleTestCenter {
 
   displayExternalDataStatus(status) {
     const element = document.getElementById('external-data-status-content');
-    if (!element) return;
+    if (!element) {return;}
 
     const yahooStatus = status.yahoo_finance === 'connected' ? 'success' : 'danger';
     const alphaStatus = status.alpha_vantage === 'connected' ? 'success' : 'danger';
@@ -620,7 +620,7 @@ class SimpleTestCenter {
 
   displayExternalDataTest(test) {
     const element = document.getElementById('external-data-test-content');
-    if (!element) return;
+    if (!element) {return;}
 
     const statusColor = test.status === 'success' ? 'success' : 'danger';
     element.innerHTML = `
@@ -634,7 +634,7 @@ class SimpleTestCenter {
 
   displayPerformanceMetrics(metrics) {
     const element = document.getElementById('performance-metrics-content');
-    if (!element) return;
+    if (!element) {return;}
 
     element.innerHTML = `
       <div class="row">
@@ -668,7 +668,7 @@ class SimpleTestCenter {
 
   displayPerformanceTest(test) {
     const element = document.getElementById('performance-test-content');
-    if (!element) return;
+    if (!element) {return;}
 
     const recommendationsHtml = test.recommendations.map(rec => `<li>${rec}</li>`).join('');
 
@@ -697,7 +697,7 @@ class SimpleTestCenter {
       <small class="text-muted">${timestamp}</small>
       <span class="ms-2">${message}</span>
     `;
-    
+
     logContent.appendChild(logEntry);
     logContent.scrollTop = logContent.scrollHeight;
   }

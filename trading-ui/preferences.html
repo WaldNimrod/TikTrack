@@ -407,6 +407,70 @@
       </div>
     </div>
     
+    <!-- מספר ניסיונות חוזרים -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🔄 מספר ניסיונות חוזרים</h4>
+        <p>מספר הניסיונות החוזרים במקרה של כשל</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="retryAttempts" class="form-control" min="0" max="5" step="1" 
+                 onchange="updatePreference('retryAttempts', this.value)" placeholder="2">
+          <span class="input-group-text">ניסיונות</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- זמן פסקה בין ניסיונות -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>⏸️ זמן פסקה בין ניסיונות</h4>
+        <p>זמן המתנה בין ניסיונות חוזרים (בשניות)</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="retryDelay" class="form-control" min="1" max="60" step="1" 
+                 onchange="updatePreference('retryDelay', this.value)" placeholder="5">
+          <span class="input-group-text">שניות</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- הפעלת רענון אוטומטי -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🔄 רענון אוטומטי</h4>
+        <p>הפעלת רענון אוטומטי של נתונים</p>
+      </div>
+      <div class="preference-control">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="autoRefresh" 
+                 onchange="updatePreference('autoRefresh', this.checked)" style="transform: scale(1.2);">
+          <label class="form-check-label" for="autoRefresh">
+            הפעל רענון אוטומטי
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <!-- הצגת לוגים מפורטים -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>📝 לוגים מפורטים</h4>
+        <p>הצגת לוגים מפורטים של פעולות נתונים</p>
+      </div>
+      <div class="preference-control">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="verboseLogging" 
+                 onchange="updatePreference('verboseLogging', this.checked)" style="transform: scale(1.2);">
+          <label class="form-check-label" for="verboseLogging">
+            הצג לוגים מפורטים
+          </label>
+        </div>
+      </div>
+    </div>
+    
     <!-- ===== סולמות צבעים ===== -->
     <div class="preference-item" style="border-top: 2px solid #ff9c05; margin-top: 20px; padding-top: 20px;">
       <div class="preference-label">
@@ -533,67 +597,140 @@
       </div>
     </div>
     
-    <!-- מספר ניסיונות חוזרים -->
-    <div class="preference-item">
+    <!-- ===== סולם צבעים לפי ישויות ===== -->
+    <div class="preference-item" style="border-top: 2px solid #007bff; margin-top: 20px; padding-top: 20px;">
       <div class="preference-label">
-        <h4>🔄 מספר ניסיונות חוזרים</h4>
-        <p>מספר הניסיונות החוזרים במקרה של כשל</p>
+        <h4>🏷️ סולם צבעים לפי ישויות</h4>
+        <p>הגדרת צבעים לסוגי ישויות במערכת</p>
       </div>
       <div class="preference-control">
-        <div class="input-group">
-          <input type="number" id="retryAttempts" class="form-control" min="0" max="5" step="1" 
-                 onchange="updatePreference('retryAttempts', this.value)" placeholder="2">
-          <span class="input-group-text">ניסיונות</span>
+        <!-- Placeholder for section header -->
+      </div>
+    </div>
+    
+    <!-- טריידים ותכנונים -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>📈 טריידים ותכנונים</h4>
+        <p>צבעים לעסקי השקעה ותכנונים</p>
+      </div>
+      <div class="preference-control">
+        <div class="row">
+          <div class="col-md-4 mb-2">
+            <label class="form-label small">טריידים</label>
+            <div class="input-group">
+              <input type="color" id="entityTradeColor" class="form-control form-control-color" 
+                     onchange="updateEntityColor('trade', this.value)" 
+                     value="#007bff" title="בחר צבע לטריידים">
+              <input type="text" id="entityTradeColorHex" class="form-control" 
+                     placeholder="#007bff" maxlength="7"
+                     onchange="updateEntityColorFromHex('trade', this.value)">
+            </div>
+          </div>
+          <div class="col-md-4 mb-2">
+            <label class="form-label small">תכנוני השקעה</label>
+            <div class="input-group">
+              <input type="color" id="entityTradePlanColor" class="form-control form-control-color" 
+                     onchange="updateEntityColor('trade_plan', this.value)" 
+                     value="#0056b3" title="בחר צבע לתכנוני השקעה">
+              <input type="text" id="entityTradePlanColorHex" class="form-control" 
+                     placeholder="#0056b3" maxlength="7"
+                     onchange="updateEntityColorFromHex('trade_plan', this.value)">
+            </div>
+          </div>
+          <div class="col-md-4 mb-2">
+            <label class="form-label small">עסקאות</label>
+            <div class="input-group">
+              <input type="color" id="entityExecutionColor" class="form-control form-control-color" 
+                     onchange="updateEntityColor('execution', this.value)" 
+                     value="#17a2b8" title="בחר צבע לעסקאות">
+              <input type="text" id="entityExecutionColorHex" class="form-control" 
+                     placeholder="#17a2b8" maxlength="7"
+                     onchange="updateEntityColorFromHex('execution', this.value)">
+            </div>
+          </div>
         </div>
       </div>
     </div>
     
-    <!-- זמן פסקה בין ניסיונות -->
+    <!-- חשבונות ותזרים מזומנים -->
     <div class="preference-item">
       <div class="preference-label">
-        <h4>⏸️ זמן פסקה בין ניסיונות</h4>
-        <p>זמן המתנה בין ניסיונות חוזרים (בשניות)</p>
+        <h4>💰 חשבונות ותזרים מזומנים</h4>
+        <p>צבעים לעניינים פיננסיים</p>
       </div>
       <div class="preference-control">
-        <div class="input-group">
-          <input type="number" id="retryDelay" class="form-control" min="1" max="60" step="1" 
-                 onchange="updatePreference('retryDelay', this.value)" placeholder="5">
-          <span class="input-group-text">שניות</span>
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <label class="form-label small">חשבונות</label>
+            <div class="input-group">
+              <input type="color" id="entityAccountColor" class="form-control form-control-color" 
+                     onchange="updateEntityColor('account', this.value)" 
+                     value="#28a745" title="בחר צבע לחשבונות">
+              <input type="text" id="entityAccountColorHex" class="form-control" 
+                     placeholder="#28a745" maxlength="7"
+                     onchange="updateEntityColorFromHex('account', this.value)">
+            </div>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label small">תזרים מזומנים</label>
+            <div class="input-group">
+              <input type="color" id="entityCashFlowColor" class="form-control form-control-color" 
+                     onchange="updateEntityColor('cash_flow', this.value)" 
+                     value="#20c997" title="בחר צבע לתזרים מזומנים">
+              <input type="text" id="entityCashFlowColorHex" class="form-control" 
+                     placeholder="#20c997" maxlength="7"
+                     onchange="updateEntityColorFromHex('cash_flow', this.value)">
+            </div>
+          </div>
         </div>
       </div>
     </div>
     
-    <!-- הפעלת רענון אוטומטי -->
+    <!-- טיקרים והתראות -->
     <div class="preference-item">
       <div class="preference-label">
-        <h4>🔄 רענון אוטומטי</h4>
-        <p>הפעלת רענון אוטומטי של נתונים</p>
+        <h4>📊 טיקרים והתראות</h4>
+        <p>צבעים לנתוני שוק והתראות</p>
       </div>
       <div class="preference-control">
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" id="autoRefresh" 
-                 onchange="updatePreference('autoRefresh', this.checked)" style="transform: scale(1.2);">
-          <label class="form-check-label" for="autoRefresh">
-            הפעל רענון אוטומטי
-          </label>
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <label class="form-label small">טיקרים</label>
+            <div class="input-group">
+              <input type="color" id="entityTickerColor" class="form-control form-control-color" 
+                     onchange="updateEntityColor('ticker', this.value)" 
+                     value="#dc3545" title="בחר צבע לטיקרים">
+              <input type="text" id="entityTickerColorHex" class="form-control" 
+                     placeholder="#dc3545" maxlength="7"
+                     onchange="updateEntityColorFromHex('ticker', this.value)">
+            </div>
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label small">התראות</label>
+            <div class="input-group">
+              <input type="color" id="entityAlertColor" class="form-control form-control-color" 
+                     onchange="updateEntityColor('alert', this.value)" 
+                     value="#ff9c05" title="בחר צבע להתראות">
+              <input type="text" id="entityAlertColorHex" class="form-control" 
+                     placeholder="#ff9c05" maxlength="7"
+                     onchange="updateEntityColorFromHex('alert', this.value)">
+            </div>
+          </div>
         </div>
       </div>
     </div>
     
-    <!-- הצגת לוגים מפורטים -->
+    <!-- כפתור איפוס צבעי ישויות -->
     <div class="preference-item">
       <div class="preference-label">
-        <h4>📝 לוגים מפורטים</h4>
-        <p>הצגת לוגים מפורטים של פעולות נתונים</p>
+        <h4>🔄 איפוס צבעי ישויות</h4>
+        <p>איפוס צבעי ישויות לברירת המחדל</p>
       </div>
       <div class="preference-control">
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" id="verboseLogging" 
-                 onchange="updatePreference('verboseLogging', this.checked)" style="transform: scale(1.2);">
-          <label class="form-check-label" for="verboseLogging">
-            הצג לוגים מפורטים
-          </label>
-        </div>
+        <button type="button" class="btn btn-outline-secondary" onclick="resetEntityColors()">
+          איפוס לברירת מחדל
+        </button>
       </div>
     </div>
     

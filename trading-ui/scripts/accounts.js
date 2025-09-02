@@ -63,6 +63,7 @@ async function loadCurrenciesFromServer() {
       window.currenciesData = currencies;
       window.currenciesLoaded = true;
     } else {
+      const errorText = await response.text();
       // טעינת מטבעות ברירת מחדל
       window.currenciesData = [
         { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' },
@@ -70,7 +71,7 @@ async function loadCurrenciesFromServer() {
       window.currenciesLoaded = true;
     }
 
-  } catch (_error) {
+  } catch (error) {
     // טעינת מטבעות ברירת מחדל
     window.currenciesData = [
       { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' },
@@ -79,7 +80,41 @@ async function loadCurrenciesFromServer() {
   }
 }
 
-// Function removed - not in use
+// פונקציה עזר להצגת מטבע
+function getCurrencyDisplay(account) {
+  if (account.currency_symbol) {
+    // אם יש סמל מטבע מהשרת
+    switch (account.currency_symbol) {
+    case 'USD': return '$';
+    case 'ILS': return '₪';
+    case 'EUR': return '€';
+    case 'GBP': return '£';
+    default: return account.currency_symbol;
+    }
+  } else if (account.currency_id && window.currenciesData.length > 0) {
+    // אם יש רק currency_id, נחפש את המטבע
+    const currency = window.currenciesData.find(c => c.id === account.currency_id);
+    if (currency) {
+      switch (currency.symbol) {
+      case 'USD': return '$';
+      case 'ILS': return '₪';
+      case 'EUR': return '€';
+      case 'GBP': return '£';
+      default: return currency.symbol;
+      }
+    }
+  } else if (account.currency && account.currency.symbol) {
+    // fallback למטבע הישן
+    switch (account.currency.symbol) {
+    case 'USD': return '$';
+    case 'ILS': return '₪';
+    case 'EUR': return '€';
+    case 'GBP': return '£';
+    default: return account.currency.symbol;
+    }
+  }
+  return '$'; // ברירת מחדל
+}
 
 // פונקציה ליצירת אפשרויות מטבע בטופס
 function generateCurrencyOptions(account = null) {
@@ -199,11 +234,11 @@ async function loadAllAccountsFromServer() {
       // החזרת הנתונים לטעינה חוזרת
       return openAccounts;
     } else {
-      // Error loading all accounts from server
+      // Error loading all accounts from server, status
       return [];
     }
 
-  } catch (_error) {
+  } catch (error) {
     // Error loading all accounts from server
     return [];
   }
@@ -254,9 +289,9 @@ async function loadAccountsData() {
       // חשבונות שהתקבלו
       return accounts;
     }
-  } catch (_error) {
-    handleDataLoadError(_error, 'טעינת נתוני חשבונות');
-    throw _error;
+  } catch (error) {
+    handleDataLoadError(error, 'טעינת נתוני חשבונות');
+    throw error;
   }
 }
 
@@ -478,7 +513,7 @@ window.updateAccountFilterMenuDirectly = function (accounts) {
 
   // הוספת החשבונות מהשרת
   if (accounts && accounts.length > 0) {
-    accounts.forEach((account, _index) => {
+    accounts.forEach(account => {
       const accountItem = document.createElement('div');
       accountItem.className = 'account-filter-item';
       accountItem.setAttribute('data-account', account.id || account.name);
@@ -557,8 +592,8 @@ function showAddAccountModal() {
     try {
       const modal = new bootstrap.Modal(modalElement);
       modal.show();
-    } catch (_error) {
-      handleSystemError(_error, 'הצגת מודל קיים');
+    } catch (error) {
+      handleSystemError(error, 'הצגת מודל קיים');
     }
   } else {
     // יצירת המודל דינמית
@@ -574,8 +609,8 @@ function showAddAccountModal() {
       if (window.initializeValidation) {
         window.initializeValidation('accountForm');
       }
-    } catch (_error) {
-      handleSystemError(_error, 'יצירת/הצגת מודל חדש');
+    } catch (error) {
+      handleSystemError(error, 'יצירת/הצגת מודל חדש');
     }
   }
 }
@@ -764,7 +799,7 @@ function validateAccountData(accountData) {
   }
 
   // בדיקת תווים לא חוקיים
-  const invalidChars = /[<>"'&]/;
+  const invalidChars = /[<>\"'&]/;
   if (invalidChars.test(trimmedName)) {
     return { isValid: false, message: 'שם החשבון מכיל תווים לא חוקיים' };
   }
@@ -914,7 +949,7 @@ async function saveAccount(mode, accountId = null) {
       if (typeof window.showWarningNotification === 'function') {
         window.showWarningNotification('אזהרה', 'החשבון נשמר אך יש בעיה בעדכון הטבלה. אנא רענן את הדף.');
       } else {
-        // Fallback warning - no console usage
+        console.warn('החשבון נשמר אך יש בעיה בעדכון הטבלה. אנא רענן את הדף.');
       }
     }
 
@@ -1060,67 +1095,6 @@ function showEditAccountModal(account) {
 
 }
 
-/**
- * יצירת חשבון חדש
- */
-async function createAccount() {
-
-  const name = document.getElementById('accountName').value.trim();
-  const currency = document.getElementById('accountCurrency').value;
-
-  // המרת סטטוס מ-פתוח/סגור ל-open/closed
-  const statusDisplay = document.getElementById('accountStatus').value || 'פתוח';
-  let status = 'open';
-  if (statusDisplay === 'סגור') {
-    status = 'closed';
-  }
-
-  const cashBalance = parseFloat(document.getElementById('accountCashBalance').value) || 0;
-  const totalValue = parseFloat(document.getElementById('accountTotalValue').value) || 0;
-  const totalPl = parseFloat(document.getElementById('accountTotalPl').value) || 0;
-  const notes = document.getElementById('accountNotes').value.trim();
-
-  if (!name || !currency) {
-    showErrorMessage('שם החשבון ומטבע הם שדות חובה');
-    return;
-  }
-
-  try {
-    const response = await fetch('/api/v1/accounts/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name,
-        currency_id: parseInt(currency),
-        status,
-        cash_balance: cashBalance,
-        total_value: totalValue,
-        total_pl: totalPl,
-        notes,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      showSuccessMessage('חשבון נוצר בהצלחה!');
-      const modal = bootstrap.Modal.getInstance(document.getElementById('addAccountModal'));
-      modal.hide();
-
-      // רענון הטבלה
-      if (typeof loadAccounts === 'function') {
-        loadAccounts();
-      }
-    } else {
-      showErrorMessage(data.message || 'שגיאה ביצירת חשבון');
-    }
-  } catch (error) {
-    handleSaveError(error, 'יצירת חשבון');
-    showErrorMessage('שגיאה ביצירת חשבון');
-  }
-}
 
 /**
  * עדכון חשבון קיים
@@ -1534,7 +1508,7 @@ function showOpenTradesWarning(accountId, accountName) {
   if (typeof window.showWarningNotification === 'function') {
     window.showWarningNotification('אזהרה', `יש עסקאות פתוחות בחשבון "${accountName}". לא ניתן למחוק חשבון עם עסקאות פעילות.`);
   } else {
-            // Fallback warning - no console usage
+    console.warn(`יש עסקאות פתוחות בחשבון "${accountName}". לא ניתן למחוק חשבון עם עסקאות פעילות.`);
   }
 }
 

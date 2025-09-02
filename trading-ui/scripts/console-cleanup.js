@@ -13,7 +13,7 @@ function clearConsole() {
     console.log('🚫 ניקוי console נחסם במהלך טעינת הדף');
     return;
   }
-  
+
   if (typeof console !== 'undefined') {
     console.clear();
   }
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // אל תפעיל ניקוי אוטומטי בטעינת הדף - רק אם המשתמש מפעיל במפורש
   console.log('Console cleanup utility loaded - manual control only');
-  
+
   // המתן קצת לפני שחרור הדגל למניעת ניקוי console
   setTimeout(() => {
     isPageInitializing = false; // סיימנו את טעינת הדף

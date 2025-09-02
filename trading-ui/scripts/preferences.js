@@ -32,21 +32,36 @@ const DEFAULT_PREFERENCES = {
       light: '#d4edda',
       medium: '#28a745',
       dark: '#155724',
-      border: '#c3e6cb'
+      border: '#c3e6cb',
     },
     negative: {
       light: '#f8d7da',
       medium: '#dc3545',
       dark: '#721c24',
-      border: '#f5c6cb'
+      border: '#f5c6cb',
     },
     zero: {
       light: '#e2e3e5',
       medium: '#6c757d',
       dark: '#383d41',
-      border: '#d6d8db'
-    }
-  }
+      border: '#d6d8db',
+    },
+  },
+  // הגדרות צבעים לפי ישויות
+  entityColors: {
+    trade: '#007bff',
+    trade_plan: '#0056b3',
+    execution: '#17a2b8',
+    account: '#28a745',
+    cash_flow: '#20c997',
+    ticker: '#dc3545',
+    alert: '#ff9c05',
+    note: '#6f42c1',
+    constraint: '#6c757d',
+    design: '#495057',
+    research: '#343a40',
+    preference: '#adb5bd',
+  },
 };
 
 // העדפות נוכחיות
@@ -278,9 +293,12 @@ function updateUI() {
   if (retryAttemptsInput) {
     retryAttemptsInput.value = currentPreferences.retryAttempts || 2;
   }
-  
+
   // עדכון ממשק הצבעים
   updateNumericValueColorsUI();
+  
+  // עדכון ממשק צבעי הישויות
+  updateEntityColorsUI();
 
   const retryDelayInput = document.getElementById('retryDelay');
   if (retryDelayInput) {
@@ -643,46 +661,46 @@ function updateNumericValueColor(valueType, colorType, colorValue) {
     if (!currentPreferences.numericValueColors) {
       currentPreferences.numericValueColors = { ...DEFAULT_PREFERENCES.numericValueColors };
     }
-    
+
     if (!currentPreferences.numericValueColors[valueType]) {
       currentPreferences.numericValueColors[valueType] = {};
     }
-    
+
     currentPreferences.numericValueColors[valueType][colorType] = colorValue;
-    
+
     // עדכון הצבע במערכת הצבעים הגלובלית
     if (window.updateNumericValueColors) {
       const newColors = {
         [valueType]: {
-          [colorType]: colorValue
-        }
+          [colorType]: colorValue,
+        },
       };
       window.updateNumericValueColors(newColors);
     }
-    
+
     // עדכון שדה הטקסט המתאים
     const hexInputId = `${valueType}${colorType.charAt(0).toUpperCase() + colorType.slice(1)}ColorHex`;
     const hexInput = document.getElementById(hexInputId);
     if (hexInput) {
       hexInput.value = colorValue;
     }
-    
+
     // הצג הודעת מידע
     const typeLabels = {
       positive: 'ערכים חיוביים',
       negative: 'ערכים שליליים',
-      zero: 'ערך אפס'
+      zero: 'ערך אפס',
     };
     const colorLabels = {
       light: 'רקע',
       medium: 'טקסט',
       dark: 'טקסט כהה',
-      border: 'גבול'
+      border: 'גבול',
     };
-    
+
     const message = `${typeLabels[valueType]} - ${colorLabels[colorType]} עודכן`;
     showPreferencesInfo('צבעים', message);
-    
+
   } catch (error) {
     console.error('שגיאה בעדכון צבע:', error);
     showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
@@ -702,17 +720,17 @@ function updateNumericValueColorFromHex(valueType, colorType, hexValue) {
       showPreferencesError('שגיאה', 'ערך hex לא תקין. השתמש בפורמט #RRGGBB');
       return;
     }
-    
+
     // עדכון הצבע
     updateNumericValueColor(valueType, colorType, hexValue);
-    
+
     // עדכון שדה הצבע המתאים
     const colorInputId = `${valueType}${colorType.charAt(0).toUpperCase() + colorType.slice(1)}Color`;
     const colorInput = document.getElementById(colorInputId);
     if (colorInput) {
       colorInput.value = hexValue;
     }
-    
+
   } catch (error) {
     console.error('שגיאה בעדכון צבע מ-hex:', error);
     showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
@@ -726,18 +744,18 @@ function resetNumericValueColors() {
   try {
     // איפוס הצבעים לברירת המחדל
     currentPreferences.numericValueColors = { ...DEFAULT_PREFERENCES.numericValueColors };
-    
+
     // עדכון הצבעים במערכת הצבעים הגלובלית
     if (window.updateNumericValueColors) {
       window.updateNumericValueColors(currentPreferences.numericValueColors);
     }
-    
+
     // עדכון הממשק
     updateNumericValueColorsUI();
-    
+
     // הצג הודעת מידע
     showPreferencesInfo('צבעים', 'הצבעים אופסו לברירת המחדל');
-    
+
   } catch (error) {
     console.error('שגיאה באיפוס צבעים:', error);
     showPreferencesError('שגיאה', 'לא ניתן לאפס את הצבעים');
@@ -750,46 +768,46 @@ function resetNumericValueColors() {
 function updateNumericValueColorsUI() {
   try {
     const colors = currentPreferences.numericValueColors || DEFAULT_PREFERENCES.numericValueColors;
-    
+
     // עדכון צבעים חיוביים
     if (colors.positive) {
       const positiveTextColor = document.getElementById('positiveTextColor');
       const positiveTextColorHex = document.getElementById('positiveTextColorHex');
       const positiveBackgroundColor = document.getElementById('positiveBackgroundColor');
       const positiveBackgroundColorHex = document.getElementById('positiveBackgroundColorHex');
-      
-      if (positiveTextColor) positiveTextColor.value = colors.positive.medium;
-      if (positiveTextColorHex) positiveTextColorHex.value = colors.positive.medium;
-      if (positiveBackgroundColor) positiveBackgroundColor.value = colors.positive.light;
-      if (positiveBackgroundColorHex) positiveBackgroundColorHex.value = colors.positive.light;
+
+      if (positiveTextColor) {positiveTextColor.value = colors.positive.medium;}
+      if (positiveTextColorHex) {positiveTextColorHex.value = colors.positive.medium;}
+      if (positiveBackgroundColor) {positiveBackgroundColor.value = colors.positive.light;}
+      if (positiveBackgroundColorHex) {positiveBackgroundColorHex.value = colors.positive.light;}
     }
-    
+
     // עדכון צבעים שליליים
     if (colors.negative) {
       const negativeTextColor = document.getElementById('negativeTextColor');
       const negativeTextColorHex = document.getElementById('negativeTextColorHex');
       const negativeBackgroundColor = document.getElementById('negativeBackgroundColor');
       const negativeBackgroundColorHex = document.getElementById('negativeBackgroundColorHex');
-      
-      if (negativeTextColor) negativeTextColor.value = colors.negative.medium;
-      if (negativeTextColorHex) negativeTextColorHex.value = colors.negative.medium;
-      if (negativeBackgroundColor) negativeBackgroundColor.value = colors.negative.light;
-      if (negativeBackgroundColorHex) negativeBackgroundColorHex.value = colors.negative.light;
+
+      if (negativeTextColor) {negativeTextColor.value = colors.negative.medium;}
+      if (negativeTextColorHex) {negativeTextColorHex.value = colors.negative.medium;}
+      if (negativeBackgroundColor) {negativeBackgroundColor.value = colors.negative.light;}
+      if (negativeBackgroundColorHex) {negativeBackgroundColorHex.value = colors.negative.light;}
     }
-    
+
     // עדכון צבעי אפס
     if (colors.zero) {
       const zeroTextColor = document.getElementById('zeroTextColor');
       const zeroTextColorHex = document.getElementById('zeroTextColorHex');
       const zeroBackgroundColor = document.getElementById('zeroBackgroundColor');
       const zeroBackgroundColorHex = document.getElementById('zeroBackgroundColorHex');
-      
-      if (zeroTextColor) zeroTextColor.value = colors.zero.medium;
-      if (zeroTextColorHex) zeroTextColorHex.value = colors.zero.medium;
-      if (zeroBackgroundColor) zeroBackgroundColor.value = colors.zero.light;
-      if (zeroBackgroundColorHex) zeroBackgroundColorHex.value = colors.zero.light;
+
+      if (zeroTextColor) {zeroTextColor.value = colors.zero.medium;}
+      if (zeroTextColorHex) {zeroTextColorHex.value = colors.zero.medium;}
+      if (zeroBackgroundColor) {zeroBackgroundColor.value = colors.zero.light;}
+      if (zeroBackgroundColorHex) {zeroBackgroundColorHex.value = colors.zero.light;}
     }
-    
+
   } catch (error) {
     console.error('שגיאה בעדכון ממשק הצבעים:', error);
   }
@@ -800,3 +818,175 @@ window.updateNumericValueColor = updateNumericValueColor;
 window.updateNumericValueColorFromHex = updateNumericValueColorFromHex;
 window.resetNumericValueColors = resetNumericValueColors;
 window.updateNumericValueColorsUI = updateNumericValueColorsUI;
+
+// ===== Entity Color Management Functions =====
+// פונקציות ניהול צבעי ישויות
+
+/**
+ * עדכון צבע ישות
+ */
+function updateEntityColor(entityType, colorValue) {
+  try {
+    // עדכון הצבע בהעדפות
+    if (!currentPreferences.entityColors) {
+      currentPreferences.entityColors = {};
+    }
+    currentPreferences.entityColors[entityType] = colorValue;
+
+    // עדכון הצבע במערכת הצבעים הגלובלית
+    if (window.updateEntityColor) {
+      window.updateEntityColor(entityType, colorValue);
+    }
+
+    // עדכון שדה ה-hex המתאים
+    const hexInputId = `entity${entityType.charAt(0).toUpperCase() + entityType.slice(1)}ColorHex`;
+    const hexInput = document.getElementById(hexInputId);
+    if (hexInput) {
+      hexInput.value = colorValue;
+    }
+
+    // הצג הודעת מידע
+    const entityLabel = getEntityLabel(entityType);
+    showPreferencesInfo('צבע ישות', `צבע ${entityLabel} עודכן`);
+
+  } catch (error) {
+    console.error('שגיאה בעדכון צבע ישות:', error);
+    showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
+  }
+}
+
+/**
+ * עדכון צבע ישות מ-hex
+ */
+function updateEntityColorFromHex(entityType, hexValue) {
+  try {
+    // בדיקת תקינות ה-hex
+    if (!/^#[0-9A-F]{6}$/i.test(hexValue)) {
+      showPreferencesError('שגיאה', 'ערך hex לא תקין (נדרש: #RRGGBB)');
+      return;
+    }
+
+    // עדכון הצבע
+    updateEntityColor(entityType, hexValue);
+
+  } catch (error) {
+    console.error('שגיאה בעדכון צבע ישות מ-hex:', error);
+    showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
+  }
+}
+
+/**
+ * איפוס צבעי ישויות לברירת המחדל
+ */
+function resetEntityColors() {
+  try {
+    // איפוס הצבעים לברירת המחדל
+    currentPreferences.entityColors = { ...DEFAULT_PREFERENCES.entityColors };
+
+    // עדכון הצבעים במערכת הצבעים הגלובלית
+    if (window.resetEntityColors) {
+      window.resetEntityColors();
+    }
+
+    // עדכון הממשק
+    updateEntityColorsUI();
+
+    // הצג הודעת מידע
+    showPreferencesInfo('צבעי ישויות', 'צבעי הישויות אופסו לברירת המחדל');
+
+  } catch (error) {
+    console.error('שגיאה באיפוס צבעי ישויות:', error);
+    showPreferencesError('שגיאה', 'לא ניתן לאפס את צבעי הישויות');
+  }
+}
+
+/**
+ * עדכון ממשק צבעי הישויות
+ */
+function updateEntityColorsUI() {
+  try {
+    const colors = currentPreferences.entityColors || DEFAULT_PREFERENCES.entityColors;
+
+    // עדכון צבעי טריידים ותכנונים
+    if (colors.trade) {
+      const tradeColor = document.getElementById('entityTradeColor');
+      const tradeColorHex = document.getElementById('entityTradeColorHex');
+      if (tradeColor) { tradeColor.value = colors.trade; }
+      if (tradeColorHex) { tradeColorHex.value = colors.trade; }
+    }
+
+    if (colors.trade_plan) {
+      const tradePlanColor = document.getElementById('entityTradePlanColor');
+      const tradePlanColorHex = document.getElementById('entityTradePlanColorHex');
+      if (tradePlanColor) { tradePlanColor.value = colors.trade_plan; }
+      if (tradePlanColorHex) { tradePlanColorHex.value = colors.trade_plan; }
+    }
+
+    if (colors.execution) {
+      const executionColor = document.getElementById('entityExecutionColor');
+      const executionColorHex = document.getElementById('entityExecutionColorHex');
+      if (executionColor) { executionColor.value = colors.execution; }
+      if (executionColorHex) { executionColorHex.value = colors.execution; }
+    }
+
+    // עדכון צבעי חשבונות ותזרים מזומנים
+    if (colors.account) {
+      const accountColor = document.getElementById('entityAccountColor');
+      const accountColorHex = document.getElementById('entityAccountColorHex');
+      if (accountColor) { accountColor.value = colors.account; }
+      if (accountColorHex) { accountColorHex.value = colors.account; }
+    }
+
+    if (colors.cash_flow) {
+      const cashFlowColor = document.getElementById('entityCashFlowColor');
+      const cashFlowColorHex = document.getElementById('entityCashFlowColorHex');
+      if (cashFlowColor) { cashFlowColor.value = colors.cash_flow; }
+      if (cashFlowColorHex) { cashFlowColorHex.value = colors.cash_flow; }
+    }
+
+    // עדכון צבעי טיקרים והתראות
+    if (colors.ticker) {
+      const tickerColor = document.getElementById('entityTickerColor');
+      const tickerColorHex = document.getElementById('entityTickerColorHex');
+      if (tickerColor) { tickerColor.value = colors.ticker; }
+      if (tickerColorHex) { tickerColorHex.value = colors.ticker; }
+    }
+
+    if (colors.alert) {
+      const alertColor = document.getElementById('entityAlertColor');
+      const alertColorHex = document.getElementById('entityAlertColorHex');
+      if (alertColor) { alertColor.value = colors.alert; }
+      if (alertColorHex) { alertColorHex.value = colors.alert; }
+    }
+
+  } catch (error) {
+    console.error('שגיאה בעדכון ממשק צבעי ישויות:', error);
+  }
+}
+
+/**
+ * קבלת תווית ישות בעברית
+ */
+function getEntityLabel(entityType) {
+  const labels = {
+    trade: 'טריידים',
+    trade_plan: 'תכנוני השקעה',
+    execution: 'עסקאות',
+    account: 'חשבונות',
+    cash_flow: 'תזרים מזומנים',
+    ticker: 'טיקרים',
+    alert: 'התראות',
+    note: 'הערות',
+    constraint: 'אילוצים',
+    design: 'עיצובים',
+    research: 'מחקר',
+    preference: 'העדפות',
+  };
+  return labels[entityType] || entityType;
+}
+
+// Export entity color functions
+window.updateEntityColor = updateEntityColor;
+window.updateEntityColorFromHex = updateEntityColorFromHex;
+window.resetEntityColors = resetEntityColors;
+window.updateEntityColorsUI = updateEntityColorsUI;

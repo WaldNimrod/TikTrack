@@ -125,7 +125,7 @@ function parseTradePlanStatus(displayStatus) {
  * קבלת תכנון לפי ID
  */
 function getTradePlanById(id) {
-  return tradePlansData.find(plan => plan.id == id);
+  return tradePlansData.find(plan => plan.id === id);
 }
 
 /**
@@ -146,14 +146,14 @@ function getTradePlansByInvestmentType(investmentType) {
  * קבלת תכנונים לפי חשבון
  */
 function getTradePlansByAccount(accountId) {
-  return tradePlansData.filter(plan => plan.account_id == accountId);
+  return tradePlansData.filter(plan => plan.account_id === accountId);
 }
 
 /**
  * קבלת תכנונים לפי טיקר
  */
 function getTradePlansByTicker(tickerId) {
-  return tradePlansData.filter(plan => plan.ticker_id == tickerId);
+  return tradePlansData.filter(plan => plan.ticker_id === tickerId);
 }
 
 /**

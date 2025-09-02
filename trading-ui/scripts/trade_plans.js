@@ -118,7 +118,7 @@ function openAddTradePlanModal() {
  * פתיחת מודל עריכת תכנון קיים
  */
 async function openEditTradePlanModal(tradePlanId) {
-  const tradePlan = trade_plansData.find(tp => tp.id == tradePlanId);
+  const tradePlan = trade_plansData.find(tp => tp.id === tradePlanId);
   if (!tradePlan) {
     handleElementNotFound('trade plan', 'CRITICAL');
     return;
@@ -240,8 +240,8 @@ async function updateEditTickerInfo() {
 
   // בדיקה אם הטיקר השתנה (רק אם יש תכנון נבחר)
   if (tradePlanId) {
-    const originalTradePlan = trade_plansData.find(tp => tp.id == tradePlanId);
-    if (originalTradePlan && originalTradePlan.ticker_id != tickerId) {
+    const originalTradePlan = trade_plansData.find(tp => tp.id === tradePlanId);
+    if (originalTradePlan && originalTradePlan.ticker_id !== tickerId) {
       // Ticker changed from original to new
 
       // הצגת הודעת אישור לשינוי טיקר
@@ -339,14 +339,14 @@ async function updateEditTickerInfo() {
   if (typeof window.tickerService?.getTickers === 'function') {
     try {
       const tickers = await window.tickerService.getTickers();
-      ticker = tickers.find(t => t.id == tickerId);
+      ticker = tickers.find(t => t.id === tickerId);
     } catch (error) {
       console.warn('Error getting tickers from service:', error);
     }
   }
 
   if (!ticker && window.tickersData) {
-    ticker = window.tickersData.find(t => t.id == tickerId);
+    ticker = window.tickersData.find(t => t.id === tickerId);
   }
 
   if (ticker) {
@@ -449,7 +449,7 @@ async function saveEditTradePlan() {
     };
 
     // בדיקה אם הסטטוס משתנה ל-'cancelled'
-    const originalTradePlan = trade_plansData.find(tp => tp.id == formData.id);
+    const originalTradePlan = trade_plansData.find(tp => tp.id === formData.id);
     const isStatusChangingToCancelled = originalTradePlan &&
                                            originalTradePlan.status !== 'cancelled' &&
                                            formData.status === 'cancelled';
@@ -462,7 +462,7 @@ async function saveEditTradePlan() {
 
     // בדיקה אם הטיקר השתנה
     const isTickerChanging = originalTradePlan &&
-                                originalTradePlan.ticker_id != formData.ticker_id;
+                                originalTradePlan.ticker_id !== formData.ticker_id;
 
     if (isTickerChanging) {
       // שינוי טיקר לא נתמך - הצגת הודעה ודחיית השינוי
@@ -654,7 +654,7 @@ async function reactivateTradePlan(tradePlanId) {
   try {
 
     // מציאת התכנון בנתונים
-    const tradePlan = trade_plansData.find(tp => tp.id == tradePlanId);
+    const tradePlan = trade_plansData.find(tp => tp.id === tradePlanId);
     if (!tradePlan) {
       handleElementNotFound('trade plan', 'CRITICAL');
       throw new Error('תכנון לא נמצא');
@@ -739,7 +739,7 @@ function addEditReminder() {
  */
 function openCancelTradePlanModal(tradePlanId) {
 
-  const tradePlan = trade_plansData.find(tp => tp.id == tradePlanId);
+  const tradePlan = trade_plansData.find(tp => tp.id === tradePlanId);
   if (!tradePlan) {
     handleElementNotFound('trade plan', 'CRITICAL');
     return;
@@ -764,7 +764,7 @@ function openCancelTradePlanModal(tradePlanId) {
  */
 function openDeleteTradePlanModal(tradePlanId) {
 
-  const tradePlan = trade_plansData.find(tp => tp.id == tradePlanId);
+  const tradePlan = trade_plansData.find(tp => tp.id === tradePlanId);
   if (!tradePlan) {
     handleElementNotFound('trade plan', 'CRITICAL');
     return;
@@ -2385,12 +2385,13 @@ function translateDateRangeToDates(dateRange) {
       break;
     }
 
-    case 'שנה':
+    case 'שנה': {
       const oneYearAgo = new Date(today);
       oneYearAgo.setFullYear(today.getFullYear() - 1);
       startDate = oneYearAgo.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
     case 'שנה קודמת':
       startDate = createDateWithTimezone(today.getFullYear() - 1, 0, 1);

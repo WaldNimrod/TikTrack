@@ -267,6 +267,7 @@ def upgrade():
         triggers = cursor.fetchall()
         
         for trigger in triggers:
+            print(f"✅ Created trigger: {trigger[0]}")
         
         # Show updated tickers
         cursor.execute("""
@@ -276,7 +277,9 @@ def upgrade():
         """)
         tickers = cursor.fetchall()
         
+        print(f"✅ Updated {len(tickers)} tickers:")
         for ticker in tickers:
+            print(f"  - {ticker[1]}: status={ticker[3]}, active_trades={ticker[4]}")
         
         conn.close()
         return True
@@ -342,5 +345,7 @@ if __name__ == "__main__":
     success = upgrade()
     
     if success:
+        print("Migration successful!")
     else:
+        print("Migration failed.")
         exit(1)

@@ -33,6 +33,9 @@
   <!-- 8. General styles (highest priority - drops everything) -->
   <link rel="stylesheet" href="styles/styles.css">
   
+  <!-- 9. Numeric value colors system -->
+  <link rel="stylesheet" href="styles/numeric-value-colors.css">
+  
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -729,7 +732,8 @@
   <script src="scripts/error-handlers.js"></script>
   <script src="scripts/linked-items.js"></script>
   <script src="scripts/page-utils.js"></script>
-      <script src="scripts/account-service.js"></script>
+  <script src="scripts/account-service.js"></script>
+  <script src="scripts/color-scheme-system.js"></script>
 
   <script src="scripts/tables.js"></script>
   <script src="scripts/main.js"></script>
@@ -748,6 +752,16 @@
       console.log("🔄 Initializing unified header system...");
       if (window.headerSystem) {
         window.headerSystem.init();
+      }
+      
+      // אתחול מערכת הצבעים לערכים מספריים
+      console.log("🎨 Initializing numeric value color system...");
+      if (window.generateNumericValueCSS) {
+        const css = window.generateNumericValueCSS();
+        const styleElement = document.createElement('style');
+        styleElement.id = 'numeric-value-colors';
+        styleElement.textContent = css;
+        document.head.appendChild(styleElement);
       }
     });
   </script>

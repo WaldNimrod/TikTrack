@@ -26,6 +26,27 @@ const DEFAULT_PREFERENCES = {
   retryDelay: 5,
   autoRefresh: false,
   verboseLogging: false,
+  // הגדרות צבעים לערכים מספריים
+  numericValueColors: {
+    positive: {
+      light: '#d4edda',
+      medium: '#28a745',
+      dark: '#155724',
+      border: '#c3e6cb'
+    },
+    negative: {
+      light: '#f8d7da',
+      medium: '#dc3545',
+      dark: '#721c24',
+      border: '#f5c6cb'
+    },
+    zero: {
+      light: '#e2e3e5',
+      medium: '#6c757d',
+      dark: '#383d41',
+      border: '#d6d8db'
+    }
+  }
 };
 
 // העדפות נוכחיות
@@ -257,6 +278,9 @@ function updateUI() {
   if (retryAttemptsInput) {
     retryAttemptsInput.value = currentPreferences.retryAttempts || 2;
   }
+  
+  // עדכון ממשק הצבעים
+  updateNumericValueColorsUI();
 
   const retryDelayInput = document.getElementById('retryDelay');
   if (retryDelayInput) {
@@ -602,3 +626,177 @@ function loadConsoleSettingsToUI() {
 window.updateConsolePreference = updateConsolePreference;
 window.manualClearConsole = manualClearConsole;
 window.loadConsoleSettingsToUI = loadConsoleSettingsToUI;
+
+// ========================================
+// 🎨 פונקציות ניהול צבעים לערכים מספריים
+// ========================================
+
+/**
+ * עדכון צבע לערך מספרי
+ * @param {string} valueType - סוג הערך (positive, negative, zero)
+ * @param {string} colorType - סוג הצבע (light, medium, dark, border)
+ * @param {string} colorValue - ערך הצבע החדש
+ */
+function updateNumericValueColor(valueType, colorType, colorValue) {
+  try {
+    // עדכון הצבע בהעדפות
+    if (!currentPreferences.numericValueColors) {
+      currentPreferences.numericValueColors = { ...DEFAULT_PREFERENCES.numericValueColors };
+    }
+    
+    if (!currentPreferences.numericValueColors[valueType]) {
+      currentPreferences.numericValueColors[valueType] = {};
+    }
+    
+    currentPreferences.numericValueColors[valueType][colorType] = colorValue;
+    
+    // עדכון הצבע במערכת הצבעים הגלובלית
+    if (window.updateNumericValueColors) {
+      const newColors = {
+        [valueType]: {
+          [colorType]: colorValue
+        }
+      };
+      window.updateNumericValueColors(newColors);
+    }
+    
+    // עדכון שדה הטקסט המתאים
+    const hexInputId = `${valueType}${colorType.charAt(0).toUpperCase() + colorType.slice(1)}ColorHex`;
+    const hexInput = document.getElementById(hexInputId);
+    if (hexInput) {
+      hexInput.value = colorValue;
+    }
+    
+    // הצג הודעת מידע
+    const typeLabels = {
+      positive: 'ערכים חיוביים',
+      negative: 'ערכים שליליים',
+      zero: 'ערך אפס'
+    };
+    const colorLabels = {
+      light: 'רקע',
+      medium: 'טקסט',
+      dark: 'טקסט כהה',
+      border: 'גבול'
+    };
+    
+    const message = `${typeLabels[valueType]} - ${colorLabels[colorType]} עודכן`;
+    showPreferencesInfo('צבעים', message);
+    
+  } catch (error) {
+    console.error('שגיאה בעדכון צבע:', error);
+    showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
+  }
+}
+
+/**
+ * עדכון צבע מערך hex
+ * @param {string} valueType - סוג הערך (positive, negative, zero)
+ * @param {string} colorType - סוג הצבע (light, medium, dark, border)
+ * @param {string} hexValue - ערך hex החדש
+ */
+function updateNumericValueColorFromHex(valueType, colorType, hexValue) {
+  try {
+    // בדיקת תקינות ערך hex
+    if (!/^#[0-9A-Fa-f]{6}$/.test(hexValue)) {
+      showPreferencesError('שגיאה', 'ערך hex לא תקין. השתמש בפורמט #RRGGBB');
+      return;
+    }
+    
+    // עדכון הצבע
+    updateNumericValueColor(valueType, colorType, hexValue);
+    
+    // עדכון שדה הצבע המתאים
+    const colorInputId = `${valueType}${colorType.charAt(0).toUpperCase() + colorType.slice(1)}Color`;
+    const colorInput = document.getElementById(colorInputId);
+    if (colorInput) {
+      colorInput.value = hexValue;
+    }
+    
+  } catch (error) {
+    console.error('שגיאה בעדכון צבע מ-hex:', error);
+    showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
+  }
+}
+
+/**
+ * איפוס צבעים לברירת המחדל
+ */
+function resetNumericValueColors() {
+  try {
+    // איפוס הצבעים לברירת המחדל
+    currentPreferences.numericValueColors = { ...DEFAULT_PREFERENCES.numericValueColors };
+    
+    // עדכון הצבעים במערכת הצבעים הגלובלית
+    if (window.updateNumericValueColors) {
+      window.updateNumericValueColors(currentPreferences.numericValueColors);
+    }
+    
+    // עדכון הממשק
+    updateNumericValueColorsUI();
+    
+    // הצג הודעת מידע
+    showPreferencesInfo('צבעים', 'הצבעים אופסו לברירת המחדל');
+    
+  } catch (error) {
+    console.error('שגיאה באיפוס צבעים:', error);
+    showPreferencesError('שגיאה', 'לא ניתן לאפס את הצבעים');
+  }
+}
+
+/**
+ * עדכון ממשק הצבעים
+ */
+function updateNumericValueColorsUI() {
+  try {
+    const colors = currentPreferences.numericValueColors || DEFAULT_PREFERENCES.numericValueColors;
+    
+    // עדכון צבעים חיוביים
+    if (colors.positive) {
+      const positiveTextColor = document.getElementById('positiveTextColor');
+      const positiveTextColorHex = document.getElementById('positiveTextColorHex');
+      const positiveBackgroundColor = document.getElementById('positiveBackgroundColor');
+      const positiveBackgroundColorHex = document.getElementById('positiveBackgroundColorHex');
+      
+      if (positiveTextColor) positiveTextColor.value = colors.positive.medium;
+      if (positiveTextColorHex) positiveTextColorHex.value = colors.positive.medium;
+      if (positiveBackgroundColor) positiveBackgroundColor.value = colors.positive.light;
+      if (positiveBackgroundColorHex) positiveBackgroundColorHex.value = colors.positive.light;
+    }
+    
+    // עדכון צבעים שליליים
+    if (colors.negative) {
+      const negativeTextColor = document.getElementById('negativeTextColor');
+      const negativeTextColorHex = document.getElementById('negativeTextColorHex');
+      const negativeBackgroundColor = document.getElementById('negativeBackgroundColor');
+      const negativeBackgroundColorHex = document.getElementById('negativeBackgroundColorHex');
+      
+      if (negativeTextColor) negativeTextColor.value = colors.negative.medium;
+      if (negativeTextColorHex) negativeTextColorHex.value = colors.negative.medium;
+      if (negativeBackgroundColor) negativeBackgroundColor.value = colors.negative.light;
+      if (negativeBackgroundColorHex) negativeBackgroundColorHex.value = colors.negative.light;
+    }
+    
+    // עדכון צבעי אפס
+    if (colors.zero) {
+      const zeroTextColor = document.getElementById('zeroTextColor');
+      const zeroTextColorHex = document.getElementById('zeroTextColorHex');
+      const zeroBackgroundColor = document.getElementById('zeroBackgroundColor');
+      const zeroBackgroundColorHex = document.getElementById('zeroBackgroundColorHex');
+      
+      if (zeroTextColor) zeroTextColor.value = colors.zero.medium;
+      if (zeroTextColorHex) zeroTextColorHex.value = colors.zero.medium;
+      if (zeroBackgroundColor) zeroBackgroundColor.value = colors.zero.light;
+      if (zeroBackgroundColorHex) zeroBackgroundColorHex.value = colors.zero.light;
+    }
+    
+  } catch (error) {
+    console.error('שגיאה בעדכון ממשק הצבעים:', error);
+  }
+}
+
+// Export numeric value color functions
+window.updateNumericValueColor = updateNumericValueColor;
+window.updateNumericValueColorFromHex = updateNumericValueColorFromHex;
+window.resetNumericValueColors = resetNumericValueColors;
+window.updateNumericValueColorsUI = updateNumericValueColorsUI;

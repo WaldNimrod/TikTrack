@@ -2269,49 +2269,55 @@ function translateDateRangeToDates(dateRange) {
       endDate = todayStr;
       break;
 
-    case 'אתמול':
+    case 'אתמול': {
       const yesterday = new Date(today);
       yesterday.setDate(today.getDate() - 1);
       startDate = yesterday.toISOString().split('T')[0];
       endDate = startDate;
       break;
+    }
 
-    case 'שבוע אחרון':
+    case 'שבוע אחרון': {
       const weekAgoLast = new Date(today);
       weekAgoLast.setDate(today.getDate() - 7);
       startDate = weekAgoLast.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case 'חודש אחרון':
+    case 'חודש אחרון': {
       const monthAgo = new Date(today);
       monthAgo.setMonth(today.getMonth() - 1);
       startDate = monthAgo.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case '3 חודשים אחרונים':
+    case '3 חודשים אחרונים': {
       const threeMonthsAgo = new Date(today);
       threeMonthsAgo.setMonth(today.getMonth() - 3);
       startDate = threeMonthsAgo.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case '6 חודשים אחרונים':
+    case '6 חודשים אחרונים': {
       const sixMonthsAgo = new Date(today);
       sixMonthsAgo.setMonth(today.getMonth() - 6);
       startDate = sixMonthsAgo.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case 'שנה אחרונה':
+    case 'שנה אחרונה': {
       const yearAgo = new Date(today);
       yearAgo.setFullYear(today.getFullYear() - 1);
       startDate = yearAgo.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case 'השבוע':
+    case 'השבוע': {
       const startOfWeek = new Date(today);
       const dayOfWeek = today.getDay();
       // In Israel, the week starts on Sunday (0)
@@ -2319,58 +2325,65 @@ function translateDateRangeToDates(dateRange) {
       startDate = startOfWeek.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case 'שבוע':
+    case 'שבוע': {
       const weekAgo7 = new Date(today);
       weekAgo7.setDate(today.getDate() - 7);
       startDate = weekAgo7.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case 'החודש':
+    case 'החודש': {
       const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
       startDate = startOfMonth.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case 'MTD':
+    case 'MTD': {
       startDate = createDateWithTimezone(today.getFullYear(), today.getMonth(), 1);
       endDate = todayStr;
-
       break;
+    }
 
-    case 'השנה':
+    case 'השנה': {
       const startOfYear = new Date(today.getFullYear(), 0, 1);
       startDate = startOfYear.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case 'YTD':
+    case 'YTD': {
       startDate = createDateWithTimezone(today.getFullYear(), 0, 1);
       endDate = todayStr;
-
       break;
+    }
 
-    case '30 יום':
+    case '30 יום': {
       const thirtyDaysAgo = new Date(today);
       thirtyDaysAgo.setDate(today.getDate() - 30);
       startDate = thirtyDaysAgo.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case '60 יום':
+    case '60 יום': {
       const sixtyDaysAgo = new Date(today);
       sixtyDaysAgo.setDate(today.getDate() - 60);
       startDate = sixtyDaysAgo.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
-    case '90 יום':
+    case '90 יום': {
       const ninetyDaysAgo = new Date(today);
       ninetyDaysAgo.setDate(today.getDate() - 90);
       startDate = ninetyDaysAgo.toISOString().split('T')[0];
       endDate = todayStr;
       break;
+    }
 
     case 'שנה':
       const oneYearAgo = new Date(today);

@@ -10,9 +10,10 @@ Features:
 - Cache cleanup
 - Log rotation
 - System monitoring
+- Real-time notifications integration
 
 Author: TikTrack Development Team
-Version: 1.0
+Version: 1.1
 Date: September 2025
 """
 
@@ -40,15 +41,50 @@ logger = logging.getLogger(__name__)
 
 class BackgroundTaskManager:
     """
-    Background task manager for TikTrack
+    Background task manager for TikTrack with real-time notifications
     """
     
-    def __init__(self):
+    def __init__(self, realtime_notifications=None):
         self.tasks: Dict[str, Dict[str, Any]] = {}
         self.task_history: List[Dict[str, Any]] = []
         self.max_history_size = 100
         self.running = False
         self.scheduler_thread = None
+        self.realtime_notifications = realtime_notifications
+        
+        logger.info("Background Task Manager initialized with real-time notifications support")
+    
+    def set_realtime_notifications(self, realtime_notifications):
+        """Set real-time notifications service"""
+        self.realtime_notifications = realtime_notifications
+        logger.info("Real-time notifications service connected to Background Task Manager")
+    
+    def _notify_task_event(self, event_type: str, task_name: str, **kwargs):
+        """Send real-time notification about task event"""
+        if self.realtime_notifications:
+            try:
+                if event_type == 'started':
+                    self.realtime_notifications.notify_background_task_started(
+                        task_name=task_name,
+                        task_id=f"{task_name}_{int(time.time())}",
+                        user_id=kwargs.get('user_id')
+                    )
+                elif event_type == 'completed':
+                    self.realtime_notifications.notify_background_task_completed(
+                        task_name=task_name,
+                        task_id=kwargs.get('task_id', f"{task_name}_{int(time.time())}"),
+                        result=kwargs.get('result', {}),
+                        user_id=kwargs.get('user_id')
+                    )
+                elif event_type == 'failed':
+                    self.realtime_notifications.notify_background_task_failed(
+                        task_name=task_name,
+                        task_id=kwargs.get('task_id', f"{task_name}_{int(time.time())}"),
+                        error=kwargs.get('error', 'Unknown error'),
+                        user_id=kwargs.get('user_id')
+                    )
+            except Exception as e:
+                logger.error(f"Error sending real-time notification for {event_type}: {e}")
     
     def register_task(self, name: str, func: Callable, schedule_interval: str, 
                      description: str = "", enabled: bool = True) -> None:
@@ -76,6 +112,9 @@ class BackgroundTaskManager:
         }
         
         logger.info(f"Registered background task: {name} ({schedule_interval})")
+        
+        # Send real-time notification about task registration
+        self._notify_task_event('started', name, user_id=None)
     
     @monitor_performance("cleanup_expired_data")
     def cleanup_expired_data(self) -> Dict[str, Any]:
@@ -369,77 +408,135 @@ class BackgroundTaskManager:
         results['duration_ms'] = round((time.time() - start_time) * 1000, 2)
         return results
     
-    def run_task(self, task_name: str) -> Dict[str, Any]:
+    def run_task(self, task_name: str, user_id: Optional[str] = None) -> Dict[str, Any]:
         """
-        Run a specific task
+        Run a specific background task
         
         Args:
             task_name (str): Name of task to run
+            user_id (str, optional): User ID for notifications
             
         Returns:
             Dict[str, Any]: Task execution results
         """
         if task_name not in self.tasks:
-            return {
-                'timestamp': datetime.now().isoformat(),
-                'error': f'Task {task_name} not found',
-                'success': False
-            }
+            error_msg = f"Task '{task_name}' not found"
+            logger.error(error_msg)
+            return {'error': error_msg, 'success': False}
         
         task = self.tasks[task_name]
         if not task['enabled']:
-            return {
-                'timestamp': datetime.now().isoformat(),
-                'error': f'Task {task_name} is disabled',
-                'success': False
-            }
+            error_msg = f"Task '{task_name}' is disabled"
+            logger.warning(error_msg)
+            return {'error': error_msg, 'success': False}
+        
+        # Notify task started
+        task_id = f"{task_name}_{int(time.time())}"
+        self._notify_task_event('started', task_name, task_id=task_id, user_id=user_id)
         
         start_time = time.time()
+        task['last_run'] = datetime.now()
+        task['run_count'] += 1
         
         try:
+            logger.info(f"Starting background task: {task_name}")
+            
             # Run the task
             result = task['function']()
             
-            # Update task statistics
-            task['last_run'] = datetime.now().isoformat()
-            task['run_count'] += 1
-            task['last_duration_ms'] = round((time.time() - start_time) * 1000, 2)
+            # Calculate duration
+            duration_ms = int((time.time() - start_time) * 1000)
+            task['last_duration_ms'] = duration_ms
+            task['success_count'] += 1
             
-            if result.get('success', False):
-                task['success_count'] += 1
-            else:
-                task['error_count'] += 1
+            # Update next run time
+            if SCHEDULE_AVAILABLE and task['schedule_interval']:
+                task['next_run'] = self._calculate_next_run(task['schedule_interval'])
             
             # Store in history
             history_entry = {
-                'timestamp': datetime.now().isoformat(),
                 'task_name': task_name,
+                'started_at': task['last_run'].isoformat(),
+                'duration_ms': duration_ms,
+                'success': True,
                 'result': result,
-                'duration_ms': task['last_duration_ms']
+                'user_id': user_id
             }
-            self.task_history.append(history_entry)
+            self._add_to_history(history_entry)
             
-            if len(self.task_history) > self.max_history_size:
-                self.task_history.pop(0)
+            logger.info(f"Background task '{task_name}' completed successfully in {duration_ms}ms")
             
-            logger.info(f"Task {task_name} completed successfully")
-            return result
+            # Notify task completed
+            self._notify_task_event('completed', task_name, task_id=task_id, result=result, user_id=user_id)
+            
+            return {
+                'success': True,
+                'task_name': task_name,
+                'duration_ms': duration_ms,
+                'result': result,
+                'timestamp': task['last_run'].isoformat()
+            }
             
         except Exception as e:
-            # Update task statistics
-            task['last_run'] = datetime.now().isoformat()
-            task['run_count'] += 1
+            error_msg = f"Error running task '{task_name}': {str(e)}"
+            logger.error(error_msg)
+            
+            # Calculate duration
+            duration_ms = int((time.time() - start_time) * 1000)
+            task['last_duration_ms'] = duration_ms
             task['error_count'] += 1
-            task['last_duration_ms'] = round((time.time() - start_time) * 1000, 2)
             
-            error_result = {
-                'timestamp': datetime.now().isoformat(),
+            # Store in history
+            history_entry = {
+                'task_name': task_name,
+                'started_at': task['last_run'].isoformat(),
+                'duration_ms': duration_ms,
+                'success': False,
                 'error': str(e),
-                'success': False
+                'user_id': user_id
             }
+            self._add_to_history(history_entry)
             
-            logger.error(f"Error running task {task_name}: {e}")
-            return error_result
+            # Notify task failed
+            self._notify_task_event('failed', task_name, task_id=task_id, error=str(e), user_id=user_id)
+            
+            return {
+                'success': False,
+                'task_name': task_name,
+                'error': str(e),
+                'duration_ms': duration_ms,
+                'timestamp': task['last_run'].isoformat()
+            }
+    
+    def _calculate_next_run(self, interval: str) -> datetime:
+        """Calculate next run time based on interval"""
+        if not SCHEDULE_AVAILABLE:
+            return datetime.now() + timedelta(hours=1)
+        
+        try:
+            if interval.endswith('h'):
+                hours = int(interval[:-1])
+                return datetime.now() + timedelta(hours=hours)
+            elif interval.endswith('d'):
+                days = int(interval[:-1])
+                return datetime.now() + timedelta(days=days)
+            elif interval.endswith('w'):
+                weeks = int(interval[:-1])
+                return datetime.now() + timedelta(weeks=weeks)
+            else:
+                # Default to 1 hour
+                return datetime.now() + timedelta(hours=1)
+        except ValueError:
+            logger.warning(f"Invalid interval format: {interval}, defaulting to 1 hour")
+            return datetime.now() + timedelta(hours=1)
+    
+    def _add_to_history(self, entry: Dict[str, Any]):
+        """Add entry to task history"""
+        self.task_history.append(entry)
+        
+        # Maintain history size
+        if len(self.task_history) > self.max_history_size:
+            self.task_history.pop(0)
     
     def start_scheduler(self) -> None:
         """Start the background task scheduler"""

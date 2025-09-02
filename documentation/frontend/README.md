@@ -59,6 +59,13 @@
 - **תכונות**: צבעים עקביים לכל סוגי הישויות, תמיכה בתאימות לאחור, יצירת מחלקות CSS דינמיות
 - **דוקומנטציה**: [LINKED_ITEMS_SYSTEM.md](LINKED_ITEMS_SYSTEM.md#-מערכת-מפתח-צבעים-מאוחדת-unified-color-scheme-system)
 
+### 6. מערכת צבעים לערכים מספריים (Numeric Value Color System)
+- **קובץ**: `scripts/color-scheme-system.js` + `styles/numeric-value-colors.css`
+- **תפקיד**: מערכת צבעים מאוחדת לצביעת ערכים מספריים (חיוביים/שליליים/אפס)
+- **תכונות**: צביעה עקבית של רווחים, הפסדים, ושינויים במערכת, ניהול צבעים בדף העדפות
+- **דוקומנטציה**: [LINKED_ITEMS_SYSTEM.md](LINKED_ITEMS_SYSTEM.md#🎯-מערכת-צבעים-לערכים-מספריים-numeric-value-color-system)
+- **דוגמה**: `numeric-value-colors-demo.html` - דף דוגמה מלא לשימוש במערכת
+
 #### יתרונות המערכת:
 - **ריכוזיות**: כל הצבעים מוגדרים במקום אחד
 - **עקביות**: אותו צבע לכל ישות בכל מקום במערכת
@@ -72,14 +79,16 @@
 - **`executions.html`**: צבעים עקביים לעסקאות
 - **`alerts.html`**: צבעים עקביים להתראות
 - **`research.html`**: צבעים עקביים למחקר
+- **`preferences.html`**: ניהול צבעים לערכים מספריים
+- **`numeric-value-colors-demo.html`**: דף דוגמה למערכת הצבעים
 
-### 6. מערכת הולידציה (Validation System)
+### 7. מערכת הולידציה (Validation System)
 - **קובץ**: `scripts/validation-utils.js`
 - **תפקיד**: ולידציה גלובלית לכל הטופסים במערכת
 - **תכונות**: ולידציה בזמן אמת, סימון ויזואלי, הודעות שגיאה בעברית
 - **דוקומנטציה**: [VALIDATION_SYSTEM.md](VALIDATION_SYSTEM.md)
 
-### 7. מערכת חיבור מידע חיצוני (External Data Integration)
+### 8. מערכת חיבור מידע חיצוני (External Data Integration)
 - **תיקייה**: `external_data_integration_client/`
 - **תפקיד**: חיבור למקורות מידע חיצוניים
 - **תכונות**: בדיקות API, מודלים, סטטיסטיקות מערכת, אינטגרציה

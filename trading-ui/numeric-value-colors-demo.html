@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>דוגמה למערכת צבעים לערכים מספריים - TikTrack</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- CSS Files -->
+  <link rel="stylesheet" href="styles/apple-theme.css">
+  <link rel="stylesheet" href="styles/header-system.css">
+  <link rel="stylesheet" href="styles/typography.css">
+  <link rel="stylesheet" href="styles/table.css">
+  <link rel="stylesheet" href="styles/notification-system.css">
+  <link rel="stylesheet" href="styles/linked-items.css">
+  <link rel="stylesheet" href="styles/styles.css">
+  <link rel="stylesheet" href="styles/numeric-value-colors.css">
+  
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8f9fa;
+    }
+    
+    .demo-section {
+      margin: 30px 0;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .demo-title {
+      color: #333;
+      border-bottom: 2px solid #ff9c05;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .demo-item {
+      margin: 15px 0;
+      padding: 15px;
+      border: 1px solid #eee;
+      border-radius: 8px;
+    }
+    
+    .demo-code {
+      background-color: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 4px;
+      padding: 10px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      margin: 10px 0;
+    }
+    
+    .color-preview {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      margin-left: 10px;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 1px #ccc;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- רקע כללי -->
+  <div class="background-wrapper">
+    
+    <!-- unified-header ייווצר כאן אוטומטית -->
+    
+    <!-- גוף הדף -->
+    <div class="page-body">
+      <div class="container">
+        <h1 class="text-center mb-5">🎨 דוגמה למערכת צבעים לערכים מספריים</h1>
+        
+        <!-- סקשן 1: צביעת טקסט בלבד -->
+        <div class="demo-section">
+          <h2 class="demo-title">1. צביעת טקסט בלבד</h2>
+          <div class="demo-item">
+            <span class="numeric-text-positive">+15.50%</span>
+            <span class="color-preview" style="background-color: #28a745;"></span>
+          </div>
+          <div class="demo-item">
+            <span class="numeric-text-negative">-8.25%</span>
+            <span class="color-preview" style="background-color: #dc3545;"></span>
+          </div>
+          <div class="demo-item">
+            <span class="numeric-text-zero">0.00%</span>
+            <span class="color-preview" style="background-color: #6c757d;"></span>
+          </div>
+          <div class="demo-code">
+&lt;span class="numeric-text-positive"&gt;+15.50%&lt;/span&gt;<br>
+&lt;span class="numeric-text-negative"&gt;-8.25%&lt;/span&gt;<br>
+&lt;span class="numeric-text-zero"&gt;0.00%&lt;/span&gt;
+          </div>
+        </div>
+        
+        <!-- סקשן 2: צביעת רקע בלבד -->
+        <div class="demo-section">
+          <h2 class="demo-title">2. צביעת רקע בלבד</h2>
+          <div class="demo-item">
+            <div class="numeric-bg-positive p-3">רווח חיובי</div>
+          </div>
+          <div class="demo-item">
+            <div class="numeric-bg-negative p-3">הפסד שלילי</div>
+          </div>
+          <div class="demo-item">
+            <div class="numeric-bg-zero p-3">אין שינוי</div>
+          </div>
+          <div class="demo-code">
+&lt;div class="numeric-bg-positive"&gt;רווח חיובי&lt;/div&gt;<br>
+&lt;div class="numeric-bg-negative"&gt;הפסד שלילי&lt;/div&gt;<br>
+&lt;div class="numeric-bg-zero"&gt;אין שינוי&lt;/div&gt;
+          </div>
+        </div>
+        
+        <!-- סקשן 3: צביעת גבול בלבד -->
+        <div class="demo-section">
+          <h2 class="demo-title">3. צביעת גבול בלבד</h2>
+          <div class="demo-item">
+            <div class="numeric-border-positive p-3 border">תיבת טקסט עם גבול חיובי</div>
+          </div>
+          <div class="demo-item">
+            <div class="numeric-border-negative p-3 border">תיבת טקסט עם גבול שלילי</div>
+          </div>
+          <div class="demo-item">
+            <div class="numeric-border-zero p-3 border">תיבת טקסט עם גבול אפס</div>
+          </div>
+          <div class="demo-code">
+&lt;div class="numeric-border-positive border"&gt;תיבת טקסט עם גבול חיובי&lt;/div&gt;<br>
+&lt;div class="numeric-border-negative border"&gt;תיבת טקסט עם גבול שלילי&lt;/div&gt;<br>
+&lt;div class="numeric-border-zero border"&gt;תיבת טקסט עם גבול אפס&lt;/div&gt;
+          </div>
+        </div>
+        
+        <!-- סקשן 4: כרטיסיות מלאות -->
+        <div class="demo-section">
+          <h2 class="demo-title">4. כרטיסיות מלאות</h2>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="demo-item">
+                <div class="numeric-card-positive numeric-transition p-3 text-center">
+                  <h5>רווח</h5>
+                  <p class="mb-0">+$1,250.00</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="demo-item">
+                <div class="numeric-card-negative numeric-transition p-3 text-center">
+                  <h5>הפסד</h5>
+                  <p class="mb-0">-$750.00</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="demo-item">
+                <div class="numeric-card-zero numeric-transition p-3 text-center">
+                  <h5>אין שינוי</h5>
+                  <p class="mb-0">$0.00</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="demo-code">
+&lt;div class="numeric-card-positive numeric-transition"&gt;<br>
+&nbsp;&nbsp;&lt;h5&gt;רווח&lt;/h5&gt;<br>
+&nbsp;&nbsp;&lt;p&gt;+$1,250.00&lt;/p&gt;<br>
+&lt;/div&gt;
+          </div>
+        </div>
+        
+        <!-- סקשן 5: כפתורים -->
+        <div class="demo-section">
+          <h2 class="demo-title">5. כפתורים</h2>
+          <div class="demo-item">
+            <button class="btn btn-numeric-positive me-2">פעולה חיובית</button>
+            <button class="btn btn-numeric-negative me-2">פעולה שלילית</button>
+            <button class="btn btn-numeric-zero">פעולה ניטרלית</button>
+          </div>
+          <div class="demo-code">
+&lt;button class="btn btn-numeric-positive"&gt;פעולה חיובית&lt;/button&gt;<br>
+&lt;button class="btn btn-numeric-negative"&gt;פעולה שלילית&lt;/button&gt;<br>
+&lt;button class="btn btn-numeric-zero"&gt;פעולה ניטרלית&lt;/button&gt;
+          </div>
+        </div>
+        
+        <!-- סקשן 6: תגיות -->
+        <div class="demo-section">
+          <h2 class="demo-title">6. תגיות</h2>
+          <div class="demo-item">
+            <span class="badge badge-numeric-positive me-2">רווח</span>
+            <span class="badge badge-numeric-negative me-2">הפסד</span>
+            <span class="badge badge-numeric-zero">אפס</span>
+          </div>
+          <div class="demo-code">
+&lt;span class="badge badge-numeric-positive"&gt;רווח&lt;/span&gt;<br>
+&lt;span class="badge badge-numeric-negative"&gt;הפסד&lt;/span&gt;<br>
+&lt;span class="badge badge-numeric-zero"&gt;אפס&lt;/span&gt;
+          </div>
+        </div>
+        
+        <!-- סקשן 7: שורות טבלה -->
+        <div class="demo-section">
+          <h2 class="demo-title">7. שורות טבלה</h2>
+          <div class="demo-item">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>סימבול</th>
+                  <th>שינוי</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="table-row-positive">
+                  <td>TSLA</td>
+                  <td>+5.25%</td>
+                </tr>
+                <tr class="table-row-negative">
+                  <td>AAPL</td>
+                  <td>-2.10%</td>
+                </tr>
+                <tr class="table-row-zero">
+                  <td>MSFT</td>
+                  <td>0.00%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="demo-code">
+&lt;tr class="table-row-positive"&gt;<br>
+&nbsp;&nbsp;&lt;td&gt;TSLA&lt;/td&gt;<br>
+&nbsp;&nbsp;&lt;td&gt;+5.25%&lt;/td&gt;<br>
+&lt;/tr&gt;
+          </div>
+        </div>
+        
+        <!-- סקשן 8: הודעות -->
+        <div class="demo-section">
+          <h2 class="demo-title">8. הודעות</h2>
+          <div class="demo-item">
+            <div class="alert alert-numeric-positive">
+              <strong>הצלחה!</strong> הרווח שלך עלה ב-15%
+            </div>
+          </div>
+          <div class="demo-item">
+            <div class="alert alert-numeric-negative">
+              <strong>אזהרה!</strong> ההפסד שלך עלה ב-8%
+            </div>
+          </div>
+          <div class="demo-item">
+            <div class="alert alert-numeric-zero">
+              <strong>מידע</strong> אין שינוי במצב שלך
+            </div>
+          </div>
+          <div class="demo-code">
+&lt;div class="alert alert-numeric-positive"&gt;<br>
+&nbsp;&nbsp;&lt;strong&gt;הצלחה!&lt;/strong&gt; הרווח שלך עלה ב-15%<br>
+&lt;/div&gt;
+          </div>
+        </div>
+        
+        <!-- סקשן 9: JavaScript -->
+        <div class="demo-section">
+          <h2 class="demo-title">9. שימוש ב-JavaScript</h2>
+          <div class="demo-item">
+            <button class="btn btn-primary" onclick="demoJavaScript()">הפעל דוגמה JavaScript</button>
+            <div id="jsResult" class="mt-3"></div>
+          </div>
+          <div class="demo-code">
+// קבלת צבע לערך מספרי<br>
+const positiveColor = window.getNumericValueColor(15.5, 'medium');<br>
+const negativeColor = window.getNumericValueColor(-8.25, 'medium');<br>
+const zeroColor = window.getNumericValueColor(0, 'medium');<br><br>
+
+// קבלת CSS class לערך מספרי<br>
+const positiveClass = window.getNumericValueCSSClass(15.5);<br>
+const negativeClass = window.getNumericValueCSSClass(-8.25);<br>
+const zeroClass = window.getNumericValueCSSClass(0);
+          </div>
+        </div>
+        
+        <!-- סקשן 10: עדכון דינמי -->
+        <div class="demo-section">
+          <h2 class="demo-title">10. עדכון צבעים דינמי</h2>
+          <div class="demo-item">
+            <button class="btn btn-warning me-2" onclick="changeToBrightColors()">צבעים בהירים</button>
+            <button class="btn btn-info me-2" onclick="changeToDarkColors()">צבעים כהים</button>
+            <button class="btn btn-secondary" onclick="resetColors()">איפוס צבעים</button>
+          </div>
+          <div class="demo-item">
+            <div class="numeric-card-positive numeric-transition p-3 text-center" id="dynamicCard">
+              <h5>כרטיסיה דינמית</h5>
+              <p class="mb-0">+$500.00</p>
+            </div>
+          </div>
+          <div class="demo-code">
+// עדכון צבעים דינמי<br>
+window.updateNumericValueColors({<br>
+&nbsp;&nbsp;positive: {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;medium: '#00ff00' // ירוק בהיר<br>
+&nbsp;&nbsp;}<br>
+});
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Scripts -->
+  <script src="scripts/color-scheme-system.js"></script>
+  <script src="scripts/header-system.js"></script>
+  
+  <script>
+    // אתחול מערכת הכותרת
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.headerSystem) {
+        window.headerSystem.init();
+      }
+      
+      // אתחול מערכת הצבעים
+      if (window.generateNumericValueCSS) {
+        const css = window.generateNumericValueCSS();
+        const styleElement = document.createElement('style');
+        styleElement.id = 'numeric-value-colors';
+        styleElement.textContent = css;
+        document.head.appendChild(styleElement);
+      }
+    });
+    
+    // דוגמה JavaScript
+    function demoJavaScript() {
+      const resultDiv = document.getElementById('jsResult');
+      
+      try {
+        // קבלת צבעים
+        const positiveColor = window.getNumericValueColor(15.5, 'medium');
+        const negativeColor = window.getNumericValueColor(-8.25, 'medium');
+        const zeroColor = window.getNumericValueColor(0, 'medium');
+        
+        // קבלת CSS classes
+        const positiveClass = window.getNumericValueCSSClass(15.5);
+        const negativeClass = window.getNumericValueCSSClass(-8.25);
+        const zeroClass = window.getNumericValueCSSClass(0);
+        
+        // בדיקות
+        const isPositive = window.isPositiveValue(15.5);
+        const isNegative = window.isNegativeValue(-8.25);
+        const isZero = window.isZeroValue(0);
+        
+        const valueType = window.getValueType(15.5);
+        
+        const result = `
+          <div class="alert alert-info">
+            <h6>תוצאות JavaScript:</h6>
+            <p><strong>צבעים:</strong></p>
+            <ul>
+              <li>חיובי: <span style="color: ${positiveColor}">${positiveColor}</span></li>
+              <li>שלילי: <span style="color: ${negativeColor}">${negativeColor}</span></li>
+              <li>אפס: <span style="color: ${zeroColor}">${zeroColor}</span></li>
+            </ul>
+            <p><strong>CSS Classes:</strong></p>
+            <ul>
+              <li>חיובי: <code>${positiveClass}</code></li>
+              <li>שלילי: <code>${negativeClass}</code></li>
+              <li>אפס: <code>${zeroClass}</code></li>
+            </ul>
+            <p><strong>בדיקות:</strong></p>
+            <ul>
+              <li>15.5 חיובי: ${isPositive}</li>
+              <li>-8.25 שלילי: ${isNegative}</li>
+              <li>0 אפס: ${isZero}</li>
+            </ul>
+            <p><strong>סוג ערך 15.5:</strong> ${valueType}</p>
+          </div>
+        `;
+        
+        resultDiv.innerHTML = result;
+        
+      } catch (error) {
+        resultDiv.innerHTML = `<div class="alert alert-danger">שגיאה: ${error.message}</div>`;
+      }
+    }
+    
+    // שינוי לצבעים בהירים
+    function changeToBrightColors() {
+      try {
+        window.updateNumericValueColors({
+          positive: {
+            medium: '#00ff00', // ירוק בהיר
+            light: '#90ee90'   // רקע בהיר
+          },
+          negative: {
+            medium: '#ff0000', // אדום בהיר
+            light: '#ffb6c1'   // רקע בהיר
+          },
+          zero: {
+            medium: '#0000ff', // כחול בהיר
+            light: '#add8e6'   // רקע בהיר
+          }
+        });
+        
+        // עדכון הכרטיסיה הדינמית
+        const card = document.getElementById('dynamicCard');
+        if (card) {
+          card.className = 'numeric-card-positive numeric-transition p-3 text-center';
+        }
+        
+      } catch (error) {
+        console.error('שגיאה בשינוי צבעים:', error);
+      }
+    }
+    
+    // שינוי לצבעים כהים
+    function changeToDarkColors() {
+      try {
+        window.updateNumericValueColors({
+          positive: {
+            medium: '#006400', // ירוק כהה
+            light: '#228b22'   // רקע כהה
+          },
+          negative: {
+            medium: '#8b0000', // אדום כהה
+            light: '#b22222'   // רקע כהה
+          },
+          zero: {
+            medium: '#000080', // כחול כהה
+            light: '#191970'   // רקע כהה
+          }
+        });
+        
+        // עדכון הכרטיסיה הדינמית
+        const card = document.getElementById('dynamicCard');
+        if (card) {
+          card.className = 'numeric-card-positive numeric-transition p-3 text-center';
+        }
+        
+      } catch (error) {
+        console.error('שגיאה בשינוי צבעים:', error);
+      }
+    }
+    
+    // איפוס צבעים
+    function resetColors() {
+      try {
+        // איפוס לברירת המחדל
+        if (window.updateNumericValueColors) {
+          window.updateNumericValueColors({
+            positive: {
+              light: '#d4edda',
+              medium: '#28a745',
+              dark: '#155724',
+              border: '#c3e6cb'
+            },
+            negative: {
+              light: '#f8d7da',
+              medium: '#dc3545',
+              dark: '#721c24',
+              border: '#f5c6cb'
+            },
+            zero: {
+              light: '#e2e3e5',
+              medium: '#6c757d',
+              dark: '#383d41',
+              border: '#d6d8db'
+            }
+          });
+        }
+        
+        // עדכון הכרטיסיה הדינמית
+        const card = document.getElementById('dynamicCard');
+        if (card) {
+          card.className = 'numeric-card-positive numeric-transition p-3 text-center';
+        }
+        
+      } catch (error) {
+        console.error('שגיאה באיפוס צבעים:', error);
+      }
+    }
+  </script>
+</body>
+</html>

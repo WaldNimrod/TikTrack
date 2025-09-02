@@ -18,11 +18,14 @@ from flask import Blueprint, jsonify, request, current_app
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 import logging
-from services.background_tasks import background_task_manager
+from services.background_tasks import BackgroundTaskManager
 from utils.performance_monitor import monitor_performance
 from utils.error_handlers import handle_database_error, handle_validation_error
 
 logger = logging.getLogger(__name__)
+
+# Create background task manager instance
+background_task_manager = BackgroundTaskManager()
 
 # Create blueprint
 background_tasks_bp = Blueprint('background_tasks', __name__, url_prefix='/api/v1/background-tasks')

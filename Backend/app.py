@@ -47,6 +47,7 @@ No connection to testing system!
 
 from flask import Flask, jsonify, request, send_from_directory, g
 from flask_cors import CORS
+from flask_socketio import SocketIO
 import sqlite3
 import os
 from datetime import datetime
@@ -63,7 +64,7 @@ from services.cache_service import cache_service
 from services.health_service import health_service
 from services.metrics_collector import metrics_collector
 from services.database_optimizer import database_optimizer
-# from services.background_tasks import background_task_manager
+from services.background_tasks import BackgroundTaskManager
 from utils.response_optimizer import ResponseOptimizer
 from utils.rate_limiter import rate_limiter, rate_limit_api
 
@@ -96,6 +97,16 @@ from routes.pages import pages_bp
 
 app = Flask(__name__)
 CORS(app)
+
+# Initialize Flask-SocketIO
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+
+# Initialize Real-time Notifications Service
+from services.realtime_notifications import RealtimeNotificationsService
+realtime_notifications = RealtimeNotificationsService(socketio)
+
+# Initialize Background Task Manager with real-time notifications
+background_task_manager = BackgroundTaskManager(realtime_notifications)
 
 # Initialize new architecture
 logger = setup_logging()
@@ -628,7 +639,7 @@ def update_all_tickers_open_status() -> None:
 
 
 if __name__ == "__main__":
-    # 🎯 **New Configuration - Flask Simple Development Server**
+    # 🎯 **New Configuration - Flask-SocketIO Development Server**
     # 
     # 🚀 **Startup:**
     # ```bash
@@ -636,7 +647,7 @@ if __name__ == "__main__":
     # ./start_dev.sh
     #
     # # Or direct startup
-    # python3 run_flask_simple.py
+    # python3 app.py
     # ```
     #
     # 📁 **Old Configuration Archive:**
@@ -644,12 +655,18 @@ if __name__ == "__main__":
     # - **Date:** August 20, 2025
     # - **Status:** Archive - not in use
     #
-    # ✅ **New Configuration:** Simple and stable Flask development server
+    # ✅ **New Configuration:** Flask-SocketIO with real-time notifications
     
+    print("🚀 Starting TikTrack Server with Real-time Notifications...")
+    print("🔔 WebSocket server enabled on port 8080")
+    print("📡 Real-time events: background tasks, data updates, external data")
     
-    app.run(
+    # Run with SocketIO instead of regular Flask
+    socketio.run(
+        app,
         host='127.0.0.1',
         port=8080,
         debug=True,
-        use_reloader=False  # Disable auto-reload to prevent issues
+        use_reloader=False,  # Disable auto-reload to prevent issues
+        allow_unsafe_werkzeug=True  # Required for development
     )

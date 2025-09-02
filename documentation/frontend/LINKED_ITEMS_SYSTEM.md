@@ -467,6 +467,91 @@ const investmentBg = window.getInvestmentTypeBackgroundColor('investment');
 const legend = window.createInvestmentTypeLegend();
 ```
 
+### 🎯 מערכת צבעים לערכים מספריים (Numeric Value Color System)
+
+#### **מבט כללי:**
+מערכת צבעים מאוחדת לצביעת ערכים מספריים במערכת. המערכת מאפשרת צביעה עקבית של ערכים חיוביים, שליליים ואפס בכל רחבי המערכת.
+
+#### **סוגי צבעים:**
+- **ערכים חיוביים**: ירוק (רווחים, עליות, הצלחות)
+- **ערכים שליליים**: אדום (הפסדים, ירידות, שגיאות)
+- **ערך אפס**: אפור (אין שינוי, ערך ניטרלי)
+
+#### **סוגי צביעה:**
+- **light**: צבע רקע בהיר
+- **medium**: צבע טקסט ראשי
+- **dark**: צבע טקסט כהה
+- **border**: צבע גבול
+
+#### **פונקציות JavaScript:**
+```javascript
+// קבלת צבע לערך מספרי
+const color = window.getNumericValueColor(15.5, 'medium');
+
+// קבלת CSS class לערך מספרי
+const cssClass = window.getNumericValueCSSClass(15.5);
+
+// בדיקת סוג הערך
+const isPositive = window.isPositiveValue(15.5);
+const isNegative = window.isNegativeValue(-8.25);
+const isZero = window.isZeroValue(0);
+
+// עדכון צבעים דינמי
+window.updateNumericValueColors({
+    positive: { medium: '#00ff00' }
+});
+```
+
+#### **CSS Classes זמינים:**
+- **`.numeric-value-positive`**: ערכים חיוביים (כל הצבעים)
+- **`.numeric-value-negative`**: ערכים שליליים (כל הצבעים)
+- **`.numeric-value-zero`**: ערך אפס (כל הצבעים)
+- **`.numeric-text-positive`**: טקסט חיובי בלבד
+- **`.numeric-bg-positive`**: רקע חיובי בלבד
+- **`.numeric-border-positive`**: גבול חיובי בלבד
+- **`.numeric-card-positive`**: כרטיסיה מלאה חיובית
+- **`.btn-numeric-positive`**: כפתור חיובי
+- **`.badge-numeric-positive`**: תגית חיובית
+- **`.table-row-positive`**: שורת טבלה חיובית
+- **`.alert-numeric-positive`**: הודעה חיובית
+
+#### **דוגמאות שימוש:**
+```html
+<!-- צביעת טקסט בלבד -->
+<span class="numeric-text-positive">+15.50%</span>
+<span class="numeric-text-negative">-8.25%</span>
+<span class="numeric-text-zero">0.00%</span>
+
+<!-- כרטיסיות מלאות -->
+<div class="numeric-card-positive numeric-transition">
+    <h5>רווח</h5>
+    <p>+$1,250.00</p>
+</div>
+
+<!-- כפתורים -->
+<button class="btn btn-numeric-positive">פעולה חיובית</button>
+<button class="btn btn-numeric-negative">פעולה שלילית</button>
+
+<!-- שורות טבלה -->
+<tr class="table-row-positive">
+    <td>TSLA</td>
+    <td>+5.25%</td>
+</tr>
+```
+
+#### **ניהול צבעים בדף העדפות:**
+- **סקשן סולמות צבעים** בדף העדפות
+- **בחירת צבעים** באמצעות color picker
+- **הקלדת ערכי hex** (6 תווים)
+- **איפוס לברירת מחדל**
+- **עדכון בזמן אמת** במערכת
+
+#### **קבצים קשורים:**
+- **JavaScript**: `trading-ui/scripts/color-scheme-system.js`
+- **CSS**: `trading-ui/styles/numeric-value-colors.css`
+- **HTML**: `trading-ui/preferences.html` (סקשן צבעים)
+- **דוגמה**: `trading-ui/numeric-value-colors-demo.html`
+
 ### יתרונות המערכת החדשה
 
 1. **ריכוזיות**: כל הצבעים מוגדרים במקום אחד

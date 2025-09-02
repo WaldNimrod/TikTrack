@@ -10,7 +10,9 @@
 7. [שלבי ביצוע](#שלבי-ביצוע)
 8. [Roadmap](#roadmap)
 9. [שיפורי שרת מתקדמים](#שיפורי-שרת-מתקדמים)
-10. [Changelog v2.0.2](#changelog-v202)
+10. [Real-time Notifications System](#real-time-notifications-system)
+11. [ממשק המשתמש ומשוב התראות](#ממשק-המשתמש-ומשוב-התראות)
+12. [Changelog v2.0.3](#changelog-v203)
 
 ---
 
@@ -992,7 +994,28 @@ socket.on('external_data_error', (data) => {
 
 ---
 
-## 📝 Changelog v2.0.2
+## 📝 Changelog v2.0.3
+
+### 🔔 NEW FEATURE: Real-time Notifications System Complete!
+
+#### ✨ Real-time Notifications Features:
+- **Flask-SocketIO Integration** - WebSocket server במערכת הקיימת
+- **Real-time Client** - קליינט JavaScript למעקב אירועים
+- **Existing UI Integration** - שילוב עם מערכת ההודעות הקיימת
+- **Background Tasks Notifications** - התראות על משימות ברקע
+- **Database Change Notifications** - התראות על שינויים בנתונים
+- **External Data Notifications** - התראות על עדכוני נתונים חיצוניים
+
+#### 📋 User Feedback Channels:
+- **Pop-up Notifications** - הודעות זמניות (מיידי)
+- **Background Tasks Page** - דשבורד משימות (מתמשך)
+- **Notifications Center** - מרכז התראות (מוצע להוספה)
+
+#### 🔧 Technical Implementation:
+- **Backend**: `realtime_notifications.py` - WebSocket service
+- **Frontend**: `realtime-notifications-client.js` - WebSocket client
+- **Integration**: Background Tasks Manager עם real-time events
+- **UI**: שימוש במערכת ההודעות הקיימת
 
 ### 🎉 MILESTONE ACHIEVED: Server Performance & Security Complete!
 
@@ -1045,7 +1068,63 @@ Utils (utils.js)
 
 ---
 
+## 📱 ממשק המשתמש ומשוב התראות
+
+### סקירה כללית
+מערכת ההתראות בזמן אמת מספקת משוב למשתמש בשלוש רמות שונות:
+
+### 1. הודעות Pop-up (מערכת קיימת) 🔔
+**תיאור**: הודעות זמניות שמופיעות ונעלמות אוטומטית
+**מיקום**: בכל עמוד במערכת
+**פונקציות**:
+- `showSuccessNotification()` - הודעות הצלחה (ירוק)
+- `showErrorNotification()` - הודעות שגיאה (אדום)  
+- `showWarningNotification()` - הודעות אזהרה (צהוב)
+- `showInfoNotification()` - הודעות מידע (כחול)
+
+**שימוש**: משוב מיידי על פעולות, שגיאות, עדכונים
+
+### 2. עמוד Background Tasks 🔧
+**מיקום**: `/background-tasks`
+**תכונות**:
+- **סטטוס משימות בזמן אמת** - מעקב אחר משימות רצות
+- **היסטוריית ביצוע** - רשימת כל המשימות שבוצעו
+- **ניתוח ביצועים** - גרפים וסטטיסטיקות
+- **ניהול משימות** - הפעלה, כיבוי, תזמון
+
+**שימוש**: ניהול וניטור משימות ברקע
+
+### 3. מרכז התראות (מוצע להוספה) 📋
+**מיקום מוצע**: `/notifications-center`
+**תכונות מוצעות**:
+- **רשימת התראות בזמן אמת** - כל ההתראות במקום אחד
+- **היסטוריית התראות** - ארכיון מלא עם חיפוש
+- **הגדרות התראות** - העדפות אישיות
+- **סטטוס חיבור WebSocket** - מידע טכני
+- **פילטרים ומיון** - לפי סוג, זמן, חשיבות
+
+**שימוש**: ניהול מרכזי של כל ההתראות והעדפות
+
+### זרימת המשוב
+```
+WebSocket Event → Real-time Client → Notification Functions
+                        ↓
+                 Pop-up Notification (מיידי)
+                        ↓
+                 Page Update (דינמי)
+                        ↓
+                 History Storage (ארכיון)
+```
+
+### עמודים עם התראות בזמן אמת
+- **כל העמודים**: הודעות pop-up זמניות
+- **Background Tasks**: דשבורד משימות מפורט
+- **Notifications Center (מוצע)**: דשבורד התראות מרכזי
+
+---
+
 **מסמך זה נוצר ב**: 15 בינואר 2026  
-**גרסה**: 2.0.2  
+**עודכן ב**: 2 בספטמבר 2025  
+**גרסה**: 2.0.3  
 **מחבר**: TikTrack Development Team
 

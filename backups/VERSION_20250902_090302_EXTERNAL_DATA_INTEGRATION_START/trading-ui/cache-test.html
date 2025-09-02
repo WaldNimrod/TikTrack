@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת מערכת Cache - TikTrack</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/tables.css">
+    <link rel="stylesheet" href="styles/forms.css">
+    <link rel="stylesheet" href="styles/buttons.css">
+    <link rel="stylesheet" href="styles/notifications.css">
+    <link rel="stylesheet" href="styles/cache-test.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <h1><i class="fas fa-memory"></i> בדיקת מערכת Cache מתקדמת</h1>
+            <p class="subtitle">בדיקה מקיפה של מערכת ה-Cache המתקדמת של TikTrack</p>
+        </header>
+
+        <!-- Cache Status Dashboard -->
+        <section class="cache-dashboard">
+            <div class="dashboard-grid">
+                <div class="status-card">
+                    <div class="card-header">
+                        <i class="fas fa-heartbeat"></i>
+                        <h3>מצב המערכת</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="system-status" class="status-indicator">
+                            <i class="fas fa-spinner fa-spin"></i> בודק...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>ביצועים</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="performance-stats" class="stats-display">
+                            <i class="fas fa-spinner fa-spin"></i> טוען...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <div class="card-header">
+                        <i class="fas fa-database"></i>
+                        <h3>זיכרון</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="memory-usage" class="memory-display">
+                            <i class="fas fa-spinner fa-spin"></i> טוען...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <div class="card-header">
+                        <i class="fas fa-bullseye"></i>
+                        <h3>Hit Rate</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="hit-rate" class="hit-rate-display">
+                            <i class="fas fa-spinner fa-spin"></i> טוען...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cache Operations -->
+        <section class="cache-operations">
+            <h2><i class="fas fa-tools"></i> פעולות Cache</h2>
+            
+            <div class="operations-grid">
+                <div class="operation-card">
+                    <h3>ניקוי Cache</h3>
+                    <p>מחיקת כל רשומות ה-Cache</p>
+                    <button id="clear-cache-btn" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> נקה Cache
+                    </button>
+                </div>
+
+                <div class="operation-card">
+                    <h3>בדיקת בריאות</h3>
+                    <p>בדיקת מצב המערכת</p>
+                    <button id="health-check-btn" class="btn btn-info">
+                        <i class="fas fa-stethoscope"></i> בדיקת בריאות
+                    </button>
+                </div>
+
+                <div class="operation-card">
+                    <h3>סטטיסטיקות</h3>
+                    <p>קבלת נתונים מפורטים</p>
+                    <button id="stats-btn" class="btn btn-success">
+                        <i class="fas fa-chart-bar"></i> סטטיסטיקות
+                    </button>
+                </div>
+
+                <div class="operation-card">
+                    <h3>רענון נתונים</h3>
+                    <p>עדכון כל הנתונים</p>
+                    <button id="refresh-btn" class="btn btn-primary">
+                        <i class="fas fa-sync-alt"></i> רענן
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cache Testing -->
+        <section class="cache-testing">
+            <h2><i class="fas fa-vial"></i> בדיקות Cache</h2>
+            
+            <div class="test-controls">
+                <div class="test-input-group">
+                    <label for="test-key">מפתח בדיקה:</label>
+                    <input type="text" id="test-key" placeholder="הכנס מפתח לבדיקה" value="test_key_123">
+                </div>
+                
+                <div class="test-input-group">
+                    <label for="test-value">ערך בדיקה:</label>
+                    <input type="text" id="test-value" placeholder="הכנס ערך לבדיקה" value="test_value_456">
+                </div>
+                
+                <div class="test-input-group">
+                    <label for="test-ttl">TTL (שניות):</label>
+                    <input type="number" id="test-ttl" placeholder="300" value="300" min="1" max="3600">
+                </div>
+            </div>
+
+            <div class="test-actions">
+                <button id="set-cache-btn" class="btn btn-success">
+                    <i class="fas fa-save"></i> שמור ב-Cache
+                </button>
+                <button id="get-cache-btn" class="btn btn-info">
+                    <i class="fas fa-search"></i> קבל מ-Cache
+                </button>
+                <button id="delete-cache-btn" class="btn btn-warning">
+                    <i class="fas fa-trash"></i> מחק מ-Cache
+                </button>
+            </div>
+
+            <div class="test-results">
+                <h3>תוצאות הבדיקה:</h3>
+                <div id="test-output" class="test-output">
+                    <p class="placeholder">התוצאות יופיעו כאן...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Monitoring -->
+        <section class="performance-monitoring">
+            <h2><i class="fas fa-tachometer-alt"></i> ניטור ביצועים</h2>
+            
+            <div class="performance-grid">
+                <div class="performance-card">
+                    <h3>זמני תגובה</h3>
+                    <div id="response-times" class="performance-data">
+                        <i class="fas fa-spinner fa-spin"></i> טוען...
+                    </div>
+                </div>
+
+                <div class="performance-card">
+                    <h3>סטטיסטיקות Cache</h3>
+                    <div id="cache-stats" class="performance-data">
+                        <i class="fas fa-spinner fa-spin"></i> טוען...
+                    </div>
+                </div>
+
+                <div class="performance-card">
+                    <h3>ניתוח ביצועים</h3>
+                    <div id="performance-analysis" class="performance-data">
+                        <i class="fas fa-spinner fa-spin"></i> טוען...
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Logs and Debugging -->
+        <section class="logs-debugging">
+            <h2><i class="fas fa-bug"></i> לוגים ודיבוג</h2>
+            
+            <div class="logs-controls">
+                <button id="clear-logs-btn" class="btn btn-secondary">
+                    <i class="fas fa-eraser"></i> נקה לוגים
+                </button>
+                <button id="export-logs-btn" class="btn btn-outline">
+                    <i class="fas fa-download"></i> ייצא לוגים
+                </button>
+            </div>
+
+            <div class="logs-display">
+                <div id="logs-content" class="logs-content">
+                    <p class="placeholder">הלוגים יופיעו כאן...</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts -->
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/cache-test.js"></script>
+</body>
+</html>

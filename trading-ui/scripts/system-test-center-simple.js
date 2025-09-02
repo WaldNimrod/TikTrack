@@ -45,7 +45,7 @@ function clearLog() {
 function exportLog() {
   console.log('exportLog function called');
   const logContent = document.getElementById('log-content');
-  if (!logContent) return;
+  if (!logContent) {return;}
 
   const entries = Array.from(logContent.children)
     .filter(entry => !entry.classList.contains('text-muted'))
@@ -59,7 +59,7 @@ function exportLog() {
   a.download = `system-test-log-${new Date().toISOString().slice(0, 19)}.txt`;
   a.click();
   URL.revokeObjectURL(url);
-  
+
   log('📥 יומן הפעילות יוצא לקובץ');
 }
 
@@ -109,11 +109,11 @@ function copyLog() {
 function testSystem() {
   console.log('testSystem function called');
   log('🚀 מתחיל בדיקת מערכת...');
-  
+
   // עדכן סטטוס שרת (במקום מערכת)
   const serverStatus = document.getElementById('server-status');
   console.log('🔍 מחפש אלמנט server-status:', serverStatus);
-  
+
   if (serverStatus) {
     console.log('✅ נמצא אלמנט server-status, מעדכן ל"בבדיקה..."');
     serverStatus.className = 'badge bg-warning';
@@ -121,7 +121,7 @@ function testSystem() {
   } else {
     console.error('❌ לא נמצא אלמנט server-status!');
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('system-results');
     if (results) {
@@ -134,7 +134,7 @@ function testSystem() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס שרת
     if (serverStatus) {
       console.log('✅ מעדכן server-status ל"פעיל"');
@@ -143,7 +143,7 @@ function testSystem() {
     } else {
       console.error('❌ לא ניתן לעדכן server-status - אלמנט לא נמצא!');
     }
-    
+
     log('✅ בדיקת מערכת הושלמה בהצלחה');
   }, 500);
 }
@@ -151,11 +151,11 @@ function testSystem() {
 function testDatabase() {
   console.log('testDatabase function called');
   log('🗄️ מתחיל בדיקת מסד נתונים...');
-  
+
   // עדכן סטטוס מסד נתונים
   const databaseStatus = document.getElementById('database-status');
   console.log('🔍 מחפש אלמנט database-status:', databaseStatus);
-  
+
   if (databaseStatus) {
     console.log('✅ נמצא אלמנט database-status, מעדכן ל"בבדיקה..."');
     databaseStatus.className = 'badge bg-warning';
@@ -163,7 +163,7 @@ function testDatabase() {
   } else {
     console.error('❌ לא נמצא אלמנט database-status!');
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('system-results');
     if (results) {
@@ -176,7 +176,7 @@ function testDatabase() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס מסד נתונים
     if (databaseStatus) {
       console.log('✅ מעדכן database-status ל"פעיל"');
@@ -185,7 +185,7 @@ function testDatabase() {
     } else {
       console.error('❌ לא ניתן לעדכן database-status - אלמנט לא נמצא!');
     }
-    
+
     log('✅ בדיקת מסד נתונים הושלמה בהצלחה');
   }, 800);
 }
@@ -193,11 +193,11 @@ function testDatabase() {
 function testCache() {
   console.log('testCache function called');
   log('⚡ מתחיל בדיקת מטמון...');
-  
+
   // עדכן סטטוס מטמון
   const cacheStatus = document.getElementById('cache-status');
   console.log('🔍 מחפש אלמנט cache-status:', cacheStatus);
-  
+
   if (cacheStatus) {
     console.log('✅ נמצא אלמנט cache-status, מעדכן ל"בבדיקה..."');
     cacheStatus.className = 'badge bg-warning';
@@ -205,7 +205,7 @@ function testCache() {
   } else {
     console.error('❌ לא נמצא אלמנט cache-status!');
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('system-results');
     if (results) {
@@ -218,7 +218,7 @@ function testCache() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס מטמון
     if (cacheStatus) {
       console.log('✅ מעדכן cache-status ל"פעיל"');
@@ -227,7 +227,7 @@ function testCache() {
     } else {
       console.error('❌ לא ניתן לעדכן cache-status - אלמנט לא נמצא!');
     }
-    
+
     log('✅ בדיקת מטמון הושלמה בהצלחה');
   }, 600);
 }
@@ -235,11 +235,11 @@ function testCache() {
 function testNetwork() {
   console.log('testNetwork function called');
   log('🌐 מתחיל בדיקת רשת...');
-  
+
   // עדכן סטטוס שרת (במקום רשת)
   const serverStatus = document.getElementById('server-status');
   console.log('🔍 מחפש אלמנט server-status:', serverStatus);
-  
+
   if (serverStatus) {
     console.log('✅ נמצא אלמנט server-status, מעדכן ל"בבדיקה..."');
     serverStatus.className = 'badge bg-warning';
@@ -247,7 +247,7 @@ function testNetwork() {
   } else {
     console.error('❌ לא נמצא אלמנט server-status!');
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('system-results');
     if (results) {
@@ -260,7 +260,7 @@ function testNetwork() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס שרת
     if (serverStatus) {
       console.log('✅ מעדכן server-status ל"פעיל"');
@@ -269,7 +269,7 @@ function testNetwork() {
     } else {
       console.error('❌ לא ניתן לעדכן server-status - אלמנט לא נמצא!');
     }
-    
+
     log('✅ בדיקת רשת הושלמה בהצלחה');
   }, 700);
 }
@@ -278,11 +278,11 @@ function testNetwork() {
 function testPerformance() {
   console.log('testPerformance function called');
   log('⚡ מתחיל בדיקת ביצועים...');
-  
+
   // עדכן סטטוס ביצועים
   const performanceStatus = document.getElementById('performance-status');
   console.log('🔍 מחפש אלמנט performance-status:', performanceStatus);
-  
+
   if (performanceStatus) {
     console.log('✅ נמצא אלמנט performance-status, מעדכן ל"בבדיקה..."');
     performanceStatus.className = 'badge bg-warning';
@@ -290,7 +290,7 @@ function testPerformance() {
   } else {
     console.error('❌ לא נמצא אלמנט performance-status!');
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('performance-results');
     if (results) {
@@ -303,7 +303,7 @@ function testPerformance() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס ביצועים
     if (performanceStatus) {
       console.log('✅ מעדכן performance-status ל"פעיל"');
@@ -312,7 +312,7 @@ function testPerformance() {
     } else {
       console.error('❌ לא ניתן לעדכן performance-status - אלמנט לא נמצא!');
     }
-    
+
     log('✅ בדיקת ביצועים הושלמה בהצלחה');
   }, 700);
 }
@@ -320,11 +320,11 @@ function testPerformance() {
 function testQueries() {
   console.log('testQueries function called');
   log('🔍 מתחיל בדיקת שאילתות...');
-  
+
   // עדכן סטטוס שאילתות
   const queriesStatus = document.getElementById('queries-status');
   console.log('🔍 מחפש אלמנט queries-status:', queriesStatus);
-  
+
   if (queriesStatus) {
     console.log('✅ נמצא אלמנט queries-status, מעדכן ל"בבדיקה..."');
     queriesStatus.className = 'badge bg-warning';
@@ -332,7 +332,7 @@ function testQueries() {
   } else {
     console.error('❌ לא נמצא אלמנט queries-status!');
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('performance-results');
     if (results) {
@@ -345,7 +345,7 @@ function testQueries() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס שאילתות
     if (queriesStatus) {
       console.log('✅ מעדכן queries-status ל"פעיל"');
@@ -354,7 +354,7 @@ function testQueries() {
     } else {
       console.error('❌ לא ניתן לעדכן queries-status - אלמנט לא נמצא!');
     }
-    
+
     log('✅ בדיקת שאילתות הושלמה בהצלחה');
   }, 900);
 }
@@ -362,14 +362,14 @@ function testQueries() {
 function testSlowQueries() {
   console.log('testSlowQueries function called');
   log('🐌 מתחיל בדיקת שאילתות איטיות...');
-  
+
   // עדכן סטטוס שאילתות (במקום שאילתות איטיות)
   const queriesStatus = document.getElementById('queries-status');
   if (queriesStatus) {
     queriesStatus.className = 'badge bg-warning';
     queriesStatus.textContent = 'בבדיקה...';
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('performance-results');
     if (results) {
@@ -382,13 +382,13 @@ function testSlowQueries() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס שאילתות
     if (queriesStatus) {
       queriesStatus.className = 'badge bg-success';
       queriesStatus.textContent = 'פעיל';
     }
-    
+
     log('⚠️ נמצאו 3 שאילתות איטיות');
   }, 800);
 }
@@ -396,14 +396,14 @@ function testSlowQueries() {
 function testQueryOptimization() {
   console.log('testQueryOptimization function called');
   log('💡 מתחיל בדיקת אופטימיזציה...');
-  
+
   // עדכן סטטוס שאילתות (במקום אופטימיזציה)
   const queriesStatus = document.getElementById('queries-status');
   if (queriesStatus) {
     queriesStatus.className = 'badge bg-warning';
     queriesStatus.textContent = 'בבדיקה...';
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('performance-results');
     if (results) {
@@ -416,13 +416,13 @@ function testQueryOptimization() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס שאילתות
     if (queriesStatus) {
       queriesStatus.className = 'badge bg-success';
       queriesStatus.textContent = 'פעיל';
     }
-    
+
     log('✅ בדיקת אופטימיזציה הושלמה - שיפור 45%');
   }, 800);
 }
@@ -431,11 +431,11 @@ function testQueryOptimization() {
 function testYahooFinance() {
   console.log('testYahooFinance function called');
   log('📊 מתחיל בדיקת Yahoo Finance...');
-  
+
   // עדכן סטטוס נתונים חיצוניים
   const externalDataStatus = document.getElementById('external-data-status');
   console.log('🔍 מחפש אלמנט external-data-status:', externalDataStatus);
-  
+
   if (externalDataStatus) {
     console.log('✅ נמצא אלמנט external-data-status, מעדכן ל"בבדיקה..."');
     externalDataStatus.className = 'badge bg-warning';
@@ -443,7 +443,7 @@ function testYahooFinance() {
   } else {
     console.error('❌ לא נמצא אלמנט external-data-status!');
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('external-data-results');
     if (results) {
@@ -456,7 +456,7 @@ function testYahooFinance() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס נתונים חיצוניים
     if (externalDataStatus) {
       console.log('✅ מעדכן external-data-status ל"פעיל"');
@@ -465,7 +465,7 @@ function testYahooFinance() {
     } else {
       console.error('❌ לא ניתן לעדכן external-data-status - אלמנט לא נמצא!');
     }
-    
+
     log('✅ בדיקת Yahoo Finance הושלמה בהצלחה');
   }, 1200);
 }
@@ -473,11 +473,11 @@ function testYahooFinance() {
 function testDataCache() {
   console.log('testDataCache function called');
   log('💾 מתחיל בדיקת מטמון נתונים...');
-  
+
   // עדכן סטטוס מטמון (במקום מטמון נתונים)
   const cacheStatus = document.getElementById('cache-status');
   console.log('🔍 מחפש אלמנט cache-status:', cacheStatus);
-  
+
   if (cacheStatus) {
     console.log('✅ נמצא אלמנט cache-status, מעדכן ל"בדיקה..."');
     cacheStatus.className = 'badge bg-warning';
@@ -485,7 +485,7 @@ function testDataCache() {
   } else {
     console.error('❌ לא נמצא אלמנט cache-status!');
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('external-data-results');
     if (results) {
@@ -498,7 +498,7 @@ function testDataCache() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס מטמון נתונים
     if (cacheStatus) {
       console.log('✅ מעדכן cache-status ל"פעיל"');
@@ -507,7 +507,7 @@ function testDataCache() {
     } else {
       console.error('❌ לא ניתן לעדכן cache-status - אלמנט לא נמצא!');
     }
-    
+
     log('✅ בדיקת מטמון נתונים הושלמה בהצלחה');
   }, 800);
 }
@@ -515,11 +515,11 @@ function testDataCache() {
 function testDataConnectors() {
   console.log('testDataConnectors function called');
   log('🔌 מתחיל בדיקת מחברים...');
-  
+
   // עדכן סטטוס נתונים חיצוניים (במקום מחברים)
   const externalDataStatus = document.getElementById('external-data-status');
   console.log('🔍 מחפש אלמנט external-data-status:', externalDataStatus);
-  
+
   if (externalDataStatus) {
     console.log('✅ נמצא אלמנט external-data-status, מעדכן ל"בבדיקה..."');
     externalDataStatus.className = 'badge bg-warning';
@@ -527,7 +527,7 @@ function testDataConnectors() {
   } else {
     console.error('❌ לא נמצא אלמנט external-data-status!');
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('external-data-results');
     if (results) {
@@ -540,7 +540,7 @@ function testDataConnectors() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס נתונים חיצוניים
     if (externalDataStatus) {
       console.log('✅ מעדכן external-data-status ל"פעיל"');
@@ -549,7 +549,7 @@ function testDataConnectors() {
     } else {
       console.error('❌ לא ניתן לעדכן external-data-status - אלמנט לא נמצא!');
     }
-    
+
     log('✅ בדיקת מחברים הושלמה - Yahoo Finance פעיל');
   }, 1000);
 }
@@ -557,14 +557,14 @@ function testDataConnectors() {
 function testDataSync() {
   console.log('testDataSync function called');
   log('🔄 מתחיל בדיקת סנכרון נתונים...');
-  
+
   // עדכן סטטוס נתונים חיצוניים (במקום סנכרון)
   const externalDataStatus = document.getElementById('external-data-status');
   if (externalDataStatus) {
     externalDataStatus.className = 'badge bg-warning';
     externalDataStatus.textContent = 'בבדיקה...';
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('external-data-results');
     if (results) {
@@ -577,7 +577,7 @@ function testDataSync() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס נתונים חיצוניים
     if (externalDataStatus) {
       console.log('✅ מעדכן external-data-status ל"פעיל"');
@@ -586,7 +586,7 @@ function testDataSync() {
     } else {
       console.error('❌ לא ניתן לעדכן external-data-status - אלמנט לא נמצא!');
     }
-    
+
     log('✅ בדיקת סנכרון נתונים הושלמה בהצלחה');
   }, 900);
 }
@@ -595,14 +595,14 @@ function testDataSync() {
 function testSecurity() {
   console.log('testSecurity function called');
   log('��️ מתחיל בדיקת אבטחה...');
-  
+
   // עדכן סטטוס שרת (במקום אבטחה)
   const serverStatus = document.getElementById('server-status');
   if (serverStatus) {
     serverStatus.className = 'badge bg-warning';
     serverStatus.textContent = 'בבדיקה...';
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('security-results');
     if (results) {
@@ -615,13 +615,13 @@ function testSecurity() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס שרת
     if (serverStatus) {
       serverStatus.className = 'badge bg-success';
       serverStatus.textContent = 'פעיל';
     }
-    
+
     log('✅ בדיקת אבטחה הושלמה - אין חולשות');
   }, 1000);
 }
@@ -629,14 +629,14 @@ function testSecurity() {
 function testIntegrity() {
   console.log('testIntegrity function called');
   log('🔍 מתחיל בדיקת תקינות...');
-  
+
   // עדכן סטטוס מסד נתונים (במקום תקינות)
   const databaseStatus = document.getElementById('database-status');
   if (databaseStatus) {
     databaseStatus.className = 'badge bg-warning';
     databaseStatus.textContent = 'בבדיקה...';
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('security-results');
     if (results) {
@@ -649,13 +649,13 @@ function testIntegrity() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס מסד נתונים
     if (databaseStatus) {
       databaseStatus.className = 'badge bg-success';
       databaseStatus.textContent = 'פעיל';
     }
-    
+
     log('✅ בדיקת תקינות הושלמה - הכול תקין');
   }, 900);
 }
@@ -663,14 +663,14 @@ function testIntegrity() {
 function testPermissions() {
   console.log('testPermissions function called');
   log('🔑 מתחיל בדיקת הרשאות...');
-  
+
   // עדכן סטטוס שרת (במקום הרשאות)
   const serverStatus = document.getElementById('server-status');
   if (serverStatus) {
     serverStatus.className = 'badge bg-warning';
     serverStatus.textContent = 'בבדיקה...';
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('security-results');
     if (results) {
@@ -683,13 +683,13 @@ function testPermissions() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס שרת
     if (serverStatus) {
       serverStatus.className = 'badge bg-success';
       serverStatus.textContent = 'פעיל';
     }
-    
+
     log('⚠️ בדיקת הרשאות הושלמה - יש להתייחס להרשאות קבצים');
   }, 700);
 }
@@ -697,14 +697,14 @@ function testPermissions() {
 function testMaintenance() {
   console.log('testMaintenance function called');
   log('🔧 מתחיל בדיקת תחזוקה...');
-  
+
   // עדכן סטטוס מסד נתונים (במקום תחזוקה)
   const databaseStatus = document.getElementById('database-status');
   if (databaseStatus) {
     databaseStatus.className = 'badge bg-warning';
     databaseStatus.textContent = 'בבדיקה...';
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('maintenance-results');
     if (results) {
@@ -717,13 +717,13 @@ function testMaintenance() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס מסד נתונים
     if (databaseStatus) {
       databaseStatus.className = 'badge bg-success';
       databaseStatus.textContent = 'פעיל';
     }
-    
+
     log('✅ בדיקת תחזוקה הושלמה');
   }, 800);
 }
@@ -731,14 +731,14 @@ function testMaintenance() {
 function testBackups() {
   console.log('testBackups function called');
   log('💾 מתחיל בדיקת גיבויים...');
-  
+
   // עדכן סטטוס מסד נתונים (במקום גיבויים)
   const databaseStatus = document.getElementById('database-status');
   if (databaseStatus) {
     databaseStatus.className = 'badge bg-warning';
     databaseStatus.textContent = 'בבדיקה...';
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('maintenance-results');
     if (results) {
@@ -751,13 +751,13 @@ function testBackups() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס מסד נתונים
     if (databaseStatus) {
       databaseStatus.className = 'badge bg-success';
       databaseStatus.textContent = 'פעיל';
     }
-    
+
     log('✅ בדיקת גיבויים הושלמה - גיבוי מעודכן');
   }, 900);
 }
@@ -765,14 +765,14 @@ function testBackups() {
 function testLogs() {
   console.log('testLogs function called');
   log('📋 מתחיל בדיקת קבצי לוג...');
-  
+
   // עדכן סטטוס שרת (במקום לוגים)
   const serverStatus = document.getElementById('server-status');
   if (serverStatus) {
     serverStatus.className = 'badge bg-warning';
     serverStatus.textContent = 'בבדיקה...';
   }
-  
+
   setTimeout(() => {
     const results = document.getElementById('maintenance-results');
     if (results) {
@@ -785,13 +785,13 @@ function testLogs() {
                 </div>
             `;
     }
-    
+
     // עדכן סטטוס שרת
     if (serverStatus) {
       serverStatus.className = 'badge bg-success';
       serverStatus.textContent = 'פעיל';
     }
-    
+
     log('⚠️ בדיקת לוגים הושלמה - מומלץ לנקות לוגים ישנים');
   }, 700);
 }
@@ -800,38 +800,38 @@ function testLogs() {
 function runAllTests() {
   console.log('runAllTests function called');
   log('🚀 מתחיל הרצת כל הבדיקות...');
-  
+
   // הרץ את כל הבדיקות ברצף עם השהיות מתאימות
   log('🔄 מריץ את כל הבדיקות ברצף...');
-  
+
   // בדיקות מערכת
   setTimeout(() => testSystem(), 100);
-  
+
   // בדיקות מסד נתונים
   setTimeout(() => testDatabase(), 600);
-  
+
   // בדיקות מטמון
   setTimeout(() => testCache(), 1200);
-  
+
   // בדיקות ביצועים
   setTimeout(() => testPerformance(), 1800);
-  
+
   // בדיקות שאילתות
   setTimeout(() => testQueries(), 2400);
-  
+
   // בדיקות נתונים חיצוניים
   setTimeout(() => testYahooFinance(), 3000);
-  
+
   // בדיקות מטמון נתונים
   setTimeout(() => testDataCache(), 3600);
-  
+
   log('✅ כל הבדיקות הוזמנו להרצה...');
 }
 
 function refreshAllStatus() {
   console.log('refreshAllStatus function called');
   log('🔄 מרענן את כל הסטטוסים...');
-  
+
   // עדכן כל הסטטוסים הקיימים
   const serverStatus = document.getElementById('server-status');
   const databaseStatus = document.getElementById('database-status');
@@ -839,7 +839,7 @@ function refreshAllStatus() {
   const performanceStatus = document.getElementById('performance-status');
   const queriesStatus = document.getElementById('queries-status');
   const externalDataStatus = document.getElementById('external-data-status');
-  
+
   if (serverStatus) {
     serverStatus.className = 'badge bg-success';
     serverStatus.textContent = 'פעיל';
@@ -864,7 +864,7 @@ function refreshAllStatus() {
     externalDataStatus.className = 'badge bg-success';
     externalDataStatus.textContent = 'פעיל';
   }
-  
+
   log('✅ כל הסטטוסים עודכנו');
 }
 
@@ -878,24 +878,24 @@ function toggleLogLevel() {
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', () => {
   console.log('=== DOMContentLoaded התחיל ===');
-  
+
   // בדיקת בריאות ראשונית
   log('🚀 מרכז בדיקות מערכת הנתונים החיצוניים מתחיל...');
   log('✅ מרכז בדיקות מערכת הנתונים החיצוניים מוכן לשימוש');
-  
+
   // בדיקה מיידית שכל הפונקציות עובדות
   console.log('=== בדיקת פונקציות ===');
   console.log('testNetwork function exists:', typeof testNetwork === 'function');
   console.log('testDataConnectors function exists:', typeof testDataConnectors === 'function');
   console.log('testSecurity function exists:', typeof testSecurity === 'function');
   console.log('testMaintenance function exists:', typeof testMaintenance === 'function');
-  
+
   // בדיקת סטטוס שרת
   setTimeout(() => {
     log('🌐 בודק סטטוס שרת...');
     log('✅ שרת פעיל ומוכן לבדיקות');
   }, 1000);
-  
+
   // בדיקה מיידית של פונקציות
   setTimeout(() => {
     log('🧪 מבצע בדיקה מיידית של פונקציות...');

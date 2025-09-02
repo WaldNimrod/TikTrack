@@ -1,0 +1,193 @@
+from flask import Blueprint, jsonify, request
+from sqlalchemy.orm import Session
+from config.database import get_db
+from models.execution import Execution
+from services.validation_service import ValidationService
+import logging
+
+logger = logging.getLogger(__name__)
+
+executions_bp = Blueprint('executions', __name__, url_prefix='/api/v1/executions')
+
+@executions_bp.route('/', methods=['GET'])
+def get_executions():
+    """Get all executions"""
+    try:
+        db: Session = next(get_db())
+        executions = db.query(Execution).all()
+        return jsonify({
+            "status": "success",
+            "data": [execution.to_dict() for execution in executions],
+            "message": "Executions retrieved successfully",
+            "version": "v1"
+        })
+    except Exception as e:
+        logger.error(f"Error getting executions: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Failed to retrieve executions"},
+            "version": "v1"
+        }), 500
+    finally:
+        db.close()
+
+@executions_bp.route('/<int:execution_id>', methods=['GET'])
+def get_execution(execution_id: int):
+    """Get execution by ID"""
+    try:
+        db: Session = next(get_db())
+        execution = db.query(Execution).filter(Execution.id == execution_id).first()
+        if execution:
+            return jsonify({
+                "status": "success",
+                "data": execution.to_dict(),
+                "message": "Execution retrieved successfully",
+                "version": "v1"
+            })
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Execution not found"},
+            "version": "v1"
+        }), 404
+    except Exception as e:
+        logger.error(f"Error getting execution {execution_id}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Failed to retrieve execution"},
+            "version": "v1"
+        }), 500
+    finally:
+        db.close()
+
+@executions_bp.route('/', methods=['POST'])
+def create_execution():
+    """Create new execution"""
+    try:
+        data = request.get_json()
+        logger.info(f"Received execution data: {data}")
+        db: Session = next(get_db())
+        
+        # Validate data against constraints
+        logger.info("Validating execution data before creation")
+        is_valid, errors = ValidationService.validate_data(db, 'executions', data)
+        if not is_valid:
+            error_message = "; ".join(errors)
+            logger.error(f"Execution validation failed: {error_message}")
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Execution validation failed: {error_message}"},
+                "version": "v1"
+            }), 400
+        
+        logger.info(f"Creating execution with data: {data}")
+        
+        # Convert date string to datetime object if provided
+        if 'date' in data and data['date']:
+            from datetime import datetime
+            try:
+                data['date'] = datetime.fromisoformat(data['date'].replace('Z', '+00:00'))
+            except ValueError:
+                data['date'] = datetime.strptime(data['date'], '%Y-%m-%dT%H:%M:%S')
+        
+        execution = Execution(**data)
+        db.add(execution)
+        db.commit()
+        db.refresh(execution)
+        return jsonify({
+            "status": "success",
+            "data": execution.to_dict(),
+            "message": "Execution created successfully",
+            "version": "v1"
+        }), 201
+    except Exception as e:
+        logger.error(f"Error creating execution: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "v1"
+        }), 400
+    finally:
+        db.close()
+
+@executions_bp.route('/<int:execution_id>', methods=['PUT'])
+def update_execution(execution_id: int):
+    """Update execution"""
+    try:
+        data = request.get_json()
+        db: Session = next(get_db())
+        execution = db.query(Execution).filter(Execution.id == execution_id).first()
+        if execution:
+            # Validate data against constraints
+            logger.info("Validating execution data before update")
+            is_valid, errors = ValidationService.validate_data(db, 'executions', data, exclude_id=execution_id)
+            if not is_valid:
+                error_message = "; ".join(errors)
+                logger.error(f"Execution validation failed: {error_message}")
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": f"Execution validation failed: {error_message}"},
+                    "version": "v1"
+                }), 400
+            
+            # Convert date string to datetime object if provided
+            if 'date' in data and data['date']:
+                from datetime import datetime
+                try:
+                    data['date'] = datetime.fromisoformat(data['date'].replace('Z', '+00:00'))
+                except ValueError:
+                    data['date'] = datetime.strptime(data['date'], '%Y-%m-%dT%H:%M:%S')
+            
+            for key, value in data.items():
+                if hasattr(execution, key):
+                    setattr(execution, key, value)
+            db.commit()
+            db.refresh(execution)
+            return jsonify({
+                "status": "success",
+                "data": execution.to_dict(),
+                "message": "Execution updated successfully",
+                "version": "v1"
+            })
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Execution not found"},
+            "version": "v1"
+        }), 404
+    except Exception as e:
+        logger.error(f"Error updating execution {execution_id}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "v1"
+        }), 400
+    finally:
+        db.close()
+
+@executions_bp.route('/<int:execution_id>', methods=['DELETE'])
+def delete_execution(execution_id: int):
+    """Delete execution"""
+    try:
+        db: Session = next(get_db())
+        execution = db.query(Execution).filter(Execution.id == execution_id).first()
+        if execution:
+            db.delete(execution)
+            db.commit()
+            return jsonify({
+                "status": "success",
+                "message": "Execution deleted successfully",
+                "version": "v1"
+            })
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Execution not found"},
+            "version": "v1"
+        }), 404
+    except Exception as e:
+        logger.error(f"Error deleting execution {execution_id}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": str(e)},
+            "version": "v1"
+        }), 500
+    finally:
+        db.close()

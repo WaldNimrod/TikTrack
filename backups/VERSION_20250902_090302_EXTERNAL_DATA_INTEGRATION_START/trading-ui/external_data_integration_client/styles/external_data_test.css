@@ -1,0 +1,300 @@
+/* External Data Integration Test Page Styles */
+
+/* RTL Support */
+body {
+    direction: rtl;
+    text-align: right;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Status Cards */
+.status-card {
+    transition: transform 0.2s ease-in-out;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.status-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.status-card .card-body {
+    padding: 1.5rem;
+}
+
+.status-card i {
+    transition: color 0.3s ease;
+}
+
+/* Quote Display */
+.quote-item {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid #007bff;
+    transition: all 0.3s ease;
+}
+
+.quote-item:hover {
+    transform: translateX(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.quote-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.quote-symbol {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #495057;
+}
+
+.quote-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #28a745;
+}
+
+.quote-change {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.change-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.change-label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 0.2rem;
+}
+
+.change-value {
+    font-weight: bold;
+}
+
+.change-positive {
+    color: #28a745;
+}
+
+.change-negative {
+    color: #dc3545;
+}
+
+.change-neutral {
+    color: #6c757d;
+}
+
+/* Log Panel */
+.log-panel {
+    height: 400px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 1rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.log-entry {
+    margin-bottom: 0.5rem;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.log-timestamp {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+.log-level-info {
+    color: #007bff;
+}
+
+.log-level-success {
+    color: #28a745;
+}
+
+.log-level-warning {
+    color: #ffc107;
+}
+
+.log-level-error {
+    color: #dc3545;
+}
+
+.log-message {
+    margin-right: 0.5rem;
+}
+
+/* Loading Animation */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Badge Animations */
+.badge {
+    transition: all 0.3s ease;
+}
+
+.badge:hover {
+    transform: scale(1.1);
+}
+
+/* Button Enhancements */
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Card Enhancements */
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    border-bottom: none;
+}
+
+/* Form Controls */
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+.input-group .btn {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group .form-control {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .status-card .card-body {
+        padding: 1rem;
+    }
+    
+    .quote-item {
+        padding: 0.75rem;
+    }
+    
+    .quote-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .log-panel {
+        height: 300px;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .quote-item {
+        background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+        color: #f8f9fa;
+    }
+    
+    .log-panel {
+        background-color: #343a40;
+        color: #f8f9fa;
+        border-color: #495057;
+    }
+    
+    .log-entry {
+        border-bottom-color: #495057;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+/* Utility Classes */
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.user-select-none {
+    user-select: none;
+}
+
+/* Custom Scrollbar */
+.log-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.log-panel::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.log-panel::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.log-panel::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}

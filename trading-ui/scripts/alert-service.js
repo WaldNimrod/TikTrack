@@ -121,7 +121,7 @@ function getAlertStatusClass(status, isTriggered) {
  * @param {string} isTriggered - Triggered flag
  * @returns {boolean} true if alert is active
  */
-function isAlertActive(status, isTriggered) {
+function isAlertActive(status, _isTriggered) {
   return status === 'open';
 }
 
@@ -271,13 +271,13 @@ async function deleteAlert(alertId) {
     const result = await response.json();
 
     if (response.ok && result.status === 'success') {
-      console.log('✅ התראה נמחקה בהצלחה');
+      // התראה נמחקה בהצלחה
       if (window.showSuccessNotification) {
         window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!');
       }
       return true;
     } else {
-      console.error('❌ שגיאה במחיקת התראה:', result);
+      // שגיאה במחיקת התראה
 
       // טיפול בשגיאות מהשרת
       if (result.error && result.error.message) {
@@ -300,7 +300,7 @@ async function deleteAlert(alertId) {
       return false;
     }
   } catch (error) {
-    console.error('❌ שגיאה במחיקת התראה:', error);
+    // שגיאה במחיקת התראה
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה', 'שגיאה במחיקת התראה - בדוק את חיבור השרת');
     }

@@ -912,45 +912,68 @@ WebSocket Server (Flask-SocketIO) → Event Broadcasting → Frontend Clients
 
 ### אירועי WebSocket
 
-#### 1. System Events
+#### 1. System Events - Background Tasks
 ```javascript
-// התראות על משימות ברקע
+// התראות על משימות ברקע - מוצגות כהודעות pop-up
 socket.on('background_task_started', (data) => {
   showInfoNotification('משימה ברקע', `התחילה: ${data.task_name}`);
+  // גם נשמר בהיסטוריית התראות למרכז ההתראות
 });
 
 socket.on('background_task_completed', (data) => {
   showSuccessNotification('משימה הושלמה', `${data.task_name} הושלמה בהצלחה`);
+  // עדכון אוטומטי של עמוד Background Tasks אם פתוח
 });
 
 socket.on('background_task_failed', (data) => {
   showErrorNotification('שגיאה במשימה', `${data.task_name} נכשלה: ${data.error}`);
+  // התראה מיידית + רישום בלוג השגיאות
 });
 ```
 
-#### 2. Database Events
+**משוב למשתמש:**
+- **מיידי**: הודעת pop-up זמנית
+- **מתמשך**: עדכון בעמוד Background Tasks  
+- **ארכיון**: שמירה במרכז ההתראות (מוצע)
+
+#### 2. Database Events - Data Operations
 ```javascript
-// התראות על שינויים בנתונים
+// התראות על שינויים בנתונים - מוצגות כהודעות pop-up
 socket.on('data_updated', (data) => {
   showInfoNotification('נתונים עודכנו', `${data.table} עודכן בהצלחה`);
+  // עדכון אוטומטי של הטבלה הרלוונטית בעמוד הנוכחי
 });
 
 socket.on('data_error', (data) => {
   showErrorNotification('שגיאת נתונים', `שגיאה ב-${data.table}: ${data.error}`);
+  // התראה מיידית + אפשרות לנסות שוב
 });
 ```
 
-#### 3. External Data Events
+**משוב למשתמש:**
+- **מיידי**: הודעת pop-up זמנית
+- **דינמי**: עדכון הטבלה הרלוונטית בזמן אמת
+- **ארכיון**: שמירה במרכז ההתראות (מוצע)
+
+#### 3. External Data Events - Provider Updates
 ```javascript
-// התראות על עדכוני נתונים חיצוניים
+// התראות על עדכוני נתונים חיצוניים - מוצגות כהודעות pop-up
 socket.on('external_data_update', (data) => {
   showSuccessNotification('נתונים חיצוניים', `${data.provider} עודכן: ${data.ticker_count} טיקרים`);
+  // עדכון אוטומטי של נתוני המחירים בכל הטבלאות הפתוחות
 });
 
 socket.on('external_data_error', (data) => {
   showErrorNotification('שגיאת נתונים חיצוניים', `${data.provider}: ${data.error}`);
+  // התראה מיידית + הצגת פרטי השגיאה במרכז ההתראות
 });
 ```
+
+**משוב למשתמש:**
+- **מיידי**: הודעת pop-up זמנית
+- **דינמי**: עדכון נתוני מחירים בזמן אמת
+- **מתמשך**: רישום בלוג הנתונים החיצוניים
+- **ארכיון**: שמירה במרכז ההתראות (מוצע)
 
 ### תצורת משתמש
 - **התראות בזמן אמת** - הפעלה/כיבוי
@@ -958,6 +981,8 @@ socket.on('external_data_error', (data) => {
 - **זמן הצגה** - משך זמן הצגת הודעות
 - **צלילים** - הפעלת צלילי התראה
 - **דחיסה** - דחיסת התראות דומות
+- **מרכז התראות** - הצגת התראות בעמוד ייעודי
+- **היסטוריה** - שמירת התראות לצפייה מאוחרת
 
 ### אבטחה
 - **Authentication** - אימות משתמשים לחיבורי WebSocket

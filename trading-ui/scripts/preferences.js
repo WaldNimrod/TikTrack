@@ -296,7 +296,7 @@ function updateUI() {
 
   // עדכון ממשק הצבעים
   updateNumericValueColorsUI();
-  
+
   // עדכון ממשק צבעי הישויות
   updateEntityColorsUI();
 

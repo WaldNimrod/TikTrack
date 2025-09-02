@@ -799,7 +799,7 @@ function validateAccountData(accountData) {
   }
 
   // בדיקת תווים לא חוקיים
-  const invalidChars = /[<>\"'&]/;
+  const invalidChars = /[<>"'&]/;
   if (invalidChars.test(trimmedName)) {
     return { isValid: false, message: 'שם החשבון מכיל תווים לא חוקיים' };
   }

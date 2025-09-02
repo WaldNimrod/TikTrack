@@ -754,7 +754,7 @@ function getTradePlanDetails(planId, data = null) {
   try {
     // נסה לקבל את פרטי התכנון מהנתונים הגלובליים
     if (window.trade_plansData && Array.isArray(window.trade_plansData)) {
-      const plan = window.trade_plansData.find(p => p.id == planId);
+      const plan = window.trade_plansData.find(p => p.id === planId);
       if (plan) {
         // נסה לקבל את הסימבול מהטיקר
         let symbol = 'לא מוגדר';
@@ -798,9 +798,9 @@ function getTradePlanDetails(planId, data = null) {
 
     // נסה לקבל מהנתונים הגלובליים של הטיקר
     if (window.tickersData && Array.isArray(window.tickersData)) {
-      const plan = window.trade_plansData?.find(p => p.id == planId);
+      const plan = window.trade_plansData?.find(p => p.id === planId);
       if (plan && plan.ticker_id) {
-        const ticker = window.tickersData.find(t => t.id == plan.ticker_id);
+        const ticker = window.tickersData.find(t => t.id === plan.ticker_id);
         if (ticker && ticker.symbol) {
           const date = plan.created_at ? new Date(plan.created_at).toLocaleDateString('he-IL') : 'לא מוגדר';
           return `לתוכנית השקעה ב${ticker.symbol} מתאריך ${date}`;

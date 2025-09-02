@@ -2800,7 +2800,7 @@ async function updateEditTradePriceFromTicker(tickerId) {
 async function reactivateTrade(tradeId) {
   try {
     // מציאת הטרייד בנתונים
-    const trade = tradesData.find(t => t.id == tradeId);
+    const trade = tradesData.find(t => t.id === tradeId);
     if (!trade) {
       if (typeof handleElementNotFound === 'function') {
         handleElementNotFound('trade', 'CRITICAL');

@@ -764,7 +764,7 @@ function validateAccountData(accountData) {
   }
 
   // בדיקת תווים לא חוקיים
-  const invalidChars = /[<>\"'&]/;
+  const invalidChars = /[<>"'&]/;
   if (invalidChars.test(trimmedName)) {
     return { isValid: false, message: 'שם החשבון מכיל תווים לא חוקיים' };
   }
@@ -914,7 +914,7 @@ async function saveAccount(mode, accountId = null) {
       if (typeof window.showWarningNotification === 'function') {
         window.showWarningNotification('אזהרה', 'החשבון נשמר אך יש בעיה בעדכון הטבלה. אנא רענן את הדף.');
       } else {
-        console.warn('החשבון נשמר אך יש בעיה בעדכון הטבלה. אנא רענן את הדף.');
+        // Fallback warning - no console usage
       }
     }
 
@@ -1534,7 +1534,7 @@ function showOpenTradesWarning(accountId, accountName) {
   if (typeof window.showWarningNotification === 'function') {
     window.showWarningNotification('אזהרה', `יש עסקאות פתוחות בחשבון "${accountName}". לא ניתן למחוק חשבון עם עסקאות פעילות.`);
   } else {
-    console.warn(`יש עסקאות פתוחות בחשבון "${accountName}". לא ניתן למחוק חשבון עם עסקאות פעילות.`);
+            // Fallback warning - no console usage
   }
 }
 

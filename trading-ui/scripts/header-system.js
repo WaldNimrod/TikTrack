@@ -4638,6 +4638,14 @@ async function clearDevelopmentCache(event) {
                document.querySelector('a[onclick*="clearDevelopmentCache"]');
     }
 
+    // אם עדיין לא מצאנו את הכפתור, נחפש לפי הטקסט
+    if (!button) {
+      button = document.querySelector('a:contains("נקה Cache (פיתוח)")') ||
+               Array.from(document.querySelectorAll('a')).find(a => 
+                 a.textContent.includes('נקה Cache (פיתוח)')
+               );
+    }
+
     // הצגת הודעת טעינה
     if (button) {
       const originalText = button.innerHTML;
@@ -4648,13 +4656,13 @@ async function clearDevelopmentCache(event) {
 
     // ===== שלב 1: ניקוי Cache של הדפדפן =====
     console.log('🧹 מנקה Cache של הדפדפן...');
-    
+
     // ניקוי localStorage (רק פריטים שקשורים למערכת)
     try {
       const keysToKeep = ['user-preferences', 'theme', 'language', 'auth-token'];
       const allKeys = Object.keys(localStorage);
       let clearedLocalStorage = 0;
-      
+
       allKeys.forEach(key => {
         if (!keysToKeep.includes(key)) {
           localStorage.removeItem(key);
@@ -4679,7 +4687,7 @@ async function clearDevelopmentCache(event) {
     try {
       if ('indexedDB' in window) {
         const databases = await indexedDB.databases();
-        for (let db of databases) {
+        for (const db of databases) {
           if (db.name && !db.name.includes('system')) {
             await indexedDB.deleteDatabase(db.name);
             console.log(`🗑️ IndexedDB נמחק: ${db.name}`);
@@ -4711,7 +4719,7 @@ async function clearDevelopmentCache(event) {
     try {
       if ('serviceWorker' in navigator) {
         const registrations = await navigator.serviceWorker.getRegistrations();
-        for (let registration of registrations) {
+        for (const registration of registrations) {
           await registration.unregister();
           console.log('🗑️ Service Worker נמחק');
         }
@@ -4726,7 +4734,7 @@ async function clearDevelopmentCache(event) {
       if ('caches' in window) {
         const cacheNames = await caches.keys();
         await Promise.all(
-          cacheNames.map(cacheName => caches.delete(cacheName))
+          cacheNames.map(cacheName => caches.delete(cacheName)),
         );
         console.log(`✅ Cache API נוקה: ${cacheNames.length} caches נמחקו`);
       }
@@ -4771,7 +4779,7 @@ async function clearDevelopmentCache(event) {
 
     // ===== הצגת הודעת הצלחה =====
     console.log('🎉 כל סוגי ה-Cache נוקו בהצלחה!');
-    
+
     if (typeof window.showSuccessNotification === 'function') {
       window.showSuccessNotification('הצלחה', 'Cache נוקה בהצלחה - כולל דפדפן ושרת');
     } else if (typeof window.showNotification === 'function') {
@@ -4782,11 +4790,11 @@ async function clearDevelopmentCache(event) {
 
     // ===== רענון הדף =====
     console.log('🔄 הדף ירענן בעוד 3 שניות...');
-    
+
     if (typeof window.showInfoNotification === 'function') {
       window.showInfoNotification('מידע', 'הדף ירענן בעוד 3 שניות...');
     }
-    
+
     setTimeout(() => {
       if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('מידע', 'הדף ירענן בעוד רגע...');
@@ -4799,7 +4807,7 @@ async function clearDevelopmentCache(event) {
 
   } catch (error) {
     console.error('❌ שגיאה כללית בניקוי Cache:', error);
-    
+
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה כללית בניקוי Cache: ' + error.message);
     } else {

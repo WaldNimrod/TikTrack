@@ -425,7 +425,7 @@ class RealtimeNotificationsClient {
   // ===== ROOM MANAGEMENT =====
 
   joinUserRoom() {
-    // TODO: Implement user authentication and room joining
+    // TODO: Implement user authentication and room joining - ראה: CENTRAL_TASKS_TODO.md (משימה 6)
     // For now, join a default room
     this.joinRoom('default');
   }

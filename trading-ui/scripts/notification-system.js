@@ -4,80 +4,32 @@
  *
  * מערכת התראות מרכזית לפרויקט TikTrack
  *
- * קובץ זה מכיל שלושה מערכות עיקריות:
- * 1. ALERTS SYSTEM - התראות עסקיות לתנאי שוק
- * 2. NOTIFICATION SYSTEM - הודעות מערכת למשוב משתמש
- * 3. LINKED ITEMS SYSTEM - הצגה וניהול פריטים מקושרים
+ * קובץ זה מכיל שתי מערכות עיקריות:
+ * 1. NOTIFICATION SYSTEM - הודעות מערכת למשוב משתמש
+ * 2. WARNING SYSTEM - אזהרות ואישורים מתקדמים
+ *
+ * הערה: ALERTS SYSTEM הועבר לרשימת המשימות העתידיות
+ * הערה: LINKED ITEMS SYSTEM הועבר לקובץ linked-items.js
  *
  * קובץ: trading-ui/scripts/notification-system.js
- * גרסה: 3.1
- * עדכון אחרון: 31 באוגוסט 2025
+ * גרסה: 3.2
+ * עדכון אחרון: 2 בספטמבר 2025
  *
- * תיקונים אחרונים (31 באוגוסט 2025):
- * - שיפור תמיכה בעמוד תכנונים
- * - תיקון הודעות הצלחה ושגיאה
- * - שיפור מערכת אישור מחיקה
- * - תמיכה במערכת ביטול תכנונים
+ * שינויים אחרונים (2 בספטמבר 2025):
+ * - הסרת ALERTS SYSTEM (הועבר למשימות עתידיות)
+ * - הסרת LINKED ITEMS SYSTEM (הועבר ל-linked-items.js)
+ * - מערכת התראות מתמקדת בהודעות מערכת ואישורים
  *
  * תלויות:
- * - linked-items.js (לפונקציות הצגת מודלים)
  * - Bootstrap 5.3.0 (לפונקציונליות מודלים)
  *
  * דוקומנטציה מפורטת: documentation/frontend/NOTIFICATION_SYSTEM.md
+ * רשימת משימות עתידיות: documentation/todo/FEATURE_ROADMAP.md
  */
 
 // ===== ALERTS SYSTEM FUNCTIONS =====
-// These functions handle business alerts for market conditions
-
-/**
- * Create a new alert
- * ALERTS SYSTEM - Creates business alert for market conditions
- *
- * @param {Object} alertData - Alert data object
- * @returns {Promise} Promise that resolves when alert is created
- */
-function createAlert(alertData) {
-  // Implementation for creating business alerts
-  // TODO: Implement alert creation logic
-}
-
-
-/**
- * Update an alert
- * ALERTS SYSTEM - Updates existing business alert
- *
- * @param {number} alertId - ID of alert to update
- * @param {Object} alertData - Updated alert data
- * @returns {Promise} Promise that resolves when alert is updated
- */
-function updateAlert(alertId, alertData) {
-  // Implementation for updating business alerts
-  // TODO: Implement alert update logic
-}
-
-/**
- * Mark alert as triggered
- * ALERTS SYSTEM - Marks business alert as triggered when conditions are met
- *
- * @param {number} alertId - ID of alert to mark as triggered
- * @returns {Promise} Promise that resolves when alert is marked
- */
-function markAlertAsTriggered(alertId) {
-  // Implementation for marking alerts as triggered
-  // TODO: Implement alert trigger logic
-}
-
-/**
- * Mark alert as read
- * ALERTS SYSTEM - Marks business alert as read by user
- *
- * @param {number} alertId - ID of alert to mark as read
- * @returns {Promise} Promise that resolves when alert is marked
- */
-function markAlertAsRead(alertId) {
-  // Implementation for marking alerts as read
-  // TODO: Implement alert read logic
-}
+// These functions have been moved to future features roadmap
+// See: documentation/todo/FEATURE_ROADMAP.md
 
 
 // ===== NOTIFICATION SYSTEM FUNCTIONS =====
@@ -531,10 +483,7 @@ function showNotificationLegacy(message, type = 'info', duration = 4000) {
 // ===== EXPORT TO GLOBAL SCOPE =====
 
 // Export ALERTS SYSTEM functions to global scope
-window.createAlert = createAlert;
-window.updateAlert = updateAlert;
-window.markAlertAsTriggered = markAlertAsTriggered;
-window.markAlertAsRead = markAlertAsRead;
+// ALERTS SYSTEM functions moved to future features roadmap
 
 
 // Export NOTIFICATION SYSTEM functions to global scope
@@ -1140,10 +1089,7 @@ window.showValidationWarningLegacy = showValidationWarningLegacy;
 // Export the module itself
 window.notificationSystem = {
   // ALERTS SYSTEM functions
-  createAlert,
-  updateAlert,
-  markAlertAsTriggered,
-  markAlertAsRead,
+  // ALERTS SYSTEM functions moved to future features roadmap
 
   // NOTIFICATION SYSTEM functions
   showNotification,

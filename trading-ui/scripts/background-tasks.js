@@ -748,7 +748,7 @@ window.showTaskDetails = function(taskName) {
 };
 
 window.showHistoryDetails = function(executionId) {
-  // TODO: Implement history details modal
+  // TODO: Implement history details modal - ראה: CENTRAL_TASKS_TODO.md (משימה 5)
   utils.showNotification('פונקציונליות זו תתווסף בקרוב', 'info');
 };
 

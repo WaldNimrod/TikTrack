@@ -2374,7 +2374,7 @@ function goToTickerPage(symbol) {
   } else {
     // מעבר לדף טיקר - בפיתוח
   }
-  // TODO: ניתוב לדף טיקר כשהפיצ'ר יהיה מוכן
+  // TODO: ניתוב לדף טיקר - ראה: CENTRAL_TASKS_TODO.md (משימה 1)
 }
 
 /**
@@ -2421,7 +2421,7 @@ function addNewTicker() {
   } else {
     // הוספת טיקר - בפיתוח
   }
-  // TODO: פתיחת מודל הוספת טיקר
+  // TODO: פתיחת מודל הוספת טיקר - ראה: CENTRAL_TASKS_TODO.md (משימה 2)
 }
 
 /**
@@ -2434,7 +2434,7 @@ function addNewPlan() {
   } else {
     // הוספת תכנון - בפיתוח
   }
-  // TODO: פתיחת מודל הוספת תכנון
+  // TODO: פתיחת מודל הוספת תכנון - ראה: CENTRAL_TASKS_TODO.md (משימה 3)
 }
 
 /**
@@ -2447,7 +2447,7 @@ function addNewTrade() {
   } else {
     // הוספת טרייד - בפיתוח
   }
-  // TODO: פתיחת מודל הוספת טרייד
+  // TODO: פתיחת מודל הוספת טרייד - ראה: CENTRAL_TASKS_TODO.md (משימה 4)
 }
 
 /**

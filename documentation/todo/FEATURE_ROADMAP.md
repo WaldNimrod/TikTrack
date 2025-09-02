@@ -541,7 +541,40 @@
 
 ---
 
-### 28. Top Section Spacing Enhancement
+### 28. ALERTS SYSTEM - מערכת התראות עסקיות לתנאי שוק
+**Status:** 🟡 Planned  
+**Priority:** Medium  
+**Description:** מערכת התראות עסקיות אוטומטיות לתנאי שוק, הועבר מ-notification-system.js
+
+**Requirements:**
+- [ ] **createAlert** - יצירת התראה עסקית חדשה לתנאי שוק
+- [ ] **updateAlert** - עדכון התראה עסקית קיימת
+- [ ] **markAlertAsTriggered** - סימון התראה כמופעלת כאשר התנאים מתקיימים
+- [ ] **markAlertAsRead** - סימון התראה כנקראה על ידי המשתמש
+
+**Technical Requirements:**
+- [ ] Integration with market data APIs
+- [ ] Real-time condition monitoring
+- [ ] Database schema for alerts storage
+- [ ] User notification system integration
+- [ ] Alert history and management interface
+
+**Features:**
+- [ ] Business alerts for market conditions
+- [ ] Automatic alert triggering
+- [ ] User alert management
+- [ ] Alert history tracking
+- [ ] Customizable alert conditions
+
+**Benefits:**
+- [ ] Proactive market condition notifications
+- [ ] Improved trading decision support
+- [ ] Automated market monitoring
+- [ ] Better risk management
+
+---
+
+### 29. Top Section Spacing Enhancement
 **Status:** 🟡 Planned  
 **Priority:** Low  
 **Description:** Add consistent top margin/spacing to top-section elements across all pages
@@ -624,5 +657,5 @@
 
 ---
 
-*Last Updated: [Current Date]*
-*Version: 1.0*
+*Last Updated: 2 בספטמבר 2025*
+*Version: 1.1*

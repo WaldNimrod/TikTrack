@@ -115,8 +115,22 @@ document.addEventListener('DOMContentLoaded', function() {
   // עצור כל ניקוי אוטומטי קיים בטעינת הדף
   stopAutoClearConsole();
 
+  // וודא שהגדרות ברירת המחדל לא מפעילות ניקוי אוטומטי
+  const currentSettings = getConsoleSettings();
+  if (currentSettings.autoClear) {
+    // אם יש הגדרה לשמירת ניקוי אוטומטי, בטל אותה בטעינת הדף
+    currentSettings.autoClear = false;
+    saveConsoleSettings(currentSettings);
+    console.log('⚠️ ניקוי אוטומטי בוטל בטעינת הדף - נדרש הפעלה ידנית');
+  }
+
   // אל תפעיל ניקוי אוטומטי בטעינת הדף - רק אם המשתמש מפעיל במפורש
   console.log('Console cleanup utility loaded - manual control only');
-  isPageInitializing = false; // סיימנו את טעינת הדף
+  
+  // המתן קצת לפני שחרור הדגל למניעת ניקוי console
+  setTimeout(() => {
+    isPageInitializing = false; // סיימנו את טעינת הדף
+    console.log('✅ הדגל למניעת ניקוי console שוחרר');
+  }, 2000); // המתן שתי שניות
 });
 

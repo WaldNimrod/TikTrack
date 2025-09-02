@@ -85,25 +85,7 @@ function markAlertAsRead(alertId) {
 
 // ===== LINKED ITEMS SYSTEM FUNCTIONS =====
 // These functions handle linked items display and management
-
-
-/**
- * Load linked items data from server
- * LINKED ITEMS SYSTEM - Fetches linked items data for any entity type
- *
- * @param {string} itemType - Type of the item
- * @param {number|string} itemId - ID of the item
- * @returns {Object} Linked items data
- */
-async function loadLinkedItemsData(itemType, itemId) {
-  const response = await fetch(`/api/v1/linked-items/${itemType}/${itemId}`);
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  return await response.json();
-}
+// NOTE: loadLinkedItemsData has been moved to linked-items.js
 
 /**
  * Create notification container if not exists
@@ -475,11 +457,26 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
           onCancel,
         );
       } else {
-        const confirmed = confirm(message);
-        if (confirmed && onConfirm) {
-          onConfirm();
-        } else if (!confirmed && onCancel) {
-          onCancel();
+        // Fallback למערכת ההודעות שלנו
+        if (typeof window.showWarningNotification === 'function') {
+          window.showWarningNotification('אישור נדרש', message);
+          // הצג כפתורי אישור/ביטול
+          setTimeout(() => {
+            if (typeof window.showConfirmationButtons === 'function') {
+              window.showConfirmationButtons(message, onConfirm, onCancel);
+            } else {
+              // Fallback אחרון - הצג הודעה בלבד
+              console.warn('אישור נדרש:', message);
+              if (onConfirm) {
+                onConfirm();
+              }
+            }
+          }, 1000);
+        } else {
+          console.warn('אישור נדרש:', message);
+          if (onConfirm) {
+            onConfirm();
+          }
         }
       }
     }
@@ -551,7 +548,7 @@ window.showConfirmationDialog = showConfirmationDialog;
 window.showDeleteWarning = showDeleteWarning;
 
 // Export LINKED ITEMS SYSTEM functions to global scope
-window.loadLinkedItemsData = loadLinkedItemsData;
+// loadLinkedItemsData moved to linked-items.js
 
 // ===== WARNING SYSTEM FUNCTIONS =====
 // These functions handle warning modals and confirmations
@@ -1081,10 +1078,26 @@ function showCancelWarning(itemType, itemName, onConfirm = null, onCancel = null
       const message = `האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?`;
       window.showConfirmationDialog(title, message, onConfirm, onCancel);
     } else {
-      // Fallback to simple confirm
-      const confirmed = confirm(`האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?`);
-      if (confirmed && onConfirm) {
-        onConfirm();
+      // Fallback למערכת ההודעות שלנו
+      if (typeof window.showWarningNotification === 'function') {
+        window.showWarningNotification('אישור נדרש', `האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?`);
+        // הצג כפתורי אישור/ביטול
+        setTimeout(() => {
+          if (typeof window.showConfirmationButtons === 'function') {
+            window.showConfirmationButtons(`האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?`, onConfirm, onCancel);
+          } else {
+            // Fallback אחרון - הצג הודעה בלבד
+            console.warn('אישור נדרש: ביטול פריט');
+            if (onConfirm) {
+              onConfirm();
+            }
+          }
+        }, 1000);
+      } else {
+        console.warn('אישור נדרש: ביטול פריט');
+        if (onConfirm) {
+          onConfirm();
+        }
       }
     }
   }
@@ -1146,7 +1159,7 @@ window.notificationSystem = {
   showDeleteWarning,
 
   // LINKED ITEMS SYSTEM functions
-  loadLinkedItemsData,
+  // loadLinkedItemsData moved to linked-items.js
 
   // WARNING SYSTEM functions
   WARNING_TYPES,
@@ -1169,3 +1182,5 @@ window.notificationSystem = {
 // showConfirmationDialog קיים
 // window.showDeleteWarning קיים
 // window.showConfirmationDialog קיים
+
+console.log('=== מערכת ההודעות נטענה בהצלחה ===');

@@ -245,6 +245,18 @@ class HeaderSystem {
         box-shadow: none;
         background: transparent;
       }
+      
+      /* Development tools icon styling */
+      .tiktrack-nav-link[data-page="development-tools"] .nav-text {
+        font-size: 0.8rem;
+        color: #6c757d;
+        opacity: 0.8;
+      }
+      
+      .tiktrack-nav-link[data-page="development-tools"]:hover .nav-text {
+        color: #495057;
+        opacity: 1;
+      }
 
       .tiktrack-nav-item.active .tiktrack-nav-link {
         color: #000000;
@@ -342,6 +354,23 @@ class HeaderSystem {
            .tiktrack-dropdown-item:hover {
              background: #F2F2F7;
              color: #3C3C43;
+           }
+           
+           /* Section headers styling */
+           .dropdown-section-header {
+             padding: 0.5rem 1rem;
+             font-size: 0.8rem;
+             font-weight: 600;
+             color: #6c757d;
+             background-color: #f8f9fa;
+             border-bottom: 1px solid #dee2e6;
+             cursor: default;
+             user-select: none;
+           }
+           
+           .dropdown-section-header:hover {
+             background-color: #f8f9fa;
+             color: #6c757d;
            }
 
       /* Filters */
@@ -624,30 +653,41 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/constraints">אילוצים</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">מיפוי סקריפטים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/system-test-center">נתונים חיצוניים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/style_demonstration">הדגמת סגנונות</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/designs">עיצובים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">מטריקס פונקציות</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/js-map">מפת JS</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/background-tasks">ניהול משימות ברקע</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/notifications-center">מרכז התראות</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/cache-test">בדיקת Cache</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/server-monitor">ניטור שרת</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/test_api">בדיקת API</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/test_performance">בדיקת ביצועים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/test_system_stats">סטטיסטיקות מערכת</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/test_models">בדיקת מודלים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/test_external_data">בדיקת נתונים חיצוניים</a></li>
-                        <li><hr class="dropdown-divider"></li>
+                      </ul>
+                    </li>
+                    
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="development-tools">
+                        <span class="nav-text">🔧</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
+                      </a>
+                      <ul class="tiktrack-dropdown-menu">
+                        <!-- 🗑️ פעולות מערכת -->
+                        <li class="dropdown-section-header">🗑️ פעולות מערכת</li>
                         <li><a class="tiktrack-dropdown-item" href="#" onclick="clearDevelopmentCache(event)" style="color: #ff6b6b;">
                           <i class="fas fa-trash"></i> נקה Cache (פיתוח)
                         </a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/notifications-center">מרכז התראות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/background-tasks">ניהול משימות ברקע</a></li>
+                        
+                        <li><hr class="dropdown-divider"></li>
+                        
+                        <!-- 🎨 ממשק משתמש -->
+                        <li class="dropdown-section-header">🎨 ממשק משתמש</li>
+                        <li><a class="tiktrack-dropdown-item" href="/style_demonstration">הדגמת סגנונות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/numeric-value-colors-demo">הדגמת צבעים לערכים מספריים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/designs">עיצובים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">מיפוי סקריפטים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/js-map">מפת JS</a></li>
+                        
+                        <li><hr class="dropdown-divider"></li>
+                        
+                        <!-- 🔍 בדיקות ונתונים -->
+                        <li class="dropdown-section-header">🔍 בדיקות ונתונים</li>
+                        <li><a class="tiktrack-dropdown-item" href="/system-test-center">נתונים חיצוניים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/server-monitor">ניטור שרת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/cache-test">בדיקת Cache</a></li>
                       </ul>
                     </li>
                   </ul>
@@ -4580,14 +4620,14 @@ window.applyFilter = applyFilter;
 // ===== פונקציות פיתוח =====
 
 /**
- * ניקוי Cache מהיר לפיתוח
+ * ניקוי Cache מהיר לפיתוח - גרסה משופרת
  */
 async function clearDevelopmentCache(event) {
   // הגדרת המשתנה button בתחילת הפונקציה
   let button = null;
 
   try {
-    console.log('🔄 מנקה Cache...');
+    console.log('🔄 מתחיל ניקוי Cache מקיף...');
 
     // מציאת הכפתור - קודם מנסה event.target, אחרת מחפש ב-DOM
     if (event && event.target) {
@@ -4603,41 +4643,167 @@ async function clearDevelopmentCache(event) {
       const originalText = button.innerHTML;
       button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מנקה...';
       button.disabled = true;
-
-      // שמירת הטקסט המקורי כדי להחזיר אותו
       button.dataset.originalText = originalText;
     }
 
+    // ===== שלב 1: ניקוי Cache של הדפדפן =====
+    console.log('🧹 מנקה Cache של הדפדפן...');
+    
+    // ניקוי localStorage (רק פריטים שקשורים למערכת)
+    try {
+      const keysToKeep = ['user-preferences', 'theme', 'language', 'auth-token'];
+      const allKeys = Object.keys(localStorage);
+      let clearedLocalStorage = 0;
+      
+      allKeys.forEach(key => {
+        if (!keysToKeep.includes(key)) {
+          localStorage.removeItem(key);
+          clearedLocalStorage++;
+        }
+      });
+      console.log(`✅ localStorage נוקה: ${clearedLocalStorage} פריטים נמחקו`);
+    } catch (e) {
+      console.warn('⚠️ לא ניתן לנקות localStorage:', e);
+    }
+
+    // ניקוי sessionStorage
+    try {
+      const sessionKeys = Object.keys(sessionStorage);
+      sessionStorage.clear();
+      console.log(`✅ sessionStorage נוקה: ${sessionKeys.length} פריטים נמחקו`);
+    } catch (e) {
+      console.warn('⚠️ לא ניתן לנקות sessionStorage:', e);
+    }
+
+    // ניקוי IndexedDB
+    try {
+      if ('indexedDB' in window) {
+        const databases = await indexedDB.databases();
+        for (let db of databases) {
+          if (db.name && !db.name.includes('system')) {
+            await indexedDB.deleteDatabase(db.name);
+            console.log(`🗑️ IndexedDB נמחק: ${db.name}`);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('⚠️ לא ניתן לנקות IndexedDB:', e);
+    }
+
+    // ===== שלב 2: ניקוי Cache של השרת =====
+    console.log('🔄 מנקה Cache של השרת...');
     const response = await fetch('/api/v1/cache/clear', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
 
     if (response.ok) {
       const result = await response.json();
-      console.log('✅ Cache נוקה בהצלחה:', result);
-
-      // הצגת הודעת הצלחה
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('הצלחה', 'Cache נוקה בהצלחה');
-      } else if (typeof window.showNotification === 'function') {
-        window.showNotification('Cache נוקה בהצלחה', 'success');
-      } else {
-        console.log('✅ Cache נוקה בהצלחה');
-      }
+      console.log('✅ Cache של השרת נוקה בהצלחה:', result);
     } else {
-      console.error('❌ שגיאה בניקוי Cache:', response.status);
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה', 'שגיאה בניקוי Cache');
-      } else {
-        console.error('❌ שגיאה בניקוי Cache');
-      }
+      console.warn('⚠️ לא ניתן לנקות Cache של השרת:', response.status);
     }
-  } catch (error) {
-    console.error('❌ שגיאה בניקוי Cache:', error);
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', 'שגיאה בניקוי Cache');
+
+    // ===== שלב 3: ניקוי Service Workers =====
+    console.log('🧹 מנקה Service Workers...');
+    try {
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (let registration of registrations) {
+          await registration.unregister();
+          console.log('🗑️ Service Worker נמחק');
+        }
+      }
+    } catch (e) {
+      console.warn('⚠️ לא ניתן לנקות Service Workers:', e);
+    }
+
+    // ===== שלב 4: ניקוי Cache API =====
+    console.log('🧹 מנקה Cache API...');
+    try {
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(
+          cacheNames.map(cacheName => caches.delete(cacheName))
+        );
+        console.log(`✅ Cache API נוקה: ${cacheNames.length} caches נמחקו`);
+      }
+    } catch (e) {
+      console.warn('⚠️ לא ניתן לנקות Cache API:', e);
+    }
+
+    // ===== שלב 5: ניקוי Application Cache =====
+    try {
+      if ('applicationCache' in window) {
+        window.applicationCache.update();
+        console.log('✅ Application Cache עודכן');
+      }
+    } catch (e) {
+      console.warn('⚠️ לא ניתן לנקות Application Cache:', e);
+    }
+
+    // ===== שלב 6: ניקוי Memory Cache =====
+    try {
+      // ניקוי cache של fetch requests
+      if (window.fetch && window.fetch.cache) {
+        window.fetch.cache.clear();
+        console.log('✅ Fetch cache נוקה');
+      }
+    } catch (e) {
+      console.warn('⚠️ לא ניתן לנקות Fetch cache:', e);
+    }
+
+    // ===== שלב 7: ניקוי DOM Cache =====
+    try {
+      // ניקוי cache של תמונות
+      const images = document.querySelectorAll('img');
+      images.forEach(img => {
+        if (img.src) {
+          img.src = img.src + '?t=' + Date.now();
+        }
+      });
+      console.log(`✅ ${images.length} תמונות נוקו מ-cache`);
+    } catch (e) {
+      console.warn('⚠️ לא ניתן לנקות תמונות:', e);
+    }
+
+    // ===== הצגת הודעת הצלחה =====
+    console.log('🎉 כל סוגי ה-Cache נוקו בהצלחה!');
+    
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification('הצלחה', 'Cache נוקה בהצלחה - כולל דפדפן ושרת');
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('Cache נוקה בהצלחה - כולל דפדפן ושרת', 'success');
     } else {
-      console.error('❌ שגיאה בניקוי Cache');
+      console.log('✅ Cache נוקה בהצלחה - כולל דפדפן ושרת');
+    }
+
+    // ===== רענון הדף =====
+    console.log('🔄 הדף ירענן בעוד 3 שניות...');
+    
+    if (typeof window.showInfoNotification === 'function') {
+      window.showInfoNotification('מידע', 'הדף ירענן בעוד 3 שניות...');
+    }
+    
+    setTimeout(() => {
+      if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('מידע', 'הדף ירענן בעוד רגע...');
+      }
+      setTimeout(() => {
+        // forced reload - bypass all cache
+        window.location.reload(true);
+      }, 1000);
+    }, 3000);
+
+  } catch (error) {
+    console.error('❌ שגיאה כללית בניקוי Cache:', error);
+    
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה כללית בניקוי Cache: ' + error.message);
+    } else {
+      console.error('❌ שגיאה כללית בניקוי Cache');
     }
   } finally {
     // החזרת הכפתור למצב רגיל

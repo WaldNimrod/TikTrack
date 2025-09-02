@@ -3,69 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>דוגמה למערכת צבעים לערכים מספריים - TikTrack</title>
+  <title>דמונסטרציה למערכת הצבעים - TikTrack</title>
   
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  
-  <!-- CSS Files -->
+  <!-- CSS Files - Ordered by priority -->
   <link rel="stylesheet" href="styles/apple-theme.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles/styles.css">
   <link rel="stylesheet" href="styles/header-system.css">
   <link rel="stylesheet" href="styles/typography.css">
   <link rel="stylesheet" href="styles/table.css">
   <link rel="stylesheet" href="styles/notification-system.css">
   <link rel="stylesheet" href="styles/linked-items.css">
-  <link rel="stylesheet" href="styles/styles.css">
   <link rel="stylesheet" href="styles/numeric-value-colors.css">
-  
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background-color: #f8f9fa;
-    }
-    
-    .demo-section {
-      margin: 30px 0;
-      padding: 20px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    
-    .demo-title {
-      color: #333;
-      border-bottom: 2px solid #ff9c05;
-      padding-bottom: 10px;
-      margin-bottom: 20px;
-    }
-    
-    .demo-item {
-      margin: 15px 0;
-      padding: 15px;
-      border: 1px solid #eee;
-      border-radius: 8px;
-    }
-    
-    .demo-code {
-      background-color: #f8f9fa;
-      border: 1px solid #e9ecef;
-      border-radius: 4px;
-      padding: 10px;
-      font-family: 'Courier New', monospace;
-      font-size: 14px;
-      margin: 10px 0;
-    }
-    
-    .color-preview {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      margin-left: 10px;
-      border: 2px solid #fff;
-      box-shadow: 0 0 0 1px #ccc;
-    }
-  </style>
 </head>
 
 <body>
@@ -77,415 +26,670 @@
     <!-- גוף הדף -->
     <div class="page-body">
       <div class="container">
-        <h1 class="text-center mb-5">🎨 דוגמה למערכת צבעים לערכים מספריים</h1>
-        
-        <!-- סקשן 1: צביעת טקסט בלבד -->
-        <div class="demo-section">
-          <h2 class="demo-title">1. צביעת טקסט בלבד</h2>
-          <div class="demo-item">
-            <span class="numeric-text-positive">+15.50%</span>
-            <span class="color-preview" style="background-color: #28a745;"></span>
-          </div>
-          <div class="demo-item">
-            <span class="numeric-text-negative">-8.25%</span>
-            <span class="color-preview" style="background-color: #dc3545;"></span>
-          </div>
-          <div class="demo-item">
-            <span class="numeric-text-zero">0.00%</span>
-            <span class="color-preview" style="background-color: #6c757d;"></span>
-          </div>
-          <div class="demo-code">
-&lt;span class="numeric-text-positive"&gt;+15.50%&lt;/span&gt;<br>
-&lt;span class="numeric-text-negative"&gt;-8.25%&lt;/span&gt;<br>
-&lt;span class="numeric-text-zero"&gt;0.00%&lt;/span&gt;
-          </div>
+        <!-- Page Header -->
+        <div class="page-header text-center mb-5">
+          <h1 class="display-4 text-primary">🎨 דמונסטרציה למערכת הצבעים</h1>
+          <p class="lead">הדגמה מקיפה של כל מפתחות הצבעים במערכת TikTrack</p>
         </div>
         
-        <!-- סקשן 2: צביעת רקע בלבד -->
-        <div class="demo-section">
-          <h2 class="demo-title">2. צביעת רקע בלבד</h2>
-          <div class="demo-item">
-            <div class="numeric-bg-positive p-3">רווח חיובי</div>
-          </div>
-          <div class="demo-item">
-            <div class="numeric-bg-negative p-3">הפסד שלילי</div>
-          </div>
-          <div class="demo-item">
-            <div class="numeric-bg-zero p-3">אין שינוי</div>
-          </div>
-          <div class="demo-code">
-&lt;div class="numeric-bg-positive"&gt;רווח חיובי&lt;/div&gt;<br>
-&lt;div class="numeric-bg-negative"&gt;הפסד שלילי&lt;/div&gt;<br>
-&lt;div class="numeric-bg-zero"&gt;אין שינוי&lt;/div&gt;
-          </div>
-        </div>
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs mb-4" id="colorSchemeTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="numeric-tab" data-bs-toggle="tab" data-bs-target="#numeric-content" type="button" role="tab">
+              🔢 ערכים מספריים
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="entity-tab" data-bs-toggle="tab" data-bs-target="#entity-content" type="button" role="tab">
+              🏷️ ישויות מערכת
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="status-tab" data-bs-toggle="tab" data-bs-target="#status-content" type="button" role="tab">
+              📊 סטטוסים
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="modal-tab" data-bs-toggle="tab" data-bs-target="#modal-content" type="button" role="tab">
+              🪟 כותרות מודלים
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="api-tab" data-bs-toggle="tab" data-bs-target="#api-content" type="button" role="tab">
+              ⚙️ API ופונקציות
+            </button>
+          </li>
+        </ul>
         
-        <!-- סקשן 3: צביעת גבול בלבד -->
-        <div class="demo-section">
-          <h2 class="demo-title">3. צביעת גבול בלבד</h2>
-          <div class="demo-item">
-            <div class="numeric-border-positive p-3 border">תיבת טקסט עם גבול חיובי</div>
-          </div>
-          <div class="demo-item">
-            <div class="numeric-border-negative p-3 border">תיבת טקסט עם גבול שלילי</div>
-          </div>
-          <div class="demo-item">
-            <div class="numeric-border-zero p-3 border">תיבת טקסט עם גבול אפס</div>
-          </div>
-          <div class="demo-code">
-&lt;div class="numeric-border-positive border"&gt;תיבת טקסט עם גבול חיובי&lt;/div&gt;<br>
-&lt;div class="numeric-border-negative border"&gt;תיבת טקסט עם גבול שלילי&lt;/div&gt;<br>
-&lt;div class="numeric-border-zero border"&gt;תיבת טקסט עם גבול אפס&lt;/div&gt;
-          </div>
-        </div>
-        
-        <!-- סקשן 4: כרטיסיות מלאות -->
-        <div class="demo-section">
-          <h2 class="demo-title">4. כרטיסיות מלאות</h2>
-          <div class="row">
-            <div class="col-md-4">
-              <div class="demo-item">
-                <div class="numeric-card-positive numeric-transition p-3 text-center">
-                  <h5>רווח</h5>
-                  <p class="mb-0">+$1,250.00</p>
+        <!-- Tab Content -->
+        <div class="tab-content" id="colorSchemeTabContent">
+          
+          <!-- Numeric Values Tab -->
+          <div class="tab-pane fade show active" id="numeric-content" role="tabpanel">
+            <div class="card">
+              <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">🔢 מערכת צבעים לערכים מספריים</h2>
+              </div>
+              <div class="card-body">
+                <!-- Display Controls -->
+                <div class="alert alert-info">
+                  <div class="d-flex flex-wrap gap-2 mb-3">
+                    <button class="btn btn-outline-primary btn-sm" onclick="showAllNumeric()">הצג הכול</button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="hideAllNumeric()">הסתר הכול</button>
+                  </div>
+                  <div class="d-flex flex-wrap gap-3">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="showText" checked onchange="toggleNumericDisplay()">
+                      <label class="form-check-label" for="showText">צביעת טקסט</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="showBackground" checked onchange="toggleNumericDisplay()">
+                      <label class="form-check-label" for="showBackground">צביעת רקע</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="showBorder" checked onchange="toggleNumericDisplay()">
+                      <label class="form-check-label" for="showBorder">צביעת מסגרת</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="showCards" checked onchange="toggleNumericDisplay()">
+                      <label class="form-check-label" for="showCards">כרטיסיות</label>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Demo Grid -->
+                <div class="row g-3">
+                  <!-- Text Coloring -->
+                  <div class="col-md-6 col-lg-3 demo-item" data-type="text">
+                    <div class="card h-100">
+                      <div class="card-header">
+                        <h5 class="card-title">צביעת טקסט</h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="mb-2">
+                          <span class="numeric-text-positive">+15.50%</span>
+                        </div>
+                        <div class="mb-2">
+                          <span class="numeric-text-negative">-8.25%</span>
+                        </div>
+                        <div class="mb-2">
+                          <span class="numeric-text-zero">0.00%</span>
+                        </div>
+                        <code class="small d-block mt-2">
+                          &lt;span class="numeric-text-positive"&gt;+15.50%&lt;/span&gt;
+                        </code>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Background Coloring -->
+                  <div class="col-md-6 col-lg-3 demo-item" data-type="background">
+                    <div class="card h-100">
+                      <div class="card-header">
+                        <h5 class="card-title">צביעת רקע</h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="mb-2">
+                          <span class="numeric-bg-positive">+15.50%</span>
+                        </div>
+                        <div class="mb-2">
+                          <span class="numeric-bg-negative">-8.25%</span>
+                        </div>
+                        <div class="mb-2">
+                          <span class="numeric-bg-zero">0.00%</span>
+                        </div>
+                        <code class="small d-block mt-2">
+                          &lt;span class="numeric-bg-positive"&gt;+15.50%&lt;/span&gt;
+                        </code>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Border Coloring -->
+                  <div class="col-md-6 col-lg-3 demo-item" data-type="border">
+                    <div class="card h-100">
+                      <div class="card-header">
+                        <h5 class="card-title">צביעת מסגרת</h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="mb-2">
+                          <span class="numeric-border-positive">+15.50%</span>
+                        </div>
+                        <div class="mb-2">
+                          <span class="numeric-border-negative">-8.25%</span>
+                        </div>
+                        <div class="mb-2">
+                          <span class="numeric-border-zero">0.00%</span>
+                        </div>
+                        <code class="small d-block mt-2">
+                          &lt;span class="numeric-border-positive"&gt;+15.50%&lt;/span&gt;
+                        </code>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Full Cards -->
+                  <div class="col-md-6 col-lg-3 demo-item" data-type="cards">
+                    <div class="card h-100">
+                      <div class="card-header">
+                        <h5 class="card-title">כרטיסיות מלאות</h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="numeric-card-positive mb-2">
+                          <strong>רווח:</strong> +15.50%
+                        </div>
+                        <div class="numeric-card-negative mb-2">
+                          <strong>הפסד:</strong> -8.25%
+                        </div>
+                        <div class="numeric-card-zero mb-2">
+                          <strong>איזון:</strong> 0.00%
+                        </div>
+                        <code class="small d-block mt-2">
+                          &lt;div class="numeric-card-positive"&gt;רווח: +15.50%&lt;/div&gt;
+                        </code>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="col-md-4">
-              <div class="demo-item">
-                <div class="numeric-card-negative numeric-transition p-3 text-center">
-                  <h5>הפסד</h5>
-                  <p class="mb-0">-$750.00</p>
+          </div>
+          
+          <!-- Entity Types Tab -->
+          <div class="tab-pane fade" id="entity-content" role="tabpanel">
+            <div class="card">
+              <div class="card-header bg-success text-white">
+                <h2 class="mb-0">🏷️ מערכת צבעים לפי ישויות</h2>
+              </div>
+              <div class="card-body">
+                <!-- Display Controls -->
+                <div class="alert alert-info">
+                  <div class="d-flex flex-wrap gap-2 mb-3">
+                    <button class="btn btn-outline-primary btn-sm" onclick="showAllEntities()">הצג הכול</button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="hideAllEntities()">הסתר הכול</button>
+                  </div>
+                  <div class="d-flex flex-wrap gap-3">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="showTradeEntities" checked onchange="toggleEntityDisplay()">
+                      <label class="form-check-label" for="showTradeEntities">טריידים ותכנונים</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="showAccountEntities" checked onchange="toggleEntityDisplay()">
+                      <label class="form-check-label" for="showAccountEntities">חשבונות ותזרים מזומנים</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="showOtherEntities" checked onchange="toggleEntityDisplay()">
+                      <label class="form-check-label" for="showOtherEntities">טיקרים והתראות</label>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Demo Grid -->
+                <div class="row g-3">
+                  <!-- Trade Entities -->
+                  <div class="col-md-6 col-lg-4 demo-item" data-category="trade">
+                    <div class="card h-100">
+                      <div class="card-header">
+                        <h5 class="card-title">טריידים ותכנונים</h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="mb-2">
+                          <span class="entity-trade">טרייד רגיל</span>
+                        </div>
+                        <div class="mb-2">
+                          <span class="entity-trade_plan">תכנון השקעה</span>
+                        </div>
+                        <div class="mb-2">
+                          <span class="entity-execution">ביצוע עסקה</span>
+                        </div>
+                        <code class="small d-block mt-2">
+                          &lt;span class="entity-trade"&gt;טרייד רגיל&lt;/span&gt;
+                        </code>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Account Entities -->
+                  <div class="col-md-6 col-lg-4 demo-item" data-category="account">
+                    <div class="card h-100">
+                      <div class="card-header">
+                        <h5 class="card-title">חשבונות ותזרים מזומנים</h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="mb-2">
+                          <span class="entity-account">חשבון בנק</span>
+                        </div>
+                        <div class="mb-2">
+                          <span class="entity-cash_flow">תזרים מזומנים</span>
+                        </div>
+                        <code class="small d-block mt-2">
+                          &lt;span class="entity-account"&gt;חשבון בנק&lt;/span&gt;
+                        </code>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Other Entities -->
+                  <div class="col-md-6 col-lg-4 demo-item" data-category="other">
+                    <div class="card h-100">
+                      <div class="card-header">
+                        <h5 class="card-title">טיקרים והתראות</h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="mb-2">
+                          <span class="entity-ticker">טיקר מניה</span>
+                        </div>
+                        <div class="mb-2">
+                          <span class="entity-alert">התראה</span>
+                        </div>
+                        <code class="small d-block mt-2">
+                          &lt;span class="entity-ticker"&gt;טיקר מניה&lt;/span&gt;
+                        </code>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="col-md-4">
-              <div class="demo-item">
-                <div class="numeric-card-zero numeric-transition p-3 text-center">
-                  <h5>אין שינוי</h5>
-                  <p class="mb-0">$0.00</p>
+          </div>
+          
+          <!-- Status Tab -->
+          <div class="tab-pane fade" id="status-content" role="tabpanel">
+            <div class="card">
+              <div class="card-header bg-info text-white">
+                <h2 class="mb-0">📊 מערכת צבעים לסטטוסים</h2>
+              </div>
+              <div class="card-body">
+                <!-- Display Controls -->
+                <div class="alert alert-info">
+                  <div class="d-flex flex-wrap gap-2">
+                    <button class="btn btn-outline-primary btn-sm" onclick="showAllStatuses()">הצג הכול</button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="hideAllStatuses()">הסתר הכול</button>
+                  </div>
+                </div>
+                
+                <!-- Demo Grid -->
+                <div class="row g-3">
+                  <!-- Investment Types -->
+                  <div class="col-md-6">
+                    <div class="card h-100">
+                      <div class="card-header">
+                        <h5 class="card-title">סוגי השקעה</h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="mb-2">
+                          <span class="investment-type-swing">Swing Trading</span>
+                        </div>
+                        <div class="mb-2">
+                          <span class="investment-type-investment">Investment</span>
+                        </div>
+                        <div class="mb-2">
+                          <span class="investment-type-passive">Passive</span>
+                        </div>
+                        <code class="small d-block mt-2">
+                          &lt;span class="investment-type-swing"&gt;Swing Trading&lt;/span&gt;
+                        </code>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Trade Statuses -->
+                  <div class="col-md-6">
+                    <div class="card h-100">
+                      <div class="card-header">
+                        <h5 class="card-title">סטטוסי טרייד</h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="mb-2">
+                          <span class="status-open">פתוח</span>
+                        </div>
+                        <div class="mb-2">
+                          <span class="status-closed">סגור</span>
+                        </div>
+                        <div class="mb-2">
+                          <span class="status-canceled">מבוטל</span>
+                        </div>
+                        <code class="small d-block mt-2">
+                          &lt;span class="status-open"&gt;פתוח&lt;/span&gt;
+                        </code>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="demo-code">
-&lt;div class="numeric-card-positive numeric-transition"&gt;<br>
-&nbsp;&nbsp;&lt;h5&gt;רווח&lt;/h5&gt;<br>
-&nbsp;&nbsp;&lt;p&gt;+$1,250.00&lt;/p&gt;<br>
-&lt;/div&gt;
-          </div>
-        </div>
-        
-        <!-- סקשן 5: כפתורים -->
-        <div class="demo-section">
-          <h2 class="demo-title">5. כפתורים</h2>
-          <div class="demo-item">
-            <button class="btn btn-numeric-positive me-2">פעולה חיובית</button>
-            <button class="btn btn-numeric-negative me-2">פעולה שלילית</button>
-            <button class="btn btn-numeric-zero">פעולה ניטרלית</button>
-          </div>
-          <div class="demo-code">
-&lt;button class="btn btn-numeric-positive"&gt;פעולה חיובית&lt;/button&gt;<br>
-&lt;button class="btn btn-numeric-negative"&gt;פעולה שלילית&lt;/button&gt;<br>
-&lt;button class="btn btn-numeric-zero"&gt;פעולה ניטרלית&lt;/button&gt;
-          </div>
-        </div>
-        
-        <!-- סקשן 6: תגיות -->
-        <div class="demo-section">
-          <h2 class="demo-title">6. תגיות</h2>
-          <div class="demo-item">
-            <span class="badge badge-numeric-positive me-2">רווח</span>
-            <span class="badge badge-numeric-negative me-2">הפסד</span>
-            <span class="badge badge-numeric-zero">אפס</span>
-          </div>
-          <div class="demo-code">
-&lt;span class="badge badge-numeric-positive"&gt;רווח&lt;/span&gt;<br>
-&lt;span class="badge badge-numeric-negative"&gt;הפסד&lt;/span&gt;<br>
-&lt;span class="badge badge-numeric-zero"&gt;אפס&lt;/span&gt;
-          </div>
-        </div>
-        
-        <!-- סקשן 7: שורות טבלה -->
-        <div class="demo-section">
-          <h2 class="demo-title">7. שורות טבלה</h2>
-          <div class="demo-item">
-            <table class="table table-bordered">
-              <thead>
-                <tr>
-                  <th>סימבול</th>
-                  <th>שינוי</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="table-row-positive">
-                  <td>TSLA</td>
-                  <td>+5.25%</td>
-                </tr>
-                <tr class="table-row-negative">
-                  <td>AAPL</td>
-                  <td>-2.10%</td>
-                </tr>
-                <tr class="table-row-zero">
-                  <td>MSFT</td>
-                  <td>0.00%</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="demo-code">
-&lt;tr class="table-row-positive"&gt;<br>
-&nbsp;&nbsp;&lt;td&gt;TSLA&lt;/td&gt;<br>
-&nbsp;&nbsp;&lt;td&gt;+5.25%&lt;/td&gt;<br>
-&lt;/tr&gt;
-          </div>
-        </div>
-        
-        <!-- סקשן 8: הודעות -->
-        <div class="demo-section">
-          <h2 class="demo-title">8. הודעות</h2>
-          <div class="demo-item">
-            <div class="alert alert-numeric-positive">
-              <strong>הצלחה!</strong> הרווח שלך עלה ב-15%
+          
+          <!-- Modal Headers Tab -->
+          <div class="tab-pane fade" id="modal-content" role="tabpanel">
+            <div class="card">
+              <div class="card-header bg-warning text-dark">
+                <h2 class="mb-0">🪟 צבעי כותרות מודלים</h2>
+              </div>
+              <div class="card-body">
+                <!-- Demo Grid -->
+                <div class="row g-3">
+                  <!-- Planning Page Modal -->
+                  <div class="col-md-6">
+                    <div class="card h-100">
+                      <div class="card-header">
+                        <h5 class="card-title">עמוד תכנון - כותרת ירוקה</h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="modal-header modal-header-colored planning-page mb-3">
+                          <h3>כותרת מודל תכנון</h3>
+                        </div>
+                        <code class="small d-block">
+                          &lt;div class="modal-header modal-header-colored planning-page"&gt;<br>
+                          &nbsp;&nbsp;&lt;h3&gt;כותרת מודל תכנון&lt;/h3&gt;<br>
+                          &lt;/div&gt;
+                        </code>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Linked Items Modal -->
+                  <div class="col-md-6">
+                    <div class="card h-100">
+                      <div class="card-header">
+                        <h5 class="card-title">מודול מקושרים - כותרת כתומה</h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="modal-header linkedItems_modal-header-colored modal-header-view mb-3">
+                          <h3>כותרת מודל מקושרים</h3>
+                        </div>
+                        <code class="small d-block">
+                          &lt;div class="modal-header linkedItems_modal-header-colored modal-header-view"&gt;<br>
+                          &nbsp;&nbsp;&lt;h3&gt;כותרת מודל מקושרים&lt;/h3&gt;<br>
+                          &lt;/div&gt;
+                        </code>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="demo-item">
-            <div class="alert alert-numeric-negative">
-              <strong>אזהרה!</strong> ההפסד שלך עלה ב-8%
-            </div>
-          </div>
-          <div class="demo-item">
-            <div class="alert alert-numeric-zero">
-              <strong>מידע</strong> אין שינוי במצב שלך
-            </div>
-          </div>
-          <div class="demo-code">
-&lt;div class="alert alert-numeric-positive"&gt;<br>
-&nbsp;&nbsp;&lt;strong&gt;הצלחה!&lt;/strong&gt; הרווח שלך עלה ב-15%<br>
-&lt;/div&gt;
-          </div>
-        </div>
-        
-        <!-- סקשן 9: JavaScript -->
-        <div class="demo-section">
-          <h2 class="demo-title">9. שימוש ב-JavaScript</h2>
-          <div class="demo-item">
-            <button class="btn btn-primary" onclick="demoJavaScript()">הפעל דוגמה JavaScript</button>
-            <div id="jsResult" class="mt-3"></div>
-          </div>
-          <div class="demo-code">
-// קבלת צבע לערך מספרי<br>
-const positiveColor = window.getNumericValueColor(15.5, 'medium');<br>
-const negativeColor = window.getNumericValueColor(-8.25, 'medium');<br>
-const zeroColor = window.getNumericValueColor(0, 'medium');<br><br>
+          
+          <!-- API Functions Tab -->
+          <div class="tab-pane fade" id="api-content" role="tabpanel">
+            <div class="card">
+              <div class="card-header bg-secondary text-white">
+                <h2 class="mb-0">⚙️ API ופונקציות מערכת הצבעים</h2>
+              </div>
+              <div class="card-body">
+                <!-- Display Controls -->
+                <div class="alert alert-info">
+                  <div class="d-flex flex-wrap gap-2 mb-3">
+                    <button class="btn btn-outline-primary btn-sm" onclick="showAllAPIs()">הצג הכול</button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="hideAllAPIs()">הסתר הכול</button>
+                  </div>
+                  <div class="d-flex flex-wrap gap-3">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="showNumericAPI" checked onchange="toggleAPIDisplay()">
+                      <label class="form-check-label" for="showNumericAPI">פונקציות ערכים מספריים</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="showEntityAPI" checked onchange="toggleAPIDisplay()">
+                      <label class="form-check-label" for="showEntityAPI">פונקציות ישויות</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="showUtilityAPI" checked onchange="toggleAPIDisplay()">
+                      <label class="form-check-label" for="showUtilityAPI">פונקציות עזר</label>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Demo Grid -->
+                <div class="row g-3">
+                  <!-- Numeric Value Functions -->
+                  <div class="col-lg-4 demo-item" data-api-type="numeric">
+                    <div class="card h-100">
+                      <div class="card-header">
+                        <h5 class="card-title">פונקציות ערכים מספריים</h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="mb-2">
+                          <code>getNumericValueColor(15.5)</code>
+                        </div>
+                        <div class="mb-2">
+                          <code>getNumericValueCSSClass(-8.25)</code>
+                        </div>
+                        <div class="mb-2">
+                          <code>isPositiveValue(0)</code>
+                        </div>
+                        <pre class="small mt-2">
+// קבלת צבע לפי ערך
+const color = getNumericValueColor(15.5, 'medium');
 
-// קבלת CSS class לערך מספרי<br>
-const positiveClass = window.getNumericValueCSSClass(15.5);<br>
-const negativeClass = window.getNumericValueCSSClass(-8.25);<br>
-const zeroClass = window.getNumericValueCSSClass(0);
-          </div>
-        </div>
-        
-        <!-- סקשן 10: עדכון דינמי -->
-        <div class="demo-section">
-          <h2 class="demo-title">10. עדכון צבעים דינמי</h2>
-          <div class="demo-item">
-            <button class="btn btn-warning me-2" onclick="changeToBrightColors()">צבעים בהירים</button>
-            <button class="btn btn-info me-2" onclick="changeToDarkColors()">צבעים כהים</button>
-            <button class="btn btn-secondary" onclick="resetColors()">איפוס צבעים</button>
-          </div>
-          <div class="demo-item">
-            <div class="numeric-card-positive numeric-transition p-3 text-center" id="dynamicCard">
-              <h5>כרטיסיה דינמית</h5>
-              <p class="mb-0">+$500.00</p>
+// קבלת CSS class
+const cssClass = getNumericValueCSSClass(-8.25);
+                        </pre>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Entity Functions -->
+                  <div class="col-lg-4 demo-item" data-api-type="entity">
+                    <div class="card h-100">
+                      <div class="card-header">
+                        <h5 class="card-title">פונקציות ישויות</h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="mb-2">
+                          <code>getEntityColor('trade')</code>
+                        </div>
+                        <div class="mb-2">
+                          <code>getEntityBackgroundColor('trade_plan')</code>
+                        </div>
+                        <div class="mb-2">
+                          <code>isValidEntityType('trade')</code>
+                        </div>
+                        <pre class="small mt-2">
+// קבלת צבע ישות
+const color = getEntityColor('trade');
+
+// קבלת צבע רקע
+const bgColor = getEntityBackgroundColor('trade_plan');
+                        </pre>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Utility Functions -->
+                  <div class="col-lg-4 demo-item" data-api-type="utility">
+                    <div class="card h-100">
+                      <div class="card-header">
+                        <h5 class="card-title">פונקציות עזר</h5>
+                      </div>
+                      <div class="card-body">
+                        <div class="mb-2">
+                          <code>generateNumericValueCSS()</code>
+                        </div>
+                        <div class="mb-2">
+                          <code>updateEntityColor('trade', '#ff0000')</code>
+                        </div>
+                        <div class="mb-2">
+                          <code>createEntityLegend()</code>
+                        </div>
+                        <pre class="small mt-2">
+// יצירת CSS דינמי
+generateNumericValueCSS();
+
+// עדכון צבע ישות
+updateEntityColor('trade', '#ff0000');
+                        </pre>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="demo-code">
-// עדכון צבעים דינמי<br>
-window.updateNumericValueColors({<br>
-&nbsp;&nbsp;positive: {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;medium: '#00ff00' // ירוק בהיר<br>
-&nbsp;&nbsp;}<br>
-});
-          </div>
         </div>
-        
       </div>
     </div>
   </div>
-
+  
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
   <!-- Scripts -->
-  <script src="scripts/color-scheme-system.js"></script>
   <script src="scripts/header-system.js"></script>
+  <script src="scripts/notification-system.js"></script>
+  <script src="scripts/color-scheme-system.js"></script>
   
   <script>
-    // אתחול מערכת הכותרת
-    document.addEventListener('DOMContentLoaded', function () {
-      if (window.headerSystem) {
-        window.headerSystem.init();
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('=== דמונסטרציה למערכת הצבעים נטענה בהצלחה ===');
+      
+      // Initialize color scheme system
+      if (window.generateNumericValueCSS) {
+        window.generateNumericValueCSS();
       }
       
-      // אתחול מערכת הצבעים
-      if (window.generateNumericValueCSS) {
-        const css = window.generateNumericValueCSS();
-        const styleElement = document.createElement('style');
-        styleElement.id = 'numeric-value-colors';
-        styleElement.textContent = css;
-        document.head.appendChild(styleElement);
+      if (window.generateEntityCSS) {
+        window.generateEntityCSS();
       }
     });
     
-    // דוגמה JavaScript
-    function demoJavaScript() {
-      const resultDiv = document.getElementById('jsResult');
-      
-      try {
-        // קבלת צבעים
-        const positiveColor = window.getNumericValueColor(15.5, 'medium');
-        const negativeColor = window.getNumericValueColor(-8.25, 'medium');
-        const zeroColor = window.getNumericValueColor(0, 'medium');
+    // Numeric Values Display Controls
+    function toggleNumericDisplay() {
+      const types = ['text', 'background', 'border', 'cards'];
+      types.forEach(type => {
+        const items = document.querySelectorAll(`[data-type="${type}"]`);
+        const checkbox = document.getElementById(`show${type.charAt(0).toUpperCase() + type.slice(1)}`);
         
-        // קבלת CSS classes
-        const positiveClass = window.getNumericValueCSSClass(15.5);
-        const negativeClass = window.getNumericValueCSSClass(-8.25);
-        const zeroClass = window.getNumericValueCSSClass(0);
-        
-        // בדיקות
-        const isPositive = window.isPositiveValue(15.5);
-        const isNegative = window.isNegativeValue(-8.25);
-        const isZero = window.isZeroValue(0);
-        
-        const valueType = window.getValueType(15.5);
-        
-        const result = `
-          <div class="alert alert-info">
-            <h6>תוצאות JavaScript:</h6>
-            <p><strong>צבעים:</strong></p>
-            <ul>
-              <li>חיובי: <span style="color: ${positiveColor}">${positiveColor}</span></li>
-              <li>שלילי: <span style="color: ${negativeColor}">${negativeColor}</span></li>
-              <li>אפס: <span style="color: ${zeroColor}">${zeroColor}</span></li>
-            </ul>
-            <p><strong>CSS Classes:</strong></p>
-            <ul>
-              <li>חיובי: <code>${positiveClass}</code></li>
-              <li>שלילי: <code>${negativeClass}</code></li>
-              <li>אפס: <code>${zeroClass}</code></li>
-            </ul>
-            <p><strong>בדיקות:</strong></p>
-            <ul>
-              <li>15.5 חיובי: ${isPositive}</li>
-              <li>-8.25 שלילי: ${isNegative}</li>
-              <li>0 אפס: ${isZero}</li>
-            </ul>
-            <p><strong>סוג ערך 15.5:</strong> ${valueType}</p>
-          </div>
-        `;
-        
-        resultDiv.innerHTML = result;
-        
-      } catch (error) {
-        resultDiv.innerHTML = `<div class="alert alert-danger">שגיאה: ${error.message}</div>`;
-      }
-    }
-    
-    // שינוי לצבעים בהירים
-    function changeToBrightColors() {
-      try {
-        window.updateNumericValueColors({
-          positive: {
-            medium: '#00ff00', // ירוק בהיר
-            light: '#90ee90'   // רקע בהיר
-          },
-          negative: {
-            medium: '#ff0000', // אדום בהיר
-            light: '#ffb6c1'   // רקע בהיר
-          },
-          zero: {
-            medium: '#0000ff', // כחול בהיר
-            light: '#add8e6'   // רקע בהיר
+        items.forEach(item => {
+          if (checkbox && checkbox.checked) {
+            item.style.display = '';
+          } else {
+            item.style.display = 'none';
           }
         });
-        
-        // עדכון הכרטיסיה הדינמית
-        const card = document.getElementById('dynamicCard');
-        if (card) {
-          card.className = 'numeric-card-positive numeric-transition p-3 text-center';
-        }
-        
-      } catch (error) {
-        console.error('שגיאה בשינוי צבעים:', error);
-      }
+      });
     }
     
-    // שינוי לצבעים כהים
-    function changeToDarkColors() {
-      try {
-        window.updateNumericValueColors({
-          positive: {
-            medium: '#006400', // ירוק כהה
-            light: '#228b22'   // רקע כהה
-          },
-          negative: {
-            medium: '#8b0000', // אדום כהה
-            light: '#b22222'   // רקע כהה
-          },
-          zero: {
-            medium: '#000080', // כחול כהה
-            light: '#191970'   // רקע כהה
-          }
-        });
-        
-        // עדכון הכרטיסיה הדינמית
-        const card = document.getElementById('dynamicCard');
-        if (card) {
-          card.className = 'numeric-card-positive numeric-transition p-3 text-center';
-        }
-        
-      } catch (error) {
-        console.error('שגיאה בשינוי צבעים:', error);
-      }
+    function showAllNumeric() {
+      document.querySelectorAll('[data-type]').forEach(item => {
+        item.style.display = '';
+      });
+      document.querySelectorAll('#numeric-content input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = true;
+      });
     }
     
-    // איפוס צבעים
-    function resetColors() {
-      try {
-        // איפוס לברירת המחדל
-        if (window.updateNumericValueColors) {
-          window.updateNumericValueColors({
-            positive: {
-              light: '#d4edda',
-              medium: '#28a745',
-              dark: '#155724',
-              border: '#c3e6cb'
-            },
-            negative: {
-              light: '#f8d7da',
-              medium: '#dc3545',
-              dark: '#721c24',
-              border: '#f5c6cb'
-            },
-            zero: {
-              light: '#e2e3e5',
-              medium: '#6c757d',
-              dark: '#383d41',
-              border: '#d6d8db'
-            }
-          });
+    function hideAllNumeric() {
+      document.querySelectorAll('[data-type]').forEach(item => {
+        item.style.display = 'none';
+      });
+      document.querySelectorAll('#numeric-content input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = false;
+      });
+    }
+    
+    // Entity Display Controls
+    function toggleEntityDisplay() {
+      const categories = ['trade', 'account', 'other'];
+      categories.forEach(category => {
+        const items = document.querySelectorAll(`[data-category="${category}"]`);
+        let checkbox;
+        
+        switch(category) {
+          case 'trade':
+            checkbox = document.getElementById('showTradeEntities');
+            break;
+          case 'account':
+            checkbox = document.getElementById('showAccountEntities');
+            break;
+          case 'other':
+            checkbox = document.getElementById('showOtherEntities');
+            break;
         }
         
-        // עדכון הכרטיסיה הדינמית
-        const card = document.getElementById('dynamicCard');
-        if (card) {
-          card.className = 'numeric-card-positive numeric-transition p-3 text-center';
+        if (checkbox && checkbox.checked) {
+          items.forEach(item => item.style.display = '');
+        } else {
+          items.forEach(item => item.style.display = 'none');
+        }
+      });
+    }
+    
+    function showAllEntities() {
+      document.querySelectorAll('[data-category]').forEach(item => {
+        item.style.display = '';
+      });
+      document.querySelectorAll('#entity-content input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = true;
+      });
+    }
+    
+    function hideAllEntities() {
+      document.querySelectorAll('[data-category]').forEach(item => {
+        item.style.display = 'none';
+      });
+      document.querySelectorAll('#entity-content input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = false;
+      });
+    }
+    
+    // Status Display Controls
+    function showAllStatuses() {
+      document.querySelectorAll('#status-content .demo-item, #status-content .col-md-6').forEach(item => {
+        item.style.display = '';
+      });
+    }
+    
+    function hideAllStatuses() {
+      document.querySelectorAll('#status-content .demo-item, #status-content .col-md-6').forEach(item => {
+        item.style.display = 'none';
+      });
+    }
+    
+    // API Display Controls
+    function toggleAPIDisplay() {
+      const types = ['numeric', 'entity', 'utility'];
+      types.forEach(type => {
+        const items = document.querySelectorAll(`[data-api-type="${type}"]`);
+        let checkbox;
+        
+        switch(type) {
+          case 'numeric':
+            checkbox = document.getElementById('showNumericAPI');
+            break;
+          case 'entity':
+            checkbox = document.getElementById('showEntityAPI');
+            break;
+          case 'utility':
+            checkbox = document.getElementById('showUtilityAPI');
+            break;
         }
         
-      } catch (error) {
-        console.error('שגיאה באיפוס צבעים:', error);
-      }
+        if (checkbox && checkbox.checked) {
+          items.forEach(item => item.style.display = '');
+        } else {
+          items.forEach(item => item.style.display = 'none');
+        }
+      });
+    }
+    
+    function showAllAPIs() {
+      document.querySelectorAll('[data-api-type]').forEach(item => {
+        item.style.display = '';
+      });
+      document.querySelectorAll('#api-content input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = true;
+      });
+    }
+    
+    function hideAllAPIs() {
+      document.querySelectorAll('[data-api-type]').forEach(item => {
+        item.style.display = 'none';
+      });
+      document.querySelectorAll('#api-content input[type="checkbox"]').forEach(checkbox => {
+        checkbox.checked = false;
+      });
     }
   </script>
 </body>

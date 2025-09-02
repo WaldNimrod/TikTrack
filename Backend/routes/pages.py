@@ -122,6 +122,11 @@ def test_header_only() -> Any:
 @pages_bp.route('/<path:filename>')
 def static_files(filename: str) -> Any:
     """Static files"""
+    # Block access to deprecated external data test page
+    if 'external_data_integration_client/pages/test_external_data' in filename:
+        from flask import abort
+        abort(404)
+    
     # If file doesn't contain extension, try adding .html
     if '.' not in filename:
         html_file = f"{filename}.html"

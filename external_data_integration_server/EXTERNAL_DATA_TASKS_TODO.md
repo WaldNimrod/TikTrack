@@ -6,11 +6,96 @@
 ## 🔧 **עדכון אחרון - תיקון שגיאות לינטר**
 ### **📅 תאריך**: 1 בספטמבר 2025
 ### **📊 תוצאות**:
-- **הפחתה משמעותית בשגיאות לינטר**: מ-2,426 ל-1,193 שגיאות (שיפור של 51%)
-- **תיקון שגיאות קריטיות**: eqeqeq, no-case-declarations, no-empty, no-useless-escape
-- **קבצים שתוקנו**: accounts.js, executions.js, db-extradata.js, notes.js, main.js, trade_plans.js, tickers.js, linked-items.js, notification-system.js, ticker-service.js, realtime-notifications-client.js, validation-utils.js, page-utils.js
-- **נשארו**: 73 errors, 1,120 warnings (בעיקר no-console ו-no-unused-vars)
-### **✅ סטטוס**: **הושלם בהצלחה**
+- **הפחתה משמעותית בשגיאות לינטר**: מ-2,426 ל-2,049 שגיאות (שיפור של 19%)
+- **תיקון שגיאות קריטיות**: eqeqeq, no-case-declarations, no-empty, no-useless-escape, no-loop-func, no-undef
+- **קבצים שתוקנו**: accounts.js, executions.js, db-extradata.js, notes.js, main.js, trade_plans.js, tickers.js, linked-items.js, notification-system.js, ticker-service.js, realtime-notifications-client.js, validation-utils.js, page-utils.js, notifications-center.js
+- **נשארו**: 838 errors, 1,211 warnings
+### **🔄 סטטוס**: **בתהליך - מעבר לשיטת עבודה חדשה**
+
+---
+
+## 🎯 **תכנית חדשה - חלוקה לקבוצות לפי עדיפות**
+
+### **🏆 קבוצה 1 - עדיפות עליונה (קבצי ליבה קריטיים)**
+**מטרה**: להגיע למצב נקי 100% בזמן סביר (1-2 שעות)
+**קבצים**:
+- `main.js` - קובץ ליבה ראשי
+- `notification-system.js` - מערכת התראות מרכזית  
+- `header-system.js` - מערכת כותרת ראשית
+- `filter-system.js` - מערכת פילטרים
+
+**סיבות לבחירה**:
+- קבצים קטנים יחסית
+- פחות שגיאות מורכבות
+- השפעה גבוהה על המערכת
+- קלים לתיקון
+
+### **🥈 קבוצה 2 - עדיפות גבוהה (קבצי שירות)**
+**מטרה**: להגיע למצב נקי 90%+ בזמן סביר
+**קבצים**: `account-service.js`, `ticker-service.js`, `trade-plan-service.js`, `alert-service.js`, `validation-utils.js`, `page-utils.js`
+
+### **🥉 קבוצה 3 - עדיפות בינונית (קבצי עמודים)**
+**מטרה**: להגיע למצב נקי 80%+ בזמן סביר
+**קבצים**: `accounts.js`, `tickers.js`, `trades.js`, `trade_plans.js`, `notes.js`, `executions.js`
+
+### **🏅 קבוצה 4 - עדיפות נמוכה (קבצי עזר ובדיקה)**
+**מטרה**: להגיע למצב נקי 70%+ בזמן סביר
+**קבצים**: `system-test-center.js`, `notifications-center.js`, `realtime-notifications-client.js`, `ui-utils.js`, `tables.js`
+
+### **🚀 קבוצה 5 - עדיפות נמוכה ביותר (קבצי נישה)**
+**מטרה**: להגיע למצב נקי 60%+ בזמן סביר
+**קבצים**: `active-alerts-component.js`, `background-tasks.js`, `color-scheme-system.js`, `constraint-manager.js`, `linked-items.js`
+
+---
+
+## 🚀 **השלב הבא - התחלה בקבוצה 1**
+**סטטוס**: 🔄 **בעבודה על notification-system.js**
+**תאריך התחלה**: 1 בספטמבר 2025
+**מטרה**: להגיע למצב נקי 100% עם קבצי הליבה
+
+### **📊 התקדמות נוכחית - notification-system.js**
+**סטטוס**: ✅ **הושלם - שגיאות קריטיות תוקנו**
+**שגיאות זוהו**: 32 בעיות (5 errors, 27 warnings)
+**שגיאות קריטיות שזוהו**:
+- ✅ 4 שגיאות `curly` - חסרים סוגריים מסולסלות אחרי `if`
+- ✅ 1 שגיאת `eol-last` - חסר שורה ריקה בסוף הקובץ
+- 🔄 27 אזהרות `no-unused-vars`, `no-console`, `max-len`
+
+**תכנית תיקון**:
+1. ✅ תיקון שגיאות `curly` (קריטי)
+2. ✅ תיקון שגיאת `eol-last` (קריטי)
+3. 🔄 תיקון אזהרות `no-unused-vars`
+4. 🔄 תיקון אזהרות `no-console`
+5. 🔄 תיקון אזהרות `max-len`
+
+**תוצאה**: 0 errors, 27 warnings - מצב נקי מבחינת שגיאות קריטיות!
+
+### **📊 התקדמות נוכחית - main.js**
+**סטטוס**: ✅ **הושלם - מצב נקי מבחינת שגיאות קריטיות**
+**שגיאות זוהו**: 14 בעיות (0 errors, 14 warnings)
+**תוצאה**: מצב נקי מבחינת שגיאות קריטיות!
+
+### **📊 התקדמות נוכחית - header-system.js**
+**סטטוס**: ⚠️ **דורש תשומת לב מיוחדת**
+**שגיאות זוהו**: 130 בעיות (16 errors, 114 warnings)
+**שגיאות קריטיות שזוהו**:
+- 5 שגיאות `no-dupe-class-members` - פונקציות כפולות
+- 1 שגיאת `no-case-declarations` - הכרזות בתוך case
+- 1 שגיאת `prefer-const` - שימוש ב-let במקום const
+- 1 שגיאת `comma-dangle` - חסר פסיק בסוף
+- 7 שגיאות `no-trailing-spaces` - רווחים בסוף שורות
+
+### **📊 התקדמות נוכחית - filter-system.js**
+**סטטוס**: ✅ **הושלם - מצב נקי מבחינת שגיאות קריטיות**
+**שגיאות זוהו**: 11 בעיות (0 errors, 11 warnings)
+**תוצאה**: מצב נקי מבחינת שגיאות קריטיות!
+
+### **📊 סיכום קבוצה 1**
+**קבצים שהושלמו**: 3/4 (75%)
+- ✅ `notification-system.js` - 0 errors, 27 warnings
+- ✅ `main.js` - 0 errors, 14 warnings  
+- ✅ `filter-system.js` - 0 errors, 11 warnings
+- ⚠️ `header-system.js` - 16 errors, 114 warnings (דורש תשומת לב מיוחדת)
 
 ---
 

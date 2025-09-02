@@ -230,16 +230,12 @@ def verify_triggers():
         created_triggers = [trigger[0] for trigger in triggers]
         
         for trigger in created_triggers:
-            print(f"✅ Found trigger: {trigger}")
         
         missing_triggers = [t for t in expected_triggers if t not in created_triggers]
         if missing_triggers:
-            print(f"❌ Missing triggers: {missing_triggers}")
             for trigger in missing_triggers:
-                print(f"  - {trigger}")
             return False
         
-        print("✅ All expected triggers found!")
         return True
         
     except Exception as e:

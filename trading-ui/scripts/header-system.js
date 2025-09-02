@@ -1899,7 +1899,6 @@ class HeaderSystem {
   }
 
 
-
   updateAccountFilterMenu(accounts) {
     const headerElement = document.getElementById('unified-header');
     if (!headerElement) {return;}
@@ -2198,7 +2197,6 @@ class HeaderSystem {
   }
 
 
-
   // פונקציות לעדכון טקסטי פילטרים
   updateStatusFilterDisplayText() {
     const statusToggle = document.getElementById('statusFilterToggle');
@@ -2456,7 +2454,6 @@ class HeaderSystem {
       accountMenu.appendChild(option);
     });
   }
-
 
 
   // ניקוי כל הפילטרים

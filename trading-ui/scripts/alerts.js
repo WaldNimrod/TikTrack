@@ -121,8 +121,7 @@ async function loadAlertsData() {
 
     return alertsData;
 
-  } catch (error) {
-    console.error('Error loading alerts data:', error);
+  } catch (_error) {
     // משתמש בנתוני דמו
 
     // שימוש בנתוני דמו
@@ -144,7 +143,9 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
   let endDate = null;
 
   if (selectedDateRange && selectedDateRange !== 'כל זמן') {
-    const dateRange = window.translateDateRangeToDates ? window.translateDateRangeToDates(selectedDateRange) : { startDate: null, endDate: null };
+    const dateRange = window.translateDateRangeToDates
+      ? window.translateDateRangeToDates(selectedDateRange)
+      : { startDate: null, endDate: null };
     startDate = dateRange.startDate;
     endDate = dateRange.endDate;
   }
@@ -178,10 +179,6 @@ function filterAlertsLocally(alerts, selectedStatuses, selectedTypes, selectedDa
         'התראה על נפח': 'volume_alert',
         'התראה מותאמת': 'custom_alert',
       };
-
-      const translatedSelectedTypes = selectedTypes.map(type =>
-        typeTranslations[type] || type,
-      );
 
       // הסרת פילטור לפי סוג התראה - השדה type הוסר
       const isMatch = true;

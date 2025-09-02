@@ -63,7 +63,6 @@ async function loadCurrenciesFromServer() {
       window.currenciesData = currencies;
       window.currenciesLoaded = true;
     } else {
-      const errorText = await response.text();
       // טעינת מטבעות ברירת מחדל
       window.currenciesData = [
         { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' },
@@ -71,7 +70,7 @@ async function loadCurrenciesFromServer() {
       window.currenciesLoaded = true;
     }
 
-  } catch (error) {
+  } catch (_error) {
     // טעינת מטבעות ברירת מחדל
     window.currenciesData = [
       { id: 1, symbol: 'USD', name: 'US Dollar', usd_rate: '1.000000' },
@@ -80,41 +79,41 @@ async function loadCurrenciesFromServer() {
   }
 }
 
-// פונקציה עזר להצגת מטבע
-function getCurrencyDisplay(account) {
-  if (account.currency_symbol) {
-    // אם יש סמל מטבע מהשרת
-    switch (account.currency_symbol) {
-    case 'USD': return '$';
-    case 'ILS': return '₪';
-    case 'EUR': return '€';
-    case 'GBP': return '£';
-    default: return account.currency_symbol;
-    }
-  } else if (account.currency_id && window.currenciesData.length > 0) {
-    // אם יש רק currency_id, נחפש את המטבע
-    const currency = window.currenciesData.find(c => c.id === account.currency_id);
-    if (currency) {
-      switch (currency.symbol) {
-      case 'USD': return '$';
-      case 'ILS': return '₪';
-      case 'EUR': return '€';
-      case 'GBP': return '£';
-      default: return currency.symbol;
-      }
-    }
-  } else if (account.currency && account.currency.symbol) {
-    // fallback למטבע הישן
-    switch (account.currency.symbol) {
-    case 'USD': return '$';
-    case 'ILS': return '₪';
-    case 'EUR': return '€';
-    case 'GBP': return '£';
-    default: return account.currency.symbol;
-    }
-  }
-  return '$'; // ברירת מחדל
-}
+// פונקציה עזר להצגת מטבע (לא בשימוש כרגע)
+// function getCurrencyDisplay(account) {
+//   if (account.currency_symbol) {
+//     // אם יש סמל מטבע מהשרת
+//     switch (account.currency_symbol) {
+//     case 'USD': return '$';
+//     case 'ILS': return '₪';
+//     case 'EUR': return '€';
+//     case 'GBP': return '£';
+//     default: return account.currency_symbol;
+//     }
+//   } else if (account.currency_id && window.currenciesData.length > 0) {
+//     // אם יש רק currency_id, נחפש את המטבע
+//     const currency = window.currenciesData.find(c => c.id === account.currency_id);
+//     if (currency) {
+//       switch (currency.symbol) {
+//       case 'USD': return '$';
+//       case 'ILS': return '₪';
+//       case 'EUR': return '€';
+//       case 'GBP': return '£';
+//       default: return currency.symbol;
+//       }
+//     }
+//   } else if (account.currency && account.currency.symbol) {
+//     // fallback למטבע הישן
+//     switch (account.currency.symbol) {
+//     case 'USD': return '$';
+//     case 'ILS': return '₪';
+//     case 'EUR': return '€';
+//     case 'GBP': return '£';
+//     default: return currency.symbol;
+//     }
+//   }
+//   return '$'; // ברירת מחדל
+// }
 
 // פונקציה ליצירת אפשרויות מטבע בטופס
 function generateCurrencyOptions(account = null) {
@@ -187,11 +186,10 @@ async function loadAccountsFromServer() {
       // החזרת הנתונים לטעינה חוזרת
       return openAccounts;
     } else {
-      const errorText = await response.text();
       loadDefaultAccounts();
     }
 
-  } catch (error) {
+  } catch (_error) {
     loadDefaultAccounts();
   }
 }
@@ -238,7 +236,7 @@ async function loadAllAccountsFromServer() {
       return [];
     }
 
-  } catch (error) {
+  } catch (_error) {
     // Error loading all accounts from server
     return [];
   }
@@ -289,9 +287,9 @@ async function loadAccountsData() {
       // חשבונות שהתקבלו
       return accounts;
     }
-  } catch (error) {
-    handleDataLoadError(error, 'טעינת נתוני חשבונות');
-    throw error;
+  } catch (_error) {
+    handleDataLoadError(_error, 'טעינת נתוני חשבונות');
+    throw _error;
   }
 }
 

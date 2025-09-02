@@ -59,7 +59,7 @@ async function getTickers() {
       // Failed to fetch tickers
       return [];
     }
-  } catch (_error) {
+  } catch {
     // Error fetching tickers
     return [];
   }
@@ -81,7 +81,7 @@ async function getTrades() {
       // Failed to fetch trades
       return [];
     }
-  } catch (_error) {
+  } catch {
     // Error fetching trades
     return [];
   }
@@ -103,7 +103,7 @@ async function getTradePlans() {
 
       return [];
     }
-  } catch (_error) {
+  } catch {
 
     return [];
   }
@@ -130,7 +130,7 @@ async function loadCache() {
     plansCache = plans;
     lastCacheUpdate = Date.now();
 
-  } catch (_error) {
+  } catch {
     // Error loading cache
     clearCache();
   }
@@ -412,7 +412,7 @@ async function loadTickersForTradePlan() {
       // Ticker select element not found
     }
 
-  } catch (_error) {
+  } catch {
     // Error loading tickers
     // Fallback to static options if API fails
   }

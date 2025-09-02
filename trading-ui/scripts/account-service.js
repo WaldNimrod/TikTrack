@@ -48,7 +48,7 @@ async function getAccounts() {
       // Failed to fetch accounts
       return [];
     }
-  } catch (_error) {
+  } catch {
     // Error fetching accounts
     return [];
   }
@@ -138,7 +138,7 @@ async function getAccountById(accountId) {
       // Failed to fetch account
       return null;
     }
-  } catch (_error) {
+  } catch {
     // Error fetching account
     return null;
   }

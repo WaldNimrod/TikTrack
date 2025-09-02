@@ -101,7 +101,7 @@ function initializePageFilters(pageName) {
     setupFilterEventHandlers(pageName);
 
     // Filters initialized for page
-  } catch (_error) {
+  } catch {
     // Error initializing filters
   }
 }
@@ -136,7 +136,7 @@ function setupSortableHeaders(pageName) {
     }
 
     // Sortable headers setup for page
-  } catch (_error) {
+  } catch {
     // Error setting up sortable headers
   }
 }
@@ -167,7 +167,7 @@ function updateTableStats(pageName, data = null) {
     updateStatsDisplay(pageName, stats);
 
     // Table stats updated for page
-  } catch (_error) {
+  } catch {
     // Error updating table stats
   }
 }
@@ -215,7 +215,7 @@ function restoreDesignsSectionState() {
     }
 
     // Designs section state restored
-  } catch (_error) {
+  } catch {
     // Error restoring designs section state
   }
 }
@@ -260,7 +260,7 @@ function initializePage(pageName) {
     }
 
     // Page initialized successfully
-  } catch (_error) {
+  } catch {
     // Error initializing page
   }
 }
@@ -286,7 +286,7 @@ function savePageState(pageName, state) {
 
     localStorage.setItem(key, JSON.stringify(stateToSave));
     // Page state saved for page
-  } catch (_error) {
+  } catch {
     // Error saving page state
   }
 }
@@ -312,7 +312,7 @@ function loadPageState(pageName) {
     }
 
     return null;
-  } catch (_error) {
+  } catch {
     // Error loading page state
     return null;
   }
@@ -330,7 +330,7 @@ function clearPageState(pageName) {
     const key = `pageState_${pageName}`;
     localStorage.removeItem(key);
     // Page state cleared for page
-  } catch (_error) {
+  } catch {
     // Error clearing page state
   }
 }
@@ -414,7 +414,7 @@ function navigateToPage(pageName, options = {}) {
     // Navigate to page
     window.location.href = pageInfo.url;
 
-  } catch (_error) {
+  } catch {
     // Error navigating to page
   }
 }
@@ -461,7 +461,7 @@ function isCurrentPage(pageName) {
  *
  * @param {Object} filters - Filter object to apply
  */
-function applySavedFilters(filters) {
+function applySavedFilters(_filters) {
   // Implementation for applying saved filters
   // Applying saved filters
 }
@@ -471,7 +471,7 @@ function applySavedFilters(filters) {
  *
  * @param {string} pageName - Name of the page
  */
-function setupFilterEventHandlers(pageName) {
+function setupFilterEventHandlers(_pageName) {
   // Implementation for setting up filter event handlers
   // Setting up filter event handlers for page
 }
@@ -482,7 +482,7 @@ function setupFilterEventHandlers(pageName) {
  * @param {string} pageName - Name of the page
  * @param {number} columnIndex - Index of the column
  */
-function handleHeaderSort(pageName, columnIndex) {
+function handleHeaderSort(_pageName, _columnIndex) {
   // Implementation for handling header sort
   // Handling header sort for page
 }
@@ -493,7 +493,7 @@ function handleHeaderSort(pageName, columnIndex) {
  * @param {string} pageName - Name of the page
  * @param {Object} sortState - Sort state to restore
  */
-function restoreSortState(pageName, sortState) {
+function restoreSortState(_pageName, _sortState) {
   // Implementation for restoring sort state
   // Restoring sort state for page
 }
@@ -504,7 +504,7 @@ function restoreSortState(pageName, sortState) {
  * @param {string} pageName - Name of the page
  * @returns {Array} Current table data
  */
-function getCurrentTableData(pageName) {
+function getCurrentTableData(_pageName) {
   // Implementation for getting current table data
   // Getting current table data for page
   return [];
@@ -517,7 +517,7 @@ function getCurrentTableData(pageName) {
  * @param {string} pageName - Name of the page
  * @returns {Object} Calculated statistics
  */
-function calculateTableStats(data, pageName) {
+function calculateTableStats(data, _pageName) {
   // Implementation for calculating table statistics
   // Calculating table stats for page
   return {
@@ -533,7 +533,7 @@ function calculateTableStats(data, pageName) {
  * @param {string} pageName - Name of the page
  * @param {Object} stats - Statistics to display
  */
-function updateStatsDisplay(pageName, stats) {
+function updateStatsDisplay(_pageName, _stats) {
   // Implementation for updating statistics display
   // Updating stats display for page
 }

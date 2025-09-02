@@ -23,12 +23,7 @@ let accountsCache = null;
 let lastCacheUpdate = null;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 דקות
 
-/**
- * בדיקה אם ה-cache עדכני
- */
-function isCacheValid() {
-  return lastCacheUpdate && Date.now() - lastCacheUpdate < CACHE_DURATION;
-}
+// Function removed - not in use
 
 /**
  * ניקוי ה-cache
@@ -53,7 +48,7 @@ async function getAccounts() {
       // Failed to fetch accounts
       return [];
     }
-  } catch (error) {
+  } catch (_error) {
     // Error fetching accounts
     return [];
   }
@@ -143,7 +138,7 @@ async function getAccountById(accountId) {
       // Failed to fetch account
       return null;
     }
-  } catch (error) {
+  } catch (_error) {
     // Error fetching account
     return null;
   }

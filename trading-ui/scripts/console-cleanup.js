@@ -3,8 +3,17 @@
  * מנקה את ה-console ומספק פונקציות עזר לניקוי
  */
 
+// דגל למניעת ניקוי console במהלך טעינת הדף
+let isPageInitializing = true;
+
 // פונקציה לניקוי console
 function clearConsole() {
+  // אל תבצע ניקוי console במהלך טעינת הדף
+  if (isPageInitializing) {
+    console.log('🚫 ניקוי console נחסם במהלך טעינת הדף');
+    return;
+  }
+  
   if (typeof console !== 'undefined') {
     console.clear();
   }
@@ -108,5 +117,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // אל תפעיל ניקוי אוטומטי בטעינת הדף - רק אם המשתמש מפעיל במפורש
   console.log('Console cleanup utility loaded - manual control only');
+  isPageInitializing = false; // סיימנו את טעינת הדף
 });
 

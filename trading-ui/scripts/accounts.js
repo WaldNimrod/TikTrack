@@ -478,7 +478,7 @@ window.updateAccountFilterMenuDirectly = function (accounts) {
 
   // הוספת החשבונות מהשרת
   if (accounts && accounts.length > 0) {
-    accounts.forEach(account => {
+    accounts.forEach((account, _index) => {
       const accountItem = document.createElement('div');
       accountItem.className = 'account-filter-item';
       accountItem.setAttribute('data-account', account.id || account.name);
@@ -557,8 +557,8 @@ function showAddAccountModal() {
     try {
       const modal = new bootstrap.Modal(modalElement);
       modal.show();
-    } catch (error) {
-      handleSystemError(error, 'הצגת מודל קיים');
+    } catch (_error) {
+      handleSystemError(_error, 'הצגת מודל קיים');
     }
   } else {
     // יצירת המודל דינמית
@@ -574,8 +574,8 @@ function showAddAccountModal() {
       if (window.initializeValidation) {
         window.initializeValidation('accountForm');
       }
-    } catch (error) {
-      handleSystemError(error, 'יצירת/הצגת מודל חדש');
+    } catch (_error) {
+      handleSystemError(_error, 'יצירת/הצגת מודל חדש');
     }
   }
 }

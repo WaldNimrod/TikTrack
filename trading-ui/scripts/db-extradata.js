@@ -244,8 +244,13 @@ function updateTriggerButtonsTable(triggerButtons) {
   return;
 }
 
-// פונקציה לעדכון מספר כפתורי טריגרים (הוסרה - קיימת בהמשך הקובץ)
-// function updateTriggerButtonsCount(count) { ... }
+// פונקציה לעדכון מספר כפתורי טריגרים
+function updateTriggerButtonsCount(count = 0) {
+  const summaryElement = document.getElementById('summaryTriggerButtonsCount');
+  if (summaryElement) {
+    summaryElement.textContent = count;
+  }
+}
 
 // פונקציה להצגת שגיאה בטבלת סוגי קישור - משתמשת במערכת ההתראות הגלובלית
 
@@ -304,14 +309,46 @@ function updateLoadingText() {
   }
 }
 
+// פונקציה לשחזור מצב הסקשנים
+function restoreDbExtradataSectionsState() {
+  try {
+    // שחזור מצב הסקשנים מ-localStorage
+    const currenciesCollapsed = localStorage.getItem('dbExtradata_currenciesCollapsed') === 'true';
+    const noteRelationTypesCollapsed = localStorage.getItem('dbExtradata_noteRelationTypesCollapsed') === 'true';
+    const triggerButtonsCollapsed = localStorage.getItem('dbExtradata_triggerButtonsCollapsed') === 'true';
+
+    // שחזור מצב טבלת מטבעות
+    if (currenciesCollapsed) {
+      const currenciesSection = document.querySelector('[data-section="currencies"] .section-body');
+      const currenciesToggle = document.querySelector('[data-section="currencies"] .filter-toggle-btn .filter-icon');
+      if (currenciesSection) {currenciesSection.style.display = 'none';}
+      if (currenciesToggle) {currenciesToggle.textContent = '▼';}
+    }
+
+    // שחזור מצב טבלת סוגי קישור
+    if (noteRelationTypesCollapsed) {
+      const noteTypesSection = document.querySelector('[data-section="note_relation_types"] .section-body');
+      const noteTypesToggle = document.querySelector('[data-section="note_relation_types"] .filter-toggle-btn .filter-icon');
+      if (noteTypesSection) {noteTypesSection.style.display = 'none';}
+      if (noteTypesToggle) {noteTypesToggle.textContent = '▼';}
+    }
+
+    // שחזור מצב טבלת כפתורי טריגרים
+    if (triggerButtonsCollapsed) {
+      const triggerButtonsSection = document.querySelector('[data-section="trigger_buttons"] .section-body');
+      const triggerButtonsToggle = document.querySelector('[data-section="trigger_buttons"] .filter-toggle-btn .filter-icon');
+      if (triggerButtonsSection) {triggerButtonsSection.style.display = 'none';}
+      if (triggerButtonsToggle) {triggerButtonsToggle.textContent = '▼';}
+    }
+  } catch (error) {
+    console.warn('⚠️ Error restoring sections state:', error);
+  }
+}
+
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
   // שחזור מצב הסגירה של הסקשנים
-  if (typeof window.restoreDbExtradataSectionState === 'function') {
-    window.restoreDbExtradataSectionState();
-  } else {
-    handleFunctionNotFound('restoreDbExtradataSectionState');
-  }
+  restoreDbExtradataSectionsState();
 
   // עדכון טקסט טעינה
   updateLoadingText();

@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from config.database import get_db
 from models.execution import Execution
 from services.validation_service import ValidationService
+from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,6 +11,7 @@ logger = logging.getLogger(__name__)
 executions_bp = Blueprint('executions', __name__, url_prefix='/api/v1/executions')
 
 @executions_bp.route('/', methods=['GET'])
+@cache_for(ttl=30)  # Cache for 30 seconds - executions change frequently
 def get_executions():
     """Get all executions"""
     try:

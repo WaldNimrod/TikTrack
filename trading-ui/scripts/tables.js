@@ -281,8 +281,8 @@ window.getSortState = function (tableType) {
   if (savedState) {
     try {
       return JSON.parse(savedState);
-    } catch (e) {
-      console.warn(`⚠️ Invalid sort state for ${tableType}:`, e);
+    } catch {
+      // Invalid sort state for ${tableType}
     }
   }
 
@@ -382,7 +382,7 @@ window.closeModal = function (modalId) {
  * External filter presence flag
  * Used to track if external filters are active
  */
-const externalFilterPresent = false;
+// const externalFilterPresent = false; // לא בשימוש כרגע
 
 /**
  * Get default column definitions for tables

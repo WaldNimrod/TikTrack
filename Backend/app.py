@@ -89,9 +89,9 @@ from routes.api.js_map import js_map_bp
 from routes.api.cache_management import cache_management_bp
 from routes.api.query_optimization import query_optimization_bp
 
-# External Data Integration blueprints - DISABLED due to import issues
-# from external_data_integration_server.api_routes.market_data_api import market_data_bp
-# from external_data_integration_server.api_routes.quotes_api import quotes_bp
+# External Data Integration blueprints
+from routes.external_data.quotes import quotes_bp
+from routes.external_data.status import status_bp
 
 from routes.pages import pages_bp
 
@@ -163,8 +163,9 @@ app.register_blueprint(cache_management_bp)
 app.register_blueprint(query_optimization_bp)
 
 # Register External Data Integration blueprints - DISABLED due to import issues
-# app.register_blueprint(market_data_bp)
-# app.register_blueprint(quotes_bp)
+# External Data Integration blueprints
+app.register_blueprint(quotes_bp)
+app.register_blueprint(status_bp)
 
 app.register_blueprint(pages_bp)
 

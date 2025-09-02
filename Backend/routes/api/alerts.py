@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.alert_service import AlertService
+from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 
 logger = logging.getLogger(__name__)
@@ -9,6 +10,7 @@ logger = logging.getLogger(__name__)
 alerts_bp = Blueprint('alerts', __name__, url_prefix='/api/v1/alerts')
 
 @alerts_bp.route('/', methods=['GET'])
+@cache_for(ttl=60)  # Cache for 1 minute - alerts don't change frequently
 def get_alerts():
     """Get all alerts"""
     try:

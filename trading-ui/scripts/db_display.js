@@ -144,24 +144,41 @@ async function fetchTableData(tableType) {
  * @param {string} tableType - The table type
  */
 function updateTableDisplay(data, tableType) {
-  const tableContainer = document.getElementById('tableContainer');
+  // Find the correct container for this table type
+  const containerId = `${tableType}Container`;
+  const tableContainer = document.getElementById(containerId);
+
   if (!tableContainer) {
-    console.error('❌ Table container not found');
+    console.error(`❌ Table container not found for ${tableType}: ${containerId}`);
+    return;
+  }
+
+  // Find the table within the container
+  const table = tableContainer.querySelector('table');
+  if (!table) {
+    console.error(`❌ Table not found in container ${containerId}`);
+    return;
+  }
+
+  // Find the table body
+  const tbody = table.querySelector('tbody');
+  if (!tbody) {
+    console.error(`❌ Table body not found in table ${tableType}`);
     return;
   }
 
   // Get table mappings
-  const tableMapping = window.tableMappings?.[tableType];
+  const tableMapping = window.TABLE_COLUMN_MAPPINGS?.[tableType];
   if (!tableMapping) {
     console.error(`❌ No table mapping found for ${tableType}`);
     return;
   }
 
-  // Create table HTML
-  const tableHTML = createTableHTML(data, tableMapping, tableType);
+  // Create table body HTML
+  const tbodyHTML = createTableBodyHTML(data, tableMapping, tableType);
 
-  // Update container
-  tableContainer.innerHTML = tableHTML;
+  // Update table body
+  tbody.innerHTML = tbodyHTML;
 
   // Apply sorting functionality
   applySortingFunctionality(tableType);
@@ -209,6 +226,33 @@ function createTableHTML(data, tableMapping, tableType) {
 }
 
 /**
+ * Create table body HTML from data
+ * @param {Array} data - The table data
+ * @param {Array} tableMapping - The table column mapping array
+ * @param {string} tableType - The table type
+ * @returns {string} The table body HTML
+ */
+function createTableBodyHTML(data, tableMapping, tableType) {
+  let tbodyHTML = '';
+
+  if (data.length === 0) {
+    tbodyHTML += `<tr><td colspan="${tableMapping.length}" class="text-center">אין נתונים</td></tr>`;
+  } else {
+    data.forEach(row => {
+      tbodyHTML += '<tr>';
+      tableMapping.forEach(fieldName => {
+        const value = row[fieldName] || '';
+        const formattedValue = formatCellValue(value, { field: fieldName });
+        tbodyHTML += `<td>${formattedValue}</td>`;
+      });
+      tbodyHTML += '</tr>';
+    });
+  }
+
+  return tbodyHTML;
+}
+
+/**
  * Format cell value based on column configuration
  * @param {*} value - The cell value
  * @param {Object} column - The column configuration
@@ -249,9 +293,16 @@ function applySortingFunctionality(tableType) {
  * Show loading state
  */
 function showLoadingState() {
-  const tableContainer = document.getElementById('tableContainer');
-  if (tableContainer) {
-    tableContainer.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">טוען...</span></div></div>';
+  // Show loading state in the current table's tbody
+  if (currentTableType) {
+    const containerId = `${currentTableType}Container`;
+    const tableContainer = document.getElementById(containerId);
+    if (tableContainer) {
+      const tbody = tableContainer.querySelector('tbody');
+      if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center">טוען נתונים...</td></tr>';
+      }
+    }
   }
 }
 
@@ -261,11 +312,10 @@ function showLoadingState() {
  * @param {number} recordCount - The number of records
  */
 function updateTableInfo(tableType, recordCount) {
-  const tableInfoElement = document.getElementById('tableInfo');
-  if (tableInfoElement) {
-    const tableMapping = window.tableMappings?.[tableType];
-    const tableName = tableMapping?.title || tableType;
-    tableInfoElement.textContent = `${tableName} - ${recordCount} רשומות`;
+  // Update the count display in the section header
+  const countElement = document.getElementById(`${tableType}Count`);
+  if (countElement) {
+    countElement.textContent = `${recordCount} רשומות`;
   }
 }
 
@@ -358,10 +408,99 @@ function handleDataLoadError(error, tableType) {
   }
 
   // Show error state in table
-  const tableContainer = document.getElementById('tableContainer');
-  if (tableContainer) {
-    tableContainer.innerHTML = `<div class="alert alert-danger">שגיאה בטעינת נתונים: ${error.message}</div>`;
+  if (currentTableType) {
+    const containerId = `${currentTableType}Container`;
+    const tableContainer = document.getElementById(containerId);
+    if (tableContainer) {
+      const tbody = tableContainer.querySelector('tbody');
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger">שגיאה בטעינת נתונים: ${error.message}</td></tr>`;
+      }
+    }
   }
+}
+
+/**
+ * Toggle top section visibility
+ */
+function toggleTopSection() {
+  const topSection = document.querySelector('.top-section');
+  if (topSection) {
+    const sectionBody = topSection.querySelector('.section-body');
+    if (sectionBody) {
+      sectionBody.style.display = sectionBody.style.display === 'none' ? 'block' : 'none';
+    }
+  }
+}
+
+/**
+ * Toggle main section visibility
+ */
+function toggleMainSection() {
+  const mainContent = document.querySelector('.main-content');
+  if (mainContent) {
+    const sections = mainContent.querySelectorAll('.content-section');
+    sections.forEach(section => {
+      const sectionBody = section.querySelector('.section-body');
+      if (sectionBody) {
+        sectionBody.style.display = sectionBody.style.display === 'none' ? 'block' : 'none';
+      }
+    });
+  }
+}
+
+/**
+ * Add new record (placeholder function)
+ */
+function addRecord() {
+  // This is a placeholder function - implement based on requirements
+  if (window.showNotification) {
+    window.showNotification('פונקציה זו תשולב בהמשך', 'info');
+  }
+}
+
+/**
+ * Simple table sorting function for database display page
+ * @param {number} columnIndex - The column index to sort by
+ * @param {string} tableType - The table type identifier
+ */
+function sortTable(columnIndex, tableType) {
+  if (!tableData[tableType] || tableData[tableType].length === 0) {
+    return;
+  }
+
+  const data = [...tableData[tableType]];
+  const tableMapping = window.TABLE_COLUMN_MAPPINGS?.[tableType];
+
+  if (!tableMapping) {
+    console.error(`❌ No table mapping found for ${tableType}`);
+    return;
+  }
+
+  // Get the field name for the column
+  const fieldName = tableMapping[columnIndex];
+  if (!fieldName) {
+    console.error(`❌ Invalid column index: ${columnIndex}`);
+    return;
+  }
+
+  // Sort the data
+  data.sort((a, b) => {
+    const aVal = a[fieldName];
+    const bVal = b[fieldName];
+
+    if (aVal === null || aVal === undefined) {return 1;}
+    if (bVal === null || bVal === undefined) {return -1;}
+
+    if (typeof aVal === 'number' && typeof bVal === 'number') {
+      return aVal - bVal;
+    }
+
+    return String(aVal).localeCompare(String(bVal), 'he');
+  });
+
+  // Update the display with sorted data
+  updateTableDisplay(data, tableType);
 }
 
 // ===== GLOBAL EXPORTS =====
@@ -370,6 +509,10 @@ function handleDataLoadError(error, tableType) {
 window.initDatabaseDisplay = initDatabaseDisplay;
 window.loadTableData = loadTableData;
 window.filterTableData = filterTableData;
+window.toggleTopSection = toggleTopSection;
+window.toggleMainSection = toggleMainSection;
+window.addRecord = addRecord;
+window.sortTable = sortTable;
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {

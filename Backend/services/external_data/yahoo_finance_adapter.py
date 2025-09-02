@@ -11,15 +11,11 @@ from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-
-from models.external_data import (
-    ExternalDataProvider, 
-    MarketDataQuote, 
-    DataRefreshLog,
-    IntradayDataSlot
-)
+from models.external_data import ExternalDataProvider, MarketDataQuote, DataRefreshLog, IntradayDataSlot
 from models.ticker import Ticker
 from models.user import User
+from services.user_service import UserService
+import pytz
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -58,7 +54,7 @@ class YahooFinanceAdapter:
     def __init__(self, db_session: Session, provider_id: int = 1):
         self.db_session = db_session
         self.provider_id = provider_id
-        self.base_url = "https://query1.finance.yahoo.com/v8/finance"
+        self.base_url = "https://query1.finance.yahoo.com"
         self.session = requests.Session()
         self.session.headers.update({
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
@@ -83,6 +79,12 @@ class YahooFinanceAdapter:
         
         # Load provider configuration
         self._load_provider_config()
+        
+        # Load user timezone preference (for display purposes only)
+        self.user_timezone = self._load_user_timezone()
+        
+        # Market timezone - always New York (NYSE)
+        self.market_timezone = pytz.timezone('America/New_York')
     
     def _load_provider_config(self):
         """Load provider configuration from database"""
@@ -107,6 +109,180 @@ class YahooFinanceAdapter:
                 
         except SQLAlchemyError as e:
             logger.error(f"Error loading provider config: {e}")
+    
+    def _load_user_timezone(self) -> str:
+        """Load user timezone preference"""
+        try:
+            # Get user preferences (default user for now)
+            user_preferences = UserService.get_user_preferences(self.db_session)
+            timezone_str = user_preferences.get('timezone', 'Asia/Jerusalem')
+            
+            # Validate timezone
+            try:
+                pytz.timezone(timezone_str)
+                logger.info(f"Loaded user timezone: {timezone_str}")
+                return timezone_str
+            except pytz.exceptions.UnknownTimeZoneError:
+                logger.warning(f"Invalid timezone '{timezone_str}', using default: Asia/Jerusalem")
+                return 'Asia/Jerusalem'
+                
+        except Exception as e:
+            logger.error(f"Error loading user timezone: {e}")
+            return 'Asia/Jerusalem'
+    
+    def _convert_to_user_timezone(self, utc_time: datetime) -> datetime:
+        """Convert UTC time to user's preferred timezone"""
+        try:
+            if utc_time.tzinfo is None:
+                utc_time = utc_time.replace(tzinfo=timezone.utc)
+            
+            user_tz = pytz.timezone(self.user_timezone)
+            return utc_time.astimezone(user_tz)
+            
+        except Exception as e:
+            logger.error(f"Error converting timezone: {e}")
+            return utc_time
+    
+    def _convert_from_user_timezone(self, user_time: datetime) -> datetime:
+        """Convert user's timezone time to UTC"""
+        try:
+            if user_time.tzinfo is None:
+                # Assume it's in user's timezone
+                user_tz = pytz.timezone(self.user_timezone)
+                user_time = user_tz.localize(user_time)
+            
+            return user_time.astimezone(timezone.utc)
+            
+        except Exception as e:
+            logger.error(f"Error converting timezone: {e}")
+            return user_time
+    
+    def is_market_open(self) -> bool:
+        """Check if NYSE market is currently open"""
+        try:
+            market_time = datetime.now(self.market_timezone)
+            
+            # Check if it's a weekday
+            if market_time.weekday() >= 5:  # Saturday = 5, Sunday = 6
+                return False
+            
+            # Check market hours (9:30 AM - 4:00 PM ET)
+            market_open = market_time.replace(hour=9, minute=30, second=0, microsecond=0)
+            market_close = market_time.replace(hour=16, minute=0, second=0, microsecond=0)
+            
+            return market_open <= market_time <= market_close
+            
+        except Exception as e:
+            logger.error(f"Error checking market status: {e}")
+            return False
+    
+    def get_market_status(self) -> Dict[str, Any]:
+        """Get current market status information"""
+        try:
+            market_time = datetime.now(self.market_timezone)
+            
+            return {
+                'market_timezone': 'America/New_York',
+                'market_time': market_time.strftime('%Y-%m-%d %H:%M:%S %Z'),
+                'market_time_unified': market_time.isoformat(),  # Unified time for database
+                'is_market_open': self.is_market_open(),
+                'market_open_time': '09:30 ET',
+                'market_close_time': '16:00 ET',
+                'next_market_open': self._get_next_market_open(market_time),
+                'user_timezone': self.user_timezone,
+                'user_local_time': self._convert_to_user_timezone(market_time).strftime('%Y-%m-%d %H:%M:%S %Z'),
+            }
+            
+        except Exception as e:
+            logger.error(f"Error getting market status: {e}")
+            return {}
+    
+    def _get_next_market_open(self, current_market_time: datetime) -> str:
+        """Get next market open time"""
+        try:
+            if current_market_time.weekday() >= 5:  # Weekend
+                # Find next Monday
+                days_until_monday = (7 - current_market_time.weekday()) % 7
+                next_monday = current_market_time + timedelta(days=days_until_monday)
+                next_open = next_monday.replace(hour=9, minute=30, second=0, microsecond=0)
+            else:
+                # Same day or next day
+                if current_market_time.hour >= 16:  # After market close
+                    next_open = current_market_time + timedelta(days=1)
+                    next_open = next_open.replace(hour=9, minute=30, second=0, microsecond=0)
+                else:
+                    next_open = current_market_time.replace(hour=9, minute=30, second=0, microsecond=0)
+            
+            return next_open.strftime('%Y-%m-%d %H:%M:%S %Z')
+            
+        except Exception as e:
+            logger.error(f"Error calculating next market open: {e}")
+            return "Unknown"
+    
+    def format_time_for_user_display(self, stored_time: datetime, include_timezone: bool = True) -> str:
+        """Format stored time for user display in their local timezone"""
+        try:
+            if stored_time.tzinfo is None:
+                # Assume stored time is in market timezone
+                stored_time = self.market_timezone.localize(stored_time)
+            
+            # Convert to user's timezone
+            user_time = stored_time.astimezone(pytz.timezone(self.user_timezone))
+            
+            if include_timezone:
+                return user_time.strftime('%Y-%m-%d %H:%M:%S %Z')
+            else:
+                return user_time.strftime('%Y-%m-%d %H:%M:%S')
+                
+        except Exception as e:
+            logger.error(f"Error formatting time for user display: {e}")
+            return str(stored_time)
+    
+    def get_user_display_info(self, stored_time: datetime) -> Dict[str, str]:
+        """Get comprehensive time display information for user"""
+        try:
+            if stored_time.tzinfo is None:
+                # Assume stored time is in market timezone
+                stored_time = self.market_timezone.localize(stored_time)
+            
+            user_time = stored_time.astimezone(pytz.timezone(self.user_timezone))
+            market_time = stored_time.astimezone(self.market_timezone)
+            
+            return {
+                'user_local_time': user_time.strftime('%Y-%m-%d %H:%M:%S %Z'),
+                'market_time': market_time.strftime('%Y-%m-%d %H:%M:%S %Z'),
+                'unified_time': stored_time.isoformat(),
+                'user_timezone': self.user_timezone,
+                'market_timezone': 'America/New_York',
+                'time_difference': f"{self._get_timezone_offset_display()}"
+            }
+            
+        except Exception as e:
+            logger.error(f"Error getting user display info: {e}")
+            return {}
+    
+    def _get_timezone_offset_display(self) -> str:
+        """Get timezone offset display for user"""
+        try:
+            user_tz = pytz.timezone(self.user_timezone)
+            market_tz = self.market_timezone
+            
+            now = datetime.now()
+            user_offset = user_tz.utcoffset(now)
+            market_offset = market_tz.utcoffset(now)
+            
+            diff_hours = (user_offset - market_offset).total_seconds() / 3600
+            
+            if diff_hours > 0:
+                return f"+{diff_hours:.0f}h ahead of NY"
+            elif diff_hours < 0:
+                return f"{abs(diff_hours):.0f}h behind NY"
+            else:
+                return "Same time as NY"
+                
+        except Exception as e:
+            logger.error(f"Error calculating timezone offset: {e}")
+            return "Unknown offset"
     
     def _check_rate_limit(self) -> bool:
         """Check if we can make a request without hitting rate limits"""
@@ -170,7 +346,7 @@ class YahooFinanceAdapter:
                 return cached_quote
             
             # Fetch from API
-            url = f"{self.base_url}/chart/{symbol}"
+            url = f"{self.base_url}/v8/finance/chart/{symbol}"
             params = {
                 'interval': '1d',
                 'range': '1d',
@@ -282,12 +458,15 @@ class YahooFinanceAdapter:
                 return None
             
             meta = result['meta']
+            # Get current time in New York (market time) - this is our reference time
+            market_now = datetime.now(self.market_timezone)
+            
             quote = QuoteData(
                 symbol=symbol,
                 price=float(meta['regularMarketPrice']),
                 currency=meta.get('currency', 'USD'),
                 source='yahoo_finance',
-                asof_utc=datetime.now(timezone.utc)
+                asof_utc=market_now  # Store market time as reference
             )
             
             # Extract additional data if available
@@ -352,7 +531,16 @@ class YahooFinanceAdapter:
         if not quote.asof_utc:
             return True
         
-        age_seconds = (datetime.now(timezone.utc) - quote.asof_utc).total_seconds()
+        # Get current market time
+        current_market_time = datetime.now(self.market_timezone)
+        
+        # Ensure quote time has timezone info
+        quote_time = quote.asof_utc
+        if quote_time.tzinfo is None:
+            quote_time = self.market_timezone.localize(quote_time)
+        
+        # Calculate age in market time
+        age_seconds = (current_market_time - quote_time).total_seconds()
         return age_seconds > self.cache_ttl_hot
     
     def _cache_quote(self, quote: QuoteData):
@@ -413,7 +601,7 @@ class YahooFinanceAdapter:
                 return cached_data
             
             # Fetch from API
-            url = f"{self.base_url}/chart/{symbol}"
+            url = f"{self.base_url}/v8/finance/chart/{symbol}"
             params = {
                 'interval': f'{interval_minutes}m',
                 'range': '1d',
@@ -598,6 +786,9 @@ class YahooFinanceAdapter:
             success_count = len([log for log in recent_logs if log.status == 'success'])
             total_count = len(recent_logs)
             
+            # Get market status
+            market_status = self.get_market_status()
+            
             return {
                 'provider_id': provider.id,
                 'name': provider.name,
@@ -610,7 +801,8 @@ class YahooFinanceAdapter:
                 'rate_limit_remaining': self.max_requests_per_hour - self.requests_this_hour,
                 'requests_this_hour': self.requests_this_hour,
                 'recent_success_rate': success_count / total_count if total_count > 0 else 0,
-                'recent_requests': total_count
+                'recent_requests': total_count,
+                'market_status': market_status
             }
             
         except SQLAlchemyError as e:

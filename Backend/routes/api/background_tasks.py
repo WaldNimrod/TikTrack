@@ -21,6 +21,7 @@ import logging
 from services.background_tasks import BackgroundTaskManager
 from utils.performance_monitor import monitor_performance
 from utils.error_handlers import handle_database_error, handle_validation_error
+from services.advanced_cache_service import cache_for, invalidate_cache
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +33,7 @@ background_tasks_bp = Blueprint('background_tasks', __name__, url_prefix='/api/v
 
 @background_tasks_bp.route('/', methods=['GET'])
 @monitor_performance("background_tasks_status")
+@cache_for(ttl=30)  # Cache for 30 seconds - background tasks status changes frequently
 def get_background_tasks_status():
     """
     Get comprehensive background tasks status
@@ -76,6 +78,7 @@ def get_background_tasks_status():
 
 @background_tasks_bp.route('/tasks', methods=['GET'])
 @monitor_performance("background_tasks_list")
+@cache_for(ttl=30)  # Cache for 30 seconds - background tasks list changes frequently
 def get_background_tasks():
     """
     Get list of all background tasks with detailed information
@@ -135,6 +138,7 @@ def get_background_tasks():
 
 @background_tasks_bp.route('/tasks/<task_name>', methods=['GET'])
 @monitor_performance("background_task_details")
+@cache_for(ttl=60)  # Cache for 1 minute - individual task details
 def get_background_task_details(task_name: str):
     """
     Get detailed information about a specific background task

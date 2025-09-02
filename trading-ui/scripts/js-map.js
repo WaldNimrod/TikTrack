@@ -112,11 +112,11 @@ class JsMapSystem {
 
       } else {
         // Fallback to local scanning
-        console.warn('⚠️ Server response not ok, using local scan');
+        // console.warn('⚠️ Server response not ok, using local scan');
         this.pageMapping = this.scanPageMappingLocally();
       }
     } catch (error) {
-      console.warn('⚠️ Using local page mapping scan due to error:', error);
+      // console.warn('⚠️ Using local page mapping scan due to error:', error);
       this.pageMapping = this.scanPageMappingLocally();
     }
   }
@@ -138,14 +138,14 @@ class JsMapSystem {
         );
 
         // Log some sample data
-        console.log('Functions data loaded successfully');
+        // console.log('Functions data loaded successfully');
       } else {
         // Fallback to local scanning
-        console.warn('⚠️ Server response not ok, using local scan');
+        // console.warn('⚠️ Server response not ok, using local scan');
         this.functionsData = this.scanFunctionsLocally();
       }
     } catch (error) {
-      console.warn('⚠️ Using local functions scan due to error:', error);
+      // console.warn('⚠️ Using local functions scan due to error:', error);
       this.functionsData = this.scanFunctionsLocally();
     }
   }
@@ -196,7 +196,7 @@ class JsMapSystem {
 
         return scanResult.functions;
       } catch (error) {
-        console.warn('⚠️ Could not scan functions, using fallback structure:', error);
+        // console.warn('⚠️ Could not scan functions, using fallback structure:', error);
       }
     }
 
@@ -251,7 +251,7 @@ class JsMapSystem {
 
         return scanResult.counts;
       } catch (error) {
-        console.warn('⚠️ Could not scan function calls, using fallback data:', error);
+        // console.warn('⚠️ Could not scan function calls, using fallback data:', error);
       }
     }
 
@@ -303,7 +303,7 @@ class JsMapSystem {
 
     // Update counts with sample data
     Object.keys(sampleFunctionCalls).forEach(file => {
-      if (functionCallCounts.hasOwnProperty(file)) {
+      if (Object.prototype.hasOwnProperty.call(functionCallCounts, file)) {
         functionCallCounts[file] = sampleFunctionCalls[file];
       }
     });

@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.trade_plan_service import TradePlanService
+from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 
 logger = logging.getLogger(__name__)
@@ -9,6 +10,7 @@ logger = logging.getLogger(__name__)
 trade_plans_bp = Blueprint('trade_plans', __name__, url_prefix='/api/v1/trade_plans')
 
 @trade_plans_bp.route('/', methods=['GET'])
+@cache_for(ttl=60)  # Cache for 1 minute - trade plans don't change frequently
 def get_trade_plans():
     """Get all trade plans"""
     try:

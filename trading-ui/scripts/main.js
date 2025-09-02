@@ -455,13 +455,13 @@ function restoreAllSectionStates() {
     const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
 
     // Restoring top section state
-    console.log('🔄 Restoring top section state:', {
-      storageKey: topSectionStorageKey,
-      savedState: topSectionCollapsed,
-      topSectionFound: !!topSection,
-      topToggleBtnFound: !!topToggleBtn,
-      topIconFound: !!topIcon,
-    });
+    // console.log('🔄 Restoring top section state:', {
+    //   storageKey: topSectionStorageKey,
+    //   savedState: topSectionCollapsed,
+    //   topSectionFound: !!topSection,
+    //   topToggleBtnFound: !!topToggleBtn,
+    //   topIconFound: !!topIcon,
+    // });
 
     if (topSection && topIcon) {
       if (topSectionCollapsed) {
@@ -521,12 +521,12 @@ window.toggleTopSectionGlobal = function () {
   const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
   // toggleTopSectionGlobal called
-  console.log('🔄 toggleTopSectionGlobal called:', {
-    currentPath,
-    sectionFound: !!section,
-    toggleBtnFound: !!toggleBtn,
-    iconFound: !!icon,
-  });
+  // console.log('🔄 toggleTopSectionGlobal called:', {
+  //   currentPath,
+  //   sectionFound: !!section,
+  //   toggleBtnFound: !!toggleBtn,
+  //   iconFound: !!icon,
+  // });
 
   if (section) {
     const isCollapsed = section.classList.contains('collapsed') || section.style.display === 'none';
@@ -1205,7 +1205,7 @@ function initializeDevelopmentShortcuts() {
   document.addEventListener('keydown', function(e) {
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
       e.preventDefault();
-      console.log('🔧 קיצור מקלדת: ניקוי Cache');
+      // console.log('🔧 קיצור מקלדת: ניקוי Cache');
       if (window.clearDevelopmentCache) {
         // יצירת event מזויף עבור הפונקציה
         const fakeEvent = {

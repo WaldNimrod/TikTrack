@@ -23,7 +23,7 @@
 
 // ייצוא מוקדם של הפונקציה למניעת שגיאות
 window.loadExecutionsData = window.loadExecutionsData || function() {
-  console.warn('⚠️ loadExecutionsData not yet defined, using placeholder');
+  // loadExecutionsData not yet defined, using placeholder
 };
 
 // משתנים גלובליים
@@ -39,7 +39,7 @@ let filteredExecutions = [];
 let tradesData = []; // נתוני טריידים לשמירת מפת חשבונות
 
 // פונקציות בסיסיות
-function openExecutionDetails(id) {
+function openExecutionDetails(_id) {
 
   showAddExecutionModal();
 }
@@ -129,7 +129,7 @@ async function showAddExecutionModal() {
       ? window.userPreferences.defaultCommission
       : 9.99; // ערך ברירת מחדל אם אין העדפות
     document.getElementById('addExecutionCommission').value = defaultCommission;
-  } catch (error) {
+  } catch {
     document.getElementById('addExecutionCommission').value = 9.99;
   }
 
@@ -205,8 +205,8 @@ async function showEditExecutionModal(id) {
     // בדיקה אם יש טרייד מקושר
     if (execution.trade_id) {
       const tradesResponse = await fetch('/api/v1/trades/');
-      const tradesData = await tradesResponse.json();
-      const trades = tradesData.data || tradesData || [];
+      const responseData = await tradesResponse.json();
+      const trades = responseData.data || responseData || [];
 
       const trade = trades.find(t => t.id === execution.trade_id);
       if (trade) {
@@ -231,8 +231,8 @@ async function showEditExecutionModal(id) {
 
           }
         }
-      } catch (error) {
-        console.warn('⚠️ לא ניתן לטעון תכנונים:', error);
+      } catch {
+        // לא ניתן לטעון תכנונים
       }
     }
 
@@ -267,8 +267,7 @@ async function showEditExecutionModal(id) {
           tradeSelect.value = value;
           // שדה טרייד/תכנון מולא
         } else {
-          console.warn('⚠️ הערך לא נמצא באפשרויות:', value);
-          console.warn('⚠️ האפשרויות הזמינות:', Array.from(tradeSelect.options).map(opt => ({value: opt.value, text: opt.textContent})));
+          // הערך לא נמצא באפשרויות
         }
       }
     }
@@ -286,14 +285,12 @@ async function showEditExecutionModal(id) {
     // מילוי שדה הכמות
     if (execution.quantity) {
       document.getElementById('editExecutionQuantity').value = execution.quantity;
-      console.log('🔄 מילוי שדה כמות:', execution.quantity);
       // שדה כמות מולא
     }
 
     // מילוי שדה המחיר
     if (execution.price) {
       document.getElementById('editExecutionPrice').value = execution.price;
-      console.log('🔄 מילוי שדה מחיר:', execution.price);
       // שדה מחיר מולא
     }
 
@@ -305,14 +302,13 @@ async function showEditExecutionModal(id) {
         const date = new Date(executionDate);
         const localDateTime = date.toISOString().slice(0, 16);
         document.getElementById('editExecutionDate').value = localDateTime;
-        console.log('🔄 מילוי שדה תאריך:', localDateTime);
         // שדה תאריך מולא
-      } catch (error) {
-        console.warn('⚠️ Error processing execution date:', executionDate, error);
+      } catch {
+        // Error processing execution date
         document.getElementById('editExecutionDate').value = '';
       }
     } else {
-      console.warn('⚠️ No execution date found');
+      // No execution date found
       document.getElementById('editExecutionDate').value = '';
     }
 
@@ -320,7 +316,6 @@ async function showEditExecutionModal(id) {
     const commissionValue = execution.fee || execution.commission || '';
     if (commissionValue) {
       document.getElementById('editExecutionCommission').value = commissionValue;
-      console.log('🔄 מילוי שדה עמלה:', commissionValue);
       // שדה עמלה מולא
     }
 
@@ -329,7 +324,6 @@ async function showEditExecutionModal(id) {
     const sourceField = document.getElementById('editExecutionSource');
     if (sourceField) {
       sourceField.value = sourceValue;
-      console.log('🔄 מילוי שדה מקור:', sourceValue);
       // שדה מקור מולא
 
       // Debug: הצגת כל השדות הזמינים
@@ -345,21 +339,19 @@ async function showEditExecutionModal(id) {
       const externalIdField = document.getElementById('editExecutionExternalId');
       if (externalIdField) {
         externalIdField.value = externalIdValue;
-        console.log('🔄 מילוי שדה מזהה חיצוני:', externalIdValue);
         // שדה מזהה חיצוני מולא
       }
 
       // הצגת/הסתרת שדה מזהה חיצוני לפי המקור
       toggleExternalIdField('edit');
     } else {
-      console.warn('⚠️ שדה מקור לא נמצא בטופס');
+      // שדה מקור לא נמצא בטופס
     }
 
     // מילוי שדה ההערות
     const notesValue = execution.notes || '';
     if (notesValue) {
       document.getElementById('editExecutionNotes').value = notesValue;
-      console.log('🔄 מילוי שדה הערות:', notesValue);
       // שדה הערות מולא
     }
 
@@ -394,51 +386,6 @@ async function showEditExecutionModal(id) {
 // פונקציות ולידציה
 // ========================================
 
-/**
- * ולידציה של סמל טיקר
- */
-function validateTickerSymbol(input) {
-  const symbol = input.value.trim().toUpperCase();
-  const errorElement = document.getElementById(input.id + 'Error');
-
-  // בדיקות בסיסיות
-  if (!symbol) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning(input.id, 'סמל טיקר הוא שדה חובה');
-    }
-    return false;
-  }
-
-  if (symbol.length < 1 || symbol.length > 10) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning(input.id, 'סמל טיקר חייב להיות בין 1 ל-10 תווים');
-    }
-    return false;
-  }
-
-  if (!/^[A-Z0-9.]+$/.test(symbol)) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning(input.id, 'סמל טיקר יכול להכיל רק אותיות באנגלית, מספרים ונקודות');
-    }
-    return false;
-  }
-
-  // בדיקת ייחודיות
-  const currentId = document.getElementById('editTickerId')?.value;
-  const existingTicker = tickersData.find(t =>
-    t.symbol.toUpperCase() === symbol && t.id !== currentId,
-  );
-
-  if (existingTicker) {
-    if (window.showValidationWarning) {
-      window.showValidationWarning(input.id, 'סמל טיקר זה כבר קיים במערכת');
-    }
-    return false;
-  }
-
-  clearFieldError(input, errorElement);
-  return true;
-}
 
 /**
  * ולידציה של מזהה טרייד
@@ -1290,7 +1237,7 @@ async function loadLinkedItemsDetails(executionId, errorData = null) {
 async function loadLinkedItemsFromMultipleSources(executionId) {
 
 
-  const execution = executionsData.find(e => e.id == executionId);
+  const execution = executionsData.find(e => e.id === executionId);
   if (!execution) {return;}
 
   const linkedItems = {
@@ -1305,10 +1252,10 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
     try {
       const tradesResponse = await fetch('/api/v1/trades/');
       if (tradesResponse.ok) {
-        const tradesData = await tradesResponse.json();
-        const trades = tradesData.data || tradesData || [];
+        const linkedTradesData = await tradesResponse.json();
+        const trades = linkedTradesData.data || linkedTradesData || [];
         linkedItems.trades = trades.filter(trade =>
-          trade.id == execution.trade_id,
+          trade.id === execution.trade_id,
         );
       }
     } catch (e) { console.warn('לא ניתן לטעון טריידים:', e); }
@@ -1320,7 +1267,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
         const plansData = await plansResponse.json();
         const plans = plansData.data || plansData || [];
         linkedItems.trade_plans = plans.filter(plan =>
-          plan.trade_id == execution.trade_id,
+          plan.trade_id === execution.trade_id,
         );
       }
     } catch (e) { console.warn('לא ניתן לטעון תכנונים:', e); }
@@ -1332,7 +1279,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
         const alertsData = await alertsResponse.json();
         const alerts = alertsData.data || alertsData || [];
         linkedItems.alerts = alerts.filter(alert =>
-          alert.related_type_id === 5 && alert.related_id == executionId &&
+          alert.related_type_id === 5 && alert.related_id === executionId &&
                     alert.status === 'open',
         );
       }
@@ -1345,7 +1292,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
         const notesData = await notesResponse.json();
         const notes = notesData.data || notesData || [];
         linkedItems.notes = notes.filter(note =>
-          note.related_type_id === 5 && note.related_id == executionId,
+          note.related_type_id === 5 && note.related_id === executionId,
         );
       }
     } catch (e) { console.warn('לא ניתן לטעון הערות:', e); }
@@ -2199,8 +2146,8 @@ async function loadActiveTradesForTicker(mode = 'add', showClosedTrades = false)
   try {
     // טעינת טריידים
     const tradesResponse = await fetch('/api/v1/trades/');
-    const tradesData = await tradesResponse.json();
-    const trades = tradesData.data || tradesData || [];
+    const tickerTradesData = await tradesResponse.json();
+    const trades = tickerTradesData.data || tickerTradesData || [];
 
     // סינון טריידים לטיקר שנבחר
     let filteredTrades;
@@ -2208,11 +2155,11 @@ async function loadActiveTradesForTicker(mode = 'add', showClosedTrades = false)
     if (showClosedTrades) {
       // הצג טריידים פעילים + טריידים סגורים
       const activeTrades = trades.filter(trade =>
-        trade.ticker_id == tickerId && (trade.status === 'active' || trade.status === 'open'),
+        trade.ticker_id === tickerId && (trade.status === 'active' || trade.status === 'open'),
       );
 
       const closedTrades = trades.filter(trade =>
-        trade.ticker_id == tickerId && trade.status === 'closed',
+        trade.ticker_id === tickerId && trade.status === 'closed',
       );
 
       filteredTrades = [...activeTrades, ...closedTrades];
@@ -2223,7 +2170,7 @@ async function loadActiveTradesForTicker(mode = 'add', showClosedTrades = false)
     } else {
       // הצג רק טריידים פעילים
       filteredTrades = trades.filter(trade =>
-        trade.ticker_id == tickerId && (trade.status === 'active' || trade.status === 'open'),
+        trade.ticker_id === tickerId && (trade.status === 'active' || trade.status === 'open'),
       );
       console.log('🔄 טריידים פעילים בלבד לטיקר:', filteredTrades.length);
     }
@@ -2286,8 +2233,8 @@ async function loadTickersWithClosedTrades() {
 
     // טעינת טריידים
     const tradesResponse = await fetch('/api/v1/trades/');
-    const tradesData = await tradesResponse.json();
-    const trades = tradesData.data || tradesData || [];
+    const fetchedTradesData = await tradesResponse.json();
+    const trades = fetchedTradesData.data || fetchedTradesData || [];
 
     // סינון טיקרים עם טריידים פעילים או סגורים
     const allTickers = tickers.filter(ticker => trades.some(trade =>
@@ -2620,38 +2567,6 @@ function loadTradeExecutions(tradeId) {
   try {
     // כאן תהיה קריאה לשרת לטעינת העסקאות
     // כרגע נציג נתוני דוגמה
-    const executionsData = [
-      {
-        id: 1,
-        date: '2024-01-15 10:30',
-        type: 'buy',
-        quantity: 50,
-        price: 44.50,
-        commission: 1.25,
-        total: 2226.25,
-        status: 'completed',
-      },
-      {
-        id: 2,
-        date: '2024-01-16 14:15',
-        type: 'buy',
-        quantity: 50,
-        price: 46.00,
-        commission: 1.25,
-        total: 2301.25,
-        status: 'completed',
-      },
-      {
-        id: 3,
-        date: '2024-01-20 11:45',
-        type: 'sell',
-        quantity: 100,
-        price: 47.50,
-        commission: 1.25,
-        total: 4748.75,
-        status: 'completed',
-      },
-    ];
 
     // לא צריך לעדכן טבלה בדף executions (זו פונקציה למודל עריכת טרייד)
     // loadTradeExecutions called on executions page - no action needed
@@ -3195,8 +3110,8 @@ async function loadTickersSummaryData() {
 
     // טעינת טריידים
     const tradesResponse = await fetch('/api/v1/trades/');
-    const tradesData = await tradesResponse.json();
-    const trades = tradesData.data || tradesData || [];
+    const summaryTradesData = await tradesResponse.json();
+    const trades = summaryTradesData.data || summaryTradesData || [];
 
     // סינון טיקרים עם טריידים פעילים או סגורים
     const relevantTickers = allTickers.filter(ticker => {
@@ -3434,8 +3349,8 @@ async function updateTickersList(mode, showClosedTrades = false) {
 
     // טעינת טריידים
     const tradesResponse = await fetch('/api/v1/trades/');
-    const tradesData = await tradesResponse.json();
-    const trades = tradesData.data || tradesData || [];
+    const tickersTradesData = await tradesResponse.json();
+    const trades = tickersTradesData.data || tickersTradesData || [];
 
     // סינון טיקרים לפי הקריטריונים
     let filteredTickers;

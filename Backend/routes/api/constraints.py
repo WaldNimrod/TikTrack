@@ -14,6 +14,7 @@ import os
 # Add the services directory to the path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'services'))
 from constraint_service import ConstraintService
+from services.advanced_cache_service import cache_for, invalidate_cache
 
 # Create blueprint
 constraints_bp = Blueprint('constraints', __name__)
@@ -24,6 +25,7 @@ constraint_service = ConstraintService()
 logger = logging.getLogger(__name__)
 
 @constraints_bp.route('/api/v1/constraints/', methods=['GET'])
+@cache_for(ttl=300)  # Cache for 5 minutes - constraints don't change frequently
 def get_constraints():
     """
     Get all constraints or constraints for a specific table

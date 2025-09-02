@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
 from models.note_relation_type import NoteRelationType
+from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 import os
 import sqlite3
@@ -21,6 +22,7 @@ def get_db_connection():
     return conn
 
 @note_relation_types_bp.route('/', methods=['GET'])
+@cache_for(ttl=600)  # Cache for 10 minutes - note relation types don't change
 def get_note_relation_types():
     """Get all note relation types"""
     try:

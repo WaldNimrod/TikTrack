@@ -62,7 +62,14 @@ class RealtimeNotificationsClient {
     script.src = 'https://cdn.socket.io/4.7.2/socket.io.min.js';
     script.onload = () => {
       console.log('Socket.IO loaded successfully');
-      this.connect();
+      // Wait a bit for the script to initialize
+      setTimeout(() => {
+        if (typeof io !== 'undefined') {
+          this.connect();
+        } else {
+          console.error('Socket.IO loaded but io object not available');
+        }
+      }, 100);
     };
     script.onerror = () => {
       console.error('Failed to load Socket.IO from CDN');
@@ -75,23 +82,29 @@ class RealtimeNotificationsClient {
       console.log('🔌 Connecting to WebSocket server...');
 
       // Create Socket.IO connection
-      if (typeof io === 'undefined') {
+      if (typeof window.io === 'undefined') {
         console.warn('Socket.IO not available, skipping connection');
         return;
       }
 
-      this.socket = io(this.serverUrl, {
-        transports: ['websocket', 'polling'],
-        timeout: 20000,
-        reconnection: true,
-        reconnectionAttempts: this.maxReconnectAttempts,
-        reconnectionDelay: this.reconnectDelay,
-      });
+      try {
 
-      // Set up event handlers
-      this.setupEventHandlers();
+        this.socket = window.io(this.serverUrl, {
+          transports: ['websocket', 'polling'],
+          timeout: 20000,
+          reconnection: true,
+          reconnectionAttempts: this.maxReconnectAttempts,
+          reconnectionDelay: this.reconnectDelay,
+        });
 
-      console.log('✅ WebSocket connection established');
+        // Set up event handlers
+        this.setupEventHandlers();
+
+        console.log('✅ WebSocket connection established');
+      } catch (socketError) {
+        console.error('❌ Error creating Socket.IO connection:', socketError);
+        return;
+      }
 
     } catch (error) {
       console.error('❌ Error connecting to WebSocket server:', error);

@@ -21,6 +21,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.ticker_service import TickerService
+from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 from typing import Dict, Any, Optional
 
@@ -29,6 +30,7 @@ logger = logging.getLogger(__name__)
 tickers_bp = Blueprint('tickers', __name__, url_prefix='/api/v1/tickers')
 
 @tickers_bp.route('/', methods=['GET'])
+@cache_for(ttl=300)  # Cache for 5 minutes - tickers don't change frequently
 def get_tickers():
     """Get all tickers"""
     try:

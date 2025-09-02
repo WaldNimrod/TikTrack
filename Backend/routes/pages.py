@@ -1,4 +1,4 @@
-from flask import Blueprint, send_from_directory, request
+from flask import Blueprint, send_from_directory, request, make_response, send_file
 from config.settings import UI_DIR
 import os
 from typing import Any
@@ -119,6 +119,48 @@ def test_header_only() -> Any:
 
 # Old external data test routes removed - now using /system-test-center
 
+@pages_bp.route('/styles/<path:filename>')
+def styles_files(filename: str) -> Any:
+    """CSS files"""
+    response = send_from_directory(UI_DIR / "styles", filename)
+    
+    # Add cache control headers for CSS files
+    if filename.endswith('.css'):
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    
+    return response
+
+@pages_bp.route('/scripts/<path:filename>')
+def scripts_files(filename: str) -> Any:
+    """JavaScript files"""
+    response = send_from_directory(UI_DIR / "scripts", filename)
+    
+    # Add cache control headers for JavaScript files
+    if filename.endswith('.js'):
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    
+    return response
+
+@pages_bp.route('/images/<path:filename>')
+def images_files(filename: str) -> Any:
+    """Image files"""
+    return send_from_directory(UI_DIR / "images", filename)
+
+@pages_bp.route('/external_data_integration_client/styles/<path:filename>')
+def external_data_styles_files(filename: str) -> Any:
+    """External data integration CSS files"""
+    return send_from_directory(UI_DIR / "external_data_integration_client/styles", filename)
+
+@pages_bp.route('/external_data_integration_client/scripts/<path:filename>')
+def external_data_scripts_files(filename: str) -> Any:
+    """External data integration JavaScript files"""
+    return send_from_directory(UI_DIR / "external_data_integration_client/scripts", filename)
+
+# Catch-all route must be LAST to avoid interfering with specific routes
 @pages_bp.route('/<path:filename>')
 def static_files(filename: str) -> Any:
     """Static files"""
@@ -137,27 +179,36 @@ def static_files(filename: str) -> Any:
     # Otherwise, return the file as is
     return send_from_directory(UI_DIR, filename)
 
-@pages_bp.route('/styles/<path:filename>')
-def styles_files(filename: str) -> Any:
-    """CSS files"""
-    return send_from_directory(UI_DIR / "styles", filename)
+@pages_bp.after_request
+def add_cache_headers(response):
+    """Add cache control headers for static files"""
+    if request.path.startswith('/scripts/') and request.path.endswith('.js'):
+        # Force no-cache for JavaScript files - OVERRIDE everything
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        # Remove ALL conflicting headers
+        response.headers.pop('ETag', None)
+        response.headers.pop('Last-Modified', None)
+        # Force override at the end
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+        # Add additional headers to ensure no caching
+        response.headers['Surrogate-Control'] = 'no-store'
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
+    elif request.path.startswith('/styles/') and request.path.endswith('.css'):
+        # Force no-cache for CSS files - OVERRIDE everything
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        # Remove ALL conflicting headers
+        response.headers.pop('ETag', None)
+        response.headers.pop('Last-Modified', None)
+        # Force override at the end
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+        # Add additional headers to ensure no caching
+        response.headers['Surrogate-Control'] = 'no-store'
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0'
+    
+    return response
 
-@pages_bp.route('/scripts/<path:filename>')
-def scripts_files(filename: str) -> Any:
-    """JavaScript files"""
-    return send_from_directory(UI_DIR / "scripts", filename)
 
-@pages_bp.route('/images/<path:filename>')
-def images_files(filename: str) -> Any:
-    """Image files"""
-    return send_from_directory(UI_DIR / "images", filename)
-
-@pages_bp.route('/external_data_integration_client/styles/<path:filename>')
-def external_data_styles_files(filename: str) -> Any:
-    """External data integration CSS files"""
-    return send_from_directory(UI_DIR / "external_data_integration_client/styles", filename)
-
-@pages_bp.route('/external_data_integration_client/scripts/<path:filename>')
-def external_data_scripts_files(filename: str) -> Any:
-    """External data integration JavaScript files"""
-    return send_from_directory(UI_DIR / "external_data_integration_client/scripts", filename)

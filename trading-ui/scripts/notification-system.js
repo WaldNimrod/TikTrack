@@ -4,32 +4,80 @@
  *
  * מערכת התראות מרכזית לפרויקט TikTrack
  *
- * קובץ זה מכיל שתי מערכות עיקריות:
- * 1. NOTIFICATION SYSTEM - הודעות מערכת למשוב משתמש
- * 2. WARNING SYSTEM - אזהרות ואישורים מתקדמים
- *
- * הערה: ALERTS SYSTEM הועבר לרשימת המשימות העתידיות
- * הערה: LINKED ITEMS SYSTEM הועבר לקובץ linked-items.js
+ * קובץ זה מכיל שלושה מערכות עיקריות:
+ * 1. ALERTS SYSTEM - התראות עסקיות לתנאי שוק
+ * 2. NOTIFICATION SYSTEM - הודעות מערכת למשוב משתמש
+ * 3. LINKED ITEMS SYSTEM - הצגה וניהול פריטים מקושרים
  *
  * קובץ: trading-ui/scripts/notification-system.js
- * גרסה: 3.2
- * עדכון אחרון: 2 בספטמבר 2025
+ * גרסה: 3.1
+ * עדכון אחרון: 31 באוגוסט 2025
  *
- * שינויים אחרונים (2 בספטמבר 2025):
- * - הסרת ALERTS SYSTEM (הועבר למשימות עתידיות)
- * - הסרת LINKED ITEMS SYSTEM (הועבר ל-linked-items.js)
- * - מערכת התראות מתמקדת בהודעות מערכת ואישורים
+ * תיקונים אחרונים (31 באוגוסט 2025):
+ * - שיפור תמיכה בעמוד תכנונים
+ * - תיקון הודעות הצלחה ושגיאה
+ * - שיפור מערכת אישור מחיקה
+ * - תמיכה במערכת ביטול תכנונים
  *
  * תלויות:
+ * - linked-items.js (לפונקציות הצגת מודלים)
  * - Bootstrap 5.3.0 (לפונקציונליות מודלים)
  *
  * דוקומנטציה מפורטת: documentation/frontend/NOTIFICATION_SYSTEM.md
- * רשימת משימות עתידיות: documentation/todo/FEATURE_ROADMAP.md
  */
 
 // ===== ALERTS SYSTEM FUNCTIONS =====
-// These functions have been moved to future features roadmap
-// See: documentation/todo/FEATURE_ROADMAP.md
+// These functions handle business alerts for market conditions
+
+/**
+ * Create a new alert
+ * ALERTS SYSTEM - Creates business alert for market conditions
+ *
+ * @param {Object} alertData - Alert data object
+ * @returns {Promise} Promise that resolves when alert is created
+ */
+function createAlert(alertData) {
+  // Implementation for creating business alerts
+  // TODO: Implement alert creation logic
+}
+
+
+/**
+ * Update an alert
+ * ALERTS SYSTEM - Updates existing business alert
+ *
+ * @param {number} alertId - ID of alert to update
+ * @param {Object} alertData - Updated alert data
+ * @returns {Promise} Promise that resolves when alert is updated
+ */
+function updateAlert(alertId, alertData) {
+  // Implementation for updating business alerts
+  // TODO: Implement alert update logic
+}
+
+/**
+ * Mark alert as triggered
+ * ALERTS SYSTEM - Marks business alert as triggered when conditions are met
+ *
+ * @param {number} alertId - ID of alert to mark as triggered
+ * @returns {Promise} Promise that resolves when alert is marked
+ */
+function markAlertAsTriggered(alertId) {
+  // Implementation for marking alerts as triggered
+  // TODO: Implement alert trigger logic
+}
+
+/**
+ * Mark alert as read
+ * ALERTS SYSTEM - Marks business alert as read by user
+ *
+ * @param {number} alertId - ID of alert to mark as read
+ * @returns {Promise} Promise that resolves when alert is marked
+ */
+function markAlertAsRead(alertId) {
+  // Implementation for marking alerts as read
+  // TODO: Implement alert read logic
+}
 
 
 // ===== NOTIFICATION SYSTEM FUNCTIONS =====
@@ -37,7 +85,25 @@
 
 // ===== LINKED ITEMS SYSTEM FUNCTIONS =====
 // These functions handle linked items display and management
-// NOTE: loadLinkedItemsData has been moved to linked-items.js
+
+
+/**
+ * Load linked items data from server
+ * LINKED ITEMS SYSTEM - Fetches linked items data for any entity type
+ *
+ * @param {string} itemType - Type of the item
+ * @param {number|string} itemId - ID of the item
+ * @returns {Object} Linked items data
+ */
+async function loadLinkedItemsData(itemType, itemId) {
+  const response = await fetch(`/api/v1/linked-items/${itemType}/${itemId}`);
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return await response.json();
+}
 
 /**
  * Create notification container if not exists
@@ -409,26 +475,11 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
           onCancel,
         );
       } else {
-        // Fallback למערכת ההודעות שלנו
-        if (typeof window.showWarningNotification === 'function') {
-          window.showWarningNotification('אישור נדרש', message);
-          // הצג כפתורי אישור/ביטול
-          setTimeout(() => {
-            if (typeof window.showConfirmationButtons === 'function') {
-              window.showConfirmationButtons(message, onConfirm, onCancel);
-            } else {
-              // Fallback אחרון - הצג הודעה בלבד
-              console.warn('אישור נדרש:', message);
-              if (onConfirm) {
-                onConfirm();
-              }
-            }
-          }, 1000);
-        } else {
-          console.warn('אישור נדרש:', message);
-          if (onConfirm) {
-            onConfirm();
-          }
+        const confirmed = confirm(message);
+        if (confirmed && onConfirm) {
+          onConfirm();
+        } else if (!confirmed && onCancel) {
+          onCancel();
         }
       }
     }
@@ -483,7 +534,10 @@ function showNotificationLegacy(message, type = 'info', duration = 4000) {
 // ===== EXPORT TO GLOBAL SCOPE =====
 
 // Export ALERTS SYSTEM functions to global scope
-// ALERTS SYSTEM functions moved to future features roadmap
+window.createAlert = createAlert;
+window.updateAlert = updateAlert;
+window.markAlertAsTriggered = markAlertAsTriggered;
+window.markAlertAsRead = markAlertAsRead;
 
 
 // Export NOTIFICATION SYSTEM functions to global scope
@@ -497,599 +551,16 @@ window.showConfirmationDialog = showConfirmationDialog;
 window.showDeleteWarning = showDeleteWarning;
 
 // Export LINKED ITEMS SYSTEM functions to global scope
-// loadLinkedItemsData moved to linked-items.js
-
-// ===== WARNING SYSTEM FUNCTIONS =====
-// These functions handle warning modals and confirmations
-
-/**
- * Predefined warning types and their configurations
- */
-const WARNING_TYPES = {
-  // מחיקת פריט
-  DELETE: {
-    id: 'delete',
-    title: 'מחיקת {itemType}',
-    message: 'האם אתה בטוח שברצונך למחוק את {itemType} "{itemName}"?',
-    icon: 'fas fa-trash-alt',
-    theme: 'danger',
-    actions: ['cancel', 'delete'],
-    defaultAction: 'cancel',
-  },
-
-  // פריטים מקושרים
-  LINKED_ITEMS: {
-    id: 'linked_items',
-    title: 'לא ניתן למחוק {itemType}',
-    message: '{itemType} זה מקושר ל-{linkedCount} פריטים במערכת. יש לטפל בהם תחילה.',
-    icon: 'fas fa-link',
-    theme: 'warning',
-    actions: ['close', 'force_delete', 'manage_linked'],
-    defaultAction: 'close',
-  },
-
-  // שגיאת אימות
-  VALIDATION: {
-    id: 'validation',
-    title: 'שגיאת אימות',
-    message: 'שדה "{field}": {message}',
-    icon: 'fas fa-exclamation-triangle',
-    theme: 'warning',
-    actions: ['ok'],
-    defaultAction: 'ok',
-  },
-
-  // אזהרת מערכת
-  SYSTEM: {
-    id: 'system',
-    title: 'אזהרת מערכת',
-    message: '{message}',
-    icon: 'fas fa-exclamation-circle',
-    theme: 'info',
-    actions: ['ok'],
-    defaultAction: 'ok',
-  },
-
-  // אישור פעולה
-  CONFIRMATION: {
-    id: 'confirmation',
-    title: 'אישור פעולה',
-    message: '{message}',
-    icon: 'fas fa-question-circle',
-    theme: 'primary',
-    actions: ['cancel', 'confirm'],
-    defaultAction: 'cancel',
-  },
-};
-
-/**
- * Get warning configuration by type
- * WARNING SYSTEM - Gets warning configuration for specific type
- *
- * @param {string} type - Warning type
- * @param {Object} data - Data to format message with
- * @returns {Object} Warning configuration
- */
-function getWarningConfig(type, data = {}) {
-  const config = WARNING_TYPES[type.toUpperCase()];
-  if (!config) {
-    throw new Error(`Unknown warning type: ${type}`);
-  }
-
-  const result = {
-    ...config,
-    title: formatWarningMessage(config.title, data),
-    message: formatWarningMessage(config.message, data),
-  };
-
-  return result;
-}
-
-/**
- * Format warning message with data
- * WARNING SYSTEM - Formats warning message with dynamic data
- *
- * @param {string} template - Message template
- * @param {Object} data - Data to insert
- * @returns {string} Formatted message
- */
-function formatWarningMessage(template, data) {
-  const result = template.replace(/\{(\w+)\}/g, (match, key) => {
-    const value = data[key] || match;
-    return value;
-  });
-
-  return result;
-}
-
-/**
- * Validate warning data
- * WARNING SYSTEM - Validates warning data parameters
- *
- * @param {string} type - Warning type
- * @param {Object} data - Warning data
- */
-function validateWarningData(type, data) {
-  if (!type || typeof type !== 'string') {
-    throw new Error('Warning type must be a string');
-  }
-
-  if (!WARNING_TYPES[type.toUpperCase()]) {
-    throw new Error(`Unknown warning type: ${type}`);
-  }
-
-  if (data && typeof data !== 'object') {
-    throw new Error('Warning data must be an object');
-  }
-}
-
-/**
- * Get warning theme configuration
- * WARNING SYSTEM - Gets theme configuration for warning modal
- *
- * @param {string} theme - Theme name
- * @returns {Object} Theme configuration
- */
-function getWarningTheme(theme) {
-  const themes = {
-    danger: {
-      headerClass: 'bg-danger text-white',
-      buttonClass: 'btn-danger',
-    },
-    warning: {
-      headerClass: 'bg-warning text-dark',
-      buttonClass: 'btn-warning',
-    },
-    info: {
-      headerClass: 'bg-info text-white',
-      buttonClass: 'btn-info',
-    },
-    primary: {
-      headerClass: 'bg-primary text-white',
-      buttonClass: 'btn-primary',
-    },
-  };
-
-  return themes[theme] || themes.warning;
-}
-
-/**
- * Get warning icon
- * WARNING SYSTEM - Gets icon for warning type
- *
- * @param {string} icon - Icon class or name
- * @returns {string} Icon HTML
- */
-function getWarningIcon(icon) {
-  const icons = {
-    'fas fa-trash-alt': '🗑️',
-    'fas fa-link': '🔗',
-    'fas fa-exclamation-triangle': '⚠️',
-    'fas fa-exclamation-circle': '❗',
-    'fas fa-question-circle': '❓',
-  };
-
-  return icons[icon] || icon;
-}
-
-/**
- * Get warning action buttons
- * WARNING SYSTEM - Generates HTML for warning action buttons
- *
- * @param {Array} actions - Action names
- * @param {string} defaultAction - Default action
- * @param {string} theme - Theme name
- * @param {Function} onConfirm - Confirm callback
- * @param {Function} onCancel - Cancel callback
- * @returns {string} HTML for action buttons
- */
-function getWarningActions(actions, defaultAction, theme, onConfirm = null, onCancel = null) {
-  const actionConfigs = {
-    cancel: {
-      text: 'ביטול',
-      class: 'btn-secondary',
-      action: 'cancel',
-    },
-    ok: {
-      text: 'אישור',
-      class: 'btn-primary',
-      action: 'ok',
-    },
-    delete: {
-      text: 'מחק',
-      class: 'btn-danger',
-      action: 'delete',
-    },
-    confirm: {
-      text: 'אישור',
-      class: 'btn-primary',
-      action: 'confirm',
-    },
-    close: {
-      text: 'סגור',
-      class: 'btn-secondary',
-      action: 'close',
-    },
-    force_delete: {
-      text: 'מחק בכל זאת',
-      class: 'btn-danger',
-      action: 'force_delete',
-    },
-    manage_linked: {
-      text: 'ניהול מקושרים',
-      class: 'btn-info',
-      action: 'manage_linked',
-    },
-  };
-
-  let buttonsHtml = '';
-
-  actions.forEach(actionName => {
-    const actionConfig = actionConfigs[actionName];
-    if (!actionConfig) {return;}
-
-    const isDefault = actionName === defaultAction;
-    const buttonClass = isDefault ? actionConfig.class : 'btn-outline-secondary';
-
-    buttonsHtml += `
-      <button type="button" class="btn ${buttonClass}" 
-              onclick="handleWarningAction('${actionConfig.action}')">
-          ${actionConfig.text}
-      </button>
-    `;
-  });
-
-  return buttonsHtml;
-}
-
-/**
- * Create warning modal
- * WARNING SYSTEM - Creates warning modal with configuration
- *
- * @param {Object} config - Warning configuration
- * @param {Object} options - Modal options
- * @param {Function} onConfirm - Confirm callback
- * @param {Function} onCancel - Cancel callback
- * @returns {string} Modal ID
- */
-function createWarningModal(config, options = {}, onConfirm = null, onCancel = null) {
-  const modalId = `warningModal_${Date.now()}`;
-
-  // Create simple modal HTML
-  const modalHtml = `
-    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="${modalId}Label">
-                        🗑️ ${config.title}
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ${config.message}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                    <button type="button" class="btn btn-danger" onclick="handleWarningAction('delete')">מחק</button>
-                </div>
-            </div>
-        </div>
-    </div>
-  `;
-
-  // Remove existing modal if it exists
-  const existingModal = document.getElementById(modalId);
-  if (existingModal) {
-    existingModal.remove();
-  }
-
-  // Add modal to page
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-  // Store callbacks globally
-  window.warningConfirmCallback = onConfirm;
-  window.warningCancelCallback = onCancel;
-
-  return modalId;
-}
-
-/**
- * Show warning modal
- * WARNING SYSTEM - Shows warning modal for specific type
- *
- * @param {string} type - Warning type
- * @param {Object} data - Warning data
- * @param {Object} options - Modal options
- * @param {Function} onConfirm - Confirm callback
- * @param {Function} onCancel - Cancel callback
- */
-function showWarning(type, data = {}, options = {}, onConfirm = null, onCancel = null) {
-  try {
-    // Store callbacks globally
-    window.warningConfirmCallback = onConfirm;
-    window.warningCancelCallback = onCancel;
-
-    // Create simple modal for DELETE type
-    if (type === 'DELETE') {
-      const modalId = `warningModal_${Date.now()}`;
-      const itemType = data.itemType || 'פריט';
-      const itemName = data.itemName || 'זה';
-
-      const modalHtml = `
-        <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title" id="${modalId}Label">
-                            🗑️ מחיקת ${itemType}
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        האם אתה בטוח שברצונך למחוק את ${itemType} "${itemName}"?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-danger" onclick="handleWarningAction('delete')">מחק</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-      `;
-
-      // Remove existing modal if it exists
-      const existingModal = document.getElementById(modalId);
-      if (existingModal) {
-        existingModal.remove();
-      }
-
-      // Add modal to page
-      document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-      // Show modal
-      const modalElement = document.getElementById(modalId);
-      if (!modalElement) {
-        throw new Error(`Modal element with ID ${modalId} not found`);
-      }
-
-      // Check if Bootstrap is available
-      if (typeof bootstrap === 'undefined' || !bootstrap.Modal) {
-        throw new Error('Bootstrap Modal is not available');
-      }
-
-      const modal = new bootstrap.Modal(modalElement, {
-        backdrop: true,
-        keyboard: true,
-        focus: true,
-      });
-
-      modal.show();
-    }
-    // Create simple modal for CANCEL type
-    else if (type === 'CANCEL') {
-      const modalId = `warningModal_${Date.now()}`;
-      const itemType = data.itemType || 'פריט';
-      const itemName = data.itemName || 'זה';
-
-      const modalHtml = `
-        <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header bg-warning text-dark">
-                        <h5 class="modal-title" id="${modalId}Label">
-                            ❌ ביטול ${itemType}
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        האם אתה בטוח שברצונך לבטל את ${itemType} "${itemName}"?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                        <button type="button" class="btn btn-warning" onclick="handleWarningAction('delete')">בטל</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-      `;
-
-      // Remove existing modal if it exists
-      const existingModal = document.getElementById(modalId);
-      if (existingModal) {
-        existingModal.remove();
-      }
-
-      // Add modal to page
-      document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-      // Show modal
-      const modalElement = document.getElementById(modalId);
-      if (!modalElement) {
-        throw new Error(`Modal element with ID ${modalId} not found`);
-      }
-
-      // Check if Bootstrap is available
-      if (typeof bootstrap === 'undefined' || !bootstrap.Modal) {
-        throw new Error('Bootstrap Modal is not available');
-      }
-
-      const modal = new bootstrap.Modal(modalElement, {
-        backdrop: true,
-        keyboard: true,
-        focus: true,
-      });
-
-      modal.show();
-    } else {
-      console.error('Unknown warning type:', type);
-    }
-  } catch (error) {
-    console.error('Error showing warning:', error);
-
-    // Fallback to simple confirm for CANCEL type
-    if (type === 'CANCEL') {
-      const itemType = data.itemType || 'פריט';
-      const itemName = data.itemName || 'זה';
-
-      if (typeof window.showConfirmationDialog === 'function') {
-        const title = `ביטול ${itemType}`;
-        const message = `האם אתה בטוח שברצונך לבטל את ${itemType} "${itemName}"?`;
-        window.showConfirmationDialog(title, message, onConfirm, onCancel);
-      } else {
-        const confirmed = confirm(`האם אתה בטוח שברצונך לבטל את ${itemType} "${itemName}"?`);
-        if (confirmed && onConfirm) {
-          onConfirm();
-        }
-      }
-    } else {
-      console.error('Error showing warning:', data.message || 'Unknown error');
-    }
-  }
-}
-
-/**
- * Handle warning action
- * WARNING SYSTEM - Handles warning action button clicks
- *
- * @param {string} action - Action to perform
- */
-function handleWarningAction(action) {
-  // Close modal - find any open modal
-  const openModal = document.querySelector('.modal.show');
-  if (openModal) {
-    const modal = bootstrap.Modal.getInstance(openModal);
-    if (modal) {
-      modal.hide();
-    }
-  }
-
-  // Handle action
-  switch (action) {
-  case 'confirm':
-  case 'ok':
-  case 'delete':
-    if (typeof window.warningConfirmCallback === 'function') {
-      window.warningConfirmCallback();
-    }
-    break;
-  case 'cancel':
-  case 'close':
-    if (typeof window.warningCancelCallback === 'function') {
-      window.warningCancelCallback();
-    }
-    break;
-  case 'force_delete':
-    if (typeof window.warningConfirmCallback === 'function') {
-      window.warningConfirmCallback();
-    }
-    break;
-  case 'manage_linked':
-    if (typeof window.showLinkedItemsModal === 'function') {
-      window.showLinkedItemsModal();
-    }
-    break;
-  }
-}
-
-/**
- * Show cancel warning (for tickers)
- * WARNING SYSTEM - Shows warning for cancel operations
- *
- * @param {string} itemType - Type of item being cancelled
- * @param {string} itemName - Name of item being cancelled
- * @param {Function} onConfirm - Confirm callback
- * @param {Function} onCancel - Cancel callback
- */
-function showCancelWarning(itemType, itemName, onConfirm = null, onCancel = null) {
-  // Fallback mapping for item types
-  const itemTypeDisplay = itemType === 'alert' ? 'התראה' :
-    itemType === 'ticker' ? 'טיקר' :
-      itemType === 'account' ? 'חשבון' :
-        itemType === 'trade' ? 'טרייד' :
-          itemType === 'trade_plan' ? 'תוכנית טרייד' :
-            itemType === 'execution' ? 'ביצוע' :
-              itemType === 'cash_flow' ? 'תזרים מזומנים' :
-                itemType === 'note' ? 'הערה' : 'אובייקט';
-
-  // Try to use the warning system, fallback to notification system
-  try {
-    return showWarning('CANCEL', {
-      itemType: itemTypeDisplay,
-      itemName,
-    }, {}, onConfirm, onCancel);
-  } catch (error) {
-    console.error('Error in showCancelWarning fallback:', error);
-
-    // Fallback to notification system
-    if (typeof window.showConfirmationDialog === 'function') {
-      const title = `ביטול ${itemTypeDisplay}`;
-      const message = `האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?`;
-      window.showConfirmationDialog(title, message, onConfirm, onCancel);
-    } else {
-      // Fallback למערכת ההודעות שלנו
-      if (typeof window.showWarningNotification === 'function') {
-        window.showWarningNotification('אישור נדרש', `האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?`);
-        // הצג כפתורי אישור/ביטול
-        setTimeout(() => {
-          if (typeof window.showConfirmationButtons === 'function') {
-            window.showConfirmationButtons(`האם אתה בטוח שברצונך לבטל את ${itemTypeDisplay} "${itemName}"?`, onConfirm, onCancel);
-          } else {
-            // Fallback אחרון - הצג הודעה בלבד
-            console.warn('אישור נדרש: ביטול פריט');
-            if (onConfirm) {
-              onConfirm();
-            }
-          }
-        }, 1000);
-      } else {
-        console.warn('אישור נדרש: ביטול פריט');
-        if (onConfirm) {
-          onConfirm();
-        }
-      }
-    }
-  }
-}
-
-/**
- * Show validation warning legacy
- * WARNING SYSTEM - Legacy validation warning function
- *
- * @param {string} field - Field name
- * @param {string} message - Validation message
- */
-function showValidationWarningLegacy(field, message) {
-  // Use the global validation warning system from notification-system.js if available
-  if (typeof window.notificationSystem !== 'undefined' && window.notificationSystem.showValidationWarning) {
-    window.notificationSystem.showValidationWarning(field, message);
-  } else if (window.showErrorNotification) {
-    // Use our notification system instead of alert
-    window.showErrorNotification('שגיאת וולידציה', `${message}`);
-  } else {
-    // Fallback to console error if notification system is not available
-    console.error('Validation error:', field, message);
-  }
-}
-
-// Export WARNING SYSTEM functions to global scope
-window.WARNING_TYPES = WARNING_TYPES;
-window.getWarningConfig = getWarningConfig;
-window.formatWarningMessage = formatWarningMessage;
-window.validateWarningData = validateWarningData;
-window.getWarningTheme = getWarningTheme;
-window.getWarningIcon = getWarningIcon;
-window.getWarningActions = getWarningActions;
-window.createWarningModal = createWarningModal;
-window.showWarning = showWarning;
-window.handleWarningAction = handleWarningAction;
-window.showCancelWarning = showCancelWarning;
-window.showValidationWarningLegacy = showValidationWarningLegacy;
+window.loadLinkedItemsData = loadLinkedItemsData;
 
 // Export the module itself
 window.notificationSystem = {
   // ALERTS SYSTEM functions
-  // ALERTS SYSTEM functions moved to future features roadmap
+  createAlert,
+  updateAlert,
+  markAlertAsTriggered,
+  markAlertAsRead,
+
 
   // NOTIFICATION SYSTEM functions
   showNotification,
@@ -1105,21 +576,7 @@ window.notificationSystem = {
   showDeleteWarning,
 
   // LINKED ITEMS SYSTEM functions
-  // loadLinkedItemsData moved to linked-items.js
-
-  // WARNING SYSTEM functions
-  WARNING_TYPES,
-  getWarningConfig,
-  formatWarningMessage,
-  validateWarningData,
-  getWarningTheme,
-  getWarningIcon,
-  getWarningActions,
-  createWarningModal,
-  showWarning,
-  handleWarningAction,
-  showCancelWarning,
-  showValidationWarningLegacy,
+  loadLinkedItemsData,
 };
 
 // בדיקת פונקציות בסוף טעינת notification-system.js
@@ -1129,4 +586,3 @@ window.notificationSystem = {
 // window.showDeleteWarning קיים
 // window.showConfirmationDialog קיים
 
-console.log('=== מערכת ההודעות נטענה בהצלחה ===');

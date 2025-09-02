@@ -512,7 +512,7 @@ class FilterSystem {
 
 
   // עדכון אפשרויות חשבונות
-  updateAccountOptions(accounts) {
+  updateAccountOptions(_accounts) {
     // כאן נוכל להוסיף לוגיקה לעדכון רשימת החשבונות בפילטר
   }
 }

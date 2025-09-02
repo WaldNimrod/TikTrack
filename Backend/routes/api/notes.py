@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request, send_from_directory
 from config.database import get_db
 from models.note import Note
 from services.validation_service import ValidationService
+from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 import os
 import uuid

@@ -14,11 +14,13 @@ from sqlalchemy.orm import Session
 from config.database import get_db
 from services.user_service import UserService
 from models.user import User
+from services.advanced_cache_service import cache_for, invalidate_cache
 
 # Create blueprint
 users_bp = Blueprint('users', __name__)
 
 @users_bp.route('/api/v1/users/', methods=['GET'])
+@cache_for(ttl=300)  # Cache for 5 minutes - users don't change frequently
 def get_users():
     """Get all users"""
     try:

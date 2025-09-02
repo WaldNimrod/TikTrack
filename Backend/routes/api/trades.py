@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.trade_service import TradeService
+from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 
 logger = logging.getLogger(__name__)
@@ -9,6 +10,7 @@ logger = logging.getLogger(__name__)
 trades_bp = Blueprint('trades', __name__, url_prefix='/api/v1/trades')
 
 @trades_bp.route('/', methods=['GET'])
+@cache_for(ttl=30)  # Cache for 30 seconds - trades change frequently
 def get_trades():
     """Get all trades with filtering options"""
     try:
@@ -52,6 +54,7 @@ def get_trades():
         db.close()
 
 @trades_bp.route('/<int:trade_id>', methods=['GET'])
+@cache_for(ttl=60)  # Cache for 1 minute - individual trades
 def get_trade(trade_id: int):
     """Get trade by ID"""
     try:

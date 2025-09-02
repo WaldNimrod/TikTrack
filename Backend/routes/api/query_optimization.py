@@ -19,6 +19,7 @@ from services.smart_query_optimizer import (
     clear_query_profiles,
     export_query_profiles
 )
+from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 import tempfile
 import os
@@ -31,6 +32,7 @@ query_optimization_bp = Blueprint('query_optimization', __name__, url_prefix='/a
 
 
 @query_optimization_bp.route('/', methods=['GET'])
+@cache_for(ttl=60)  # Cache for 1 minute - system status doesn't change frequently
 def get_query_optimization_status():
     """Get query optimization system status"""
     try:

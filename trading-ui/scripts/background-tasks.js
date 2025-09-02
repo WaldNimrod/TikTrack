@@ -56,7 +56,7 @@ const utils = {
     try {
       const date = new Date(timestamp);
       return date.toLocaleString('he-IL');
-    } catch (e) {
+    } catch {
       return timestamp;
     }
   },
@@ -72,7 +72,7 @@ const utils = {
       window.showNotification(message, type);
     } else {
       // Fallback למקרה שמערכת התראות לא זמינה
-      console.log(`${type.toUpperCase()}: ${message}`);
+      // console.log(`${type.toUpperCase()}: ${message}`);
     }
   },
 
@@ -121,7 +121,7 @@ const apiService = {
 
       return await response.json();
     } catch (error) {
-      console.error('API request failed:', error);
+      // console.error('API request failed:', error);
       utils.showNotification(`שגיאה בפנייה לשרת: ${error.message}`, 'error');
       throw error;
     }
@@ -325,7 +325,8 @@ const uiManager = {
 }
                 </td>
                 <td>
-                    <button class="btn btn-sm btn-primary" onclick="showHistoryDetails('${entry.execution_id || entry.timestamp}')">
+                    <button class="btn btn-sm btn-primary" 
+                            onclick="showHistoryDetails('${entry.execution_id || entry.timestamp}')">
                         <i class="fas fa-eye"></i> צפה
                     </button>
                 </td>
@@ -585,8 +586,8 @@ const eventHandlers = {
     try {
       const status = await apiService.getStatus();
       uiManager.updateStatus(status);
-    } catch (error) {
-      console.error('Failed to refresh status:', error);
+    } catch {
+      // console.error('Failed to refresh status:', error);
     }
   },
 
@@ -598,8 +599,8 @@ const eventHandlers = {
       utils.showLoading('refresh-tasks', true);
       const tasks = await apiService.getTasks();
       uiManager.renderTasks(tasks.tasks || []);
-    } catch (error) {
-      console.error('Failed to refresh tasks:', error);
+    } catch {
+      // console.error('Failed to refresh tasks:', error);
     } finally {
       utils.showLoading('refresh-tasks', false);
     }
@@ -619,8 +620,8 @@ const eventHandlers = {
     try {
       const tasks = await apiService.getTasks(params);
       uiManager.renderTasks(tasks.tasks || []);
-    } catch (error) {
-      console.error('Failed to apply filters:', error);
+    } catch {
+      // console.error('Failed to apply filters:', error);
     }
   },
 
@@ -633,8 +634,8 @@ const eventHandlers = {
       const hours = document.getElementById('history-hours')?.value || 24;
       const history = await apiService.getHistory({ hours });
       uiManager.renderHistory(history.history || []);
-    } catch (error) {
-      console.error('Failed to refresh history:', error);
+    } catch {
+      // console.error('Failed to refresh history:', error);
     } finally {
       utils.showLoading('refresh-history', false);
     }
@@ -655,8 +656,8 @@ const eventHandlers = {
     try {
       const history = await apiService.getHistory(params);
       uiManager.renderHistory(history.history || []);
-    } catch (error) {
-      console.error('Failed to apply history filters:', error);
+    } catch {
+      // console.error('Failed to apply history filters:', error);
     }
   },
 
@@ -669,8 +670,8 @@ const eventHandlers = {
       const period = document.getElementById('analytics-period')?.value || '7d';
       const analytics = await apiService.getAnalytics({ period });
       uiManager.renderAnalytics(analytics);
-    } catch (error) {
-      console.error('Failed to refresh analytics:', error);
+    } catch {
+      // console.error('Failed to refresh analytics:', error);
     } finally {
       utils.showLoading('refresh-analytics', false);
     }
@@ -683,7 +684,7 @@ const eventHandlers = {
     if (!currentTaskName) {return;}
 
     try {
-      await executeTask(currentTaskName);
+      await window.executeTask(currentTaskName);
       modalManager.closeModal();
     } catch (error) {
       console.error('Failed to execute modal task:', error);
@@ -697,7 +698,7 @@ const eventHandlers = {
     if (!currentTaskName) {return;}
 
     try {
-      await toggleTask(currentTaskName);
+      await window.toggleTask(currentTaskName);
       modalManager.closeModal();
       await this.refreshTasks();
     } catch (error) {

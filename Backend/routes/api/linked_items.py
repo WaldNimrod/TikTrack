@@ -34,6 +34,7 @@ Recent Updates:
 
 from flask import Blueprint, jsonify, request
 from typing import Dict, List, Any, Optional
+from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 
 # Setup logging
@@ -55,6 +56,7 @@ def get_db_connection():
     return conn
 
 @linked_items_bp.route('/types', methods=['GET'])
+@cache_for(ttl=600)  # Cache for 10 minutes - entity types don't change
 def get_entity_types():
     """Get all available entity types and their mappings"""
     try:

@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.account_service import AccountService
+from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 
 logger = logging.getLogger(__name__)
@@ -9,6 +10,7 @@ logger = logging.getLogger(__name__)
 accounts_bp = Blueprint('accounts', __name__, url_prefix='/api/v1/accounts')
 
 @accounts_bp.route('/', methods=['GET'])
+@cache_for(ttl=60)  # Cache for 1 minute - accounts don't change frequently
 def get_accounts():
     """Get all accounts"""
     try:
@@ -31,6 +33,7 @@ def get_accounts():
         db.close()
 
 @accounts_bp.route('/<int:account_id>', methods=['GET'])
+@cache_for(ttl=120)  # Cache for 2 minutes - individual accounts
 def get_account(account_id: int):
     """Get account by ID"""
     try:
@@ -65,6 +68,10 @@ def create_account():
         data = request.get_json()
         db: Session = next(get_db())
         account = AccountService.create(db, data)
+        
+        # Invalidate cache when creating new account
+        invalidate_cache('accounts')
+        
         return jsonify({
             "status": "success",
             "data": account.to_dict(),
@@ -102,6 +109,9 @@ def update_account(account_id: int):
         db: Session = next(get_db())
         account = AccountService.update(db, account_id, data)
         if account:
+            # Invalidate cache when updating account
+            invalidate_cache('accounts')
+            invalidate_cache(f'account_{account_id}')
             return jsonify({
                 "status": "success",
                 "data": account.to_dict(),
@@ -137,6 +147,7 @@ def update_account(account_id: int):
         db.close()
 
 @accounts_bp.route('/<int:account_id>/open-trades', methods=['GET'])
+@cache_for(ttl=30)  # Cache for 30 seconds - open trades change frequently
 def get_account_open_trades(account_id: int):
     """Get account's open trades"""
     try:
@@ -190,6 +201,9 @@ def delete_account(account_id: int):
         # Try to delete (this will check for all linked items)
         success = AccountService.delete(db, account_id)
         if success:
+            # Invalidate cache when deleting account
+            invalidate_cache('accounts')
+            invalidate_cache(f'account_{account_id}')
             return jsonify({
                 "status": "success",
                 "message": "Account deleted successfully",
@@ -215,6 +229,7 @@ def delete_account(account_id: int):
         db.close()
 
 @accounts_bp.route('/<int:account_id>/stats', methods=['GET'])
+@cache_for(ttl=60)  # Cache for 1 minute - stats don't change frequently
 def get_account_stats(account_id: int):
     """Get account statistics"""
     try:

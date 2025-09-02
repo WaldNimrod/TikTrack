@@ -941,13 +941,14 @@ class ActiveAlertsComponent extends HTMLElement {
     let relatedDisplay = '';
 
     switch (relatedTypeId) {
-    case 1: // חשבון
+    case 1: { // חשבון
       // נציג שם חשבון עם מטבע
       const accountNames = ['חשבון מעודכן (USD)', 'חשבון השקעות (ILS)', 'חשבון מסחר (USD)', 'חשבון פנסיה (ILS)'];
       const accountName = accountNames[relatedObjectId % accountNames.length];
       relatedDisplay = accountName;
       break;
-    case 2: // טרייד
+    }
+    case 2: { // טרייד
       // נציג טרייד עם סוג השקעה, צד ותאריך בפורמט: טרייד | סווינג | Long | 24.3.25
       const investmentTypes = ['סווינג', 'השקעה', 'פסיבי'];
       const sides = ['Long', 'Short'];
@@ -957,7 +958,8 @@ class ActiveAlertsComponent extends HTMLElement {
 
       relatedDisplay = `טרייד | ${investmentType} | ${side} | ${tradeDate}`;
       break;
-    case 3: // תוכנית
+    }
+    case 3: { // תוכנית
       // נציג תוכנית עם סוג השקעה, צד ותאריך בפורמט: תוכנית | סווינג | Long | 24.3.25
       const planTypes = ['סווינג', 'השקעה', 'פסיבי'];
       const planSides = ['Long', 'Short'];
@@ -966,10 +968,12 @@ class ActiveAlertsComponent extends HTMLElement {
       const planDate = new Date().toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.');
       relatedDisplay = `תוכנית | ${planType} | ${planSide} | ${planDate}`;
       break;
-    case 4: // טיקר - נציג את הסימבול עם המילה "טיקר:"
+    }
+    case 4: { // טיקר - נציג את הסימבול עם המילה "טיקר:"
       const symbol = this.getSymbolFromRelatedObject(relatedTypeId, relatedObjectId);
       relatedDisplay = symbol ? `טיקר: ${symbol}` : `טיקר ${relatedObjectId}`;
       break;
+    }
     default:
       relatedDisplay = `אובייקט ${relatedObjectId}`;
     }
@@ -1009,23 +1013,27 @@ class ActiveAlertsComponent extends HTMLElement {
     // כרגע נחזיר סימבול דמה - בהמשך יטען מהשרת
     // בהתבסס על סוג האובייקט המקושר
     switch (relatedType) {
-    case 'ticker':
+    case 'ticker': {
       // אם זה טיקר, נחזיר סימבול אקראי
       const tickerSymbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA', 'SPY', 'QQQ', 'IWM', 'AMZN', 'META', 'NFLX', 'AMD', 'INTC', 'ORCL', 'CRM', 'ADBE'];
       const symbol = tickerSymbols[relatedObjectId % tickerSymbols.length];
       return symbol;
-    case 'trade':
+    }
+    case 'trade': {
       // אם זה טרייד, נחזיר סימבול דמה
       const tradeSymbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA'];
       return tradeSymbols[relatedObjectId % tradeSymbols.length];
-    case 'trade_plan':
+    }
+    case 'trade_plan': {
       // אם זה תכנון טרייד, נחזיר סימבול דמה
       const planSymbols = ['SPY', 'QQQ', 'IWM', 'AMZN', 'META'];
       return planSymbols[relatedObjectId % planSymbols.length];
-    case 'account':
+    }
+    case 'account': {
       // אם זה חשבון, נחזיר שם החשבון
       const accountNames = ['חשבון מעודכן', 'חשבון השקעות', 'חשבון מסחר', 'חשבון פנסיה'];
       return accountNames[relatedObjectId % accountNames.length];
+    }
     default:
       return 'התראה';
     }

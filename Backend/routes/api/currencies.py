@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.currency_service import CurrencyService
+from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 import os
 import sqlite3
@@ -21,6 +22,7 @@ def get_db_connection():
     return conn
 
 @currencies_bp.route('/', methods=['GET'])
+@cache_for(ttl=600)  # Cache for 10 minutes - currencies don't change frequently
 def get_currencies():
     """Get all currencies"""
     try:

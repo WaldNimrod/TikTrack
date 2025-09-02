@@ -245,14 +245,14 @@ class HeaderSystem {
         box-shadow: none;
         background: transparent;
       }
-      
+
       /* Development tools icon styling */
       .tiktrack-nav-link[data-page="development-tools"] .nav-text {
         font-size: 0.8rem;
         color: #6c757d;
         opacity: 0.8;
       }
-      
+
       .tiktrack-nav-link[data-page="development-tools"]:hover .nav-text {
         color: #495057;
         opacity: 1;
@@ -355,7 +355,7 @@ class HeaderSystem {
              background: #F2F2F7;
              color: #3C3C43;
            }
-           
+
            /* Section headers styling */
            .dropdown-section-header {
              padding: 0.5rem 1rem;
@@ -367,7 +367,7 @@ class HeaderSystem {
              cursor: default;
              user-select: none;
            }
-           
+
            .dropdown-section-header:hover {
              background-color: #f8f9fa;
              color: #6c757d;
@@ -617,25 +617,27 @@ class HeaderSystem {
                         <span class="nav-text">בית</span>
                       </a>
                     </li>
-                    
+
                     <li class="tiktrack-nav-item">
                       <a href="/trade_plans" class="tiktrack-nav-link" data-page="trade_plans">
                         <span class="nav-text">תכנון</span>
                       </a>
                     </li>
-                    
+
                     <li class="tiktrack-nav-item">
                       <a href="/trades" class="tiktrack-nav-link" data-page="trades">
                         <span class="nav-text">מעקב</span>
                       </a>
                     </li>
-                    
+
                     <li class="tiktrack-nav-item">
                       <a href="/research" class="tiktrack-nav-link" data-page="research">
                         <span class="nav-text">מחקר</span>
                       </a>
                     </li>
-                    
+
+
+
                     <li class="tiktrack-nav-item dropdown">
                       <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="settings">
                         <span class="nav-text">הגדרות</span>
@@ -652,42 +654,92 @@ class HeaderSystem {
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/constraints">אילוצים</a></li>
                       </ul>
                     </li>
-                    
+
                     <li class="tiktrack-nav-item dropdown">
                       <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="development-tools">
-                        <span class="nav-text">🔧</span>
+                        <span class="nav-text">🔧 כלי פיתוח</span>
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
                         <!-- 🗑️ פעולות מערכת -->
-                        <li class="dropdown-section-header">🗑️ פעולות מערכת</li>
-                        <li><a class="tiktrack-dropdown-item" href="#" onclick="clearDevelopmentCache(event)" style="color: #ff6b6b;">
-                          <i class="fas fa-trash"></i> נקה Cache (פיתוח)
-                        </a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/notifications-center">מרכז התראות</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/background-tasks">ניהול משימות ברקע</a></li>
-                        
-                        <li><hr class="dropdown-divider"></li>
-                        
+                        <li class="dropdown-submenu">
+                          <a href="#" class="tiktrack-dropdown-item tiktrack-submenu-toggle">
+                            <span>🗑️ פעולות מערכת</span>
+                            <span class="submenu-arrow">▶</span>
+                          </a>
+                          <ul class="tiktrack-submenu">
+                            <li><a class="tiktrack-dropdown-item" href="#" onclick="clearDevelopmentCache(event)" style="color: #ff6b6b;">
+                              <i class="fas fa-trash"></i> נקה Cache (פיתוח)
+                            </a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/notifications-center">מרכז התראות</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/background-tasks">ניהול משימות ברקע</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/system_health.html">בריאות מערכת</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/log_viewer.html">צפייה בלוגים</a></li>
+                          </ul>
+                        </li>
+
                         <!-- 🎨 ממשק משתמש -->
-                        <li class="dropdown-section-header">🎨 ממשק משתמש</li>
-                        <li><a class="tiktrack-dropdown-item" href="/style_demonstration">הדגמת סגנונות</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/numeric-value-colors-demo">הדגמת צבעים לערכים מספריים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/designs">עיצובים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">מיפוי סקריפטים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/js-map">מפת JS</a></li>
-                        
-                        <li><hr class="dropdown-divider"></li>
-                        
+                        <li class="dropdown-submenu">
+                          <a href="#" class="tiktrack-dropdown-item tiktrack-submenu-toggle">
+                            <span>🎨 ממשק משתמש</span>
+                            <span class="submenu-arrow">▶</span>
+                          </a>
+                          <ul class="tiktrack-submenu">
+                            <li><a class="tiktrack-dropdown-item" href="/style_demonstration">הדגמת סגנונות</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/numeric-value-colors-demo">הדגמת צבעים לערכים מספריים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/designs">עיצובים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">מיפוי סקריפטים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/js-map">מפת JS</a></li>
+                          </ul>
+                        </li>
+
                         <!-- 🔍 בדיקות ונתונים -->
-                        <li class="dropdown-section-header">🔍 בדיקות ונתונים</li>
-                        <li><a class="tiktrack-dropdown-item" href="/system-test-center">נתונים חיצוניים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/server-monitor">ניטור שרת</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/cache-test">בדיקת Cache</a></li>
+                        <li class="dropdown-submenu">
+                          <a href="#" class="tiktrack-dropdown-item tiktrack-submenu-toggle">
+                            <span>🔍 בדיקות ונתונים</span>
+                            <span class="submenu-arrow">▶</span>
+                          </a>
+                          <ul class="tiktrack-submenu">
+                            <li><a class="tiktrack-dropdown-item" href="/system-test-center">מרכז בדיקות מערכת</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/external-data-dashboard">דשבורד נתונים חיצוניים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/server-monitor">ניטור שרת</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/cache-test">בדיקת Cache</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/constraints">אילוצים</a></li>
+                          </ul>
+                        </li>
+
+                        <!-- 🚀 מערכת נתונים חיצוניים -->
+                        <li class="dropdown-submenu">
+                          <a href="#" class="tiktrack-dropdown-item tiktrack-submenu-toggle">
+                            <span>🚀 מערכת נתונים חיצוניים</span>
+                            <span class="submenu-arrow">▶</span>
+                          </a>
+                          <ul class="tiktrack-submenu">
+                            <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 ניהול מערכת</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/yahoo_finance_test.html">בדיקת Yahoo Finance</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/data_integration_demo.html">הדגמת אינטגרציה</a></li>
+                          </ul>
+                        </li>
+
+                        <!-- 🛠️ כלי פיתוח מתקדמים -->
+                        <li class="dropdown-submenu">
+                          <a href="#" class="tiktrack-dropdown-item tiktrack-submenu-toggle">
+                            <span>🛠️ כלי פיתוח מתקדמים</span>
+                            <span class="submenu-arrow">▶</span>
+                          </a>
+                          <ul class="tiktrack-submenu">
+                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/developer_tools.html">כלי מפתח</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/api_testing.html">בדיקת API</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/performance_monitoring.html">ניטור ביצועים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/security_monitoring.html">ניטור אבטחה</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/audit_logs.html">יומני ביקורת</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/communication_monitoring.html">ניטור תקשורת</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/external_data_integration_client/pages/network_status.html">סטטוס רשת</a></li>
+                          </ul>
+                        </li>
                       </ul>
                     </li>
                   </ul>
@@ -700,7 +752,7 @@ class HeaderSystem {
                   <span class="logo-text">פשוט לנהל תיק</span>
                 </div>
               </div>
-              
+
               <!-- כפתור פילטר עגול -->
               <div class="filter-toggle-section">
                 <button class="filter-toggle-btn" id="filterToggleBtn" title="הצג/הסתר פילטרים">
@@ -853,10 +905,10 @@ class HeaderSystem {
             <!-- פילטר חיפוש -->
             <div class="filter-group search-filter">
               <div class="search-input-wrapper">
-                <input 
-                  type="text" 
-                  id="searchFilterInput" 
-                  class="search-filter-input" 
+                <input
+                  type="text"
+                  id="searchFilterInput"
+                  class="search-filter-input"
                   placeholder="חיפוש..."
                   autocomplete="off"
                 >
@@ -898,6 +950,9 @@ class HeaderSystem {
       }
     });
 
+    // הוספת event listeners לתפריטי משנה כדי לבטל טיימרים
+    this.setupSubmenuEventListeners();
+
     // Event listeners for dropdown hover behavior
     document.addEventListener('mouseenter', e => {
       if (e.target && typeof e.target.closest === 'function') {
@@ -929,6 +984,38 @@ class HeaderSystem {
         const submenu = e.target.closest('.submenu');
         if (submenu && submenu.classList.contains('show')) {
           this.handleSubmenuMouseEnter(submenu);
+        }
+
+        // ביטול טיימרים של התפריט הראשי כשהעכבר נכנס לתפריט משנה
+        const parentMenu = e.target.closest('.tiktrack-dropdown-menu');
+        if (parentMenu) {
+          this.clearMenuTimers(parentMenu);
+        }
+      }
+    });
+
+    // Event listeners נוספים לתפריטי משנה
+    document.addEventListener('mouseenter', e => {
+      if (e.target && typeof e.target.closest === 'function') {
+        // ביטול טיימרים כשהעכבר נכנס לתפריט משנה
+        if (e.target.closest('.submenu') || e.target.closest('.dropdown-submenu')) {
+          const parentMenu = e.target.closest('.tiktrack-dropdown-menu');
+          if (parentMenu) {
+            this.clearMenuTimers(parentMenu);
+          }
+        }
+      }
+    });
+
+    // Event listener נוסף לטיפול בתפריטי משנה
+    document.addEventListener('mouseover', e => {
+      if (e.target && typeof e.target.closest === 'function') {
+        // ביטול טיימרים כשהעכבר עובר לתפריט משנה
+        if (e.target.closest('.submenu') || e.target.closest('.dropdown-submenu')) {
+          const parentMenu = e.target.closest('.tiktrack-dropdown-menu');
+          if (parentMenu) {
+            this.clearMenuTimers(parentMenu);
+          }
         }
       }
     });
@@ -1143,11 +1230,28 @@ class HeaderSystem {
   handleSubmenuMouseEnter(submenu) {
     // ביטול טיימר סגירה כשהעכבר נכנס לתפריט משנה
     this.clearDropdownTimer();
+
+    // ביטול טיימרים של התפריט הראשי
+    const parentMenu = submenu.closest('.tiktrack-dropdown-menu');
+    if (parentMenu) {
+      this.clearMenuTimers(parentMenu);
+    }
   }
 
   handleSubmenuMouseLeave(submenu) {
-    // הפעלת טיימר לסגירה אחרי יציאת העכבר מתפריט משנה
-    this.startMenuTimer('dropdown', 500); // זמן קצר לסגירה אחרי יציאת העכבר
+    // בדיקה אם העכבר עבר לתפריט משנה אחר
+    const relatedTarget = event.relatedTarget;
+    if (relatedTarget && (
+      relatedTarget.closest('.submenu') ||
+      relatedTarget.closest('.tiktrack-dropdown-menu') ||
+      relatedTarget.closest('.dropdown-submenu')
+    )) {
+      // העכבר עבר לתפריט אחר - לא סוגרים
+      return;
+    }
+
+    // העכבר יצא מכל התפריטים - הפעלת טיימר לסגירה
+    this.startMenuTimer('dropdown', 1000); // זמן ארוך יותר לסגירה
   }
 
   toggleDropdown(dropdownMenu) {
@@ -1818,6 +1922,9 @@ class HeaderSystem {
           } else {
             menu.classList.add('show');
             this.setupMenuAutoClose(menu);
+            
+            // הוספת event listeners לתפריטי משנה
+            this.setupSubmenuEventListenersForMenu(menu);
           }
         }
       });
@@ -1833,6 +1940,27 @@ class HeaderSystem {
             this.clearMenuTimers(menu);
           });
         }
+      }
+    });
+  }
+
+  // פונקציה להגדרת event listeners לתפריטי משנה של תפריט ספציפי
+  setupSubmenuEventListenersForMenu(menu) {
+    // הוספת event listeners לתפריטי משנה קיימים
+    const submenus = menu.querySelectorAll('.submenu, .dropdown-submenu');
+    submenus.forEach(submenu => {
+      this.addSubmenuEventListenersToElement(submenu);
+    });
+
+    // הוספת event listener לתפריט הראשי
+    menu.addEventListener('mouseenter', () => {
+      this.clearMenuTimers(menu);
+    });
+
+    // הוספת event listener לתפריטי משנה
+    menu.addEventListener('mouseover', (e) => {
+      if (e.target.closest('.submenu') || e.target.closest('.dropdown-submenu')) {
+        this.clearMenuTimers(menu);
       }
     });
   }
@@ -1857,11 +1985,27 @@ class HeaderSystem {
       }
     };
 
-    const handleMouseLeave = () => {
+    const handleMouseLeave = e => {
+      // בדיקה אם העכבר עבר לתפריט משנה
+      const relatedTarget = e.relatedTarget;
+      if (relatedTarget && (
+        relatedTarget.closest('.submenu') ||
+        relatedTarget.closest('.tiktrack-dropdown-menu') ||
+        relatedTarget.closest('.dropdown-submenu') ||
+        relatedTarget.closest('.tiktrack-nav-item')
+      )) {
+        // העכבר עבר לתפריט משנה - לא סוגרים
+        return;
+      }
+
+      // העכבר יצא מהתפריט הראשי - הפעלת טיימר לסגירה
       mouseLeaveTimer = setTimeout(() => {
-        menu.classList.remove('show');
-        this.clearMenuTimers(menu);
-      }, 5000);
+        // בדיקה נוספת שהעכבר לא חזר לתפריט
+        if (!menu.matches(':hover') && !this.isMouseInSubmenu()) {
+          menu.classList.remove('show');
+          this.clearMenuTimers(menu);
+        }
+      }, 2000); // זמן ארוך יותר לסגירה
     };
 
     // הוספת event listeners
@@ -1896,6 +2040,85 @@ class HeaderSystem {
       menu.removeEventListener('mouseleave', menu._handleMouseLeave);
       menu._handleMouseLeave = null;
     }
+  }
+
+    // פונקציה עזר לבדיקה אם העכבר נמצא בתפריט משנה
+  isMouseInSubmenu() {
+    // בדיקה אם העכבר נמצא בתפריט משנה כלשהו
+    const submenu = document.querySelector('.submenu:hover');
+    const dropdownSubmenu = document.querySelector('.dropdown-submenu:hover');
+    
+    // בדיקה אם העכבר נמצא בתפריט הראשי
+    const dropdownMenu = document.querySelector('.tiktrack-dropdown-menu:hover');
+    
+    // בדיקה אם העכבר נמצא בפריט תפריט
+    const navItem = document.querySelector('.tiktrack-nav-item:hover');
+    
+    // בדיקה אם העכבר נמצא בפריט תפריט נפתח
+    const navDropdown = document.querySelector('.tiktrack-nav-item.dropdown:hover');
+    
+    return !!(submenu || dropdownSubmenu || dropdownMenu || navItem || navDropdown);
+  }
+
+  // פונקציה להגדרת event listeners לתפריטי משנה
+  setupSubmenuEventListeners() {
+    // הוספת event listeners לתפריטי משנה קיימים
+    this.addSubmenuEventListeners();
+
+    // הוספת event listeners לתפריטי משנה חדשים שנוצרים
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              if (node.classList && (node.classList.contains('submenu') || node.classList.contains('dropdown-submenu'))) {
+                this.addSubmenuEventListenersToElement(node);
+              }
+              // בדיקה של ילדים שנוספו
+              const submenus = node.querySelectorAll('.submenu, .dropdown-submenu');
+              submenus.forEach(submenu => this.addSubmenuEventListenersToElement(submenu));
+            }
+          });
+        }
+      });
+    });
+
+    // התחלת מעקב אחרי שינויים ב-DOM
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  }
+
+  // פונקציה להוספת event listeners לאלמנט תפריט משנה
+  addSubmenuEventListenersToElement(submenu) {
+    if (submenu._submenuEventListenersAdded) return;
+
+    submenu.addEventListener('mouseenter', () => {
+      // ביטול טיימרים של התפריט הראשי
+      const parentMenu = submenu.closest('.tiktrack-dropdown-menu');
+      if (parentMenu) {
+        this.clearMenuTimers(parentMenu);
+      }
+    });
+
+    submenu.addEventListener('mouseover', () => {
+      // ביטול טיימרים של התפריט הראשי
+      const parentMenu = submenu.closest('.tiktrack-dropdown-menu');
+      if (parentMenu) {
+        this.clearMenuTimers(parentMenu);
+      }
+    });
+
+    submenu._submenuEventListenersAdded = true;
+  }
+
+  // פונקציה להוספת event listeners לכל תפריטי המשנה הקיימים
+  addSubmenuEventListeners() {
+    const submenus = document.querySelectorAll('.submenu, .dropdown-submenu');
+    submenus.forEach(submenu => {
+      this.addSubmenuEventListenersToElement(submenu);
+    });
   }
 
 
@@ -2455,64 +2678,6 @@ class HeaderSystem {
     });
   }
 
-
-  // ניקוי כל הפילטרים
-  clearAllFilters() {
-    // ניקוי פילטר סטטוס
-    document.querySelectorAll('#statusFilterMenu .status-filter-item.selected').forEach(item => {
-      item.classList.remove('selected');
-    });
-
-    // ניקוי פילטר סוג
-    document.querySelectorAll('#typeFilterMenu .type-filter-item.selected').forEach(item => {
-      item.classList.remove('selected');
-    });
-
-    // ניקוי פילטר חשבון
-    document.querySelectorAll('#accountFilterMenu .account-filter-item.selected').forEach(item => {
-      item.classList.remove('selected');
-    });
-
-    // ניקוי פילטר חיפוש
-    const searchInput = document.querySelector('#searchFilterInput');
-    if (searchInput) {
-      searchInput.value = '';
-    }
-
-    // ניקוי פילטר תאריכים
-    const dateRangeDisplay = document.querySelector('#dateRangeFilterDisplay');
-    if (dateRangeDisplay) {
-      dateRangeDisplay.textContent = 'כל זמן';
-    }
-
-    // הפעלת הפילטרים המעודכנים
-    if (window.filterSystem && window.filterSystem.resetFilters) {
-      window.filterSystem.resetFilters();
-    } else {
-      // Fallback - הצגת כל הרשומות
-      const visibleContainers = getVisibleContainers();
-      for (const containerId of visibleContainers) {
-        showAllRecordsInTable(containerId);
-      }
-    }
-  }
-
-  // ניקוי פילטר חיפוש
-  clearSearchFilter() {
-    const searchInput = document.querySelector('#searchFilterInput');
-    if (searchInput) {
-      searchInput.value = '';
-      // הפעלת פילטר חיפוש ריק כדי להציג את כל הרשומות
-      if (window.applySearchFilter) {
-        window.applySearchFilter('');
-      }
-    }
-
-    if (window.filterSystem) {
-      window.filterSystem.currentFilters.search = '';
-      window.filterSystem.applyAllFilters();
-    }
-  }
 
   // ניווט לדף
   navigateToPage(href) {
@@ -4761,3 +4926,4 @@ async function clearDevelopmentCache(event) {
 window.clearDevelopmentCache = clearDevelopmentCache;
 
 // Header System JS loaded completely
+

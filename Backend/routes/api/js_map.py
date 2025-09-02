@@ -47,6 +47,7 @@ import re
 import json
 from flask import Blueprint, jsonify, request, current_app
 from pathlib import Path
+from services.advanced_cache_service import cache_for, invalidate_cache
 
 # Create blueprint
 js_map_bp = Blueprint('js_map', __name__, url_prefix='/api/js-map')
@@ -56,6 +57,7 @@ TRADING_UI_PATH = Path(__file__).parent.parent.parent.parent / 'trading-ui'
 SCRIPTS_PATH = TRADING_UI_PATH / 'scripts'
 
 @js_map_bp.route('/files-list', methods=['GET'])
+@cache_for(ttl=300)  # Cache for 5 minutes - JS files don't change frequently
 def get_js_files_list():
     """
     Get list of all JavaScript files in the scripts directory

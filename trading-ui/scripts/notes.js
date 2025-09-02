@@ -22,12 +22,12 @@
  */
 
 // פונקציות בסיסיות
-function openNoteDetails(id) {
+function openNoteDetails(_id) {
   showAddNoteModal();
 }
 
-function editNote(id) {
-  showEditNoteModal(id);
+function editNote(_id) {
+  showEditNoteModal(_id);
 }
 
 function deleteNote(id) {
@@ -208,7 +208,7 @@ async function loadNotesData() {
 
     // בדיקה אם הנתונים ריקים או לא תקינים
     if (!notes || notes.length === 0) {
-      console.warn('⚠️ לא נמצאו הערות בשרת');
+      // console.warn('⚠️ לא נמצאו הערות בשרת');
       const tbody = document.querySelector('#notesTable tbody');
       if (tbody) {
         tbody.innerHTML = `
@@ -229,21 +229,21 @@ async function loadNotesData() {
     // טעינת נתונים נוספים (חשבונות, טריידים, תוכניות, טיקרים)
 
     // פונקציה לטעינת נתונים עם טיפול בשגיאות
-    const loadDataSafely = async (url, dataName) => {
+    const loadDataSafely = async (url, _dataName) => {
       try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          console.warn(`⚠️ שגיאה בטעינת ${dataName}: ${response.status}`);
+        const innerResponse = await fetch(url);
+        if (!innerResponse.ok) {
+          // console.warn(`⚠️ שגיאה בטעינת ${_dataName}: ${innerResponse.status}`);
           return [];
         }
-        const data = await response.json();
+        const data = await innerResponse.json();
         if (data.status === 'error') {
-          console.warn(`⚠️ שגיאה ב-API ${dataName}: ${data.error?.message || 'שגיאה לא ידועה'}`);
+          // console.warn(`⚠️ שגיאה ב-API ${_dataName}: ${data.error?.message || 'שגיאה לא ידועה'}`);
           return [];
         }
         return Array.isArray(data.data) ? data.data : [];
-      } catch (error) {
-        console.warn(`⚠️ שגיאה בטעינת ${dataName}:`, error);
+      } catch {
+        // console.warn(`⚠️ שגיאה בטעינת ${_dataName}:`);
         return [];
       }
     };
@@ -381,8 +381,8 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
       case 2: { // טרייד
         const trade = trades.find(t => t.id === note.related_id);
         if (trade) {
-          const date = trade.created_at || trade.date;
-          const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+          const tradeDate = trade.created_at || trade.date;
+          const formattedDate = tradeDate ? new Date(tradeDate).toLocaleDateString('he-IL') : 'לא מוגדר';
           const side = trade.side || 'לא מוגדר';
           relatedDisplay = `טרייד | ${side} | ${formattedDate}`;
           // קביעת סימבול לטרייד
@@ -403,8 +403,8 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
       case 3: { // תוכנית
         const plan = tradePlans.find(p => p.id === note.related_id);
         if (plan) {
-          const date = plan.created_at || plan.date;
-          const formattedDate = date ? new Date(date).toLocaleDateString('he-IL') : 'לא מוגדר';
+          const planDate = plan.created_at || plan.date;
+          const formattedDate = planDate ? new Date(planDate).toLocaleDateString('he-IL') : 'לא מוגדר';
           const side = plan.side || 'לא מוגדר';
           relatedDisplay = `תוכנית | ${side} | ${formattedDate}`;
           // קביעת סימבול לתוכנית
@@ -462,31 +462,40 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
     let symbolLink = symbolDisplay;
     if (note.related_type_id === 1) {
       // עבור חשבונות - הצג רק אייקון קישור
-      symbolLink = `<a href="#" onclick="viewLinkedItemsForNote(${note.id})" class="symbol-link" title="עבור לדף החשבון">🔗</a>`;
+      symbolLink = `<a href='#' onclick='viewLinkedItemsForNote(${note.id})' ` +
+        'class=\'symbol-link\' title=\'עבור לדף החשבון\'>🔗</a>';
     } else if (symbolDisplay && symbolDisplay !== '-' && symbolDisplay !== '') {
       // עבור טיקרים, טריידים ותוכניות - הצג אייקון קישור + סימבול
-      symbolLink = `<a href="#" onclick="showTickerPage('${symbolDisplay}')" class="symbol-link" title="עבור לדף הטיקר">🔗</a> ${symbolDisplay}`;
+      symbolLink = `<a href='#' onclick='showTickerPage("${symbolDisplay}")' ` +
+        `class='symbol-link' title='עבור לדף הטיקר'>🔗</a> ${symbolDisplay}`;
     }
 
     return `
-      <tr onclick="viewNote(${note.id})" style="cursor: pointer;">
-        <td class="ticker-cell"><span class="symbol-text">${symbolLink}</span></td>
-        <td style="padding: 0;" data-type="${typeForFilter}">
-          <div class="related-object-cell ${relatedClass}" style="justify-content: flex-start; text-align: right; min-width: 150px;">
+      <tr onclick='viewNote(${note.id})' style='cursor: pointer;'>
+        <td class='ticker-cell'><span class='symbol-text'>${symbolLink}</span></td>
+        <td style='padding: 0;' data-type='${typeForFilter}'>
+          <div class='related-object-cell ${relatedClass}' 
+            style='justify-content: flex-start; text-align: right; min-width: 150px;'>
             ${relatedDisplay}
           </div>
         </td>
         <td>${contentDisplay}</td>
         <td>${attachmentDisplay}</td>
-        <td data-date="${note.created_at}">${date}</td>
-        <td class="actions-cell" onclick="event.stopPropagation();">
-          <button class="btn btn-sm btn-info" onclick="window.showLinkedItemsModal && window.showLinkedItemsModal([], 'note', ${note.id})" title="צפה בפריטים מקושרים">
+        <td data-date='${note.created_at}'>${date}</td>
+        <td class='actions-cell' onclick='event.stopPropagation();'>
+          <button class='btn btn-sm btn-info' 
+            onclick='window.showLinkedItemsModal && window.showLinkedItemsModal([], "note", ${note.id})' 
+            title='צפה בפריטים מקושרים'>
             🔗
           </button>
-          <button class="btn btn-sm btn-secondary" onclick="editNote('${note.id}')" title="ערוך הערה">
+          <button class='btn btn-sm btn-secondary' 
+            onclick='editNote("${note.id}")' 
+            title='ערוך הערה'>
             ✏️
           </button>
-          <button class="btn btn-sm btn-danger" onclick="deleteNote('${note.id}')" title="מחק הערה">
+          <button class='btn btn-sm btn-danger' 
+            onclick='deleteNote("${note.id}")' 
+            title='מחק הערה'>
             🗑️
           </button>
         </td>
@@ -547,7 +556,13 @@ function updateNotesSummary(notes) {
 }
 
 // פונקציה לעדכון גלובלי של הטבלה (נדרשת עבור הפילטרים)
-function updateGridFromComponent(selectedStatuses, selectedTypes, selectedAccounts, selectedDateRange, searchTerm) {
+function updateGridFromComponent(
+  _selectedStatuses,
+  _selectedTypes,
+  _selectedAccounts,
+  _selectedDateRange,
+  _searchTerm,
+) {
   // כרגע רק נטען מחדש את הנתונים
   loadNotesData();
 }
@@ -635,10 +650,10 @@ async function loadNoteData(noteId) {
         handleElementNotFound('populateEditSelectByType', `לא נמצא רדיו באטון עבור ערך: ${relationType}`);
       }
     } else {
-      console.warn('⚠️ אין סוג קשר מוגדר');
+      // console.warn('⚠️ אין סוג קשר מוגדר');
     }
 
-  } catch (error) {
+  } catch {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתוני הערה');
     }
@@ -667,7 +682,7 @@ async function loadModalData() {
     populateSelect('noteRelatedObjectSelect', tickers, 'symbol', '');
     populateSelect('editNoteRelatedObjectSelect', tickers, 'symbol', '');
 
-  } catch (error) {
+  } catch {
     // המשך עם מערכים ריקים
     updateRadioButtons([], [], [], []);
   }
@@ -849,7 +864,7 @@ async function populateEditSelectByType(relationType, selectedId) {
       }, 100);
     }
 
-  } catch (error) {
+  } catch {
     // שגיאה במילוי רשימה לעריכה
   }
 }
@@ -1061,7 +1076,7 @@ async function saveNote() {
       }
     }
 
-  } catch (error) {
+  } catch {
     window.showErrorNotification('שגיאה בשמירה', 'שגיאה בשמירת הערה - בדוק את הנתונים שהוזנו');
   }
 }
@@ -1076,7 +1091,7 @@ async function updateNoteFromModal() {
 
   // בדיקה אם נדרשת מחיקת קובץ
   const shouldRemoveAttachment = window.removeAttachmentFlag === true;
-  const shouldReplaceAttachment = window.replaceAttachmentFlag === true;
+  // const shouldReplaceAttachment = window.replaceAttachmentFlag === true;
 
   // ולידציה מקיפה
   if (!validateEditNoteForm(content, relationType, relatedId, attachment)) {
@@ -1184,7 +1199,7 @@ async function updateNoteFromModal() {
       }
     }
 
-  } catch (error) {
+  } catch {
     window.showErrorNotification('שגיאה בעדכון', 'שגיאה בעדכון הערה - בדוק את הנתונים שהוזנו');
   }
 }
@@ -1235,7 +1250,7 @@ async function deleteNoteFromServer(noteId) {
         return; // יציאה עם שגיאה
       }
 
-    } catch (error) {
+    } catch {
       retryCount++;
 
       if (retryCount >= maxRetries) {
@@ -1272,24 +1287,24 @@ function clearNoteValidationErrors() {
   }
 }
 
-function getFieldByErrorId(errorId) {
-  switch (errorId) {
-  case 'contentError':
-    return document.getElementById('noteContent');
-  case 'editContentError':
-    return document.getElementById('editNoteContent');
-  case 'relationTypeError':
-    return document.querySelector('input[name="noteRelationType"]:checked')?.closest('.col-md-6');
-  case 'editRelationTypeError':
-    return document.querySelector('input[name="editNoteRelationType"]:checked')?.closest('.col-md-6');
-  case 'relatedObjectError':
-    return document.getElementById('noteRelatedObjectSelect');
-  case 'editRelatedObjectError':
-    return document.getElementById('editNoteRelatedObjectSelect');
-  default:
-    return null;
-  }
-}
+// function getFieldByErrorId(errorId) {
+//   switch (errorId) {
+//   case 'contentError':
+//     return document.getElementById('noteContent');
+//   case 'editContentError':
+//     return document.getElementById('editNoteContent');
+//   case 'relationTypeError':
+//     return document.querySelector('input[name="noteRelationType"]:checked')?.closest('.col-md-6');
+//   case 'editRelationTypeError':
+//     return document.querySelector('input[name="editNoteRelationType"]:checked')?.closest('.col-md-6');
+//   case 'relatedObjectError':
+//     return document.getElementById('noteRelatedObjectSelect');
+//   case 'editRelatedObjectError':
+//     return document.getElementById('editNoteRelatedObjectSelect');
+//   default:
+//     return null;
+//   }
+// }
 
 window.loadNotesData = loadNotesData;
 window.updateNotesTable = updateNotesTable;
@@ -1609,7 +1624,7 @@ function formatText(command, mode = 'add') {
     break;
   }
   default:
-    console.warn(`⚠️ פקודה לא מוכרת: ${command}`);
+    // console.warn(`⚠️ פקודה לא מוכרת: ${command}`);
   }
 }
 
@@ -1690,7 +1705,7 @@ window.clearSelectedFile = clearSelectedFile;
 // פונקציה לסינון הערות לפי חיפוש
 function filterNotesData(searchTerm) {
   if (!window.notesData) {
-    console.warn('⚠️ אין נתוני הערות זמינים לסינון');
+    // console.warn('⚠️ אין נתוני הערות זמינים לסינון');
     return;
   }
 
@@ -1708,7 +1723,7 @@ function filterNotesData(searchTerm) {
 // פונקציה לסינון הערות לפי סוג
 function filterNotesByType(type) {
   if (!window.notesData) {
-    console.warn('⚠️ אין נתוני הערות זמינים לסינון');
+    // console.warn('⚠️ אין נתוני הערות זמינים לסינון');
     return;
   }
 

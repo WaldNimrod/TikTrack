@@ -485,8 +485,8 @@ async function deleteCashFlow(id) {
     } else {
       throw new Error(result.error || 'שגיאה לא ידועה');
     }
-  } catch (error) {
-    console.error('❌ Delete error:', error);
+  } catch {
+    // console.error('❌ Delete error:', error);
     window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת תזרים המזומנים');
   }
 }
@@ -754,13 +754,17 @@ function renderCashFlowsTable() {
             <td style="text-align: center;">${rateDisplay}</td>
             <td style="text-align: center;">${formatDate(cashFlow.date)}</td>
             <td>${cashFlow.description || '-'}</td>
-            <td>${window.translateCashFlowSource ? window.translateCashFlowSource(cashFlow.source) : cashFlow.source}</td>
+            <td>${window.translateCashFlowSource ?
+    window.translateCashFlowSource(cashFlow.source) :
+    cashFlow.source}</td>
             <td>${cashFlow.external_id || '0'}</td>
             <td style="text-align: center;">${formatDateOnly(cashFlow.created_at)}</td>
             <td class="actions-cell">
-                ${createLinkButton(`window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`)}
-                ${createEditButton(`showEditCashFlowModal(${cashFlow.id})`)}
-                ${createDeleteButton(`deleteCashFlow(${cashFlow.id})`)}
+              ${createLinkButton(
+    `window.showLinkedItemsModal && window.showLinkedItemsModal([], 'cash_flow', ${cashFlow.id})`,
+  )}
+              ${createEditButton(`showEditCashFlowModal(${cashFlow.id})`)}
+              ${createDeleteButton(`deleteCashFlow(${cashFlow.id})`)}
 
             </td>
         `;
@@ -842,6 +846,13 @@ function getCashFlowTypeWithColor(type) {
   }
 
   return `<span class="${typeClass}"><strong>${typeTranslation}</strong></span>`;
+}
+
+/**
+ * קבלת סוג תזרים כטקסט בלבד (ללא HTML)
+ */
+function getCashFlowTypeText(type) {
+  return window.translateCashFlowType ? window.translateCashFlowType(type) : type;
 }
 
 /**
@@ -955,7 +966,13 @@ window.toggleCashFlowsSection = toggleCashFlowsSection;
 window.restoreCashFlowsSectionState = restoreCashFlowsSectionState;
 window.saveCashFlow = saveCashFlow;
 window.updateCashFlow = updateCashFlow;
+
+// יצירת alias לפונקציית המחיקה לשמירה על תאימות
+function confirmDeleteCashFlow(id) {
+  return deleteCashFlow(id);
+}
 window.confirmDeleteCashFlow = confirmDeleteCashFlow;
+
 // window.viewLinkedItemsForCashFlow = viewLinkedItemsForCashFlow; // נמחק
 
 // ===== פונקציות סידור =====
@@ -1082,9 +1099,9 @@ function setupValidationListeners() {
         validateField(fieldId, this.value, 'add');
       });
       field.addEventListener('input', function() {
-        const field = document.getElementById(fieldId);
-        if (field && window.clearFieldValidation) {
-          window.clearFieldValidation(field);
+        const inputField = document.getElementById(fieldId);
+        if (inputField && window.clearFieldValidation) {
+          window.clearFieldValidation(inputField);
         }
       });
     }
@@ -1099,9 +1116,9 @@ function setupValidationListeners() {
         validateField(fieldId, this.value, 'edit');
       });
       field.addEventListener('input', function() {
-        const field = document.getElementById(fieldId);
-        if (field && window.clearFieldValidation) {
-          window.clearFieldValidation(field);
+        const inputField = document.getElementById(fieldId);
+        if (inputField && window.clearFieldValidation) {
+          window.clearFieldValidation(inputField);
         }
       });
     }
@@ -1251,22 +1268,7 @@ function validateField(fieldId, value, formType) {
  */
 // showFieldError() - זמינה גלובלית מ-ui-utils.js כ-showValidationWarning
 
-/**
- * ניקוי שגיאה משדה בודד
- */
-function clearFieldError(fieldId, formType) {
-  const field = document.getElementById(fieldId);
-  const errorDiv = document.getElementById(fieldId + 'Error');
-
-  if (field) {
-    field.classList.remove('is-invalid');
-  }
-
-  if (errorDiv) {
-    errorDiv.textContent = '';
-    errorDiv.style.display = 'none';
-  }
-}
+// Function removed - not used anywhere
 
 /**
  * אתחול שדות מזהה חיצוני במודלים

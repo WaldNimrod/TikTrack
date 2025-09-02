@@ -16,6 +16,7 @@ from pathlib import Path
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.user_service import UserService
+from services.advanced_cache_service import cache_for, invalidate_cache
 
 # Create blueprint
 preferences_bp = Blueprint('preferences', __name__)
@@ -87,6 +88,7 @@ def get_user_id_from_request() -> int:
         return UserService.DEFAULT_USER_ID
 
 @preferences_bp.route('/api/v1/preferences/', methods=['GET'])
+@cache_for(ttl=300)  # Cache for 5 minutes - preferences don't change frequently
 def get_preferences():
     """Get user preferences with fallback to default user"""
     try:

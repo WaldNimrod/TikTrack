@@ -340,8 +340,8 @@ async function updateEditTickerInfo() {
     try {
       const tickers = await window.tickerService.getTickers();
       ticker = tickers.find(t => t.id === tickerId);
-    } catch (error) {
-      console.warn('Error getting tickers from service:', error);
+    } catch {
+      // console.warn('Error getting tickers from service:', error);
     }
   }
 
@@ -527,63 +527,7 @@ async function saveEditTradePlan() {
 }
 
 
-/**
- * עדכון תכנון בשרת
- */
-async function updateTradePlanOnServer(formData) {
-  try {
-
-
-    // שליחה לשרת
-    const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const response = await fetch(`${base}/api/v1/trade_plans/${formData.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText);
-    }
-
-    // הצגת הודעת הצלחה
-    if (typeof window.showSuccessNotification === 'function') {
-      window.showSuccessNotification('תכנון עודכן בהצלחה!', 'התכנון עודכן בהצלחה בשרת');
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification('תכנון עודכן בהצלחה!', 'success');
-    }
-
-    // סגירת המודל
-    const modal = bootstrap.Modal.getInstance(document.getElementById('editTradePlanModal'));
-    if (modal) {
-      modal.hide();
-    }
-
-    // רענון הטבלה
-    await loadTradePlansData();
-
-  } catch (error) {
-    handleSaveError(error, 'עדכון תכנון');
-
-    // הצגת הודעת שגיאה
-    let errorMessage = 'שגיאה בעדכון התכנון';
-    try {
-      const errorData = JSON.parse(error.message);
-      errorMessage = errorData.error?.message || errorMessage;
-    } catch {
-      errorMessage = error.message || errorMessage;
-    }
-
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בעדכון תכנון', errorMessage);
-    } else if (typeof window.showNotification === 'function') {
-      window.showNotification(errorMessage, 'error');
-    }
-  }
-}
+// Function removed - not used anywhere
 
 /**
  * בדיקת פריטים מקושרים לפני ביטול תכנון
@@ -636,7 +580,7 @@ async function checkLinkedItemsBeforeCancel(tradePlanId) {
     }
 
   } catch (error) {
-    console.error('❌ שגיאה בבדיקת פריטים מקושרים:', error);
+    // console.error('❌ שגיאה בבדיקת פריטים מקושרים:', error);
     if (typeof window.handleSystemError === 'function') {
       window.handleSystemError(error, 'בדיקת פריטים מקושרים');
     } else if (typeof window.handleDataLoadError === 'function') {
@@ -682,7 +626,7 @@ async function reactivateTradePlan(tradePlanId) {
       if (typeof window.updateTickerActiveTradesStatus === 'function') {
         await window.updateTickerActiveTradesStatus(tradePlan.ticker_id);
       } else {
-        console.warn('⚠️ updateTickerActiveTradesStatus function not available');
+        // console.warn('⚠️ updateTickerActiveTradesStatus function not available');
       }
     }
 

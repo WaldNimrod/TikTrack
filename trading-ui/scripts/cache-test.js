@@ -265,10 +265,10 @@ class CacheTestSystem {
      * Clear all cache entries
      */
   async clearCache() {
-    try {
-      const button = document.getElementById('clear-cache-btn');
-      const originalText = button.innerHTML;
+    const button = document.getElementById('clear-cache-btn');
+    const originalText = button.innerHTML;
 
+    try {
       button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מנקה...';
       button.disabled = true;
 
@@ -291,7 +291,6 @@ class CacheTestSystem {
       this.log(`Failed to clear cache: ${error.message}`, 'error');
       this.showNotification('שגיאה בניקוי Cache', 'error');
     } finally {
-      const button = document.getElementById('clear-cache-btn');
       button.innerHTML = originalText;
       button.disabled = false;
     }
@@ -301,10 +300,10 @@ class CacheTestSystem {
      * Perform health check
      */
   async performHealthCheck() {
-    try {
-      const button = document.getElementById('health-check-btn');
-      const originalText = button.innerHTML;
+    const button = document.getElementById('health-check-btn');
+    const originalText = button.innerHTML;
 
+    try {
       button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> בודק...';
       button.disabled = true;
 
@@ -336,10 +335,10 @@ class CacheTestSystem {
      * Get cache statistics
      */
   async getCacheStats() {
-    try {
-      const button = document.getElementById('stats-btn');
-      const originalText = button.innerHTML;
+    const button = document.getElementById('stats-btn');
+    const originalText = button.innerHTML;
 
+    try {
       button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> טוען...';
       button.disabled = true;
 
@@ -370,10 +369,10 @@ class CacheTestSystem {
      * Refresh all data
      */
   async refreshAllData() {
-    try {
-      const button = document.getElementById('refresh-btn');
-      const originalText = button.innerHTML;
+    const button = document.getElementById('refresh-btn');
+    const originalText = button.innerHTML;
 
+    try {
       button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מרענן...';
       button.disabled = true;
 

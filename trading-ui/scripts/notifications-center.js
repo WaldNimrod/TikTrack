@@ -41,9 +41,6 @@ class NotificationsCenter {
     // אתחול UI
     this.initUI();
 
-    // טעינת הגדרות
-    this.loadSettings();
-
     // אתחול סטטיסטיקות
     this.updateStats();
 
@@ -61,7 +58,7 @@ class NotificationsCenter {
 
   initUI() {
     // עדכון סטטוס חיבור
-    this.updateConnectionStatus();
+    this.updateConnectionStatus('connecting');
 
     // עדכון הגדרות
     this.updateSettingsUI();
@@ -158,6 +155,7 @@ class NotificationsCenter {
 
     // עדכון סטטיסטיקות
     this.stats[type]++;
+    this.updateStats();
 
     // עדכון UI
     this.updateNotificationsUI();
@@ -235,6 +233,8 @@ class NotificationsCenter {
     const statusDot = document.getElementById('connectionStatus').querySelector('.status-dot');
     const statusText = document.getElementById('connectionStatus').querySelector('.status-text');
     const websocketStatus = document.getElementById('websocketStatus');
+    const connectionTimeElement = document.getElementById('connectionTime');
+    const messagesSentElement = document.getElementById('messagesSent');
 
     // הסרת כל הקלאסים הקיימים
     statusDot.className = 'status-dot';
@@ -249,25 +249,38 @@ class NotificationsCenter {
       statusDot.classList.add('disconnected');
       statusText.textContent = 'מנותק';
       websocketStatus.textContent = 'לא פעיל';
+      connectionTimeElement.textContent = '-';
+      messagesSentElement.textContent = '0';
       break;
     case 'connecting':
       statusDot.classList.add('connecting');
       statusText.textContent = 'מתחבר...';
       websocketStatus.textContent = 'מתחבר...';
+      connectionTimeElement.textContent = '-';
+      messagesSentElement.textContent = '0';
       break;
     }
 
-    // עדכון זמן חיבור
+    // עדכון זמן חיבור והודעות
     if (status === 'connected' && window.realtimeNotificationsClient) {
-      const stats = window.realtimeNotificationsClient.getConnectionStats();
-      if (stats.connectedAt) {
-        const connectionTime = new Date(stats.connectedAt);
-        const now = new Date();
-        const diff = Math.floor((now - connectionTime) / 1000);
-        document.getElementById('connectionTime').textContent = this.formatDuration(diff);
-      }
+      try {
+        const stats = window.realtimeNotificationsClient.getConnectionStats();
+        
+        if (stats && stats.connectedAt) {
+          const connectionTime = new Date(stats.connectedAt);
+          const now = new Date();
+          const diff = Math.floor((now - connectionTime) / 1000);
+          connectionTimeElement.textContent = this.formatDuration(diff);
+        } else {
+          connectionTimeElement.textContent = 'עכשיו';
+        }
 
-      document.getElementById('messagesSent').textContent = stats.totalMessages || 0;
+        messagesSentElement.textContent = (stats && stats.totalMessages) ? stats.totalMessages : 0;
+      } catch (error) {
+        console.warn('שגיאה בעדכון סטטיסטיקות חיבור:', error);
+        connectionTimeElement.textContent = 'עכשיו';
+        messagesSentElement.textContent = '0';
+      }
     }
   }
 
@@ -327,6 +340,14 @@ class NotificationsCenter {
     }
 
     container.innerHTML = filteredHistory.map(notification => this.createNotificationHTML(notification)).join('');
+  }
+
+  updateStats() {
+    // עדכון סטטיסטיקות פנימיות
+    this.stats.success = this.notifications.filter(n => n.type === 'success').length;
+    this.stats.error = this.notifications.filter(n => n.type === 'error').length;
+    this.stats.warning = this.notifications.filter(n => n.type === 'warning').length;
+    this.stats.info = this.notifications.filter(n => n.type === 'info').length;
   }
 
   updateStatsUI() {
@@ -469,6 +490,18 @@ class NotificationsCenter {
     }
   }
 
+  loadHistory() {
+    // טעינת היסטוריית התראות מלוקל סטורג'
+    this.loadFromLocalStorage();
+
+    // עדכון סטטיסטיקות לאחר טעינה
+    this.updateStats();
+
+    // עדכון UI
+    this.updateHistoryUI();
+    this.updateStatsUI();
+  }
+
   // שמירה לקובץ לוג
   saveToLogFile(notification) {
     try {
@@ -501,14 +534,18 @@ class NotificationsCenter {
     this.notifications = this.notifications.filter(n => n.id !== id);
     this.history = this.history.filter(n => n.id !== id);
 
+    this.updateStats();
     this.updateNotificationsUI();
     this.updateHistoryUI();
+    this.updateStatsUI();
     this.saveToLocalStorage();
   }
 
   clearLiveNotifications() {
     this.notifications = [];
+    this.updateStats();
     this.updateNotificationsUI();
+    this.updateStatsUI();
     this.saveToLocalStorage();
 
     window.showSuccessNotification('מרכז התראות', 'התראות פעילות נוקו בהצלחה');
@@ -543,9 +580,58 @@ class NotificationsCenter {
   startAutoRefresh() {
     // רענון אוטומטי כל 30 שניות
     setInterval(() => {
-      this.updateConnectionStatus();
+      // עדכון סטטוס חיבור רק אם יש שינוי
+      if (window.realtimeNotificationsClient) {
+        const isConnected = window.realtimeNotificationsClient.isConnected();
+        const currentStatus = this.getCurrentConnectionStatus();
+        
+        if (isConnected && currentStatus !== 'connected') {
+          this.updateConnectionStatus('connected');
+        } else if (!isConnected && currentStatus !== 'disconnected') {
+          this.updateConnectionStatus('disconnected');
+        }
+      }
+      
       this.updateNotificationsUI();
     }, 30000);
+
+    // עדכון זמן חיבור כל שנייה כאשר מחובר
+    setInterval(() => {
+      if (window.realtimeNotificationsClient && window.realtimeNotificationsClient.isConnected()) {
+        this.updateConnectionTime();
+      }
+    }, 1000);
+  }
+
+  updateConnectionTime() {
+    try {
+      const connectionTimeElement = document.getElementById('connectionTime');
+      if (connectionTimeElement && window.realtimeNotificationsClient) {
+        const stats = window.realtimeNotificationsClient.getConnectionStats();
+        if (stats && stats.connectedAt) {
+          const connectionTime = new Date(stats.connectedAt);
+          const now = new Date();
+          const diff = Math.floor((now - connectionTime) / 1000);
+          connectionTimeElement.textContent = this.formatDuration(diff);
+        }
+      }
+    } catch (error) {
+      console.warn('שגיאה בעדכון זמן חיבור:', error);
+    }
+  }
+
+  getCurrentConnectionStatus() {
+    try {
+      const statusDot = document.getElementById('connectionStatus');
+      if (statusDot) {
+        if (statusDot.querySelector('.connected')) return 'connected';
+        if (statusDot.querySelector('.disconnected')) return 'disconnected';
+        if (statusDot.querySelector('.connecting')) return 'connecting';
+      }
+    } catch (error) {
+      console.warn('שגיאה בקבלת סטטוס חיבור נוכחי:', error);
+    }
+    return 'connecting';
   }
 }
 

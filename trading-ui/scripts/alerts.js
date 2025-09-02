@@ -310,7 +310,7 @@ function updateAlertsTable(alerts) {
       tradePlans = (tradePlansResponse.data || tradePlansResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
       tickers = (tickersResponse.data || tickersResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
     } catch (error) {
-      console.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error);
+      // // console.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error);
       // המשך עם מערכים ריקים
       accounts = [];
       trades = [];
@@ -329,19 +329,19 @@ function updateAlertsTable(alerts) {
       let relatedIcon = '';
       let relatedClass = '';
 
-      console.log('🔍 Alert details:', {
-        id: alert.id,
-        related_type_id: alert.related_type_id,
-        related_id: alert.related_id,
-        status: alert.status,
-      });
+      // console.log('🔍 Alert details:', {
+      //   id: alert.id,
+      //   related_type_id: alert.related_type_id,
+      //   related_id: alert.related_id,
+      //   status: alert.status,
+      // });
 
-      console.log('📊 Related data counts:', {
-        accounts: accounts.length,
-        trades: trades.length,
-        tradePlans: tradePlans.length,
-        tickers: tickers.length,
-      });
+      // console.log('📊 Related data counts:', {
+      //   accounts: accounts.length,
+      //   trades: trades.length,
+      //   tradePlans: tradePlans.length,
+      //   tickers: tickers.length,
+      // });
 
       // טיפול במקרים שבהם related_type_id הוא null
       if (alert.related_type_id === null || alert.related_id === null) {
@@ -351,25 +351,26 @@ function updateAlertsTable(alerts) {
 
       } else {
         switch (alert.related_type_id) {
-        case 1: // חשבון
-          console.log(`🔍 Looking for account with ID: ${alert.related_id}`);
-          console.log('🔍 Available accounts:', accounts.map(a => ({ id: a.id, name: a.name || a.account_name })));
+        case 1: { // חשבון
+          // console.log(`🔍 Looking for account with ID: ${alert.related_id}`);
+          // console.log('🔍 Available accounts:', accounts.map(a => ({ id: a.id, name: a.name || a.account_name })));
           const account = accounts.find(a => a.id === alert.related_id);
           if (account) {
             const name = account.name || account.account_name || 'לא מוגדר';
             const currency = account.currency || 'ILS';
             relatedDisplay = `${name} (${currency})`;
-            console.log(`✅ Found account: ${name} (${currency})`);
+            // console.log(`✅ Found account: ${name} (${currency})`);
           } else {
             relatedDisplay = `חשבון ${alert.related_id}`;
-            console.log(`❌ Account not found for ID: ${alert.related_id}`);
+            // console.log(`❌ Account not found for ID: ${alert.related_id}`);
           }
           relatedIcon = '🏦';
           relatedClass = 'related-account';
           break;
-        case 2: // טרייד
-          console.log(`🔍 Looking for trade with ID: ${alert.related_id}`);
-          console.log('🔍 Available trades:', trades.map(t => ({ id: t.id, created_at: t.created_at, date: t.date, side: t.side, investment_type: t.investment_type })));
+        }
+        case 2: { // טרייד
+          // console.log(`🔍 Looking for trade with ID: ${alert.related_id}`);
+          // console.log('🔍 Available trades:', trades.map(t => ({ id: t.id, created_at: t.created_at, date: t.date, side: t.side, investment_type: t.investment_type })));
           const trade = trades.find(t => t.id === alert.related_id);
           if (trade) {
             const date = trade.created_at || trade.date;
@@ -377,17 +378,18 @@ function updateAlertsTable(alerts) {
             const side = trade.side || 'לא מוגדר';
             const investmentType = trade.investment_type || 'לא מוגדר';
             relatedDisplay = `טרייד | ${side} | ${investmentType} | ${formattedDate}`;
-            console.log(`✅ Found trade: ${relatedDisplay}`);
+            // console.log(`✅ Found trade: ${relatedDisplay}`);
           } else {
             relatedDisplay = `טרייד ${alert.related_id}`;
-            console.log(`❌ Trade not found for ID: ${alert.related_id}`);
+            // console.log(`❌ Trade not found for ID: ${alert.related_id}`);
           }
           relatedIcon = '📈';
           relatedClass = 'related-trade';
           break;
-        case 3: // תוכנית
-          console.log(`🔍 Looking for trade plan with ID: ${alert.related_id}`);
-          console.log('🔍 Available trade plans:', tradePlans.map(p => ({ id: p.id, created_at: p.created_at, date: p.date, side: p.side, investment_type: p.investment_type })));
+        }
+        case 3: { // תוכנית
+          // console.log(`🔍 Looking for trade plan with ID: ${alert.related_id}`);
+          // console.log('🔍 Available trade plans:', tradePlans.map(p => ({ id: p.id, created_at: p.created_at, date: p.date, side: p.side, investment_type: p.investment_type })));
           const plan = tradePlans.find(p => p.id === alert.related_id);
           if (plan) {
             const date = plan.created_at || plan.date;
@@ -395,58 +397,60 @@ function updateAlertsTable(alerts) {
             const side = plan.side || 'לא מוגדר';
             const investmentType = plan.investment_type || 'לא מוגדר';
             relatedDisplay = `תוכנית | ${side} | ${investmentType} | ${formattedDate}`;
-            console.log(`✅ Found trade plan: ${relatedDisplay}`);
+            // console.log(`✅ Found trade plan: ${relatedDisplay}`);
           } else {
             relatedDisplay = `תוכנית ${alert.related_id}`;
-            console.log(`❌ Trade plan not found for ID: ${alert.related_id}`);
+            // console.log(`❌ Trade plan not found for ID: ${alert.related_id}`);
           }
           relatedIcon = '📋';
           relatedClass = 'related-plan';
           break;
-        case 4: // טיקר
-          console.log(`🔍 Looking for ticker with ID: ${alert.related_id}`);
-          console.log('🔍 Available tickers:', tickers.map(t => ({ id: t.id, symbol: t.symbol })));
+        }
+        case 4: { // טיקר
+          // console.log(`🔍 Looking for ticker with ID: ${alert.related_id}`);
+          // console.log('🔍 Available tickers:', tickers.map(t => ({ id: t.id, symbol: t.symbol })));
           const ticker = tickers.find(t => t.id === alert.related_id);
           if (ticker) {
             relatedDisplay = ticker.symbol;
-            console.log(`✅ Found ticker: ${ticker.symbol}`);
+            // console.log(`✅ Found ticker: ${ticker.symbol}`);
           } else {
             relatedDisplay = `טיקר ${alert.related_id}`;
-            console.log(`❌ Ticker not found for ID: ${alert.related_id}`);
+            // console.log(`❌ Ticker not found for ID: ${alert.related_id}`);
           }
           relatedIcon = '📊';
           relatedClass = 'related-ticker';
           break;
+        }
         default:
           relatedDisplay = `אובייקט ${alert.related_id}`;
           relatedIcon = '❓';
           relatedClass = 'related-other';
-          console.log(`❓ Unknown related_type_id: ${alert.related_type_id}`);
+          // console.log(`❓ Unknown related_type_id: ${alert.related_type_id}`);
         }
       }
 
       // קביעת הסימבול לטור הראשון
       let symbolDisplay = '';
-      if (alert.related_type_id == 1) { // חשבון - ריק
+      if (alert.related_type_id === 1) { // חשבון - ריק
         symbolDisplay = '-';
-      } else if (alert.related_type_id == 2) { // טרייד
-        const trade = trades.find(t => t.id == alert.related_id);
+      } else if (alert.related_type_id === 2) { // טרייד
+        const trade = trades.find(t => t.id === alert.related_id);
         if (trade && trade.ticker_id) {
-          const ticker = tickers.find(tick => tick.id == trade.ticker_id);
+          const ticker = tickers.find(tick => tick.id === trade.ticker_id);
           symbolDisplay = ticker ? ticker.symbol : `טרייד ${alert.related_id}`;
         } else {
           symbolDisplay = `טרייד ${alert.related_id}`;
         }
-      } else if (alert.related_type_id == 3) { // תוכנית
-        const plan = tradePlans.find(p => p.id == alert.related_id);
+      } else if (alert.related_type_id === 3) { // תוכנית
+        const plan = tradePlans.find(p => p.id === alert.related_id);
         if (plan && plan.ticker_id) {
-          const ticker = tickers.find(tick => tick.id == plan.ticker_id);
+          const ticker = tickers.find(tick => tick.id === plan.ticker_id);
           symbolDisplay = ticker ? ticker.symbol : `תוכנית ${alert.related_id}`;
         } else {
           symbolDisplay = `תוכנית ${alert.related_id}`;
         }
-      } else if (alert.related_type_id == 4) { // טיקר
-        const ticker = tickers.find(tick => tick.id == alert.related_id);
+      } else if (alert.related_type_id === 4) { // טיקר
+        const ticker = tickers.find(tick => tick.id === alert.related_id);
         symbolDisplay = ticker ? ticker.symbol : `טיקר ${alert.related_id}`;
       } else {
         symbolDisplay = `אובייקט ${alert.related_id}`;
@@ -644,7 +648,7 @@ function showAddAlertModal() {
       document.body.appendChild(backdrop);
     }
   } else {
-    console.error('Modal element not found');
+    // console.error('Modal element not found');
   }
 }
 
@@ -698,7 +702,7 @@ async function loadModalData() {
   try {
 
     // טעינת נתונים במקביל
-    console.log('🔧 Loading modal data...');
+    // console.log('🔧 Loading modal data...');
     const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
       fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
       fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
@@ -716,11 +720,11 @@ async function loadModalData() {
     const tickers = Array.isArray(tickersResponse?.data) ? tickersResponse.data :
       Array.isArray(tickersResponse) ? tickersResponse : [];
 
-    console.log('🔧 Modal data loaded:');
-    console.log('🔧 Accounts:', accounts.length);
-    console.log('🔧 Trades:', trades.length);
-    console.log('🔧 Trade Plans:', tradePlans.length);
-    console.log('🔧 Tickers:', tickers.length);
+    // console.log('🔧 Modal data loaded:');
+    // console.log('🔧 Accounts:', accounts.length);
+    // console.log('🔧 Trades:', trades.length);
+    // console.log('🔧 Trade Plans:', tradePlans.length);
+    // console.log('🔧 Tickers:', tickers.length);
 
     // נטענו נתונים נוספים
 
@@ -734,11 +738,11 @@ async function loadModalData() {
     updateRadioButtons(accounts, trades, tradePlans, tickers);
 
     // הגדרת נתונים ראשוניים (ברירת מחדל לטיקר)
-    console.log('🔧 Setting initial data for tickers...');
+    // console.log('🔧 Setting initial data for tickers...');
     populateSelect('alertRelatedObjectSelect', tickers, 'symbol', '');
     populateSelect('editAlertRelatedObjectSelect', tickers, 'symbol', '');
   } catch (error) {
-    console.error('שגיאה בטעינת נתונים למודל:', error);
+    // console.error('שגיאה בטעינת נתונים למודל:', error);
     // המשך עם מערכים ריקים
     updateRadioButtons([], [], [], []);
     populateSelect('alertRelatedObjectSelect', [], 'symbol', '');
@@ -819,18 +823,18 @@ function updateRadioButtons(accounts, trades, tradePlans, tickers) {
  * מילוי select עם נתונים
  */
 function populateSelect(selectId, data, field, prefix = '') {
-  console.log('🔧 populateSelect called:', { selectId, dataLength: data?.length, field, prefix });
+  // console.log('🔧 populateSelect called:', { selectId, dataLength: data?.length, field, prefix });
 
   const select = document.getElementById(selectId);
   if (!select) {
-    console.error('🔧 Select element not found:', selectId);
+    // console.error('🔧 Select element not found:', selectId);
     return;
   }
 
   select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
 
   if (!data || data.length === 0) {
-    console.log('🔧 No data available for:', selectId);
+    // console.log('🔧 No data available for:', selectId);
     const option = document.createElement('option');
     option.value = '';
     option.textContent = 'אין רשומות זמינות';
@@ -876,7 +880,7 @@ function populateSelect(selectId, data, field, prefix = '') {
     select.appendChild(option);
   });
 
-  console.log('🔧 populateSelect completed for:', selectId, 'with', data.length, 'items');
+  // console.log('🔧 populateSelect completed for:', selectId, 'with', data.length, 'items');
 }
 
 /**
@@ -906,7 +910,7 @@ function closeModal(modalId) {
  * @param {HTMLInputElement} radioElement - אלמנט הרדיו שנבחר
  */
 function onRelationTypeChange(radioElement) {
-  console.log('🔧 Relation type changed:', radioElement.value);
+  // console.log('🔧 Relation type changed:', radioElement.value);
 
   // הפעלת שדה בחירת אובייקט
   const relatedObjectSelect = document.getElementById('alertRelatedObjectSelect');
@@ -924,7 +928,7 @@ function onRelationTypeChange(radioElement) {
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
  */
 function onRelatedObjectChange(selectElement) {
-  console.log('🔧 Related object changed:', selectElement.value);
+  // console.log('🔧 Related object changed:', selectElement.value);
 
   if (selectElement.value) {
     // הפעלת שדות התנאי ישירות
@@ -1061,7 +1065,7 @@ function populateEditRelatedObjects(relationTypeId) {
  * @param {HTMLInputElement} radioElement - אלמנט הרדיו שנבחר
  */
 function onEditRelationTypeChange(radioElement) {
-  console.log('🔧 Edit relation type changed:', radioElement.value);
+  // console.log('🔧 Edit relation type changed:', radioElement.value);
 
   // מילוי רשימת האובייקטים לפי הסוג שנבחר
   populateEditRelatedObjects(parseInt(radioElement.value));
@@ -1072,7 +1076,7 @@ function onEditRelationTypeChange(radioElement) {
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
  */
 function onEditRelatedObjectChange(selectElement) {
-  console.log('🔧 Edit related object changed:', selectElement.value);
+  // console.log('🔧 Edit related object changed:', selectElement.value);
 
   if (selectElement.value) {
     // הפעלת שדות התנאי ישירות
@@ -1151,19 +1155,19 @@ function disableEditConditionFields() {
  * @returns {boolean} true אם נתמך, false אם לא
  */
 function checkAlertVariable(selectElement) {
-  console.log('🔍 === CHECK ALERT VARIABLE ===');
-  console.log('🔍 Element:', selectElement);
-  console.log('🔍 Selected value:', selectElement.value);
+  // console.log('🔍 === CHECK ALERT VARIABLE ===');
+  // console.log('🔍 Element:', selectElement);
+  // console.log('🔍 Selected value:', selectElement.value);
 
   // כרגע מאפשרים את כל התכונות
   const selectedValue = selectElement.value;
 
   if (!selectedValue) {
-    console.log('❌ No variable selected');
+    // console.log('❌ No variable selected');
     return false;
   }
 
-  console.log('✅ Variable accepted:', selectedValue);
+  // console.log('✅ Variable accepted:', selectedValue);
   return true;
 }
 
@@ -1177,19 +1181,19 @@ function checkAlertVariable(selectElement) {
  * @returns {boolean} true אם נתמך, false אם לא
  */
 function checkAlertOperator(selectElement) {
-  console.log('🔍 === CHECK ALERT OPERATOR ===');
-  console.log('🔍 Element:', selectElement);
-  console.log('🔍 Selected value:', selectElement.value);
+  // console.log('🔍 === CHECK ALERT OPERATOR ===');
+  // console.log('🔍 Element:', selectElement);
+  // console.log('🔍 Selected value:', selectElement.value);
 
   // כרגע מאפשרים את כל האופרטורים
   const selectedValue = selectElement.value;
 
   if (!selectedValue) {
-    console.log('❌ No operator selected');
+    // console.log('❌ No operator selected');
     return false;
   }
 
-  console.log('✅ Operator accepted:', selectedValue);
+  // console.log('✅ Operator accepted:', selectedValue);
   return true;
 }
 
@@ -1239,7 +1243,7 @@ function parseAlertCondition(condition) {
 async function saveAlert() {
   const form = document.getElementById('addAlertForm');
   if (!form) {
-    console.warn('⚠️ Form element not found - skipping save operation');
+    // console.warn('⚠️ Form element not found - skipping save operation');
     return;
   }
 
@@ -1255,9 +1259,9 @@ async function saveAlert() {
   const relatedType = formData.get('alertRelationType');
   const relatedId = document.getElementById('alertRelatedObjectSelect').value;
 
-  console.log('🔧 Form validation:');
-  console.log('🔧 Related type:', relatedType);
-  console.log('🔧 Related ID:', relatedId);
+  // console.log('🔧 Form validation:');
+  // console.log('🔧 Related type:', relatedType);
+  // console.log('🔧 Related ID:', relatedId);
 
   // בדיקת תנאי התראה
   const conditionAttributeElement = document.getElementById('conditionAttribute');
@@ -1268,10 +1272,10 @@ async function saveAlert() {
   const conditionOperator = conditionOperatorElement.value;
   const conditionNumber = conditionNumberElement.value;
 
-  console.log('🔧 Condition validation:');
-  console.log('🔧 Condition attribute:', conditionAttribute);
-  console.log('🔧 Condition operator:', conditionOperator);
-  console.log('🔧 Condition number:', conditionNumber);
+  // console.log('🔧 Condition validation:');
+  // console.log('🔧 Condition attribute:', conditionAttribute);
+  // console.log('🔧 Condition operator:', conditionOperator);
+  // console.log('🔧 Condition number:', conditionNumber);
 
   // ולידציה באמצעות מערכת הולידציה הגלובלית
   let hasErrors = false;
@@ -1365,11 +1369,11 @@ async function saveAlert() {
   };
 
   // שולח התראה חדשה
-  console.log('🔧 === SAVING ALERT ===');
-  console.log('🔧 Alert data:', alertData);
-  console.log('🔧 Request URL:', '/api/v1/alerts/');
-  console.log('🔧 Request method:', 'POST');
-  console.log('🔧 Request body:', JSON.stringify(alertData, null, 2));
+  // console.log('🔧 === SAVING ALERT ===');
+  // console.log('🔧 Alert data:', alertData);
+  // console.log('🔧 Request URL:', '/api/v1/alerts/');
+  // console.log('🔧 Request method:', 'POST');
+  // console.log('🔧 Request body:', JSON.stringify(alertData, null, 2));
 
   try {
     const response = await fetch('/api/v1/alerts/', {
@@ -1380,12 +1384,12 @@ async function saveAlert() {
       body: JSON.stringify(alertData),
     });
 
-    console.log('🔧 Response status:', response.status);
-    console.log('🔧 Response ok:', response.ok);
+    // console.log('🔧 Response status:', response.status);
+    // console.log('🔧 Response ok:', response.ok);
 
     if (response.ok) {
       const newAlert = await response.json();
-      console.log('🔧 New alert created:', newAlert);
+      // console.log('🔧 New alert created:', newAlert);
 
       // התראה נשמרה בהצלחה
 
@@ -1401,11 +1405,11 @@ async function saveAlert() {
       }
     } else {
       const errorText = await response.text();
-      console.error('🔧 Server error response:', errorText);
+      // console.error('🔧 Server error response:', errorText);
       throw new Error(`שגיאה בשמירת התראה: ${response.status} - ${errorText}`);
     }
   } catch (error) {
-    console.error('🔧 Error saving alert:', error);
+    // console.error('🔧 Error saving alert:', error);
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה בשמירת התראה', 'שגיאה בשמירת התראה: ' + error.message);
     }
@@ -1545,7 +1549,7 @@ function editAlert(alertId) {
       document.body.appendChild(backdrop);
     }
   } else {
-    console.error('Edit modal element not found');
+    // console.error('Edit modal element not found');
   }
 }
 
@@ -1678,7 +1682,7 @@ function updateStatusAndTriggered() {
 async function updateAlert() {
   const form = document.getElementById('editAlertForm');
   if (!form) {
-    console.warn('⚠️ Form element not found - skipping update operation');
+    // console.warn('⚠️ Form element not found - skipping update operation');
     return;
   }
 
@@ -1800,11 +1804,11 @@ async function updateAlert() {
   };
 
   // מעדכן התראה
-  console.log('🔍 בדיקת נתונים לפני שליחה:');
-  console.log('- related_type_id:', relatedTypeId, '(valid:', !isNaN(relatedTypeId), ')');
-  console.log('- related_id:', relatedId, '(valid:', !isNaN(relatedId), ')');
-  console.log('- status:', alertData.status);
-  console.log('- is_triggered:', alertData.is_triggered);
+  // console.log('🔍 בדיקת נתונים לפני שליחה:');
+  // console.log('- related_type_id:', relatedTypeId, '(valid:', !isNaN(relatedTypeId), ')');
+  // console.log('- related_id:', relatedId, '(valid:', !isNaN(relatedId), ')');
+  // console.log('- status:', alertData.status);
+  // console.log('- is_triggered:', alertData.is_triggered);
 
   try {
     const response = await fetch(`/api/v1/alerts/${alertId}`, {
@@ -1833,7 +1837,7 @@ async function updateAlert() {
       throw new Error(`שגיאה בעדכון התראה: ${response.status}`);
     }
   } catch (error) {
-    console.error('שגיאה בעדכון התראה:', error);
+    // console.error('שגיאה בעדכון התראה:', error);
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה בעדכון התראה', 'שגיאה בעדכון התראה: ' + error.message);
     }
@@ -1859,7 +1863,7 @@ async function deleteAlert(alertId) {
           await confirmDeleteAlert(alertId);
         },
         () => {
-          console.log('מחיקה בוטלה');
+          // console.log('מחיקה בוטלה');
         },
       );
     } else {
@@ -1877,7 +1881,7 @@ async function deleteAlert(alertId) {
  * אישור מחיקת התראה
  */
 async function confirmDeleteAlert(alertId) {
-  console.log('🔄 confirmDeleteAlert נקראה עבור ID:', alertId);
+  // console.log('🔄 confirmDeleteAlert נקראה עבור ID:', alertId);
 
   try {
     const response = await fetch(`/api/v1/alerts/${alertId}`, {
@@ -1887,13 +1891,13 @@ async function confirmDeleteAlert(alertId) {
     const result = await response.json();
 
     if (response.ok && result.status === 'success') {
-      console.log('✅ התראה נמחקה בהצלחה');
+      // console.log('✅ התראה נמחקה בהצלחה');
       if (window.showSuccessNotification) {
         window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!');
       }
       loadAlertsData();
     } else {
-      console.error('❌ שגיאה במחיקת התראה:', result);
+      // console.error('❌ שגיאה במחיקת התראה:', result);
 
       // טיפול בשגיאות מהשרת
       if (result.error && result.error.message) {
@@ -1915,7 +1919,7 @@ async function confirmDeleteAlert(alertId) {
       }
     }
   } catch (error) {
-    console.error('❌ שגיאה במחיקת התראה:', error);
+    // console.error('❌ שגיאה במחיקת התראה:', error);
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה', 'שגיאה במחיקת התראה - בדוק את חיבור השרת');
     }
@@ -1938,7 +1942,7 @@ async function confirmDeleteAlert(alertId) {
  * @requires updateAlertsTable - פונקציה לעדכון הטבלה
  */
 function sortTable(columnIndex) {
-  console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex} - התראות`);
+  // console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex} - התראות`);
 
   // שימוש בפונקציה הגלובלית החדשה
   if (typeof window.sortTableData === 'function') {
@@ -1949,7 +1953,7 @@ function sortTable(columnIndex) {
       updateAlertsTable,
     );
   } else {
-    console.error('❌ sortTableData function not found in tables.js');
+    // console.error('❌ sortTableData function not found in tables.js');
   }
 }
 
@@ -1998,14 +2002,14 @@ function restoreAlertsSectionState() {
   if (typeof window.restoreAllSectionStates === 'function') {
     window.restoreAllSectionStates();
   } else {
-    console.error('restoreAllSectionStates function not found in main.js');
+    // console.error('restoreAllSectionStates function not found in main.js');
   }
 }
 
 // הגנה - וידוא שהפונקציות הגלובליות זמינות
 if (typeof window.toggleTopSection !== 'function') {
   window.toggleTopSection = function () {
-    console.warn('toggleTopSection fallback called - main.js may not be loaded properly');
+    // console.warn('toggleTopSection fallback called - main.js may not be loaded properly');
   };
 }
 
@@ -2015,7 +2019,7 @@ if (typeof window.toggleMainSection !== 'function') {
     const alertsSection = contentSections[0]; // הסקשן הראשון - התראות
 
     if (!alertsSection) {
-      console.error('❌ לא נמצא סקשן התראות');
+      // console.error('❌ לא נמצא סקשן התראות');
       return;
     }
 
@@ -2065,27 +2069,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-  console.log('🔄 === DOM CONTENT LOADED (ALERTS) ===');
+  // console.log('🔄 === DOM CONTENT LOADED (ALERTS) ===');
 
   // בדיקת זמינות מערכות
-  console.log('🔍 בדיקת זמינות מערכות:');
-  console.log('showSuccessNotification:', typeof window.showSuccessNotification);
-  console.log('showErrorNotification:', typeof window.showErrorNotification);
-  console.log('showValidationWarning:', typeof window.showValidationWarning);
-  console.log('showDeleteWarning:', typeof window.showDeleteWarning);
+  // console.log('🔍 בדיקת זמינות מערכות:');
+  // console.log('showSuccessNotification:', typeof window.showSuccessNotification);
+  // console.log('showErrorNotification:', typeof window.showErrorNotification);
+  // console.log('showValidationWarning:', typeof window.showValidationWarning);
+  // console.log('showDeleteWarning:', typeof window.showDeleteWarning);
 
   // בדיקה שהמערכת זמינה
   if (typeof window.showSuccessNotification !== 'function') {
-    console.error('❌ מערכת התראות לא זמינה!');
+    // console.error('❌ מערכת התראות לא זמינה!');
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'מערכת התראות לא זמינה. בדוק את טעינת הקבצים.');
     } else {
-      console.error('שגיאה: מערכת התראות לא זמינה. בדוק את טעינת הקבצים.');
+      // console.error('שגיאה: מערכת התראות לא זמינה. בדוק את טעינת הקבצים.');
     }
     return;
   }
 
-  console.log('✅ מערכת התראות זמינה');
+  // console.log('✅ מערכת התראות זמינה');
 
   // שחזור מצב הסגירה
   if (typeof window.restoreAllSectionStates === 'function') {
@@ -2100,7 +2104,7 @@ document.addEventListener('DOMContentLoaded', function () {
     window.loadSortState('alerts');
   }
 
-  console.log('דף התראות נטען בהצלחה');
+  // console.log('דף התראות נטען בהצלחה');
 });
 
 // פונקציה לעדכון הטבלה מפילטרים
@@ -2113,7 +2117,7 @@ if (window.location.pathname.includes('/alerts')) {
     if (typeof window.loadAlertsData === 'function') {
       window.loadAlertsData();
     } else {
-      console.error('❌ loadAlertsData function not found');
+      // console.error('❌ loadAlertsData function not found');
     }
   };
 }
@@ -2131,7 +2135,7 @@ window.filterAlertsLocally = filterAlertsLocally;
  * @param {string} type - סוג האובייקט: 'all', 'account', 'trade', 'trade_plan', 'ticker'
  */
 function filterAlertsByRelatedObjectType(type) {
-  console.log('🔧 פילטר התראות לפי סוג אובייקט מקושר - סוג:', type);
+  // console.log('🔧 פילטר התראות לפי סוג אובייקט מקושר - סוג:', type);
 
   // עדכון מצב הכפתורים
   const buttons = document.querySelectorAll('[data-type]');
@@ -2178,7 +2182,7 @@ function filterAlertsByRelatedObjectType(type) {
     countElement.textContent = `${filteredAlerts.length} התראות`;
   }
 
-  console.log(`✅ Filtered alerts by type '${type}': ${filteredAlerts.length} alerts found`);
+  // console.log(`✅ Filtered alerts by type '${type}': ${filteredAlerts.length} alerts found`);
 }
 
 window.filterAlertsByRelatedObjectType = filterAlertsByRelatedObjectType;
@@ -2216,7 +2220,7 @@ window.loadAlerts = loadAlerts;
 
 // בדיקת זמינות פונקציות (ללא ניקוי אוטומטי)
 setTimeout(() => {
-  console.log('🔍 בדיקת זמינות פונקציות alerts.js - ' + new Date().toLocaleTimeString());
+  // console.log('🔍 בדיקת זמינות פונקציות alerts.js - ' + new Date().toLocaleTimeString());
 }, 18000);
 
 // ========================================
@@ -2291,15 +2295,15 @@ async function reactivateAlert(alertId) {
 // הוספת הפונקציה לחלון הגלובלי
 window.reactivateAlert = reactivateAlert;
 
-console.log('✅ alerts.js הושלם בהצלחה - כל הפונקציות זמינות');
+// console.log('✅ alerts.js הושלם בהצלחה - כל הפונקציות זמינות');
 
 // בדיקת ייצוא פונקציות
-console.log('🔍 בדיקת ייצוא פונקציות alerts.js:');
-console.log('- loadAlertsData:', typeof window.loadAlertsData);
-console.log('- updateAlertsTable:', typeof window.updateAlertsTable);
-console.log('- showAddAlertModal:', typeof window.showAddAlertModal);
-console.log('- editAlert:', typeof window.editAlert);
-console.log('- deleteAlert:', typeof window.deleteAlert);
-console.log('- formatAlertCondition:', typeof window.formatAlertCondition);
-console.log('- parseAlertCondition:', typeof window.parseAlertCondition);
-console.log('- clearAlertValidation:', typeof window.clearAlertValidation);
+// console.log('🔍 בדיקת ייצוא פונקציות alerts.js:');
+// console.log('- loadAlertsData:', typeof window.loadAlertsData);
+// console.log('- updateAlertsTable:', typeof window.updateAlertsTable);
+// console.log('- showAddAlertModal:', typeof window.showAddAlertModal);
+// console.log('- editAlert:', typeof window.editAlert);
+// console.log('- deleteAlert:', typeof window.deleteAlert);
+// console.log('- formatAlertCondition:', typeof window.formatAlertCondition);
+// console.log('- parseAlertCondition:', typeof window.parseAlertCondition);
+// console.log('- clearAlertValidation:', typeof window.clearAlertValidation);

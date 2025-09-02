@@ -319,7 +319,6 @@ function getInvestmentTypeBackgroundColor(investmentType) {
     return 'rgba(108, 117, 125, 0.1)'; // אפור שקוף לנתונים חסרים
   }
 
-  const normalizedType = investmentType.toLowerCase().trim();
   const entityType = getInvestmentTypeEntityType(investmentType);
   return getEntityBackgroundColor(entityType);
 }
@@ -336,7 +335,6 @@ function getInvestmentTypeTextColor(investmentType) {
     return '#495057'; // אפור כהה לנתונים חסרים
   }
 
-  const normalizedType = investmentType.toLowerCase().trim();
   const entityType = getInvestmentTypeEntityType(investmentType);
   return getEntityTextColor(entityType);
 }
@@ -353,7 +351,6 @@ function getInvestmentTypeBorderColor(investmentType) {
     return 'rgba(108, 117, 125, 0.3)'; // אפור שקוף לנתונים חסרים
   }
 
-  const normalizedType = investmentType.toLowerCase().trim();
   const entityType = getInvestmentTypeEntityType(investmentType);
   return getEntityBorderColor(entityType);
 }
@@ -489,7 +486,6 @@ function createEntityLegend(options = {}) {
   const {
     title = '🎨 מפתח צבעים - סוגי ישויות:',
     containerClass = 'entity-color-legend',
-    showDescriptions = false,
     compact = false,
     entityTypes = VALID_ENTITY_TYPES,
   } = options;
@@ -798,6 +794,163 @@ function updateNumericValueColors(newColors) {
 // 📤 ייצוא פונקציות לערכים מספריים
 // ========================================
 
+// ===== ENTITY COLOR MANAGEMENT FUNCTIONS =====
+// פונקציות ניהול צבעי ישויות
+
+/**
+ * עדכון צבע ישות
+ * @param {string} entityType - סוג הישות
+ * @param {string} colorValue - ערך הצבע
+ */
+function updateEntityColor(entityType, colorValue) {
+  try {
+    // עדכון הצבע במערכת הצבעים הגלובלית
+    if (Object.prototype.hasOwnProperty.call(ENTITY_COLORS, entityType)) {
+      ENTITY_COLORS[entityType] = colorValue;
+
+      // עדכון צבעי רקע שקופים
+      if (Object.prototype.hasOwnProperty.call(ENTITY_BACKGROUND_COLORS, entityType)) {
+        const rgb = hexToRgb(colorValue);
+        if (rgb) {
+          ENTITY_BACKGROUND_COLORS[entityType] = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`;
+        }
+      }
+
+      // עדכון צבעי טקסט
+      if (Object.prototype.hasOwnProperty.call(ENTITY_TEXT_COLORS, entityType)) {
+        ENTITY_TEXT_COLORS[entityType] = getContrastColor(colorValue);
+      }
+
+      // עדכון צבעי גבול
+      if (Object.prototype.hasOwnProperty.call(ENTITY_BORDER_COLORS, entityType)) {
+        ENTITY_BORDER_COLORS[entityType] = colorValue;
+      }
+    }
+  } catch {
+    // שגיאה בעדכון צבע ישות
+  }
+}
+
+/**
+ * עדכון צבע ישות מ-hex
+ * @param {string} entityType - סוג הישות
+ * @param {string} hexValue - ערך hex
+ */
+function updateEntityColorFromHex(entityType, hexValue) {
+  try {
+    // בדיקת תקינות ה-hex
+    if (!/^#[0-9A-F]{6}$/i.test(hexValue)) {
+      // ערך hex לא תקין
+      return;
+    }
+
+    // עדכון הצבע
+    updateEntityColor(entityType, hexValue);
+  } catch {
+    // שגיאה בעדכון צבע ישות מ-hex
+  }
+}
+
+/**
+ * איפוס צבעי ישויות לברירת המחדל
+ */
+function resetEntityColors() {
+  try {
+    // איפוס הצבעים לברירת המחדל
+    Object.assign(ENTITY_COLORS, {
+      'trade': '#007bff',
+      'trade_plan': '#0056b3',
+      'execution': '#17a2b8',
+      'account': '#28a745',
+      'cash_flow': '#20c997',
+      'ticker': '#dc3545',
+      'alert': '#ff9c05',
+      'note': '#6f42c1',
+      'constraint': '#6c757d',
+      'design': '#495057',
+      'research': '#343a40',
+      'preference': '#adb5bd',
+    });
+
+    // איפוס צבעי רקע שקופים
+    Object.assign(ENTITY_BACKGROUND_COLORS, {
+      'trade': 'rgba(0, 123, 255, 0.1)',
+      'trade_plan': 'rgba(0, 86, 179, 0.1)',
+      'execution': 'rgba(23, 162, 184, 0.1)',
+      'account': 'rgba(40, 167, 69, 0.1)',
+      'cash_flow': 'rgba(32, 201, 151, 0.1)',
+      'ticker': 'rgba(220, 53, 69, 0.1)',
+      'alert': 'rgba(255, 156, 5, 0.1)',
+      'note': 'rgba(111, 66, 193, 0.1)',
+      'constraint': 'rgba(108, 117, 125, 0.1)',
+      'design': 'rgba(73, 80, 87, 0.1)',
+      'research': 'rgba(52, 58, 64, 0.1)',
+      'preference': 'rgba(173, 181, 189, 0.1)',
+    });
+
+    // איפוס צבעי טקסט
+    Object.assign(ENTITY_TEXT_COLORS, {
+      'trade': '#0056b3',
+      'trade_plan': '#004085',
+      'execution': '#138496',
+      'account': '#1e7e34',
+      'cash_flow': '#1a9f7a',
+      'ticker': '#c82333',
+      'alert': '#e68900',
+      'note': '#5a2d91',
+      'constraint': '#545b62',
+      'design': '#343a40',
+      'research': '#212529',
+      'preference': '#6c757d',
+    });
+
+    // איפוס צבעי גבול
+    Object.assign(ENTITY_BORDER_COLORS, {
+      'trade': '#007bff',
+      'trade_plan': '#0056b3',
+      'execution': '#17a2b8',
+      'account': '#28a745',
+      'cash_flow': '#20c997',
+      'ticker': '#dc3545',
+      'alert': '#ff9c05',
+      'note': '#6f42c1',
+      'constraint': '#6c757d',
+      'design': '#495057',
+      'research': '#343a40',
+      'preference': '#adb5bd',
+    });
+  } catch {
+    // שגיאה באיפוס צבעי ישויות
+  }
+}
+
+/**
+ * המרת hex ל-RGB
+ * @param {string} hex - ערך hex
+ * @returns {Object|null} אובייקט RGB או null אם לא תקין
+ */
+function hexToRgb(hex) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16),
+  } : null;
+}
+
+/**
+ * קבלת צבע ניגוד לצבע נתון
+ * @param {string} hexColor - צבע hex
+ * @returns {string} צבע ניגוד (שחור או לבן)
+ */
+function getContrastColor(hexColor) {
+  const rgb = hexToRgb(hexColor);
+  if (!rgb) {return '#000000';}
+
+  const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+  return brightness > 128 ? '#000000' : '#ffffff';
+}
+
 // ייצוא לפונקציות ערכים מספריים
 window.getNumericValueColor = getNumericValueColor;
 window.getNumericValueBackgroundColor = getNumericValueBackgroundColor;
@@ -926,6 +1079,4 @@ window.colorSchemeSystem = {
   NUMERIC_VALUE_COLORS,
 };
 
-console.log('🎨 Unified Color Scheme System loaded successfully!');
-console.log('📋 Available entity types:', VALID_ENTITY_TYPES);
-console.log('🔧 Use window.colorSchemeSystem for advanced features');
+// Color Scheme System loaded successfully

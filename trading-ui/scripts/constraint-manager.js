@@ -12,6 +12,9 @@
  * Last Updated: August 23, 2025
  */
 
+// Global constraint manager instance
+let constraintManager;
+
 class ConstraintManager {
   constructor() {
     this.apiBase = 'http://localhost:8080/api/v1/constraints';
@@ -28,7 +31,7 @@ class ConstraintManager {
       await this.loadTables();
       await this.loadConstraints();
       this.setupEventListeners();
-    } catch (error) {
+    } catch {
       // Error initializing constraint manager
       this.showMessage('שגיאה בטעינת המערכת', 'error');
     }
@@ -49,7 +52,7 @@ class ConstraintManager {
           .reduce((sum, c) => sum + (c.enum_values?.length || 0), 0);
         document.getElementById('total-enums').textContent = enumCount;
       }
-    } catch (error) {
+    } catch {
       // Error loading stats
     }
   }
@@ -63,7 +66,7 @@ class ConstraintManager {
         this.tables = data.data;
         this.populateTableFilter();
       }
-    } catch (error) {
+    } catch {
       // Error loading tables
     }
   }
@@ -81,7 +84,7 @@ class ConstraintManager {
         // Error loading constraints
         this.showMessage('שגיאה בטעינת האילוצים', 'error');
       }
-    } catch (error) {
+    } catch {
       // Error loading constraints
       this.showMessage('שגיאה בטעינת האילוצים', 'error');
       // הצגת נתונים לדוגמה במקרה של שגיאה
@@ -189,7 +192,9 @@ class ConstraintManager {
     }
 
     return `
-            <div class="constraint-item" data-constraint-id="${constraint.id}" onclick="selectConstraint(${constraint.id})">
+            <div class="constraint-item" 
+                 data-constraint-id="${constraint.id}" 
+                 onclick="selectConstraint(${constraint.id})">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <strong>${constraint.table_name}.${constraint.column_name}</strong>
@@ -205,7 +210,7 @@ class ConstraintManager {
         `;
   }
 
-  getBadgeClass(constraintType) {
+  static getBadgeClass(constraintType) {
     const classes = {
       'ENUM': 'badge-enum',
       'NOT_NULL': 'badge-not-null',
@@ -215,7 +220,7 @@ class ConstraintManager {
     return classes[constraintType] || 'badge-enum';
   }
 
-  getBadgeText(constraintType) {
+  static getBadgeText(constraintType) {
     const texts = {
       'ENUM': 'ENUM',
       'NOT_NULL': 'NOT NULL',
@@ -298,7 +303,8 @@ class ConstraintManager {
                 </div>
                 ${enumValuesHtml}
                 <div class="text-center">
-                    <button type="button" class="btn btn-danger" onclick="constraintManager.deleteConstraint(${constraint.id})">
+                    <button type="button" class="btn btn-danger" 
+                            onclick="constraintManager.deleteConstraint(${constraint.id})">
                         <i class="fas fa-trash"></i> מחק אילוץ
                     </button>
                 </div>
@@ -343,7 +349,7 @@ class ConstraintManager {
       } else {
         this.showMessage('שגיאה במחיקת האילוץ', 'error');
       }
-    } catch (error) {
+    } catch {
       // Error deleting constraint
       this.showMessage('שגיאה במחיקת האילוץ', 'error');
     }
@@ -508,27 +514,13 @@ class ConstraintManager {
       } else {
         this.showMessage('שגיאה בהוספת האילוץ', 'error');
       }
-    } catch (error) {
+    } catch (_error) {
       this.showMessage('שגיאה בהוספת האילוץ', 'error');
     }
   }
 }
 
 // Global functions for enum values
-function addEnumValue() {
-  const container = document.getElementById('enum-values-container');
-  const newItem = document.createElement('div');
-  newItem.className = 'enum-value-item';
-  newItem.innerHTML = `
-        <input type="text" class="form-control" placeholder="ערך" name="enum-value">
-        <input type="text" class="form-control" placeholder="שם תצוגה" name="enum-display">
-        <input type="number" class="form-control" placeholder="סדר" name="enum-sort" value="1">
-        <button type="button" class="btn btn-sm btn-danger" onclick="removeEnumValue(this)">
-            <i class="fas fa-trash"></i>
-        </button>
-    `;
-  container.appendChild(newItem);
-}
 
 // Global function to show add constraint modal
 function showAddConstraintModal() {
@@ -575,7 +567,8 @@ function showAddConstraintModal() {
                                         <input type="text" class="form-control" id="modal-constraint-name" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="modal-constraint-definition" class="form-label">הגדרת האילוץ</label>
+                                        <label for="modal-constraint-definition" 
+                                               class="form-label">הגדרת האילוץ</label>
                                         <input type="text" class="form-control" id="modal-constraint-definition" required>
                                     </div>
                                 </div>
@@ -600,9 +593,7 @@ function showAddConstraintModal() {
   }
 }
 
-function removeEnumValue(button) {
-  button.closest('.enum-value-item').remove();
-}
+// removeEnumValue function is defined as window function below
 
 // Global functions for enum values
 window.addEnumValue = function () {
@@ -630,6 +621,11 @@ window.showAddConstraintModal = function () {
   showAddConstraintModal();
 };
 
+// Initialize constraint manager when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  constraintManager = new ConstraintManager();
+});
+
 // Global function for selecting constraint
 window.selectConstraint = function (constraintId) {
   if (constraintManager) {
@@ -650,12 +646,6 @@ window.handleModalAddConstraint = function () {
     constraintManager.handleModalAddConstraint();
   }
 };
-
-// Initialize constraint manager when page loads
-let constraintManager;
-document.addEventListener('DOMContentLoaded', () => {
-  constraintManager = new ConstraintManager();
-});
 
 // Global function for loading constraints data (for compatibility with main.js)
 window.loadConstraintsData = function () {

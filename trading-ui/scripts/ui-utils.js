@@ -22,12 +22,12 @@
  */
 function calculateStopPrice(currentPrice, stopPercentage, side = 'Long') {
   if (!currentPrice || currentPrice <= 0) {
-    console.warn('Invalid current price for stop calculation:', currentPrice);
+    // Invalid current price for stop calculation
     return 0;
   }
 
   if (!stopPercentage || stopPercentage <= 0) {
-    console.warn('Invalid stop percentage:', stopPercentage);
+    // Invalid stop percentage
     return 0;
   }
 
@@ -40,7 +40,7 @@ function calculateStopPrice(currentPrice, stopPercentage, side = 'Long') {
     // For Short: Stop above current price
     return currentPrice * (1 + percentage);
   } else {
-    console.warn('Invalid side for stop calculation:', side);
+    // Invalid side for stop calculation
     return 0;
   }
 }
@@ -54,12 +54,12 @@ function calculateStopPrice(currentPrice, stopPercentage, side = 'Long') {
  */
 function calculateTargetPrice(currentPrice, targetPercentage, side = 'Long') {
   if (!currentPrice || currentPrice <= 0) {
-    console.warn('Invalid current price for target calculation:', currentPrice);
+    // Invalid current price for target calculation
     return 0;
   }
 
   if (!targetPercentage || targetPercentage <= 0) {
-    console.warn('Invalid target percentage:', targetPercentage);
+    // Invalid target percentage
     return 0;
   }
 
@@ -72,7 +72,7 @@ function calculateTargetPrice(currentPrice, targetPercentage, side = 'Long') {
     // For Short: Target below current price
     return currentPrice * (1 - percentage);
   } else {
-    console.warn('Invalid side for target calculation:', side);
+    // Invalid side for target calculation
     return 0;
   }
 }
@@ -86,12 +86,12 @@ function calculateTargetPrice(currentPrice, targetPercentage, side = 'Long') {
  */
 function calculatePercentageFromPrice(currentPrice, targetPrice, side = 'Long') {
   if (!currentPrice || currentPrice <= 0) {
-    console.warn('Invalid current price for percentage calculation:', currentPrice);
+    // Invalid current price for percentage calculation
     return 0;
   }
 
   if (!targetPrice || targetPrice <= 0) {
-    console.warn('Invalid target price for percentage calculation:', targetPrice);
+    // Invalid target price for percentage calculation
     return 0;
   }
 
@@ -100,7 +100,7 @@ function calculatePercentageFromPrice(currentPrice, targetPrice, side = 'Long') 
   } else if (side === 'Short') {
     return (currentPrice - targetPrice) / currentPrice * 100;
   } else {
-    console.warn('Invalid side for percentage calculation:', side);
+    // Invalid side for percentage calculation
     return 0;
   }
 }
@@ -142,14 +142,14 @@ function updatePricesFromPercentages(formId, currentPrice) {
   targetPriceElement.value = newTargetPrice.toFixed(2);
 
   // Updated prices from percentages
-  console.log('Updated prices from percentages:', {
-    currentPrice,
-    side,
-    stopPercentage,
-    targetPercentage,
-    newStopPrice: newStopPrice.toFixed(2),
-    newTargetPrice: newTargetPrice.toFixed(2),
-  });
+  // console.log('Updated prices from percentages:', {
+  //   currentPrice,
+  //   side,
+  //   stopPercentage,
+  //   targetPercentage,
+  //   newStopPrice: newStopPrice.toFixed(2),
+  //   newTargetPrice: newTargetPrice.toFixed(2),
+  // });
 }
 
 /**
@@ -189,14 +189,14 @@ function updatePercentagesFromPrices(formId, currentPrice) {
   targetPercentageElement.value = newTargetPercentage.toFixed(2);
 
   // Updated percentages from prices
-  console.log('Updated percentages from prices:', {
-    currentPrice,
-    side,
-    stopPrice,
-    targetPrice,
-    newStopPercentage: newStopPercentage.toFixed(2),
-    newTargetPercentage: newTargetPercentage.toFixed(2),
-  });
+  // console.log('Updated percentages from prices:', {
+  //   currentPrice,
+  //   side,
+  //   stopPrice,
+  //   targetPrice,
+  //   newStopPercentage: newStopPercentage.toFixed(2),
+  //   newTargetPercentage: newTargetPercentage.toFixed(2),
+  // });
 }
 
 /**
@@ -256,52 +256,13 @@ function showModal(modalId, options = {}) {
  * הצגת הודעת אישור שנייה
  * Show second confirmation modal
  */
-function showSecondConfirmation(title, message, onConfirm) {
-  // Showing second confirmation modal
-
-  const modal = document.getElementById('secondConfirmationModal');
-  if (!modal) {
-    handleElementNotFound('showSecondConfirmation', 'Second confirmation modal not found');
-    return;
-  }
-
-  // עדכון תוכן המודל
-  const titleElement = modal.querySelector('.modal-title');
-  const messageElement = modal.querySelector('.modal-body');
-
-  if (titleElement) {titleElement.textContent = title;}
-  if (messageElement) {messageElement.textContent = message;}
-
-  // הגדרת פונקציית האישור
-  const confirmBtn = modal.querySelector('.btn-confirm');
-  if (confirmBtn) {
-    confirmBtn.onclick = () => {
-      const bootstrapModal = bootstrap.Modal.getInstance(modal);
-      if (bootstrapModal) {
-        bootstrapModal.hide();
-      }
-      if (onConfirm) {onConfirm();}
-    };
-  }
-
-  // הצגת המודל
-  const bootstrapModal = new bootstrap.Modal(modal);
-  bootstrapModal.show();
-}
+// function showSecondConfirmation(title, message, onConfirm) - לא בשימוש כרגע
 
 /**
  * אישור פעולה שנייה
  * Confirm second action
  */
-function confirmSecondAction() {
-  if (typeof window.secondConfirmationCallback === 'function') {
-    window.secondConfirmationCallback();
-  }
-  const modal = bootstrap.Modal.getInstance(document.getElementById('secondConfirmationModal'));
-  if (modal) {
-    modal.hide();
-  }
-}
+// function confirmSecondAction() - לא בשימוש כרגע
 
 
 // ===== Notification Functions =====
@@ -313,35 +274,16 @@ function confirmSecondAction() {
 // These functions handle color formatting
 
 /**
- * פונקציה לצביעת סכומים (חיובי/שלילי)
- * Function for coloring amounts (positive/negative)
+ * פונקציה לצביעת סכומים (חיובי/שלילי) - הוסרה כי לא בשימוש
+ * Function for coloring amounts (positive/negative) - removed because not used
  */
-function colorAmount(amount, displayText = null) {
-  const text = displayText || (amount >= 0 ? `+$${amount.toFixed(2)}` : `-$${Math.abs(amount).toFixed(2)}`);
-  const className = amount >= 0 ? 'profit-positive' : 'profit-negative';
-  return `<span class="${className}">${text}</span>`;
-}
+// function colorAmount(amount, displayText = null) { ... }
 
 /**
- * המרת סוג הודעה לצבע Bootstrap
- * Convert notification type to Bootstrap color
- *
- * @param {string} type - סוג ההודעה
- * @returns {string} צבע Bootstrap
+ * המרת סוג הודעה לצבע Bootstrap - הוסרה כי לא בשימוש
+ * Convert notification type to Bootstrap color - removed because not used
  */
-function getBootstrapColor(type) {
-  switch (type) {
-  case 'success':
-    return 'success';
-  case 'error':
-    return 'danger';
-  case 'warning':
-    return 'warning';
-  case 'info':
-  default:
-    return 'info';
-  }
-}
+// function getBootstrapColor(type) { ... }
 
 // ===== Export Functions =====
 window.showModal = showModal;
@@ -453,8 +395,8 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
         return;
       }
     }
-  } catch (error) {
-    console.warn('⚠️ Linked items check failed, proceeding with cancellation');
+  } catch (_error) {
+    // Linked items check failed, proceeding with cancellation
   }
 
   // אין פריטים מקושרים - ביצוע הביטול
@@ -470,7 +412,7 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
  * @param {number} itemId - ID of the item
  * @param {string} itemName - Display name of the item
  */
-async function performItemCancellation(itemType, itemId, itemName) {
+async function performItemCancellation(itemType, itemId, _itemName) {
   try {
     const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
     let response;
@@ -565,16 +507,13 @@ async function performItemCancellation(itemType, itemId, itemName) {
  */
 
 
-// אתחול UI Utils
-function initializeUIUtils() {
-  // UI Utils loaded successfully
-}
+// אתחול UI Utils - הוסר כי לא בשימוש
+// function initializeUIUtils() { ... }
 
 // Export functions to global scope
 window.uiUtils = {
   cancelItem,
   performItemCancellation,
-  createCancelButton,
   createDeleteButton,
 };
 

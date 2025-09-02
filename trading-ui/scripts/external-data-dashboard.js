@@ -535,7 +535,19 @@ class ExternalDataDashboard {
     if (!logContent) {return;}
 
     if (logs.length === 0) {
-      logContent.innerHTML = '<div class="no-logs">אין לוגים להצגה</div>';
+      const currentTime = new Date().toLocaleString('he-IL');
+      logContent.innerHTML = `
+        <div class="no-logs">
+          <div class="no-logs-icon">📋</div>
+          <div class="no-logs-title">אין לוגים להצגה</div>
+          <div class="no-logs-subtitle">המערכת פועלת ללא שגיאות</div>
+          <div class="no-logs-time">נבדק לאחרונה: ${currentTime}</div>
+          <div class="no-logs-info">
+            <p>• לוגים יופיעו כאן כאשר יש פעילות במערכת</p>
+            <p>• רענן את הדף כדי לבדוק עדכונים חדשים</p>
+          </div>
+        </div>
+      `;
       return;
     }
 

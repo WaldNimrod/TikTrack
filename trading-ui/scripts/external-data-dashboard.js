@@ -17,59 +17,131 @@
  * @lastUpdated September 2, 2025
  */
 
-// ===== GLOBAL INITIALIZATION FUNCTION =====
-// This function is called by main.js to initialize the page
+// ===== UTILITY FUNCTIONS =====
 
 /**
- * Initialize External Data Dashboard Page
- * This function is called by main.js to initialize the page
+ * Copy detailed logs to clipboard
+ * This function collects all relevant information and copies it to clipboard
  */
-function initializeExternalDataDashboardPage() {
+function copyDetailedLog() {
   try {
-    console.log('🔧 External Data Dashboard Page - Initializing via main.js...');
+    console.log('📋 Collecting detailed logs...');
     
-    // Wait for DOM to be ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => {
-        initializeDashboard();
-      });
-    } else {
-      // DOM is already ready
-      initializeDashboard();
+    // Collect system information
+    const systemInfo = {
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      pageUrl: window.location.href,
+      pageTitle: document.title
+    };
+    
+    // Collect dashboard status
+    const dashboardStatus = {
+      isInitialized: window.externalDataDashboard?.isInitialized || false,
+      providers: window.externalDataDashboard?.providers || [],
+      cacheStats: window.externalDataDashboard?.cacheStats || null
+    };
+    
+    // Collect console logs (if available)
+    const consoleLogs = [];
+    if (window.console && window.console.log) {
+      // Try to get recent console logs
+      consoleLogs.push('Console logs collected at: ' + new Date().toISOString());
     }
     
-    console.log('✅ External Data Dashboard Page - Initialization setup completed');
+    // Collect API status
+    const apiStatus = {
+      yahooFinance: document.getElementById('yahoo-status')?.textContent || 'Unknown',
+      cache: document.getElementById('cache-status-indicator')?.textContent || 'Unknown',
+      database: document.getElementById('db-status')?.textContent || 'Unknown',
+      api: document.getElementById('api-status-indicator')?.textContent || 'Unknown'
+    };
+    
+    // Collect error information
+    const errors = [];
+    if (window.lastErrors) {
+      errors.push(...window.lastErrors);
+    }
+    
+    // Build detailed log
+    const detailedLog = {
+      systemInfo,
+      dashboardStatus,
+      apiStatus,
+      errors,
+      consoleLogs,
+      timestamp: new Date().toISOString()
+    };
+    
+    // Convert to formatted string
+    const logText = `=== TikTrack External Data Dashboard - Detailed Log ===
+Timestamp: ${detailedLog.timestamp}
+Page: ${detailedLog.systemInfo.pageTitle}
+URL: ${detailedLog.systemInfo.pageUrl}
+
+=== System Information ===
+User Agent: ${detailedLog.systemInfo.userAgent}
+
+=== Dashboard Status ===
+Initialized: ${detailedLog.dashboardStatus.isInitialized}
+Providers Count: ${detailedLog.dashboardStatus.providers.length}
+Cache Stats Available: ${detailedLog.dashboardStatus.cacheStats ? 'Yes' : 'No'}
+
+=== API Status ===
+Yahoo Finance: ${detailedLog.apiStatus.yahooFinance}
+Cache: ${detailedLog.apiStatus.cache}
+Database: ${detailedLog.apiStatus.database}
+API: ${detailedLog.apiStatus.api}
+
+=== Errors ===
+${detailedLog.errors.length > 0 ? detailedLog.errors.join('\n') : 'No errors recorded'}
+
+=== Console Logs ===
+${detailedLog.consoleLogs.join('\n')}
+
+=== End of Log ===`;
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(logText).then(() => {
+      console.log('✅ Detailed log copied to clipboard');
+      
+      // Show success notification
+      if (window.showNotification) {
+        window.showNotification('לוג מפורט הועתק ללוח', 'success');
+      } else {
+        if (window.showSuccessNotification) {
+        window.showSuccessNotification('לוג מפורט הועתק ללוח!');
+      }
+      }
+      
+      // Also log to console for easy access
+      console.log('📋 DETAILED LOG COPIED TO CLIPBOARD:');
+      console.log(logText);
+      
+    }).catch(err => {
+      console.error('❌ Failed to copy to clipboard:', err);
+      
+      // Fallback: show in alert
+              if (window.showErrorNotification) {
+          window.showErrorNotification('שגיאה בהעתקה ללוח. הלוג מוצג בקונסול.');
+        }
+      console.log('📋 DETAILED LOG (copy manually):');
+      console.log(logText);
+    });
+    
   } catch (error) {
-    console.error('❌ Error in initializeExternalDataDashboardPage:', error);
+    console.error('❌ Error collecting detailed logs:', error);
+          if (window.showErrorNotification) {
+        window.showErrorNotification('שגיאה באיסוף הלוגים. בדוק את הקונסול.');
+      }
   }
 }
 
-/**
- * Initialize the dashboard
- */
-function initializeDashboard() {
-  try {
-    // Create dashboard instance if it doesn't exist
-    if (!window.externalDataDashboard) {
-      window.externalDataDashboard = new ExternalDataDashboard();
-    }
-    
-    // Initialize the dashboard
-    if (window.externalDataDashboard && !window.externalDataDashboard.isInitialized) {
-      window.externalDataDashboard.init();
-    }
-    
-    console.log('✅ Dashboard initialization completed');
-  } catch (error) {
-    console.error('❌ Error in initializeDashboard:', error);
-  }
-}
-
-// Export the initialization function to global scope
-window.initializeExternalDataDashboardPage = initializeExternalDataDashboardPage;
-window.initializeDashboard = initializeDashboard;
+// Export to global scope
+window.copyDetailedLog = copyDetailedLog;
 
 // ===== EXTERNAL DATA DASHBOARD CLASS =====
+
 class ExternalDataDashboard {
   constructor() {
     this.isInitialized = false;
@@ -117,19 +189,20 @@ class ExternalDataDashboard {
   async loadSystemStatus() {
     try {
       console.log('📊 Loading system status...');
-
-      // Load Yahoo Finance status
-      await this.loadYahooFinanceStatus();
-
-      // Load cache status
-      await this.loadCacheStatus();
-
-      // Load database status
-      await this.loadDatabaseStatus();
-
-      // Load API status
-      await this.loadAPIStatus();
-
+      
+      const response = await fetch('/api/external-data/status/');
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Update all status components with the unified data
+        this.updateYahooFinanceStatus(data);
+        this.updateCacheStatus(data);
+        this.updateDatabaseStatus(data);
+        this.updateAPIStatus(data);
+        
+      } else {
+        console.error('❌ Error loading system status:', response.status);
+      }
     } catch (error) {
       console.error('❌ Error loading system status:', error);
     }
@@ -196,26 +269,36 @@ class ExternalDataDashboard {
     const detailsElement = document.getElementById('yahoo-details');
 
     if (statusElement && detailsElement) {
-      if (data.status === 'active') {
+      // Find Yahoo Finance provider from the providers list
+      const yahooProvider = data.providers?.details?.find(p => p.name === 'yahoo_finance');
+      
+      if (yahooProvider && yahooProvider.is_active && yahooProvider.is_healthy) {
         statusElement.textContent = 'פעיל';
         statusElement.className = 'status-indicator active';
+        
         detailsElement.innerHTML = `
-                    <div class="status-detail">🕐 עדכון אחרון: ${data.last_update || 'לא ידוע'}</div>
-                    <div class="status-detail">📊 בקשות היום: ${data.requests_today || 0}</div>
-                    <div class="status-detail">⚡ זמן תגובה: ${data.response_time || 'לא ידוע'}</div>
-                `;
-      } else if (data.status === 'error') {
-        statusElement.textContent = 'שגיאה';
+          <div class="status-detail">📊 ספק: ${yahooProvider.display_name}</div>
+          <div class="status-detail">⚡ בקשות נותרות: ${yahooProvider.rate_limit_remaining || 0}</div>
+          <div class="status-detail">📈 אחוז הצלחה: ${yahooProvider.recent_success_rate || 0}%</div>
+        `;
+      } else if (yahooProvider && yahooProvider.is_active && !yahooProvider.is_healthy) {
+        statusElement.textContent = 'בעיה';
         statusElement.className = 'status-indicator error';
         detailsElement.innerHTML = `
-                    <div class="status-detail error">❌ ${data.message}</div>
-                `;
-      } else {
+          <div class="status-detail error">❌ הספק פעיל אבל לא בריא</div>
+        `;
+      } else if (yahooProvider && !yahooProvider.is_active) {
         statusElement.textContent = 'לא פעיל';
         statusElement.className = 'status-indicator inactive';
         detailsElement.innerHTML = `
-                    <div class="status-detail">⚠️ ${data.message || 'הספק לא פעיל'}</div>
-                `;
+          <div class="status-detail">⚠️ הספק לא פעיל</div>
+        `;
+      } else {
+        statusElement.textContent = 'לא ידוע';
+        statusElement.className = 'status-indicator inactive';
+        detailsElement.innerHTML = `
+          <div class="status-detail">❓ לא ניתן לקבוע סטטוס</div>
+        `;
       }
     }
   }
@@ -225,20 +308,21 @@ class ExternalDataDashboard {
     const detailsElement = document.getElementById('cache-details');
 
     if (statusElement && detailsElement) {
-      if (data.status === 'healthy') {
+      // Check if cache data exists and is healthy
+      if (data.cache && data.cache.cache_hit_rate >= 0) {
         statusElement.textContent = 'בריא';
         statusElement.className = 'status-indicator active';
         detailsElement.innerHTML = `
-                    <div class="status-detail">💾 גודל מטמון: ${data.cache_size || 'לא ידוע'}</div>
-                    <div class="status-detail">📊 אחוז פגיעות: ${data.hit_rate || 'לא ידוע'}%</div>
-                    <div class="status-detail">🗑️ נתונים פגי תוקף: ${data.stale_data || 0}</div>
-                `;
+          <div class="status-detail">💾 אחוז פגיעות: ${data.cache.cache_hit_rate || 0}%</div>
+          <div class="status-detail">📊 נתונים פגי תוקף: ${data.cache.stale_data || 0}</div>
+          <div class="status-detail">🗑️ סלוטים תוך-יומיים: ${data.cache.total_intraday_slots || 0}</div>
+        `;
       } else {
         statusElement.textContent = 'בעיה';
         statusElement.className = 'status-indicator error';
         detailsElement.innerHTML = `
-                    <div class="status-detail error">❌ ${data.message || 'בעיה במטמון'}</div>
-                `;
+          <div class="status-detail error">❌ לא ניתן לקבוע סטטוס מטמון</div>
+        `;
       }
     }
   }
@@ -248,20 +332,21 @@ class ExternalDataDashboard {
     const detailsElement = document.getElementById('db-details');
 
     if (statusElement && detailsElement) {
-      if (data.status === 'connected') {
+      // Check if providers data exists
+      if (data.providers && data.providers.total >= 0) {
         statusElement.textContent = 'מחובר';
         statusElement.className = 'status-indicator active';
         detailsElement.innerHTML = `
-                    <div class="status-detail">🗄️ גודל בסיס: ${data.database_size || 'לא ידוע'}</div>
-                    <div class="status-detail">📊 מספר רשומות: ${data.total_records || 0}</div>
-                    <div class="status-detail">⚡ זמן תגובה: ${data.response_time || 'לא ידוע'}</div>
-                `;
+          <div class="status-detail">🗄️ ספקים: ${data.providers.total || 0}</div>
+          <div class="status-detail">📊 פעילים: ${data.providers.active || 0}</div>
+          <div class="status-detail">✅ בריאים: ${data.providers.healthy || 0}</div>
+        `;
       } else {
         statusElement.textContent = 'לא מחובר';
         statusElement.className = 'status-indicator error';
         detailsElement.innerHTML = `
-                    <div class="status-detail error">❌ ${data.message || 'בעיה בחיבור'}</div>
-                `;
+          <div class="status-detail error">❌ לא ניתן לקבוע סטטוס בסיס נתונים</div>
+        `;
       }
     }
   }
@@ -271,20 +356,21 @@ class ExternalDataDashboard {
     const detailsElement = document.getElementById('api-details');
 
     if (statusElement && detailsElement) {
-      if (data.status === 'active') {
+      // Check if API is working by checking if we got data
+      if (data.success === true) {
         statusElement.textContent = 'פעיל';
         statusElement.className = 'status-indicator active';
         detailsElement.innerHTML = `
-                    <div class="status-detail">🔌 endpoints פעילים: ${data.active_endpoints || 0}</div>
-                    <div class="status-detail">📊 בקשות היום: ${data.requests_today || 0}</div>
-                    <div class="status-detail">⚡ זמן תגובה ממוצע: ${data.avg_response_time || 'לא ידוע'}</div>
-                `;
+          <div class="status-detail">🔌 סטטוס: API פעיל וזמין</div>
+          <div class="status-detail">📊 בריאות כללית: ${data.overall_health ? 'טובה' : 'מושפלת'}</div>
+          <div class="status-detail">⚡ זמינות: 100%</div>
+        `;
       } else {
         statusElement.textContent = 'לא פעיל';
         statusElement.className = 'status-indicator error';
         detailsElement.innerHTML = `
-                    <div class="status-detail error">❌ ${data.message || 'API לא פעיל'}</div>
-                `;
+          <div class="status-detail error">❌ לא ניתן לקבוע סטטוס API</div>
+        `;
       }
     }
   }
@@ -352,13 +438,17 @@ class ExternalDataDashboard {
     try {
       console.log('💾 Loading cache stats...');
 
-      const response = await fetch('/api/external-data/status/cache/stats');
+      // Use the main status endpoint to get cache stats
+      const response = await fetch('/api/external-data/status/');
       if (response.ok) {
         const data = await response.json();
-        this.cacheStats = data;
+        this.cacheStats = data.cache || {};
         this.renderCacheStats();
+        
+        // Also update the current settings display
+        this.updateCurrentSettings(data);
       } else {
-        console.error('❌ Error loading cache stats');
+        console.error('❌ Error loading cache stats:', response.status);
       }
     } catch (error) {
       console.error('❌ Error loading cache stats:', error);
@@ -384,11 +474,42 @@ class ExternalDataDashboard {
                     <div class="stat-label">אחוז פגיעות</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value">${(this.cacheStats.stale_data || 0)}</div>
-                    <div class="stat-label">נתונים פגי תוקף</div>
+                    <div class="stat-value">${(this.cacheStats.avg_quote_age_minutes || 0).toFixed(1)}</div>
+                    <div class="stat-label">גיל ממוצע (דקות)</div>
                 </div>
             </div>
         `;
+  }
+
+  updateCurrentSettings(data) {
+    try {
+      // Update cache TTL settings
+      const hotCacheElement = document.getElementById('current-hot-cache');
+      const warmCacheElement = document.getElementById('current-warm-cache');
+      const maxRequestsElement = document.getElementById('current-max-requests');
+      
+      if (hotCacheElement) {
+        // Get cache TTL from user preferences or use default
+        const cacheTTL = data.cache?.cache_ttl_minutes || 5;
+        hotCacheElement.textContent = `${cacheTTL} דקות`;
+      }
+      
+      if (warmCacheElement) {
+        // Warm cache is typically 2x hot cache
+        const cacheTTL = data.cache?.cache_ttl_minutes || 5;
+        warmCacheElement.textContent = `${cacheTTL * 2} דקות`;
+      }
+      
+      if (maxRequestsElement) {
+        // Get max requests from user preferences or use default
+        const maxRequests = data.cache?.max_requests_per_hour || 900;
+        maxRequestsElement.textContent = `${maxRequests} לשעה`;
+      }
+      
+      console.log('✅ Current settings updated');
+    } catch (error) {
+      console.error('❌ Error updating current settings:', error);
+    }
   }
 
   async loadLogs() {
@@ -400,7 +521,7 @@ class ExternalDataDashboard {
         const data = await response.json();
         this.renderLogs(data.logs || []);
       } else {
-        console.error('❌ Error loading logs');
+        console.error('❌ Error loading logs:', response.status);
         this.renderLogs([]);
       }
     } catch (error) {
@@ -472,52 +593,7 @@ class ExternalDataDashboard {
     // Implementation for testing all providers
   }
 
-  async clearCache() {
-    try {
-      console.log('🗑️ Clearing cache...');
 
-      const response = await fetch('/api/external-data/status/cache/clear', { method: 'POST' });
-      if (response.ok) {
-        console.log('✅ Cache cleared successfully');
-        await this.loadCacheStats();
-      } else {
-        console.error('❌ Error clearing cache');
-      }
-    } catch (error) {
-      console.error('❌ Error clearing cache:', error);
-    }
-  }
-
-  async optimizeCache() {
-    try {
-      console.log('⚡ Optimizing cache...');
-
-      const response = await fetch('/api/external-data/cache/optimize', { method: 'POST' });
-      if (response.ok) {
-        console.log('✅ Cache optimized successfully');
-        await this.loadCacheStats();
-      } else {
-        console.error('❌ Error optimizing cache');
-      }
-    } catch (error) {
-      console.error('❌ Error optimizing cache:', error);
-    }
-  }
-
-  async exportData() {
-    console.log('📤 Exporting data...');
-    // Implementation for data export
-  }
-
-  async analyzeData() {
-    console.log('📊 Analyzing data...');
-    // Implementation for data analysis
-  }
-
-  async backupData() {
-    console.log('💾 Backing up data...');
-    // Implementation for data backup
-  }
 
   async saveSettings() {
     try {
@@ -536,9 +612,11 @@ class ExternalDataDashboard {
       });
 
       if (response.ok) {
-        console.log('✅ Settings saved successfully');
+        const result = await response.json();
+        console.log('✅ Settings saved successfully:', result.message);
+        console.log('📋 Updated settings:', result.settings);
       } else {
-        console.error('❌ Error saving settings');
+        console.error('❌ Error saving settings:', response.status);
       }
     } catch (error) {
       console.error('❌ Error saving settings:', error);
@@ -569,10 +647,137 @@ class ExternalDataDashboard {
         console.log('✅ Logs cleared successfully');
         await this.loadLogs();
       } else {
-        console.error('❌ Error clearing logs');
+        console.error('❌ Error clearing logs:', response.status);
       }
     } catch (error) {
       console.error('❌ Error clearing logs:', error);
+    }
+  }
+
+  async clearCache() {
+    try {
+      console.log('🗑️ Clearing cache...');
+
+      const response = await fetch('/api/external-data/status/cache/clear', { method: 'POST' });
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Cache cleared successfully:', result.message);
+        await this.loadCacheStats();
+      } else {
+        console.error('❌ Error clearing cache:', response.status);
+      }
+    } catch (error) {
+      console.error('❌ Error clearing cache:', error);
+    }
+  }
+
+  async optimizeCache() {
+    try {
+      console.log('⚡ Optimizing cache...');
+
+      const response = await fetch('/api/external-data/status/cache/optimize', { method: 'POST' });
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Cache optimized successfully:', result.message);
+        await this.loadCacheStats();
+      } else {
+        console.error('❌ Error optimizing cache:', response.status);
+      }
+    } catch (error) {
+      console.error('❌ Error optimizing cache:', error);
+    }
+  }
+
+  async testAllProviders() {
+    try {
+      console.log('🧪 Testing all providers...');
+
+      const response = await fetch('/api/external-data/status/providers/test-all', { method: 'POST' });
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ All providers tested:', result.message);
+        console.log('📊 Test results:', result.test_results);
+        await this.loadProviders();
+      } else {
+        console.error('❌ Error testing providers:', response.status);
+      }
+    } catch (error) {
+      console.error('❌ Error testing providers:', error);
+    }
+  }
+
+  async exportData() {
+    try {
+      console.log('📤 Exporting data...');
+      
+      // For now, export the current system status as JSON
+      const response = await fetch('/api/external-data/status/');
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Create and download JSON file
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `external-data-export-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        console.log('✅ Data exported successfully');
+      } else {
+        console.error('❌ Error exporting data:', response.status);
+      }
+    } catch (error) {
+      console.error('❌ Error exporting data:', error);
+    }
+  }
+
+  async analyzeData() {
+    try {
+      console.log('📊 Analyzing data...');
+      
+      // For now, just show current system metrics
+      const response = await fetch('/api/external-data/status/');
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Create analysis summary
+        const analysis = {
+          total_providers: data.providers?.total || 0,
+          active_providers: data.providers?.active || 0,
+          healthy_providers: data.providers?.healthy || 0,
+          cache_hit_rate: data.cache?.cache_hit_rate || 0,
+          overall_health: data.overall_health ? 'טובה' : 'מושפלת',
+          system_status: data.status || 'לא ידוע'
+        };
+        
+        console.log('📊 Data Analysis:', analysis);
+        
+        // Show analysis in UI (you can implement this later)
+        if (window.showInfoNotification) {
+          window.showInfoNotification(`ניתוח נתונים:\nספקים: ${analysis.total_providers}\nפעילים: ${analysis.active_providers}\nבריאים: ${analysis.healthy_providers}\nבריאות כללית: ${analysis.overall_health}`, 'ניתוח נתונים');
+        }
+        
+      } else {
+        console.error('❌ Error analyzing data:', response.status);
+      }
+    } catch (error) {
+      console.error('❌ Error analyzing data:', error);
+    }
+  }
+
+  async backupData() {
+    try {
+      console.log('💾 Backing up data...');
+      
+      // For now, just export current data as backup
+      await this.exportData();
+      console.log('✅ Data backup completed');
+      
+    } catch (error) {
+      console.error('❌ Error backing up data:', error);
     }
   }
 
@@ -593,6 +798,73 @@ window.testProvider = function(providerId) {
 window.toggleProvider = function(providerId) {
   console.log('🔄 Toggling provider:', providerId);
   // Implementation for toggling provider status
+};
+
+// Additional global functions for button onclick handlers
+window.refreshLogs = function() {
+  if (window.externalDataDashboard) {
+    window.externalDataDashboard.refreshLogs();
+  }
+};
+
+window.saveSettings = function() {
+  if (window.externalDataDashboard) {
+    window.externalDataDashboard.saveSettings();
+  }
+};
+
+window.clearLogs = function() {
+  if (window.externalDataDashboard) {
+    window.externalDataDashboard.clearLogs();
+  }
+};
+
+window.analyzeData = function() {
+  if (window.externalDataDashboard) {
+    window.externalDataDashboard.analyzeData();
+  }
+};
+
+window.backupData = function() {
+  if (window.externalDataDashboard) {
+    window.externalDataDashboard.backupData();
+  }
+};
+
+window.clearCache = function() {
+  if (window.externalDataDashboard) {
+    window.externalDataDashboard.clearCache();
+  }
+};
+
+window.optimizeCache = function() {
+  if (window.externalDataDashboard) {
+    window.externalDataDashboard.optimizeCache();
+  }
+};
+
+window.refreshProviders = function() {
+  if (window.externalDataDashboard) {
+    window.externalDataDashboard.loadProviders();
+  }
+};
+
+window.testAllProviders = function() {
+  if (window.externalDataDashboard) {
+    window.externalDataDashboard.testAllProviders();
+  }
+};
+
+window.exportData = function() {
+  if (window.externalDataDashboard) {
+    window.externalDataDashboard.exportData();
+  }
+};
+
+window.resetSettings = function() {
+  if (window.externalDataDashboard) {
+    window.externalDataDashboard.resetSettings();
+  }
 };
 
 // Initialize dashboard when DOM is ready

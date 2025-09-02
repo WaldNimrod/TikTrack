@@ -83,6 +83,59 @@ function markAlertAsRead(alertId) {
 // ===== NOTIFICATION SYSTEM FUNCTIONS =====
 // These functions handle system messages for user feedback
 
+/**
+ * Show a notification message
+ * NOTIFICATION SYSTEM - Displays system notification to user
+ *
+ * @param {string} message - Message to display
+ * @param {string} type - Type of notification (success, error, warning, info)
+ * @param {string} title - Optional title for the notification
+ * @param {number} duration - Optional duration in milliseconds (default: 5000)
+ */
+function showNotification(message, type = 'info', title = 'מערכת', duration = 5000) {
+  // אם מרכז ההתראות זמין, הוסף את ההתראה אליו
+  if (window.notificationsCenter && typeof window.notificationsCenter.addNotification === 'function') {
+    window.notificationsCenter.addNotification(type, title, message);
+  }
+
+  // הצגת התראה מיידית בממשק (אם לא במרכז ההתראות)
+  if (!window.location.pathname.includes('notifications-center')) {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : type === 'warning' ? 'warning' : 'info'} alert-dismissible fade show`;
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      min-width: 300px;
+      max-width: 400px;
+      animation: slideInRight 0.3s ease-out;
+    `;
+
+    notification.innerHTML = `
+      <strong>${title}</strong><br>
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+    document.body.appendChild(notification);
+
+    // הסרה אוטומטית
+    setTimeout(() => {
+      if (notification.parentElement) {
+        notification.remove();
+      }
+    }, duration);
+  }
+}
+
+// ייצוא הפונקציה הגלובלית
+window.showNotification = showNotification;
+window.showSuccessNotification = (message, title = 'הצלחה') => showNotification(message, 'success', title);
+window.showErrorNotification = (message, title = 'שגיאה') => showNotification(message, 'error', title);
+window.showWarningNotification = (message, title = 'אזהרה') => showNotification(message, 'warning', title);
+window.showInfoNotification = (message, title = 'מידע') => showNotification(message, 'info', title);
+
 // ===== LINKED ITEMS SYSTEM FUNCTIONS =====
 // These functions handle linked items display and management
 
@@ -124,74 +177,6 @@ function createNotificationContainer() {
   return container;
 }
 
-/**
- * Show notification to user
- * NOTIFICATION SYSTEM - Displays system message to user
- *
- * @param {string} message - Notification message
- * @param {string} type - Notification type: 'success', 'error', 'warning', 'info'
- * @param {string} title - Notification title
- * @param {number} duration - Display duration in milliseconds (default: 4000)
- */
-function showNotification(message, type = 'info', title = 'התראה', duration = 4000) {
-  // showNotification called
-  // Parameter types:
-  // Parameter types check
-  // Raw parameters check
-
-  // Validate and sanitize parameters
-  const validTypes = ['success', 'error', 'warning', 'info'];
-  const sanitizedType = validTypes.includes(type) ? type : 'info';
-  const sanitizedTitle = title || 'הודעה';
-  const sanitizedMessage = message || '';
-
-  // Sanitized parameters check
-
-  // Create notification container
-  const container = createNotificationContainer();
-
-  // Create notification element
-  const notification = document.createElement('div');
-  notification.className = `notification ${sanitizedType}`;
-
-  // Get icon for notification type
-  const icon = getNotificationIcon(sanitizedType);
-
-  // Create notification content
-  notification.innerHTML = `
-        <div class="notification-icon">${icon}</div>
-        <div class="notification-content">
-            <div class="notification-title">${sanitizedTitle}</div>
-            <div class="notification-message">${sanitizedMessage}</div>
-        </div>
-        <button class="notification-close" onclick="this.parentElement.remove()">×</button>
-    `;
-
-  // Created notification element
-
-  // Add to container
-  container.appendChild(notification);
-
-  // Show notification with animation
-  setTimeout(() => {
-    notification.classList.add('show');
-    // Notification shown
-  }, 100);
-
-  // Auto-remove after duration
-  setTimeout(() => {
-    hideNotification(notification);
-  }, duration);
-
-  // שליחה למרכז ההתראות (אם זמין)
-  if (window.notificationsCenter && typeof window.notificationsCenter.addNotification === 'function') {
-    try {
-      window.notificationsCenter.addNotification(sanitizedType, sanitizedTitle, sanitizedMessage, 'now');
-    } catch (error) {
-      console.warn('שגיאה בשליחה למרכז ההתראות:', error);
-    }
-  }
-}
 
 /**
  * Hide notification with animation
@@ -484,7 +469,7 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
           onCancel,
         );
       } else {
-        const confirmed = confirm(message);
+        const confirmed = window.confirm(message);
         if (confirmed && onConfirm) {
           onConfirm();
         } else if (!confirmed && onCancel) {

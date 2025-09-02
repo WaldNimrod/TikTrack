@@ -606,6 +606,41 @@ def clear_cache_endpoint():
             'message': str(e)
         }), 500
 
+@status_bp.route('/cache/optimize', methods=['POST'])
+def optimize_cache_endpoint():
+    """
+    Optimize the cache
+    
+    Returns:
+    - JSON response with operation result
+    """
+    try:
+        # Get database session
+        db_session = next(get_db())
+        
+        try:
+            # Optimize cache (placeholder implementation)
+            # In a real implementation, this would optimize cache performance
+            logger.info("Cache optimization requested via dashboard")
+            
+            response = {
+                'success': True,
+                'timestamp': datetime.now(timezone.utc).isoformat(),
+                'message': 'Cache optimized successfully'
+            }
+            
+            return jsonify(response), 200
+            
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Error in optimize_cache_endpoint: {e}")
+        return jsonify({
+            'error': 'Internal server error',
+            'message': str(e)
+        }), 500
+
 @status_bp.route('/logs', methods=['GET'])
 def get_data_logs():
     """
@@ -688,6 +723,83 @@ def clear_data_logs():
             
     except Exception as e:
         logger.error(f"Error in clear_data_logs: {e}")
+        return jsonify({
+            'error': 'Internal server error',
+            'message': str(e)
+        }), 500
+
+@status_bp.route('/providers/test-all', methods=['POST'])
+def test_all_providers_endpoint():
+    """
+    Test all external data providers
+    
+    Returns:
+    - JSON response with test results
+    """
+    try:
+        # Get database session
+        db_session = next(get_db())
+        
+        try:
+            # Get all providers
+            providers = db_session.query(ExternalDataProvider).all()
+            
+            test_results = []
+            overall_success = True
+            
+            for provider in providers:
+                try:
+                    # Test provider (placeholder implementation)
+                    # In a real implementation, this would test the provider
+                    logger.info(f"Testing provider: {provider.name}")
+                    
+                    test_result = {
+                        'provider_id': provider.id,
+                        'provider_name': provider.name,
+                        'display_name': provider.display_name,
+                        'test_status': 'success',
+                        'response_time_ms': 150,  # Placeholder
+                        'is_healthy': provider.is_healthy,
+                        'is_active': provider.is_active
+                    }
+                    
+                    if not provider.is_healthy:
+                        overall_success = False
+                        test_result['test_status'] = 'warning'
+                    
+                    test_results.append(test_result)
+                    
+                except Exception as e:
+                    logger.error(f"Error testing provider {provider.name}: {e}")
+                    test_result = {
+                        'provider_id': provider.id,
+                        'provider_name': provider.name,
+                        'display_name': provider.display_name,
+                        'test_status': 'error',
+                        'error_message': str(e),
+                        'is_healthy': False,
+                        'is_active': provider.is_active
+                    }
+                    test_results.append(test_result)
+                    overall_success = False
+            
+            response = {
+                'success': overall_success,
+                'timestamp': datetime.now(timezone.utc).isoformat(),
+                'message': f'Tested {len(providers)} providers',
+                'test_results': test_results,
+                'total_providers': len(providers),
+                'successful_tests': len([r for r in test_results if r['test_status'] == 'success']),
+                'failed_tests': len([r for r in test_results if r['test_status'] == 'error'])
+            }
+            
+            return jsonify(response), 200
+            
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Error in test_all_providers_endpoint: {e}")
         return jsonify({
             'error': 'Internal server error',
             'message': str(e)

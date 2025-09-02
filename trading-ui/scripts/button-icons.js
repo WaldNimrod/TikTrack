@@ -60,7 +60,7 @@ const BUTTON_TEXTS = {
 };
 
 // פונקציה ליצירת כפתור עם איקון
-function createButton(type, onClick, _additionalClasses = '', additionalAttributes = '') {
+function createButton(type, onClick, additionalClasses = '', additionalAttributes = '') {
   const icon = BUTTON_ICONS[type.toUpperCase()] || '';
   const text = BUTTON_TEXTS[type.toUpperCase()] || '';
 
@@ -146,13 +146,10 @@ function createCancelButton(itemType, itemId, status = 'open', size = 'sm', addi
       case 'execution':
         onclick = `onclick="window.reactivateExecution && window.reactivateExecution(${itemId})"`;
         break;
-      default: {
-        const reactivateFunc = `window.reactivate${itemType.charAt(0).toUpperCase() + itemType.slice(1)}`;
-        onclick = `onclick="${reactivateFunc} && ${reactivateFunc}(${itemId})"`;
+      default:
+        onclick = `onclick="window.reactivate${itemType.charAt(0).toUpperCase() + itemType.slice(1)} && window.reactivate${itemType.charAt(0).toUpperCase() + itemType.slice(1)}(${itemId})"`;
       }
-    }
-    
-    if (!isCancelled) {
+    } else {
       // ביטול - פונקציות שונות לכל סוג
       switch (itemType) {
       case 'trade_plan':
@@ -176,9 +173,8 @@ function createCancelButton(itemType, itemId, status = 'open', size = 'sm', addi
       case 'execution':
         onclick = `onclick="window.cancelExecution && window.cancelExecution(${itemId})"`;
         break;
-      default: {
-        const cancelFunc = `window.cancel${itemType.charAt(0).toUpperCase() + itemType.slice(1)}`;
-        onclick = `onclick="${cancelFunc} && ${cancelFunc}(${itemId})"`;
+      default:
+        onclick = `onclick="window.cancel${itemType.charAt(0).toUpperCase() + itemType.slice(1)} && window.cancel${itemType.charAt(0).toUpperCase() + itemType.slice(1)}(${itemId})"`;
       }
     }
   }
@@ -217,10 +213,8 @@ function createDeleteButtonByType(itemType, itemId, size = 'sm', additionalClass
     case 'execution':
       onclick = `onclick="window.deleteExecution && window.deleteExecution(${itemId})"`;
       break;
-      default: {
-        const deleteFunc = `window.delete${itemType.charAt(0).toUpperCase() + itemType.slice(1)}`;
-        onclick = `onclick="${deleteFunc} && ${deleteFunc}(${itemId})"`;
-      }
+    default:
+      onclick = `onclick="window.delete${itemType.charAt(0).toUpperCase() + itemType.slice(1)} && window.delete${itemType.charAt(0).toUpperCase() + itemType.slice(1)}(${itemId})"`;
     }
   }
 

@@ -421,7 +421,6 @@ function updateAlertsTable(alerts) {
         }
         default:
           relatedDisplay = `אובייקט ${alert.related_id}`;
-          relatedIcon = '❓';
           relatedClass = 'related-other';
           // console.log(`❓ Unknown related_type_id: ${alert.related_type_id}`);
         }
@@ -499,15 +498,22 @@ function updateAlertsTable(alerts) {
             <span class="symbol-text">${symbolDisplay}</span>
           </td>
           <td><span class="condition-text">${(() => {
-    if (alert.condition_attribute && alert.condition_operator && alert.condition_number && window.translateConditionFields) {
-      return window.translateConditionFields(alert.condition_attribute, alert.condition_operator, alert.condition_number);
+    if (alert.condition_attribute && alert.condition_operator &&
+        alert.condition_number && window.translateConditionFields) {
+      return window.translateConditionFields(
+        alert.condition_attribute,
+        alert.condition_operator,
+        alert.condition_number,
+      );
     }
     return alert.condition || '-';
   })()}</span></td>
           <td class="status-cell" data-status="${alert.status || ''}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
           <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
           <td style="padding: 0;">
-            <div class="related-object-cell ${relatedClass}" style="justify-content: flex-start; text-align: right; min-width: 150px; cursor: pointer;" title="קישור לדף אובייקט - בפיתוח">
+            <div class="related-object-cell ${relatedClass}" 
+             style="justify-content: flex-start; text-align: right; min-width: 150px; cursor: pointer;" 
+             title="קישור לדף אובייקט - בפיתוח">
               ${relatedDisplay}
             </div>
           </td>
@@ -516,10 +522,16 @@ function updateAlertsTable(alerts) {
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell">
             <div class="btn-group btn-group-sm" role="group" style="gap: 2px;">
-              <button class="btn btn-info" onclick="viewLinkedItemsForAlert(${alert.id})" title="צפה באלמנטים מקושרים">🔗</button>
+              <button class="btn btn-info" 
+                      onclick="viewLinkedItemsForAlert(${alert.id})" 
+                      title="צפה באלמנטים מקושרים">🔗</button>
               <button class="btn btn-secondary" onclick="editAlert(${alert.id})" title="ערוך">✏️</button>
               ${alert.status === 'cancelled' || alert.status === 'canceled' ? `
-              <button class="btn btn-outline-secondary" onclick="reactivateAlert(${alert.id})" title="הפעל מחדש התראה"><span class="reactivate-icon">✓</span></button>
+              <button class="btn btn-outline-secondary" 
+                      onclick="reactivateAlert(${alert.id})" 
+                      title="הפעל מחדש התראה">
+                <span class="reactivate-icon">✓</span>
+              </button>
               ` : `
               <button class="btn btn-danger" onclick="cancelAlert(${alert.id})" title="ביטול"><span class="cancel-icon">X</span></button>
               `}
@@ -551,8 +563,12 @@ function updateAlertsTable(alerts) {
 function updatePageSummaryStats() {
   // סטטיסטיקות לפי הדוקומנטציה של מערכת ההתראות
   const totalAlerts = alertsData.length;
-  const openAlerts = alertsData.filter(alert => alert.status === 'open').length; // התראות פעילות
-  const newAlerts = alertsData.filter(alert => alert.is_triggered === 'new').length; // התראות חדשות (הופעלו ולא נקראו)
+  const openAlerts = alertsData.filter(alert =>
+    alert.status === 'open',
+  ).length; // התראות פעילות
+  const newAlerts = alertsData.filter(alert =>
+    alert.is_triggered === 'new',
+  ).length; // התראות חדשות (הופעלו ולא נקראו)
   const todayAlerts = alertsData.filter(alert => {
     const today = new Date().toDateString();
     const alertDate = new Date(alert.created_at).toDateString();
@@ -1386,7 +1402,7 @@ async function saveAlert() {
     // console.log('🔧 Response ok:', response.ok);
 
     if (response.ok) {
-      const newAlert = await response.json();
+      await response.json();
       // console.log('🔧 New alert created:', newAlert);
 
       // התראה נשמרה בהצלחה
@@ -1818,7 +1834,7 @@ async function updateAlert() {
     });
 
     if (response.ok) {
-      const updatedAlert = await response.json();
+      await response.json();
       // התראה עודכנה בהצלחה
 
       // סגירת המודל
@@ -1834,10 +1850,10 @@ async function updateAlert() {
     } else {
       throw new Error(`שגיאה בעדכון התראה: ${response.status}`);
     }
-  } catch (error) {
+  } catch {
     // console.error('שגיאה בעדכון התראה:', error);
     if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה בעדכון התראה', 'שגיאה בעדכון התראה: ' + error.message);
+      window.showErrorNotification('שגיאה בעדכון התראה', 'שגיאה בעדכון התראה');
     }
   }
 }
@@ -1845,7 +1861,7 @@ async function updateAlert() {
 /**
  * מחיקת התראה
  */
-async function deleteAlert(alertId) {
+async function _deleteAlert(alertId) {
   // שימוש במערכת הגלובלית למחיקה
   if (typeof window.showDeleteWarning === 'function') {
     window.showDeleteWarning('alerts', alertId, 'התראה', async () => {
@@ -1866,7 +1882,7 @@ async function deleteAlert(alertId) {
       );
     } else {
       // fallback אחרון - confirm רגיל (אם מערכת התראות לא זמינה)
-      const confirmed = confirm('האם אתה בטוח שברצונך למחוק התראה זו?');
+      const confirmed = window.confirm('האם אתה בטוח שברצונך למחוק התראה זו?');
       if (confirmed) {
         await confirmDeleteAlert(alertId);
       }
@@ -1903,23 +1919,35 @@ async function confirmDeleteAlert(alertId) {
 
         if (serverMessage.includes('has linked items')) {
           if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה במחיקה', 'לא ניתן למחוק התראה זו - יש פריטים מקושרים אליה');
+            window.showErrorNotification(
+              'שגיאה במחיקה',
+              'לא ניתן למחוק התראה זו - יש פריטים מקושרים אליה',
+            );
           }
         } else {
           if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה במחיקה', serverMessage);
+            window.showErrorNotification(
+              'שגיאה במחיקה',
+              serverMessage,
+            );
           }
         }
       } else {
         if (window.showErrorNotification) {
-          window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת התראה - בדוק את הנתונים');
+          window.showErrorNotification(
+            'שגיאה במחיקה',
+            'שגיאה במחיקת התראה - בדוק את הנתונים',
+          );
         }
       }
     }
-  } catch (error) {
+  } catch {
     // console.error('❌ שגיאה במחיקת התראה:', error);
     if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', 'שגיאה במחיקת התראה - בדוק את חיבור השרת');
+      window.showErrorNotification(
+        'שגיאה',
+        'שגיאה במחיקת התראה - בדוק את חיבור השרת',
+      );
     }
   }
 }
@@ -1977,7 +2005,7 @@ function getStatusClass(status) {
  * @param {number} relatedType - מזהה סוג האובייקט (1=חשבון, 2=טרייד, 3=תכנון, 4=טיקר)
  * @returns {string} שם המחלקה CSS
  */
-function getRelatedClass(relatedType) {
+function _getRelatedClass(relatedType) {
   switch (relatedType) {
   case 4: return 'related-ticker'; // ticker
   case 2: return 'related-trade'; // trade
@@ -2080,7 +2108,10 @@ document.addEventListener('DOMContentLoaded', function () {
   if (typeof window.showSuccessNotification !== 'function') {
     // console.error('❌ מערכת התראות לא זמינה!');
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', 'מערכת התראות לא זמינה. בדוק את טעינת הקבצים.');
+      window.showErrorNotification(
+        'שגיאה',
+        'מערכת התראות לא זמינה. בדוק את טעינת הקבצים.',
+      );
     } else {
       // console.error('שגיאה: מערכת התראות לא זמינה. בדוק את טעינת הקבצים.');
     }
@@ -2107,7 +2138,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // פונקציה לעדכון הטבלה מפילטרים
 if (window.location.pathname.includes('/alerts')) {
-  window.updateGridFromComponent = function (selectedStatuses, selectedTypes, selectedDateRange, searchTerm) {
+  window.updateGridFromComponent = function (_selectedStatuses, _selectedTypes, _selectedDateRange, _searchTerm) {
     // שמירת הפילטרים
 
 
@@ -2168,7 +2199,9 @@ function filterAlertsByRelatedObjectType(type) {
   let filteredAlerts = alertsData;
 
   if (type !== 'all') {
-    filteredAlerts = alertsData.filter(alert => alert.related_type_id === targetTypeId);
+    filteredAlerts = alertsData.filter(alert =>
+      alert.related_type_id === targetTypeId,
+    );
   }
 
   // עדכון הטבלה עם הנתונים המסוננים
@@ -2257,7 +2290,7 @@ async function reactivateAlert(alertId) {
     if (!confirmed) {return;}
   } else {
     // Fallback למקרה שמערכת התראות לא זמינה
-    if (!confirm('האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?')) {
+    if (!window.confirm('האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?')) {
       return;
     }
   }

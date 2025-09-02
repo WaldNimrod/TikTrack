@@ -460,9 +460,9 @@ async function deleteCashFlow(id) {
       }
     } else {
       // Fallback למקרה שמערכת התראות לא זמינה
-      if (!confirm(confirmMessage)) {
-        return;
-      }
+        if (!window.confirm(confirmMessage)) {
+    return;
+  }
     }
 
     // שליחת בקשת מחיקה

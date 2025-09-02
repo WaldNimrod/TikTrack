@@ -55,6 +55,9 @@ from typing import Dict, Any, Optional, List
 import time
 import sys # Added for sys.exit
 
+# Import configuration settings for cache modes
+from config.settings import DEVELOPMENT_MODE, CACHE_DISABLED, DEFAULT_CACHE_TTL, CACHE_ENABLED
+
 # Import new architecture components
 from config.database import init_db
 from config.logging import setup_logging

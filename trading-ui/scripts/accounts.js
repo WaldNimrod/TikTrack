@@ -1,4 +1,4 @@
-/* ===== מערכת ניהול חשבונות ===== */
+/* ===== מערכת ניהול חשבונות ===== */מהמם
 /*
  * קובץ זה מכיל את כל הפונקציות הקשורות לניהול חשבונות
  * כולל טעינת נתונים, עדכון טבלאות, מודלים ופעולות CRUD
@@ -1232,10 +1232,10 @@ async function cancelAccount(accountId, accountName) {
           if (!confirmed) {return;}
         } else {
           // Fallback למקרה שמערכת התראות לא זמינה
-          if (!confirm(`האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`)) {
+          if (!window.confirm(`האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`)) {
             return;
           }
-          if (!confirm(`הסטטוס ישתנה ל"מבוטל". האם אתה בטוח שברצונך להמשיך בביטול החשבון "${accountName}"?`)) {
+          if (!window.confirm(`הסטטוס ישתנה ל"מבוטל". האם אתה בטוח שברצונך להמשיך בביטול החשבון "${accountName}"?`)) {
             return;
           }
         }
@@ -1336,10 +1336,10 @@ async function deleteAccount(accountId, accountName) {
         });
         if (!confirmed) {return;}
       } else {
-        if (!confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?`)) {
+        if (!window.confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?`)) {
           return;
         }
-        if (!confirm(`פעולה זו אינה הפיכה. האם אתה בטוח שברצונך להמשיך במחיקת החשבון "${accountName}"?`)) {
+        if (!window.confirm(`פעולה זו אינה הפיכה. האם אתה בטוח שברצונך להמשיך במחיקת החשבון "${accountName}"?`)) {
           return;
         }
       }
@@ -1834,7 +1834,7 @@ async function cancelAccountWithLinkedItemsCheck(accountId, _accountName) {
       );
     } else {
       // Fallback למקרה שהמערכת הגלובלית לא זמינה
-      if (!confirm(`האם אתה בטוח שברצונך לבטל חשבון זה?${accountDetails}`)) {
+      if (!window.confirm(`האם אתה בטוח שברצונך לבטל חשבון זה?${accountDetails}`)) {
         return;
       }
       await checkLinkedItemsAndCancelAccount(accountId);
@@ -1884,7 +1884,7 @@ async function deleteAccountWithLinkedItemsCheck(accountId, _accountName) {
       );
     } else {
       // Fallback למקרה שהמערכת הגלובלית לא זמינה
-      if (!confirm(`האם אתה בטוח שברצונך למחוק חשבון זה?${accountDetails}`)) {
+      if (!window.confirm(`האם אתה בטוח שברצונך למחוק חשבון זה?${accountDetails}`)) {
         return;
       }
       await checkLinkedItemsAndDeleteAccount(accountId);
@@ -1916,7 +1916,7 @@ async function restoreAccount(accountId, accountName) {
     });
     if (!confirmed) {return;}
   } else {
-    if (!confirm(`האם אתה בטוח שברצונך להחזיר את החשבון "${accountName}" לסטטוס סגור?`)) {
+    if (!window.confirm(`האם אתה בטוח שברצונך להחזיר את החשבון "${accountName}" לסטטוס סגור?`)) {
       return;
     }
   }

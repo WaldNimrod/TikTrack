@@ -33,7 +33,7 @@ let isDataLoaded = false;
  * Initialize the database display page
  */
 function initDatabaseDisplay() {
-  console.log('🔄 Initializing database display page...');
+  // console.log('🔄 Initializing database display page...');
 
   // Load default table (accounts)
   loadTableData('accounts');
@@ -46,7 +46,7 @@ function initDatabaseDisplay() {
     window.headerSystem.init();
   }
 
-  console.log('✅ Database display page initialized successfully');
+  // console.log('✅ Database display page initialized successfully');
 }
 
 /**
@@ -79,7 +79,7 @@ function setupEventListeners() {
  */
 async function loadTableData(tableType) {
   try {
-    console.log(`📊 Loading data for table type: ${tableType}`);
+    // console.log(`📊 Loading data for table type: ${tableType}`);
 
     // Update current table type
     currentTableType = tableType;
@@ -102,10 +102,10 @@ async function loadTableData(tableType) {
     // Mark as loaded
     isDataLoaded = true;
 
-    console.log(`✅ Data loaded for ${tableType}: ${data.length} records`);
+    // console.log(`✅ Data loaded for ${tableType}: ${data.length} records`);
 
   } catch (error) {
-    console.error(`❌ Error loading data for ${tableType}:`, error);
+    // console.error(`❌ Error loading data for ${tableType}:`, error);
     handleDataLoadError(error, tableType);
   }
 }
@@ -130,7 +130,7 @@ async function fetchTableData(tableType) {
       throw new Error(result.error?.message || `Error fetching ${tableType} data`);
     }
   } catch (error) {
-    console.error(`❌ Error fetching ${tableType} data:`, error);
+    // console.error(`❌ Error fetching ${tableType} data:`, error);
     // Return empty array on error
     return [];
   }
@@ -149,28 +149,28 @@ function updateTableDisplay(data, tableType) {
   const tableContainer = document.getElementById(containerId);
 
   if (!tableContainer) {
-    console.error(`❌ Table container not found for ${tableType}: ${containerId}`);
+    // console.error(`❌ Table container not found for ${tableType}: ${containerId}`);
     return;
   }
 
   // Find the table within the container
   const table = tableContainer.querySelector('table');
   if (!table) {
-    console.error(`❌ Table not found in container ${containerId}`);
+    // console.error(`❌ Table not found in container ${containerId}`);
     return;
   }
 
   // Find the table body
   const tbody = table.querySelector('tbody');
   if (!tbody) {
-    console.error(`❌ Table body not found in table ${tableType}`);
+    // console.error(`❌ Table body not found in table ${tableType}`);
     return;
   }
 
   // Get table mappings
   const tableMapping = window.TABLE_COLUMN_MAPPINGS?.[tableType];
   if (!tableMapping) {
-    console.error(`❌ No table mapping found for ${tableType}`);
+    // console.error(`❌ No table mapping found for ${tableType}`);
     return;
   }
 
@@ -284,7 +284,7 @@ function formatCellValue(value, column) {
  */
 function applySortingFunctionality(tableType) {
   // Sorting is handled by global sortTable function from main.js
-  console.log(`🔀 Sorting functionality applied to ${tableType} table`);
+  // console.log(`🔀 Sorting functionality applied to ${tableType} table`);
 }
 
 // ===== UTILITY FUNCTIONS =====
@@ -400,11 +400,11 @@ function formatStatus(status) {
  * @param {string} tableType - The table type
  */
 function handleDataLoadError(error, tableType) {
-  console.error(`❌ Error loading ${tableType} data:`, error);
+      // console.error(`❌ Error loading ${tableType} data:`, error);
 
   // Show error notification
-  if (window.showNotification) {
-    window.showNotification(`שגיאה בטעינת נתוני ${tableType}`, 'error');
+  if (window.showErrorNotification) {
+    window.showErrorNotification(`שגיאה בטעינת נתוני ${tableType}`);
   }
 
   // Show error state in table
@@ -454,8 +454,8 @@ function toggleMainSection() {
  */
 function addRecord() {
   // This is a placeholder function - implement based on requirements
-  if (window.showNotification) {
-    window.showNotification('פונקציה זו תשולב בהמשך', 'info');
+  if (window.showInfoNotification) {
+    window.showInfoNotification('פונקציה זו תשולב בהמשך');
   }
 }
 
@@ -473,14 +473,14 @@ function sortTable(columnIndex, tableType) {
   const tableMapping = window.TABLE_COLUMN_MAPPINGS?.[tableType];
 
   if (!tableMapping) {
-    console.error(`❌ No table mapping found for ${tableType}`);
+    // console.error(`❌ No table mapping found for ${tableType}`);
     return;
   }
 
   // Get the field name for the column
   const fieldName = tableMapping[columnIndex];
   if (!fieldName) {
-    console.error(`❌ Invalid column index: ${columnIndex}`);
+    // console.error(`❌ Invalid column index: ${columnIndex}`);
     return;
   }
 
@@ -516,9 +516,9 @@ window.sortTable = sortTable;
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('➕ Database display page DOM loaded');
+  // console.log('➕ Database display page DOM loaded');
   initDatabaseDisplay();
 });
 
-console.log('✅ DB Display script loaded successfully');
+// console.log('✅ DB Display script loaded successfully');
 

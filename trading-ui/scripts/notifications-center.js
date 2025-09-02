@@ -165,35 +165,40 @@ class NotificationsCenter {
     // שמירה ללוקל סטורג'
     this.saveToLocalStorage();
 
-    // שמירה לקובץ לוג (אם זמין)
-    this.saveToLogFile(notification);
+    // שמירה לקובץ לוג מבוטלת זמנית למניעת עומס
+    // this.saveToLogFile(notification);
 
     // הצגת הודעה אם מופעל
     if (this.settings.enableRealtime) {
       this.showNotificationPopup(notification);
     }
 
-    // הפעלת צליל אם מופעל
-    if (this.settings.enableSounds) {
-      this.playNotificationSound(type);
-    }
+    // צלילים מבוטלים זמנית למניעת שגיאות AudioContext
+    // if (this.settings.enableSounds) {
+    //   this.playNotificationSound(type);
+    // }
   }
 
   showNotificationPopup(notification) {
-    switch (notification.type) {
-    case 'success':
-      window.showSuccessNotification(notification.title, notification.message);
-      break;
-    case 'error':
-      window.showErrorNotification(notification.title, notification.message);
-      break;
-    case 'warning':
-      window.showWarningNotification(notification.title, notification.message);
-      break;
-    case 'info':
-      window.showInfoNotification(notification.title, notification.message);
-      break;
-    }
+    // הצגת התראה ישירה ללא לולאה
+    const popup = document.createElement('div');
+    popup.className = `notification-popup ${notification.type}`;
+    popup.innerHTML = `
+      <div class="popup-header">
+        <span class="popup-title">${notification.title}</span>
+        <button class="popup-close" onclick="this.parentElement.parentElement.remove()">×</button>
+      </div>
+      <div class="popup-message">${notification.message}</div>
+    `;
+
+    document.body.appendChild(popup);
+
+    // הסרה אוטומטית אחרי 5 שניות
+    setTimeout(() => {
+      if (popup.parentElement) {
+        popup.remove();
+      }
+    }, 5000);
   }
 
   playNotificationSound(type) {
@@ -333,11 +338,11 @@ class NotificationsCenter {
     // פילטור לפי בחירת המשתמש
     const filterElement = document.getElementById('historyFilter');
     const periodElement = document.getElementById('historyPeriod');
-    
+
     if (!filterElement || !periodElement) {
       return; // אלמנטי פילטר לא קיימים
     }
-    
+
     const filter = filterElement.value;
     const period = periodElement.value;
 
@@ -381,10 +386,10 @@ class NotificationsCenter {
     const warningCount = document.getElementById('warningCount');
     const infoCount = document.getElementById('infoCount');
 
-    if (successCount) successCount.textContent = this.stats.success;
-    if (errorCount) errorCount.textContent = this.stats.error;
-    if (warningCount) warningCount.textContent = this.stats.warning;
-    if (infoCount) infoCount.textContent = this.stats.info;
+    if (successCount) {successCount.textContent = this.stats.success;}
+    if (errorCount) {errorCount.textContent = this.stats.error;}
+    if (warningCount) {warningCount.textContent = this.stats.warning;}
+    if (infoCount) {infoCount.textContent = this.stats.info;}
   }
 
   updateSettingsUI() {
@@ -396,12 +401,12 @@ class NotificationsCenter {
     const enableExternalData = document.getElementById('enableExternalData');
     const enableSystemEvents = document.getElementById('enableSystemEvents');
 
-    if (enableRealtime) enableRealtime.checked = this.settings.enableRealtime;
-    if (enableSounds) enableSounds.checked = this.settings.enableSounds;
-    if (enableBackgroundTasks) enableBackgroundTasks.checked = this.settings.enableBackgroundTasks;
-    if (enableDataUpdates) enableDataUpdates.checked = this.settings.enableDataUpdates;
-    if (enableExternalData) enableExternalData.checked = this.settings.enableExternalData;
-    if (enableSystemEvents) enableSystemEvents.checked = this.settings.enableSystemEvents;
+    if (enableRealtime) {enableRealtime.checked = this.settings.enableRealtime;}
+    if (enableSounds) {enableSounds.checked = this.settings.enableSounds;}
+    if (enableBackgroundTasks) {enableBackgroundTasks.checked = this.settings.enableBackgroundTasks;}
+    if (enableDataUpdates) {enableDataUpdates.checked = this.settings.enableDataUpdates;}
+    if (enableExternalData) {enableExternalData.checked = this.settings.enableExternalData;}
+    if (enableSystemEvents) {enableSystemEvents.checked = this.settings.enableSystemEvents;}
   }
 
   createNotificationHTML(notification) {
@@ -596,11 +601,12 @@ class NotificationsCenter {
     this.updateStatsUI();
     this.saveToLocalStorage();
 
-    window.showSuccessNotification('מרכז התראות', 'התראות פעילות נוקו בהצלחה');
+    // הודעה ישירה לממשק ללא לולאה
+    console.log('✅ התראות פעילות נוקו בהצלחה');
   }
 
   clearHistory() {
-    if (confirm('האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?')) {
+    if (window.confirm('האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?')) {
       this.history = [];
       this.stats = { success: 0, error: 0, warning: 0, info: 0 };
 
@@ -608,7 +614,8 @@ class NotificationsCenter {
       this.updateStatsUI();
       this.saveToLocalStorage();
 
-      window.showSuccessNotification('מרכז התראות', 'היסטוריית ההתראות נוקתה בהצלחה');
+      // הודעה ישירה לממשק ללא לולאה
+      console.log('✅ היסטוריית ההתראות נוקתה בהצלחה');
     }
   }
 
@@ -618,7 +625,8 @@ class NotificationsCenter {
     this.updateHistoryUI();
     this.updateStatsUI();
 
-    window.showInfoNotification('מרכז התראות', 'ההתראות רועננו בהצלחה');
+    // הודעה ישירה לממשק ללא לולאה
+    console.log('✅ ההתראות רועננו בהצלחה');
   }
 
   filterHistory() {
@@ -657,7 +665,7 @@ class NotificationsCenter {
       if (!connectionTimeElement) {
         return; // לא בעמוד מרכז ההתראות
       }
-      
+
       if (window.realtimeNotificationsClient) {
         const stats = window.realtimeNotificationsClient.getConnectionStats();
         if (stats && stats.connectedAt) {
@@ -678,7 +686,7 @@ class NotificationsCenter {
       if (!statusDot) {
         return 'connecting'; // לא בעמוד מרכז ההתראות
       }
-      
+
       if (statusDot.querySelector('.connected')) {return 'connected';}
       if (statusDot.querySelector('.disconnected')) {return 'disconnected';}
       if (statusDot.querySelector('.connecting')) {return 'connecting';}
@@ -739,7 +747,14 @@ function copyNotificationsToClipboard() {
     }).catch(err => {
       console.error('❌ שגיאה בהעתקה ללוח:', err);
       // גיבוי - הצגה בחלון
-      alert('לוג התראות:\n\n' + log);
+      // העתקה ללוח
+      navigator.clipboard.writeText(log).then(() => {
+        window.showSuccessNotification('לוג התראות הועתק ללוח בהצלחה');
+      }).catch(() => {
+      // Fallback - הצגת הלוג בחלון נפרד
+        const newWindow = window.open('', '_blank');
+        newWindow.document.write(`<pre>${log}</pre>`);
+      });
     });
   } catch (error) {
     console.error('❌ שגיאה ביצירת לוג התראות:', error);
@@ -776,7 +791,7 @@ function saveNotificationSettings() {
 }
 
 function resetNotificationSettings() {
-  if (confirm('האם אתה בטוח שברצונך לאפס את כל ההגדרות?')) {
+  if (window.confirm('האם אתה בטוח שברצונך לאפס את כל ההגדרות?')) {
     if (window.notificationsCenter) {
       window.notificationsCenter.settings = window.notificationsCenter.loadSettings();
       window.notificationsCenter.updateSettingsUI();

@@ -143,7 +143,7 @@ function initializeApplication() {
     initializeCurrentPage();
   } catch (error) {
     // Application Initialization Failed - Show actual error
-    console.error('❌ Application initialization error:', error);
+    // console.error('❌ Application initialization error:', error);
     showSystemError(`Application initialization failed: ${error.message || 'Unknown error'}. Please refresh the page.`);
   }
 }
@@ -1155,7 +1155,8 @@ function filterDataByFilters(data, pageName) {
         return itemDate >= weekAgo;
       }
       case 'החודש': {
-        return itemDate.getMonth() === now.getMonth() && itemDate.getFullYear() === now.getFullYear();
+        return itemDate.getMonth() === now.getMonth() && 
+               itemDate.getFullYear() === now.getFullYear();
       }
       case 'השנה':
         return itemDate.getFullYear() === now.getFullYear();
@@ -1169,7 +1170,8 @@ function filterDataByFilters(data, pageName) {
   // פילטר לפי חיפוש
   if (searchTerm && searchTerm.trim() !== '') {
     // Filtering by search term
-    const searchTerms = searchTerm.toLowerCase().split(' ').filter(term => term.length > 0);
+            const searchTerms = searchTerm.toLowerCase().split(' ')
+          .filter(term => term.length > 0);
 
     filteredData = filteredData.filter(item => {
       const searchableText = [
@@ -1184,7 +1186,9 @@ function filterDataByFilters(data, pageName) {
         item.type || '',
       ].join(' ').toLowerCase();
 
-      return searchTerms.every(term => searchableText.includes(term));
+      return searchTerms.every(term => 
+        searchableText.includes(term)
+      );
     });
     // After search filter
   }
@@ -1216,7 +1220,8 @@ window.filterDataByFilters = filterDataByFilters;
 function initializeDevelopmentShortcuts() {
   // קיצור מקלדת לניקוי Cache: Ctrl+Shift+C (או Cmd+Shift+C במק)
   document.addEventListener('keydown', function(e) {
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') {
+          if ((e.ctrlKey || e.metaKey) && e.shiftKey && 
+          e.key === 'C') {
       e.preventDefault();
       // console.log('🔧 קיצור מקלדת: ניקוי Cache');
       if (window.clearDevelopmentCache) {

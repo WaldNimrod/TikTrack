@@ -662,7 +662,7 @@ function showSecondConfirmationModal(message, onConfirm) {
           );
         } else {
           // Fallback למקרה שמערכת התראות לא זמינה
-          if (confirm(message)) {
+          if (window.confirm(message)) {
             onConfirm();
           }
         }

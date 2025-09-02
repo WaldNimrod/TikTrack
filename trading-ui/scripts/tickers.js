@@ -770,7 +770,7 @@ async function cancelTicker(id) {
       );
     } else {
       // Fallback למקרה שהמערכת הגלובלית לא זמינה
-      if (!confirm(`האם אתה בטוח שברצונך לבטל טיקר זה?${tickerDetails}`)) {
+      if (!window.confirm(`האם אתה בטוח שברצונך לבטל טיקר זה?${tickerDetails}`)) {
         return;
       }
       await checkLinkedItemsAndCancelTicker(id);

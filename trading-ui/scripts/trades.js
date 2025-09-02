@@ -507,7 +507,7 @@ async function cancelTradeRecord(tradeId) {
           if (!confirmed) {return;}
         } else {
           // Fallback למקרה שמערכת התראות לא זמינה
-          if (!confirm(`האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`)) {
+          if (!window.confirm(`האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`)) {
             return;
           }
         }
@@ -633,7 +633,7 @@ async function deleteTradeRecord(tradeId) {
           if (!confirmed) {return;}
         } else {
           // Fallback למקרה שמערכת התראות לא זמינה
-          if (!confirm('האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.')) {
+          if (!window.confirm('האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.')) {
             return;
           }
         }
@@ -1787,7 +1787,7 @@ function validateTradeStatusChange(newStatus, tradeData) {
             );
           } else {
             // Fallback למקרה שמערכת התראות לא זמינה
-            firstWarning = confirm(
+            firstWarning = window.confirm(
               '⚠️ אזהרה: במערכת מופיע שיש פוזיציה פתוחה.\n' +
                     'האם אתה בטוח שברצונך לסגור את הטרייד?\n\n' +
                     'פוזיציה נוכחית: ' + currentPosition.quantity + ' מניות',
@@ -1829,7 +1829,7 @@ function validateTradeStatusChange(newStatus, tradeData) {
               );
             } else {
               // Fallback למקרה שמערכת התראות לא זמינה
-              secondWarning = confirm(
+              secondWarning = window.confirm(
                 '🔒 ממשק הסגירה המלא כולל סגירת פוזיציה נמצא בפיתוח.\n\n' +
                           'כרגע ניתן לסגור את הטרייד אך יש לזכור לעדכן עסקה לסגירת פוזיציה.\n\n' +
                           'האם אתה בטוח שברצונך להמשיך?',
@@ -2637,7 +2637,7 @@ function showTickerChangeConfirmation(originalSymbol, newSymbol) {
           );
         } else {
           // Fallback למקרה שמערכת התראות לא זמינה
-          const confirmed = confirm(message);
+          const confirmed = window.confirm(message);
           resolve(confirmed);
         }
         resolve(confirmed);

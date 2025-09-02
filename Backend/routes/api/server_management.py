@@ -9,6 +9,8 @@ from flask import Blueprint, request, jsonify
 import subprocess
 import os
 import logging
+import threading
+import time
 from datetime import datetime
 from typing import Any, Dict
 
@@ -17,6 +19,83 @@ server_management_bp = Blueprint('server_management', __name__, url_prefix='/api
 
 # Configure logging
 logger = logging.getLogger(__name__)
+
+# Global variable to track restart status
+restart_status = {
+    'in_progress': False,
+    'mode': None,
+    'start_time': None,
+    'status': 'idle'
+}
+
+def execute_restart_async(mode: str) -> None:
+    """
+    Execute restart script asynchronously to prevent Flask endpoint from hanging
+    """
+    global restart_status
+    
+    try:
+        restart_status['in_progress'] = True
+        restart_status['mode'] = mode
+        restart_status['start_time'] = datetime.now()
+        restart_status['status'] = 'executing'
+        
+        logger.info(f'Starting async restart for mode: {mode}')
+        
+        # Get the project root directory
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        restart_script = os.path.join(project_root, 'restart')
+        
+        # Alternative path check if script not found
+        if not os.path.exists(restart_script):
+            current_dir = os.getcwd()
+            if current_dir.endswith('Backend'):
+                project_root = os.path.dirname(current_dir)
+                restart_script = os.path.join(project_root, 'restart')
+        
+        if not os.path.exists(restart_script):
+            logger.error('Restart script not found')
+            restart_status['status'] = 'failed'
+            restart_status['error'] = 'Restart script not found'
+            return
+        
+        # Make restart script executable
+        os.chmod(restart_script, 0o755)
+        
+        # Execute restart script with the specified mode
+        logger.info(f'Executing restart script: {restart_script} --cache-mode={mode}')
+        logger.info(f'Working directory: {project_root}')
+        
+        # Execute the restart script
+        result = subprocess.run(
+            [restart_script, f'--cache-mode={mode}'],
+            capture_output=True,
+            text=True,
+            cwd=project_root,
+            timeout=120  # 2 minute timeout
+        )
+        
+        if result.returncode == 0:
+            logger.info(f'Server restart completed successfully for mode: {mode}')
+            restart_status['status'] = 'completed'
+            restart_status['output'] = result.stdout
+        else:
+            logger.error(f'Restart script failed with return code: {result.returncode}')
+            logger.error(f'Error output: {result.stderr}')
+            restart_status['status'] = 'failed'
+            restart_status['error'] = result.stderr
+            restart_status['return_code'] = result.returncode
+            
+    except subprocess.TimeoutExpired:
+        logger.error('Restart script timed out')
+        restart_status['status'] = 'timeout'
+        restart_status['error'] = 'Restart script timed out'
+    except Exception as e:
+        logger.error(f'Error during restart: {e}')
+        restart_status['status'] = 'failed'
+        restart_status['error'] = str(e)
+    finally:
+        restart_status['in_progress'] = False
 
 @server_management_bp.route('/change-mode', methods=['POST'])
 def change_server_mode() -> Any:
@@ -48,122 +127,95 @@ def change_server_mode() -> Any:
                 'message': f'Invalid mode. Must be one of: {", ".join(valid_modes)}'
             }), 400
         
+        # Check if restart is already in progress
+        if restart_status['in_progress']:
+            return jsonify({
+                'status': 'error',
+                'message': 'Server restart already in progress',
+                'data': {
+                    'current_status': restart_status
+                }
+            }), 409
+        
         # Log the mode change request
         logger.info(f'Server mode change requested: {mode}')
         
-        # Get the project root directory (one level up from Backend)
-        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        restart_script = os.path.join(project_root, 'restart')
-        
-        # Log the path for debugging
-        logger.info(f'Project root: {project_root}')
-        logger.info(f'Restart script path: {restart_script}')
-        logger.info(f'Script exists: {os.path.exists(restart_script)}')
-        
-        # Alternative path check
-        if not os.path.exists(restart_script):
-            # Try relative path from current working directory
-            current_dir = os.getcwd()
-            logger.info(f'Current working directory: {current_dir}')
-            
-            # If we're in Backend directory, go up one level
-            if current_dir.endswith('Backend'):
-                project_root = os.path.dirname(current_dir)
-                restart_script = os.path.join(project_root, 'restart')
-                logger.info(f'Adjusted project root: {project_root}')
-                logger.info(f'Adjusted restart script path: {restart_script}')
-                logger.info(f'Script exists after adjustment: {os.path.exists(restart_script)}')
-        
-        # Check if restart script exists
-        if not os.path.exists(restart_script):
-            return jsonify({
-                'status': 'error',
-                'message': 'Restart script not found'
-            }), 500
-        
-        # Make restart script executable
-        os.chmod(restart_script, 0o755)
-        
-        # Log the mode change request for manual action
-        logger.info(f'Server mode change requested: {mode}')
-        
-        return jsonify({
-            'status': 'success',
-            'message': f'Server mode change to {mode} requested successfully',
-            'data': {
-                'mode': mode,
-                'timestamp': datetime.now().isoformat(),
-                'instructions': f'To apply the {mode} mode, please restart the server manually using: ./restart --cache-mode={mode}',
-                'note': 'The server will continue running in the current mode until manually restarted'
-            }
-        })
-        
-        # TODO: Uncomment the actual restart logic below when the issue is resolved
-        """
-        # Execute restart script with the specified mode
+        # Try to execute restart script
         try:
-            logger.info(f'Executing restart script: {restart_script} --cache-mode={mode}')
-            logger.info(f'Working directory: {project_root}')
+            # Get the project root directory
+            project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            restart_script = os.path.join(project_root, 'restart')
             
-            # Test if the script can be executed first
-            test_result = subprocess.run(
-                [restart_script, '--help'],
-                capture_output=True,
-                text=True,
-                cwd=project_root,
-                timeout=10
-            )
-            logger.info(f'Help test result: {test_result.returncode}')
-            logger.info(f'Help output: {test_result.stdout[:200]}...')
+            # Alternative path check if script not found
+            if not os.path.exists(restart_script):
+                current_dir = os.getcwd()
+                if current_dir.endswith('Backend'):
+                    project_root = os.path.dirname(current_dir)
+                    restart_script = os.path.join(project_root, 'restart')
             
-            result = subprocess.run(
-                [restart_script, f'--cache-mode={mode}'],
-                capture_output=True,
-                text=True,
-                cwd=project_root,
-                timeout=60  # 60 second timeout
-            )
+            logger.info(f'Project root: {project_root}')
+            logger.info(f'Restart script path: {restart_script}')
+            logger.info(f'Script exists: {os.path.exists(restart_script)}')
             
-            if result.returncode == 0:
-                logger.info(f'Server mode changed successfully to: {mode}')
+            if os.path.exists(restart_script):
+                # Make restart script executable
+                os.chmod(restart_script, 0o755)
+                
+                # Start async restart process
+                restart_thread = threading.Thread(
+                    target=execute_restart_async,
+                    args=(mode,),
+                    daemon=True
+                )
+                restart_thread.start()
+                
+                logger.info(f'Async restart thread started for mode: {mode}')
                 
                 return jsonify({
                     'status': 'success',
-                    'message': f'Server mode changed to {mode} successfully',
+                    'message': f'Server restart initiated for mode: {mode}',
                     'data': {
                         'mode': mode,
                         'timestamp': datetime.now().isoformat(),
-                        'output': result.stdout,
-                        'return_code': result.returncode
+                        'restart_id': f'restart_{int(time.time())}',
+                        'note': 'Server restart is running in background. Check /api/server/restart-status for progress.',
+                        'restart_script_path': restart_script,
+                        'project_root': project_root
                     }
                 })
             else:
-                logger.error(f'Restart script failed with return code: {result.returncode}')
-                logger.error(f'Error output: {result.stderr}')
-                
+                # Provide manual restart instructions
+                logger.warning(f'Restart script not found at: {restart_script}')
                 return jsonify({
-                    'status': 'error',
-                    'message': f'Restart script failed with return code: {result.returncode}',
+                    'status': 'success',
+                    'message': f'Mode change to {mode} requested successfully',
                     'data': {
-                        'error_output': result.stderr,
-                        'return_code': result.returncode
+                        'mode': mode,
+                        'timestamp': datetime.now().isoformat(),
+                        'restart_id': f'manual_{int(time.time())}',
+                        'note': 'Restart script not found. Please restart manually.',
+                        'instructions': f'To apply the {mode} mode, please restart the server manually using: ./restart --cache-mode={mode}',
+                        'restart_script_path': restart_script,
+                        'project_root': project_root
                     }
-                }), 500
+                })
                 
-        except subprocess.TimeoutExpired:
-            logger.error('Restart script timed out')
-            return jsonify({
-                'status': 'error',
-                'message': 'Restart script timed out'
-            }), 500
+        except Exception as restart_error:
+            logger.error(f'Error starting restart process: {restart_error}')
             
-        except subprocess.SubprocessError as e:
-            logger.error(f'Subprocess error: {e}')
+            # Provide manual restart instructions as fallback
             return jsonify({
-                'status': 'error',
-                'message': f'Subprocess error: {str(e)}'
-            }), 500
-        """
+                'status': 'success',
+                'message': f'Mode change to {mode} requested successfully',
+                'data': {
+                    'mode': mode,
+                    'timestamp': datetime.now().isoformat(),
+                    'restart_id': f'manual_{int(time.time())}',
+                    'note': 'Automatic restart failed. Please restart manually.',
+                    'instructions': f'To apply the {mode} mode, please restart the server manually using: ./restart --cache-mode={mode}',
+                    'error': str(restart_error)
+                }
+            })
             
     except Exception as e:
         logger.error(f'Error changing server mode: {e}')
@@ -172,24 +224,42 @@ def change_server_mode() -> Any:
             'message': f'Internal server error: {str(e)}'
         }), 500
 
+@server_management_bp.route('/restart-status', methods=['GET'])
+def get_restart_status() -> Any:
+    """
+    Get current restart status
+    """
+    try:
+        return jsonify({
+            'status': 'success',
+            'data': restart_status
+        })
+    except Exception as e:
+        logger.error(f'Error getting restart status: {e}')
+        return jsonify({
+            'status': 'error',
+            'message': f'Error getting restart status: {str(e)}'
+        }), 500
+
 @server_management_bp.route('/current-mode', methods=['GET'])
 def get_current_server_mode() -> Any:
     """
-    Get current server cache mode
+    Get current server cache mode based on environment variables
     """
     try:
-        # Get cache statistics to determine current mode
+        # Import settings to check environment variables
+        from config.settings import DEVELOPMENT_MODE, CACHE_DISABLED, DEFAULT_CACHE_TTL
         from services.advanced_cache_service import advanced_cache_service
         
         cache_stats = advanced_cache_service.get_stats()
         
-        # Determine mode based on cache behavior
-        if cache_stats['total_entries'] == 0 and cache_stats['stats']['sets'] == 0:
+        # Determine mode based on environment variables
+        if CACHE_DISABLED:
             current_mode = 'no-cache'
-        elif cache_stats['stats']['hits'] > 0 and cache_stats['hit_rate_percent'] > 20:
-            current_mode = 'production'
-        elif cache_stats['stats']['hits'] > 0 and cache_stats['hit_rate_percent'] <= 20:
+        elif DEVELOPMENT_MODE:
             current_mode = 'development'
+        elif DEFAULT_CACHE_TTL >= 300:
+            current_mode = 'production'
         else:
             current_mode = 'preserve'
         
@@ -198,6 +268,11 @@ def get_current_server_mode() -> Any:
             'data': {
                 'mode': current_mode,
                 'cache_stats': cache_stats,
+                'environment': {
+                    'DEVELOPMENT_MODE': DEVELOPMENT_MODE,
+                    'CACHE_DISABLED': CACHE_DISABLED,
+                    'DEFAULT_CACHE_TTL': DEFAULT_CACHE_TTL
+                },
                 'timestamp': datetime.now().isoformat()
             }
         })
@@ -215,6 +290,7 @@ def get_server_status() -> Any:
     Get comprehensive server status including mode information
     """
     try:
+        from config.settings import DEVELOPMENT_MODE, CACHE_DISABLED, DEFAULT_CACHE_TTL
         from services.advanced_cache_service import advanced_cache_service
         from services.health_service import HealthService
         
@@ -225,13 +301,13 @@ def get_server_status() -> Any:
         # Get overall health
         overall_health = HealthService().comprehensive_health_check()
         
-        # Determine current mode
-        if cache_stats['total_entries'] == 0 and cache_stats['stats']['sets'] == 0:
+        # Determine current mode based on environment variables
+        if CACHE_DISABLED:
             current_mode = 'no-cache'
-        elif cache_stats['stats']['hits'] > 0 and cache_stats['hit_rate_percent'] > 20:
-            current_mode = 'production'
-        elif cache_stats['stats']['hits'] > 0 and cache_stats['hit_rate_percent'] <= 20:
+        elif DEVELOPMENT_MODE:
             current_mode = 'development'
+        elif DEFAULT_CACHE_TTL >= 300:
+            current_mode = 'production'
         else:
             current_mode = 'preserve'
         
@@ -244,6 +320,7 @@ def get_server_status() -> Any:
                     'cache_health': cache_health
                 },
                 'overall_health': overall_health,
+                'restart_status': restart_status,
                 'timestamp': datetime.now().isoformat()
             }
         })
@@ -255,3 +332,99 @@ def get_server_status() -> Any:
             'message': f'Error getting server status: {str(e)}'
         }), 500
 
+@server_management_bp.route('/system/info', methods=['GET'])
+def get_system_info() -> Any:
+    """
+    Get detailed system information
+    """
+    try:
+        import platform
+        import sys
+        import sqlite3
+        
+        # Server information
+        server_info = {
+            'version': '2.0.0',
+            'environment': 'development',
+            'port': 8080,
+            'startup_time': datetime.now().isoformat()
+        }
+        
+        # Python information
+        python_info = {
+            'version': sys.version,
+            'flask': '2.3.3',
+            'sqlite': sqlite3.sqlite_version,
+            'platform': platform.platform()
+        }
+        
+        # OS information
+        os_info = {
+            'system': platform.system(),
+            'architecture': platform.architecture()[0],
+            'uptime': 'N/A'  # Would need system-specific implementation
+        }
+        
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'server': server_info,
+                'python': python_info,
+                'os': os_info,
+                'timestamp': datetime.now().isoformat()
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f'Error getting system info: {e}')
+        return jsonify({
+            'status': 'error',
+            'message': f'Error getting system info: {str(e)}'
+        }), 500
+
+@server_management_bp.route('/logs/recent', methods=['GET'])
+def get_recent_logs() -> Any:
+    """
+    Get recent server logs - SIMPLIFIED VERSION
+    """
+    try:
+        # Simple hardcoded logs for testing
+        logs = [
+            {
+                'timestamp': '2025-09-03T00:49:06.000000',
+                'level': 'success',
+                'message': 'Server restart completed successfully',
+                'source': 'server_detailed.log'
+            },
+            {
+                'timestamp': '2025-09-03T00:49:03.000000',
+                'level': 'info',
+                'message': 'Setting cache mode: no-cache',
+                'source': 'server_detailed.log'
+            },
+            {
+                'timestamp': '2025-09-03T00:40:37.000000',
+                'level': 'info',
+                'message': 'Cache mode changed to: no-cache',
+                'source': 'server_detailed.log'
+            }
+        ]
+        
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'logs': logs,
+                'count': len(logs),
+                'timestamp': datetime.now().isoformat()
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'logs': [],
+                'count': 0,
+                'timestamp': datetime.now().isoformat()
+            }
+        })

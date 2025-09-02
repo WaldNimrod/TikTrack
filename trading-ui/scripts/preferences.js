@@ -174,7 +174,7 @@ async function resetToDefaults() {
       );
     } else {
       // Fallback למקרה שמערכת התראות לא זמינה
-      if (confirm('האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?')) {
+      if (window.confirm('האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?')) {
         currentPreferences = { ...DEFAULT_PREFERENCES };
         updateUI();
 

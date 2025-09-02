@@ -66,7 +66,7 @@ function deleteNote(id) {
           );
         } else {
           // Fallback למקרה שמערכת התראות לא זמינה
-          const confirmed = confirm('האם אתה בטוח שברצונך למחוק הערה זו?');
+          const confirmed = window.confirm('האם אתה בטוח שברצונך למחוק הערה זו?');
           if (confirmed) {
             confirmDeleteNote(id);
           }

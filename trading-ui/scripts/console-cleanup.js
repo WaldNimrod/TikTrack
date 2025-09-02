@@ -37,14 +37,14 @@ function suppressConsoleMessages() {
     console.warn = function() {};
     console.error = function() {};
 
-    console.log('🔇 הודעות קונסול מוסתרות ל-' + duration/1000 + ' שניות');
+    // console.log('🔇 הודעות קונסול מוסתרות ל-' + duration/1000 + ' שניות');
 
     // החזרת הפונקציות המקוריות אחרי הזמן שהוגדר
     setTimeout(() => {
       console.log = originalLog;
       console.warn = originalWarn;
       console.error = originalError;
-      console.log('🔊 הודעות קונסול הופעלו מחדש');
+      // console.log('🔊 הודעות קונסול הופעלו מחדש');
     }, duration);
   }
 }
@@ -52,7 +52,7 @@ function suppressConsoleMessages() {
 // פונקציה להצגת הודעות console בפיתוח
 function enableConsoleMessages() {
   if (typeof console !== 'undefined') {
-    console.log('Console messages enabled');
+    // console.log('Console messages enabled');
   }
 }
 
@@ -60,7 +60,7 @@ function enableConsoleMessages() {
 function autoClearConsole() {
   // אל תפעיל ניקוי אוטומטי במהלך טעינת הדף
   if (isPageInitializing) {
-    console.log('🚫 ניקוי אוטומטי נחסם במהלך טעינת הדף');
+    // console.log('🚫 ניקוי אוטומטי נחסם במהלך טעינת הדף');
     return;
   }
 
@@ -73,7 +73,7 @@ function autoClearConsole() {
 
     // הפעל טיימר חדש - ללא ניקוי קונסול ישיר
     window.consoleClearTimer = setInterval(() => {
-      console.log('🧹 ניקוי אוטומטי מבוטל - פועל דרך המערכת המובנית - ' + new Date().toLocaleTimeString());
+      // console.log('🧹 ניקוי אוטומטי מבוטל - פועל דרך המערכת המובנית - ' + new Date().toLocaleTimeString());
 
       // בדוק אם יש מערכת מובנית לניקוי console
       if (window.manualClearConsole) {
@@ -81,7 +81,7 @@ function autoClearConsole() {
       }
     }, settings.clearInterval * 1000);
 
-    console.log('🔄 ניקוי אוטומטי של קונסול מופעל - כל ' + settings.clearInterval + ' שניות');
+    // console.log('🔄 ניקוי אוטומטי של קונסול מופעל - כל ' + settings.clearInterval + ' שניות');
   } else {
     // עצור ניקוי אוטומטי אם לא מופעל
     stopAutoClearConsole();
@@ -93,7 +93,7 @@ function stopAutoClearConsole() {
   if (window.consoleClearTimer) {
     clearInterval(window.consoleClearTimer);
     window.consoleClearTimer = null;
-    console.log('⏹️ ניקוי אוטומטי של קונסול נעצר');
+    // console.log('⏹️ ניקוי אוטומטי של קונסול נעצר');
   }
 }
 

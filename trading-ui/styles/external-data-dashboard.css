@@ -136,6 +136,73 @@
     flex-wrap: wrap;
 }
 
+/* Settings Info Section */
+.settings-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-card {
+    background: var(--apple-bg-secondary);
+    border: 1px solid var(--apple-border-light);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--apple-shadow-medium);
+}
+
+.info-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--apple-text-primary);
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.info-card p {
+    color: var(--apple-text-secondary);
+    margin: 0 0 1rem 0;
+    line-height: 1.5;
+}
+
+.current-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--apple-bg-elevated);
+    border-radius: 8px;
+    border: 1px solid var(--apple-border-light);
+}
+
+.setting-label {
+    font-weight: 500;
+    color: var(--apple-text-primary);
+}
+
+.setting-value {
+    font-weight: 600;
+    color: var(--apple-text-secondary);
+    background: var(--apple-bg-secondary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
 /* Providers Grid */
 .providers-grid {
     display: grid;
@@ -659,6 +726,7 @@
         border: 1px solid #ccc;
     }
 }
+
 
 
 

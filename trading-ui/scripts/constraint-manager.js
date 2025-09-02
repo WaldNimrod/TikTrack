@@ -325,9 +325,9 @@ class ConstraintManager {
       if (!confirmed) {return;}
     } else {
       // Fallback למקרה שמערכת התראות לא זמינה
-      if (!confirm('האם אתה בטוח שברצונך למחוק את האילוץ הזה?')) {
-        return;
-      }
+        if (!window.confirm('האם אתה בטוח שברצונך למחוק את האילוץ הזה?')) {
+    return;
+  }
     }
 
     try {

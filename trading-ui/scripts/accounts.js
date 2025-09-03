@@ -950,7 +950,7 @@ async function saveAccount(mode, accountId = null) {
       if (typeof window.showWarningNotification === 'function') {
         window.showWarningNotification('אזהרה', 'החשבון נשמר אך יש בעיה בעדכון הטבלה. אנא רענן את הדף.');
       } else {
-        // console.warn('החשבון נשמר אך יש בעיה בעדכון הטבלה. אנא רענן את הדף.');
+// Console statement removed for no-console compliance
       }
     }
 
@@ -1451,7 +1451,7 @@ function showOpenTradesWarning(accountId, accountName) {
   if (typeof window.showWarningNotification === 'function') {
     window.showWarningNotification('אזהרה', `יש עסקאות פתוחות בחשבון "${accountName}". לא ניתן למחוק חשבון עם עסקאות פעילות.`);
   } else {
-    // console.warn(`יש עסקאות פתוחות בחשבון "${accountName}". לא ניתן למחוק חשבון עם עסקאות פעילות.`);
+// Console statement removed for no-console compliance
   }
 }
 
@@ -1815,7 +1815,7 @@ async function cancelAccountWithLinkedItemsCheck(accountId, _accountName) {
         accountDetails = `\n\nפרטי החשבון:\n• שם: ${account.name || 'לא מוגדר'}\n• סטטוס: ${account.status || 'לא מוגדר'}\n• יתרה: ${account.cash_balance || '0'}`;
       }
     } catch {
-      // console.warn('לא ניתן לטעון פרטי חשבון:', error);
+// Console statement removed for no-console compliance
     }
 
     // אישור מהמשתמש באמצעות המערכת הגלובלית
@@ -1865,7 +1865,7 @@ async function deleteAccountWithLinkedItemsCheck(accountId, _accountName) {
         accountDetails = `\n\nפרטי החשבון:\n• שם: ${account.name || 'לא מוגדר'}\n• סטטוס: ${account.status || 'לא מוגדר'}\n• יתרה: ${account.cash_balance || '0'}`;
       }
     } catch {
-      // console.warn('לא ניתן לטעון פרטי חשבון:', error);
+// Console statement removed for no-console compliance
     }
 
     // אישור מהמשתמש באמצעות המערכת הגלובלית
@@ -2121,7 +2121,7 @@ async function performAccountDeletion(accountId) {
  */
 async function checkLinkedItemsBeforeCancelAccount(accountId) {
   try {
-    // console.log('🔍 בדיקת פריטים מקושרים לחשבון:', accountId);
+// Console statement removed for no-console compliance
 
     // בדיקה ישירה של טריידים פעילים (סטטוס 'open')
     const tradesResponse = await fetch(`/api/v1/trades/?account_id=${accountId}&status=open`);
@@ -2129,10 +2129,10 @@ async function checkLinkedItemsBeforeCancelAccount(accountId) {
       const tradesData = await tradesResponse.json();
       const openTrades = tradesData.data || tradesData || [];
 
-      // console.log('📊 טריידים פעילים:', openTrades.length);
+// Console statement removed for no-console compliance
 
       if (openTrades.length > 0) {
-        // console.log('⚠️ יש טריידים פעילים - הצגת מודול מקושרים במצב אזהרה');
+// Console statement removed for no-console compliance
 
         // יש טריידים פעילים - הצגת מודול מקושרים במצב אזהרה
         if (typeof window.showLinkedItemsModal === 'function') {
@@ -2154,7 +2154,7 @@ async function checkLinkedItemsBeforeCancelAccount(accountId) {
 
           window.showLinkedItemsModal(linkedItemsData, 'account', accountId, 'warningBlock');
         } else {
-          // console.log('❌ showLinkedItemsModal לא זמינה - הצגת אזהרה פשוטה');
+// Console statement removed for no-console compliance
           if (typeof window.showWarningNotification === 'function') {
             window.showWarningNotification(
               'לא ניתן לבטל חשבון',
@@ -2170,22 +2170,22 @@ async function checkLinkedItemsBeforeCancelAccount(accountId) {
     const response = await fetch(`/api/v1/linked-items/account/${accountId}`);
 
     if (!response.ok) {
-      // console.log('❌ לא ניתן לבדוק פריטים מקושרים, ממשיכים עם הביטול');
+// Console statement removed for no-console compliance
       return false;
     }
 
     const linkedItemsData = await response.json();
-    // console.log('📊 נתוני מקושרים:', linkedItemsData);
+// Console statement removed for no-console compliance
 
     const childEntities = linkedItemsData.child_entities || [];
     // const parentEntities = linkedItemsData.parent_entities || []; // לא בשימוש
 
-    // console.log('👶 פריטים מקושרים (child):', childEntities.length);
-    // console.log('👨‍👩‍👧‍👦 פריטים מקושרים (parent):', parentEntities.length);
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
 
     // בדיקה אם יש פריטים שמקושרים אל החשבון (child entities)
     if (childEntities.length > 0) {
-      // console.log('⚠️ יש פריטים מקושרים - הצגת חלון מקושרים');
+// Console statement removed for no-console compliance
       // יש פריטים מקושרים - הצגת חלון מקושרים
       if (typeof window.showLinkedItemsModal === 'function') {
         // הוספת פרטי החשבון לנתונים
@@ -2193,7 +2193,7 @@ async function checkLinkedItemsBeforeCancelAccount(accountId) {
         window.showLinkedItemsModal(linkedItemsData, 'account', accountId, 'warningBlock');
         return true;
       } else {
-        // console.log('❌ showLinkedItemsModal לא זמינה');
+// Console statement removed for no-console compliance
         if (typeof window.showNotification === 'function') {
           window.showNotification('אזהרה', 'יש פריטים מקושרים לחשבון זה', 'warning');
         }
@@ -2201,10 +2201,10 @@ async function checkLinkedItemsBeforeCancelAccount(accountId) {
       }
     }
 
-    // console.log('✅ אין פריטים מקושרים - אפשר לבטל');
+// Console statement removed for no-console compliance
     return false;
   } catch (error) {
-    // console.error('❌ שגיאה בבדיקת פריטים מקושרים:', error);
+// Console statement removed for no-console compliance
     handleSystemError(error, 'בדיקת פריטים מקושרים');
     return false;
   }

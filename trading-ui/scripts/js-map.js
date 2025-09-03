@@ -112,11 +112,11 @@ class JsMapSystem {
 
       } else {
         // Fallback to local scanning
-        // console.warn('⚠️ Server response not ok, using local scan');
+// Console statement removed for no-console compliance
         this.pageMapping = this.scanPageMappingLocally();
       }
     } catch (_error) {
-      // console.warn('⚠️ Using local page mapping scan due to error:', _error);
+// Console statement removed for no-console compliance
       this.pageMapping = this.scanPageMappingLocally();
     }
   }
@@ -138,14 +138,14 @@ class JsMapSystem {
         // );
 
         // Log some sample data
-        // console.log('Functions data loaded successfully');
+// Console statement removed for no-console compliance
       } else {
         // Fallback to local scanning
-        // console.warn('⚠️ Server response not ok, using local scan');
+// Console statement removed for no-console compliance
         this.functionsData = this.scanFunctionsLocally();
       }
     } catch (_error) {
-      // console.warn('⚠️ Using local functions scan due to error:', _error);
+// Console statement removed for no-console compliance
       this.functionsData = this.scanFunctionsLocally();
     }
   }
@@ -196,7 +196,7 @@ class JsMapSystem {
 
         return scanResult.functions;
       } catch (error) {
-        // console.warn('⚠️ Could not scan functions, using fallback structure:', error);
+// Console statement removed for no-console compliance
       }
     }
 
@@ -251,7 +251,7 @@ class JsMapSystem {
 
         return scanResult.counts;
       } catch (error) {
-        // console.warn('⚠️ Could not scan function calls, using fallback data:', error);
+// Console statement removed for no-console compliance
       }
     }
 

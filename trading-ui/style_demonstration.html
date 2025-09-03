@@ -1554,7 +1554,7 @@
             const linkElement = document.querySelector(`link[href="styles/${filename}"]`);
             if (linkElement) {
                 linkElement.disabled = !enabled;
-                console.log(`🔄 ${filename} ${enabled ? 'enabled' : 'disabled'}`);
+            // Console statement removed for no-console compliance
             }
         }
 
@@ -1562,7 +1562,7 @@
             const linkElement = document.querySelector('link[href*="bootstrap"]');
             if (linkElement) {
                 linkElement.disabled = !enabled;
-                console.log(`🔄 Bootstrap CSS ${enabled ? 'enabled' : 'disabled'}`);
+            // Console statement removed for no-console compliance
             }
         }
 
@@ -1582,52 +1582,52 @@
         }
 
         function refreshStylesTest() {
-            console.log('🔄 Refreshing styles page');
+            // Console statement removed for no-console compliance
             location.reload();
         }
 
         function refreshStylesTest2() {
-            console.log('🔄 Refreshing styles section 2');
+            // Console statement removed for no-console compliance
             location.reload();
         }
 
         function refreshStylesTest3() {
-            console.log('🔄 Refreshing styles section 3');
+            // Console statement removed for no-console compliance
             location.reload();
         }
 
         function refreshStylesTest4() {
-            console.log('🔄 Refreshing styles section 4');
+            // Console statement removed for no-console compliance
             location.reload();
         }
 
         function refreshStylesTest5() {
-            console.log('🔄 Refreshing styles section 5');
+            // Console statement removed for no-console compliance
             location.reload();
         }
 
         function refreshStylesTest6() {
-            console.log('🔄 Refreshing styles section 6');
+            // Console statement removed for no-console compliance
             location.reload();
         }
 
         function refreshStylesTest7() {
-            console.log('🔄 Refreshing styles section 7');
+            // Console statement removed for no-console compliance
             location.reload();
         }
 
         function refreshStylesTest8() {
-            console.log('🔄 Refreshing styles section 8');
+            // Console statement removed for no-console compliance
             location.reload();
         }
 
         function refreshStylesTest9() {
-            console.log('🔄 Refreshing styles section 9');
+            // Console statement removed for no-console compliance
             location.reload();
         }
 
         function refreshStylesTest10() {
-            console.log('🔄 Refreshing styles section 10');
+            // Console statement removed for no-console compliance
             location.reload();
         }
 
@@ -1767,12 +1767,12 @@
         }
 
         function refreshTradesTable() {
-            console.log('🔄 Refreshing trades table');
+            // Console statement removed for no-console compliance
             // כאן אפשר להוסיף לוגיקה לרענון הטבלה
         }
 
         function refreshAlertsTable() {
-            console.log('🔄 Refreshing alerts table');
+            // Console statement removed for no-console compliance
             // כאן אפשר להוסיף לוגיקה לרענון הטבלה
         }
 
@@ -1807,7 +1807,7 @@
         }
 
         function showLinkedItems(type, id) {
-            console.log(`🔄 Showing linked items for ${type} #${id}`);
+            // Console statement removed for no-console compliance
             if (typeof window.showLinkedItems === 'function') {
                 window.showLinkedItems(type, id);
             } else {
@@ -1816,18 +1816,18 @@
         }
 
         function editTrade(id) {
-            console.log(`🔄 Editing trade #${id}`);
+            // Console statement removed for no-console compliance
             alert(`עריכת טרייד #${id}`);
         }
 
         function editAlert(id) {
-            console.log(`🔄 Editing alert #${id}`);
+            // Console statement removed for no-console compliance
             alert(`עריכת התראה #${id}`);
         }
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function () {
-            console.log('🔄 Styles page loaded');
+            // Console statement removed for no-console compliance
 
             // Restore section states
             if (typeof window.restoreAllSectionStates === 'function') {

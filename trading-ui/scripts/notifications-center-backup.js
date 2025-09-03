@@ -56,7 +56,7 @@ class NotificationsCenter {
     // רענון אוטומטי
     this.startAutoRefresh();
 
-    console.log('✅ מרכז התראות אותחל בהצלחה');
+// Console statement removed for no-console compliance
   }
 
   initUI() {
@@ -280,7 +280,7 @@ class NotificationsCenter {
 
         messagesSentElement.textContent = stats && stats.totalMessages ? stats.totalMessages : 0;
       } catch (error) {
-        console.warn('שגיאה בעדכון סטטיסטיקות חיבור:', error);
+// Console statement removed for no-console compliance
         connectionTimeElement.textContent = 'עכשיו';
         messagesSentElement.textContent = '0';
       }
@@ -451,7 +451,7 @@ class NotificationsCenter {
       const saved = localStorage.getItem('tiktrack_notification_settings');
       return saved ? { ...defaultSettings, ...JSON.parse(saved) } : defaultSettings;
     } catch (error) {
-      console.error('שגיאה בטעינת הגדרות:', error);
+// Console statement removed for no-console compliance
       return defaultSettings;
     }
   }
@@ -459,9 +459,9 @@ class NotificationsCenter {
   saveSettings() {
     try {
       localStorage.setItem('tiktrack_notification_settings', JSON.stringify(this.settings));
-      console.log('✅ הגדרות נשמרו בהצלחה');
+// Console statement removed for no-console compliance
     } catch (error) {
-      console.error('שגיאה בשמירת הגדרות:', error);
+// Console statement removed for no-console compliance
     }
   }
 
@@ -471,7 +471,7 @@ class NotificationsCenter {
       localStorage.setItem('tiktrack_notifications_history', JSON.stringify(this.history.slice(0, 100)));
       localStorage.setItem('tiktrack_notifications_stats', JSON.stringify(this.stats));
     } catch (error) {
-      console.error('שגיאה בשמירה ללוקל סטורג:', error);
+// Console statement removed for no-console compliance
     }
   }
 
@@ -489,7 +489,7 @@ class NotificationsCenter {
         this.stats = JSON.parse(savedStats);
       }
     } catch (error) {
-      console.error('שגיאה בטעינה מלוקל סטורג:', error);
+// Console statement removed for no-console compliance
     }
   }
 
@@ -525,10 +525,10 @@ class NotificationsCenter {
         },
         body: JSON.stringify(logEntry),
       }).catch(error => {
-        console.warn('לא ניתן לשמור בקובץ לוג:', error);
+// Console statement removed for no-console compliance
       });
     } catch (error) {
-      console.warn('שגיאה בשמירה לקובץ לוג:', error);
+// Console statement removed for no-console compliance
     }
   }
 
@@ -619,7 +619,7 @@ class NotificationsCenter {
         }
       }
     } catch (error) {
-      console.warn('שגיאה בעדכון זמן חיבור:', error);
+// Console statement removed for no-console compliance
     }
   }
 
@@ -634,7 +634,7 @@ class NotificationsCenter {
       if (statusDot.querySelector('.disconnected')) {return 'disconnected';}
       if (statusDot.querySelector('.connecting')) {return 'connecting';}
     } catch (error) {
-      console.warn('שגיאה בקבלת סטטוס חיבור נוכחי:', error);
+// Console statement removed for no-console compliance
     }
     return 'connecting';
   }
@@ -708,16 +708,16 @@ function filterHistory() {
 
 // אתחול
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 טעינת דף מרכז התראות...');
+// Console statement removed for no-console compliance
 
   // אתחול HeaderSystem
   if (window.headerSystem && !window.headerSystem.isInitialized) {
-    console.log('✅ אתחול HeaderSystem...');
+// Console statement removed for no-console compliance
     window.headerSystem.init();
   }
 
   // יצירת מופע מרכז התראות
   window.notificationsCenter = new NotificationsCenter();
 
-  console.log('✅ דף מרכז התראות נטען בהצלחה');
+// Console statement removed for no-console compliance
 });

@@ -143,7 +143,7 @@ function initializeApplication() {
     initializeCurrentPage();
   } catch (error) {
     // Application Initialization Failed - Show actual error
-    // console.error('❌ Application initialization error:', error);
+// Console statement removed for no-console compliance
     showSystemError(`Application initialization failed: ${error.message || 'Unknown error'}. Please refresh the page.`);
   }
 }
@@ -168,7 +168,7 @@ function checkDependencies() {
   const missingModules = requiredModules.filter(module => !window[module]);
 
   if (missingModules.length > 0) {
-    // console.warn('⚠️ Missing modules:', missingModules);
+// Console statement removed for no-console compliance
 
     // לא נחזיר false כדי לא לעצור את האתחול
     return true;
@@ -193,9 +193,9 @@ function initializeCoreSystems() {
   if (window.NotificationsCenter && !window.notificationsCenter && !window.location.pathname.includes('notifications-center')) {
     try {
       window.notificationsCenter = new window.NotificationsCenter();
-      // console.log('✅ מרכז התראות אותחל בהצלחה');
+// Console statement removed for no-console compliance
     } catch {
-      // console.warn('⚠️ שגיאה באתחול מרכז התראות:', error);
+// Console statement removed for no-console compliance
     }
   }
 
@@ -275,7 +275,7 @@ function initializeCurrentPage() {
     if (typeof window.restoreAllSectionStates === 'function') {
       window.restoreAllSectionStates();
     } else {
-      // console.warn('⚠️ restoreAllSectionStates function not found');
+// Console statement removed for no-console compliance
     }
   }, 100);
 }
@@ -349,7 +349,7 @@ function showSystemError(message) {
   } else if (typeof window.showNotification === 'function') {
     window.showNotification(message, 'error', 'שגיאת מערכת');
   } else {
-    // console.error('❌ שגיאת מערכת:', message);
+// Console statement removed for no-console compliance
   }
 }
 
@@ -465,7 +465,7 @@ function restoreAllSectionStates() {
     const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon') : null;
 
     // Restoring top section state
-    // console.log('🔄 Restoring top section state:', {
+// Console statement removed for no-console compliance
     //   storageKey: topSectionStorageKey,
     //   savedState: topSectionCollapsed,
     //   topSectionFound: !!topSection,
@@ -485,7 +485,7 @@ function restoreAllSectionStates() {
       }
       // Restored top section state
     } else {
-      // console.warn('⚠️ Could not restore top section state - elements not found');
+// Console statement removed for no-console compliance
     }
 
   } catch {
@@ -531,7 +531,7 @@ window.toggleTopSectionGlobal = function () {
   const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
   // toggleTopSectionGlobal called
-  // console.log('🔄 toggleTopSectionGlobal called:', {
+// Console statement removed for no-console compliance
   //   currentPath,
   //   sectionFound: !!section,
   //   toggleBtnFound: !!toggleBtn,
@@ -1223,7 +1223,7 @@ function initializeDevelopmentShortcuts() {
     if ((e.ctrlKey || e.metaKey) && e.shiftKey &&
             e.key === 'C') {
       e.preventDefault();
-      // console.log('🔧 קיצור מקלדת: ניקוי Cache');
+// Console statement removed for no-console compliance
       if (window.clearDevelopmentCache) {
         // יצירת event מזויף עבור הפונקציה
         const fakeEvent = {
@@ -1262,7 +1262,7 @@ window.updateSortIcons = function (tableType, activeColumnIndex, direction) {
     // Find all sortable headers in the current table
     const table = document.querySelector(`[data-table-type="${tableType}"]`);
     if (!table) {
-      // console.warn(`⚠️ Table with type "${tableType}" not found`);
+// Console statement removed for no-console compliance
       return;
     }
 
@@ -1283,7 +1283,7 @@ window.updateSortIcons = function (tableType, activeColumnIndex, direction) {
       }
     });
   } catch {
-    // console.warn('⚠️ Error updating sort icons:', error);
+// Console statement removed for no-console compliance
   }
 };
 

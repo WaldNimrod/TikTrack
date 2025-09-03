@@ -736,14 +736,14 @@
     <script>
       // אתחול מערכת הכותרת החדשה
       document.addEventListener("DOMContentLoaded", () => {
-        console.log("🔄 Initializing unified header system...");
+            // Console statement removed for no-console compliance
         
         // וידוא שמערכת הראש נטענה
         if (typeof HeaderSystem !== 'undefined' && window.headerSystem) {
-          console.log("✅ HeaderSystem found, initializing...");
+            // Console statement removed for no-console compliance
           window.headerSystem.init();
         } else {
-          console.log("❌ HeaderSystem not found, creating new instance...");
+            // Console statement removed for no-console compliance
           if (typeof HeaderSystem !== 'undefined') {
             window.headerSystem = new HeaderSystem();
             window.headerSystem.init();
@@ -778,7 +778,7 @@
           });
         });
 
-        console.log('✅ מודולים הוגדרו לסגירה בלחיצה על הרקע');
+            // Console statement removed for no-console compliance
       });
     </script>
   </div> <!-- End background-wrapper -->

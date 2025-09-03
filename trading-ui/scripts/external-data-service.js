@@ -478,7 +478,4 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = ExternalDataService;
 }
 
-// Log service availability
-if (window.console && window.console.info) {
-    window.console.info('[ExternalData] Service loaded and ready');
-}
+// Service loaded and ready - console logging removed for no-console compliance

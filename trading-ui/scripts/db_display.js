@@ -32,7 +32,7 @@ const tableData = {};
  * Initialize the database display page
  */
 function initDatabaseDisplay() {
-  // console.log('🔄 Initializing database display page...');
+// Console statement removed for no-console compliance
 
   // Load default table (accounts)
   loadTableData('accounts');
@@ -45,7 +45,7 @@ function initDatabaseDisplay() {
     window.headerSystem.init();
   }
 
-  // console.log('✅ Database display page initialized successfully');
+// Console statement removed for no-console compliance
 }
 
 /**
@@ -78,7 +78,7 @@ function setupEventListeners() {
  */
 async function loadTableData(tableType) {
   try {
-    // console.log(`📊 Loading data for table type: ${tableType}`);
+// Console statement removed for no-console compliance
 
     // Update current table type
     currentTableType = tableType;
@@ -99,10 +99,10 @@ async function loadTableData(tableType) {
     updateTableInfo(tableType, data.length);
 
 
-    // console.log(`✅ Data loaded for ${tableType}: ${data.length} records`);
+// Console statement removed for no-console compliance
 
   } catch (error) {
-    // console.error(`❌ Error loading data for ${tableType}:`, error);
+// Console statement removed for no-console compliance
     handleDataLoadError(error, tableType);
   }
 }
@@ -127,7 +127,7 @@ async function fetchTableData(tableType) {
       throw new Error(result.error?.message || `Error fetching ${tableType} data`);
     }
   } catch {
-    // console.error(`❌ Error fetching ${tableType} data:`, error);
+// Console statement removed for no-console compliance
     // Return empty array on error
     return [];
   }
@@ -146,28 +146,28 @@ function updateTableDisplay(data, tableType) {
   const tableContainer = document.getElementById(containerId);
 
   if (!tableContainer) {
-    // console.error(`❌ Table container not found for ${tableType}: ${containerId}`);
+// Console statement removed for no-console compliance
     return;
   }
 
   // Find the table within the container
   const table = tableContainer.querySelector('table');
   if (!table) {
-    // console.error(`❌ Table not found in container ${containerId}`);
+// Console statement removed for no-console compliance
     return;
   }
 
   // Find the table body
   const tbody = table.querySelector('tbody');
   if (!tbody) {
-    // console.error(`❌ Table body not found in table ${tableType}`);
+// Console statement removed for no-console compliance
     return;
   }
 
   // Get table mappings
   const tableMapping = window.TABLE_COLUMN_MAPPINGS?.[tableType];
   if (!tableMapping) {
-    // console.error(`❌ No table mapping found for ${tableType}`);
+// Console statement removed for no-console compliance
     return;
   }
 
@@ -241,7 +241,7 @@ function formatCellValue(value, column) {
  */
 function applySortingFunctionality(_tableType) {
   // Sorting is handled by global sortTable function from main.js
-  // console.log(`🔀 Sorting functionality applied to ${tableType} table`);
+// Console statement removed for no-console compliance
 }
 
 // ===== UTILITY FUNCTIONS =====
@@ -357,7 +357,7 @@ function formatStatus(status) {
  * @param {string} tableType - The table type
  */
 function handleDataLoadError(error, tableType) {
-  // console.error(`❌ Error loading ${tableType} data:`, error);
+// Console statement removed for no-console compliance
 
   // Show error notification
   if (window.showErrorNotification) {
@@ -431,14 +431,14 @@ function sortTable(columnIndex, tableType) {
   const tableMapping = window.TABLE_COLUMN_MAPPINGS?.[tableType];
 
   if (!tableMapping) {
-    // console.error(`❌ No table mapping found for ${tableType}`);
+// Console statement removed for no-console compliance
     return;
   }
 
   // Get the field name for the column
   const fieldName = tableMapping[columnIndex];
   if (!fieldName) {
-    // console.error(`❌ Invalid column index: ${columnIndex}`);
+// Console statement removed for no-console compliance
     return;
   }
 
@@ -474,9 +474,9 @@ window.sortTable = sortTable;
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-  // console.log('➕ Database display page DOM loaded');
+// Console statement removed for no-console compliance
   initDatabaseDisplay();
 });
 
-// console.log('✅ DB Display script loaded successfully');
+// Console statement removed for no-console compliance
 

@@ -25,7 +25,7 @@
  */
 function copyDetailedLog() {
   try {
-    // console.log('📋 Collecting detailed logs...');
+    // // // console.log('📋 Collecting detailed logs...');
 
     // Collect system information
     const systemInfo = {
@@ -42,12 +42,9 @@ function copyDetailedLog() {
       cacheStats: window.externalDataDashboard?.cacheStats || null,
     };
 
-    // Collect console logs (if available)
+    // Console logs collection removed for no-console compliance
     const consoleLogs = [];
-    if (window.console && window.console.log) {
-      // Try to get recent console logs
-      consoleLogs.push('Console logs collected at: ' + new Date().toISOString());
-    }
+    // Console logging functionality disabled for linting compliance
 
     // Collect API status
     const apiStatus = {
@@ -103,7 +100,7 @@ ${detailedLog.consoleLogs.join('\n')}
 
     // Copy to clipboard
     navigator.clipboard.writeText(logText).then(() => {
-      // console.log('✅ Detailed log copied to clipboard');
+      // // // console.log('✅ Detailed log copied to clipboard');
 
       // Show success notification
       if (window.showNotification) {
@@ -115,8 +112,8 @@ ${detailedLog.consoleLogs.join('\n')}
       }
 
       // Also log to console for easy access
-      // console.log('📋 DETAILED LOG COPIED TO CLIPBOARD:');
-      // console.log(logText);
+      // // // console.log('📋 DETAILED LOG COPIED TO CLIPBOARD:');
+      // // // console.log(logText);
 
     }).catch(_err => {
       // Failed to copy to clipboard
@@ -155,7 +152,7 @@ class ExternalDataDashboard {
       return;
     }
 
-    // console.log('🚀 External Data Dashboard - Initializing...');
+    // // // console.log('🚀 External Data Dashboard - Initializing...');
 
     // Initialize dashboard
     this.initializeDashboard();
@@ -173,7 +170,7 @@ class ExternalDataDashboard {
     this.setupEventListeners();
 
     this.isInitialized = true;
-    // console.log('✅ External Data Dashboard - Initialized successfully');
+    // // // console.log('✅ External Data Dashboard - Initialized successfully');
   }
 
   static initializeDashboard() {
@@ -188,7 +185,7 @@ class ExternalDataDashboard {
 
   async loadSystemStatus() {
     try {
-      // console.log('📊 Loading system status...');
+      // // // console.log('📊 Loading system status...');
 
       const response = await fetch('/api/external-data/status/');
       if (response.ok) {
@@ -201,7 +198,7 @@ class ExternalDataDashboard {
         this.updateAPIStatus(data);
 
       } else {
-        // console.error('❌ Error loading system status:', response.status);
+        // // // console.error('❌ Error loading system status:', response.status);
       }
     } catch (_error) {
       // Error loading system status
@@ -377,7 +374,7 @@ class ExternalDataDashboard {
 
   async loadProviders() {
     try {
-      // console.log('📊 Loading providers...');
+      // // // console.log('📊 Loading providers...');
 
       const response = await fetch('/api/external-data/status/providers');
       if (response.ok) {
@@ -385,10 +382,10 @@ class ExternalDataDashboard {
         this.providers = data.providers || [];
         this.renderProviders();
       } else {
-        // console.error('❌ Error loading providers');
+        // // // console.error('❌ Error loading providers');
       }
     } catch (error) {
-      // console.error('❌ Error loading providers:', error);
+      // // // console.error('❌ Error loading providers:', error);
     }
   }
 
@@ -436,7 +433,7 @@ class ExternalDataDashboard {
 
   async loadCacheStats() {
     try {
-      // console.log('💾 Loading cache stats...');
+      // // // console.log('💾 Loading cache stats...');
 
       // Use the main status endpoint to get cache stats
       const response = await fetch('/api/external-data/status/');
@@ -448,10 +445,10 @@ class ExternalDataDashboard {
         // Also update the current settings display
         this.updateCurrentSettings(data);
       } else {
-        // console.error('❌ Error loading cache stats:', response.status);
+        // // // console.error('❌ Error loading cache stats:', response.status);
       }
     } catch (error) {
-      // console.error('❌ Error loading cache stats:', error);
+      // // // console.error('❌ Error loading cache stats:', error);
     }
   }
 
@@ -506,26 +503,26 @@ class ExternalDataDashboard {
         maxRequestsElement.textContent = `${maxRequests} לשעה`;
       }
 
-      // console.log('✅ Current settings updated');
+      // // // console.log('✅ Current settings updated');
     } catch (error) {
-      // console.error('❌ Error updating current settings:', error);
+      // // // console.error('❌ Error updating current settings:', error);
     }
   }
 
   async loadLogs() {
     try {
-      // console.log('📋 Loading logs...');
+      // // // console.log('📋 Loading logs...');
 
       const response = await fetch('/api/external-data/status/logs');
       if (response.ok) {
         const data = await response.json();
         this.renderLogs(data.logs || []);
       } else {
-        // console.error('❌ Error loading logs:', response.status);
+        // // // console.error('❌ Error loading logs:', response.status);
         this.renderLogs([]);
       }
     } catch (error) {
-      // console.error('❌ Error loading logs:', error);
+      // // // console.error('❌ Error loading logs:', error);
       this.renderLogs([]);
     }
   }
@@ -591,19 +588,19 @@ class ExternalDataDashboard {
     const searchTerm = document.getElementById('log-search')?.value || '';
 
     // Implementation for log filtering
-    // console.log('🔍 Filtering logs:', { level: levelFilter, search: searchTerm });
+    // // // console.log('🔍 Filtering logs:', { level: levelFilter, search: searchTerm });
   }
 
   // Public methods for buttons
   async refreshProviders() {
-    // console.log('🔄 Refreshing providers...');
+    // // // console.log('🔄 Refreshing providers...');
     await this.loadProviders();
   }
 
 
   static async saveSettings() {
     try {
-      // console.log('💾 Saving settings...');
+      // // // console.log('💾 Saving settings...');
 
       const settings = {
         hot_cache_ttl: document.getElementById('hot-cache-ttl')?.value || 1,
@@ -619,18 +616,18 @@ class ExternalDataDashboard {
 
       if (response.ok) {
         const result = await response.json();
-        // console.log('✅ Settings saved successfully:', result.message);
-        // console.log('📋 Updated settings:', result.settings);
+        // // // console.log('✅ Settings saved successfully:', result.message);
+        // // // console.log('📋 Updated settings:', result.settings);
       } else {
-        // console.error('❌ Error saving settings:', response.status);
+        // // // console.error('❌ Error saving settings:', response.status);
       }
     } catch (error) {
-      // console.error('❌ Error saving settings:', error);
+      // // // console.error('❌ Error saving settings:', error);
     }
   }
 
   async resetSettings() {
-    // console.log('🔄 Resetting settings...');
+    // // // console.log('🔄 Resetting settings...');
 
     document.getElementById('hot-cache-ttl').value = 1;
     document.getElementById('warm-cache-ttl').value = 5;
@@ -640,81 +637,81 @@ class ExternalDataDashboard {
   }
 
   async refreshLogs() {
-    // console.log('🔄 Refreshing logs...');
+    // // // console.log('🔄 Refreshing logs...');
     await this.loadLogs();
   }
 
   async clearLogs() {
     try {
-      // console.log('🗑️ Clearing logs...');
+      // // // console.log('🗑️ Clearing logs...');
 
       const response = await fetch('/api/external-data/status/logs/clear', { method: 'POST' });
       if (response.ok) {
-        // console.log('✅ Logs cleared successfully');
+        // // // console.log('✅ Logs cleared successfully');
         await this.loadLogs();
       } else {
-        // console.error('❌ Error clearing logs:', response.status);
+        // // // console.error('❌ Error clearing logs:', response.status);
       }
     } catch (error) {
-      // console.error('❌ Error clearing logs:', error);
+      // // // console.error('❌ Error clearing logs:', error);
     }
   }
 
   async clearCache() {
     try {
-      // console.log('🗑️ Clearing cache...');
+      // // // console.log('🗑️ Clearing cache...');
 
       const response = await fetch('/api/external-data/status/cache/clear', { method: 'POST' });
       if (response.ok) {
         const result = await response.json();
-        // console.log('✅ Cache cleared successfully:', result.message);
+        // // // console.log('✅ Cache cleared successfully:', result.message);
         await this.loadCacheStats();
       } else {
-        // console.error('❌ Error clearing cache:', response.status);
+        // // // console.error('❌ Error clearing cache:', response.status);
       }
     } catch (error) {
-      // console.error('❌ Error clearing cache:', error);
+      // // // console.error('❌ Error clearing cache:', error);
     }
   }
 
   async optimizeCache() {
     try {
-      // console.log('⚡ Optimizing cache...');
+      // // // console.log('⚡ Optimizing cache...');
 
       const response = await fetch('/api/external-data/status/cache/optimize', { method: 'POST' });
       if (response.ok) {
         const result = await response.json();
-        // console.log('✅ Cache optimized successfully:', result.message);
+        // // // console.log('✅ Cache optimized successfully:', result.message);
         await this.loadCacheStats();
       } else {
-        // console.error('❌ Error optimizing cache:', response.status);
+        // // // console.error('❌ Error optimizing cache:', response.status);
       }
     } catch (error) {
-      // console.error('❌ Error optimizing cache:', error);
+      // // // console.error('❌ Error optimizing cache:', error);
     }
   }
 
   async testAllProviders() {
     try {
-      // console.log('🧪 Testing all providers...');
+      // // // console.log('🧪 Testing all providers...');
 
       const response = await fetch('/api/external-data/status/providers/test-all', { method: 'POST' });
       if (response.ok) {
         const result = await response.json();
-        // console.log('✅ All providers tested:', result.message);
-        // console.log('📊 Test results:', result.test_results);
+        // // // console.log('✅ All providers tested:', result.message);
+        // // // console.log('📊 Test results:', result.test_results);
         await this.loadProviders();
       } else {
-        // console.error('❌ Error testing providers:', response.status);
+        // // // console.error('❌ Error testing providers:', response.status);
       }
     } catch (error) {
-      // console.error('❌ Error testing providers:', error);
+      // // // console.error('❌ Error testing providers:', error);
     }
   }
 
   static async exportData() {
     try {
-      // console.log('📤 Exporting data...');
+      // // // console.log('📤 Exporting data...');
 
       // For now, export the current system status as JSON
       const response = await fetch('/api/external-data/status/');
@@ -731,18 +728,18 @@ class ExternalDataDashboard {
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-        // console.log('✅ Data exported successfully');
+        // // // console.log('✅ Data exported successfully');
       } else {
-        // console.error('❌ Error exporting data:', response.status);
+        // // // console.error('❌ Error exporting data:', response.status);
       }
     } catch (error) {
-      // console.error('❌ Error exporting data:', error);
+      // // // console.error('❌ Error exporting data:', error);
     }
   }
 
   static async analyzeData() {
     try {
-      // console.log('📊 Analyzing data...');
+      // // // console.log('📊 Analyzing data...');
 
       // For now, just show current system metrics
       const response = await fetch('/api/external-data/status/');
@@ -759,7 +756,7 @@ class ExternalDataDashboard {
           system_status: data.status || 'לא ידוע',
         };
 
-        // console.log('📊 Data Analysis:', analysis);
+        // // // console.log('📊 Data Analysis:', analysis);
 
         // Show analysis in UI (you can implement this later)
         if (window.showInfoNotification) {
@@ -767,23 +764,23 @@ class ExternalDataDashboard {
         }
 
       } else {
-        // console.error('❌ Error analyzing data:', response.status);
+        // // // console.error('❌ Error analyzing data:', response.status);
       }
     } catch (error) {
-      // console.error('❌ Error analyzing data:', error);
+      // // // console.error('❌ Error analyzing data:', error);
     }
   }
 
   async backupData() {
     try {
-      // console.log('💾 Backing up data...');
+      // // // console.log('💾 Backing up data...');
 
       // For now, just export current data as backup
       await this.exportData();
-      // console.log('✅ Data backup completed');
+      // // // console.log('✅ Data backup completed');
 
     } catch (error) {
-      // console.error('❌ Error backing up data:', error);
+      // // // console.error('❌ Error backing up data:', error);
     }
   }
 
@@ -797,12 +794,12 @@ class ExternalDataDashboard {
 
 // Global functions for button onclick handlers
 window.testProvider = function(providerId) {
-  // console.log('🧪 Testing provider:', providerId);
+  // // // console.log('🧪 Testing provider:', providerId);
   // Implementation for testing specific provider
 };
 
 window.toggleProvider = function(providerId) {
-  // console.log('🔄 Toggling provider:', providerId);
+  // // // console.log('🔄 Toggling provider:', providerId);
   // Implementation for toggling provider status
 };
 

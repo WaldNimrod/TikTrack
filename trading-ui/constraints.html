@@ -446,7 +446,7 @@
   <script>
     // פונקציות מותאמות לעמוד אילוצים
     function loadConstraints() {
-      console.log('טעינת אילוצים');
+            // Console statement removed for no-console compliance
       if (typeof window.loadConstraintsData === 'function') {
         window.loadConstraintsData();
       } else {
@@ -455,38 +455,38 @@
     }
 
     function addNewConstraint() {
-      console.log('הוספת אילוץ חדש');
+            // Console statement removed for no-console compliance
       // הפונקציה מוגדרת ב-constraint-manager.js
     }
 
     function filterConstraintsData() {
-      console.log('סינון אילוצים');
+            // Console statement removed for no-console compliance
       // הפונקציה מוגדרת ב-constraint-manager.js
     }
 
     // פונקציות גלובליות לניהול אילוצים
     window.showAddConstraintModal = function () {
-      console.log('הצגת מודל הוספת אילוץ');
+            // Console statement removed for no-console compliance
       // הפונקציה מוגדרת ב-constraint-manager.js
     };
 
     window.addEnumValue = function () {
-      console.log('הוספת ערך ENUM');
+            // Console statement removed for no-console compliance
       // הפונקציה מוגדרת ב-constraint-manager.js
     };
 
     window.removeEnumValue = function (button) {
-      console.log('הסרת ערך ENUM');
+            // Console statement removed for no-console compliance
       // הפונקציה מוגדרת ב-constraint-manager.js
     };
 
     window.selectConstraint = function (constraintId) {
-      console.log('בחירת אילוץ:', constraintId);
+            // Console statement removed for no-console compliance
       // הפונקציה מוגדרת ב-constraint-manager.js
     };
 
     window.handleModalAddConstraint = function () {
-      console.log('טיפול בהוספת אילוץ במודל');
+            // Console statement removed for no-console compliance
       // הפונקציה מוגדרת ב-constraint-manager.js
     };
 
@@ -499,7 +499,7 @@
     };
 
     window.filterConstraintsData = function (statusValues, typeValues, accountValues, dateRange, searchText) {
-      console.log('סינון אילוצים:', { statusValues, typeValues, accountValues, dateRange, searchText });
+            // Console statement removed for no-console compliance
       // הפונקציה מוגדרת ב-constraint-manager.js
     };
 
@@ -534,7 +534,7 @@
 
     // טעינת נתונים בטעינת הדף
     document.addEventListener('DOMContentLoaded', function () {
-      console.log('דף אילוצים נטען');
+            // Console statement removed for no-console compliance
       loadConstraints();
     });
   </script>

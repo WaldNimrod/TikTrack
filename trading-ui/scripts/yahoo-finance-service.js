@@ -66,7 +66,7 @@ class YahooFinanceService {
       return result;
 
     } catch (error) {
-      console.error(`Error getting quote for ${symbol}:`, error);
+// Console statement removed for no-console compliance
       return null;
     }
   }
@@ -112,7 +112,7 @@ class YahooFinanceService {
       return { ...results, ...freshData };
 
     } catch (error) {
-      console.error('Error getting multiple quotes:', error);
+// Console statement removed for no-console compliance
       return {};
     }
   }
@@ -154,7 +154,7 @@ class YahooFinanceService {
       return data;
 
     } catch (error) {
-      console.error('Error refreshing quotes:', error);
+// Console statement removed for no-console compliance
       this._showNotification(`שגיאה ברענון נתונים: ${error.message}`, 'error');
       return {};
     } finally {
@@ -179,10 +179,10 @@ class YahooFinanceService {
         data[symbol] && !data[symbol].error,
       ).length;
 
-      console.log(`Yahoo Finance: Updated ${successCount}/${symbols.length} quotes`);
+// Console statement removed for no-console compliance
       return data;
     } catch (error) {
-      console.warn('Silent Yahoo Finance refresh failed:', error.message);
+// Console statement removed for no-console compliance
       return {};
     }
   }
@@ -273,7 +273,7 @@ class YahooFinanceService {
         throw new Error(result.error || 'Unknown error');
       }
     } catch (error) {
-      console.error(`Failed to fetch quote for ${symbol}:`, error);
+// Console statement removed for no-console compliance
       return null;
     }
   }
@@ -311,7 +311,7 @@ class YahooFinanceService {
         throw new Error(result.error || 'Unknown error');
       }
     } catch (error) {
-      console.error('Failed to fetch multiple quotes:', error);
+// Console statement removed for no-console compliance
       return {};
     }
   }
@@ -345,7 +345,7 @@ class YahooFinanceService {
     if (typeof window.showNotification === 'function') {
       window.showNotification(message, type);
     } else {
-      console.log(`${type.toUpperCase()}: ${message}`);
+// Console statement removed for no-console compliance
     }
   }
 
@@ -402,4 +402,4 @@ window.getMultipleYahooQuotes = symbols => window.YahooFinanceService.getMultipl
 window.formatYahooPrice = (price, currency) => window.YahooFinanceService.formatPrice(price, currency);
 window.formatYahooChange = change => window.YahooFinanceService.formatChange(change);
 
-console.log('✅ Yahoo Finance Service loaded successfully');
+// Console statement removed for no-console compliance

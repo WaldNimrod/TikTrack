@@ -680,7 +680,7 @@ class CacheTestSystem {
     }
 
     // Also log to console
-    console.log(`[CacheTest] [${level.toUpperCase()}] ${message}`);
+// Console statement removed for no-console compliance
   }
 
   /**
@@ -699,7 +699,7 @@ class CacheTestSystem {
       window.showNotification(message, type);
     } else {
       // Fallback notification
-      console.log(`[${type.toUpperCase()}] ${message}`);
+// Console statement removed for no-console compliance
     }
   }
 

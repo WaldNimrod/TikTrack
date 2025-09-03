@@ -3,145 +3,145 @@
  * מרכז בדיקות מערכת - גרסה פשוטה
  */
 
-console.log('=== system-test-center.js נטען ===');
+// Console statement removed for no-console compliance
 
 class SimpleTestCenter {
   constructor() {
-    console.log('=== SimpleTestCenter נוצר ===');
+// Console statement removed for no-console compliance
     this.init();
   }
 
   init() {
-    console.log('=== init התחיל ===');
+// Console statement removed for no-console compliance
     this.setupEventListeners();
     this.log('🚀 מרכז בדיקות מערכת מתחיל...');
     this.log('✅ מרכז בדיקות מערכת מוכן לשימוש');
-    console.log('=== init הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   setupEventListeners() {
-    console.log('=== setupEventListeners התחיל ===');
+// Console statement removed for no-console compliance
 
     // System status buttons
     const refreshAllStatusBtn = document.getElementById('refresh-all-status');
     if (refreshAllStatusBtn) {
       refreshAllStatusBtn.addEventListener('click', () => this.refreshAllStatus());
-      console.log('כפתור refresh-all-status מקושר');
+// Console statement removed for no-console compliance
     }
 
     // Cache buttons
     const clearCacheBtn = document.getElementById('clear-cache-btn');
     if (clearCacheBtn) {
       clearCacheBtn.addEventListener('click', () => this.clearCache());
-      console.log('כפתור clear-cache-btn מקושר');
+// Console statement removed for no-console compliance
     }
 
     const invalidateCacheBtn = document.getElementById('invalidate-cache-btn');
     if (invalidateCacheBtn) {
       invalidateCacheBtn.addEventListener('click', () => this.invalidateCache());
-      console.log('כפתור invalidate-cache-btn מקושר');
+// Console statement removed for no-console compliance
     }
 
     const cacheHealthCheckBtn = document.getElementById('cache-health-check');
     if (cacheHealthCheckBtn) {
       cacheHealthCheckBtn.addEventListener('click', () => this.checkCacheHealth());
-      console.log('כפתור cache-health-check מקושר');
+// Console statement removed for no-console compliance
     }
 
     const getCacheInfoBtn = document.getElementById('get-cache-info');
     if (getCacheInfoBtn) {
       getCacheInfoBtn.addEventListener('click', () => this.getCacheInfo());
-      console.log('כפתור get-cache-info מקושר');
+// Console statement removed for no-console compliance
     }
 
     const refreshCacheStatsBtn = document.getElementById('refresh-cache-stats');
     if (refreshCacheStatsBtn) {
       refreshCacheStatsBtn.addEventListener('click', () => this.refreshCacheStats());
-      console.log('כפתור refresh-cache-stats מקושר');
+// Console statement removed for no-console compliance
     }
 
     // Query buttons
     const optimizeQueriesBtn = document.getElementById('optimize-queries-btn');
     if (optimizeQueriesBtn) {
       optimizeQueriesBtn.addEventListener('click', () => this.optimizeQueries());
-      console.log('כפתור optimize-queries-btn מקושר');
+// Console statement removed for no-console compliance
     }
 
     const runQueryTestBtn = document.getElementById('run-query-test');
     if (runQueryTestBtn) {
       runQueryTestBtn.addEventListener('click', () => this.runQueryTest());
-      console.log('כפתור run-query-test מקושר');
+// Console statement removed for no-console compliance
     }
 
     const refreshQueryStatsBtn = document.getElementById('refresh-query-stats');
     if (refreshQueryStatsBtn) {
       refreshQueryStatsBtn.addEventListener('click', () => this.refreshQueryStats());
-      console.log('כפתור refresh-query-stats מקושר');
+// Console statement removed for no-console compliance
     }
 
     const getSlowQueriesBtn = document.getElementById('get-slow-queries');
     if (getSlowQueriesBtn) {
       getSlowQueriesBtn.addEventListener('click', () => this.getSlowQueries());
-      console.log('כפתור get-slow-queries מקושר');
+// Console statement removed for no-console compliance
     }
 
     const clearQueryProfilesBtn = document.getElementById('clear-query-profiles');
     if (clearQueryProfilesBtn) {
       clearQueryProfilesBtn.addEventListener('click', () => this.clearQueryProfiles());
-      console.log('כפתור clear-query-profiles מקושר');
+// Console statement removed for no-console compliance
     }
 
     const exportQueryProfilesBtn = document.getElementById('export-query-profiles');
     if (exportQueryProfilesBtn) {
       exportQueryProfilesBtn.addEventListener('click', () => this.exportQueryProfiles());
-      console.log('כפתור export-query-profiles מקושר');
+// Console statement removed for no-console compliance
     }
 
     // External data buttons
     const testExternalDataBtn = document.getElementById('test-external-data-btn');
     if (testExternalDataBtn) {
       testExternalDataBtn.addEventListener('click', () => this.testExternalData());
-      console.log('כפתור test-external-data-btn מקושר');
+// Console statement removed for no-console compliance
     }
 
     const testExternalDataDataBtn = document.getElementById('test-external-data-data-btn');
     if (testExternalDataDataBtn) {
       testExternalDataDataBtn.addEventListener('click', () => this.testExternalDataData());
-      console.log('כפתור test-external-data-data-btn מקושר');
+// Console statement removed for no-console compliance
     }
 
     // Performance buttons
     const runPerformanceTestBtn = document.getElementById('run-performance-test-btn');
     if (runPerformanceTestBtn) {
       runPerformanceTestBtn.addEventListener('click', () => this.runPerformanceTest());
-      console.log('כפתור run-performance-test-btn מקושר');
+// Console statement removed for no-console compliance
     }
 
     const runPerformanceTestCheckBtn = document.getElementById('run-performance-test-check-btn');
     if (runPerformanceTestCheckBtn) {
       runPerformanceTestCheckBtn.addEventListener('click', () => this.runPerformanceTestCheck());
-      console.log('כפתור run-performance-test-check-btn מקושר');
+// Console statement removed for no-console compliance
     }
 
     // Log buttons
     const clearLogBtn = document.getElementById('clear-log');
     if (clearLogBtn) {
       clearLogBtn.addEventListener('click', () => this.clearLog());
-      console.log('כפתור clear-log מקושר');
+// Console statement removed for no-console compliance
     }
 
     const exportLogBtn = document.getElementById('export-log');
     if (exportLogBtn) {
       exportLogBtn.addEventListener('click', () => this.exportLog());
-      console.log('כפתור export-log מקושר');
+// Console statement removed for no-console compliance
     }
 
-    console.log('=== setupEventListeners הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   // Button action functions
   async refreshAllStatus() {
-    console.log('=== refreshAllStatus התחיל ===');
+// Console statement removed for no-console compliance
     this.log('🔄 מתחיל רענון סטטוס כללי...');
     this.showLoading('system-status-overview', 'מרענן סטטוס כללי...');
     await this.delay(1000);
@@ -158,74 +158,74 @@ class SimpleTestCenter {
       this.log('❌ שגיאה בעדכון סטטוס: ' + error.message);
     }
 
-    console.log('=== refreshAllStatus הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async clearCache() {
-    console.log('=== clearCache התחיל ===');
+// Console statement removed for no-console compliance
     this.log('🧹 מתחיל ניקוי Cache...');
     this.showLoading('cache-stats-content', 'מנקה Cache...');
     await this.delay(1000);
     this.loadCacheData();
     this.log('✅ Cache נוקה בהצלחה');
-    console.log('=== clearCache הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async invalidateCache() {
-    console.log('=== invalidateCache התחיל ===');
+// Console statement removed for no-console compliance
     this.log('🗑️ מתחיל ביטול Cache...');
     this.showLoading('cache-health-content', 'מבטל Cache...');
     await this.delay(1000);
     this.loadCacheData();
     this.log('✅ Cache בוטל בהצלחה');
-    console.log('=== invalidateCache הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async checkCacheHealth() {
-    console.log('=== checkCacheHealth התחיל ===');
+// Console statement removed for no-console compliance
     this.log('🏥 מתחיל בדיקת בריאות Cache...');
     this.showLoading('cache-health-content', 'בודק בריאות Cache...');
     await this.delay(800);
     this.loadCacheData();
     this.log('✅ בדיקת בריאות Cache הושלמה');
-    console.log('=== checkCacheHealth הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async getCacheInfo() {
-    console.log('=== getCacheInfo התחיל ===');
+// Console statement removed for no-console compliance
     this.log('ℹ️ מתחיל קבלת מידע על Cache...');
     this.showLoading('cache-info-content', 'מקבל מידע על Cache...');
     await this.delay(600);
     this.loadCacheData();
     this.log('✅ מידע על Cache התקבל בהצלחה');
-    console.log('=== getCacheInfo הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async refreshCacheStats() {
-    console.log('=== refreshCacheStats התחיל ===');
+// Console statement removed for no-console compliance
     this.log('📊 מתחיל רענון סטטיסטיקות Cache...');
     this.showLoading('cache-stats-content', 'מרענן סטטיסטיקות Cache...');
     await this.delay(700);
     this.loadCacheData();
     this.log('✅ סטטיסטיקות Cache עודכנו בהצלחה');
-    console.log('=== refreshCacheStats הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async optimizeQueries() {
-    console.log('=== optimizeQueries התחיל ===');
+// Console statement removed for no-console compliance
     this.log('⚡ מתחיל אופטימיזציה של Queries...');
     this.showLoading('query-opportunities-content', 'מבצע אופטימיזציה...');
     await this.delay(1000);
     this.loadQueryData();
     this.log('✅ אופטימיזציה של Queries הושלמה בהצלחה');
-    console.log('=== optimizeQueries הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async runQueryTest() {
-    console.log('=== runQueryTest התחיל ===');
+// Console statement removed for no-console compliance
 
     const queryType = document.getElementById('test-query-type')?.value || 'tickers';
-    console.log(`סוג Query: ${queryType}`);
+// Console statement removed for no-console compliance
     this.log(`🧪 מתחיל בדיקת Query: ${queryType}`);
 
     this.showLoading('query-test-results', 'מבצע בדיקה...');
@@ -240,52 +240,52 @@ class SimpleTestCenter {
 
     this.displayQueryTestResults(results);
     this.log(`✅ בדיקת Query ${queryType} הושלמה בהצלחה`);
-    console.log('=== runQueryTest הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async refreshQueryStats() {
-    console.log('=== refreshQueryStats התחיל ===');
+// Console statement removed for no-console compliance
     this.log('📈 מתחיל רענון סטטיסטיקות Queries...');
     this.showLoading('query-stats-content', 'מרענן סטטיסטיקות Queries...');
     await this.delay(700);
     this.loadQueryData();
     this.log('✅ סטטיסטיקות Queries עודכנו בהצלחה');
-    console.log('=== refreshQueryStats הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async getSlowQueries() {
-    console.log('=== getSlowQueries התחיל ===');
+// Console statement removed for no-console compliance
     this.log('🐌 מתחיל בדיקת Queries איטיים...');
     this.showLoading('slow-queries-content', 'בודק Queries איטיים...');
     await this.delay(900);
     this.loadQueryData();
     this.log('✅ Queries איטיים נבדקו בהצלחה');
-    console.log('=== getSlowQueries הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async clearQueryProfiles() {
-    console.log('=== clearQueryProfiles התחיל ===');
+// Console statement removed for no-console compliance
     this.log('🗑️ מתחיל ניקוי פרופילי Queries...');
     await this.delay(500);
     this.log('✅ פרופילי Queries נוקו בהצלחה');
-    console.log('=== clearQueryProfiles הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async exportQueryProfiles() {
-    console.log('=== exportQueryProfiles התחיל ===');
+// Console statement removed for no-console compliance
     this.log('📤 מתחיל ייצוא פרופילי Queries...');
     await this.delay(800);
     this.log('✅ פרופילי Queries יוצאו בהצלחה');
-    console.log('=== exportQueryProfiles הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   displayQueryTestResults(results) {
-    console.log('=== displayQueryTestResults התחיל ===');
-    console.log('תוצאות:', results);
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
 
     const element = document.getElementById('query-test-results');
     if (!element) {
-      console.error('Element query-test-results לא נמצא');
+// Console statement removed for no-console compliance
       this.log('❌ שגיאה: Element query-test-results לא נמצא');
       return;
     }
@@ -301,71 +301,71 @@ class SimpleTestCenter {
     `;
 
     this.log('✅ תוצאות בדיקת Query הוצגו בהצלחה');
-    console.log('=== displayQueryTestResults הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async testExternalData() {
-    console.log('=== testExternalData התחיל ===');
+// Console statement removed for no-console compliance
     this.log('🌐 מתחיל בדיקת חיבור לנתונים חיצוניים...');
     this.showLoading('external-data-status-content', 'בודק חיבור...');
     await this.delay(1000);
     this.loadExternalData();
     this.log('✅ בדיקת חיבור לנתונים חיצוניים הושלמה');
-    console.log('=== testExternalData הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async testExternalDataData() {
-    console.log('=== testExternalDataData התחיל ===');
+// Console statement removed for no-console compliance
     this.log('📊 מתחיל בדיקת נתונים חיצוניים...');
     this.showLoading('external-data-test-content', 'בודק נתונים...');
     await this.delay(1000);
     this.loadExternalData();
     this.log('✅ בדיקת נתונים חיצוניים הושלמה');
-    console.log('=== testExternalDataData הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async runPerformanceTest() {
-    console.log('=== runPerformanceTest התחיל ===');
+// Console statement removed for no-console compliance
     this.log('🚀 מתחיל בדיקת ביצועים...');
     this.showLoading('performance-metrics-content', 'מבצע בדיקה...');
     await this.delay(1000);
     this.loadPerformanceData();
     this.log('✅ בדיקת ביצועים הושלמה בהצלחה');
-    console.log('=== runPerformanceTest הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async runPerformanceTestCheck() {
-    console.log('=== runPerformanceTestCheck התחיל ===');
+// Console statement removed for no-console compliance
     this.log('🔍 מתחיל בדיקת ביצועים מתקדמת...');
     this.showLoading('performance-test-content', 'בודק ביצועים...');
     await this.delay(1000);
     this.loadPerformanceData();
     this.log('✅ בדיקת ביצועים מתקדמת הושלמה בהצלחה');
-    console.log('=== runPerformanceTestCheck הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async clearLog() {
-    console.log('=== clearLog התחיל ===');
+// Console statement removed for no-console compliance
     this.log('🧹 מנקה יומן פעילות...');
     const logContent = document.getElementById('unified-log-content');
     if (logContent) {
       logContent.innerHTML = '';
     }
     this.log('✅ יומן פעילות נוקה בהצלחה');
-    console.log('=== clearLog הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async exportLog() {
-    console.log('=== exportLog התחיל ===');
+// Console statement removed for no-console compliance
     this.log('📤 מתחיל ייצוא יומן פעילות...');
     await this.delay(500);
     this.log('✅ יומן פעילות יוצא בהצלחה');
-    console.log('=== exportLog הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   // Data loading functions
   async loadCacheData() {
-    console.log('=== loadCacheData התחיל ===');
+// Console statement removed for no-console compliance
 
     // Cache Stats
     this.displayCacheStats({
@@ -393,11 +393,11 @@ class SimpleTestCenter {
       last_cleanup: '2025-01-01 10:00:00',
     });
 
-    console.log('=== loadCacheData הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async loadQueryData() {
-    console.log('=== loadQueryData התחיל ===');
+// Console statement removed for no-console compliance
 
     // Query Stats
     this.displayQueryStats({
@@ -418,11 +418,11 @@ class SimpleTestCenter {
       { query: 'SELECT * FROM executions JOIN trades', execution_time: 1.8, frequency: 8 },
     ]);
 
-    console.log('=== loadQueryData הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async loadExternalData() {
-    console.log('=== loadExternalData התחיל ===');
+// Console statement removed for no-console compliance
 
     // External Data Status
     this.displayExternalDataStatus({
@@ -437,11 +437,11 @@ class SimpleTestCenter {
       message: 'בדיקת חיבור לנתונים חיצוניים הושלמה בהצלחה',
     });
 
-    console.log('=== loadExternalData הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   async loadPerformanceData() {
-    console.log('=== loadPerformanceData התחיל ===');
+// Console statement removed for no-console compliance
 
     // Performance Metrics
     this.displayPerformanceMetrics({
@@ -462,7 +462,7 @@ class SimpleTestCenter {
       ],
     });
 
-    console.log('=== loadPerformanceData הושלם ===');
+// Console statement removed for no-console compliance
   }
 
   // Display functions
@@ -686,7 +686,7 @@ class SimpleTestCenter {
   log(message) {
     const logContent = document.getElementById('unified-log-content');
     if (!logContent) {
-      console.error('Element unified-log-content לא נמצא');
+// Console statement removed for no-console compliance
       return;
     }
 
@@ -705,7 +705,7 @@ class SimpleTestCenter {
   showLoading(elementId, message) {
     const element = document.getElementById(elementId);
     if (!element) {
-      console.error(`Element ${elementId} לא נמצא`);
+// Console statement removed for no-console compliance
       return;
     }
 
@@ -726,9 +726,9 @@ class SimpleTestCenter {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('=== DOMContentLoaded התחיל ===');
+// Console statement removed for no-console compliance
   new SimpleTestCenter();
-  console.log('=== SimpleTestCenter נוצר בהצלחה ===');
+// Console statement removed for no-console compliance
 });
 
-console.log('=== system-test-center.js נטען בהצלחה ===');
+// Console statement removed for no-console compliance

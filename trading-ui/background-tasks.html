@@ -205,7 +205,7 @@
             const timestamp = new Date().toLocaleTimeString('he-IL');
             logElement.textContent += `[${timestamp}] ${message}\n`;
             logElement.scrollTop = logElement.scrollHeight;
-            console.log(message);
+            // Console statement removed for no-console compliance
         }
 
         function clearLog() {
@@ -394,13 +394,13 @@
                 const logContent = generateDetailedLog();
                 await navigator.clipboard.writeText(logContent);
                 window.showNotification && window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
-                console.log('=== לוג מפורט שהועתק ===');
-                console.log(logContent);
-                console.log('=== סוף הלוג ===');
+            // Console statement removed for no-console compliance
+            // Console statement removed for no-console compliance
+            // Console statement removed for no-console compliance
             } catch (error) {
-                console.error('Failed to copy log:', error);
+            // Console statement removed for no-console compliance
                 window.showNotification && window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
-                console.log(generateDetailedLog());
+            // Console statement removed for no-console compliance
             }
         }
 

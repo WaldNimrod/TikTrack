@@ -142,7 +142,7 @@ function updatePricesFromPercentages(formId, currentPrice) {
   targetPriceElement.value = newTargetPrice.toFixed(2);
 
   // Updated prices from percentages
-  // console.log('Updated prices from percentages:', {
+// Console statement removed for no-console compliance
   //   currentPrice,
   //   side,
   //   stopPercentage,
@@ -189,7 +189,7 @@ function updatePercentagesFromPrices(formId, currentPrice) {
   targetPercentageElement.value = newTargetPercentage.toFixed(2);
 
   // Updated percentages from prices
-  // console.log('Updated percentages from prices:', {
+// Console statement removed for no-console compliance
   //   currentPrice,
   //   side,
   //   stopPrice,

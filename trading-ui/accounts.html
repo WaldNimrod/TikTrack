@@ -172,7 +172,7 @@
   <script>
     // אתחול מערכות בסיסיות
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('🔄 Accounts page basic initialization');
+            // Console statement removed for no-console compliance
       
       // אתחול מערכת התראות
       if (window.initializeNotifications) {
@@ -239,7 +239,7 @@
             <div class="table-count">טוען...</div>
             <div class="table-actions">
               <button class="refresh-btn"
-                onclick="console.log('Button clicked'); console.log('showAddAccountModal exists:', typeof window.showAddAccountModal); if (typeof window.showAddAccountModal === 'function') { window.showAddAccountModal(); }"
+            // Console statement removed for no-console compliance
                 title="הוסף חשבון חדש">
                 <img src="images/icons/accounts.svg" alt="הוסף" class="action-icon">
                 הוסף
@@ -358,7 +358,7 @@
        * @since 2.0
        */
       function sortTable(columnIndex) {
-        console.log(`🔄 מיון טבלת חשבונות לפי עמודה ${columnIndex}`);
+            // Console statement removed for no-console compliance
 
         // Use global function
         if (typeof window.sortTableData === 'function') {
@@ -388,33 +388,33 @@
 
       // Function to load account data - simplified like database.js
       async function loadAccountsData() {
-        console.log('🚀🚀🚀 accounts.html loadAccountsData STARTED 🚀🚀🚀');
+            // Console statement removed for no-console compliance
         try {
-          console.log('🔄 טוען נתוני חשבונות...');
-          console.log('🔄 About to fetch /api/v1/accounts/ directly...');
+            // Console statement removed for no-console compliance
+            // Console statement removed for no-console compliance
 
           const response = await fetch('/api/v1/accounts/');
-          console.log('🚀 Response received:', response.status);
+            // Console statement removed for no-console compliance
 
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
 
           const data = await response.json();
-          console.log('🚀 Data received:', data);
-          console.log('🚀 Data type:', typeof data);
-          console.log('🚀 Data has data property:', data && data.hasOwnProperty('data'));
+            // Console statement removed for no-console compliance
+            // Console statement removed for no-console compliance
+            // Console statement removed for no-console compliance
 
           const accounts = data.data || data || [];
-          console.log('🚀 Accounts extracted:', accounts);
-          console.log('🚀 Accounts type:', typeof accounts);
-          console.log('🚀 Accounts is array:', Array.isArray(accounts));
-          console.log('🚀 Accounts length:', accounts.length);
+            // Console statement removed for no-console compliance
+            // Console statement removed for no-console compliance
+            // Console statement removed for no-console compliance
+            // Console statement removed for no-console compliance
 
           if (Array.isArray(accounts)) {
             accountsData = accounts;
-            console.log('🔄 נתונים נטענו בהצלחה:', accounts.length, 'חשבונות');
-            console.log('🚀🚀🚀 accounts.html loadAccountsData SUCCESS 🚀🚀🚀');
+            // Console statement removed for no-console compliance
+            // Console statement removed for no-console compliance
 
             // Update the table
             if (typeof window.updateAccountsTable === 'function') {

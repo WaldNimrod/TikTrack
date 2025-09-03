@@ -3,14 +3,14 @@
  * מרכז בדיקות מערכת הנתונים החיצוניים - גרסה פשוטה
  */
 
-console.log('=== מרכז בדיקות מערכת הנתונים החיצוניים נטען ===');
+// Console statement removed for no-console compliance
 
 // פונקציות לוג פשוטות
 function log(message) {
-  console.log('log function called with:', message);
+// Console statement removed for no-console compliance
   const logContent = document.getElementById('log-content');
   if (!logContent) {
-    console.error('Element log-content לא נמצא');
+// Console statement removed for no-console compliance
     return;
   }
 
@@ -30,11 +30,11 @@ function log(message) {
 
   logContent.appendChild(logEntry);
   logContent.scrollTop = logContent.scrollHeight;
-  console.log(`[${timestamp}] ${message}`);
+// Console statement removed for no-console compliance
 }
 
 function clearLog() {
-  console.log('clearLog function called');
+// Console statement removed for no-console compliance
   const logContent = document.getElementById('log-content');
   if (logContent) {
     logContent.innerHTML = '<div class="text-muted">יומן הפעילות יוצג כאן...</div>';
@@ -43,7 +43,7 @@ function clearLog() {
 }
 
 function exportLog() {
-  console.log('exportLog function called');
+// Console statement removed for no-console compliance
   const logContent = document.getElementById('log-content');
   if (!logContent) {return;}
 
@@ -64,7 +64,7 @@ function exportLog() {
 }
 
 function copyLog() {
-  console.log('copyLog function called');
+// Console statement removed for no-console compliance
   const logContent = document.getElementById('log-content');
   if (!logContent) {
     log('❌ שגיאה: Element log-content לא נמצא עבור העתקה');
@@ -83,7 +83,7 @@ function copyLog() {
       })
       .catch(err => {
         log('❌ שגיאה בהעתקת יומן: ' + err);
-        console.error('Failed to copy log: ', err);
+// Console statement removed for no-console compliance
       });
   } else {
     // Fallback for browsers that don't support navigator.clipboard
@@ -99,7 +99,7 @@ function copyLog() {
       log('📋 יומן הפעילות הועתק ללוח הגזירים (fallback)');
     } catch (err) {
       log('❌ שגיאה בהעתקת יומן (fallback): ' + err);
-      console.error('Fallback: Oops, unable to copy', err);
+// Console statement removed for no-console compliance
     }
     document.body.removeChild(textarea);
   }
@@ -107,19 +107,19 @@ function copyLog() {
 
 // פונקציות בדיקה בסיסיות
 function testSystem() {
-  console.log('testSystem function called');
+// Console statement removed for no-console compliance
   log('🚀 מתחיל בדיקת מערכת...');
 
   // עדכן סטטוס שרת (במקום מערכת)
   const serverStatus = document.getElementById('server-status');
-  console.log('🔍 מחפש אלמנט server-status:', serverStatus);
+// Console statement removed for no-console compliance
 
   if (serverStatus) {
-    console.log('✅ נמצא אלמנט server-status, מעדכן ל"בבדיקה..."');
+// Console statement removed for no-console compliance
     serverStatus.className = 'badge bg-warning';
     serverStatus.textContent = 'בבדיקה...';
   } else {
-    console.error('❌ לא נמצא אלמנט server-status!');
+// Console statement removed for no-console compliance
   }
 
   setTimeout(() => {
@@ -137,11 +137,11 @@ function testSystem() {
 
     // עדכן סטטוס שרת
     if (serverStatus) {
-      console.log('✅ מעדכן server-status ל"פעיל"');
+// Console statement removed for no-console compliance
       serverStatus.className = 'badge bg-success';
       serverStatus.textContent = 'פעיל';
     } else {
-      console.error('❌ לא ניתן לעדכן server-status - אלמנט לא נמצא!');
+// Console statement removed for no-console compliance
     }
 
     log('✅ בדיקת מערכת הושלמה בהצלחה');
@@ -149,19 +149,19 @@ function testSystem() {
 }
 
 function testDatabase() {
-  console.log('testDatabase function called');
+// Console statement removed for no-console compliance
   log('🗄️ מתחיל בדיקת מסד נתונים...');
 
   // עדכן סטטוס מסד נתונים
   const databaseStatus = document.getElementById('database-status');
-  console.log('🔍 מחפש אלמנט database-status:', databaseStatus);
+// Console statement removed for no-console compliance
 
   if (databaseStatus) {
-    console.log('✅ נמצא אלמנט database-status, מעדכן ל"בבדיקה..."');
+// Console statement removed for no-console compliance
     databaseStatus.className = 'badge bg-warning';
     databaseStatus.textContent = 'בבדיקה...';
   } else {
-    console.error('❌ לא נמצא אלמנט database-status!');
+// Console statement removed for no-console compliance
   }
 
   setTimeout(() => {
@@ -179,11 +179,11 @@ function testDatabase() {
 
     // עדכן סטטוס מסד נתונים
     if (databaseStatus) {
-      console.log('✅ מעדכן database-status ל"פעיל"');
+// Console statement removed for no-console compliance
       databaseStatus.className = 'badge bg-success';
       databaseStatus.textContent = 'פעיל';
     } else {
-      console.error('❌ לא ניתן לעדכן database-status - אלמנט לא נמצא!');
+// Console statement removed for no-console compliance
     }
 
     log('✅ בדיקת מסד נתונים הושלמה בהצלחה');
@@ -191,19 +191,19 @@ function testDatabase() {
 }
 
 function testCache() {
-  console.log('testCache function called');
+// Console statement removed for no-console compliance
   log('⚡ מתחיל בדיקת מטמון...');
 
   // עדכן סטטוס מטמון
   const cacheStatus = document.getElementById('cache-status');
-  console.log('🔍 מחפש אלמנט cache-status:', cacheStatus);
+// Console statement removed for no-console compliance
 
   if (cacheStatus) {
-    console.log('✅ נמצא אלמנט cache-status, מעדכן ל"בבדיקה..."');
+// Console statement removed for no-console compliance
     cacheStatus.className = 'badge bg-warning';
     cacheStatus.textContent = 'בבדיקה...';
   } else {
-    console.error('❌ לא נמצא אלמנט cache-status!');
+// Console statement removed for no-console compliance
   }
 
   setTimeout(() => {
@@ -221,11 +221,11 @@ function testCache() {
 
     // עדכן סטטוס מטמון
     if (cacheStatus) {
-      console.log('✅ מעדכן cache-status ל"פעיל"');
+// Console statement removed for no-console compliance
       cacheStatus.className = 'badge bg-success';
       cacheStatus.textContent = 'פעיל';
     } else {
-      console.error('❌ לא ניתן לעדכן cache-status - אלמנט לא נמצא!');
+// Console statement removed for no-console compliance
     }
 
     log('✅ בדיקת מטמון הושלמה בהצלחה');
@@ -233,19 +233,19 @@ function testCache() {
 }
 
 function testNetwork() {
-  console.log('testNetwork function called');
+// Console statement removed for no-console compliance
   log('🌐 מתחיל בדיקת רשת...');
 
   // עדכן סטטוס שרת (במקום רשת)
   const serverStatus = document.getElementById('server-status');
-  console.log('🔍 מחפש אלמנט server-status:', serverStatus);
+// Console statement removed for no-console compliance
 
   if (serverStatus) {
-    console.log('✅ נמצא אלמנט server-status, מעדכן ל"בבדיקה..."');
+// Console statement removed for no-console compliance
     serverStatus.className = 'badge bg-warning';
     serverStatus.textContent = 'בבדיקה...';
   } else {
-    console.error('❌ לא נמצא אלמנט server-status!');
+// Console statement removed for no-console compliance
   }
 
   setTimeout(() => {
@@ -263,11 +263,11 @@ function testNetwork() {
 
     // עדכן סטטוס שרת
     if (serverStatus) {
-      console.log('✅ מעדכן server-status ל"פעיל"');
+// Console statement removed for no-console compliance
       serverStatus.className = 'badge bg-success';
       serverStatus.textContent = 'פעיל';
     } else {
-      console.error('❌ לא ניתן לעדכן server-status - אלמנט לא נמצא!');
+// Console statement removed for no-console compliance
     }
 
     log('✅ בדיקת רשת הושלמה בהצלחה');
@@ -276,19 +276,19 @@ function testNetwork() {
 
 // פונקציות בדיקות ביצועים
 function testPerformance() {
-  console.log('testPerformance function called');
+// Console statement removed for no-console compliance
   log('⚡ מתחיל בדיקת ביצועים...');
 
   // עדכן סטטוס ביצועים
   const performanceStatus = document.getElementById('performance-status');
-  console.log('🔍 מחפש אלמנט performance-status:', performanceStatus);
+// Console statement removed for no-console compliance
 
   if (performanceStatus) {
-    console.log('✅ נמצא אלמנט performance-status, מעדכן ל"בבדיקה..."');
+// Console statement removed for no-console compliance
     performanceStatus.className = 'badge bg-warning';
     performanceStatus.textContent = 'בבדיקה...';
   } else {
-    console.error('❌ לא נמצא אלמנט performance-status!');
+// Console statement removed for no-console compliance
   }
 
   setTimeout(() => {
@@ -306,11 +306,11 @@ function testPerformance() {
 
     // עדכן סטטוס ביצועים
     if (performanceStatus) {
-      console.log('✅ מעדכן performance-status ל"פעיל"');
+// Console statement removed for no-console compliance
       performanceStatus.className = 'badge bg-success';
       performanceStatus.textContent = 'פעיל';
     } else {
-      console.error('❌ לא ניתן לעדכן performance-status - אלמנט לא נמצא!');
+// Console statement removed for no-console compliance
     }
 
     log('✅ בדיקת ביצועים הושלמה בהצלחה');
@@ -318,19 +318,19 @@ function testPerformance() {
 }
 
 function testQueries() {
-  console.log('testQueries function called');
+// Console statement removed for no-console compliance
   log('🔍 מתחיל בדיקת שאילתות...');
 
   // עדכן סטטוס שאילתות
   const queriesStatus = document.getElementById('queries-status');
-  console.log('🔍 מחפש אלמנט queries-status:', queriesStatus);
+// Console statement removed for no-console compliance
 
   if (queriesStatus) {
-    console.log('✅ נמצא אלמנט queries-status, מעדכן ל"בבדיקה..."');
+// Console statement removed for no-console compliance
     queriesStatus.className = 'badge bg-warning';
     queriesStatus.textContent = 'בבדיקה...';
   } else {
-    console.error('❌ לא נמצא אלמנט queries-status!');
+// Console statement removed for no-console compliance
   }
 
   setTimeout(() => {
@@ -348,11 +348,11 @@ function testQueries() {
 
     // עדכן סטטוס שאילתות
     if (queriesStatus) {
-      console.log('✅ מעדכן queries-status ל"פעיל"');
+// Console statement removed for no-console compliance
       queriesStatus.className = 'badge bg-success';
       queriesStatus.textContent = 'פעיל';
     } else {
-      console.error('❌ לא ניתן לעדכן queries-status - אלמנט לא נמצא!');
+// Console statement removed for no-console compliance
     }
 
     log('✅ בדיקת שאילתות הושלמה בהצלחה');
@@ -360,7 +360,7 @@ function testQueries() {
 }
 
 function testSlowQueries() {
-  console.log('testSlowQueries function called');
+// Console statement removed for no-console compliance
   log('🐌 מתחיל בדיקת שאילתות איטיות...');
 
   // עדכן סטטוס שאילתות (במקום שאילתות איטיות)
@@ -394,7 +394,7 @@ function testSlowQueries() {
 }
 
 function testQueryOptimization() {
-  console.log('testQueryOptimization function called');
+// Console statement removed for no-console compliance
   log('💡 מתחיל בדיקת אופטימיזציה...');
 
   // עדכן סטטוס שאילתות (במקום אופטימיזציה)
@@ -429,19 +429,19 @@ function testQueryOptimization() {
 
 // פונקציות בדיקות נתונים חיצוניים
 function testYahooFinance() {
-  console.log('testYahooFinance function called');
+// Console statement removed for no-console compliance
   log('📊 מתחיל בדיקת Yahoo Finance...');
 
   // עדכן סטטוס נתונים חיצוניים
   const externalDataStatus = document.getElementById('external-data-status');
-  console.log('🔍 מחפש אלמנט external-data-status:', externalDataStatus);
+// Console statement removed for no-console compliance
 
   if (externalDataStatus) {
-    console.log('✅ נמצא אלמנט external-data-status, מעדכן ל"בבדיקה..."');
+// Console statement removed for no-console compliance
     externalDataStatus.className = 'badge bg-warning';
     externalDataStatus.textContent = 'בבדיקה...';
   } else {
-    console.error('❌ לא נמצא אלמנט external-data-status!');
+// Console statement removed for no-console compliance
   }
 
   setTimeout(() => {
@@ -459,11 +459,11 @@ function testYahooFinance() {
 
     // עדכן סטטוס נתונים חיצוניים
     if (externalDataStatus) {
-      console.log('✅ מעדכן external-data-status ל"פעיל"');
+// Console statement removed for no-console compliance
       externalDataStatus.className = 'badge bg-success';
       externalDataStatus.textContent = 'פעיל';
     } else {
-      console.error('❌ לא ניתן לעדכן external-data-status - אלמנט לא נמצא!');
+// Console statement removed for no-console compliance
     }
 
     log('✅ בדיקת Yahoo Finance הושלמה בהצלחה');
@@ -471,19 +471,19 @@ function testYahooFinance() {
 }
 
 function testDataCache() {
-  console.log('testDataCache function called');
+// Console statement removed for no-console compliance
   log('💾 מתחיל בדיקת מטמון נתונים...');
 
   // עדכן סטטוס מטמון (במקום מטמון נתונים)
   const cacheStatus = document.getElementById('cache-status');
-  console.log('🔍 מחפש אלמנט cache-status:', cacheStatus);
+// Console statement removed for no-console compliance
 
   if (cacheStatus) {
-    console.log('✅ נמצא אלמנט cache-status, מעדכן ל"בדיקה..."');
+// Console statement removed for no-console compliance
     cacheStatus.className = 'badge bg-warning';
     cacheStatus.textContent = 'בדיקה...';
   } else {
-    console.error('❌ לא נמצא אלמנט cache-status!');
+// Console statement removed for no-console compliance
   }
 
   setTimeout(() => {
@@ -501,11 +501,11 @@ function testDataCache() {
 
     // עדכן סטטוס מטמון נתונים
     if (cacheStatus) {
-      console.log('✅ מעדכן cache-status ל"פעיל"');
+// Console statement removed for no-console compliance
       cacheStatus.className = 'badge bg-success';
       cacheStatus.textContent = 'פעיל';
     } else {
-      console.error('❌ לא ניתן לעדכן cache-status - אלמנט לא נמצא!');
+// Console statement removed for no-console compliance
     }
 
     log('✅ בדיקת מטמון נתונים הושלמה בהצלחה');
@@ -513,19 +513,19 @@ function testDataCache() {
 }
 
 function testDataConnectors() {
-  console.log('testDataConnectors function called');
+// Console statement removed for no-console compliance
   log('🔌 מתחיל בדיקת מחברים...');
 
   // עדכן סטטוס נתונים חיצוניים (במקום מחברים)
   const externalDataStatus = document.getElementById('external-data-status');
-  console.log('🔍 מחפש אלמנט external-data-status:', externalDataStatus);
+// Console statement removed for no-console compliance
 
   if (externalDataStatus) {
-    console.log('✅ נמצא אלמנט external-data-status, מעדכן ל"בבדיקה..."');
+// Console statement removed for no-console compliance
     externalDataStatus.className = 'badge bg-warning';
     externalDataStatus.textContent = 'בבדיקה...';
   } else {
-    console.error('❌ לא נמצא אלמנט external-data-status!');
+// Console statement removed for no-console compliance
   }
 
   setTimeout(() => {
@@ -543,11 +543,11 @@ function testDataConnectors() {
 
     // עדכן סטטוס נתונים חיצוניים
     if (externalDataStatus) {
-      console.log('✅ מעדכן external-data-status ל"פעיל"');
+// Console statement removed for no-console compliance
       externalDataStatus.className = 'badge bg-success';
       externalDataStatus.textContent = 'פעיל';
     } else {
-      console.error('❌ לא ניתן לעדכן external-data-status - אלמנט לא נמצא!');
+// Console statement removed for no-console compliance
     }
 
     log('✅ בדיקת מחברים הושלמה - Yahoo Finance פעיל');
@@ -555,7 +555,7 @@ function testDataConnectors() {
 }
 
 function testDataSync() {
-  console.log('testDataSync function called');
+// Console statement removed for no-console compliance
   log('🔄 מתחיל בדיקת סנכרון נתונים...');
 
   // עדכן סטטוס נתונים חיצוניים (במקום סנכרון)
@@ -580,11 +580,11 @@ function testDataSync() {
 
     // עדכן סטטוס נתונים חיצוניים
     if (externalDataStatus) {
-      console.log('✅ מעדכן external-data-status ל"פעיל"');
+// Console statement removed for no-console compliance
       externalDataStatus.className = 'badge bg-success';
       externalDataStatus.textContent = 'פעיל';
     } else {
-      console.error('❌ לא ניתן לעדכן external-data-status - אלמנט לא נמצא!');
+// Console statement removed for no-console compliance
     }
 
     log('✅ בדיקת סנכרון נתונים הושלמה בהצלחה');
@@ -593,7 +593,7 @@ function testDataSync() {
 
 // פונקציות בדיקות אבטחה ותחזוקה - מעדכנות רק את הסטטוסים הקיימים
 function testSecurity() {
-  console.log('testSecurity function called');
+// Console statement removed for no-console compliance
   log('��️ מתחיל בדיקת אבטחה...');
 
   // עדכן סטטוס שרת (במקום אבטחה)
@@ -627,7 +627,7 @@ function testSecurity() {
 }
 
 function testIntegrity() {
-  console.log('testIntegrity function called');
+// Console statement removed for no-console compliance
   log('🔍 מתחיל בדיקת תקינות...');
 
   // עדכן סטטוס מסד נתונים (במקום תקינות)
@@ -661,7 +661,7 @@ function testIntegrity() {
 }
 
 function testPermissions() {
-  console.log('testPermissions function called');
+// Console statement removed for no-console compliance
   log('🔑 מתחיל בדיקת הרשאות...');
 
   // עדכן סטטוס שרת (במקום הרשאות)
@@ -695,7 +695,7 @@ function testPermissions() {
 }
 
 function testMaintenance() {
-  console.log('testMaintenance function called');
+// Console statement removed for no-console compliance
   log('🔧 מתחיל בדיקת תחזוקה...');
 
   // עדכן סטטוס מסד נתונים (במקום תחזוקה)
@@ -729,7 +729,7 @@ function testMaintenance() {
 }
 
 function testBackups() {
-  console.log('testBackups function called');
+// Console statement removed for no-console compliance
   log('💾 מתחיל בדיקת גיבויים...');
 
   // עדכן סטטוס מסד נתונים (במקום גיבויים)
@@ -763,7 +763,7 @@ function testBackups() {
 }
 
 function testLogs() {
-  console.log('testLogs function called');
+// Console statement removed for no-console compliance
   log('📋 מתחיל בדיקת קבצי לוג...');
 
   // עדכן סטטוס שרת (במקום לוגים)
@@ -798,7 +798,7 @@ function testLogs() {
 
 // פונקציות כלליות
 function runAllTests() {
-  console.log('runAllTests function called');
+// Console statement removed for no-console compliance
   log('🚀 מתחיל הרצת כל הבדיקות...');
 
   // הרץ את כל הבדיקות ברצף עם השהיות מתאימות
@@ -829,7 +829,7 @@ function runAllTests() {
 }
 
 function refreshAllStatus() {
-  console.log('refreshAllStatus function called');
+// Console statement removed for no-console compliance
   log('🔄 מרענן את כל הסטטוסים...');
 
   // עדכן כל הסטטוסים הקיימים
@@ -869,7 +869,7 @@ function refreshAllStatus() {
 }
 
 function toggleLogLevel() {
-  console.log('toggleLogLevel function called');
+// Console statement removed for no-console compliance
   log('🔧 משנה רמת פירוט הלוג...');
   // פונקציה עתידית לשינוי רמת הפירוט
   log('✅ רמת פירוט הלוג עודכנה');
@@ -877,18 +877,18 @@ function toggleLogLevel() {
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('=== DOMContentLoaded התחיל ===');
+// Console statement removed for no-console compliance
 
   // בדיקת בריאות ראשונית
   log('🚀 מרכז בדיקות מערכת הנתונים החיצוניים מתחיל...');
   log('✅ מרכז בדיקות מערכת הנתונים החיצוניים מוכן לשימוש');
 
   // בדיקה מיידית שכל הפונקציות עובדות
-  console.log('=== בדיקת פונקציות ===');
-  console.log('testNetwork function exists:', typeof testNetwork === 'function');
-  console.log('testDataConnectors function exists:', typeof testDataConnectors === 'function');
-  console.log('testSecurity function exists:', typeof testSecurity === 'function');
-  console.log('testMaintenance function exists:', typeof testMaintenance === 'function');
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
 
   // בדיקת סטטוס שרת
   setTimeout(() => {
@@ -904,9 +904,9 @@ document.addEventListener('DOMContentLoaded', () => {
       log('✅ בדיקת רשת עובדת');
     } catch (error) {
       log('❌ שגיאה בבדיקת רשת: ' + error.message);
-      console.error('Network test error:', error);
+// Console statement removed for no-console compliance
     }
   }, 2000);
 });
 
-console.log('=== כל הפונקציות נטענו בהצלחה ===');
+// Console statement removed for no-console compliance

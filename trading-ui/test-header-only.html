@@ -92,35 +92,35 @@
     <script src="scripts/main.js"></script>
     <script>
         // בדיקת timing
-        console.log('🚀 טעינת דף בדיקה עם Header System החדש...');
+            // Console statement removed for no-console compliance
 
         // אתחול HeaderSystem
         document.addEventListener('DOMContentLoaded', function () {
-            console.log('🏠 DOM loaded, initializing HeaderSystem...');
+            // Console statement removed for no-console compliance
 
             if (window.headerSystem) {
-                console.log('✅ HeaderSystem found, initializing...');
+            // Console statement removed for no-console compliance
                 window.headerSystem.init();
 
                 // בדיקה אם HeaderSystem זמין
-                console.log('✅ HeaderSystem זמין');
+            // Console statement removed for no-console compliance
 
                 // בדיקה אם FilterSystem זמין
                 if (window.filterSystem) {
-                    console.log('✅ FilterSystem זמין');
+            // Console statement removed for no-console compliance
                 } else {
-                    console.log('❌ FilterSystem לא זמין');
+            // Console statement removed for no-console compliance
                 }
 
                 // בדיקה אם אלמנט unified-header נוצר
                 const unifiedHeader = document.querySelector('#unified-header');
                 if (unifiedHeader) {
-                    console.log('✅ אלמנט unified-header נוצר');
+            // Console statement removed for no-console compliance
                 } else {
-                    console.log('❌ אלמנט unified-header לא נוצר');
+            // Console statement removed for no-console compliance
                 }
             } else {
-                console.log('❌ HeaderSystem לא זמין');
+            // Console statement removed for no-console compliance
             }
         });
     </script>
@@ -523,7 +523,7 @@
                 const timestamp = new Date().toLocaleTimeString();
                 logElement.innerHTML += `<p>[${timestamp}] ${message}</p>`;
                 logElement.scrollTop = logElement.scrollHeight;
-                console.log(message);
+            // Console statement removed for no-console compliance
             }
 
             function updateStatus(elementId, status, isSuccess = true) {
@@ -742,47 +742,47 @@ setInterval(updateDebugInfo, 2000);
 
 // פונקציות בדיקה לפילטרים
 function testStatusFilter() {
-    console.log('🧪 Testing status filter...');
+            // Console statement removed for no-console compliance
     const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
     const selectedStatuses = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
-    console.log('Selected statuses:', selectedStatuses);
+            // Console statement removed for no-console compliance
     applyTableFilter('status', selectedStatuses);
 }
 
 function testTypeFilter() {
-    console.log('🧪 Testing type filter...');
+            // Console statement removed for no-console compliance
     const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
     const selectedTypes = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
-    console.log('Selected types:', selectedTypes);
+            // Console statement removed for no-console compliance
     applyTableFilter('type', selectedTypes);
 }
 
 function testAccountFilter() {
-    console.log('🧪 Testing account filter...');
+            // Console statement removed for no-console compliance
     const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
     const selectedAccounts = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
-    console.log('Selected accounts:', selectedAccounts);
+            // Console statement removed for no-console compliance
     applyTableFilter('account', selectedAccounts);
 }
 
 function showActiveContainer() {
-    console.log('🔍 Showing active container...');
+            // Console statement removed for no-console compliance
     const activeContainer = getActiveTableContainer();
-    console.log('Active container:', activeContainer);
+            // Console statement removed for no-console compliance
     alert(`הקונטיינר הפעיל: ${activeContainer || 'לא נמצא'}`);
 }
 
 function testDateFilter() {
-    console.log('🧪 Testing date filter...');
+            // Console statement removed for no-console compliance
     const dateRange = 'השבוע'; // או כל ערך אחר
-    console.log('Date range:', dateRange);
+            // Console statement removed for no-console compliance
     applyTableFilter('date', [dateRange]);
 }
 
 function testSearchFilter() {
-    console.log('🧪 Testing search filter...');
+            // Console statement removed for no-console compliance
     const searchTerm = 'AAPL'; // או כל ערך אחר
-    console.log('Search term:', searchTerm);
+            // Console statement removed for no-console compliance
     applyTableFilter('search', [searchTerm]);
 }
 

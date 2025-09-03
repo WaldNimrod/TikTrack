@@ -101,7 +101,7 @@ function formatDate(dateString) {
       year: 'numeric',
     });
   } catch {
-    // console.warn('⚠️ Error formatting date:', dateString, error);
+// Console statement removed for no-console compliance
     return '-';
   }
 }
@@ -130,7 +130,7 @@ function formatDateTime(dateString) {
       minute: '2-digit',
     });
   } catch {
-    // console.warn('⚠️ Error formatting date time:', dateString, error);
+// Console statement removed for no-console compliance
     return '-';
   }
 }
@@ -157,7 +157,7 @@ function formatDateOnly(dateString) {
       year: 'numeric',
     });
   } catch {
-    // console.warn('⚠️ Error formatting date only:', dateString, error);
+// Console statement removed for no-console compliance
     return '-';
   }
 }
@@ -182,7 +182,7 @@ function formatShortDate(dateString) {
       month: '2-digit',
     });
   } catch {
-    // console.warn('⚠️ Error formatting short date:', dateString, error);
+// Console statement removed for no-console compliance
     return '-';
   }
 }
@@ -209,7 +209,7 @@ function formatLongDate(dateString) {
       year: 'numeric',
     });
   } catch {
-    // console.warn('⚠️ Error formatting long date:', dateString, error);
+// Console statement removed for no-console compliance
     return '-';
   }
 }
@@ -235,7 +235,7 @@ function formatTimeOnly(dateString) {
       minute: '2-digit',
     });
   } catch {
-    // console.warn('⚠️ Error formatting time:', dateString, error);
+// Console statement removed for no-console compliance
     return '-';
   }
 }
@@ -259,7 +259,7 @@ function toISOString(date) {
 
     return dateObj.toISOString();
   } catch {
-    // console.warn('⚠️ Error converting to ISO string:', date, error);
+// Console statement removed for no-console compliance
     return null;
   }
 }
@@ -282,7 +282,7 @@ function toDate(date) {
 
     return dateObj;
   } catch {
-    // console.warn('⚠️ Error converting to Date:', date, error);
+// Console statement removed for no-console compliance
     return null;
   }
 }
@@ -324,7 +324,7 @@ function isPastDate(date) {
 
     return dateObj < new Date();
   } catch {
-    // console.warn('⚠️ Error checking past date:', date, error);
+// Console statement removed for no-console compliance
     return false;
   }
 }
@@ -346,7 +346,7 @@ function isFutureDate(date) {
 
     return dateObj > new Date();
   } catch {
-    // console.warn('⚠️ Error checking future date:', date, error);
+// Console statement removed for no-console compliance
     return false;
   }
 }
@@ -376,7 +376,7 @@ function daysDifference(startDate, endDate) {
 
     return diffDays;
   } catch {
-    // console.warn('⚠️ Error calculating days difference:', error);
+// Console statement removed for no-console compliance
     return null;
   }
 }
@@ -400,7 +400,7 @@ function addDays(date, days) {
     dateObj.setDate(dateObj.getDate() + days);
     return dateObj;
   } catch {
-    // console.warn('⚠️ Error adding days:', error);
+// Console statement removed for no-console compliance
     return null;
   }
 }
@@ -424,7 +424,7 @@ function addMonths(date, months) {
     dateObj.setMonth(dateObj.getMonth() + months);
     return dateObj;
   } catch {
-    // console.warn('⚠️ Error adding months:', error);
+// Console statement removed for no-console compliance
     return null;
   }
 }

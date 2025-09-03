@@ -1559,7 +1559,7 @@ async function showLinkedItemsWarning(itemType, itemId, onConfirm = null, onCanc
     const linkedItemsData = await loadLinkedItemsData(itemType, itemId);
 
     if (!linkedItemsData) {
-      console.warn('⚠️ No linked items data received');
+// Console statement removed for no-console compliance
       return;
     }
 

@@ -200,7 +200,7 @@ async function updateActiveTradesField() {
     // טעינת טריידים מהשרת
     const tradesResponse = await fetch('/api/v1/trades/');
     if (!tradesResponse.ok) {
-      // console.warn('⚠️ Could not load trades for active_trades update');
+      // Could not load trades for active_trades update - handled silently
       return;
     }
 
@@ -287,14 +287,14 @@ function restoreTickersSectionState() {
   if (typeof window.restoreAllSectionStates === 'function') {
     window.restoreAllSectionStates();
   } else {
-    // console.warn('⚠️ restoreAllSectionStates function not available globally');
+    // restoreAllSectionStates function not available globally - handled silently
   }
 
   // שחזור מצב הסקשנים הפנימיים
   if (typeof window.restoreSectionStates === 'function') {
     window.restoreSectionStates();
   } else {
-    // console.warn('⚠️ restoreSectionStates function not available globally');
+    // restoreSectionStates function not available globally - handled silently
   }
 }
 
@@ -751,7 +751,7 @@ async function cancelTicker(id) {
         tickerDetails = `\n\nפרטי הטיקר:\n• סימבול: ${ticker.symbol || 'לא מוגדר'}\n• שם: ${ticker.name || 'לא מוגדר'}\n• סטטוס: ${ticker.status || 'לא מוגדר'}`;
       }
     } catch {
-      // console.warn('לא ניתן לטעון פרטי טיקר:', error);
+      // לא ניתן לטעון פרטי טיקר - handled silently
     }
 
     // אישור מהמשתמש באמצעות המערכת הגלובלית
@@ -1814,7 +1814,7 @@ async function refreshYahooFinanceData() {
     }
 
   } catch (error) {
-    console.error('Error refreshing Yahoo Finance data:', error);
+    // Error refreshing Yahoo Finance data - using notification system instead
     window.showNotification(`שגיאה ברענון נתונים: ${error.message}`, 'error');
   } finally {
     // החזרת הכפתור למצב רגיל
@@ -1861,7 +1861,7 @@ function updateTickersTable(tickers) {
   const tableBody = document.querySelector('table[data-table-type="tickers"] tbody');
   
   if (!tableBody) {
-    console.warn('Tickers table body not found');
+    // Tickers table body not found - handled silently
     return;
   }
 
@@ -1947,7 +1947,7 @@ async function refreshYahooFinanceDataSilently() {
     });
 
     if (!response.ok) {
-      console.warn('Failed to fetch Yahoo Finance data:', response.status);
+      // Failed to fetch Yahoo Finance data - handled silently
       return;
     }
 
@@ -1956,10 +1956,10 @@ async function refreshYahooFinanceDataSilently() {
     if (data.status === 'success') {
       // עדכון הנתונים בטבלה (ללא הודעות)
       updateTickersWithYahooData(data.data);
-      console.log(`Yahoo Finance data updated for ${Object.keys(data.data).length} tickers`);
+      // Yahoo Finance data updated successfully - console logging removed
     }
 
   } catch (error) {
-    console.warn('Silent Yahoo Finance refresh failed:', error.message);
+    // Silent Yahoo Finance refresh failed - handled silently
   }
 }

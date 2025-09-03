@@ -302,7 +302,7 @@ function updateAlertsTable(alerts) {
       tradePlans = (tradePlansResponse.data || tradePlansResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
       tickers = (tickersResponse.data || tickersResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
     } catch {
-      // // console.warn('⚠️ שגיאה בטעינת נתונים נוספים:', error);
+// Console statement removed for no-console compliance
       // המשך עם מערכים ריקים
       accounts = [];
       trades = [];
@@ -321,14 +321,14 @@ function updateAlertsTable(alerts) {
       let relatedIcon = '';
       let relatedClass = '';
 
-      // console.log('🔍 Alert details:', {
+// Console statement removed for no-console compliance
       //   id: alert.id,
       //   related_type_id: alert.related_type_id,
       //   related_id: alert.related_id,
       //   status: alert.status,
       // });
 
-      // console.log('📊 Related data counts:', {
+// Console statement removed for no-console compliance
       //   accounts: accounts.length,
       //   trades: trades.length,
       //   tradePlans: tradePlans.length,
@@ -344,25 +344,25 @@ function updateAlertsTable(alerts) {
       } else {
         switch (alert.related_type_id) {
         case 1: { // חשבון
-          // console.log(`🔍 Looking for account with ID: ${alert.related_id}`);
-          // console.log('🔍 Available accounts:', accounts.map(a => ({ id: a.id, name: a.name || a.account_name })));
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
           const account = accounts.find(a => a.id === alert.related_id);
           if (account) {
             const name = account.name || account.account_name || 'לא מוגדר';
             const currency = account.currency || 'ILS';
             relatedDisplay = `${name} (${currency})`;
-            // console.log(`✅ Found account: ${name} (${currency})`);
+// Console statement removed for no-console compliance
           } else {
             relatedDisplay = `חשבון ${alert.related_id}`;
-            // console.log(`❌ Account not found for ID: ${alert.related_id}`);
+// Console statement removed for no-console compliance
           }
           relatedIcon = '🏦';
           relatedClass = 'related-account';
           break;
         }
         case 2: { // טרייד
-          // console.log(`🔍 Looking for trade with ID: ${alert.related_id}`);
-          // console.log('🔍 Available trades:', trades.map(t => ({
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
           //   id: t.id, created_at: t.created_at, date: t.date,
           //   side: t.side, investment_type: t.investment_type
           // })));
@@ -373,18 +373,18 @@ function updateAlertsTable(alerts) {
             const side = trade.side || 'לא מוגדר';
             const investmentType = trade.investment_type || 'לא מוגדר';
             relatedDisplay = `טרייד | ${side} | ${investmentType} | ${formattedDate}`;
-            // console.log(`✅ Found trade: ${relatedDisplay}`);
+// Console statement removed for no-console compliance
           } else {
             relatedDisplay = `טרייד ${alert.related_id}`;
-            // console.log(`❌ Trade not found for ID: ${alert.related_id}`);
+// Console statement removed for no-console compliance
           }
           relatedIcon = '📈';
           relatedClass = 'related-trade';
           break;
         }
         case 3: { // תוכנית
-          // console.log(`🔍 Looking for trade plan with ID: ${alert.related_id}`);
-          // console.log('🔍 Available trade plans:', tradePlans.map(p => ({
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
           //   id: p.id, created_at: p.created_at, date: p.date,
           //   side: p.side, investment_type: p.investment_type
           // })));
@@ -395,25 +395,25 @@ function updateAlertsTable(alerts) {
             const side = plan.side || 'לא מוגדר';
             const investmentType = plan.investment_type || 'לא מוגדר';
             relatedDisplay = `תוכנית | ${side} | ${investmentType} | ${formattedDate}`;
-            // console.log(`✅ Found trade plan: ${relatedDisplay}`);
+// Console statement removed for no-console compliance
           } else {
             relatedDisplay = `תוכנית ${alert.related_id}`;
-            // console.log(`❌ Trade plan not found for ID: ${alert.related_id}`);
+// Console statement removed for no-console compliance
           }
           relatedIcon = '📋';
           relatedClass = 'related-plan';
           break;
         }
         case 4: { // טיקר
-          // console.log(`🔍 Looking for ticker with ID: ${alert.related_id}`);
-          // console.log('🔍 Available tickers:', tickers.map(t => ({ id: t.id, symbol: t.symbol })));
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
           const ticker = tickers.find(t => t.id === alert.related_id);
           if (ticker) {
             relatedDisplay = ticker.symbol;
-            // console.log(`✅ Found ticker: ${ticker.symbol}`);
+// Console statement removed for no-console compliance
           } else {
             relatedDisplay = `טיקר ${alert.related_id}`;
-            // console.log(`❌ Ticker not found for ID: ${alert.related_id}`);
+// Console statement removed for no-console compliance
           }
           relatedIcon = '📊';
           relatedClass = 'related-ticker';
@@ -422,7 +422,7 @@ function updateAlertsTable(alerts) {
         default:
           relatedDisplay = `אובייקט ${alert.related_id}`;
           relatedClass = 'related-other';
-          // console.log(`❓ Unknown related_type_id: ${alert.related_type_id}`);
+// Console statement removed for no-console compliance
         }
       }
 
@@ -662,7 +662,7 @@ function showAddAlertModal() {
       document.body.appendChild(backdrop);
     }
   } else {
-    // console.error('Modal element not found');
+// Console statement removed for no-console compliance
   }
 }
 
@@ -716,7 +716,7 @@ async function loadModalData() {
   try {
 
     // טעינת נתונים במקביל
-    // console.log('🔧 Loading modal data...');
+// Console statement removed for no-console compliance
     const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
       fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
       fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
@@ -734,11 +734,11 @@ async function loadModalData() {
     const tickers = Array.isArray(tickersResponse?.data) ? tickersResponse.data :
       Array.isArray(tickersResponse) ? tickersResponse : [];
 
-    // console.log('🔧 Modal data loaded:');
-    // console.log('🔧 Accounts:', accounts.length);
-    // console.log('🔧 Trades:', trades.length);
-    // console.log('🔧 Trade Plans:', tradePlans.length);
-    // console.log('🔧 Tickers:', tickers.length);
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
 
     // נטענו נתונים נוספים
 
@@ -752,11 +752,11 @@ async function loadModalData() {
     updateRadioButtons(accounts, trades, tradePlans, tickers);
 
     // הגדרת נתונים ראשוניים (ברירת מחדל לטיקר)
-    // console.log('🔧 Setting initial data for tickers...');
+// Console statement removed for no-console compliance
     populateSelect('alertRelatedObjectSelect', tickers, 'symbol', '');
     populateSelect('editAlertRelatedObjectSelect', tickers, 'symbol', '');
   } catch (error) {
-    // console.error('שגיאה בטעינת נתונים למודל:', error);
+// Console statement removed for no-console compliance
     // המשך עם מערכים ריקים
     updateRadioButtons([], [], [], []);
     populateSelect('alertRelatedObjectSelect', [], 'symbol', '');
@@ -837,18 +837,18 @@ function updateRadioButtons(accounts, trades, tradePlans, tickers) {
  * מילוי select עם נתונים
  */
 function populateSelect(selectId, data, field, prefix = '') {
-  // console.log('🔧 populateSelect called:', { selectId, dataLength: data?.length, field, prefix });
+// Console statement removed for no-console compliance
 
   const select = document.getElementById(selectId);
   if (!select) {
-    // console.error('🔧 Select element not found:', selectId);
+// Console statement removed for no-console compliance
     return;
   }
 
   select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
 
   if (!data || data.length === 0) {
-    // console.log('🔧 No data available for:', selectId);
+// Console statement removed for no-console compliance
     const option = document.createElement('option');
     option.value = '';
     option.textContent = 'אין רשומות זמינות';
@@ -894,7 +894,7 @@ function populateSelect(selectId, data, field, prefix = '') {
     select.appendChild(option);
   });
 
-  // console.log('🔧 populateSelect completed for:', selectId, 'with', data.length, 'items');
+// Console statement removed for no-console compliance
 }
 
 /**
@@ -924,7 +924,7 @@ function closeModal(modalId) {
  * @param {HTMLInputElement} radioElement - אלמנט הרדיו שנבחר
  */
 function onRelationTypeChange(radioElement) {
-  // console.log('🔧 Relation type changed:', radioElement.value);
+// Console statement removed for no-console compliance
 
   // הפעלת שדה בחירת אובייקט
   const relatedObjectSelect = document.getElementById('alertRelatedObjectSelect');
@@ -942,7 +942,7 @@ function onRelationTypeChange(radioElement) {
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
  */
 function onRelatedObjectChange(selectElement) {
-  // console.log('🔧 Related object changed:', selectElement.value);
+// Console statement removed for no-console compliance
 
   if (selectElement.value) {
     // הפעלת שדות התנאי ישירות
@@ -1079,7 +1079,7 @@ function populateEditRelatedObjects(relationTypeId) {
  * @param {HTMLInputElement} radioElement - אלמנט הרדיו שנבחר
  */
 function onEditRelationTypeChange(radioElement) {
-  // console.log('🔧 Edit relation type changed:', radioElement.value);
+// Console statement removed for no-console compliance
 
   // מילוי רשימת האובייקטים לפי הסוג שנבחר
   populateEditRelatedObjects(parseInt(radioElement.value));
@@ -1090,7 +1090,7 @@ function onEditRelationTypeChange(radioElement) {
  * @param {HTMLSelectElement} selectElement - אלמנט הבחירה
  */
 function onEditRelatedObjectChange(selectElement) {
-  // console.log('🔧 Edit related object changed:', selectElement.value);
+// Console statement removed for no-console compliance
 
   if (selectElement.value) {
     // הפעלת שדות התנאי ישירות
@@ -1169,19 +1169,19 @@ function disableEditConditionFields() {
  * @returns {boolean} true אם נתמך, false אם לא
  */
 function checkAlertVariable(selectElement) {
-  // console.log('🔍 === CHECK ALERT VARIABLE ===');
-  // console.log('🔍 Element:', selectElement);
-  // console.log('🔍 Selected value:', selectElement.value);
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
 
   // כרגע מאפשרים את כל התכונות
   const selectedValue = selectElement.value;
 
   if (!selectedValue) {
-    // console.log('❌ No variable selected');
+// Console statement removed for no-console compliance
     return false;
   }
 
-  // console.log('✅ Variable accepted:', selectedValue);
+// Console statement removed for no-console compliance
   return true;
 }
 
@@ -1195,19 +1195,19 @@ function checkAlertVariable(selectElement) {
  * @returns {boolean} true אם נתמך, false אם לא
  */
 function checkAlertOperator(selectElement) {
-  // console.log('🔍 === CHECK ALERT OPERATOR ===');
-  // console.log('🔍 Element:', selectElement);
-  // console.log('🔍 Selected value:', selectElement.value);
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
 
   // כרגע מאפשרים את כל האופרטורים
   const selectedValue = selectElement.value;
 
   if (!selectedValue) {
-    // console.log('❌ No operator selected');
+// Console statement removed for no-console compliance
     return false;
   }
 
-  // console.log('✅ Operator accepted:', selectedValue);
+// Console statement removed for no-console compliance
   return true;
 }
 
@@ -1257,7 +1257,7 @@ function parseAlertCondition(condition) {
 async function saveAlert() {
   const form = document.getElementById('addAlertForm');
   if (!form) {
-    // console.warn('⚠️ Form element not found - skipping save operation');
+// Console statement removed for no-console compliance
     return;
   }
 
@@ -1273,9 +1273,9 @@ async function saveAlert() {
   const relatedType = formData.get('alertRelationType');
   const relatedId = document.getElementById('alertRelatedObjectSelect').value;
 
-  // console.log('🔧 Form validation:');
-  // console.log('🔧 Related type:', relatedType);
-  // console.log('🔧 Related ID:', relatedId);
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
 
   // בדיקת תנאי התראה
   const conditionAttributeElement = document.getElementById('conditionAttribute');
@@ -1286,10 +1286,10 @@ async function saveAlert() {
   const conditionOperator = conditionOperatorElement.value;
   const conditionNumber = conditionNumberElement.value;
 
-  // console.log('🔧 Condition validation:');
-  // console.log('🔧 Condition attribute:', conditionAttribute);
-  // console.log('🔧 Condition operator:', conditionOperator);
-  // console.log('🔧 Condition number:', conditionNumber);
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
 
   // ולידציה באמצעות מערכת הולידציה הגלובלית
   let hasErrors = false;
@@ -1383,11 +1383,11 @@ async function saveAlert() {
   };
 
   // שולח התראה חדשה
-  // console.log('🔧 === SAVING ALERT ===');
-  // console.log('🔧 Alert data:', alertData);
-  // console.log('🔧 Request URL:', '/api/v1/alerts/');
-  // console.log('🔧 Request method:', 'POST');
-  // console.log('🔧 Request body:', JSON.stringify(alertData, null, 2));
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
 
   try {
     const response = await fetch('/api/v1/alerts/', {
@@ -1398,12 +1398,12 @@ async function saveAlert() {
       body: JSON.stringify(alertData),
     });
 
-    // console.log('🔧 Response status:', response.status);
-    // console.log('🔧 Response ok:', response.ok);
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
 
     if (response.ok) {
       await response.json();
-      // console.log('🔧 New alert created:', newAlert);
+// Console statement removed for no-console compliance
 
       // התראה נשמרה בהצלחה
 
@@ -1419,11 +1419,11 @@ async function saveAlert() {
       }
     } else {
       const errorText = await response.text();
-      // console.error('🔧 Server error response:', errorText);
+// Console statement removed for no-console compliance
       throw new Error(`שגיאה בשמירת התראה: ${response.status} - ${errorText}`);
     }
   } catch (error) {
-    // console.error('🔧 Error saving alert:', error);
+// Console statement removed for no-console compliance
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה בשמירת התראה', 'שגיאה בשמירת התראה: ' + error.message);
     }
@@ -1563,7 +1563,7 @@ function editAlert(alertId) {
       document.body.appendChild(backdrop);
     }
   } else {
-    // console.error('Edit modal element not found');
+// Console statement removed for no-console compliance
   }
 }
 
@@ -1696,7 +1696,7 @@ function updateStatusAndTriggered() {
 async function updateAlert() {
   const form = document.getElementById('editAlertForm');
   if (!form) {
-    // console.warn('⚠️ Form element not found - skipping update operation');
+// Console statement removed for no-console compliance
     return;
   }
 
@@ -1818,11 +1818,11 @@ async function updateAlert() {
   };
 
   // מעדכן התראה
-  // console.log('🔍 בדיקת נתונים לפני שליחה:');
-  // console.log('- related_type_id:', relatedTypeId, '(valid:', !isNaN(relatedTypeId), ')');
-  // console.log('- related_id:', relatedId, '(valid:', !isNaN(relatedId), ')');
-  // console.log('- status:', alertData.status);
-  // console.log('- is_triggered:', alertData.is_triggered);
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
 
   try {
     const response = await fetch(`/api/v1/alerts/${alertId}`, {
@@ -1851,7 +1851,7 @@ async function updateAlert() {
       throw new Error(`שגיאה בעדכון התראה: ${response.status}`);
     }
   } catch {
-    // console.error('שגיאה בעדכון התראה:', error);
+// Console statement removed for no-console compliance
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה בעדכון התראה', 'שגיאה בעדכון התראה');
     }
@@ -1877,7 +1877,7 @@ async function _deleteAlert(alertId) {
           await confirmDeleteAlert(alertId);
         },
         () => {
-          // console.log('מחיקה בוטלה');
+// Console statement removed for no-console compliance
         },
       );
     } else {
@@ -1895,7 +1895,7 @@ async function _deleteAlert(alertId) {
  * אישור מחיקת התראה
  */
 async function confirmDeleteAlert(alertId) {
-  // console.log('🔄 confirmDeleteAlert נקראה עבור ID:', alertId);
+// Console statement removed for no-console compliance
 
   try {
     const response = await fetch(`/api/v1/alerts/${alertId}`, {
@@ -1905,13 +1905,13 @@ async function confirmDeleteAlert(alertId) {
     const result = await response.json();
 
     if (response.ok && result.status === 'success') {
-      // console.log('✅ התראה נמחקה בהצלחה');
+// Console statement removed for no-console compliance
       if (window.showSuccessNotification) {
         window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!');
       }
       loadAlertsData();
     } else {
-      // console.error('❌ שגיאה במחיקת התראה:', result);
+// Console statement removed for no-console compliance
 
       // טיפול בשגיאות מהשרת
       if (result.error && result.error.message) {
@@ -1942,7 +1942,7 @@ async function confirmDeleteAlert(alertId) {
       }
     }
   } catch {
-    // console.error('❌ שגיאה במחיקת התראה:', error);
+// Console statement removed for no-console compliance
     if (window.showErrorNotification) {
       window.showErrorNotification(
         'שגיאה',
@@ -1968,7 +1968,7 @@ async function confirmDeleteAlert(alertId) {
  * @requires updateAlertsTable - פונקציה לעדכון הטבלה
  */
 function sortTable(columnIndex) {
-  // console.log(`🔄 sortTable נקראה עבור עמודה ${columnIndex} - התראות`);
+// Console statement removed for no-console compliance
 
   // שימוש בפונקציה הגלובלית החדשה
   if (typeof window.sortTableData === 'function') {
@@ -1979,7 +1979,7 @@ function sortTable(columnIndex) {
       updateAlertsTable,
     );
   } else {
-    // console.error('❌ sortTableData function not found in tables.js');
+// Console statement removed for no-console compliance
   }
 }
 
@@ -2028,14 +2028,14 @@ function restoreAlertsSectionState() {
   if (typeof window.restoreAllSectionStates === 'function') {
     window.restoreAllSectionStates();
   } else {
-    // console.error('restoreAllSectionStates function not found in main.js');
+// Console statement removed for no-console compliance
   }
 }
 
 // הגנה - וידוא שהפונקציות הגלובליות זמינות
 if (typeof window.toggleTopSection !== 'function') {
   window.toggleTopSection = function () {
-    // console.warn('toggleTopSection fallback called - main.js may not be loaded properly');
+// Console statement removed for no-console compliance
   };
 }
 
@@ -2045,7 +2045,7 @@ if (typeof window.toggleMainSection !== 'function') {
     const alertsSection = contentSections[0]; // הסקשן הראשון - התראות
 
     if (!alertsSection) {
-      // console.error('❌ לא נמצא סקשן התראות');
+// Console statement removed for no-console compliance
       return;
     }
 
@@ -2095,30 +2095,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-  // console.log('🔄 === DOM CONTENT LOADED (ALERTS) ===');
+// Console statement removed for no-console compliance
 
   // בדיקת זמינות מערכות
-  // console.log('🔍 בדיקת זמינות מערכות:');
-  // console.log('showSuccessNotification:', typeof window.showSuccessNotification);
-  // console.log('showErrorNotification:', typeof window.showErrorNotification);
-  // console.log('showValidationWarning:', typeof window.showValidationWarning);
-  // console.log('showDeleteWarning:', typeof window.showDeleteWarning);
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
 
   // בדיקה שהמערכת זמינה
   if (typeof window.showSuccessNotification !== 'function') {
-    // console.error('❌ מערכת התראות לא זמינה!');
+// Console statement removed for no-console compliance
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification(
         'שגיאה',
         'מערכת התראות לא זמינה. בדוק את טעינת הקבצים.',
       );
     } else {
-      // console.error('שגיאה: מערכת התראות לא זמינה. בדוק את טעינת הקבצים.');
+// Console statement removed for no-console compliance
     }
     return;
   }
 
-  // console.log('✅ מערכת התראות זמינה');
+// Console statement removed for no-console compliance
 
   // שחזור מצב הסגירה
   if (typeof window.restoreAllSectionStates === 'function') {
@@ -2133,7 +2133,7 @@ document.addEventListener('DOMContentLoaded', function () {
     window.loadSortState('alerts');
   }
 
-  // console.log('דף התראות נטען בהצלחה');
+// Console statement removed for no-console compliance
 });
 
 // פונקציה לעדכון הטבלה מפילטרים
@@ -2146,7 +2146,7 @@ if (window.location.pathname.includes('/alerts')) {
     if (typeof window.loadAlertsData === 'function') {
       window.loadAlertsData();
     } else {
-      // console.error('❌ loadAlertsData function not found');
+// Console statement removed for no-console compliance
     }
   };
 }
@@ -2164,7 +2164,7 @@ window.filterAlertsLocally = filterAlertsLocally;
  * @param {string} type - סוג האובייקט: 'all', 'account', 'trade', 'trade_plan', 'ticker'
  */
 function filterAlertsByRelatedObjectType(type) {
-  // console.log('🔧 פילטר התראות לפי סוג אובייקט מקושר - סוג:', type);
+// Console statement removed for no-console compliance
 
   // עדכון מצב הכפתורים
   const buttons = document.querySelectorAll('[data-type]');
@@ -2214,7 +2214,7 @@ function filterAlertsByRelatedObjectType(type) {
     countElement.textContent = `${filteredAlerts.length} התראות`;
   }
 
-  // console.log(`✅ Filtered alerts by type '${type}': ${filteredAlerts.length} alerts found`);
+// Console statement removed for no-console compliance
 }
 
 window.filterAlertsByRelatedObjectType = filterAlertsByRelatedObjectType;
@@ -2252,7 +2252,7 @@ window.loadAlerts = loadAlerts;
 
 // בדיקת זמינות פונקציות (ללא ניקוי אוטומטי)
 setTimeout(() => {
-  // console.log('🔍 בדיקת זמינות פונקציות alerts.js - ' + new Date().toLocaleTimeString());
+// Console statement removed for no-console compliance
 }, 18000);
 
 // ========================================
@@ -2327,15 +2327,15 @@ async function reactivateAlert(alertId) {
 // הוספת הפונקציה לחלון הגלובלי
 window.reactivateAlert = reactivateAlert;
 
-// console.log('✅ alerts.js הושלם בהצלחה - כל הפונקציות זמינות');
+// Console statement removed for no-console compliance
 
 // בדיקת ייצוא פונקציות
-// console.log('🔍 בדיקת ייצוא פונקציות alerts.js:');
-// console.log('- loadAlertsData:', typeof window.loadAlertsData);
-// console.log('- updateAlertsTable:', typeof window.updateAlertsTable);
-// console.log('- showAddAlertModal:', typeof window.showAddAlertModal);
-// console.log('- editAlert:', typeof window.editAlert);
-// console.log('- deleteAlert:', typeof window.deleteAlert);
-// console.log('- formatAlertCondition:', typeof window.formatAlertCondition);
-// console.log('- parseAlertCondition:', typeof window.parseAlertCondition);
-// console.log('- clearAlertValidation:', typeof window.clearAlertValidation);
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance

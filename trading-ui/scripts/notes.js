@@ -208,7 +208,7 @@ async function loadNotesData() {
 
     // בדיקה אם הנתונים ריקים או לא תקינים
     if (!notes || notes.length === 0) {
-      // console.warn('⚠️ לא נמצאו הערות בשרת');
+// Console statement removed for no-console compliance
       const tbody = document.querySelector('#notesTable tbody');
       if (tbody) {
         tbody.innerHTML = `
@@ -233,17 +233,17 @@ async function loadNotesData() {
       try {
         const innerResponse = await fetch(url);
         if (!innerResponse.ok) {
-          // console.warn(`⚠️ שגיאה בטעינת ${_dataName}: ${innerResponse.status}`);
+// Console statement removed for no-console compliance
           return [];
         }
         const data = await innerResponse.json();
         if (data.status === 'error') {
-          // console.warn(`⚠️ שגיאה ב-API ${_dataName}: ${data.error?.message || 'שגיאה לא ידועה'}`);
+// Console statement removed for no-console compliance
           return [];
         }
         return Array.isArray(data.data) ? data.data : [];
       } catch {
-        // console.warn(`⚠️ שגיאה בטעינת ${_dataName}:`);
+// Console statement removed for no-console compliance
         return [];
       }
     };
@@ -650,7 +650,7 @@ async function loadNoteData(noteId) {
         handleElementNotFound('populateEditSelectByType', `לא נמצא רדיו באטון עבור ערך: ${relationType}`);
       }
     } else {
-      // console.warn('⚠️ אין סוג קשר מוגדר');
+// Console statement removed for no-console compliance
     }
 
   } catch {
@@ -1624,7 +1624,7 @@ function formatText(command, mode = 'add') {
     break;
   }
   default:
-    // console.warn(`⚠️ פקודה לא מוכרת: ${command}`);
+// Console statement removed for no-console compliance
   }
 }
 
@@ -1705,7 +1705,7 @@ window.clearSelectedFile = clearSelectedFile;
 // פונקציה לסינון הערות לפי חיפוש
 function filterNotesData(searchTerm) {
   if (!window.notesData) {
-    // console.warn('⚠️ אין נתוני הערות זמינים לסינון');
+// Console statement removed for no-console compliance
     return;
   }
 
@@ -1729,7 +1729,7 @@ function filterNotesData(searchTerm) {
 // פונקציה לסינון הערות לפי סוג
 function filterNotesByType(type) {
   if (!window.notesData) {
-    // console.warn('⚠️ אין נתוני הערות זמינים לסינון');
+// Console statement removed for no-console compliance
     return;
   }
 

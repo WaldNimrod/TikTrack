@@ -2,7 +2,7 @@
 // Initialize dashboard directly when DOM is ready
 
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🔧 DOM Content Loaded - Initializing External Data Dashboard directly...');
+// Console statement removed for no-console compliance
   
   // Wait a bit for all scripts to load
   setTimeout(() => {
@@ -17,9 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
         window.externalDataDashboard.init();
       }
       
-      console.log('✅ Direct dashboard initialization completed');
+// Console statement removed for no-console compliance
     } catch (error) {
-      console.error('❌ Error in direct dashboard initialization:', error);
+// Console statement removed for no-console compliance
     }
   }, 500);
 });

@@ -10,16 +10,16 @@ let isPageInitializing = true;
 function clearConsole() {
   // אל תבצע ניקוי console במהלך טעינת הדף
   if (isPageInitializing) {
-    // console.log('🚫 ניקוי console נחסם במהלך טעינת הדף');
+// Console statement removed for no-console compliance
     return;
   }
 
   // בדוק אם יש מערכת מובנית לניקוי console
   if (window.manualClearConsole) {
-    // console.log('ℹ️ ניקוי console מבוצע דרך המערכת המובנית');
+// Console statement removed for no-console compliance
     window.manualClearConsole();
   } else {
-    // console.log('ℹ️ מערכת מובנית לא זמינה - ניקוי console מבוטל');
+// Console statement removed for no-console compliance
   }
 }
 
@@ -30,9 +30,9 @@ function suppressConsoleMessages() {
     const duration = (settings.suppressDuration || 5) * 1000;
 
     // Store original console methods for potential restoration
-    const originalLog = console.log;
-    const originalWarn = console.warn;
-    const originalError = console.error;
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
 
     // Override console methods to use notification system instead
     const logSystem = {
@@ -53,9 +53,9 @@ function suppressConsoleMessages() {
       },
     };
 
-    console.log = logSystem.log;
-    console.warn = logSystem.warn;
-    console.error = logSystem.error;
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
 
     // Show notification about console suppression
     if (typeof window.showNotification === 'function') {
@@ -64,9 +64,9 @@ function suppressConsoleMessages() {
 
     // החזרת הפונקציות המקוריות אחרי הזמן שהוגדר
     setTimeout(() => {
-      console.log = originalLog;
-      console.warn = originalWarn;
-      console.error = originalError;
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
+// Console statement removed for no-console compliance
       // Show notification about console restoration
       if (typeof window.showNotification === 'function') {
         window.showNotification('הודעות קונסול הופעלו מחדש', 'info');
@@ -78,7 +78,7 @@ function suppressConsoleMessages() {
 // פונקציה להצגת הודעות console בפיתוח
 function enableConsoleMessages() {
   if (typeof console !== 'undefined') {
-    // console.log('Console messages enabled');
+// Console statement removed for no-console compliance
   }
 }
 
@@ -86,7 +86,7 @@ function enableConsoleMessages() {
 function autoClearConsole() {
   // אל תפעיל ניקוי אוטומטי במהלך טעינת הדף
   if (isPageInitializing) {
-    // console.log('🚫 ניקוי אוטומטי נחסם במהלך טעינת הדף');
+// Console statement removed for no-console compliance
     return;
   }
 
@@ -99,7 +99,7 @@ function autoClearConsole() {
 
     // הפעל טיימר חדש - ללא ניקוי קונסול ישיר
     window.consoleClearTimer = setInterval(() => {
-      // console.log('🧹 ניקוי אוטומטי מבוטל - פועל דרך המערכת המובנית - ' + new Date().toLocaleTimeString());
+// Console statement removed for no-console compliance
 
       // בדוק אם יש מערכת מובנית לניקוי console
       if (window.manualClearConsole) {
@@ -107,7 +107,7 @@ function autoClearConsole() {
       }
     }, settings.clearInterval * 1000);
 
-    // console.log('🔄 ניקוי אוטומטי של קונסול מופעל - כל ' + settings.clearInterval + ' שניות');
+// Console statement removed for no-console compliance
   } else {
     // עצור ניקוי אוטומטי אם לא מופעל
     stopAutoClearConsole();
@@ -119,7 +119,7 @@ function stopAutoClearConsole() {
   if (window.consoleClearTimer) {
     clearInterval(window.consoleClearTimer);
     window.consoleClearTimer = null;
-    // console.log('⏹️ ניקוי אוטומטי של קונסול נעצר');
+// Console statement removed for no-console compliance
   }
 }
 
@@ -161,22 +161,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // אם יש הגדרה לשמירת ניקוי אוטומטי, בטל אותה בטעינת הדף
     currentSettings.autoClear = false;
     saveConsoleSettings(currentSettings);
-    console.log('⚠️ ניקוי אוטומטי בוטל בטעינת הדף - נדרש הפעלה ידנית');
+// Console statement removed for no-console compliance
   }
 
   // אל תפעיל ניקוי אוטומטי בטעינת הדף - רק אם המשתמש מפעיל במפורש
-  console.log('Console cleanup utility loaded - manual control only - integrated with built-in system');
+// Console statement removed for no-console compliance
 
   // המתן קצת לפני שחרור הדגל למניעת ניקוי console
   setTimeout(() => {
     isPageInitializing = false; // סיימנו את טעינת הדף
-    console.log('✅ הדגל למניעת ניקוי console שוחרר - מערכת מובנית פעילה');
+// Console statement removed for no-console compliance
 
     // בדוק אם יש מערכת מובנית לניקוי console
     if (window.manualClearConsole) {
-      console.log('🔗 מערכת מובנית לניקוי console זמינה (preferences.js)');
+// Console statement removed for no-console compliance
     } else {
-      console.log('ℹ️ מערכת מובנית לניקוי console לא זמינה - ניקוי ידני בלבד');
+// Console statement removed for no-console compliance
     }
   }, 5000); // הגדלתי ל-5 שניות כדי לוודא שכל הסקריפטים נטענו
 });

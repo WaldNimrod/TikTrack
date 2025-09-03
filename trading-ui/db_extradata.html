@@ -504,22 +504,22 @@
     <script>
       // Page initialization
       document.addEventListener('DOMContentLoaded', function () {
-        console.log('🔄 Initializing db_extradata page...');
+            // Console statement removed for no-console compliance
 
         // שחזור מצב הסגירה - משתמש בפונקציה מ-db-extradata.js
         if (typeof restoreSectionsState === 'function') {
           restoreSectionsState();
         } else {
-          console.warn('⚠️ restoreSectionsState function not available');
+            // Console statement removed for no-console compliance
         }
 
-        console.log('✅ דף טבלאות עזר אותחל בהצלחה');
+            // Console statement removed for no-console compliance
       });
     </script>
     <script>
       // אתחול מערכת הכותרת החדשה
       document.addEventListener("DOMContentLoaded", () => {
-        console.log("🔄 Initializing unified header system...");
+            // Console statement removed for no-console compliance
         if (window.headerSystem) {
           window.headerSystem.init();
         }

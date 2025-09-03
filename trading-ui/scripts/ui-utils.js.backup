@@ -22,12 +22,12 @@
  */
 function calculateStopPrice(currentPrice, stopPercentage, side = 'Long') {
   if (!currentPrice || currentPrice <= 0) {
-    console.warn('Invalid current price for stop calculation:', currentPrice);
+// Console statement removed for no-console compliance
     return 0;
   }
 
   if (!stopPercentage || stopPercentage <= 0) {
-    console.warn('Invalid stop percentage:', stopPercentage);
+// Console statement removed for no-console compliance
     return 0;
   }
 
@@ -40,7 +40,7 @@ function calculateStopPrice(currentPrice, stopPercentage, side = 'Long') {
     // For Short: Stop above current price
     return currentPrice * (1 + percentage);
   } else {
-    console.warn('Invalid side for stop calculation:', side);
+// Console statement removed for no-console compliance
     return 0;
   }
 }
@@ -54,12 +54,12 @@ function calculateStopPrice(currentPrice, stopPercentage, side = 'Long') {
  */
 function calculateTargetPrice(currentPrice, targetPercentage, side = 'Long') {
   if (!currentPrice || currentPrice <= 0) {
-    console.warn('Invalid current price for target calculation:', currentPrice);
+// Console statement removed for no-console compliance
     return 0;
   }
 
   if (!targetPercentage || targetPercentage <= 0) {
-    console.warn('Invalid target percentage:', targetPercentage);
+// Console statement removed for no-console compliance
     return 0;
   }
 
@@ -72,7 +72,7 @@ function calculateTargetPrice(currentPrice, targetPercentage, side = 'Long') {
     // For Short: Target below current price
     return currentPrice * (1 - percentage);
   } else {
-    console.warn('Invalid side for target calculation:', side);
+// Console statement removed for no-console compliance
     return 0;
   }
 }
@@ -86,12 +86,12 @@ function calculateTargetPrice(currentPrice, targetPercentage, side = 'Long') {
  */
 function calculatePercentageFromPrice(currentPrice, targetPrice, side = 'Long') {
   if (!currentPrice || currentPrice <= 0) {
-    console.warn('Invalid current price for percentage calculation:', currentPrice);
+// Console statement removed for no-console compliance
     return 0;
   }
 
   if (!targetPrice || targetPrice <= 0) {
-    console.warn('Invalid target price for percentage calculation:', targetPrice);
+// Console statement removed for no-console compliance
     return 0;
   }
 
@@ -100,7 +100,7 @@ function calculatePercentageFromPrice(currentPrice, targetPrice, side = 'Long') 
   } else if (side === 'Short') {
     return (currentPrice - targetPrice) / currentPrice * 100;
   } else {
-    console.warn('Invalid side for percentage calculation:', side);
+// Console statement removed for no-console compliance
     return 0;
   }
 }
@@ -142,7 +142,7 @@ function updatePricesFromPercentages(formId, currentPrice) {
   targetPriceElement.value = newTargetPrice.toFixed(2);
 
   // Updated prices from percentages
-  console.log('Updated prices from percentages:', {
+// Console statement removed for no-console compliance
     currentPrice,
     side,
     stopPercentage,
@@ -189,7 +189,7 @@ function updatePercentagesFromPrices(formId, currentPrice) {
   targetPercentageElement.value = newTargetPercentage.toFixed(2);
 
   // Updated percentages from prices
-  console.log('Updated percentages from prices:', {
+// Console statement removed for no-console compliance
     currentPrice,
     side,
     stopPrice,
@@ -842,7 +842,7 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
       }
     }
   } catch (error) {
-    console.warn('⚠️ Linked items check failed, proceeding with cancellation');
+// Console statement removed for no-console compliance
   }
 
   // אין פריטים מקושרים - ביצוע הביטול

@@ -46,7 +46,7 @@ class RealtimeNotificationsClient {
     try {
       // Check if Socket.IO is available
       if (typeof io === 'undefined') {
-        // console.warn('Socket.IO not available, loading from CDN...');
+// Console statement removed for no-console compliance
         this.loadSocketIO();
       } else {
         this.connect();
@@ -61,29 +61,29 @@ class RealtimeNotificationsClient {
     const script = document.createElement('script');
     script.src = 'https://cdn.socket.io/4.7.2/socket.io.min.js';
     script.onload = () => {
-      // console.log('Socket.IO loaded successfully');
+// Console statement removed for no-console compliance
       // Wait a bit for the script to initialize
       setTimeout(() => {
         if (typeof io !== 'undefined') {
           this.connect();
         } else {
-          // console.error('Socket.IO loaded but io object not available');
+// Console statement removed for no-console compliance
         }
       }, 100);
     };
     script.onerror = () => {
-      // console.error('Failed to load Socket.IO from CDN');
+// Console statement removed for no-console compliance
     };
     document.head.appendChild(script);
   }
 
   connect() {
     try {
-      // console.log('🔌 Connecting to WebSocket server...');
+// Console statement removed for no-console compliance
 
       // Create Socket.IO connection
       if (typeof window.io === 'undefined') {
-        // console.warn('Socket.IO not available, skipping connection');
+// Console statement removed for no-console compliance
         return;
       }
 
@@ -100,7 +100,7 @@ class RealtimeNotificationsClient {
         // Set up event handlers
         this.setupEventHandlers();
 
-        // console.log('✅ WebSocket connection established');
+// Console statement removed for no-console compliance
       } catch {
         // Error creating Socket.IO connection
         return;
@@ -122,7 +122,7 @@ class RealtimeNotificationsClient {
       this.reconnectAttempts = 0;
       this.reconnectDelay = 1000;
 
-      // console.log('🔗 WebSocket connected');
+// Console statement removed for no-console compliance
       this.showConnectionStatus('connected');
 
       // Join user-specific room if user is logged in
@@ -133,7 +133,7 @@ class RealtimeNotificationsClient {
       this.connected = false;
       this.connectionStats.disconnectedAt = new Date();
 
-      // console.log('🔌 WebSocket disconnected:', reason);
+// Console statement removed for no-console compliance
       this.showConnectionStatus('disconnected');
 
       if (reason === 'io server disconnect') {
@@ -149,12 +149,12 @@ class RealtimeNotificationsClient {
     });
 
     this.socket.on('reconnect', attemptNumber => {
-      // console.log(`🔄 WebSocket reconnected after ${attemptNumber} attempts`);
+// Console statement removed for no-console compliance
       this.showConnectionStatus('reconnected');
     });
 
     this.socket.on('reconnect_failed', () => {
-      // console.error('❌ WebSocket reconnection failed');
+// Console statement removed for no-console compliance
       this.showConnectionStatus('failed');
     });
 
@@ -170,55 +170,55 @@ class RealtimeNotificationsClient {
 
     // Background task events
     this.socket.on('background_task_started', data => {
-      // console.log('🚀 Background task started:', data);
+// Console statement removed for no-console compliance
       this.handleBackgroundTaskEvent('started', data);
     });
 
     this.socket.on('background_task_completed', data => {
-      // console.log('✅ Background task completed:', data);
+// Console statement removed for no-console compliance
       this.handleBackgroundTaskEvent('completed', data);
     });
 
     this.socket.on('background_task_failed', data => {
-      // console.log('❌ Background task failed:', data);
+// Console statement removed for no-console compliance
       this.handleBackgroundTaskEvent('failed', data);
     });
 
     // Database events
     this.socket.on('data_updated', data => {
-      // console.log('📊 Data updated:', data);
+// Console statement removed for no-console compliance
       this.handleDataEvent('updated', data);
     });
 
     this.socket.on('data_error', data => {
-      // console.log('❌ Data error:', data);
+// Console statement removed for no-console compliance
       this.handleDataEvent('error', data);
     });
 
     // External data events
     this.socket.on('external_data_update', data => {
-      // console.log('🌐 External data updated:', data);
+// Console statement removed for no-console compliance
       this.handleExternalDataEvent('updated', data);
     });
 
     this.socket.on('external_data_error', data => {
-      // console.log('❌ External data error:', data);
+// Console statement removed for no-console compliance
       this.handleExternalDataEvent('error', data);
     });
 
     // System events
     this.socket.on('connected', data => {
-      // console.log('🔗 Client connected to server:', data);
+// Console statement removed for no-console compliance
       this.handleSystemEvent('connected', data);
     });
 
     this.socket.on('room_joined', data => {
-      // console.log('🚪 Joined room:', data);
+// Console statement removed for no-console compliance
       this.handleSystemEvent('room_joined', data);
     });
 
     this.socket.on('room_left', data => {
-      // console.log('🚪 Left room:', data);
+// Console statement removed for no-console compliance
       this.handleSystemEvent('room_left', data);
     });
   }
@@ -229,7 +229,7 @@ class RealtimeNotificationsClient {
     // Handle custom events from other parts of the system
     this.socket.onAny((eventName, ...args) => {
       if (!this.isSystemEvent(eventName)) {
-        // console.log(`📡 Custom event received: ${eventName}`, args);
+// Console statement removed for no-console compliance
         this.handleCustomEvent(eventName, args);
       }
     });
@@ -287,7 +287,7 @@ class RealtimeNotificationsClient {
       this.emitCustomEvent('background_task_event', { type, data });
 
     } catch (error) {
-      // console.error('Error handling background task event:', error);
+// Console statement removed for no-console compliance
     }
   }
 
@@ -322,7 +322,7 @@ class RealtimeNotificationsClient {
       this.emitCustomEvent('data_event', { type, data });
 
     } catch (error) {
-      // console.error('Error handling data event:', error);
+// Console statement removed for no-console compliance
     }
   }
 
@@ -358,7 +358,7 @@ class RealtimeNotificationsClient {
       this.emitCustomEvent('external_data_event', { type, data });
 
     } catch (error) {
-      // console.error('Error handling external data event:', error);
+// Console statement removed for no-console compliance
     }
   }
 
@@ -366,20 +366,20 @@ class RealtimeNotificationsClient {
     try {
       switch (type) {
       case 'connected':
-        // console.log('Successfully connected to server');
+// Console statement removed for no-console compliance
         break;
 
       case 'room_joined':
-        // console.log(`Joined room: ${data.room}`);
+// Console statement removed for no-console compliance
         break;
 
       case 'room_left':
-        // console.log(`Left room: ${data.room}`);
+// Console statement removed for no-console compliance
         break;
       }
 
     } catch (error) {
-      // console.error('Error handling system event:', error);
+// Console statement removed for no-console compliance
     }
   }
 
@@ -389,7 +389,7 @@ class RealtimeNotificationsClient {
       this.emitCustomEvent('custom_event', { eventName, args });
 
     } catch (error) {
-      // console.error('Error handling custom event:', error);
+// Console statement removed for no-console compliance
     }
   }
 
@@ -401,7 +401,7 @@ class RealtimeNotificationsClient {
     } else if (typeof window.showNotification === 'function') {
       window.showNotification(message, 'info', title, duration);
     } else {
-      // console.log(`[INFO] ${title}: ${message}`);
+// Console statement removed for no-console compliance
     }
   }
 
@@ -411,7 +411,7 @@ class RealtimeNotificationsClient {
     } else if (typeof window.showNotification === 'function') {
       window.showNotification(message, 'success', title, duration);
     } else {
-      // console.log(`[SUCCESS] ${title}: ${message}`);
+// Console statement removed for no-console compliance
     }
   }
 
@@ -421,7 +421,7 @@ class RealtimeNotificationsClient {
     } else if (typeof window.showNotification === 'function') {
       window.showNotification(message, 'error', title, duration);
     } else {
-      // console.log(`[ERROR] ${title}: ${message}`);
+// Console statement removed for no-console compliance
     }
   }
 
@@ -431,7 +431,7 @@ class RealtimeNotificationsClient {
     } else if (typeof window.showNotification === 'function') {
       window.showNotification(message, 'warning', title, duration);
     } else {
-      // console.log(`[WARNING] ${title}: ${message}`);
+// Console statement removed for no-console compliance
     }
   }
 
@@ -446,14 +446,14 @@ class RealtimeNotificationsClient {
   joinRoom(roomName) {
     if (this.socket && this.connected) {
       this.socket.emit('join_room', { room: roomName });
-      // console.log(`🚪 Joining room: ${roomName}`);
+// Console statement removed for no-console compliance
     }
   }
 
   leaveRoom(roomName) {
     if (this.socket && this.connected) {
       this.socket.emit('leave_room', { room: roomName });
-      // console.log(`🚪 Leaving room: ${roomName}`);
+// Console statement removed for no-console compliance
     }
   }
 
@@ -499,13 +499,13 @@ class RealtimeNotificationsClient {
       this.reconnectAttempts++;
       this.reconnectDelay = Math.min(this.reconnectDelay * 2, 30000); // Max 30 seconds
 
-      // console.log(`🔄 Scheduling reconnect attempt ${this.reconnectAttempts} in ${this.reconnectDelay}ms`);
+// Console statement removed for no-console compliance
 
       setTimeout(() => {
         this.connect();
       }, this.reconnectDelay);
     } else {
-      // console.error('❌ Max reconnection attempts reached');
+// Console statement removed for no-console compliance
     }
   }
 
@@ -513,7 +513,7 @@ class RealtimeNotificationsClient {
     if (this.socket) {
       this.socket.disconnect();
       this.connected = false;
-      // console.log('🔌 WebSocket disconnected manually');
+// Console statement removed for no-console compliance
     }
   }
 

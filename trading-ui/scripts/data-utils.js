@@ -195,7 +195,7 @@ async function loadDataFromAPI(endpoint, maxRetries = 3) {
 
         return data;
       } else {
-        // console.warn('⚠️ Response is not an array:', typeof data);
+// Console statement removed for no-console compliance
         return [];
       }
     } catch {
@@ -355,7 +355,7 @@ function calculateDefaultPrices(currentPrice, options = {}) {
  */
 function convertAmountToShares(amount, price, allowFractionalShares = null) {
   if (!amount || !price || price <= 0) {
-    // console.warn('Invalid amount or price for conversion:', { amount, price });
+// Console statement removed for no-console compliance
     return { shares: 0, adjustedAmount: 0 };
   }
 
@@ -390,7 +390,7 @@ function convertAmountToShares(amount, price, allowFractionalShares = null) {
  */
 function convertSharesToAmount(shares, price) {
   if (!shares || !price || price <= 0) {
-    // console.warn('Invalid shares or price for conversion:', { shares, price });
+// Console statement removed for no-console compliance
     return 0;
   }
 
@@ -409,7 +409,7 @@ function getUserPreference(key, defaultValue = null) {
     const preferences = JSON.parse(localStorage.getItem('userPreferences') || '{}');
     return preferences[key] !== undefined ? preferences[key] : defaultValue;
   } catch {
-    // console.warn('Error reading user preference:', error);
+// Console statement removed for no-console compliance
     return defaultValue;
   }
 }

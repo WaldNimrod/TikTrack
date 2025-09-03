@@ -345,7 +345,7 @@ function restoreDbExtradataSectionsState() {
       if (triggerButtonsToggle) {triggerButtonsToggle.textContent = '▼';}
     }
   } catch (error) {
-    // console.warn('⚠️ Error restoring sections state:', error);
+    console.warn('⚠️ Error restoring sections state:', error);
   }
 }
 
@@ -379,7 +379,7 @@ function editCurrencyRecord(id) {
     if (typeof window.showWarningNotification === 'function') {
       window.showWarningNotification('רשומה מוגנת', 'לא ניתן לערוך רשומת בסיס מוגנת');
     } else {
-      // console.warn('לא ניתן לערוך רשומת בסיס מוגנת');
+      console.warn('לא ניתן לערוך רשומת בסיס מוגנת');
     }
     return;
   }
@@ -393,7 +393,7 @@ function deleteCurrencyRecord(id) {
     if (typeof window.showWarningNotification === 'function') {
       window.showWarningNotification('רשומה מוגנת', 'לא ניתן למחוק רשומת בסיס מוגנת');
     } else {
-      // console.warn('לא ניתן למחוק רשומת בסיס מוגנת');
+      console.warn('לא ניתן למחוק רשומת בסיס מוגנת');
     }
     return;
   }
@@ -1662,7 +1662,7 @@ function initializeRealTimeValidation() {
       }, 'select');
     }
   } else {
-    // console.warn('⚠️ Validation system not available');
+    console.warn('⚠️ Validation system not available');
   }
 }
 
@@ -1674,21 +1674,21 @@ document.addEventListener('DOMContentLoaded', function() {
   if (typeof window.restoreAllSectionStates === 'function') {
     window.restoreAllSectionStates();
   } else {
-    // console.warn('⚠️ restoreAllSectionStates function not available globally');
+    console.warn('⚠️ restoreAllSectionStates function not available globally');
   }
 
   // שחזור מצב הסקשנים הפנימיים
   if (typeof window.restoreSectionStates === 'function') {
     window.restoreSectionStates();
   } else {
-    // console.warn('⚠️ restoreSectionStates function not available globally');
+    console.warn('⚠️ restoreSectionStates function not available globally');
   }
 
   // אתחול וולידציה בזמן אמת (אם המערכת זמינה)
   if (typeof window.setupFieldValidation === 'function') {
     initializeRealTimeValidation();
   } else {
-    // console.warn('⚠️ Validation system not available');
+    console.warn('⚠️ Validation system not available');
   }
 
 });

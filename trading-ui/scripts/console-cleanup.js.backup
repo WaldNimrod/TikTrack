@@ -161,22 +161,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // אם יש הגדרה לשמירת ניקוי אוטומטי, בטל אותה בטעינת הדף
     currentSettings.autoClear = false;
     saveConsoleSettings(currentSettings);
-    // console.log('⚠️ ניקוי אוטומטי בוטל בטעינת הדף - נדרש הפעלה ידנית');
+    console.log('⚠️ ניקוי אוטומטי בוטל בטעינת הדף - נדרש הפעלה ידנית');
   }
 
   // אל תפעיל ניקוי אוטומטי בטעינת הדף - רק אם המשתמש מפעיל במפורש
-  // console.log('Console cleanup utility loaded - manual control only - integrated with built-in system');
+  console.log('Console cleanup utility loaded - manual control only - integrated with built-in system');
 
   // המתן קצת לפני שחרור הדגל למניעת ניקוי console
   setTimeout(() => {
     isPageInitializing = false; // סיימנו את טעינת הדף
-    // console.log('✅ הדגל למניעת ניקוי console שוחרר - מערכת מובנית פעילה');
+    console.log('✅ הדגל למניעת ניקוי console שוחרר - מערכת מובנית פעילה');
 
     // בדוק אם יש מערכת מובנית לניקוי console
     if (window.manualClearConsole) {
-      // console.log('🔗 מערכת מובנית לניקוי console זמינה (preferences.js)');
+      console.log('🔗 מערכת מובנית לניקוי console זמינה (preferences.js)');
     } else {
-      // console.log('ℹ️ מערכת מובנית לניקוי console לא זמינה - ניקוי ידני בלבד');
+      console.log('ℹ️ מערכת מובנית לניקוי console לא זמינה - ניקוי ידני בלבד');
     }
   }, 5000); // הגדלתי ל-5 שניות כדי לוודא שכל הסקריפטים נטענו
 });

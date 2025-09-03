@@ -787,7 +787,7 @@ const eventHandlers = {
       // console.error('❌ Failed to refresh analytics:', error);
     } finally {
       utils.showLoading('refresh-analytics', false);
-      // console.log('🔄 refreshAnalytics loading cleared');
+      console.log('🔄 refreshAnalytics loading cleared');
     }
   },
 
@@ -801,7 +801,7 @@ const eventHandlers = {
       await window.executeTask(currentTaskName);
       modalManager.closeModal();
     } catch (error) {
-      // console.error('Failed to execute modal task:', error);
+      console.error('Failed to execute modal task:', error);
     }
   },
 
@@ -816,7 +816,7 @@ const eventHandlers = {
       modalManager.closeModal();
       await eventHandlers.refreshTasks();
     } catch (error) {
-      // console.error('Failed to toggle modal task:', error);
+      console.error('Failed to toggle modal task:', error);
     }
   },
 };
@@ -883,11 +883,11 @@ const autoRefresh = {
       try {
         await eventHandlers.refreshStatus();
       } catch (error) {
-        // console.error('Auto-refresh failed:', error);
+        console.error('Auto-refresh failed:', error);
       }
     }, 30000); // Refresh every 30 seconds
 
-    // console.log('Auto-refresh started');
+    console.log('Auto-refresh started');
   },
 
   /**
@@ -897,7 +897,7 @@ const autoRefresh = {
     if (refreshInterval) {
       clearInterval(refreshInterval);
       refreshInterval = null;
-      // console.log('Auto-refresh stopped');
+      console.log('Auto-refresh stopped');
     }
   },
 };
@@ -1016,19 +1016,19 @@ const detailedLogGenerator = {
       utils.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
 
       // Show log in console for easy access
-      // console.log('=== לוג מפורט שהועתק ===');
-      // console.log(log);
-      // console.log('=== סוף הלוג ===');
+      console.log('=== לוג מפורט שהועתק ===');
+      console.log(log);
+      console.log('=== סוף הלוג ===');
 
     } catch (error) {
-      // console.error('Failed to copy log:', error);
+      console.error('Failed to copy log:', error);
       utils.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
 
       // Fallback: show in console
       const log = this.generateDetailedLog();
-      // console.log('=== לוג מפורט (לא הועתק) ===');
-      // console.log(log);
-      // console.log('=== סוף הלוג ===');
+      console.log('=== לוג מפורט (לא הועתק) ===');
+      console.log(log);
+      console.log('=== סוף הלוג ===');
     }
   },
 };
@@ -1036,7 +1036,7 @@ const detailedLogGenerator = {
 // Main initialization
 async function initializeBackgroundTasks() {
   try {
-    // console.log('Initializing Background Tasks Management...');
+    console.log('Initializing Background Tasks Management...');
 
     // Initialize event handlers
     eventHandlers.init();
@@ -1058,13 +1058,13 @@ async function initializeBackgroundTasks() {
       copyLogBtn.addEventListener('click', () => {
         detailedLogGenerator.copyDetailedLog();
       });
-      // console.log('Detailed log button initialized');
+      console.log('Detailed log button initialized');
     }
 
-    // console.log('Background Tasks Management initialized successfully');
+    console.log('Background Tasks Management initialized successfully');
 
   } catch (error) {
-    // console.error('Failed to initialize Background Tasks Management:', error);
+    console.error('Failed to initialize Background Tasks Management:', error);
     utils.showNotification('שגיאה באתחול מערכת ניהול המשימות', 'error');
   }
 }

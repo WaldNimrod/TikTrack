@@ -827,16 +827,16 @@ function filterHistory() {
 
 // אתחול
 document.addEventListener('DOMContentLoaded', () => {
-  // console.log('🚀 טעינת דף מרכז התראות...');
+  console.log('🚀 טעינת דף מרכז התראות...');
 
   // אתחול HeaderSystem
   if (window.headerSystem && !window.headerSystem.isInitialized) {
-    // console.log('✅ אתחול HeaderSystem...');
+    console.log('✅ אתחול HeaderSystem...');
     window.headerSystem.init();
   }
 
   // יצירת מופע מרכז התראות
   window.notificationsCenter = new NotificationsCenter();
 
-  // console.log('✅ דף מרכז התראות נטען בהצלחה');
+  console.log('✅ דף מרכז התראות נטען בהצלחה');
 });

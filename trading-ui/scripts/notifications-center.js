@@ -36,7 +36,7 @@ class NotificationsCenter {
   }
 
   init() {
-    // console.log('🚀 אתחול מרכז התראות...');
+    // // Log:('🚀 אתחול מרכז התראות...');
 
     // אתחול UI
     this.initUI();
@@ -53,7 +53,7 @@ class NotificationsCenter {
     // רענון אוטומטי
     this.startAutoRefresh();
 
-    // console.log('✅ מרכז התראות אותחל בהצלחה');
+    // // Log:('✅ מרכז התראות אותחל בהצלחה');
   }
 
   initUI() {
@@ -454,7 +454,7 @@ class NotificationsCenter {
       try {
         date = new Date(date);
       } catch (error) {
-        // console.warn('שגיאה בהמרת תאריך:', error);
+        // // Warning:('שגיאה בהמרת תאריך:', error);
         return 'לא ידוע';
       }
     }
@@ -510,7 +510,7 @@ class NotificationsCenter {
   saveSettings() {
     try {
       localStorage.setItem('tiktrack_notification_settings', JSON.stringify(this.settings));
-      // console.log('✅ הגדרות נשמרו בהצלחה');
+      // // Log:('✅ הגדרות נשמרו בהצלחה');
     } catch {
       // שגיאה בשמירת הגדרות
     }
@@ -576,10 +576,10 @@ class NotificationsCenter {
         },
         body: JSON.stringify(logEntry),
       }).catch(error => {
-        // console.warn('לא ניתן לשמור בקובץ לוג:', error);
+        // // Warning:('לא ניתן לשמור בקובץ לוג:', error);
       });
     } catch (error) {
-      // console.warn('שגיאה בשמירה לקובץ לוג:', error);
+      // // Warning:('שגיאה בשמירה לקובץ לוג:', error);
     }
   }
 
@@ -603,7 +603,7 @@ class NotificationsCenter {
     this.saveToLocalStorage();
 
     // הודעה ישירה לממשק ללא לולאה
-    // console.log('✅ התראות פעילות נוקו בהצלחה');
+    // // Log:('✅ התראות פעילות נוקו בהצלחה');
   }
 
   clearHistory() {
@@ -616,7 +616,7 @@ class NotificationsCenter {
       this.saveToLocalStorage();
 
       // הודעה ישירה לממשק ללא לולאה
-      // console.log('✅ היסטוריית ההתראות נוקתה בהצלחה');
+      // // Log:('✅ היסטוריית ההתראות נוקתה בהצלחה');
     }
   }
 
@@ -627,7 +627,7 @@ class NotificationsCenter {
     this.updateStatsUI();
 
     // הודעה ישירה לממשק ללא לולאה
-    // console.log('✅ ההתראות רועננו בהצלחה');
+    // // Log:('✅ ההתראות רועננו בהצלחה');
   }
 
   filterHistory() {
@@ -677,7 +677,7 @@ class NotificationsCenter {
         }
       }
     } catch (error) {
-      // console.warn('שגיאה בעדכון זמן חיבור:', error);
+      // // Warning:('שגיאה בעדכון זמן חיבור:', error);
     }
   }
 
@@ -692,7 +692,7 @@ class NotificationsCenter {
       if (statusDot.querySelector('.disconnected')) {return 'disconnected';}
       if (statusDot.querySelector('.connecting')) {return 'connecting';}
     } catch (error) {
-      // console.warn('שגיאה בקבלת סטטוס חיבור נוכחי:', error);
+      // // Warning:('שגיאה בקבלת סטטוס חיבור נוכחי:', error);
     }
     return 'connecting';
   }
@@ -702,7 +702,7 @@ class NotificationsCenter {
 function copyNotificationsToClipboard() {
   try {
     if (!window.notificationsCenter) {
-      // console.warn('מרכז התראות לא זמין');
+      // // Warning:('מרכז התראות לא זמין');
       return;
     }
 
@@ -744,9 +744,9 @@ function copyNotificationsToClipboard() {
 
     // העתקה ללוח
     navigator.clipboard.writeText(log).then(() => {
-      // console.log('✅ לוג התראות הועתק ללוח בהצלחה');
+      // // Log:('✅ לוג התראות הועתק ללוח בהצלחה');
     }).catch(err => {
-      // console.error('❌ שגיאה בהעתקה ללוח:', err);
+      // // Error:('❌ שגיאה בהעתקה ללוח:', err);
       // גיבוי - הצגה בחלון
       // העתקה ללוח
       navigator.clipboard.writeText(log).then(() => {
@@ -758,7 +758,7 @@ function copyNotificationsToClipboard() {
       });
     });
   } catch (error) {
-    // console.error('❌ שגיאה ביצירת לוג התראות:', error);
+    // // Error:('❌ שגיאה ביצירת לוג התראות:', error);
   }
 }
 
@@ -827,16 +827,16 @@ function filterHistory() {
 
 // אתחול
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 טעינת דף מרכז התראות...');
+  // Log:('🚀 טעינת דף מרכז התראות...');
 
   // אתחול HeaderSystem
   if (window.headerSystem && !window.headerSystem.isInitialized) {
-    console.log('✅ אתחול HeaderSystem...');
+    // Log:('✅ אתחול HeaderSystem...');
     window.headerSystem.init();
   }
 
   // יצירת מופע מרכז התראות
   window.notificationsCenter = new NotificationsCenter();
 
-  console.log('✅ דף מרכז התראות נטען בהצלחה');
+  // Log:('✅ דף מרכז התראות נטען בהצלחה');
 });

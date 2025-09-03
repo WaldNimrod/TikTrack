@@ -365,12 +365,14 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
 
   // יצירת HTML למודל
   const modalHTML = `
-        <div class="modal fade warning-modal" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+        <div class="modal fade warning-modal" id="${modalId}" tabindex="-1" 
+             aria-labelledby="${modalId}Label" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header bg-${color} text-white">
                         <h5 class="modal-title" id="${modalId}Label">${title}</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" 
+                                data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         ${message.replace(/\n/g, '<br>')}

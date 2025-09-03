@@ -437,7 +437,8 @@ class JsMapSystem {
     if (pageMappingContent) {
       pageMappingContent.innerHTML = `
                 <div class="loading">
-                    <i class="fas fa-exclamation-triangle" style="color: #ff6b6b; font-size: 2rem; margin-bottom: 15px;"></i>
+                    <i class="fas fa-exclamation-triangle" style="color: #ff6b6b; font-size: 2rem;\
+                       margin-bottom: 15px;"></i>
                     <div>${message}</div>
                 </div>
             `;
@@ -446,7 +447,8 @@ class JsMapSystem {
     if (functionsContent) {
       functionsContent.innerHTML = `
                 <div class="loading">
-                    <i class="fas fa-exclamation-triangle" style="color: #ff6b6b; font-size: 2rem; margin-bottom: 15px;"></i>
+                    <i class="fas fa-exclamation-triangle" style="color: #ff6b6b; font-size: 2rem;\
+                       margin-bottom: 15px;"></i>
                     <div>${message}</div>
                 </div>
             `;

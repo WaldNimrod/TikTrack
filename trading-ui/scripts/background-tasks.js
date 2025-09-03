@@ -98,7 +98,7 @@ const utils = {
       window.showNotification(message, type);
     } else {
       // Fallback למקרה שמערכת התראות לא זמינה
-      console.log(`${type.toUpperCase()}: ${message}`);
+      // Log:(`${type.toUpperCase()}: ${message}`);
     }
   },
 
@@ -136,7 +136,7 @@ const apiService = {
       // Add cache buster to all requests
       const separator = url.includes('?') ? '&' : '?';
       const urlWithCacheBuster = `${url}${separator}_t=${Date.now()}`;
-      console.log('📡 API Request URL:', urlWithCacheBuster);
+      // Log:('📡 API Request URL:', urlWithCacheBuster);
 
       const response = await fetch(urlWithCacheBuster, {
         headers: {
@@ -154,7 +154,7 @@ const apiService = {
 
       return await response.json();
     } catch (error) {
-      console.error('❌ API request failed:', error);
+      // Error:('❌ API request failed:', error);
       utils.showNotification(`שגיאה בפנייה לשרת: ${error.message}`, 'error');
       throw error;
     }
@@ -244,7 +244,7 @@ const uiManager = {
      * Update system status display
      */
   updateStatus(status) {
-    console.log('🔧 Updating UI status:', status);
+    // Log:('🔧 Updating UI status:', status);
 
     // Update scheduler status
     const schedulerStatus = document.getElementById('scheduler-status');
@@ -269,7 +269,7 @@ const uiManager = {
      * Update scheduler button states
      */
   updateSchedulerButtons(isRunning) {
-    console.log('🔧 Updating scheduler buttons, isRunning:', isRunning);
+    // Log:('🔧 Updating scheduler buttons, isRunning:', isRunning);
     const startBtn = document.getElementById('start-scheduler');
     const stopBtn = document.getElementById('stop-scheduler');
 
@@ -280,14 +280,14 @@ const uiManager = {
         stopBtn.style.setProperty('display', 'inline-block', 'important');
         stopBtn.innerHTML = '<i class="fas fa-stop me-1"></i> עצור Scheduler';
         stopBtn.disabled = false;
-        console.log('🟢 Scheduler running - showing stop button');
+        // Log:('🟢 Scheduler running - showing stop button');
       } else {
         // Scheduler is stopped - show only start button
         startBtn.style.setProperty('display', 'inline-block', 'important');
         stopBtn.style.setProperty('display', 'none', 'important');
         startBtn.innerHTML = '<i class="fas fa-play me-1"></i> הפעל Scheduler';
         startBtn.disabled = false;
-        console.log('🔴 Scheduler stopped - showing start button');
+        // Log:('🔴 Scheduler stopped - showing start button');
       }
     }
   },
@@ -557,39 +557,38 @@ const eventHandlers = {
      * Initialize event handlers
      */
   init() {
-    console.log('🔧 EventHandlers init - fixing button connections v20250903-2050');
+    // Log:('🔧 EventHandlers init - fixing button connections v20250903-2050');
 
     // Check if buttons exist
     const startBtn = document.getElementById('start-scheduler');
     const stopBtn = document.getElementById('stop-scheduler');
     const refreshBtn = document.getElementById('refresh-status');
 
-    console.log('🔍 Button check:', {
-      startBtn: !!startBtn,
-      stopBtn: !!stopBtn,
-      refreshBtn: !!refreshBtn,
-    });
+    // Log: Button check status
+    // startBtn: !!startBtn
+    // stopBtn: !!stopBtn
+    // refreshBtn: !!refreshBtn
 
     // Scheduler controls
     if (startBtn) {
       startBtn.addEventListener('click', eventHandlers.startScheduler);
-      console.log('✅ Start scheduler button connected');
+      // Log:('✅ Start scheduler button connected');
     } else {
-      console.error('❌ Start scheduler button not found!');
+      // Error:('❌ Start scheduler button not found!');
     }
 
     if (stopBtn) {
       stopBtn.addEventListener('click', eventHandlers.stopScheduler);
-      console.log('✅ Stop scheduler button connected');
+      // Log:('✅ Stop scheduler button connected');
     } else {
-      console.error('❌ Stop scheduler button not found!');
+      // Error:('❌ Stop scheduler button not found!');
     }
 
     if (refreshBtn) {
       refreshBtn.addEventListener('click', eventHandlers.refreshStatus);
-      console.log('✅ Refresh status button connected');
+      // Log:('✅ Refresh status button connected');
     } else {
-      console.error('❌ Refresh status button not found!');
+      // Error:('❌ Refresh status button not found!');
     }
 
     // Task management
@@ -632,24 +631,24 @@ const eventHandlers = {
      * Start scheduler
      */
   async startScheduler() {
-    console.log('🚀 startScheduler clicked!');
+    // Log:('🚀 startScheduler clicked!');
     try {
       utils.showLoading('start-scheduler', true);
-      console.log('📡 Calling API to start scheduler...');
+      // Log:('📡 Calling API to start scheduler...');
       const result = await apiService.startScheduler();
-      console.log('📡 Start scheduler API response:', result);
+      // Log:('📡 Start scheduler API response:', result);
       utils.showNotification('Scheduler הופעל בהצלחה', 'success');
-      console.log('🔄 Refreshing status after start...');
+      // Log:('🔄 Refreshing status after start...');
       // Wait a bit for server to update
       await new Promise(resolve => setTimeout(resolve, 1000));
       await eventHandlers.refreshStatus();
-      console.log('✅ startScheduler completed successfully');
+      // Log:('✅ startScheduler completed successfully');
     } catch (error) {
-      console.error('❌ Error in startScheduler:', error);
+      // Error:('❌ Error in startScheduler:', error);
       utils.showNotification(`שגיאה בהפעלת Scheduler: ${error.message}`, 'error');
     } finally {
       utils.showLoading('start-scheduler', false);
-      console.log('🔄 startScheduler loading cleared');
+      // Log:('🔄 startScheduler loading cleared');
     }
   },
 
@@ -657,24 +656,24 @@ const eventHandlers = {
      * Stop scheduler
      */
   async stopScheduler() {
-    console.log('🛑 stopScheduler clicked!');
+    // Log:('🛑 stopScheduler clicked!');
     try {
       utils.showLoading('stop-scheduler', true);
-      console.log('📡 Calling API to stop scheduler...');
+      // Log:('📡 Calling API to stop scheduler...');
       const result = await apiService.stopScheduler();
-      console.log('📡 Stop scheduler API response:', result);
+      // Log:('📡 Stop scheduler API response:', result);
       utils.showNotification('Scheduler נעצר בהצלחה', 'success');
-      console.log('🔄 Refreshing status after stop...');
+      // Log:('🔄 Refreshing status after stop...');
       // Wait a bit for server to update
       await new Promise(resolve => setTimeout(resolve, 1000));
       await eventHandlers.refreshStatus();
-      console.log('✅ stopScheduler completed successfully');
+      // Log:('✅ stopScheduler completed successfully');
     } catch (error) {
-      console.error('❌ Error in stopScheduler:', error);
+      // Error:('❌ Error in stopScheduler:', error);
       utils.showNotification(`שגיאה בעצירת Scheduler: ${error.message}`, 'error');
     } finally {
       utils.showLoading('stop-scheduler', false);
-      console.log('🔄 stopScheduler loading cleared');
+      // Log:('🔄 stopScheduler loading cleared');
     }
   },
 
@@ -682,14 +681,14 @@ const eventHandlers = {
      * Refresh system status
      */
   async refreshStatus() {
-    console.log('🔄 refreshStatus started');
+    // Log:('🔄 refreshStatus started');
     try {
       const status = await apiService.getStatus();
-      console.log('📊 Status received:', status);
+      // Log:('📊 Status received:', status);
       uiManager.updateStatus(status);
-      console.log('✅ refreshStatus completed');
+      // Log:('✅ refreshStatus completed');
     } catch (error) {
-      console.error('❌ Failed to refresh status:', error);
+      // Error:('❌ Failed to refresh status:', error);
     }
   },
 
@@ -697,18 +696,18 @@ const eventHandlers = {
      * Refresh tasks list
      */
   async refreshTasks() {
-    console.log('🔄 refreshTasks started');
+    // Log:('🔄 refreshTasks started');
     try {
       utils.showLoading('refresh-tasks', true);
       const tasks = await apiService.getTasks();
-      console.log('📋 Tasks received:', tasks);
+      // Log:('📋 Tasks received:', tasks);
       uiManager.renderTasks(tasks.tasks || []);
-      console.log('✅ refreshTasks completed');
+      // Log:('✅ refreshTasks completed');
     } catch (error) {
-      console.error('❌ Failed to refresh tasks:', error);
+      // Error:('❌ Failed to refresh tasks:', error);
     } finally {
       utils.showLoading('refresh-tasks', false);
-      console.log('🔄 refreshTasks loading cleared');
+      // Log:('🔄 refreshTasks loading cleared');
     }
   },
 
@@ -727,7 +726,7 @@ const eventHandlers = {
       const tasks = await apiService.getTasks(params);
       uiManager.renderTasks(tasks.tasks || []);
     } catch {
-      // console.error('Failed to apply filters:', error);
+      // // Error:('Failed to apply filters:', error);
     }
   },
 
@@ -735,19 +734,19 @@ const eventHandlers = {
      * Refresh history
      */
   async refreshHistory() {
-    console.log('🔄 refreshHistory started');
+    // Log:('🔄 refreshHistory started');
     try {
       utils.showLoading('refresh-history', true);
       const hours = document.getElementById('history-hours')?.value || 24;
       const history = await apiService.getHistory({ hours });
-      console.log('📜 History received:', history);
+      // Log:('📜 History received:', history);
       uiManager.renderHistory(history.history || []);
-      console.log('✅ refreshHistory completed');
+      // Log:('✅ refreshHistory completed');
     } catch (error) {
-      console.error('❌ Failed to refresh history:', error);
+      // Error:('❌ Failed to refresh history:', error);
     } finally {
       utils.showLoading('refresh-history', false);
-      console.log('🔄 refreshHistory loading cleared');
+      // Log:('🔄 refreshHistory loading cleared');
     }
   },
 
@@ -767,7 +766,7 @@ const eventHandlers = {
       const history = await apiService.getHistory(params);
       uiManager.renderHistory(history.history || []);
     } catch {
-      // console.error('Failed to apply history filters:', error);
+      // // Error:('Failed to apply history filters:', error);
     }
   },
 
@@ -775,19 +774,19 @@ const eventHandlers = {
      * Refresh analytics
      */
   async refreshAnalytics() {
-    console.log('🔄 refreshAnalytics started');
+    // Log:('🔄 refreshAnalytics started');
     try {
       utils.showLoading('refresh-analytics', true);
       const period = document.getElementById('analytics-period')?.value || '7d';
       const analytics = await apiService.getAnalytics({ period });
-      console.log('📊 Analytics received:', analytics);
+      // Log:('📊 Analytics received:', analytics);
       uiManager.renderAnalytics(analytics);
-      console.log('✅ refreshAnalytics completed');
+      // Log:('✅ refreshAnalytics completed');
     } catch (error) {
-      console.error('❌ Failed to refresh analytics:', error);
+      // Error:('❌ Failed to refresh analytics:', error);
     } finally {
       utils.showLoading('refresh-analytics', false);
-      console.log('🔄 refreshAnalytics loading cleared');
+      // Log:('🔄 refreshAnalytics loading cleared');
     }
   },
 
@@ -801,7 +800,7 @@ const eventHandlers = {
       await window.executeTask(currentTaskName);
       modalManager.closeModal();
     } catch (error) {
-      console.error('Failed to execute modal task:', error);
+      // Error:('Failed to execute modal task:', error);
     }
   },
 
@@ -816,7 +815,7 @@ const eventHandlers = {
       modalManager.closeModal();
       await eventHandlers.refreshTasks();
     } catch (error) {
-      console.error('Failed to toggle modal task:', error);
+      // Error:('Failed to toggle modal task:', error);
     }
   },
 };
@@ -883,11 +882,11 @@ const autoRefresh = {
       try {
         await eventHandlers.refreshStatus();
       } catch (error) {
-        console.error('Auto-refresh failed:', error);
+        // Error:('Auto-refresh failed:', error);
       }
     }, 30000); // Refresh every 30 seconds
 
-    console.log('Auto-refresh started');
+    // Log:('Auto-refresh started');
   },
 
   /**
@@ -897,7 +896,7 @@ const autoRefresh = {
     if (refreshInterval) {
       clearInterval(refreshInterval);
       refreshInterval = null;
-      console.log('Auto-refresh stopped');
+      // Log:('Auto-refresh stopped');
     }
   },
 };
@@ -1016,19 +1015,19 @@ const detailedLogGenerator = {
       utils.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
 
       // Show log in console for easy access
-      console.log('=== לוג מפורט שהועתק ===');
-      console.log(log);
-      console.log('=== סוף הלוג ===');
+      // Log:('=== לוג מפורט שהועתק ===');
+      // Log:(log);
+      // Log:('=== סוף הלוג ===');
 
     } catch (error) {
-      console.error('Failed to copy log:', error);
+      // Error:('Failed to copy log:', error);
       utils.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
 
       // Fallback: show in console
       const log = this.generateDetailedLog();
-      console.log('=== לוג מפורט (לא הועתק) ===');
-      console.log(log);
-      console.log('=== סוף הלוג ===');
+      // Log:('=== לוג מפורט (לא הועתק) ===');
+      // Log:(log);
+      // Log:('=== סוף הלוג ===');
     }
   },
 };
@@ -1036,7 +1035,7 @@ const detailedLogGenerator = {
 // Main initialization
 async function initializeBackgroundTasks() {
   try {
-    console.log('Initializing Background Tasks Management...');
+    // Log:('Initializing Background Tasks Management...');
 
     // Initialize event handlers
     eventHandlers.init();
@@ -1058,13 +1057,13 @@ async function initializeBackgroundTasks() {
       copyLogBtn.addEventListener('click', () => {
         detailedLogGenerator.copyDetailedLog();
       });
-      console.log('Detailed log button initialized');
+      // Log:('Detailed log button initialized');
     }
 
-    console.log('Background Tasks Management initialized successfully');
+    // Log:('Background Tasks Management initialized successfully');
 
   } catch (error) {
-    console.error('Failed to initialize Background Tasks Management:', error);
+    // Error:('Failed to initialize Background Tasks Management:', error);
     utils.showNotification('שגיאה באתחול מערכת ניהול המשימות', 'error');
   }
 }

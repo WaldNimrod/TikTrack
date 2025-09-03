@@ -1015,7 +1015,7 @@ function getColorPreferences() {
  */
 function updateCSSVariablesFromPreferences(preferences) {
   try {
-    console.log('🎨 עדכון CSS Variables מהעדפות...');
+    // Log:('🎨 עדכון CSS Variables מהעדפות...');
 
     // עדכון צבעי ערכים מספריים
     if (preferences.numericValueColors) {
@@ -1087,10 +1087,10 @@ function updateCSSVariablesFromPreferences(preferences) {
       }
     }
 
-    console.log('✅ CSS Variables עודכנו בהצלחה');
+    // Log:('✅ CSS Variables עודכנו בהצלחה');
 
   } catch (error) {
-    console.error('❌ שגיאה בעדכון CSS Variables:', error);
+    // Error:('❌ שגיאה בעדכון CSS Variables:', error);
   }
 }
 
@@ -1100,7 +1100,7 @@ function updateCSSVariablesFromPreferences(preferences) {
  */
 async function loadColorPreferences() {
   try {
-    console.log('🎨 טוען הגדרות צבע מהעדפות...');
+    // Log:('🎨 טוען הגדרות צבע מהעדפות...');
 
     const response = await fetch('/api/v1/preferences/');
     if (response.ok) {
@@ -1119,10 +1119,10 @@ async function loadColorPreferences() {
         Object.assign(ENTITY_COLORS, preferences.entityColors);
       }
 
-      console.log('✅ הגדרות צבע נטענו בהצלחה');
+      // Log:('✅ הגדרות צבע נטענו בהצלחה');
     }
   } catch (error) {
-    console.error('❌ שגיאה בטעינת הגדרות צבע:', error);
+    // Error:('❌ שגיאה בטעינת הגדרות צבע:', error);
   }
 }
 
@@ -1136,10 +1136,10 @@ function updateEntityColors(preferences) {
     if (preferences && preferences.entityColors) {
       Object.assign(ENTITY_COLORS, preferences.entityColors);
       updateCSSVariablesFromPreferences(preferences);
-      console.log('✅ צבעי ישויות עודכנו מהעדפות');
+      // Log:('✅ צבעי ישויות עודכנו מהעדפות');
     }
   } catch (error) {
-    console.error('❌ שגיאה בעדכון צבעי ישויות:', error);
+    // Error:('❌ שגיאה בעדכון צבעי ישויות:', error);
   }
 }
 
@@ -1148,7 +1148,7 @@ function updateEntityColors(preferences) {
 
 // טעינת הגדרות צבע בטעינת הדף
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🎨 מאתחל מערכת צבעים...');
+  // Log:('🎨 מאתחל מערכת צבעים...');
   loadColorPreferences();
 });
 

@@ -343,7 +343,7 @@ function showValidationWarning(fieldId, message, duration = 6000) {
     }, 3000);
   } else {
     // Field not found
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 }
 

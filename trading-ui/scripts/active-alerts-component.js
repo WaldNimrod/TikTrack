@@ -92,7 +92,7 @@ class ActiveAlertsComponent extends HTMLElement {
     setTimeout(() => {
       // בדיקה אם יש הרבה הודעות בקונסולה
       if (this._checkAttempts > 3) {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
       }
     }, 10000);
   }
@@ -928,7 +928,7 @@ class ActiveAlertsComponent extends HTMLElement {
     });
 
     if (!hasStyles) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 

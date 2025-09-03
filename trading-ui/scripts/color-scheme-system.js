@@ -1015,7 +1015,7 @@ function getColorPreferences() {
  */
 function updateCSSVariablesFromPreferences(preferences) {
   try {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
 
     // עדכון צבעי ערכים מספריים
     if (preferences.numericValueColors) {
@@ -1087,10 +1087,10 @@ function updateCSSVariablesFromPreferences(preferences) {
       }
     }
 
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
 
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 }
 
@@ -1100,7 +1100,7 @@ function updateCSSVariablesFromPreferences(preferences) {
  */
 async function loadColorPreferences() {
   try {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
 
     const response = await fetch('/api/v1/preferences/');
     if (response.ok) {
@@ -1119,10 +1119,10 @@ async function loadColorPreferences() {
         Object.assign(ENTITY_COLORS, preferences.entityColors);
       }
 
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 }
 
@@ -1136,10 +1136,10 @@ function updateEntityColors(preferences) {
     if (preferences && preferences.entityColors) {
       Object.assign(ENTITY_COLORS, preferences.entityColors);
       updateCSSVariablesFromPreferences(preferences);
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 }
 

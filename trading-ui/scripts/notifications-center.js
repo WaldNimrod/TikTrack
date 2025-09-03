@@ -36,7 +36,7 @@ class NotificationsCenter {
   }
 
   init() {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
 
     // אתחול UI
     this.initUI();
@@ -53,7 +53,7 @@ class NotificationsCenter {
     // רענון אוטומטי
     this.startAutoRefresh();
 
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 
   initUI() {
@@ -454,7 +454,7 @@ class NotificationsCenter {
       try {
         date = new Date(date);
       } catch (error) {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         return 'לא ידוע';
       }
     }
@@ -510,7 +510,7 @@ class NotificationsCenter {
   saveSettings() {
     try {
       localStorage.setItem('tiktrack_notification_settings', JSON.stringify(this.settings));
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     } catch {
       // שגיאה בשמירת הגדרות
     }
@@ -576,10 +576,10 @@ class NotificationsCenter {
         },
         body: JSON.stringify(logEntry),
       }).catch(error => {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
       });
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -603,7 +603,7 @@ class NotificationsCenter {
     this.saveToLocalStorage();
 
     // הודעה ישירה לממשק ללא לולאה
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 
   clearHistory() {
@@ -616,7 +616,7 @@ class NotificationsCenter {
       this.saveToLocalStorage();
 
       // הודעה ישירה לממשק ללא לולאה
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -627,7 +627,7 @@ class NotificationsCenter {
     this.updateStatsUI();
 
     // הודעה ישירה לממשק ללא לולאה
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 
   filterHistory() {
@@ -677,7 +677,7 @@ class NotificationsCenter {
         }
       }
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -692,7 +692,7 @@ class NotificationsCenter {
       if (statusDot.querySelector('.disconnected')) {return 'disconnected';}
       if (statusDot.querySelector('.connecting')) {return 'connecting';}
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
     return 'connecting';
   }
@@ -702,7 +702,7 @@ class NotificationsCenter {
 function copyNotificationsToClipboard() {
   try {
     if (!window.notificationsCenter) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       return;
     }
 
@@ -744,9 +744,9 @@ function copyNotificationsToClipboard() {
 
     // העתקה ללוח
     navigator.clipboard.writeText(log).then(() => {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }).catch(err => {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       // גיבוי - הצגה בחלון
       // העתקה ללוח
       navigator.clipboard.writeText(log).then(() => {
@@ -758,7 +758,7 @@ function copyNotificationsToClipboard() {
       });
     });
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 }
 
@@ -831,7 +831,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // אתחול HeaderSystem
   if (window.headerSystem && !window.headerSystem.isInitialized) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     window.headerSystem.init();
   }
 

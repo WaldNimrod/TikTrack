@@ -680,7 +680,7 @@ class CacheTestSystem {
     }
 
     // Also log to console
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 
   /**
@@ -699,7 +699,7 @@ class CacheTestSystem {
       window.showNotification(message, type);
     } else {
       // Fallback notification
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 

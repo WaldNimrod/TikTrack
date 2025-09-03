@@ -197,7 +197,7 @@ async function resetToDefaults() {
       }
     }
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
   }
 }
@@ -348,12 +348,12 @@ async function loadAccountsToFilter() {
       const accounts = await window.getAccounts();
       updateAccountFilter(accounts);
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       showPreferencesWarning('טעינת חשבונות', 'פונקציית getAccounts לא זמינה, משתמש בנתונים מקומיים');
       loadLocalAccounts();
     }
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     showPreferencesError('טעינת חשבונות', 'שגיאה בטעינת חשבונות מהשרת');
     loadLocalAccounts();
   }
@@ -387,7 +387,7 @@ function updateAccountFilter(accounts) {
 
   const accountFilterSelect = document.getElementById('defaultAccountFilter');
   if (!accountFilterSelect) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     return;
   }
 
@@ -405,7 +405,7 @@ function updateAccountFilter(accounts) {
       accountFilterSelect.appendChild(option);
     });
   } else {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 
   // החזר את הבחירה הקודמת אם היא עדיין קיימת
@@ -453,7 +453,7 @@ function showPreferencesSuccess(title, message) {
   } else if (typeof window.showNotification === 'function') {
     window.showNotification(title, message, 'success');
   } else {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 }
 
@@ -466,7 +466,7 @@ function showPreferencesError(title, message) {
   } else if (typeof window.showNotification === 'function') {
     window.showNotification(title, message, 'error');
   } else {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 }
 
@@ -479,7 +479,7 @@ function showPreferencesInfo(title, message) {
   } else if (typeof window.showNotification === 'function') {
     window.showNotification(title, message, 'info');
   } else {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 }
 
@@ -492,7 +492,7 @@ function showPreferencesWarning(title, message) {
   } else if (typeof window.showNotification === 'function') {
     window.showNotification(title, message, 'warning');
   } else {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 }
 
@@ -505,7 +505,7 @@ async function initializePreferences() {
     if (typeof window.restoreAllSectionStates === 'function') {
       window.restoreAllSectionStates();
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
 
     // טען העדפות
@@ -517,9 +517,9 @@ async function initializePreferences() {
     // טען הגדרות קונסול לממשק
     loadConsoleSettingsToUI();
 
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     showPreferencesError('שגיאה', 'שגיאה באתחול דף העדפות');
   }
 }
@@ -553,7 +553,7 @@ window.toggleTopSection = function() {
   if (typeof window.toggleTopSectionGlobal === 'function') {
     window.toggleTopSectionGlobal();
   } else {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 };
 
@@ -580,7 +580,7 @@ function updateConsolePreference(key, value) {
     // אל תפעיל את ההגדרות עד שהמשתמש לוחץ על "שמור שינויים"
     // applyConsoleSettings();
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 }
 
@@ -617,7 +617,7 @@ function applyConsoleSettings() {
       }
     }
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 }
 
@@ -633,7 +633,7 @@ function manualClearConsole() {
       showPreferencesError('שגיאה', 'פונקציית ניקוי קונסול לא זמינה');
     }
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     showPreferencesError('שגיאה', 'שגיאה בניקוי הקונסול');
   }
 }
@@ -658,7 +658,7 @@ function loadConsoleSettingsToUI() {
       if (suppressDurationInput) {suppressDurationInput.value = settings.suppressDuration || 5;}
     }
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 }
 
@@ -711,7 +711,7 @@ function updateNumericValueColor(colorType, intensity, colorValue) {
     showPreferencesInfo('צבעים', `${colorLabel} עודכן`);
 
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
   }
 }
@@ -738,7 +738,7 @@ function updateNumericValueColorFromHex(colorType, intensity, hexValue) {
     }
 
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
   }
 }
@@ -763,7 +763,7 @@ function resetNumericValueColors() {
     showPreferencesInfo('צבעים', 'הצבעים אופסו לברירת המחדל');
 
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     showPreferencesError('שגיאה', 'לא ניתן לאפס את הצבעים');
   }
 }
@@ -815,7 +815,7 @@ function updateNumericValueColorsUI() {
     }
 
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 }
 
@@ -879,7 +879,7 @@ function updateEntityColor(entityType, colorValue) {
     showPreferencesInfo('צבעי ישויות', `צבע ${entityLabel} עודכן`);
 
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
   }
 }
@@ -899,7 +899,7 @@ function updateEntityColorFromHex(entityType, hexValue) {
     updateEntityColor(entityType, hexValue);
 
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
   }
 }
@@ -924,7 +924,7 @@ function resetEntityColors() {
     showPreferencesInfo('צבעי ישויות', 'צבעי הישויות אופסו לברירת המחדל');
 
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     showPreferencesError('שגיאה', 'לא ניתן לאפס את צבעי הישויות');
   }
 }
@@ -1026,7 +1026,7 @@ function updateEntityColorsUI() {
     }
 
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 }
 

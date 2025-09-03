@@ -486,7 +486,7 @@ async function deleteCashFlow(id) {
       throw new Error(result.error || 'שגיאה לא ידועה');
     }
   } catch {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת תזרים המזומנים');
   }
 }

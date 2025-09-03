@@ -287,7 +287,7 @@ async function loadTradesData() {
     if (typeof handleDataLoadError === 'function') {
       handleDataLoadError(error, 'נתוני טריידים');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
 
     const tbody = document.querySelector('#tradesTable tbody');
@@ -297,7 +297,7 @@ async function loadTradesData() {
       if (typeof handleElementNotFound === 'function') {
         handleElementNotFound('#tradesTable tbody', 'CRITICAL');
       } else {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
       }
     }
   }
@@ -340,7 +340,7 @@ function updateTradesTable(trades) {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('#tradesTable tbody', 'CRITICAL');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
     return;
   }
@@ -446,7 +446,7 @@ function editTradeRecord(tradeId) {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('trade', 'CRITICAL');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
     window.showErrorNotification('שגיאה', 'טרייד לא נמצא');
   }
@@ -467,7 +467,7 @@ async function cancelTradeRecord(tradeId) {
         tradeDetails = `\n\nפרטי הטרייד:\n• טיקר: ${trade.ticker_symbol || 'לא מוגדר'}\n• צד: ${trade.side || 'לא מוגדר'}\n• סטטוס: ${trade.status || 'לא מוגדר'}`;
       }
     } catch {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
 
     // אישור מהמשתמש באמצעות המערכת הגלובלית
@@ -520,7 +520,7 @@ async function cancelTradeRecord(tradeId) {
     if (typeof handleSaveError === 'function') {
       handleSaveError(error, 'ביטול טרייד');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
     window.showErrorNotification('שגיאה', error.message);
   }
@@ -546,7 +546,7 @@ async function checkLinkedItemsAndCancel(tradeId) {
     if (typeof handleSystemError === 'function') {
       handleSystemError(error, 'בדיקת מקושרים');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
     window.showErrorNotification('שגיאה', error.message);
   }
@@ -579,7 +579,7 @@ async function performTradeCancellation(tradeId) {
     if (typeof handleSaveError === 'function') {
       handleSaveError(error, 'ביטול טרייד');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
     window.showErrorNotification('שגיאה', error.message);
   }
@@ -646,7 +646,7 @@ async function deleteTradeRecord(tradeId) {
     if (typeof handleDeleteError === 'function') {
       handleDeleteError(error, 'טרייד');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
     window.showErrorNotification('שגיאה', error.message);
   }
@@ -678,7 +678,7 @@ async function performTradeDeletion(tradeId) {
     if (typeof handleDeleteError === 'function') {
       handleDeleteError(error, 'טרייד');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
     window.showErrorNotification('שגיאה', error.message);
   }
@@ -727,14 +727,14 @@ async function showEditTradeModal(trade) {
       if (typeof handleFunctionNotFound === 'function') {
         handleFunctionNotFound('loadTradeExecutions');
       } else {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
       }
     }
   } else {
     if (typeof handleFunctionNotFound === 'function') {
       handleFunctionNotFound('loadTradeExecutions');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -763,7 +763,7 @@ async function showEditTradeModal(trade) {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('editTradeModal', 'CRITICAL');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 }
@@ -922,7 +922,7 @@ async function loadEditTradeModalData(trade) {
               editTradePlanSelect.value = trade.trade_plan_id;
             } else {
               // התוכנית לא נמצאת ברשימה (כנראה סגורה או מבוטלת)
-// Console statement removed for no-console compliance
+              // Console statement removed for no-console compliance
               editTradePlanSelect.setAttribute('data-cleared', 'true');
               editTradePlanSelect.value = '';
 
@@ -1023,7 +1023,7 @@ async function loadEditTradeModalData(trade) {
     if (typeof handleDataLoadError === 'function') {
       handleDataLoadError(error, 'נתונים למודל עריכת טרייד');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
     if (typeof window.showNotification === 'function') {
       window.showErrorNotification('שגיאה בטעינת נתונים', 'שגיאה בטעינת נתונים למודל העריכה');
@@ -1149,7 +1149,7 @@ async function saveEditTradeData() {
     if (typeof handleSaveError === 'function') {
       handleSaveError(error, 'עדכון טרייד');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
     window.showErrorNotification('שגיאה', error.message);
   }
@@ -1210,7 +1210,7 @@ function showAddTradeModal() {
       if (typeof handleSystemError === 'function') {
         handleSystemError(new Error('Bootstrap is not loaded'), 'מערכת מודלים');
       } else {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
       }
       // נסיון חלופי להצגת המודל
       modalElement.style.display = 'block';
@@ -1221,7 +1221,7 @@ function showAddTradeModal() {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('addTradeModal', 'CRITICAL');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 }
@@ -1335,7 +1335,7 @@ function validateTradeForm() {
   if (typeof window.validateForm === 'function') {
     return window.validateForm('addTradeForm', validationRules);
   } else {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     return { isValid: true, errors: {}, errorMessages: [] };
   }
 }
@@ -1391,7 +1391,7 @@ async function saveNewTradeRecord() {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('form elements', 'CRITICAL');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
 
     // בדיקה אם המודל פתוח
@@ -1436,7 +1436,7 @@ async function saveNewTradeRecord() {
       if (typeof handleSaveError === 'function') {
         handleSaveError(new Error(`Status: ${response.status} - ${errorData.error?.message || errorData.message || 'שגיאה לא ידועה'}`), 'שמירת טרייד');
       } else {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
       }
 
       window.showErrorNotification('שגיאה', `שגיאה בשמירת טרייד: ${errorData.error?.message || errorData.message || 'שגיאה לא ידועה'}`);
@@ -1446,7 +1446,7 @@ async function saveNewTradeRecord() {
     if (typeof handleSaveError === 'function') {
       handleSaveError(error, 'שמירת טרייד');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
     window.showErrorNotification('שגיאה', 'שגיאה בתקשורת עם השרת');
   }
@@ -1565,7 +1565,7 @@ async function loadModalData() {
     if (typeof handleDataLoadError === 'function') {
       handleDataLoadError(error, 'נתונים למודל');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 }
@@ -1651,7 +1651,7 @@ async function updateTickerFromTradePlan(tradePlanId) {
           if (typeof handleDataLoadError === 'function') {
             handleDataLoadError(error, 'נתוני טיקר');
           } else {
-// Console statement removed for no-console compliance
+            // Console statement removed for no-console compliance
           }
           // ערכי ברירת מחדל
           document.getElementById('addTradeCurrentPrice').textContent = 'לא זמין';
@@ -1670,7 +1670,7 @@ async function updateTickerFromTradePlan(tradePlanId) {
     if (typeof handleDataLoadError === 'function') {
       handleDataLoadError(error, 'עדכון טיקר');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 }
@@ -1745,7 +1745,7 @@ window.updateGridFromComponent = function (_selectedStatuses, _selectedTypes, _s
     if (typeof handleFunctionNotFound === 'function') {
       handleFunctionNotFound('loadTradesData');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 };
@@ -1938,7 +1938,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (typeof handleFunctionNotFound === 'function') {
       handleFunctionNotFound('restoreAllSectionStates');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -1999,7 +1999,7 @@ async function checkLinkedItemsBeforeDelete(tradeId) {
     if (typeof handleSystemError === 'function') {
       handleSystemError(error, 'בדיקת פריטים מקושרים');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
     return false;
   }
@@ -2041,7 +2041,7 @@ async function checkLinkedItemsBeforeCancel(tradeId) {
     if (typeof handleSystemError === 'function') {
       handleSystemError(error, 'בדיקת פריטים מקושרים');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
     return false;
   }
@@ -2221,7 +2221,7 @@ function updateTableStats() {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('tradesCount', 'CRITICAL');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -2269,7 +2269,7 @@ function updateTableStats() {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('summaryStats', 'CRITICAL');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -2304,7 +2304,7 @@ async function loadTradePlanDates() {
         if (typeof handleDataLoadError === 'function') {
           handleDataLoadError(error, `תוכנית ${planId}`);
         } else {
-// Console statement removed for no-console compliance
+          // Console statement removed for no-console compliance
         }
       }
     }
@@ -2323,7 +2323,7 @@ function filterTradesData(_selectedStatuses, _selectedTypes, _selectedAccounts, 
     if (typeof handleFunctionNotFound === 'function') {
       handleFunctionNotFound('filterDataByFilters');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -2346,7 +2346,7 @@ function setupSortEventListeners() {
         if (typeof handleFunctionNotFound === 'function') {
           handleFunctionNotFound('sortTable');
         } else {
-// Console statement removed for no-console compliance
+          // Console statement removed for no-console compliance
         }
       }
     });
@@ -2503,7 +2503,7 @@ async function validateTradeChanges(originalTrade, updatedTrade) {
  */
 function applyStatusFilterToTrades(selectedStatuses) {
   if (!window.tradesData || !Array.isArray(window.tradesData)) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     return;
   }
 
@@ -2764,7 +2764,7 @@ async function updateEditTradeTickerFromPlan(tradePlanId) {
     if (typeof handleDataLoadError === 'function') {
       handleDataLoadError(error, 'עדכון טיקר במודל העריכה');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 }
@@ -2812,7 +2812,7 @@ async function updateEditTradePriceFromTicker(tickerId) {
     if (typeof handleDataLoadError === 'function') {
       handleDataLoadError(error, 'עדכון מחיר במודל העריכה');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 }
@@ -2830,7 +2830,7 @@ async function reactivateTrade(tradeId) {
       if (typeof handleElementNotFound === 'function') {
         handleElementNotFound('trade', 'CRITICAL');
       } else {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
       }
       throw new Error('טרייד לא נמצא');
     }
@@ -2864,7 +2864,7 @@ async function reactivateTrade(tradeId) {
     if (typeof handleSaveError === 'function') {
       handleSaveError(error, 'הפעלה מחדש של טרייד');
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהפעלה מחדש', error.message);

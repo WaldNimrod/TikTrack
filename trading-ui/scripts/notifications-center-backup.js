@@ -56,7 +56,7 @@ class NotificationsCenter {
     // רענון אוטומטי
     this.startAutoRefresh();
 
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
   }
 
   initUI() {
@@ -280,7 +280,7 @@ class NotificationsCenter {
 
         messagesSentElement.textContent = stats && stats.totalMessages ? stats.totalMessages : 0;
       } catch (error) {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         connectionTimeElement.textContent = 'עכשיו';
         messagesSentElement.textContent = '0';
       }
@@ -451,7 +451,7 @@ class NotificationsCenter {
       const saved = localStorage.getItem('tiktrack_notification_settings');
       return saved ? { ...defaultSettings, ...JSON.parse(saved) } : defaultSettings;
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       return defaultSettings;
     }
   }
@@ -459,9 +459,9 @@ class NotificationsCenter {
   saveSettings() {
     try {
       localStorage.setItem('tiktrack_notification_settings', JSON.stringify(this.settings));
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -471,7 +471,7 @@ class NotificationsCenter {
       localStorage.setItem('tiktrack_notifications_history', JSON.stringify(this.history.slice(0, 100)));
       localStorage.setItem('tiktrack_notifications_stats', JSON.stringify(this.stats));
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -489,7 +489,7 @@ class NotificationsCenter {
         this.stats = JSON.parse(savedStats);
       }
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -525,10 +525,10 @@ class NotificationsCenter {
         },
         body: JSON.stringify(logEntry),
       }).catch(error => {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
       });
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -619,7 +619,7 @@ class NotificationsCenter {
         }
       }
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -634,7 +634,7 @@ class NotificationsCenter {
       if (statusDot.querySelector('.disconnected')) {return 'disconnected';}
       if (statusDot.querySelector('.connecting')) {return 'connecting';}
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
     return 'connecting';
   }
@@ -712,7 +712,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // אתחול HeaderSystem
   if (window.headerSystem && !window.headerSystem.isInitialized) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     window.headerSystem.init();
   }
 

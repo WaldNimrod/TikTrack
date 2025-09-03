@@ -112,11 +112,11 @@ class JsMapSystem {
 
       } else {
         // Fallback to local scanning
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         this.pageMapping = this.scanPageMappingLocally();
       }
     } catch (_error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.pageMapping = this.scanPageMappingLocally();
     }
   }
@@ -138,14 +138,14 @@ class JsMapSystem {
         // );
 
         // Log some sample data
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
       } else {
         // Fallback to local scanning
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         this.functionsData = this.scanFunctionsLocally();
       }
     } catch (_error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.functionsData = this.scanFunctionsLocally();
     }
   }
@@ -196,7 +196,7 @@ class JsMapSystem {
 
         return scanResult.functions;
       } catch (error) {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
       }
     }
 
@@ -251,7 +251,7 @@ class JsMapSystem {
 
         return scanResult.counts;
       } catch (error) {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
       }
     }
 

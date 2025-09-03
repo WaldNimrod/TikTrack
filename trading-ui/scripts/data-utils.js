@@ -195,7 +195,7 @@ async function loadDataFromAPI(endpoint, maxRetries = 3) {
 
         return data;
       } else {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         return [];
       }
     } catch {
@@ -355,7 +355,7 @@ function calculateDefaultPrices(currentPrice, options = {}) {
  */
 function convertAmountToShares(amount, price, allowFractionalShares = null) {
   if (!amount || !price || price <= 0) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     return { shares: 0, adjustedAmount: 0 };
   }
 
@@ -390,7 +390,7 @@ function convertAmountToShares(amount, price, allowFractionalShares = null) {
  */
 function convertSharesToAmount(shares, price) {
   if (!shares || !price || price <= 0) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     return 0;
   }
 
@@ -409,7 +409,7 @@ function getUserPreference(key, defaultValue = null) {
     const preferences = JSON.parse(localStorage.getItem('userPreferences') || '{}');
     return preferences[key] !== undefined ? preferences[key] : defaultValue;
   } catch {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     return defaultValue;
   }
 }

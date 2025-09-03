@@ -847,7 +847,7 @@ function getTradePlanDetails(planId, data = null) {
 
     return `תוכנית ${planId}`;
   } catch {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     return `תוכנית ${planId}`;
   }
 }
@@ -1537,7 +1537,7 @@ async function loadLinkedItemsData(itemType, itemId) {
     return await response.json();
 
   } catch {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     return null;
   }
 }

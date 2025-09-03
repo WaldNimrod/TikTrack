@@ -66,7 +66,7 @@ class YahooFinanceService {
       return result;
 
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       return null;
     }
   }
@@ -112,7 +112,7 @@ class YahooFinanceService {
       return { ...results, ...freshData };
 
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       return {};
     }
   }
@@ -154,7 +154,7 @@ class YahooFinanceService {
       return data;
 
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this._showNotification(`שגיאה ברענון נתונים: ${error.message}`, 'error');
       return {};
     } finally {
@@ -179,10 +179,10 @@ class YahooFinanceService {
         data[symbol] && !data[symbol].error,
       ).length;
 
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       return data;
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       return {};
     }
   }
@@ -273,7 +273,7 @@ class YahooFinanceService {
         throw new Error(result.error || 'Unknown error');
       }
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       return null;
     }
   }
@@ -311,7 +311,7 @@ class YahooFinanceService {
         throw new Error(result.error || 'Unknown error');
       }
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       return {};
     }
   }
@@ -345,7 +345,7 @@ class YahooFinanceService {
     if (typeof window.showNotification === 'function') {
       window.showNotification(message, type);
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 

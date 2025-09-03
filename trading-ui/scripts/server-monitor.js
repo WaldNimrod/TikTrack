@@ -144,11 +144,11 @@ class ServerMonitor {
         this.updateCurrentModeDisplay(currentMode, cacheTTL);
         return currentMode;
       } else {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         this.updateCurrentModeDisplay('unknown', 'שגיאה');
       }
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.updateCurrentModeDisplay('unknown', 'שגיאה');
     }
 
@@ -204,12 +204,12 @@ class ServerMonitor {
   async setServerMode(mode) {
     // הגנה מפני קריאות כפולות
     if (this.isChangingMode) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       return;
     }
 
     this.isChangingMode = true;
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
 
     try {
       // הצגת הודעה על התחלת השינוי
@@ -220,7 +220,7 @@ class ServerMonitor {
         );
       }
 
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       // ביצוע שינוי המצב דרך הסקריפט restart
       const response = await fetch('/api/server/change-mode', {
         method: 'POST',
@@ -230,13 +230,13 @@ class ServerMonitor {
         body: JSON.stringify({ mode }),
       });
 
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       if (response.ok) {
         const result = await response.json();
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
 
         if (result.status === 'success') {
-// Console statement removed for no-console compliance
+          // Console statement removed for no-console compliance
           if (window.showSuccessNotification) {
             window.showSuccessNotification(
               `מצב שרת שונה בהצלחה ל: ${this.getModeDisplayName(mode)}`,
@@ -253,16 +253,16 @@ class ServerMonitor {
           this.addModeToHistory(mode, 'success');
 
         } else {
-// Console statement removed for no-console compliance
+          // Console statement removed for no-console compliance
           throw new Error(result.message || 'שגיאה בשינוי המצב');
         }
       } else {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         throw new Error(`שגיאת שרת: ${response.status}`);
       }
 
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
 
       if (window.showErrorNotification) {
         window.showErrorNotification(
@@ -400,7 +400,7 @@ class ServerMonitor {
   addModeToHistory(mode, status, errorMessage = null) {
     const historyList = document.getElementById('modeHistoryList');
     if (!historyList) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       return;
     }
 
@@ -575,7 +575,7 @@ class ServerMonitor {
         window.showErrorNotification('בריאות שרת', 'השרת לא מגיב');
       }
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       window.showErrorNotification('בריאות שרת', 'שגיאה בבדיקה');
     }
   }
@@ -602,7 +602,7 @@ class ServerMonitor {
           window.showErrorNotification('ניטור שרת', 'שגיאה בהפעלה מחדש');
         }
       } catch (error) {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         window.showErrorNotification('ניטור שרת', 'שגיאה בהפעלה מחדש');
       }
     }
@@ -629,7 +629,7 @@ class ServerMonitor {
           window.showErrorNotification('ניטור שרת', 'שגיאה בניקוי Cache');
         }
       } catch (error) {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         window.showErrorNotification('ניטור שרת', 'שגיאה בניקוי Cache');
       }
     }
@@ -651,7 +651,7 @@ class ServerMonitor {
           window.showErrorNotification('ניטור שרת', 'שגיאה באופטימיזציה');
         }
       } catch (error) {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         window.showErrorNotification('ניטור שרת', 'שגיאה באופטימיזציה');
       }
     }
@@ -678,7 +678,7 @@ class ServerMonitor {
           window.showErrorNotification('ניטור שרת', 'שגיאה בעצירת חירום');
         }
       } catch (error) {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         window.showErrorNotification('ניטור שרת', 'שגיאה בעצירת חירום');
       }
     }
@@ -709,7 +709,7 @@ class ServerMonitor {
         window.showErrorNotification('ניטור שרת', 'שגיאה בייצוא לוגים');
       }
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       window.showErrorNotification('ניטור שרת', 'שגיאה בייצוא לוגים');
     }
   }
@@ -741,7 +741,7 @@ class ServerMonitor {
         window.showErrorNotification('ניטור שרת', `שגיאה בהרצת סקריפט ${scriptName}`);
       }
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       window.showErrorNotification('ניטור שרת', `שגיאה בהרצת סקריפט ${scriptName}`);
     }
   }
@@ -855,7 +855,7 @@ class ServerMonitor {
         this.limitPerformanceData();
       }
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -891,7 +891,7 @@ class ServerMonitor {
 
       window.showSuccessNotification('ניטור שרת', 'נתוני ביצועים יוצאו בהצלחה');
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       window.showErrorNotification('ניטור שרת', 'שגיאה בייצוא נתונים');
     }
   }
@@ -906,11 +906,11 @@ class ServerMonitor {
         this.logs = data.data.logs;
         this.displayLogs();
       } else {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         this.displayLogs([]);
       }
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.displayLogs([]);
     }
   }
@@ -1012,10 +1012,10 @@ class ServerMonitor {
       if (response.ok && data.status === 'success') {
         this.updateSystemInfo(data.data);
       } else {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
       }
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -1097,7 +1097,7 @@ class ServerMonitor {
   // העתקת לוג מפורט
   async copyDetailedLog() {
     try {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
 
       // יצירת לוג מפורט
       const detailedLog = await this.generateDetailedLog();
@@ -1114,10 +1114,10 @@ class ServerMonitor {
         }
       }
 
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
 
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
 
       // הצגת הודעת שגיאה
       if (window.showErrorNotification) {
@@ -1230,7 +1230,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // אתחול HeaderSystem
   if (window.headerSystem && !window.headerSystem.isInitialized) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     window.headerSystem.init();
   }
 

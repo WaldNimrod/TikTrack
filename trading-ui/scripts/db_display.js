@@ -78,7 +78,7 @@ function setupEventListeners() {
  */
 async function loadTableData(tableType) {
   try {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
 
     // Update current table type
     currentTableType = tableType;
@@ -99,10 +99,10 @@ async function loadTableData(tableType) {
     updateTableInfo(tableType, data.length);
 
 
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
 
   } catch (error) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     handleDataLoadError(error, tableType);
   }
 }
@@ -127,7 +127,7 @@ async function fetchTableData(tableType) {
       throw new Error(result.error?.message || `Error fetching ${tableType} data`);
     }
   } catch {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     // Return empty array on error
     return [];
   }
@@ -146,28 +146,28 @@ function updateTableDisplay(data, tableType) {
   const tableContainer = document.getElementById(containerId);
 
   if (!tableContainer) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     return;
   }
 
   // Find the table within the container
   const table = tableContainer.querySelector('table');
   if (!table) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     return;
   }
 
   // Find the table body
   const tbody = table.querySelector('tbody');
   if (!tbody) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     return;
   }
 
   // Get table mappings
   const tableMapping = window.TABLE_COLUMN_MAPPINGS?.[tableType];
   if (!tableMapping) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     return;
   }
 
@@ -431,14 +431,14 @@ function sortTable(columnIndex, tableType) {
   const tableMapping = window.TABLE_COLUMN_MAPPINGS?.[tableType];
 
   if (!tableMapping) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     return;
   }
 
   // Get the field name for the column
   const fieldName = tableMapping[columnIndex];
   if (!fieldName) {
-// Console statement removed for no-console compliance
+    // Console statement removed for no-console compliance
     return;
   }
 

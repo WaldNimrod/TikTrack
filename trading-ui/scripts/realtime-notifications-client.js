@@ -46,7 +46,7 @@ class RealtimeNotificationsClient {
     try {
       // Check if Socket.IO is available
       if (typeof io === 'undefined') {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         this.loadSocketIO();
       } else {
         this.connect();
@@ -61,29 +61,29 @@ class RealtimeNotificationsClient {
     const script = document.createElement('script');
     script.src = 'https://cdn.socket.io/4.7.2/socket.io.min.js';
     script.onload = () => {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       // Wait a bit for the script to initialize
       setTimeout(() => {
         if (typeof io !== 'undefined') {
           this.connect();
         } else {
-// Console statement removed for no-console compliance
+          // Console statement removed for no-console compliance
         }
       }, 100);
     };
     script.onerror = () => {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     };
     document.head.appendChild(script);
   }
 
   connect() {
     try {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
 
       // Create Socket.IO connection
       if (typeof window.io === 'undefined') {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         return;
       }
 
@@ -100,7 +100,7 @@ class RealtimeNotificationsClient {
         // Set up event handlers
         this.setupEventHandlers();
 
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
       } catch {
         // Error creating Socket.IO connection
         return;
@@ -122,7 +122,7 @@ class RealtimeNotificationsClient {
       this.reconnectAttempts = 0;
       this.reconnectDelay = 1000;
 
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.showConnectionStatus('connected');
 
       // Join user-specific room if user is logged in
@@ -133,7 +133,7 @@ class RealtimeNotificationsClient {
       this.connected = false;
       this.connectionStats.disconnectedAt = new Date();
 
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.showConnectionStatus('disconnected');
 
       if (reason === 'io server disconnect') {
@@ -149,12 +149,12 @@ class RealtimeNotificationsClient {
     });
 
     this.socket.on('reconnect', attemptNumber => {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.showConnectionStatus('reconnected');
     });
 
     this.socket.on('reconnect_failed', () => {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.showConnectionStatus('failed');
     });
 
@@ -170,55 +170,55 @@ class RealtimeNotificationsClient {
 
     // Background task events
     this.socket.on('background_task_started', data => {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.handleBackgroundTaskEvent('started', data);
     });
 
     this.socket.on('background_task_completed', data => {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.handleBackgroundTaskEvent('completed', data);
     });
 
     this.socket.on('background_task_failed', data => {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.handleBackgroundTaskEvent('failed', data);
     });
 
     // Database events
     this.socket.on('data_updated', data => {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.handleDataEvent('updated', data);
     });
 
     this.socket.on('data_error', data => {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.handleDataEvent('error', data);
     });
 
     // External data events
     this.socket.on('external_data_update', data => {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.handleExternalDataEvent('updated', data);
     });
 
     this.socket.on('external_data_error', data => {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.handleExternalDataEvent('error', data);
     });
 
     // System events
     this.socket.on('connected', data => {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.handleSystemEvent('connected', data);
     });
 
     this.socket.on('room_joined', data => {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.handleSystemEvent('room_joined', data);
     });
 
     this.socket.on('room_left', data => {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
       this.handleSystemEvent('room_left', data);
     });
   }
@@ -229,7 +229,7 @@ class RealtimeNotificationsClient {
     // Handle custom events from other parts of the system
     this.socket.onAny((eventName, ...args) => {
       if (!this.isSystemEvent(eventName)) {
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         this.handleCustomEvent(eventName, args);
       }
     });
@@ -287,7 +287,7 @@ class RealtimeNotificationsClient {
       this.emitCustomEvent('background_task_event', { type, data });
 
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -322,7 +322,7 @@ class RealtimeNotificationsClient {
       this.emitCustomEvent('data_event', { type, data });
 
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -358,7 +358,7 @@ class RealtimeNotificationsClient {
       this.emitCustomEvent('external_data_event', { type, data });
 
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -366,20 +366,20 @@ class RealtimeNotificationsClient {
     try {
       switch (type) {
       case 'connected':
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         break;
 
       case 'room_joined':
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         break;
 
       case 'room_left':
-// Console statement removed for no-console compliance
+        // Console statement removed for no-console compliance
         break;
       }
 
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -389,7 +389,7 @@ class RealtimeNotificationsClient {
       this.emitCustomEvent('custom_event', { eventName, args });
 
     } catch (error) {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -401,7 +401,7 @@ class RealtimeNotificationsClient {
     } else if (typeof window.showNotification === 'function') {
       window.showNotification(message, 'info', title, duration);
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -411,7 +411,7 @@ class RealtimeNotificationsClient {
     } else if (typeof window.showNotification === 'function') {
       window.showNotification(message, 'success', title, duration);
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -421,7 +421,7 @@ class RealtimeNotificationsClient {
     } else if (typeof window.showNotification === 'function') {
       window.showNotification(message, 'error', title, duration);
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -431,7 +431,7 @@ class RealtimeNotificationsClient {
     } else if (typeof window.showNotification === 'function') {
       window.showNotification(message, 'warning', title, duration);
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -446,14 +446,14 @@ class RealtimeNotificationsClient {
   joinRoom(roomName) {
     if (this.socket && this.connected) {
       this.socket.emit('join_room', { room: roomName });
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
   leaveRoom(roomName) {
     if (this.socket && this.connected) {
       this.socket.emit('leave_room', { room: roomName });
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -499,13 +499,13 @@ class RealtimeNotificationsClient {
       this.reconnectAttempts++;
       this.reconnectDelay = Math.min(this.reconnectDelay * 2, 30000); // Max 30 seconds
 
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
 
       setTimeout(() => {
         this.connect();
       }, this.reconnectDelay);
     } else {
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 
@@ -513,7 +513,7 @@ class RealtimeNotificationsClient {
     if (this.socket) {
       this.socket.disconnect();
       this.connected = false;
-// Console statement removed for no-console compliance
+      // Console statement removed for no-console compliance
     }
   }
 

@@ -1,0 +1,484 @@
+
+> tiktrackapp@1.0.0 lint
+> eslint trading-ui/scripts/*.js
+
+
+/workspace/trading-ui/scripts/alerts.js
+   418:11  warning  'relatedIcon' is assigned a value but never used  no-unused-vars
+   766:12  warning  'error' is defined but never used                 no-unused-vars
+  1872:16  warning  '_deleteAlert' is defined but never used          no-unused-vars
+  2016:10  warning  '_getRelatedClass' is defined but never used      no-unused-vars
+
+/workspace/trading-ui/scripts/auth.js
+  305:24  warning  'permission' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+/workspace/trading-ui/scripts/background-tasks.js
+    26:7   warning  'logSystem' is assigned a value but never used                                 no-unused-vars
+   101:7   warning  Unexpected console statement                                                   no-console
+   139:7   warning  Unexpected console statement                                                   no-console
+   157:7   warning  Unexpected console statement                                                   no-console
+   247:5   warning  Unexpected console statement                                                   no-console
+   272:5   warning  Unexpected console statement                                                   no-console
+   283:9   warning  Unexpected console statement                                                   no-console
+   290:9   warning  Unexpected console statement                                                   no-console
+   560:5   warning  Unexpected console statement                                                   no-console
+   567:5   warning  Unexpected console statement                                                   no-console
+   576:7   warning  Unexpected console statement                                                   no-console
+   578:7   warning  Unexpected console statement                                                   no-console
+   583:7   warning  Unexpected console statement                                                   no-console
+   585:7   warning  Unexpected console statement                                                   no-console
+   590:7   warning  Unexpected console statement                                                   no-console
+   592:7   warning  Unexpected console statement                                                   no-console
+   635:5   warning  Unexpected console statement                                                   no-console
+   638:7   warning  Unexpected console statement                                                   no-console
+   640:7   warning  Unexpected console statement                                                   no-console
+   642:7   warning  Unexpected console statement                                                   no-console
+   646:7   warning  Unexpected console statement                                                   no-console
+   648:7   warning  Unexpected console statement                                                   no-console
+   652:7   warning  Unexpected console statement                                                   no-console
+   660:5   warning  Unexpected console statement                                                   no-console
+   663:7   warning  Unexpected console statement                                                   no-console
+   665:7   warning  Unexpected console statement                                                   no-console
+   667:7   warning  Unexpected console statement                                                   no-console
+   671:7   warning  Unexpected console statement                                                   no-console
+   673:7   warning  Unexpected console statement                                                   no-console
+   677:7   warning  Unexpected console statement                                                   no-console
+   685:5   warning  Unexpected console statement                                                   no-console
+   688:7   warning  Unexpected console statement                                                   no-console
+   690:7   warning  Unexpected console statement                                                   no-console
+   692:7   warning  Unexpected console statement                                                   no-console
+   700:5   warning  Unexpected console statement                                                   no-console
+   704:7   warning  Unexpected console statement                                                   no-console
+   706:7   warning  Unexpected console statement                                                   no-console
+   708:7   warning  Unexpected console statement                                                   no-console
+   711:7   warning  Unexpected console statement                                                   no-console
+   738:5   warning  Unexpected console statement                                                   no-console
+   743:7   warning  Unexpected console statement                                                   no-console
+   745:7   warning  Unexpected console statement                                                   no-console
+   747:7   warning  Unexpected console statement                                                   no-console
+   750:7   warning  Unexpected console statement                                                   no-console
+   778:5   warning  Unexpected console statement                                                   no-console
+   783:7   warning  Unexpected console statement                                                   no-console
+   785:7   warning  Unexpected console statement                                                   no-console
+   787:7   warning  Unexpected console statement                                                   no-console
+   790:7   warning  Unexpected console statement                                                   no-console
+   804:7   warning  Unexpected console statement                                                   no-console
+   819:7   warning  Unexpected console statement                                                   no-console
+   865:38  warning  'executionId' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+   886:9   warning  Unexpected console statement                                                   no-console
+   890:5   warning  Unexpected console statement                                                   no-console
+   900:7   warning  Unexpected console statement                                                   no-console
+  1019:7   warning  Unexpected console statement                                                   no-console
+  1020:7   warning  Unexpected console statement                                                   no-console
+  1021:7   warning  Unexpected console statement                                                   no-console
+  1024:7   warning  Unexpected console statement                                                   no-console
+  1029:7   warning  Unexpected console statement                                                   no-console
+  1030:7   warning  Unexpected console statement                                                   no-console
+  1031:7   warning  Unexpected console statement                                                   no-console
+  1039:5   warning  Unexpected console statement                                                   no-console
+  1061:7   warning  Unexpected console statement                                                   no-console
+  1064:5   warning  Unexpected console statement                                                   no-console
+  1067:5   warning  Unexpected console statement                                                   no-console
+
+/workspace/trading-ui/scripts/cache-test.js
+  404:3  warning  Async method 'testSetCache' has no 'await' expression     require-await
+  440:3  warning  Async method 'testGetCache' has no 'await' expression     require-await
+  473:3  warning  Async method 'testDeleteCache' has no 'await' expression  require-await
+  671:1  warning  This line has a length of 143. Maximum allowed is 120     max-len
+  683:5  warning  Unexpected console statement                              no-console
+  702:7  warning  Unexpected console statement                              no-console
+
+/workspace/trading-ui/scripts/cash_flows.js
+  1291:16  warning  '_showAddCashFlowModal' is defined but never used   no-unused-vars
+  1327:16  warning  '_showEditCashFlowModal' is defined but never used  no-unused-vars
+
+/workspace/trading-ui/scripts/color-scheme-system.js
+  1018:5  warning  Unexpected console statement  no-console
+  1090:5  warning  Unexpected console statement  no-console
+  1093:5  warning  Unexpected console statement  no-console
+  1103:5  warning  Unexpected console statement  no-console
+  1122:7  warning  Unexpected console statement  no-console
+  1125:5  warning  Unexpected console statement  no-console
+  1139:7  warning  Unexpected console statement  no-console
+  1142:5  warning  Unexpected console statement  no-console
+  1151:3  warning  Unexpected console statement  no-console
+
+/workspace/trading-ui/scripts/console-cleanup.js
+   33:25  warning  Unexpected console statement  no-console
+   34:26  warning  Unexpected console statement  no-console
+   35:27  warning  Unexpected console statement  no-console
+   56:5   warning  Unexpected console statement  no-console
+   57:5   warning  Unexpected console statement  no-console
+   58:5   warning  Unexpected console statement  no-console
+   67:7   warning  Unexpected console statement  no-console
+   68:7   warning  Unexpected console statement  no-console
+   69:7   warning  Unexpected console statement  no-console
+  164:5   warning  Unexpected console statement  no-console
+  168:3   warning  Unexpected console statement  no-console
+  173:5   warning  Unexpected console statement  no-console
+  177:7   warning  Unexpected console statement  no-console
+  179:7   warning  Unexpected console statement  no-console
+
+/workspace/trading-ui/scripts/constraint-manager.js
+  89:7  warning  Unexpected console statement  no-console
+
+/workspace/trading-ui/scripts/db-extradata.js
+   347:12  warning  'error' is defined but never used                      no-unused-vars
+   406:1   warning  This line has a length of 151. Maximum allowed is 120  max-len
+   502:1   warning  This line has a length of 153. Maximum allowed is 120  max-len
+   580:1   warning  This line has a length of 159. Maximum allowed is 120  max-len
+   585:1   warning  This line has a length of 132. Maximum allowed is 120  max-len
+   596:1   warning  This line has a length of 126. Maximum allowed is 120  max-len
+   791:1   warning  This line has a length of 167. Maximum allowed is 120  max-len
+   802:1   warning  This line has a length of 171. Maximum allowed is 120  max-len
+   808:1   warning  This line has a length of 122. Maximum allowed is 120  max-len
+   850:1   warning  This line has a length of 169. Maximum allowed is 120  max-len
+   862:1   warning  This line has a length of 187. Maximum allowed is 120  max-len
+   868:1   warning  This line has a length of 124. Maximum allowed is 120  max-len
+   892:1   warning  This line has a length of 175. Maximum allowed is 120  max-len
+   897:1   warning  This line has a length of 132. Maximum allowed is 120  max-len
+   908:1   warning  This line has a length of 134. Maximum allowed is 120  max-len
+  1069:1   warning  This line has a length of 161. Maximum allowed is 120  max-len
+  1080:1   warning  This line has a length of 171. Maximum allowed is 120  max-len
+  1084:1   warning  This line has a length of 190. Maximum allowed is 120  max-len
+  1101:1   warning  This line has a length of 141. Maximum allowed is 120  max-len
+  1150:1   warning  This line has a length of 163. Maximum allowed is 120  max-len
+  1162:1   warning  This line has a length of 172. Maximum allowed is 120  max-len
+  1166:1   warning  This line has a length of 157. Maximum allowed is 120  max-len
+  1170:1   warning  This line has a length of 122. Maximum allowed is 120  max-len
+  1190:1   warning  This line has a length of 121. Maximum allowed is 120  max-len
+  1214:1   warning  This line has a length of 169. Maximum allowed is 120  max-len
+  1219:1   warning  This line has a length of 132. Maximum allowed is 120  max-len
+  1230:1   warning  This line has a length of 131. Maximum allowed is 120  max-len
+  1713:1   warning  This line has a length of 133. Maximum allowed is 120  max-len
+
+/workspace/trading-ui/scripts/executions.js
+  1596:9  warning  'negativeColor' is assigned a value but never used  no-unused-vars
+
+/workspace/trading-ui/scripts/external-data-dashboard.js
+  132:12  warning  'error' is defined but never used                                             no-unused-vars
+  206:14  warning  'error' is defined but never used                                             no-unused-vars
+  220:14  warning  'error' is defined but never used                                             no-unused-vars
+  234:14  warning  'error' is defined but never used                                             no-unused-vars
+  248:14  warning  'error' is defined but never used                                             no-unused-vars
+  262:14  warning  'error' is defined but never used                                             no-unused-vars
+  390:14  warning  'error' is defined but never used                                             no-unused-vars
+  453:14  warning  'error' is defined but never used                                             no-unused-vars
+  510:14  warning  'error' is defined but never used                                             no-unused-vars
+  527:14  warning  'error' is defined but never used                                             no-unused-vars
+  590:11  warning  'levelFilter' is assigned a value but never used                              no-unused-vars
+  591:11  warning  'searchTerm' is assigned a value but never used                               no-unused-vars
+  621:15  warning  'result' is assigned a value but never used                                   no-unused-vars
+  627:14  warning  'error' is defined but never used                                             no-unused-vars
+  658:14  warning  'error' is defined but never used                                             no-unused-vars
+  669:15  warning  'result' is assigned a value but never used                                   no-unused-vars
+  675:14  warning  'error' is defined but never used                                             no-unused-vars
+  686:15  warning  'result' is assigned a value but never used                                   no-unused-vars
+  692:14  warning  'error' is defined but never used                                             no-unused-vars
+  703:15  warning  'result' is assigned a value but never used                                   no-unused-vars
+  710:14  warning  'error' is defined but never used                                             no-unused-vars
+  738:14  warning  'error' is defined but never used                                             no-unused-vars
+  772:14  warning  'error' is defined but never used                                             no-unused-vars
+  785:14  warning  'error' is defined but never used                                             no-unused-vars
+  799:32  warning  'providerId' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  804:34  warning  'providerId' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+/workspace/trading-ui/scripts/external-data-service.js
+   89:3   warning  Expected 'this' to be used by class method 'getCacheKey'             class-methods-use-this
+  416:3   warning  Expected 'this' to be used by class method 'formatPrice'             class-methods-use-this
+  442:3   warning  Expected 'this' to be used by class method 'formatPercentageChange'  class-methods-use-this
+  488:3   warning  Expected 'this' to be used by class method 'isDataStale'             class-methods-use-this
+  497:14  warning  'error' is defined but never used                                    no-unused-vars
+
+/workspace/trading-ui/scripts/header-system.js
+   673:1   warning  This line has a length of 138. Maximum allowed is 120                           max-len
+   689:1   warning  This line has a length of 135. Maximum allowed is 120                           max-len
+   705:1   warning  This line has a length of 129. Maximum allowed is 120                           max-len
+   746:1   warning  This line has a length of 122. Maximum allowed is 120                           max-len
+   775:1   warning  This line has a length of 127. Maximum allowed is 120                           max-len
+   802:1   warning  This line has a length of 125. Maximum allowed is 120                           max-len
+   815:1   warning  This line has a length of 132. Maximum allowed is 120                           max-len
+   864:1   warning  This line has a length of 122. Maximum allowed is 120                           max-len
+   868:1   warning  This line has a length of 122. Maximum allowed is 120                           max-len
+   872:1   warning  This line has a length of 122. Maximum allowed is 120                           max-len
+  1555:38  warning  'e' is defined but never used. Allowed unused args must match /^_/u             no-unused-vars
+  1748:38  warning  'e' is defined but never used. Allowed unused args must match /^_/u             no-unused-vars
+  1768:38  warning  'e' is defined but never used. Allowed unused args must match /^_/u             no-unused-vars
+  1802:38  warning  'e' is defined but never used. Allowed unused args must match /^_/u             no-unused-vars
+  1836:38  warning  'e' is defined but never used. Allowed unused args must match /^_/u             no-unused-vars
+  1942:3   warning  Expected 'this' to be used by class method 'setupMenuAutoClose'                 class-methods-use-this
+  2068:3   warning  Expected 'this' to be used by class method 'addSubmenuEventListenersToElement'  class-methods-use-this
+  2099:3   warning  Expected 'this' to be used by class method 'updateAccountFilterMenu'            class-methods-use-this
+  2356:3   warning  Expected 'this' to be used by class method 'loadUserPreferences'                class-methods-use-this
+  2383:14  warning  'error' is defined but never used                                               no-unused-vars
+  2398:3   warning  Expected 'this' to be used by class method 'updateStatusFilterDisplayText'      class-methods-use-this
+  2421:3   warning  Expected 'this' to be used by class method 'updateTypeFilterDisplayText'        class-methods-use-this
+  2444:3   warning  Expected 'this' to be used by class method 'updateDateRangeFilterDisplayText'   class-methods-use-this
+  2470:14  warning  'path' is assigned a value but never used                                       no-unused-vars
+  2470:20  warning  'anchor' is assigned a value but never used                                     no-unused-vars
+  2479:3   warning  Expected 'this' to be used by class method 'scrollToSection'                    class-methods-use-this
+  2492:3   warning  Expected 'this' to be used by class method 'toggleFilterSection'                class-methods-use-this
+  2504:3   warning  Expected 'this' to be used by class method 'closeMainMenu'                      class-methods-use-this
+  2537:13  warning  'menuType' is assigned a value but never used                                   no-unused-vars
+  2605:14  warning  'err' is defined but never used                                                 no-unused-vars
+  2611:3   warning  Expected 'this' to be used by class method 'updateAccountFilterOptions'         class-methods-use-this
+  2657:3   warning  Expected 'this' to be used by class method 'navigateToPage'                     class-methods-use-this
+  3036:13  warning  'selectedItems' is assigned a value but never used                              no-unused-vars
+  3087:13  warning  'selectedItems' is assigned a value but never used                              no-unused-vars
+  3138:13  warning  'selectedItems' is assigned a value but never used                              no-unused-vars
+  3554:54  warning  'totalCount' is defined but never used. Allowed unused args must match /^_/u    no-unused-vars
+  3755:12  warning  'error' is defined but never used                                               no-unused-vars
+  4309:1   warning  This line has a length of 134. Maximum allowed is 120                           max-len
+  4311:12  warning  'error' is defined but never used                                               no-unused-vars
+  4591:12  warning  'error' is defined but never used                                               no-unused-vars
+  4600:10  warning  'getAccountsFromStorage' is defined but never used                              no-unused-vars
+  4609:12  warning  'error' is defined but never used                                               no-unused-vars
+  4618:10  warning  'processAccountFilterReset' is defined but never used                           no-unused-vars
+  4624:31  warning  'index' is defined but never used. Allowed unused args must match /^_/u         no-unused-vars
+  4625:11  warning  'value' is assigned a value but never used                                      no-unused-vars
+  4626:11  warning  'id' is assigned a value but never used                                         no-unused-vars
+  4698:27  error    Trailing spaces not allowed                                                     no-trailing-spaces
+  4717:11  warning  'clearedLocalStorage' is assigned a value but never used                        no-unused-vars
+  4726:14  warning  'e' is defined but never used                                                   no-unused-vars
+  4732:13  warning  'sessionKeys' is assigned a value but never used                                no-unused-vars
+  4735:14  warning  'e' is defined but never used                                                   no-unused-vars
+  4750:14  warning  'e' is defined but never used                                                   no-unused-vars
+  4764:13  warning  'result' is assigned a value but never used                                     no-unused-vars
+  4780:14  warning  'e' is defined but never used                                                   no-unused-vars
+  4794:14  warning  'e' is defined but never used                                                   no-unused-vars
+  4804:14  warning  'e' is defined but never used                                                   no-unused-vars
+  4815:14  warning  'e' is defined but never used                                                   no-unused-vars
+  4829:14  warning  'e' is defined but never used                                                   no-unused-vars
+
+/workspace/trading-ui/scripts/js-map.js
+   98:14  warning  'error' is defined but never used                         no-unused-vars
+  118:14  warning  'error' is defined but never used                         no-unused-vars
+  146:14  warning  'error' is defined but never used                         no-unused-vars
+  197:16  warning  'error' is defined but never used                         no-unused-vars
+  252:16  warning  'error' is defined but never used                         no-unused-vars
+  269:11  warning  'sampleFunctionCalls' is assigned a value but never used  no-unused-vars
+  440:1   warning  This line has a length of 125. Maximum allowed is 120     max-len
+  449:1   warning  This line has a length of 125. Maximum allowed is 120     max-len
+  481:14  warning  'error' is defined but never used                         no-unused-vars
+  499:10  warning  'loadJsMapData' is defined but never used                 no-unused-vars
+  505:10  warning  'refreshJsMap' is defined but never used                  no-unused-vars
+  511:10  warning  'toggleFunctionGroup' is defined but never used           no-unused-vars
+  524:10  warning  'openFunctionDetails' is defined but never used           no-unused-vars
+  540:1   warning  This line has a length of 125. Maximum allowed is 120     max-len
+  541:1   warning  This line has a length of 140. Maximum allowed is 120     max-len
+
+/workspace/trading-ui/scripts/linked-items.js
+   656:11  warning  'explanation' is already declared in the upper scope on line 606 column 7            no-shadow
+   675:11  warning  'explanation' is already declared in the upper scope on line 606 column 7            no-shadow
+  1189:35  warning  'itemType' is assigned a value but never used. Allowed unused args must match /^_/u  no-unused-vars
+  1229:14  warning  'error' is defined but never used. Allowed unused args must match /^_/u              no-unused-vars
+  1251:41  warning  'itemType' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  1251:51  warning  'itemId' is defined but never used. Allowed unused args must match /^_/u             no-unused-vars
+  1336:26  warning  'type' is defined but never used. Allowed unused args must match /^_/u               no-unused-vars
+  1336:32  warning  'id' is defined but never used. Allowed unused args must match /^_/u                 no-unused-vars
+  1349:19  warning  'type' is defined but never used. Allowed unused args must match /^_/u               no-unused-vars
+  1349:25  warning  'id' is defined but never used. Allowed unused args must match /^_/u                 no-unused-vars
+  1362:21  warning  'type' is defined but never used. Allowed unused args must match /^_/u               no-unused-vars
+  1362:27  warning  'id' is defined but never used. Allowed unused args must match /^_/u                 no-unused-vars
+  1375:10  warning  'openItemPage' is defined but never used                                             no-unused-vars
+  1375:23  warning  'itemType' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  1375:33  warning  'itemId' is defined but never used. Allowed unused args must match /^_/u             no-unused-vars
+
+/workspace/trading-ui/scripts/notification-system.js
+  346:5   warning  Unexpected console statement                           no-console
+  368:1   warning  This line has a length of 129. Maximum allowed is 120  max-len
+  373:1   warning  This line has a length of 132. Maximum allowed is 120  max-len
+  456:12  warning  'error' is defined but never used                      no-unused-vars
+  516:10  warning  'showNotificationLegacy' is defined but never used     no-unused-vars
+
+/workspace/trading-ui/scripts/notifications-center-backup.js
+   59:5   warning  Unexpected console statement                                             no-console
+  185:3   warning  Expected 'this' to be used by class method 'showNotificationPopup'       class-methods-use-this
+  202:3   warning  Expected 'this' to be used by class method 'playNotificationSound'       class-methods-use-this
+  283:9   warning  Unexpected console statement                                             no-console
+  387:1   warning  This line has a length of 146. Maximum allowed is 120                    max-len
+  395:3   warning  Expected 'this' to be used by class method 'getIconClass'                class-methods-use-this
+  410:3   warning  Expected 'this' to be used by class method 'getTimeAgo'                  class-methods-use-this
+  422:3   warning  Expected 'this' to be used by class method 'getPeriodInMs'               class-methods-use-this
+  432:3   warning  Expected 'this' to be used by class method 'formatDuration'              class-methods-use-this
+  440:3   warning  Expected 'this' to be used by class method 'loadSettings'                class-methods-use-this
+  454:7   warning  Unexpected console statement                                             no-console
+  462:7   warning  Unexpected console statement                                             no-console
+  464:7   warning  Unexpected console statement                                             no-console
+  474:7   warning  Unexpected console statement                                             no-console
+  492:7   warning  Unexpected console statement                                             no-console
+  509:3   warning  Expected 'this' to be used by class method 'saveToLogFile'               class-methods-use-this
+  528:9   warning  Unexpected console statement                                             no-console
+  531:7   warning  Unexpected console statement                                             no-console
+  622:7   warning  Unexpected console statement                                             no-console
+  626:3   warning  Expected 'this' to be used by class method 'getCurrentConnectionStatus'  class-methods-use-this
+  637:7   warning  Unexpected console statement                                             no-console
+  655:10  warning  'saveNotificationSettings' is defined but never used                     no-unused-vars
+  673:10  warning  'resetNotificationSettings' is defined but never used                    no-unused-vars
+  685:10  warning  'clearLiveNotifications' is defined but never used                       no-unused-vars
+  691:10  warning  'clearHistory' is defined but never used                                 no-unused-vars
+  697:10  warning  'refreshNotifications' is defined but never used                         no-unused-vars
+  703:10  warning  'filterHistory' is defined but never used                                no-unused-vars
+  711:3   warning  Unexpected console statement                                             no-console
+  715:5   warning  Unexpected console statement                                             no-console
+  722:3   warning  Unexpected console statement                                             no-console
+
+/workspace/trading-ui/scripts/notifications-center.js
+  427:1   warning  This line has a length of 146. Maximum allowed is 120                    max-len
+  456:16  warning  'error' is defined but never used                                        no-unused-vars
+  578:16  warning  'error' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  581:14  warning  'error' is defined but never used                                        no-unused-vars
+  679:14  warning  'error' is defined but never used                                        no-unused-vars
+  694:14  warning  'error' is defined but never used                                        no-unused-vars
+  702:10  warning  'copyNotificationsToClipboard' is defined but never used                 no-unused-vars
+  748:14  warning  'err' is defined but never used. Allowed unused args must match /^_/u    no-unused-vars
+  760:12  warning  'error' is defined but never used                                        no-unused-vars
+  766:10  warning  'saveNotificationSettings' is defined but never used                     no-unused-vars
+  775:1   warning  This line has a length of 135. Maximum allowed is 120                    max-len
+  794:10  warning  'resetNotificationSettings' is defined but never used                    no-unused-vars
+  804:10  warning  'clearLiveNotifications' is defined but never used                       no-unused-vars
+  810:10  warning  'clearHistory' is defined but never used                                 no-unused-vars
+  816:10  warning  'refreshNotifications' is defined but never used                         no-unused-vars
+  822:10  warning  'filterHistory' is defined but never used                                no-unused-vars
+  830:3   warning  Unexpected console statement                                             no-console
+  834:5   warning  Unexpected console statement                                             no-console
+  841:3   warning  Unexpected console statement                                             no-console
+
+/workspace/trading-ui/scripts/preferences.js
+   180:20  warning  'error' is defined but never used  no-unused-vars
+   194:18  warning  'error' is defined but never used  no-unused-vars
+   199:12  warning  'error' is defined but never used  no-unused-vars
+   355:12  warning  'error' is defined but never used  no-unused-vars
+   521:12  warning  'error' is defined but never used  no-unused-vars
+   582:12  warning  'error' is defined but never used  no-unused-vars
+   619:12  warning  'error' is defined but never used  no-unused-vars
+   635:12  warning  'error' is defined but never used  no-unused-vars
+   660:12  warning  'error' is defined but never used  no-unused-vars
+   713:12  warning  'error' is defined but never used  no-unused-vars
+   740:12  warning  'error' is defined but never used  no-unused-vars
+   765:12  warning  'error' is defined but never used  no-unused-vars
+   817:12  warning  'error' is defined but never used  no-unused-vars
+   881:12  warning  'error' is defined but never used  no-unused-vars
+   901:12  warning  'error' is defined but never used  no-unused-vars
+   926:12  warning  'error' is defined but never used  no-unused-vars
+  1028:12  warning  'error' is defined but never used  no-unused-vars
+
+/workspace/trading-ui/scripts/realtime-notifications-client.js
+  151:33  warning  'attemptNumber' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+  238:3   warning  Expected 'this' to be used by class method 'isSystemEvent'                       class-methods-use-this
+  253:13  warning  'taskId' is assigned a value but never used                                      no-unused-vars
+  254:13  warning  'timestamp' is assigned a value but never used                                   no-unused-vars
+  289:14  warning  'error' is defined but never used                                                no-unused-vars
+  297:13  warning  'operation' is assigned a value but never used                                   no-unused-vars
+  324:14  warning  'error' is defined but never used                                                no-unused-vars
+  360:14  warning  'error' is defined but never used                                                no-unused-vars
+  365:3   warning  Expected 'this' to be used by class method 'handleSystemEvent'                   class-methods-use-this
+  365:27  warning  'data' is defined but never used. Allowed unused args must match /^_/u           no-unused-vars
+  381:14  warning  'error' is defined but never used                                                no-unused-vars
+  391:14  warning  'error' is defined but never used                                                no-unused-vars
+  398:3   warning  Expected 'this' to be used by class method 'showInfoNotification'                class-methods-use-this
+  408:3   warning  Expected 'this' to be used by class method 'showSuccessNotification'             class-methods-use-this
+  418:3   warning  Expected 'this' to be used by class method 'showErrorNotification'               class-methods-use-this
+  428:3   warning  Expected 'this' to be used by class method 'showWarningNotification'             class-methods-use-this
+  462:3   warning  Expected 'this' to be used by class method 'emitCustomEvent'                     class-methods-use-this
+
+/workspace/trading-ui/scripts/server-monitor.js
+   150:14  warning  'error' is defined but never used                                          no-unused-vars
+   577:14  warning  'error' is defined but never used                                          no-unused-vars
+   604:16  warning  'error' is defined but never used                                          no-unused-vars
+   631:16  warning  'error' is defined but never used                                          no-unused-vars
+   653:16  warning  'error' is defined but never used                                          no-unused-vars
+   680:16  warning  'error' is defined but never used                                          no-unused-vars
+   711:14  warning  'error' is defined but never used                                          no-unused-vars
+   731:15  warning  'result' is assigned a value but never used                                no-unused-vars
+   743:14  warning  'error' is defined but never used                                          no-unused-vars
+   781:1   warning  This line has a length of 128. Maximum allowed is 120                      max-len
+   857:14  warning  'error' is defined but never used                                          no-unused-vars
+   893:14  warning  'error' is defined but never used                                          no-unused-vars
+   912:14  warning  'error' is defined but never used                                          no-unused-vars
+  1017:14  warning  'error' is defined but never used                                          no-unused-vars
+  1119:14  warning  'error' is defined but never used                                          no-unused-vars
+  1134:3   warning  Static async method 'generateDetailedLog' has no 'await' expression        require-await
+  1182:19  warning  'timestamp' is already declared in the upper scope on line 1135 column 11  no-shadow
+  1203:19  warning  'timestamp' is already declared in the upper scope on line 1135 column 11  no-shadow
+
+/workspace/trading-ui/scripts/system-test-center-simple.js
+   41:10  warning  'clearLog' is defined but never used               no-unused-vars
+   50:10  warning  'exportLog' is defined but never used              no-unused-vars
+   71:10  warning  'copyLog' is defined but never used                no-unused-vars
+  377:10  warning  'testSlowQueries' is defined but never used        no-unused-vars
+  411:10  warning  'testQueryOptimization' is defined but never used  no-unused-vars
+  530:10  warning  'testDataConnectors' is defined but never used     no-unused-vars
+  572:10  warning  'testDataSync' is defined but never used           no-unused-vars
+  610:10  warning  'testSecurity' is defined but never used           no-unused-vars
+  644:10  warning  'testIntegrity' is defined but never used          no-unused-vars
+  678:10  warning  'testPermissions' is defined but never used        no-unused-vars
+  712:10  warning  'testMaintenance' is defined but never used        no-unused-vars
+  746:10  warning  'testBackups' is defined but never used            no-unused-vars
+  780:10  warning  'testLogs' is defined but never used               no-unused-vars
+  815:10  warning  'runAllTests' is defined but never used            no-unused-vars
+  846:10  warning  'refreshAllStatus' is defined but never used       no-unused-vars
+  886:10  warning  'toggleLogLevel' is defined but never used         no-unused-vars
+
+/workspace/trading-ui/scripts/system-test-center.js
+  331:3  warning  Async method 'clearLog' has no 'await' expression                       require-await
+  351:3  warning  Async method 'loadCacheData' has no 'await' expression                  require-await
+  383:3  warning  Async method 'loadQueryData' has no 'await' expression                  require-await
+  408:3  warning  Async method 'loadExternalData' has no 'await' expression               require-await
+  427:3  warning  Async method 'loadPerformanceData' has no 'await' expression            require-await
+  453:3  warning  Expected 'this' to be used by class method 'displayCacheStats'          class-methods-use-this
+  487:3  warning  Expected 'this' to be used by class method 'displayCacheHealth'         class-methods-use-this
+  507:3  warning  Expected 'this' to be used by class method 'displayCacheInfo'           class-methods-use-this
+  521:3  warning  Expected 'this' to be used by class method 'displayQueryStats'          class-methods-use-this
+  549:3  warning  Expected 'this' to be used by class method 'displayQueryOpportunities'  class-methods-use-this
+  569:3  warning  Expected 'this' to be used by class method 'displaySlowQueries'         class-methods-use-this
+  588:3  warning  Expected 'this' to be used by class method 'displayExternalDataStatus'  class-methods-use-this
+  605:3  warning  Expected 'this' to be used by class method 'displayExternalDataTest'    class-methods-use-this
+  619:3  warning  Expected 'this' to be used by class method 'displayPerformanceMetrics'  class-methods-use-this
+  653:3  warning  Expected 'this' to be used by class method 'displayPerformanceTest'     class-methods-use-this
+  670:3  warning  Expected 'this' to be used by class method 'log'                        class-methods-use-this
+  689:3  warning  Expected 'this' to be used by class method 'showLoading'                class-methods-use-this
+  706:3  warning  Expected 'this' to be used by class async method 'delay'                class-methods-use-this
+  706:3  warning  Async method 'delay' has no 'await' expression                          require-await
+
+/workspace/trading-ui/scripts/tickers.js
+  1842:12  warning  'error' is defined but never used  no-unused-vars
+  1876:12  warning  'error' is defined but never used  no-unused-vars
+
+/workspace/trading-ui/scripts/trade_plans.js
+   999:1   warning  This line has a length of 130. Maximum allowed is 120                       max-len
+  1090:16  warning  'error' is defined but never used                                           no-unused-vars
+  1102:1   warning  This line has a length of 123. Maximum allowed is 120                       max-len
+  1116:1   warning  This line has a length of 123. Maximum allowed is 120                       max-len
+  1117:1   warning  This line has a length of 142. Maximum allowed is 120                       max-len
+  1122:1   warning  This line has a length of 135. Maximum allowed is 120                       max-len
+  1124:1   warning  This line has a length of 127. Maximum allowed is 120                       max-len
+  1154:9   warning  'openDesigns' is assigned a value but never used                            no-unused-vars
+  1155:9   warning  'closedDesigns' is assigned a value but never used                          no-unused-vars
+  1156:9   warning  'cancelledDesigns' is assigned a value but never used                       no-unused-vars
+  1715:13  warning  'newDesign' is assigned a value but never used                              no-unused-vars
+  1737:10  warning  'getFieldIdFromServerField' is defined but never used                       no-unused-vars
+  1860:10  warning  'filterDesignsData' is defined but never used                               no-unused-vars
+  2618:10  warning  'showTickerPage' is defined but never used                                  no-unused-vars
+  2618:25  warning  'tickerId' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+/workspace/trading-ui/scripts/ui-utils.js
+  690:83  warning  'operationName' is assigned a value but never used. Allowed unused args must match /^_/u  no-unused-vars
+  712:12  warning  'error' is defined but never used                                                         no-unused-vars
+
+/workspace/trading-ui/scripts/yahoo-finance-service.js
+   68:14  warning  'error' is defined but never used                               no-unused-vars
+  114:14  warning  'error' is defined but never used                               no-unused-vars
+  178:13  warning  'successCount' is assigned a value but never used               no-unused-vars
+  184:14  warning  'error' is defined but never used                               no-unused-vars
+  198:3   warning  Expected 'this' to be used by class method 'formatPrice'        class-methods-use-this
+  212:3   warning  Expected 'this' to be used by class method 'formatChange'       class-methods-use-this
+  227:3   warning  Expected 'this' to be used by class method 'getChangeClass'     class-methods-use-this
+  241:3   warning  Expected 'this' to be used by class method 'formatVolume'       class-methods-use-this
+  275:14  warning  'error' is defined but never used                               no-unused-vars
+  313:14  warning  'error' is defined but never used                               no-unused-vars
+  344:3   warning  Expected 'this' to be used by class method '_showNotification'  class-methods-use-this
+
+✖ 422 problems (1 error, 421 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+

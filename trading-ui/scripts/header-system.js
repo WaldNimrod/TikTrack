@@ -4695,7 +4695,7 @@ async function clearDevelopmentCache(event) {
     // לוג לבדיקה
     // Log: Debug information for button search
     // eventTarget: event?.target
-    // foundButton: button  
+    // foundButton: button
     // buttonText: button?.textContent
     // buttonHTML: button?.innerHTML
 
@@ -4834,11 +4834,10 @@ async function clearDevelopmentCache(event) {
     // Log:('🎉 כל סוגי ה-Cache נוקו בהצלחה!');
 
     // לוג לבדיקת מערכת ההתראות
-    // Log:('🔍 בדיקת מערכת התראות:', {
-      showSuccessNotification: typeof window.showSuccessNotification,
-      showNotification: typeof window.showNotification,
-      notificationSystem: typeof window.notificationSystem,
-    });
+    // Debug: Checking notification system
+    // showSuccessNotification: typeof window.showSuccessNotification
+    // showNotification: typeof window.showNotification
+    // notificationSystem: typeof window.notificationSystem
 
     if (typeof window.showSuccessNotification === 'function') {
       // Log:('✅ קורא ל-showSuccessNotification');

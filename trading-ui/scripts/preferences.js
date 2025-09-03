@@ -155,9 +155,9 @@ async function saveAllPreferences() {
     }
   } catch (error) {
     if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בשמירת העדפות: ' + _error.message, 'error');
+      window.showNotification('שגיאה בשמירת העדפות: ' + error.message, 'error');
     }
-    showPreferencesError('שגיאה', `שגיאה בשמירת העדפות: ${_error.message}`);
+    showPreferencesError('שגיאה', `שגיאה בשמירת העדפות: ${error.message}`);
   }
 }
 

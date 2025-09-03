@@ -103,7 +103,21 @@ class UserPreferences(BaseModel):
         # Add numeric value colors if available
         if self.numeric_value_colors_json:
             try:
-                result['numericValueColors'] = json.loads(self.numeric_value_colors_json)
+                numeric_colors = json.loads(self.numeric_value_colors_json)
+                # Ensure all required fields exist
+                for color_type in ['positive', 'negative', 'zero']:
+                    if color_type not in numeric_colors:
+                        numeric_colors[color_type] = {}
+                    for intensity in ['light', 'medium', 'dark', 'border']:
+                        if intensity not in numeric_colors[color_type]:
+                            # Use default colors if missing
+                            if color_type == 'positive':
+                                numeric_colors[color_type][intensity] = '#28a745' if intensity == 'medium' else '#d4edda'
+                            elif color_type == 'negative':
+                                numeric_colors[color_type][intensity] = '#dc3545' if intensity == 'medium' else '#f8d7da'
+                            else:  # zero
+                                numeric_colors[color_type][intensity] = '#6c757d' if intensity == 'medium' else '#e2e3e5'
+                result['numericValueColors'] = numeric_colors
             except (json.JSONDecodeError, TypeError):
                 result['numericValueColors'] = {}
         
@@ -172,7 +186,35 @@ class UserPreferences(BaseModel):
         
         # Colors
         if 'numericValueColors' in data:
-            self.numeric_value_colors_json = json.dumps(data['numericValueColors'])
+            # Get current colors or start with defaults
+            current_colors = {}
+            if self.numeric_value_colors_json:
+                try:
+                    current_colors = json.loads(self.numeric_value_colors_json)
+                except (json.JSONDecodeError, TypeError):
+                    current_colors = {}
+            
+            # Update with new colors
+            new_colors = data['numericValueColors']
+            if isinstance(new_colors, dict):
+                for color_type in ['positive', 'negative', 'zero']:
+                    if color_type in new_colors:
+                        if color_type not in current_colors:
+                            current_colors[color_type] = {}
+                        # Update all intensity levels
+                        for intensity in ['light', 'medium', 'dark', 'border']:
+                            if intensity in new_colors[color_type]:
+                                current_colors[color_type][intensity] = new_colors[color_type][intensity]
+                            elif intensity not in current_colors[color_type]:
+                                # Use default colors if missing
+                                if color_type == 'positive':
+                                    current_colors[color_type][intensity] = '#28a745' if intensity == 'medium' else '#d4edda'
+                                elif color_type == 'negative':
+                                    current_colors[color_type][intensity] = '#dc3545' if intensity == 'medium' else '#f8d7da'
+                                else:  # zero
+                                    current_colors[color_type][intensity] = '#6c757d' if intensity == 'medium' else '#e2e3e5'
+            
+            self.numeric_value_colors_json = json.dumps(current_colors)
         if 'entityColors' in data:
             self.entity_colors_json = json.dumps(data['entityColors'])
         
@@ -203,6 +245,7 @@ class UserPreferences(BaseModel):
             "retryDelay": 5,
             "autoRefresh": False,
             "verboseLogging": False,
+            # הגדרות צבעים לערכים מספריים
             "numericValueColors": {
                 "positive": {
                     "light": "#d4edda",
@@ -223,6 +266,7 @@ class UserPreferences(BaseModel):
                     "border": "#d6d8db",
                 },
             },
+            # הגדרות צבעים לפי ישויות
             "entityColors": {
                 "trade": "#007bff",
                 "trade_plan": "#0056b3",

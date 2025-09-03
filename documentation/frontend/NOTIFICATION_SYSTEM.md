@@ -3,7 +3,10 @@
 ## 📅 תאריך עדכון
 2 בספטמבר 2025
 
-## 🔄 שינויים אחרונים (2 בספטמבר 2025)
+## 🔄 שינויים אחרונים (4 בספטמבר 2025)
+- **תיקון מערכת ההודעות**: הסרת סגנונות inline והחזרת עיצוב מותאם
+- **תיקון כפתור סגירה**: הסרת טקסט מיותר וחזרה לאייקון X בלבד
+- **שיפור מבנה HTML**: שימוש במבנה מותאם במקום Bootstrap classes
 - **ALERTS SYSTEM הועבר למשימות עתידיות** - ראה: `../todo/FEATURE_ROADMAP.md`
 - **LINKED ITEMS SYSTEM הועבר לקובץ** `trading-ui/scripts/linked-items.js`
 - **מערכת התראות מתמקדת בהודעות מערכת ואישורים**
@@ -187,17 +190,34 @@ if (typeof window.showConfirmationDialog === 'function') {
 
 ## 🎨 עיצוב התראות
 
-### **סגנונות CSS**
+### **מבנה HTML המותאם (אחרי התיקון):**
+```html
+<div class="notification success show">
+  <div class="notification-icon">
+    <i class="fas fa-check-circle"></i>
+  </div>
+  <div class="notification-content">
+    <div class="notification-title">הצלחה</div>
+    <div class="notification-message">הפעולה הושלמה בהצלחה</div>
+  </div>
+  <button type="button" class="notification-close">
+    <i class="fas fa-times"></i>
+  </button>
+</div>
+```
+
+### **סגנונות CSS (מעודכנים):**
 ```css
-/* רקע 80% שקיפות אחיד לכל סוגי ההתראות */
+/* רקע לבן קבוע עם צל מתקדם */
 .notification {
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
-/* צבעי גבול שמאלי נכונים לכל סוג התראה */
+/* צבעי גבול שמאלי מעודכנים */
 .notification.success {
-    border-left: 4px solid #28a745;
+    border-left: 4px solid #29a6a8;
 }
 
 .notification.error {
@@ -211,7 +231,22 @@ if (typeof window.showConfirmationDialog === 'function') {
 .notification.info {
     border-left: 4px solid #17a2b8;
 }
+
+/* כפתור סגירה נקי עם אייקון בלבד */
+.notification-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+}
 ```
+
+### **תיקונים שבוצעו (4 בספטמבר 2025):**
+- ✅ **הסרת סגנונות inline**: כל הסגנונות עברו לקובץ CSS חיצוני
+- ✅ **תיקון כפתור סגירה**: רק אייקון FontAwesome X ללא טקסט
+- ✅ **מבנה HTML נקי**: שימוש במבנה מותאם במקום Bootstrap classes
+- ✅ **שיפור נגישות**: הסרת aria-label מיותר שהציג טקסט
 
 ## 🔧 שימוש נכון במערכת
 

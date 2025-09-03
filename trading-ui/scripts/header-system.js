@@ -670,11 +670,23 @@ class HeaderSystem {
                             <span class="submenu-arrow">▶</span>
                           </a>
                           <ul class="tiktrack-submenu">
-                            <li><a class="tiktrack-dropdown-item" href="#" onclick="clearDevelopmentCache(event)" style="color: #ff6b6b;">
-                              <i class="fas fa-trash"></i> נקה Cache (פיתוח)
-                            </a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 ניהול מערכת</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/notifications-center">מרכז התראות</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/background-tasks">ניהול משימות ברקע</a></li>
+                          </ul>
+                        </li>
+
+                        <!-- 🔍 בדיקות ונתונים -->
+                        <li class="dropdown-submenu">
+                          <a href="#" class="tiktrack-dropdown-item tiktrack-submenu-toggle">
+                            <span>🔍 בדיקות ונתונים</span>
+                            <span class="submenu-arrow">▶</span>
+                          </a>
+                          <ul class="tiktrack-submenu">
+                            <li><a class="tiktrack-dropdown-item" href="/external-data-dashboard">דשבורד נתונים חיצוניים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/server-monitor">ניטור שרת</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/cache-test">בדיקת Cache</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/constraints">אילוצים</a></li>
                           </ul>
                         </li>
 
@@ -694,28 +706,14 @@ class HeaderSystem {
                           </ul>
                         </li>
 
-                        <!-- 🔍 בדיקות ונתונים -->
-                        <li class="dropdown-submenu">
-                          <a href="#" class="tiktrack-dropdown-item tiktrack-submenu-toggle">
-                            <span>🔍 בדיקות ונתונים</span>
-                            <span class="submenu-arrow">▶</span>
-                          </a>
-                          <ul class="tiktrack-submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/system-test-center">מרכז בדיקות מערכת</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/external-data-dashboard">דשבורד נתונים חיצוניים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/server-monitor">ניטור שרת</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/cache-test">בדיקת Cache</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/constraints">אילוצים</a></li>
-                          </ul>
-                        </li>
-
-                        <!-- 🚀 מערכת נתונים חיצוניים -->
-                        <li class="tiktrack-dropdown-item">
-                          <a href="/system-management">🔧 ניהול מערכת</a>
-                        </li>
-
 
                       </ul>
+                    </li>
+
+                    <li class="tiktrack-nav-item">
+                      <a href="#" class="tiktrack-nav-link" onclick="clearDevelopmentCache(event)" title="נקה מטמון פיתוח">
+                        <span class="nav-text" style="color: #ff0000; font-size: 1.2rem;">🧹</span>
+                      </a>
                     </li>
                   </ul>
                 </nav>

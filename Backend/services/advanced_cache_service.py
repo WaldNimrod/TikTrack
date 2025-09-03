@@ -406,9 +406,46 @@ def cache_with_deps(ttl: int = 300, dependencies: List[str] = None):
     return advanced_cache_service.cache_with_dependencies(ttl=ttl, dependencies=dependencies)
 
 
-def invalidate_cache(dependency: str):
-    """Invalidate cache by dependency"""
-    advanced_cache_service.invalidate_by_dependency(dependency)
+def invalidate_cache(func_name_pattern: str):
+    """Decorator that invalidates cache by function name pattern after function execution"""
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            logger.info(f"🔄 DECORATOR CALLED: About to execute {func.__name__} and then invalidate cache for pattern '{func_name_pattern}'")
+            
+            # Execute the original function
+            result = func(*args, **kwargs)
+            
+            # Invalidate cache after successful execution
+            try:
+                logger.info(f"🧹 Starting cache invalidation for pattern '{func_name_pattern}'")
+                
+                # Clear all cache entries that match the function name pattern
+                keys_to_remove = []
+                all_keys = []
+                with advanced_cache_service.lock:
+                    all_keys = list(advanced_cache_service.cache.keys())
+                    for key in all_keys:
+                        # Check if this cache key is for the function we want to invalidate
+                        if func_name_pattern in key or key.endswith(func_name_pattern):
+                            keys_to_remove.append(key)
+                    
+                    # Remove the matching cache entries
+                    for key in keys_to_remove:
+                        del advanced_cache_service.cache[key]
+                        advanced_cache_service.stats['invalidations'] = advanced_cache_service.stats.get('invalidations', 0) + 1
+                
+                logger.info(f"✅ Cache invalidated for pattern '{func_name_pattern}': {len(keys_to_remove)} entries removed from {len(all_keys)} total keys")
+                logger.info(f"🔑 All keys were: {all_keys}")
+                logger.info(f"🗑️ Removed keys: {keys_to_remove}")
+                
+            except Exception as e:
+                logger.error(f"❌ Failed to invalidate cache for {func_name_pattern}: {e}")
+                import traceback
+                logger.error(f"Traceback: {traceback.format_exc()}")
+            return result
+        return wrapper
+    return decorator
 
 
 def clear_cache():

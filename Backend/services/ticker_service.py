@@ -20,7 +20,7 @@ from models.note import Note
 from models.alert import Alert
 from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
-from services.smart_query_optimizer import optimize_query, profile_query
+# from services.smart_query_optimizer import optimize_query, profile_query  # TEMPORARILY DISABLED
 from typing import List, Optional, Dict, Any, Union
 import logging
 import time
@@ -76,43 +76,8 @@ class TickerService:
         Example:
             >>> tickers = TickerService.get_all(db_session)
         """
-        # Create base query
-        base_query = db.query(Ticker)
-        
-        # Optimize query using smart query optimizer
-        try:
-            optimization_result = optimize_query(
-                base_query, 
-                expected_usage='read', 
-                context='ticker_queries'
-            )
-            
-            # Use optimized query
-            optimized_query = optimization_result.optimized_query
-            
-            # Execute and profile the query
-            start_time = time.time()
-            result = optimized_query.all()
-            execution_time = time.time() - start_time
-            
-            # Profile the query for performance monitoring
-            profile_query(
-                base_query, 
-                execution_time, 
-                row_count=len(result),
-                memory_usage=0.0  # Will be calculated by the optimizer
-            )
-            
-            # Log optimization results if significant
-            if optimization_result.estimated_improvement > 0.1:
-                logger.info(f"Query optimized with {optimization_result.estimated_improvement:.1%} estimated improvement")
-            
-            return result
-            
-        except Exception as e:
-            logger.warning(f"Query optimization failed, using fallback: {e}")
-            # Fallback to original query
-            return base_query.all()
+        # Simple query without optimization (smart query optimizer disabled)
+        return db.query(Ticker).all()
     
     @staticmethod
     def get_by_id(db: Session, ticker_id: int) -> Optional[Ticker]:

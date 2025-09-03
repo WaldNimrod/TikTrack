@@ -13,15 +13,15 @@ from .advanced_cache_service import (
     get_cache_stats,
     cache_health_check
 )
-from .smart_query_optimizer import (
-    SmartQueryOptimizer,
-    smart_query_optimizer,
-    optimize_query,
-    profile_query,
-    get_performance_report,
-    clear_query_profiles,
-    export_query_profiles
-)
+# from .smart_query_optimizer import (  # TEMPORARILY DISABLED
+#     SmartQueryOptimizer,
+#     smart_query_optimizer,
+#     optimize_query,
+#     profile_query,
+#     get_performance_report,
+#     clear_query_profiles,
+#     export_query_profiles
+# )
 
 __all__ = [
     'TickerService',
@@ -37,11 +37,11 @@ __all__ = [
     'clear_cache',
     'get_cache_stats',
     'cache_health_check',
-    'SmartQueryOptimizer',
-    'smart_query_optimizer',
-    'optimize_query',
-    'profile_query',
-    'get_performance_report',
-    'clear_query_profiles',
-    'export_query_profiles'
+    # 'SmartQueryOptimizer',  # TEMPORARILY DISABLED
+    # 'smart_query_optimizer',
+    # 'optimize_query',
+    # 'profile_query',
+    # 'get_performance_report',
+    # 'clear_query_profiles',
+    # 'export_query_profiles'
 ]

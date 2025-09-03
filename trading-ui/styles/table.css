@@ -448,14 +448,14 @@ table[data-table-type="tickers"] td:last-child {
 }
 /* הסגנונות החדשים נמצאים ב-styles.css */
 
-/* צביעת סכומים - חיובי/שלילי */
+/* צביעת סכומים - חיובי/שלילי - משתמש במערכת הצבעים הגלובלית */
 .profit-positive {
-  color: #28a745 !important;
+  color: var(--numeric-positive-medium, #28a745) !important;
   font-weight: 600;
 }
 
 .profit-negative {
-  color: #dc3545 !important;
+  color: var(--numeric-negative-medium, #dc3545) !important;
   font-weight: 600;
 }
 
@@ -1993,93 +1993,18 @@ th {
 
 /* טבלת ביצועים - הגדרות כללית */
 #executionsTable {
-  table-layout: fixed !important;
-  width: 98% !important;
-  max-width: 98% !important;
+  width: auto !important;
+  min-width: 100% !important;
+  white-space: nowrap !important;
 }
 
 #executionsContainer {
   overflow-x: auto !important;
   overflow-y: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
 }
 
-/* עמודת סימבול - 7% */
-#executionsTable th:nth-child(1),
-#executionsTable td:nth-child(1) {
-  width: 7% !important;
-}
-
-/* עמודת טרייד - 8% */
-#executionsTable th:nth-child(2),
-#executionsTable td:nth-child(2) {
-  width: 8% !important;
-}
-
-/* עמודת פעולה - 6% */
-#executionsTable th:nth-child(3),
-#executionsTable td:nth-child(3) {
-  width: 6% !important;
-}
-
-/* עמודת חשבון - 7% */
-#executionsTable th:nth-child(4),
-#executionsTable td:nth-child(4) {
-  width: 7% !important;
-}
-
-/* עמודת כמות - 6% */
-#executionsTable th:nth-child(5),
-#executionsTable td:nth-child(5) {
-  width: 6% !important;
-}
-
-/* עמודת מחיר - 7% */
-#executionsTable th:nth-child(6),
-#executionsTable td:nth-child(6) {
-  width: 7% !important;
-}
-
-/* עמודת עמלה - 5% */
-#executionsTable th:nth-child(7),
-#executionsTable td:nth-child(7) {
-  width: 5% !important;
-}
-
-/* עמודת רווח/הפסד - 8% */
-#executionsTable th:nth-child(8),
-#executionsTable td:nth-child(8) {
-  width: 8% !important;
-}
-
-/* עמודת הערות - 6% */
-#executionsTable th:nth-child(9),
-#executionsTable td:nth-child(9) {
-  width: 6% !important;
-}
-
-/* עמודת נוצר ב - 6% */
-#executionsTable th:nth-child(10),
-#executionsTable td:nth-child(10) {
-  width: 6% !important;
-}
-
-/* עמודת תאריך ביצוע - 9% */
-#executionsTable th:nth-child(11),
-#executionsTable td:nth-child(11) {
-  width: 9% !important;
-}
-
-/* עמודת מקור - 7% */
-#executionsTable th:nth-child(12),
-#executionsTable td:nth-child(12) {
-  width: 7% !important;
-}
-
-/* עמודת פעולות - 16% */
-#executionsTable th:nth-child(13),
-#executionsTable td:nth-child(13) {
-  width: 16% !important;
-}
+/* הסרת כל הגדרות הרוחב - הטבלה תתנהג באופן טבעי */
 
 /* עיצוב כפתורי פעולה בטבלת ביצועים */
 #executionsTable .btn {
@@ -2120,16 +2045,16 @@ th {
   vertical-align: middle !important;
 }
 
-/* עמודות שצריכות יותר גמישות בתצוגה */
-#executionsTable td:nth-child(1), /* סימבול */
-#executionsTable td:nth-child(2), /* טרייד */
-#executionsTable td:nth-child(12) /* מקור */ {
+/* עמודת טרייד - אפשר שבירת שורות */
+#executionsTable td:nth-child(2) {
   white-space: normal !important;
   word-wrap: break-word !important;
-  line-height: 1.2 !important;
+  word-break: break-word !important;
+  line-height: 1.3 !important;
+  min-width: 80px !important;
 }
 
-/* סה"כ: 7+8+6+7+6+7+5+8+6+6+9+7+16 = 98% (מנצל את כל הרוחב) */
+/* רוחב טבעי - הטבלה תחשב את הרוחב בעצמה */
 
 /* סגנונות כלליים לעמוד עסקעות */
 .section-icon {

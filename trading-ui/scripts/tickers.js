@@ -517,26 +517,47 @@ async function saveTicker() {
       body: JSON.stringify(tickerData),
     });
 
-    if (response.ok) {
-      await response.json(); // result not used
-
-
-      // סגירת המודל
-      const modal = bootstrap.Modal.getInstance(document.getElementById('addTickerModal'));
-      modal.hide();
-
-      // הצגת הודעת הצלחה
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('הצלחה', `טיקר ${symbol} נוסף בהצלחה למערכת`);
+    // בדיקה שהמערכת הגלובלית קיימת
+    if (!window.handleApiResponseWithRefresh) {
+      console.error('❌ המערכת הגלובלית לא נטענה! משתמש בקוד הישן');
+      // קוד ישן כ-fallback
+      if (response.ok) {
+        await response.json();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addTickerModal'));
+        modal.hide();
+        if (window.showSuccessNotification) {
+          window.showSuccessNotification('הצלחה', `טיקר ${symbol} נוסף בהצלחה למערכת`);
+        }
+        await loadTickersData();
+        await updateActiveTradesField();
+        return;
       }
-
-      // רענון הנתונים
-      await loadTickersData();
-
-      // עדכון שדה active_trades
-      await updateActiveTradesField();
-
     } else {
+      // השתמש במערכת הגלובלית החדשה
+      console.log('🔄 משתמש במערכת הגלובלית לטיפול בהוספת טיקר');
+      const handled = await window.handleApiResponseWithRefresh(response, {
+        loadDataFunction: window.loadTickersData,
+        updateActiveFieldsFunction: window.updateActiveTradesField,
+        operationName: 'הוספה',
+        itemName: `טיקר ${symbol}`,
+        successMessage: `טיקר ${symbol} נוסף בהצלחה למערכת`,
+        onSuccess: () => {
+          // סגירת המודל
+          const modal = bootstrap.Modal.getInstance(document.getElementById('addTickerModal'));
+          modal.hide();
+        }
+      });
+      
+      console.log('✅ המערכת הגלובלית החזירה:', handled);
+      
+      if (handled) {
+        return; // המערכת הגלובלית טיפלה בהכל
+      }
+    }
+
+    // רק אם המערכת הגלובלית לא טיפלה או לא קיימת
+    console.log('⚠️ נכנס לטיפול בשגיאות הישן');
+    if (!handled) {
       const errorText = await response.text();
       handleApiError('שגיאה בשמירת טיקר', errorText);
 
@@ -835,28 +856,21 @@ async function performTickerCancellation(tickerId) {
       body: JSON.stringify({ cancel_reason: 'בוטל על ידי המשתמש' }),
     });
 
-    if (response.ok) {
-      await response.json(); // result not used
-
-      // הצגת הודעת הצלחה
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('הצלחה', 'הטיקר בוטל בהצלחה');
-      }
-
-      // רענון הנתונים
-      if (typeof loadTickersData === 'function') {
-        // אנחנו בעמוד tickers
-        await loadTickersData();
-      } else {
-        // רענון כללי או קריאה למערכת callback
+    // השתמש במערכת הגלובלית החדשה
+    const handled = await window.handleApiResponseWithRefresh(response, {
+      loadDataFunction: window.loadTickersData,
+      updateActiveFieldsFunction: window.updateActiveTradesField,
+      operationName: 'ביטול',
+      itemName: 'הטיקר',
+      successMessage: 'הטיקר בוטל בהצלחה',
+      onSuccess: () => {
         if (typeof window.onTickerStatusChanged === 'function') {
           window.onTickerStatusChanged(tickerId, 'cancelled');
-        } else {
-          location.reload();
         }
       }
+    });
 
-    } else {
+    if (!handled) {
       const errorResponse = await response.text();
 
       try {
@@ -1017,22 +1031,16 @@ async function updateAllTickerStatuses() {
       },
     });
 
-    if (response.ok) {
-      await response.json(); // result not used
+    // השתמש במערכת הגלובלית החדשה
+    const handled = await window.handleApiResponseWithRefresh(response, {
+      loadDataFunction: window.loadTickersData,
+      updateActiveFieldsFunction: window.updateActiveTradesField,
+      operationName: 'עדכון',
+      itemName: 'סטטוסי כל הטיקרים',
+      successMessage: 'סטטוסים של כל הטיקרים עודכנו בהצלחה'
+    });
 
-
-      // הצגת הודעת הצלחה
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('הצלחה', 'סטטוסים של כל הטיקרים עודכנו בהצלחה');
-      }
-
-      // רענון הנתונים
-      await loadTickersData();
-
-      // עדכון שדה active_trades
-      await updateActiveTradesField();
-
-    } else {
+    if (!handled) {
       const errorResponse = await response.text();
       handleApiError('שגיאה בעדכון סטטוסים', errorResponse);
       if (window.showErrorNotification) {
@@ -1320,31 +1328,47 @@ async function confirmDeleteTicker(id) {
       method: 'DELETE',
     });
 
-    if (response.ok) {
-      // הצגת הודעת הצלחה
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('הצלחה', `טיקר ${tickerInfo} נמחק בהצלחה מהמערכת`);
+    // בדיקה שהמערכת הגלובלית קיימת
+    if (!window.handleApiResponseWithRefresh) {
+      console.error('❌ המערכת הגלובלית לא נטענה במחיקה! משתמש בקוד הישן');
+      // קוד ישן כ-fallback
+      if (response.ok) {
+        if (window.showSuccessNotification) {
+          window.showSuccessNotification('הצלחה', `טיקר ${tickerInfo} נמחק בהצלחה מהמערכת`);
+        }
+        await loadTickersData();
+        await updateActiveTradesField();
+        return;
+      } else if (response.status === 404) {
+        console.warn(`טיקר ${id} כבר לא קיים בבסיס הנתונים, מרענן נתונים`);
+        if (window.showSuccessNotification) {
+          window.showSuccessNotification('הצלחה', `טיקר ${tickerInfo} הוסר מהתצוגה (כבר לא קיים במערכת)`);
+        }
+        await loadTickersData();
+        await updateActiveTradesField();
+        return;
       }
-
-      // רענון הנתונים
-      await loadTickersData();
-
-      // עדכון שדה active_trades
-      await updateActiveTradesField();
-
-    } else if (response.status === 404) {
-      // הטיקר כבר לא קיים בבסיס הנתונים - נסיר אותו מהמטמון ונרענן
-      console.warn(`טיקר ${id} כבר לא קיים בבסיס הנתונים, מרענן נתונים`);
-      
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('הצלחה', `טיקר ${tickerInfo} הוסר מהתצוגה (כבר לא קיים במערכת)`);
-      }
-
-      // רענון הנתונים מהשרת
-      await loadTickersData();
-      await updateActiveTradesField();
-
     } else {
+      // השתמש במערכת הגלובלית החדשה
+      console.log('🔄 משתמש במערכת הגלובלית לטיפול במחיקת טיקר');
+      const handled = await window.handleApiResponseWithRefresh(response, {
+        loadDataFunction: window.loadTickersData,
+        updateActiveFieldsFunction: window.updateActiveTradesField,
+        operationName: 'מחיקה',
+        itemName: tickerInfo,
+        successMessage: `טיקר ${tickerInfo} נמחק בהצלחה מהמערכת`
+      });
+      
+      console.log('✅ המערכת הגלובלית החזירה במחיקה:', handled);
+      
+      if (handled) {
+        return; // המערכת הגלובלית טיפלה בהכל
+      }
+    }
+
+    // רק אם המערכת הגלובלית לא טיפלה או לא קיימת
+    console.log('⚠️ נכנס לטיפול בשגיאות הישן במחיקה');
+    if (!handled) {
       const errorResponse = await response.text();
       handleApiError('שגיאה במחיקת טיקר', errorResponse);
 

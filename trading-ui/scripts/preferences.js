@@ -142,6 +142,14 @@ async function saveAllPreferences() {
       await response.json();
       showPreferencesSuccess('הצלחה', 'כל ההעדפות נשמרו בהצלחה');
 
+      // עדכן את מערכת הצבעים הגלובלית מיד
+      if (window.loadColorPreferences) {
+        await window.loadColorPreferences();
+      }
+
+      // טען מחדש את ההעדפות מהשרת כדי להציג את השינויים
+      await loadPreferences();
+
       // הפעל הגדרות קונסול אחרי שמירה מוצלחת
       if (typeof applyConsoleSettings === 'function') {
         applyConsoleSettings();

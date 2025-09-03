@@ -84,6 +84,23 @@ function markAlertAsRead(_alertId) {
 // These functions handle system messages for user feedback
 
 /**
+ * Get notification icon based on type
+ * NOTIFICATION SYSTEM - Returns appropriate FontAwesome icon for notification type
+ *
+ * @param {string} type - Type of notification (success, error, warning, info)
+ * @returns {string} FontAwesome icon class
+ */
+function getNotificationIcon(type) {
+  const icons = {
+    success: 'fa-check-circle',
+    error: 'fa-exclamation-circle',
+    warning: 'fa-exclamation-triangle',
+    info: 'fa-info-circle'
+  };
+  return icons[type] || icons.info;
+}
+
+/**
  * Show a notification message
  * NOTIFICATION SYSTEM - Displays system notification to user
  *
@@ -100,31 +117,29 @@ function showNotification(message, type = 'info', title = 'מערכת', duration
 
   // הצגת התראה מיידית בממשק (אם לא במרכז ההתראות)
   if (!window.location.pathname.includes('notifications-center')) {
+    const container = createNotificationContainer();
+    
     const notification = document.createElement('div');
-    notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : type === 'warning' ? 'warning' : 'info'} alert-dismissible fade show`;
-    notification.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
-      min-width: 300px;
-      max-width: 400px;
-      animation: slideInRight 0.3s ease-out;
-    `;
-
+    notification.className = `notification ${type} show`;
+    
     notification.innerHTML = `
-      <strong>${title}</strong><br>
-      ${message}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      <div class="notification-icon">
+        <i class="fas ${getNotificationIcon(type)}"></i>
+      </div>
+      <div class="notification-content">
+        <div class="notification-title">${title}</div>
+        <div class="notification-message">${message}</div>
+      </div>
+      <button type="button" class="notification-close" onclick="this.parentElement.remove()">
+        <i class="fas fa-times"></i>
+      </button>
     `;
 
-    document.body.appendChild(notification);
+    container.appendChild(notification);
 
     // הסרה אוטומטית
     setTimeout(() => {
-      if (notification.parentElement) {
-        notification.remove();
-      }
+      hideNotification(notification);
     }, duration);
   }
 }

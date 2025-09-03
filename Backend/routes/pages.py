@@ -98,10 +98,7 @@ def js_map() -> Any:
     """JS Map page"""
     return send_from_directory(UI_DIR, "js-map.html")
 
-@pages_bp.route('/system-test-center')
-def system_test_center() -> Any:
-    """Unified system test center page"""
-    return send_from_directory(UI_DIR, "system-test-center.html")
+
 
 @pages_bp.route('/page-scripts-matrix')
 def page_scripts_matrix() -> Any:

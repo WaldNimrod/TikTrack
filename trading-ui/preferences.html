@@ -109,6 +109,72 @@
       z-index: 1000;
       min-width: 300px;
     }
+    
+    /* סגנונות לסקשנים */
+    .main-preferences-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #eee;
+    }
+    
+    .preference-section {
+      margin-bottom: 25px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: white;
+    }
+    
+    .preference-section-header {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      padding: 15px 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e0e0e0;
+      transition: background-color 0.3s ease;
+    }
+    
+    .preference-section-header:hover {
+      background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    }
+    
+    .preference-section-header h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #495057;
+      display: flex;
+      align-items: center;
+    }
+    
+    .section-icon {
+      margin-left: 10px;
+      font-size: 20px;
+    }
+    
+    .toggle-icon {
+      font-size: 16px;
+      transition: transform 0.3s ease;
+      color: #6c757d;
+    }
+    
+    .toggle-icon.collapsed {
+      transform: rotate(-90deg);
+    }
+    
+    .preference-section-body {
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+    
+    .preference-section-body.collapsed {
+      display: none;
+    }
   </style>
 </head>
 
@@ -161,7 +227,21 @@
           </div>
           <div class="section-body">
       <div class="preferences-container">
-        <h2 class="mb-4">⚙️ הגדרות מערכת</h2>
+        <!-- כותרת ראשית עם כפתור פתיחה/סגירה כללי -->
+        <div class="main-preferences-header">
+          <h2 class="mb-4">⚙️ הגדרות מערכת</h2>
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleAllPreferenceSections()" id="toggleAllBtn">
+            <span id="toggleAllIcon">▼</span> פתח/סגור הכל
+          </button>
+        </div>
+    
+    <!-- ===== הגדרות בסיסיות ===== -->
+    <div class="preference-section">
+      <div class="preference-section-header" onclick="togglePreferenceSection('basic-settings')">
+        <h3><span class="section-icon">⚙️</span> הגדרות בסיסיות</h3>
+        <span class="toggle-icon" id="basic-settings-icon">▼</span>
+      </div>
+      <div class="preference-section-body" id="basic-settings-body">
     
     <!-- מטבע ראשי -->
     <div class="preference-item">
@@ -238,7 +318,16 @@
       </div>
     </div>
     
+      </div> <!-- סוף basic-settings-body -->
+    </div> <!-- סוף preference-section -->
 
+    <!-- ===== הגדרות פילטרים ברירת מחדל ===== -->
+    <div class="preference-section">
+      <div class="preference-section-header" onclick="togglePreferenceSection('filter-settings')">
+        <h3><span class="section-icon">🔍</span> הגדרות פילטרים ברירת מחדל</h3>
+        <span class="toggle-icon" id="filter-settings-icon">▼</span>
+      </div>
+      <div class="preference-section-body" id="filter-settings-body">
     
     <!-- פילטר סטטוס ברירת מחדל -->
     <div class="preference-item">
@@ -319,16 +408,16 @@
       </div>
     </div>
     
+      </div> <!-- סוף filter-settings-body -->
+    </div> <!-- סוף preference-section -->
+
     <!-- ===== הגדרות מערכת הנתונים החיצוניים ===== -->
-    <div class="preference-item" style="border-top: 2px solid #007bff; margin-top: 20px; padding-top: 20px;">
-      <div class="preference-label">
-        <h4>🌐 מערכת נתונים חיצוניים</h4>
-        <p>הגדרות לחיבור למקורות מידע חיצוניים</p>
+    <div class="preference-section">
+      <div class="preference-section-header" onclick="togglePreferenceSection('external-data-settings')">
+        <h3><span class="section-icon">🌐</span> הגדרות מערכת הנתונים החיצוניים</h3>
+        <span class="toggle-icon" id="external-data-settings-icon">▼</span>
       </div>
-      <div class="preference-control">
-        <!-- Placeholder for section header -->
-      </div>
-    </div>
+      <div class="preference-section-body" id="external-data-settings-body">
     
     <!-- מרווח רענון נתונים -->
     <div class="preference-item">
@@ -485,16 +574,16 @@
       </div>
     </div>
     
+      </div> <!-- סוף external-data-settings-body -->
+    </div> <!-- סוף preference-section -->
+
     <!-- ===== סולמות צבעים ===== -->
-    <div class="preference-item" style="border-top: 2px solid #ff9c05; margin-top: 20px; padding-top: 20px;">
-      <div class="preference-label">
-        <h4>🎨 סולמות צבעים</h4>
-        <p>הגדרת צבעים לערכים מספריים במערכת</p>
+    <div class="preference-section">
+      <div class="preference-section-header" onclick="togglePreferenceSection('color-settings')">
+        <h3><span class="section-icon">🎨</span> סולמות צבעים</h3>
+        <span class="toggle-icon" id="color-settings-icon">▼</span>
       </div>
-      <div class="preference-control">
-        <!-- Placeholder for section header -->
-      </div>
-    </div>
+      <div class="preference-section-body" id="color-settings-body">
     
     <!-- ערכים חיוביים -->
     <div class="preference-item">
@@ -748,16 +837,16 @@
       </div>
     </div>
     
+      </div> <!-- סוף color-settings-body -->
+    </div> <!-- סוף preference-section -->
+
     <!-- ===== הגדרות ניהול קונסול ===== -->
-    <div class="preference-item" style="border-top: 2px solid #ff9c05; margin-top: 20px; padding-top: 20px;">
-      <div class="preference-label">
-        <h4>🖥️ ניהול קונסול</h4>
-        <p>הגדרות לניקוי וניהול הודעות קונסול</p>
+    <div class="preference-section">
+      <div class="preference-section-header" onclick="togglePreferenceSection('console-settings')">
+        <h3><span class="section-icon">🖥️</span> הגדרות ניהול קונסול</h3>
+        <span class="toggle-icon" id="console-settings-icon">▼</span>
       </div>
-      <div class="preference-control">
-        <!-- Placeholder for section header -->
-      </div>
-    </div>
+      <div class="preference-section-body" id="console-settings-body">
     
     <!-- ניקוי אוטומטי של קונסול -->
     <div class="preference-item">
@@ -836,6 +925,9 @@
       </div>
     </div>
     
+      </div> <!-- סוף console-settings-body -->
+    </div> <!-- סוף preference-section -->
+
     <!-- כפתורי פעולה -->
     <div class="d-flex justify-content-between mt-4 pt-4 border-top">
       <button class="btn btn-outline-secondary" onclick="resetToDefaults()">
@@ -893,6 +985,60 @@
   
   <!-- Page initialization -->
   <script>
+    // פונקציות לניהול סקשנים
+    function togglePreferenceSection(sectionId) {
+      const body = document.getElementById(sectionId + '-body');
+      const icon = document.getElementById(sectionId + '-icon');
+      
+      if (body && icon) {
+        if (body.classList.contains('collapsed')) {
+          body.classList.remove('collapsed');
+          icon.classList.remove('collapsed');
+          icon.textContent = '▼';
+        } else {
+          body.classList.add('collapsed');
+          icon.classList.add('collapsed');
+          icon.textContent = '◀';
+        }
+      }
+    }
+    
+    function toggleAllPreferenceSections() {
+      const sections = ['basic-settings', 'filter-settings', 'external-data-settings', 'color-settings', 'console-settings'];
+      const toggleAllIcon = document.getElementById('toggleAllIcon');
+      
+      // בדוק אם יש סקשן פתוח
+      const hasOpenSection = sections.some(sectionId => {
+        const body = document.getElementById(sectionId + '-body');
+        return body && !body.classList.contains('collapsed');
+      });
+      
+      // אם יש סקשן פתוח, סגור את כולם. אחרת, פתח את כולם
+      sections.forEach(sectionId => {
+        const body = document.getElementById(sectionId + '-body');
+        const icon = document.getElementById(sectionId + '-icon');
+        
+        if (body && icon) {
+          if (hasOpenSection) {
+            // סגור הכל
+            body.classList.add('collapsed');
+            icon.classList.add('collapsed');
+            icon.textContent = '◀';
+          } else {
+            // פתח הכל
+            body.classList.remove('collapsed');
+            icon.classList.remove('collapsed');
+            icon.textContent = '▼';
+          }
+        }
+      });
+      
+      // עדכן את האיקון הכללי
+      if (toggleAllIcon) {
+        toggleAllIcon.textContent = hasOpenSection ? '▶' : '▼';
+      }
+    }
+    
     document.addEventListener('DOMContentLoaded', function () {
       // אתחול מערכת הכותרת החדשה
       console.log("🔄 Initializing unified header system...");
@@ -909,6 +1055,9 @@
         styleElement.textContent = css;
         document.head.appendChild(styleElement);
       }
+      
+      // אתחול סקשנים - כולם פתוחים בברירת מחדל
+      console.log("📂 Initializing preference sections...");
     });
   </script>
 </body>

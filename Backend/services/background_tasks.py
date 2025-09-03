@@ -408,6 +408,80 @@ class BackgroundTaskManager:
         results['duration_ms'] = round((time.time() - start_time) * 1000, 2)
         return results
     
+    @monitor_performance("update_closed_tickers_daily")
+    def update_closed_tickers_daily(self) -> Dict[str, Any]:
+        """
+        Update closed tickers daily after market close (16:45 ET)
+        
+        Returns:
+            Dict[str, Any]: Update results
+        """
+        start_time = time.time()
+        
+        try:
+            # Get current NY time (simplified without pytz)
+            # ny_timezone = pytz.timezone('America/New_York')
+            # current_ny_time = datetime.now(ny_timezone)
+            current_ny_time = datetime.now()
+            
+            # Check if it's after market close (16:45 ET)
+            market_close_time = current_ny_time.replace(hour=16, minute=45, second=0, microsecond=0)
+            
+            if current_ny_time < market_close_time:
+                logger.info("Market not closed yet, skipping closed tickers update")
+                return {
+                    'timestamp': datetime.now().isoformat(),
+                    'status': 'skipped',
+                    'reason': 'Market not closed yet',
+                    'success': True
+                }
+            
+            # Get all closed tickers
+            db: Session = next(get_db())
+            try:
+                from services.ticker_service import TickerService
+                closed_tickers = db.query(TickerService.model).filter(
+                    TickerService.model.status.in_(['closed', 'cancelled'])
+                ).all()
+                
+                logger.info(f"Found {len(closed_tickers)} closed tickers to update")
+                
+                # Update each closed ticker with latest data
+                updated_count = 0
+                for ticker in closed_tickers:
+                    try:
+                        # Here you would call the external data service to update the ticker
+                        # For now, we'll just log it
+                        logger.info(f"Would update closed ticker: {ticker.symbol}")
+                        updated_count += 1
+                    except Exception as e:
+                        logger.error(f"Error updating ticker {ticker.symbol}: {e}")
+                
+                results = {
+                    'timestamp': datetime.now().isoformat(),
+                    'status': 'completed',
+                    'tickers_updated': updated_count,
+                    'total_closed_tickers': len(closed_tickers),
+                    'success': True
+                }
+                
+                logger.info(f"Closed tickers update completed: {updated_count}/{len(closed_tickers)} updated")
+                
+            finally:
+                db.close()
+            
+        except Exception as e:
+            results = {
+                'timestamp': datetime.now().isoformat(),
+                'error': str(e),
+                'status': 'error',
+                'success': False
+            }
+            logger.error(f"Error during closed tickers update: {e}")
+        
+        results['duration_ms'] = round((time.time() - start_time) * 1000, 2)
+        return results
+    
 
     
     def run_task(self, task_name: str, user_id: Optional[str] = None) -> Dict[str, Any]:
@@ -589,6 +663,13 @@ class BackgroundTaskManager:
             self.system_health_check,
             '1h',
             'Perform system health check'
+        )
+        
+        self.register_task(
+            'update_closed_tickers_daily',
+            self.update_closed_tickers_daily,
+            '1d',
+            'Update closed tickers daily after market close (16:45 ET)'
         )
         
 

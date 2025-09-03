@@ -137,10 +137,11 @@ background_task_manager = BackgroundTaskManager(realtime_notifications)
 data_refresh_scheduler = None
 if EXTERNAL_DATA_AVAILABLE and DataRefreshScheduler:
     try:
-        data_refresh_scheduler = DataRefreshScheduler()
-        logger.info("✅ Data Refresh Scheduler initialized successfully")
+        # Pass None as db_session for now - will be updated later
+        data_refresh_scheduler = DataRefreshScheduler(None)
+        print("✅ Data Refresh Scheduler initialized successfully")
     except Exception as e:
-        logger.error(f"❌ Failed to initialize Data Refresh Scheduler: {e}")
+        print(f"❌ Failed to initialize Data Refresh Scheduler: {e}")
         data_refresh_scheduler = None
 
 # Set the background task manager instance in the API routes
@@ -677,32 +678,59 @@ def get_yahoo_quotes() -> Any:
                 "timestamp": datetime.now().isoformat()
             }), 400
         
-        # Direct import and usage
-        import sys
-        import os
-        external_data_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'external_data_integration_server')
-        if external_data_path not in sys.path:
-            sys.path.insert(0, external_data_path)
+        # Use the correct Yahoo Finance adapter from our services
+        from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
+        from models.external_data import ExternalDataProvider
+        from config.database import get_db
         
-        from providers.yahoo_finance import YahooFinanceAdapter
+        # Get database session for caching quotes
+        db_session = next(get_db())
         
-        adapter = YahooFinanceAdapter()
-        results = {}
-        
-        for symbol in symbols[:10]:  # Limit to 10 symbols
-            try:
-                quote_data = adapter.fetch_quote_data(symbol.upper())
-                if quote_data:
-                    results[symbol.upper()] = {
-                        "price": quote_data.get("price"),
-                        "change_percent": quote_data.get("change_percent"),
-                        "volume": quote_data.get("volume"),
-                        "timestamp": quote_data.get("timestamp"),
-                        "currency": quote_data.get("currency", "USD")
-                    }
-            except Exception as e:
-                logger.warning(f"Failed to fetch data for {symbol}: {e}")
-                results[symbol.upper()] = {"error": str(e)}
+        try:
+            # Get or create Yahoo Finance provider
+            provider = db_session.query(ExternalDataProvider).filter(
+                ExternalDataProvider.name == 'yahoo_finance'
+            ).first()
+            
+            if not provider:
+                # Create provider if it doesn't exist
+                provider = ExternalDataProvider(
+                    name='yahoo_finance',
+                    display_name='Yahoo Finance',
+                    is_active=True,
+                    provider_type='finance',
+                    base_url='https://query1.finance.yahoo.com',
+                    rate_limit_per_hour=900,
+                    timeout_seconds=20
+                )
+                db_session.add(provider)
+                db_session.commit()
+                db_session.refresh(provider)
+            
+            # Initialize adapter with database session
+            adapter = YahooFinanceAdapter(db_session, provider.id)
+            results = {}
+            
+            for symbol in symbols[:10]:  # Limit to 10 symbols
+                try:
+                    quote_data = adapter.get_quote(symbol.upper())
+                    if quote_data:
+                        results[symbol.upper()] = {
+                            "price": quote_data.price,
+                            "change_percent": quote_data.change_pct,
+                            "volume": quote_data.volume,
+                            "timestamp": quote_data.asof_utc.isoformat() if quote_data.asof_utc else None,
+                            "currency": quote_data.currency
+                        }
+                        logger.info(f"✅ Fetched and cached quote for {symbol}: ${quote_data.price}")
+                    else:
+                        results[symbol.upper()] = {"error": "No data available"}
+                        logger.warning(f"⚠️ No data available for {symbol}")
+                except Exception as e:
+                    logger.warning(f"Failed to fetch data for {symbol}: {e}")
+                    results[symbol.upper()] = {"error": str(e)}
+        finally:
+            db_session.close()
         
         return jsonify({
             "status": "success",

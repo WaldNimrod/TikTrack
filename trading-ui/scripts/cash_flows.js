@@ -594,127 +594,13 @@ async function loadCurrenciesFromServer() {
   return [];
 }
 
-/**
- * טעינת רשימת חשבונות למודל הוספה
- */
-async function loadAccountsForCashFlow() {
-  try {
-    const response = await fetch('http://localhost:8080/api/v1/accounts/');
-    if (response.ok) {
-      const result = await response.json();
-      if (result.status === 'success') {
-        const select = document.getElementById('cashFlowAccountId');
-        if (select) {
-          select.innerHTML = '<option value="">בחר חשבון...</option>';
+// Removed unused function loadAccountsForCashFlow
 
-          // הצגת רק חשבונות פתוחים
-          const activeAccounts = result.data.filter(account => account.status === 'open');
-          activeAccounts.forEach(account => {
-            const option = document.createElement('option');
-            option.value = account.id;
-            option.textContent = account.name;
-            select.appendChild(option);
-          });
+// Removed unused function loadAccountsForEditCashFlow
 
-        } else {
-          handleElementNotFound('loadAccountsForCashFlow', 'לא נמצא אלמנט select עם ID: cashFlowAccountId');
-        }
-      } else {
-        handleApiError('שגיאה בתגובת API', result.error);
-      }
-    } else {
-      handleApiError('שגיאת HTTP', response.status);
-    }
-  } catch (error) {
-    handleDataLoadError(error, 'טעינת חשבונות');
+// Removed unused function loadCurrenciesForCashFlow
 
-    // הצגת הודעת שגיאה
-    if (window.showInfoNotification) {
-      window.showInfoNotification('מידע על הטעינה', 'שגיאה בטעינת חשבונות');
-    }
-  }
-}
-
-/**
- * טעינת רשימת חשבונות למודל עריכה
- */
-async function loadAccountsForEditCashFlow() {
-  try {
-    const response = await fetch('http://localhost:8080/api/v1/accounts/');
-    if (response.ok) {
-      const result = await response.json();
-      if (result.status === 'success') {
-        const select = document.getElementById('editCashFlowAccountId');
-        select.innerHTML = '<option value="">בחר חשבון...</option>';
-
-        // הצגת רק חשבונות פתוחים
-        result.data
-          .filter(account => account.status === 'open')
-          .forEach(account => {
-            const option = document.createElement('option');
-            option.value = account.id;
-            option.textContent = account.name;
-            select.appendChild(option);
-          });
-      }
-    }
-  } catch (error) {
-    handleDataLoadError(error, 'טעינת חשבונות');
-  }
-}
-
-/**
- * טעינת רשימת מטבעות למודל הוספה
- */
-async function loadCurrenciesForCashFlow() {
-  try {
-    // טעינת מטבעות מהשרת עם המערכת החדשה
-    const currencies = await loadCurrenciesFromServer();
-    const select = document.getElementById('cashFlowCurrencyId');
-    if (select) {
-      select.innerHTML = '<option value="">בחר מטבע...</option>';
-
-      currencies.forEach(currency => {
-        const option = document.createElement('option');
-        option.value = currency.id;
-        option.textContent = `${currency.symbol} - ${currency.name}`;
-        select.appendChild(option);
-      });
-
-    } else {
-      handleElementNotFound('loadCurrenciesForCashFlow', 'לא נמצא אלמנט select עם ID: cashFlowCurrencyId');
-    }
-  } catch (error) {
-    handleDataLoadError(error, 'טעינת מטבעות');
-
-    // הצגת הודעת שגיאה
-    if (window.showInfoNotification) {
-      window.showInfoNotification('מידע על הטעינה', 'שגיאה בטעינת מטבעות');
-    }
-  }
-}
-
-/**
- * טעינת רשימת מטבעות למודל עריכה
- */
-async function loadCurrenciesForEditCashFlow() {
-  try {
-    // טעינת מטבעות מהשרת עם המערכת החדשה
-    const currencies = await loadCurrenciesFromServer();
-
-    const select = document.getElementById('editCashFlowCurrencyId');
-    select.innerHTML = '<option value="">בחר מטבע...</option>';
-
-    currencies.forEach(currency => {
-      const option = document.createElement('option');
-      option.value = currency.id;
-      option.textContent = `${currency.symbol} - ${currency.name}`;
-      select.appendChild(option);
-    });
-  } catch (error) {
-    handleDataLoadError(error, 'טעינת מטבעות');
-  }
-}
+// Removed unused function loadCurrenciesForEditCashFlow
 
 /**
  * רינדור טבלת תזרימי מזומנים
@@ -1287,92 +1173,9 @@ function initializeExternalIdFields() {
   }
 }
 
-// עדכון פונקציית showAddCashFlowModal
-async function _showAddCashFlowModal() {
-  // איפוס הטופס
-  document.getElementById('addCashFlowForm').reset();
+// Removed unused function _showAddCashFlowModal
 
-  // ניקוי וולידציה
-  if (window.clearValidation) {
-    window.clearValidation('addCashFlowForm');
-  }
-
-  // הגדרת תאריך ברירת מחדל להיום
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('cashFlowDate').value = today;
-
-  try {
-    // טעינת רשימת החשבונות והמטבעות
-    await loadAccountsForCashFlow();
-    await loadCurrenciesForCashFlow();
-    // אתחול שדה מזהה חיצוני
-    initializeExternalIdFields();
-
-    // הוספת event listeners לוולידציה מיידית
-    setupValidationListeners();
-
-    // הוספת event listeners לשדות מקור
-    setupSourceFieldListeners();
-
-    // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById('addCashFlowModal'));
-    modal.show();
-  } catch (error) {
-    handleDataLoadError(error, 'טעינת נתונים להוספה');
-    window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתונים להוספה');
-  }
-}
-
-// עדכון פונקציית showEditCashFlowModal
-async function _showEditCashFlowModal(id) {
-  const cashFlow = cashFlowsData.find(cf => cf.id === id);
-  if (!cashFlow) {
-    handleElementNotFound('showEditCashFlowModal', `תזרים מזומנים לא נמצא: ${id}`);
-    return;
-  }
-
-  // ניקוי וולידציה
-  if (window.clearValidation) {
-    window.clearValidation('editCashFlowForm');
-  }
-
-  try {
-    // טעינת רשימת החשבונות והמטבעות קודם
-    await loadAccountsForEditCashFlow();
-    await loadCurrenciesForEditCashFlow();
-    // מילוי הטופס אחרי שהרשימות נטענו
-    const editTypeField = document.getElementById('editCashFlowType');
-    document.getElementById('editCashFlowId').value = cashFlow.id;
-    document.getElementById('editCashFlowAccountId').value = cashFlow.account_id;
-
-    if (editTypeField) {
-      editTypeField.value = cashFlow.type;
-    } else {
-      handleElementNotFound('showEditCashFlowModal', 'לא נמצא אלמנט editCashFlowType');
-    }
-    document.getElementById('editCashFlowAmount').value = cashFlow.amount;
-    document.getElementById('editCashFlowCurrencyId').value = cashFlow.currency_id || '';
-    document.getElementById('editCashFlowDate').value = cashFlow.date;
-    document.getElementById('editCashFlowDescription').value = cashFlow.description || '';
-
-    const editSourceField = document.getElementById('editCashFlowSource');
-    editSourceField.value = cashFlow.source || 'manual';
-    document.getElementById('editCashFlowExternalId').value = cashFlow.external_id || '0';
-
-    // אתחול שדה מזהה חיצוני
-    initializeExternalIdFields();
-
-    // הוספת event listeners לוולידציה מיידית
-    setupValidationListeners();
-
-    // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById('editCashFlowModal'));
-    modal.show();
-  } catch (error) {
-    handleDataLoadError(error, 'טעינת נתונים לעריכה');
-    window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתונים לעריכה');
-  }
-}
+// Removed unused function _showEditCashFlowModal
 
 // עדכון פונקציית saveCashFlow
 async function saveCashFlow() {

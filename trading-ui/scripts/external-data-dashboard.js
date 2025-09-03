@@ -129,7 +129,7 @@ ${detailedLog.consoleLogs.join('\n')}
       // logText
     });
 
-  } catch (_error) {
+  } catch {
     // Error collecting detailed logs
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה באיסוף הלוגים. בדוק את הקונסול.');
@@ -203,7 +203,7 @@ class ExternalDataDashboard {
       } else {
         // console.error('❌ Error loading system status:', response.status);
       }
-    } catch (_error) {
+    } catch {
       // Error loading system status
     }
   }
@@ -217,7 +217,7 @@ class ExternalDataDashboard {
       } else {
         this.updateYahooFinanceStatus({ status: 'error', message: 'שגיאה בטעינת סטטוס' });
       }
-    } catch (error) {
+    } catch {
       this.updateYahooFinanceStatus({ status: 'error', message: 'שגיאת תקשורת' });
     }
   }
@@ -231,7 +231,7 @@ class ExternalDataDashboard {
       } else {
         this.updateCacheStatus({ status: 'error', message: 'שגיאה בטעינת סטטוס מטמון' });
       }
-    } catch (error) {
+    } catch {
       this.updateCacheStatus({ status: 'error', message: 'שגיאת תקשורת' });
     }
   }
@@ -245,7 +245,7 @@ class ExternalDataDashboard {
       } else {
         this.updateDatabaseStatus({ status: 'error', message: 'שגיאה בטעינת סטטוס בסיס נתונים' });
       }
-    } catch (error) {
+    } catch {
       this.updateDatabaseStatus({ status: 'error', message: 'שגיאת תקשורת' });
     }
   }
@@ -259,7 +259,7 @@ class ExternalDataDashboard {
       } else {
         this.updateAPIStatus({ status: 'error', message: 'שגיאה בטעינת סטטוס API' });
       }
-    } catch (error) {
+    } catch {
       this.updateAPIStatus({ status: 'error', message: 'שגיאת תקשורת' });
     }
   }
@@ -387,7 +387,7 @@ class ExternalDataDashboard {
       } else {
         // console.error('❌ Error loading providers');
       }
-    } catch (error) {
+    } catch {
       // console.error('❌ Error loading providers:', error);
     }
   }
@@ -450,7 +450,7 @@ class ExternalDataDashboard {
       } else {
         // console.error('❌ Error loading cache stats:', response.status);
       }
-    } catch (error) {
+    } catch {
       // console.error('❌ Error loading cache stats:', error);
     }
   }
@@ -507,7 +507,7 @@ class ExternalDataDashboard {
       }
 
       // console.log('✅ Current settings updated');
-    } catch (error) {
+    } catch {
       // console.error('❌ Error updating current settings:', error);
     }
   }
@@ -524,7 +524,7 @@ class ExternalDataDashboard {
         // console.error('❌ Error loading logs:', response.status);
         this.renderLogs([]);
       }
-    } catch (error) {
+    } catch {
       // console.error('❌ Error loading logs:', error);
       this.renderLogs([]);
     }
@@ -587,10 +587,9 @@ class ExternalDataDashboard {
   }
 
   static filterLogs() {
-    const levelFilter = document.getElementById('log-level-filter')?.value || 'all';
-    const searchTerm = document.getElementById('log-search')?.value || '';
-
     // Implementation for log filtering
+    // const levelFilter = document.getElementById('log-level-filter')?.value || 'all';
+    // const searchTerm = document.getElementById('log-search')?.value || '';
     // console.log('🔍 Filtering logs:', { level: levelFilter, search: searchTerm });
   }
 
@@ -618,13 +617,13 @@ class ExternalDataDashboard {
       });
 
       if (response.ok) {
-        const result = await response.json();
+        await response.json();
         // console.log('✅ Settings saved successfully:', result.message);
         // console.log('📋 Updated settings:', result.settings);
       } else {
         // console.error('❌ Error saving settings:', response.status);
       }
-    } catch (error) {
+    } catch {
       // console.error('❌ Error saving settings:', error);
     }
   }
@@ -655,7 +654,7 @@ class ExternalDataDashboard {
       } else {
         // console.error('❌ Error clearing logs:', response.status);
       }
-    } catch (error) {
+    } catch {
       // console.error('❌ Error clearing logs:', error);
     }
   }
@@ -666,13 +665,13 @@ class ExternalDataDashboard {
 
       const response = await fetch('/api/external-data/status/cache/clear', { method: 'POST' });
       if (response.ok) {
-        const result = await response.json();
+        await response.json();
         // console.log('✅ Cache cleared successfully:', result.message);
         await this.loadCacheStats();
       } else {
         // console.error('❌ Error clearing cache:', response.status);
       }
-    } catch (error) {
+    } catch {
       // console.error('❌ Error clearing cache:', error);
     }
   }
@@ -683,13 +682,13 @@ class ExternalDataDashboard {
 
       const response = await fetch('/api/external-data/status/cache/optimize', { method: 'POST' });
       if (response.ok) {
-        const result = await response.json();
+        await response.json();
         // console.log('✅ Cache optimized successfully:', result.message);
         await this.loadCacheStats();
       } else {
         // console.error('❌ Error optimizing cache:', response.status);
       }
-    } catch (error) {
+    } catch {
       // console.error('❌ Error optimizing cache:', error);
     }
   }
@@ -700,14 +699,14 @@ class ExternalDataDashboard {
 
       const response = await fetch('/api/external-data/status/providers/test-all', { method: 'POST' });
       if (response.ok) {
-        const result = await response.json();
+        await response.json();
         // console.log('✅ All providers tested:', result.message);
         // console.log('📊 Test results:', result.test_results);
         await this.loadProviders();
       } else {
         // console.error('❌ Error testing providers:', response.status);
       }
-    } catch (error) {
+    } catch {
       // console.error('❌ Error testing providers:', error);
     }
   }
@@ -735,7 +734,7 @@ class ExternalDataDashboard {
       } else {
         // console.error('❌ Error exporting data:', response.status);
       }
-    } catch (error) {
+    } catch {
       // console.error('❌ Error exporting data:', error);
     }
   }
@@ -769,7 +768,7 @@ class ExternalDataDashboard {
       } else {
         // console.error('❌ Error analyzing data:', response.status);
       }
-    } catch (error) {
+    } catch {
       // console.error('❌ Error analyzing data:', error);
     }
   }
@@ -782,7 +781,7 @@ class ExternalDataDashboard {
       await this.exportData();
       // console.log('✅ Data backup completed');
 
-    } catch (error) {
+    } catch {
       // console.error('❌ Error backing up data:', error);
     }
   }
@@ -796,12 +795,12 @@ class ExternalDataDashboard {
 }
 
 // Global functions for button onclick handlers
-window.testProvider = function(providerId) {
+window.testProvider = function(_providerId) {
   // console.log('🧪 Testing provider:', providerId);
   // Implementation for testing specific provider
 };
 
-window.toggleProvider = function(providerId) {
+window.toggleProvider = function(_providerId) {
   // console.log('🔄 Toggling provider:', providerId);
   // Implementation for toggling provider status
 };

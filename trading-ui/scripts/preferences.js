@@ -177,7 +177,7 @@ async function resetToDefaults() {
           try {
             await saveAllPreferences();
             showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
-          } catch (error) {
+          } catch (_error) {
             showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
           }
         },
@@ -191,7 +191,7 @@ async function resetToDefaults() {
         try {
           await saveAllPreferences();
           showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
-        } catch (_error) {
+        } catch {
           showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
         }
       }

@@ -22,29 +22,7 @@ let refreshInterval = null;
 window.consoleLogs = [];
 window.errorLog = [];
 
-// Enhanced logging system using notifications
-const logSystem = {
-  log: message => {
-    if (typeof window.showNotification === 'function') {
-      window.showNotification(message, 'info');
-    }
-  },
-  error: message => {
-    if (typeof window.showNotification === 'function') {
-      window.showNotification(message, 'error');
-    }
-  },
-  warn: message => {
-    if (typeof window.showNotification === 'function') {
-      window.showNotification(message, 'warning');
-    }
-  },
-  info: message => {
-    if (typeof window.showNotification === 'function') {
-      window.showNotification(message, 'info');
-    }
-  },
-};
+// Enhanced logging system using notifications (removed unused logSystem)
 
 // API endpoints
 const API_BASE = '/api/v1/background-tasks';
@@ -862,7 +840,7 @@ window.showTaskDetails = function(taskName) {
   modalManager.showTaskDetails(taskName);
 };
 
-window.showHistoryDetails = function(executionId) {
+window.showHistoryDetails = function(_executionId) {
   // TODO: Implement history details modal - ראה: CENTRAL_TASKS_TODO.md (משימה 5)
   utils.showNotification('פונקציונליות זו תתווסף בקרוב', 'info');
 };

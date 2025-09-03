@@ -1854,70 +1854,7 @@ function updateTickersWithYahooData(yahooData) {
   updateTickersTable(updatedData);
 }
 
-/**
- * עדכון טבלת הטיקרים
- */
-function updateTickersTable(tickers) {
-  const tableBody = document.querySelector('table[data-table-type="tickers"] tbody');
-  
-  if (!tableBody) {
-    console.warn('Tickers table body not found');
-    return;
-  }
-
-  if (!tickers || tickers.length === 0) {
-    tableBody.innerHTML = '<tr><td colspan="13" class="text-center">אין טיקרים להצגה</td></tr>';
-    return;
-  }
-
-  const rows = tickers.map(ticker => {
-    const priceDisplay = ticker.current_price ? 
-      `$${parseFloat(ticker.current_price).toFixed(2)}` : 
-      'אין נתונים';
-    
-    const changeDisplay = ticker.change_percent ? 
-      `${parseFloat(ticker.change_percent).toFixed(2)}%` : 
-      'אין נתונים';
-    
-    const changeClass = ticker.change_percent > 0 ? 'text-success' : 
-                       ticker.change_percent < 0 ? 'text-danger' : '';
-    
-    const volumeDisplay = ticker.volume ? 
-      ticker.volume.toLocaleString() : 
-      'אין נתונים';
-
-    const updatedAtDisplay = ticker.yahoo_updated_at || 
-                            ticker.updated_at || 
-                            'אין נתונים';
-
-    return `
-      <tr>
-        <td><strong>${ticker.symbol || ''}</strong></td>
-        <td>${ticker.active_trades ? 'כן' : 'לא'}</td>
-        <td>${ticker.type || ''}</td>
-        <td>${ticker.currency || ''}</td>
-        <td><strong>${priceDisplay}</strong></td>
-        <td class="${changeClass}"><strong>${changeDisplay}</strong></td>
-        <td>${volumeDisplay}</td>
-        <td><small>${updatedAtDisplay}</small></td>
-        <td>${ticker.name || ''}</td>
-        <td><small>${ticker.created_at || ''}</small></td>
-        <td>${ticker.remarks || ''}</td>
-        <td><span class="badge ${ticker.status === 'active' ? 'bg-success' : 'bg-secondary'}">${ticker.status || ''}</span></td>
-        <td class="actions-cell">
-          <button class="btn btn-sm btn-outline-primary" onclick="editTicker(${ticker.id})" title="ערוך טיקר">
-            <i class="fas fa-edit"></i>
-          </button>
-          <button class="btn btn-sm btn-outline-danger" onclick="deleteTicker(${ticker.id})" title="מחק טיקר">
-            <i class="fas fa-trash"></i>
-          </button>
-        </td>
-      </tr>
-    `;
-  }).join('');
-
-  tableBody.innerHTML = rows;
-}
+// Duplicate function removed - using main implementation at line 1501
 
 /**
  * רענון נתוני Yahoo Finance ללא הודעות (לטעינה אוטומטית)

@@ -1593,7 +1593,6 @@ async function updateExecutionsTableMain(executions) {
   // קבלת צבעים מהמערכת הגלובלית
   const colors = window.getTableColors();
   const positiveColor = colors.positive;
-  const negativeColor = colors.negative;
   const secondaryColor = colors.secondary;
 
   // טעינת נתוני טריידים וטיקרים

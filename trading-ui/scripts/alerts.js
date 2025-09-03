@@ -415,7 +415,6 @@ function updateAlertsTable(alerts) {
             relatedDisplay = `טיקר ${alert.related_id}`;
             // console.log(`❌ Ticker not found for ID: ${alert.related_id}`);
           }
-          relatedIcon = '📊';
           relatedClass = 'related-ticker';
           break;
         }
@@ -755,7 +754,7 @@ async function loadModalData() {
     // console.log('🔧 Setting initial data for tickers...');
     populateSelect('alertRelatedObjectSelect', tickers, 'symbol', '');
     populateSelect('editAlertRelatedObjectSelect', tickers, 'symbol', '');
-  } catch (error) {
+  } catch {
     // console.error('שגיאה בטעינת נתונים למודל:', error);
     // המשך עם מערכים ריקים
     updateRadioButtons([], [], [], []);
@@ -1858,99 +1857,9 @@ async function updateAlert() {
   }
 }
 
-/**
- * מחיקת התראה
- */
-async function _deleteAlert(alertId) {
-  // שימוש במערכת הגלובלית למחיקה
-  if (typeof window.showDeleteWarning === 'function') {
-    window.showDeleteWarning('alerts', alertId, 'התראה', async () => {
-      await confirmDeleteAlert(alertId);
-    }, null);
-  } else {
-    // גיבוי למקרה שהמערכת הגלובלית לא זמינה
-    if (typeof window.showConfirmationDialog === 'function') {
-      window.showConfirmationDialog(
-        'מחיקת התראה',
-        'האם אתה בטוח שברצונך למחוק התראה זו?\n\nפעולה זו אינה ניתנת לביטול.',
-        async () => {
-          await confirmDeleteAlert(alertId);
-        },
-        () => {
-          // console.log('מחיקה בוטלה');
-        },
-      );
-    } else {
-      // fallback אחרון - confirm רגיל (אם מערכת התראות לא זמינה)
-      const confirmed = window.confirm('האם אתה בטוח שברצונך למחוק התראה זו?');
-      if (confirmed) {
-        await confirmDeleteAlert(alertId);
-      }
-    }
-    return;
-  }
-}
+// Removed unused function _deleteAlert
 
-/**
- * אישור מחיקת התראה
- */
-async function confirmDeleteAlert(alertId) {
-  // console.log('🔄 confirmDeleteAlert נקראה עבור ID:', alertId);
-
-  try {
-    const response = await fetch(`/api/v1/alerts/${alertId}`, {
-      method: 'DELETE',
-    });
-
-    const result = await response.json();
-
-    if (response.ok && result.status === 'success') {
-      // console.log('✅ התראה נמחקה בהצלחה');
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!');
-      }
-      loadAlertsData();
-    } else {
-      // console.error('❌ שגיאה במחיקת התראה:', result);
-
-      // טיפול בשגיאות מהשרת
-      if (result.error && result.error.message) {
-        const serverMessage = result.error.message;
-
-        if (serverMessage.includes('has linked items')) {
-          if (window.showErrorNotification) {
-            window.showErrorNotification(
-              'שגיאה במחיקה',
-              'לא ניתן למחוק התראה זו - יש פריטים מקושרים אליה',
-            );
-          }
-        } else {
-          if (window.showErrorNotification) {
-            window.showErrorNotification(
-              'שגיאה במחיקה',
-              serverMessage,
-            );
-          }
-        }
-      } else {
-        if (window.showErrorNotification) {
-          window.showErrorNotification(
-            'שגיאה במחיקה',
-            'שגיאה במחיקת התראה - בדוק את הנתונים',
-          );
-        }
-      }
-    }
-  } catch {
-    // console.error('❌ שגיאה במחיקת התראה:', error);
-    if (window.showErrorNotification) {
-      window.showErrorNotification(
-        'שגיאה',
-        'שגיאה במחיקת התראה - בדוק את חיבור השרת',
-      );
-    }
-  }
-}
+// Removed unused function confirmDeleteAlert
 
 /**
  * פונקציה לסידור טבלת התראות
@@ -2005,15 +1914,7 @@ function getStatusClass(status) {
  * @param {number} relatedType - מזהה סוג האובייקט (1=חשבון, 2=טרייד, 3=תכנון, 4=טיקר)
  * @returns {string} שם המחלקה CSS
  */
-function _getRelatedClass(relatedType) {
-  switch (relatedType) {
-  case 4: return 'related-ticker'; // ticker
-  case 2: return 'related-trade'; // trade
-  case 3: return 'related-plan'; // trade_plan
-  case 1: return 'related-account'; // account
-  default: return 'related-other';
-  }
-}
+// Removed unused function _getRelatedClass
 
 
 /**

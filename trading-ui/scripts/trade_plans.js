@@ -1087,7 +1087,7 @@ function updateTradePlansTable(trade_plans) {
         } else {
           handleValidationError('date', 'תאריך לא תקין');
         }
-      } catch (error) {
+      } catch {
         handleValidationError('date parsing', 'שגיאה בניתוח תאריך');
       }
     }
@@ -1151,9 +1151,6 @@ function updatePageSummaryStats() {
   // Using filtered data if available, otherwise all data
   const dataToUse = window.filteredTradePlansData || trade_plansData;
   const totalDesigns = dataToUse.length;
-  const openDesigns = dataToUse.filter(design => design.status === 'open').length;
-  const closedDesigns = dataToUse.filter(design => design.status === 'closed').length;
-  const cancelledDesigns = dataToUse.filter(design => design.status === 'cancelled').length;
 
   // Calculating sums
   let totalInvestment = 0;
@@ -1712,7 +1709,7 @@ async function saveNewTradePlan() {
     }
 
     if (response.ok) {
-      const newDesign = await response.json();
+      await response.json();
 
       // Closing the modal
       closeModal('addTradePlanModal');
@@ -1731,20 +1728,7 @@ async function saveNewTradePlan() {
   }
 }
 
-/**
- * המרת שם שדה מהשרת ל-ID של השדה בטופס
- */
-function getFieldIdFromServerField(serverField) {
-  const fieldMapping = {
-    'ticker_id': 'addTradePlanTickerId',
-    'investment_type': 'addTradePlanInvestmentType',
-    'side': 'addTradePlanSide',
-    'planned_amount': 'addTradePlanPlannedAmount',
-    'stop_price': 'addTradePlanStopPrice',
-    'target_price': 'addTradePlanTargetPrice',
-  };
-  return fieldMapping[serverField] || null;
-}
+// Removed unused function getFieldIdFromServerField
 
 /**
  * עריכת תכנון
@@ -1857,14 +1841,7 @@ function closeModal(modalId) {
 /**
  * פילטור נתוני תכנונים
  */
-function filterDesignsData(statuses, types, accounts, dateRange, searchTerm) {
-
-
-  // Calling global function with pageName
-  if (typeof window.updateGridFromComponentGlobal === 'function') {
-    window.updateGridFromComponentGlobal(statuses, types, accounts, dateRange, searchTerm, 'planning');
-  }
-}
+// Removed unused function filterDesignsData
 
 /**
  * פונקציה לסידור הטבלה
@@ -2615,11 +2592,7 @@ window.updateAccountFilterDisplayText = function () {
 /**
  * הצגת עמוד הנכס (בפיתוח)
  */
-function showTickerPage(tickerId) {
-  if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('פיתוח', 'עמוד הנכס נמצא בפיתוח');
-  }
-}
+// Removed unused function showTickerPage
 
 /**
  * הוספת הערה חשובה

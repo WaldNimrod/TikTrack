@@ -1096,7 +1096,7 @@ class HeaderSystem {
           e.target.closest('#searchFilterInput') ||
           e.target.closest('#searchClearBtn') ||
           e.target.closest('.tiktrack-dropdown-menu') ||
-          e.target.closest('.tiktrack-dropdown-toggle') ||
+          e.target.closest('.tiktrack-toggle') ||
           e.target.closest('.submenu');
 
         if (!isClickInsideMenu) {
@@ -1145,7 +1145,7 @@ class HeaderSystem {
     });
 
     // Event listeners לדרופדאונים
-    this.setupDropdownEventListeners();
+    HeaderSystem.setupDropdownEventListeners();
 
     // הגדרת הפריט הפעיל
     HeaderSystem.setActiveMenuItem();
@@ -1180,7 +1180,7 @@ class HeaderSystem {
 
     // שחזור מצב הפילטרים הספציפיים
     setTimeout(() => {
-      this.restoreFilterStates();
+      HeaderSystem.restoreFilterStates();
     }, 100);
   }
 
@@ -1414,7 +1414,7 @@ class HeaderSystem {
   }
 
   // שחזור מצב הפילטרים הספציפיים
-  restoreFilterStates() {
+  static restoreFilterStates() {
     const savedStates = localStorage.getItem('filterStates');
     if (savedStates) {
       try {
@@ -1478,7 +1478,7 @@ class HeaderSystem {
           window.filterSystem.updateFilter('account', filterStates.account || []);
           window.filterSystem.updateFilter('search', filterStates.search || '');
         }
-      } catch (error) {
+      } catch {
         // Error restoring filter states
       }
     }
@@ -1492,9 +1492,9 @@ class HeaderSystem {
 
 
     // בדיקה נוספת - הדפסת כל הכפתורים שנמצאו
-    navItems.forEach((item, index) => {
+    navItems.forEach((item, _index) => {
       const link = item.querySelector('.tiktrack-nav-link');
-      const href = link ? link.getAttribute('href') : 'no href';
+      // const _href = link ? link.getAttribute('href') : 'no href';
 
     });
 
@@ -1541,9 +1541,9 @@ class HeaderSystem {
     // בדיקה סופית - כמה פריטים פעילים יש
     const activeItems = document.querySelectorAll('#unified-header .tiktrack-nav-item.active');
 
-    activeItems.forEach((item, index) => {
+    activeItems.forEach((item, _index) => {
       const link = item.querySelector('.tiktrack-nav-link');
-      const href = link ? link.getAttribute('href') : 'no href';
+      // const _href = link ? link.getAttribute('href') : 'no href';
 
     });
   }
@@ -1598,7 +1598,7 @@ class HeaderSystem {
     // });
   }
 
-  setupDropdownEventListeners() {
+  static setupDropdownEventListeners() {
     // DISABLED - Using global toggle functions instead
     // const dropdowns = [
     //   { toggle: 'dateRangeFilterToggle', menu: 'dateRangeFilterMenu' },
@@ -1670,7 +1670,7 @@ class HeaderSystem {
   }
 
   // פונקציה לעדכון חשבונות בפילטר
-  updateAccountFilter(accounts) {
+  static updateAccountFilter(accounts) {
     const accountMenu = document.getElementById('accountFilterMenu');
     if (!accountMenu) {return;}
 
@@ -1723,9 +1723,9 @@ class HeaderSystem {
         e.stopPropagation();
 
         // הסרת בחירה מ"הכול"
-        const allItem = accountMenu.querySelector('[data-value="הכול"]');
-        if (allItem) {
-          allItem.classList.remove('selected');
+        const currentAllItem = accountMenu.querySelector('[data-value="הכול"]');
+        if (currentAllItem) {
+          currentAllItem.classList.remove('selected');
         }
 
         item.classList.toggle('selected');
@@ -2322,7 +2322,7 @@ class HeaderSystem {
     if (typeof window.getAccounts === 'function') {
       window.getAccounts().then(accounts => {
         if (accounts && accounts.length > 0) {
-          this.updateAccountFilter(accounts);
+          HeaderSystem.updateAccountFilter(accounts);
         }
       });
     }

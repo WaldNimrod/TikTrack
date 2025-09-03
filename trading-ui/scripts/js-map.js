@@ -95,7 +95,7 @@ class JsMapSystem {
       await this.renderPageMapping();
       this.renderFunctionsData();
 
-    } catch (_error) {
+    } catch (error) {
       // Error loading JS map data
       this.showErrorState('שגיאה בטעינת נתונים');
     }
@@ -115,7 +115,7 @@ class JsMapSystem {
         // console.warn('⚠️ Server response not ok, using local scan');
         this.pageMapping = this.scanPageMappingLocally();
       }
-    } catch (_error) {
+    } catch (error) {
       // console.warn('⚠️ Using local page mapping scan due to error:', _error);
       this.pageMapping = this.scanPageMappingLocally();
     }
@@ -143,7 +143,7 @@ class JsMapSystem {
         // console.warn('⚠️ Server response not ok, using local scan');
         this.functionsData = this.scanFunctionsLocally();
       }
-    } catch (_error) {
+    } catch (error) {
       // console.warn('⚠️ Using local functions scan due to error:', _error);
       this.functionsData = this.scanFunctionsLocally();
     }

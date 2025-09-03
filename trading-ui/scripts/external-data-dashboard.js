@@ -129,7 +129,7 @@ ${detailedLog.consoleLogs.join('\n')}
       // logText
     });
 
-  } catch (_error) {
+  } catch (error) {
     // Error collecting detailed logs
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה באיסוף הלוגים. בדוק את הקונסול.');
@@ -203,7 +203,7 @@ class ExternalDataDashboard {
       } else {
         // console.error('❌ Error loading system status:', response.status);
       }
-    } catch (_error) {
+    } catch (error) {
       // Error loading system status
     }
   }

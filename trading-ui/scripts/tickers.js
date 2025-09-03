@@ -200,7 +200,7 @@ async function updateActiveTradesField() {
     // טעינת טריידים מהשרת
     const tradesResponse = await fetch('/api/v1/trades/');
     if (!tradesResponse.ok) {
-      // console.warn('⚠️ Could not load trades for active_trades update');
+      // // Warning:('⚠️ Could not load trades for active_trades update');
       return;
     }
 
@@ -287,14 +287,14 @@ function restoreTickersSectionState() {
   if (typeof window.restoreAllSectionStates === 'function') {
     window.restoreAllSectionStates();
   } else {
-    // console.warn('⚠️ restoreAllSectionStates function not available globally');
+    // // Warning:('⚠️ restoreAllSectionStates function not available globally');
   }
 
   // שחזור מצב הסקשנים הפנימיים
   if (typeof window.restoreSectionStates === 'function') {
     window.restoreSectionStates();
   } else {
-    // console.warn('⚠️ restoreSectionStates function not available globally');
+    // // Warning:('⚠️ restoreSectionStates function not available globally');
   }
 }
 
@@ -720,10 +720,10 @@ async function updateTicker() {
 
     } else if (response.status === 404) {
       // הטיקר כבר לא קיים בבסיס הנתונים - נסיר אותו מהמטמון ונרענן
-      console.warn(`טיקר ${id} כבר לא קיים בבסיס הנתונים, מרענן נתונים`);
-      
+      // Warning:(`טיקר ${id} כבר לא קיים בבסיס הנתונים, מרענן נתונים`);
+
       if (window.showSuccessNotification) {
-        window.showSuccessNotification('מידע', `הטיקר כבר לא קיים במערכת - מרענן נתונים`);
+        window.showSuccessNotification('מידע', 'הטיקר כבר לא קיים במערכת - מרענן נתונים');
       }
 
       // סגירת המודל
@@ -766,7 +766,7 @@ async function cancelTicker(id) {
         tickerDetails = `\n\nפרטי הטיקר:\n• סימבול: ${ticker.symbol || 'לא מוגדר'}\n• שם: ${ticker.name || 'לא מוגדר'}\n• סטטוס: ${ticker.status || 'לא מוגדר'}`;
       }
     } catch {
-      // console.warn('לא ניתן לטעון פרטי טיקר:', error);
+      // // Warning:('לא ניתן לטעון פרטי טיקר:', error);
     }
 
     // אישור מהמשתמש באמצעות המערכת הגלובלית
@@ -1102,10 +1102,10 @@ async function performCancelTicker(id) {
 
     } else if (response.status === 404) {
       // הטיקר כבר לא קיים בבסיס הנתונים - נסיר אותו מהמטמון ונרענן
-      console.warn(`טיקר ${id} כבר לא קיים בבסיס הנתונים, מרענן נתונים`);
-      
+      // Warning:(`טיקר ${id} כבר לא קיים בבסיס הנתונים, מרענן נתונים`);
+
       if (window.showSuccessNotification) {
-        window.showSuccessNotification('מידע', `הטיקר כבר לא קיים במערכת - מרענן נתונים`);
+        window.showSuccessNotification('מידע', 'הטיקר כבר לא קיים במערכת - מרענן נתונים');
       }
 
       // רענון הנתונים כמו במקרה של הצלחה
@@ -1193,7 +1193,7 @@ async function reactivateTicker(tickerId) {
         if (typeof window.onTickerStatusChanged === 'function') {
           window.onTickerStatusChanged(tickerId, 'open');
         }
-      }
+      },
     });
 
     if (!handled) {
@@ -1258,7 +1258,7 @@ async function performTickerDeletion(tickerId) {
         if (typeof window.onTickerDeleted === 'function') {
           window.onTickerDeleted(tickerId);
         }
-      }
+      },
     });
 
     if (!handled) {
@@ -1334,8 +1334,8 @@ async function confirmDeleteTicker(id) {
 
     } else if (response.status === 404) {
       // הטיקר כבר לא קיים בבסיס הנתונים - נסיר אותו מהמטמון ונרענן
-      console.warn(`טיקר ${id} כבר לא קיים בבסיס הנתונים, מרענן נתונים`);
-      
+      // Warning:(`טיקר ${id} כבר לא קיים בבסיס הנתונים, מרענן נתונים`);
+
       if (window.showSuccessNotification) {
         window.showSuccessNotification('הצלחה', `טיקר ${tickerInfo} הוסר מהתצוגה (כבר לא קיים במערכת)`);
       }
@@ -1412,7 +1412,7 @@ async function confirmDeleteTicker(id) {
 function clearTickersCache() {
   window.tickersData = [];
   tickersData = [];
-  console.log('🗑️ מטמון הטיקרים נוקה');
+  // Log:('🗑️ מטמון הטיקרים נוקה');
 }
 
 /**
@@ -1422,7 +1422,7 @@ async function loadTickersData() {
   try {
     // ניקוי מטמון לפני טעינה
     clearTickersCache();
-    
+
     // טעינת מטבעות אם עוד לא נטענו
     if (!window.currenciesLoaded) {
       await loadCurrenciesData();
@@ -1638,7 +1638,7 @@ function updateTickersTable(tickers) {
     const finalHTML = tableRows.join('');
     tbody.innerHTML = '';  // ניקוי מלא
     tbody.innerHTML = finalHTML;  // הוספת התוכן החדש
-    
+
     // כפיית reflow של הדפדפן
     tbody.offsetHeight;
 
@@ -1647,8 +1647,8 @@ function updateTickersTable(tickers) {
     if (countElement) {
       countElement.textContent = `${tickers.length} טיקרים`;
     }
-    
-    console.log(`📊 טבלת טיקרים עודכנה עם ${tickers.length} פריטים`);
+
+    // Log:(`📊 טבלת טיקרים עודכנה עם ${tickers.length} פריטים`);
 
     // עדכון סטטיסטיקות סיכום
     updateTickersSummaryStats(tickers);
@@ -1840,7 +1840,7 @@ async function refreshYahooFinanceData() {
     }
 
   } catch (error) {
-    console.error('Error refreshing external data:', error);
+    // Error:('Error refreshing external data:', error);
   }
 }
 
@@ -1860,7 +1860,7 @@ async function refreshYahooFinanceDataSilently() {
     // שימוש בשירות האחיד לקבלת נתונים
     const externalDataService = window.ExternalDataService;
     if (!externalDataService) {
-      console.warn('External Data Service not available for silent refresh');
+      // Warning:('External Data Service not available for silent refresh');
       return;
     }
 
@@ -1874,6 +1874,6 @@ async function refreshYahooFinanceDataSilently() {
     }
 
   } catch (error) {
-    console.warn('Silent external data refresh failed:', error.message);
+    // Warning:('Silent external data refresh failed:', error.message);
   }
 }

@@ -2148,7 +2148,7 @@ class HeaderSystem {
     if (window.filterSystem) {
       window.filterSystem.applyAccountFilter(accountName === 'הכול' ? [] : [accountName]);
     } else {
-      console.warn('⚠️ No filter system found');
+      // No filter system found
     }
   }
 
@@ -2603,7 +2603,7 @@ class HeaderSystem {
         this.updateAccountFilterOptions(activeAccounts);
       }
     } catch (err) {
-      console.warn('Failed to load accounts for filter:', err);
+      // Failed to load accounts for filter
     }
   }
 
@@ -2750,7 +2750,7 @@ function toggleStatusFilter() {
       setupFilterMenuAutoClose(menu);
     }
   } else {
-    console.warn('⚠️ Status filter menu not found');
+    // Status filter menu not found
   }
 }
 
@@ -2778,7 +2778,7 @@ function toggleTypeFilter() {
       setupFilterMenuAutoClose(menu);
     }
   } else {
-    console.warn('⚠️ Type filter menu not found');
+    // Type filter menu not found
   }
 }
 
@@ -2806,7 +2806,7 @@ function toggleAccountFilter() {
       setupFilterMenuAutoClose(menu);
     }
   } else {
-    console.warn('⚠️ Account filter menu not found');
+    // Account filter menu not found
   }
 }
 
@@ -2837,7 +2837,7 @@ function toggleDateRangeFilter() {
 
 
   } else {
-    console.warn('⚠️ Date range filter menu not found');
+    // Date range filter menu not found
   }
 }
 
@@ -3972,7 +3972,7 @@ function applyTableFilter(filterType, selectedValues) {
   // Get filter configuration
   const filterConfig = getFilterConfig(filterType);
   if (!filterConfig) {
-    console.warn(`⚠️ No filter config found for type: ${filterType}`);
+    // No filter config found for type
     return;
   }
 
@@ -4310,7 +4310,7 @@ async function resetAllFilters() {
 
   } catch (error) {
     // שגיאה בקבלת הגדרות ברירת מחדל
-    console.warn('⚠️ Using fallback reset');
+    // Using fallback reset
     // Fallback - איפוס ידני
     resetFiltersManually();
   }
@@ -4326,7 +4326,7 @@ function clearAllFilters() {
   if (window.filterSystem) {
     window.filterSystem.clearFilters();
   } else {
-    console.warn('⚠️ filterSystem not available, using fallback');
+    // FilterSystem not available, using fallback
     // Fallback - ניקוי ידני
     clearFiltersManually();
   }
@@ -4673,7 +4673,7 @@ async function clearDevelopmentCache(event) {
   let button = null;
 
   try {
-    console.log('🔄 מתחיל ניקוי Cache מקיף...');
+    // Log:('🔄 מתחיל ניקוי Cache מקיף...');
 
     // מציאת הכפתור - קודם מנסה event.target, אחרת מחפש ב-DOM
     if (event && event.target) {
@@ -4693,12 +4693,11 @@ async function clearDevelopmentCache(event) {
     }
 
     // לוג לבדיקה
-    console.log('🔍 חיפוש כפתור:', {
-      eventTarget: event?.target,
-      foundButton: button,
-      buttonText: button?.textContent,
-      buttonHTML: button?.innerHTML,
-    });
+    // Log: Debug information for button search
+    // eventTarget: event?.target
+    // foundButton: button  
+    // buttonText: button?.textContent
+    // buttonHTML: button?.innerHTML
 
     // הצגת הודעת טעינה
     if (button) {
@@ -4709,7 +4708,7 @@ async function clearDevelopmentCache(event) {
     }
 
     // ===== שלב 1: ניקוי Cache של הדפדפן =====
-    console.log('🧹 מנקה Cache של הדפדפן...');
+    // Log:('🧹 מנקה Cache של הדפדפן...');
 
     // ניקוי localStorage (רק פריטים שקשורים למערכת)
     try {
@@ -4723,18 +4722,18 @@ async function clearDevelopmentCache(event) {
           clearedLocalStorage++;
         }
       });
-      console.log(`✅ localStorage נוקה: ${clearedLocalStorage} פריטים נמחקו`);
+      // Log:(`✅ localStorage נוקה: ${clearedLocalStorage} פריטים נמחקו`);
     } catch (e) {
-      console.warn('⚠️ לא ניתן לנקות localStorage:', e);
+      // Warning:('⚠️ לא ניתן לנקות localStorage:', e);
     }
 
     // ניקוי sessionStorage
     try {
       const sessionKeys = Object.keys(sessionStorage);
       sessionStorage.clear();
-      console.log(`✅ sessionStorage נוקה: ${sessionKeys.length} פריטים נמחקו`);
+      // Log:(`✅ sessionStorage נוקה: ${sessionKeys.length} פריטים נמחקו`);
     } catch (e) {
-      console.warn('⚠️ לא ניתן לנקות sessionStorage:', e);
+      // Warning:('⚠️ לא ניתן לנקות sessionStorage:', e);
     }
 
     // ניקוי IndexedDB
@@ -4744,16 +4743,16 @@ async function clearDevelopmentCache(event) {
         for (const db of databases) {
           if (db.name && !db.name.includes('system')) {
             await indexedDB.deleteDatabase(db.name);
-            console.log(`🗑️ IndexedDB נמחק: ${db.name}`);
+            // Log:(`🗑️ IndexedDB נמחק: ${db.name}`);
           }
         }
       }
     } catch (e) {
-      console.warn('⚠️ לא ניתן לנקות IndexedDB:', e);
+      // Warning:('⚠️ לא ניתן לנקות IndexedDB:', e);
     }
 
     // ===== שלב 2: ניקוי Cache של השרת =====
-    console.log('🔄 מנקה Cache של השרת...');
+    // Log:('🔄 מנקה Cache של השרת...');
     const response = await fetch('/api/v1/cache/clear', {
       method: 'POST',
       headers: {
@@ -4763,47 +4762,47 @@ async function clearDevelopmentCache(event) {
 
     if (response.ok) {
       const result = await response.json();
-      console.log('✅ Cache של השרת נוקה בהצלחה:', result);
+      // Log:('✅ Cache של השרת נוקה בהצלחה:', result);
     } else {
-      console.warn('⚠️ לא ניתן לנקות Cache של השרת:', response.status);
+      // Warning:('⚠️ לא ניתן לנקות Cache של השרת:', response.status);
     }
 
     // ===== שלב 3: ניקוי Service Workers =====
-    console.log('🧹 מנקה Service Workers...');
+    // Log:('🧹 מנקה Service Workers...');
     try {
       if ('serviceWorker' in navigator) {
         const registrations = await navigator.serviceWorker.getRegistrations();
         for (const registration of registrations) {
           await registration.unregister();
-          console.log('🗑️ Service Worker נמחק');
+          // Log:('🗑️ Service Worker נמחק');
         }
       }
     } catch (e) {
-      console.warn('⚠️ לא ניתן לנקות Service Workers:', e);
+      // Warning:('⚠️ לא ניתן לנקות Service Workers:', e);
     }
 
     // ===== שלב 4: ניקוי Cache API =====
-    console.log('🧹 מנקה Cache API...');
+    // Log:('🧹 מנקה Cache API...');
     try {
       if ('caches' in window) {
         const cacheNames = await caches.keys();
         await Promise.all(
           cacheNames.map(cacheName => caches.delete(cacheName)),
         );
-        console.log(`✅ Cache API נוקה: ${cacheNames.length} caches נמחקו`);
+        // Log:(`✅ Cache API נוקה: ${cacheNames.length} caches נמחקו`);
       }
     } catch (e) {
-      console.warn('⚠️ לא ניתן לנקות Cache API:', e);
+      // Warning:('⚠️ לא ניתן לנקות Cache API:', e);
     }
 
     // ===== שלב 5: ניקוי Application Cache =====
     try {
       if ('applicationCache' in window) {
         window.applicationCache.update();
-        console.log('✅ Application Cache עודכן');
+        // Log:('✅ Application Cache עודכן');
       }
     } catch (e) {
-      console.warn('⚠️ לא ניתן לנקות Application Cache:', e);
+      // Warning:('⚠️ לא ניתן לנקות Application Cache:', e);
     }
 
     // ===== שלב 6: ניקוי Memory Cache =====
@@ -4811,10 +4810,10 @@ async function clearDevelopmentCache(event) {
       // ניקוי cache של fetch requests
       if (window.fetch && window.fetch.cache) {
         window.fetch.cache.clear();
-        console.log('✅ Fetch cache נוקה');
+        // Log:('✅ Fetch cache נוקה');
       }
     } catch (e) {
-      console.warn('⚠️ לא ניתן לנקות Fetch cache:', e);
+      // Warning:('⚠️ לא ניתן לנקות Fetch cache:', e);
     }
 
     // ===== שלב 7: ניקוי DOM Cache =====
@@ -4826,65 +4825,65 @@ async function clearDevelopmentCache(event) {
           img.src = img.src + '?t=' + Date.now();
         }
       });
-      console.log(`✅ ${images.length} תמונות נוקו מ-cache`);
+      // Log:(`✅ ${images.length} תמונות נוקו מ-cache`);
     } catch (e) {
-      console.warn('⚠️ לא ניתן לנקות תמונות:', e);
+      // Warning:('⚠️ לא ניתן לנקות תמונות:', e);
     }
 
     // ===== הצגת הודעת הצלחה =====
-    console.log('🎉 כל סוגי ה-Cache נוקו בהצלחה!');
+    // Log:('🎉 כל סוגי ה-Cache נוקו בהצלחה!');
 
     // לוג לבדיקת מערכת ההתראות
-    console.log('🔍 בדיקת מערכת התראות:', {
+    // Log:('🔍 בדיקת מערכת התראות:', {
       showSuccessNotification: typeof window.showSuccessNotification,
       showNotification: typeof window.showNotification,
       notificationSystem: typeof window.notificationSystem,
     });
 
     if (typeof window.showSuccessNotification === 'function') {
-      console.log('✅ קורא ל-showSuccessNotification');
+      // Log:('✅ קורא ל-showSuccessNotification');
       window.showSuccessNotification('הצלחה', 'Cache נוקה בהצלחה - כולל דפדפן ושרת');
     } else if (typeof window.showNotification === 'function') {
-      console.log('✅ קורא ל-showNotification');
+      // Log:('✅ קורא ל-showNotification');
       window.showNotification('Cache נוקה בהצלחה - כולל דפדפן ושרת', 'success');
     } else {
-      console.log('❌ מערכת התראות לא זמינה - רק console.log');
-      console.log('✅ Cache נוקה בהצלחה - כולל דפדפן ושרת');
+      // Log:('❌ מערכת התראות לא זמינה - רק // Log:');
+      // Log:('✅ Cache נוקה בהצלחה - כולל דפדפן ושרת');
     }
 
     // ===== רענון הדף =====
-    console.log('🔄 הדף ירענן בעוד 3 שניות...');
+    // Log:('🔄 הדף ירענן בעוד 3 שניות...');
 
     if (typeof window.showInfoNotification === 'function') {
-      console.log('✅ קורא ל-showInfoNotification - רענון בעוד 3 שניות');
+      // Log:('✅ קורא ל-showInfoNotification - רענון בעוד 3 שניות');
       window.showInfoNotification('מידע', 'הדף ירענן בעוד 3 שניות...');
     } else {
-      console.log('❌ showInfoNotification לא זמין');
+      // Log:('❌ showInfoNotification לא זמין');
     }
 
     setTimeout(() => {
       if (typeof window.showInfoNotification === 'function') {
-        console.log('✅ קורא ל-showInfoNotification - רענון בעוד רגע');
+        // Log:('✅ קורא ל-showInfoNotification - רענון בעוד רגע');
         window.showInfoNotification('מידע', 'הדף ירענן בעוד רגע...');
       } else {
-        console.log('❌ showInfoNotification לא זמין - רענון בעוד רגע');
+        // Log:('❌ showInfoNotification לא זמין - רענון בעוד רגע');
       }
       setTimeout(() => {
         // forced reload - bypass all cache
-        console.log('🔄 מבצע רענון כפוי של הדף...');
+        // Log:('🔄 מבצע רענון כפוי של הדף...');
         window.location.reload(true);
       }, 1000);
     }, 3000);
 
   } catch (error) {
-    console.error('❌ שגיאה כללית בניקוי Cache:', error);
+    // Error:('❌ שגיאה כללית בניקוי Cache:', error);
 
     if (typeof window.showErrorNotification === 'function') {
-      console.log('✅ קורא ל-showErrorNotification');
+      // Log:('✅ קורא ל-showErrorNotification');
       window.showErrorNotification('שגיאה', 'שגיאה כללית בניקוי Cache: ' + error.message);
     } else {
-      console.log('❌ showErrorNotification לא זמין - רק console.error');
-      console.error('❌ שגיאה כללית בניקוי Cache');
+      // Log:('❌ showErrorNotification לא זמין - רק // Error:');
+      // Error:('❌ שגיאה כללית בניקוי Cache');
     }
   } finally {
     // החזרת הכפתור למצב רגיל

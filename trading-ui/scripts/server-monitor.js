@@ -144,11 +144,11 @@ class ServerMonitor {
         this.updateCurrentModeDisplay(currentMode, cacheTTL);
         return currentMode;
       } else {
-        console.warn('לא ניתן לקבל מצב שרת:', data.message || 'שגיאה לא ידועה');
+        // Warning:('לא ניתן לקבל מצב שרת:', data.message || 'שגיאה לא ידועה');
         this.updateCurrentModeDisplay('unknown', 'שגיאה');
       }
     } catch (error) {
-      console.error('שגיאה בקבלת מצב השרת הנוכחי:', error);
+      // Error:('שגיאה בקבלת מצב השרת הנוכחי:', error);
       this.updateCurrentModeDisplay('unknown', 'שגיאה');
     }
 
@@ -204,12 +204,12 @@ class ServerMonitor {
   async setServerMode(mode) {
     // הגנה מפני קריאות כפולות
     if (this.isChangingMode) {
-      console.log('⚠️ Mode change already in progress, ignoring duplicate request');
+      // Log:('⚠️ Mode change already in progress, ignoring duplicate request');
       return;
     }
 
     this.isChangingMode = true;
-    console.log('🚀 setServerMode called with mode:', mode);
+    // Log:('🚀 setServerMode called with mode:', mode);
 
     try {
       // הצגת הודעה על התחלת השינוי
@@ -220,7 +220,7 @@ class ServerMonitor {
         );
       }
 
-      console.log('📡 Sending request to /api/server/change-mode');
+      // Log:('📡 Sending request to /api/server/change-mode');
       // ביצוע שינוי המצב דרך הסקריפט restart
       const response = await fetch('/api/server/change-mode', {
         method: 'POST',
@@ -230,13 +230,13 @@ class ServerMonitor {
         body: JSON.stringify({ mode }),
       });
 
-      console.log('📥 Response received:', response.status, response.ok);
+      // Log:('📥 Response received:', response.status, response.ok);
       if (response.ok) {
         const result = await response.json();
-        console.log('📋 Response data:', result);
+        // Log:('📋 Response data:', result);
 
         if (result.status === 'success') {
-          console.log('✅ Mode change successful');
+          // Log:('✅ Mode change successful');
           if (window.showSuccessNotification) {
             window.showSuccessNotification(
               `מצב שרת שונה בהצלחה ל: ${this.getModeDisplayName(mode)}`,
@@ -253,16 +253,16 @@ class ServerMonitor {
           this.addModeToHistory(mode, 'success');
 
         } else {
-          console.log('❌ Mode change failed:', result.message);
+          // Log:('❌ Mode change failed:', result.message);
           throw new Error(result.message || 'שגיאה בשינוי המצב');
         }
       } else {
-        console.log('❌ HTTP error:', response.status);
+        // Log:('❌ HTTP error:', response.status);
         throw new Error(`שגיאת שרת: ${response.status}`);
       }
 
     } catch (error) {
-      console.error('💥 Error in setServerMode:', error);
+      // Error:('💥 Error in setServerMode:', error);
 
       if (window.showErrorNotification) {
         window.showErrorNotification(
@@ -400,7 +400,7 @@ class ServerMonitor {
   addModeToHistory(mode, status, errorMessage = null) {
     const historyList = document.getElementById('modeHistoryList');
     if (!historyList) {
-      console.warn('modeHistoryList לא נמצא - לא ניתן להוסיף להיסטוריה');
+      // Warning:('modeHistoryList לא נמצא - לא ניתן להוסיף להיסטוריה');
       return;
     }
 
@@ -575,7 +575,7 @@ class ServerMonitor {
         window.showErrorNotification('בריאות שרת', 'השרת לא מגיב');
       }
     } catch (error) {
-      console.error('שגיאה בבדיקת בריאות שרת:', error);
+      // Error:('שגיאה בבדיקת בריאות שרת:', error);
       window.showErrorNotification('בריאות שרת', 'שגיאה בבדיקה');
     }
   }
@@ -602,7 +602,7 @@ class ServerMonitor {
           window.showErrorNotification('ניטור שרת', 'שגיאה בהפעלה מחדש');
         }
       } catch (error) {
-        console.error('שגיאה בהפעלת שרת מחדש:', error);
+        // Error:('שגיאה בהפעלת שרת מחדש:', error);
         window.showErrorNotification('ניטור שרת', 'שגיאה בהפעלה מחדש');
       }
     }
@@ -629,7 +629,7 @@ class ServerMonitor {
           window.showErrorNotification('ניטור שרת', 'שגיאה בניקוי Cache');
         }
       } catch (error) {
-        console.error('שגיאה בניקוי Cache:', error);
+        // Error:('שגיאה בניקוי Cache:', error);
         window.showErrorNotification('ניטור שרת', 'שגיאה בניקוי Cache');
       }
     }
@@ -651,7 +651,7 @@ class ServerMonitor {
           window.showErrorNotification('ניטור שרת', 'שגיאה באופטימיזציה');
         }
       } catch (error) {
-        console.error('שגיאה באופטימיזציה:', error);
+        // Error:('שגיאה באופטימיזציה:', error);
         window.showErrorNotification('ניטור שרת', 'שגיאה באופטימיזציה');
       }
     }
@@ -678,7 +678,7 @@ class ServerMonitor {
           window.showErrorNotification('ניטור שרת', 'שגיאה בעצירת חירום');
         }
       } catch (error) {
-        console.error('שגיאה בעצירת חירום:', error);
+        // Error:('שגיאה בעצירת חירום:', error);
         window.showErrorNotification('ניטור שרת', 'שגיאה בעצירת חירום');
       }
     }
@@ -709,7 +709,7 @@ class ServerMonitor {
         window.showErrorNotification('ניטור שרת', 'שגיאה בייצוא לוגים');
       }
     } catch (error) {
-      console.error('שגיאה בייצוא לוגים:', error);
+      // Error:('שגיאה בייצוא לוגים:', error);
       window.showErrorNotification('ניטור שרת', 'שגיאה בייצוא לוגים');
     }
   }
@@ -741,7 +741,7 @@ class ServerMonitor {
         window.showErrorNotification('ניטור שרת', `שגיאה בהרצת סקריפט ${scriptName}`);
       }
     } catch (error) {
-      console.error(`שגיאה בהרצת סקריפט ${scriptName}:`, error);
+      // Error:(`שגיאה בהרצת סקריפט ${scriptName}:`, error);
       window.showErrorNotification('ניטור שרת', `שגיאה בהרצת סקריפט ${scriptName}`);
     }
   }
@@ -855,7 +855,7 @@ class ServerMonitor {
         this.limitPerformanceData();
       }
     } catch (error) {
-      console.error('שגיאה באיסוף נתוני ביצועים:', error);
+      // Error:('שגיאה באיסוף נתוני ביצועים:', error);
     }
   }
 
@@ -891,7 +891,7 @@ class ServerMonitor {
 
       window.showSuccessNotification('ניטור שרת', 'נתוני ביצועים יוצאו בהצלחה');
     } catch (error) {
-      console.error('שגיאה בייצוא נתוני ביצועים:', error);
+      // Error:('שגיאה בייצוא נתוני ביצועים:', error);
       window.showErrorNotification('ניטור שרת', 'שגיאה בייצוא נתונים');
     }
   }
@@ -906,11 +906,11 @@ class ServerMonitor {
         this.logs = data.data.logs;
         this.displayLogs();
       } else {
-        console.warn('לא ניתן לטעון לוגים:', data.message || 'שגיאה לא ידועה');
+        // Warning:('לא ניתן לטעון לוגים:', data.message || 'שגיאה לא ידועה');
         this.displayLogs([]);
       }
     } catch (error) {
-      console.error('שגיאה בטעינת לוגים:', error);
+      // Error:('שגיאה בטעינת לוגים:', error);
       this.displayLogs([]);
     }
   }
@@ -1012,10 +1012,10 @@ class ServerMonitor {
       if (response.ok && data.status === 'success') {
         this.updateSystemInfo(data.data);
       } else {
-        console.warn('לא ניתן לטעון מידע מערכת:', data.message || 'שגיאה לא ידועה');
+        // Warning:('לא ניתן לטעון מידע מערכת:', data.message || 'שגיאה לא ידועה');
       }
     } catch (error) {
-      console.error('שגיאה בטעינת מידע מערכת:', error);
+      // Error:('שגיאה בטעינת מידע מערכת:', error);
     }
   }
 
@@ -1097,7 +1097,7 @@ class ServerMonitor {
   // העתקת לוג מפורט
   async copyDetailedLog() {
     try {
-      console.log('📋 העתקת לוג מפורט...');
+      // Log:('📋 העתקת לוג מפורט...');
 
       // יצירת לוג מפורט
       const detailedLog = await this.generateDetailedLog();
@@ -1114,10 +1114,10 @@ class ServerMonitor {
         }
       }
 
-      console.log('✅ לוג מפורט הועתק בהצלחה');
+      // Log:('✅ לוג מפורט הועתק בהצלחה');
 
     } catch (error) {
-      console.error('❌ שגיאה בהעתקת לוג מפורט:', error);
+      // Error:('❌ שגיאה בהעתקת לוג מפורט:', error);
 
       // הצגת הודעת שגיאה
       if (window.showErrorNotification) {
@@ -1226,13 +1226,13 @@ window.serverMonitor = new ServerMonitor();
 
 // אתחול
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 טעינת דף ניטור שרת...');
+  // Log:('🚀 טעינת דף ניטור שרת...');
 
   // אתחול HeaderSystem
   if (window.headerSystem && !window.headerSystem.isInitialized) {
-    console.log('✅ אתחול HeaderSystem...');
+    // Log:('✅ אתחול HeaderSystem...');
     window.headerSystem.init();
   }
 
-  console.log('✅ דף ניטור שרת נטען בהצלחה');
+  // Log:('✅ דף ניטור שרת נטען בהצלחה');
 });

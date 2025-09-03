@@ -96,7 +96,6 @@ class ConstraintManager {
   }
 
 
-
   updateStats() {
     document.getElementById('total-constraints').textContent = this.constraints.length;
     document.getElementById('total-tables').textContent = new Set(this.constraints.map(c => c.table_name)).size;

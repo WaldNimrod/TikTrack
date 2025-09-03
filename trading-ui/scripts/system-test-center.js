@@ -3,145 +3,141 @@
  * מרכז בדיקות מערכת - גרסה פשוטה
  */
 
-console.log('=== system-test-center.js נטען ===');
+// System Test Center loaded successfully
 
 class SimpleTestCenter {
   constructor() {
-    console.log('=== SimpleTestCenter נוצר ===');
     this.init();
   }
 
   init() {
-    console.log('=== init התחיל ===');
     this.setupEventListeners();
     this.log('🚀 מרכז בדיקות מערכת מתחיל...');
     this.log('✅ מרכז בדיקות מערכת מוכן לשימוש');
-    console.log('=== init הושלם ===');
   }
 
   setupEventListeners() {
-    console.log('=== setupEventListeners התחיל ===');
 
     // System status buttons
     const refreshAllStatusBtn = document.getElementById('refresh-all-status');
     if (refreshAllStatusBtn) {
       refreshAllStatusBtn.addEventListener('click', () => this.refreshAllStatus());
-      console.log('כפתור refresh-all-status מקושר');
+      // Button refresh-all-status connected
     }
 
     // Cache buttons
     const clearCacheBtn = document.getElementById('clear-cache-btn');
     if (clearCacheBtn) {
       clearCacheBtn.addEventListener('click', () => this.clearCache());
-      console.log('כפתור clear-cache-btn מקושר');
+      // Button clear-cache-btn connected
     }
 
     const invalidateCacheBtn = document.getElementById('invalidate-cache-btn');
     if (invalidateCacheBtn) {
       invalidateCacheBtn.addEventListener('click', () => this.invalidateCache());
-      console.log('כפתור invalidate-cache-btn מקושר');
+      // Button invalidate-cache-btn connected
     }
 
     const cacheHealthCheckBtn = document.getElementById('cache-health-check');
     if (cacheHealthCheckBtn) {
       cacheHealthCheckBtn.addEventListener('click', () => this.checkCacheHealth());
-      console.log('כפתור cache-health-check מקושר');
+      // Button cache-health-check connected
     }
 
     const getCacheInfoBtn = document.getElementById('get-cache-info');
     if (getCacheInfoBtn) {
       getCacheInfoBtn.addEventListener('click', () => this.getCacheInfo());
-      console.log('כפתור get-cache-info מקושר');
+      // Button get-cache-info connected
     }
 
     const refreshCacheStatsBtn = document.getElementById('refresh-cache-stats');
     if (refreshCacheStatsBtn) {
       refreshCacheStatsBtn.addEventListener('click', () => this.refreshCacheStats());
-      console.log('כפתור refresh-cache-stats מקושר');
+      // Button refresh-cache-stats connected
     }
 
     // Query buttons
     const optimizeQueriesBtn = document.getElementById('optimize-queries-btn');
     if (optimizeQueriesBtn) {
       optimizeQueriesBtn.addEventListener('click', () => this.optimizeQueries());
-      console.log('כפתור optimize-queries-btn מקושר');
+      // Button optimize-queries-btn connected
     }
 
     const runQueryTestBtn = document.getElementById('run-query-test');
     if (runQueryTestBtn) {
       runQueryTestBtn.addEventListener('click', () => this.runQueryTest());
-      console.log('כפתור run-query-test מקושר');
+      // Button run-query-test connected
     }
 
     const refreshQueryStatsBtn = document.getElementById('refresh-query-stats');
     if (refreshQueryStatsBtn) {
       refreshQueryStatsBtn.addEventListener('click', () => this.refreshQueryStats());
-      console.log('כפתור refresh-query-stats מקושר');
+      // Button refresh-query-stats connected
     }
 
     const getSlowQueriesBtn = document.getElementById('get-slow-queries');
     if (getSlowQueriesBtn) {
       getSlowQueriesBtn.addEventListener('click', () => this.getSlowQueries());
-      console.log('כפתור get-slow-queries מקושר');
+      // Button get-slow-queries connected
     }
 
     const clearQueryProfilesBtn = document.getElementById('clear-query-profiles');
     if (clearQueryProfilesBtn) {
       clearQueryProfilesBtn.addEventListener('click', () => this.clearQueryProfiles());
-      console.log('כפתור clear-query-profiles מקושר');
+      // Button clear-query-profiles connected
     }
 
     const exportQueryProfilesBtn = document.getElementById('export-query-profiles');
     if (exportQueryProfilesBtn) {
       exportQueryProfilesBtn.addEventListener('click', () => this.exportQueryProfiles());
-      console.log('כפתור export-query-profiles מקושר');
+      // Button export-query-profiles connected
     }
 
     // External data buttons
     const testExternalDataBtn = document.getElementById('test-external-data-btn');
     if (testExternalDataBtn) {
       testExternalDataBtn.addEventListener('click', () => this.testExternalData());
-      console.log('כפתור test-external-data-btn מקושר');
+      // Button test-external-data-btn connected
     }
 
     const testExternalDataDataBtn = document.getElementById('test-external-data-data-btn');
     if (testExternalDataDataBtn) {
       testExternalDataDataBtn.addEventListener('click', () => this.testExternalDataData());
-      console.log('כפתור test-external-data-data-btn מקושר');
+      // Button test-external-data-data-btn connected
     }
 
     // Performance buttons
     const runPerformanceTestBtn = document.getElementById('run-performance-test-btn');
     if (runPerformanceTestBtn) {
       runPerformanceTestBtn.addEventListener('click', () => this.runPerformanceTest());
-      console.log('כפתור run-performance-test-btn מקושר');
+      // Button run-performance-test-btn connected
     }
 
     const runPerformanceTestCheckBtn = document.getElementById('run-performance-test-check-btn');
     if (runPerformanceTestCheckBtn) {
       runPerformanceTestCheckBtn.addEventListener('click', () => this.runPerformanceTestCheck());
-      console.log('כפתור run-performance-test-check-btn מקושר');
+      // Button run-performance-test-check-btn connected
     }
 
     // Log buttons
     const clearLogBtn = document.getElementById('clear-log');
     if (clearLogBtn) {
       clearLogBtn.addEventListener('click', () => this.clearLog());
-      console.log('כפתור clear-log מקושר');
+      // Button clear-log connected
     }
 
     const exportLogBtn = document.getElementById('export-log');
     if (exportLogBtn) {
       exportLogBtn.addEventListener('click', () => this.exportLog());
-      console.log('כפתור export-log מקושר');
+      // Button export-log connected
     }
 
-    console.log('=== setupEventListeners הושלם ===');
+    // Function completed
   }
 
   // Button action functions
   async refreshAllStatus() {
-    console.log('=== refreshAllStatus התחיל ===');
+
     this.log('🔄 מתחיל רענון סטטוס כללי...');
     this.showLoading('system-status-overview', 'מרענן סטטוס כללי...');
     await this.delay(1000);
@@ -158,74 +154,68 @@ class SimpleTestCenter {
       this.log('❌ שגיאה בעדכון סטטוס: ' + error.message);
     }
 
-    console.log('=== refreshAllStatus הושלם ===');
+    // Refresh all status completed
   }
 
   async clearCache() {
-    console.log('=== clearCache התחיל ===');
     this.log('🧹 מתחיל ניקוי Cache...');
     this.showLoading('cache-stats-content', 'מנקה Cache...');
     await this.delay(1000);
     this.loadCacheData();
     this.log('✅ Cache נוקה בהצלחה');
-    console.log('=== clearCache הושלם ===');
+    // Clear cache completed
   }
 
   async invalidateCache() {
-    console.log('=== invalidateCache התחיל ===');
     this.log('🗑️ מתחיל ביטול Cache...');
     this.showLoading('cache-health-content', 'מבטל Cache...');
     await this.delay(1000);
     this.loadCacheData();
     this.log('✅ Cache בוטל בהצלחה');
-    console.log('=== invalidateCache הושלם ===');
+    // Invalidate cache completed
   }
 
   async checkCacheHealth() {
-    console.log('=== checkCacheHealth התחיל ===');
     this.log('🏥 מתחיל בדיקת בריאות Cache...');
     this.showLoading('cache-health-content', 'בודק בריאות Cache...');
     await this.delay(800);
     this.loadCacheData();
     this.log('✅ בדיקת בריאות Cache הושלמה');
-    console.log('=== checkCacheHealth הושלם ===');
+    // Check cache health completed
   }
 
   async getCacheInfo() {
-    console.log('=== getCacheInfo התחיל ===');
     this.log('ℹ️ מתחיל קבלת מידע על Cache...');
     this.showLoading('cache-info-content', 'מקבל מידע על Cache...');
     await this.delay(600);
     this.loadCacheData();
     this.log('✅ מידע על Cache התקבל בהצלחה');
-    console.log('=== getCacheInfo הושלם ===');
+    // Get cache info completed
   }
 
   async refreshCacheStats() {
-    console.log('=== refreshCacheStats התחיל ===');
+
     this.log('📊 מתחיל רענון סטטיסטיקות Cache...');
     this.showLoading('cache-stats-content', 'מרענן סטטיסטיקות Cache...');
     await this.delay(700);
     this.loadCacheData();
     this.log('✅ סטטיסטיקות Cache עודכנו בהצלחה');
-    console.log('=== refreshCacheStats הושלם ===');
+    // Refresh cache stats completed
   }
 
   async optimizeQueries() {
-    console.log('=== optimizeQueries התחיל ===');
     this.log('⚡ מתחיל אופטימיזציה של Queries...');
     this.showLoading('query-opportunities-content', 'מבצע אופטימיזציה...');
     await this.delay(1000);
     this.loadQueryData();
     this.log('✅ אופטימיזציה של Queries הושלמה בהצלחה');
-    console.log('=== optimizeQueries הושלם ===');
+    // Optimize queries completed
   }
 
   async runQueryTest() {
-    console.log('=== runQueryTest התחיל ===');
 
     const queryType = document.getElementById('test-query-type')?.value || 'tickers';
-    console.log(`סוג Query: ${queryType}`);
+    // Query type selected
     this.log(`🧪 מתחיל בדיקת Query: ${queryType}`);
 
     this.showLoading('query-test-results', 'מבצע בדיקה...');
@@ -240,52 +230,46 @@ class SimpleTestCenter {
 
     this.displayQueryTestResults(results);
     this.log(`✅ בדיקת Query ${queryType} הושלמה בהצלחה`);
-    console.log('=== runQueryTest הושלם ===');
+    // Run query test completed
   }
 
   async refreshQueryStats() {
-    console.log('=== refreshQueryStats התחיל ===');
     this.log('📈 מתחיל רענון סטטיסטיקות Queries...');
     this.showLoading('query-stats-content', 'מרענן סטטיסטיקות Queries...');
     await this.delay(700);
     this.loadQueryData();
     this.log('✅ סטטיסטיקות Queries עודכנו בהצלחה');
-    console.log('=== refreshQueryStats הושלם ===');
+    // Refresh query stats completed
   }
 
   async getSlowQueries() {
-    console.log('=== getSlowQueries התחיל ===');
     this.log('🐌 מתחיל בדיקת Queries איטיים...');
     this.showLoading('slow-queries-content', 'בודק Queries איטיים...');
     await this.delay(900);
     this.loadQueryData();
     this.log('✅ Queries איטיים נבדקו בהצלחה');
-    console.log('=== getSlowQueries הושלם ===');
+    // Get slow queries completed
   }
 
   async clearQueryProfiles() {
-    console.log('=== clearQueryProfiles התחיל ===');
     this.log('🗑️ מתחיל ניקוי פרופילי Queries...');
     await this.delay(500);
     this.log('✅ פרופילי Queries נוקו בהצלחה');
-    console.log('=== clearQueryProfiles הושלם ===');
+    // Clear query profiles completed
   }
 
   async exportQueryProfiles() {
-    console.log('=== exportQueryProfiles התחיל ===');
     this.log('📤 מתחיל ייצוא פרופילי Queries...');
     await this.delay(800);
     this.log('✅ פרופילי Queries יוצאו בהצלחה');
-    console.log('=== exportQueryProfiles הושלם ===');
+    // Export query profiles completed
   }
 
   displayQueryTestResults(results) {
-    console.log('=== displayQueryTestResults התחיל ===');
-    console.log('תוצאות:', results);
 
     const element = document.getElementById('query-test-results');
     if (!element) {
-      console.error('Element query-test-results לא נמצא');
+      // Element not found error
       this.log('❌ שגיאה: Element query-test-results לא נמצא');
       return;
     }
@@ -301,71 +285,71 @@ class SimpleTestCenter {
     `;
 
     this.log('✅ תוצאות בדיקת Query הוצגו בהצלחה');
-    console.log('=== displayQueryTestResults הושלם ===');
+    // Display query test results completed
   }
 
   async testExternalData() {
-    console.log('=== testExternalData התחיל ===');
+
     this.log('🌐 מתחיל בדיקת חיבור לנתונים חיצוניים...');
     this.showLoading('external-data-status-content', 'בודק חיבור...');
     await this.delay(1000);
     this.loadExternalData();
     this.log('✅ בדיקת חיבור לנתונים חיצוניים הושלמה');
-    console.log('=== testExternalData הושלם ===');
+    // Function completed
   }
 
   async testExternalDataData() {
-    console.log('=== testExternalDataData התחיל ===');
+
     this.log('📊 מתחיל בדיקת נתונים חיצוניים...');
     this.showLoading('external-data-test-content', 'בודק נתונים...');
     await this.delay(1000);
     this.loadExternalData();
     this.log('✅ בדיקת נתונים חיצוניים הושלמה');
-    console.log('=== testExternalDataData הושלם ===');
+    // Function completed
   }
 
   async runPerformanceTest() {
-    console.log('=== runPerformanceTest התחיל ===');
+
     this.log('🚀 מתחיל בדיקת ביצועים...');
     this.showLoading('performance-metrics-content', 'מבצע בדיקה...');
     await this.delay(1000);
     this.loadPerformanceData();
     this.log('✅ בדיקת ביצועים הושלמה בהצלחה');
-    console.log('=== runPerformanceTest הושלם ===');
+    // Function completed
   }
 
   async runPerformanceTestCheck() {
-    console.log('=== runPerformanceTestCheck התחיל ===');
+
     this.log('🔍 מתחיל בדיקת ביצועים מתקדמת...');
     this.showLoading('performance-test-content', 'בודק ביצועים...');
     await this.delay(1000);
     this.loadPerformanceData();
     this.log('✅ בדיקת ביצועים מתקדמת הושלמה בהצלחה');
-    console.log('=== runPerformanceTestCheck הושלם ===');
+    // Function completed
   }
 
   async clearLog() {
-    console.log('=== clearLog התחיל ===');
+
     this.log('🧹 מנקה יומן פעילות...');
     const logContent = document.getElementById('unified-log-content');
     if (logContent) {
       logContent.innerHTML = '';
     }
     this.log('✅ יומן פעילות נוקה בהצלחה');
-    console.log('=== clearLog הושלם ===');
+    // Function completed
   }
 
   async exportLog() {
-    console.log('=== exportLog התחיל ===');
+
     this.log('📤 מתחיל ייצוא יומן פעילות...');
     await this.delay(500);
     this.log('✅ יומן פעילות יוצא בהצלחה');
-    console.log('=== exportLog הושלם ===');
+    // Function completed
   }
 
   // Data loading functions
   async loadCacheData() {
-    console.log('=== loadCacheData התחיל ===');
+
 
     // Cache Stats
     this.displayCacheStats({
@@ -393,11 +377,11 @@ class SimpleTestCenter {
       last_cleanup: '2025-01-01 10:00:00',
     });
 
-    console.log('=== loadCacheData הושלם ===');
+    // Function completed
   }
 
   async loadQueryData() {
-    console.log('=== loadQueryData התחיל ===');
+
 
     // Query Stats
     this.displayQueryStats({
@@ -418,11 +402,11 @@ class SimpleTestCenter {
       { query: 'SELECT * FROM executions JOIN trades', execution_time: 1.8, frequency: 8 },
     ]);
 
-    console.log('=== loadQueryData הושלם ===');
+    // Function completed
   }
 
   async loadExternalData() {
-    console.log('=== loadExternalData התחיל ===');
+
 
     // External Data Status
     this.displayExternalDataStatus({
@@ -437,11 +421,11 @@ class SimpleTestCenter {
       message: 'בדיקת חיבור לנתונים חיצוניים הושלמה בהצלחה',
     });
 
-    console.log('=== loadExternalData הושלם ===');
+    // Function completed
   }
 
   async loadPerformanceData() {
-    console.log('=== loadPerformanceData התחיל ===');
+
 
     // Performance Metrics
     this.displayPerformanceMetrics({
@@ -462,7 +446,7 @@ class SimpleTestCenter {
       ],
     });
 
-    console.log('=== loadPerformanceData הושלם ===');
+    // Function completed
   }
 
   // Display functions
@@ -686,7 +670,7 @@ class SimpleTestCenter {
   log(message) {
     const logContent = document.getElementById('unified-log-content');
     if (!logContent) {
-      console.error('Element unified-log-content לא נמצא');
+      // Log element not found - cannot display message
       return;
     }
 
@@ -705,7 +689,7 @@ class SimpleTestCenter {
   showLoading(elementId, message) {
     const element = document.getElementById(elementId);
     if (!element) {
-      console.error(`Element ${elementId} לא נמצא`);
+      // Element not found error
       return;
     }
 
@@ -726,9 +710,9 @@ class SimpleTestCenter {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('=== DOMContentLoaded התחיל ===');
+
   new SimpleTestCenter();
-  console.log('=== SimpleTestCenter נוצר בהצלחה ===');
+  // Object created
 });
 
-console.log('=== system-test-center.js נטען בהצלחה ===');
+// Script loaded

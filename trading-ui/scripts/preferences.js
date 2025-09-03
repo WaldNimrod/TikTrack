@@ -153,7 +153,7 @@ async function saveAllPreferences() {
       }
       showPreferencesError('שגיאה', `שגיאה בשמירת העדפות: ${response.status}`);
     }
-  } catch (_error) {
+  } catch (error) {
     if (typeof window.showNotification === 'function') {
       window.showNotification('שגיאה בשמירת העדפות: ' + _error.message, 'error');
     }
@@ -191,13 +191,13 @@ async function resetToDefaults() {
         try {
           await saveAllPreferences();
           showPreferencesSuccess('הצלחה', 'העדפות אופסו לברירות מחדל');
-        } catch (_error) {
+        } catch (error) {
           showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
         }
       }
     }
   } catch (error) {
-    console.error('שגיאה באיפוס העדפות:', error);
+    // Error:('שגיאה באיפוס העדפות:', error);
     showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
   }
 }
@@ -348,12 +348,12 @@ async function loadAccountsToFilter() {
       const accounts = await window.getAccounts();
       updateAccountFilter(accounts);
     } else {
-      console.warn('⚠️ פונקציית getAccounts לא זמינה, משתמש בנתונים מקומיים');
+      // Warning:('⚠️ פונקציית getAccounts לא זמינה, משתמש בנתונים מקומיים');
       showPreferencesWarning('טעינת חשבונות', 'פונקציית getAccounts לא זמינה, משתמש בנתונים מקומיים');
       loadLocalAccounts();
     }
   } catch (error) {
-    console.error('שגיאה בטעינת חשבונות:', error);
+    // Error:('שגיאה בטעינת חשבונות:', error);
     showPreferencesError('טעינת חשבונות', 'שגיאה בטעינת חשבונות מהשרת');
     loadLocalAccounts();
   }
@@ -387,7 +387,7 @@ function updateAccountFilter(accounts) {
 
   const accountFilterSelect = document.getElementById('defaultAccountFilter');
   if (!accountFilterSelect) {
-    console.warn('לא נמצא אלמנט פילטר חשבונות');
+    // Warning:('לא נמצא אלמנט פילטר חשבונות');
     return;
   }
 
@@ -405,7 +405,7 @@ function updateAccountFilter(accounts) {
       accountFilterSelect.appendChild(option);
     });
   } else {
-    console.warn('⚠️ אין חשבונות להוספה');
+    // Warning:('⚠️ אין חשבונות להוספה');
   }
 
   // החזר את הבחירה הקודמת אם היא עדיין קיימת
@@ -453,7 +453,7 @@ function showPreferencesSuccess(title, message) {
   } else if (typeof window.showNotification === 'function') {
     window.showNotification(title, message, 'success');
   } else {
-    console.log('✅ הצלחה:', title, '-', message);
+    // Log:('✅ הצלחה:', title, '-', message);
   }
 }
 
@@ -466,7 +466,7 @@ function showPreferencesError(title, message) {
   } else if (typeof window.showNotification === 'function') {
     window.showNotification(title, message, 'error');
   } else {
-    console.error('❌ שגיאה:', title, '-', message);
+    // Error:('❌ שגיאה:', title, '-', message);
   }
 }
 
@@ -479,7 +479,7 @@ function showPreferencesInfo(title, message) {
   } else if (typeof window.showNotification === 'function') {
     window.showNotification(title, message, 'info');
   } else {
-    console.log('ℹ️ מידע:', title, '-', message);
+    // Log:('ℹ️ מידע:', title, '-', message);
   }
 }
 
@@ -492,7 +492,7 @@ function showPreferencesWarning(title, message) {
   } else if (typeof window.showNotification === 'function') {
     window.showNotification(title, message, 'warning');
   } else {
-    console.warn('⚠️ אזהרה:', title, '-', message);
+    // Warning:('⚠️ אזהרה:', title, '-', message);
   }
 }
 
@@ -505,7 +505,7 @@ async function initializePreferences() {
     if (typeof window.restoreAllSectionStates === 'function') {
       window.restoreAllSectionStates();
     } else {
-      console.warn('פונקציית שחזור מצב סקשנים לא נמצאה');
+      // Warning:('פונקציית שחזור מצב סקשנים לא נמצאה');
     }
 
     // טען העדפות
@@ -517,9 +517,9 @@ async function initializePreferences() {
     // טען הגדרות קונסול לממשק
     loadConsoleSettingsToUI();
 
-    console.log('✅ דף העדפות אותחל בהצלחה');
+    // Log:('✅ דף העדפות אותחל בהצלחה');
   } catch (error) {
-    console.error('שגיאה באתחול דף העדפות:', error);
+    // Error:('שגיאה באתחול דף העדפות:', error);
     showPreferencesError('שגיאה', 'שגיאה באתחול דף העדפות');
   }
 }
@@ -553,7 +553,7 @@ window.toggleTopSection = function() {
   if (typeof window.toggleTopSectionGlobal === 'function') {
     window.toggleTopSectionGlobal();
   } else {
-    console.warn('פונקציית toggleTopSectionGlobal לא נמצאה ב-main.js');
+    // Warning:('פונקציית toggleTopSectionGlobal לא נמצאה ב-main.js');
   }
 };
 
@@ -580,7 +580,7 @@ function updateConsolePreference(key, value) {
     // אל תפעיל את ההגדרות עד שהמשתמש לוחץ על "שמור שינויים"
     // applyConsoleSettings();
   } catch (error) {
-    console.error('שגיאה בעדכון הגדרת קונסול:', error);
+    // Error:('שגיאה בעדכון הגדרת קונסול:', error);
   }
 }
 
@@ -617,7 +617,7 @@ function applyConsoleSettings() {
       }
     }
   } catch (error) {
-    console.error('שגיאה בהפעלת הגדרות קונסול:', error);
+    // Error:('שגיאה בהפעלת הגדרות קונסול:', error);
   }
 }
 
@@ -633,7 +633,7 @@ function manualClearConsole() {
       showPreferencesError('שגיאה', 'פונקציית ניקוי קונסול לא זמינה');
     }
   } catch (error) {
-    console.error('שגיאה בניקוי קונסול:', error);
+    // Error:('שגיאה בניקוי קונסול:', error);
     showPreferencesError('שגיאה', 'שגיאה בניקוי הקונסול');
   }
 }
@@ -658,7 +658,7 @@ function loadConsoleSettingsToUI() {
       if (suppressDurationInput) {suppressDurationInput.value = settings.suppressDuration || 5;}
     }
   } catch (error) {
-    console.error('שגיאה בטעינת הגדרות קונסול לממשק:', error);
+    // Error:('שגיאה בטעינת הגדרות קונסול לממשק:', error);
   }
 }
 
@@ -711,7 +711,7 @@ function updateNumericValueColor(colorType, intensity, colorValue) {
     showPreferencesInfo('צבעים', `${colorLabel} עודכן`);
 
   } catch (error) {
-    console.error('שגיאה בעדכון צבע ערך מספרי:', error);
+    // Error:('שגיאה בעדכון צבע ערך מספרי:', error);
     showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
   }
 }
@@ -738,7 +738,7 @@ function updateNumericValueColorFromHex(colorType, intensity, hexValue) {
     }
 
   } catch (error) {
-    console.error('שגיאה בעדכון צבע ערך מספרי מ-hex:', error);
+    // Error:('שגיאה בעדכון צבע ערך מספרי מ-hex:', error);
     showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
   }
 }
@@ -763,7 +763,7 @@ function resetNumericValueColors() {
     showPreferencesInfo('צבעים', 'הצבעים אופסו לברירת המחדל');
 
   } catch (error) {
-    console.error('שגיאה באיפוס צבעים:', error);
+    // Error:('שגיאה באיפוס צבעים:', error);
     showPreferencesError('שגיאה', 'לא ניתן לאפס את הצבעים');
   }
 }
@@ -815,7 +815,7 @@ function updateNumericValueColorsUI() {
     }
 
   } catch (error) {
-    console.error('שגיאה בעדכון ממשק הצבעים המספריים:', error);
+    // Error:('שגיאה בעדכון ממשק הצבעים המספריים:', error);
   }
 }
 
@@ -879,7 +879,7 @@ function updateEntityColor(entityType, colorValue) {
     showPreferencesInfo('צבעי ישויות', `צבע ${entityLabel} עודכן`);
 
   } catch (error) {
-    console.error('שגיאה בעדכון צבע ישות:', error);
+    // Error:('שגיאה בעדכון צבע ישות:', error);
     showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
   }
 }
@@ -899,7 +899,7 @@ function updateEntityColorFromHex(entityType, hexValue) {
     updateEntityColor(entityType, hexValue);
 
   } catch (error) {
-    console.error('שגיאה בעדכון צבע ישות מ-hex:', error);
+    // Error:('שגיאה בעדכון צבע ישות מ-hex:', error);
     showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
   }
 }
@@ -924,7 +924,7 @@ function resetEntityColors() {
     showPreferencesInfo('צבעי ישויות', 'צבעי הישויות אופסו לברירת המחדל');
 
   } catch (error) {
-    console.error('שגיאה באיפוס צבעי ישויות:', error);
+    // Error:('שגיאה באיפוס צבעי ישויות:', error);
     showPreferencesError('שגיאה', 'לא ניתן לאפס את צבעי הישויות');
   }
 }
@@ -1026,7 +1026,7 @@ function updateEntityColorsUI() {
     }
 
   } catch (error) {
-    console.error('שגיאה בעדכון ממשק צבעי ישויות:', error);
+    // Error:('שגיאה בעדכון ממשק צבעי ישויות:', error);
   }
 }
 

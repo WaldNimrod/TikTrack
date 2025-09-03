@@ -74,23 +74,46 @@ User (nimrod)
 ```
 External Data Integration
 ├── Server Components (Backend)
-│   ├── Models
-│   ├── Services
-│   ├── Providers
-│   └── API Routes
+│   ├── Models (external_data.py) ✅
+│   ├── Services (7 modular services) ✅
+│   │   ├── yahoo_finance_adapter.py (864 lines)
+│   │   ├── cache_manager.py
+│   │   ├── data_normalizer.py
+│   │   ├── advanced_cache_service.py
+│   │   ├── smart_query_optimizer.py
+│   │   ├── metrics_collector.py
+│   │   └── health_service.py
+│   ├── Providers (Yahoo Finance) ✅
+│   └── API Routes (4 blueprints) ✅
+│       ├── quotes.py
+│       ├── status.py
+│       ├── cache_management.py
+│       └── query_optimization.py
 └── Client Components (Frontend)
-    ├── Pages
-    ├── Scripts
-    └── Styles
+    ├── Pages (2 main interfaces) ✅
+    │   ├── system-test-center.html
+    │   └── external-data-dashboard.html
+    ├── Scripts (4 JS files) ✅
+    │   ├── system-test-center.js
+    │   ├── external-data-dashboard.js
+    │   └── header-system.js integration
+    └── Styles (responsive CSS) ✅
 ```
 
-### **Data Flow**
-1. **Scheduler** → Triggers automatic refresh
-2. **Provider** → Collects data from external source
-3. **Normalizer** → Normalizes data to unified format
-4. **Service** → Stores and processes data
-5. **API** → Provides data to user interface
-6. **UI** → Displays data to user
+### **Data Flow (Current Implementation)**
+1. **User Interface** → Triggers data requests via dashboard or test center ✅
+2. **API Routes** → Handle requests and route to appropriate services ✅
+3. **Yahoo Finance Adapter** → Collects data from external source (simulated) ✅
+4. **Data Normalizer** → Normalizes data to unified format ✅
+5. **Cache Manager** → Stores processed data with TTL management ✅
+6. **API Response** → Provides data back to user interface ✅
+7. **UI Display** → Renders data with proper formatting and RTL support ✅
+
+### **Future Data Flow (Live Data)**
+1. **Scheduler** → Triggers automatic refresh (to be implemented)
+2. **Yahoo Finance API** → Real data collection (ready to activate)
+3. **Database Storage** → Persistent data storage (tables ready)
+4. **Real-time Updates** → WebSocket notifications (future stage)
 
 ---
 

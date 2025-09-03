@@ -1,6 +1,6 @@
 # מערכת חיבור מידע חיצוני - TikTrack
 
-> 📋 **אפיון מפורט**: [EXTERNAL_DATA_INTEGRATION_SPECIFICATION_v1.3.1.md](../../EXTERNAL_DATA_INTEGRATION_SPECIFICATION_v1.3.1.md)
+> 📋 **אפיון מפורט**: [EXTERNAL_DATA_INTEGRATION_SPECIFICATION_v1.3.4.md](../../EXTERNAL_DATA_INTEGRATION_SPECIFICATION_v1.3.4.md)
 
 ## סקירה כללית
 
@@ -26,35 +26,35 @@
 
 ## מבנה הקבצים
 
-### עמודי בדיקה
+### עמודי בדיקה ודשבורד
 
 ```
-trading-ui/external_data_integration_client/pages/
-├── test_external_data.html      # בדיקת מידע חיצוני
-├── test_models.html             # בדיקת מודלים
-├── test_system_stats.html       # בדיקת סטטיסטיקות מערכת
-└── test_integration.html        # בדיקת אינטגרציה
+trading-ui/
+├── system-test-center.html           # מרכז בדיקות מאוחד ✅
+├── external-data-dashboard.html      # דשבורד נתונים חיצוניים ✅
+└── scripts/
+    ├── system-test-center.js         # לוגיקת בדיקות ✅
+    ├── external-data-dashboard.js    # לוגיקת דשבורד ✅
+    └── header-system.js              # אינטגרציה עם תפריט ✅
 ```
 
 ### נתיבי שרת
 
 ```python
 # ב-Backend/routes/pages.py
-@app.route('/external-data-test')
-def external_data_test():
-    return send_from_directory('trading-ui/external_data_integration_client/pages', 'test_external_data.html')
+@app.route('/system-test-center')
+def system_test_center():
+    return send_from_directory('trading-ui', 'system-test-center.html')
 
-@app.route('/models-test')
-def models_test():
-    return send_from_directory('trading-ui/external_data_integration_client/pages', 'test_models.html')
+@app.route('/external-data-dashboard')
+def external_data_dashboard():
+    return send_from_directory('trading-ui', 'external-data-dashboard.html')
 
-@app.route('/system-stats-test')
-def system_stats_test():
-    return send_from_directory('trading-ui/external_data_integration_client/pages', 'test_system_stats.html')
-
-@app.route('/integration-test')
-def integration_test():
-    return send_from_directory('trading-ui/external_data_integration_client/pages', 'test_integration.html')
+# API Routes
+from routes.external_data.quotes import quotes_bp         # Line 97
+from routes.external_data.status import status_bp         # Line 98
+from routes.api.cache_management import cache_management_bp  # Line 92
+from routes.api.query_optimization import query_optimization_bp  # Line 93
 ```
 
 ## פונקציות מרכזיות
@@ -314,3 +314,20 @@ console.log('📝 Adding result...');
 - ✅ **לוגים מפורטים** לניטור
 
 מערכת חיבור המידע החיצוני מוכנה לשימוש ולפיתוח עתידי!
+
+---
+
+## 🔄 **עדכון דוקומנטציה מלא - 3 בספטמבר 2025**
+
+### **✅ מה שעודכן:**
+- **מבנה קבצים**: עדכון למבנה הנוכחי עם system-test-center ו-external-data-dashboard
+- **נתיבי שרת**: עדכון ל-routes החדשים
+- **ארכיטקטורה**: עדכון למבנה המודולרי הנוכחי
+- **API Routes**: הוספת מידע על 4 blueprints פעילים
+
+### **📊 מצב נוכחי:**
+מערכת הנתונים החיצוניים עובדת במלואה עם 2 ממשקי משתמש ראשיים ו-8 API endpoints פעילים.
+
+---
+
+*עודכן לאחרונה: 3 בספטמבר 2025*

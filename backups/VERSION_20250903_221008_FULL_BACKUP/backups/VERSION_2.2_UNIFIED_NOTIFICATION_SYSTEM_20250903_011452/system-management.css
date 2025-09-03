@@ -1,0 +1,470 @@
+/**
+ * System Management Styles - TikTrack
+ * ===================================
+ * 
+ * CSS styles for the system management dashboard
+ * 
+ * @author TikTrack Development Team
+ * @version 1.0.0
+ * @lastUpdated September 2, 2025
+ */
+
+/* Page Layout */
+.page-body {
+    padding: 2rem 0;
+    min-height: calc(100vh - 200px);
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--apple-text-primary);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* Section Cards */
+.section-card {
+    background: var(--apple-bg-elevated);
+    border: 1px solid var(--apple-border-light);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--apple-shadow-light);
+}
+
+.section-card h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--apple-text-primary);
+    margin: 0 0 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Health Grid */
+.health-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.health-card {
+    background: var(--apple-bg);
+    border: 1px solid var(--apple-border-light);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.health-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--apple-shadow-light);
+}
+
+.health-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--apple-text-primary);
+    margin: 0 0 1rem 0;
+}
+
+.health-status {
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+}
+
+.health-status.active {
+    background: #34c759;
+    color: white;
+}
+
+.health-status.inactive {
+    background: #8e8e93;
+    color: white;
+}
+
+.health-status.error {
+    background: #ff3b30;
+    color: white;
+}
+
+.health-details {
+    font-size: 0.9rem;
+    color: var(--apple-text-secondary);
+}
+
+/* Logs Section */
+.logs-section {
+    background: var(--apple-bg);
+    border: 1px solid var(--apple-border-light);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.log-filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.log-filters select,
+.log-filters input {
+    padding: 0.75rem;
+    border: 1px solid var(--apple-border-light);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: var(--apple-bg-elevated);
+    color: var(--apple-text-primary);
+    transition: border-color 0.3s ease;
+}
+
+.log-filters select:focus,
+.log-filters input:focus {
+    outline: none;
+    border-color: var(--apple-accent);
+}
+
+.log-filters select {
+    min-width: 150px;
+}
+
+.log-filters input {
+    flex: 1;
+    min-width: 200px;
+}
+
+.log-content {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--apple-border-light);
+    border-radius: 8px;
+    background: var(--apple-bg-elevated);
+    padding: 1rem;
+}
+
+.log-entry {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--apple-border-light);
+    align-items: center;
+}
+
+.log-entry:last-child {
+    border-bottom: none;
+}
+
+.log-entry.log-error {
+    background: rgba(255, 59, 48, 0.05);
+    border-left: 3px solid #ff3b30;
+}
+
+.log-entry.log-warning {
+    background: rgba(255, 149, 0, 0.05);
+    border-left: 3px solid #ff9500;
+}
+
+.log-entry.log-info {
+    background: rgba(0, 122, 255, 0.05);
+    border-left: 3px solid #007aff;
+}
+
+.log-timestamp {
+    font-size: 0.8rem;
+    color: var(--apple-text-secondary);
+    font-family: monospace;
+}
+
+.log-level {
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    text-transform: uppercase;
+    min-width: 60px;
+    text-align: center;
+}
+
+.log-entry.log-error .log-level {
+    background: #ff3b30;
+    color: white;
+}
+
+.log-entry.log-warning .log-level {
+    background: #ff9500;
+    color: white;
+}
+
+.log-entry.log-info .log-level {
+    background: #007aff;
+    color: white;
+}
+
+.log-message {
+    font-size: 0.9rem;
+    color: var(--apple-text-primary);
+    line-height: 1.4;
+}
+
+/* Backup Grid */
+.backup-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.backup-card {
+    background: var(--apple-bg);
+    border: 1px solid var(--apple-border-light);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.backup-card:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--apple-shadow-light);
+}
+
+.backup-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--apple-text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.backup-card p {
+    font-size: 0.9rem;
+    color: var(--apple-text-secondary);
+    margin: 0 0 1rem 0;
+    line-height: 1.4;
+}
+
+/* Security Grid */
+.security-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.security-card {
+    background: var(--apple-bg);
+    border: 1px solid var(--apple-border-light);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.security-card:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--apple-shadow-light);
+}
+
+.security-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--apple-text-primary);
+    margin: 0 0 1rem 0;
+}
+
+.security-status {
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+}
+
+.security-status.safe {
+    background: #34c759;
+    color: white;
+}
+
+.security-status.warning {
+    background: #ff9500;
+    color: white;
+}
+
+.security-status.danger {
+    background: #ff3b30;
+    color: white;
+}
+
+.security-details {
+    font-size: 0.9rem;
+    color: var(--apple-text-secondary);
+}
+
+/* Buttons */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--apple-shadow-light);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary {
+    background: var(--apple-accent);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--apple-accent-dark);
+}
+
+.btn-warning {
+    background: #ff9500;
+    color: white;
+}
+
+.btn-warning:hover {
+    background: #ff9f0a;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 1rem;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .health-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .backup-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .security-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .log-filters {
+        flex-direction: column;
+    }
+    
+    .log-filters select,
+    .log-filters input {
+        width: 100%;
+    }
+    
+    .log-entry {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-body {
+        padding: 1rem 0;
+    }
+    
+    .container {
+        padding: 0 0.5rem;
+    }
+    
+    .section-card {
+        padding: 1rem;
+    }
+    
+    .health-card {
+        padding: 1rem;
+    }
+    
+    .backup-card {
+        padding: 1rem;
+    }
+    
+    .security-card {
+        padding: 1rem;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .section-card,
+    .health-card,
+    .backup-card,
+    .security-card {
+        background: var(--apple-bg-elevated-dark);
+        border-color: var(--apple-border-light-dark);
+    }
+    
+    .logs-section {
+        background: var(--apple-bg-dark);
+        border-color: var(--apple-border-light-dark);
+    }
+    
+    .log-content {
+        background: var(--apple-bg-elevated-dark);
+        border-color: var(--apple-border-light-dark);
+    }
+    
+    .setting-group input,
+    .log-filters select,
+    .log-filters input {
+        background: var(--apple-bg-elevated-dark);
+        border-color: var(--apple-border-light-dark);
+        color: var(--apple-text-primary-dark);
+    }
+}
+
+/* Print Styles */
+@media print {
+    .log-filters {
+        display: none;
+    }
+    
+    .health-card,
+    .backup-card,
+    .security-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+}
+
+
+
+
+
+
+

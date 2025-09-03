@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת מודלים - TikTrack</title>
+
+    <!-- 
+        ===== דף בדיקת מודלים - TikTrack =====
+        
+        דף זה מכיל:
+        1. בדיקת מודל העדפות
+        2. בדיקת מודל מחירים
+        3. בדיקת מודל טיקר
+        4. ולידציה של מבנה נתונים
+        5. לוגים מפורטים של הבדיקות
+        
+        מבנה הדף:
+        - unified-header: כותרת האפליקציה החדשה עם ניווט ופילטרים מאוחדים
+        - page-body: תוכן ראשי מוגבל ברוחב (1400px)
+          - top-section: כותרת בדיקת מודלים
+          - content-section: טופסי בדיקה ותוצאות
+    -->
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- TikTrack Styles -->
+    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/header-system.css">
+    <link rel="stylesheet" href="/styles/apple-theme.css">
+    <link rel="stylesheet" href="/external_data_integration_client/styles/external_data_test.css">
+
+    <!-- Modular grid files -->
+    <script src="/scripts/console-cleanup.js"></script>
+    <script src="/scripts/button-icons.js"></script>
+    <script src="/scripts/translation-utils.js"></script>
+    <script src="/scripts/data-utils.js"></script>
+    <script src="/scripts/ui-utils.js"></script>
+    <script src="/scripts/table-mappings.js"></script>
+    <script src="/scripts/date-utils.js"></script>
+    <script src="/scripts/tables.js"></script>
+    <script src="/scripts/linked-items.js"></script>
+    <script src="/scripts/page-utils.js"></script>
+    <script src="/scripts/main.js"></script>
+    <script src="/scripts/header-system.js"></script>
+    <script src="/scripts/alerts.js"></script>
+    <script src="/scripts/active-alerts-component.js"></script>
+
+    <!-- External data test script -->
+    <!-- Functions embedded directly in page -->
+</head>
+
+<body>
+    <!-- רקע כללי -->
+    <div class="background-wrapper">
+
+        <!-- unified-header ייווצר כאן אוטומטית -->
+
+        <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+        <div class="page-body">
+            <!-- אזור בדיקת מודלים - top-Section -->
+            <div class="top-section models-test-page">
+                <!-- כותרת בדיקת מודלים -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="/images/icons/development.svg" alt="בדיקת מודלים" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                        בדיקת מודלים
+                    </div>
+                    <div class="table-actions">
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור בדיקת מודלים">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+            </div> <!-- סוף top-section -->
+
+            <!-- תוכן ראשי -->
+            <div class="main-content">
+
+                <!-- אזור בדיקת מודלים - content-section -->
+                <div class="content-section models-test-page">
+                    <!-- כותרת בדיקת מודלים -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="/images/icons/development.svg" alt="בדיקת מודלים" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                            בדיקת מודלים
+                        </div>
+                        <div class="table-count">
+                            <img src="/images/icons/development.svg" alt="בדיקות" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                            בדיקות
+                        </div>
+                        <div class="table-actions">
+                            <button class="refresh-btn" onclick="clearTestLogs()" title="נקה לוגים">
+                                <img src="/images/icons/development.svg" alt="נקה" class="action-icon" style="width: 16px; height: 16px;"> נקה
+                            </button>
+
+                            <div class="action-separator"></div>
+                            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור בדיקת מודלים">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- תוכן בדיקות -->
+                    <div class="content-body">
+                        <div class="row">
+                            <!-- עמודה שמאלית - טופסי בדיקה -->
+                            <div class="col-md-6">
+                                <div class="test-controls">
+                                    <h5>בקרת בדיקות מודלים</h5>
+                                    
+                                    <!-- בדיקת מודל העדפות -->
+                                    <div class="test-group">
+                                        <h6>בדיקת מודל העדפות</h6>
+                                        <button id="test-preferences-model" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-cog"></i> בדוק העדפות
+                                        </button>
+                                    </div>
+
+                                    <!-- בדיקת מודל מחירים -->
+                                    <div class="test-group">
+                                        <h6>בדיקת מודל מחירים</h6>
+                                        <button id="test-quote-model" class="btn btn-info btn-sm">
+                                            <i class="fas fa-chart-line"></i> בדוק מחירים
+                                        </button>
+                                    </div>
+
+                                    <!-- בדיקת מודל טיקר -->
+                                    <div class="test-group">
+                                        <h6>בדיקת מודל טיקר</h6>
+                                        <button id="test-ticker-model" class="btn btn-success btn-sm">
+                                            <i class="fas fa-tag"></i> בדוק טיקרים
+                                        </button>
+                                    </div>
+
+                                    <!-- בדיקת ולידציה נתונים -->
+                                    <div class="test-group">
+                                        <h6>בדיקת ולידציה נתונים</h6>
+                                        <button id="test-data-validation" class="btn btn-warning btn-sm">
+                                            <i class="fas fa-check-circle"></i> בדוק ולידציה
+                                        </button>
+                                    </div>
+
+                                    <!-- בדיקת מבנה נתונים -->
+                                    <div class="test-group">
+                                        <h6>בדיקת מבנה נתונים</h6>
+                                        <button id="test-structure-validation" class="btn btn-secondary btn-sm">
+                                            <i class="fas fa-database"></i> בדוק מבנה
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- עמודה ימנית - לוגים ותוצאות -->
+                            <div class="col-md-6">
+                                <div class="test-results">
+                                    <h5>לוגים</h5>
+                                    <div id="test-logs" class="logs-container">
+                                        <div class="log-entry">
+                                            <small class="text-muted">[ממתין לבדיקות...]</small>
+                                        </div>
+                                    </div>
+
+                                    <h5>תוצאות בדיקות</h5>
+                                    <div id="test-results" class="results-container">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle"></i>
+                                            לחץ על כפתורי הבדיקה כדי לראות תוצאות
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- סוף content-section -->
+            </div> <!-- סוף main-content -->
+        </div> <!-- סוף page-body -->
+    </div> <!-- סוף background-wrapper -->
+
+    <script>
+        // פונקציה לבדיקת מודל העדפות
+        async function testPreferencesModel() {
+            addLog('info', 'בודק מודל העדפות...');
+            
+            try {
+                const mockPreferences = {
+                    user_id: 1,
+                    timezone: 'Asia/Jerusalem',
+                    primaryCurrency: 'USD',
+                    defaultStopLoss: 5,
+                    defaultTargetPrice: 10,
+                    defaultCommission: 1.0,
+                    consoleCleanupInterval: 60000,
+                    defaultStatusFilter: 'open',
+                    defaultTypeFilter: 'swing',
+                    defaultAccountFilter: 'all',
+                    defaultDateRangeFilter: 'this_week',
+                    defaultSearchFilter: '',
+                    dataRefreshInterval: 5,
+                    primaryDataProvider: 'yahoo',
+                    secondaryDataProvider: 'google',
+                    cacheTTL: 5,
+                    maxBatchSize: 25,
+                    requestDelay: 200,
+                    retryAttempts: 2,
+                    retryDelay: 5,
+                    autoRefresh: true,
+                    verboseLogging: false
+                };
+                
+                // ולידציה של המודל
+                const validation = validatePreferencesModel(mockPreferences);
+                
+                if (validation.isValid) {
+                    addLog('success', 'מודל העדפות תקין');
+                    displayResults('בדיקת מודל העדפות', {
+                        status: 'success',
+                        message: 'מודל העדפות תקין ומכיל את כל השדות הנדרשים',
+                        preferences: mockPreferences,
+                        validation: validation
+                    });
+                } else {
+                    addLog('error', 'שגיאה במודל העדפות');
+                    displayResults('שגיאה במודל העדפות', {
+                        status: 'error',
+                        message: 'מודל העדפות מכיל שגיאות',
+                        errors: validation.errors
+                    });
+                }
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת מודל העדפות: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
+        }
+
+        // פונקציה לבדיקת מודל מחירים
+        async function testQuoteModel() {
+            addLog('info', 'בודק מודל מחירים...');
+            
+            try {
+                const mockQuote = {
+                    id: 1,
+                    ticker_id: 1,
+                    price: 150.25,
+                    change_amount: 2.50,
+                    change_percent: 1.69,
+                    volume: 1500000,
+                    high_24h: 152.00,
+                    low_24h: 148.50,
+                    open_price: 149.75,
+                    previous_close: 147.75,
+                    provider: 'yahoo_finance',
+                    asof_utc: new Date().toISOString(),
+                    fetched_at: new Date().toISOString(),
+                    last_updated: new Date().toISOString(),
+                    created_at: new Date().toISOString()
+                };
+                
+                // ולידציה של המודל
+                const validation = validateQuoteModel(mockQuote);
+                
+                if (validation.isValid) {
+                    addLog('success', 'מודל מחירים תקין');
+                    displayResults('בדיקת מודל מחירים', {
+                        status: 'success',
+                        message: 'מודל מחירים תקין ומכיל את כל השדות הנדרשים',
+                        quote: mockQuote,
+                        validation: validation
+                    });
+                } else {
+                    addLog('error', 'שגיאה במודל מחירים');
+                    displayResults('שגיאה במודל מחירים', {
+                        status: 'error',
+                        message: 'מודל מחירים מכיל שגיאות',
+                        errors: validation.errors
+                    });
+                }
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת מודל מחירים: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
+        }
+
+        // פונקציה לבדיקת מודל טיקר
+        async function testTickerModel() {
+            addLog('info', 'בודק מודל טיקר...');
+            
+            try {
+                const mockTicker = {
+                    id: 1,
+                    symbol: 'AAPL',
+                    name: 'Apple Inc.',
+                    type: 'stock',
+                    remarks: 'American technology company',
+                    currency_id: 1,
+                    active_trades: true,
+                    status: 'open',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+                
+                // ולידציה של המודל
+                const validation = validateTickerModel(mockTicker);
+                
+                if (validation.isValid) {
+                    addLog('success', 'מודל טיקר תקין');
+                    displayResults('בדיקת מודל טיקר', {
+                        status: 'success',
+                        message: 'מודל טיקר תקין ומכיל את כל השדות הנדרשים',
+                        ticker: mockTicker,
+                        validation: validation
+                    });
+                } else {
+                    addLog('error', 'שגיאה במודל טיקר');
+                    displayResults('שגיאה במודל טיקר', {
+                        status: 'error',
+                        message: 'מודל טיקר מכיל שגיאות',
+                        errors: validation.errors
+                    });
+                }
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת מודל טיקר: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
+        }
+
+        // פונקציה לבדיקת ולידציה נתונים
+        async function testDataValidation() {
+            addLog('info', 'בודק ולידציה נתונים...');
+            
+            try {
+                const testCases = [
+                    {
+                        name: 'מחיר תקין',
+                        data: { price: 150.25 },
+                        expected: true
+                    },
+                    {
+                        name: 'מחיר שלילי',
+                        data: { price: -10 },
+                        expected: false
+                    },
+                    {
+                        name: 'אחוז שינוי תקין',
+                        data: { change_percent: 5.5 },
+                        expected: true
+                    },
+                    {
+                        name: 'אחוז שינוי גבוה מדי',
+                        data: { change_percent: 1500 },
+                        expected: false
+                    },
+                    {
+                        name: 'נפח תקין',
+                        data: { volume: 1000000 },
+                        expected: true
+                    },
+                    {
+                        name: 'נפח שלילי',
+                        data: { volume: -1000 },
+                        expected: false
+                    }
+                ];
+                
+                const results = testCases.map(testCase => {
+                    const isValid = validateDataField(testCase.data);
+                    return {
+                        test: testCase.name,
+                        data: testCase.data,
+                        expected: testCase.expected,
+                        actual: isValid,
+                        passed: isValid === testCase.expected
+                    };
+                });
+                
+                const passedTests = results.filter(r => r.passed).length;
+                const totalTests = results.length;
+                
+                if (passedTests === totalTests) {
+                    addLog('success', `כל ${totalTests} בדיקות הוולידציה עברו בהצלחה`);
+                } else {
+                    addLog('warning', `${passedTests}/${totalTests} בדיקות הוולידציה עברו`);
+                }
+                
+                displayResults('בדיקת ולידציה נתונים', {
+                    status: passedTests === totalTests ? 'success' : 'warning',
+                    message: `${passedTests}/${totalTests} בדיקות עברו`,
+                    results: results,
+                    summary: {
+                        total: totalTests,
+                        passed: passedTests,
+                        failed: totalTests - passedTests
+                    }
+                });
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת ולידציה: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
+        }
+
+        // פונקציה לבדיקת מבנה נתונים
+        async function testStructureValidation() {
+            addLog('info', 'בודק מבנה נתונים...');
+            
+            try {
+                const structures = [
+                    {
+                        name: 'מבנה העדפות',
+                        fields: ['user_id', 'timezone', 'primaryCurrency', 'dataRefreshInterval'],
+                        required: true
+                    },
+                    {
+                        name: 'מבנה מחיר',
+                        fields: ['ticker_id', 'price', 'provider', 'asof_utc'],
+                        required: true
+                    },
+                    {
+                        name: 'מבנה טיקר',
+                        fields: ['symbol', 'name', 'type', 'status'],
+                        required: true
+                    }
+                ];
+                
+                const results = structures.map(structure => {
+                    const isValid = validateStructure(structure);
+                    return {
+                        structure: structure.name,
+                        fields: structure.fields,
+                        required: structure.required,
+                        valid: isValid,
+                        message: isValid ? 'מבנה תקין' : 'מבנה חסר שדות נדרשים'
+                    };
+                });
+                
+                const validStructures = results.filter(r => r.valid).length;
+                const totalStructures = results.length;
+                
+                if (validStructures === totalStructures) {
+                    addLog('success', `כל ${totalStructures} המבנים תקינים`);
+                } else {
+                    addLog('warning', `${validStructures}/${totalStructures} מבנים תקינים`);
+                }
+                
+                displayResults('בדיקת מבנה נתונים', {
+                    status: validStructures === totalStructures ? 'success' : 'warning',
+                    message: `${validStructures}/${totalStructures} מבנים תקינים`,
+                    structures: results,
+                    summary: {
+                        total: totalStructures,
+                        valid: validStructures,
+                        invalid: totalStructures - validStructures
+                    }
+                });
+                
+            } catch (error) {
+                addLog('error', `שגיאה בבדיקת מבנה: ${error.message}`);
+                displayResults('שגיאה', { error: error.message });
+            }
+        }
+
+        // פונקציות ולידציה עזר
+        function validatePreferencesModel(preferences) {
+            const requiredFields = [
+                'user_id', 'timezone', 'primaryCurrency', 'dataRefreshInterval',
+                'primaryDataProvider', 'cacheTTL', 'maxBatchSize'
+            ];
+            
+            const errors = [];
+            
+            requiredFields.forEach(field => {
+                if (!preferences.hasOwnProperty(field)) {
+                    errors.push(`שדה חסר: ${field}`);
+                }
+            });
+            
+            if (preferences.dataRefreshInterval < 1 || preferences.dataRefreshInterval > 60) {
+                errors.push('מרווח רענון נתונים חייב להיות בין 1 ל-60 דקות');
+            }
+            
+            if (preferences.maxBatchSize < 1 || preferences.maxBatchSize > 100) {
+                errors.push('גודל batch מקסימלי חייב להיות בין 1 ל-100');
+            }
+            
+            return {
+                isValid: errors.length === 0,
+                errors: errors
+            };
+        }
+
+        function validateQuoteModel(quote) {
+            const requiredFields = [
+                'ticker_id', 'price', 'provider', 'asof_utc', 'fetched_at'
+            ];
+            
+            const errors = [];
+            
+            requiredFields.forEach(field => {
+                if (!quote.hasOwnProperty(field)) {
+                    errors.push(`שדה חסר: ${field}`);
+                }
+            });
+            
+            if (quote.price <= 0) {
+                errors.push('מחיר חייב להיות חיובי');
+            }
+            
+            if (quote.volume && quote.volume < 0) {
+                errors.push('נפח חייב להיות חיובי');
+            }
+            
+            return {
+                isValid: errors.length === 0,
+                errors: errors
+            };
+        }
+
+        function validateTickerModel(ticker) {
+            const requiredFields = [
+                'symbol', 'name', 'type', 'status', 'currency_id'
+            ];
+            
+            const errors = [];
+            
+            requiredFields.forEach(field => {
+                if (!ticker.hasOwnProperty(field)) {
+                    errors.push(`שדה חסר: ${field}`);
+                }
+            });
+            
+            if (ticker.symbol && ticker.symbol.length > 10) {
+                errors.push('סמל טיקר לא יכול להיות ארוך מ-10 תווים');
+            }
+            
+            if (ticker.name && ticker.name.length > 100) {
+                errors.push('שם טיקר לא יכול להיות ארוך מ-100 תווים');
+            }
+            
+            const validTypes = ['stock', 'etf', 'crypto', 'forex', 'commodity'];
+            if (ticker.type && !validTypes.includes(ticker.type)) {
+                errors.push(`סוג טיקר חייב להיות אחד מ: ${validTypes.join(', ')}`);
+            }
+            
+            const validStatuses = ['open', 'closed', 'cancelled'];
+            if (ticker.status && !validStatuses.includes(ticker.status)) {
+                errors.push(`סטטוס טיקר חייב להיות אחד מ: ${validStatuses.join(', ')}`);
+            }
+            
+            return {
+                isValid: errors.length === 0,
+                errors: errors
+            };
+        }
+
+        function validateDataField(data) {
+            // בדיקת מחיר
+            if (data.price !== undefined) {
+                if (data.price <= 0) {
+                    return false;
+                }
+            }
+            
+            // בדיקת אחוז שינוי
+            if (data.change_percent !== undefined) {
+                if (data.change_percent < -100 || data.change_percent > 1000) {
+                    return false;
+                }
+            }
+            
+            // בדיקת נפח
+            if (data.volume !== undefined) {
+                if (data.volume < 0) {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+
+        function validateStructure(structure) {
+            // בדיקת מבנה קבועה - תמיד תחזיר true
+            return true;
+        }
+
+        // פונקציה לתצוגת תוצאות
+        function displayResults(title, data) {
+            const resultsContainer = document.getElementById('test-results');
+            if (!resultsContainer) return;
+            
+            const resultHtml = `
+                <div class="alert alert-info mb-2">
+                    <h6>${title}</h6>
+                    <pre class="mb-0"><code>${JSON.stringify(data, null, 2)}</code></pre>
+                </div>
+            `;
+            
+            resultsContainer.innerHTML = resultHtml;
+        }
+
+        // פונקציה להוספת לוג
+        function addLog(level, message) {
+            const logContainer = document.getElementById('test-logs');
+            if (!logContainer) return;
+            
+            const timestamp = new Date().toLocaleTimeString('he-IL');
+            const levelClass = level === 'error' ? 'text-danger' : 
+                              level === 'warning' ? 'text-warning' : 
+                              level === 'success' ? 'text-success' : 'text-info';
+            
+            const logHtml = `
+                <div class="log-entry mb-1">
+                    <small class="text-muted">[${timestamp}]</small>
+                    <span class="${levelClass}">[${level.toUpperCase()}]</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            logContainer.innerHTML = logHtml + logContainer.innerHTML;
+            logContainer.scrollTop = 0;
+        }
+
+        // פונקציה לניקוי לוגים
+        function clearTestLogs() {
+            const logContainer = document.getElementById('test-logs');
+            const resultsContainer = document.getElementById('test-results');
+            
+            if (logContainer) logContainer.innerHTML = '';
+            if (resultsContainer) resultsContainer.innerHTML = '';
+            
+            addLog('info', 'לוגים נוקו');
+        }
+
+        // אתחול event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // הוספת event listeners לכפתורים
+            document.getElementById('test-preferences-model')?.addEventListener('click', testPreferencesModel);
+            document.getElementById('test-quote-model')?.addEventListener('click', testQuoteModel);
+            document.getElementById('test-ticker-model')?.addEventListener('click', testTickerModel);
+            document.getElementById('test-data-validation')?.addEventListener('click', testDataValidation);
+            document.getElementById('test-structure-validation')?.addEventListener('click', testStructureValidation);
+
+            // הוספת הודעה ראשונית
+            addLog('info', 'דף בדיקת מודלים נטען בהצלחה');
+            
+            // בדיקה אוטומטית של מודל העדפות
+            setTimeout(() => {
+                testPreferencesModel();
+            }, 1000);
+        });
+    </script>
+</body>
+
+</html>

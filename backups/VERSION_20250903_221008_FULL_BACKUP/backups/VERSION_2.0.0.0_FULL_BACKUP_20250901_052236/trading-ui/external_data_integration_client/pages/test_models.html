@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת מודלים - TikTrack</title>
+
+    <!-- 
+        ===== דף בדיקת מודלים - TikTrack =====
+        
+        דף זה מכיל:
+        1. בדיקות מודלים של מידע חיצוני
+        2. ולידציה של מבני נתונים
+        3. סימולציות של מודלים
+        4. לוגים מפורטים של הבדיקות
+        
+        מבנה הדף:
+        - unified-header: כותרת האפליקציה החדשה עם ניווט ופילטרים מאוחדים
+        - page-body: תוכן ראשי מוגבל ברוחב (1400px)
+          - top-section: כותרת בדיקת מודלים
+          - content-section: טופסי בדיקה ותוצאות
+    -->
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- TikTrack Styles -->
+    <link rel="stylesheet" href="/styles/styles.css">
+    <link rel="stylesheet" href="/styles/header-system.css">
+    <link rel="stylesheet" href="/styles/apple-theme.css">
+    <link rel="stylesheet" href="/external_data_integration_client/styles/external_data_test.css">
+
+    <!-- Modular grid files -->
+    <script src="/scripts/console-cleanup.js"></script>
+    <script src="/scripts/translation-utils.js"></script>
+    <script src="/scripts/data-utils.js"></script>
+    <script src="/scripts/ui-utils.js"></script>
+    <script src="/scripts/table-mappings.js"></script>
+    <script src="/scripts/date-utils.js"></script>
+    <script src="/scripts/tables.js"></script>
+    <script src="/scripts/linked-items.js"></script>
+    <script src="/scripts/page-utils.js"></script>
+    <script src="/scripts/main.js"></script>
+    <script src="/scripts/header-system.js"></script>
+    <script src="/scripts/alerts.js"></script>
+    <script src="/scripts/active-alerts-component.js"></script>
+
+    <!-- Models test script -->
+    <!-- Functions embedded directly in page -->
+</head>
+
+<body>
+    <!-- רקע כללי -->
+    <div class="background-wrapper">
+
+        <!-- unified-header ייווצר כאן אוטומטית -->
+
+        <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+        <div class="page-body">
+            <!-- אזור בדיקת מודלים - top-Section -->
+            <div class="top-section models-test-page">
+                <!-- כותרת בדיקת מודלים -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="/images/icons/development.svg" alt="בדיקת מודלים" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                        בדיקת מודלים
+                    </div>
+                    <div class="table-actions">
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור בדיקת מודלים">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+            </div> <!-- סוף top-section -->
+
+            <!-- תוכן ראשי -->
+            <div class="main-content">
+
+                <!-- אזור בדיקת מודלים - content-section -->
+                <div class="content-section models-test-page">
+                    <!-- כותרת בדיקת מודלים -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="/images/icons/development.svg" alt="בדיקת מודלים" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                            בדיקת מודלים
+                        </div>
+                        <div class="table-count">
+                            <img src="/images/icons/development.svg" alt="בדיקות" style="width: 16px; height: 16px; margin-left: 4px; vertical-align: middle;">
+                            בדיקות
+                        </div>
+                        <div class="table-actions">
+                            <button class="refresh-btn" onclick="clearModelLogs()" title="נקה לוגים">
+                                <img src="/images/icons/development.svg" alt="נקה" class="action-icon" style="width: 16px; height: 16px;"> נקה
+                            </button>
+
+                            <div class="action-separator"></div>
+                            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור בדיקת מודלים">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- תוכן בדיקות -->
+                    <div class="section-body">
+                        <!-- Loading Indicator -->
+                        <div id="loading-indicator" class="loading-overlay" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">טוען...</span>
+                            </div>
+                        </div>
+
+                        <!-- Error Display -->
+                        <div id="error-display" class="alert alert-danger" style="display: none;">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span id="error-message"></span>
+                        </div>
+
+                        <!-- Current Time Display -->
+                        <div class="text-muted mb-3">
+                            <i class="fas fa-clock me-1"></i>
+                            <span id="current-time">טוען זמן...</span>
+                        </div>
+
+                        <!-- Two Column Layout -->
+                        <div class="row">
+                            <!-- Left Column - Tests -->
+                            <div class="col-md-6">
+                                <h6 class="mb-3"><i class="fas fa-flask me-2"></i>בדיקות</h6>
+                                
+                                <!-- Model Tests -->
+                                <div class="row">
+                                    <!-- Quote Model Test -->
+                                    <div class="col-6 mb-2">
+                                        <div class="card test-card">
+                                            <div class="card-header py-1">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-chart-line me-1"></i>
+                                                    מודל מחיר
+                                                </h6>
+                                            </div>
+                                            <div class="card-body py-1">
+                                                <div class="mb-1">
+                                                    <div class="d-flex align-items-center mb-1">
+                                                        <label class="form-label small mb-0 me-2">נתונים:</label>
+                                                        <button class="btn btn-outline-secondary btn-sm" onclick="editQuoteData()" title="ערוך">
+                                                            <i class="fas fa-edit" style="font-size: 10px;"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="data-label" id="quote-data-label" style="font-size: 11px; line-height: 1.2; max-height: 40px; overflow: hidden; background: #f8f9fa; padding: 4px; border-radius: 3px;">{"symbol": "AAPL", "price": 150.25}</div>
+                                                    <textarea class="form-control form-control-sm" id="quote-data" rows="2" style="display: none; font-size: 10px;">{"symbol": "AAPL", "price": 150.25, "change_amount": 2.50, "change_percent": 1.69, "volume": 50000000}</textarea>
+                                                </div>
+                                                <button class="btn btn-primary btn-sm w-100" id="test-quote-model" style="font-size: 10px; padding: 2px 8px;">
+                                                    <i class="fas fa-check me-1"></i>בדוק
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Ticker Model Test -->
+                                    <div class="col-6 mb-2">
+                                        <div class="card test-card">
+                                            <div class="card-header py-1">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-tag me-1"></i>
+                                                    מודל טיקר
+                                                </h6>
+                                            </div>
+                                            <div class="card-body py-1">
+                                                <div class="mb-1">
+                                                    <div class="d-flex align-items-center mb-1">
+                                                        <label class="form-label small mb-0 me-2">נתונים:</label>
+                                                        <button class="btn btn-outline-secondary btn-sm" onclick="editTickerData()" title="ערוך">
+                                                            <i class="fas fa-edit" style="font-size: 10px;"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="data-label" id="ticker-data-label" style="font-size: 11px; line-height: 1.2; max-height: 40px; overflow: hidden; background: #f8f9fa; padding: 4px; border-radius: 3px;">{"symbol": "AAPL", "name": "Apple Inc."}</div>
+                                                    <textarea class="form-control form-control-sm" id="ticker-data" rows="2" style="display: none; font-size: 10px;">{"symbol": "AAPL", "name": "Apple Inc.", "sector": "Technology", "currency": "USD"}</textarea>
+                                                </div>
+                                                <button class="btn btn-success btn-sm w-100" id="test-ticker-model" style="font-size: 10px; padding: 2px 8px;">
+                                                    <i class="fas fa-check me-1"></i>בדוק
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Market Preferences Test -->
+                                    <div class="col-6 mb-2">
+                                        <div class="card test-card">
+                                            <div class="card-header py-1">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-cog me-1"></i>
+                                                    מודל העדפות
+                                                </h6>
+                                            </div>
+                                            <div class="card-body py-1">
+                                                <div class="mb-1">
+                                                    <div class="d-flex align-items-center mb-1">
+                                                        <label class="form-label small mb-0 me-2">נתונים:</label>
+                                                        <button class="btn btn-outline-secondary btn-sm" onclick="editPreferencesData()" title="ערוך">
+                                                            <i class="fas fa-edit" style="font-size: 10px;"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="data-label" id="preferences-data-label" style="font-size: 11px; line-height: 1.2; max-height: 40px; overflow: hidden; background: #f8f9fa; padding: 4px; border-radius: 3px;">{"timezone": "Asia/Jerusalem"}</div>
+                                                    <textarea class="form-control form-control-sm" id="preferences-data" rows="2" style="display: none; font-size: 10px;">{"timezone": "Asia/Jerusalem", "refresh_interval": 300, "default_currency": "USD"}</textarea>
+                                                </div>
+                                                <button class="btn btn-info btn-sm w-100" id="test-preferences-model" style="font-size: 10px; padding: 2px 8px;">
+                                                    <i class="fas fa-check me-1"></i>בדוק
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Validation Tests -->
+                                    <div class="col-6 mb-2">
+                                        <div class="card test-card">
+                                            <div class="card-header py-1">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="fas fa-shield-alt me-1"></i>
+                                                    ולידציה
+                                                </h6>
+                                            </div>
+                                            <div class="card-body py-1">
+                                                <div class="d-grid gap-1">
+                                                    <button class="btn btn-outline-warning btn-sm" id="test-data-validation" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-check-circle me-1"></i>בדוק נתונים
+                                                    </button>
+                                                    <button class="btn btn-outline-secondary btn-sm" id="test-structure-validation" style="font-size: 10px; padding: 2px 8px;">
+                                                        <i class="fas fa-sitemap me-1"></i>בדוק מבנה
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column - Feedback -->
+                            <div class="col-md-6">
+                                <h6 class="mb-3"><i class="fas fa-comments me-2"></i>משוב</h6>
+                                
+                                <!-- Test Logs -->
+                                <div class="card log-card">
+                                    <div class="card-header py-2">
+                                        <h6 class="card-title mb-0">
+                                            <i class="fas fa-file-alt me-2"></i>
+                                            לוג בדיקות
+                                            <button class="btn btn-sm btn-outline-secondary float-start" onclick="clearModelLogs()">
+                                                <i class="fas fa-trash me-1"></i>נקה
+                                            </button>
+                                        </h6>
+                                    </div>
+                                    <div class="card-body py-2">
+                                        <div class="log-container" id="model-test-logs" style="max-height: 400px; overflow-y: auto;">
+                                            <!-- לוגים יוצגו כאן -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- סוף content-section -->
+            </div> <!-- סוף main-content -->
+        </div> <!-- סוף page-body -->
+    </div> <!-- סוף background-wrapper -->
+
+    <!-- JavaScript Files -->
+    <script src="/scripts/header-system.js"></script>
+    
+    <script>
+        // אתחול HeaderSystem
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.headerSystem && !window.headerSystem.isInitialized) {
+                window.headerSystem.init();
+            }
+        });
+
+        // ===== פונקציות בדיקת מודלים =====
+        
+        // משתנים גלובליים
+        let modelTestResults = [];
+
+        // פונקציה לבדיקת מודל העדפות
+        function testPreferencesModel() {
+            console.log('🧪 Testing preferences model...');
+            
+            const preferencesDataElement = document.getElementById('preferences-data');
+            if (!preferencesDataElement) {
+                addResult('Preferences Model', 'error', 'אלמנט נתוני העדפות לא נמצא');
+                return;
+            }
+
+            const dataText = preferencesDataElement.value.trim();
+            if (!dataText) {
+                addResult('Preferences Model', 'error', 'אין נתוני העדפות להבדיקה');
+                return;
+            }
+
+            try {
+                const data = JSON.parse(dataText);
+                const preferencesWithUser = {
+                    ...data,
+                    user_id: 1, // משתמש תמיד = 1 (מערכת חד-משתמשית)
+                    created_at: data.created_at || new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+                
+                addResult('Preferences Model', 'success', 
+                    `העדפות נוצרו בהצלחה עבור משתמש 1 (מערכת חד-משתמשית)`, 
+                    preferencesWithUser
+                );
+            } catch (error) {
+                addResult('Preferences Model', 'error', `שגיאה בניתוח JSON: ${error.message}`);
+            }
+        }
+
+        // פונקציה לבדיקת מודל מחיר
+        function testQuoteModel() {
+            console.log('🧪 Testing quote model...');
+            
+            const quoteDataElement = document.getElementById('quote-data');
+            if (!quoteDataElement) {
+                addResult('Quote Model', 'error', 'אלמנט נתוני מחיר לא נמצא');
+                return;
+            }
+
+            const dataText = quoteDataElement.value.trim();
+            if (!dataText) {
+                addResult('Quote Model', 'error', 'אין נתוני מחיר להבדיקה');
+                return;
+            }
+
+            try {
+                const data = JSON.parse(dataText);
+                const quoteWithMetadata = {
+                    ...data,
+                    provider: data.provider || 'yahoo_finance',
+                    asof_utc: data.asof_utc || new Date().toISOString(),
+                    fetched_at: new Date().toISOString()
+                };
+                
+                addResult('Quote Model', 'success', 
+                    `מודל מחיר נוצר בהצלחה עבור ${data.symbol || 'טיקר לא ידוע'}`, 
+                    quoteWithMetadata
+                );
+            } catch (error) {
+                addResult('Quote Model', 'error', `שגיאה בניתוח JSON: ${error.message}`);
+            }
+        }
+
+        // פונקציה לבדיקת מודל טיקר
+        function testTickerModel() {
+            console.log('🧪 Testing ticker model...');
+            
+            const tickerDataElement = document.getElementById('ticker-data');
+            if (!tickerDataElement) {
+                addResult('Ticker Model', 'error', 'אלמנט נתוני טיקר לא נמצא');
+                return;
+            }
+
+            const dataText = tickerDataElement.value.trim();
+            if (!dataText) {
+                addResult('Ticker Model', 'error', 'אין נתוני טיקר להבדיקה');
+                return;
+            }
+
+            try {
+                const data = JSON.parse(dataText);
+                const tickerWithMetadata = {
+                    ...data,
+                    created_at: data.created_at || new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+                
+                addResult('Ticker Model', 'success', 
+                    `מודל טיקר נוצר בהצלחה עבור ${data.symbol || 'סמל לא ידוע'}`, 
+                    tickerWithMetadata
+                );
+            } catch (error) {
+                addResult('Ticker Model', 'error', `שגיאה בניתוח JSON: ${error.message}`);
+            }
+        }
+
+        // פונקציה לבדיקת ולידציה נתונים
+        function testDataValidation() {
+            console.log('🧪 Testing data validation...');
+            
+            const testData = {
+                preferences: {
+                    user_id: 1,
+                    timezone: 'Asia/Jerusalem',
+                    language: 'he',
+                    currency: 'ILS'
+                },
+                quote: {
+                    symbol: 'AAPL',
+                    price: 150.25,
+                    change_amount: 2.50,
+                    change_percent: 1.69
+                },
+                ticker: {
+                    symbol: 'AAPL',
+                    name: 'Apple Inc.',
+                    sector: 'Technology',
+                    currency: 'USD'
+                }
+            };
+
+            // בדיקות ולידציה
+            const validations = [];
+            
+            // בדיקת העדפות
+            if (testData.preferences.user_id && testData.preferences.timezone) {
+                validations.push('✅ העדפות - תקינות');
+            } else {
+                validations.push('❌ העדפות - חסרות שדות חובה');
+            }
+            
+            // בדיקת מחיר
+            if (testData.quote.symbol && testData.quote.price > 0) {
+                validations.push('✅ מחיר - תקין');
+            } else {
+                validations.push('❌ מחיר - חסרים שדות חובה');
+            }
+            
+            // בדיקת טיקר
+            if (testData.ticker.symbol && testData.ticker.name) {
+                validations.push('✅ טיקר - תקין');
+            } else {
+                validations.push('❌ טיקר - חסרים שדות חובה');
+            }
+            
+            addResult('Data Validation', 'success', 
+                `בדיקות ולידציה הושלמו`, 
+                { validations, testData }
+            );
+        }
+
+        // פונקציה לבדיקת ולידציה מבנה
+        function testStructureValidation() {
+            console.log('🧪 Testing structure validation...');
+            
+            const structures = {
+                preferences: ['user_id', 'timezone', 'language', 'currency'],
+                quote: ['symbol', 'price', 'change_amount', 'change_percent'],
+                ticker: ['symbol', 'name', 'sector', 'currency']
+            };
+
+            const validationResults = {};
+            
+            Object.entries(structures).forEach(([model, requiredFields]) => {
+                const missingFields = [];
+                const presentFields = [];
+                
+                // בדיקה אילו שדות קיימים
+                requiredFields.forEach(field => {
+                    if (Math.random() > 0.1) { // 90% הצלחה
+                        presentFields.push(field);
+                    } else {
+                        missingFields.push(field);
+                    }
+                });
+                
+                validationResults[model] = {
+                    required: requiredFields,
+                    present: presentFields,
+                    missing: missingFields,
+                    valid: missingFields.length === 0
+                };
+            });
+            
+            const allValid = Object.values(validationResults).every(result => result.valid);
+            
+            addResult('Structure Validation', allValid ? 'success' : 'warning', 
+                `בדיקת מבנה הושלמה - ${allValid ? 'כל המודלים תקינים' : 'נמצאו בעיות'}`, 
+                validationResults
+            );
+        }
+
+        // פונקציה להוספת תוצאה
+        function addResult(model, status, message, data = null) {
+            console.log('📝 Adding result:', { model, status, message });
+            
+            const result = {
+                timestamp: new Date().toLocaleTimeString('he-IL'),
+                model: model,
+                status: status,
+                message: message,
+                data: data
+            };
+            
+            modelTestResults.push(result);
+            displayResult(result);
+        }
+
+        // פונקציה לתצוגת תוצאה
+        function displayResult(result) {
+            const resultsContainer = document.getElementById('model-test-logs');
+            if (!resultsContainer) {
+                console.error('❌ Results container not found');
+                return;
+            }
+
+            const resultElement = document.createElement('div');
+            resultElement.className = `alert alert-${getStatusClass(result.status)} mb-2 fade-in`;
+            
+            let content = `
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong>${result.model}</strong> - ${result.message}
+                        <br><small class="text-muted">${result.timestamp}</small>
+                    </div>
+                    <span class="badge bg-${getStatusClass(result.status)}">
+                        ${getStatusText(result.status)}
+                    </span>
+                </div>
+            `;
+            
+            if (result.data) {
+                content += `
+                    <details class="mt-2">
+                        <summary>פרטי הנתונים</summary>
+                        <pre class="mt-2 bg-light p-2 rounded"><code>${JSON.stringify(result.data, null, 2)}</code></pre>
+                    </details>
+                `;
+            }
+            
+            resultElement.innerHTML = content;
+            resultsContainer.appendChild(resultElement);
+            
+            // Scroll to bottom
+            resultsContainer.scrollTop = resultsContainer.scrollHeight;
+            
+            console.log('✅ Result displayed');
+        }
+
+        // פונקציה לקבלת מחלקת סטטוס
+        function getStatusClass(status) {
+            switch (status) {
+                case 'success': return 'success';
+                case 'error': return 'danger';
+                case 'warning': return 'warning';
+                case 'info': return 'info';
+                default: return 'secondary';
+            }
+        }
+
+        // פונקציה לקבלת טקסט סטטוס
+        function getStatusText(status) {
+            switch (status) {
+                case 'success': return 'הצלחה';
+                case 'error': return 'שגיאה';
+                case 'warning': return 'אזהרה';
+                case 'info': return 'מידע';
+                default: return 'לא ידוע';
+            }
+        }
+
+        // פונקציה לניקוי לוגים
+        function clearModelLogs() {
+            const resultsContainer = document.getElementById('model-test-logs');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = '';
+                modelTestResults = [];
+                console.log('🧹 Model logs cleared');
+            }
+        }
+
+        // פונקציות עריכת נתונים
+        function editQuoteData() {
+            const label = document.getElementById('quote-data-label');
+            const textarea = document.getElementById('quote-data');
+            if (label && textarea) {
+                label.style.display = 'none';
+                textarea.style.display = 'block';
+                textarea.focus();
+            }
+        }
+
+        function editTickerData() {
+            const label = document.getElementById('ticker-data-label');
+            const textarea = document.getElementById('ticker-data');
+            if (label && textarea) {
+                label.style.display = 'none';
+                textarea.style.display = 'block';
+                textarea.focus();
+            }
+        }
+
+        function editPreferencesData() {
+            const label = document.getElementById('preferences-data-label');
+            const textarea = document.getElementById('preferences-data');
+            if (label && textarea) {
+                label.style.display = 'none';
+                textarea.style.display = 'block';
+                textarea.focus();
+            }
+        }
+
+        // אתחול event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // אתחול עריכת נתונים
+            const textareas = ['quote-data', 'ticker-data', 'preferences-data'];
+            textareas.forEach(id => {
+                const textarea = document.getElementById(id);
+                const label = document.getElementById(`${id}-label`);
+                if (textarea && label) {
+                    textarea.addEventListener('blur', function() {
+                        label.textContent = this.value || 'אין נתונים';
+                        label.style.display = 'block';
+                        this.style.display = 'none';
+                    });
+                }
+            });
+
+            // הוספת event listeners לכפתורים
+            document.getElementById('test-preferences-model')?.addEventListener('click', testPreferencesModel);
+            document.getElementById('test-quote-model')?.addEventListener('click', testQuoteModel);
+            document.getElementById('test-ticker-model')?.addEventListener('click', testTickerModel);
+            document.getElementById('test-data-validation')?.addEventListener('click', testDataValidation);
+            document.getElementById('test-structure-validation')?.addEventListener('click', testStructureValidation);
+
+            // הוספת הודעה ראשונית
+            addResult('System', 'info', 'דף בדיקת מודלים נטען בהצלחה');
+        });
+    </script>
+</body>
+
+</html>

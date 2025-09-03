@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>העדפות - TikTrack</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- CSS Files - Ordered by priority (weak to strong) -->
+  <!-- 1. Apple theme (base) -->
+  <link rel="stylesheet" href="styles/apple-theme.css">
+  
+  <!-- 2. Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- 3. Header system -->
+  <link rel="stylesheet" href="styles/header-system.css">
+  
+  <!-- 4. Typography -->
+  <link rel="stylesheet" href="styles/typography.css">
+
+  <!-- 5. Table styles -->
+  <link rel="stylesheet" href="styles/table.css">
+
+  <!-- 6. Warning system styles -->
+  <link rel="stylesheet" href="styles/notification-system.css">
+
+  <!-- 7. Linked items modal styles -->
+  <link rel="stylesheet" href="styles/linked-items.css">
+
+  <!-- 8. General styles (highest priority - drops everything) -->
+  <link rel="stylesheet" href="styles/styles.css">
+  
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8f9fa;
+    }
+    
+    .page-body {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .preferences-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+    
+    .preference-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .preference-item:last-child {
+      border-bottom: none;
+    }
+    
+    .preference-label {
+      flex: 1;
+    }
+    
+    .preference-label h4 {
+      margin: 0 0 5px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .preference-label p {
+      margin: 0;
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .preference-control {
+      min-width: 200px;
+    }
+    
+    .btn-save {
+      background-color: #28a745;
+      border-color: #28a745;
+      color: white;
+    }
+    
+    .btn-save:hover {
+      background-color: #218838;
+      border-color: #1e7e34;
+      color: white;
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      min-width: 300px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- רקע כללי -->
+  <div class="background-wrapper">
+    
+    <!-- unified-header ייווצר כאן אוטומטית -->
+    
+    <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+    <div class="page-body">
+      <!-- top-section -->
+      <div class="top-section">
+        <!-- Main header -->
+        <div class="section-header">
+          <div class="table-title">
+            <img src="images/icons/prefrences.svg" alt="העדפות"
+                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+            העדפות
+          </div>
+          <div class="table-actions">
+            <button class="filter-toggle-btn" onclick="toggleTopSection()"
+                title="הצג/הסתר אזור העדפות">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Alert cards -->
+        <div class="section-body">
+          <active-alerts></active-alerts>
+
+          <!-- Data summary -->
+          <div class="info-summary" id="summaryStats">
+            <div>הגדרות מערכת: <strong id="totalPreferences">0</strong></div>
+            <div>התראות חדשות: <strong id="newAlerts">0</strong></div>
+          </div>
+        </div>
+      </div> <!-- End top-section -->
+
+      <!-- Main content -->
+      <div class="main-content">
+        <div class="content-section">
+          <div class="section-header">
+            <div class="table-title">
+              <img src="images/icons/prefrences.svg" alt="הגדרות מערכת"
+                  style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              הגדרות מערכת
+            </div>
+          </div>
+          <div class="section-body">
+      <div class="preferences-container">
+        <h2 class="mb-4">⚙️ הגדרות מערכת</h2>
+    
+    <!-- מטבע ראשי -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>💰 מטבע ראשי</h4>
+        <p>המטבע הראשי שיוצג במערכת</p>
+      </div>
+      <div class="preference-control">
+        <select id="primaryCurrency" class="form-select" onchange="updatePreference('primaryCurrency', this.value)">
+          <option value="USD">USD - דולר אמריקאי</option>
+          <option value="ILS">ILS - שקל ישראלי</option>
+          <option value="EUR">EUR - יורו</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- אזור זמן -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🌍 אזור זמן</h4>
+        <p>אזור הזמן שישמש לחישובי תאריכים</p>
+      </div>
+      <div class="preference-control">
+        <select id="timezone" class="form-select" onchange="updatePreference('timezone', this.value)">
+          <option value="Asia/Jerusalem">Asia/Jerusalem - ישראל</option>
+          <option value="UTC">UTC - זמן אוניברסלי</option>
+          <option value="America/New_York">America/New_York - ניו יורק</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- סטופ לוס ברירת מחדל -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🛑 סטופ לוס ברירת מחדל</h4>
+        <p>אחוז הסטופ לוס לטריידים חדשים</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="defaultStopLoss" class="form-control" min="0" max="100" step="0.1" 
+                 onchange="updatePreference('defaultStopLoss', this.value)" placeholder="5">
+          <span class="input-group-text">%</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- יעד ברירת מחדל -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🎯 יעד ברירת מחדל</h4>
+        <p>אחוז היעד לטריידים חדשים</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="defaultTargetPrice" class="form-control" min="0" max="100" step="0.1" 
+                 onchange="updatePreference('defaultTargetPrice', this.value)" placeholder="10">
+          <span class="input-group-text">%</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- עמלה ברירת מחדל -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>💵 עמלה ברירת מחדל</h4>
+        <p>עמלה לעסקאות קניה/מכירה</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="defaultCommission" class="form-control" min="0" step="0.01" 
+                 onchange="updatePreference('defaultCommission', this.value)" placeholder="1">
+          <span class="input-group-text">$</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- פילטר סטטוס ברירת מחדל -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>📊 פילטר סטטוס ברירת מחדל</h4>
+        <p>סטטוס שיוצג כברירת מחדל</p>
+      </div>
+      <div class="preference-control">
+        <select id="defaultStatusFilter" class="form-select" onchange="updatePreference('defaultStatusFilter', this.value)">
+          <option value="all">הכול</option>
+          <option value="open">פתוח</option>
+          <option value="closed">סגור</option>
+          <option value="cancelled">מבוטל</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- פילטר סוג ברירת מחדל -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🏷️ פילטר סוג ברירת מחדל</h4>
+        <p>סוג שיוצג כברירת מחדל</p>
+      </div>
+      <div class="preference-control">
+        <select id="defaultTypeFilter" class="form-select" onchange="updatePreference('defaultTypeFilter', this.value)">
+          <option value="all">הכול</option>
+          <option value="swing">סווינג</option>
+          <option value="investment">השקעה</option>
+          <option value="passive">פאסיבי</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- פילטר חשבון ברירת מחדל -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🏦 פילטר חשבון ברירת מחדל</h4>
+        <p>חשבון שיוצג כברירת מחדל</p>
+      </div>
+      <div class="preference-control">
+        <select id="defaultAccountFilter" class="form-select" onchange="updatePreference('defaultAccountFilter', this.value)">
+          <option value="all">הכול</option>
+          <!-- חשבונות יטענו דינמית -->
+        </select>
+      </div>
+    </div>
+    
+    <!-- פילטר טווח תאריכים ברירת מחדל -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>📅 פילטר טווח תאריכים ברירת מחדל</h4>
+        <p>טווח תאריכים שיוצג כברירת מחדל</p>
+      </div>
+      <div class="preference-control">
+        <select id="defaultDateRangeFilter" class="form-select" onchange="updatePreference('defaultDateRangeFilter', this.value)">
+          <option value="all">כל זמן</option>
+          <option value="this_week">השבוע</option>
+          <option value="week">שבוע</option>
+          <option value="mtd">MTD</option>
+          <option value="30_days">30 יום</option>
+          <option value="60_days">60 יום</option>
+          <option value="90_days">90 יום</option>
+          <option value="year">שנה</option>
+          <option value="ytd">YTD</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- ===== הגדרות מערכת הנתונים החיצוניים ===== -->
+    <div class="preference-item" style="border-top: 2px solid #007bff; margin-top: 20px; padding-top: 20px;">
+      <div class="preference-label">
+        <h4>🌐 מערכת נתונים חיצוניים</h4>
+        <p>הגדרות לחיבור למקורות מידע חיצוניים</p>
+      </div>
+      <div class="preference-control">
+        <!-- Placeholder for section header -->
+      </div>
+    </div>
+    
+    <!-- מרווח רענון נתונים -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>⏱️ מרווח רענון נתונים</h4>
+        <p>מרווח זמן בין רענון נתונים חיצוניים (בדקות)</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="dataRefreshInterval" class="form-control" min="1" max="60" step="1" 
+                 onchange="updatePreference('dataRefreshInterval', this.value)" placeholder="5">
+          <span class="input-group-text">דקות</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ספק נתונים ראשי -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>📡 ספק נתונים ראשי</h4>
+        <p>ספק הנתונים שישמש כברירת מחדל</p>
+      </div>
+      <div class="preference-control">
+        <select id="primaryDataProvider" class="form-select" onchange="updatePreference('primaryDataProvider', this.value)">
+          <option value="yahoo">Yahoo Finance</option>
+          <option value="google">Google Finance</option>
+          <option value="alpha_vantage">Alpha Vantage</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- ספק נתונים משני -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>📡 ספק נתונים משני</h4>
+        <p>ספק נתונים גיבוי במקרה של כשל</p>
+      </div>
+      <div class="preference-control">
+        <select id="secondaryDataProvider" class="form-select" onchange="updatePreference('secondaryDataProvider', this.value)">
+          <option value="google">Google Finance</option>
+          <option value="yahoo">Yahoo Finance</option>
+          <option value="alpha_vantage">Alpha Vantage</option>
+          <option value="none">ללא</option>
+        </select>
+      </div>
+    </div>
+    
+    <!-- מרווח זמן Cache -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>💾 מרווח זמן Cache</h4>
+        <p>זמן שמירת נתונים במטמון (בדקות)</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="cacheTTL" class="form-control" min="1" max="1440" step="1" 
+                 onchange="updatePreference('cacheTTL', this.value)" placeholder="5">
+          <span class="input-group-text">דקות</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- מספר מקסימלי של טיקרים לרענון -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>📊 מספר מקסימלי של טיקרים לרענון</h4>
+        <p>מספר הטיקרים המקסימלי שירענן בבת אחת</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="maxBatchSize" class="form-control" min="1" max="100" step="1" 
+                 onchange="updatePreference('maxBatchSize', this.value)" placeholder="25">
+          <span class="input-group-text">טיקרים</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- מרווח בין בקשות -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>⏳ מרווח בין בקשות</h4>
+        <p>מרווח זמן בין בקשות לספקי נתונים (במילישניות)</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="requestDelay" class="form-control" min="0" max="5000" step="100" 
+                 onchange="updatePreference('requestDelay', this.value)" placeholder="200">
+          <span class="input-group-text">מ"ש</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- מספר ניסיונות חוזרים -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🔄 מספר ניסיונות חוזרים</h4>
+        <p>מספר הניסיונות החוזרים במקרה של כשל</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="retryAttempts" class="form-control" min="0" max="5" step="1" 
+                 onchange="updatePreference('retryAttempts', this.value)" placeholder="2">
+          <span class="input-group-text">ניסיונות</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- זמן פסקה בין ניסיונות -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>⏸️ זמן פסקה בין ניסיונות</h4>
+        <p>זמן המתנה בין ניסיונות חוזרים (בשניות)</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="retryDelay" class="form-control" min="1" max="60" step="1" 
+                 onchange="updatePreference('retryDelay', this.value)" placeholder="5">
+          <span class="input-group-text">שניות</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- הפעלת רענון אוטומטי -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🔄 רענון אוטומטי</h4>
+        <p>הפעלת רענון אוטומטי של נתונים</p>
+      </div>
+      <div class="preference-control">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="autoRefresh" 
+                 onchange="updatePreference('autoRefresh', this.checked)" style="transform: scale(1.2);">
+          <label class="form-check-label" for="autoRefresh">
+            הפעל רענון אוטומטי
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <!-- הצגת לוגים מפורטים -->
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>📝 לוגים מפורטים</h4>
+        <p>הצגת לוגים מפורטים של פעולות נתונים</p>
+      </div>
+      <div class="preference-control">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="verboseLogging" 
+                 onchange="updatePreference('verboseLogging', this.checked)" style="transform: scale(1.2);">
+          <label class="form-check-label" for="verboseLogging">
+            הצג לוגים מפורטים
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <!-- כפתורי פעולה -->
+    <div class="d-flex justify-content-between mt-4 pt-4 border-top">
+      <button class="btn btn-outline-secondary" onclick="resetToDefaults()">
+        🔄 אופס לברירות מחדל
+      </button>
+      <button class="btn btn-save" onclick="saveAllPreferences()">
+        💾 שמור שינויים
+      </button>
+        </div>
+      </div> <!-- סוף preferences-container -->
+        </div> <!-- סוף section-body -->
+      </div> <!-- סוף content-section -->
+    </div> <!-- סוף main-content -->
+  </div> <!-- סוף page-body -->
+
+  <!-- Bottom page spacing -->
+  <div class="bottom-spacer"></div>
+
+  <!-- Notification system -->
+  <div class="notification-container" id="notificationContainer"></div>
+
+  </div> <!-- סוף background-wrapper -->
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- קבצים מודולריים של הגריד -->
+  <script src="scripts/button-icons.js"></script>
+  <script src="scripts/translation-utils.js"></script>
+  <script src="scripts/data-utils.js"></script>
+  <script src="scripts/ui-utils.js"></script>
+  <script src="scripts/validation-utils.js"></script>
+  <script src="scripts/crud-utils.js"></script>
+  <script src="scripts/table-mappings.js"></script>
+  <script src="scripts/date-utils.js"></script>
+  
+  <!-- Scripts -->
+  <script src="scripts/notification-system.js"></script>
+  <script src="scripts/error-handlers.js"></script>
+  <script src="scripts/linked-items.js"></script>
+  <script src="scripts/page-utils.js"></script>
+      <script src="scripts/account-service.js"></script>
+  <script src="scripts/filter-system.js"></script>
+  <script src="scripts/tables.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/preferences.js"></script>
+  
+  <!-- Header System Scripts -->
+  <script src="scripts/header-system.js?v=20250830_2"></script>
+  <!-- alerts.js הוסר - לא נחוץ בעמוד זה -->
+    <script src="scripts/alert-service.js"></script>
+  <script src="scripts/active-alerts-component.js?v=20250830_1"></script>
+  
+  <!-- Page initialization -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // אתחול מערכת הכותרת החדשה
+      console.log("🔄 Initializing unified header system...");
+      if (window.headerSystem) {
+        window.headerSystem.init();
+      }
+      if (window.filterSystem) {
+        window.filterSystem.initialize();
+      }
+    });
+  </script>
+</body>
+</html>

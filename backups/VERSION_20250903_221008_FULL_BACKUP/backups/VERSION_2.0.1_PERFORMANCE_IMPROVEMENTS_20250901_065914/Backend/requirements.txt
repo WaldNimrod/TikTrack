@@ -1,0 +1,31 @@
+# TikTrack Server Dependencies
+# ==============================================
+# ⚠️  Important: This is server dependencies only!
+# 
+# Not related to testing system!
+# 
+# 🎯 Purpose: Python dependencies required for running TikTrack server
+# 📍 Location: Backend/requirements.txt
+# 🔗 Testing system: Backend/testing_suite/requirements.txt
+# 
+# ==============================================
+
+# Core server dependencies
+Flask==2.3.3
+Flask-CORS==4.0.0
+Werkzeug==2.3.7
+SQLAlchemy==2.0.23
+
+# Production server dependencies
+gunicorn==21.2.0
+waitress==2.1.2
+requests==2.31.0
+
+# Testing dependencies (for API endpoints)
+pytest==7.4.3
+pytest-cov==4.1.0
+pytest-html==4.1.1
+pytest-xdist==3.3.1
+psutil==5.9.6
+
+

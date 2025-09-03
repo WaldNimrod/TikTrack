@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מיפוי עמודים וסקריפטים - TikTrack</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .page-title {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .table th {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+        .table td {
+            vertical-align: middle;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .script-list {
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        .primary-script {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        .utility-script {
+            color: #7f8c8d;
+        }
+        .page-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .script-count {
+            background-color: #3498db;
+            color: white;
+            border-radius: 15px;
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .legend {
+            background-color: #ecf0f1;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .legend-item {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <h1 class="page-title">📊 מיפוי עמודים וסקריפטים - TikTrack</h1>
+        
+        <div class="legend">
+            <h5>🔍 מקרא:</h5>
+            <div class="legend-item"><span class="primary-script">■</span> סקריפט ראשי של העמוד</div>
+            <div class="legend-item"><span class="utility-script">■</span> סקריפטים כלליים ותמיכה</div>
+        </div>
+
+        <div class="table-container">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">שם העמוד</th>
+                        <th style="width: 15%;">קובץ HTML</th>
+                        <th style="width: 10%;">מספר סקריפטים</th>
+                        <th style="width: 55%;">קבצי סקריפט</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="page-name">🏠 עמוד ראשי</td>
+                        <td>index.html</td>
+                        <td><span class="script-count">12</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">console-cleanup.js, translation-utils.js, data-utils.js, ui-utils.js, table-mappings.js, date-utils.js, tables.js, linked-items.js, page-utils.js, main.js</span><br>
+                            <span class="utility-script">header-system.js, alerts.js, active-alerts-component.js</span><br>
+                            <span class="utility-script">chart.js (external)</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">💰 חשבונות</td>
+                        <td>accounts.html</td>
+                        <td><span class="script-count">15</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">button-icons.js, console-cleanup.js, translation-utils.js, data-utils.js, ui-utils.js, table-mappings.js, date-utils.js, tables.js, linked-items.js, page-utils.js, main.js</span><br>
+                            <span class="utility-script">header-system.js, alerts.js, active-alerts-component.js, notification-system.js, validation-utils.js</span><br>
+                            <span class="primary-script">accounts.js</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">🚨 התראות</td>
+                        <td>alerts.html</td>
+                        <td><span class="script-count">14</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">button-icons.js, console-cleanup.js, translation-utils.js, data-utils.js, notification-system.js, alert-service.js, ui-utils.js, validation-utils.js, crud-utils.js, linked-items.js, table-mappings.js, date-utils.js, tables.js</span><br>
+                            <span class="primary-script">alerts.js</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">💸 תזרימי מזומנים</td>
+                        <td>cash_flows.html</td>
+                        <td><span class="script-count">13</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">button-icons.js, console-cleanup.js, translation-utils.js, data-utils.js, ui-utils.js, validation-utils.js, notification-system.js, crud-utils.js, table-mappings.js, date-utils.js, tables.js, linked-items.js, page-utils.js, main.js, header-system.js, active-alerts-component.js</span><br>
+                            <span class="primary-script">cash_flows.js</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">⚙️ העדפות</td>
+                        <td>preferences.html</td>
+                        <td><span class="script-count">12</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">button-icons.js, console-cleanup.js, translation-utils.js, data-utils.js, ui-utils.js, validation-utils.js, crud-utils.js, table-mappings.js, date-utils.js, notification-system.js, header-system.js, active-alerts-component.js</span><br>
+                            <span class="primary-script">accounts.js, preferences.js</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">📈 טריידים</td>
+                        <td>trades.html</td>
+                        <td><span class="script-count">17</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">button-icons.js, console-cleanup.js, translation-utils.js, data-utils.js, ui-utils.js, validation-utils.js, crud-utils.js, table-mappings.js, date-utils.js, tables.js, linked-items.js, filter-system.js, page-utils.js, main.js</span><br>
+                            <span class="utility-script">header-system.js, alerts.js, active-alerts-component.js, accounts.js, executions.js</span><br>
+                            <span class="primary-script">trades.js</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">📋 תוכניות טריידים</td>
+                        <td>trade_plans.html</td>
+                        <td><span class="script-count">16</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">button-icons.js, console-cleanup.js, translation-utils.js, data-utils.js, ui-utils.js, table-mappings.js, date-utils.js, tables.js, linked-items.js, page-utils.js, main.js</span><br>
+                            <span class="utility-script">header-system.js, notification-system.js, alert-service.js, validation-utils.js, alerts.js, active-alerts-component.js, accounts.js</span><br>
+                            <span class="primary-script">trade_plans.js</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">🏷️ טיקרים</td>
+                        <td>tickers.html</td>
+                        <td><span class="script-count">14</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">button-icons.js, console-cleanup.js, translation-utils.js, data-utils.js, ui-utils.js, validation-utils.js, crud-utils.js, table-mappings.js, date-utils.js, tables.js, linked-items.js, page-utils.js, main.js</span><br>
+                            <span class="utility-script">header-system.js, active-alerts-component.js, notification-system.js</span><br>
+                            <span class="primary-script">tickers.js</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">📝 הערות</td>
+                        <td>notes.html</td>
+                        <td><span class="script-count">14</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">button-icons.js, console-cleanup.js, translation-utils.js, data-utils.js, ui-utils.js, table-mappings.js, date-utils.js, tables.js, linked-items.js, page-utils.js, notification-system.js, main.js</span><br>
+                            <span class="utility-script">header-system.js, active-alerts-component.js, accounts.js, alerts.js</span><br>
+                            <span class="primary-script">notes.js</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">⚡ ביצועים</td>
+                        <td>executions.html</td>
+                        <td><span class="script-count">16</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">ticker-service.js, notification-system.js, validation-utils.js, filter-system.js, crud-utils.js, preferences.js, button-icons.js, console-cleanup.js, translation-utils.js, data-utils.js, ui-utils.js, table-mappings.js, date-utils.js, tables.js, linked-items.js, page-utils.js</span><br>
+                            <span class="utility-script">alerts.js, active-alerts-component.js, main.js, header-system.js</span><br>
+                            <span class="primary-script">executions.js</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">🗄️ מסד נתונים</td>
+                        <td>db_display.html</td>
+                        <td><span class="script-count">15</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">notification-system.js, validation-utils.js, filter-system.js, crud-utils.js, alerts.js, button-icons.js, console-cleanup.js, translation-utils.js, data-utils.js, ui-utils.js, table-mappings.js, date-utils.js, tables.js, linked-items.js, page-utils.js, main.js, header-system.js, active-alerts-component.js</span><br>
+                            <span class="primary-script">database.js</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">🛠️ נתונים נוספים</td>
+                        <td>db_extradata.html</td>
+                        <td><span class="script-count">15</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">console-cleanup.js, translation-utils.js, data-utils.js, notification-system.js, validation-utils.js, ui-utils.js, table-mappings.js, date-utils.js, tables.js, linked-items.js, page-utils.js, main.js</span><br>
+                            <span class="utility-script">header-system.js, alerts.js, active-alerts-component.js</span><br>
+                            <span class="primary-script">db-extradata.js</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">🎨 עיצובים</td>
+                        <td>designs.html</td>
+                        <td><span class="script-count">12</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">console-cleanup.js, translation-utils.js, data-utils.js, ui-utils.js, table-mappings.js, date-utils.js, tables.js, linked-items.js, page-utils.js, main.js, header-system.js</span><br>
+                            <span class="primary-script">trade_plans.js</span> <small>(משותף)</small>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">🔬 מחקר</td>
+                        <td>research.html</td>
+                        <td><span class="script-count">13</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">console-cleanup.js, translation-utils.js, data-utils.js, ui-utils.js, table-mappings.js, date-utils.js, tables.js, linked-items.js, page-utils.js, main.js, header-system.js, trades.js</span><br>
+                            <span class="primary-script">research.js</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">⚖️ אילוצים</td>
+                        <td>constraints.html</td>
+                        <td><span class="script-count">12</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">console-cleanup.js, translation-utils.js, data-utils.js, ui-utils.js, table-mappings.js, date-utils.js, tables.js, linked-items.js, page-utils.js, main.js, header-system.js, alerts.js</span><br>
+                            <span class="primary-script">constraint-manager.js</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">⚙️ העדפות פשוטות</td>
+                        <td>preferences-simple.html</td>
+                        <td><span class="script-count">3</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">notification-system.js, accounts.js</span><br>
+                            <span class="primary-script">preferences-simple.js</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">🎨 הדגמת סגנונות</td>
+                        <td>style_demonstration.html</td>
+                        <td><span class="script-count">12</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">console-cleanup.js, translation-utils.js, data-utils.js, ui-utils.js, table-mappings.js, date-utils.js, tables.js, linked-items.js, page-utils.js, main.js</span><br>
+                            <span class="utility-script">header-system.js, alerts.js, active-alerts-component.js</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">🗺️ מפת JavaScript</td>
+                        <td>js-map.html</td>
+                        <td><span class="script-count">1</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">Bootstrap (external)</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="page-name">🎨 ניתוח כפילויות CSS</td>
+                        <td>styles-duplicates-analyzer.html</td>
+                        <td><span class="script-count">1</span></td>
+                        <td class="script-list">
+                            <span class="utility-script">Bootstrap (external)</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-container">
+            <h3>📊 סיכום סקריפטים</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>🎯 סקריפטים ראשיים לפי עמוד:</h5>
+                    <ul>
+                        <li><strong>accounts.js</strong> - חשבונות</li>
+                        <li><strong>alerts.js</strong> - התראות</li>
+                        <li><strong>cash_flows.js</strong> - תזרימי מזומנים</li>
+                        <li><strong>trades.js</strong> - טריידים</li>
+                        <li><strong>trade_plans.js</strong> - תוכניות טריידים</li>
+                        <li><strong>tickers.js</strong> - טיקרים</li>
+                        <li><strong>notes.js</strong> - הערות</li>
+                        <li><strong>executions.js</strong> - ביצועים</li>
+                        <li><strong>database.js</strong> - מסד נתונים</li>
+                        <li><strong>db-extradata.js</strong> - נתונים נוספים</li>
+                        <li><strong>research.js</strong> - מחקר</li>
+                        <li><strong>constraint-manager.js</strong> - אילוצים</li>
+                        <li><strong>preferences.js</strong> - העדפות</li>
+                        <li><strong>preferences-simple.js</strong> - העדפות פשוטות</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h5>🔧 סקריפטים כלליים (משותפים):</h5>
+                    <ul>
+                        <li><strong>main.js</strong> - פונקציות ליבה</li>
+                        <li><strong>header-system.js</strong> - מערכת כותרת</li>
+                        <li><strong>translation-utils.js</strong> - תרגומים ופורמט</li>
+                        <li><strong>ui-utils.js</strong> - כלי UI</li>
+                        <li><strong>data-utils.js</strong> - כלי נתונים</li>
+                        <li><strong>tables.js</strong> - ניהול טבלאות</li>
+                        <li><strong>linked-items.js</strong> - פריטים מקושרים</li>
+                        <li><strong>notification-system.js</strong> - מערכת הודעות</li>
+                        <li><strong>validation-utils.js</strong> - בדיקות תקינות</li>
+                        <li><strong>crud-utils.js</strong> - פעולות CRUD</li>
+                        <li><strong>table-mappings.js</strong> - מיפוי טבלאות</li>
+                        <li><strong>date-utils.js</strong> - כלי תאריכים</li>
+                        <li><strong>page-utils.js</strong> - כלי עמודים</li>
+                        <li><strong>button-icons.js</strong> - אייקוני כפתורים</li>
+                        <li><strong>console-cleanup.js</strong> - ניקוי קונסול</li>
+                        <li><strong>active-alerts-component.js</strong> - רכיב התראות פעילות</li>
+                        <li><strong>filter-system.js</strong> - מערכת סינון</li>
+                        <li><strong>alert-service.js</strong> - שירות התראות</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-info">
+            <h5>📝 הערות:</h5>
+            <ul class="mb-0">
+                <li>כל העמודים משתמשים ב-Bootstrap כספרייה חיצונית</li>
+                <li>רוב העמודים משתמשים במערכת הכותרת החדשה (header-system.js)</li>
+                <li>כל העמודים משתמשים בסקריפטים כלליים לתמיכה</li>
+                <li>עמודי בדיקה לא נכללו בטבלה זו</li>
+                <li>קבצי backup ו-external לא נכללו</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+

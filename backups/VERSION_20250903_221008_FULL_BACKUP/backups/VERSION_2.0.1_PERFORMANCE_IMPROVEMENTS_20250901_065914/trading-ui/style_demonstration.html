@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<!--
+  ========================================
+  עמוד בדיקת סגנונות - Styles Page
+  ========================================
+  
+  עמוד זה משמש לבדיקת סגנונות CSS במערכת
+  כולל אפשרות להעביר קבצי CSS להערות ולצפות בתוצאה
+  קובץ קבוע במערכת לשימוש מתמשך
+  
+  תכונות:
+  - העברת קבצי CSS להערות לבדיקה
+  - תצוגת מגוון סגנונות מרכזיים
+  - טקסטים, כפתורים, טבלאות ועוד
+  - מערכת התראות גלובלית
+  
+  מחבר: Tik.track Development Team
+  תאריך עדכון אחרון: 2025
+  ========================================
+-->
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>סגנונות - TikTrack</title>
+
+    <!-- סגנונות מותאמים לעמוד הדגמת סגנונות -->
+    <style>
+        .css-controls-table td {
+            text-align: center !important;
+            vertical-align: middle !important;
+            padding: 8px 12px !important;
+            border: 1px solid var(--border-color) !important;
+        }
+
+        .css-controls-table td.css-header {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px !important;
+        }
+
+        .css-controls-table td.css-header input[type="checkbox"] {
+            margin: 0 !important;
+        }
+    </style>
+
+    <!-- CSS Files - Ordered by priority (weak to strong) -->
+    <!-- 1. Apple theme (base) -->
+    <link rel="stylesheet" href="styles/apple-theme.css">
+
+    <!-- 2. Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- 3. General styles -->
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/header-system.css">
+    <!-- 4. Typography -->
+    <link rel="stylesheet" href="styles/typography.css">
+
+    <!-- 5. Table styles -->
+    <link rel="stylesheet" href="styles/table.css">
+
+    <!-- 6. Header system styles (highest priority) -->
+
+    <!-- 7. Styles test page custom styles -->
+    <link rel="stylesheet" href="styles/styles-test.css">
+
+    <!-- Bootstrap JS - חייב להיות ראשון -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Modular grid files -->
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/table-mappings.js"></script>
+    <script src="scripts/date-utils.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/linked-items.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/header-system.js?v=20250830_2"></script>    <!-- alerts.js הוסר - לא נחוץ בעמוד זה -->
+    <script src="scripts/alert-service.js"></script>
+    <script src="scripts/active-alerts-component.js?v=20250830_1"></script>
+</head>
+
+<body class="styles-test-page">
+    <!-- General background -->
+    <div class="background-wrapper">
+
+        <!-- unified-header ייווצר כאן אוטומטית -->
+
+        <!-- Page body - All content after header -->
+        <div class="page-body">
+            <!-- CSS Controls Section -->
+            <div class="top-section" id="cssControlsSection">
+                <!-- CSS Controls header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/home.svg" alt="הגדרות"
+                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                        בקרת קבצי CSS
+                    </div>
+                    <div class="table-actions">
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור בקרה">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CSS Controls body -->
+                <div class="section-body">
+                    <div class="styles-test-container">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>קובץ CSS</th>
+                                    <th>תיאור</th>
+                                    <th>פעולה</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Bootstrap Framework -->
+                                <tr>
+                                    <td><strong>Bootstrap</strong></td>
+                                    <td>מסגרת CSS בסיסית - Grid, Components, Utilities</td>
+                                    <td>
+                                        <input type="checkbox" id="bootstrapToggle" checked
+                                            onchange="toggleBootstrap(this.checked)">
+                                    </td>
+                                </tr>
+
+                                <!-- Apple Theme -->
+                                <tr>
+                                    <td><strong>Apple Theme</strong></td>
+                                    <td>עיצוב Apple-inspired - צבעים, גרדיאנטים, אנימציות</td>
+                                    <td>
+                                        <input type="checkbox" id="appleThemeToggle" checked
+                                            onchange="toggleCSS('apple-theme.css', this.checked)">
+                                    </td>
+                                </tr>
+
+                                <!-- General Styles -->
+                                <tr>
+                                    <td><strong>General Styles</strong></td>
+                                    <td>סגנונות כלליים - משתנים, Reset, Layout בסיסי</td>
+                                    <td>
+                                        <input type="checkbox" id="generalStylesToggle" checked
+                                            onchange="toggleCSS('styles.css', this.checked)">
+                                    </td>
+                                </tr>
+
+                                <!-- Typography -->
+                                <tr>
+                                    <td><strong>Typography</strong></td>
+                                    <td>סגנונות טקסט - כותרות, פסקאות, יישור</td>
+                                    <td>
+                                        <input type="checkbox" id="typographyToggle" checked
+                                            onchange="toggleCSS('typography.css', this.checked)">
+                                    </td>
+                                </tr>
+
+                                <!-- Table Styles -->
+                                <tr>
+                                    <td><strong>Table Styles</strong></td>
+                                    <td>עיצוב טבלאות - כותרות, תאים, סידור, פילטרים</td>
+                                    <td>
+                                        <input type="checkbox" id="tableStylesToggle" checked
+                                            onchange="toggleCSS('table.css', this.checked)">
+                                    </td>
+                                </tr>
+
+                                <!-- Header System -->
+                                <tr>
+                                    <td><strong>Header System</strong></td>
+                                    <td>מערכת כותרת מאוחדת - תפריט, פילטרים, ניווט</td>
+                                    <td>
+                                        <input type="checkbox" id="headerSystemToggle" checked
+                                    </td>
+                                </tr>
+
+                                <!-- Database Display -->
+                                <tr>
+                                    <td><strong>Database Display</strong></td>
+                                    <td>עיצוב עמודי בסיס נתונים - טבלאות, תצוגה קומפקטית</td>
+                                    <td>
+                                        <input type="checkbox" id="dbDisplayToggle" checked
+                                            onchange="toggleCSS('db-display.css', this.checked)">
+                                    </td>
+                                </tr>
+
+                                <!-- Styles Test (Page Specific) -->
+                                <tr>
+                                    <td><strong>Styles Test</strong></td>
+                                    <td>סגנונות ייחודיים לעמוד הדגמת סגנונות</td>
+                                    <td>
+                                        <input type="checkbox" id="stylesTestToggle" checked
+                                            onchange="toggleCSS('styles-test.css', this.checked)">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="main-content">
+
+                <!-- Styles Test Section 7 - Trades and Alerts Tables -->
+                <div class="content-section styles-test-page" id="stylesTestSection7">
+                    <!-- Styles Test header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/home.svg" alt="סגנונות"
+                                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                            טבלאות טריידים והתראות
+                        </div>
+                        <div class="table-count">טבלאות לדוגמה</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleMainSection7()"
+                                title="הצג/הסתר אזור בדיקה">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Styles Test body -->
+                    <div class="section-body">
+                        <div class="styles-test-container">
+                            <!-- Trades Table Test Section -->
+                            <div class="style-section">
+                                <h3 class="style-section-title">טבלת טריידים לדוגמה</h3>
+                                <div class="style-examples">
+                                    <div class="table-responsive">
+                                        <table class="table" data-table-type="trades">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <button class="btn btn-link sortable-header"
+                                                            onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }"
+                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            חשבון <span class="sort-icon">↕</span>
+                                                        </button>
+                                                    </th>
+                                                    <th>
+                                                        <button class="btn btn-link sortable-header"
+                                                            onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }"
+                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            טיקר <span class="sort-icon">↕</span>
+                                                        </button>
+                                                    </th>
+                                                    <th>
+                                                        <button class="btn btn-link sortable-header"
+                                                            onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }"
+                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            סוג <span class="sort-icon">↕</span>
+                                                        </button>
+                                                    </th>
+                                                    <th>
+                                                        <button class="btn btn-link sortable-header"
+                                                            onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }"
+                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            כמות <span class="sort-icon">↕</span>
+                                                        </button>
+                                                    </th>
+                                                    <th>
+                                                        <button class="btn btn-link sortable-header"
+                                                            onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }"
+                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            מחיר <span class="sort-icon">↕</span>
+                                                        </button>
+                                                    </th>
+                                                    <th>
+                                                        <button class="btn btn-link sortable-header"
+                                                            onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }"
+                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            סטטוס <span class="sort-icon">↕</span>
+                                                        </button>
+                                                    </th>
+                                                    <th>
+                                                        <button class="btn btn-link sortable-header"
+                                                            onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); }"
+                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            תאריך <span class="sort-icon">↕</span>
+                                                        </button>
+                                                    </th>
+                                                    <th class="actions-cell">
+                                                        פעולות
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr data-status="active" data-type="buy">
+                                                    <td data-field="account_name">חשבון 1</td>
+                                                    <td data-field="symbol">AAPL</td>
+                                                    <td data-field="type">קנייה</td>
+                                                    <td data-field="quantity">100</td>
+                                                    <td data-field="price">$150.25</td>
+                                                    <td data-field="status">פעיל</td>
+                                                    <td data-field="created_at">2025-08-26</td>
+                                                    <td class="actions-cell">
+                                                        <button class="btn btn-sm btn-primary"
+                                                            onclick="showLinkedItems('trade', 1)"
+                                                            title="הצג פריטים מקושרים">
+                                                            <span class="action-icon">🔗</span>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-secondary" onclick="editTrade(1)"
+                                                            title="ערוך טרייד">
+                                                            <span class="action-icon">✏️</span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr data-status="closed" data-type="sell">
+                                                    <td data-field="account_name">חשבון 2</td>
+                                                    <td data-field="symbol">TSLA</td>
+                                                    <td data-field="type">מכירה</td>
+                                                    <td data-field="quantity">50</td>
+                                                    <td data-field="price">$250.75</td>
+                                                    <td data-field="status">סגור</td>
+                                                    <td data-field="created_at">2025-08-25</td>
+                                                    <td class="actions-cell">
+                                                        <button class="btn btn-sm btn-primary"
+                                                            onclick="showLinkedItems('trade', 2)"
+                                                            title="הצג פריטים מקושרים">
+                                                            <span class="action-icon">🔗</span>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-secondary" onclick="editTrade(2)"
+                                                            title="ערוך טרייד">
+                                                            <span class="action-icon">✏️</span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr data-status="active" data-type="buy">
+                                                    <td data-field="account_name">חשבון 1</td>
+                                                    <td data-field="symbol">MSFT</td>
+                                                    <td data-field="type">קנייה</td>
+                                                    <td data-field="quantity">75</td>
+                                                    <td data-field="price">$320.50</td>
+                                                    <td data-field="status">פעיל</td>
+                                                    <td data-field="created_at">2025-08-24</td>
+                                                    <td class="actions-cell">
+                                                        <button class="btn btn-sm btn-primary"
+                                                            onclick="showLinkedItems('trade', 3)"
+                                                            title="הצג פריטים מקושרים">
+                                                            <span class="action-icon">🔗</span>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-secondary" onclick="editTrade(3)"
+                                                            title="ערוך טרייד">
+                                                            <span class="action-icon">✏️</span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr data-status="canceled" data-type="buy">
+                                                    <td data-field="account_name">חשבון 3</td>
+                                                    <td data-field="symbol">GOOGL</td>
+                                                    <td data-field="type">קנייה</td>
+                                                    <td data-field="quantity">25</td>
+                                                    <td data-field="price">$140.00</td>
+                                                    <td data-field="status">בוטל</td>
+                                                    <td data-field="created_at">2025-08-23</td>
+                                                    <td class="actions-cell">
+                                                        <button class="btn btn-sm btn-primary"
+                                                            onclick="showLinkedItems('trade', 4)"
+                                                            title="הצג פריטים מקושרים">
+                                                            <span class="action-icon">🔗</span>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-secondary" onclick="editTrade(4)"
+                                                            title="ערוך טרייד">
+                                                            <span class="action-icon">✏️</span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr data-status="closed" data-type="sell">
+                                                    <td data-field="account_name">חשבון 2</td>
+                                                    <td data-field="symbol">AMZN</td>
+                                                    <td data-field="type">מכירה</td>
+                                                    <td data-field="quantity">30</td>
+                                                    <td data-field="price">$180.25</td>
+                                                    <td data-field="status">סגור</td>
+                                                    <td data-field="created_at">2025-08-22</td>
+                                                    <td class="actions-cell">
+                                                        <button class="btn btn-sm btn-primary"
+                                                            onclick="showLinkedItems('trade', 5)"
+                                                            title="הצג פריטים מקושרים">
+                                                            <span class="action-icon">🔗</span>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-secondary" onclick="editTrade(5)"
+                                                            title="ערוך טרייד">
+                                                            <span class="action-icon">✏️</span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Alerts Table Test Section -->
+                            <div class="style-section">
+                                <h3 class="style-section-title">טבלת התראות לדוגמה</h3>
+                                <div class="style-examples">
+                                    <div class="table-responsive">
+                                        <table class="table" data-table-type="alerts">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <button class="btn btn-link sortable-header"
+                                                            onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }"
+                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            טיקר <span class="sort-icon">↕</span>
+                                                        </button>
+                                                    </th>
+                                                    <th>
+                                                        <button class="btn btn-link sortable-header"
+                                                            onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }"
+                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            תנאי <span class="sort-icon">↕</span>
+                                                        </button>
+                                                    </th>
+                                                    <th>
+                                                        <button class="btn btn-link sortable-header"
+                                                            onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }"
+                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            סטטוס <span class="sort-icon">↕</span>
+                                                        </button>
+                                                    </th>
+                                                    <th>
+                                                        <button class="btn btn-link sortable-header"
+                                                            onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }"
+                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            הופעל <span class="sort-icon">↕</span>
+                                                        </button>
+                                                    </th>
+                                                    <th>
+                                                        <button class="btn btn-link sortable-header"
+                                                            onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }"
+                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            קשור ל: <span class="sort-icon">↕</span>
+                                                        </button>
+                                                    </th>
+                                                    <th>
+                                                        <button class="btn btn-link sortable-header"
+                                                            onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }"
+                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            הודעה <span class="sort-icon">↕</span>
+                                                        </button>
+                                                    </th>
+                                                    <th>
+                                                        <button class="btn btn-link sortable-header"
+                                                            onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); }"
+                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            נוצר ב: <span class="sort-icon">↕</span>
+                                                        </button>
+                                                    </th>
+                                                    <th class="actions-cell">
+                                                        פעולות
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr data-status="active" data-type="price">
+                                                    <td data-field="symbol">AAPL</td>
+                                                    <td data-field="condition">מחיר > $150</td>
+                                                    <td data-field="status">פעיל</td>
+                                                    <td data-field="triggered_at">2025-08-26 10:30</td>
+                                                    <td data-field="related_object">טרייד #1</td>
+                                                    <td data-field="message">המחיר עלה מעל $150</td>
+                                                    <td data-field="created_at">2025-08-25</td>
+                                                    <td class="actions-cell">
+                                                        <button class="btn btn-sm btn-primary"
+                                                            onclick="showLinkedItems('alert', 1)"
+                                                            title="הצג פריטים מקושרים">
+                                                            <span class="action-icon">🔗</span>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-secondary" onclick="editAlert(1)"
+                                                            title="ערוך התראה">
+                                                            <span class="action-icon">✏️</span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr data-status="triggered" data-type="volume">
+                                                    <td data-field="symbol">TSLA</td>
+                                                    <td data-field="condition">נפח > 1M</td>
+                                                    <td data-field="status">הופעל</td>
+                                                    <td data-field="triggered_at">2025-08-25 15:45</td>
+                                                    <td data-field="related_object">טרייד #2</td>
+                                                    <td data-field="message">נפח המסחר עלה מעל מיליון</td>
+                                                    <td data-field="created_at">2025-08-24</td>
+                                                    <td class="actions-cell">
+                                                        <button class="btn btn-sm btn-primary"
+                                                            onclick="showLinkedItems('alert', 2)"
+                                                            title="הצג פריטים מקושרים">
+                                                            <span class="action-icon">🔗</span>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-secondary" onclick="editAlert(2)"
+                                                            title="ערוך התראה">
+                                                            <span class="action-icon">✏️</span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr data-status="active" data-type="price">
+                                                    <td data-field="symbol">MSFT</td>
+                                                    <td data-field="condition">מחיר < $320</td>
+                                                    <td data-field="status">פעיל</td>
+                                                    <td data-field="triggered_at">-</td>
+                                                    <td data-field="related_object">טרייד #3</td>
+                                                    <td data-field="message">המחיר ירד מתחת ל-$320</td>
+                                                    <td data-field="created_at">2025-08-23</td>
+                                                    <td class="actions-cell">
+                                                        <button class="btn btn-sm btn-primary"
+                                                            onclick="showLinkedItems('alert', 3)"
+                                                            title="הצג פריטים מקושרים">
+                                                            <span class="action-icon">🔗</span>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-secondary" onclick="editAlert(3)"
+                                                            title="ערוך התראה">
+                                                            <span class="action-icon">✏️</span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr data-status="inactive" data-type="price">
+                                                    <td data-field="symbol">GOOGL</td>
+                                                    <td data-field="condition">מחיר > $140</td>
+                                                    <td data-field="status">לא פעיל</td>
+                                                    <td data-field="triggered_at">-</td>
+                                                    <td data-field="related_object">טרייד #4</td>
+                                                    <td data-field="message">המחיר עלה מעל $140</td>
+                                                    <td data-field="created_at">2025-08-22</td>
+                                                    <td class="actions-cell">
+                                                        <button class="btn btn-sm btn-primary"
+                                                            onclick="showLinkedItems('alert', 4)"
+                                                            title="הצג פריטים מקושרים">
+                                                            <span class="action-icon">🔗</span>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-secondary" onclick="editAlert(4)"
+                                                            title="ערוך התראה">
+                                                            <span class="action-icon">✏️</span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Styles Test Section 2 -->
+                <div class="content-section styles-test-page" id="stylesTestSection2">
+                    <!-- Styles Test header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/home.svg" alt="סגנונות"
+                                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                            עצירת סגנונות
+                        </div>
+                        <div class="table-count">ניהול קבצי CSS</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleMainSection2()"
+                                title="הצג/הסתר אזור בדיקה">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Styles Test body -->
+                    <div class="section-body">
+                        <div class="styles-test-container">
+                            <!-- תוכן יוכנס כאן בהמשך -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Typography Section -->
+                <div class="content-section styles-test-page" id="typographySection">
+                    <!-- Typography header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/home.svg" alt="טיפוגרפיה"
+                                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                            טיפוגרפיה - Typography
+                        </div>
+                        <div class="table-count">כותרות וטקסט</div>
+                        <div class="table-actions">
+                            <button class="filter-toggle-btn" onclick="toggleTypographySection()"
+                                title="הצג/הסתר סקשן טיפוגרפיה">
+                                <span class="filter-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Typography body -->
+                    <div class="section-body">
+                        <div class="styles-test-container">
+                            <div class="style-section">
+                                <div class="style-examples">
+                                    <h1>כותרת ראשית H1</h1>
+                                    <h2>כותרת משנה H2</h2>
+                                    <h3>כותרת שלישית H3</h3>
+                                    <h4>כותרת רביעית H4</h4>
+                                    <h5>כותרת חמישית H5</h5>
+                                    <h6>כותרת שישית H6</h6>
+                                    <p>פסקה רגילה עם טקסט בעברית. זהו טקסט לדוגמה שמציג כיצד נראה טקסט רגיל במערכת.</p>
+                                    <p class="text-muted">טקסט מושתק (muted) - זהו טקסט עם צבע מושתק יותר.</p>
+                                    <p class="text-primary">טקסט ראשי (primary) - זהו טקסט עם צבע ראשי.</p>
+                                    <p class="text-success">טקסט הצלחה (success) - זהו טקסט עם צבע הצלחה.</p>
+                                    <p class="text-warning">טקסט אזהרה (warning) - זהו טקסט עם צבע אזהרה.</p>
+                                    <p class="text-danger">טקסט שגיאה (danger) - זהו טקסט עם צבע שגיאה.</p>
+                                    <p class="text-info">טקסט מידע (info) - זהו טקסט עם צבע מידע.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+            </div>
+
+            <!-- Styles Test Section 3 -->
+            <div class="content-section styles-test-page" id="stylesTestSection3">
+                <!-- Styles Test header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/home.svg" alt="סגנונות"
+                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                        כפתורים
+                    </div>
+                    <div class="table-count">כפתורים שונים</div>
+                    <div class="table-actions">
+                        <button class="filter-toggle-btn" onclick="toggleMainSection3()" title="הצג/הסתר אזור בדיקה">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Styles Test body -->
+                <div class="section-body">
+                    <div class="styles-test-container">
+                        <!-- Buttons Section -->
+                        <div class="style-section">
+                            <h3 class="style-section-title">כפתורים</h3>
+                            <div class="style-examples">
+                                <h4>כפתורי ברירת מחדל</h4>
+                                <div class="button-group">
+                                    <button class="btn btn-primary">כפתור ראשי</button>
+                                    <button class="btn btn-secondary">כפתור משני</button>
+                                    <button class="btn btn-success">כפתור הצלחה</button>
+                                    <button class="btn btn-warning">כפתור אזהרה</button>
+                                    <button class="btn btn-danger">כפתור שגיאה</button>
+                                    <button class="btn btn-info">כפתור מידע</button>
+                                </div>
+                                <div class="button-group">
+                                    <button class="btn btn-outline-primary">כפתור ראשי (outline)</button>
+                                    <button class="btn btn-outline-secondary">כפתור משני (outline)</button>
+                                    <button class="btn btn-outline-success">כפתור הצלחה (outline)</button>
+                                    <button class="btn btn-outline-warning">כפתור אזהרה (outline)</button>
+                                    <button class="btn btn-outline-danger">כפתור שגיאה (outline)</button>
+                                    <button class="btn btn-outline-info">כפתור מידע (outline)</button>
+                                </div>
+                                <div class="button-group">
+                                    <button class="btn btn-sm btn-primary">כפתור קטן</button>
+                                    <button class="btn btn-primary">כפתור רגיל</button>
+                                    <button class="btn btn-lg btn-primary">כפתור גדול</button>
+                                </div>
+                                <div class="button-group">
+                                    <button class="btn btn-primary" disabled>כפתור מושבת</button>
+                                    <button class="btn btn-secondary" disabled>כפתור מושבת</button>
+                                </div>
+                                <div class="button-group">
+                                    <button class="filter-toggle-btn">▲ הצג/הסתר</button>
+                                    <button class="button-primary">כפתור ראשי מותאם</button>
+                                    <button class="button-secondary">כפתור משני מותאם</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Styles Test Section 4 -->
+            <div class="content-section styles-test-page" id="stylesTestSection4">
+                <!-- Styles Test header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/home.svg" alt="סגנונות"
+                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                        טבלאות וטפסים
+                    </div>
+                    <div class="table-count">טפסים וטבלאות</div>
+                    <div class="table-actions">
+                        <button class="filter-toggle-btn" onclick="toggleMainSection4()" title="הצג/הסתר אזור בדיקה">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Styles Test body -->
+                <div class="section-body">
+                    <div class="styles-test-container">
+                        <!-- Forms and Tables Section -->
+                        <div class="style-section">
+                            <h3 class="style-section-title">טבלאות וטפסים</h3>
+                            <div class="style-examples">
+                                <h4>טפסים</h4>
+                                <form class="test-form">
+                                    <div class="mb-3">
+                                        <label for="testInput1" class="form-label">שדה טקסט רגיל</label>
+                                        <input type="text" class="form-control" id="testInput1"
+                                            placeholder="הכנס טקסט כאן">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="testInput2" class="form-label">שדה טקסט עם ערך</label>
+                                        <input type="text" class="form-control" id="testInput2" value="ערך לדוגמה">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="testSelect" class="form-label">רשימה נפתחת</label>
+                                        <select class="form-select" id="testSelect">
+                                            <option>בחר אפשרות</option>
+                                            <option value="1">אפשרות 1</option>
+                                            <option value="2">אפשרות 2</option>
+                                            <option value="3">אפשרות 3</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="testTextarea" class="form-label">אזור טקסט</label>
+                                        <textarea class="form-control" id="testTextarea" rows="3"
+                                            placeholder="הכנס טקסט ארוך כאן"></textarea>
+                                    </div>
+                                    <div class="mb-3 form-check">
+                                        <input type="checkbox" class="form-check-input" id="testCheckbox">
+                                        <label class="form-check-label" for="testCheckbox">תיבת סימון</label>
+                                    </div>
+                                    <div class="mb-3 form-check">
+                                        <input type="radio" class="form-check-input" id="testRadio1" name="testRadio">
+                                        <label class="form-check-label" for="testRadio1">כפתור רדיו 1</label>
+                                    </div>
+                                    <div class="mb-3 form-check">
+                                        <input type="radio" class="form-check-input" id="testRadio2" name="testRadio">
+                                        <label class="form-check-label" for="testRadio2">כפתור רדיו 2</label>
+                                    </div>
+                                </form>
+
+                                <h4>טבלאות</h4>
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>עמודה 1</th>
+                                                <th>עמודה 2</th>
+                                                <th>עמודה 3</th>
+                                                <th>עמודה 4</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>תא 1-1</td>
+                                                <td>תא 1-2</td>
+                                                <td>תא 1-3</td>
+                                                <td>תא 1-4</td>
+                                            </tr>
+                                            <tr>
+                                                <td>תא 2-1</td>
+                                                <td>תא 2-2</td>
+                                                <td>תא 2-3</td>
+                                                <td>תא 2-4</td>
+                                            </tr>
+                                            <tr>
+                                                <td>תא 3-1</td>
+                                                <td>תא 3-2</td>
+                                                <td>תא 3-3</td>
+                                                <td>תא 3-4</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>עמודה 1</th>
+                                                <th>עמודה 2</th>
+                                                <th>עמודה 3</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>טבלה עם פסים</td>
+                                                <td>שורה 1</td>
+                                                <td>תא נוסף</td>
+                                            </tr>
+                                            <tr>
+                                                <td>טבלה עם פסים</td>
+                                                <td>שורה 2</td>
+                                                <td>תא נוסף</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Styles Test Section 5 -->
+            <div class="content-section styles-test-page" id="stylesTestSection5">
+                <!-- Styles Test header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/home.svg" alt="סגנונות"
+                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                        תגיות, פסי התקדמות וספינרים
+                    </div>
+                    <div class="table-count">אלמנטים נוספים</div>
+                    <div class="table-actions">
+                        <button class="filter-toggle-btn" onclick="toggleMainSection5()" title="הצג/הסתר אזור בדיקה">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Styles Test body -->
+                <div class="section-body">
+                    <div class="styles-test-container">
+                        <!-- Badges Section -->
+                        <div class="style-section">
+                            <h3 class="style-section-title">תגיות - Badges</h3>
+                            <div class="style-examples">
+                                <div class="badge-group">
+                                    <span class="badge bg-primary">ראשי</span>
+                                    <span class="badge bg-secondary">משני</span>
+                                    <span class="badge bg-success">הצלחה</span>
+                                    <span class="badge bg-warning">אזהרה</span>
+                                    <span class="badge bg-danger">שגיאה</span>
+                                    <span class="badge bg-info">מידע</span>
+                                </div>
+                                <div class="badge-group">
+                                    <span class="badge rounded-pill bg-primary">ראשי (עגול)</span>
+                                    <span class="badge rounded-pill bg-secondary">משני (עגול)</span>
+                                    <span class="badge rounded-pill bg-success">הצלחה (עגול)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Section -->
+                        <div class="style-section">
+                            <h3 class="style-section-title">פסי התקדמות - Progress</h3>
+                            <div class="style-examples">
+                                <div class="progress mb-3">
+                                    <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25"
+                                        aria-valuemin="0" aria-valuemax="100">25%</div>
+                                </div>
+                                <div class="progress mb-3">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 50%"
+                                        aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
+                                </div>
+                                <div class="progress mb-3">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 75%"
+                                        aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75%</div>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 100%"
+                                        aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Spinners Section -->
+                        <div class="style-section">
+                            <h3 class="style-section-title">ספינרים - Spinners</h3>
+                            <div class="style-examples">
+                                <div class="spinner-group">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">טוען...</span>
+                                    </div>
+                                    <div class="spinner-border text-secondary" role="status">
+                                        <span class="visually-hidden">טוען...</span>
+                                    </div>
+                                    <div class="spinner-border text-success" role="status">
+                                        <span class="visually-hidden">טוען...</span>
+                                    </div>
+                                    <div class="spinner-border text-warning" role="status">
+                                        <span class="visually-hidden">טוען...</span>
+                                    </div>
+                                    <div class="spinner-border text-danger" role="status">
+                                        <span class="visually-hidden">טוען...</span>
+                                    </div>
+                                    <div class="spinner-border text-info" role="status">
+                                        <span class="visually-hidden">טוען...</span>
+                                    </div>
+                                </div>
+                                <div class="spinner-group">
+                                    <div class="spinner-grow text-primary" role="status">
+                                        <span class="visually-hidden">טוען...</span>
+                                    </div>
+                                    <div class="spinner-grow text-secondary" role="status">
+                                        <span class="visually-hidden">טוען...</span>
+                                    </div>
+                                    <div class="spinner-grow text-success" role="status">
+                                        <span class="visually-hidden">טוען...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Styles Test Section 6 -->
+            <div class="content-section styles-test-page" id="stylesTestSection6">
+                <!-- Styles Test header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/home.svg" alt="סגנונות"
+                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                        התראות וכרטיסיות
+                    </div>
+                    <div class="table-count">התראות וכרטיסיות</div>
+                    <div class="table-actions">
+                        <button class="filter-toggle-btn" onclick="toggleMainSection6()" title="הצג/הסתר אזור בדיקה">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Styles Test body -->
+                <div class="section-body">
+                    <div class="styles-test-container">
+                        <!-- Alerts Section -->
+                        <div class="style-section">
+                            <h3 class="style-section-title">התראות - Alerts</h3>
+                            <div class="style-examples">
+                                <div class="alert alert-primary" role="alert">
+                                    זו התראה ראשית (primary) עם <a href="#" class="alert-link">קישור</a>.
+                                </div>
+                                <div class="alert alert-secondary" role="alert">
+                                    זו התראה משנית (secondary) עם <a href="#" class="alert-link">קישור</a>.
+                                </div>
+                                <div class="alert alert-success" role="alert">
+                                    זו התראה הצלחה (success) עם <a href="#" class="alert-link">קישור</a>.
+                                </div>
+                                <div class="alert alert-warning" role="alert">
+                                    זו התראה אזהרה (warning) עם <a href="#" class="alert-link">קישור</a>.
+                                </div>
+                                <div class="alert alert-danger" role="alert">
+                                    זו התראה שגיאה (danger) עם <a href="#" class="alert-link">קישור</a>.
+                                </div>
+                                <div class="alert alert-info" role="alert">
+                                    זו התראה מידע (info) עם <a href="#" class="alert-link">קישור</a>.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cards Section -->
+                        <div class="style-section">
+                            <h3 class="style-section-title">כרטיסיות - Cards</h3>
+                            <div class="style-examples">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                כותרת כרטיסיה
+                                            </div>
+                                            <div class="card-body">
+                                                <h5 class="card-title">כותרת כרטיסיה</h5>
+                                                <p class="card-text">זהו תוכן הכרטיסיה עם טקסט לדוגמה.</p>
+                                                <button class="btn btn-primary">כפתור</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h5 class="card-title">כרטיסיה ללא כותרת</h5>
+                                                <p class="card-text">כרטיסיה פשוטה ללא כותרת עליונה.</p>
+                                                <button class="btn btn-secondary">כפתור</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <h5 class="card-title">כרטיסיה ממורכזת</h5>
+                                                <p class="card-text">כרטיסיה עם תוכן ממורכז.</p>
+                                                <button class="btn btn-success">כפתור</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Styles Test Section 8 -->
+            <div class="content-section styles-test-page" id="stylesTestSection8">
+                <!-- Styles Test header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/home.svg" alt="הגדרות"
+                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                        מפת שיוכים - עמודים לקבצים
+                    </div>
+                    <div class="table-count">בקרת קבצי CSS</div>
+                    <div class="table-actions">
+                        <button class="filter-toggle-btn" onclick="toggleMainSection8()" title="הצג/הסתר אזור בדיקה">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Styles Test body -->
+                <div class="section-body">
+                    <div class="styles-test-container">
+                        <div class="css-controls-table-container">
+                            <table class="css-controls-table">
+                                <tbody>
+                                    <tr>
+                                        <td class="page-name">עמוד</td>
+                                        <td class="css-cell"><span class="css-used">Apple Theme</span></td>
+                                        <td class="css-cell"><span class="css-used">Bootstrap</span></td>
+                                        <td class="css-cell"><span class="css-used">General</span></td>
+                                        <td class="css-cell"><span class="css-used">Typography</span></td>
+                                        <td class="css-cell"><span class="css-used">Table</span></td>
+                                        <td class="css-cell"><span class="css-used">Header</span></td>
+                                        <td class="css-cell"><span class="css-used">Styles</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="page-name">בית</td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="page-name">תכנון</td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="page-name">מעקב</td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="page-name">מחקר</td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="page-name">התראות</td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="page-name">עסקעות</td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="page-name">טיקרים</td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="page-name">חשבונות</td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="page-name">תזרימי מזומנים</td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="page-name">הערות</td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="page-name">העדפות</td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="page-name">בסיס נתונים</td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="page-name">טבלאות עזר</td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="page-name">אילוצים</td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="page-name">מפת JS</td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="page-name">הדגמת סגנונות</td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                        <td class="css-cell"><span class="css-used">✓</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Styles Test Section 9 -->
+            <div class="content-section styles-test-page" id="stylesTestSection9">
+                <!-- Styles Test header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/home.svg" alt="סגנונות"
+                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                        בדיקת סגנונות - סקשן 9
+                    </div>
+                    <div class="table-count">מגוון אלמנטים לבדיקה</div>
+                    <div class="table-actions">
+                        <button class="filter-toggle-btn" onclick="toggleMainSection9()" title="הצג/הסתר אזור בדיקה">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Styles Test body -->
+                <div class="section-body">
+                    <div class="styles-test-container">
+                        <!-- תוכן יוכנס כאן בהמשך -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Styles Test Section 10 -->
+            <div class="content-section styles-test-page" id="stylesTestSection10">
+                <!-- Styles Test header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/home.svg" alt="סגנונות"
+                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                        בדיקת סגנונות - סקשן 10
+                    </div>
+                    <div class="table-count">מגוון אלמנטים לבדיקה</div>
+                    <div class="table-actions">
+                        <button class="filter-toggle-btn" onclick="toggleMainSection10()" title="הצג/הסתר אזור בדיקה">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Styles Test body -->
+                <div class="section-body">
+                    <div class="styles-test-container">
+                        <!-- תוכן יוכנס כאן בהמשך -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <style>
+        /* Styles Test Page Specific Styles */
+        .styles-test-page {
+            background: var(--background-color);
+        }
+
+        .styles-test-container {
+            padding: 20px;
+        }
+
+        .style-section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .style-section-title {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .style-section-title::before {
+            content: "🎨";
+            font-size: 1.2em;
+        }
+
+        .style-examples {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Button Groups */
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            padding: 15px;
+            background: var(--surface-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .button-group .btn {
+            margin: 0;
+        }
+
+        /* Badge Groups */
+        .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            padding: 15px;
+            background: var(--surface-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Spinner Groups */
+        .spinner-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            padding: 15px;
+            background: var(--surface-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Test Form */
+        .test-form {
+            max-width: 600px;
+            padding: 20px;
+            background: var(--surface-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* CSS Controls Table - Fixed Checkbox Layout */
+        .css-controls-table-container {
+            padding: 15px;
+            background: var(--surface-color);
+            border-radius: 12px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .css-controls-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            background: var(--background-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .css-controls-table th,
+        .css-controls-table td {
+            padding: 8px 12px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .css-controls-table th {
+            background: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+            position: relative;
+            padding-top: 30px;
+        }
+
+        .css-controls-table th:first-child {
+            text-align: right;
+            min-width: 80px;
+            padding-top: 8px;
+        }
+
+        .page-name-header {
+            background: var(--secondary-color, #6c757d) !important;
+        }
+
+        .css-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            min-width: 80px;
+            position: relative;
+        }
+
+        .css-header input[type="checkbox"] {
+            position: absolute;
+            top: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            margin: 0;
+            z-index: 1;
+        }
+
+        .css-name {
+            font-size: 0.75rem;
+            font-weight: 500;
+            line-height: 1.2;
+            margin-top: 8px;
+        }
+
+        .page-name {
+            font-weight: 600;
+            text-align: right;
+            background: var(--surface-color);
+        }
+
+        .css-cell {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .css-used {
+            color: var(--success-color, #28a745);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .css-not-used {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .style-section {
+                padding: 20px;
+                margin-bottom: 30px;
+            }
+
+            .button-group,
+            .badge-group {
+                justify-content: center;
+            }
+
+            .spinner-group {
+                justify-content: center;
+            }
+
+            .test-form {
+                max-width: 100%;
+            }
+
+            .css-controls-table-container {
+                padding: 10px;
+                margin: 15px 0;
+            }
+
+            .css-controls-table {
+                font-size: 0.8rem;
+            }
+
+            .css-controls-table th,
+            .css-controls-table td {
+                padding: 6px 8px;
+            }
+
+            .css-name {
+                font-size: 0.7rem;
+            }
+
+            .css-header {
+                min-width: 60px;
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            .style-section {
+                background: var(--background-color-dark, #1a1a1a);
+                border-color: var(--border-color-dark, #404040);
+            }
+
+            .button-group,
+            .badge-group,
+            .spinner-group,
+            .test-form {
+                background: var(--surface-color-dark, #2a2a2a);
+                border-color: var(--border-color-dark, #404040);
+            }
+
+            .css-controls-table {
+                background: var(--background-color-dark, #1a1a1a);
+            }
+
+            .css-controls-table th,
+            .css-controls-table td {
+                border-color: var(--border-color-dark, #404040);
+            }
+
+            .page-name {
+                background: var(--surface-color-dark, #2a2a2a);
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .style-section {
+                break-inside: avoid;
+                margin-bottom: 20px;
+            }
+
+            .button-group,
+            .badge-group,
+            .spinner-group {
+                break-inside: avoid;
+            }
+
+            .css-controls-table-container,
+            .button-group,
+            .badge-group,
+            .spinner-group {
+                display: none;
+            }
+        }
+    </style>
+
+    <script>
+        // CSS Control Functions
+        function toggleCSS(filename, enabled) {
+            const linkElement = document.querySelector(`link[href="styles/${filename}"]`);
+            if (linkElement) {
+                linkElement.disabled = !enabled;
+                console.log(`🔄 ${filename} ${enabled ? 'enabled' : 'disabled'}`);
+            }
+        }
+
+        function toggleBootstrap(enabled) {
+            const linkElement = document.querySelector('link[href*="bootstrap"]');
+            if (linkElement) {
+                linkElement.disabled = !enabled;
+                console.log(`🔄 Bootstrap CSS ${enabled ? 'enabled' : 'disabled'}`);
+            }
+        }
+
+        function toggleAllCSS() {
+            const checkboxes = document.querySelectorAll('.css-header input[type="checkbox"]');
+            const allEnabled = Array.from(checkboxes).every(cb => cb.checked);
+
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = !allEnabled;
+                if (checkbox.id === 'bootstrapCSS') {
+                    toggleBootstrap(!allEnabled);
+                } else {
+                    const filename = checkbox.id.replace('CSS', '').replace(/([A-Z])/g, '-$1').toLowerCase() + '.css';
+                    toggleCSS(filename, !allEnabled);
+                }
+            });
+        }
+
+        function refreshStylesTest() {
+            console.log('🔄 Refreshing styles page');
+            location.reload();
+        }
+
+        function refreshStylesTest2() {
+            console.log('🔄 Refreshing styles section 2');
+            location.reload();
+        }
+
+        function refreshStylesTest3() {
+            console.log('🔄 Refreshing styles section 3');
+            location.reload();
+        }
+
+        function refreshStylesTest4() {
+            console.log('🔄 Refreshing styles section 4');
+            location.reload();
+        }
+
+        function refreshStylesTest5() {
+            console.log('🔄 Refreshing styles section 5');
+            location.reload();
+        }
+
+        function refreshStylesTest6() {
+            console.log('🔄 Refreshing styles section 6');
+            location.reload();
+        }
+
+        function refreshStylesTest7() {
+            console.log('🔄 Refreshing styles section 7');
+            location.reload();
+        }
+
+        function refreshStylesTest8() {
+            console.log('🔄 Refreshing styles section 8');
+            location.reload();
+        }
+
+        function refreshStylesTest9() {
+            console.log('🔄 Refreshing styles section 9');
+            location.reload();
+        }
+
+        function refreshStylesTest10() {
+            console.log('🔄 Refreshing styles section 10');
+            location.reload();
+        }
+
+        function toggleMainSection2() {
+            const section = document.getElementById('stylesTestSection2');
+            const toggleBtn = section.querySelector('button[onclick="toggleMainSection2()"]');
+            const icon = toggleBtn.querySelector('.filter-icon');
+            const body = section.querySelector('.section-body');
+
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                icon.textContent = '▲';
+            } else {
+                body.style.display = 'none';
+                icon.textContent = '▼';
+            }
+        }
+
+        function toggleMainSection3() {
+            const section = document.getElementById('stylesTestSection3');
+            const toggleBtn = section.querySelector('button[onclick="toggleMainSection3()"]');
+            const icon = toggleBtn.querySelector('.filter-icon');
+            const body = section.querySelector('.section-body');
+
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                icon.textContent = '▲';
+            } else {
+                body.style.display = 'none';
+                icon.textContent = '▼';
+            }
+        }
+
+        function toggleMainSection4() {
+            const section = document.getElementById('stylesTestSection4');
+            const toggleBtn = section.querySelector('button[onclick="toggleMainSection4()"]');
+            const icon = toggleBtn.querySelector('.filter-icon');
+            const body = section.querySelector('.section-body');
+
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                icon.textContent = '▲';
+            } else {
+                body.style.display = 'none';
+                icon.textContent = '▼';
+            }
+        }
+
+        function toggleMainSection5() {
+            const section = document.getElementById('stylesTestSection5');
+            const toggleBtn = section.querySelector('button[onclick="toggleMainSection5()"]');
+            const icon = toggleBtn.querySelector('.filter-icon');
+            const body = section.querySelector('.section-body');
+
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                icon.textContent = '▲';
+            } else {
+                body.style.display = 'none';
+                icon.textContent = '▼';
+            }
+        }
+
+        function toggleMainSection6() {
+            const section = document.getElementById('stylesTestSection6');
+            const toggleBtn = section.querySelector('button[onclick="toggleMainSection6()"]');
+            const icon = toggleBtn.querySelector('.filter-icon');
+            const body = section.querySelector('.section-body');
+
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                icon.textContent = '▲';
+            } else {
+                body.style.display = 'none';
+                icon.textContent = '▼';
+            }
+        }
+
+        function toggleMainSection7() {
+            const section = document.getElementById('stylesTestSection7');
+            const toggleBtn = section.querySelector('button[onclick="toggleMainSection7()"]');
+            const icon = toggleBtn.querySelector('.filter-icon');
+            const body = section.querySelector('.section-body');
+
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                icon.textContent = '▲';
+            } else {
+                body.style.display = 'none';
+                icon.textContent = '▼';
+            }
+        }
+
+        function toggleMainSection8() {
+            const section = document.getElementById('stylesTestSection8');
+            const toggleBtn = section.querySelector('button[onclick="toggleMainSection8()"]');
+            const icon = toggleBtn.querySelector('.filter-icon');
+            const body = section.querySelector('.section-body');
+
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                icon.textContent = '▲';
+            } else {
+                body.style.display = 'none';
+                icon.textContent = '▼';
+            }
+        }
+
+        function toggleMainSection9() {
+            const section = document.getElementById('stylesTestSection9');
+            const toggleBtn = section.querySelector('button[onclick="toggleMainSection9()"]');
+            const icon = toggleBtn.querySelector('.filter-icon');
+            const body = section.querySelector('.section-body');
+
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                icon.textContent = '▲';
+            } else {
+                body.style.display = 'none';
+                icon.textContent = '▼';
+            }
+        }
+
+        function toggleMainSection10() {
+            const section = document.getElementById('stylesTestSection10');
+            const toggleBtn = section.querySelector('button[onclick="toggleMainSection10()"]');
+            const icon = toggleBtn.querySelector('.filter-icon');
+            const body = section.querySelector('.section-body');
+
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                icon.textContent = '▲';
+            } else {
+                body.style.display = 'none';
+                icon.textContent = '▼';
+            }
+        }
+
+        function refreshTradesTable() {
+            console.log('🔄 Refreshing trades table');
+            // כאן אפשר להוסיף לוגיקה לרענון הטבלה
+        }
+
+        function refreshAlertsTable() {
+            console.log('🔄 Refreshing alerts table');
+            // כאן אפשר להוסיף לוגיקה לרענון הטבלה
+        }
+
+        function toggleTradesTableSection() {
+            const section = document.getElementById('tradesTableTestSection');
+            const toggleBtn = section.querySelector('button[onclick="toggleTradesTableSection()"]');
+            const icon = toggleBtn.querySelector('.filter-icon');
+            const body = section.querySelector('.section-body');
+
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                icon.textContent = '▲';
+            } else {
+                body.style.display = 'none';
+                icon.textContent = '▼';
+            }
+        }
+
+        function toggleAlertsTableSection() {
+            const section = document.getElementById('alertsTableTestSection');
+            const toggleBtn = section.querySelector('button[onclick="toggleAlertsTableSection()"]');
+            const icon = toggleBtn.querySelector('.filter-icon');
+            const body = section.querySelector('.section-body');
+
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                icon.textContent = '▲';
+            } else {
+                body.style.display = 'none';
+                icon.textContent = '▼';
+            }
+        }
+
+        function showLinkedItems(type, id) {
+            console.log(`🔄 Showing linked items for ${type} #${id}`);
+            if (typeof window.showLinkedItems === 'function') {
+                window.showLinkedItems(type, id);
+            } else {
+                alert(`הצגת פריטים מקושרים ל-${type} #${id}`);
+            }
+        }
+
+        function editTrade(id) {
+            console.log(`🔄 Editing trade #${id}`);
+            alert(`עריכת טרייד #${id}`);
+        }
+
+        function editAlert(id) {
+            console.log(`🔄 Editing alert #${id}`);
+            alert(`עריכת התראה #${id}`);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('🔄 Styles page loaded');
+
+            // Restore section states
+            if (typeof window.restoreAllSectionStates === 'function') {
+                window.restoreAllSectionStates();
+            }
+        });
+    </script>
+
+</body>
+
+</html>

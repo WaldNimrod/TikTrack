@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<!--
+  ========================================
+  דף התכנון - Planning Page
+  ========================================
+  
+  דף זה מציג את כל תכנוני הטרייד במערכת
+  כולל טבלה עם מיון ופילטרים, הוספה ועריכה
+  
+  תכונות:
+  - טבלת תכנונים עם מיון ופילטרים
+  - הוספת תכנון חדש עם ולידציה מלאה
+  - עריכת תכנון קיים עם ולידציה בזמן אמת
+  - ביטול תכנון עם בדיקת פריטים מקושרים
+  - מחיקת תכנון עם אישור
+  - מערכת התראות גלובלית
+  - שינוי טיקר (כרגע מוגבל - פיצ'ר בפיתוח)
+  
+  תיקונים אחרונים (31 באוגוסט 2025):
+  - תיקון ולידציה להוספה - הסרת כפילות הודעות שגיאה
+  - תיקון שינוי טיקר - אישור מידי עם דחיית שינוי
+  - תיקון ביטול תכנון - הסרת כפילות חלונות אישור
+  - תיקון שגיאות שרת - הפעלה מחדש וניקוי קבצי נעילה
+  - שימוש במערכת ולידציה גלובלית
+  - שימוש במערכת התראות גלובלית
+  
+  מחבר: Tik.track Development Team
+  תאריך עדכון אחרון: 31 באוגוסט 2025
+  סטטוס: ✅ הושלם - סבב ב
+  ========================================
+-->
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>תכנון טריידים והשקעות - Tik.track</title>
+
+  <!-- 
+    ===== דף תכנון טריידים - TikTrack =====
+    
+    דף זה מכיל:
+    1. טבלת תכנונים (עיצובים) - הסקשן הראשון
+    2. טבלת חשבונות - הסקשן השני (נוסף לאחרונה)
+    3. כרטיסיות התראות - בחלק העליון
+    4. מערכת פילטרים ומיון מתקדמת
+    
+    מבנה הדף:
+    - unified-header: כותרת האפליקציה החדשה עם ניווט ופילטרים מאוחדים
+    - page-body: תוכן ראשי מוגבל ברוחב (1400px)
+      - top-section: כרטיסיות התראות וסיכום נתונים
+      - content-section (1): טבלת תכנונים
+      - content-section (2): טבלת חשבונות
+    
+    שינויים אחרונים (31 באוגוסט 2025):
+    - תיקון ולידציה להוספה - הסרת כפילות הודעות שגיאה
+    - תיקון שינוי טיקר - אישור מידי עם דחיית שינוי
+    - תיקון ביטול תכנון - הסרת כפילות חלונות אישור
+    - תיקון שגיאות שרת - הפעלה מחדש וניקוי קבצי נעילה
+    - שימוש במערכת ולידציה גלובלית
+    - שימוש במערכת התראות גלובלית
+    - החלפת app-header במערכת header-system החדשה
+    - העתקת תוכן מדף עיצובים לדף תכנון טריידים
+    - הוספת טבלת חשבונות מלאים
+    - שיפור עיצוב כרטיסיות התראות
+    - תיקון כפתורי סגירה עצמאיים
+    - ריכוז פונקציות חשבונות ב-accounts.js?v=20250830_1
+  -->
+
+  <!-- CSS Files - Ordered by priority (weak to strong) -->
+  <!-- 1. Apple theme (base) -->
+  <link rel="stylesheet" href="styles/apple-theme.css">
+
+  <!-- 2. Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- 3. General styles -->
+  <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/header-system.css">
+  <!-- 4. Typography -->
+  <link rel="stylesheet" href="styles/typography.css">
+
+  <!-- 5. Table styles -->
+  <link rel="stylesheet" href="styles/table.css">
+
+  <!-- 6. Notification system styles -->
+  <link rel="stylesheet" href="styles/notification-system.css">
+
+  <!-- 7. Header system styles (highest priority) -->
+
+  <!-- Bootstrap JS - חייב להיות ראשון -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Modular grid files -->
+  <script src="scripts/button-icons.js"></script>
+  <script src="scripts/console-cleanup.js"></script>
+  <script src="scripts/translation-utils.js"></script>
+  <script src="scripts/data-utils.js"></script>
+  <script src="scripts/ui-utils.js"></script>
+  <script src="scripts/table-mappings.js"></script>
+  <script src="scripts/date-utils.js"></script>
+  <script src="scripts/tables.js"></script>
+  <script src="scripts/linked-items.js"></script>
+  <script src="scripts/page-utils.js"></script>
+  <script src="scripts/error-handlers.js"></script>
+  <script src="scripts/main.js"></script>
+    <script src="scripts/header-system.js?v=20250830_2"></script>
+  <script src="scripts/notification-system.js"></script>
+  <script src="scripts/alert-service.js"></script>
+  <script src="scripts/validation-utils.js"></script>
+  <script src="scripts/alerts.js?v=20250830_1"></script>
+  <script src="scripts/active-alerts-component.js?v=20250830_1"></script>
+  <script src="scripts/ticker-service.js"></script>
+  <script src="scripts/tickers.js?v=20250830_1"></script>
+  <script src="scripts/trade_plans.js?v=20250830_1"></script>
+  <script src="scripts/accounts.js?v=20250830_1"></script>
+</head>
+
+<body class="planning-page">
+  <!-- General background -->
+  <div class="background-wrapper">
+
+    <!-- unified-header ייווצר כאן אוטומטית -->
+
+    <!-- Page body - All content after header -->
+    <div class="page-body">
+
+
+
+      <!-- Planning area - top-Section -->
+      <div class="top-section planning-page">
+        <!-- Planning header -->
+        <div class="section-header">
+          <div class="table-title">
+            <img src="images/icons/trade_plans.svg" alt="תכנון טריידים והשקעות"
+              style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+            תכנון טריידים והשקעות
+          </div>
+          <div class="table-actions">
+            <button class="refresh-btn"
+              onclick="if (typeof window.openAddTradePlanModal === 'function') { window.openAddTradePlanModal(); }"
+              title="הוסף תכנון חדש">
+              <img src="images/icons/trade_plans.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;">
+              הוסף
+            </button>
+            <div class="action-separator"></div>
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור עיצובים">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Alert cards -->
+        <div class="section-body">
+          <!-- Active alerts web component -->
+          <active-alerts></active-alerts>
+
+          <!-- Alerts cards container -->
+          <div class="alerts-cards" id="alertsCards"></div>
+
+          <!-- Data summary -->
+          <div class="info-summary" id="summaryStats">
+            <div>סה"כ תכנונים: <strong id="totalDesigns">0</strong></div>
+            <div>סה"כ השקעה: <strong id="totalInvestment">$0</strong></div>
+            <div>השקעה ממוצעת: <strong id="avgInvestment">$0</strong></div>
+            <div>רווח כולל: <strong id="totalProfit">$0</strong></div>
+          </div>
+
+
+
+        </div>
+      </div> <!-- End top-section -->
+
+      <!-- Main content -->
+      <div class="main-content">
+        <!-- My planning area - content-section -->
+        <div class="content-section planning-page">
+          <!-- My planning header -->
+          <div class="section-header">
+            <div class="table-title">
+              <img src="images/icons/trade_plans.svg" alt="התכנונים שלי"
+                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              התכנונים שלי
+            </div>
+            <div class="table-count" id="trade_plansCount">טוען...</div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <button class="refresh-btn"
+                onclick="if (typeof window.showAddTradePlanModal === 'function') { window.showAddTradePlanModal(); }"
+                title="הוסף תכנון חדש">
+                <img src="images/icons/trade_plans.svg" alt="הוסף" class="action-icon"
+                  style="width: 16px; height: 16px;"> הוסף
+              </button>
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור התכנונים שלי">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Planning table -->
+          <div class="section-body">
+            <div class="table-responsive" id="trade_plansContainer">
+              <table class="table trade-plans-table" id="trade_plansTable" data-table-type="trade_plans">
+                <thead>
+                  <tr>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        טיקר <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        תאריך <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        סוג <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        צד <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        סכום <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        יעד <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        סטופ <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        נוכחי <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        סטטוס <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th class="actions-cell">
+                      פעולות
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="10" class="loading">טוען תכנונים...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="table-footer">
+            <!-- Add buttons moved to table header -->
+          </div>
+        </div>
+      </div>
+    </div> <!-- End page-body -->
+  </div> <!-- End background-wrapper -->
+
+  <!-- Bottom page spacing -->
+  <div style="height: 3rem;"></div>
+
+  <!-- Notification system -->
+  <div class="notification-container" id="notificationContainer"></div>
+
+  <!-- Add Trade Plan Modal -->
+  <div class="modal fade" id="addTradePlanModal" tabindex="-1" aria-labelledby="addTradePlanModalLabel"
+    aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal-dialog modal-lg" style="max-width: 800px; margin: 1.75rem auto;">
+      <div class="modal-content">
+        <div class="modal-header modal-header-colored">
+          <h5 class="modal-title" id="addTradePlanModalLabel" style="order: 1;">הוסף תכנון חדש</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="order: 2;"></button>
+        </div>
+        <div class="modal-body">
+          <form id="addTradePlanForm">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="addTradePlanTickerId" class="form-label">
+                    טיקר <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-control" id="addTradePlanTickerId" name="addTradePlanTickerId" onchange="updateTickerInfo()">
+                    <option value="">בחר טיקר</option>
+                    <option value="1">AAPL</option>
+                    <option value="2">GOOGL</option>
+                    <option value="3">TSLA</option>
+                    <option value="4">MSFT</option>
+                    <option value="5">SPY</option>
+                  </select>
+
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="addTradePlanDate" class="form-label">תאריך</label>
+                  <input type="date" class="form-control" id="addTradePlanDate" name="addTradePlanDate">
+                </div>
+              </div>
+            </div>
+
+            <!-- שורת תצוגה לטיקר הנבחר -->
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">טיקר נבחר</label>
+                  <div class="form-control-plaintext" id="selectedTickerDisplay">לא נבחר</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">מחיר נוכחי</label>
+                  <div class="form-control-plaintext" id="currentPriceDisplay">-</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">שינוי יומי</label>
+                  <div class="form-control-plaintext" id="dailyChangeDisplay">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="addTradePlanInvestmentType" class="form-label">
+                    סוג השקעה <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-control" id="addTradePlanInvestmentType" name="addTradePlanInvestmentType" disabled>
+                    <option value="">בחר סוג השקעה</option>
+                    <option value="swing">סווינג</option>
+                    <option value="investment">השקעה</option>
+                    <option value="passive">פאסיבי</option>
+                  </select>
+
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="addTradePlanSide" class="form-label">
+                    צד <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-control" id="addTradePlanSide" name="addTradePlanSide" disabled>
+                    <option value="">בחר צד</option>
+                    <option value="Long">Long</option>
+                    <option value="Short">Short</option>
+                  </select>
+
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="addTradePlanPlannedAmount" class="form-label">
+                    סכום מתוכנן <span class="text-danger">*</span>
+                  </label>
+                  <input type="number" step="0.01" class="form-control" id="addTradePlanPlannedAmount" name="addTradePlanPlannedAmount"
+                    min="0.01" disabled
+                    onchange="if(typeof updateSharesFromAmount === 'function') { updateSharesFromAmount(); }"
+                    oninput="if(typeof updateSharesFromAmount === 'function') { updateSharesFromAmount(); }"
+                    style="background-color: #f8f9fa;">
+
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="addTradePlanShares" class="form-label">
+                    מספר מניות
+                  </label>
+                  <input type="number" step="1" class="form-control" id="addTradePlanShares" name="addTradePlanShares" min="1" disabled
+                    onchange="if(typeof updateAmountFromShares === 'function') { updateAmountFromShares(); }"
+                    oninput="if(typeof updateAmountFromShares === 'function') { updateAmountFromShares(); }">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="addTradePlanStopPrice" class="form-label">מחיר עצירה</label>
+                  <input type="number" step="0.01" class="form-control" id="addTradePlanStopPrice" name="addTradePlanStopPrice" disabled>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="addTradePlanTargetPrice" class="form-label">מחיר יעד</label>
+                  <input type="number" step="0.01" class="form-control" id="addTradePlanTargetPrice" name="addTradePlanTargetPrice" disabled>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="addTradePlanEntryConditions" class="form-label">תנאי כניסה</label>
+              <textarea class="form-control" id="addTradePlanEntryConditions" name="addTradePlanEntryConditions" rows="2" disabled></textarea>
+              <div class="text-start">
+                <button type="button" class="btn btn-info btn-sm mt-2" onclick="addEntryCondition()">
+                  <span class="btn-icon">➕</span> הוסף תנאי
+                </button>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="addTradePlanReasons" class="form-label">סיבות</label>
+              <textarea class="form-control" id="addTradePlanReasons" name="addTradePlanReasons" rows="3" disabled></textarea>
+              <div class="text-start">
+                <button type="button" class="btn btn-info btn-sm mt-2" onclick="addReason()">
+                  <span class="btn-icon">➕</span> הוסף סיבה
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <div class="d-flex justify-content-between w-100">
+            <!-- כפתורים בצד שמאל -->
+            <div>
+              <button type="button" class="btn btn-info me-2" onclick="addImportantNote()">
+                <span class="btn-icon">📝</span> יש לי עוד משהו חשוב
+              </button>
+              <button type="button" class="btn btn-info" onclick="addReminder()">
+                <span class="btn-icon">⏰</span> תזכיר לי כש...
+              </button>
+            </div>
+
+            <!-- כפתורים בצד ימין -->
+            <div>
+              <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">ביטול</button>
+              <button type="button" class="btn btn-success"
+                onclick="if (typeof window.saveNewTradePlan === 'function') { window.saveNewTradePlan(); }">שמור</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Trade Plan Modal -->
+  <div class="modal fade" id="editTradePlanModal" tabindex="-1" aria-labelledby="editTradePlanModalLabel"
+    aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal-dialog modal-lg" style="max-width: 800px; margin: 1.75rem auto;">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: #ff9c05; color: white;">
+          <h5 class="modal-title" id="editTradePlanModalLabel" style="order: 1; color: white;">ערוך תכנון</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="order: 2; filter: invert(1);"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editTradePlanForm">
+            <input type="hidden" id="editTradePlanId">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanTickerId" class="form-label">
+                    טיקר <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-control" id="editTradePlanTickerId" required onchange="updateEditTickerInfo()">
+                    <option value="">בחר טיקר</option>
+                    <option value="1">AAPL</option>
+                    <option value="2">GOOGL</option>
+                    <option value="3">TSLA</option>
+                    <option value="4">MSFT</option>
+                    <option value="5">SPY</option>
+                  </select>
+
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanDate" class="form-label">תאריך</label>
+                  <input type="date" class="form-control" id="editTradePlanDate" required>
+                </div>
+              </div>
+            </div>
+
+            <!-- שורת תצוגה לטיקר הנבחר -->
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">טיקר נבחר</label>
+                  <div class="form-control-plaintext" id="editSelectedTickerDisplay">לא נבחר</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">מחיר נוכחי</label>
+                  <div class="form-control-plaintext" id="editCurrentPriceDisplay">-</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label class="form-label">שינוי יומי</label>
+                  <div class="form-control-plaintext" id="editDailyChangeDisplay">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="editTradePlanInvestmentType" class="form-label">
+                    סוג השקעה <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-control" id="editTradePlanInvestmentType" required disabled>
+                    <option value="">בחר סוג השקעה</option>
+                    <option value="swing">סווינג</option>
+                    <option value="investment">השקעה</option>
+                    <option value="passive">פאסיבי</option>
+                  </select>
+
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="editTradePlanSide" class="form-label">
+                    צד <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-control" id="editTradePlanSide" required disabled>
+                    <option value="">בחר צד</option>
+                    <option value="Long">Long</option>
+                    <option value="Short">Short</option>
+                  </select>
+
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="editTradePlanStatus" class="form-label">
+                    סטטוס <span class="text-danger">*</span>
+                  </label>
+                  <select class="form-control" id="editTradePlanStatus" required disabled>
+                    <option value="">בחר סטטוס</option>
+                    <option value="open">פתוח</option>
+                    <option value="closed">סגור</option>
+                  </select>
+
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanPlannedAmount" class="form-label">
+                    סכום מתוכנן <span class="text-danger">*</span>
+                  </label>
+                  <input type="number" step="0.01" class="form-control" id="editTradePlanPlannedAmount" required
+                    disabled onchange="updateEditSharesFromAmount()">
+
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanShares" class="form-label">מספר מניות</label>
+                  <input type="number" step="0.0001" class="form-control" id="editTradePlanShares" disabled
+                    onchange="updateEditAmountFromShares()">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanStopPrice" class="form-label">מחיר עצירה</label>
+                  <input type="number" step="0.01" class="form-control" id="editTradePlanStopPrice" disabled>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="editTradePlanTargetPrice" class="form-label">מחיר יעד</label>
+                  <input type="number" step="0.01" class="form-control" id="editTradePlanTargetPrice" disabled>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="mb-3">
+                  <label for="editTradePlanEntryConditions" class="form-label">תנאי כניסה</label>
+                  <textarea class="form-control" id="editTradePlanEntryConditions" rows="3" disabled></textarea>
+                  <div class="text-start">
+                    <button type="button" class="btn btn-info btn-sm mt-2" onclick="addEditCondition()">
+                      <span class="btn-icon">➕</span> הוסף תנאי
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="mb-3">
+                  <label for="editTradePlanReasons" class="form-label">סיבות</label>
+                  <textarea class="form-control" id="editTradePlanReasons" rows="3" disabled></textarea>
+                  <div class="text-start">
+                    <button type="button" class="btn btn-info btn-sm mt-2" onclick="addEditReason()">
+                      <span class="btn-icon">➕</span> הוסף סיבה
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <div class="d-flex justify-content-between w-100">
+            <!-- כפתורים בצד שמאל -->
+            <div>
+              <button type="button" class="btn btn-info me-2" onclick="addEditImportantNote()">
+                <span class="btn-icon">📝</span> יש לי עוד משהו חשוב
+              </button>
+              <button type="button" class="btn btn-info" onclick="addEditReminder()">
+                <span class="btn-icon">⏰</span> תזכיר לי כש...
+              </button>
+            </div>
+
+            <!-- כפתורים בצד ימין -->
+            <div>
+              <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">ביטול</button>
+              <button type="button" class="btn btn-success"
+                onclick="if (typeof window.saveEditTradePlan === 'function') { window.saveEditTradePlan(); }">שמור</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cancel Trade Plan Modal -->
+  <div class="modal fade" id="cancelTradePlanModal" tabindex="-1" aria-labelledby="cancelTradePlanModalLabel"
+    aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: #dc3545; color: white;">
+          <h5 class="modal-title" id="cancelTradePlanModalLabel" style="order: 1; color: white;">בטל תכנון</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="order: 2; filter: invert(1);"></button>
+        </div>
+        <div class="modal-body">
+          <p>האם אתה בטוח שברצונך לבטל את התכנון הבא?</p>
+          <div id="cancelTradePlanDetails" class="alert alert-info">
+            פרטי התכנון יוצגו כאן
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" style="height: 38px;">ביטול</button>
+          <button type="button" class="btn btn-danger"
+            onclick="if (typeof window.confirmCancelTradePlan === 'function') { window.confirmCancelTradePlan(); }" style="height: 38px;">בטל תכנון</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Trade Plan Modal -->
+  <div class="modal fade" id="deleteTradePlanModal" tabindex="-1" aria-labelledby="deleteTradePlanModalLabel"
+    aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: #dc3545; color: white;">
+          <h5 class="modal-title" id="deleteTradePlanModalLabel" style="order: 1; color: white;">מחק תכנון</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="order: 2; filter: invert(1);"></button>
+        </div>
+        <div class="modal-body">
+          <p>האם אתה בטוח שברצונך למחוק את התכנון הבא?</p>
+          <div id="deleteTradePlanDetails" class="alert alert-info">
+            פרטי התכנון יוצגו כאן
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" style="height: 38px;">ביטול</button>
+          <button type="button" class="btn btn-danger"
+            onclick="if (typeof window.confirmDeleteTradePlan === 'function') { window.confirmDeleteTradePlan(); }" style="height: 38px;">מחק</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Linked Items Modal -->
+  <div class="modal fade" id="linkedItemsModal" tabindex="-1" aria-labelledby="linkedItemsModalLabel"
+    aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header modal-header-colored">
+          <h5 class="modal-title" id="linkedItemsModalLabel">פרטים מקושרים</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="linkedItemsModalBody">
+          <!-- Content will be dynamically loaded by linked-items.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- All JavaScript functionality is handled by external files -->
+  <!-- No inline scripts - all logic is in trade_plans.js?v=20250830_1 and other external files -->
+</body>
+
+</html>

@@ -84,47 +84,18 @@ class ConstraintManager {
         // Error loading constraints
         this.showMessage('שגיאה בטעינת האילוצים', 'error');
       }
-    } catch {
+    } catch (error) {
       // Error loading constraints
-      this.showMessage('שגיאה בטעינת האילוצים', 'error');
-      // הצגת נתונים לדוגמה במקרה של שגיאה
-      this.showSampleData();
+      console.error('שגיאה בטעינת constraints:', error);
+      this.showMessage('שגיאה בטעינת האילוצים מהשרת', 'error');
+      // אין נתוני דמה - רק הודעת שגיאה
+      this.constraints = [];
+      this.renderConstraintsList();
+      this.updateStats();
     }
   }
 
-  showSampleData() {
 
-    this.constraints = [
-      {
-        id: 1,
-        table_name: 'trades',
-        column_name: 'status',
-        constraint_type: 'ENUM',
-        constraint_name: 'status_enum',
-        constraint_definition: 'CHECK (status IN (\'open\', \'closed\', \'canceled\'))',
-        enum_values: [
-          { value: 'open', display_name: 'פתוח', sort_order: 1 },
-          { value: 'closed', display_name: 'סגור', sort_order: 2 },
-          { value: 'canceled', display_name: 'מבוטל', sort_order: 3 },
-        ],
-      },
-      {
-        id: 2,
-        table_name: 'trades',
-        column_name: 'type',
-        constraint_type: 'ENUM',
-        constraint_name: 'type_enum',
-        constraint_definition: 'CHECK (type IN (\'swing\', \'investment\', \'passive\'))',
-        enum_values: [
-          { value: 'swing', display_name: 'סווינג', sort_order: 1 },
-          { value: 'investment', display_name: 'השקעה', sort_order: 2 },
-          { value: 'passive', display_name: 'פסיבי', sort_order: 3 },
-        ],
-      },
-    ];
-    this.renderConstraintsList();
-    this.updateStats();
-  }
 
   updateStats() {
     document.getElementById('total-constraints').textContent = this.constraints.length;

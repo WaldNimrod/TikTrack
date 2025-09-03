@@ -409,58 +409,41 @@ table[data-table-type="notes"] .actions-cell {
 
 /* צבעים לאיקונים - הועבר ל-styles.css */
 
-/* רוחב עמודות לטבלת טיקרים - מותאם ל-1000px */
-table[data-table-type="tickers"] th:nth-child(1),
-table[data-table-type="tickers"] td:nth-child(1) {
-    width: 9% !important; /* סמל - 90px */
+/* טבלת טיקרים - ללא הגבלת רוחב (גלילה אופקית) */
+table[data-table-type="tickers"] {
+    width: auto !important;
+    min-width: 1200px !important; /* רוחב מינימלי לכל העמודות */
+    white-space: nowrap;
 }
 
-table[data-table-type="tickers"] th:nth-child(2),
-table[data-table-type="tickers"] td:nth-child(2) {
-    width: 7% !important; /* יש טריידים - 70px */
+/* מיכל הטבלה - גלילה אופקית */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
-table[data-table-type="tickers"] th:nth-child(3),
-table[data-table-type="tickers"] td:nth-child(3) {
-    width: 9% !important; /* סוג - 90px */
+/* עמודות עם גודל מינימלי */
+table[data-table-type="tickers"] th,
+table[data-table-type="tickers"] td {
+    min-width: 80px !important;
+    padding: 8px 12px !important;
 }
 
-table[data-table-type="tickers"] th:nth-child(4),
-table[data-table-type="tickers"] td:nth-child(4) {
-    width: 7% !important; /* מטבע - 70px */
-}
-
-table[data-table-type="tickers"] th:nth-child(5),
-table[data-table-type="tickers"] td:nth-child(5) {
-    width: 11% !important; /* עודכן ב - 110px */
-}
-
-table[data-table-type="tickers"] th:nth-child(6),
-table[data-table-type="tickers"] td:nth-child(6) {
-    width: 18% !important; /* שם - 180px */
-}
-
-table[data-table-type="tickers"] th:nth-child(7),
-table[data-table-type="tickers"] td:nth-child(7) {
-    width: 11% !important; /* נוצר ב - 110px */
-}
-
-table[data-table-type="tickers"] th:nth-child(8),
+/* עמודות רחבות יותר */
+table[data-table-type="tickers"] th:nth-child(8), /* שם */
 table[data-table-type="tickers"] td:nth-child(8) {
-    width: 18% !important; /* הערות - 180px */
+    min-width: 150px !important;
 }
 
-table[data-table-type="tickers"] th:nth-child(9),
-table[data-table-type="tickers"] td:nth-child(9) {
-    width: 10% !important; /* סטטוס - 100px */
+table[data-table-type="tickers"] th:nth-child(10), /* הערות */
+table[data-table-type="tickers"] td:nth-child(10) {
+    min-width: 120px !important;
 }
 
-/* עמודת פעולות נשארת 120px קבוע */
+/* עמודת פעולות - רק גודל מינימלי */
 table[data-table-type="tickers"] th:last-child,
 table[data-table-type="tickers"] td:last-child {
-    width: 120px !important;
-    min-width: 120px !important;
-    max-width: 120px !important;
+    min-width: 140px !important;
     border-bottom: 2px solid #f1f3f4 !important;
 }
 /* הסגנונות החדשים נמצאים ב-styles.css */
@@ -2011,8 +1994,8 @@ th {
 /* טבלת ביצועים - הגדרות כללית */
 #executionsTable {
   table-layout: fixed !important;
-  width: 85% !important;
-  max-width: 85% !important;
+  width: 98% !important;
+  max-width: 98% !important;
 }
 
 #executionsContainer {
@@ -2020,16 +2003,16 @@ th {
   overflow-y: hidden !important;
 }
 
-/* עמודת סימבול - 6% */
+/* עמודת סימבול - 7% */
 #executionsTable th:nth-child(1),
 #executionsTable td:nth-child(1) {
-  width: 6% !important;
+  width: 7% !important;
 }
 
-/* עמודת טרייד - 6% */
+/* עמודת טרייד - 8% */
 #executionsTable th:nth-child(2),
 #executionsTable td:nth-child(2) {
-  width: 6% !important;
+  width: 8% !important;
 }
 
 /* עמודת פעולה - 6% */
@@ -2038,40 +2021,40 @@ th {
   width: 6% !important;
 }
 
-/* עמודת חשבון - 6% */
+/* עמודת חשבון - 7% */
 #executionsTable th:nth-child(4),
 #executionsTable td:nth-child(4) {
-  width: 6% !important;
+  width: 7% !important;
 }
 
-/* עמודת כמות - 5% */
+/* עמודת כמות - 6% */
 #executionsTable th:nth-child(5),
 #executionsTable td:nth-child(5) {
-  width: 5% !important;
-}
-
-/* עמודת מחיר - 5% */
-#executionsTable th:nth-child(6),
-#executionsTable td:nth-child(6) {
-  width: 5% !important;
-}
-
-/* עמודת עמלה - 4% */
-#executionsTable th:nth-child(7),
-#executionsTable td:nth-child(7) {
-  width: 4% !important;
-}
-
-/* עמודת רווח/הפסד - 6% */
-#executionsTable th:nth-child(8),
-#executionsTable td:nth-child(8) {
   width: 6% !important;
 }
 
-/* עמודת הערות - 5% */
+/* עמודת מחיר - 7% */
+#executionsTable th:nth-child(6),
+#executionsTable td:nth-child(6) {
+  width: 7% !important;
+}
+
+/* עמודת עמלה - 5% */
+#executionsTable th:nth-child(7),
+#executionsTable td:nth-child(7) {
+  width: 5% !important;
+}
+
+/* עמודת רווח/הפסד - 8% */
+#executionsTable th:nth-child(8),
+#executionsTable td:nth-child(8) {
+  width: 8% !important;
+}
+
+/* עמודת הערות - 6% */
 #executionsTable th:nth-child(9),
 #executionsTable td:nth-child(9) {
-  width: 5% !important;
+  width: 6% !important;
 }
 
 /* עמודת נוצר ב - 6% */
@@ -2080,22 +2063,22 @@ th {
   width: 6% !important;
 }
 
-/* עמודת תאריך ביצוע - 6% */
+/* עמודת תאריך ביצוע - 9% */
 #executionsTable th:nth-child(11),
 #executionsTable td:nth-child(11) {
-  width: 6% !important;
+  width: 9% !important;
 }
 
-/* עמודת מקור - 6% */
+/* עמודת מקור - 7% */
 #executionsTable th:nth-child(12),
 #executionsTable td:nth-child(12) {
-  width: 6% !important;
+  width: 7% !important;
 }
 
-/* עמודת פעולות - 18% */
+/* עמודת פעולות - 16% */
 #executionsTable th:nth-child(13),
 #executionsTable td:nth-child(13) {
-  width: 18% !important;
+  width: 16% !important;
 }
 
 /* עיצוב כפתורי פעולה בטבלת ביצועים */
@@ -2128,7 +2111,77 @@ th {
   max-width: none !important;
 }
 
-/* סה"כ: 6+6+6+6+5+5+4+6+5+6+6+6+18 = 79% (מאוזן היטב) */
+/* תיקון בעיית הסתרות עמודות - אפשר גלישת טקסט מבוקרת */
+#executionsTable td {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  padding: 8px 4px !important;
+  vertical-align: middle !important;
+}
+
+/* עמודות שצריכות יותר גמישות בתצוגה */
+#executionsTable td:nth-child(1), /* סימבול */
+#executionsTable td:nth-child(2), /* טרייד */
+#executionsTable td:nth-child(12) /* מקור */ {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  line-height: 1.2 !important;
+}
+
+/* סה"כ: 7+8+6+7+6+7+5+8+6+6+9+7+16 = 98% (מנצל את כל הרוחב) */
+
+/* סגנונות כלליים לעמוד עסקעות */
+.section-icon {
+  width: 40px !important;
+  height: 40px !important;
+  margin-left: 8px !important;
+  vertical-align: middle !important;
+}
+
+.action-icon-small {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.buy-color {
+  color: #28a745 !important;
+}
+
+.sell-color {
+  color: #dc3545 !important;
+}
+
+/* סגנונות לכותרות טבלה עם כפתורי מיון */
+.sortable-header {
+  border: none !important;
+  background: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  text-align: center !important;
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+/* סגנונות למודלים */
+.hidden {
+  display: none !important;
+}
+
+.ticker-help-section {
+  background: #f8f9fa !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 8px !important;
+  padding: 15px !important;
+}
+
+.calculated-values {
+  background: #f8f9fa !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 8px !important;
+  padding: 15px !important;
+}
 
 /* ===== טבלת טריידים - רוחב יחסי באחוזים ===== */
 

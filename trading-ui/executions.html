@@ -74,8 +74,7 @@
         <!-- Main header -->
         <div class="section-header">
           <div class="table-title">
-            <img src="images/icons/executions.svg" alt="עסקעות"
-              style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+            <img src="images/icons/executions.svg" alt="עסקעות" class="section-icon">
             עסקעות
           </div>
           <div class="table-actions">
@@ -91,9 +90,7 @@
 
           <!-- Data summary -->
           <div class="info-summary" id="summaryStats">
-            <div>סה"כ עסקעות: <strong id="totalExecutions">0</strong> (<span id="totalBuyExecutions"
-                style="color: #28a745;">0</span> קניה / <span id="totalSellExecutions" style="color: #dc3545;">0</span>
-              מכירה)</div>
+            <div>סה"כ עסקעות: <strong id="totalExecutions">0</strong> (<span id="totalBuyExecutions" class="buy-color">0</span> קניה / <span id="totalSellExecutions" class="sell-color">0</span> מכירה)</div>
             <div>סה"כ קניה: <strong id="totalBuyAmount">$0</strong></div>
             <div>סה"כ מכירות: <strong id="totalSellAmount">$0</strong></div>
             <div>מאזן: <strong id="balanceAmount">$0</strong></div>
@@ -111,15 +108,13 @@
           <!-- Designs header -->
           <div class="section-header">
             <div class="table-title">
-              <img src="images/icons/executions.svg" alt="העסקעות שלי"
-                style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+              <img src="images/icons/executions.svg" alt="העסקעות שלי" class="section-icon">
               העסקעות שלי
             </div>
             <div class="table-count">12 עסקעות</div>
             <div class="table-actions">
               <button class="refresh-btn" onclick="openExecutionDetails()" title="הוסף עסקה חדשה">
-                <img src="images/icons/executions.svg" alt="הוסף" class="action-icon"
-                  style="width: 16px; height: 16px;"> הוסף
+                <img src="images/icons/executions.svg" alt="הוסף" class="action-icon-small"> הוסף
               </button>
               <div class="action-separator"></div>
               <button class="filter-toggle-btn" onclick="toggleExecutionsSection()" title="הצג/הסתר אזור עסקעות">
@@ -136,85 +131,73 @@
                   <tr>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 0, window.executionsData || [], updateExecutionsTableMain); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 0, window.executionsData || [], updateExecutionsTableMain); }">
                         סימבול <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 1, window.executionsData || [], updateExecutionsTableMain); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 1, window.executionsData || [], updateExecutionsTableMain); }">
                         טרייד <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 2, window.executionsData || [], updateExecutionsTableMain); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 2, window.executionsData || [], updateExecutionsTableMain); }">
                         פעולה <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 3, window.executionsData || [], updateExecutionsTableMain); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 3, window.executionsData || [], updateExecutionsTableMain); }">
                         חשבון <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 4, window.executionsData || [], updateExecutionsTableMain); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 4, window.executionsData || [], updateExecutionsTableMain); }">
                         כמות <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 5, window.executionsData || [], updateExecutionsTableMain); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 5, window.executionsData || [], updateExecutionsTableMain); }">
                         מחיר <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 6, window.executionsData || [], updateExecutionsTableMain); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 6, window.executionsData || [], updateExecutionsTableMain); }">
                         עמלה <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 7, window.executionsData || [], updateExecutionsTableMain); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 7, window.executionsData || [], updateExecutionsTableMain); }">
                         רווח/הפסד <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 8, window.executionsData || [], updateExecutionsTableMain); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 8, window.executionsData || [], updateExecutionsTableMain); }">
                         הערות <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 9, window.executionsData || [], updateExecutionsTableMain); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 9, window.executionsData || [], updateExecutionsTableMain); }">
                         נוצר ב <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 10, window.executionsData || [], updateExecutionsTableMain); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 10, window.executionsData || [], updateExecutionsTableMain); }">
                         תאריך ביצוע <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 11, window.executionsData || [], updateExecutionsTableMain); }"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 11, window.executionsData || [], updateExecutionsTableMain); }">
                         מקור <span class="sort-icon">↕</span>
                       </button>
                     </th>
@@ -273,8 +256,8 @@
                         onchange="validateExecutionTradeId(this); enableAllFields('add');">
                         <option value="">בחר טרייד...</option>
                       </select>
-                      <button type="button" class="btn btn-outline-success link-button" id="addExecutionTradeLink"
-                        onclick="goToLinkedTrade('add')" title="עבור לטרייד" style="display: none;">
+                      <button type="button" class="btn btn-outline-success link-button hidden" id="addExecutionTradeLink"
+                        onclick="goToLinkedTrade('add')" title="עבור לטרייד">
                         🔗
                       </button>
                     </div>
@@ -712,6 +695,7 @@
     <script src="scripts/validation-utils.js"></script>
     <script src="scripts/filter-system.js"></script>
     <script src="scripts/crud-utils.js"></script>
+    <script src="scripts/account-service.js"></script>
     <script src="scripts/preferences.js"></script>
 
     <!-- Scripts -->

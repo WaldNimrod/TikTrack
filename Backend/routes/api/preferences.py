@@ -13,7 +13,7 @@ from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.user_service import UserService
-from services.advanced_cache_service import cache_for, invalidate_cache
+from services.advanced_cache_service import cache_with_deps, invalidate_cache
 
 # Create blueprint
 preferences_bp = Blueprint('preferences', __name__)
@@ -54,7 +54,7 @@ def get_user_id_from_request() -> int:
         return UserService.DEFAULT_USER_ID
 
 @preferences_bp.route('/api/v1/preferences/', methods=['GET'])
-@cache_for(ttl=300)  # Cache for 5 minutes - preferences don't change frequently
+@cache_with_deps(ttl=300, dependencies=['preferences'])  # Cache for 5 minutes with dependency
 def get_preferences():
     """Get user preferences with fallback to default user"""
     try:
@@ -86,7 +86,7 @@ def save_all_preferences():
         
         if success:
             # Invalidate cache so changes take effect immediately
-            invalidate_cache('get_preferences')
+            invalidate_cache('preferences')
             return jsonify({"success": True, "message": "Preferences saved successfully"})
         else:
             return jsonify({"success": False, "message": "Error saving preferences"}), 500
@@ -116,7 +116,7 @@ def update_preference(key):
         
         if success:
             # Invalidate cache so changes take effect immediately
-            invalidate_cache('get_preferences')
+            invalidate_cache('preferences')
             return jsonify({"success": True, "message": f"Preference {key} saved successfully"})
         else:
             return jsonify({"success": False, "message": "Error saving preference"}), 500
@@ -136,7 +136,7 @@ def reset_preferences():
         
         if success:
             # Invalidate cache so changes take effect immediately
-            invalidate_cache('get_preferences')
+            invalidate_cache('preferences')
             return jsonify({"success": True, "message": "Preferences reset to defaults"})
         else:
             return jsonify({"success": False, "message": "Error resetting preferences"}), 500

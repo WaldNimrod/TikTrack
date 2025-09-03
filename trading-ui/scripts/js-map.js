@@ -137,7 +137,6 @@ class JsMapSystem {
         //   this.functionsData[file] && this.functionsData[file].length > 0,
         // );
 
-        // Log some sample data
         // console.log('Functions data loaded successfully');
       } else {
         // Fallback to local scanning
@@ -264,49 +263,12 @@ class JsMapSystem {
       functionCallCounts[file] = 0;
     });
 
-    // Sample function call data - in a real implementation, this would scan all files
-    // For now, we'll use a static mapping based on common patterns
-    const sampleFunctionCalls = {
-      'header-system.js': 45,  // Most used - header system functions
+    // Real function call analysis would require actual code scanning
+    // For now, return empty data with informative message
+    // אין נתוני דמה - נתונים אמיתיים יחושבו על ידי סריקת הקוד
+    const sampleFunctionCalls = {};
 
-      'ui-utils.js': 32,       // UI utility functions
-      'main.js': 15,           // Main app functions
-      'trades.js': 28,         // Trade-specific functions
-      'alerts.js': 22,         // Alert functions
-      'tickers.js': 25,        // Ticker functions
-      'accounts.js': 18,       // Account functions
-      'cash_flows.js': 16,     // Cash flow functions
-      'notes.js': 14,          // Note functions
-      'preferences.js': 12,    // Preference functions
-      'database.js': 20,       // Database functions
-      'db-extradata.js': 15,   // Extra data functions
-      'constraint-manager.js': 8, // Constraint functions
-
-      'currencies.js': 8,      // Currency functions
-      'auth.js': 5,            // Auth functions
-      'js-map.js': 3,          // JS map functions
-      'js-scanner.js': 2,      // JS scanner functions
-      'translation-utils.js': 12, // Translation functions
-      'data-utils.js': 18,     // Data utility functions
-      'table-mappings.js': 14, // Table mapping functions
-      'date-utils.js': 16,     // Date utility functions
-      'tables.js': 20,         // Table functions
-      'linked-items.js': 12,   // Linked items functions
-      'page-utils.js': 15,     // Page utility functions
-      'active-alerts-component.js': 8, // Active alerts component
-      'trade_plans.js': 18,    // Trade plans functions
-      'research.js': 16,       // Research functions
-      'executions.js': 14,     // Execution functions
-      'ticker-service.js': 12, // Ticker service functions
-      'console-cleanup.js': 3,  // Console cleanup functions
-    };
-
-    // Update counts with sample data
-    Object.keys(sampleFunctionCalls).forEach(file => {
-      if (Object.prototype.hasOwnProperty.call(functionCallCounts, file)) {
-        functionCallCounts[file] = sampleFunctionCalls[file];
-      }
-    });
+    // לא מעדכנים עם נתוני דמה - כל הערכים יישארו 0 עד שנוסיף סריקה אמיתית
 
     return functionCallCounts;
   }

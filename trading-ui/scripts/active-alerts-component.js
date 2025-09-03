@@ -396,7 +396,9 @@ class ActiveAlertsComponent extends HTMLElement {
     }
 
     // שימוש בפונקציה formatAlertCondition לתרגום התנאי
-    // const formattedCondition = window.formatAlertCondition ? window.formatAlertCondition(alert.condition) : this.formatAlertCondition(alert.condition);
+    // const formattedCondition = window.formatAlertCondition ?
+    //   window.formatAlertCondition(alert.condition) :
+    //   this.formatAlertCondition(alert.condition);
 
     // נתוני דמה לטיקר
     const currentPrice = this.constructor.getCurrentPrice(symbol);
@@ -432,7 +434,11 @@ class ActiveAlertsComponent extends HTMLElement {
     alert.condition_attribute, alert.condition_operator, alert.condition_number)}</span>
             <span class="alert-detail-item ${changeClass}">${currentPrice}</span>
             <span class="alert-detail-item ${changeClass}">${dailyChange}</span>
-            ${message ? `<span class="alert-detail-item message-icon" title="${message}">${window.BUTTON_ICONS ? window.BUTTON_ICONS.SEARCH : '🔍'}</span>` : ''}
+            ${message ?
+    `<span class="alert-detail-item message-icon" title="${message}">${
+      window.BUTTON_ICONS ? window.BUTTON_ICONS.SEARCH : '🔍'
+    }</span>` : ''
+}
           </div>
         </div>
       </div>
@@ -459,7 +465,13 @@ class ActiveAlertsComponent extends HTMLElement {
     }
     try {
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const res = await fetch(`${base}/api/v1/alerts/${alertId}/mark-read`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' } });
+      const res = await fetch(
+        `${base}/api/v1/alerts/${alertId}/mark-read`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
 
       if (!res.ok) {throw new Error(`HTTP ${res.status}`);}
       const card = this.querySelector(`[data-alert-id="${alertId}"]`);
@@ -570,7 +582,12 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   static getAlertTypeDisplay(t) {
-    const m = { price_alert: 'התראת מחיר', stop_loss: 'עצירת הפסד', volume_alert: 'התראת נפח', custom_alert: 'התראה מותאמת' };
+    const m = {
+      price_alert: 'התראת מחיר',
+      stop_loss: 'עצירת הפסד',
+      volume_alert: 'התראת נפח',
+      custom_alert: 'התראה מותאמת',
+    };
     return m[t] || t;
   }
 
@@ -950,7 +967,8 @@ class ActiveAlertsComponent extends HTMLElement {
    */
   getRelatedObjectDetails(relatedTypeId, relatedObjectId) {
     // בדיקה אם השדות קיימים
-    if (relatedTypeId === null || relatedTypeId === undefined || relatedObjectId === null || relatedObjectId === undefined) {
+    if (relatedTypeId === null || relatedTypeId === undefined ||
+            relatedObjectId === null || relatedObjectId === undefined) {
       return '<span class="no-linked-object">כללי</span>';
     }
 
@@ -971,7 +989,11 @@ class ActiveAlertsComponent extends HTMLElement {
       const sides = ['Long', 'Short'];
       const investmentType = investmentTypes[relatedObjectId % investmentTypes.length];
       const side = sides[relatedObjectId % sides.length];
-      const tradeDate = new Date().toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' }).replace(/\//g, '.');
+      const tradeDate = new Date().toLocaleDateString('he-IL', {
+        day: '2-digit',
+        month: '2-digit',
+        year: '2-digit',
+      }).replace(/\//g, '.');
 
       relatedDisplay = `טרייד | ${investmentType} | ${side} | ${tradeDate}`;
       break;
@@ -1243,10 +1265,16 @@ window.showTickerPage = function (symbol) {
 // פונקציה גלובלית להצגת מודל אובייקטים מקושרים
 window.showRelatedObjectModal = function (relatedTypeId, relatedObjectId) {
   if (window.showInfoNotification) {
-    window.showInfoNotification('אובייקט מקושר', `פתיחת אובייקט מסוג ${relatedTypeId} עם מזהה ${relatedObjectId} - ייפתח בקרוב`);
+    window.showInfoNotification(
+      'אובייקט מקושר',
+      `פתיחת אובייקט מסוג ${relatedTypeId} עם מזהה ${relatedObjectId} - ייפתח בקרוב`,
+    );
   } else {
     if (typeof window.showInfoNotification === 'function') {
-      window.showInfoNotification('פיתוח', `פתיחת אובייקט מסוג ${relatedTypeId} עם מזהה ${relatedObjectId} - ייפתח בקרוב`);
+      window.showInfoNotification(
+        'פיתוח',
+        `פתיחת אובייקט מסוג ${relatedTypeId} עם מזהה ${relatedObjectId} - ייפתח בקרוב`,
+      );
     }
   }
 };

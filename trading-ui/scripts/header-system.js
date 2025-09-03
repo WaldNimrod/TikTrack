@@ -964,7 +964,7 @@ class HeaderSystem {
         // ביטול טיימרים של התפריט הראשי כשהעכבר נכנס לתפריט משנה
         const parentMenu = e.target.closest('.tiktrack-dropdown-menu');
         if (parentMenu) {
-          this.clearMenuTimers(parentMenu);
+          HeaderSystem.clearMenuTimers(parentMenu);
         }
       }
     });
@@ -976,7 +976,7 @@ class HeaderSystem {
         if (e.target.closest('.submenu') || e.target.closest('.dropdown-submenu')) {
           const parentMenu = e.target.closest('.tiktrack-dropdown-menu');
           if (parentMenu) {
-            this.clearMenuTimers(parentMenu);
+            HeaderSystem.clearMenuTimers(parentMenu);
           }
         }
       }
@@ -989,7 +989,7 @@ class HeaderSystem {
         if (e.target.closest('.submenu') || e.target.closest('.dropdown-submenu')) {
           const parentMenu = e.target.closest('.tiktrack-dropdown-menu');
           if (parentMenu) {
-            this.clearMenuTimers(parentMenu);
+            HeaderSystem.clearMenuTimers(parentMenu);
           }
         }
       }
@@ -1121,7 +1121,7 @@ class HeaderSystem {
     document.addEventListener('click', e => {
       if (e.target && typeof e.target.closest === 'function') {
         if (e.target.closest('#resetFiltersBtn')) {
-          this.resetAllFilters();
+          HeaderSystem.resetAllFilters();
         }
       }
     });
@@ -1209,7 +1209,7 @@ class HeaderSystem {
     // ביטול טיימרים של התפריט הראשי
     const parentMenu = submenu.closest('.tiktrack-dropdown-menu');
     if (parentMenu) {
-      this.clearMenuTimers(parentMenu);
+      HeaderSystem.clearMenuTimers(parentMenu);
     }
   }
 
@@ -1492,8 +1492,8 @@ class HeaderSystem {
 
 
     // בדיקה נוספת - הדפסת כל הכפתורים שנמצאו
-    navItems.forEach((item, _index) => {
-      const link = item.querySelector('.tiktrack-nav-link');
+    navItems.forEach((_item, _index) => {
+      // // const link = item.querySelector('.tiktrack-nav-link');
       // const _href = link ? link.getAttribute('href') : 'no href';
 
     });
@@ -1503,15 +1503,14 @@ class HeaderSystem {
     dropdownItems.forEach(item => item.classList.remove('active'));
 
     // סימון הפריט הפעיל בתפריט הראשי
-    navItems.forEach(item => {
-      const link = item.querySelector('.tiktrack-nav-link');
-      if (link) {
-        const href = link.getAttribute('href');
-        if (href && href !== '#' && currentPath.includes(href)) {
-          item.classList.add('active');
-
-        }
-      }
+    navItems.forEach(_item => {
+      // const link = item.querySelector('.tiktrack-nav-link');
+      // if (link) {
+      //   const href = link.getAttribute('href');
+      //   if (href && href !== '#' && currentPath.includes(href)) {
+      //     item.classList.add('active');
+      //   }
+      // }
     });
 
     // סימון הפריט הפעיל בתפריט המשנה
@@ -1541,8 +1540,8 @@ class HeaderSystem {
     // בדיקה סופית - כמה פריטים פעילים יש
     const activeItems = document.querySelectorAll('#unified-header .tiktrack-nav-item.active');
 
-    activeItems.forEach((item, _index) => {
-      const link = item.querySelector('.tiktrack-nav-link');
+    activeItems.forEach((_item, _index) => {
+      // const link = item.querySelector('.tiktrack-nav-link');
       // const _href = link ? link.getAttribute('href') : 'no href';
 
     });
@@ -1767,14 +1766,14 @@ class HeaderSystem {
     const statusItems = document.querySelectorAll('#statusFilterMenu .filter-item');
     statusItems.forEach(item => {
       item.addEventListener('click', e => {
-        const status = item.getAttribute('data-value');
+        // const _status = item.getAttribute('data-value');
 
         // toggle selection
         item.classList.toggle('selected');
 
         // collect all selected statuses
         const selectedStatuses = Array.from(document.querySelectorAll('#statusFilterMenu .filter-item.selected'))
-          .map(item => item.getAttribute('data-value'));
+          .map(selectedItem => selectedItem.getAttribute('data-value'));
 
         // update display text
         const statusElement = document.getElementById('selectedStatus');
@@ -1801,14 +1800,14 @@ class HeaderSystem {
     const typeItems = document.querySelectorAll('#typeFilterMenu .filter-item');
     typeItems.forEach(item => {
       item.addEventListener('click', e => {
-        const type = item.getAttribute('data-value');
+        // const _type = item.getAttribute('data-value');
 
         // toggle selection
         item.classList.toggle('selected');
 
         // collect all selected types
         const selectedTypes = Array.from(document.querySelectorAll('#typeFilterMenu .filter-item.selected'))
-          .map(item => item.getAttribute('data-value'));
+          .map(selectedTypeItem => selectedTypeItem.getAttribute('data-value'));
 
         // update display text
         const typeElement = document.getElementById('selectedType');
@@ -1835,14 +1834,14 @@ class HeaderSystem {
     const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
     accountItems.forEach(item => {
       item.addEventListener('click', e => {
-        const account = item.getAttribute('data-value');
+        // const _account = item.getAttribute('data-value');
 
         // toggle selection
         item.classList.toggle('selected');
 
         // collect all selected accounts
         const selectedAccounts = Array.from(document.querySelectorAll('#accountFilterMenu .filter-item.selected'))
-          .map(item => item.getAttribute('data-value'));
+          .map(selectedAccountItem => selectedAccountItem.getAttribute('data-value'));
 
         // update display text
         const accountElement = document.getElementById('selectedAccount');
@@ -1881,7 +1880,7 @@ class HeaderSystem {
             const otherMenu = otherToggle.nextElementSibling;
             if (otherMenu && otherMenu.classList.contains('tiktrack-dropdown-menu')) {
               otherMenu.classList.remove('show');
-              this.clearMenuTimers(otherMenu);
+              HeaderSystem.clearMenuTimers(otherMenu);
             }
           }
         });
@@ -1893,7 +1892,7 @@ class HeaderSystem {
 
           if (isVisible) {
             menu.classList.remove('show');
-            this.clearMenuTimers(menu);
+            HeaderSystem.clearMenuTimers(menu);
           } else {
             menu.classList.add('show');
             this.setupMenuAutoClose(menu);
@@ -1912,7 +1911,7 @@ class HeaderSystem {
           const navMenus = document.querySelectorAll('.tiktrack-nav-item.dropdown .tiktrack-dropdown-menu');
           navMenus.forEach(menu => {
             menu.classList.remove('show');
-            this.clearMenuTimers(menu);
+            HeaderSystem.clearMenuTimers(menu);
           });
         }
       }
@@ -1929,25 +1928,25 @@ class HeaderSystem {
 
     // הוספת event listener לתפריט הראשי
     menu.addEventListener('mouseenter', () => {
-      this.clearMenuTimers(menu);
+      HeaderSystem.clearMenuTimers(menu);
     });
 
     // הוספת event listener לתפריטי משנה
     menu.addEventListener('mouseover', e => {
       if (e.target.closest('.submenu') || e.target.closest('.dropdown-submenu')) {
-        this.clearMenuTimers(menu);
+        HeaderSystem.clearMenuTimers(menu);
       }
     });
   }
 
   setupMenuAutoClose(menu) {
     // ניקוי טיימרים קודמים
-    this.clearMenuTimers(menu);
+    HeaderSystem.clearMenuTimers(menu);
 
     // טיימר לסגירה אוטומטית אחרי 10 שניות
     const autoCloseTimer = setTimeout(() => {
       menu.classList.remove('show');
-      this.clearMenuTimers(menu);
+      HeaderSystem.clearMenuTimers(menu);
     }, 10000);
 
     // טיימר לסגירה אחרי יציאת העכבר
@@ -1976,9 +1975,9 @@ class HeaderSystem {
       // העכבר יצא מהתפריט הראשי - הפעלת טיימר לסגירה
       mouseLeaveTimer = setTimeout(() => {
         // בדיקה נוספת שהעכבר לא חזר לתפריט
-        if (!menu.matches(':hover') && !this.isMouseInSubmenu()) {
+        if (!menu.matches(':hover') && !HeaderSystem.isMouseInSubmenu()) {
           menu.classList.remove('show');
-          this.clearMenuTimers(menu);
+          HeaderSystem.clearMenuTimers(menu);
         }
       }, 2000); // זמן ארוך יותר לסגירה
     };
@@ -1994,7 +1993,7 @@ class HeaderSystem {
     menu._handleMouseLeave = handleMouseLeave;
   }
 
-  clearMenuTimers(menu) {
+  static clearMenuTimers(menu) {
     if (menu._autoCloseTimer) {
       clearTimeout(menu._autoCloseTimer);
       menu._autoCloseTimer = null;
@@ -2018,7 +2017,7 @@ class HeaderSystem {
   }
 
   // פונקציה עזר לבדיקה אם העכבר נמצא בתפריט משנה
-  isMouseInSubmenu() {
+  static isMouseInSubmenu() {
     // בדיקה אם העכבר נמצא בתפריט משנה כלשהו
     const submenu = document.querySelector('.submenu:hover');
     const dropdownSubmenu = document.querySelector('.dropdown-submenu:hover');
@@ -2073,7 +2072,7 @@ class HeaderSystem {
       // ביטול טיימרים של התפריט הראשי
       const parentMenu = submenu.closest('.tiktrack-dropdown-menu');
       if (parentMenu) {
-        this.clearMenuTimers(parentMenu);
+        HeaderSystem.clearMenuTimers(parentMenu);
       }
     });
 
@@ -2081,7 +2080,7 @@ class HeaderSystem {
       // ביטול טיימרים של התפריט הראשי
       const parentMenu = submenu.closest('.tiktrack-dropdown-menu');
       if (parentMenu) {
-        this.clearMenuTimers(parentMenu);
+        HeaderSystem.clearMenuTimers(parentMenu);
       }
     });
 
@@ -2111,7 +2110,7 @@ class HeaderSystem {
     const allOption = document.createElement('div');
     allOption.className = 'account-filter-item';
     allOption.textContent = 'הכול';
-    allOption.onclick = () => this.selectAccountFilter('הכול');
+    allOption.onclick = () => HeaderSystem.selectAccountFilter('הכול');
     accountMenu.appendChild(allOption);
 
     // הוספת חשבונות מהשרת
@@ -2120,7 +2119,7 @@ class HeaderSystem {
         const accountOption = document.createElement('div');
         accountOption.className = 'account-filter-item';
         accountOption.textContent = account.name;
-        accountOption.onclick = () => this.selectAccountFilter(account.name);
+        accountOption.onclick = () => HeaderSystem.selectAccountFilter(account.name);
         accountMenu.appendChild(accountOption);
       });
     } else {
@@ -2130,13 +2129,13 @@ class HeaderSystem {
         const accountOption = document.createElement('div');
         accountOption.className = 'account-filter-item';
         accountOption.textContent = accountName;
-        accountOption.onclick = () => this.selectAccountFilter(accountName);
+        accountOption.onclick = () => HeaderSystem.selectAccountFilter(accountName);
         accountMenu.appendChild(accountOption);
       });
     }
   }
 
-  selectAccountFilter(accountName) {
+  static selectAccountFilter(accountName) {
 
 
     // עדכון תצוגה
@@ -2183,7 +2182,7 @@ class HeaderSystem {
   }
 
   // שמירת מצב אזור הפילטרים
-  saveFiltersSectionState() {
+  static saveFiltersSectionState() {
     const filtersElement = document.getElementById('headerFilters');
     if (filtersElement) {
       const isOpen = filtersElement.style.display !== 'none';
@@ -2218,7 +2217,7 @@ class HeaderSystem {
   }
 
   // פונקציה לאיפוס כל הפילטרים
-  resetAllFilters() {
+  static resetAllFilters() {
 
 
     // איפוס פילטר סטטוס
@@ -2341,7 +2340,7 @@ class HeaderSystem {
   }
 
   // פונקציה לנקות חיפוש
-  clearSearchFilter() {
+  static clearSearchFilter() {
 
     const searchInput = document.getElementById('searchFilterInput');
     if (searchInput) {
@@ -2507,7 +2506,7 @@ class HeaderSystem {
     const navMenus = document.querySelectorAll('.tiktrack-nav-item.dropdown .tiktrack-dropdown-menu');
     navMenus.forEach(menu => {
       menu.classList.remove('show');
-      this.clearMenuTimers(menu);
+      HeaderSystem.clearMenuTimers(menu);
     });
   }
 

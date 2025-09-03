@@ -79,7 +79,8 @@ def get_system_status():
                         'recent_success_rate': status.get('recent_success_rate', 0)
                     })
                     
-                    if not provider.is_healthy:
+                    # Only check health for active providers
+                    if provider.is_active and not provider.is_healthy:
                         overall_health = False
                         
                 except Exception as e:
@@ -92,7 +93,9 @@ def get_system_status():
                         'is_healthy': False,
                         'error': str(e)
                     })
-                    overall_health = False
+                    # Only mark as unhealthy if provider is active
+                    if provider.is_active:
+                        overall_health = False
             
             # System metrics
             total_providers = len(providers)

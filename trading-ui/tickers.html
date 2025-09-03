@@ -31,7 +31,7 @@
     - עדכון שם הדף לטיקרים
     - שיפור עיצוב כרטיסיות התראות
     - תיקון כפתורי סגירה עצמאיים
-    - ריכוז פונקציות טיקרים ב-tickers.js?v=20250830_1
+    - ריכוז פונקציות טיקרים ב-tickers.js?v=20250903_2352
     - הוספת מערכת פריטים מקושרים מתקדמת
     - הוספת קובץ CSS ייעודי למודל הפריטים המקושרים
   -->
@@ -266,24 +266,7 @@
         border-radius: 0.25rem;
       }
 
-      /* רוחב קבוע לטבלה */
-      table[data-table-type="tickers"] {
-        table-layout: fixed;
-        width: 100%;
-      }
-
-      /* התאמה לטקסט ארוך */
-      table[data-table-type="tickers"] td {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      /* אפשרות לטקסט ארוך בהערות */
-      table[data-table-type="tickers"] td:nth-child(8) {
-        white-space: normal;
-        word-wrap: break-word;
-      }
+      /* CSS לטבלת טיקרים מוגדר ב-table.css */
     </style>
 
     <!-- Add Ticker Modal -->
@@ -503,7 +486,8 @@
     <script src="scripts/active-alerts-component.js?v=20250830_1"></script>
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/filter-system.js"></script>
-    <script src="scripts/tickers.js?v=20250830_1?v=20250828_044"></script>
+    <script src="scripts/external-data-service.js"></script>
+    <script src="scripts/tickers.js?v=20250904_0010"></script>
     <script>
               // אתחול מערכת הכותרת החדשה
         document.addEventListener("DOMContentLoaded", () => {

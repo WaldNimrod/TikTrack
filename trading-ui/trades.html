@@ -30,21 +30,23 @@
     - Sorting failed due to incorrect column mappings
     
     FIXES APPLIED:
-    - Updated colspan from 10 to 11 in loading row
-    - Fixed table headers to match 11-column structure
+    - Updated colspan from 10 to 13 in loading row
+    - Fixed table headers to match 13-column structure
     - Added "Show Linked Details" button to actions column
     - Integrated with linked-items.js for modal functionality
     
-    TABLE COLUMNS (11 total):
-    - חשבון (account_name)
+    TABLE COLUMNS (13 total):
     - טיקר (ticker_symbol) 
-    - תוכנית (trade_plan_id)
+    - מחיר נוכחי (current_price)
+    - שינוי % (change_percent)
     - סטטוס (status)
     - סוג (investment_type)
     - צד (side)
+    - תוכנית (trade_plan_id)
+    - רווח/הפסד (total_pl)
     - נוצר ב (created_at)
     - נסגר ב (closed_at)
-    - רווח/הפסד (total_pl)
+    - חשבון (account_name)
     - הערות (notes)
     - פעולות (actions) - כולל כפתור "הצג פרטים מקושרים"
     
@@ -110,6 +112,7 @@
   <script src="scripts/tables.js"></script>
   <script src="scripts/linked-items.js"></script>
   <script src="scripts/filter-system.js"></script>
+  <script src="scripts/external-data-service.js"></script>
   <script src="scripts/page-utils.js"></script>
   <script src="scripts/main.js"></script>
           <script src="scripts/header-system.js?v=20250901_3"></script>
@@ -201,61 +204,75 @@
                       <button class="btn btn-link sortable-header"
                         data-sort-column="1"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        סטטוס <span class="sort-icon">↕</span>
+                        מחיר נוכחי <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         data-sort-column="2"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        סוג <span class="sort-icon">↕</span>
+                        שינוי % <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         data-sort-column="3"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        צד <span class="sort-icon">↕</span>
+                        סטטוס <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         data-sort-column="4"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        תוכנית <span class="sort-icon">↕</span>
+                        סוג <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         data-sort-column="5"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        רווח/הפסד <span class="sort-icon">↕</span>
+                        צד <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         data-sort-column="6"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        נוצר ב <span class="sort-icon">↕</span>
+                        תוכנית <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         data-sort-column="7"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        נסגר ב <span class="sort-icon">↕</span>
+                        רווח/הפסד <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         data-sort-column="8"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
-                        חשבון <span class="sort-icon">↕</span>
+                        נוצר ב <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         data-sort-column="9"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        נסגר ב <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        data-sort-column="10"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        חשבון <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        data-sort-column="11"
                         style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
                         הערות <span class="sort-icon">↕</span>
                       </button>
@@ -267,7 +284,7 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="11" class="loading">טוען טריידים...</td>
+                    <td colspan="13" class="loading">טוען טריידים...</td>
                   </tr>
                 </tbody>
               </table>

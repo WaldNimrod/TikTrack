@@ -673,7 +673,198 @@ function showSecondConfirmationModal(message, onConfirm) {
 
 // פונקציה createWarningModal כבר מוגדרת בשורה 1041
 
+// ===== TABLE REFRESH SYSTEM =====
+
+/**
+ * מערכת רענון טבלאות גלובלית
+ * מטפלת ברענון טבלאות אחרי פעולות CRUD עם שיפורי ביצועים
+ */
+
+/**
+ * רענון טבלה משופר עם כפיית DOM reflow
+ * @param {Function} loadDataFunction - פונקציית טעינת הנתונים
+ * @param {Function} updateActiveFieldsFunction - פונקציית עדכון שדות פעילים (אופציונלי)
+ * @param {string} operationName - שם הפעולה לצורך לוגים
+ * @param {number} delay - עיכוב במילישניות לפני הרענון (ברירת מחדל: 100)
+ */
+async function enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction, operationName = 'פעולה', delay = 100) {
+  try {
+    // עיכוב קטן לוודא שהשרת עדכן את הנתונים
+    if (delay > 0) {
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+    
+    console.log(`🔄 רענון נתונים אחרי ${operationName}`);
+    
+    // טעינת נתונים חדשים
+    if (typeof loadDataFunction === 'function') {
+      await loadDataFunction();
+    }
+    
+    // עדכון שדות פעילים אם קיים
+    if (typeof updateActiveFieldsFunction === 'function') {
+      await updateActiveFieldsFunction();
+    }
+    
+    console.log(`✅ רענון הטבלה הושלם אחרי ${operationName}`);
+    
+    return true;
+  } catch (error) {
+    console.error(`❌ שגיאה ברענון טבלה אחרי ${operationName}:`, error);
+    return false;
+  }
+}
+
+/**
+ * טיפול משופר בתגובות API עם רענון טבלה אוטומטי
+ * @param {Response} response - תגובת ה-API
+ * @param {Object} options - אפשרויות הטיפול
+ * @param {Function} options.loadDataFunction - פונקציית טעינת נתונים
+ * @param {Function} options.updateActiveFieldsFunction - פונקציית עדכון שדות פעילים
+ * @param {string} options.operationName - שם הפעולה
+ * @param {string} options.itemName - שם הפריט (טיקר, עסקה וכו')
+ * @param {string} options.successMessage - הודעת הצלחה מותאמת אישית
+ * @param {Function} options.onSuccess - פונקציה נוספת לביצוע בהצלחה
+ * @param {Function} options.onNotFound - פונקציה מותאמת אישית ל-404
+ */
+async function handleApiResponseWithRefresh(response, options = {}) {
+  const {
+    loadDataFunction,
+    updateActiveFieldsFunction,
+    operationName = 'פעולה',
+    itemName = 'פריט',
+    successMessage,
+    onSuccess,
+    onNotFound
+  } = options;
+
+  if (response.ok) {
+    // פעולה הצליחה
+    const defaultMessage = `${itemName} ${operationName === 'מחיקה' ? 'נמחק' : 
+                                      operationName === 'עדכון' ? 'עודכן' : 
+                                      operationName === 'הוספה' ? 'נוסף' : 
+                                      operationName === 'ביטול' ? 'בוטל' : 
+                                      operationName === 'שיחזור' ? 'שוחזר' : 'עובד'} בהצלחה`;
+    
+    if (window.showSuccessNotification) {
+      window.showSuccessNotification('הצלחה', successMessage || defaultMessage);
+    }
+
+    // ביצוע פונקציה נוספת אם קיימת
+    if (typeof onSuccess === 'function') {
+      await onSuccess();
+    }
+
+    // רענון טבלה
+    await enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction, operationName);
+    
+    return true;
+
+  } else if (response.status === 404) {
+    // פריט לא קיים - טיפול ב-404
+    console.warn(`${itemName} כבר לא קיים בבסיס הנתונים, מרענן נתונים`);
+    
+    if (typeof onNotFound === 'function') {
+      await onNotFound();
+    } else {
+      if (window.showSuccessNotification) {
+        window.showSuccessNotification('מידע', `${itemName} כבר לא קיים במערכת - מרענן נתונים`);
+      }
+    }
+
+    // רענון טבלה גם במקרה של 404
+    await enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction, `זיהוי 404 ב${operationName}`);
+    
+    return true;
+
+  } else {
+    // שגיאה אחרת
+    const errorResponse = await response.text();
+    console.error(`שגיאה ב${operationName}:`, errorResponse);
+    
+    try {
+      const errorData = JSON.parse(errorResponse);
+      const errorMessage = errorData.error?.message || errorResponse;
+      
+      if (window.showErrorNotification) {
+        window.showErrorNotification(`שגיאה ב${operationName}`, errorMessage);
+      }
+    } catch {
+      if (window.showErrorNotification) {
+        window.showErrorNotification(`שגיאה ב${operationName}`, 'שגיאה לא מזוהה');
+      }
+    }
+    
+    return false;
+  }
+}
+
+/**
+ * פונקציית עזר לזיהוי אוטומטי של פונקציות טעינת נתונים לפי עמוד נוכחי
+ */
+function getPageDataFunctions() {
+  const currentPage = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
+  
+  const pageFunctions = {
+    'tickers': {
+      loadData: window.loadTickersData,
+      updateActive: window.updateActiveTradesField
+    },
+    'trades': {
+      loadData: window.loadTradesData,
+      updateActive: window.updateActiveTradesField
+    },
+    'accounts': {
+      loadData: window.loadAccountsDataForAccountsPage,
+      updateActive: null
+    },
+    'alerts': {
+      loadData: window.loadAlertsData,
+      updateActive: null
+    },
+    'trade_plans': {
+      loadData: window.loadTradePlansData,
+      updateActive: null
+    },
+    'executions': {
+      loadData: window.loadExecutionsData,
+      updateActive: null
+    },
+    'cash_flows': {
+      loadData: window.loadCashFlowsData,
+      updateActive: null
+    },
+    'notes': {
+      loadData: window.loadNotesData,
+      updateActive: null
+    }
+  };
+  
+  return pageFunctions[currentPage] || { loadData: null, updateActive: null };
+}
+
+/**
+ * פונקציית עזר מקוצרת לרענון אוטומטי לפי עמוד נוכחי
+ * @param {string} operationName - שם הפעולה
+ */
+async function autoRefreshCurrentPage(operationName = 'פעולה') {
+  const { loadData, updateActive } = getPageDataFunctions();
+  
+  if (loadData) {
+    await enhancedTableRefresh(loadData, updateActive, operationName);
+  } else {
+    console.warn('לא נמצאה פונקציית טעינת נתונים לעמוד הנוכחי');
+    location.reload(); // fallback
+  }
+}
+
 // ===== EXPORTS =====
+
+// Export table refresh system functions
+window.enhancedTableRefresh = enhancedTableRefresh;
+window.handleApiResponseWithRefresh = handleApiResponseWithRefresh;
+window.getPageDataFunctions = getPageDataFunctions;
+window.autoRefreshCurrentPage = autoRefreshCurrentPage;
 
 // Export account utility functions
 window.showSecondConfirmationModal = showSecondConfirmationModal;

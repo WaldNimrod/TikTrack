@@ -104,7 +104,6 @@
  *    - createExecutionDetails() - Create execution details display
  *
  * 6. UTILITY FUNCTIONS:
- *    - getMockLinkedData() - Get mock data for development
  *    - exportLinkedItemsData() - Export linked items data
  *    - viewItemDetails() - View item details
  *    - editItem() - Edit item

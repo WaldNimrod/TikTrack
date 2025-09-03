@@ -494,7 +494,9 @@ function updateAlertsTable(alerts) {
       return `
         <tr data-status="${alert.status || ''}" data-date="${alert.created_at || ''}">
           <td class="ticker-cell">
-            <span class="link-icon" title="חיבור לעמוד טרייד - בפיתוח" style="cursor: pointer; margin-left: 5px;">🔗</span>
+            <span class="link-icon" 
+              title="חיבור לעמוד טרייד - בפיתוח" 
+              style="cursor: pointer; margin-left: 5px;">🔗</span>
             <span class="symbol-text">${symbolDisplay}</span>
           </td>
           <td><span class="condition-text">${(() => {
@@ -508,7 +510,9 @@ function updateAlertsTable(alerts) {
     }
     return alert.condition || '-';
   })()}</span></td>
-          <td class="status-cell" data-status="${alert.status || ''}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
+          <td class="status-cell" data-status="${alert.status || ''}">
+          <span class="status-badge ${statusClass}">${statusDisplay}</span>
+        </td>
           <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
           <td style="padding: 0;">
             <div class="related-object-cell ${relatedClass}" 
@@ -533,7 +537,11 @@ function updateAlertsTable(alerts) {
                 <span class="reactivate-icon">✓</span>
               </button>
               ` : `
-              <button class="btn btn-danger" onclick="cancelAlert(${alert.id})" title="ביטול"><span class="cancel-icon">X</span></button>
+              <button class="btn btn-danger" 
+                      onclick="cancelAlert(${alert.id})" 
+                      title="ביטול">
+                <span class="cancel-icon">X</span>
+              </button>
               `}
               <button class="btn btn-danger" onclick="deleteAlert(${alert.id})" title="מחק">🗑️</button>
             </div>

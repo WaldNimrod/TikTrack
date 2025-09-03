@@ -16,7 +16,7 @@ trading-ui/scripts/
 │   └── console-cleanup.js         # Console cleanup
 │
 ├── 🛠️ Utility Files
-│   ├── ui-utils.js                # Shared UI functions
+│   ├── ui-utils.js                # Shared UI functions + TABLE REFRESH SYSTEM
 │   ├── validation-utils.js        # Global validation system
 │   ├── data-utils.js              # Shared data functions
 │   ├── date-utils.js              # Date functions
@@ -503,15 +503,95 @@ Optimized loading order and efficient function organization.
 4. **Debugging**: Clear file organization for troubleshooting
 5. **Team Development**: Clear responsibilities and boundaries
 
+## 🔄 Global Table Refresh System (New in v2.9.0)
+
+### Overview
+מערכת רענון טבלאות גלובלית חדשה הוטמעה ב-`ui-utils.js` לטיפול אחיד ויעיל ברענון טבלאות אחרי פעולות CRUD בכל העמודים.
+
+### Core Functions
+
+#### `enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction, operationName, delay)`
+- **תפקיד**: רענון טבלה משופר עם כפיית DOM reflow
+- **פרמטרים**: פונקציית טעינת נתונים, עדכון שדות פעילים, שם פעולה, עיכוב
+- **יתרונות**: לוגים אחידים, טיפול בשגיאות, אופטימיזציה של ביצועים
+
+#### `handleApiResponseWithRefresh(response, options)`
+- **תפקיד**: טיפול אוטומטי בתגובות API עם רענון טבלה
+- **תכונות**:
+  - טיפול אחיד בהצלחה, 404, ושגיאות
+  - הודעות מותאמות אישית
+  - רענון אוטומטי של טבלאות
+  - תמיכה בפונקציות callback מותאמות
+
+#### `autoRefreshCurrentPage(operationName)`
+- **תפקיד**: רענון אוטומטי לפי עמוד נוכחי
+- **זיהוי אוטומטי**: מזהה את העמוד הנוכחי ופונקציות הנתונים המתאימות
+
+### Page Function Mapping
+```javascript
+const pageFunctions = {
+  'tickers': { loadData: loadTickersData, updateActive: updateActiveTradesField },
+  'trades': { loadData: loadTradesData, updateActive: updateActiveTradesField },
+  'accounts': { loadData: loadAccountsDataForAccountsPage, updateActive: null },
+  'alerts': { loadData: loadAlertsData, updateActive: null },
+  // ... additional pages
+};
+```
+
+### Usage Examples
+
+**Before (50+ lines of repetitive code):**
+```javascript
+if (response.ok) {
+  // success handling
+  // delay
+  // refresh data
+  // update fields
+  // logging
+} else if (response.status === 404) {
+  // 404 handling
+  // refresh data
+  // logging
+} else {
+  // error handling
+}
+```
+
+**After (10 lines with global system):**
+```javascript
+const handled = await window.handleApiResponseWithRefresh(response, {
+  loadDataFunction: window.loadTickersData,
+  updateActiveFieldsFunction: window.updateActiveTradesField,
+  operationName: 'מחיקה',
+  itemName: 'הטיקר',
+  successMessage: 'הטיקר נמחק בהצלחה'
+});
+```
+
+### Benefits
+1. **Code Reduction**: 80% less code in CRUD operations
+2. **Consistency**: Uniform behavior across all pages
+3. **Maintainability**: Single point of change for refresh logic
+4. **404 Handling**: Automatic handling of non-existent items
+5. **Enhanced UX**: Immediate table updates without manual refresh
+6. **Debugging**: Comprehensive logging for all operations
+
+### Implementation Status
+- ✅ **Tickers Page**: Delete and reactivate functions updated
+- ⏳ **Other Pages**: Ready for migration to new system
+- ✅ **Global Functions**: All exported to window object
+- ✅ **Documentation**: Complete usage examples
+
 ## 📚 Related Documentation
 
 - [Filter System](FILTER_SYSTEM.md)
 - [Number Formatting](NUMBER_FORMATTING.md)
 - [CSS Architecture](../css/CSS_ARCHITECTURE.md)
 - [Backend Integration](../../backend/README.md)
+- [External Data Integration](EXTERNAL_DATA_INTEGRATION.md)
 
 ---
 
-**Last Updated**: August 26, 2025  
-**Version**: 2.8.0  
+**Last Updated**: September 4, 2025  
+**Version**: 2.9.0  
 **Maintained By**: TikTrack Development Team

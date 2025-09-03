@@ -25,7 +25,6 @@
 // ===== GLOBAL VARIABLES =====
 let currentTableType = 'accounts'; // Default table type
 const tableData = {};
-let isDataLoaded = false;
 
 // ===== PAGE INITIALIZATION =====
 
@@ -99,8 +98,6 @@ async function loadTableData(tableType) {
     // Update table info
     updateTableInfo(tableType, data.length);
 
-    // Mark as loaded
-    isDataLoaded = true;
 
     // console.log(`✅ Data loaded for ${tableType}: ${data.length} records`);
 
@@ -129,7 +126,7 @@ async function fetchTableData(tableType) {
     } else {
       throw new Error(result.error?.message || `Error fetching ${tableType} data`);
     }
-  } catch (error) {
+  } catch {
     // console.error(`❌ Error fetching ${tableType} data:`, error);
     // Return empty array on error
     return [];
@@ -184,46 +181,6 @@ function updateTableDisplay(data, tableType) {
   applySortingFunctionality(tableType);
 }
 
-/**
- * Create table HTML from data
- * @param {Array} data - The data to display
- * @param {Object} tableMapping - The table mapping configuration
- * @param {string} tableType - The table type
- * @returns {string} The table HTML
- */
-function createTableHTML(data, tableMapping, tableType) {
-  const columns = tableMapping.columns || [];
-
-  // Create header
-  let headerHTML = '<thead><tr>';
-  columns.forEach((column, index) => {
-    const sortable = column.sortable !== false;
-    const sortClass = sortable ? 'sortable' : '';
-    const sortOnClick = sortable ? `onclick="sortTable(${index}, '${tableType}')"` : '';
-
-    headerHTML += `<th class="${sortClass}" ${sortOnClick} style="width: ${column.width || 'auto'};">${column.title || column.field}</th>`;
-  });
-  headerHTML += '</tr></thead>';
-
-  // Create body
-  let bodyHTML = '<tbody>';
-  if (data.length === 0) {
-    bodyHTML += `<tr><td colspan="${columns.length}" class="text-center">אין נתונים</td></tr>`;
-  } else {
-    data.forEach(row => {
-      bodyHTML += '<tr>';
-      columns.forEach(column => {
-        const value = row[column.field] || '';
-        const formattedValue = formatCellValue(value, column);
-        bodyHTML += `<td>${formattedValue}</td>`;
-      });
-      bodyHTML += '</tr>';
-    });
-  }
-  bodyHTML += '</tbody>';
-
-  return `<table class="table table-striped table-hover" data-table-type="${tableType}">${headerHTML}${bodyHTML}</table>`;
-}
 
 /**
  * Create table body HTML from data
@@ -232,7 +189,7 @@ function createTableHTML(data, tableMapping, tableType) {
  * @param {string} tableType - The table type
  * @returns {string} The table body HTML
  */
-function createTableBodyHTML(data, tableMapping, tableType) {
+function createTableBodyHTML(data, tableMapping, _tableType) {
   let tbodyHTML = '';
 
   if (data.length === 0) {
@@ -282,7 +239,7 @@ function formatCellValue(value, column) {
  * Apply sorting functionality to table
  * @param {string} tableType - The table type
  */
-function applySortingFunctionality(tableType) {
+function applySortingFunctionality(_tableType) {
   // Sorting is handled by global sortTable function from main.js
   // console.log(`🔀 Sorting functionality applied to ${tableType} table`);
 }
@@ -347,7 +304,7 @@ function formatDate(dateString) {
   try {
     const date = new Date(dateString);
     return date.toLocaleDateString('he-IL');
-  } catch (error) {
+  } catch {
     return dateString;
   }
 }
@@ -400,7 +357,7 @@ function formatStatus(status) {
  * @param {string} tableType - The table type
  */
 function handleDataLoadError(error, tableType) {
-      // console.error(`❌ Error loading ${tableType} data:`, error);
+  // console.error(`❌ Error loading ${tableType} data:`, error);
 
   // Show error notification
   if (window.showErrorNotification) {
@@ -414,7 +371,8 @@ function handleDataLoadError(error, tableType) {
     if (tableContainer) {
       const tbody = tableContainer.querySelector('tbody');
       if (tbody) {
-        tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger">שגיאה בטעינת נתונים: ${error.message}</td></tr>`;
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center text-danger">' +
+          `שגיאה בטעינת נתונים: ${error.message}</td></tr>`;
       }
     }
   }

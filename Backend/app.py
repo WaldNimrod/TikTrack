@@ -228,6 +228,16 @@ if data_refresh_scheduler:
 else:
     logger.info("ℹ️ External data refresh scheduler not available - skipping")
 
+# Start Cache Warming Service
+try:
+    logger.info("🚀 Starting cache warming service...")
+    from services.cache_warming_service import cache_warming_service
+    cache_warming_service.start_warming()
+    cache_warming_service.warm_critical_data()
+    logger.info("✅ Cache warming service started successfully")
+except Exception as e:
+    logger.error(f"❌ Failed to start cache warming service: {e}")
+
 # Register advanced error handlers
 ErrorHandler.register_error_handlers(app)
 

@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דשבורד ניתוח מטמון - TikTrack</title>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="styles/table.css">
+    <link rel="stylesheet" href="styles/cache-test.css">
+    
+    <style>
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .metric-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 2px solid #f0f0f0;
+        }
+        
+        .metric-card.healthy {
+            border-color: #28a745;
+        }
+        
+        .metric-card.warning {
+            border-color: #ffc107;
+        }
+        
+        .metric-card.critical {
+            border-color: #dc3545;
+        }
+        
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #333;
+        }
+        
+        .metric-label {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .metric-details {
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 10px;
+        }
+        
+        .chart-container {
+            height: 300px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+        
+        .cache-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .cache-table th,
+        .cache-table td {
+            padding: 12px;
+            text-align: right;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cache-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .cache-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-left: 5px;
+        }
+        
+        .status-healthy { background-color: #28a745; }
+        .status-warning { background-color: #ffc107; }
+        .status-critical { background-color: #dc3545; }
+        
+        .refresh-button {
+            background: #ff9c05;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        
+        .refresh-button:hover {
+            background: #e68900;
+        }
+        
+        .control-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app-header"></div>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>🚀 דשבורד ניתוח מטמון</h1>
+            <p>ניטור ביצועים מתקדם של מערכת המטמון</p>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <h3>🎛️ בקרת מטמון</h3>
+            <button class="refresh-button" onclick="refreshAllMetrics()">
+                🔄 רענן הכל
+            </button>
+            <button class="refresh-button" onclick="clearAllCache()" style="background: #dc3545;">
+                🗑️ נקה מטמון
+            </button>
+            <button class="refresh-button" onclick="exportAnalytics()" style="background: #17a2b8;">
+                📊 ייצא נתונים
+            </button>
+            <button class="refresh-button" onclick="testCachePattern()" style="background: #6f42c1;">
+                🧪 בדיקת Patterns
+            </button>
+        </div>
+
+        <!-- Key Metrics Grid -->
+        <div class="analytics-grid">
+            <!-- Frontend Cache Stats -->
+            <div class="metric-card" id="frontend-stats-card">
+                <div class="metric-label">📱 מטמון Frontend</div>
+                <div class="metric-value" id="frontend-hit-rate">--</div>
+                <div class="metric-details" id="frontend-details">טוען נתונים...</div>
+            </div>
+
+            <!-- Backend Cache Stats -->
+            <div class="metric-card" id="backend-stats-card">
+                <div class="metric-label">🗄️ מטמון Backend</div>
+                <div class="metric-value" id="backend-hit-rate">--</div>
+                <div class="metric-details" id="backend-details">טוען נתונים...</div>
+            </div>
+
+            <!-- Memory Usage -->
+            <div class="metric-card" id="memory-stats-card">
+                <div class="metric-label">🧠 שימוש בזיכרון</div>
+                <div class="metric-value" id="memory-usage">--</div>
+                <div class="metric-details" id="memory-details">טוען נתונים...</div>
+            </div>
+
+            <!-- Response Times -->
+            <div class="metric-card" id="response-stats-card">
+                <div class="metric-label">⚡ זמני תגובה</div>
+                <div class="metric-value" id="avg-response-time">--</div>
+                <div class="metric-details" id="response-details">טוען נתונים...</div>
+            </div>
+        </div>
+
+        <!-- Cache Entries Table -->
+        <div class="section">
+            <h3>📋 רשימת רכיבי מטמון</h3>
+            <table class="cache-table">
+                <thead>
+                    <tr>
+                        <th>מפתח</th>
+                        <th>גודל (KB)</th>
+                        <th>גיל</th>
+                        <th>פגיעות</th>
+                        <th>תלויות</th>
+                        <th>סטטוס</th>
+                        <th>פעולות</th>
+                    </tr>
+                </thead>
+                <tbody id="cache-entries-table">
+                    <tr>
+                        <td colspan="7">טוען נתונים...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Performance Trends Chart -->
+        <div class="section">
+            <h3>📈 מגמות ביצועים</h3>
+            <div class="chart-container">
+                📈 גרף מגמות ביצועים יועלה בקרוב
+                <br>
+                <small>יציג: hit rate לאורך זמן, זמני תגובה, שימוש בזיכרון</small>
+            </div>
+        </div>
+
+        <!-- Cache Patterns Analysis -->
+        <div class="section">
+            <h3>🔍 ניתוח דפוסי שימוש</h3>
+            <div class="analytics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">🎯 דפוסים חמים</div>
+                    <div id="hot-patterns">טוען...</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">❄️ דפוסים קרים</div>
+                    <div id="cold-patterns">טוען...</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">⚠️ דפוסים בעיתיים</div>
+                    <div id="problematic-patterns">טוען...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-time Logs -->
+        <div class="section">
+            <h3>📝 לוגים בזמן אמת</h3>
+            <div class="logs-container" id="analytics-logs" style="height: 300px; overflow-y: auto; background: #f8f9fa; padding: 15px; border-radius: 4px; font-family: monospace;">
+                מתחיל ניטור...
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/header-system.js"></script>
+    <script src="scripts/frontend-cache-manager.js"></script>
+    
+    <script>
+        // ===== CACHE ANALYTICS DASHBOARD =====
+        
+        class CacheAnalyticsDashboard {
+            constructor() {
+                this.refreshInterval = 30000; // 30 seconds
+                this.performanceHistory = [];
+                this.isMonitoring = false;
+                
+                this.initialize();
+            }
+            
+            async initialize() {
+                console.log('[CacheAnalytics] Initializing dashboard...');
+                
+                // Wait for dependencies
+                await this.waitForDependencies();
+                
+                // Start real-time monitoring
+                this.startRealTimeMonitoring();
+                
+                // Initial data load
+                await this.loadAllMetrics();
+                
+                console.log('[CacheAnalytics] Dashboard initialized successfully');
+            }
+            
+            async waitForDependencies() {
+                // Wait for frontend cache manager
+                let attempts = 0;
+                while (!window.frontendCacheManager && attempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+                
+                if (!window.frontendCacheManager) {
+                    console.warn('[CacheAnalytics] Frontend Cache Manager not available');
+                }
+            }
+            
+            startRealTimeMonitoring() {
+                if (this.isMonitoring) return;
+                
+                this.isMonitoring = true;
+                this.monitoringInterval = setInterval(() => {
+                    this.updateRealTimeMetrics();
+                }, this.refreshInterval);
+                
+                console.log('[CacheAnalytics] Real-time monitoring started');
+            }
+            
+            stopRealTimeMonitoring() {
+                this.isMonitoring = false;
+                if (this.monitoringInterval) {
+                    clearInterval(this.monitoringInterval);
+                }
+                console.log('[CacheAnalytics] Real-time monitoring stopped');
+            }
+            
+            async loadAllMetrics() {
+                try {
+                    await Promise.all([
+                        this.updateFrontendStats(),
+                        this.updateBackendStats(),
+                        this.updateMemoryStats(),
+                        this.updateResponseStats(),
+                        this.updateCacheEntries(),
+                        this.updatePatternAnalysis()
+                    ]);
+                } catch (error) {
+                    this.log(`Failed to load metrics: ${error.message}`, 'error');
+                }
+            }
+            
+            async updateRealTimeMetrics() {
+                await Promise.all([
+                    this.updateFrontendStats(),
+                    this.updateBackendStats(),
+                    this.updateMemoryStats(),
+                    this.updateResponseStats()
+                ]);
+            }
+            
+            async updateFrontendStats() {
+                try {
+                    if (!window.frontendCacheManager) {
+                        this.updateFrontendDisplay('N/A', 'FrontendCacheManager לא זמין', 'critical');
+                        return;
+                    }
+                    
+                    const stats = window.frontendCacheManager.getStats();
+                    const hitRateText = `${stats.hitRate.toFixed(1)}%`;
+                    const details = `רכיבים: ${stats.totalEntries} | זיכרון: ${stats.memoryUsageMB.toFixed(1)}MB`;
+                    
+                    const status = stats.hitRate > 80 ? 'healthy' : 
+                                 stats.hitRate > 60 ? 'warning' : 'critical';
+                    
+                    this.updateFrontendDisplay(hitRateText, details, status);
+                    
+                } catch (error) {
+                    this.updateFrontendDisplay('Error', error.message, 'critical');
+                }
+            }
+            
+            async updateBackendStats() {
+                try {
+                    const response = await fetch('/api/v1/cache/stats');
+                    const data = await response.json();
+                    
+                    if (data.status === 'success') {
+                        const stats = data.data;
+                        const hitRateText = `${stats.hit_rate_percent}%`;
+                        const details = `רכיבים: ${stats.total_entries} | זיכרון: ${stats.estimated_memory_mb}MB`;
+                        
+                        const status = stats.hit_rate_percent > 80 ? 'healthy' : 
+                                     stats.hit_rate_percent > 60 ? 'warning' : 'critical';
+                        
+                        this.updateBackendDisplay(hitRateText, details, status);
+                    } else {
+                        this.updateBackendDisplay('Error', data.message, 'critical');
+                    }
+                    
+                } catch (error) {
+                    this.updateBackendDisplay('Offline', error.message, 'critical');
+                }
+            }
+            
+            async updateMemoryStats() {
+                try {
+                    const frontendStats = window.frontendCacheManager?.getStats() || {};
+                    const backendResponse = await fetch('/api/v1/cache/stats');
+                    const backendData = await backendResponse.json();
+                    
+                    if (backendData.status === 'success') {
+                        const totalMemory = (frontendStats.memoryUsageMB || 0) + 
+                                          (backendData.data.estimated_memory_mb || 0);
+                        
+                        const memoryText = `${totalMemory.toFixed(1)}MB`;
+                        const details = `Frontend: ${(frontendStats.memoryUsageMB || 0).toFixed(1)}MB | Backend: ${(backendData.data.estimated_memory_mb || 0).toFixed(1)}MB`;
+                        
+                        const status = totalMemory < 100 ? 'healthy' : 
+                                     totalMemory < 150 ? 'warning' : 'critical';
+                        
+                        this.updateMemoryDisplay(memoryText, details, status);
+                    }
+                    
+                } catch (error) {
+                    this.updateMemoryDisplay('Error', error.message, 'critical');
+                }
+            }
+            
+            async updateResponseStats() {
+                const startTime = performance.now();
+                try {
+                    await fetch('/api/v1/cache/health');
+                    const responseTime = performance.now() - startTime;
+                    
+                    const responseText = `${responseTime.toFixed(1)}ms`;
+                    const details = `API Response Time`;
+                    
+                    const status = responseTime < 50 ? 'healthy' : 
+                                 responseTime < 100 ? 'warning' : 'critical';
+                    
+                    this.updateResponseDisplay(responseText, details, status);
+                    
+                    // Track in history
+                    this.performanceHistory.push({
+                        timestamp: Date.now(),
+                        responseTime: responseTime
+                    });
+                    
+                    // Keep only last 100 measurements
+                    if (this.performanceHistory.length > 100) {
+                        this.performanceHistory.shift();
+                    }
+                    
+                } catch (error) {
+                    this.updateResponseDisplay('Error', error.message, 'critical');
+                }
+            }
+            
+            async updateCacheEntries() {
+                try {
+                    const tableBody = document.getElementById('cache-entries-table');
+                    if (!tableBody) return;
+                    
+                    let entries = [];
+                    
+                    // Get frontend cache entries
+                    if (window.frontendCacheManager) {
+                        const exportData = window.frontendCacheManager.exportCache();
+                        
+                        Object.entries(exportData.cache).forEach(([key, entry]) => {
+                            entries.push({
+                                key: key,
+                                size: this.estimateSize(entry.data),
+                                age: Date.now() - entry.createdAt,
+                                hits: entry.accessCount,
+                                dependencies: entry.dependencies.join(', '),
+                                status: Date.now() - entry.createdAt > entry.ttl ? 'expired' : 'valid',
+                                type: 'frontend'
+                            });
+                        });
+                    }
+                    
+                    // Render table
+                    this.renderCacheEntriesTable(entries);
+                    
+                } catch (error) {
+                    this.log(`Failed to update cache entries: ${error.message}`, 'error');
+                }
+            }
+            
+            async updatePatternAnalysis() {
+                try {
+                    const hotPatterns = document.getElementById('hot-patterns');
+                    const coldPatterns = document.getElementById('cold-patterns');
+                    const problematicPatterns = document.getElementById('problematic-patterns');
+                    
+                    if (window.frontendCacheManager) {
+                        const stats = window.frontendCacheManager.getStats();
+                        const exportData = window.frontendCacheManager.exportCache();
+                        
+                        // Analyze patterns
+                        const patterns = this.analyzePatterns(exportData.cache);
+                        
+                        hotPatterns.innerHTML = this.renderPatterns(patterns.hot);
+                        coldPatterns.innerHTML = this.renderPatterns(patterns.cold);
+                        problematicPatterns.innerHTML = this.renderPatterns(patterns.problematic);
+                    } else {
+                        hotPatterns.innerHTML = 'FrontendCacheManager לא זמין';
+                        coldPatterns.innerHTML = 'FrontendCacheManager לא זמין';
+                        problematicPatterns.innerHTML = 'FrontendCacheManager לא זמין';
+                    }
+                    
+                } catch (error) {
+                    this.log(`Failed to update pattern analysis: ${error.message}`, 'error');
+                }
+            }
+            
+            analyzePatterns(cacheData) {
+                const patterns = { hot: [], cold: [], problematic: [] };
+                const namespaceStats = {};
+                
+                // Group by namespace
+                Object.entries(cacheData).forEach(([key, entry]) => {
+                    const namespace = key.split(':')[0];
+                    if (!namespaceStats[namespace]) {
+                        namespaceStats[namespace] = {
+                            count: 0,
+                            totalHits: 0,
+                            totalSize: 0,
+                            avgAge: 0
+                        };
+                    }
+                    
+                    namespaceStats[namespace].count++;
+                    namespaceStats[namespace].totalHits += entry.accessCount;
+                    namespaceStats[namespace].totalSize += this.estimateSize(entry.data);
+                });
+                
+                // Categorize patterns
+                Object.entries(namespaceStats).forEach(([namespace, stats]) => {
+                    const avgHits = stats.totalHits / stats.count;
+                    const avgSizeMB = stats.totalSize / (1024 * 1024);
+                    
+                    if (avgHits > 10) {
+                        patterns.hot.push(`${namespace} (${avgHits.toFixed(1)} hits avg)`);
+                    } else if (avgHits < 2) {
+                        patterns.cold.push(`${namespace} (${avgHits.toFixed(1)} hits avg)`);
+                    }
+                    
+                    if (avgSizeMB > 5) {
+                        patterns.problematic.push(`${namespace} (${avgSizeMB.toFixed(1)}MB avg)`);
+                    }
+                });
+                
+                return patterns;
+            }
+            
+            renderPatterns(patterns) {
+                if (patterns.length === 0) {
+                    return '<div style="color: #666;">אין נתונים</div>';
+                }
+                
+                return patterns.map(pattern => 
+                    `<div style="margin: 5px 0; padding: 5px; background: #f0f0f0; border-radius: 3px;">${pattern}</div>`
+                ).join('');
+            }
+            
+            renderCacheEntriesTable(entries) {
+                const tableBody = document.getElementById('cache-entries-table');
+                if (!tableBody) return;
+                
+                if (entries.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="7">אין רכיבי מטמון</td></tr>';
+                    return;
+                }
+                
+                // Sort by hits (most accessed first)
+                entries.sort((a, b) => b.hits - a.hits);
+                
+                // Show top 20 entries
+                const topEntries = entries.slice(0, 20);
+                
+                const html = topEntries.map(entry => `
+                    <tr>
+                        <td>${entry.key}</td>
+                        <td>${(entry.size / 1024).toFixed(1)}</td>
+                        <td>${this.formatAge(entry.age)}</td>
+                        <td>${entry.hits}</td>
+                        <td>${entry.dependencies}</td>
+                        <td>
+                            <span class="status-indicator status-${entry.status === 'valid' ? 'healthy' : 'critical'}"></span>
+                            ${entry.status === 'valid' ? 'תקף' : 'פג תוקף'}
+                        </td>
+                        <td>
+                            <button onclick="invalidateCacheEntry('${entry.key}')" style="font-size: 0.8em; padding: 3px 8px;">
+                                🗑️ מחק
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                tableBody.innerHTML = html;
+            }
+            
+            // Helper methods for display updates
+            updateFrontendDisplay(value, details, status) {
+                const card = document.getElementById('frontend-stats-card');
+                const valueEl = document.getElementById('frontend-hit-rate');
+                const detailsEl = document.getElementById('frontend-details');
+                
+                if (card) card.className = `metric-card ${status}`;
+                if (valueEl) valueEl.textContent = value;
+                if (detailsEl) detailsEl.textContent = details;
+            }
+            
+            updateBackendDisplay(value, details, status) {
+                const card = document.getElementById('backend-stats-card');
+                const valueEl = document.getElementById('backend-hit-rate');
+                const detailsEl = document.getElementById('backend-details');
+                
+                if (card) card.className = `metric-card ${status}`;
+                if (valueEl) valueEl.textContent = value;
+                if (detailsEl) detailsEl.textContent = details;
+            }
+            
+            updateMemoryDisplay(value, details, status) {
+                const card = document.getElementById('memory-stats-card');
+                const valueEl = document.getElementById('memory-usage');
+                const detailsEl = document.getElementById('memory-details');
+                
+                if (card) card.className = `metric-card ${status}`;
+                if (valueEl) valueEl.textContent = value;
+                if (detailsEl) detailsEl.textContent = details;
+            }
+            
+            updateResponseDisplay(value, details, status) {
+                const card = document.getElementById('response-stats-card');
+                const valueEl = document.getElementById('avg-response-time');
+                const detailsEl = document.getElementById('response-details');
+                
+                if (card) card.className = `metric-card ${status}`;
+                if (valueEl) valueEl.textContent = value;
+                if (detailsEl) detailsEl.textContent = details;
+            }
+            
+            estimateSize(data) {
+                try {
+                    return new Blob([JSON.stringify(data)]).size;
+                } catch {
+                    return 1024; // 1KB fallback
+                }
+            }
+            
+            formatAge(ageMs) {
+                const seconds = Math.floor(ageMs / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const hours = Math.floor(minutes / 60);
+                
+                if (hours > 0) return `${hours}h ${minutes % 60}m`;
+                if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
+                return `${seconds}s`;
+            }
+            
+            log(message, level = 'info') {
+                const timestamp = new Date().toLocaleTimeString('he-IL');
+                const logMessage = `[${timestamp}] ${message}`;
+                
+                const logsContainer = document.getElementById('analytics-logs');
+                if (logsContainer) {
+                    logsContainer.innerHTML += `<div style="margin: 2px 0; color: ${level === 'error' ? '#dc3545' : level === 'warn' ? '#ffc107' : '#333'}">${logMessage}</div>`;
+                    logsContainer.scrollTop = logsContainer.scrollHeight;
+                }
+                
+                console.log(`[CacheAnalytics] ${message}`);
+            }
+        }
+        
+        // ===== GLOBAL FUNCTIONS =====
+        
+        async function refreshAllMetrics() {
+            if (window.cacheAnalyticsDashboard) {
+                await window.cacheAnalyticsDashboard.loadAllMetrics();
+                window.cacheAnalyticsDashboard.log('כל המדדים רוענו', 'info');
+            }
+        }
+        
+        async function clearAllCache() {
+            if (confirm('האם אתה בטוח שברצונך לנקות את כל המטמון?')) {
+                try {
+                    // Clear frontend cache
+                    if (window.frontendCacheManager) {
+                        window.frontendCacheManager.clearAll();
+                    }
+                    
+                    // Clear backend cache
+                    const response = await fetch('/api/v1/cache/clear', { method: 'POST' });
+                    const data = await response.json();
+                    
+                    if (data.status === 'success') {
+                        window.cacheAnalyticsDashboard?.log('כל המטמון נוקה בהצלחה', 'info');
+                    } else {
+                        window.cacheAnalyticsDashboard?.log(`שגיאה בניקוי מטמון Backend: ${data.message}`, 'error');
+                    }
+                    
+                    // Refresh metrics
+                    await refreshAllMetrics();
+                    
+                } catch (error) {
+                    window.cacheAnalyticsDashboard?.log(`שגיאה בניקוי מטמון: ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        async function exportAnalytics() {
+            try {
+                const frontendStats = window.frontendCacheManager?.getStats() || {};
+                const backendResponse = await fetch('/api/v1/cache/stats');
+                const backendData = await backendResponse.json();
+                
+                const analyticsData = {
+                    timestamp: new Date().toISOString(),
+                    frontend: frontendStats,
+                    backend: backendData.data || {},
+                    performance_history: window.cacheAnalyticsDashboard?.performanceHistory || []
+                };
+                
+                // Create downloadable file
+                const blob = new Blob([JSON.stringify(analyticsData, null, 2)], { 
+                    type: 'application/json' 
+                });
+                const url = URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `cache_analytics_${new Date().toISOString().slice(0,10)}.json`;
+                link.click();
+                
+                URL.revokeObjectURL(url);
+                
+                window.cacheAnalyticsDashboard?.log('נתוני ניתוח יוצאו בהצלחה', 'info');
+                
+            } catch (error) {
+                window.cacheAnalyticsDashboard?.log(`שגיאה בייצוא נתונים: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testCachePattern() {
+            const pattern = prompt('הזן pattern לבדיקה (לדוגמה: tickers:* או *trade*)');
+            if (!pattern) return;
+            
+            try {
+                const response = await fetch('/api/v1/cache/invalidate/pattern', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pattern })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    window.cacheAnalyticsDashboard?.log(`Pattern invalidation בוצע: ${pattern}`, 'info');
+                } else {
+                    window.cacheAnalyticsDashboard?.log(`שגיאה ב-pattern invalidation: ${data.message}`, 'error');
+                }
+                
+                // Refresh metrics
+                await refreshAllMetrics();
+                
+            } catch (error) {
+                window.cacheAnalyticsDashboard?.log(`שגיאה בבדיקת Pattern: ${error.message}`, 'error');
+            }
+        }
+        
+        function invalidateCacheEntry(key) {
+            if (window.frontendCacheManager && key.includes(':')) {
+                const [namespace, ...rest] = key.split(':');
+                const actualKey = rest.join(':');
+                
+                window.frontendCacheManager.delete(namespace, actualKey);
+                window.cacheAnalyticsDashboard?.log(`רכיב מטמון נמחק: ${key}`, 'info');
+                
+                // Refresh cache entries display
+                setTimeout(() => {
+                    window.cacheAnalyticsDashboard?.updateCacheEntries();
+                }, 500);
+            }
+        }
+        
+        // Initialize dashboard when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            window.cacheAnalyticsDashboard = new CacheAnalyticsDashboard();
+        });
+    </script>
+</body>
+</html>

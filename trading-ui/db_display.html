@@ -41,9 +41,16 @@
   <!-- 5. Table styles -->
   <link rel="stylesheet" href="styles/table.css">
 
-  <!-- 6. Header system styles (highest priority) -->
-
-  <!-- 7. Database display specific styles (highest priority) -->
+  <!-- 6. Notification system -->
+  <link rel="stylesheet" href="styles/notification-system.css">
+  
+  <!-- 7. Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  
+  <!-- 8. Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <!-- 9. Page-specific styles (highest priority) -->
   <link rel="stylesheet" href="styles/db-display.css">
 </head>
 
@@ -53,7 +60,9 @@
   <!-- Unified Header System will create header automatically -->
 
   <div class="background-wrapper">
-
+    <!-- unified-header יווצר כאן אוטומטית -->
+    <div id="unified-header"></div>
+    
     <!-- Page body - All content after header -->
     <div class="page-body">
       <!-- Database area - top-Section -->
@@ -62,10 +71,13 @@
         <div class="section-header">
           <div class="table-title">
             <img src="images/icons/db_display.svg" alt="בסיס נתונים"
-              style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
             בסיס נתונים
           </div>
           <div class="table-actions">
+            <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+              <i class="fas fa-copy"></i> העתק לוג מפורט
+            </button>
             <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור בסיס נתונים">
               <span class="filter-icon">▲</span>
             </button>

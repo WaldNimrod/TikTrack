@@ -15,21 +15,74 @@
     <link rel="stylesheet" href="styles/typography.css">
     <link rel="stylesheet" href="styles/table.css">
     <link rel="stylesheet" href="styles/notification-system.css">
+    
+    <!-- 7. Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- 8. Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<body>
-    <div class="page-body">
-        <!-- unified-header auto-generated -->
+<body class="linter-realtime-monitor-page">
+    <div class="background-wrapper">
+        <!-- unified-header יווצר כאן אוטומטית -->
         <div id="unified-header"></div>
         
+<<<<<<< HEAD
         <div class="monitor-dashboard">
             <div class="dashboard-header">
                 <h1 class="dashboard-title">🔍 ניטור Linter בזמן אמת</h1>
                 <div class="status-indicator" id="statusIndicator">
                     <span class="status-dot"></span>
                     <span class="status-text">מתחבר...</span>
+=======
+        <!-- Page body - All content after header -->
+        <div class="page-body">
+            <!-- Page area - top-Section -->
+            <div class="top-section">
+                <!-- Main header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/linter-monitor.svg" alt="ניטור Linter"
+                            style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                        ניטור Linter בזמן אמת
+                    </div>
+                    <div class="table-actions">
+                        <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                            <i class="fas fa-copy"></i> העתק לוג מפורט
+                        </button>
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור Linter">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert cards -->
+                <div class="section-body">
+                    <active-alerts></active-alerts>
+
+                    <!-- Page summary -->
+                    <div class="info-summary" id="summaryStats">
+                        <div>קבצים: <strong id="totalFilesStats">0</strong></div>
+                        <div>שגיאות: <strong id="totalErrorsStats">0</strong></div>
+                        <div>אזהרות: <strong id="totalWarningsStats">0</strong></div>
+                        <div>סטטוס: <strong id="overallStatus">בדיקה...</strong></div>
+                    </div>
+                </div>
+            </div> <!-- End top-section -->
+
+            <!-- Main content -->
+            <div class="main-content" data-section="linter-monitor">
+                <div class="monitor-dashboard">
+
+            <!-- Status Indicator -->
+            <div class="text-center mb-4">
+                <div class="status-indicator status-active" id="monitorStatus">
+                    <span>🟢</span>
+                    <span>ניטור פעיל</span>
+>>>>>>> origin/cursor/update-git-after-tool-standardization-a017
                 </div>
             </div>
 
@@ -144,15 +197,331 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+                </div>
+            </div> <!-- End main-content -->
+        </div> <!-- End page-body -->
+    </div> <!-- End background-wrapper -->
 
     <!-- Scripts -->
     <script src="scripts/console-cleanup.js"></script>
     <script src="scripts/header-system.js"></script>
     <script src="scripts/notification-system.js"></script>
+<<<<<<< HEAD
     <script src="scripts/page-utils.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/linter-realtime-monitor.js"></script>
+=======
+    <script src="scripts/console-cleanup.js"></script>
+
+    <script>
+        // Global variables
+        let qualityChart;
+        let autoRefreshInterval;
+        let isAutoRefreshActive = true;
+        let currentFilter = 'all';
+
+        // אתחול מערכת ראש הדף
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log('🚀 טעינת דף ניטור Linter בזמן אמת...');
+
+            // אתחול HeaderSystem
+            if (window.headerSystem && !window.headerSystem.isInitialized) {
+                console.log('✅ אתחול HeaderSystem...');
+                window.headerSystem.init();
+            }
+
+            // בדיקת זמינות מערכת התראות
+            if (typeof window.showSuccessNotification === 'function') {
+                console.log('✅ מערכת התראות זמינה');
+            } else {
+                console.log('⚠️ מערכת התראות לא זמינה');
+            }
+
+            // אתחול הרכיבים
+            initializeChart();
+            loadInitialData();
+            startAutoRefresh();
+        });
+
+        function initializeChart() {
+            const ctx = document.getElementById('qualityChart').getContext('2d');
+            qualityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'איכות קוד (%)',
+                        data: [],
+                        borderColor: '#007aff',
+                        backgroundColor: 'rgba(0, 122, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadInitialData() {
+            // סימולציה של נתונים
+            const mockData = {
+                totalFiles: 127,
+                totalErrors: 3,
+                totalWarnings: 12,
+                codeQuality: 87
+            };
+
+            updateStats(mockData);
+            updateChart(mockData);
+            loadIssues();
+        }
+
+        function updateStats(data) {
+            document.getElementById('totalFiles').textContent = data.totalFiles;
+            document.getElementById('totalErrors').textContent = data.totalErrors;
+            document.getElementById('totalWarnings').textContent = data.totalWarnings;
+            document.getElementById('codeQuality').textContent = data.codeQuality + '%';
+
+            // עדכון שינויים (סימולציה)
+            document.getElementById('filesChange').textContent = `+${Math.floor(Math.random() * 5)} מהשבוע שעבר`;
+            document.getElementById('errorsChange').textContent = `${Math.random() > 0.5 ? '+' : '-'}${Math.floor(Math.random() * 3)} מהשבוע שעבר`;
+            document.getElementById('warningsChange').textContent = `${Math.random() > 0.5 ? '+' : '-'}${Math.floor(Math.random() * 5)} מהשבוע שעבר`;
+            document.getElementById('qualityChange').textContent = `${Math.random() > 0.5 ? '+' : '-'}${Math.floor(Math.random() * 5)}% מהשבוע שעבר`;
+        }
+
+        function updateChart(data) {
+            const now = new Date();
+            const timeLabel = now.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+            
+            qualityChart.data.labels.push(timeLabel);
+            qualityChart.data.datasets[0].data.push(data.codeQuality);
+            
+            // שמירה על 20 נקודות אחרונות
+            if (qualityChart.data.labels.length > 20) {
+                qualityChart.data.labels.shift();
+                qualityChart.data.datasets[0].data.shift();
+            }
+            
+            qualityChart.update('none');
+        }
+
+        function loadIssues() {
+            const mockIssues = [
+                {
+                    severity: 'error',
+                    message: 'Missing semicolon',
+                    file: 'trading-ui/scripts/main.js',
+                    line: 45,
+                    rule: 'semi'
+                },
+                {
+                    severity: 'warning',
+                    message: 'Unused variable',
+                    file: 'Backend/routes/api/trades.py',
+                    line: 23,
+                    rule: 'unused-variable'
+                },
+                {
+                    severity: 'info',
+                    message: 'Consider using const instead of let',
+                    file: 'trading-ui/scripts/header-system.js',
+                    line: 156,
+                    rule: 'prefer-const'
+                },
+                {
+                    severity: 'error',
+                    message: 'Function too complex',
+                    file: 'Backend/services/health_service.py',
+                    line: 89,
+                    rule: 'complexity'
+                },
+                {
+                    severity: 'warning',
+                    message: 'Long line detected',
+                    file: 'trading-ui/styles/apple-theme.css',
+                    line: 234,
+                    rule: 'max-len'
+                }
+            ];
+
+            displayIssues(mockIssues);
+        }
+
+        function displayIssues(issues) {
+            const issuesList = document.getElementById('issuesList');
+            
+            if (issues.length === 0) {
+                issuesList.innerHTML = `
+                    <div class="text-center py-4">
+                        <p class="text-muted">🎉 אין בעיות נוכחיות!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const filteredIssues = currentFilter === 'all' ? issues : issues.filter(issue => issue.severity === currentFilter);
+            
+            issuesList.innerHTML = filteredIssues.map(issue => `
+                <div class="issue-item" data-severity="${issue.severity}">
+                    <div class="issue-severity ${issue.severity}"></div>
+                    <div class="issue-content">
+                        <div class="issue-message">${issue.message}</div>
+                        <div class="issue-details">
+                            ${issue.file}:${issue.line} | כלל: ${issue.rule}
+                        </div>
+                    </div>
+                    <div class="issue-actions">
+                        <button class="btn btn-sm btn-outline-primary" onclick="fixIssue('${issue.file}', ${issue.line})">
+                            🔧 תיקון
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="ignoreIssue('${issue.file}', ${issue.line})">
+                            👁️ התעלם
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterIssues(filter) {
+            currentFilter = filter;
+            
+            // עדכון כפתורי הפילטר
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // טעינה מחדש של הבעיות
+            loadIssues();
+        }
+
+        function fixIssue(file, line) {
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('תיקון אוטומטי', `תיקון אוטומטי עבור ${file}:${line}`);
+            } else {
+                alert(`תיקון אוטומטי עבור ${file}:${line}`);
+            }
+        }
+
+        function ignoreIssue(file, line) {
+            if (typeof window.showInfoNotification === 'function') {
+                window.showInfoNotification('התעלמות מבעיה', `התעלמות מבעיה ב-${file}:${line}`);
+            } else {
+                alert(`התעלמות מבעיה ב-${file}:${line}`);
+            }
+        }
+
+        function toggleAutoRefresh() {
+            isAutoRefreshActive = !isAutoRefreshActive;
+            const toggle = document.querySelector('.refresh-toggle');
+            const status = document.getElementById('refreshStatus');
+            
+            if (isAutoRefreshActive) {
+                toggle.classList.add('active');
+                status.textContent = 'פעיל';
+                startAutoRefresh();
+            } else {
+                toggle.classList.remove('active');
+                status.textContent = 'לא פעיל';
+                stopAutoRefresh();
+            }
+        }
+
+        function startAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+            
+            autoRefreshInterval = setInterval(() => {
+                if (isAutoRefreshActive) {
+                    loadInitialData();
+                }
+            }, 30000); // עדכון כל 30 שניות
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+        }
+
+        // פונקציית העתקת לוג מפורט
+        function copyDetailedLog() {
+          try {
+            let detailedLog = `=== ניטור Linter בזמן אמת - לוג מפורט ===\n`;
+            detailedLog += `תאריך ושעה: ${new Date().toLocaleString('he-IL')}\n\n`;
+            
+            // Statistics
+            const totalFiles = document.getElementById('totalFiles')?.textContent || '0';
+            const totalErrors = document.getElementById('totalErrors')?.textContent || '0';
+            const totalWarnings = document.getElementById('totalWarnings')?.textContent || '0';
+            const codeQuality = document.getElementById('codeQuality')?.textContent || '0%';
+            
+            detailedLog += `=== סטטיסטיקות ===\n`;
+            detailedLog += `סה"כ קבצים: ${totalFiles}\n`;
+            detailedLog += `שגיאות: ${totalErrors}\n`;
+            detailedLog += `אזהרות: ${totalWarnings}\n`;
+            detailedLog += `איכות קוד: ${codeQuality}\n\n`;
+
+            // Monitor status
+            const monitorStatus = document.getElementById('monitorStatus')?.textContent || 'לא ידוע';
+            const refreshStatus = document.getElementById('refreshStatus')?.textContent || 'לא ידוע';
+            
+            detailedLog += `=== מצב הניטור ===\n`;
+            detailedLog += `סטטוס ניטור: ${monitorStatus}\n`;
+            detailedLog += `עדכון אוטומטי: ${refreshStatus}\n\n`;
+
+            detailedLog += `=== סיום לוג ===`;
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(detailedLog).then(() => {
+              if (window.showSuccessNotification) {
+                window.showSuccessNotification('העתקת לוג', 'לוג מפורט הועתק ללוח בהצלחה');
+              }
+            }).catch(err => {
+              console.error('שגיאה בהעתקת לוג:', err);
+            });
+          } catch (error) {
+            console.error('שגיאה ביצירת לוג מפורט:', error);
+          }
+        }
+
+        // Global functions for button onclick handlers
+        window.toggleTopSection = function() {
+          if (typeof window.toggleTopSectionGlobal === 'function') {
+            window.toggleTopSectionGlobal();
+          } else {
+            console.warn('פונקציית toggleTopSectionGlobal לא נמצאה ב-main.js');
+          }
+        };
+        
+        window.copyDetailedLog = copyDetailedLog;
+
+        // ניקוי בעת סגירת הדף
+        window.addEventListener('beforeunload', () => {
+            stopAutoRefresh();
+        });
+    </script>
+>>>>>>> origin/cursor/update-git-after-tool-standardization-a017
 </body>
 </html>

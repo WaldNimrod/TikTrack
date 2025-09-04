@@ -461,6 +461,68 @@ function sortTable(columnIndex, tableType) {
   updateTableDisplay(data, tableType);
 }
 
+// ===== UTILITY FUNCTIONS =====
+
+/**
+ * Copy detailed log with all database information
+ */
+function copyDetailedLog() {
+  try {
+    let detailedLog = `=== בסיס נתונים - לוג מפורט ===\n`;
+    detailedLog += `תאריך ושעה: ${new Date().toLocaleString('he-IL')}\n\n`;
+    
+    // Database summary
+    const summaryStats = document.getElementById('summaryStats');
+    if (summaryStats) {
+      detailedLog += `=== סיכום נתונים ===\n`;
+      const accounts = document.getElementById('accountsStats')?.textContent || '0';
+      const trades = document.getElementById('tradesStats')?.textContent || '0';
+      const tickers = document.getElementById('tickersStats')?.textContent || '0';
+      const tradePlans = document.getElementById('tradePlansStats')?.textContent || '0';
+      const alerts = document.getElementById('alertsStats')?.textContent || '0';
+      
+      detailedLog += `סה"כ חשבונות: ${accounts}\n`;
+      detailedLog += `סה"כ טריידים: ${trades}\n`;
+      detailedLog += `סה"כ טיקרים: ${tickers}\n`;
+      detailedLog += `סה"כ תוכניות: ${tradePlans}\n`;
+      detailedLog += `סה"כ התראות: ${alerts}\n\n`;
+    }
+
+    // Tables status
+    detailedLog += `=== סטטוס טבלאות ===\n`;
+    const tables = ['accounts', 'trades', 'tickers', 'trade_plans', 'executions', 'alerts', 'notes'];
+    tables.forEach(tableType => {
+      const count = document.getElementById(`${tableType}Count`)?.textContent || 'לא ידוע';
+      detailedLog += `${tableType}: ${count}\n`;
+    });
+
+    // Current table data
+    if (currentTableType && tableData[currentTableType]) {
+      detailedLog += `\n=== טבלה פעילה: ${currentTableType} ===\n`;
+      detailedLog += `מספר רשומות: ${tableData[currentTableType].length}\n`;
+    }
+
+    detailedLog += `\n=== סיום לוג ===`;
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(detailedLog).then(() => {
+      if (window.notifications && window.notifications.success) {
+        window.notifications.success('לוג מפורט הועתק ללוח בהצלחה');
+      }
+    }).catch(err => {
+      console.error('שגיאה בהעתקת לוג:', err);
+      if (window.notifications && window.notifications.error) {
+        window.notifications.error('שגיאה בהעתקת לוג מפורט');
+      }
+    });
+  } catch (error) {
+    console.error('שגיאה ביצירת לוג מפורט:', error);
+    if (window.notifications && window.notifications.error) {
+      window.notifications.error('שגיאה ביצירת לוג מפורט');
+    }
+  }
+}
+
 // ===== GLOBAL EXPORTS =====
 
 // Export functions to global scope
@@ -471,6 +533,7 @@ window.toggleTopSection = toggleTopSection;
 window.toggleMainSection = toggleMainSection;
 window.addRecord = addRecord;
 window.sortTable = sortTable;
+window.copyDetailedLog = copyDetailedLog;
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {

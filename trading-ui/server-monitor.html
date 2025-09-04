@@ -25,31 +25,61 @@
     <!-- 6. Notification system styles -->
     <link rel="stylesheet" href="styles/notification-system.css">
     
+<<<<<<< HEAD
+=======
+    <!-- 7. Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+>>>>>>> origin/cursor/update-git-after-tool-standardization-a017
     
-    <!-- Icons -->
+    <!-- 8. Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-    <!-- Header System -->
-    <div id="unified-header"></div>
     
-    <!-- Main Content -->
-    <main class="main-content">
-        <div class="container">
-            <div class="page-header">
-                <div class="header-content">
-                    <div class="header-text">
-                        <h1><i class="fas fa-server"></i> ניטור שרת</h1>
-                        <p class="page-description">כלי פיתוח לניטור וניהול השרת</p>
+    <!-- 9. Page specific styles -->
+    <link rel="stylesheet" href="styles/server-monitor.css?v=20250904">
+</head>
+<body class="server-monitor-page">
+    <div class="background-wrapper">
+        <!-- unified-header יווצר כאן אוטומטית -->
+        <div id="unified-header"></div>
+        
+        <!-- Page body - All content after header -->
+        <div class="page-body">
+            <!-- Page area - top-Section -->
+            <div class="top-section">
+                <!-- Main header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/server-monitor.svg" alt="ניטור שרת"
+                            style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                        ניטור שרת
                     </div>
-                    <div class="header-actions">
-                        <button class="btn btn-outline-primary" onclick="serverMonitor.copyDetailedLog()" title="העתק לוג מפורט">
-                            <i class="fas fa-copy"></i>
-                            העתק לוג מפורט
+                    <div class="table-actions">
+                        <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                            <i class="fas fa-copy"></i> העתק לוג מפורט
+                        </button>
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור ניטור שרת">
+                            <span class="filter-icon">▲</span>
                         </button>
                     </div>
                 </div>
-            </div>
+
+                <!-- Alert cards -->
+                <div class="section-body">
+                    <active-alerts></active-alerts>
+
+                    <!-- Page summary -->
+                    <div class="info-summary" id="summaryStats">
+                        <div>סטטוס שרת: <strong id="serverStatusStats">בדיקה...</strong></div>
+                        <div>בסיס נתונים: <strong id="databaseStatusStats">בדיקה...</strong></div>
+                        <div>Cache: <strong id="cacheStatusStats">בדיקה...</strong></div>
+                        <div>סטטוס: <strong id="overallStatus">בדיקה...</strong></div>
+                    </div>
+                </div>
+            </div> <!-- End top-section -->
+
+            <!-- Main content -->
+            <div class="main-content" data-section="server-monitor">
+                <div class="container">
             
             <!-- Server Status Overview -->
             <div class="status-overview">
@@ -545,8 +575,10 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
+                </div>
+            </div> <!-- End main-content -->
+        </div> <!-- End page-body -->
+    </div> <!-- End background-wrapper -->
     
     <!-- Scripts -->
     <script src="scripts/console-cleanup.js"></script>

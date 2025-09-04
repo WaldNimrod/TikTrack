@@ -1255,38 +1255,6 @@ function updateEntityHeaderCSS() {
   }
 }
 
-/**
- * יישום שקיפות על כל העמודים
- * Apply opacity to all pages
- */
-function applyHeaderOpacityToAllPages() {
-  try {
-    console.log('🎭 מיישם שקיפות כותרות על כל העמודים...');
-    
-    // קבלת העדפות השקיפות
-    const mainOpacity = currentPreferences.headerOpacity?.main || 60;
-    const subOpacity = currentPreferences.headerOpacity?.sub || 30;
-    
-    // עדכון CSS דינמי
-    updateHeaderOpacityCSS('main', mainOpacity);
-    updateHeaderOpacityCSS('sub', subOpacity);
-    
-    // יישום על כותרות קיימות
-    if (window.applyEntityColorsToHeaders) {
-      // יישום על כל סוגי הישויות
-      const entityTypes = ['execution', 'trade', 'account', 'ticker', 'alert'];
-      entityTypes.forEach(entityType => {
-        window.applyEntityColorsToHeaders(entityType);
-      });
-    }
-    
-    showPreferencesInfo('שקיפות כותרות', 'השקיפות יושמה על כל העמודים');
-    
-  } catch (error) {
-    console.error('❌ שגיאה ביישום שקיפות על כל העמודים:', error);
-    showPreferencesError('שגיאה', 'לא ניתן ליישם שקיפות על כל העמודים');
-  }
-}
 
 /**
  * טעינת העדפות שקיפות
@@ -1575,7 +1543,6 @@ function updateStatusColorsUI() {
 // Export header opacity functions
 window.updateHeaderOpacity = updateHeaderOpacity;
 window.updateHeaderOpacityUI = updateHeaderOpacityUI;
-window.applyHeaderOpacityToAllPages = applyHeaderOpacityToAllPages;
 window.loadHeaderOpacityPreferences = loadHeaderOpacityPreferences;
 
 // ===== INVESTMENT TYPE COLOR FUNCTIONS =====

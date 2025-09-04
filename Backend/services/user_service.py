@@ -95,6 +95,17 @@ class UserService:
             return UserService.get_default_user(db)
     
     @staticmethod
+    def deep_merge_dicts(d1: Dict, d2: Dict) -> Dict:
+        """Deep merge two dictionaries"""
+        merged = d1.copy()
+        for k, v in d2.items():
+            if k in merged and isinstance(merged[k], dict) and isinstance(v, dict):
+                merged[k] = UserService.deep_merge_dicts(merged[k], v)
+            else:
+                merged[k] = v
+        return merged
+    
+    @staticmethod
     def get_user_preferences(db: Session, user_id: int = None) -> Dict[str, Any]:
         """Get user preferences with fallback to default user"""
         try:

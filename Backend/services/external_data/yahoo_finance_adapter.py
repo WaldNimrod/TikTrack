@@ -465,9 +465,11 @@ class YahooFinanceAdapter:
             # Get current time in New York (market time) - this is our reference time
             market_now = datetime.now(self.market_timezone)
             
+            current_price = float(meta['regularMarketPrice'])
+            
             quote = QuoteData(
                 symbol=symbol,
-                price=float(meta['regularMarketPrice']),
+                price=current_price,
                 currency=meta.get('currency', 'USD'),
                 source='yahoo_finance',
                 asof_utc=market_now  # Store market time as reference
@@ -475,24 +477,41 @@ class YahooFinanceAdapter:
             
             # Extract additional data if available
             logger.info(f"📊 {symbol}: Available meta keys: {list(meta.keys())}")
+            logger.info(f"📊 {symbol}: Current price: ${current_price}")
             
+            # Try to get change data directly from Yahoo
             if 'regularMarketChange' in meta:
                 quote.change_amount = float(meta['regularMarketChange'])
-                logger.info(f"📊 {symbol}: change_amount = {quote.change_amount}")
+                logger.info(f"📊 {symbol}: Direct change_amount from Yahoo = {quote.change_amount}")
+            elif 'chartPreviousClose' in meta:
+                # Calculate change ourselves if Yahoo doesn't provide it
+                previous_close = float(meta['chartPreviousClose'])
+                quote.change_amount = current_price - previous_close
+                logger.info(f"📊 {symbol}: Calculated change_amount = {current_price} - {previous_close} = {quote.change_amount}")
             else:
-                logger.warning(f"📊 {symbol}: regularMarketChange not found in meta")
+                logger.warning(f"📊 {symbol}: No previous close data available for change calculation")
             
             if 'regularMarketChangePercent' in meta:
                 quote.change_pct = float(meta['regularMarketChangePercent'])
-                logger.info(f"📊 {symbol}: change_pct = {quote.change_pct}")
+                logger.info(f"📊 {symbol}: Direct change_pct from Yahoo = {quote.change_pct}%")
+            elif 'chartPreviousClose' in meta and quote.change_amount is not None:
+                # Calculate percentage change ourselves
+                previous_close = float(meta['chartPreviousClose'])
+                if previous_close > 0:
+                    quote.change_pct = (quote.change_amount / previous_close) * 100
+                    logger.info(f"📊 {symbol}: Calculated change_pct = ({quote.change_amount} / {previous_close}) * 100 = {quote.change_pct:.2f}%")
+                else:
+                    logger.warning(f"📊 {symbol}: Previous close is 0, cannot calculate percentage change")
             else:
-                logger.warning(f"📊 {symbol}: regularMarketChangePercent not found in meta")
+                logger.warning(f"📊 {symbol}: Cannot calculate percentage change - missing data")
             
             if 'regularMarketVolume' in meta:
                 quote.volume = int(meta['regularMarketVolume'])
                 logger.info(f"📊 {symbol}: volume = {quote.volume}")
             
-            logger.info(f"📊 {symbol}: Final quote data - price: {quote.price}, change_pct: {quote.change_pct}, change_amount: {quote.change_amount}")
+            change_pct_display = f"{quote.change_pct:.2f}%" if quote.change_pct is not None else "N/A"
+            change_amount_display = f"${quote.change_amount:.2f}" if quote.change_amount is not None else "N/A"
+            logger.info(f"📊 {symbol}: Final quote data - price: ${quote.price}, change_pct: {change_pct_display}, change_amount: {change_amount_display}")
             
             return quote
             

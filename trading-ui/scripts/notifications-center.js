@@ -35,7 +35,7 @@ class NotificationsCenter {
   }
 
   init() {
-    console.log('🚀 אתחול מרכז התראות... (v1.0.7 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed)');
+    console.log('🚀 אתחול מרכז התראות... (v1.0.9 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed + Settings Fix + AutoRefresh Fix)');
 
     // אתחול UI
     this.initUI();
@@ -55,7 +55,7 @@ class NotificationsCenter {
     // רענון אוטומטי
     this.startAutoRefresh();
 
-    console.log('✅ מרכז התראות אותחל בהצלחה (v1.0.7 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed)');
+    console.log('✅ מרכז התראות אותחל בהצלחה (v1.0.9 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed + Settings Fix + AutoRefresh Fix)');
   }
 
   initUI() {
@@ -535,7 +535,7 @@ class NotificationsCenter {
 
   addTestNotifications() {
     // הוספת התראות בדיקה אם אין התראות קיימות
-    if (this.notifications.length === 0 && this.history.length === 0) {
+    if (this.history.length === 0) {
       console.log('📝 הוספת התראות בדיקה...');
       
       this.addNotification('success', 'מערכת', 'מרכז ההתראות אותחל בהצלחה', 'now');
@@ -551,7 +551,14 @@ class NotificationsCenter {
     // תיקון הגדרות אם הן מבוטלות
     if (!this.settings.enableRealtime && !this.settings.enableSounds && !this.settings.enableBackgroundTasks) {
       console.log('🔧 תיקון הגדרות מבוטלות...');
-      this.settings = NotificationsCenter.loadSettings();
+      this.settings = {
+        enableRealtime: true,
+        enableSounds: true,
+        enableBackgroundTasks: true,
+        enableDataUpdates: true,
+        enableExternalData: true,
+        enableSystemEvents: true,
+      };
       this.saveSettings();
       this.updateSettingsUI();
       console.log('✅ הגדרות תוקנו:', this.settings);
@@ -646,7 +653,6 @@ class NotificationsCenter {
         }
       }
 
-      this.updateNotificationsUI();
     }, 30000);
 
     // עדכון זמן חיבור כל שנייה כאשר מחובר
@@ -954,7 +960,7 @@ function filterHistory() {
 
 // אתחול
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 טעינת דף מרכז התראות... (v1.0.7 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed)');
+  console.log('🚀 טעינת דף מרכז התראות... (v1.0.9 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed + Settings Fix + AutoRefresh Fix)');
 
   // אתחול HeaderSystem
   if (window.headerSystem && !window.headerSystem.isInitialized) {
@@ -965,5 +971,5 @@ document.addEventListener('DOMContentLoaded', () => {
   // יצירת מופע מרכז התראות
   window.notificationsCenter = new NotificationsCenter();
 
-  console.log('✅ דף מרכז התראות נטען בהצלחה (v1.0.7 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed)');
+  console.log('✅ דף מרכז התראות נטען בהצלחה (v1.0.9 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed + Settings Fix + AutoRefresh Fix)');
 });

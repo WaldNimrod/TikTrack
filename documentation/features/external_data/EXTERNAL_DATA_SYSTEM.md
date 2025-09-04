@@ -105,10 +105,13 @@ External Data Integration
 2. **Tickers API** → `/api/v1/tickers/` returns tickers with integrated market data ✅
 3. **TickerService** → Joins tickers with latest market data quotes ✅
 4. **MarketDataQuote** → Latest price data from external providers ✅
-5. **Unified Response** → Single API call returns complete ticker + market data ✅
-6. **UI Display** → Renders all data with proper formatting and RTL support ✅
+5. **Yahoo Finance Adapter** → Calculates daily change when not provided by Yahoo ✅
+6. **Unified Response** → Single API call returns complete ticker + market data ✅
+7. **UI Display** → Renders all data with proper formatting and RTL support ✅
 
 **Note**: This unified approach provides better performance and user experience compared to separate API endpoints.
+
+**Daily Change Calculation**: When Yahoo Finance doesn't provide `regularMarketChange` or `regularMarketChangePercent`, the adapter automatically calculates them using `regularMarketPrice` and `chartPreviousClose` to ensure consistent data availability.
 
 ### **Future Data Flow (Live Data)**
 1. **Scheduler** → Triggers automatic refresh (to be implemented)
@@ -223,6 +226,28 @@ batch_quotes = adapter.fetch_batch_quotes(['AAPL', 'GOOGL', 'MSFT'])
     "provider": "yahoo_finance"
 }
 ```
+
+#### **Daily Change Calculation Logic:**
+
+**Scenario 1 - Yahoo provides change data directly:**
+```
+regularMarketChange: 2.50
+regularMarketChangePercent: 1.69
+→ Use values directly from Yahoo Finance
+```
+
+**Scenario 2 - Yahoo doesn't provide change data (current situation):**
+```
+regularMarketPrice: 150.25
+chartPreviousClose: 147.75
+→ change_amount = 150.25 - 147.75 = 2.50
+→ change_percent = (2.50 / 147.75) * 100 = 1.69%
+```
+
+**Implementation Location:**
+- File: `Backend/services/external_data/yahoo_finance_adapter.py`
+- Function: `_parse_quote_response()`
+- Logic: Fallback calculation when Yahoo fields are missing
 
 ### **Future Providers:**
 - **Interactive Brokers (IBKR)** - For trading accounts

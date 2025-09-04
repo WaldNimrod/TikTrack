@@ -70,6 +70,7 @@ def get_preferences():
         return jsonify(DEFAULT_PREFERENCES)
 
 @preferences_bp.route('/api/v1/preferences/', methods=['POST'])
+@invalidate_cache(['preferences'])  # Invalidate cache after saving preferences
 def save_all_preferences():
     """Save all user preferences with fallback to default user"""
     try:
@@ -95,6 +96,7 @@ def save_all_preferences():
         return jsonify({"success": False, "message": "Error saving preferences"}), 500
 
 @preferences_bp.route('/api/v1/preferences/<key>', methods=['PUT'])
+@invalidate_cache(['preferences'])  # Invalidate cache after updating preference
 def update_preference(key):
     """Update single preference with fallback to default user"""
     try:
@@ -125,6 +127,7 @@ def update_preference(key):
         return jsonify({"success": False, "message": "Error updating preference"}), 500
 
 @preferences_bp.route('/api/v1/preferences/reset', methods=['POST'])
+@invalidate_cache(['preferences'])  # Invalidate cache after resetting preferences
 def reset_preferences():
     """Reset preferences to defaults with fallback to default user"""
     try:

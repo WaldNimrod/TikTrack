@@ -550,11 +550,15 @@ class YahooFinanceAdapter:
     def _cache_quote(self, quote: QuoteData):
         """Cache quote in database"""
         try:
+            logger.info(f"🔄 _cache_quote called for symbol: {quote.symbol}")
+            
             # Get ticker ID
             ticker = self.db_session.query(Ticker).filter(Ticker.symbol == quote.symbol).first()
             if not ticker:
-                logger.warning(f"Ticker not found for symbol: {quote.symbol}")
+                logger.warning(f"⚠️ Ticker not found for symbol: {quote.symbol} - cannot cache quote")
                 return
+            
+            logger.info(f"✅ Found ticker {ticker.symbol} (ID: {ticker.id}) - proceeding to cache quote")
             
             # Create or update quote
             db_quote = MarketDataQuote(
@@ -571,13 +575,21 @@ class YahooFinanceAdapter:
                 quality_score=1.0
             )
             
+            logger.info(f"💾 Adding quote to database: {quote.symbol} = ${quote.price} ({quote.currency})")
             self.db_session.add(db_quote)
+            
+            logger.info(f"🔄 Committing transaction for {quote.symbol}")
             self.db_session.commit()
             
-            logger.debug(f"Cached quote for {quote.symbol}")
+            logger.info(f"✅ Successfully cached quote for {quote.symbol}: ${quote.price}")
             
         except SQLAlchemyError as e:
-            logger.error(f"Error caching quote for {quote.symbol}: {e}")
+            logger.error(f"❌ SQLAlchemy error caching quote for {quote.symbol}: {e}")
+            logger.error(f"🔄 Rolling back transaction for {quote.symbol}")
+            self.db_session.rollback()
+        except Exception as e:
+            logger.error(f"❌ Unexpected error caching quote for {quote.symbol}: {e}")
+            logger.error(f"🔄 Rolling back transaction for {quote.symbol}")
             self.db_session.rollback()
     
     def _log_refresh_operation(self, **kwargs):

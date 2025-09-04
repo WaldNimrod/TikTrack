@@ -40,7 +40,57 @@ DEFAULT_PREFERENCES = {
     "retryAttempts": 2,
     "retryDelay": 5,
     "autoRefresh": False,
-    "verboseLogging": False
+    "verboseLogging": False,
+    # External data preferences
+    "showPercentageChanges": True,
+    "showVolume": True,
+    "notifyOnDataFailures": True,
+    "notifyOnStaleData": False,
+    "refreshOverrides": {},
+    "headerOpacity": {
+        "main": 60,
+        "sub": 30
+    },
+    "statusColors": {
+        "open": {
+            "light": "rgba(40, 167, 69, 0.1)",
+            "medium": "#28a745",
+            "dark": "#155724",
+            "border": "rgba(40, 167, 69, 0.3)"
+        },
+        "closed": {
+            "light": "rgba(108, 117, 125, 0.1)",
+            "medium": "#6c757d",
+            "dark": "#383d41",
+            "border": "rgba(108, 117, 125, 0.3)"
+        },
+        "cancelled": {
+            "light": "rgba(220, 53, 69, 0.1)",
+            "medium": "#dc3545",
+            "dark": "#721c24",
+            "border": "rgba(220, 53, 69, 0.3)"
+        }
+    },
+    "investmentTypeColors": {
+        "swing": {
+            "light": "rgba(0, 123, 255, 0.1)",
+            "medium": "#007bff",
+            "dark": "#0056b3",
+            "border": "rgba(0, 123, 255, 0.3)"
+        },
+        "investment": {
+            "light": "rgba(40, 167, 69, 0.1)",
+            "medium": "#28a745",
+            "dark": "#155724",
+            "border": "rgba(40, 167, 69, 0.3)"
+        },
+        "passive": {
+            "light": "rgba(111, 66, 193, 0.1)",
+            "medium": "#6f42c1",
+            "dark": "#4a2c7a",
+            "border": "rgba(111, 66, 193, 0.3)"
+        }
+    }
 }
 
 def get_user_id_from_request() -> int:

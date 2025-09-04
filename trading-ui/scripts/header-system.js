@@ -687,6 +687,9 @@ class HeaderSystem {
                             <li><a class="tiktrack-dropdown-item" href="/server-monitor">ניטור שרת</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/cache-test">בדיקת Cache</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/constraints">אילוצים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/create_linter_dashboard">יצירת Linter Dashboard</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/linter-realtime-monitor">ניטור Linter בזמן אמת</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/linter-dashboard-demo">דשבורד Linter לדוגמה</a></li>
                           </ul>
                         </li>
 
@@ -2595,7 +2598,7 @@ class HeaderSystem {
       if (data.status === 'success' && Array.isArray(data.data)) {
         // סינון רק חשבונות פעילים
         const activeAccounts = data.data.filter(account =>
-          account.status === 'active' || account.status === 'open',
+          account.status === 'open',
         );
         // Loaded active accounts out of total accounts
         this.updateAccountFilterOptions(activeAccounts);

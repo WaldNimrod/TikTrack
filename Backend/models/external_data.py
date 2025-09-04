@@ -94,40 +94,6 @@ class MarketDataQuote(BaseModel):
         return f"<MarketDataQuote(ticker_id={self.ticker_id}, price={self.price}, asof_utc={self.asof_utc})>"
 
 
-class UserDataPreferences(BaseModel):
-    """User preferences for external data integration"""
-    __tablename__ = 'user_data_preferences'
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, unique=True)
-    
-    # Timezone settings
-    timezone = Column(String(64), nullable=False, default='UTC')    # User timezone
-    
-    # Refresh policy overrides (JSON stored as TEXT)
-    refresh_overrides_json = Column(Text, nullable=True)            # JSON with refresh policy overrides
-    
-    # Provider preferences
-    primary_provider = Column(String(50), default='yahoo_finance')   # Primary data provider
-    secondary_provider = Column(String(50), nullable=True)          # Secondary/backup provider
-    
-    # Display preferences
-    primary_currency = Column(String(10), default='USD')            # Primary currency for display
-    show_percentage_changes = Column(Boolean, default=True)         # Show percentage changes
-    show_volume = Column(Boolean, default=True)                     # Show trading volume
-    
-    # Notification preferences
-    notify_on_data_failures = Column(Boolean, default=True)         # Notify on data fetch failures
-    notify_on_stale_data = Column(Boolean, default=False)           # Notify on stale data
-    
-    # Timestamps
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    
-    # Relationships
-    user = relationship("User", back_populates="data_preferences")
-    
-    def __repr__(self):
-        return f"<UserDataPreferences(user_id={self.user_id}, timezone='{self.timezone}')>"
-
-
 class DataRefreshLog(BaseModel):
     """Log of data refresh operations"""
     __tablename__ = 'data_refresh_logs'

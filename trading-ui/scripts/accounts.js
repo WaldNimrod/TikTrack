@@ -1780,6 +1780,11 @@ document.addEventListener('DOMContentLoaded', function () {
   // טעינת מטבעות
   loadCurrenciesFromServer();
 
+  // יישום צבעי ישות על כותרות
+  if (window.applyEntityColorsToHeaders) {
+    window.applyEntityColorsToHeaders('account');
+  }
+
   // בדיקה אם אנחנו בדף החשבונות
   if (window.location.pathname.includes('/accounts')) {
     // טעינת נתוני חשבונות

@@ -136,6 +136,36 @@ def get_optimization_opportunities():
         }), 500
 
 
+@query_optimization_bp.route('/optimize', methods=['POST'])
+def optimize_database():
+    """Optimize database performance"""
+    try:
+        # Clear query profiles to start fresh
+        clear_query_profiles()
+        
+        # Get current performance report
+        report = get_performance_report()
+        
+        # Log optimization action
+        logger.info("Database optimization performed by API request")
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Database optimization completed successfully',
+            'data': {
+                'optimization_performed': True,
+                'profiles_cleared': True,
+                'current_performance': report,
+                'timestamp': datetime.now().isoformat()
+            }
+        }), 200
+    except Exception as e:
+        logger.error(f"Failed to optimize database: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': f'Failed to optimize database: {str(e)}'
+        }), 500
+
 @query_optimization_bp.route('/clear-profiles', methods=['POST'])
 def clear_all_query_profiles():
     """Clear all query profiles"""

@@ -1876,6 +1876,11 @@ document.addEventListener('DOMContentLoaded', function () {
     window.restoreAllSectionStates();
   }
 
+  // יישום צבעי ישות על כותרות
+  if (window.applyEntityColorsToHeaders) {
+    window.applyEntityColorsToHeaders('trade');
+  }
+
   // אתחול וולידציה עם כללים מותאמים לטריידים
   if (window.initializeValidation) {
     // כללי וולידציה מותאמים לטופס הוספת טרייד

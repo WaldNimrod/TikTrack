@@ -474,14 +474,25 @@ class YahooFinanceAdapter:
             )
             
             # Extract additional data if available
+            logger.info(f"📊 {symbol}: Available meta keys: {list(meta.keys())}")
+            
             if 'regularMarketChange' in meta:
                 quote.change_amount = float(meta['regularMarketChange'])
+                logger.info(f"📊 {symbol}: change_amount = {quote.change_amount}")
+            else:
+                logger.warning(f"📊 {symbol}: regularMarketChange not found in meta")
             
             if 'regularMarketChangePercent' in meta:
                 quote.change_pct = float(meta['regularMarketChangePercent'])
+                logger.info(f"📊 {symbol}: change_pct = {quote.change_pct}")
+            else:
+                logger.warning(f"📊 {symbol}: regularMarketChangePercent not found in meta")
             
             if 'regularMarketVolume' in meta:
                 quote.volume = int(meta['regularMarketVolume'])
+                logger.info(f"📊 {symbol}: volume = {quote.volume}")
+            
+            logger.info(f"📊 {symbol}: Final quote data - price: {quote.price}, change_pct: {quote.change_pct}, change_amount: {quote.change_amount}")
             
             return quote
             

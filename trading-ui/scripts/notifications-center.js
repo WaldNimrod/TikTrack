@@ -17,14 +17,13 @@
  *
  * @author TikTrack Development Team
  * @version 1.0.0
- * @lastUpdated September 2, 2025
+ * @lastUpdated September 4, 2025 - Fixed function calls + debug log
  */
 
 class NotificationsCenter {
   constructor() {
-    this.notifications = [];
     this.history = [];
-    this.settings = this.loadSettings();
+    this.settings = NotificationsCenter.loadSettings();
     this.stats = {
       success: 0,
       error: 0,
@@ -36,7 +35,7 @@ class NotificationsCenter {
   }
 
   init() {
-    // console.log('🚀 אתחול מרכז התראות...');
+    console.log('🚀 אתחול מרכז התראות... (v1.0.7 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed)');
 
     // אתחול UI
     this.initUI();
@@ -50,10 +49,13 @@ class NotificationsCenter {
     // טעינת היסטוריה
     this.loadHistory();
 
+    // הוספת התראות בדיקה
+    this.addTestNotifications();
+
     // רענון אוטומטי
     this.startAutoRefresh();
 
-    // console.log('✅ מרכז התראות אותחל בהצלחה');
+    console.log('✅ מרכז התראות אותחל בהצלחה (v1.0.7 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed)');
   }
 
   initUI() {
@@ -65,6 +67,11 @@ class NotificationsCenter {
 
     // עדכון סטטיסטיקות
     this.updateStatsUI();
+    
+    // בדיקת חיבור WebSocket אחרי טעינה
+    setTimeout(() => {
+      this.checkWebSocketConnection();
+    }, 1000);
   }
 
   setupWebSocketEvents() {
@@ -141,13 +148,7 @@ class NotificationsCenter {
       timestamp: Date.now(),
     };
 
-    // הוספה להתראות פעילות
-    this.notifications.unshift(notification);
-    if (this.notifications.length > 50) {
-      this.notifications = this.notifications.slice(0, 50);
-    }
-
-    // הוספה להיסטוריה
+    // הוספה להיסטוריה (כל ההתראות)
     this.history.unshift(notification);
     if (this.history.length > 1000) {
       this.history = this.history.slice(0, 1000);
@@ -158,7 +159,6 @@ class NotificationsCenter {
     this.updateStats();
 
     // עדכון UI
-    this.updateNotificationsUI();
     this.updateHistoryUI();
     this.updateStatsUI();
 
@@ -170,7 +170,7 @@ class NotificationsCenter {
 
     // הצגת הודעה אם מופעל
     if (this.settings.enableRealtime) {
-      this.showNotificationPopup(notification);
+      NotificationsCenter.showNotificationPopup(notification);
     }
 
     // צלילים מבוטלים זמנית למניעת שגיאות AudioContext
@@ -286,7 +286,7 @@ class NotificationsCenter {
           const connectionTime = new Date(stats.connectedAt);
           const now = new Date();
           const diff = Math.floor((now - connectionTime) / 1000);
-          connectionTimeElement.textContent = this.formatDuration(diff);
+          connectionTimeElement.textContent = NotificationsCenter.formatDuration(diff);
         } else {
           connectionTimeElement.textContent = 'עכשיו';
         }
@@ -300,24 +300,6 @@ class NotificationsCenter {
     }
   }
 
-  updateNotificationsUI() {
-    const container = document.getElementById('liveNotifications');
-    if (!container) {
-      return; // לא בעמוד מרכז ההתראות
-    }
-
-    if (this.notifications.length === 0) {
-      container.innerHTML = `
-                <div class="no-notifications">
-                    <i class="fas fa-bell-slash"></i>
-                    <p>אין התראות פעילות כרגע</p>
-                </div>
-            `;
-      return;
-    }
-
-    container.innerHTML = this.notifications.map(notification => this.createNotificationHTML(notification)).join('');
-  }
 
   updateHistoryUI() {
     const container = document.getElementById('notificationHistory');
@@ -355,7 +337,7 @@ class NotificationsCenter {
 
     // פילטר לפי זמן
     const now = Date.now();
-    const periodMs = this.getPeriodInMs(period);
+    const periodMs = NotificationsCenter.getPeriodInMs(period);
     filteredHistory = filteredHistory.filter(n => now - n.timestamp <= periodMs);
 
     if (filteredHistory.length === 0) {
@@ -372,15 +354,15 @@ class NotificationsCenter {
   }
 
   updateStats() {
-    // עדכון סטטיסטיקות פנימיות
-    this.stats.success = this.notifications.filter(n => n.type === 'success').length;
-    this.stats.error = this.notifications.filter(n => n.type === 'error').length;
-    this.stats.warning = this.notifications.filter(n => n.type === 'warning').length;
-    this.stats.info = this.notifications.filter(n => n.type === 'info').length;
+    // עדכון סטטיסטיקות פנימיות (מבוסס על היסטוריה)
+    this.stats.success = this.history.filter(n => n.type === 'success').length;
+    this.stats.error = this.history.filter(n => n.type === 'error').length;
+    this.stats.warning = this.history.filter(n => n.type === 'warning').length;
+    this.stats.info = this.history.filter(n => n.type === 'info').length;
   }
 
   updateStatsUI() {
-    // בדיקה אם האלמנטים קיימים (רק בעמוד מרכז ההתראות)
+    // עדכון סטטיסטיקות מפורטות
     const successCount = document.getElementById('successCount');
     const errorCount = document.getElementById('errorCount');
     const warningCount = document.getElementById('warningCount');
@@ -410,8 +392,8 @@ class NotificationsCenter {
   }
 
   createNotificationHTML(notification) {
-    const timeAgo = this.getTimeAgo(notification.time);
-    const iconClass = this.getIconClass(notification.type);
+    const timeAgo = NotificationsCenter.getTimeAgo(notification.time);
+    const iconClass = NotificationsCenter.getIconClass(notification.type);
 
     return `
             <div class="notification-item ${notification.type}">
@@ -422,11 +404,6 @@ class NotificationsCenter {
                     <div class="notification-title">${notification.title}</div>
                     <div class="notification-message">${notification.message}</div>
                     <div class="notification-time">${timeAgo}</div>
-                </div>
-                <div class="notification-actions">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="window.notificationsCenter?.removeNotification(${notification.id})">
-                        <i class="fas fa-times"></i>
-                    </button>
                 </div>
             </div>
         `;
@@ -556,6 +533,48 @@ class NotificationsCenter {
     this.updateStatsUI();
   }
 
+  addTestNotifications() {
+    // הוספת התראות בדיקה אם אין התראות קיימות
+    if (this.notifications.length === 0 && this.history.length === 0) {
+      console.log('📝 הוספת התראות בדיקה...');
+      
+      this.addNotification('success', 'מערכת', 'מרכז ההתראות אותחל בהצלחה', 'now');
+      this.addNotification('info', 'חיבור', 'מתחבר לשרת WebSocket...', 'now');
+      this.addNotification('warning', 'בדיקה', 'זוהי התראת בדיקה למערכת', 'now');
+      
+      console.log('✅ התראות בדיקה נוספו');
+    }
+    
+    // בדיקת הגדרות
+    console.log('⚙️ הגדרות נוכחיות:', this.settings);
+    
+    // תיקון הגדרות אם הן מבוטלות
+    if (!this.settings.enableRealtime && !this.settings.enableSounds && !this.settings.enableBackgroundTasks) {
+      console.log('🔧 תיקון הגדרות מבוטלות...');
+      this.settings = NotificationsCenter.loadSettings();
+      this.saveSettings();
+      this.updateSettingsUI();
+      console.log('✅ הגדרות תוקנו:', this.settings);
+    }
+  }
+
+  checkWebSocketConnection() {
+    // בדיקת חיבור WebSocket
+    if (window.realtimeNotificationsClient) {
+      const isConnected = window.realtimeNotificationsClient.isConnected();
+      console.log('🔍 בדיקת חיבור WebSocket:', isConnected ? 'מחובר' : 'לא מחובר');
+      
+      if (isConnected) {
+        this.updateConnectionStatus('connected');
+      } else {
+        this.updateConnectionStatus('disconnected');
+      }
+    } else {
+      console.log('⚠️ realtimeNotificationsClient לא זמין');
+      this.updateConnectionStatus('disconnected');
+    }
+  }
+
   // שמירה לקובץ לוג
   static saveToLogFile(notification) {
     try {
@@ -584,27 +603,6 @@ class NotificationsCenter {
   }
 
   // פונקציות ציבוריות
-  removeNotification(id) {
-    this.notifications = this.notifications.filter(n => n.id !== id);
-    this.history = this.history.filter(n => n.id !== id);
-
-    this.updateStats();
-    this.updateNotificationsUI();
-    this.updateHistoryUI();
-    this.updateStatsUI();
-    this.saveToLocalStorage();
-  }
-
-  clearLiveNotifications() {
-    this.notifications = [];
-    this.updateStats();
-    this.updateNotificationsUI();
-    this.updateStatsUI();
-    this.saveToLocalStorage();
-
-    // הודעה ישירה לממשק ללא לולאה
-    // console.log('✅ התראות פעילות נוקו בהצלחה');
-  }
 
   clearHistory() {
     if (window.confirm('האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?')) {
@@ -622,7 +620,6 @@ class NotificationsCenter {
 
   refreshNotifications() {
     this.loadFromLocalStorage();
-    this.updateNotificationsUI();
     this.updateHistoryUI();
     this.updateStatsUI();
 
@@ -640,7 +637,7 @@ class NotificationsCenter {
       // עדכון סטטוס חיבור רק אם יש שינוי
       if (window.realtimeNotificationsClient) {
         const isConnected = window.realtimeNotificationsClient.isConnected();
-        const currentStatus = this.getCurrentConnectionStatus();
+        const currentStatus = NotificationsCenter.getCurrentConnectionStatus();
 
         if (isConnected && currentStatus !== 'connected') {
           this.updateConnectionStatus('connected');
@@ -673,7 +670,7 @@ class NotificationsCenter {
           const connectionTime = new Date(stats.connectedAt);
           const now = new Date();
           const diff = Math.floor((now - connectionTime) / 1000);
-          connectionTimeElement.textContent = this.formatDuration(diff);
+          connectionTimeElement.textContent = NotificationsCenter.formatDuration(diff);
         }
       }
     } catch (error) {
@@ -695,6 +692,140 @@ class NotificationsCenter {
       // console.warn('שגיאה בקבלת סטטוס חיבור נוכחי:', error);
     }
     return 'connecting';
+  }
+}
+
+// פונקציה להעתקת לוג מפורט עם כל הנתונים והסטטוס
+function copyDetailedLogToClipboard() {
+  try {
+    console.log('📋 יצירת לוג מפורט...');
+    
+    let log = '=== לוג מפורט - מרכז התראות TikTrack ===\n\n';
+    log += `📅 תאריך: ${new Date().toLocaleString('he-IL')}\n`;
+    log += `🌐 URL: ${window.location.href}\n`;
+    log += `👤 User Agent: ${navigator.userAgent}\n\n`;
+    
+    // סטטוס חיבור
+    log += '🔗 סטטוס חיבור:\n';
+    log += `WebSocket: ${window.realtimeNotificationsClient?.isConnected() ? 'מחובר' : 'לא מחובר'}\n`;
+    log += `סטטוס נוכחי: ${document.getElementById('connectionStatus')?.querySelector('.status-text')?.textContent || 'לא ידוע'}\n`;
+    log += `WebSocket Status: ${document.getElementById('websocketStatus')?.textContent || 'לא ידוע'}\n`;
+    log += `זמן חיבור: ${document.getElementById('connectionTime')?.textContent || 'לא ידוע'}\n`;
+    log += `הודעות נשלחו: ${document.getElementById('messagesSent')?.textContent || '0'}\n\n`;
+    
+    // הגדרות
+    log += '⚙️ הגדרות:\n';
+    const settings = window.notificationsCenter?.settings || {};
+    log += `התראות בזמן אמת: ${settings.enableRealtime ? 'מופעל' : 'מבוטל'}\n`;
+    log += `צלילי התראה: ${settings.enableSounds ? 'מופעל' : 'מבוטל'}\n`;
+    log += `משימות ברקע: ${settings.enableBackgroundTasks ? 'מופעל' : 'מבוטל'}\n`;
+    log += `עדכוני נתונים: ${settings.enableDataUpdates ? 'מופעל' : 'מבוטל'}\n`;
+    log += `נתונים חיצוניים: ${settings.enableExternalData ? 'מופעל' : 'מבוטל'}\n`;
+    log += `אירועי מערכת: ${settings.enableSystemEvents ? 'מופעל' : 'מבוטל'}\n\n`;
+    
+    // סטטיסטיקות
+    log += '📊 סטטיסטיקות:\n';
+    log += `✅ הצלחות: ${document.getElementById('successCount')?.textContent || '0'}\n`;
+    log += `❌ שגיאות: ${document.getElementById('errorCount')?.textContent || '0'}\n`;
+    log += `⚠️ אזהרות: ${document.getElementById('warningCount')?.textContent || '0'}\n`;
+    log += `ℹ️ הודעות מידע: ${document.getElementById('infoCount')?.textContent || '0'}\n\n`;
+    
+    // התראות פעילות
+    log += '🔔 התראות פעילות:\n';
+    const liveContainer = document.getElementById('liveNotifications');
+    if (liveContainer) {
+      const notifications = liveContainer.querySelectorAll('.notification-item');
+      if (notifications && notifications.length > 0) {
+        // המרה ל-Array כדי שנוכל להשתמש ב-forEach
+        const notificationsArray = Array.from(notifications);
+        notificationsArray.forEach((notification, index) => {
+          const type = notification.className.match(/notification-item (\w+)/)?.[1] || 'unknown';
+          const title = notification.querySelector('.notification-title')?.textContent || 'ללא כותרת';
+          const message = notification.querySelector('.notification-message')?.textContent || 'ללא הודעה';
+          const time = notification.querySelector('.notification-time')?.textContent || 'ללא זמן';
+          log += `${index + 1}. [${type.toUpperCase()}] ${title}: ${message} (${time})\n`;
+        });
+      } else {
+        log += 'אין התראות פעילות\n';
+      }
+    } else {
+      log += 'אלמנט התראות פעילות לא נמצא\n';
+    }
+    log += '\n';
+    
+    // היסטוריה
+    log += '📚 היסטוריית התראות:\n';
+    const historyContainer = document.getElementById('notificationHistory');
+    if (historyContainer) {
+      const historyItems = historyContainer.querySelectorAll('.notification-item');
+      if (historyItems && historyItems.length > 0) {
+        // המרה ל-Array כדי שנוכל להשתמש ב-slice
+        const historyArray = Array.from(historyItems);
+        historyArray.slice(0, 10).forEach((item, index) => {
+          const type = item.className.match(/notification-item (\w+)/)?.[1] || 'unknown';
+          const title = item.querySelector('.notification-title')?.textContent || 'ללא כותרת';
+          const message = item.querySelector('.notification-message')?.textContent || 'ללא הודעה';
+          const time = item.querySelector('.notification-time')?.textContent || 'ללא זמן';
+          log += `${index + 1}. [${type.toUpperCase()}] ${title}: ${message} (${time})\n`;
+        });
+        if (historyArray.length > 10) {
+          log += `... ועוד ${historyArray.length - 10} התראות\n`;
+        }
+      } else {
+        log += 'אין היסטוריית התראות\n';
+      }
+    } else {
+      log += 'אלמנט היסטוריה לא נמצא\n';
+    }
+    log += '\n';
+    
+    // פילטרים
+    log += '🔍 פילטרים:\n';
+    log += `פילטר סוג: ${document.getElementById('historyFilter')?.value || 'כל ההתראות'}\n`;
+    log += `פילטר זמן: ${document.getElementById('historyPeriod')?.value || '24 שעות אחרונות'}\n\n`;
+    
+    // לוג קונסול
+    log += '🖥️ לוג קונסול (אחרונות):\n';
+    try {
+      // נסיון לקבל לוג קונסול - זה לא תמיד עובד בדפדפנים
+      if (window.console && window.console.log) {
+        log += 'לוג קונסול זמין (פרטים לא נגישים מהסקריפט)\n';
+      } else {
+        log += 'לוג קונסול לא זמין\n';
+      }
+    } catch (error) {
+      log += `שגיאה בגישה ללוג קונסול: ${error.message}\n`;
+    }
+    log += '\n';
+    
+    // מידע נוסף
+    log += '🔧 מידע נוסף:\n';
+    log += `גודל localStorage: ${JSON.stringify(localStorage).length} תווים\n`;
+    log += `זמן טעינת דף: ${performance.timing ? (performance.timing.loadEventEnd - performance.timing.navigationStart) + 'ms' : 'לא זמין'}\n`;
+    log += `זיכרון זמין: ${navigator.deviceMemory ? navigator.deviceMemory + 'GB' : 'לא זמין'}\n`;
+    log += `חיבור: ${navigator.onLine ? 'מחובר' : 'לא מחובר'}\n\n`;
+    
+    log += '=== סוף לוג מפורט ===';
+    
+    // העתקה ללוח
+    navigator.clipboard.writeText(log).then(() => {
+      console.log('✅ לוג מפורט הועתק ללוח בהצלחה');
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('העתקה ללוח', 'לוג מפורט הועתק ללוח בהצלחה', 3000);
+      }
+    }).catch(err => {
+      console.error('❌ שגיאה בהעתקה ללוח:', err);
+      // Fallback - הצגת הלוג בחלון נפרד
+      const newWindow = window.open('', '_blank');
+      newWindow.document.write(`<pre style="direction: rtl; text-align: right; font-family: monospace; white-space: pre-wrap;">${log}</pre>`);
+      newWindow.document.title = 'לוג מפורט - מרכז התראות';
+    });
+    
+  } catch (error) {
+    console.error('❌ שגיאה ביצירת לוג מפורט:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה ביצירת לוג מפורט: ' + error.message, 5000);
+    }
   }
 }
 
@@ -794,18 +925,13 @@ function saveNotificationSettings() {
 function resetNotificationSettings() {
   if (window.confirm('האם אתה בטוח שברצונך לאפס את כל ההגדרות?')) {
     if (window.notificationsCenter) {
-      window.notificationsCenter.settings = window.notificationsCenter.loadSettings();
+      window.notificationsCenter.settings = NotificationsCenter.loadSettings();
       window.notificationsCenter.updateSettingsUI();
       window.notificationsCenter.saveSettings();
     }
   }
 }
 
-function clearLiveNotifications() {
-  if (window.notificationsCenter) {
-    window.notificationsCenter.clearLiveNotifications();
-  }
-}
 
 function clearHistory() {
   if (window.notificationsCenter) {
@@ -825,9 +951,10 @@ function filterHistory() {
   }
 }
 
+
 // אתחול
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 טעינת דף מרכז התראות...');
+  console.log('🚀 טעינת דף מרכז התראות... (v1.0.7 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed)');
 
   // אתחול HeaderSystem
   if (window.headerSystem && !window.headerSystem.isInitialized) {
@@ -838,5 +965,5 @@ document.addEventListener('DOMContentLoaded', () => {
   // יצירת מופע מרכז התראות
   window.notificationsCenter = new NotificationsCenter();
 
-  console.log('✅ דף מרכז התראות נטען בהצלחה');
+  console.log('✅ דף מרכז התראות נטען בהצלחה (v1.0.7 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed)');
 });

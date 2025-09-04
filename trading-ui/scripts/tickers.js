@@ -1096,6 +1096,10 @@ async function performCancelTicker(id) {
       // רענון הנתונים
       if (typeof loadTickersData === 'function') {
         // אנחנו בעמוד tickers
+        // ניקוי מטמון לפני רענון
+        if (typeof window.clearTickersCache === 'function') {
+          window.clearTickersCache();
+        }
         await loadTickersData();
         // עדכון שדה active_trades רק בעמוד tickers
         await updateActiveTradesField();
@@ -1118,6 +1122,10 @@ async function performCancelTicker(id) {
 
       // רענון הנתונים כמו במקרה של הצלחה
       if (typeof loadTickersData === 'function') {
+        // ניקוי מטמון לפני רענון
+        if (typeof window.clearTickersCache === 'function') {
+          window.clearTickersCache();
+        }
         await loadTickersData();
         await updateActiveTradesField();
       } else {
@@ -1473,9 +1481,6 @@ async function loadTickersData() {
     // עדכון סטטיסטיקות סיכום
     updateTickersSummaryStats(tickersData);
 
-    // רענון נתוני Yahoo Finance אוטומטית (ללא הודעות)
-    refreshYahooFinanceDataSilently();
-
 
   } catch (error) {
     handleDataLoadError(error, 'טעינת נתוני טיקרים');
@@ -1511,11 +1516,18 @@ function updateTickersSummaryStats(tickers) {
 
     // חישוב סטטיסטיקות
     const totalTickers = tickers.length;
-    const activeTickers = tickers.filter(ticker => ticker.active_trades).length;
+    
+    // ספירת טיקרים לפי סטטוס
+    const openTickers = tickers.filter(ticker => ticker.status === 'open').length;
+    const closedTickers = tickers.filter(ticker => ticker.status === 'closed').length;
+    const cancelledTickers = tickers.filter(ticker => ticker.status === 'cancelled').length;
+    
+    // סה"כ טיקרים עם טרייד
+    const tickersWithTrades = tickers.filter(ticker => ticker.active_trades).length;
 
-    // חישוב תאריכי עדכון
-    const validUpdatedDates = tickers
-      .map(ticker => ticker.updated_at)
+    // חישוב תאריכי עדכון נתונים חיצוניים
+    const validExternalDates = tickers
+      .map(ticker => ticker.yahoo_updated_at)
       .filter(date => date)
       .map(date => new Date(date))
       .filter(date => !isNaN(date.getTime()));
@@ -1523,17 +1535,17 @@ function updateTickersSummaryStats(tickers) {
     let latestUpdate = 'אין נתונים';
     let oldestUpdate = 'אין נתונים';
 
-    if (validUpdatedDates.length > 0) {
-      const latest = new Date(Math.max(...validUpdatedDates));
-      const oldest = new Date(Math.min(...validUpdatedDates));
+    if (validExternalDates.length > 0) {
+      const latest = new Date(Math.max(...validExternalDates));
+      const oldest = new Date(Math.min(...validExternalDates));
 
-      latestUpdate = latest.toLocaleDateString('he-IL');
-      oldestUpdate = oldest.toLocaleDateString('he-IL');
+      latestUpdate = latest.toLocaleString('he-IL');
+      oldestUpdate = oldest.toLocaleString('he-IL');
     }
 
     // עדכון השדות ב-HTML
-    totalTickersElement.textContent = totalTickers;
-    activeTickersElement.textContent = activeTickers;
+    totalTickersElement.textContent = `${totalTickers} (פתוח: ${openTickers}, סגור: ${closedTickers}, מבוטל: ${cancelledTickers})`;
+    activeTickersElement.textContent = tickersWithTrades;
     latestUpdateElement.textContent = latestUpdate;
     oldestUpdateElement.textContent = oldestUpdate;
 
@@ -1565,7 +1577,7 @@ function updateTickersTable(tickers) {
 
     // בדיקה אם יש נתונים
     if (!tickers || tickers.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="13" class="text-center">לא נמצאו טיקרים</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" class="text-center">לא נמצאו טיקרים</td></tr>';
       return;
     }
 
@@ -1588,16 +1600,45 @@ function updateTickersTable(tickers) {
       const changePercent = ticker.change_percent || 0;
       const volume = ticker.volume || 'N/A';
       const updatedAtDisplay = ticker.yahoo_updated_at || 'N/A';
+      
+      // לוגים לדיבוג
+      if (ticker.symbol === 'AAPL') {
+        console.log(`🔍 Debug AAPL:`, {
+          current_price: ticker.current_price,
+          change_percent: ticker.change_percent,
+          volume: ticker.volume,
+          yahoo_updated_at: ticker.yahoo_updated_at
+        });
+      }
 
       // עיצוב שינוי אחוזים
       const changeColor = changePercent >= 0 ? '#28a745' : '#dc3545';
       const changeSign = changePercent >= 0 ? '+' : '';
-      const changeDisplay = changePercent !== 'N/A' && changePercent !== 0 ?
+      const changeDisplay = (changePercent !== 'N/A' && changePercent !== null && changePercent !== undefined) ?
         `${changeSign}${changePercent.toFixed(2)}%` : 'N/A';
 
       return `
                 <tr>
-                    <td title="${ticker.symbol || 'N/A'}"><strong>${ticker.symbol || 'N/A'}</strong></td>
+                    <td title="${ticker.symbol || 'N/A'}">
+                        <span class="ticker-symbol-link" 
+                              onclick="if (window.showEntityDetails) { window.showEntityDetails('ticker', ${ticker.id}); } else { console.error('פונקציה showEntityDetails לא קיימת'); }" 
+                              title="לחץ לצפייה בפרטי הטיקר">
+                            <strong>${ticker.symbol || 'N/A'}</strong>
+                        </span>
+                    </td>
+                    <td title="${statusLabel}">
+                        <span style="background-color: ${statusStyle.backgroundColor}; 
+                                     color: ${statusStyle.color}; 
+                                     padding: ${statusStyle.padding}; 
+                                     border-radius: ${statusStyle.borderRadius}; 
+                                     font-size: ${statusStyle.fontSize}; 
+                                     font-weight: ${statusStyle.fontWeight}; 
+                                     display: ${statusStyle.display}; 
+                                     min-width: ${statusStyle.minWidth}; 
+                                     text-align: ${statusStyle.textAlign};">
+                            ${statusLabel}
+                        </span>
+                    </td>
                     <td title="${ticker.active_trades ? 'יש טריידים פעילים' : 'אין טריידים פעילים'}">${ticker.active_trades ? '✅' : '❌'}</td>
                     <td title="${typeLabel}">
                         <span style="background-color: ${typeStyle.backgroundColor}; 
@@ -1612,34 +1653,13 @@ function updateTickersTable(tickers) {
                             ${typeLabel}
                         </span>
                     </td>
-                    <td title="${currencySymbol}"><strong>${currencySymbol}</strong></td>
-                    <td title="${currentPrice !== 'N/A' ? `מחיר נוכחי: ${currentPrice}` : 'אין נתוני מחיר'}">${currentPrice !== 'N/A' ? `$${currentPrice}` : 'N/A'}</td>
+                    <td title="${currentPrice !== 'N/A' ? `מחיר נוכחי: ${currentPrice}` : 'אין נתוני מחיר'}" style="color: ${changeColor}; font-weight: bold;">${currentPrice !== 'N/A' ? `$${currentPrice}` : 'N/A'}</td>
                     <td title="${changeDisplay !== 'N/A' ? `שינוי יומי: ${changeDisplay}` : 'אין נתוני שינוי'}" style="color: ${changeColor}; font-weight: bold;">${changeDisplay}</td>
-                    <td title="${volume !== 'N/A' ? `נפח מסחר: ${volume.toLocaleString()}` : 'אין נתוני נפח'}">${volume !== 'N/A' ? volume.toLocaleString() : 'N/A'}</td>
-                    <td title="${updatedAtDisplay !== 'N/A' ? `עודכן לאחרונה: ${updatedAtDisplay}` : 'לא עודכן'}">${updatedAtDisplay}</td>
                     <td title="${ticker.name || 'N/A'}">${ticker.name || 'N/A'}</td>
                     <td title="${ticker.created_at ? new Date(ticker.created_at).toLocaleDateString('he-IL') : 'N/A'}">${ticker.created_at ? new Date(ticker.created_at).toLocaleDateString('he-IL') : 'N/A'}</td>
                     <td title="${ticker.remarks || '-'}">${ticker.remarks || '-'}</td>
-                    <td title="${statusLabel}">
-                        <span style="background-color: ${statusStyle.backgroundColor}; 
-                                     color: ${statusStyle.color}; 
-                                     padding: ${statusStyle.padding}; 
-                                     border-radius: ${statusStyle.borderRadius}; 
-                                     font-size: ${statusStyle.fontSize}; 
-                                     font-weight: ${statusStyle.fontWeight}; 
-                                     display: ${statusStyle.display}; 
-                                     min-width: ${statusStyle.minWidth}; 
-                                     text-align: ${statusStyle.textAlign};">
-                            ${statusLabel}
-                        </span>
-                    </td>
                     <td class="actions-cell">
                         <div class="btn-group btn-group-sm" role="group">
-                            <button class="btn btn-outline-primary" 
-                                    onclick="showEntityDetails('ticker', ${ticker.id})" 
-                                    title="פרטי טיקר">
-                                <i class="fas fa-info-circle"></i>
-                            </button>
                             <button class="btn btn-outline-info" 
                                     onclick="window.showLinkedItemsWarning('ticker', ${ticker.id})" 
                                     title="פריטים מקושרים">🔗</button>
@@ -1654,9 +1674,6 @@ function updateTickersTable(tickers) {
              onclick="window.cancelTicker(${ticker.id})" 
              title="בטל טיקר"><span class="cancel-icon">X</span></button>`
 }
-                            <button class="btn btn-outline-danger" 
-                                    onclick="window.deleteTicker(${ticker.id})" 
-                                    title="מחק טיקר"><span class="delete-icon">🗑️</span></button>
                         </div>
                     </td>
                 </tr>
@@ -1788,6 +1805,11 @@ document.addEventListener('DOMContentLoaded', function () {
   // שחזור מצב הסגירה
   restoreTickersSectionState();
 
+  // יישום צבעי ישות על כותרות
+  if (window.applyEntityColorsToHeaders) {
+    window.applyEntityColorsToHeaders('ticker');
+  }
+
   // אתחול וולידציה - שימוש בפונקציות הגלובליות
   if (window.initializeValidation) {
     // שימוש בוולידציה הגלובלית ללא כללים מותאמים
@@ -1848,7 +1870,7 @@ window.addEventListener('load', function () {
  */
 async function refreshYahooFinanceData() {
   try {
-    // קבלת כל הטיקרים מהמערכת
+    // קבלת כל הטיקרים מהמערכת (כולל מבוטלים)
     if (!window.tickersData || window.tickersData.length === 0) {
       await loadTickersData();
     }
@@ -1859,13 +1881,16 @@ async function refreshYahooFinanceData() {
       throw new Error('External Data Service not available');
     }
 
-    // קבלת נתוני מחירים ועדכון הטבלה
+    // קבלת נתוני מחירים לכל הטיקרים (כולל מבוטלים)
     const externalData = await externalDataService.refreshTickersData(window.tickersData, 'yahooRefreshBtn');
 
     if (externalData) {
-      // עדכון הנתונים הגלובליים והטבלה
+      // עדכון הנתונים הגלובליים והטבלה (כולל מבוטלים)
       window.tickersData = externalDataService.updateTickersWithExternalData(window.tickersData, externalData);
       updateTickersTable(window.tickersData);
+      
+      // עדכון סטטיסטיקות סיכום
+      updateTickersSummaryStats(window.tickersData);
     }
 
   } catch (error) {
@@ -1897,9 +1922,11 @@ async function refreshYahooFinanceDataSilently() {
     const externalData = await externalDataService.refreshTickersDataSilently(window.tickersData);
 
     if (externalData) {
-      // עדכון הנתונים הגלובליים והטבלה (ללא הודעות)
+      // עדכון הנתונים הגלובליים (ללא הודעות)
       window.tickersData = externalDataService.updateTickersWithExternalData(window.tickersData, externalData);
-      updateTickersTable(window.tickersData);
+      console.log('📈 External data updated silently:', externalData);
+    } else {
+      console.warn('📈 No external data received for silent refresh');
     }
 
   } catch (error) {

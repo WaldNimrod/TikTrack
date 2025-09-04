@@ -113,7 +113,6 @@
           <div class="info-summary" id="summaryStats">
             <div>סה"כ טיקרים: <strong id="totalTickers">0</strong></div>
             <div>סה"כ טיקרים עם טרייד: <strong id="activeTickers">0</strong></div>
-            <div>התראות חדשות: <strong id="newAlerts">0</strong></div>
             <div>עדכון אחרון: <strong id="latestUpdate">אין נתונים</strong></div>
             <div>עדכון ישן ביותר: <strong id="oldestUpdate">אין נתונים</strong></div>
           </div>
@@ -169,67 +168,49 @@
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }">
-                        יש טריידים <span class="sort-icon">↕</span>
+                        סטטוס <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }">
-                        סוג <span class="sort-icon">↕</span>
+                        יש טריידים <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }">
-                        מטבע <span class="sort-icon">↕</span>
-                      </button>
-                    </th>
-                    <th>
-                      <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }">
                         מחיר נוכחי <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }">
                         שינוי % <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }">
+                        סוג <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); }">
-                        נפח מסחר <span class="sort-icon">↕</span>
-                      </button>
-                    </th>
-                    <th>
-                      <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); }">
-                        עודכן ב <span class="sort-icon">↕</span>
-                      </button>
-                    </th>
-                    <th>
-                      <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); }">
                         שם <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(9); }">
-                        נוצר ב <span class="sort-icon">↕</span>
-                      </button>
-                    </th>
-                    <th>
-                      <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(10); }">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); }">
                         הערות <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(11); }">
-                        סטטוס <span class="sort-icon">↕</span>
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); }">
+                        נוצר ב <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th class="actions-cell">פעולות</th>

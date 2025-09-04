@@ -62,6 +62,53 @@ const DEFAULT_PREFERENCES = {
     research: '#343a40',
     preference: '#adb5bd',
   },
+  // הגדרות צבעים לפי סטטוסים
+  statusColors: {
+    open: {
+      light: 'rgba(40, 167, 69, 0.1)',
+      medium: '#28a745',
+      dark: '#155724',
+      border: 'rgba(40, 167, 69, 0.3)',
+    },
+    closed: {
+      light: 'rgba(108, 117, 125, 0.1)',
+      medium: '#6c757d',
+      dark: '#383d41',
+      border: 'rgba(108, 117, 125, 0.3)',
+    },
+    cancelled: {
+      light: 'rgba(220, 53, 69, 0.1)',
+      medium: '#dc3545',
+      dark: '#721c24',
+      border: 'rgba(220, 53, 69, 0.3)',
+    },
+  },
+  // הגדרות צבעים לפי סוגי השקעה
+  investmentTypeColors: {
+    swing: {
+      light: 'rgba(0, 123, 255, 0.1)',
+      medium: '#007bff',
+      dark: '#0056b3',
+      border: 'rgba(0, 123, 255, 0.3)',
+    },
+    investment: {
+      light: 'rgba(40, 167, 69, 0.1)',
+      medium: '#28a745',
+      dark: '#155724',
+      border: 'rgba(40, 167, 69, 0.3)',
+    },
+    passive: {
+      light: 'rgba(111, 66, 193, 0.1)',
+      medium: '#6f42c1',
+      dark: '#4a2c7a',
+      border: 'rgba(111, 66, 193, 0.3)',
+    },
+  },
+  // הגדרות שקיפות כותרות
+  headerOpacity: {
+    main: 60,
+    sub: 30,
+  },
 };
 
 // העדפות נוכחיות
@@ -329,6 +376,15 @@ function updateUI() {
 
   // עדכון ממשק צבעי הישויות
   updateEntityColorsUI();
+
+  // טעינת העדפות שקיפות כותרות
+  loadHeaderOpacityPreferences();
+
+  // עדכון ממשק צבעי הסטטוסים
+  updateStatusColorsUI();
+
+  // עדכון ממשק צבעי סוגי השקעה
+  updateInvestmentTypeColorsUI();
 
   const retryDelayInput = document.getElementById('retryDelay');
   if (retryDelayInput) {
@@ -1071,5 +1127,786 @@ window.updateEntityColorFromHex = updateEntityColorFromHex;
 window.resetEntityColors = resetEntityColors;
 window.updateEntityColorsUI = updateEntityColorsUI;
 
+// ===== HEADER OPACITY FUNCTIONS =====
+// פונקציות לשקיפות כותרות
+
+// דגל למניעת לולאה אינסופית
+let isUpdatingHeaderOpacity = false;
+
+/**
+ * עדכון שקיפות כותרת
+ * Update header opacity
+ */
+function updateHeaderOpacity(headerType, opacityValue) {
+  try {
+    // מניעת לולאה אינסופית
+    if (isUpdatingHeaderOpacity) {
+      return;
+    }
+    
+    isUpdatingHeaderOpacity = true;
+    
+    console.log(`🎭 מעדכן שקיפות כותרת ${headerType} ל-${opacityValue}%`);
+    
+    // עדכון הערך המוצג
+    const valueElement = document.getElementById(`${headerType}HeaderOpacityValue`);
+    if (valueElement) {
+      valueElement.textContent = `${opacityValue}%`;
+    }
+    
+    // עדכון תצוגה מקדימה
+    updateHeaderOpacityPreview(headerType, opacityValue);
+    
+    // שמירת העדפה
+    if (!currentPreferences.headerOpacity) {
+      currentPreferences.headerOpacity = {};
+    }
+    currentPreferences.headerOpacity[headerType] = parseInt(opacityValue);
+    
+    // עדכון CSS דינמי
+    updateHeaderOpacityCSS(headerType, opacityValue);
+    
+    // שמירה אוטומטית של ההעדפות
+    saveAllPreferences().catch(error => {
+      console.error(`❌ שגיאה בשמירת שקיפות כותרת ${headerType}:`, error);
+    }).finally(() => {
+      // שחרור הדגל אחרי השמירה
+      setTimeout(() => {
+        isUpdatingHeaderOpacity = false;
+      }, 100);
+    });
+    
+    console.log(`✅ שקיפות כותרת ${headerType} עודכנה ל-${opacityValue}%`);
+    
+  } catch (error) {
+    console.error(`❌ שגיאה בעדכון שקיפות כותרת ${headerType}:`, error);
+    showPreferencesError('שגיאה', `לא ניתן לעדכן שקיפות כותרת ${headerType}`);
+    isUpdatingHeaderOpacity = false;
+  }
+}
+
+/**
+ * עדכון תצוגה מקדימה של שקיפות
+ * Update header opacity preview
+ */
+function updateHeaderOpacityPreview(headerType, opacityValue) {
+  try {
+    const previewElement = document.getElementById(`${headerType}HeaderPreview`);
+    if (!previewElement) return;
+    
+    // צבע דוגמה (כחול טורקיז)
+    const baseColor = '23, 162, 184'; // #17a2b8
+    const opacity = opacityValue / 100;
+    
+    previewElement.style.backgroundColor = `rgba(${baseColor}, ${opacity})`;
+    
+  } catch (error) {
+    console.error(`❌ שגיאה בעדכון תצוגה מקדימה:`, error);
+  }
+}
+
+/**
+ * עדכון CSS דינמי לשקיפות כותרות
+ * Update dynamic CSS for header opacity
+ */
+function updateHeaderOpacityCSS(headerType, opacityValue) {
+  try {
+    // המרת אחוזים לערך hex
+    const opacityHex = Math.round(opacityValue * 255 / 100).toString(16).padStart(2, '0');
+    
+    // עדכון CSS Variables
+    if (headerType === 'main') {
+      document.documentElement.style.setProperty('--header-main-opacity', opacityHex);
+    } else if (headerType === 'sub') {
+      document.documentElement.style.setProperty('--header-sub-opacity', opacityHex);
+    }
+    
+    // עדכון מחלקות CSS קיימות
+    updateEntityHeaderCSS();
+    
+  } catch (error) {
+    console.error(`❌ שגיאה בעדכון CSS דינמי:`, error);
+  }
+}
+
+/**
+ * עדכון מחלקות CSS של כותרות ישויות
+ * Update entity header CSS classes
+ */
+function updateEntityHeaderCSS() {
+  try {
+    if (!window.generateEntityCSS) return;
+    
+    // יצירת CSS חדש עם השקיפות המעודכנות
+    const newCSS = window.generateEntityCSS();
+    
+    // עדכון אלמנט ה-CSS
+    let styleElement = document.getElementById('dynamic-entity-colors');
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = 'dynamic-entity-colors';
+      document.head.appendChild(styleElement);
+    }
+    
+    styleElement.textContent = newCSS;
+    
+  } catch (error) {
+    console.error('❌ שגיאה בעדכון CSS כותרות ישויות:', error);
+  }
+}
+
+/**
+ * יישום שקיפות על כל העמודים
+ * Apply opacity to all pages
+ */
+function applyHeaderOpacityToAllPages() {
+  try {
+    console.log('🎭 מיישם שקיפות כותרות על כל העמודים...');
+    
+    // קבלת העדפות השקיפות
+    const mainOpacity = currentPreferences.headerOpacity?.main || 60;
+    const subOpacity = currentPreferences.headerOpacity?.sub || 30;
+    
+    // עדכון CSS דינמי
+    updateHeaderOpacityCSS('main', mainOpacity);
+    updateHeaderOpacityCSS('sub', subOpacity);
+    
+    // יישום על כותרות קיימות
+    if (window.applyEntityColorsToHeaders) {
+      // יישום על כל סוגי הישויות
+      const entityTypes = ['execution', 'trade', 'account', 'ticker', 'alert'];
+      entityTypes.forEach(entityType => {
+        window.applyEntityColorsToHeaders(entityType);
+      });
+    }
+    
+    showPreferencesInfo('שקיפות כותרות', 'השקיפות יושמה על כל העמודים');
+    
+  } catch (error) {
+    console.error('❌ שגיאה ביישום שקיפות על כל העמודים:', error);
+    showPreferencesError('שגיאה', 'לא ניתן ליישם שקיפות על כל העמודים');
+  }
+}
+
+/**
+ * טעינת העדפות שקיפות
+ * Load header opacity preferences
+ */
+function loadHeaderOpacityPreferences() {
+  try {
+    // מניעת עדכון אם אנחנו באמצע עדכון ידני
+    if (isUpdatingHeaderOpacity) {
+      return;
+    }
+    
+    const mainOpacity = currentPreferences.headerOpacity?.main || 60;
+    const subOpacity = currentPreferences.headerOpacity?.sub || 30;
+    
+    // עדכון ממשק המשתמש
+    const mainSlider = document.getElementById('mainHeaderOpacity');
+    const subSlider = document.getElementById('subHeaderOpacity');
+    
+    if (mainSlider) {
+      mainSlider.value = mainOpacity;
+      // עדכון ממשק ללא שמירה (רק בטעינה)
+      updateHeaderOpacityUI('main', mainOpacity);
+    }
+    
+    if (subSlider) {
+      subSlider.value = subOpacity;
+      // עדכון ממשק ללא שמירה (רק בטעינה)
+      updateHeaderOpacityUI('sub', subOpacity);
+    }
+    
+  } catch (error) {
+    console.error('❌ שגיאה בטעינת העדפות שקיפות:', error);
+  }
+}
+
+/**
+ * עדכון ממשק שקיפות כותרת ללא שמירה
+ * Update header opacity UI without saving
+ */
+function updateHeaderOpacityUI(headerType, opacityValue) {
+  try {
+    // עדכון הערך המוצג
+    const valueElement = document.getElementById(`${headerType}HeaderOpacityValue`);
+    if (valueElement) {
+      valueElement.textContent = `${opacityValue}%`;
+    }
+    
+    // עדכון תצוגה מקדימה
+    updateHeaderOpacityPreview(headerType, opacityValue);
+    
+    // עדכון CSS דינמי
+    updateHeaderOpacityCSS(headerType, opacityValue);
+    
+  } catch (error) {
+    console.error(`❌ שגיאה בעדכון ממשק שקיפות כותרת ${headerType}:`, error);
+  }
+}
+
+// ===== STATUS COLOR FUNCTIONS =====
+// פונקציות לצבעי סטטוסים
+
+/**
+ * המרת hex ל-rgba עם שקיפות
+ * Convert hex to rgba with opacity
+ */
+function hexToRgba(hex, opacity = 0.1) {
+  try {
+    // אם זה כבר rgba, החזר כפי שהוא
+    if (hex.includes('rgba')) {
+      return hex;
+    }
+    
+    // הסרת # אם קיים
+    hex = hex.replace('#', '');
+    
+    // המרה ל-rgb
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    
+  } catch (error) {
+    console.error('❌ שגיאה בהמרת hex ל-rgba:', error);
+    return hex; // החזר את הערך המקורי
+  }
+}
+
+/**
+ * עדכון צבע סטטוס לפי עוצמה
+ * Update status color by intensity
+ */
+function updateStatusColorIntensity(status, intensity, colorValue) {
+  try {
+    console.log(`🏷️ מעדכן צבע סטטוס ${status} (${intensity}) ל-${colorValue}`);
+    
+    // וידוא שהצבעים מאותחלים
+    if (!currentPreferences.statusColors) {
+      currentPreferences.statusColors = {};
+    }
+    if (!currentPreferences.statusColors[status]) {
+      currentPreferences.statusColors[status] = {};
+    }
+    
+    // המרת hex ל-rgba לפי העוצמה
+    let finalColorValue = colorValue;
+    if (colorValue.startsWith('#')) {
+      if (intensity === 'light') {
+        finalColorValue = hexToRgba(colorValue, 0.1);
+      } else if (intensity === 'border') {
+        finalColorValue = hexToRgba(colorValue, 0.3);
+      }
+      // medium ו-dark נשארים hex
+    }
+    
+    // עדכון הצבע
+    currentPreferences.statusColors[status][intensity] = finalColorValue;
+    
+    // עדכון הצבע במערכת הצבעים הגלובלית
+    if (window.STATUS_COLORS && window.STATUS_COLORS[status]) {
+      window.STATUS_COLORS[status][intensity] = finalColorValue;
+    }
+    
+    // עדכון השדה המקושר
+    const linkedFieldId = `status${status.charAt(0).toUpperCase() + status.slice(1)}${intensity.charAt(0).toUpperCase() + intensity.slice(1)}ColorHex`;
+    const linkedField = document.getElementById(linkedFieldId);
+    if (linkedField) {
+      linkedField.value = finalColorValue;
+    }
+    
+    // עדכון CSS דינמי
+    if (window.generateStatusCSS) {
+      const newCSS = window.generateStatusCSS();
+      let styleElement = document.getElementById('dynamic-status-colors');
+      if (!styleElement) {
+        styleElement = document.createElement('style');
+        styleElement.id = 'dynamic-status-colors';
+        document.head.appendChild(styleElement);
+      }
+      styleElement.textContent = newCSS;
+    }
+    
+    showPreferencesInfo('צבע סטטוס', `צבע הסטטוס ${status} (${intensity}) עודכן`);
+    
+  } catch (error) {
+    console.error(`❌ שגיאה בעדכון צבע סטטוס ${status} (${intensity}):`, error);
+    showPreferencesError('שגיאה', `לא ניתן לעדכן צבע סטטוס ${status} (${intensity})`);
+  }
+}
+
+/**
+ * עדכון צבע סטטוס מ-hex לפי עוצמה
+ * Update status color from hex by intensity
+ */
+function updateStatusColorIntensityFromHex(status, intensity, hexValue) {
+  try {
+    // בדיקת תקינות ה-hex
+    if (!/^#[0-9A-F]{6}$/i.test(hexValue)) {
+      showPreferencesError('שגיאה', 'ערך hex לא תקין (נדרש: #RRGGBB)');
+      return;
+    }
+
+    // עדכון הצבע
+    updateStatusColorIntensity(status, intensity, hexValue);
+
+    // עדכון השדה המקושר
+    const linkedFieldId = `status${status.charAt(0).toUpperCase() + status.slice(1)}${intensity.charAt(0).toUpperCase() + intensity.slice(1)}Color`;
+    const linkedField = document.getElementById(linkedFieldId);
+    if (linkedField && linkedField.value !== hexValue) {
+      linkedField.value = hexValue;
+    }
+
+  } catch (error) {
+    console.error(`❌ שגיאה בעדכון צבע סטטוס ${status} (${intensity}) מ-hex:`, error);
+    showPreferencesError('שגיאה', `לא ניתן לעדכן צבע סטטוס ${status} (${intensity})`);
+  }
+}
+
+/**
+ * איפוס צבעי סטטוסים לברירת המחדל
+ * Reset status colors to default
+ */
+function resetStatusColors() {
+  try {
+    console.log('🏷️ מאפס צבעי סטטוסים לברירת המחדל...');
+    
+    // איפוס הצבעים לברירת המחדל
+    currentPreferences.statusColors = { ...DEFAULT_PREFERENCES.statusColors };
+    
+    // עדכון הצבעים במערכת הצבעים הגלובלית
+    if (window.STATUS_COLORS) {
+      Object.assign(window.STATUS_COLORS, currentPreferences.statusColors);
+    }
+    
+    // עדכון הממשק
+    updateStatusColorsUI();
+    
+    // עדכון CSS דינמי
+    if (window.generateStatusCSS) {
+      const newCSS = window.generateStatusCSS();
+      let styleElement = document.getElementById('dynamic-status-colors');
+      if (!styleElement) {
+        styleElement = document.createElement('style');
+        styleElement.id = 'dynamic-status-colors';
+        document.head.appendChild(styleElement);
+      }
+      styleElement.textContent = newCSS;
+    }
+    
+    showPreferencesInfo('צבעי סטטוסים', 'צבעי הסטטוסים אופסו לברירת המחדל');
+    
+  } catch (error) {
+    console.error('❌ שגיאה באיפוס צבעי סטטוסים:', error);
+    showPreferencesError('שגיאה', 'לא ניתן לאפס את צבעי הסטטוסים');
+  }
+}
+
+/**
+ * המרת rgba ל-hex
+ * Convert rgba to hex
+ */
+function rgbaToHex(rgba) {
+  try {
+    // אם זה כבר hex, החזר כפי שהוא
+    if (rgba.startsWith('#')) {
+      return rgba;
+    }
+    
+    // חילוץ ערכי rgba
+    const match = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+    if (!match) {
+      return '#000000'; // ברירת מחדל
+    }
+    
+    const r = parseInt(match[1]);
+    const g = parseInt(match[2]);
+    const b = parseInt(match[3]);
+    
+    // המרה ל-hex
+    const toHex = (n) => {
+      const hex = n.toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    };
+    
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+    
+  } catch (error) {
+    console.error('❌ שגיאה בהמרת rgba ל-hex:', error);
+    return '#000000';
+  }
+}
+
+/**
+ * עדכון ממשק צבעי הסטטוסים
+ * Update status colors UI
+ */
+function updateStatusColorsUI() {
+  try {
+    const colors = currentPreferences.statusColors || DEFAULT_PREFERENCES.statusColors;
+    
+    // עדכון צבעי סטטוסים
+    Object.keys(colors).forEach(status => {
+      const statusColors = colors[status];
+      Object.keys(statusColors).forEach(intensity => {
+        const colorInput = document.getElementById(`status${status.charAt(0).toUpperCase() + status.slice(1)}${intensity.charAt(0).toUpperCase() + intensity.slice(1)}Color`);
+        const colorHexInput = document.getElementById(`status${status.charAt(0).toUpperCase() + status.slice(1)}${intensity.charAt(0).toUpperCase() + intensity.slice(1)}ColorHex`);
+        
+        if (colorInput) {
+          // המרת rgba ל-hex עבור color input
+          const hexValue = rgbaToHex(statusColors[intensity]);
+          colorInput.value = hexValue;
+        }
+        if (colorHexInput) {
+          // שמירת הערך המקורי (rgba) בשדה הטקסט
+          colorHexInput.value = statusColors[intensity];
+        }
+      });
+    });
+    
+  } catch (error) {
+    console.error('❌ שגיאה בעדכון ממשק צבעי סטטוסים:', error);
+  }
+}
+
+// Export header opacity functions
+window.updateHeaderOpacity = updateHeaderOpacity;
+window.updateHeaderOpacityUI = updateHeaderOpacityUI;
+window.applyHeaderOpacityToAllPages = applyHeaderOpacityToAllPages;
+window.loadHeaderOpacityPreferences = loadHeaderOpacityPreferences;
+
+// ===== INVESTMENT TYPE COLOR FUNCTIONS =====
+// פונקציות לצבעי סוגי השקעה
+
+/**
+ * עדכון צבע סוג השקעה לפי עוצמה
+ * Update investment type color by intensity
+ */
+function updateInvestmentTypeColorIntensity(type, intensity, colorValue) {
+  try {
+    console.log(`📊 מעדכן צבע סוג השקעה ${type} (${intensity}) ל-${colorValue}`);
+    
+    // וידוא שהצבעים מאותחלים
+    if (!currentPreferences.investmentTypeColors) {
+      currentPreferences.investmentTypeColors = {};
+    }
+    if (!currentPreferences.investmentTypeColors[type]) {
+      currentPreferences.investmentTypeColors[type] = {};
+    }
+    
+    // המרת hex ל-rgba לפי העוצמה
+    let finalColorValue = colorValue;
+    if (colorValue.startsWith('#')) {
+      if (intensity === 'light') {
+        finalColorValue = hexToRgba(colorValue, 0.1);
+      } else if (intensity === 'border') {
+        finalColorValue = hexToRgba(colorValue, 0.3);
+      }
+      // medium ו-dark נשארים hex
+    }
+    
+    // עדכון הצבע
+    currentPreferences.investmentTypeColors[type][intensity] = finalColorValue;
+    
+    // עדכון הצבע במערכת הצבעים הגלובלית
+    if (window.INVESTMENT_TYPE_COLORS && window.INVESTMENT_TYPE_COLORS[type]) {
+      window.INVESTMENT_TYPE_COLORS[type][intensity] = finalColorValue;
+    }
+    
+    // עדכון השדה המקושר
+    const linkedFieldId = `investmentType${type.charAt(0).toUpperCase() + type.slice(1)}${intensity.charAt(0).toUpperCase() + intensity.slice(1)}ColorHex`;
+    const linkedField = document.getElementById(linkedFieldId);
+    if (linkedField) {
+      linkedField.value = finalColorValue;
+    }
+    
+    // עדכון CSS דינמי
+    if (window.generateInvestmentTypeCSS) {
+      const newCSS = window.generateInvestmentTypeCSS();
+      let styleElement = document.getElementById('dynamic-investment-type-colors');
+      if (!styleElement) {
+        styleElement = document.createElement('style');
+        styleElement.id = 'dynamic-investment-type-colors';
+        document.head.appendChild(styleElement);
+      }
+      styleElement.textContent = newCSS;
+    }
+    
+    showPreferencesInfo('צבע סוג השקעה', `צבע סוג השקעה ${type} (${intensity}) עודכן`);
+    
+  } catch (error) {
+    console.error(`❌ שגיאה בעדכון צבע סוג השקעה ${type} (${intensity}):`, error);
+    showPreferencesError('שגיאה', `לא ניתן לעדכן צבע סוג השקעה ${type} (${intensity})`);
+  }
+}
+
+/**
+ * עדכון צבע סוג השקעה מ-hex לפי עוצמה
+ * Update investment type color from hex by intensity
+ */
+function updateInvestmentTypeColorIntensityFromHex(type, intensity, hexValue) {
+  try {
+    // בדיקת תקינות ה-hex
+    if (!/^#[0-9A-F]{6}$/i.test(hexValue)) {
+      showPreferencesError('שגיאה', 'ערך hex לא תקין (נדרש: #RRGGBB)');
+      return;
+    }
+
+    // עדכון הצבע
+    updateInvestmentTypeColorIntensity(type, intensity, hexValue);
+
+    // עדכון השדה המקושר
+    const linkedFieldId = `investmentType${type.charAt(0).toUpperCase() + type.slice(1)}${intensity.charAt(0).toUpperCase() + intensity.slice(1)}Color`;
+    const linkedField = document.getElementById(linkedFieldId);
+    if (linkedField && linkedField.value !== hexValue) {
+      linkedField.value = hexValue;
+    }
+
+  } catch (error) {
+    console.error(`❌ שגיאה בעדכון צבע סוג השקעה ${type} (${intensity}) מ-hex:`, error);
+    showPreferencesError('שגיאה', `לא ניתן לעדכן צבע סוג השקעה ${type} (${intensity})`);
+  }
+}
+
+/**
+ * איפוס צבעי סוגי השקעה לברירת המחדל
+ * Reset investment type colors to default
+ */
+function resetInvestmentTypeColors() {
+  try {
+    console.log('📊 מאפס צבעי סוגי השקעה לברירת המחדל...');
+    
+    // איפוס הצבעים לברירת המחדל
+    currentPreferences.investmentTypeColors = { ...DEFAULT_PREFERENCES.investmentTypeColors };
+    
+    // עדכון הצבעים במערכת הצבעים הגלובלית
+    if (window.INVESTMENT_TYPE_COLORS) {
+      Object.assign(window.INVESTMENT_TYPE_COLORS, currentPreferences.investmentTypeColors);
+    }
+    
+    // עדכון הממשק
+    updateInvestmentTypeColorsUI();
+    
+    // עדכון CSS דינמי
+    if (window.generateInvestmentTypeCSS) {
+      const newCSS = window.generateInvestmentTypeCSS();
+      let styleElement = document.getElementById('dynamic-investment-type-colors');
+      if (!styleElement) {
+        styleElement = document.createElement('style');
+        styleElement.id = 'dynamic-investment-type-colors';
+        document.head.appendChild(styleElement);
+      }
+      styleElement.textContent = newCSS;
+    }
+    
+    showPreferencesInfo('צבעי סוגי השקעה', 'צבעי סוגי השקעה אופסו לברירת המחדל');
+    
+  } catch (error) {
+    console.error('❌ שגיאה באיפוס צבעי סוגי השקעה:', error);
+    showPreferencesError('שגיאה', 'לא ניתן לאפס את צבעי סוגי השקעה');
+  }
+}
+
+/**
+ * עדכון ממשק צבעי סוגי השקעה
+ * Update investment type colors UI
+ */
+function updateInvestmentTypeColorsUI() {
+  try {
+    const colors = currentPreferences.investmentTypeColors || DEFAULT_PREFERENCES.investmentTypeColors;
+    
+    // עדכון צבעי סוגי השקעה
+    Object.keys(colors).forEach(type => {
+      const typeColors = colors[type];
+      Object.keys(typeColors).forEach(intensity => {
+        const colorInput = document.getElementById(`investmentType${type.charAt(0).toUpperCase() + type.slice(1)}${intensity.charAt(0).toUpperCase() + intensity.slice(1)}Color`);
+        const colorHexInput = document.getElementById(`investmentType${type.charAt(0).toUpperCase() + type.slice(1)}${intensity.charAt(0).toUpperCase() + intensity.slice(1)}ColorHex`);
+        
+        if (colorInput) {
+          // המרת rgba ל-hex עבור color input
+          const hexValue = rgbaToHex(typeColors[intensity]);
+          colorInput.value = hexValue;
+        }
+        if (colorHexInput) {
+          // שמירת הערך המקורי (rgba) בשדה הטקסט
+          colorHexInput.value = typeColors[intensity];
+        }
+      });
+    });
+    
+  } catch (error) {
+    console.error('❌ שגיאה בעדכון ממשק צבעי סוגי השקעה:', error);
+  }
+}
+
+// Export status color functions
+window.updateStatusColorIntensity = updateStatusColorIntensity;
+window.updateStatusColorIntensityFromHex = updateStatusColorIntensityFromHex;
+window.resetStatusColors = resetStatusColors;
+window.updateStatusColorsUI = updateStatusColorsUI;
+
+// Export investment type color functions
+window.updateInvestmentTypeColorIntensity = updateInvestmentTypeColorIntensity;
+window.updateInvestmentTypeColorIntensityFromHex = updateInvestmentTypeColorIntensityFromHex;
+window.resetInvestmentTypeColors = resetInvestmentTypeColors;
+window.updateInvestmentTypeColorsUI = updateInvestmentTypeColorsUI;
+
+// Export utility functions
+window.rgbaToHex = rgbaToHex;
+window.hexToRgba = hexToRgba;
+
+// Export validation functions
+window.validateAllPreferencesSaved = validateAllPreferencesSaved;
+window.quickPreferencesCheck = quickPreferencesCheck;
+
+// ===== VALIDATION AND TESTING FUNCTIONS =====
+// פונקציות לבדיקה ואימות
+
+/**
+ * בדיקה חוזרת שכל השדות נשמרים
+ * Comprehensive validation that all fields are saved
+ */
+function validateAllPreferencesSaved() {
+  try {
+    console.log('🔍 מתחיל בדיקה חוזרת של כל ההעדפות...');
+    
+    const validationResults = {
+      headerOpacity: false,
+      statusColors: false,
+      investmentTypeColors: false,
+      entityColors: false,
+      numericValueColors: false,
+      basicPreferences: false
+    };
+    
+    // בדיקת שקיפות כותרות
+    if (currentPreferences.headerOpacity && 
+        currentPreferences.headerOpacity.main && 
+        currentPreferences.headerOpacity.sub) {
+      validationResults.headerOpacity = true;
+      console.log('✅ שקיפות כותרות נשמרה:', currentPreferences.headerOpacity);
+    } else {
+      console.log('❌ שקיפות כותרות לא נשמרה');
+    }
+    
+    // בדיקת צבעי סטטוסים
+    if (currentPreferences.statusColors && 
+        currentPreferences.statusColors.open && 
+        currentPreferences.statusColors.closed && 
+        currentPreferences.statusColors.cancelled) {
+      validationResults.statusColors = true;
+      console.log('✅ צבעי סטטוסים נשמרו:', currentPreferences.statusColors);
+    } else {
+      console.log('❌ צבעי סטטוסים לא נשמרו');
+    }
+    
+    // בדיקת צבעי סוגי השקעה
+    if (currentPreferences.investmentTypeColors && 
+        currentPreferences.investmentTypeColors.swing && 
+        currentPreferences.investmentTypeColors.investment && 
+        currentPreferences.investmentTypeColors.passive) {
+      validationResults.investmentTypeColors = true;
+      console.log('✅ צבעי סוגי השקעה נשמרו:', currentPreferences.investmentTypeColors);
+    } else {
+      console.log('❌ צבעי סוגי השקעה לא נשמרו');
+    }
+    
+    // בדיקת צבעי ישויות
+    if (currentPreferences.entityColors && 
+        Object.keys(currentPreferences.entityColors).length > 0) {
+      validationResults.entityColors = true;
+      console.log('✅ צבעי ישויות נשמרו:', currentPreferences.entityColors);
+    } else {
+      console.log('❌ צבעי ישויות לא נשמרו');
+    }
+    
+    // בדיקת צבעי ערכים מספריים
+    if (currentPreferences.numericValueColors && 
+        currentPreferences.numericValueColors.positive && 
+        currentPreferences.numericValueColors.negative && 
+        currentPreferences.numericValueColors.zero) {
+      validationResults.numericValueColors = true;
+      console.log('✅ צבעי ערכים מספריים נשמרו:', currentPreferences.numericValueColors);
+    } else {
+      console.log('❌ צבעי ערכים מספריים לא נשמרו');
+    }
+    
+    // בדיקת העדפות בסיסיות
+    if (currentPreferences.primaryCurrency && 
+        currentPreferences.timezone && 
+        currentPreferences.defaultStopLoss !== undefined) {
+      validationResults.basicPreferences = true;
+      console.log('✅ העדפות בסיסיות נשמרו');
+    } else {
+      console.log('❌ העדפות בסיסיות לא נשמרו');
+    }
+    
+    // סיכום התוצאות
+    const totalChecks = Object.keys(validationResults).length;
+    const passedChecks = Object.values(validationResults).filter(Boolean).length;
+    
+    console.log(`📊 תוצאות הבדיקה: ${passedChecks}/${totalChecks} בדיקות עברו`);
+    
+    if (passedChecks === totalChecks) {
+      console.log('🎉 כל ההעדפות נשמרו בהצלחה!');
+      showPreferencesSuccess('בדיקה הושלמה', 'כל ההעדפות נשמרו בהצלחה!');
+    } else {
+      console.log('⚠️ חלק מההעדפות לא נשמרו');
+      showPreferencesWarning('בדיקה הושלמה', `רק ${passedChecks}/${totalChecks} העדפות נשמרו`);
+    }
+    
+    return validationResults;
+    
+  } catch (error) {
+    console.error('❌ שגיאה בבדיקת ההעדפות:', error);
+    showPreferencesError('שגיאה', 'שגיאה בבדיקת ההעדפות');
+    return null;
+  }
+}
+
+/**
+ * בדיקה מהירה של שמירת העדפות
+ * Quick check for preferences saving
+ */
+function quickPreferencesCheck() {
+  try {
+    console.log('⚡ בדיקה מהירה של העדפות...');
+    
+    const missingFields = [];
+    
+    if (!currentPreferences.headerOpacity) missingFields.push('headerOpacity');
+    if (!currentPreferences.statusColors) missingFields.push('statusColors');
+    if (!currentPreferences.investmentTypeColors) missingFields.push('investmentTypeColors');
+    
+    if (missingFields.length === 0) {
+      console.log('✅ כל ההעדפות החדשות קיימות');
+      return true;
+    } else {
+      console.log('❌ חסרים שדות:', missingFields);
+      return false;
+    }
+    
+  } catch (error) {
+    console.error('❌ שגיאה בבדיקה מהירה:', error);
+    return false;
+  }
+}
+
 // אתחול העדפות בטעינת הדף
-document.addEventListener('DOMContentLoaded', loadPreferences);
+document.addEventListener('DOMContentLoaded', function() {
+  loadPreferences();
+  
+  // בדיקה אוטומטית של העדפות אחרי טעינה
+  setTimeout(() => {
+    console.log('🔍 מבצע בדיקה אוטומטית של העדפות...');
+    quickPreferencesCheck();
+  }, 2000);
+  
+  // יישום צבעי ישות על כותרות עמוד העדפות
+  if (window.applyEntityColorsToHeaders) {
+    window.applyEntityColorsToHeaders('preference');
+  }
+});

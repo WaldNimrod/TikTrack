@@ -18,6 +18,7 @@ from models.trade import Trade
 from models.trade_plan import TradePlan
 from models.note import Note
 from models.alert import Alert
+from models.external_data import MarketDataQuote
 from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
 # from services.smart_query_optimizer import optimize_query, profile_query  # TEMPORARILY DISABLED
@@ -65,19 +66,40 @@ class TickerService:
     @cache_with_deps(ttl=30, dependencies=['tickers'])  # Cache for 30 seconds - critical data with frequent updates
     def get_all(db: Session) -> List[Ticker]:
         """
-        Get all tickers from the system
+        Get all tickers from the system with external market data
         
         Args:
             db (Session): Database connection
             
         Returns:
-            List[Ticker]: List of all tickers in the system
+            List[Ticker]: List of all tickers in the system with market data
             
         Example:
             >>> tickers = TickerService.get_all(db_session)
         """
-        # Simple query without optimization (smart query optimizer disabled)
-        return db.query(Ticker).all()
+        # Get tickers with latest market data
+        tickers = db.query(Ticker).all()
+        logger.info(f"Found {len(tickers)} tickers in database")
+        
+        # Add market data to each ticker
+        for ticker in tickers:
+            latest_quote = db.query(MarketDataQuote).filter(
+                MarketDataQuote.ticker_id == ticker.id
+            ).order_by(MarketDataQuote.fetched_at.desc()).first()
+            
+            if latest_quote:
+                # Add market data fields to ticker object
+                ticker.current_price = latest_quote.price
+                ticker.change_percent = latest_quote.change_pct_day
+                ticker.change_amount = latest_quote.change_amount_day
+                ticker.volume = latest_quote.volume
+                ticker.yahoo_updated_at = latest_quote.fetched_at
+                ticker.data_source = latest_quote.source
+                logger.debug(f"Added market data to {ticker.symbol}: price={latest_quote.price}")
+            else:
+                logger.debug(f"No market data found for {ticker.symbol}")
+        
+        return tickers
     
     @staticmethod
     def get_by_id(db: Session, ticker_id: int) -> Optional[Ticker]:

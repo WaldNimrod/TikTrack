@@ -112,10 +112,9 @@ class UserService:
                 if user_prefs:
                     # Convert database preferences to dictionary format
                     db_preferences = user_prefs.to_dict()
-                    # Merge with defaults (database preferences override defaults)
-                    merged_preferences = default_preferences.copy()
-                    merged_preferences.update(db_preferences)
-                    return merged_preferences
+                    # Deep merge with defaults (database preferences override defaults)
+                    current_user_preferences = UserService.deep_merge_dicts(default_preferences, db_preferences)
+                    return current_user_preferences
             except Exception as e:
                 logger.warning(f"Could not load preferences from user_preferences table: {e}")
             
@@ -123,10 +122,9 @@ class UserService:
             user = UserService.get_user_by_id(db, user_id)
             if user:
                 user_preferences = user.get_preferences()
-                # Merge user preferences with defaults (user preferences override defaults)
-                merged_preferences = default_preferences.copy()
-                merged_preferences.update(user_preferences)
-                return merged_preferences
+                # Deep merge user preferences with defaults (user preferences override defaults)
+                current_user_preferences = UserService.deep_merge_dicts(default_preferences, user_preferences)
+                return current_user_preferences
             
             # Fallback to default preferences
             logger.warning(f"User {user_id} not found, using default preferences")
@@ -144,28 +142,6 @@ class UserService:
             if user_id is None:
                 user_id = UserService.DEFAULT_USER_ID
             
-            # Try to save preferences to the new user_preferences table
-            try:
-                from models.user_preferences import UserPreferences
-                
-                # Get or create user preferences record
-                user_prefs = db.query(UserPreferences).filter(UserPreferences.user_id == user_id).first()
-                if not user_prefs:
-                    # Create new preferences record
-                    user_prefs = UserPreferences(user_id=user_id)
-                    db.add(user_prefs)
-                
-                # Update preferences from dictionary
-                user_prefs.from_dict(preferences)
-                db.commit()
-                logger.info(f"Updated preferences in user_preferences table for user {user_id}")
-                return True
-                
-            except Exception as e:
-                logger.warning(f"Could not save preferences to user_preferences table: {e}")
-                db.rollback()
-            
-            # Fallback to old method (user.set_preferences() to legacy JSON field)
             user = UserService.get_user_by_id(db, user_id)
             if user:
                 # Get current preferences and merge with new ones
@@ -177,7 +153,7 @@ class UserService:
                 merged_preferences.update(preferences)
                 user.set_preferences(merged_preferences)
                 db.commit()
-                logger.info(f"Updated preferences using legacy method for user {user_id}")
+                logger.info(f"Updated preferences for user {user_id}")
                 return True
             
             logger.error(f"User {user_id} not found, cannot update preferences")
@@ -214,41 +190,58 @@ class UserService:
             "retryDelay": 5,
             "autoRefresh": False,
             "verboseLogging": False,
-            # הגדרות צבעים לערכים מספריים
-            "numericValueColors": {
-                "positive": {
-                    "light": "#d4edda",
+            # External data preferences
+            "showPercentageChanges": True,
+            "showVolume": True,
+            "notifyOnDataFailures": True,
+            "notifyOnStaleData": False,
+            "refreshOverrides": {},
+            # הגדרות שקיפות כותרות
+            "headerOpacity": {
+                "main": 60,
+                "sub": 30
+            },
+            # הגדרות צבעים לפי סטטוסים
+            "statusColors": {
+                "open": {
+                    "light": "rgba(40, 167, 69, 0.1)",
                     "medium": "#28a745",
                     "dark": "#155724",
-                    "border": "#c3e6cb",
+                    "border": "rgba(40, 167, 69, 0.3)"
                 },
-                "negative": {
-                    "light": "#f8d7da",
-                    "medium": "#dc3545",
-                    "dark": "#721c24",
-                    "border": "#f5c6cb",
-                },
-                "zero": {
-                    "light": "#e2e3e5",
+                "closed": {
+                    "light": "rgba(108, 117, 125, 0.1)",
                     "medium": "#6c757d",
                     "dark": "#383d41",
-                    "border": "#d6d8db",
+                    "border": "rgba(108, 117, 125, 0.3)"
                 },
+                "cancelled": {
+                    "light": "rgba(220, 53, 69, 0.1)",
+                    "medium": "#dc3545",
+                    "dark": "#721c24",
+                    "border": "rgba(220, 53, 69, 0.3)"
+                }
             },
-            # הגדרות צבעים לפי ישויות
-            "entityColors": {
-                "trade": "#007bff",
-                "trade_plan": "#0056b3",
-                "execution": "#17a2b8",
-                "account": "#28a745",
-                "cash_flow": "#20c997",
-                "ticker": "#dc3545",
-                "alert": "#ff9c05",
-                "note": "#6f42c1",
-                "constraint": "#6c757d",
-                "design": "#495057",
-                "research": "#343a40",
-                "preference": "#adb5bd",
+            # הגדרות צבעים לפי סוגי השקעה
+            "investmentTypeColors": {
+                "swing": {
+                    "light": "rgba(0, 123, 255, 0.1)",
+                    "medium": "#007bff",
+                    "dark": "#0056b3",
+                    "border": "rgba(0, 123, 255, 0.3)"
+                },
+                "investment": {
+                    "light": "rgba(40, 167, 69, 0.1)",
+                    "medium": "#28a745",
+                    "dark": "#155724",
+                    "border": "rgba(40, 167, 69, 0.3)"
+                },
+                "passive": {
+                    "light": "rgba(111, 66, 193, 0.1)",
+                    "medium": "#6f42c1",
+                    "dark": "#4a2c7a",
+                    "border": "rgba(111, 66, 193, 0.3)"
+                }
             }
         }
     

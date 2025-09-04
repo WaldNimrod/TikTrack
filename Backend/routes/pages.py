@@ -88,6 +88,11 @@ def preferences() -> Any:
     """Preferences page"""
     return send_from_directory(UI_DIR, "preferences.html")
 
+@pages_bp.route('/external-data-dashboard')
+def external_data_dashboard() -> Any:
+    """External Data Dashboard page"""
+    return send_from_directory(UI_DIR, "external-data-dashboard.html")
+
 @pages_bp.route('/constraints')
 def constraints() -> Any:
     """Constraints management page"""

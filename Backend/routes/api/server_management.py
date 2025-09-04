@@ -382,6 +382,50 @@ def get_system_info() -> Any:
             'message': f'Error getting system info: {str(e)}'
         }), 500
 
+@server_management_bp.route('/mode-history', methods=['GET'])
+def get_mode_history() -> Any:
+    """
+    Get server mode change history
+    """
+    try:
+        # Simple hardcoded history for testing - in real implementation this would come from a database
+        history = [
+            {
+                'timestamp': '2025-09-04T12:02:58.000000',
+                'mode': 'production',
+                'status': 'success',
+                'message': 'Mode changed to production successfully'
+            },
+            {
+                'timestamp': '2025-09-03T00:49:03.000000',
+                'mode': 'no-cache',
+                'status': 'success',
+                'message': 'Mode changed to no-cache successfully'
+            },
+            {
+                'timestamp': '2025-09-03T00:40:37.000000',
+                'mode': 'no-cache',
+                'status': 'success',
+                'message': 'Mode changed to no-cache successfully'
+            }
+        ]
+        
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'history': history,
+                'count': len(history),
+                'timestamp': datetime.now().isoformat()
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f'Error getting mode history: {e}')
+        return jsonify({
+            'status': 'error',
+            'message': f'Error getting mode history: {str(e)}'
+        }), 500
+
 @server_management_bp.route('/logs/recent', methods=['GET'])
 def get_recent_logs() -> Any:
     """
@@ -390,6 +434,12 @@ def get_recent_logs() -> Any:
     try:
         # Simple hardcoded logs for testing
         logs = [
+            {
+                'timestamp': '2025-09-04T12:03:11.000000',
+                'level': 'info',
+                'message': 'Server monitor page loaded successfully',
+                'source': 'server_detailed.log'
+            },
             {
                 'timestamp': '2025-09-03T00:49:06.000000',
                 'level': 'success',

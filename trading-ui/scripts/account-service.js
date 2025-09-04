@@ -20,7 +20,7 @@
 
 // Cache לחשבונות
 let accountsCache = null;
-let lastCacheUpdate = null;
+let accountsLastCacheUpdate = null;
 // const CACHE_DURATION = 5 * 60 * 1000; // 5 דקות - לא בשימוש כרגע
 
 // Function removed - not in use
@@ -30,7 +30,7 @@ let lastCacheUpdate = null;
  */
 function clearCache() {
   accountsCache = null;
-  lastCacheUpdate = null;
+  accountsLastCacheUpdate = null;
 }
 
 /**
@@ -159,7 +159,7 @@ window.clearAccountsCache = clearCache;
  * @returns {boolean} האם החשבונות נטענו
  */
 function isAccountsLoaded() {
-  return accountsCache !== null && lastCacheUpdate !== null;
+  return accountsCache !== null && accountsLastCacheUpdate !== null;
 }
 
 // ייצוא הפונקציה הנוספת

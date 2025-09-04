@@ -2087,6 +2087,11 @@ document.addEventListener('DOMContentLoaded', function () {
   // שחזור מצב הסקשנים
   restoreAlertsSectionState();
 
+  // יישום צבעי ישות על כותרות
+  if (window.applyEntityColorsToHeaders) {
+    window.applyEntityColorsToHeaders('alert');
+  }
+
   // אתחול פילטרים
   if (typeof window.initializePageFilters === 'function') {
     window.initializePageFilters('alerts');

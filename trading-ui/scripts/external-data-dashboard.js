@@ -176,7 +176,7 @@ class ExternalDataDashboard {
     // console.log('✅ External Data Dashboard - Initialized successfully');
   }
 
-  static initializeDashboard() {
+  initializeDashboard() {
     // Initialize header system
     if (window.headerSystem) {
       window.headerSystem.init();
@@ -264,7 +264,7 @@ class ExternalDataDashboard {
     }
   }
 
-  static updateYahooFinanceStatus(data) {
+  updateYahooFinanceStatus(data) {
     const statusElement = document.getElementById('yahoo-status');
     const detailsElement = document.getElementById('yahoo-details');
 
@@ -303,7 +303,7 @@ class ExternalDataDashboard {
     }
   }
 
-  static updateCacheStatus(data) {
+  updateCacheStatus(data) {
     const statusElement = document.getElementById('cache-status-indicator');
     const detailsElement = document.getElementById('cache-details');
 
@@ -327,7 +327,7 @@ class ExternalDataDashboard {
     }
   }
 
-  static updateDatabaseStatus(data) {
+  updateDatabaseStatus(data) {
     const statusElement = document.getElementById('db-status');
     const detailsElement = document.getElementById('db-details');
 
@@ -351,7 +351,7 @@ class ExternalDataDashboard {
     }
   }
 
-  static updateAPIStatus(data) {
+  updateAPIStatus(data) {
     const statusElement = document.getElementById('api-status-indicator');
     const detailsElement = document.getElementById('api-details');
 
@@ -481,7 +481,7 @@ class ExternalDataDashboard {
         `;
   }
 
-  static updateCurrentSettings(data) {
+  updateCurrentSettings(data) {
     try {
       // Update cache TTL settings
       const hotCacheElement = document.getElementById('current-hot-cache');
@@ -530,7 +530,7 @@ class ExternalDataDashboard {
     }
   }
 
-  static renderLogs(logs) {
+  renderLogs(logs) {
     const logContent = document.getElementById('log-content');
     if (!logContent) {return;}
 
@@ -586,7 +586,7 @@ class ExternalDataDashboard {
     }
   }
 
-  static filterLogs() {
+  filterLogs() {
     const levelFilter = document.getElementById('log-level-filter')?.value || 'all';
     const searchTerm = document.getElementById('log-search')?.value || '';
 
@@ -601,7 +601,7 @@ class ExternalDataDashboard {
   }
 
 
-  static async saveSettings() {
+  async saveSettings() {
     try {
       // console.log('💾 Saving settings...');
 
@@ -712,7 +712,7 @@ class ExternalDataDashboard {
     }
   }
 
-  static async exportData() {
+  async exportData() {
     try {
       // console.log('📤 Exporting data...');
 
@@ -740,7 +740,7 @@ class ExternalDataDashboard {
     }
   }
 
-  static async analyzeData() {
+  async analyzeData() {
     try {
       // console.log('📊 Analyzing data...');
 

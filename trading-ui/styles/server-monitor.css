@@ -150,8 +150,9 @@
 
 .status-details {
     display: flex;
-    gap: 1rem;
-    font-size: 0.9rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.85rem;
     color: #7f8c8d;
 }
 
@@ -159,6 +160,19 @@
     display: flex;
     align-items: center;
     gap: 0.25rem;
+    white-space: nowrap;
+}
+
+/* התאמה מיוחדת לכרטיס המערכת */
+.system-status .status-details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.system-status .status-details span {
+    width: 100%;
+    justify-content: space-between;
 }
 
 /* Quick Actions */

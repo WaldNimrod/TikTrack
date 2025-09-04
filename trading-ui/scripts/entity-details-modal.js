@@ -98,12 +98,19 @@ class EntityDetailsModal {
                 <div class="modal-dialog modal-xl modal-dialog-scrollable">
                     <div class="modal-content entity-details-modal">
                         <div class="modal-header entity-details-header">
+                            <button type="button" class="btn-close" 
+                                    data-bs-dismiss="modal" aria-label="סגירה"
+                                    title="סגירה (ESC)">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                             <h5 class="modal-title" id="${this.modalId}Label">
                                 פרטי ישות
                             </h5>
-                            <button type="button" class="btn-close" 
+                            <button type="button" class="btn btn-outline-secondary btn-sm" 
                                     data-bs-dismiss="modal" aria-label="סגירה"
-                                    title="סגירה (ESC)"></button>
+                                    title="סגירה">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
                         <div class="modal-body entity-details-body" id="entityDetailsContent">
                             <div class="entity-details-loading">
@@ -517,8 +524,26 @@ class EntityDetailsModal {
     showLinkedItems(entityType, entityId) {
         try {
             // שימוש במערכת הפריטים המקושרים הקיימת
-            if (window.showLinkedItemsModal) {
-                window.showLinkedItemsModal(entityType, entityId);
+            if (window.loadLinkedItemsData && window.showLinkedItemsModal) {
+                // טעינת נתונים מקושרים באמצעות המנגנון הקיים
+                window.loadLinkedItemsData(entityType, entityId)
+                    .then(data => {
+                        if (data && data.child_entities && data.child_entities.length > 0) {
+                            // הצגת מודול מקושרים מלא
+                            window.showLinkedItemsModal(data, entityType, entityId, 'view');
+                        } else {
+                            // הצגת הודעת אין פריטים
+                            if (window.showInfoNotification) {
+                                window.showInfoNotification('אין פריטים מקושרים לישות זו');
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading linked items:', error);
+                        if (window.showErrorNotification) {
+                            window.showErrorNotification('שגיאה בטעינת פריטים מקושרים');
+                        }
+                    });
             } else {
                 console.warn('Linked items system not available');
                 if (window.showWarningNotification) {
@@ -604,6 +629,10 @@ class EntityDetailsModal {
  */
 function showEntityDetails(entityType, entityId, options = {}) {
     try {
+        // שמירת ID נוכחי לשימוש בפריטים מקושרים
+        window.currentEntityId = entityId;
+        window.currentEntityType = entityType;
+        
         if (window.entityDetailsModal) {
             window.entityDetailsModal.show(entityType, entityId, options);
         } else {
@@ -632,6 +661,84 @@ function hideEntityDetails() {
         }
     } catch (error) {
         console.error('Error in hideEntityDetails:', error);
+    }
+}
+
+/**
+ * Show linked items - פונקציה גלובלית להצגת פריטים מקושרים
+ * 
+ * @param {string} entityType - סוג הישות
+ * @param {number|string} entityId - מזהה הישות
+ * @global
+ */
+function showLinkedItems(entityType, entityId) {
+    try {
+        // שימוש במנגנון המקושרים הקיים
+        if (window.loadLinkedItemsData && window.showLinkedItemsModal) {
+            // טעינת נתונים מקושרים באמצעות המנגנון הקיים
+            window.loadLinkedItemsData(entityType, entityId)
+                .then(data => {
+                    if (data && data.child_entities && data.child_entities.length > 0) {
+                        // הצגת מודול מקושרים מלא
+                        window.showLinkedItemsModal(data, entityType, entityId, 'view');
+                    } else {
+                        // הצגת הודעת אין פריטים
+                        if (window.showInfoNotification) {
+                            window.showInfoNotification('אין פריטים מקושרים לישות זו');
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading linked items:', error);
+                    if (window.showErrorNotification) {
+                        window.showErrorNotification('שגיאה בטעינת פריטים מקושרים');
+                    }
+                });
+        } else {
+            console.error('Linked items system not available');
+            if (window.showErrorNotification) {
+                window.showErrorNotification('מערכת הפריטים המקושרים לא זמינה');
+            }
+        }
+    } catch (error) {
+        console.error('Error in showLinkedItems:', error);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בהצגת פריטים מקושרים');
+        }
+    }
+}
+
+/**
+ * Edit ticker - עריכת טיקר
+ * 
+ * @param {number|string} tickerId - מזהה הטיקר
+ * @global
+ */
+function editTicker(tickerId) {
+    try {
+        console.log(`✏️ Editing ticker ${tickerId}`);
+        
+        // סגירת המודל הנוכחי
+        if (window.entityDetailsModal) {
+            window.entityDetailsModal.hide();
+        }
+        
+        // פתיחת מודול עריכת טיקר
+        if (window.editTickerModal) {
+            window.editTickerModal(tickerId);
+        } else if (window.openEditTickerModal) {
+            window.openEditTickerModal(tickerId);
+        } else {
+            console.error('Edit ticker modal not available');
+            if (window.showErrorNotification) {
+                window.showErrorNotification('מודול עריכת טיקר לא זמין');
+            }
+        }
+    } catch (error) {
+        console.error('Error in editTicker:', error);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה בפתיחת עריכת טיקר');
+        }
     }
 }
 

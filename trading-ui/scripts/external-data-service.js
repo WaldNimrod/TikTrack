@@ -516,14 +516,14 @@ class ExternalDataService {
         refreshBtn.innerHTML = '<span class="action-icon">⏳</span> מרענן...';
       }
 
-      // Get active symbols
+      // Get symbols for open and closed tickers (not cancelled)
       const symbols = tickersData
-        .filter(ticker => ticker.symbol && ticker.status === 'open')
+        .filter(ticker => ticker.symbol && (ticker.status === 'open' || ticker.status === 'closed'))
         .map(ticker => ticker.symbol);
 
       if (symbols.length === 0) {
         if (window.showNotification) {
-          window.showNotification('אין טיקרים פעילים לעדכון', 'warning');
+          window.showNotification('אין טיקרים פעילים או סגורים לעדכון', 'warning');
         }
         return {};
       }
@@ -582,9 +582,9 @@ class ExternalDataService {
      */
   async refreshTickersDataSilently(tickersData) {
     try {
-      // Get active symbols
+      // Get all symbols (including cancelled ones)
       const symbols = tickersData
-        .filter(ticker => ticker.symbol && ticker.status === 'open')
+        .filter(ticker => ticker.symbol)
         .map(ticker => ticker.symbol);
 
       if (symbols.length === 0) {

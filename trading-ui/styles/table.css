@@ -215,10 +215,12 @@ table[data-table-type="cash_flows"] td:last-child {
     min-width: 120px !important;
     max-width: 120px !important;
     text-align: center !important;
-    vertical-align: middle !important;
-    height: 100% !important;
+    vertical-align: top !important;
+    height: auto !important;
+    min-height: 100% !important;
     display: table-cell !important;
     white-space: nowrap !important;
+    padding: 8px 4px !important;
 }
 
 .actions-cell .btn {
@@ -269,6 +271,81 @@ table[data-table-type="cash_flows"] .actions-cell table td {
     display: inline-flex !important;
     visibility: visible !important;
     opacity: 1 !important;
+}
+
+/* תיקון גובה עמודות כפתורים - פתרון לבעיית שורות שבורות */
+.actions-cell {
+    vertical-align: top !important;
+    height: auto !important;
+    min-height: 100% !important;
+    padding: 8px 4px !important;
+}
+
+/* תיקון גובה כותרת עמודת פעולות */
+table th.actions-cell {
+    height: auto !important;
+    min-height: auto !important;
+    max-height: 3rem !important;
+    padding: 0.5rem 0.25rem !important;
+    vertical-align: middle !important;
+    line-height: 1.2 !important;
+}
+
+/* וידוא שכל הכותרות באותו גובה */
+table thead th {
+    height: auto !important;
+    min-height: 2.5rem !important;
+    max-height: 3rem !important;
+    padding: 0.5rem 0.25rem !important;
+    vertical-align: middle !important;
+    line-height: 1.2 !important;
+}
+
+/* תיקון ספציפי לגובה כותרות - יותר חזק */
+table[data-table-type="executions"] thead th {
+    height: 2.5rem !important;
+    min-height: 2.5rem !important;
+    max-height: 2.5rem !important;
+    padding: 0.5rem 0.25rem !important;
+    vertical-align: middle !important;
+    line-height: 1.2 !important;
+    box-sizing: border-box !important;
+}
+
+/* תיקון ספציפי לעמודת פעולות */
+table[data-table-type="executions"] thead th.actions-cell {
+    height: 2.5rem !important;
+    min-height: 2.5rem !important;
+    max-height: 2.5rem !important;
+    padding: 0.5rem 0.25rem !important;
+    vertical-align: middle !important;
+    line-height: 1.2 !important;
+    box-sizing: border-box !important;
+}
+
+/* וידוא שעמודות כפתורים יקבלו את הגובה הנכון */
+table tr td.actions-cell {
+    vertical-align: top !important;
+    height: auto !important;
+    min-height: 100% !important;
+}
+
+/* תיקון נוסף לגובה עמודות - וידוא שכל התאים יקבלו את הגובה הנכון */
+table tr {
+    height: auto !important;
+}
+
+table tr td {
+    vertical-align: top !important;
+    height: auto !important;
+    min-height: 2.5rem !important;
+    padding: 0.5rem 0.25rem !important;
+}
+
+/* תיקון ספציפי לטבלת העסקעות */
+table[data-table-type="executions"] tr td {
+    min-height: 3rem !important;
+    padding: 0.75rem 0.5rem !important;
 }
 
 /* סגנונות ספציפיים לטבלת טריידים - כפתורים קטנים יותר */
@@ -332,6 +409,10 @@ table[data-table-type="executions"] .actions-cell {
     width: 140px !important;
     min-width: 140px !important;
     max-width: 140px !important;
+    vertical-align: top !important;
+    height: auto !important;
+    min-height: 100% !important;
+    padding: 8px 4px !important;
 }
 
 table[data-table-type="executions"] .actions-cell .btn {
@@ -339,6 +420,7 @@ table[data-table-type="executions"] .actions-cell .btn {
     height: 28px !important;
     font-size: 0.7rem !important;
     margin: 0 1px !important;
+    vertical-align: middle !important;
 }
 
 /* סגנונות לטבלת התראות */

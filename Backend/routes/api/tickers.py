@@ -36,9 +36,31 @@ def get_tickers():
     try:
         db: Session = next(get_db())
         tickers = TickerService.get_all(db)
+        
+        # Convert tickers to dict with market data
+        tickers_data = []
+        for ticker in tickers:
+            ticker_dict = ticker.to_dict()
+            
+            # Add market data fields if they exist (dynamically added by TickerService)
+            if hasattr(ticker, 'current_price'):
+                ticker_dict['current_price'] = ticker.current_price
+            if hasattr(ticker, 'change_percent'):
+                ticker_dict['change_percent'] = ticker.change_percent
+            if hasattr(ticker, 'change_amount'):
+                ticker_dict['change_amount'] = ticker.change_amount
+            if hasattr(ticker, 'volume'):
+                ticker_dict['volume'] = ticker.volume
+            if hasattr(ticker, 'yahoo_updated_at'):
+                ticker_dict['yahoo_updated_at'] = ticker.yahoo_updated_at.isoformat() if ticker.yahoo_updated_at else None
+            if hasattr(ticker, 'data_source'):
+                ticker_dict['data_source'] = ticker.data_source
+                
+            tickers_data.append(ticker_dict)
+        
         return jsonify({
             "status": "success",
-            "data": [ticker.to_dict() for ticker in tickers],
+            "data": tickers_data,
             "message": "Tickers retrieved successfully",
             "version": "v1"
         })

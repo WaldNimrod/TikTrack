@@ -44,6 +44,61 @@
             <div class="page-header">
                 <h1><i class="fas fa-bell"></i> מרכז התראות</h1>
                 <p class="page-description">ניהול מרכזי של כל ההתראות והעדפות במערכת</p>
+                <div class="page-actions">
+                    <button class="btn btn-outline-primary" onclick="copyDetailedLogToClipboard()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                        <i class="fas fa-copy"></i> העתק לוג מפורט
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Statistics Card -->
+            <div class="stats-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-bar"></i> סטטיסטיקות התראות</h3>
+                    <button class="btn btn-sm btn-outline-primary" onclick="copyNotificationsToClipboard()" title="העתק לוג התראות ללוח">
+                        <i class="fas fa-copy"></i> העתק ללוח
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="stats-grid">
+                        <div class="stat-item success">
+                            <div class="stat-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="successCount">0</div>
+                                <div class="stat-label">הצלחות</div>
+                            </div>
+                        </div>
+                        <div class="stat-item error">
+                            <div class="stat-icon">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="errorCount">0</div>
+                                <div class="stat-label">שגיאות</div>
+                            </div>
+                        </div>
+                        <div class="stat-item warning">
+                            <div class="stat-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="warningCount">0</div>
+                                <div class="stat-label">אזהרות</div>
+                            </div>
+                        </div>
+                        <div class="stat-item info">
+                            <div class="stat-icon">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="infoCount">0</div>
+                                <div class="stat-label">הודעות מידע</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <!-- Connection Status Card -->
@@ -134,26 +189,6 @@
                 </div>
             </div>
             
-            <!-- Live Notifications Card -->
-            <div class="notifications-card">
-                <div class="card-header">
-                    <h3><i class="fas fa-bell"></i> התראות פעילות</h3>
-                    <div class="card-actions">
-                        <button class="btn btn-sm btn-outline-danger" onclick="clearLiveNotifications()">
-                            <i class="fas fa-trash"></i> נקה הכל
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="notifications-container" id="liveNotifications">
-                        <div class="empty-state">
-                            <i class="fas fa-bell-slash"></i>
-                            <p>אין התראות פעילות כרגע</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
             <!-- History Card -->
             <div class="history-card">
                 <div class="card-header">
@@ -186,56 +221,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Statistics Card -->
-            <div class="stats-card">
-                <div class="card-header">
-                    <h3><i class="fas fa-chart-bar"></i> סטטיסטיקות התראות</h3>
-                    <button class="btn btn-sm btn-outline-primary" onclick="copyNotificationsToClipboard()" title="העתק לוג התראות ללוח">
-                        <i class="fas fa-copy"></i> העתק ללוח
-                    </button>
-                </div>
-                <div class="card-body">
-                    <div class="stats-grid">
-                        <div class="stat-item success">
-                            <div class="stat-icon">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-value" id="successCount">0</div>
-                                <div class="stat-label">הצלחות</div>
-                            </div>
-                        </div>
-                        <div class="stat-item error">
-                            <div class="stat-icon">
-                                <i class="fas fa-exclamation-circle"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-value" id="errorCount">0</div>
-                                <div class="stat-label">שגיאות</div>
-                            </div>
-                        </div>
-                        <div class="stat-item warning">
-                            <div class="stat-icon">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-value" id="warningCount">0</div>
-                                <div class="stat-label">אזהרות</div>
-                            </div>
-                        </div>
-                        <div class="stat-item info">
-                            <div class="stat-icon">
-                                <i class="fas fa-info-circle"></i>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-value" id="infoCount">0</div>
-                                <div class="stat-label">הודעות מידע</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </main>
     
@@ -254,6 +239,7 @@
     <script src="scripts/page-utils.js"></script>
     <script src="scripts/header-system.js"></script>
     <script src="scripts/notification-system.js"></script>
+    <script src="scripts/realtime-notifications-client.js"></script>
     <script src="scripts/main.js"></script>
     <script src="scripts/notifications-center.js"></script>
 </body>

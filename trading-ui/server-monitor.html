@@ -26,7 +26,7 @@
     <link rel="stylesheet" href="styles/notification-system.css">
     
     <!-- 7. Page specific styles -->
-    <link rel="stylesheet" href="styles/server-monitor.css">
+    <link rel="stylesheet" href="styles/server-monitor.css?v=20250904">
     
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -107,6 +107,8 @@
                         <div class="status-details">
                             <span>CPU: <span id="cpuUsage">-</span></span>
                             <span>זיכרון: <span id="memoryUsage">-</span></span>
+                            <span>זיכרון זמין: <span id="memoryAvailable">-</span></span>
+                            <span>זיכרון תהליך: <span id="processMemory">-</span></span>
                         </div>
                     </div>
                 </div>
@@ -133,7 +135,7 @@
                         <span>ניקוי Cache</span>
                     </button>
                     
-                    <button class="action-btn info" onclick="serverMonitor.optimizeDatabase()">
+                    <button class="action-btn info" onclick="ServerMonitor.optimizeDatabase()">
                         <i class="fas fa-database"></i>
                         <span>אופטימיזציית DB</span>
                     </button>
@@ -143,7 +145,7 @@
                         <span>עצירת חירום</span>
                     </button>
                     
-                    <button class="action-btn secondary" onclick="serverMonitor.exportLogs()">
+                    <button class="action-btn secondary" onclick="ServerMonitor.exportLogs()">
                         <i class="fas fa-download"></i>
                         <span>ייצוא לוגים</span>
                     </button>
@@ -337,7 +339,7 @@
                             <button class="btn btn-sm btn-primary" onclick="serverMonitor.runScript('quick-restart')">
                                 <i class="fas fa-play"></i> הרץ
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="serverMonitor.showScriptInfo('quick-restart')">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="ServerMonitor.showScriptInfo('quick-restart')">
                                 <i class="fas fa-info"></i> פרטים
                             </button>
                         </div>
@@ -352,7 +354,7 @@
                             <button class="btn btn-sm btn-primary" onclick="serverMonitor.runScript('complete-restart')">
                                 <i class="fas fa-play"></i> הרץ
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="serverMonitor.showScriptInfo('complete-restart')">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="ServerMonitor.showScriptInfo('complete-restart')">
                                 <i class="fas fa-info"></i> פרטים
                             </button>
                         </div>
@@ -367,7 +369,7 @@
                             <button class="btn btn-sm btn-primary" onclick="serverMonitor.runScript('route-check')">
                                 <i class="fas fa-play"></i> הרץ
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="serverMonitor.showScriptInfo('route-check')">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="ServerMonitor.showScriptInfo('route-check')">
                                 <i class="fas fa-info"></i> פרטים
                             </button>
                         </div>
@@ -382,7 +384,7 @@
                             <button class="btn btn-sm btn-primary" onclick="serverMonitor.runScript('clean-logs')">
                                 <i class="fas fa-play"></i> הרץ
                             </button>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="serverMonitor.showScriptInfo('clean-logs')">
+                            <button class="btn btn-sm btn-outline-secondary" onclick="ServerMonitor.showScriptInfo('clean-logs')">
                                 <i class="fas fa-info"></i> פרטים
                             </button>
                         </div>
@@ -493,15 +495,15 @@
                     <div class="info-card">
                         <h4>מידע שרת</h4>
                         <div class="info-content" id="serverInfo">
-                            <div class="info-item">
+                            <div class="info-item" data-key="version">
                                 <span class="label">גרסה:</span>
                                 <span class="value">טוען...</span>
                             </div>
-                            <div class="info-item">
+                            <div class="info-item" data-key="environment">
                                 <span class="label">סביבה:</span>
                                 <span class="value">טוען...</span>
                             </div>
-                            <div class="info-item">
+                            <div class="info-item" data-key="port">
                                 <span class="label">פורט:</span>
                                 <span class="value">טוען...</span>
                             </div>
@@ -511,15 +513,15 @@
                     <div class="info-card">
                         <h4>מידע Python</h4>
                         <div class="info-content" id="pythonInfo">
-                            <div class="info-item">
+                            <div class="info-item" data-key="version">
                                 <span class="label">גרסה:</span>
                                 <span class="value">טוען...</span>
                             </div>
-                            <div class="info-item">
+                            <div class="info-item" data-key="flask">
                                 <span class="label">Flask:</span>
                                 <span class="value">טוען...</span>
                             </div>
-                            <div class="info-item">
+                            <div class="info-item" data-key="sqlite">
                                 <span class="label">SQLite:</span>
                                 <span class="value">טוען...</span>
                             </div>
@@ -529,15 +531,15 @@
                     <div class="info-card">
                         <h4>מידע מערכת</h4>
                         <div class="info-content" id="osInfo">
-                            <div class="info-item">
+                            <div class="info-item" data-key="system">
                                 <span class="label">מערכת הפעלה:</span>
                                 <span class="value">טוען...</span>
                             </div>
-                            <div class="info-item">
+                            <div class="info-item" data-key="architecture">
                                 <span class="label">ארכיטקטורה:</span>
                                 <span class="value">טוען...</span>
                             </div>
-                            <div class="info-item">
+                            <div class="info-item" data-key="uptime">
                                 <span class="label">זמן הפעלה:</span>
                                 <span class="value">טוען...</span>
                             </div>
@@ -554,6 +556,6 @@
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/page-utils.js"></script>
     <script src="scripts/main.js"></script>
-    <script src="scripts/server-monitor.js"></script>
+    <script src="scripts/server-monitor.js?v=20250904_13"></script>
 </body>
 </html>

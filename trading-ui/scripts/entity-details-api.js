@@ -104,6 +104,76 @@ class EntityDetailsAPI {
 
             // קריאה לשרת עם retry logic
             const entityData = await this.fetchWithRetry(entityType, entityId, options);
+            console.log(`📊 Entity data received:`, entityData);
+            
+            // טעינת פריטים מקושרים אם נדרש
+            if (options.includeLinkedItems !== false) {
+                try {
+                    console.log(`🔗 Loading linked items for ${entityType} ${entityId}...`);
+                    const linkedItems = await this.getLinkedItems(entityType, entityId);
+                    console.log(`🔗 Linked items received:`, linkedItems);
+                    entityData.linked_items = linkedItems;
+                } catch (error) {
+                    console.warn(`Failed to load linked items for ${entityType} ${entityId}:`, error);
+                    entityData.linked_items = [];
+                }
+            }
+            
+            // טעינת נתוני שוק אם נדרש (לטיקרים)
+            if (entityType === 'ticker' && options.includeMarketData !== false) {
+                try {
+                    console.log(`📈 Loading market data for ${entityType} ${entityId}...`);
+                    const marketData = await this.getMarketData(entityId);
+                    console.log(`📈 Market data received:`, marketData);
+                    if (marketData) {
+                        entityData.current_price = marketData.price;
+                        entityData.change_percent = marketData.change_pct_day;
+                        entityData.change_amount = marketData.change_amount_day;
+                        entityData.volume = marketData.volume;
+                        entityData.yahoo_updated_at = marketData.fetched_at;
+                        entityData.data_source = marketData.provider;
+                    }
+                } catch (error) {
+                    console.warn(`Failed to load market data for ${entityType} ${entityId}:`, error);
+                }
+            }
+
+            // טעינת שם המטבע אם נדרש (לטיקרים)
+            if (entityType === 'ticker' && entityData.currency_id) {
+                try {
+                    console.log(`💰 Loading currency data for currency_id ${entityData.currency_id}...`);
+                    const currencyData = await this.getCurrencyData(entityData.currency_id);
+                    console.log(`💰 Currency data received:`, currencyData);
+                    if (currencyData) {
+                        entityData.currency_name = currencyData.name;
+                        entityData.currency_symbol = currencyData.symbol;
+                    }
+                } catch (error) {
+                    console.warn(`Failed to load currency data for currency_id ${entityData.currency_id}:`, error);
+                }
+            }
+
+            // טעינת נתונים על טריידים ותכנונים אם נדרש (לטיקרים)
+            if (entityType === 'ticker' && options.includeLinkedItems !== false) {
+                try {
+                    console.log(`📊 Loading trades and plans data for ${entityType} ${entityId}...`);
+                    const linkedItems = await this.getLinkedItems(entityType, entityId);
+                    console.log(`📊 Linked items received:`, linkedItems);
+                    
+                    if (linkedItems && linkedItems.length > 0) {
+                        // סינון טריידים ותכנונים
+                        const trades = linkedItems.filter(item => item.type === 'trade');
+                        const tradePlans = linkedItems.filter(item => item.type === 'trade_plan');
+                        
+                        entityData.trades_summary = trades;
+                        entityData.trade_plans_summary = tradePlans;
+                        
+                        console.log(`📊 Trades: ${trades.length}, Trade Plans: ${tradePlans.length}`);
+                    }
+                } catch (error) {
+                    console.warn(`Failed to load trades and plans data for ${entityType} ${entityId}:`, error);
+                }
+            }
             
             // שמירה ב-cache
             this.setCachedData(entityType, entityId, entityData);
@@ -166,13 +236,12 @@ class EntityDetailsAPI {
      * @private
      */
     async fetchEntityFromAPI(entityType, entityId) {
-        // נסה קודם את endpoint החדש המיוחד
+        // השתמש ישירות ב-endpoints הקיימים (endpoint החדש לא עובד)
         try {
-            return await this.fetchFromNewEndpoint(entityType, entityId);
-        } catch (error) {
-            console.debug(`New endpoint failed for ${entityType}, trying existing endpoints:`, error.message);
-            // אם החדש לא עובד, נסה את הendpoints הקיימים
             return await this.fetchFromExistingEndpoints(entityType, entityId);
+        } catch (error) {
+            console.error(`Failed to fetch ${entityType} ${entityId}:`, error.message);
+            throw error;
         }
     }
 
@@ -221,14 +290,14 @@ class EntityDetailsAPI {
      */
     async fetchFromExistingEndpoints(entityType, entityId) {
         const endpointMappings = {
-            ticker: `/api/tickers/${entityId}`,
-            trade: `/api/trades/${entityId}`,
-            trade_plan: `/api/trade-plans/${entityId}`,
-            execution: `/api/executions/${entityId}`,
-            account: `/api/accounts/${entityId}`,
-            alert: `/api/alerts/${entityId}`,
-            cash_flow: `/api/cash-flows/${entityId}`,
-            note: `/api/notes/${entityId}`
+            ticker: `/api/v1/tickers/${entityId}`,
+            trade: `/api/v1/trades/${entityId}`,
+            trade_plan: `/api/v1/trade_plans/${entityId}`,
+            execution: `/api/v1/executions/${entityId}`,
+            account: `/api/v1/accounts/${entityId}`,
+            alert: `/api/v1/alerts/${entityId}`,
+            cash_flow: `/api/v1/cash_flows/${entityId}`,
+            note: `/api/v1/notes/${entityId}`
         };
 
         const endpoint = endpointMappings[entityType];
@@ -450,7 +519,8 @@ class EntityDetailsAPI {
      */
     async getLinkedItems(entityType, entityId) {
         try {
-            const url = `/api/linked-items/${entityType}/${entityId}`;
+            const url = `/api/v1/linked-items/${entityType}/${entityId}`;
+            console.log(`🔗 Fetching linked items from: ${url}`);
             
             const response = await fetch(url, {
                 method: 'GET',
@@ -459,6 +529,8 @@ class EntityDetailsAPI {
                     'Accept': 'application/json'
                 }
             });
+            
+            console.log(`🔗 Response status: ${response.status}`);
 
             if (!response.ok) {
                 if (response.status === 404) {
@@ -469,11 +541,124 @@ class EntityDetailsAPI {
             }
 
             const data = await response.json();
-            return data.data || data || [];
+            console.log(`🔗 Raw linked items data:`, data);
+            
+            if (data && data.child_entities) {
+                console.log(`🔗 Processing linked items data:`, data.child_entities);
+                
+                // המרת הנתונים לפורמט הרצוי
+                const linkedItems = data.child_entities.map(item => ({
+                    id: item.id,
+                    type: item.type,
+                    title: item.title || `${item.type} ${item.id}`,
+                    description: item.description || '',
+                    status: item.status,
+                    created_at: item.created_at,
+                    updated_at: item.updated_at
+                }));
+                
+                console.log(`🔗 Final linked items:`, linkedItems);
+                return linkedItems;
+            } else {
+                console.log(`🔗 No linked items data found`);
+                return [];
+            }
 
         } catch (error) {
             console.error(`Error getting linked items for ${entityType} ${entityId}:`, error);
             return []; // החזר מערך ריק במקום לזרוק שגיאה
+        }
+    }
+
+    /**
+     * Get market data for ticker - קבלת נתוני שוק לטיקר
+     * 
+     * @param {number|string} tickerId - מזהה הטיקר
+     * @returns {Promise<Object|null>} - Promise עם נתוני שוק או null
+     * @public
+     */
+    async getMarketData(tickerId) {
+        try {
+            const url = `/api/external-data/quotes/${tickerId}`;
+            console.log(`📈 Fetching market data from: ${url}`);
+            
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+            
+            console.log(`📈 Market data response status: ${response.status}`);
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    console.debug(`No market data found for ticker ${tickerId}`);
+                    return null;
+                }
+                throw new Error(`שגיאת שרת בקבלת נתוני שוק: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(`📈 Raw market data:`, data);
+            
+            if (data.status === 'success' && data.data) {
+                return data.data;
+            } else {
+                console.log(`📈 No market data found`);
+                return null;
+            }
+
+        } catch (error) {
+            console.error(`Error getting market data for ticker ${tickerId}:`, error);
+            return null; // החזר null במקום לזרוק שגיאה
+        }
+    }
+
+    /**
+     * Get currency data - קבלת נתוני מטבע
+     * 
+     * @param {number|string} currencyId - מזהה המטבע
+     * @returns {Promise<Object|null>} - Promise עם נתוני מטבע או null
+     * @public
+     */
+    async getCurrencyData(currencyId) {
+        try {
+            const url = `/api/v1/currencies/${currencyId}`;
+            console.log(`💰 Fetching currency data from: ${url}`);
+            
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+            
+            console.log(`💰 Currency data response status: ${response.status}`);
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    console.debug(`No currency data found for currency ${currencyId}`);
+                    return null;
+                }
+                throw new Error(`שגיאת שרת בקבלת נתוני מטבע: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(`💰 Raw currency data:`, data);
+            
+            if (data.status === 'success' && data.data) {
+                return data.data;
+            } else {
+                console.log(`💰 No currency data found`);
+                return null;
+            }
+
+        } catch (error) {
+            console.error(`Error getting currency data for currency ${currencyId}:`, error);
+            return null; // החזר null במקום לזרוק שגיאה
         }
     }
 

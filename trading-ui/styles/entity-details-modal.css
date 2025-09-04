@@ -66,6 +66,20 @@
   transition: all 0.2s ease;
 }
 
+.entity-details-header .btn-outline-secondary {
+  position: absolute;
+  inset-inline-end: 1rem;
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
 .entity-details-header .btn-close:hover {
   background-color: #f8d7da;
   border-color: #f5c6cb;
@@ -210,6 +224,25 @@
   border-radius: 8px;
   padding: 1.5rem;
   margin-block-end: 1rem;
+}
+
+/* Linked items table buttons - כפתורים בטבלת פריטים מקושרים */
+.entity-linked-items .btn-group .btn {
+  min-width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.entity-linked-items .btn-group .btn i {
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.entity-linked-items .btn-group .btn:hover i {
+  color: inherit;
 }
 
 .entity-linked-items h6 {

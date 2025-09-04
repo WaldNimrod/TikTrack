@@ -62,6 +62,22 @@ class UserPreferences(BaseModel):
     # Entity colors (JSON stored as TEXT)
     entity_colors_json = Column(Text, nullable=True)
     
+    # Header opacity (JSON stored as TEXT)
+    header_opacity_json = Column(Text, nullable=True)
+    
+    # Status colors (JSON stored as TEXT)
+    status_colors_json = Column(Text, nullable=True)
+    
+    # Investment type colors (JSON stored as TEXT)
+    investment_type_colors_json = Column(Text, nullable=True)
+    
+    # External data preferences (migrated from user_data_preferences)
+    refresh_overrides_json = Column(Text, nullable=True)
+    show_percentage_changes = Column(Boolean, default=True)
+    show_volume = Column(Boolean, default=True)
+    notify_on_data_failures = Column(Boolean, default=True)
+    notify_on_stale_data = Column(Boolean, default=False)
+    
     # Timestamps
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
@@ -96,6 +112,10 @@ class UserPreferences(BaseModel):
             'retryDelay': self.retry_delay,
             'autoRefresh': self.auto_refresh,
             'verboseLogging': self.verbose_logging,
+            'showPercentageChanges': self.show_percentage_changes,
+            'showVolume': self.show_volume,
+            'notifyOnDataFailures': self.notify_on_data_failures,
+            'notifyOnStaleData': self.notify_on_stale_data,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
@@ -127,6 +147,34 @@ class UserPreferences(BaseModel):
                 result['entityColors'] = json.loads(self.entity_colors_json)
             except (json.JSONDecodeError, TypeError):
                 result['entityColors'] = {}
+        
+        # Add header opacity if available
+        if self.header_opacity_json:
+            try:
+                result['headerOpacity'] = json.loads(self.header_opacity_json)
+            except (json.JSONDecodeError, TypeError):
+                result['headerOpacity'] = {}
+        
+        # Add status colors if available
+        if self.status_colors_json:
+            try:
+                result['statusColors'] = json.loads(self.status_colors_json)
+            except (json.JSONDecodeError, TypeError):
+                result['statusColors'] = {}
+        
+        # Add investment type colors if available
+        if self.investment_type_colors_json:
+            try:
+                result['investmentTypeColors'] = json.loads(self.investment_type_colors_json)
+            except (json.JSONDecodeError, TypeError):
+                result['investmentTypeColors'] = {}
+        
+        # Add refresh overrides if available
+        if self.refresh_overrides_json:
+            try:
+                result['refreshOverrides'] = json.loads(self.refresh_overrides_json)
+            except (json.JSONDecodeError, TypeError):
+                result['refreshOverrides'] = {}
         
         return result
     
@@ -184,6 +232,18 @@ class UserPreferences(BaseModel):
         if 'verboseLogging' in data:
             self.verbose_logging = data['verboseLogging']
         
+        # External data preferences
+        if 'showPercentageChanges' in data:
+            self.show_percentage_changes = data['showPercentageChanges']
+        if 'showVolume' in data:
+            self.show_volume = data['showVolume']
+        if 'notifyOnDataFailures' in data:
+            self.notify_on_data_failures = data['notifyOnDataFailures']
+        if 'notifyOnStaleData' in data:
+            self.notify_on_stale_data = data['notifyOnStaleData']
+        if 'refreshOverrides' in data:
+            self.refresh_overrides_json = json.dumps(data['refreshOverrides'])
+        
         # Colors
         if 'numericValueColors' in data:
             # Get current colors or start with defaults
@@ -218,6 +278,18 @@ class UserPreferences(BaseModel):
         if 'entityColors' in data:
             self.entity_colors_json = json.dumps(data['entityColors'])
         
+        # Header opacity
+        if 'headerOpacity' in data:
+            self.header_opacity_json = json.dumps(data['headerOpacity'])
+        
+        # Status colors
+        if 'statusColors' in data:
+            self.status_colors_json = json.dumps(data['statusColors'])
+        
+        # Investment type colors
+        if 'investmentTypeColors' in data:
+            self.investment_type_colors_json = json.dumps(data['investmentTypeColors'])
+        
         self.updated_at = datetime.utcnow()
     
     @classmethod
@@ -245,6 +317,12 @@ class UserPreferences(BaseModel):
             "retryDelay": 5,
             "autoRefresh": False,
             "verboseLogging": False,
+            # External data preferences
+            "showPercentageChanges": True,
+            "showVolume": True,
+            "notifyOnDataFailures": True,
+            "notifyOnStaleData": False,
+            "refreshOverrides": {},
             # הגדרות צבעים לערכים מספריים
             "numericValueColors": {
                 "positive": {
@@ -280,6 +358,53 @@ class UserPreferences(BaseModel):
                 "design": "#495057",
                 "research": "#343a40",
                 "preference": "#adb5bd",
+            },
+            # הגדרות שקיפות כותרות
+            "headerOpacity": {
+                "main": 60,
+                "sub": 30
+            },
+            # הגדרות צבעים לפי סטטוסים
+            "statusColors": {
+                "open": {
+                    "light": "rgba(40, 167, 69, 0.1)",
+                    "medium": "#28a745",
+                    "dark": "#155724",
+                    "border": "rgba(40, 167, 69, 0.3)"
+                },
+                "closed": {
+                    "light": "rgba(108, 117, 125, 0.1)",
+                    "medium": "#6c757d",
+                    "dark": "#383d41",
+                    "border": "rgba(108, 117, 125, 0.3)"
+                },
+                "cancelled": {
+                    "light": "rgba(220, 53, 69, 0.1)",
+                    "medium": "#dc3545",
+                    "dark": "#721c24",
+                    "border": "rgba(220, 53, 69, 0.3)"
+                }
+            },
+            # הגדרות צבעים לפי סוגי השקעה
+            "investmentTypeColors": {
+                "swing": {
+                    "light": "rgba(0, 123, 255, 0.1)",
+                    "medium": "#007bff",
+                    "dark": "#0056b3",
+                    "border": "rgba(0, 123, 255, 0.3)"
+                },
+                "investment": {
+                    "light": "rgba(40, 167, 69, 0.1)",
+                    "medium": "#28a745",
+                    "dark": "#155724",
+                    "border": "rgba(40, 167, 69, 0.3)"
+                },
+                "passive": {
+                    "light": "rgba(111, 66, 193, 0.1)",
+                    "medium": "#6f42c1",
+                    "dark": "#4a2c7a",
+                    "border": "rgba(111, 66, 193, 0.3)"
+                }
             }
         }
 

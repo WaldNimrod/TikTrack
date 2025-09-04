@@ -23,6 +23,7 @@
     font-size: 1.1rem;
 }
 
+
 /* Card Styles */
 .status-card,
 .settings-card,
@@ -222,6 +223,8 @@
     border-radius: 8px;
     border: 1px solid #e9ecef;
     transition: all 0.2s ease;
+    position: relative;
+    z-index: 1;
 }
 
 .notification-item:hover {

@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>דשבורד Linter לדוגמה - TikTrack</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles/apple-theme.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/header-system.css">
+    <link rel="stylesheet" href="styles/typography.css">
+    <link rel="stylesheet" href="styles/table.css">
+    <link rel="stylesheet" href="styles/notification-system.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .demo-dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--apple-text-primary);
+            margin: 0;
+        }
+
+        .demo-badge {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--apple-bg-elevated);
+            border: 1px solid var(--apple-border-light);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--apple-shadow-light);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--apple-shadow-medium);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--apple-text-primary);
+        }
+
+        .stat-icon {
+            font-size: 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--apple-text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .stat-change.positive {
+            color: #34c759;
+        }
+
+        .stat-change.negative {
+            color: #ff3b30;
+        }
+
+        .stat-change.neutral {
+            color: var(--apple-text-secondary);
+        }
+
+        .chart-section {
+            background: var(--apple-bg-elevated);
+            border: 1px solid var(--apple-border-light);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--apple-shadow-light);
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--apple-text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 1rem;
+        }
+
+        .issues-section {
+            background: var(--apple-bg-elevated);
+            border: 1px solid var(--apple-border-light);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--apple-shadow-light);
+        }
+
+        .issues-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .issues-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--apple-text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--apple-border-light);
+            background: var(--apple-bg-primary);
+            color: var(--apple-text-primary);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: #007aff;
+            color: white;
+            border-color: #007aff;
+        }
+
+        .filter-btn:hover {
+            background: var(--apple-bg-secondary);
+        }
+
+        .issue-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid var(--apple-border-light);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .issue-item:hover {
+            background: var(--apple-bg-secondary);
+        }
+
+        .issue-severity {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .issue-severity.error {
+            background: #ff3b30;
+        }
+
+        .issue-severity.warning {
+            background: #ff9500;
+        }
+
+        .issue-severity.info {
+            background: #007aff;
+        }
+
+        .issue-content {
+            flex: 1;
+        }
+
+        .issue-message {
+            font-weight: 600;
+            color: var(--apple-text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .issue-details {
+            font-size: 0.9rem;
+            color: var(--apple-text-secondary);
+        }
+
+        .issue-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
+            border-radius: 4px;
+        }
+
+        .auto-refresh {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--apple-text-secondary);
+        }
+
+        .refresh-toggle {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background: var(--apple-border-light);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-toggle.active {
+            background: #34c759;
+        }
+
+        .refresh-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-toggle.active::after {
+            transform: translateX(-20px);
+        }
+
+        .error-category {
+            background: var(--apple-bg-elevated);
+            border: 1px solid var(--apple-border-light);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--apple-shadow-light);
+        }
+
+        .category-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--apple-text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .category-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .category-stat {
+            text-align: center;
+            padding: 1rem;
+            background: var(--apple-bg-primary);
+            border-radius: 8px;
+        }
+
+        .category-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--apple-text-primary);
+        }
+
+        .category-stat-label {
+            font-size: 0.9rem;
+            color: var(--apple-text-secondary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-body">
+        <!-- unified-header auto-generated -->
+        <div id="unified-header"></div>
+        
+        <div class="demo-dashboard">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">🔧 דשבורד Linter לדוגמה</h1>
+                <div class="demo-badge">דוגמה עם שגיאות אמיתיות</div>
+            </div>
+
+            <!-- Statistics Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">סה"כ קבצים</div>
+                        <div class="stat-icon">📁</div>
+                    </div>
+                    <div class="stat-value">247</div>
+                    <div class="stat-change neutral">+12 מהשבוע שעבר</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">שגיאות</div>
+                        <div class="stat-icon">❌</div>
+                    </div>
+                    <div class="stat-value">23</div>
+                    <div class="stat-change negative">+5 מהשבוע שעבר</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">אזהרות</div>
+                        <div class="stat-icon">⚠️</div>
+                    </div>
+                    <div class="stat-value">156</div>
+                    <div class="stat-change negative">+23 מהשבוע שעבר</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-title">איכות קוד</div>
+                        <div class="stat-icon">⭐</div>
+                    </div>
+                    <div class="stat-value">78%</div>
+                    <div class="stat-change negative">-3% מהשבוע שעבר</div>
+                </div>
+            </div>
+
+            <!-- Error Categories -->
+            <div class="error-category">
+                <h2 class="category-title">
+                    🐍 שגיאות Python
+                </h2>
+                <div class="category-stats">
+                    <div class="category-stat">
+                        <div class="category-stat-value">8</div>
+                        <div class="category-stat-label">TypeError</div>
+                    </div>
+                    <div class="category-stat">
+                        <div class="category-stat-value">5</div>
+                        <div class="category-stat-label">AttributeError</div>
+                    </div>
+                    <div class="category-stat">
+                        <div class="category-stat-value">3</div>
+                        <div class="category-stat-label">ImportError</div>
+                    </div>
+                    <div class="category-stat">
+                        <div class="category-stat-value">2</div>
+                        <div class="category-stat-label">ValueError</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="error-category">
+                <h2 class="category-title">
+                    🌐 שגיאות JavaScript
+                </h2>
+                <div class="category-stats">
+                    <div class="category-stat">
+                        <div class="category-stat-value">12</div>
+                        <div class="category-stat-label">SyntaxError</div>
+                    </div>
+                    <div class="category-stat">
+                        <div class="category-stat-value">8</div>
+                        <div class="category-stat-label">ReferenceError</div>
+                    </div>
+                    <div class="category-stat">
+                        <div class="category-stat-value">6</div>
+                        <div class="category-stat-label">TypeError</div>
+                    </div>
+                    <div class="category-stat">
+                        <div class="category-stat-value">4</div>
+                        <div class="category-stat-label">Undefined</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="chart-section">
+                <h2 class="chart-title">
+                    📈 מגמות איכות קוד
+                </h2>
+                <div class="chart-container">
+                    <canvas id="qualityChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Issues Section -->
+            <div class="issues-section">
+                <div class="issues-header">
+                    <h2 class="issues-title">
+                        🔍 שגיאות נפוצות במערכת
+                    </h2>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="filterIssues('all')">הכל</button>
+                        <button class="filter-btn" onclick="filterIssues('error')">שגיאות</button>
+                        <button class="filter-btn" onclick="filterIssues('warning')">אזהרות</button>
+                        <button class="filter-btn" onclick="filterIssues('info')">מידע</button>
+                    </div>
+                </div>
+
+                <div id="issuesList">
+                    <!-- Issues will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- TikTrack Scripts -->
+    <script src="scripts/main.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/header-system.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/console-cleanup.js"></script>
+
+    <script>
+        // Global variables
+        let qualityChart;
+        let currentFilter = 'all';
+
+        // אתחול מערכת ראש הדף
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log('🚀 טעינת דשבורד Linter לדוגמה...');
+
+            // אתחול HeaderSystem
+            if (window.headerSystem && !window.headerSystem.isInitialized) {
+                console.log('✅ אתחול HeaderSystem...');
+                window.headerSystem.init();
+            }
+
+            // בדיקת זמינות מערכת התראות
+            if (typeof window.showSuccessNotification === 'function') {
+                console.log('✅ מערכת התראות זמינה');
+            } else {
+                console.log('⚠️ מערכת התראות לא זמינה');
+            }
+
+            // אתחול הרכיבים
+            initializeChart();
+            loadDemoIssues();
+        });
+
+        function initializeChart() {
+            const ctx = document.getElementById('qualityChart').getContext('2d');
+            qualityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['שבוע 1', 'שבוע 2', 'שבוע 3', 'שבוע 4', 'שבוע 5', 'שבוע 6', 'שבוע 7', 'שבוע 8'],
+                    datasets: [{
+                        label: 'איכות קוד (%)',
+                        data: [85, 82, 79, 81, 78, 76, 78, 78],
+                        borderColor: '#ff3b30',
+                        backgroundColor: 'rgba(255, 59, 48, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadDemoIssues() {
+            const demoIssues = [
+                {
+                    severity: 'error',
+                    message: 'cache_for() got an unexpected keyword argument \'dependencies\'',
+                    file: 'Backend/routes/api/tickers.py',
+                    line: 33,
+                    rule: 'TypeError',
+                    category: 'Python'
+                },
+                {
+                    severity: 'error',
+                    message: 'getCurrentPageName is not defined',
+                    file: 'trading-ui/create_linter_dashboard.html',
+                    line: 290,
+                    rule: 'ReferenceError',
+                    category: 'JavaScript'
+                },
+                {
+                    severity: 'warning',
+                    message: 'Missing semicolon',
+                    file: 'trading-ui/scripts/main.js',
+                    line: 1251,
+                    rule: 'semi',
+                    category: 'JavaScript'
+                },
+                {
+                    severity: 'error',
+                    message: 'window.notificationSystem.init is not a function',
+                    file: 'trading-ui/linter-realtime-monitor.html',
+                    line: 449,
+                    rule: 'TypeError',
+                    category: 'JavaScript'
+                },
+                {
+                    severity: 'warning',
+                    message: 'Unused variable \'formData\'',
+                    file: 'trading-ui/scripts/trades.js',
+                    line: 156,
+                    rule: 'unused-variable',
+                    category: 'JavaScript'
+                },
+                {
+                    severity: 'error',
+                    message: 'ImportError: No module named \'flask_socketio\'',
+                    file: 'Backend/app.py',
+                    line: 50,
+                    rule: 'ImportError',
+                    category: 'Python'
+                },
+                {
+                    severity: 'info',
+                    message: 'Consider using const instead of let',
+                    file: 'trading-ui/scripts/header-system.js',
+                    line: 156,
+                    rule: 'prefer-const',
+                    category: 'JavaScript'
+                },
+                {
+                    severity: 'error',
+                    message: 'AttributeError: \'NoneType\' object has no attribute \'get\'',
+                    file: 'Backend/services/ticker_service.py',
+                    line: 89,
+                    rule: 'AttributeError',
+                    category: 'Python'
+                },
+                {
+                    severity: 'warning',
+                    message: 'Long line detected (120 characters)',
+                    file: 'trading-ui/styles/apple-theme.css',
+                    line: 234,
+                    rule: 'max-len',
+                    category: 'CSS'
+                },
+                {
+                    severity: 'error',
+                    message: 'KeyError: \'user_id\'',
+                    file: 'Backend/services/user_service.py',
+                    line: 45,
+                    rule: 'KeyError',
+                    category: 'Python'
+                },
+                {
+                    severity: 'warning',
+                    message: 'Function too complex (cyclomatic complexity: 15)',
+                    file: 'Backend/services/health_service.py',
+                    line: 89,
+                    rule: 'complexity',
+                    category: 'Python'
+                },
+                {
+                    severity: 'info',
+                    message: 'Consider using async/await instead of Promise.then()',
+                    file: 'trading-ui/scripts/external-data-dashboard.js',
+                    line: 67,
+                    rule: 'prefer-async-await',
+                    category: 'JavaScript'
+                }
+            ];
+
+            displayIssues(demoIssues);
+        }
+
+        function displayIssues(issues) {
+            const issuesList = document.getElementById('issuesList');
+            
+            if (issues.length === 0) {
+                issuesList.innerHTML = `
+                    <div class="text-center py-4">
+                        <p class="text-muted">🎉 אין בעיות נוכחיות!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const filteredIssues = currentFilter === 'all' ? issues : issues.filter(issue => issue.severity === currentFilter);
+            
+            issuesList.innerHTML = filteredIssues.map(issue => `
+                <div class="issue-item" data-severity="${issue.severity}">
+                    <div class="issue-severity ${issue.severity}"></div>
+                    <div class="issue-content">
+                        <div class="issue-message">${issue.message}</div>
+                        <div class="issue-details">
+                            ${issue.file}:${issue.line} | כלל: ${issue.rule} | קטגוריה: ${issue.category}
+                        </div>
+                    </div>
+                    <div class="issue-actions">
+                        <button class="btn btn-sm btn-outline-primary" onclick="fixIssue('${issue.file}', ${issue.line})">
+                            🔧 תיקון
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="ignoreIssue('${issue.file}', ${issue.line})">
+                            👁️ התעלם
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterIssues(filter) {
+            currentFilter = filter;
+            
+            // עדכון כפתורי הפילטר
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // טעינה מחדש של הבעיות
+            loadDemoIssues();
+        }
+
+        function fixIssue(file, line) {
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('תיקון אוטומטי', `תיקון אוטומטי עבור ${file}:${line}`);
+            } else {
+                alert(`תיקון אוטומטי עבור ${file}:${line}`);
+            }
+        }
+
+        function ignoreIssue(file, line) {
+            if (typeof window.showInfoNotification === 'function') {
+                window.showInfoNotification('התעלמות מבעיה', `התעלמות מבעיה ב-${file}:${line}`);
+            } else {
+                alert(`התעלמות מבעיה ב-${file}:${line}`);
+            }
+        }
+    </script>
+</body>
+
+</html>

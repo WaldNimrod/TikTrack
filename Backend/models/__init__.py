@@ -11,7 +11,7 @@ from .execution import Execution
 from .currency import Currency
 from .user import User
 from .user_preferences import UserPreferences
-from .external_data import ExternalDataProvider, MarketDataQuote, UserDataPreferences, DataRefreshLog, IntradayDataSlot
+from .external_data import ExternalDataProvider, MarketDataQuote, DataRefreshLog, IntradayDataSlot
 
 __all__ = [
     'BaseModel',
@@ -29,7 +29,6 @@ __all__ = [
     'UserPreferences',
     'ExternalDataProvider',
     'MarketDataQuote',
-    'UserDataPreferences',
     'DataRefreshLog',
     'IntradayDataSlot'
 ]

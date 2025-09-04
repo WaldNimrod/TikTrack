@@ -101,13 +101,14 @@ External Data Integration
 ```
 
 ### **Data Flow (Current Implementation)**
-1. **User Interface** → Triggers data requests via dashboard or test center ✅
-2. **API Routes** → Handle requests and route to appropriate services ✅
-3. **Yahoo Finance Adapter** → Collects data from external source (simulated) ✅
-4. **Data Normalizer** → Normalizes data to unified format ✅
-5. **Cache Manager** → Stores processed data with TTL management ✅
-6. **API Response** → Provides data back to user interface ✅
-7. **UI Display** → Renders data with proper formatting and RTL support ✅
+1. **User Interface** → Requests ticker data from unified API endpoint ✅
+2. **Tickers API** → `/api/v1/tickers/` returns tickers with integrated market data ✅
+3. **TickerService** → Joins tickers with latest market data quotes ✅
+4. **MarketDataQuote** → Latest price data from external providers ✅
+5. **Unified Response** → Single API call returns complete ticker + market data ✅
+6. **UI Display** → Renders all data with proper formatting and RTL support ✅
+
+**Note**: This unified approach provides better performance and user experience compared to separate API endpoints.
 
 ### **Future Data Flow (Live Data)**
 1. **Scheduler** → Triggers automatic refresh (to be implemented)
@@ -233,36 +234,44 @@ batch_quotes = adapter.fetch_batch_quotes(['AAPL', 'GOOGL', 'MSFT'])
 
 ## 🌐 **API Endpoints**
 
-### **Market Data API**
+### **Primary API - Unified Tickers with Market Data**
 ```
-GET /api/v1/market-data/status
-GET /api/v1/market-data/refresh
-GET /api/v1/market-data/providers
-GET /api/v1/market-data/logs
+GET /api/v1/tickers/
 ```
+**Description**: Returns all tickers with integrated market data (price, change, volume) in a single response.
 
-### **Quotes API**
-```
-GET /api/v1/quotes/{ticker_id}
-GET /api/v1/quotes/batch
-GET /api/v1/quotes/{ticker_id}/history
-POST /api/v1/quotes/{ticker_id}/refresh
-```
-
-### **Response Examples:**
+**Response Example:**
 ```json
 {
-    "success": true,
-    "data": {
-        "ticker_id": 1,
-        "symbol": "AAPL",
-        "price": 150.25,
-        "change_percent": 1.69,
-        "volume": 50000000,
-        "last_updated": "2024-01-15T15:30:00Z"
-    }
+    "status": "success",
+    "data": [
+        {
+            "id": 1,
+            "symbol": "AAPL",
+            "name": "Apple Inc.",
+            "status": "open",
+            "current_price": 150.25,
+            "change_percent": 1.69,
+            "change_amount": 2.50,
+            "volume": 50000000,
+            "yahoo_updated_at": "2024-01-15T15:30:00Z",
+            "data_source": "yahoo_finance"
+        }
+    ],
+    "message": "Tickers retrieved successfully",
+    "version": "v1"
 }
 ```
+
+### **Secondary APIs - Direct Market Data Access**
+```
+GET /api/external-data/quotes/{ticker_id}    # Direct quote access
+GET /api/v1/market-data/status               # System status
+GET /api/v1/market-data/refresh              # Manual refresh
+POST /api/v1/quotes/{ticker_id}/refresh      # Refresh specific ticker
+```
+
+**Note**: The unified `/api/v1/tickers/` endpoint is the recommended approach for better performance.
 
 ---
 

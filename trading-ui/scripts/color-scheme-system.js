@@ -92,6 +92,31 @@ const ENTITY_BACKGROUND_COLORS = {
 };
 
 /**
+ * מפתח צבעי סטטוסים - מבנה מלא כמו ערכים מספריים
+ * Status colors scheme - full structure like numeric values
+ */
+const STATUS_COLORS = {
+  'open': {
+    light: 'rgba(40, 167, 69, 0.1)',    // רקע בהיר
+    medium: '#28a745',                   // צבע ראשי
+    dark: '#155724',                     // צבע כהה
+    border: 'rgba(40, 167, 69, 0.3)',   // צבע גבול
+  },
+  'closed': {
+    light: 'rgba(108, 117, 125, 0.1)',
+    medium: '#6c757d',
+    dark: '#383d41',
+    border: 'rgba(108, 117, 125, 0.3)',
+  },
+  'cancelled': {
+    light: 'rgba(220, 53, 69, 0.1)',
+    medium: '#dc3545',
+    dark: '#721c24',
+    border: 'rgba(220, 53, 69, 0.3)',
+  },
+};
+
+/**
  * מפתח צבעי טקסט על רקע צבעוני
  * Text colors for colored backgrounds
  */
@@ -163,13 +188,28 @@ const INVESTMENT_TYPE_DESCRIPTIONS = {
 };
 
 /**
- * מפתח צבעים לסוגי השקעה (מתאים לצבעי הישויות)
- * Investment type colors (matching entity colors)
+ * מפתח צבעים לסוגי השקעה - מבנה מלא
+ * Investment type colors - full structure
  */
 const INVESTMENT_TYPE_COLORS = {
-  'swing': ENTITY_COLORS.trade,        // כחול - כמו טריידים
-  'investment': ENTITY_COLORS.account, // ירוק - כמו חשבונות
-  'passive': ENTITY_COLORS.note,        // סגול - כמו הערות
+  'swing': {
+    light: 'rgba(0, 123, 255, 0.1)',     // רקע בהיר
+    medium: '#007bff',                    // צבע ראשי
+    dark: '#0056b3',                      // צבע כהה
+    border: 'rgba(0, 123, 255, 0.3)',   // צבע גבול
+  },
+  'investment': {
+    light: 'rgba(40, 167, 69, 0.1)',
+    medium: '#28a745',
+    dark: '#155724',
+    border: 'rgba(40, 167, 69, 0.3)',
+  },
+  'passive': {
+    light: 'rgba(111, 66, 193, 0.1)',
+    medium: '#6f42c1',
+    dark: '#4a2c7a',
+    border: 'rgba(111, 66, 193, 0.3)',
+  },
 };
 
 // ===== UTILITY FUNCTIONS =====
@@ -189,6 +229,56 @@ function getEntityColor(entityType) {
 
   const normalizedType = entityType.toLowerCase().trim();
   return ENTITY_COLORS[normalizedType] || '#6c757d';
+}
+
+/**
+ * קבלת צבע סטטוס
+ * Get status color
+ * 
+ * @param {string} status - סטטוס
+ * @param {string} intensity - עוצמה (light, medium, dark, border)
+ * @returns {string} - קוד צבע
+ */
+function getStatusColor(status, intensity = 'medium') {
+  if (!status) {
+    return STATUS_COLORS['closed'][intensity] || '#6c757d';
+  }
+
+  const normalizedStatus = status.toLowerCase().trim();
+  return STATUS_COLORS[normalizedStatus]?.[intensity] || STATUS_COLORS['closed'][intensity] || '#6c757d';
+}
+
+/**
+ * קבלת צבע רקע סטטוס
+ * Get status background color
+ * 
+ * @param {string} status - סטטוס
+ * @returns {string} - קוד צבע רקע
+ */
+function getStatusBackgroundColor(status) {
+  return getStatusColor(status, 'light');
+}
+
+/**
+ * קבלת צבע טקסט סטטוס
+ * Get status text color
+ * 
+ * @param {string} status - סטטוס
+ * @returns {string} - קוד צבע טקסט
+ */
+function getStatusTextColor(status) {
+  return getStatusColor(status, 'medium');
+}
+
+/**
+ * קבלת צבע גבול סטטוס
+ * Get status border color
+ * 
+ * @param {string} status - סטטוס
+ * @returns {string} - קוד צבע גבול
+ */
+function getStatusBorderColor(status) {
+  return getStatusColor(status, 'border');
 }
 
 /**
@@ -292,19 +382,53 @@ function getEntityLabel(entityType) {
 // פונקציות תאימות לאחור
 
 /**
- * קבלת צבע לסוג השקעה (תאימות לאחור)
- * Get color for investment type (backward compatibility)
+ * קבלת צבע לסוג השקעה
+ * Get color for investment type
+ *
+ * @param {string} investmentType - סוג ההשקעה
+ * @param {string} intensity - עוצמה (light, medium, dark, border)
+ * @returns {string} קוד הצבע
+ */
+function getInvestmentTypeColor(investmentType, intensity = 'medium') {
+  if (!investmentType) {
+    return INVESTMENT_TYPE_COLORS['swing'][intensity] || '#007bff';
+  }
+
+  const normalizedType = investmentType.toLowerCase().trim();
+  return INVESTMENT_TYPE_COLORS[normalizedType]?.[intensity] || INVESTMENT_TYPE_COLORS['swing'][intensity] || '#007bff';
+}
+
+/**
+ * קבלת צבע רקע לסוג השקעה
+ * Get background color for investment type
  *
  * @param {string} investmentType - סוג ההשקעה
  * @returns {string} קוד הצבע
  */
-function getInvestmentTypeColor(investmentType) {
-  if (!investmentType) {
-    return '#6c757d'; // אפור לנתונים חסרים
-  }
+function getInvestmentTypeBackgroundColor(investmentType) {
+  return getInvestmentTypeColor(investmentType, 'light');
+}
 
-  const normalizedType = investmentType.toLowerCase().trim();
-  return INVESTMENT_TYPE_COLORS[normalizedType] || '#6c757d';
+/**
+ * קבלת צבע טקסט לסוג השקעה
+ * Get text color for investment type
+ *
+ * @param {string} investmentType - סוג ההשקעה
+ * @returns {string} קוד הצבע
+ */
+function getInvestmentTypeTextColor(investmentType) {
+  return getInvestmentTypeColor(investmentType, 'medium');
+}
+
+/**
+ * קבלת צבע גבול לסוג השקעה
+ * Get border color for investment type
+ *
+ * @param {string} investmentType - סוג ההשקעה
+ * @returns {string} קוד הצבע
+ */
+function getInvestmentTypeBorderColor(investmentType) {
+  return getInvestmentTypeColor(investmentType, 'border');
 }
 
 /**
@@ -416,6 +540,16 @@ function generateEntityCSS() {
   color: white !important;
   border-bottom: 2px solid ${darkenColor(color, 20)} !important;
 }
+
+.entity-${type}-main-header {
+  background-color: ${color}${getMainHeaderOpacityHex()} !important;
+  border-left: 4px solid ${color} !important;
+}
+
+.entity-${type}-sub-header {
+  background-color: ${color}${getSubHeaderOpacityHex()} !important;
+  border-left: 3px solid ${color} !important;
+}
 `;
   });
 
@@ -448,6 +582,98 @@ function generateEntityCSS() {
   color: ${color} !important;
 }
 `;
+  });
+
+  return css;
+}
+
+/**
+ * יצירת CSS דינמי לסטטוסים
+ * Generate dynamic CSS for statuses
+ * 
+ * @returns {string} CSS code
+ */
+function generateStatusCSS() {
+  let css = '';
+
+  Object.keys(STATUS_COLORS).forEach(status => {
+    const colors = STATUS_COLORS[status];
+
+    css += `
+.status-${status} {
+  background-color: ${colors.light} !important;
+  border-color: ${colors.border} !important;
+  color: ${colors.medium} !important;
+}
+
+.status-${status}-badge {
+  background-color: ${colors.medium} !important;
+  color: white !important;
+  border: 1px solid ${colors.medium} !important;
+}
+
+.status-${status}-text {
+  color: ${colors.medium} !important;
+}
+
+.status-${status}-bg {
+  background-color: ${colors.light} !important;
+}
+
+.status-${status}-border {
+  border-color: ${colors.border} !important;
+}
+
+.status-${status}-dark {
+  color: ${colors.dark} !important;
+}
+    `;
+  });
+
+  return css;
+}
+
+/**
+ * יצירת CSS דינמי לסוגי השקעה
+ * Generate dynamic CSS for investment types
+ * 
+ * @returns {string} CSS code
+ */
+function generateInvestmentTypeCSS() {
+  let css = '';
+
+  Object.keys(INVESTMENT_TYPE_COLORS).forEach(type => {
+    const colors = INVESTMENT_TYPE_COLORS[type];
+
+    css += `
+.investment-type-${type} {
+  background-color: ${colors.light} !important;
+  border-color: ${colors.border} !important;
+  color: ${colors.medium} !important;
+}
+
+.investment-type-${type}-badge {
+  background-color: ${colors.medium} !important;
+  color: white !important;
+  border: 1px solid ${colors.medium} !important;
+}
+
+.investment-type-${type}-text {
+  color: ${colors.medium} !important;
+}
+
+.investment-type-${type}-bg {
+  background-color: ${colors.light} !important;
+}
+
+.investment-type-${type}-border {
+  border-color: ${colors.border} !important;
+}
+
+.investment-type-${type}-dark {
+  color: ${colors.dark} !important;
+}
+    `;
   });
 
   return css;
@@ -1143,6 +1369,171 @@ function updateEntityColors(preferences) {
   }
 }
 
+// ===== HEADER STYLING FUNCTIONS =====
+// פונקציות לעיצוב כותרות
+
+/**
+ * יישום צבעי ישות על כותרות עמוד
+ * Apply entity colors to page headers
+ *
+ * @param {string} entityType - סוג הישות
+ * @param {boolean} excludeWarningModals - האם להחריג מודולי אזהרה
+ */
+function applyEntityColorsToHeaders(entityType, excludeWarningModals = true) {
+  try {
+    console.log(`🎨 מיישם צבעי ישות ${entityType} על כותרות...`);
+    
+    const color = getEntityColor(entityType);
+    if (!color) {
+      console.warn(`⚠️ לא נמצא צבע לישות: ${entityType}`);
+      return;
+    }
+
+    // כותרת ראשית - שקיפות 0.6
+    const mainHeaders = document.querySelectorAll('.section-header:first-of-type');
+    mainHeaders.forEach(header => {
+      if (excludeWarningModals && isWarningModal(header)) {
+        return; // דלג על מודולי אזהרה
+      }
+      
+      header.classList.add(`entity-${entityType}-main-header`);
+      console.log(`✅ כותרת ראשית קיבלה צבע ${entityType}`);
+    });
+
+    // כותרות משניות - שקיפות 0.3
+    const subHeaders = document.querySelectorAll('.section-header:not(:first-of-type)');
+    subHeaders.forEach(header => {
+      if (excludeWarningModals && isWarningModal(header)) {
+        return; // דלג על מודולי אזהרה
+      }
+      
+      header.classList.add(`entity-${entityType}-sub-header`);
+      console.log(`✅ כותרת משנית קיבלה צבע ${entityType}`);
+    });
+
+    // כותרות מודלים (למעט אזהרות)
+    const modalHeaders = document.querySelectorAll('.modal-header');
+    modalHeaders.forEach(header => {
+      if (excludeWarningModals && isWarningModal(header)) {
+        return; // דלג על מודולי אזהרה
+      }
+      
+      header.classList.add(`entity-${entityType}-sub-header`);
+      console.log(`✅ כותרת מודל קיבלה צבע ${entityType}`);
+    });
+
+    console.log(`✅ צבעי ישות ${entityType} יושמו על כל הכותרות`);
+    
+  } catch (error) {
+    console.error(`❌ שגיאה ביישום צבעי ישות ${entityType}:`, error);
+  }
+}
+
+/**
+ * בדיקה אם אלמנט הוא מודל אזהרה
+ * Check if element is a warning modal
+ *
+ * @param {Element} element - האלמנט לבדיקה
+ * @returns {boolean} האם מודל אזהרה
+ */
+function isWarningModal(element) {
+  if (!element) return false;
+  
+  // בדיקת ID של מודלים
+  const warningModalIds = [
+    'deleteExecutionModal',
+    'deleteTradeModal', 
+    'deleteAccountModal',
+    'deleteTickerModal',
+    'deleteAlertModal',
+    'confirmDeleteModal',
+    'warningModal'
+  ];
+  
+  // בדיקת ID ישיר
+  if (element.id && warningModalIds.includes(element.id)) {
+    return true;
+  }
+  
+  // בדיקת מודל הורה
+  const modal = element.closest('.modal');
+  if (modal && modal.id && warningModalIds.includes(modal.id)) {
+    return true;
+  }
+  
+  // בדיקת טקסט אזהרה
+  const text = element.textContent?.toLowerCase() || '';
+  const warningKeywords = ['מחיקה', 'ביטול', 'אזהרה', 'delete', 'cancel', 'warning'];
+  
+  return warningKeywords.some(keyword => text.includes(keyword));
+}
+
+/**
+ * הסרת צבעי ישות מכל הכותרות
+ * Remove entity colors from all headers
+ */
+function removeEntityColorsFromHeaders() {
+  try {
+    console.log('🎨 מסיר צבעי ישות מכל הכותרות...');
+    
+    // הסרת מחלקות צבע מכל הכותרות
+    const allHeaders = document.querySelectorAll('.section-header, .modal-header');
+    allHeaders.forEach(header => {
+      VALID_ENTITY_TYPES.forEach(type => {
+        header.classList.remove(`entity-${type}-main-header`);
+        header.classList.remove(`entity-${type}-sub-header`);
+      });
+    });
+    
+    console.log('✅ צבעי ישות הוסרו מכל הכותרות');
+    
+  } catch (error) {
+    console.error('❌ שגיאה בהסרת צבעי ישות:', error);
+  }
+}
+
+/**
+ * קבלת שקיפות כותרת ראשית כ-hex
+ * Get main header opacity as hex
+ */
+function getMainHeaderOpacityHex() {
+  try {
+    // ניסיון לקבל מהעדפות
+    if (window.currentPreferences && window.currentPreferences.headerOpacity && window.currentPreferences.headerOpacity.main) {
+      const opacity = window.currentPreferences.headerOpacity.main;
+      return Math.round(opacity * 255 / 100).toString(16).padStart(2, '0');
+    }
+    
+    // ברירת מחדל: 60%
+    return '99'; // 60% of 255 = 153 = 99 in hex
+    
+  } catch (error) {
+    console.error('❌ שגיאה בקבלת שקיפות כותרת ראשית:', error);
+    return '99'; // ברירת מחדל
+  }
+}
+
+/**
+ * קבלת שקיפות כותרת משנית כ-hex
+ * Get sub header opacity as hex
+ */
+function getSubHeaderOpacityHex() {
+  try {
+    // ניסיון לקבל מהעדפות
+    if (window.currentPreferences && window.currentPreferences.headerOpacity && window.currentPreferences.headerOpacity.sub) {
+      const opacity = window.currentPreferences.headerOpacity.sub;
+      return Math.round(opacity * 255 / 100).toString(16).padStart(2, '0');
+    }
+    
+    // ברירת מחדל: 30%
+    return '4D'; // 30% of 255 = 77 = 4D in hex
+    
+  } catch (error) {
+    console.error('❌ שגיאה בקבלת שקיפות כותרת משנית:', error);
+    return '4D'; // ברירת מחדל
+  }
+}
+
 // ===== INITIALIZATION =====
 // אתחול המערכת
 
@@ -1171,6 +1562,14 @@ window.isValidEntityType = isValidEntityType;
 window.getEntityLabel = getEntityLabel;
 window.createEntityLegend = createEntityLegend;
 window.generateEntityCSS = generateEntityCSS;
+window.generateStatusCSS = generateStatusCSS;
+window.generateInvestmentTypeCSS = generateInvestmentTypeCSS;
+
+// Export status color functions
+window.getStatusColor = getStatusColor;
+window.getStatusBackgroundColor = getStatusBackgroundColor;
+window.getStatusTextColor = getStatusTextColor;
+window.getStatusBorderColor = getStatusBorderColor;
 
 // Export entity color management functions
 window.updateEntityColor = updateEntityColor;
@@ -1187,6 +1586,13 @@ window.getTableColors = getTableColors;
 window.getTableColorsWithFallbacks = getTableColorsWithFallbacks;
 window.getColorPreferences = getColorPreferences;
 
+// Export header styling functions
+window.applyEntityColorsToHeaders = applyEntityColorsToHeaders;
+window.removeEntityColorsFromHeaders = removeEntityColorsFromHeaders;
+window.isWarningModal = isWarningModal;
+window.getMainHeaderOpacityHex = getMainHeaderOpacityHex;
+window.getSubHeaderOpacityHex = getSubHeaderOpacityHex;
+
 // Export constants
 window.VALID_INVESTMENT_TYPES = VALID_INVESTMENT_TYPES;
 window.INVESTMENT_TYPE_LABELS = INVESTMENT_TYPE_LABELS;
@@ -1198,6 +1604,8 @@ window.ENTITY_COLORS = ENTITY_COLORS;
 window.ENTITY_BACKGROUND_COLORS = ENTITY_BACKGROUND_COLORS;
 window.ENTITY_TEXT_COLORS = ENTITY_TEXT_COLORS;
 window.ENTITY_BORDER_COLORS = ENTITY_BORDER_COLORS;
+window.STATUS_COLORS = STATUS_COLORS;
+window.INVESTMENT_TYPE_COLORS = INVESTMENT_TYPE_COLORS;
 
 // Export as module object
 window.colorSchemeSystem = {
@@ -1230,6 +1638,27 @@ window.colorSchemeSystem = {
   getValueType,
   getNumericValueCSSClass,
   generateNumericValueCSS,
+
+  // Status color functions
+  getStatusColor,
+  getStatusBackgroundColor,
+  getStatusTextColor,
+  getStatusBorderColor,
+  generateStatusCSS,
+
+  // Investment type color functions
+  getInvestmentTypeColor,
+  getInvestmentTypeBackgroundColor,
+  getInvestmentTypeTextColor,
+  getInvestmentTypeBorderColor,
+  generateInvestmentTypeCSS,
+
+  // Header styling functions
+  applyEntityColorsToHeaders,
+  removeEntityColorsFromHeaders,
+  isWarningModal,
+  getMainHeaderOpacityHex,
+  getSubHeaderOpacityHex,
   updateNumericValueColors,
 
   // Constants
@@ -1238,6 +1667,8 @@ window.colorSchemeSystem = {
   ENTITY_BACKGROUND_COLORS,
   ENTITY_TEXT_COLORS,
   ENTITY_BORDER_COLORS,
+  STATUS_COLORS,
+  INVESTMENT_TYPE_COLORS,
 
   VALID_INVESTMENT_TYPES,
   INVESTMENT_TYPE_LABELS,

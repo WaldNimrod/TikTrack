@@ -2350,12 +2350,12 @@ class HeaderSystem {
       HeaderSystem.updateFilterTexts();
 
       // עדכון פילטרים
-      if (window.filterSystem) {
-        window.filterSystem.updateFilter('status', []);
-        window.filterSystem.updateFilter('type', []);
-        window.filterSystem.updateFilter('account', []);
-        window.filterSystem.updateFilter('dateRange', '');
-        window.filterSystem.updateFilter('search', '');
+      if (window.updateFilter) {
+        window.updateFilter('status', []);
+        window.updateFilter('type', []);
+        window.updateFilter('account', []);
+        window.updateFilter('dateRange', '');
+        window.updateFilter('search', '');
       }
 
       // שמירת מצב
@@ -2364,7 +2364,7 @@ class HeaderSystem {
     } catch (error) {
       console.warn('⚠️ Using fallback reset:', error);
       // Fallback - איפוס פשוט
-      HeaderSystem.resetFiltersManually();
+      resetFiltersManually();
     }
   }
 
@@ -4701,11 +4701,13 @@ async function getCurrentPreference(key) {
     const response = await fetch('/api/v1/preferences/');
     if (response.ok) {
       const preferences = await response.json();
-      return preferences.user[key] || preferences.defaults[key];
+      console.log(`🔍 All preferences from server:`, preferences);
+      console.log(`🔍 Getting preference ${key}:`, preferences[key]);
+      return preferences[key];
     }
     return null;
   } catch (error) {
-    // שגיאה בקבלת הגדרה
+    console.warn(`⚠️ Error getting preference ${key}:`, error);
     return null;
   }
 }

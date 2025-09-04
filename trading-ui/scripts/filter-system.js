@@ -717,6 +717,16 @@ FilterSystem.prototype.resetToUserDefaults = async function() {
   console.log('🔄 Resetting filters to user defaults...');
   
   try {
+    // טעינת חשבונות לפני איפוס הפילטר
+    if (!window.accountsData || window.accountsData.length === 0) {
+      console.log('🔄 Loading accounts before resetting filters...');
+      if (typeof window.loadAccountsFromServer === 'function') {
+        await window.loadAccountsFromServer();
+      } else if (typeof window.loadAllAccountsFromServer === 'function') {
+        await window.loadAllAccountsFromServer();
+      }
+    }
+    
     // קבלת העדפות המשתמש
     const defaultStatusFilter = await this.getUserPreference('defaultStatusFilter') || 'all';
     const defaultTypeFilter = await this.getUserPreference('defaultTypeFilter') || 'all';
@@ -724,12 +734,30 @@ FilterSystem.prototype.resetToUserDefaults = async function() {
     const defaultDateRangeFilter = await this.getUserPreference('defaultDateRangeFilter') || 'all';
     const defaultSearchFilter = await this.getUserPreference('defaultSearchFilter') || '';
     
+    // לוג לבדיקת הערכים הגולמיים
+    console.log('🔍 Raw preference values before fallback:', {
+      'defaultStatusFilter': await this.getUserPreference('defaultStatusFilter'),
+      'defaultTypeFilter': await this.getUserPreference('defaultTypeFilter'),
+      'defaultAccountFilter': await this.getUserPreference('defaultAccountFilter'),
+      'defaultDateRangeFilter': await this.getUserPreference('defaultDateRangeFilter'),
+      'defaultSearchFilter': await this.getUserPreference('defaultSearchFilter')
+    });
+    
     console.log('📋 User preferences loaded:', {
       status: defaultStatusFilter,
       type: defaultTypeFilter,
       account: defaultAccountFilter,
       dateRange: defaultDateRangeFilter,
       search: defaultSearchFilter
+    });
+    
+    // לוג נוסף לבדיקת הערכים
+    console.log('🔍 Raw preference values:', {
+      'defaultStatusFilter': defaultStatusFilter,
+      'defaultTypeFilter': defaultTypeFilter,
+      'defaultAccountFilter': defaultAccountFilter,
+      'defaultDateRangeFilter': defaultDateRangeFilter,
+      'defaultSearchFilter': defaultSearchFilter
     });
     
     // המרת ערכים מאנגלית לעברית
@@ -748,14 +776,19 @@ FilterSystem.prototype.resetToUserDefaults = async function() {
     };
 
     const dateRangeTranslation = {
-      'all': 'כל התאריכים',
+      'all': 'כל זמן',
       'today': 'היום',
       'yesterday': 'אתמול',
       'this_week': 'השבוע',
-      'last_week': 'שבוע קודם',
-      'this_month': 'החודש',
-      'last_month': 'חודש קודם',
-      'this_year': 'השנה',
+      'last_week': 'שבוע אחרון',
+      'last_month': 'חודש אחרון',
+      '3_months': '3 חודשים',
+      'mtd': 'MTD',
+      '30_days': '30 יום',
+      '60_days': '60 יום',
+      '90_days': '90 יום',
+      'ytd': 'YTD',
+      'year': 'שנה',
       'last_year': 'שנה קודמת',
     };
 
@@ -769,13 +802,25 @@ FilterSystem.prototype.resetToUserDefaults = async function() {
     
     // איפוס פילטר חשבון
     if (defaultAccountFilter !== 'all') {
-      this.setAccountFilter([defaultAccountFilter]);
+      // המרת ID לשם חשבון
+      const accountName = this.getAccountNameById(defaultAccountFilter);
+      if (accountName) {
+        console.log(`✅ Setting account filter to: ${accountName}`);
+        this.setAccountFilter([accountName]);
+      } else {
+        console.log(`⚠️ Account not found, falling back to 'all'`);
+        this.setAccountFilter([]);
+      }
     } else {
+      console.log(`✅ Setting account filter to 'all'`);
       this.setAccountFilter([]);
     }
     
     // איפוס פילטר תאריכים
+    console.log(`🔍 Date range filter value: "${defaultDateRangeFilter}"`);
+    console.log(`🔍 Available translations:`, dateRangeTranslation);
     const dateRangeValue = dateRangeTranslation[defaultDateRangeFilter] || 'כל התאריכים';
+    console.log(`🔍 Translated date range: "${dateRangeValue}"`);
     this.setDateRangeFilter(dateRangeValue);
     
     // איפוס פילטר חיפוש
@@ -798,13 +843,50 @@ FilterSystem.prototype.getUserPreference = async function(preferenceKey) {
   try {
     // נסיון לקבל מהשרת
     if (typeof window.getCurrentPreference === 'function') {
-      return await window.getCurrentPreference(preferenceKey);
+      const value = await window.getCurrentPreference(preferenceKey);
+      console.log(`🔍 FilterSystem.getUserPreference(${preferenceKey}):`, value);
+      return value;
     }
     
     // Fallback - localStorage
-    return localStorage.getItem(`preference_${preferenceKey}`) || null;
+    const localValue = localStorage.getItem(`preference_${preferenceKey}`) || null;
+    console.log(`🔍 FilterSystem.getUserPreference(${preferenceKey}) from localStorage:`, localValue);
+    return localValue;
   } catch (error) {
     console.warn(`⚠️ Failed to get preference ${preferenceKey}:`, error);
+    return null;
+  }
+};
+
+// פונקציה לקבלת שם חשבון לפי ID
+FilterSystem.prototype.getAccountNameById = function(accountId) {
+  try {
+    console.log(`🔍 Looking for account ID: ${accountId}`);
+    console.log(`🔍 window.accountsData:`, window.accountsData);
+    console.log(`🔍 window.allAccountsData:`, window.allAccountsData);
+    
+    // נסיון למצוא בחשבונות שנטענו
+    if (window.accountsData && Array.isArray(window.accountsData)) {
+      const account = window.accountsData.find(a => a.id == accountId);
+      if (account) {
+        console.log(`✅ Found account in accountsData: ${account.name}`);
+        return account.name;
+      }
+    }
+    
+    // נסיון למצוא בחשבונות הכלליים
+    if (window.allAccountsData && Array.isArray(window.allAccountsData)) {
+      const account = window.allAccountsData.find(a => a.id == accountId);
+      if (account) {
+        console.log(`✅ Found account in allAccountsData: ${account.name}`);
+        return account.name;
+      }
+    }
+    
+    console.warn(`⚠️ Account with ID ${accountId} not found in loaded accounts`);
+    return null;
+  } catch (error) {
+    console.warn(`⚠️ Error getting account name for ID ${accountId}:`, error);
     return null;
   }
 };
@@ -859,13 +941,20 @@ FilterSystem.prototype.updateTypeFilterUI = function(types) {
 };
 
 FilterSystem.prototype.updateAccountFilterUI = function(accounts) {
+  console.log(`🔍 updateAccountFilterUI called with:`, accounts);
   const accountFilter = document.getElementById('selectedAccount');
+  console.log(`🔍 selectedAccount element:`, accountFilter);
+  
   if (accountFilter) {
     if (accounts.length === 0 || accounts.includes('הכול')) {
       accountFilter.textContent = 'כל החשבונות';
+      console.log(`✅ Set account filter to: כל החשבונות`);
     } else {
       accountFilter.textContent = accounts.join(', ');
+      console.log(`✅ Set account filter to: ${accounts.join(', ')}`);
     }
+  } else {
+    console.warn(`⚠️ selectedAccount element not found`);
   }
 };
 
@@ -880,6 +969,25 @@ FilterSystem.prototype.updateSearchFilterUI = function(search) {
   const searchInput = document.getElementById('searchFilterInput');
   if (searchInput) {
     searchInput.value = search || '';
+  }
+};
+
+// ייצוא פונקציות חשובות לגלובל
+window.updateFilter = function(filterName, value) {
+  if (window.filterSystem) {
+    window.filterSystem.updateFilter(filterName, value);
+  }
+};
+
+window.clearAllFilters = function() {
+  if (window.filterSystem) {
+    window.filterSystem.clearFilters();
+  }
+};
+
+window.resetToUserDefaults = function() {
+  if (window.filterSystem) {
+    return window.filterSystem.resetToUserDefaults();
   }
 };
 

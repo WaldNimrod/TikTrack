@@ -148,8 +148,7 @@ async function loadPreferences() {
     currentPreferences = { ...DEFAULT_PREFERENCES };
   }
 
-  // עדכון הממשק
-  updateUI();
+  // עדכון הממשק יבוצע אחרי טעינת החשבונות
 }
 
 /**
@@ -157,6 +156,22 @@ async function loadPreferences() {
  */
 function updatePreference(key, value) {
   try {
+    // בדיקה מיוחדת לפילטר חשבון - וודא שהחשבון קיים
+    if (key === 'defaultAccountFilter' && value !== 'all') {
+      const accountFilterSelect = document.getElementById('defaultAccountFilter');
+      if (accountFilterSelect) {
+        const accountExists = Array.from(accountFilterSelect.options).some(opt => opt.value === value);
+        if (!accountExists) {
+          console.warn(`⚠️ החשבון ${value} לא קיים ברשימה, מעבר ל"הכול"`);
+          value = 'all';
+          if (accountFilterSelect) {
+            accountFilterSelect.value = 'all';
+          }
+          showPreferencesWarning('פילטר חשבון', 'החשבון שנבחר לא קיים, הוחזר ל"הכול"');
+        }
+      }
+    }
+
     // עדכן את הזיכרון הזמני מיד
     currentPreferences[key] = value;
 
@@ -369,7 +384,29 @@ function updateUI() {
   // פילטר חשבון
   const accountFilterSelect = document.getElementById('defaultAccountFilter');
   if (accountFilterSelect) {
-    accountFilterSelect.value = currentPreferences.defaultAccountFilter || 'all';
+    const savedAccountFilter = currentPreferences.defaultAccountFilter || 'all';
+    
+    // בדוק אם החשבונות כבר נטענו (יש יותר מאפשרות אחת - "הכול")
+    const hasLoadedAccounts = accountFilterSelect.options.length > 1;
+    
+    if (hasLoadedAccounts) {
+      // בדוק אם החשבון השמור קיים ברשימה
+      const accountExists = Array.from(accountFilterSelect.options).some(opt => opt.value === savedAccountFilter);
+      if (accountExists) {
+        accountFilterSelect.value = savedAccountFilter;
+      } else {
+        // אם החשבון לא קיים, חזור ל"הכול" ועדכן את ההעדפה
+        accountFilterSelect.value = 'all';
+        if (savedAccountFilter !== 'all') {
+          console.warn(`⚠️ החשבון ${savedAccountFilter} לא קיים ברשימה, מעבר ל"הכול"`);
+          currentPreferences.defaultAccountFilter = 'all';
+          showPreferencesWarning('פילטר חשבון', `החשבון שהוגדר כברירת מחדל לא קיים יותר, הוחזר ל"הכול"`);
+        }
+      }
+    } else {
+      // החשבונות עדיין לא נטענו, פשוט הגדר את הערך
+      accountFilterSelect.value = savedAccountFilter;
+    }
   }
 
   // פילטר טווח תאריכים
@@ -571,9 +608,17 @@ function updateAccountFilter(accounts) {
     console.warn('⚠️ אין חשבונות להוספה');
   }
 
-  // החזר את הבחירה הקודמת אם היא עדיין קיימת
+  // החזר את הבחירה הקודמת אם היא עדיין קיימת, אחרת חזור ל"הכול"
   if (currentValue && Array.from(accountFilterSelect.options).some(opt => opt.value === currentValue)) {
     accountFilterSelect.value = currentValue;
+  } else {
+    // אם החשבון השמור לא קיים יותר, חזור ל"הכול" ועדכן את ההעדפה
+    accountFilterSelect.value = 'all';
+    if (currentValue && currentValue !== 'all') {
+      console.warn(`⚠️ החשבון ${currentValue} לא קיים יותר, מעבר ל"הכול"`);
+      updatePreference('defaultAccountFilter', 'all');
+      showPreferencesWarning('פילטר חשבון', `החשבון שהוגדר כברירת מחדל לא קיים יותר, הוחזר ל"הכול"`);
+    }
   }
 }
 
@@ -676,6 +721,9 @@ async function initializePreferences() {
 
     // טען חשבונות
     await loadAccountsToFilter();
+
+    // עדכן את הממשק שוב אחרי טעינת החשבונות
+    updateUI();
 
     // טען הגדרות קונסול לממשק
     loadConsoleSettingsToUI();

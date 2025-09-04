@@ -375,14 +375,19 @@
             </div>
             <div class="preference-control">
               <select id="defaultDateRangeFilter" class="form-select" onchange="updatePreference('defaultDateRangeFilter', this.value)">
+                <option value="today">היום</option>
+                <option value="yesterday">אתמול</option>
                 <option value="this_week">השבוע</option>
-                <option value="week">שבוע</option>
+                <option value="last_week">שבוע אחרון</option>
+                <option value="last_month">חודש אחרון</option>
+                <option value="3_months">3 חודשים</option>
                 <option value="mtd">MTD</option>
                 <option value="30_days">30 יום</option>
                 <option value="60_days">60 יום</option>
                 <option value="90_days">90 יום</option>
-                <option value="year">שנה</option>
                 <option value="ytd">YTD</option>
+                <option value="year">שנה</option>
+                <option value="last_year">שנה קודמת</option>
                 <option value="all">כל זמן</option>
               </select>
             </div>
@@ -911,6 +916,7 @@
   <script src="scripts/page-utils.js"></script>
   <script src="scripts/account-service.js"></script>
   <script src="scripts/color-scheme-system.js"></script>
+  <script src="scripts/filter-system.js"></script>
 
   <script src="scripts/tables.js"></script>
   <script src="scripts/main.js"></script>

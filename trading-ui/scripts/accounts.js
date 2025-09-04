@@ -220,6 +220,7 @@ async function loadAllAccountsFromServer() {
 
       // שמירת החשבונות הפתוחים במשתנה גלובלי
       window.allAccountsData = openAccounts;
+      window.accountsData = openAccounts; // גם עבור הפילטר
 
       // עדכון הפילטר עם החשבונות הפתוחים (אם הפונקציה קיימת)
       if (typeof window.updateAccountFilterMenu === 'function') {

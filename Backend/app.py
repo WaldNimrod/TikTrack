@@ -104,6 +104,7 @@ from routes.api.executions import executions_bp
 from routes.api.preferences import preferences_bp
 from routes.api.users import users_bp
 from routes.api.background_tasks import background_tasks_bp
+from routes.api.entity_details import entity_details_bp
 
 from routes.api.constraints import constraints_bp
 from routes.api.currencies import currencies_bp
@@ -191,6 +192,7 @@ app.register_blueprint(executions_bp)
 app.register_blueprint(preferences_bp)
 app.register_blueprint(users_bp)
 app.register_blueprint(background_tasks_bp)
+app.register_blueprint(entity_details_bp)
 
 
 app.register_blueprint(constraints_bp)

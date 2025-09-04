@@ -15,7 +15,13 @@
     <link rel="stylesheet" href="styles/typography.css">
     <link rel="stylesheet" href="styles/table.css">
     <link rel="stylesheet" href="styles/notification-system.css">
+    
+    <!-- 7. Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- 8. Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .monitor-dashboard {
@@ -321,20 +327,49 @@
     </style>
 </head>
 
-<body>
-    <div class="page-body">
-        <!-- unified-header auto-generated -->
+<body class="linter-realtime-monitor-page">
+    <div class="background-wrapper">
+        <!-- unified-header יווצר כאן אוטומטית -->
         <div id="unified-header"></div>
         
-        <div class="monitor-dashboard">
-            <div class="dashboard-header">
-                <h1 class="dashboard-title">📊 ניטור Linter בזמן אמת</h1>
-                <div class="auto-refresh">
-                    <span>עדכון אוטומטי:</span>
-                    <div class="refresh-toggle active" onclick="toggleAutoRefresh()"></div>
-                    <span id="refreshStatus">פעיל</span>
+        <!-- Page body - All content after header -->
+        <div class="page-body">
+            <!-- Page area - top-Section -->
+            <div class="top-section">
+                <!-- Main header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/linter-monitor.svg" alt="ניטור Linter"
+                            style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                        ניטור Linter בזמן אמת
+                    </div>
+                    <div class="table-actions">
+                        <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                            <i class="fas fa-copy"></i> העתק לוג מפורט
+                        </button>
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור Linter">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
                 </div>
-            </div>
+
+                <!-- Alert cards -->
+                <div class="section-body">
+                    <active-alerts></active-alerts>
+
+                    <!-- Page summary -->
+                    <div class="info-summary" id="summaryStats">
+                        <div>קבצים: <strong id="totalFilesStats">0</strong></div>
+                        <div>שגיאות: <strong id="totalErrorsStats">0</strong></div>
+                        <div>אזהרות: <strong id="totalWarningsStats">0</strong></div>
+                        <div>סטטוס: <strong id="overallStatus">בדיקה...</strong></div>
+                    </div>
+                </div>
+            </div> <!-- End top-section -->
+
+            <!-- Main content -->
+            <div class="main-content" data-section="linter-monitor">
+                <div class="monitor-dashboard">
 
             <!-- Status Indicator -->
             <div class="text-center mb-4">
@@ -414,8 +449,10 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+                </div>
+            </div> <!-- End main-content -->
+        </div> <!-- End page-body -->
+    </div> <!-- End background-wrapper -->
 
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -678,6 +715,58 @@
                 autoRefreshInterval = null;
             }
         }
+
+        // פונקציית העתקת לוג מפורט
+        function copyDetailedLog() {
+          try {
+            let detailedLog = `=== ניטור Linter בזמן אמת - לוג מפורט ===\n`;
+            detailedLog += `תאריך ושעה: ${new Date().toLocaleString('he-IL')}\n\n`;
+            
+            // Statistics
+            const totalFiles = document.getElementById('totalFiles')?.textContent || '0';
+            const totalErrors = document.getElementById('totalErrors')?.textContent || '0';
+            const totalWarnings = document.getElementById('totalWarnings')?.textContent || '0';
+            const codeQuality = document.getElementById('codeQuality')?.textContent || '0%';
+            
+            detailedLog += `=== סטטיסטיקות ===\n`;
+            detailedLog += `סה"כ קבצים: ${totalFiles}\n`;
+            detailedLog += `שגיאות: ${totalErrors}\n`;
+            detailedLog += `אזהרות: ${totalWarnings}\n`;
+            detailedLog += `איכות קוד: ${codeQuality}\n\n`;
+
+            // Monitor status
+            const monitorStatus = document.getElementById('monitorStatus')?.textContent || 'לא ידוע';
+            const refreshStatus = document.getElementById('refreshStatus')?.textContent || 'לא ידוע';
+            
+            detailedLog += `=== מצב הניטור ===\n`;
+            detailedLog += `סטטוס ניטור: ${monitorStatus}\n`;
+            detailedLog += `עדכון אוטומטי: ${refreshStatus}\n\n`;
+
+            detailedLog += `=== סיום לוג ===`;
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(detailedLog).then(() => {
+              if (window.showSuccessNotification) {
+                window.showSuccessNotification('העתקת לוג', 'לוג מפורט הועתק ללוח בהצלחה');
+              }
+            }).catch(err => {
+              console.error('שגיאה בהעתקת לוג:', err);
+            });
+          } catch (error) {
+            console.error('שגיאה ביצירת לוג מפורט:', error);
+          }
+        }
+
+        // Global functions for button onclick handlers
+        window.toggleTopSection = function() {
+          if (typeof window.toggleTopSectionGlobal === 'function') {
+            window.toggleTopSectionGlobal();
+          } else {
+            console.warn('פונקציית toggleTopSectionGlobal לא נמצאה ב-main.js');
+          }
+        };
+        
+        window.copyDetailedLog = copyDetailedLog;
 
         // ניקוי בעת סגירת הדף
         window.addEventListener('beforeunload', () => {

@@ -815,6 +815,64 @@ class CacheTestSystem {
   }
 }
 
+// Global utility functions
+function copyDetailedLog() {
+  try {
+    let detailedLog = `=== מוניטורינג Cache מתקדם - לוג מפורט ===\n`;
+    detailedLog += `תאריך ושעה: ${new Date().toLocaleString('he-IL')}\n\n`;
+    
+    // System status
+    const systemStatus = document.getElementById('system-status')?.textContent || 'לא ידוע';
+    const performanceStats = document.getElementById('performance-stats')?.textContent || 'לא ידוע';
+    const memoryUsage = document.getElementById('memory-usage')?.textContent || 'לא ידוע';
+    const hitRate = document.getElementById('hit-rate')?.textContent || 'לא ידוע';
+    
+    detailedLog += `=== מצב מערכת Cache ===\n`;
+    detailedLog += `מצב מערכת: ${systemStatus}\n`;
+    detailedLog += `ביצועים: ${performanceStats}\n`;
+    detailedLog += `זיכרון: ${memoryUsage}\n`;
+    detailedLog += `Hit Rate: ${hitRate}\n\n`;
+
+    // Test results
+    const testOutput = document.getElementById('test-output')?.textContent || 'אין תוצאות';
+    detailedLog += `=== תוצאות בדיקות ===\n`;
+    detailedLog += `${testOutput}\n\n`;
+
+    // Logs content
+    const logsContent = document.getElementById('logs-content')?.textContent || 'אין לוגים';
+    detailedLog += `=== לוגים ===\n`;
+    detailedLog += `${logsContent}\n\n`;
+
+    detailedLog += `=== סיום לוג ===`;
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(detailedLog).then(() => {
+      if (window.notifications && window.notifications.success) {
+        window.notifications.success('לוג מפורט הועתק ללוח בהצלחה');
+      }
+    }).catch(err => {
+      console.error('שגיאה בהעתקת לוג:', err);
+      if (window.notifications && window.notifications.error) {
+        window.notifications.error('שגיאה בהעתקת לוג מפורט');
+      }
+    });
+  } catch (error) {
+    console.error('שגיאה ביצירת לוג מפורט:', error);
+    if (window.notifications && window.notifications.error) {
+      window.notifications.error('שגיאה ביצירת לוג מפורט');
+    }
+  }
+}
+
+// Global functions for button onclick handlers
+window.toggleTopSection = function() {
+  if (typeof window.toggleTopSectionGlobal === 'function') {
+    window.toggleTopSectionGlobal();
+  } else {
+    console.warn('פונקציית toggleTopSectionGlobal לא נמצאה ב-main.js');
+  }
+};
+
 // Initialize the cache test system when the page loads
 document.addEventListener('DOMContentLoaded', () => {
   window.cacheTestSystem = new CacheTestSystem();
@@ -822,3 +880,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Export for global access
 window.CacheTestSystem = CacheTestSystem;
+window.copyDetailedLog = copyDetailedLog;

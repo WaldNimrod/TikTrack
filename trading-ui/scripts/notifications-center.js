@@ -702,7 +702,7 @@ class NotificationsCenter {
 }
 
 // פונקציה להעתקת לוג מפורט עם כל הנתונים והסטטוס
-function copyDetailedLogToClipboard() {
+function copyDetailedLog() {
   try {
     console.log('📋 יצירת לוג מפורט...');
     

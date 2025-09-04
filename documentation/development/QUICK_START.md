@@ -51,7 +51,28 @@ cd trading-ui
 # No Node.js setup required
 ```
 
-### **4. Initialize Database**
+### **4. Set Up Code Quality Tools ✅ NEW!**
+```bash
+# Install linter dependencies
+npm install
+
+# Run initial code quality check
+npm run lint
+
+# Auto-fix issues (recommended for new contributors)
+npm run lint:fix
+
+# Generate detailed quality report
+npm run quality:report
+
+# Open interactive linter dashboard
+open create_linter_dashboard.html
+
+# Start real-time code monitoring (optional)
+npm run watch:linter
+```
+
+### **5. Initialize Database**
 ```bash
 # Navigate back to root
 cd ..

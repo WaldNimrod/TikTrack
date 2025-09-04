@@ -1870,8 +1870,8 @@ async function refreshYahooFinanceData() {
       updateTickersTable(window.tickersData);
     }
 
-  } catch (error) {
-    // // console.error('Error refreshing external data:', error); // Disabled for linting
+  } catch {
+    // Error refreshing external data
   }
 }
 
@@ -1904,7 +1904,7 @@ async function refreshYahooFinanceDataSilently() {
       updateTickersTable(window.tickersData);
     }
 
-  } catch (error) {
-    // // console.warn('Silent external data refresh failed:', error.message); // Disabled for linting
+  } catch {
+    // Silent external data refresh failed
   }
 }

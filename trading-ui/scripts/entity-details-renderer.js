@@ -60,7 +60,7 @@ class EntityDetailsRenderer {
       // הוספה לאובייקט הגלובלי
       window.entityDetailsRenderer = this;
 
-      console.info('EntityDetailsRenderer initialized successfully');
+      // EntityDetailsRenderer initialized successfully
 
     } catch (error) {
       // // console.error('Error initializing EntityDetailsRenderer:', error); // Disabled for linting
@@ -225,7 +225,7 @@ class EntityDetailsRenderer {
      * @returns {string} - מחלקת אייקון FontAwesome
      * @private
      */
-  getEntityIcon(entityType) {
+  static getEntityIcon(entityType) {
     const iconMappings = {
       ticker: 'fa-chart-line',
       trade: 'fa-exchange-alt',
@@ -488,7 +488,7 @@ class EntityDetailsRenderer {
   }
 
   // Helper methods
-  getBasicFields(entityType) {
+  static getBasicFields(entityType) {
     const fieldMappings = {
       ticker: [
         { key: 'symbol', label: 'סימול', type: 'text' },
@@ -529,11 +529,11 @@ class EntityDetailsRenderer {
     }
   }
 
-  renderError(message) {
+  static renderError(message) {
     return `<div class="alert alert-danger">${message}</div>`;
   }
 
-  getEntityDisplayName(entityType) {
+  static getEntityDisplayName(entityType) {
     const names = {
       ticker: 'טיקר', trade: 'טרייד', trade_plan: 'תכנית',
       execution: 'ביצוע', account: 'חשבון', alert: 'התראה',
@@ -561,7 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // אתחול מערכת הרנדור
     new EntityDetailsRenderer();
 
-    console.info('Entity Details Renderer system loaded and ready');
+    // Entity Details Renderer system loaded and ready
 
   } catch (error) {
     // // console.error('Error auto-initializing EntityDetailsRenderer:', error); // Disabled for linting

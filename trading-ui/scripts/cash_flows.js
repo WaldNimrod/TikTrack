@@ -597,7 +597,7 @@ async function loadCurrenciesFromServer() {
 /**
  * טעינת רשימת חשבונות למודל הוספה
  */
-async function loadAccountsForCashFlow() {
+async function _loadAccountsForCashFlow() { // Not used
   try {
     const response = await fetch('http://localhost:8080/api/v1/accounts/');
     if (response.ok) {
@@ -666,7 +666,7 @@ async function loadAccountsForEditCashFlow() {
 /**
  * טעינת רשימת מטבעות למודל הוספה
  */
-async function loadCurrenciesForCashFlow() {
+async function _loadCurrenciesForCashFlow() { // Not used
   try {
     // טעינת מטבעות מהשרת עם המערכת החדשה
     const currencies = await loadCurrenciesFromServer();
@@ -1287,44 +1287,10 @@ function initializeExternalIdFields() {
   }
 }
 
-// עדכון פונקציית showAddCashFlowModal
-async function _showAddCashFlowModal() {
-  // איפוס הטופס
-  document.getElementById('addCashFlowForm').reset();
-
-  // ניקוי וולידציה
-  if (window.clearValidation) {
-    window.clearValidation('addCashFlowForm');
-  }
-
-  // הגדרת תאריך ברירת מחדל להיום
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('cashFlowDate').value = today;
-
-  try {
-    // טעינת רשימת החשבונות והמטבעות
-    await loadAccountsForCashFlow();
-    await loadCurrenciesForCashFlow();
-    // אתחול שדה מזהה חיצוני
-    initializeExternalIdFields();
-
-    // הוספת event listeners לוולידציה מיידית
-    setupValidationListeners();
-
-    // הוספת event listeners לשדות מקור
-    setupSourceFieldListeners();
-
-    // הצגת המודל
-    const modal = new bootstrap.Modal(document.getElementById('addCashFlowModal'));
-    modal.show();
-  } catch (error) {
-    handleDataLoadError(error, 'טעינת נתונים להוספה');
-    window.showErrorNotification('שגיאה', 'שגיאה בטעינת נתונים להוספה');
-  }
-}
+// Legacy functions removed - not used
 
 // עדכון פונקציית showEditCashFlowModal
-async function _showEditCashFlowModal(id) {
+async function showEditCashFlowModalDisabled(id) { // Not used
   const cashFlow = cashFlowsData.find(cf => cf.id === id);
   if (!cashFlow) {
     handleElementNotFound('showEditCashFlowModal', `תזרים מזומנים לא נמצא: ${id}`);

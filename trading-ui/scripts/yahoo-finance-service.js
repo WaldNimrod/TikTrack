@@ -195,7 +195,7 @@ class YahooFinanceService {
    * @param {string} currency - המטבע (ברירת מחדל: USD)
    * @returns {string} מחיר מעוצב
    */
-  formatPrice(price, currency = 'USD') {
+  static formatPrice(price, currency = 'USD') {
     if (price === null || price === undefined || isNaN(price)) {
       return 'אין נתונים';
     }
@@ -209,7 +209,7 @@ class YahooFinanceService {
    * @param {number} changePercent - אחוז השינוי
    * @returns {string} שינוי מעוצב
    */
-  formatChange(changePercent) {
+  static formatChange(changePercent) {
     if (changePercent === null || changePercent === undefined || isNaN(changePercent)) {
       return 'אין נתונים';
     }
@@ -224,7 +224,7 @@ class YahooFinanceService {
    * @param {number} changePercent - אחוז השינוי
    * @returns {string} CSS class
    */
-  getChangeClass(changePercent) {
+  static getChangeClass(changePercent) {
     if (changePercent === null || changePercent === undefined || isNaN(changePercent)) {
       return '';
     }
@@ -238,7 +238,7 @@ class YahooFinanceService {
    * @param {number} volume - נפח המסחר
    * @returns {string} נפח מעוצב
    */
-  formatVolume(volume) {
+  static formatVolume(volume) {
     if (volume === null || volume === undefined || isNaN(volume)) {
       return 'אין נתונים';
     }
@@ -341,7 +341,7 @@ class YahooFinanceService {
   /**
    * הצגת הודעה (עם fallback)
    */
-  _showNotification(message, type = 'info') {
+  static _showNotification(message, type = 'info') {
     if (typeof window.showNotification === 'function') {
       window.showNotification(message, type);
     } else {

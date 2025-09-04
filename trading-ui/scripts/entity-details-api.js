@@ -68,7 +68,7 @@ class EntityDetailsAPI {
       // הוספה לאובייקט הגלובלי
       window.entityDetailsAPI = this;
 
-      console.info('EntityDetailsAPI initialized successfully');
+      // EntityDetailsAPI initialized successfully
 
     } catch (error) {
       // // console.error('Error initializing EntityDetailsAPI:', error); // Disabled for linting
@@ -100,7 +100,7 @@ class EntityDetailsAPI {
         }
       }
 
-      console.info(`Fetching entity details for ${entityType} ${entityId}`);
+      // Fetching entity details
 
       // קריאה לשרת עם retry logic
       const entityData = await this.fetchWithRetry(entityType, entityId, options);
@@ -265,7 +265,7 @@ class EntityDetailsAPI {
      * @returns {Object} - נתונים מעוצבים
      * @private
      */
-  normalizeEntityData(entityType, rawData) {
+  static normalizeEntityData(entityType, rawData) {
     // אם הנתונים עטופים בsucess/data, חלץ אותם
     const data = rawData.data || rawData;
 
@@ -358,7 +358,7 @@ class EntityDetailsAPI {
   clearCache() {
     const cacheSize = this.cache.size;
     this.cache.clear();
-    console.info(`Cleared ${cacheSize} cache entries`);
+    // Cache cleared successfully
   }
 
   /**
@@ -393,7 +393,7 @@ class EntityDetailsAPI {
       // קבלת נתונים חדשים
       const entityData = await this.getEntityDetails(entityType, entityId, { forceRefresh: true });
 
-      console.info(`Refreshed data for ${entityType} ${entityId}`);
+      // Data refreshed successfully
 
       // התראת הצלחה
       if (window.showSuccessNotification) {
@@ -494,7 +494,7 @@ class EntityDetailsAPI {
         const externalData = await window.externalDataService.getQuote(entityData.symbol);
 
         if (externalData && externalData.success && externalData.data) {
-          console.info(`External data loaded for ${entityData.symbol}`);
+          // External data loaded successfully
 
           // עיצוב הנתונים לתצוגה במערכת פרטי הישויות
           const formattedData = {
@@ -535,7 +535,7 @@ class EntityDetailsAPI {
      * @returns {string} - Market status
      * @private
      */
-  _determineMarketStatus(externalData) {
+  static _determineMarketStatus(externalData) {
     try {
       // בדיקה אם השוק פתוח בהתבסס על הנתונים
       const now = new Date();
@@ -670,7 +670,7 @@ class EntityDetailsAPI {
      * @returns {Promise<boolean>} - Promise עם תוצאת האישור
      * @private
      */
-  async confirmDeletion(entityType, entityId) {
+  confirmDeletion(entityType, entityId) {
     return new Promise(resolve => {
       // שימוש במערכת ההתראות הגלובלית
       if (window.showConfirmNotification) {
@@ -694,7 +694,7 @@ class EntityDetailsAPI {
      * @returns {Promise} - Promise שמסתיים לאחר ההמתנה
      * @private
      */
-  delay(ms) {
+  static delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
@@ -773,7 +773,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // אתחול מערכת API
     new EntityDetailsAPI();
 
-    console.info('Entity Details API system loaded and ready');
+    // Entity Details API system loaded and ready
 
   } catch (error) {
     // // console.error('Error auto-initializing EntityDetailsAPI:', error); // Disabled for linting

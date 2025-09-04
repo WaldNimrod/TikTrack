@@ -1131,7 +1131,7 @@ class ServerMonitor {
   }
 
   // יצירת לוג מפורט
-  static async generateDetailedLog() {
+  static generateDetailedLog() {
     const timestamp = new Date().toLocaleString('he-IL');
     let log = '=== TikTrack Server Monitor - לוג מפורט ===\n';
     log += `זמן יצירה: ${timestamp}\n`;
@@ -1179,10 +1179,10 @@ class ServerMonitor {
       if (logEntries.length > 0) {
         logEntries.forEach((entry, index) => {
           if (index < 10) { // רק 10 לוגים אחרונים
-            const timestamp = entry.querySelector('.log-timestamp')?.textContent || '';
+            const logTimestamp = entry.querySelector('.log-timestamp')?.textContent || '';
             const level = entry.querySelector('.log-level')?.textContent || '';
             const message = entry.querySelector('.log-message')?.textContent || '';
-            log += `[${timestamp}] ${level}: ${message}\n`;
+            log += `[${logTimestamp}] ${level}: ${message}\n`;
           }
         });
       } else {
@@ -1200,8 +1200,8 @@ class ServerMonitor {
           if (index < 5) { // רק 5 היסטוריות אחרונות
             const mode = entry.querySelector('.mode-name')?.textContent || '';
             const status = entry.querySelector('.mode-history-status')?.textContent || '';
-            const timestamp = entry.querySelector('.mode-timestamp')?.textContent || '';
-            log += `[${timestamp}] ${mode}: ${status}\n`;
+            const entryTimestamp = entry.querySelector('.mode-timestamp')?.textContent || '';
+            log += `[${entryTimestamp}] ${mode}: ${status}\n`;
           }
         });
       } else {

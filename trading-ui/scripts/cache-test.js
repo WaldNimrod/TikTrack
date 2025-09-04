@@ -401,7 +401,7 @@ class CacheTestSystem {
   /**
      * Test setting cache entry
      */
-  async testSetCache() {
+  testSetCache() {
     const key = document.getElementById('test-key').value;
     const value = document.getElementById('test-value').value;
     const ttl = document.getElementById('test-ttl').value;
@@ -437,7 +437,7 @@ class CacheTestSystem {
   /**
      * Test getting cache entry
      */
-  async testGetCache() {
+  testGetCache() {
     const key = document.getElementById('test-key').value;
 
     if (!key) {
@@ -470,7 +470,7 @@ class CacheTestSystem {
   /**
      * Test deleting cache entry
      */
-  async testDeleteCache() {
+  testDeleteCache() {
     const key = document.getElementById('test-key').value;
 
     if (!key) {

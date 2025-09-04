@@ -250,4 +250,11 @@ module.exports = [
       'no-console': 'off', // Allow console in tests
     },
   },
+  {
+    // Rules for console-cleanup.js - needs to use console methods
+    files: ['**/console-cleanup.js'],
+    rules: {
+      'no-console': 'off', // Allow console in console management
+    },
+  },
 ];

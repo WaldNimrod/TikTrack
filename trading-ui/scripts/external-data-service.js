@@ -494,7 +494,7 @@ class ExternalDataService {
       const ageMinutes = (now - dataTime) / (1000 * 60);
 
       return ageMinutes > maxAgeMinutes;
-    } catch (error) {
+    } catch {
       return true;
     }
   }

@@ -459,7 +459,7 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
     const bootstrapModal = new bootstrap.Modal(modal);
     bootstrapModal.show();
     // המודל הוצג בהצלחה
-  } catch (error) {
+  } catch {
     // fallback ל-confirm רגיל
     if (typeof window.showConfirmationDialog === 'function') {
       window.showConfirmationDialog(
@@ -519,7 +519,7 @@ function showDeleteWarning(itemType, itemName, itemTypeDisplay, onConfirm = null
  * @param {string} type - Notification type
  * @param {number} duration - Display duration
  */
-function showNotificationLegacy(message, type = 'info', duration = 4000) {
+function _showNotificationLegacy(message, type = 'info', duration = 4000) { // Not used
   // If message contains ":" then it's title + message
   if (message.includes(':')) {
     const parts = message.split(':');

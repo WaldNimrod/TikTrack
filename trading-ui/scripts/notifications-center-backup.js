@@ -392,7 +392,7 @@ class NotificationsCenter {
         `;
   }
 
-  getIconClass(type) {
+  static getIconClass(type) {
     switch (type) {
     case 'success':
       return 'fas fa-check-circle';
@@ -407,7 +407,7 @@ class NotificationsCenter {
     }
   }
 
-  getTimeAgo(date) {
+  static getTimeAgo(date) {
     const now = new Date();
     const diff = Math.floor((now - date) / 1000);
 
@@ -419,7 +419,7 @@ class NotificationsCenter {
     return date.toLocaleDateString('he-IL');
   }
 
-  getPeriodInMs(period) {
+  static getPeriodInMs(period) {
     switch (period) {
     case '1h': return 3600000;
     case '24h': return 86400000;
@@ -429,7 +429,7 @@ class NotificationsCenter {
     }
   }
 
-  formatDuration(seconds) {
+  static formatDuration(seconds) {
     if (seconds < 60) {return `${seconds} שניות`;}
     if (seconds < 3600) {return `${Math.floor(seconds / 60)} דקות`;}
     if (seconds < 86400) {return `${Math.floor(seconds / 3600)} שעות`;}
@@ -623,7 +623,7 @@ class NotificationsCenter {
     }
   }
 
-  getCurrentConnectionStatus() {
+  static getCurrentConnectionStatus() {
     try {
       const statusDot = document.getElementById('connectionStatus');
       if (!statusDot) {

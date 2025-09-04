@@ -687,7 +687,7 @@ function showSecondConfirmationModal(message, onConfirm) {
  * @param {string} operationName - שם הפעולה לצורך לוגים
  * @param {number} delay - עיכוב במילישניות לפני הרענון (ברירת מחדל: 100)
  */
-async function enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction, operationName = 'פעולה', delay = 100) {
+async function enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction, _operationName = 'פעולה', delay = 100) {
   try {
     // עיכוב קטן לוודא שהשרת עדכן את הנתונים
     if (delay > 0) {
@@ -709,8 +709,8 @@ async function enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction
     // // console.log(`✅ רענון הטבלה הושלם אחרי ${operationName}`); // Disabled for linting
 
     return true;
-  } catch (error) {
-    // // console.error(`❌ שגיאה ברענון טבלה אחרי ${operationName}:`, error); // Disabled for linting
+  } catch {
+    // Error in table refresh
     return false;
   }
 }

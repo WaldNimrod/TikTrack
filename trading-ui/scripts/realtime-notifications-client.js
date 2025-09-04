@@ -235,7 +235,7 @@ class RealtimeNotificationsClient {
     });
   }
 
-  isSystemEvent(eventName) {
+  static isSystemEvent(eventName) {
     const systemEvents = [
       'connect', 'disconnect', 'connect_error', 'reconnect', 'reconnect_failed',
       'background_task_started', 'background_task_completed', 'background_task_failed',
@@ -395,7 +395,7 @@ class RealtimeNotificationsClient {
 
   // ===== NOTIFICATION INTEGRATION =====
 
-  showInfoNotification(title, message, duration = 4000) {
+  static showInfoNotification(title, message, duration = 4000) {
     if (typeof window.showInfoNotification === 'function') {
       window.showInfoNotification(title, message, duration);
     } else if (typeof window.showNotification === 'function') {
@@ -405,7 +405,7 @@ class RealtimeNotificationsClient {
     }
   }
 
-  showSuccessNotification(title, message, duration = 5000) {
+  static showSuccessNotification(title, message, duration = 5000) {
     if (typeof window.showSuccessNotification === 'function') {
       window.showSuccessNotification(title, message, duration);
     } else if (typeof window.showNotification === 'function') {
@@ -415,7 +415,7 @@ class RealtimeNotificationsClient {
     }
   }
 
-  showErrorNotification(title, message, duration = 6000) {
+  static showErrorNotification(title, message, duration = 6000) {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification(title, message, duration);
     } else if (typeof window.showNotification === 'function') {
@@ -425,7 +425,7 @@ class RealtimeNotificationsClient {
     }
   }
 
-  showWarningNotification(title, message, duration = 5000) {
+  static showWarningNotification(title, message, duration = 5000) {
     if (typeof window.showWarningNotification === 'function') {
       window.showWarningNotification(title, message, duration);
     } else if (typeof window.showNotification === 'function') {
@@ -459,7 +459,7 @@ class RealtimeNotificationsClient {
 
   // ===== CUSTOM EVENTS =====
 
-  emitCustomEvent(eventName, data) {
+  static emitCustomEvent(eventName, data) {
     // Create and dispatch custom event
     const customEvent = new CustomEvent('tiktrack_realtime_event', {
       detail: {

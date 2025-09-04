@@ -68,7 +68,7 @@ class EntityDetailsModal {
       // הוספה לאובייקט הגלובלי
       window.entityDetailsModal = this;
 
-      console.info('EntityDetailsModal initialized successfully');
+      // EntityDetailsModal initialized successfully
 
     } catch (error) {
       // // console.error('Error initializing EntityDetailsModal:', error); // Disabled for linting
@@ -646,7 +646,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // אתחול המחלקה הראשית
     new EntityDetailsModal();
 
-    console.info('Entity Details Modal system loaded and ready');
+    // Entity Details Modal system loaded and ready
 
   } catch (error) {
     // // console.error('Error auto-initializing EntityDetailsModal:', error); // Disabled for linting

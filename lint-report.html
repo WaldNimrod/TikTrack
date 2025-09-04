@@ -1,0 +1,3760 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>ESLint Report</title>
+        <link rel="icon" type="image/png" sizes="any" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAHaAAAB2gGFomX7AAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAABD1JREFUWMPFl11sk2UUx3/nbYtjxS1MF7MLMTECMgSTtSSyrQkLhAj7UBPnDSEGoxegGzMwojhXVpmTAA5iYpSoMQa8GBhFOrMFk03buei6yRAlcmOM0SEmU9d90b19jxcM1o5+sGnsc/e+z/l6ztf/HFFVMnns6QieeOCHBePGsHM+wrOtvLG2C4WRVDSSygNV7sCjlspxwDnPB44aols/DXk+mbMBmx/6OseITF1CuOtfevkPh2Uu+/jbdX8lujSScRlT5r7/QDlAfsRmfzmpnkQ/H3H13gf6bBrBn1uqK8WylgEnU8eZmk1repbfchJG1TyKyIKEwuBHFd3lD3naY3O1siiwXsVoBV2VgM1ht/QQUJk2ByqKghsQziYQ8ifKgexIXmuyzC4r67Y7R+xPAfuB/Nn3Cpva+0s7khpQVtZtd4bt51BWxtBYAiciprG7c7D4SixzU9PYalDL6110Ifb/w8W9eY7JqFeFHbO8fPGyLHwwFHJNJTSgwtVTB9oaw9BlQ+tO93vOxypoaQnfEYlI43SeCHDC4TDq9+51/h5fxr33q0ZfV9g04wat9Q943rjJgCp3952W2i8Bi6eDvdsfKj0cK/DYMRyXL4/sUJUmIHd2zYMezsvLaamp4WpcWN3BXSiHpuMwbGbZlnZ8tXY4rgosy+G7oRwQ0cAsd28YGgqfU5UjCZQDLALxDg+Hv/P5Rqvj4hwrS8izXzWb4spwc1GgENFnkpWRzxeuB+ssUHgLdb9UVdt8vpGdKQpze7n7y1U3DBChNRUuqOo9c+0+qpKKxyZqtAIYla7gY4JszAAQri93BSsMRZoyBcUC+w3Q3AyOA4sNhAOZ0q7Iq0b2vUNvK5zPgP+/H8+Zetdoa6uOikhdGurxebwvJY8Iz3V1rTMNAH+opEuQj5KTT/qA1yC+wyUjBm12OidaUtCcPNNX2h0Hx2JG69VulANZAJZJwfU7rzd/FHixuXniTdM0m4GtSQT7bTartqEh9yfImUEzkwKZmTwmo5a5JwkYBfcDL01/RkR5y8iWhtPBknB8ZxwtU9UjwOrrKCeizzc25nTGg1F/turEHoU9wMLpDvWKf8DTmNCAKnd/tqUTF4ElMXJ+A5rWDJS+41WsGWzALhJ+ErBWrLj9g+pqojHxlXJX8HGUg0BsR/x1yhxf3jm4cSzpQFLp6tmi6PEE7g1ZhtZ91ufpSZUAFa6gC+UoQslNaSmypT1U8mHKiUgEKS8KfgF4EpYunFI16tsHin+OG0LcgQK7yj7g6cSzpva2D3hKVNG0Y3mVO1BkqfSlmJrHBQ4uvM12gJHc6ETW8HZVfMRmXvyxxNC1Z/o839zyXlDuCr4nsC11J+MXueaVJWn6yPv+/pJtc9oLTNN4AeTvNGByd3rlhE2x9s5pLwDoHCy+grDzWmOZ95lUtLYj5Bma126Y8eX0/zj/ADxGyViSg4BXAAAAAElFTkSuQmCC">
+        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PScwIDAgMjk0LjgyNSAyNTguOTgyJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPg0KPHBhdGggZmlsbD0nIzgwODBGMicgZD0nTTk3LjAyMSw5OS4wMTZsNDguNDMyLTI3Ljk2MmMxLjIxMi0wLjcsMi43MDYtMC43LDMuOTE4LDBsNDguNDMzLDI3Ljk2MiBjMS4yMTEsMC43LDEuOTU5LDEuOTkzLDEuOTU5LDMuMzkzdjU1LjkyNGMwLDEuMzk5LTAuNzQ4LDIuNjkzLTEuOTU5LDMuMzk0bC00OC40MzMsMjcuOTYyYy0xLjIxMiwwLjctMi43MDYsMC43LTMuOTE4LDAgbC00OC40MzItMjcuOTYyYy0xLjIxMi0wLjctMS45NTktMS45OTQtMS45NTktMy4zOTR2LTU1LjkyNEM5NS4wNjMsMTAxLjAwOSw5NS44MSw5OS43MTYsOTcuMDIxLDk5LjAxNicvPg0KPHBhdGggZmlsbD0nIzRCMzJDMycgZD0nTTI3My4zMzYsMTI0LjQ4OEwyMTUuNDY5LDIzLjgxNmMtMi4xMDItMy42NC01Ljk4NS02LjMyNS0xMC4xODgtNi4zMjVIODkuNTQ1IGMtNC4yMDQsMC04LjA4OCwyLjY4NS0xMC4xOSw2LjMyNWwtNTcuODY3LDEwMC40NWMtMi4xMDIsMy42NDEtMi4xMDIsOC4yMzYsMCwxMS44NzdsNTcuODY3LDk5Ljg0NyBjMi4xMDIsMy42NCw1Ljk4Niw1LjUwMSwxMC4xOSw1LjUwMWgxMTUuNzM1YzQuMjAzLDAsOC4wODctMS44MDUsMTAuMTg4LTUuNDQ2bDU3Ljg2Ny0xMDAuMDEgQzI3NS40MzksMTMyLjM5NiwyNzUuNDM5LDEyOC4xMjgsMjczLjMzNiwxMjQuNDg4IE0yMjUuNDE5LDE3Mi44OThjMCwxLjQ4LTAuODkxLDIuODQ5LTIuMTc0LDMuNTlsLTczLjcxLDQyLjUyNyBjLTEuMjgyLDAuNzQtMi44ODgsMC43NC00LjE3LDBsLTczLjc2Ny00Mi41MjdjLTEuMjgyLTAuNzQxLTIuMTc5LTIuMTA5LTIuMTc5LTMuNTlWODcuODQzYzAtMS40ODEsMC44ODQtMi44NDksMi4xNjctMy41OSBsNzMuNzA3LTQyLjUyN2MxLjI4Mi0wLjc0MSwyLjg4Ni0wLjc0MSw0LjE2OCwwbDczLjc3Miw0Mi41MjdjMS4yODMsMC43NDEsMi4xODYsMi4xMDksMi4xODYsMy41OVYxNzIuODk4eicvPg0KPC9zdmc+">
+        <style>
+            body {
+                font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+                font-size: 16px;
+                font-weight: normal;
+                margin: 0;
+                padding: 0;
+                color: #333;
+            }
+
+            #overview {
+                padding: 20px 30px;
+            }
+
+            td,
+            th {
+                padding: 5px 10px;
+            }
+
+            h1 {
+                margin: 0;
+            }
+
+            table {
+                margin: 30px;
+                width: calc(100% - 60px);
+                max-width: 1000px;
+                border-radius: 5px;
+                border: 1px solid #ddd;
+                border-spacing: 0;
+            }
+
+            th {
+                font-weight: 400;
+                font-size: medium;
+                text-align: left;
+                cursor: pointer;
+            }
+
+            td.clr-1,
+            td.clr-2,
+            th span {
+                font-weight: 700;
+            }
+
+            th span {
+                float: right;
+                margin-left: 20px;
+            }
+
+            th span::after {
+                content: "";
+                clear: both;
+                display: block;
+            }
+
+            tr:last-child td {
+                border-bottom: none;
+            }
+
+            tr td:first-child,
+            tr td:last-child {
+                color: #9da0a4;
+            }
+
+            #overview.bg-0,
+            tr.bg-0 th {
+                color: #468847;
+                background: #dff0d8;
+                border-bottom: 1px solid #d6e9c6;
+            }
+
+            #overview.bg-1,
+            tr.bg-1 th {
+                color: #f0ad4e;
+                background: #fcf8e3;
+                border-bottom: 1px solid #fbeed5;
+            }
+
+            #overview.bg-2,
+            tr.bg-2 th {
+                color: #b94a48;
+                background: #f2dede;
+                border-bottom: 1px solid #eed3d7;
+            }
+
+            td {
+                border-bottom: 1px solid #ddd;
+            }
+
+            td.clr-1 {
+                color: #f0ad4e;
+            }
+
+            td.clr-2 {
+                color: #b94a48;
+            }
+
+            td a {
+                color: #3a33d1;
+                text-decoration: none;
+            }
+
+            td a:hover {
+                color: #272296;
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="overview" class="bg-1">
+            <h1>ESLint Report</h1>
+            <div>
+                <span>364 problems (0 errors, 364 warnings)</span> - Generated on Thu Sep 04 2025 08:27:38 GMT+0000 (Coordinated Universal Time)
+            </div>
+        </div>
+        <table>
+            <tbody>
+                <tr class="bg-0" data-group="f-0">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/account-service.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-1" data-group="f-1">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/accounts.js
+        <span>1 problem (0 errors, 1 warning)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-1">
+    <td>1454:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 130. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr class="bg-1" data-group="f-2">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/active-alerts-component.js
+        <span>1 problem (0 errors, 1 warning)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-2">
+    <td>948:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 134. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr class="bg-0" data-group="f-3">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/alert-service.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-1" data-group="f-4">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/alerts.js
+        <span>8 problems (0 errors, 8 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-4">
+    <td>348:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 144. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-4">
+    <td>409:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 128. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-4">
+    <td>418:11</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;relatedIcon&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-4">
+    <td>766:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-4">
+    <td>848:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 127. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-4">
+    <td>1872:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;_deleteAlert&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-4">
+    <td>2016:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;_getRelatedClass&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-4">
+    <td>2225:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 122. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr class="bg-0" data-group="f-5">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/auth.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-1" data-group="f-6">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/background-tasks.js
+        <span>13 problems (0 errors, 13 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-6">
+    <td>26:7</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;_logSystem&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-6">
+    <td>639:13</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;result&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-6">
+    <td>664:13</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;result&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-6">
+    <td>691:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-6">
+    <td>707:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-6">
+    <td>746:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-6">
+    <td>786:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-6">
+    <td>803:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-6">
+    <td>818:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-6">
+    <td>865:38</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;executionId&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-6">
+    <td>885:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-6">
+    <td>1028:13</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;log&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-6">
+    <td>1066:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr class="bg-0" data-group="f-7">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/button-icons.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-1" data-group="f-8">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/cache-test.js
+        <span>1 problem (0 errors, 1 warning)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-8">
+    <td>671:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 143. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr class="bg-1" data-group="f-9">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/cash_flows.js
+        <span>3 problems (0 errors, 3 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-9">
+    <td>600:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;_loadAccountsForCashFlow&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-9">
+    <td>669:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;_loadCurrenciesForCashFlow&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-9">
+    <td>1293:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;showEditCashFlowModalDisabled&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr class="bg-1" data-group="f-10">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/color-scheme-system.js
+        <span>3 problems (0 errors, 3 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-10">
+    <td>1092:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-10">
+    <td>1124:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-10">
+    <td>1141:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr class="bg-1" data-group="f-11">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/console-cleanup.js
+        <span>3 problems (0 errors, 3 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-11">
+    <td>102:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 139. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-11">
+    <td>110:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 126. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-11">
+    <td>168:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 134. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr class="bg-1" data-group="f-12">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/constraint-manager.js
+        <span>1 problem (0 errors, 1 warning)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-12">
+    <td>87:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr class="bg-0" data-group="f-13">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/crud-utils.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-0" data-group="f-14">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/currencies.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-0" data-group="f-15">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/data-utils.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-0" data-group="f-16">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/date-utils.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-1" data-group="f-17">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/db-extradata.js
+        <span>28 problems (0 errors, 28 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-17">
+    <td>347:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>406:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 151. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>502:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 153. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>580:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 159. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>585:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 132. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>596:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 126. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>791:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 167. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>802:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 171. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>808:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 122. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>850:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 169. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>862:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 187. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>868:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 124. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>892:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 175. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>897:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 132. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>908:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 134. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>1069:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 161. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>1080:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 171. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>1084:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 190. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>1101:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 141. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>1150:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 163. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>1162:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 172. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>1166:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 157. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>1170:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 122. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>1190:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 121. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>1214:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 169. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>1219:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 132. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>1230:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 131. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-17">
+    <td>1713:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 133. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr class="bg-0" data-group="f-18">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/db_display.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-1" data-group="f-19">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/entity-details-api.js
+        <span>15 problems (0 errors, 15 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-19">
+    <td>73:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-19">
+    <td>134:46</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;options&#39; is assigned a value but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-19">
+    <td>139:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 132. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-19">
+    <td>148:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 126. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-19">
+    <td>172:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-19">
+    <td>173:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 134. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-19">
+    <td>359:11</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;cacheSize&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-19">
+    <td>445:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class async method &#39;getLinkedItems&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-19">
+    <td>468:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-19">
+    <td>525:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-19">
+    <td>561:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-19">
+    <td>673:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;confirmDeletion&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-19">
+    <td>742:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;getEntityDetails&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-19">
+    <td>758:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;refreshEntityData&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-19">
+    <td>778:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr class="bg-1" data-group="f-20">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/entity-details-modal.js
+        <span>20 problems (0 errors, 20 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-20">
+    <td>73:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>217:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>263:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;showLoadingState&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>268:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 136. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>309:18</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>332:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;showRenderedContent&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>345:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;showErrorState&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>350:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 134. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>374:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>459:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>474:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;openEntityPage&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>503:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>518:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;showLinkedItems&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>530:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>545:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class async method &#39;exportEntity&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>606:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;showEntityDetails&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>616:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>629:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;hideEntityDetails&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>634:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-20">
+    <td>651:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr class="bg-1" data-group="f-21">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/entity-details-renderer.js
+        <span>44 problems (0 errors, 44 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-21">
+    <td>65:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>93:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>149:28</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;options&#39; is assigned a value but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>188:26</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;options&#39; is assigned a value but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>317:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 128. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>328:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 127. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>338:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 128. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>348:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;formatMarketStatus&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>362:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;formatVolume&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>383:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;formatDataSource&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>418:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;renderActionButtons&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>423:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 136. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>426:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 137. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>429:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 143. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>432:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 138. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>472:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 140. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>507:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;formatPrice&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>512:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;formatStatus&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>517:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;formatDateTime&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>544:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;renderTradeSpecific&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>544:23</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;tradeData&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>545:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;renderTradePlan&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>545:19</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;tradePlanData&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>545:34</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;options&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>546:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;renderExecution&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>546:19</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;executionData&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>546:34</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;options&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>547:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;renderAccount&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>547:17</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;accountData&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>547:30</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;options&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>548:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;renderAlert&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>548:15</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;alertData&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>548:26</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;options&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>549:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;renderCashFlow&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>549:18</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;cashFlowData&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>549:32</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;options&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>550:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;renderNote&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>550:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;noteData&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>550:24</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;options&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>551:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;renderGeneric&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>551:17</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;entityData&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>551:29</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;entityType&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>551:41</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;options&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-21">
+    <td>566:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr class="bg-0" data-group="f-22">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/error-handlers.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-1" data-group="f-23">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/executions.js
+        <span>5 problems (0 errors, 5 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-23">
+    <td>1584:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 122. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-23">
+    <td>2144:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 125. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-23">
+    <td>2383:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 125. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-23">
+    <td>3337:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 123. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-23">
+    <td>3338:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 123. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr class="bg-1" data-group="f-24">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/external-data-dashboard.js
+        <span>26 problems (0 errors, 26 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-24">
+    <td>132:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;_error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>206:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;_error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>220:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>234:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>248:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>262:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>390:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>453:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>510:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>527:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>590:11</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;levelFilter&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>591:11</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;searchTerm&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>621:15</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;result&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>627:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>658:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>669:15</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;result&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>675:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>686:15</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;result&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>692:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>703:15</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;result&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>710:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>738:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>772:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>785:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>799:32</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;providerId&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-24">
+    <td>804:34</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;providerId&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr class="bg-0" data-group="f-25">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/external-data-service.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-0" data-group="f-26">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/filter-system.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-1" data-group="f-27">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/header-system.js
+        <span>57 problems (0 errors, 57 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-27">
+    <td>686:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 129. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>701:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 135. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>714:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 123. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>744:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 122. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>773:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 127. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>800:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 125. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>813:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 132. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>862:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 122. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>866:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 122. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>870:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 122. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>1553:38</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;e&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>1746:38</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;e&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>1766:38</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;e&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>1800:38</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;e&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>1834:38</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;e&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>1940:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;setupMenuAutoClose&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>2066:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;addSubmenuEventListenersToElement&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>2097:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;updateAccountFilterMenu&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>2354:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;loadUserPreferences&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>2381:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>2396:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;updateStatusFilterDisplayText&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>2419:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;updateTypeFilterDisplayText&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>2442:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;updateDateRangeFilterDisplayText&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>2468:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;path&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>2468:20</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;anchor&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>2477:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;scrollToSection&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>2490:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;toggleFilterSection&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>2502:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;closeMainMenu&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>2535:13</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;menuType&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>2603:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;err&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>2609:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;updateAccountFilterOptions&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>2655:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;navigateToPage&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>3034:13</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;selectedItems&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>3085:13</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;selectedItems&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>3136:13</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;selectedItems&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>3552:54</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;totalCount&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>3753:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4307:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 134. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4309:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4589:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4598:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;getAccountsFromStorage&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4607:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4616:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;processAccountFilterReset&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4622:31</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;index&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4623:11</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;value&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4624:11</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;id&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4716:11</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;clearedLocalStorage&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4725:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;e&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4731:13</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;sessionKeys&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4734:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;e&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4749:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;e&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4763:13</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;result&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4779:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;e&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4793:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;e&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4803:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;e&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4814:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;e&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-27">
+    <td>4828:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;e&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr class="bg-1" data-group="f-28">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/js-map.js
+        <span>15 problems (0 errors, 15 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-28">
+    <td>98:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;_error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-28">
+    <td>118:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;_error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-28">
+    <td>146:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;_error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-28">
+    <td>197:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-28">
+    <td>252:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-28">
+    <td>269:11</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;sampleFunctionCalls&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-28">
+    <td>440:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 125. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-28">
+    <td>449:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 125. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-28">
+    <td>481:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-28">
+    <td>499:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;loadJsMapData&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-28">
+    <td>505:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;refreshJsMap&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-28">
+    <td>511:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;toggleFunctionGroup&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-28">
+    <td>524:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;openFunctionDetails&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-28">
+    <td>540:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 125. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-28">
+    <td>541:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 140. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr class="bg-1" data-group="f-29">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/linked-items.js
+        <span>14 problems (0 errors, 14 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-29">
+    <td>689:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 122. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-29">
+    <td>1189:35</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;itemType&#39; is assigned a value but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-29">
+    <td>1229:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-29">
+    <td>1251:41</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;itemType&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-29">
+    <td>1251:51</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;itemId&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-29">
+    <td>1336:26</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;type&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-29">
+    <td>1336:32</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;id&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-29">
+    <td>1349:19</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;type&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-29">
+    <td>1349:25</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;id&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-29">
+    <td>1362:21</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;type&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-29">
+    <td>1362:27</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;id&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-29">
+    <td>1375:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;openItemPage&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-29">
+    <td>1375:23</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;itemType&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-29">
+    <td>1375:33</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;itemId&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr class="bg-0" data-group="f-30">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/main.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-1" data-group="f-31">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/notes.js
+        <span>1 problem (0 errors, 1 warning)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-31">
+    <td>241:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 128. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr class="bg-1" data-group="f-32">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/notification-system.js
+        <span>3 problems (0 errors, 3 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-32">
+    <td>374:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 129. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-32">
+    <td>379:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 132. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-32">
+    <td>522:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;_showNotificationLegacy&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr class="bg-1" data-group="f-33">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/notifications-center-backup.js
+        <span>20 problems (0 errors, 20 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-33">
+    <td>185:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;showNotificationPopup&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>202:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;playNotificationSound&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>282:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>387:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 146. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>440:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;loadSettings&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>453:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>463:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>473:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>491:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>509:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;saveToLogFile&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>527:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>530:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>621:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>636:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>655:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;saveNotificationSettings&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>673:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;resetNotificationSettings&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>685:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;clearLiveNotifications&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>691:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;clearHistory&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>697:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;refreshNotifications&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-33">
+    <td>703:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;filterHistory&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr class="bg-1" data-group="f-34">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/notifications-center.js
+        <span>16 problems (0 errors, 16 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-34">
+    <td>427:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 146. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-34">
+    <td>456:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-34">
+    <td>578:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-34">
+    <td>581:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-34">
+    <td>679:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-34">
+    <td>694:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-34">
+    <td>702:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;copyNotificationsToClipboard&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-34">
+    <td>748:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;err&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-34">
+    <td>760:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-34">
+    <td>766:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;saveNotificationSettings&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-34">
+    <td>775:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 135. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-34">
+    <td>794:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;resetNotificationSettings&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-34">
+    <td>804:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;clearLiveNotifications&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-34">
+    <td>810:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;clearHistory&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-34">
+    <td>816:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;refreshNotifications&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-34">
+    <td>822:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;filterHistory&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr class="bg-0" data-group="f-35">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/page-utils.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-1" data-group="f-36">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/preferences.js
+        <span>17 problems (0 errors, 17 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-36">
+    <td>188:20</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-36">
+    <td>202:18</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;_error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-36">
+    <td>207:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-36">
+    <td>363:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-36">
+    <td>529:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-36">
+    <td>590:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-36">
+    <td>627:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-36">
+    <td>643:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-36">
+    <td>668:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-36">
+    <td>721:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-36">
+    <td>748:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-36">
+    <td>773:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-36">
+    <td>825:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-36">
+    <td>889:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-36">
+    <td>909:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-36">
+    <td>934:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-36">
+    <td>1036:12</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr class="bg-0" data-group="f-37">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/query-optimization-test.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-1" data-group="f-38">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/realtime-notifications-client.js
+        <span>12 problems (0 errors, 12 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-38">
+    <td>151:33</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;attemptNumber&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-38">
+    <td>253:13</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;taskId&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-38">
+    <td>254:13</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;timestamp&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-38">
+    <td>289:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-38">
+    <td>297:13</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;operation&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-38">
+    <td>324:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-38">
+    <td>360:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-38">
+    <td>365:3</td>
+    <td class="clr-1">Warning</td>
+    <td>Expected &#39;this&#39; to be used by class method &#39;handleSystemEvent&#39;.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/class-methods-use-this" target="_blank" rel="noopener noreferrer">class-methods-use-this</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-38">
+    <td>365:27</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;data&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-38">
+    <td>381:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-38">
+    <td>391:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-38">
+    <td>502:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 136. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr class="bg-0" data-group="f-39">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/related-object-filters.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-1" data-group="f-40">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/server-monitor.js
+        <span>15 problems (0 errors, 15 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-40">
+    <td>150:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-40">
+    <td>577:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-40">
+    <td>604:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-40">
+    <td>631:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-40">
+    <td>653:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-40">
+    <td>680:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-40">
+    <td>711:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-40">
+    <td>731:15</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;result&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-40">
+    <td>743:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-40">
+    <td>781:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 128. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-40">
+    <td>857:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-40">
+    <td>893:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-40">
+    <td>912:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-40">
+    <td>1017:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-40">
+    <td>1119:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr class="bg-0" data-group="f-41">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/system-management.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-0" data-group="f-42">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/table-mappings.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-0" data-group="f-43">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/tables.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-0" data-group="f-44">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/ticker-service.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-0" data-group="f-45">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/tickers.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-0" data-group="f-46">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/trade-plan-service.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-1" data-group="f-47">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/trade_plans.js
+        <span>15 problems (0 errors, 15 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-47">
+    <td>999:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 130. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-47">
+    <td>1090:16</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-47">
+    <td>1102:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 123. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-47">
+    <td>1116:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 123. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-47">
+    <td>1117:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 142. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-47">
+    <td>1122:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 135. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-47">
+    <td>1124:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 127. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-47">
+    <td>1154:9</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;openDesigns&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-47">
+    <td>1155:9</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;closedDesigns&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-47">
+    <td>1156:9</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;cancelledDesigns&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-47">
+    <td>1715:13</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;newDesign&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-47">
+    <td>1737:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;getFieldIdFromServerField&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-47">
+    <td>1860:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;filterDesignsData&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-47">
+    <td>2618:10</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;showTickerPage&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-47">
+    <td>2618:25</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;tickerId&#39; is defined but never used. Allowed unused args must match /^_/u.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr class="bg-1" data-group="f-48">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/trades.js
+        <span>1 problem (0 errors, 1 warning)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-48">
+    <td>1338:1</td>
+    <td class="clr-1">Warning</td>
+    <td>This line has a length of 139. Maximum allowed is 120.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/max-len" target="_blank" rel="noopener noreferrer">max-len</a>
+    </td>
+</tr>
+
+<tr class="bg-0" data-group="f-49">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/translation-utils.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-0" data-group="f-50">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/ui-utils.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-0" data-group="f-51">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/validation-utils.js
+        <span>0 problems</span>
+    </th>
+</tr>
+
+<tr class="bg-1" data-group="f-52">
+    <th colspan="4">
+        [+] /workspace/trading-ui/scripts/yahoo-finance-service.js
+        <span>6 problems (0 errors, 6 warnings)</span>
+    </th>
+</tr>
+<tr style="display: none;" class="f-52">
+    <td>68:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-52">
+    <td>114:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-52">
+    <td>178:13</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;successCount&#39; is assigned a value but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-52">
+    <td>184:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-52">
+    <td>275:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+<tr style="display: none;" class="f-52">
+    <td>313:14</td>
+    <td class="clr-1">Warning</td>
+    <td>&#39;error&#39; is defined but never used.</td>
+    <td>
+        <a href="https://eslint.org/docs/latest/rules/no-unused-vars" target="_blank" rel="noopener noreferrer">no-unused-vars</a>
+    </td>
+</tr>
+
+            </tbody>
+        </table>
+        <script type="text/javascript">
+            var groups = document.querySelectorAll("tr[data-group]");
+            for (i = 0; i < groups.length; i++) {
+                groups[i].addEventListener("click", function() {
+                    var inGroup = document.getElementsByClassName(this.getAttribute("data-group"));
+                    this.innerHTML = (this.innerHTML.indexOf("+") > -1) ? this.innerHTML.replace("+", "-") : this.innerHTML.replace("-", "+");
+                    for (var j = 0; j < inGroup.length; j++) {
+                        inGroup[j].style.display = (inGroup[j].style.display !== "none") ? "none" : "table-row";
+                    }
+                });
+            }
+        </script>
+    </body>
+</html>

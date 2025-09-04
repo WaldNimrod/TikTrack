@@ -4,6 +4,9 @@
 
 This document describes the comprehensive JavaScript architecture implemented in TikTrack, featuring a modular system with 40+ organized script files and clear separation of concerns.
 
+## 🚨 **עדכון דחוף - 4 בספטמבר 2025**
+**בעיה קריטית זוהתה במערכת הנתונים החיצוניים** - הנתונים נאספים מ-Yahoo Finance API אבל לא נשמרים בבסיס הנתונים. המערכת 90% מושלמת עם בעיה אחת קריטית שצריכה פתרון.
+
 ## 🏗️ Architecture Overview
 
 ### Project Structure

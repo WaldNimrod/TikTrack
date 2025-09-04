@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.trade_service import TradeService
-from services.advanced_cache_service import cache_for, invalidate_cache
+from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
 import logging
 
 logger = logging.getLogger(__name__)
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 trades_bp = Blueprint('trades', __name__, url_prefix='/api/v1/trades')
 
 @trades_bp.route('/', methods=['GET'])
-@cache_for(ttl=30)  # Cache for 30 seconds - trades change frequently
+@cache_with_deps(ttl=30, dependencies=['trades'])  # Cache for 30 seconds - critical data
 def get_trades():
     """Get all trades with filtering options"""
     try:
@@ -54,7 +54,7 @@ def get_trades():
         db.close()
 
 @trades_bp.route('/<int:trade_id>', methods=['GET'])
-@cache_for(ttl=60)  # Cache for 1 minute - individual trades
+@cache_with_deps(ttl=60, dependencies=['trades'])  # Cache for 1 minute - individual trades
 def get_trade(trade_id: int):
     """Get trade by ID"""
     try:
@@ -105,6 +105,7 @@ def get_trades_by_account(account_id: int):
         db.close()
 
 @trades_bp.route('/', methods=['POST'])
+@invalidate_cache(['trades', 'tickers', 'dashboard'])  # Invalidate cache after creating trade
 def create_trade():
     """Create a new trade"""
     try:
@@ -137,6 +138,7 @@ def create_trade():
         db.close()
 
 @trades_bp.route('/<int:trade_id>', methods=['PUT'])
+@invalidate_cache(['trades', 'tickers', 'dashboard'])  # Invalidate cache after updating trade
 def update_trade(trade_id: int):
     """Update trade"""
     try:
@@ -201,6 +203,7 @@ def update_trade(trade_id: int):
         db.close()
 
 @trades_bp.route('/<int:trade_id>/close', methods=['POST'])
+@invalidate_cache(['trades', 'tickers', 'dashboard'])  # Invalidate cache after closing trade
 def close_trade(trade_id: int):
     """Close trade"""
     db = None
@@ -232,6 +235,7 @@ def close_trade(trade_id: int):
             db.close()
 
 @trades_bp.route('/<int:trade_id>/cancel', methods=['POST'])
+@invalidate_cache(['trades', 'tickers', 'dashboard'])  # Invalidate cache after cancelling trade
 def cancel_trade(trade_id: int):
     """Cancel trade"""
     db = None
@@ -264,6 +268,7 @@ def cancel_trade(trade_id: int):
             db.close()
 
 @trades_bp.route('/<int:trade_id>', methods=['DELETE'])
+@invalidate_cache(['trades', 'tickers', 'dashboard'])  # Invalidate cache after deleting trade
 def delete_trade(trade_id: int):
     """Delete trade"""
     try:

@@ -4,7 +4,7 @@ from pathlib import Path
 # Paths
 BASE_DIR = Path(__file__).parent.parent
 DB_PATH = BASE_DIR / "db" / "simpleTrade_new.db"
-UI_DIR = Path("/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui")
+UI_DIR = BASE_DIR.parent / "trading-ui"
 
 # Flask settings
 DEBUG = False

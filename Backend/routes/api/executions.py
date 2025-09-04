@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from config.database import get_db
 from models.execution import Execution
 from services.validation_service import ValidationService
-from services.advanced_cache_service import cache_for, invalidate_cache
+from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
 import logging
 
 logger = logging.getLogger(__name__)
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 executions_bp = Blueprint('executions', __name__, url_prefix='/api/v1/executions')
 
 @executions_bp.route('/', methods=['GET'])
-@cache_for(ttl=30)  # Cache for 30 seconds - executions change frequently
+@cache_with_deps(ttl=30, dependencies=['executions'])  # Cache for 30 seconds - critical data
 def get_executions():
     """Get all executions"""
     try:
@@ -62,6 +62,7 @@ def get_execution(execution_id: int):
         db.close()
 
 @executions_bp.route('/', methods=['POST'])
+@invalidate_cache(['executions', 'trades', 'dashboard'])  # Invalidate cache after creating execution
 def create_execution():
     """Create new execution"""
     try:
@@ -112,6 +113,7 @@ def create_execution():
         db.close()
 
 @executions_bp.route('/<int:execution_id>', methods=['PUT'])
+@invalidate_cache(['executions', 'trades', 'dashboard'])  # Invalidate cache after updating execution
 def update_execution(execution_id: int):
     """Update execution"""
     try:
@@ -166,6 +168,7 @@ def update_execution(execution_id: int):
         db.close()
 
 @executions_bp.route('/<int:execution_id>', methods=['DELETE'])
+@invalidate_cache(['executions', 'trades', 'dashboard'])  # Invalidate cache after deleting execution
 def delete_execution(execution_id: int):
     """Delete execution"""
     try:

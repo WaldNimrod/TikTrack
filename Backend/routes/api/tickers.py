@@ -134,7 +134,7 @@ def check_linked_items(ticker_id: int):
         db.close()
 
 @tickers_bp.route('/', methods=['POST'])
-@invalidate_cache('get_tickers')  # Invalidate cache after creating ticker
+@invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after creating ticker
 def create_ticker():
     """Create new ticker"""
     db = None
@@ -150,7 +150,10 @@ def create_ticker():
         # Get database session first
         db: Session = next(get_db())
         
-        # First, try to fetch external data for the new ticker BEFORE creating it
+        # Create the ticker first
+        ticker = TickerService.create(db, data)
+        
+        # AFTER creating the ticker, try to fetch and cache external data
         external_data_available = False
         external_data_error = None
         quote_data = None
@@ -182,20 +185,17 @@ def create_ticker():
             # Initialize adapter with database session
             yahoo_adapter = YahooFinanceAdapter(db, provider.id)
             
-            # Try to get quote for the new ticker
+            # Now try to get and cache quote for the newly created ticker
             quote_data = yahoo_adapter.get_quote(data['symbol'])
             if quote_data and quote_data.price:
                 external_data_available = True
-                logger.info(f"✅ External data available for new ticker {data['symbol']}: ${quote_data.price}")
+                logger.info(f"✅ External data fetched and cached for new ticker {data['symbol']}: ${quote_data.price}")
             else:
                 external_data_error = "No external data available for this symbol"
                 logger.warning(f"⚠️ No external data available for new ticker {data['symbol']}")
         except Exception as e:
             external_data_error = f"Failed to fetch external data: {str(e)}"
             logger.warning(f"⚠️ Failed to fetch external data for new ticker {data['symbol']}: {e}")
-        
-        # Now create the ticker
-        ticker = TickerService.create(db, data)
         
         # CACHE DISABLED - No need to clear cache
         
@@ -229,7 +229,7 @@ def create_ticker():
             db.close()
 
 @tickers_bp.route('/<int:ticker_id>', methods=['PUT'])
-@invalidate_cache('get_tickers')  # Invalidate cache after updating ticker
+@invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after updating ticker
 def update_ticker(ticker_id: int):
     """Update ticker"""
     db = None
@@ -304,7 +304,7 @@ def update_ticker(ticker_id: int):
             db.close()
 
 @tickers_bp.route('/<int:ticker_id>', methods=['DELETE'])
-@invalidate_cache('get_tickers')  # Invalidate cache after deleting ticker
+@invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after deleting ticker
 def delete_ticker(ticker_id: int):
     """Delete ticker"""
     try:
@@ -418,7 +418,7 @@ def update_active_trades(ticker_id: int):
         db.close()
 
 @tickers_bp.route('/update-all-active-trades', methods=['POST'])
-@invalidate_cache('get_tickers')  # Invalidate cache after updating all active trades
+@invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after updating all active trades
 def update_all_active_trades():
     """Update active_trades field for all tickers based on open trades and plans"""
     try:
@@ -521,7 +521,7 @@ def update_ticker_status_auto(ticker_id: int):
         db.close()
 
 @tickers_bp.route('/update-all-statuses-auto', methods=['POST'])
-@invalidate_cache('get_tickers')  # Invalidate cache after updating all statuses
+@invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after updating all statuses
 def update_all_statuses_auto():
     """Update status for all non-cancelled tickers automatically"""
     try:
@@ -555,7 +555,7 @@ def update_all_statuses_auto():
         db.close()
 
 @tickers_bp.route('/<int:ticker_id>/cancel', methods=['POST'])
-@invalidate_cache('get_tickers')  # Invalidate cache after cancelling ticker
+@invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after cancelling ticker
 def cancel_ticker(ticker_id: int):
     """Cancel ticker"""
     db = None

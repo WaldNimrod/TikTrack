@@ -62,7 +62,7 @@ class TickerService:
     MAX_REMARKS_LENGTH: int = 500
     # CURRENCY_LENGTH: int = 3  # Removed - now using currency_id
     @staticmethod
-    @cache_for(ttl=300)  # Cache for 5 minutes
+    @cache_with_deps(ttl=30, dependencies=['tickers'])  # Cache for 30 seconds - critical data with frequent updates
     def get_all(db: Session) -> List[Ticker]:
         """
         Get all tickers from the system

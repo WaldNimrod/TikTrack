@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.currency_service import CurrencyService
-from services.advanced_cache_service import cache_for, invalidate_cache
+from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
 import logging
 import os
 import sqlite3
@@ -22,7 +22,7 @@ def get_db_connection():
     return conn
 
 @currencies_bp.route('/', methods=['GET'])
-@cache_for(ttl=600)  # Cache for 10 minutes - currencies don't change frequently
+@cache_with_deps(ttl=3600, dependencies=['currencies'])  # Cache for 1 hour - static data
 def get_currencies():
     """Get all currencies"""
     try:
@@ -100,6 +100,7 @@ def get_currency(currency_id: int):
         }), 500
 
 @currencies_bp.route('/', methods=['POST'])
+@invalidate_cache(['currencies'])  # Invalidate cache after creating currency
 def create_currency():
     """Create new currency"""
     try:
@@ -198,6 +199,7 @@ def create_currency():
         }), 500
 
 @currencies_bp.route('/<int:currency_id>', methods=['PUT'])
+@invalidate_cache(['currencies'])  # Invalidate cache after updating currency
 def update_currency(currency_id: int):
     """Update currency"""
     try:
@@ -354,6 +356,7 @@ def get_currencies_dropdown():
         }), 500
 
 @currencies_bp.route('/<int:currency_id>', methods=['DELETE'])
+@invalidate_cache(['currencies'])  # Invalidate cache after deleting currency
 def delete_currency(currency_id: int):
     """Delete currency"""
     try:

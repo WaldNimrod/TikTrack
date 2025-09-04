@@ -219,6 +219,7 @@
 - [מערכת העדפות](../preferences/README.md)
 - [מערכת הנתונים החיצוניים](../external_data/README.md)
 - [מדריך RTL](../../RTL_HEBREW_GUIDE.md)
+- [מדריך אינטגרציה](INTEGRATION_GUIDE.md) - הוראות הוספת כפתורי פרטים לטבלאות ✅ **חדש!**
 
 ---
 

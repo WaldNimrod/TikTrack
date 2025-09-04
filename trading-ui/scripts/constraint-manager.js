@@ -86,7 +86,7 @@ class ConstraintManager {
       }
     } catch (error) {
       // Error loading constraints
-      console.error('שגיאה בטעינת constraints:', error);
+      // // console.error('שגיאה בטעינת constraints:', error); // Disabled for linting // Using showMessage instead
       this.showMessage('שגיאה בטעינת האילוצים מהשרת', 'error');
       // אין נתוני דמה - רק הודעת שגיאה
       this.constraints = [];
@@ -94,7 +94,6 @@ class ConstraintManager {
       this.updateStats();
     }
   }
-
 
 
   updateStats() {

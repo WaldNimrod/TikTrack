@@ -486,7 +486,7 @@ async function deleteCashFlow(id) {
       throw new Error(result.error || 'שגיאה לא ידועה');
     }
   } catch {
-    // console.error('❌ Delete error:', error);
+    // // console.error('❌ Delete error:', error); // Disabled for linting
     window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת תזרים המזומנים');
   }
 }

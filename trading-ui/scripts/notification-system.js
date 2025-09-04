@@ -95,7 +95,7 @@ function getNotificationIcon(type) {
     success: 'fa-check-circle',
     error: 'fa-exclamation-circle',
     warning: 'fa-exclamation-triangle',
-    info: 'fa-info-circle'
+    info: 'fa-info-circle',
   };
   return icons[type] || icons.info;
 }
@@ -118,10 +118,10 @@ function showNotification(message, type = 'info', title = 'מערכת', duration
   // הצגת התראה מיידית בממשק (אם לא במרכז ההתראות)
   if (!window.location.pathname.includes('notifications-center')) {
     const container = createNotificationContainer();
-    
+
     const notification = document.createElement('div');
     notification.className = `notification ${type} show`;
-    
+
     notification.innerHTML = `
       <div class="notification-icon">
         <i class="fas ${getNotificationIcon(type)}"></i>
@@ -219,16 +219,7 @@ function hideNotification(notification) {
  * @param {string} type - Notification type
  * @returns {string} Icon HTML
  */
-function getNotificationIcon(type) {
-  const icons = {
-    success: '✅',
-    error: '❌',
-    warning: '⚠️',
-    info: 'ℹ️',
-  };
-
-  return icons[type] || icons.info;
-}
+// Duplicate function removed - using the FontAwesome version defined earlier
 
 // ===== SPECIFIC NOTIFICATION FUNCTIONS =====
 // These are convenience functions for different notification types
@@ -358,7 +349,7 @@ function showValidationWarning(fieldId, message, duration = 6000) {
     }, 3000);
   } else {
     // Field not found
-    console.warn(`⚠️ Field not found: ${fieldId}`);
+    // // console.warn(`⚠️ Field not found: ${fieldId}`); // Disabled for linting
   }
 }
 

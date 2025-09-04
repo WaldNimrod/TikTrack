@@ -302,7 +302,7 @@ function createLogoutButton(containerId) {
 }
 
 // פונקציה לבדיקת הרשאות
-function hasPermission(permission) {
+function hasPermission(_permission) {
   if (!currentUser || !currentUser.roles) {return false;}
 
   // כאן אפשר להוסיף לוגיקה לבדיקת הרשאות

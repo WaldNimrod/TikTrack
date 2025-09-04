@@ -195,7 +195,7 @@ async function loadDataFromAPI(endpoint, maxRetries = 3) {
 
         return data;
       } else {
-        // console.warn('⚠️ Response is not an array:', typeof data);
+        // // console.warn('⚠️ Response is not an array:', typeof data); // Disabled for linting
         return [];
       }
     } catch {
@@ -355,7 +355,7 @@ function calculateDefaultPrices(currentPrice, options = {}) {
  */
 function convertAmountToShares(amount, price, allowFractionalShares = null) {
   if (!amount || !price || price <= 0) {
-    // console.warn('Invalid amount or price for conversion:', { amount, price });
+    // // console.warn('Invalid amount or price for conversion:', { amount, price }); // Disabled for linting
     return { shares: 0, adjustedAmount: 0 };
   }
 
@@ -390,7 +390,7 @@ function convertAmountToShares(amount, price, allowFractionalShares = null) {
  */
 function convertSharesToAmount(shares, price) {
   if (!shares || !price || price <= 0) {
-    // console.warn('Invalid shares or price for conversion:', { shares, price });
+    // // console.warn('Invalid shares or price for conversion:', { shares, price }); // Disabled for linting
     return 0;
   }
 
@@ -409,7 +409,7 @@ function getUserPreference(key, defaultValue = null) {
     const preferences = JSON.parse(localStorage.getItem('userPreferences') || '{}');
     return preferences[key] !== undefined ? preferences[key] : defaultValue;
   } catch {
-    // console.warn('Error reading user preference:', error);
+    // // console.warn('Error reading user preference:', error); // Disabled for linting
     return defaultValue;
   }
 }

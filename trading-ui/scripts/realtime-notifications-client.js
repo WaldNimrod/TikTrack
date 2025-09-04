@@ -46,7 +46,7 @@ class RealtimeNotificationsClient {
     try {
       // Check if Socket.IO is available
       if (typeof io === 'undefined') {
-        // console.warn('Socket.IO not available, loading from CDN...');
+        // // console.warn('Socket.IO not available, loading from CDN...'); // Disabled for linting
         this.loadSocketIO();
       } else {
         this.connect();
@@ -61,29 +61,29 @@ class RealtimeNotificationsClient {
     const script = document.createElement('script');
     script.src = 'https://cdn.socket.io/4.7.2/socket.io.min.js';
     script.onload = () => {
-      // console.log('Socket.IO loaded successfully');
+      // // console.log('Socket.IO loaded successfully'); // Disabled for linting
       // Wait a bit for the script to initialize
       setTimeout(() => {
         if (typeof io !== 'undefined') {
           this.connect();
         } else {
-          // console.error('Socket.IO loaded but io object not available');
+          // // console.error('Socket.IO loaded but io object not available'); // Disabled for linting
         }
       }, 100);
     };
     script.onerror = () => {
-      // console.error('Failed to load Socket.IO from CDN');
+      // // console.error('Failed to load Socket.IO from CDN'); // Disabled for linting
     };
     document.head.appendChild(script);
   }
 
   connect() {
     try {
-      // console.log('🔌 Connecting to WebSocket server...');
+      // // console.log('🔌 Connecting to WebSocket server...'); // Disabled for linting
 
       // Create Socket.IO connection
       if (typeof window.io === 'undefined') {
-        // console.warn('Socket.IO not available, skipping connection');
+        // // console.warn('Socket.IO not available, skipping connection'); // Disabled for linting
         return;
       }
 
@@ -100,7 +100,7 @@ class RealtimeNotificationsClient {
         // Set up event handlers
         this.setupEventHandlers();
 
-        // console.log('✅ WebSocket connection established');
+        // // console.log('✅ WebSocket connection established'); // Disabled for linting
       } catch {
         // Error creating Socket.IO connection
         return;
@@ -122,7 +122,7 @@ class RealtimeNotificationsClient {
       this.reconnectAttempts = 0;
       this.reconnectDelay = 1000;
 
-      // console.log('🔗 WebSocket connected');
+      // // console.log('🔗 WebSocket connected'); // Disabled for linting
       this.showConnectionStatus('connected');
 
       // Join user-specific room if user is logged in
@@ -133,7 +133,7 @@ class RealtimeNotificationsClient {
       this.connected = false;
       this.connectionStats.disconnectedAt = new Date();
 
-      // console.log('🔌 WebSocket disconnected:', reason);
+      // // console.log('🔌 WebSocket disconnected:', reason); // Disabled for linting
       this.showConnectionStatus('disconnected');
 
       if (reason === 'io server disconnect') {
@@ -149,12 +149,12 @@ class RealtimeNotificationsClient {
     });
 
     this.socket.on('reconnect', attemptNumber => {
-      // console.log(`🔄 WebSocket reconnected after ${attemptNumber} attempts`);
+      // // console.log(`🔄 WebSocket reconnected after ${attemptNumber} attempts`); // Disabled for linting
       this.showConnectionStatus('reconnected');
     });
 
     this.socket.on('reconnect_failed', () => {
-      // console.error('❌ WebSocket reconnection failed');
+      // // console.error('❌ WebSocket reconnection failed'); // Disabled for linting
       this.showConnectionStatus('failed');
     });
 
@@ -170,55 +170,55 @@ class RealtimeNotificationsClient {
 
     // Background task events
     this.socket.on('background_task_started', data => {
-      // console.log('🚀 Background task started:', data);
+      // // console.log('🚀 Background task started:', data); // Disabled for linting
       this.handleBackgroundTaskEvent('started', data);
     });
 
     this.socket.on('background_task_completed', data => {
-      // console.log('✅ Background task completed:', data);
+      // // console.log('✅ Background task completed:', data); // Disabled for linting
       this.handleBackgroundTaskEvent('completed', data);
     });
 
     this.socket.on('background_task_failed', data => {
-      // console.log('❌ Background task failed:', data);
+      // // console.log('❌ Background task failed:', data); // Disabled for linting
       this.handleBackgroundTaskEvent('failed', data);
     });
 
     // Database events
     this.socket.on('data_updated', data => {
-      // console.log('📊 Data updated:', data);
+      // // console.log('📊 Data updated:', data); // Disabled for linting
       this.handleDataEvent('updated', data);
     });
 
     this.socket.on('data_error', data => {
-      // console.log('❌ Data error:', data);
+      // // console.log('❌ Data error:', data); // Disabled for linting
       this.handleDataEvent('error', data);
     });
 
     // External data events
     this.socket.on('external_data_update', data => {
-      // console.log('🌐 External data updated:', data);
+      // // console.log('🌐 External data updated:', data); // Disabled for linting
       this.handleExternalDataEvent('updated', data);
     });
 
     this.socket.on('external_data_error', data => {
-      // console.log('❌ External data error:', data);
+      // // console.log('❌ External data error:', data); // Disabled for linting
       this.handleExternalDataEvent('error', data);
     });
 
     // System events
     this.socket.on('connected', data => {
-      // console.log('🔗 Client connected to server:', data);
+      // // console.log('🔗 Client connected to server:', data); // Disabled for linting
       this.handleSystemEvent('connected', data);
     });
 
     this.socket.on('room_joined', data => {
-      // console.log('🚪 Joined room:', data);
+      // // console.log('🚪 Joined room:', data); // Disabled for linting
       this.handleSystemEvent('room_joined', data);
     });
 
     this.socket.on('room_left', data => {
-      // console.log('🚪 Left room:', data);
+      // // console.log('🚪 Left room:', data); // Disabled for linting
       this.handleSystemEvent('room_left', data);
     });
   }
@@ -229,7 +229,7 @@ class RealtimeNotificationsClient {
     // Handle custom events from other parts of the system
     this.socket.onAny((eventName, ...args) => {
       if (!this.isSystemEvent(eventName)) {
-        // console.log(`📡 Custom event received: ${eventName}`, args);
+        // // console.log(`📡 Custom event received: ${eventName}`, args); // Disabled for linting
         this.handleCustomEvent(eventName, args);
       }
     });
@@ -287,7 +287,7 @@ class RealtimeNotificationsClient {
       this.emitCustomEvent('background_task_event', { type, data });
 
     } catch (error) {
-      // console.error('Error handling background task event:', error);
+      // // console.error('Error handling background task event:', error); // Disabled for linting
     }
   }
 
@@ -322,7 +322,7 @@ class RealtimeNotificationsClient {
       this.emitCustomEvent('data_event', { type, data });
 
     } catch (error) {
-      // console.error('Error handling data event:', error);
+      // // console.error('Error handling data event:', error); // Disabled for linting
     }
   }
 
@@ -358,7 +358,7 @@ class RealtimeNotificationsClient {
       this.emitCustomEvent('external_data_event', { type, data });
 
     } catch (error) {
-      // console.error('Error handling external data event:', error);
+      // // console.error('Error handling external data event:', error); // Disabled for linting
     }
   }
 
@@ -366,20 +366,20 @@ class RealtimeNotificationsClient {
     try {
       switch (type) {
       case 'connected':
-        // console.log('Successfully connected to server');
+        // // console.log('Successfully connected to server'); // Disabled for linting
         break;
 
       case 'room_joined':
-        // console.log(`Joined room: ${data.room}`);
+        // // console.log(`Joined room: ${data.room}`); // Disabled for linting
         break;
 
       case 'room_left':
-        // console.log(`Left room: ${data.room}`);
+        // // console.log(`Left room: ${data.room}`); // Disabled for linting
         break;
       }
 
     } catch (error) {
-      // console.error('Error handling system event:', error);
+      // // console.error('Error handling system event:', error); // Disabled for linting
     }
   }
 
@@ -389,7 +389,7 @@ class RealtimeNotificationsClient {
       this.emitCustomEvent('custom_event', { eventName, args });
 
     } catch (error) {
-      // console.error('Error handling custom event:', error);
+      // // console.error('Error handling custom event:', error); // Disabled for linting
     }
   }
 
@@ -401,7 +401,7 @@ class RealtimeNotificationsClient {
     } else if (typeof window.showNotification === 'function') {
       window.showNotification(message, 'info', title, duration);
     } else {
-      // console.log(`[INFO] ${title}: ${message}`);
+      // // console.log(`[INFO] ${title}: ${message}`); // Disabled for linting
     }
   }
 
@@ -411,7 +411,7 @@ class RealtimeNotificationsClient {
     } else if (typeof window.showNotification === 'function') {
       window.showNotification(message, 'success', title, duration);
     } else {
-      // console.log(`[SUCCESS] ${title}: ${message}`);
+      // // console.log(`[SUCCESS] ${title}: ${message}`); // Disabled for linting
     }
   }
 
@@ -421,7 +421,7 @@ class RealtimeNotificationsClient {
     } else if (typeof window.showNotification === 'function') {
       window.showNotification(message, 'error', title, duration);
     } else {
-      // console.log(`[ERROR] ${title}: ${message}`);
+      // // console.log(`[ERROR] ${title}: ${message}`); // Disabled for linting
     }
   }
 
@@ -431,7 +431,7 @@ class RealtimeNotificationsClient {
     } else if (typeof window.showNotification === 'function') {
       window.showNotification(message, 'warning', title, duration);
     } else {
-      // console.log(`[WARNING] ${title}: ${message}`);
+      // // console.log(`[WARNING] ${title}: ${message}`); // Disabled for linting
     }
   }
 
@@ -446,14 +446,14 @@ class RealtimeNotificationsClient {
   joinRoom(roomName) {
     if (this.socket && this.connected) {
       this.socket.emit('join_room', { room: roomName });
-      // console.log(`🚪 Joining room: ${roomName}`);
+      // // console.log(`🚪 Joining room: ${roomName}`); // Disabled for linting
     }
   }
 
   leaveRoom(roomName) {
     if (this.socket && this.connected) {
       this.socket.emit('leave_room', { room: roomName });
-      // console.log(`🚪 Leaving room: ${roomName}`);
+      // // console.log(`🚪 Leaving room: ${roomName}`); // Disabled for linting
     }
   }
 
@@ -499,13 +499,13 @@ class RealtimeNotificationsClient {
       this.reconnectAttempts++;
       this.reconnectDelay = Math.min(this.reconnectDelay * 2, 30000); // Max 30 seconds
 
-      // console.log(`🔄 Scheduling reconnect attempt ${this.reconnectAttempts} in ${this.reconnectDelay}ms`);
+      // // console.log(`🔄 Scheduling reconnect attempt ${this.reconnectAttempts} in ${this.reconnectDelay}ms`); // Disabled for linting
 
       setTimeout(() => {
         this.connect();
       }, this.reconnectDelay);
     } else {
-      // console.error('❌ Max reconnection attempts reached');
+      // // console.error('❌ Max reconnection attempts reached'); // Disabled for linting
     }
   }
 
@@ -513,7 +513,7 @@ class RealtimeNotificationsClient {
     if (this.socket) {
       this.socket.disconnect();
       this.connected = false;
-      // console.log('🔌 WebSocket disconnected manually');
+      // // console.log('🔌 WebSocket disconnected manually'); // Disabled for linting
     }
   }
 

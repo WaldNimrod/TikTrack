@@ -341,7 +341,7 @@ async function updateEditTickerInfo() {
       const tickers = await window.tickerService.getTickers();
       ticker = tickers.find(t => t.id === tickerId);
     } catch {
-      // console.warn('Error getting tickers from service:', error);
+      // // console.warn('Error getting tickers from service:', error); // Disabled for linting
     }
   }
 
@@ -580,7 +580,7 @@ async function checkLinkedItemsBeforeCancel(tradePlanId) {
     }
 
   } catch (error) {
-    // console.error('❌ שגיאה בבדיקת פריטים מקושרים:', error);
+    // // console.error('❌ שגיאה בבדיקת פריטים מקושרים:', error); // Disabled for linting
     if (typeof window.handleSystemError === 'function') {
       window.handleSystemError(error, 'בדיקת פריטים מקושרים');
     } else if (typeof window.handleDataLoadError === 'function') {
@@ -626,7 +626,7 @@ async function reactivateTradePlan(tradePlanId) {
       if (typeof window.updateTickerActiveTradesStatus === 'function') {
         await window.updateTickerActiveTradesStatus(tradePlan.ticker_id);
       } else {
-        // console.warn('⚠️ updateTickerActiveTradesStatus function not available');
+        // // console.warn('⚠️ updateTickerActiveTradesStatus function not available'); // Disabled for linting
       }
     }
 

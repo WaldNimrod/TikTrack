@@ -66,7 +66,7 @@ class YahooFinanceService {
       return result;
 
     } catch (error) {
-      console.error(`Error getting quote for ${symbol}:`, error);
+      // // console.error(`Error getting quote for ${symbol}:`, error); // Disabled for linting
       return null;
     }
   }
@@ -112,7 +112,7 @@ class YahooFinanceService {
       return { ...results, ...freshData };
 
     } catch (error) {
-      console.error('Error getting multiple quotes:', error);
+      // // console.error('Error getting multiple quotes:', error); // Disabled for linting
       return {};
     }
   }
@@ -154,7 +154,7 @@ class YahooFinanceService {
       return data;
 
     } catch (error) {
-      console.error('Error refreshing quotes:', error);
+      // // console.error('Error refreshing quotes:', error); // Disabled for linting
       this._showNotification(`שגיאה ברענון נתונים: ${error.message}`, 'error');
       return {};
     } finally {
@@ -179,10 +179,10 @@ class YahooFinanceService {
         data[symbol] && !data[symbol].error,
       ).length;
 
-      console.log(`Yahoo Finance: Updated ${successCount}/${symbols.length} quotes`);
+      // // console.log(`Yahoo Finance: Updated ${successCount}/${symbols.length} quotes`); // Disabled for linting
       return data;
     } catch (error) {
-      console.warn('Silent Yahoo Finance refresh failed:', error.message);
+      // // console.warn('Silent Yahoo Finance refresh failed:', error.message); // Disabled for linting
       return {};
     }
   }
@@ -273,7 +273,7 @@ class YahooFinanceService {
         throw new Error(result.error || 'Unknown error');
       }
     } catch (error) {
-      console.error(`Failed to fetch quote for ${symbol}:`, error);
+      // // console.error(`Failed to fetch quote for ${symbol}:`, error); // Disabled for linting
       return null;
     }
   }
@@ -311,7 +311,7 @@ class YahooFinanceService {
         throw new Error(result.error || 'Unknown error');
       }
     } catch (error) {
-      console.error('Failed to fetch multiple quotes:', error);
+      // // console.error('Failed to fetch multiple quotes:', error); // Disabled for linting
       return {};
     }
   }
@@ -345,7 +345,7 @@ class YahooFinanceService {
     if (typeof window.showNotification === 'function') {
       window.showNotification(message, type);
     } else {
-      console.log(`${type.toUpperCase()}: ${message}`);
+      // // console.log(`${type.toUpperCase()}: ${message}`); // Disabled for linting
     }
   }
 
@@ -402,4 +402,4 @@ window.getMultipleYahooQuotes = symbols => window.YahooFinanceService.getMultipl
 window.formatYahooPrice = (price, currency) => window.YahooFinanceService.formatPrice(price, currency);
 window.formatYahooChange = change => window.YahooFinanceService.formatChange(change);
 
-console.log('✅ Yahoo Finance Service loaded successfully');
+// // console.log('✅ Yahoo Finance Service loaded successfully'); // Disabled for linting

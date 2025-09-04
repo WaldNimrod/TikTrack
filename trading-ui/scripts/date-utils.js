@@ -101,7 +101,7 @@ function formatDate(dateString) {
       year: 'numeric',
     });
   } catch {
-    // console.warn('⚠️ Error formatting date:', dateString, error);
+    // // console.warn('⚠️ Error formatting date:', dateString, error); // Disabled for linting
     return '-';
   }
 }
@@ -130,7 +130,7 @@ function formatDateTime(dateString) {
       minute: '2-digit',
     });
   } catch {
-    // console.warn('⚠️ Error formatting date time:', dateString, error);
+    // // console.warn('⚠️ Error formatting date time:', dateString, error); // Disabled for linting
     return '-';
   }
 }
@@ -157,7 +157,7 @@ function formatDateOnly(dateString) {
       year: 'numeric',
     });
   } catch {
-    // console.warn('⚠️ Error formatting date only:', dateString, error);
+    // // console.warn('⚠️ Error formatting date only:', dateString, error); // Disabled for linting
     return '-';
   }
 }
@@ -182,7 +182,7 @@ function formatShortDate(dateString) {
       month: '2-digit',
     });
   } catch {
-    // console.warn('⚠️ Error formatting short date:', dateString, error);
+    // // console.warn('⚠️ Error formatting short date:', dateString, error); // Disabled for linting
     return '-';
   }
 }
@@ -209,7 +209,7 @@ function formatLongDate(dateString) {
       year: 'numeric',
     });
   } catch {
-    // console.warn('⚠️ Error formatting long date:', dateString, error);
+    // // console.warn('⚠️ Error formatting long date:', dateString, error); // Disabled for linting
     return '-';
   }
 }
@@ -235,7 +235,7 @@ function formatTimeOnly(dateString) {
       minute: '2-digit',
     });
   } catch {
-    // console.warn('⚠️ Error formatting time:', dateString, error);
+    // // console.warn('⚠️ Error formatting time:', dateString, error); // Disabled for linting
     return '-';
   }
 }
@@ -259,7 +259,7 @@ function toISOString(date) {
 
     return dateObj.toISOString();
   } catch {
-    // console.warn('⚠️ Error converting to ISO string:', date, error);
+    // // console.warn('⚠️ Error converting to ISO string:', date, error); // Disabled for linting
     return null;
   }
 }
@@ -282,7 +282,7 @@ function toDate(date) {
 
     return dateObj;
   } catch {
-    // console.warn('⚠️ Error converting to Date:', date, error);
+    // // console.warn('⚠️ Error converting to Date:', date, error); // Disabled for linting
     return null;
   }
 }
@@ -324,7 +324,7 @@ function isPastDate(date) {
 
     return dateObj < new Date();
   } catch {
-    // console.warn('⚠️ Error checking past date:', date, error);
+    // // console.warn('⚠️ Error checking past date:', date, error); // Disabled for linting
     return false;
   }
 }
@@ -346,7 +346,7 @@ function isFutureDate(date) {
 
     return dateObj > new Date();
   } catch {
-    // console.warn('⚠️ Error checking future date:', date, error);
+    // // console.warn('⚠️ Error checking future date:', date, error); // Disabled for linting
     return false;
   }
 }
@@ -376,7 +376,7 @@ function daysDifference(startDate, endDate) {
 
     return diffDays;
   } catch {
-    // console.warn('⚠️ Error calculating days difference:', error);
+    // // console.warn('⚠️ Error calculating days difference:', error); // Disabled for linting
     return null;
   }
 }
@@ -400,7 +400,7 @@ function addDays(date, days) {
     dateObj.setDate(dateObj.getDate() + days);
     return dateObj;
   } catch {
-    // console.warn('⚠️ Error adding days:', error);
+    // // console.warn('⚠️ Error adding days:', error); // Disabled for linting
     return null;
   }
 }
@@ -424,7 +424,7 @@ function addMonths(date, months) {
     dateObj.setMonth(dateObj.getMonth() + months);
     return dateObj;
   } catch {
-    // console.warn('⚠️ Error adding months:', error);
+    // // console.warn('⚠️ Error adding months:', error); // Disabled for linting
     return null;
   }
 }

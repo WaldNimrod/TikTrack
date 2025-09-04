@@ -1015,7 +1015,7 @@ function getColorPreferences() {
  */
 function updateCSSVariablesFromPreferences(preferences) {
   try {
-    console.log('🎨 עדכון CSS Variables מהעדפות...');
+    // // console.log('🎨 עדכון CSS Variables מהעדפות...'); // Disabled for linting
 
     // עדכון צבעי ערכים מספריים
     if (preferences.numericValueColors) {
@@ -1087,10 +1087,10 @@ function updateCSSVariablesFromPreferences(preferences) {
       }
     }
 
-    console.log('✅ CSS Variables עודכנו בהצלחה');
+    // // console.log('✅ CSS Variables עודכנו בהצלחה'); // Disabled for linting
 
   } catch (error) {
-    console.error('❌ שגיאה בעדכון CSS Variables:', error);
+    // // console.error('❌ שגיאה בעדכון CSS Variables:', error); // Disabled for linting
   }
 }
 
@@ -1100,7 +1100,7 @@ function updateCSSVariablesFromPreferences(preferences) {
  */
 async function loadColorPreferences() {
   try {
-    console.log('🎨 טוען הגדרות צבע מהעדפות...');
+    // // console.log('🎨 טוען הגדרות צבע מהעדפות...'); // Disabled for linting
 
     const response = await fetch('/api/v1/preferences/');
     if (response.ok) {
@@ -1119,10 +1119,10 @@ async function loadColorPreferences() {
         Object.assign(ENTITY_COLORS, preferences.entityColors);
       }
 
-      console.log('✅ הגדרות צבע נטענו בהצלחה');
+      // // console.log('✅ הגדרות צבע נטענו בהצלחה'); // Disabled for linting
     }
   } catch (error) {
-    console.error('❌ שגיאה בטעינת הגדרות צבע:', error);
+    // // console.error('❌ שגיאה בטעינת הגדרות צבע:', error); // Disabled for linting
   }
 }
 
@@ -1136,10 +1136,10 @@ function updateEntityColors(preferences) {
     if (preferences && preferences.entityColors) {
       Object.assign(ENTITY_COLORS, preferences.entityColors);
       updateCSSVariablesFromPreferences(preferences);
-      console.log('✅ צבעי ישויות עודכנו מהעדפות');
+      // // console.log('✅ צבעי ישויות עודכנו מהעדפות'); // Disabled for linting
     }
   } catch (error) {
-    console.error('❌ שגיאה בעדכון צבעי ישויות:', error);
+    // // console.error('❌ שגיאה בעדכון צבעי ישויות:', error); // Disabled for linting
   }
 }
 
@@ -1148,7 +1148,7 @@ function updateEntityColors(preferences) {
 
 // טעינת הגדרות צבע בטעינת הדף
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🎨 מאתחל מערכת צבעים...');
+  // // console.log('🎨 מאתחל מערכת צבעים...'); // Disabled for linting
   loadColorPreferences();
 });
 

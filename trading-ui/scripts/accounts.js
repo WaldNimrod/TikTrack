@@ -950,7 +950,7 @@ async function saveAccount(mode, accountId = null) {
       if (typeof window.showWarningNotification === 'function') {
         window.showWarningNotification('אזהרה', 'החשבון נשמר אך יש בעיה בעדכון הטבלה. אנא רענן את הדף.');
       } else {
-        // console.warn('החשבון נשמר אך יש בעיה בעדכון הטבלה. אנא רענן את הדף.');
+        // // console.warn('החשבון נשמר אך יש בעיה בעדכון הטבלה. אנא רענן את הדף.'); // Disabled for linting
       }
     }
 
@@ -1451,7 +1451,7 @@ function showOpenTradesWarning(accountId, accountName) {
   if (typeof window.showWarningNotification === 'function') {
     window.showWarningNotification('אזהרה', `יש עסקאות פתוחות בחשבון "${accountName}". לא ניתן למחוק חשבון עם עסקאות פעילות.`);
   } else {
-    // console.warn(`יש עסקאות פתוחות בחשבון "${accountName}". לא ניתן למחוק חשבון עם עסקאות פעילות.`);
+    // // console.warn(`יש עסקאות פתוחות בחשבון "${accountName}". לא ניתן למחוק חשבון עם עסקאות פעילות.`); // Disabled for linting
   }
 }
 
@@ -1815,7 +1815,7 @@ async function cancelAccountWithLinkedItemsCheck(accountId, _accountName) {
         accountDetails = `\n\nפרטי החשבון:\n• שם: ${account.name || 'לא מוגדר'}\n• סטטוס: ${account.status || 'לא מוגדר'}\n• יתרה: ${account.cash_balance || '0'}`;
       }
     } catch {
-      // console.warn('לא ניתן לטעון פרטי חשבון:', error);
+      // // console.warn('לא ניתן לטעון פרטי חשבון:', error); // Disabled for linting
     }
 
     // אישור מהמשתמש באמצעות המערכת הגלובלית
@@ -1865,7 +1865,7 @@ async function deleteAccountWithLinkedItemsCheck(accountId, _accountName) {
         accountDetails = `\n\nפרטי החשבון:\n• שם: ${account.name || 'לא מוגדר'}\n• סטטוס: ${account.status || 'לא מוגדר'}\n• יתרה: ${account.cash_balance || '0'}`;
       }
     } catch {
-      // console.warn('לא ניתן לטעון פרטי חשבון:', error);
+      // // console.warn('לא ניתן לטעון פרטי חשבון:', error); // Disabled for linting
     }
 
     // אישור מהמשתמש באמצעות המערכת הגלובלית
@@ -2121,7 +2121,7 @@ async function performAccountDeletion(accountId) {
  */
 async function checkLinkedItemsBeforeCancelAccount(accountId) {
   try {
-    // console.log('🔍 בדיקת פריטים מקושרים לחשבון:', accountId);
+    // // console.log('🔍 בדיקת פריטים מקושרים לחשבון:', accountId); // Disabled for linting
 
     // בדיקה ישירה של טריידים פעילים (סטטוס 'open')
     const tradesResponse = await fetch(`/api/v1/trades/?account_id=${accountId}&status=open`);
@@ -2129,10 +2129,10 @@ async function checkLinkedItemsBeforeCancelAccount(accountId) {
       const tradesData = await tradesResponse.json();
       const openTrades = tradesData.data || tradesData || [];
 
-      // console.log('📊 טריידים פעילים:', openTrades.length);
+      // // console.log('📊 טריידים פעילים:', openTrades.length); // Disabled for linting
 
       if (openTrades.length > 0) {
-        // console.log('⚠️ יש טריידים פעילים - הצגת מודול מקושרים במצב אזהרה');
+        // // console.log('⚠️ יש טריידים פעילים - הצגת מודול מקושרים במצב אזהרה'); // Disabled for linting
 
         // יש טריידים פעילים - הצגת מודול מקושרים במצב אזהרה
         if (typeof window.showLinkedItemsModal === 'function') {
@@ -2154,7 +2154,7 @@ async function checkLinkedItemsBeforeCancelAccount(accountId) {
 
           window.showLinkedItemsModal(linkedItemsData, 'account', accountId, 'warningBlock');
         } else {
-          // console.log('❌ showLinkedItemsModal לא זמינה - הצגת אזהרה פשוטה');
+          // // console.log('❌ showLinkedItemsModal לא זמינה - הצגת אזהרה פשוטה'); // Disabled for linting
           if (typeof window.showWarningNotification === 'function') {
             window.showWarningNotification(
               'לא ניתן לבטל חשבון',
@@ -2170,22 +2170,22 @@ async function checkLinkedItemsBeforeCancelAccount(accountId) {
     const response = await fetch(`/api/v1/linked-items/account/${accountId}`);
 
     if (!response.ok) {
-      // console.log('❌ לא ניתן לבדוק פריטים מקושרים, ממשיכים עם הביטול');
+      // // console.log('❌ לא ניתן לבדוק פריטים מקושרים, ממשיכים עם הביטול'); // Disabled for linting
       return false;
     }
 
     const linkedItemsData = await response.json();
-    // console.log('📊 נתוני מקושרים:', linkedItemsData);
+    // // console.log('📊 נתוני מקושרים:', linkedItemsData); // Disabled for linting
 
     const childEntities = linkedItemsData.child_entities || [];
     // const parentEntities = linkedItemsData.parent_entities || []; // לא בשימוש
 
-    // console.log('👶 פריטים מקושרים (child):', childEntities.length);
-    // console.log('👨‍👩‍👧‍👦 פריטים מקושרים (parent):', parentEntities.length);
+    // // console.log('👶 פריטים מקושרים (child):', childEntities.length); // Disabled for linting
+    // // console.log('👨‍👩‍👧‍👦 פריטים מקושרים (parent):', parentEntities.length); // Disabled for linting
 
     // בדיקה אם יש פריטים שמקושרים אל החשבון (child entities)
     if (childEntities.length > 0) {
-      // console.log('⚠️ יש פריטים מקושרים - הצגת חלון מקושרים');
+      // // console.log('⚠️ יש פריטים מקושרים - הצגת חלון מקושרים'); // Disabled for linting
       // יש פריטים מקושרים - הצגת חלון מקושרים
       if (typeof window.showLinkedItemsModal === 'function') {
         // הוספת פרטי החשבון לנתונים
@@ -2193,7 +2193,7 @@ async function checkLinkedItemsBeforeCancelAccount(accountId) {
         window.showLinkedItemsModal(linkedItemsData, 'account', accountId, 'warningBlock');
         return true;
       } else {
-        // console.log('❌ showLinkedItemsModal לא זמינה');
+        // // console.log('❌ showLinkedItemsModal לא זמינה'); // Disabled for linting
         if (typeof window.showNotification === 'function') {
           window.showNotification('אזהרה', 'יש פריטים מקושרים לחשבון זה', 'warning');
         }
@@ -2201,10 +2201,10 @@ async function checkLinkedItemsBeforeCancelAccount(accountId) {
       }
     }
 
-    // console.log('✅ אין פריטים מקושרים - אפשר לבטל');
+    // // console.log('✅ אין פריטים מקושרים - אפשר לבטל'); // Disabled for linting
     return false;
   } catch (error) {
-    // console.error('❌ שגיאה בבדיקת פריטים מקושרים:', error);
+    // // console.error('❌ שגיאה בבדיקת פריטים מקושרים:', error); // Disabled for linting
     handleSystemError(error, 'בדיקת פריטים מקושרים');
     return false;
   }

@@ -36,7 +36,7 @@ class NotificationsCenter {
   }
 
   init() {
-    // console.log('🚀 אתחול מרכז התראות...');
+    // // // console.log('🚀 אתחול מרכז התראות...'); // Disabled for linting
 
     // אתחול UI
     this.initUI();
@@ -53,7 +53,7 @@ class NotificationsCenter {
     // רענון אוטומטי
     this.startAutoRefresh();
 
-    // console.log('✅ מרכז התראות אותחל בהצלחה');
+    // // // console.log('✅ מרכז התראות אותחל בהצלחה'); // Disabled for linting
   }
 
   initUI() {
@@ -454,7 +454,7 @@ class NotificationsCenter {
       try {
         date = new Date(date);
       } catch (error) {
-        // console.warn('שגיאה בהמרת תאריך:', error);
+        // // // console.warn('שגיאה בהמרת תאריך:', error); // Disabled for linting
         return 'לא ידוע';
       }
     }
@@ -510,7 +510,7 @@ class NotificationsCenter {
   saveSettings() {
     try {
       localStorage.setItem('tiktrack_notification_settings', JSON.stringify(this.settings));
-      // console.log('✅ הגדרות נשמרו בהצלחה');
+      // // // console.log('✅ הגדרות נשמרו בהצלחה'); // Disabled for linting
     } catch {
       // שגיאה בשמירת הגדרות
     }
@@ -576,10 +576,10 @@ class NotificationsCenter {
         },
         body: JSON.stringify(logEntry),
       }).catch(error => {
-        // console.warn('לא ניתן לשמור בקובץ לוג:', error);
+        // // // console.warn('לא ניתן לשמור בקובץ לוג:', error); // Disabled for linting
       });
     } catch (error) {
-      // console.warn('שגיאה בשמירה לקובץ לוג:', error);
+      // // // console.warn('שגיאה בשמירה לקובץ לוג:', error); // Disabled for linting
     }
   }
 
@@ -603,7 +603,7 @@ class NotificationsCenter {
     this.saveToLocalStorage();
 
     // הודעה ישירה לממשק ללא לולאה
-    // console.log('✅ התראות פעילות נוקו בהצלחה');
+    // // // console.log('✅ התראות פעילות נוקו בהצלחה'); // Disabled for linting
   }
 
   clearHistory() {
@@ -616,7 +616,7 @@ class NotificationsCenter {
       this.saveToLocalStorage();
 
       // הודעה ישירה לממשק ללא לולאה
-      // console.log('✅ היסטוריית ההתראות נוקתה בהצלחה');
+      // // // console.log('✅ היסטוריית ההתראות נוקתה בהצלחה'); // Disabled for linting
     }
   }
 
@@ -627,7 +627,7 @@ class NotificationsCenter {
     this.updateStatsUI();
 
     // הודעה ישירה לממשק ללא לולאה
-    // console.log('✅ ההתראות רועננו בהצלחה');
+    // // // console.log('✅ ההתראות רועננו בהצלחה'); // Disabled for linting
   }
 
   filterHistory() {
@@ -677,7 +677,7 @@ class NotificationsCenter {
         }
       }
     } catch (error) {
-      // console.warn('שגיאה בעדכון זמן חיבור:', error);
+      // // // console.warn('שגיאה בעדכון זמן חיבור:', error); // Disabled for linting
     }
   }
 
@@ -692,7 +692,7 @@ class NotificationsCenter {
       if (statusDot.querySelector('.disconnected')) {return 'disconnected';}
       if (statusDot.querySelector('.connecting')) {return 'connecting';}
     } catch (error) {
-      // console.warn('שגיאה בקבלת סטטוס חיבור נוכחי:', error);
+      // // // console.warn('שגיאה בקבלת סטטוס חיבור נוכחי:', error); // Disabled for linting
     }
     return 'connecting';
   }
@@ -702,7 +702,7 @@ class NotificationsCenter {
 function copyNotificationsToClipboard() {
   try {
     if (!window.notificationsCenter) {
-      // console.warn('מרכז התראות לא זמין');
+      // // // console.warn('מרכז התראות לא זמין'); // Disabled for linting
       return;
     }
 
@@ -744,9 +744,9 @@ function copyNotificationsToClipboard() {
 
     // העתקה ללוח
     navigator.clipboard.writeText(log).then(() => {
-      // console.log('✅ לוג התראות הועתק ללוח בהצלחה');
+      // // // console.log('✅ לוג התראות הועתק ללוח בהצלחה'); // Disabled for linting
     }).catch(err => {
-      // console.error('❌ שגיאה בהעתקה ללוח:', err);
+      // // // console.error('❌ שגיאה בהעתקה ללוח:', err); // Disabled for linting
       // גיבוי - הצגה בחלון
       // העתקה ללוח
       navigator.clipboard.writeText(log).then(() => {
@@ -758,7 +758,7 @@ function copyNotificationsToClipboard() {
       });
     });
   } catch (error) {
-    // console.error('❌ שגיאה ביצירת לוג התראות:', error);
+    // // // console.error('❌ שגיאה ביצירת לוג התראות:', error); // Disabled for linting
   }
 }
 
@@ -827,16 +827,16 @@ function filterHistory() {
 
 // אתחול
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 טעינת דף מרכז התראות...');
+  // // console.log('🚀 טעינת דף מרכז התראות...'); // Disabled for linting
 
   // אתחול HeaderSystem
   if (window.headerSystem && !window.headerSystem.isInitialized) {
-    console.log('✅ אתחול HeaderSystem...');
+    // // console.log('✅ אתחול HeaderSystem...'); // Disabled for linting
     window.headerSystem.init();
   }
 
   // יצירת מופע מרכז התראות
   window.notificationsCenter = new NotificationsCenter();
 
-  console.log('✅ דף מרכז התראות נטען בהצלחה');
+  // // console.log('✅ דף מרכז התראות נטען בהצלחה'); // Disabled for linting
 });

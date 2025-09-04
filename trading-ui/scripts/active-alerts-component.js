@@ -92,7 +92,7 @@ class ActiveAlertsComponent extends HTMLElement {
     setTimeout(() => {
       // בדיקה אם יש הרבה הודעות בקונסולה
       if (this._checkAttempts > 3) {
-        // console.log('⚠️ הרבה ניסיונות טעינה - בדוק את הקונסול');
+        // // console.log('⚠️ הרבה ניסיונות טעינה - בדוק את הקונסול'); // Disabled for linting
       }
     }, 10000);
   }
@@ -945,7 +945,7 @@ class ActiveAlertsComponent extends HTMLElement {
     });
 
     if (!hasStyles) {
-      // console.warn('⚠️ Active Alerts Component: styles.css not found - icon may not display correctly');
+      // // console.warn('⚠️ Active Alerts Component: styles.css not found - icon may not display correctly'); // Disabled for linting
     }
   }
 

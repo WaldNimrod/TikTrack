@@ -112,11 +112,11 @@ class JsMapSystem {
 
       } else {
         // Fallback to local scanning
-        // console.warn('⚠️ Server response not ok, using local scan');
+        // // console.warn('⚠️ Server response not ok, using local scan'); // Disabled for linting
         this.pageMapping = this.scanPageMappingLocally();
       }
     } catch (_error) {
-      // console.warn('⚠️ Using local page mapping scan due to error:', _error);
+      // // console.warn('⚠️ Using local page mapping scan due to error:', _error); // Disabled for linting
       this.pageMapping = this.scanPageMappingLocally();
     }
   }
@@ -137,14 +137,14 @@ class JsMapSystem {
         //   this.functionsData[file] && this.functionsData[file].length > 0,
         // );
 
-        // console.log('Functions data loaded successfully');
+        // // console.log('Functions data loaded successfully'); // Disabled for linting
       } else {
         // Fallback to local scanning
-        // console.warn('⚠️ Server response not ok, using local scan');
+        // // console.warn('⚠️ Server response not ok, using local scan'); // Disabled for linting
         this.functionsData = this.scanFunctionsLocally();
       }
     } catch (_error) {
-      // console.warn('⚠️ Using local functions scan due to error:', _error);
+      // // console.warn('⚠️ Using local functions scan due to error:', _error); // Disabled for linting
       this.functionsData = this.scanFunctionsLocally();
     }
   }
@@ -195,7 +195,7 @@ class JsMapSystem {
 
         return scanResult.functions;
       } catch (error) {
-        // console.warn('⚠️ Could not scan functions, using fallback structure:', error);
+        // // console.warn('⚠️ Could not scan functions, using fallback structure:', error); // Disabled for linting
       }
     }
 
@@ -250,7 +250,7 @@ class JsMapSystem {
 
         return scanResult.counts;
       } catch (error) {
-        // console.warn('⚠️ Could not scan function calls, using fallback data:', error);
+        // // console.warn('⚠️ Could not scan function calls, using fallback data:', error); // Disabled for linting
       }
     }
 

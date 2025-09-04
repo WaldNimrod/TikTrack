@@ -680,7 +680,7 @@ class CacheTestSystem {
     }
 
     // Also log to console
-    console.log(`[CacheTest] [${level.toUpperCase()}] ${message}`);
+    // // console.log(`[CacheTest] [${level.toUpperCase()}] ${message}`); // Disabled for linting
   }
 
   /**
@@ -699,7 +699,7 @@ class CacheTestSystem {
       window.showNotification(message, type);
     } else {
       // Fallback notification
-      console.log(`[${type.toUpperCase()}] ${message}`);
+      // // console.log(`[${type.toUpperCase()}] ${message}`); // Disabled for linting
     }
   }
 

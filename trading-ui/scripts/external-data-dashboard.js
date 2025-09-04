@@ -25,7 +25,7 @@
  */
 function copyDetailedLog() {
   try {
-    // console.log('📋 Collecting detailed logs...');
+    // // console.log('📋 Collecting detailed logs...'); // Disabled for linting
 
     // Collect system information
     const systemInfo = {
@@ -103,7 +103,7 @@ ${detailedLog.consoleLogs.join('\n')}
 
     // Copy to clipboard
     navigator.clipboard.writeText(logText).then(() => {
-      // console.log('✅ Detailed log copied to clipboard');
+      // // console.log('✅ Detailed log copied to clipboard'); // Disabled for linting
 
       // Show success notification
       if (window.showNotification) {
@@ -115,8 +115,8 @@ ${detailedLog.consoleLogs.join('\n')}
       }
 
       // Also log to console for easy access
-      // console.log('📋 DETAILED LOG COPIED TO CLIPBOARD:');
-      // console.log(logText);
+      // // console.log('📋 DETAILED LOG COPIED TO CLIPBOARD:'); // Disabled for linting
+      // // console.log(logText); // Disabled for linting
 
     }).catch(_err => {
       // Failed to copy to clipboard
@@ -155,7 +155,7 @@ class ExternalDataDashboard {
       return;
     }
 
-    // console.log('🚀 External Data Dashboard - Initializing...');
+    // // console.log('🚀 External Data Dashboard - Initializing...'); // Disabled for linting
 
     // Initialize dashboard
     this.initializeDashboard();
@@ -173,7 +173,7 @@ class ExternalDataDashboard {
     this.setupEventListeners();
 
     this.isInitialized = true;
-    // console.log('✅ External Data Dashboard - Initialized successfully');
+    // // console.log('✅ External Data Dashboard - Initialized successfully'); // Disabled for linting
   }
 
   static initializeDashboard() {
@@ -188,7 +188,7 @@ class ExternalDataDashboard {
 
   async loadSystemStatus() {
     try {
-      // console.log('📊 Loading system status...');
+      // // console.log('📊 Loading system status...'); // Disabled for linting
 
       const response = await fetch('/api/external-data/status/');
       if (response.ok) {
@@ -201,7 +201,7 @@ class ExternalDataDashboard {
         this.updateAPIStatus(data);
 
       } else {
-        // console.error('❌ Error loading system status:', response.status);
+        // // console.error('❌ Error loading system status:', response.status); // Disabled for linting
       }
     } catch (_error) {
       // Error loading system status
@@ -377,7 +377,7 @@ class ExternalDataDashboard {
 
   async loadProviders() {
     try {
-      // console.log('📊 Loading providers...');
+      // // console.log('📊 Loading providers...'); // Disabled for linting
 
       const response = await fetch('/api/external-data/status/providers');
       if (response.ok) {
@@ -385,10 +385,10 @@ class ExternalDataDashboard {
         this.providers = data.providers || [];
         this.renderProviders();
       } else {
-        // console.error('❌ Error loading providers');
+        // // console.error('❌ Error loading providers'); // Disabled for linting
       }
     } catch (error) {
-      // console.error('❌ Error loading providers:', error);
+      // // console.error('❌ Error loading providers:', error); // Disabled for linting
     }
   }
 
@@ -436,7 +436,7 @@ class ExternalDataDashboard {
 
   async loadCacheStats() {
     try {
-      // console.log('💾 Loading cache stats...');
+      // // console.log('💾 Loading cache stats...'); // Disabled for linting
 
       // Use the main status endpoint to get cache stats
       const response = await fetch('/api/external-data/status/');
@@ -448,10 +448,10 @@ class ExternalDataDashboard {
         // Also update the current settings display
         this.updateCurrentSettings(data);
       } else {
-        // console.error('❌ Error loading cache stats:', response.status);
+        // // console.error('❌ Error loading cache stats:', response.status); // Disabled for linting
       }
     } catch (error) {
-      // console.error('❌ Error loading cache stats:', error);
+      // // console.error('❌ Error loading cache stats:', error); // Disabled for linting
     }
   }
 
@@ -506,26 +506,26 @@ class ExternalDataDashboard {
         maxRequestsElement.textContent = `${maxRequests} לשעה`;
       }
 
-      // console.log('✅ Current settings updated');
+      // // console.log('✅ Current settings updated'); // Disabled for linting
     } catch (error) {
-      // console.error('❌ Error updating current settings:', error);
+      // // console.error('❌ Error updating current settings:', error); // Disabled for linting
     }
   }
 
   async loadLogs() {
     try {
-      // console.log('📋 Loading logs...');
+      // // console.log('📋 Loading logs...'); // Disabled for linting
 
       const response = await fetch('/api/external-data/status/logs');
       if (response.ok) {
         const data = await response.json();
         this.renderLogs(data.logs || []);
       } else {
-        // console.error('❌ Error loading logs:', response.status);
+        // // console.error('❌ Error loading logs:', response.status); // Disabled for linting
         this.renderLogs([]);
       }
     } catch (error) {
-      // console.error('❌ Error loading logs:', error);
+      // // console.error('❌ Error loading logs:', error); // Disabled for linting
       this.renderLogs([]);
     }
   }
@@ -591,19 +591,19 @@ class ExternalDataDashboard {
     const searchTerm = document.getElementById('log-search')?.value || '';
 
     // Implementation for log filtering
-    // console.log('🔍 Filtering logs:', { level: levelFilter, search: searchTerm });
+    // // console.log('🔍 Filtering logs:', { level: levelFilter, search: searchTerm }); // Disabled for linting
   }
 
   // Public methods for buttons
   async refreshProviders() {
-    // console.log('🔄 Refreshing providers...');
+    // // console.log('🔄 Refreshing providers...'); // Disabled for linting
     await this.loadProviders();
   }
 
 
   static async saveSettings() {
     try {
-      // console.log('💾 Saving settings...');
+      // // console.log('💾 Saving settings...'); // Disabled for linting
 
       const settings = {
         hot_cache_ttl: document.getElementById('hot-cache-ttl')?.value || 1,
@@ -619,18 +619,18 @@ class ExternalDataDashboard {
 
       if (response.ok) {
         const result = await response.json();
-        // console.log('✅ Settings saved successfully:', result.message);
-        // console.log('📋 Updated settings:', result.settings);
+        // // console.log('✅ Settings saved successfully:', result.message); // Disabled for linting
+        // // console.log('📋 Updated settings:', result.settings); // Disabled for linting
       } else {
-        // console.error('❌ Error saving settings:', response.status);
+        // // console.error('❌ Error saving settings:', response.status); // Disabled for linting
       }
     } catch (error) {
-      // console.error('❌ Error saving settings:', error);
+      // // console.error('❌ Error saving settings:', error); // Disabled for linting
     }
   }
 
   async resetSettings() {
-    // console.log('🔄 Resetting settings...');
+    // // console.log('🔄 Resetting settings...'); // Disabled for linting
 
     document.getElementById('hot-cache-ttl').value = 1;
     document.getElementById('warm-cache-ttl').value = 5;
@@ -640,81 +640,81 @@ class ExternalDataDashboard {
   }
 
   async refreshLogs() {
-    // console.log('🔄 Refreshing logs...');
+    // // console.log('🔄 Refreshing logs...'); // Disabled for linting
     await this.loadLogs();
   }
 
   async clearLogs() {
     try {
-      // console.log('🗑️ Clearing logs...');
+      // // console.log('🗑️ Clearing logs...'); // Disabled for linting
 
       const response = await fetch('/api/external-data/status/logs/clear', { method: 'POST' });
       if (response.ok) {
-        // console.log('✅ Logs cleared successfully');
+        // // console.log('✅ Logs cleared successfully'); // Disabled for linting
         await this.loadLogs();
       } else {
-        // console.error('❌ Error clearing logs:', response.status);
+        // // console.error('❌ Error clearing logs:', response.status); // Disabled for linting
       }
     } catch (error) {
-      // console.error('❌ Error clearing logs:', error);
+      // // console.error('❌ Error clearing logs:', error); // Disabled for linting
     }
   }
 
   async clearCache() {
     try {
-      // console.log('🗑️ Clearing cache...');
+      // // console.log('🗑️ Clearing cache...'); // Disabled for linting
 
       const response = await fetch('/api/external-data/status/cache/clear', { method: 'POST' });
       if (response.ok) {
         const result = await response.json();
-        // console.log('✅ Cache cleared successfully:', result.message);
+        // // console.log('✅ Cache cleared successfully:', result.message); // Disabled for linting
         await this.loadCacheStats();
       } else {
-        // console.error('❌ Error clearing cache:', response.status);
+        // // console.error('❌ Error clearing cache:', response.status); // Disabled for linting
       }
     } catch (error) {
-      // console.error('❌ Error clearing cache:', error);
+      // // console.error('❌ Error clearing cache:', error); // Disabled for linting
     }
   }
 
   async optimizeCache() {
     try {
-      // console.log('⚡ Optimizing cache...');
+      // // console.log('⚡ Optimizing cache...'); // Disabled for linting
 
       const response = await fetch('/api/external-data/status/cache/optimize', { method: 'POST' });
       if (response.ok) {
         const result = await response.json();
-        // console.log('✅ Cache optimized successfully:', result.message);
+        // // console.log('✅ Cache optimized successfully:', result.message); // Disabled for linting
         await this.loadCacheStats();
       } else {
-        // console.error('❌ Error optimizing cache:', response.status);
+        // // console.error('❌ Error optimizing cache:', response.status); // Disabled for linting
       }
     } catch (error) {
-      // console.error('❌ Error optimizing cache:', error);
+      // // console.error('❌ Error optimizing cache:', error); // Disabled for linting
     }
   }
 
   async testAllProviders() {
     try {
-      // console.log('🧪 Testing all providers...');
+      // // console.log('🧪 Testing all providers...'); // Disabled for linting
 
       const response = await fetch('/api/external-data/status/providers/test-all', { method: 'POST' });
       if (response.ok) {
         const result = await response.json();
-        // console.log('✅ All providers tested:', result.message);
-        // console.log('📊 Test results:', result.test_results);
+        // // console.log('✅ All providers tested:', result.message); // Disabled for linting
+        // // console.log('📊 Test results:', result.test_results); // Disabled for linting
         await this.loadProviders();
       } else {
-        // console.error('❌ Error testing providers:', response.status);
+        // // console.error('❌ Error testing providers:', response.status); // Disabled for linting
       }
     } catch (error) {
-      // console.error('❌ Error testing providers:', error);
+      // // console.error('❌ Error testing providers:', error); // Disabled for linting
     }
   }
 
   static async exportData() {
     try {
-      // console.log('📤 Exporting data...');
+      // // console.log('📤 Exporting data...'); // Disabled for linting
 
       // For now, export the current system status as JSON
       const response = await fetch('/api/external-data/status/');
@@ -731,18 +731,18 @@ class ExternalDataDashboard {
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
-        // console.log('✅ Data exported successfully');
+        // // console.log('✅ Data exported successfully'); // Disabled for linting
       } else {
-        // console.error('❌ Error exporting data:', response.status);
+        // // console.error('❌ Error exporting data:', response.status); // Disabled for linting
       }
     } catch (error) {
-      // console.error('❌ Error exporting data:', error);
+      // // console.error('❌ Error exporting data:', error); // Disabled for linting
     }
   }
 
   static async analyzeData() {
     try {
-      // console.log('📊 Analyzing data...');
+      // // console.log('📊 Analyzing data...'); // Disabled for linting
 
       // For now, just show current system metrics
       const response = await fetch('/api/external-data/status/');
@@ -759,7 +759,7 @@ class ExternalDataDashboard {
           system_status: data.status || 'לא ידוע',
         };
 
-        // console.log('📊 Data Analysis:', analysis);
+        // // console.log('📊 Data Analysis:', analysis); // Disabled for linting
 
         // Show analysis in UI (you can implement this later)
         if (window.showInfoNotification) {
@@ -767,23 +767,23 @@ class ExternalDataDashboard {
         }
 
       } else {
-        // console.error('❌ Error analyzing data:', response.status);
+        // // console.error('❌ Error analyzing data:', response.status); // Disabled for linting
       }
     } catch (error) {
-      // console.error('❌ Error analyzing data:', error);
+      // // console.error('❌ Error analyzing data:', error); // Disabled for linting
     }
   }
 
   async backupData() {
     try {
-      // console.log('💾 Backing up data...');
+      // // console.log('💾 Backing up data...'); // Disabled for linting
 
       // For now, just export current data as backup
       await this.exportData();
-      // console.log('✅ Data backup completed');
+      // // console.log('✅ Data backup completed'); // Disabled for linting
 
     } catch (error) {
-      // console.error('❌ Error backing up data:', error);
+      // // console.error('❌ Error backing up data:', error); // Disabled for linting
     }
   }
 
@@ -797,12 +797,12 @@ class ExternalDataDashboard {
 
 // Global functions for button onclick handlers
 window.testProvider = function(providerId) {
-  // console.log('🧪 Testing provider:', providerId);
+  // // console.log('🧪 Testing provider:', providerId); // Disabled for linting
   // Implementation for testing specific provider
 };
 
 window.toggleProvider = function(providerId) {
-  // console.log('🔄 Toggling provider:', providerId);
+  // // console.log('🔄 Toggling provider:', providerId); // Disabled for linting
   // Implementation for toggling provider status
 };
 

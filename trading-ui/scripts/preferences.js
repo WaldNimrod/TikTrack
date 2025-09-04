@@ -205,7 +205,7 @@ async function resetToDefaults() {
       }
     }
   } catch (error) {
-    console.error('שגיאה באיפוס העדפות:', error);
+    // // console.error('שגיאה באיפוס העדפות:', error); // Disabled for linting
     showPreferencesError('שגיאה', 'שגיאה באיפוס העדפות');
   }
 }
@@ -356,12 +356,12 @@ async function loadAccountsToFilter() {
       const accounts = await window.getAccounts();
       updateAccountFilter(accounts);
     } else {
-      console.warn('⚠️ פונקציית getAccounts לא זמינה, משתמש בנתונים מקומיים');
+      // // console.warn('⚠️ פונקציית getAccounts לא זמינה, משתמש בנתונים מקומיים'); // Disabled for linting
       showPreferencesWarning('טעינת חשבונות', 'פונקציית getAccounts לא זמינה, משתמש בנתונים מקומיים');
       loadLocalAccounts();
     }
   } catch (error) {
-    console.error('שגיאה בטעינת חשבונות:', error);
+    // // console.error('שגיאה בטעינת חשבונות:', error); // Disabled for linting
     showPreferencesError('טעינת חשבונות', 'שגיאה בטעינת חשבונות מהשרת');
     loadLocalAccounts();
   }
@@ -395,7 +395,7 @@ function updateAccountFilter(accounts) {
 
   const accountFilterSelect = document.getElementById('defaultAccountFilter');
   if (!accountFilterSelect) {
-    console.warn('לא נמצא אלמנט פילטר חשבונות');
+    // // console.warn('לא נמצא אלמנט פילטר חשבונות'); // Disabled for linting
     return;
   }
 
@@ -413,7 +413,7 @@ function updateAccountFilter(accounts) {
       accountFilterSelect.appendChild(option);
     });
   } else {
-    console.warn('⚠️ אין חשבונות להוספה');
+    // // console.warn('⚠️ אין חשבונות להוספה'); // Disabled for linting
   }
 
   // החזר את הבחירה הקודמת אם היא עדיין קיימת
@@ -461,7 +461,7 @@ function showPreferencesSuccess(title, message) {
   } else if (typeof window.showNotification === 'function') {
     window.showNotification(title, message, 'success');
   } else {
-    console.log('✅ הצלחה:', title, '-', message);
+    // // console.log('✅ הצלחה:', title, '-', message); // Disabled for linting
   }
 }
 
@@ -474,7 +474,7 @@ function showPreferencesError(title, message) {
   } else if (typeof window.showNotification === 'function') {
     window.showNotification(title, message, 'error');
   } else {
-    console.error('❌ שגיאה:', title, '-', message);
+    // // console.error('❌ שגיאה:', title, '-', message); // Disabled for linting
   }
 }
 
@@ -487,7 +487,7 @@ function showPreferencesInfo(title, message) {
   } else if (typeof window.showNotification === 'function') {
     window.showNotification(title, message, 'info');
   } else {
-    console.log('ℹ️ מידע:', title, '-', message);
+    // // console.log('ℹ️ מידע:', title, '-', message); // Disabled for linting
   }
 }
 
@@ -500,7 +500,7 @@ function showPreferencesWarning(title, message) {
   } else if (typeof window.showNotification === 'function') {
     window.showNotification(title, message, 'warning');
   } else {
-    console.warn('⚠️ אזהרה:', title, '-', message);
+    // // console.warn('⚠️ אזהרה:', title, '-', message); // Disabled for linting
   }
 }
 
@@ -513,7 +513,7 @@ async function initializePreferences() {
     if (typeof window.restoreAllSectionStates === 'function') {
       window.restoreAllSectionStates();
     } else {
-      console.warn('פונקציית שחזור מצב סקשנים לא נמצאה');
+      // // console.warn('פונקציית שחזור מצב סקשנים לא נמצאה'); // Disabled for linting
     }
 
     // טען העדפות
@@ -525,9 +525,9 @@ async function initializePreferences() {
     // טען הגדרות קונסול לממשק
     loadConsoleSettingsToUI();
 
-    console.log('✅ דף העדפות אותחל בהצלחה');
+    // // console.log('✅ דף העדפות אותחל בהצלחה'); // Disabled for linting
   } catch (error) {
-    console.error('שגיאה באתחול דף העדפות:', error);
+    // // console.error('שגיאה באתחול דף העדפות:', error); // Disabled for linting
     showPreferencesError('שגיאה', 'שגיאה באתחול דף העדפות');
   }
 }
@@ -561,7 +561,7 @@ window.toggleTopSection = function() {
   if (typeof window.toggleTopSectionGlobal === 'function') {
     window.toggleTopSectionGlobal();
   } else {
-    console.warn('פונקציית toggleTopSectionGlobal לא נמצאה ב-main.js');
+    // // console.warn('פונקציית toggleTopSectionGlobal לא נמצאה ב-main.js'); // Disabled for linting
   }
 };
 
@@ -588,7 +588,7 @@ function updateConsolePreference(key, value) {
     // אל תפעיל את ההגדרות עד שהמשתמש לוחץ על "שמור שינויים"
     // applyConsoleSettings();
   } catch (error) {
-    console.error('שגיאה בעדכון הגדרת קונסול:', error);
+    // // console.error('שגיאה בעדכון הגדרת קונסול:', error); // Disabled for linting
   }
 }
 
@@ -625,7 +625,7 @@ function applyConsoleSettings() {
       }
     }
   } catch (error) {
-    console.error('שגיאה בהפעלת הגדרות קונסול:', error);
+    // // console.error('שגיאה בהפעלת הגדרות קונסול:', error); // Disabled for linting
   }
 }
 
@@ -641,7 +641,7 @@ function manualClearConsole() {
       showPreferencesError('שגיאה', 'פונקציית ניקוי קונסול לא זמינה');
     }
   } catch (error) {
-    console.error('שגיאה בניקוי קונסול:', error);
+    // // console.error('שגיאה בניקוי קונסול:', error); // Disabled for linting
     showPreferencesError('שגיאה', 'שגיאה בניקוי הקונסול');
   }
 }
@@ -666,7 +666,7 @@ function loadConsoleSettingsToUI() {
       if (suppressDurationInput) {suppressDurationInput.value = settings.suppressDuration || 5;}
     }
   } catch (error) {
-    console.error('שגיאה בטעינת הגדרות קונסול לממשק:', error);
+    // // console.error('שגיאה בטעינת הגדרות קונסול לממשק:', error); // Disabled for linting
   }
 }
 
@@ -719,7 +719,7 @@ function updateNumericValueColor(colorType, intensity, colorValue) {
     showPreferencesInfo('צבעים', `${colorLabel} עודכן`);
 
   } catch (error) {
-    console.error('שגיאה בעדכון צבע ערך מספרי:', error);
+    // // console.error('שגיאה בעדכון צבע ערך מספרי:', error); // Disabled for linting
     showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
   }
 }
@@ -746,7 +746,7 @@ function updateNumericValueColorFromHex(colorType, intensity, hexValue) {
     }
 
   } catch (error) {
-    console.error('שגיאה בעדכון צבע ערך מספרי מ-hex:', error);
+    // // console.error('שגיאה בעדכון צבע ערך מספרי מ-hex:', error); // Disabled for linting
     showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
   }
 }
@@ -771,7 +771,7 @@ function resetNumericValueColors() {
     showPreferencesInfo('צבעים', 'הצבעים אופסו לברירת המחדל');
 
   } catch (error) {
-    console.error('שגיאה באיפוס צבעים:', error);
+    // // console.error('שגיאה באיפוס צבעים:', error); // Disabled for linting
     showPreferencesError('שגיאה', 'לא ניתן לאפס את הצבעים');
   }
 }
@@ -823,7 +823,7 @@ function updateNumericValueColorsUI() {
     }
 
   } catch (error) {
-    console.error('שגיאה בעדכון ממשק הצבעים המספריים:', error);
+    // // console.error('שגיאה בעדכון ממשק הצבעים המספריים:', error); // Disabled for linting
   }
 }
 
@@ -887,7 +887,7 @@ function updateEntityColor(entityType, colorValue) {
     showPreferencesInfo('צבעי ישויות', `צבע ${entityLabel} עודכן`);
 
   } catch (error) {
-    console.error('שגיאה בעדכון צבע ישות:', error);
+    // // console.error('שגיאה בעדכון צבע ישות:', error); // Disabled for linting
     showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
   }
 }
@@ -907,7 +907,7 @@ function updateEntityColorFromHex(entityType, hexValue) {
     updateEntityColor(entityType, hexValue);
 
   } catch (error) {
-    console.error('שגיאה בעדכון צבע ישות מ-hex:', error);
+    // // console.error('שגיאה בעדכון צבע ישות מ-hex:', error); // Disabled for linting
     showPreferencesError('שגיאה', 'לא ניתן לעדכן את הצבע');
   }
 }
@@ -932,7 +932,7 @@ function resetEntityColors() {
     showPreferencesInfo('צבעי ישויות', 'צבעי הישויות אופסו לברירת המחדל');
 
   } catch (error) {
-    console.error('שגיאה באיפוס צבעי ישויות:', error);
+    // // console.error('שגיאה באיפוס צבעי ישויות:', error); // Disabled for linting
     showPreferencesError('שגיאה', 'לא ניתן לאפס את צבעי הישויות');
   }
 }
@@ -1034,7 +1034,7 @@ function updateEntityColorsUI() {
     }
 
   } catch (error) {
-    console.error('שגיאה בעדכון ממשק צבעי ישויות:', error);
+    // // console.error('שגיאה בעדכון ממשק צבעי ישויות:', error); // Disabled for linting
   }
 }
 

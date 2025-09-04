@@ -32,7 +32,7 @@ const tableData = {};
  * Initialize the database display page
  */
 function initDatabaseDisplay() {
-  // console.log('🔄 Initializing database display page...');
+  // // console.log('🔄 Initializing database display page...'); // Disabled for linting
 
   // Load default table (accounts)
   loadTableData('accounts');
@@ -45,7 +45,7 @@ function initDatabaseDisplay() {
     window.headerSystem.init();
   }
 
-  // console.log('✅ Database display page initialized successfully');
+  // // console.log('✅ Database display page initialized successfully'); // Disabled for linting
 }
 
 /**
@@ -78,7 +78,7 @@ function setupEventListeners() {
  */
 async function loadTableData(tableType) {
   try {
-    // console.log(`📊 Loading data for table type: ${tableType}`);
+    // // console.log(`📊 Loading data for table type: ${tableType}`); // Disabled for linting
 
     // Update current table type
     currentTableType = tableType;
@@ -99,10 +99,10 @@ async function loadTableData(tableType) {
     updateTableInfo(tableType, data.length);
 
 
-    // console.log(`✅ Data loaded for ${tableType}: ${data.length} records`);
+    // // console.log(`✅ Data loaded for ${tableType}: ${data.length} records`); // Disabled for linting
 
   } catch (error) {
-    // console.error(`❌ Error loading data for ${tableType}:`, error);
+    // // console.error(`❌ Error loading data for ${tableType}:`, error); // Disabled for linting
     handleDataLoadError(error, tableType);
   }
 }
@@ -127,7 +127,7 @@ async function fetchTableData(tableType) {
       throw new Error(result.error?.message || `Error fetching ${tableType} data`);
     }
   } catch {
-    // console.error(`❌ Error fetching ${tableType} data:`, error);
+    // // console.error(`❌ Error fetching ${tableType} data:`, error); // Disabled for linting
     // Return empty array on error
     return [];
   }
@@ -146,28 +146,28 @@ function updateTableDisplay(data, tableType) {
   const tableContainer = document.getElementById(containerId);
 
   if (!tableContainer) {
-    // console.error(`❌ Table container not found for ${tableType}: ${containerId}`);
+    // // console.error(`❌ Table container not found for ${tableType}: ${containerId}`); // Disabled for linting
     return;
   }
 
   // Find the table within the container
   const table = tableContainer.querySelector('table');
   if (!table) {
-    // console.error(`❌ Table not found in container ${containerId}`);
+    // // console.error(`❌ Table not found in container ${containerId}`); // Disabled for linting
     return;
   }
 
   // Find the table body
   const tbody = table.querySelector('tbody');
   if (!tbody) {
-    // console.error(`❌ Table body not found in table ${tableType}`);
+    // // console.error(`❌ Table body not found in table ${tableType}`); // Disabled for linting
     return;
   }
 
   // Get table mappings
   const tableMapping = window.TABLE_COLUMN_MAPPINGS?.[tableType];
   if (!tableMapping) {
-    // console.error(`❌ No table mapping found for ${tableType}`);
+    // // console.error(`❌ No table mapping found for ${tableType}`); // Disabled for linting
     return;
   }
 
@@ -241,7 +241,7 @@ function formatCellValue(value, column) {
  */
 function applySortingFunctionality(_tableType) {
   // Sorting is handled by global sortTable function from main.js
-  // console.log(`🔀 Sorting functionality applied to ${tableType} table`);
+  // // console.log(`🔀 Sorting functionality applied to ${tableType} table`); // Disabled for linting
 }
 
 // ===== UTILITY FUNCTIONS =====
@@ -357,7 +357,7 @@ function formatStatus(status) {
  * @param {string} tableType - The table type
  */
 function handleDataLoadError(error, tableType) {
-  // console.error(`❌ Error loading ${tableType} data:`, error);
+  // // console.error(`❌ Error loading ${tableType} data:`, error); // Disabled for linting
 
   // Show error notification
   if (window.showErrorNotification) {
@@ -431,14 +431,14 @@ function sortTable(columnIndex, tableType) {
   const tableMapping = window.TABLE_COLUMN_MAPPINGS?.[tableType];
 
   if (!tableMapping) {
-    // console.error(`❌ No table mapping found for ${tableType}`);
+    // // console.error(`❌ No table mapping found for ${tableType}`); // Disabled for linting
     return;
   }
 
   // Get the field name for the column
   const fieldName = tableMapping[columnIndex];
   if (!fieldName) {
-    // console.error(`❌ Invalid column index: ${columnIndex}`);
+    // // console.error(`❌ Invalid column index: ${columnIndex}`); // Disabled for linting
     return;
   }
 
@@ -474,9 +474,9 @@ window.sortTable = sortTable;
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-  // console.log('➕ Database display page DOM loaded');
+  // // console.log('➕ Database display page DOM loaded'); // Disabled for linting
   initDatabaseDisplay();
 });
 
-// console.log('✅ DB Display script loaded successfully');
+// // console.log('✅ DB Display script loaded successfully'); // Disabled for linting
 

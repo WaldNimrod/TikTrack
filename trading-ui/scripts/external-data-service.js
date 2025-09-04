@@ -86,7 +86,7 @@ class ExternalDataService {
   /**
      * Get cache key for a request
      */
-  getCacheKey(endpoint, params = {}) {
+  static getCacheKey(endpoint, params = {}) {
     const paramString = Object.keys(params).length > 0 ?
       '?' + new URLSearchParams(params).toString() : '';
     return `${endpoint}${paramString}`;
@@ -413,7 +413,7 @@ class ExternalDataService {
      * @param {string} currency - Currency code
      * @returns {string} Formatted price
      */
-  formatPrice(price, currency = 'USD') {
+  static formatPrice(price, currency = 'USD') {
     if (typeof price !== 'number' || isNaN(price)) {
       return 'N/A';
     }
@@ -439,7 +439,7 @@ class ExternalDataService {
      * @param {number} changePercent - Percentage change
      * @returns {Object} Formatted change with color class
      */
-  formatPercentageChange(changePercent) {
+  static formatPercentageChange(changePercent) {
     if (typeof changePercent !== 'number' || isNaN(changePercent)) {
       return { text: 'N/A', colorClass: '' };
     }
@@ -485,7 +485,7 @@ class ExternalDataService {
      * @param {number} maxAgeMinutes - Maximum age in minutes
      * @returns {boolean} True if data is stale
      */
-  isDataStale(timestamp, maxAgeMinutes = 5) {
+  static isDataStale(timestamp, maxAgeMinutes = 5) {
     if (!timestamp) {return true;}
 
     try {

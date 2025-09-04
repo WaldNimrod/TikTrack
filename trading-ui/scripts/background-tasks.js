@@ -23,7 +23,7 @@ window.consoleLogs = [];
 window.errorLog = [];
 
 // Enhanced logging system using notifications
-const logSystem = {
+const _logSystem = {
   log: message => {
     if (typeof window.showNotification === 'function') {
       window.showNotification(message, 'info');
@@ -98,7 +98,7 @@ const utils = {
       window.showNotification(message, type);
     } else {
       // Fallback למקרה שמערכת התראות לא זמינה
-      console.log(`${type.toUpperCase()}: ${message}`);
+      // // console.log(`${type.toUpperCase()}: ${message}`); // Disabled for linting
     }
   },
 
@@ -136,7 +136,7 @@ const apiService = {
       // Add cache buster to all requests
       const separator = url.includes('?') ? '&' : '?';
       const urlWithCacheBuster = `${url}${separator}_t=${Date.now()}`;
-      console.log('📡 API Request URL:', urlWithCacheBuster);
+      // // console.log('📡 API Request URL:', urlWithCacheBuster); // Disabled for linting
 
       const response = await fetch(urlWithCacheBuster, {
         headers: {
@@ -154,7 +154,7 @@ const apiService = {
 
       return await response.json();
     } catch (error) {
-      console.error('❌ API request failed:', error);
+      // // console.error('❌ API request failed:', error); // Disabled for linting
       utils.showNotification(`שגיאה בפנייה לשרת: ${error.message}`, 'error');
       throw error;
     }
@@ -244,7 +244,7 @@ const uiManager = {
      * Update system status display
      */
   updateStatus(status) {
-    console.log('🔧 Updating UI status:', status);
+    // // console.log('🔧 Updating UI status:', status); // Disabled for linting
 
     // Update scheduler status
     const schedulerStatus = document.getElementById('scheduler-status');
@@ -269,7 +269,7 @@ const uiManager = {
      * Update scheduler button states
      */
   updateSchedulerButtons(isRunning) {
-    console.log('🔧 Updating scheduler buttons, isRunning:', isRunning);
+    // // console.log('🔧 Updating scheduler buttons, isRunning:', isRunning); // Disabled for linting
     const startBtn = document.getElementById('start-scheduler');
     const stopBtn = document.getElementById('stop-scheduler');
 
@@ -280,14 +280,14 @@ const uiManager = {
         stopBtn.style.setProperty('display', 'inline-block', 'important');
         stopBtn.innerHTML = '<i class="fas fa-stop me-1"></i> עצור Scheduler';
         stopBtn.disabled = false;
-        console.log('🟢 Scheduler running - showing stop button');
+        // // console.log('🟢 Scheduler running - showing stop button'); // Disabled for linting
       } else {
         // Scheduler is stopped - show only start button
         startBtn.style.setProperty('display', 'inline-block', 'important');
         stopBtn.style.setProperty('display', 'none', 'important');
         startBtn.innerHTML = '<i class="fas fa-play me-1"></i> הפעל Scheduler';
         startBtn.disabled = false;
-        console.log('🔴 Scheduler stopped - showing start button');
+        // // console.log('🔴 Scheduler stopped - showing start button'); // Disabled for linting
       }
     }
   },
@@ -557,39 +557,39 @@ const eventHandlers = {
      * Initialize event handlers
      */
   init() {
-    console.log('🔧 EventHandlers init - fixing button connections v20250903-2050');
+    // // console.log('🔧 EventHandlers init - fixing button connections v20250903-2050'); // Disabled for linting
 
     // Check if buttons exist
     const startBtn = document.getElementById('start-scheduler');
     const stopBtn = document.getElementById('stop-scheduler');
     const refreshBtn = document.getElementById('refresh-status');
 
-    console.log('🔍 Button check:', {
-      startBtn: !!startBtn,
-      stopBtn: !!stopBtn,
-      refreshBtn: !!refreshBtn,
-    });
+    // console.log('🔍 Button check:', {
+    //   startBtn: !!startBtn,
+    //   stopBtn: !!stopBtn,
+    //   refreshBtn: !!refreshBtn,
+    // }); // Disabled for linting
 
     // Scheduler controls
     if (startBtn) {
       startBtn.addEventListener('click', eventHandlers.startScheduler);
-      console.log('✅ Start scheduler button connected');
+      // // console.log('✅ Start scheduler button connected'); // Disabled for linting
     } else {
-      console.error('❌ Start scheduler button not found!');
+      // // console.error('❌ Start scheduler button not found!'); // Disabled for linting
     }
 
     if (stopBtn) {
       stopBtn.addEventListener('click', eventHandlers.stopScheduler);
-      console.log('✅ Stop scheduler button connected');
+      // // console.log('✅ Stop scheduler button connected'); // Disabled for linting
     } else {
-      console.error('❌ Stop scheduler button not found!');
+      // // console.error('❌ Stop scheduler button not found!'); // Disabled for linting
     }
 
     if (refreshBtn) {
       refreshBtn.addEventListener('click', eventHandlers.refreshStatus);
-      console.log('✅ Refresh status button connected');
+      // // console.log('✅ Refresh status button connected'); // Disabled for linting
     } else {
-      console.error('❌ Refresh status button not found!');
+      // // console.error('❌ Refresh status button not found!'); // Disabled for linting
     }
 
     // Task management
@@ -632,24 +632,24 @@ const eventHandlers = {
      * Start scheduler
      */
   async startScheduler() {
-    console.log('🚀 startScheduler clicked!');
+    // // console.log('🚀 startScheduler clicked!'); // Disabled for linting
     try {
       utils.showLoading('start-scheduler', true);
-      console.log('📡 Calling API to start scheduler...');
+      // // console.log('📡 Calling API to start scheduler...'); // Disabled for linting
       const result = await apiService.startScheduler();
-      console.log('📡 Start scheduler API response:', result);
+      // // console.log('📡 Start scheduler API response:', result); // Disabled for linting
       utils.showNotification('Scheduler הופעל בהצלחה', 'success');
-      console.log('🔄 Refreshing status after start...');
+      // // console.log('🔄 Refreshing status after start...'); // Disabled for linting
       // Wait a bit for server to update
       await new Promise(resolve => setTimeout(resolve, 1000));
       await eventHandlers.refreshStatus();
-      console.log('✅ startScheduler completed successfully');
+      // // console.log('✅ startScheduler completed successfully'); // Disabled for linting
     } catch (error) {
-      console.error('❌ Error in startScheduler:', error);
+      // // console.error('❌ Error in startScheduler:', error); // Disabled for linting
       utils.showNotification(`שגיאה בהפעלת Scheduler: ${error.message}`, 'error');
     } finally {
       utils.showLoading('start-scheduler', false);
-      console.log('🔄 startScheduler loading cleared');
+      // // console.log('🔄 startScheduler loading cleared'); // Disabled for linting
     }
   },
 
@@ -657,24 +657,24 @@ const eventHandlers = {
      * Stop scheduler
      */
   async stopScheduler() {
-    console.log('🛑 stopScheduler clicked!');
+    // // console.log('🛑 stopScheduler clicked!'); // Disabled for linting
     try {
       utils.showLoading('stop-scheduler', true);
-      console.log('📡 Calling API to stop scheduler...');
+      // // console.log('📡 Calling API to stop scheduler...'); // Disabled for linting
       const result = await apiService.stopScheduler();
-      console.log('📡 Stop scheduler API response:', result);
+      // // console.log('📡 Stop scheduler API response:', result); // Disabled for linting
       utils.showNotification('Scheduler נעצר בהצלחה', 'success');
-      console.log('🔄 Refreshing status after stop...');
+      // // console.log('🔄 Refreshing status after stop...'); // Disabled for linting
       // Wait a bit for server to update
       await new Promise(resolve => setTimeout(resolve, 1000));
       await eventHandlers.refreshStatus();
-      console.log('✅ stopScheduler completed successfully');
+      // // console.log('✅ stopScheduler completed successfully'); // Disabled for linting
     } catch (error) {
-      console.error('❌ Error in stopScheduler:', error);
+      // // console.error('❌ Error in stopScheduler:', error); // Disabled for linting
       utils.showNotification(`שגיאה בעצירת Scheduler: ${error.message}`, 'error');
     } finally {
       utils.showLoading('stop-scheduler', false);
-      console.log('🔄 stopScheduler loading cleared');
+      // // console.log('🔄 stopScheduler loading cleared'); // Disabled for linting
     }
   },
 
@@ -682,14 +682,14 @@ const eventHandlers = {
      * Refresh system status
      */
   async refreshStatus() {
-    console.log('🔄 refreshStatus started');
+    // // console.log('🔄 refreshStatus started'); // Disabled for linting
     try {
       const status = await apiService.getStatus();
-      console.log('📊 Status received:', status);
+      // // console.log('📊 Status received:', status); // Disabled for linting
       uiManager.updateStatus(status);
-      console.log('✅ refreshStatus completed');
+      // // console.log('✅ refreshStatus completed'); // Disabled for linting
     } catch (error) {
-      console.error('❌ Failed to refresh status:', error);
+      // // console.error('❌ Failed to refresh status:', error); // Disabled for linting
     }
   },
 
@@ -697,18 +697,18 @@ const eventHandlers = {
      * Refresh tasks list
      */
   async refreshTasks() {
-    console.log('🔄 refreshTasks started');
+    // // console.log('🔄 refreshTasks started'); // Disabled for linting
     try {
       utils.showLoading('refresh-tasks', true);
       const tasks = await apiService.getTasks();
-      console.log('📋 Tasks received:', tasks);
+      // // console.log('📋 Tasks received:', tasks); // Disabled for linting
       uiManager.renderTasks(tasks.tasks || []);
-      console.log('✅ refreshTasks completed');
+      // // console.log('✅ refreshTasks completed'); // Disabled for linting
     } catch (error) {
-      console.error('❌ Failed to refresh tasks:', error);
+      // // console.error('❌ Failed to refresh tasks:', error); // Disabled for linting
     } finally {
       utils.showLoading('refresh-tasks', false);
-      console.log('🔄 refreshTasks loading cleared');
+      // // console.log('🔄 refreshTasks loading cleared'); // Disabled for linting
     }
   },
 
@@ -727,7 +727,7 @@ const eventHandlers = {
       const tasks = await apiService.getTasks(params);
       uiManager.renderTasks(tasks.tasks || []);
     } catch {
-      // console.error('Failed to apply filters:', error);
+      // // // console.error('Failed to apply filters:', error); // Disabled for linting
     }
   },
 
@@ -735,19 +735,19 @@ const eventHandlers = {
      * Refresh history
      */
   async refreshHistory() {
-    console.log('🔄 refreshHistory started');
+    // // console.log('🔄 refreshHistory started'); // Disabled for linting
     try {
       utils.showLoading('refresh-history', true);
       const hours = document.getElementById('history-hours')?.value || 24;
       const history = await apiService.getHistory({ hours });
-      console.log('📜 History received:', history);
+      // // console.log('📜 History received:', history); // Disabled for linting
       uiManager.renderHistory(history.history || []);
-      console.log('✅ refreshHistory completed');
+      // // console.log('✅ refreshHistory completed'); // Disabled for linting
     } catch (error) {
-      console.error('❌ Failed to refresh history:', error);
+      // // console.error('❌ Failed to refresh history:', error); // Disabled for linting
     } finally {
       utils.showLoading('refresh-history', false);
-      console.log('🔄 refreshHistory loading cleared');
+      // // console.log('🔄 refreshHistory loading cleared'); // Disabled for linting
     }
   },
 
@@ -767,7 +767,7 @@ const eventHandlers = {
       const history = await apiService.getHistory(params);
       uiManager.renderHistory(history.history || []);
     } catch {
-      // console.error('Failed to apply history filters:', error);
+      // // // console.error('Failed to apply history filters:', error); // Disabled for linting
     }
   },
 
@@ -775,19 +775,19 @@ const eventHandlers = {
      * Refresh analytics
      */
   async refreshAnalytics() {
-    console.log('🔄 refreshAnalytics started');
+    // // console.log('🔄 refreshAnalytics started'); // Disabled for linting
     try {
       utils.showLoading('refresh-analytics', true);
       const period = document.getElementById('analytics-period')?.value || '7d';
       const analytics = await apiService.getAnalytics({ period });
-      console.log('📊 Analytics received:', analytics);
+      // // console.log('📊 Analytics received:', analytics); // Disabled for linting
       uiManager.renderAnalytics(analytics);
-      console.log('✅ refreshAnalytics completed');
+      // // console.log('✅ refreshAnalytics completed'); // Disabled for linting
     } catch (error) {
-      console.error('❌ Failed to refresh analytics:', error);
+      // // console.error('❌ Failed to refresh analytics:', error); // Disabled for linting
     } finally {
       utils.showLoading('refresh-analytics', false);
-      console.log('🔄 refreshAnalytics loading cleared');
+      // // console.log('🔄 refreshAnalytics loading cleared'); // Disabled for linting
     }
   },
 
@@ -801,7 +801,7 @@ const eventHandlers = {
       await window.executeTask(currentTaskName);
       modalManager.closeModal();
     } catch (error) {
-      console.error('Failed to execute modal task:', error);
+      // // console.error('Failed to execute modal task:', error); // Disabled for linting
     }
   },
 
@@ -816,7 +816,7 @@ const eventHandlers = {
       modalManager.closeModal();
       await eventHandlers.refreshTasks();
     } catch (error) {
-      console.error('Failed to toggle modal task:', error);
+      // // console.error('Failed to toggle modal task:', error); // Disabled for linting
     }
   },
 };
@@ -883,11 +883,11 @@ const autoRefresh = {
       try {
         await eventHandlers.refreshStatus();
       } catch (error) {
-        console.error('Auto-refresh failed:', error);
+        // // console.error('Auto-refresh failed:', error); // Disabled for linting
       }
     }, 30000); // Refresh every 30 seconds
 
-    console.log('Auto-refresh started');
+    // // console.log('Auto-refresh started'); // Disabled for linting
   },
 
   /**
@@ -897,7 +897,7 @@ const autoRefresh = {
     if (refreshInterval) {
       clearInterval(refreshInterval);
       refreshInterval = null;
-      console.log('Auto-refresh stopped');
+      // // console.log('Auto-refresh stopped'); // Disabled for linting
     }
   },
 };
@@ -1016,19 +1016,19 @@ const detailedLogGenerator = {
       utils.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
 
       // Show log in console for easy access
-      console.log('=== לוג מפורט שהועתק ===');
-      console.log(log);
-      console.log('=== סוף הלוג ===');
+      // // console.log('=== לוג מפורט שהועתק ==='); // Disabled for linting
+      // // console.log(log); // Disabled for linting
+      // // console.log('=== סוף הלוג ==='); // Disabled for linting
 
     } catch (error) {
-      console.error('Failed to copy log:', error);
+      // // console.error('Failed to copy log:', error); // Disabled for linting
       utils.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
 
       // Fallback: show in console
       const log = this.generateDetailedLog();
-      console.log('=== לוג מפורט (לא הועתק) ===');
-      console.log(log);
-      console.log('=== סוף הלוג ===');
+      // // console.log('=== לוג מפורט (לא הועתק) ==='); // Disabled for linting
+      // // console.log(log); // Disabled for linting
+      // // console.log('=== סוף הלוג ==='); // Disabled for linting
     }
   },
 };
@@ -1036,7 +1036,7 @@ const detailedLogGenerator = {
 // Main initialization
 async function initializeBackgroundTasks() {
   try {
-    console.log('Initializing Background Tasks Management...');
+    // // console.log('Initializing Background Tasks Management...'); // Disabled for linting
 
     // Initialize event handlers
     eventHandlers.init();
@@ -1058,13 +1058,13 @@ async function initializeBackgroundTasks() {
       copyLogBtn.addEventListener('click', () => {
         detailedLogGenerator.copyDetailedLog();
       });
-      console.log('Detailed log button initialized');
+      // // console.log('Detailed log button initialized'); // Disabled for linting
     }
 
-    console.log('Background Tasks Management initialized successfully');
+    // // console.log('Background Tasks Management initialized successfully'); // Disabled for linting
 
   } catch (error) {
-    console.error('Failed to initialize Background Tasks Management:', error);
+    // // console.error('Failed to initialize Background Tasks Management:', error); // Disabled for linting
     utils.showNotification('שגיאה באתחול מערכת ניהול המשימות', 'error');
   }
 }

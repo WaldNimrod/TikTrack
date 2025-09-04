@@ -10,16 +10,16 @@ let isPageInitializing = true;
 function clearConsole() {
   // אל תבצע ניקוי console במהלך טעינת הדף
   if (isPageInitializing) {
-    // console.log('🚫 ניקוי console נחסם במהלך טעינת הדף');
+    // // // console.log('🚫 ניקוי console נחסם במהלך טעינת הדף'); // Disabled for linting
     return;
   }
 
   // בדוק אם יש מערכת מובנית לניקוי console
   if (window.manualClearConsole) {
-    // console.log('ℹ️ ניקוי console מבוצע דרך המערכת המובנית');
+    // // // console.log('ℹ️ ניקוי console מבוצע דרך המערכת המובנית'); // Disabled for linting
     window.manualClearConsole();
   } else {
-    // console.log('ℹ️ מערכת מובנית לא זמינה - ניקוי console מבוטל');
+    // // // console.log('ℹ️ מערכת מובנית לא זמינה - ניקוי console מבוטל'); // Disabled for linting
   }
 }
 
@@ -78,7 +78,7 @@ function suppressConsoleMessages() {
 // פונקציה להצגת הודעות console בפיתוח
 function enableConsoleMessages() {
   if (typeof console !== 'undefined') {
-    // console.log('Console messages enabled');
+    // // // console.log('Console messages enabled'); // Disabled for linting
   }
 }
 
@@ -86,7 +86,7 @@ function enableConsoleMessages() {
 function autoClearConsole() {
   // אל תפעיל ניקוי אוטומטי במהלך טעינת הדף
   if (isPageInitializing) {
-    // console.log('🚫 ניקוי אוטומטי נחסם במהלך טעינת הדף');
+    // // // console.log('🚫 ניקוי אוטומטי נחסם במהלך טעינת הדף'); // Disabled for linting
     return;
   }
 
@@ -99,7 +99,7 @@ function autoClearConsole() {
 
     // הפעל טיימר חדש - ללא ניקוי קונסול ישיר
     window.consoleClearTimer = setInterval(() => {
-      // console.log('🧹 ניקוי אוטומטי מבוטל - פועל דרך המערכת המובנית - ' + new Date().toLocaleTimeString());
+      // // // console.log('🧹 ניקוי אוטומטי מבוטל - פועל דרך המערכת המובנית - ' + new Date().toLocaleTimeString()); // Disabled for linting
 
       // בדוק אם יש מערכת מובנית לניקוי console
       if (window.manualClearConsole) {
@@ -107,7 +107,7 @@ function autoClearConsole() {
       }
     }, settings.clearInterval * 1000);
 
-    // console.log('🔄 ניקוי אוטומטי של קונסול מופעל - כל ' + settings.clearInterval + ' שניות');
+    // // // console.log('🔄 ניקוי אוטומטי של קונסול מופעל - כל ' + settings.clearInterval + ' שניות'); // Disabled for linting
   } else {
     // עצור ניקוי אוטומטי אם לא מופעל
     stopAutoClearConsole();
@@ -119,7 +119,7 @@ function stopAutoClearConsole() {
   if (window.consoleClearTimer) {
     clearInterval(window.consoleClearTimer);
     window.consoleClearTimer = null;
-    // console.log('⏹️ ניקוי אוטומטי של קונסול נעצר');
+    // // // console.log('⏹️ ניקוי אוטומטי של קונסול נעצר'); // Disabled for linting
   }
 }
 
@@ -161,22 +161,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // אם יש הגדרה לשמירת ניקוי אוטומטי, בטל אותה בטעינת הדף
     currentSettings.autoClear = false;
     saveConsoleSettings(currentSettings);
-    console.log('⚠️ ניקוי אוטומטי בוטל בטעינת הדף - נדרש הפעלה ידנית');
+    // // console.log('⚠️ ניקוי אוטומטי בוטל בטעינת הדף - נדרש הפעלה ידנית'); // Disabled for linting
   }
 
   // אל תפעיל ניקוי אוטומטי בטעינת הדף - רק אם המשתמש מפעיל במפורש
-  console.log('Console cleanup utility loaded - manual control only - integrated with built-in system');
+  // // console.log('Console cleanup utility loaded - manual control only - integrated with built-in system'); // Disabled for linting
 
   // המתן קצת לפני שחרור הדגל למניעת ניקוי console
   setTimeout(() => {
     isPageInitializing = false; // סיימנו את טעינת הדף
-    console.log('✅ הדגל למניעת ניקוי console שוחרר - מערכת מובנית פעילה');
+    // // console.log('✅ הדגל למניעת ניקוי console שוחרר - מערכת מובנית פעילה'); // Disabled for linting
 
     // בדוק אם יש מערכת מובנית לניקוי console
     if (window.manualClearConsole) {
-      console.log('🔗 מערכת מובנית לניקוי console זמינה (preferences.js)');
+      // // console.log('🔗 מערכת מובנית לניקוי console זמינה (preferences.js)'); // Disabled for linting
     } else {
-      console.log('ℹ️ מערכת מובנית לניקוי console לא זמינה - ניקוי ידני בלבד');
+      // // console.log('ℹ️ מערכת מובנית לניקוי console לא זמינה - ניקוי ידני בלבד'); // Disabled for linting
     }
   }, 5000); // הגדלתי ל-5 שניות כדי לוודא שכל הסקריפטים נטענו
 });

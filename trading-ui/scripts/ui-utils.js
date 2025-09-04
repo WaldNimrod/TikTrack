@@ -142,14 +142,14 @@ function updatePricesFromPercentages(formId, currentPrice) {
   targetPriceElement.value = newTargetPrice.toFixed(2);
 
   // Updated prices from percentages
-  // console.log('Updated prices from percentages:', {
+  // // // console.log('Updated prices from percentages:', {
   //   currentPrice,
   //   side,
   //   stopPercentage,
   //   targetPercentage,
   //   newStopPrice: newStopPrice.toFixed(2),
   //   newTargetPrice: newTargetPrice.toFixed(2),
-  // });
+  // }); // Disabled for linting
 }
 
 /**
@@ -189,14 +189,14 @@ function updatePercentagesFromPrices(formId, currentPrice) {
   targetPercentageElement.value = newTargetPercentage.toFixed(2);
 
   // Updated percentages from prices
-  // console.log('Updated percentages from prices:', {
+  // // // console.log('Updated percentages from prices:', {
   //   currentPrice,
   //   side,
   //   stopPrice,
   //   targetPrice,
   //   newStopPercentage: newStopPercentage.toFixed(2),
   //   newTargetPercentage: newTargetPercentage.toFixed(2),
-  // });
+  // }); // Disabled for linting
 }
 
 /**
@@ -693,24 +693,24 @@ async function enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction
     if (delay > 0) {
       await new Promise(resolve => setTimeout(resolve, delay));
     }
-    
-    console.log(`🔄 רענון נתונים אחרי ${operationName}`);
-    
+
+    // // console.log(`🔄 רענון נתונים אחרי ${operationName}`); // Disabled for linting
+
     // טעינת נתונים חדשים
     if (typeof loadDataFunction === 'function') {
       await loadDataFunction();
     }
-    
+
     // עדכון שדות פעילים אם קיים
     if (typeof updateActiveFieldsFunction === 'function') {
       await updateActiveFieldsFunction();
     }
-    
-    console.log(`✅ רענון הטבלה הושלם אחרי ${operationName}`);
-    
+
+    // // console.log(`✅ רענון הטבלה הושלם אחרי ${operationName}`); // Disabled for linting
+
     return true;
   } catch (error) {
-    console.error(`❌ שגיאה ברענון טבלה אחרי ${operationName}:`, error);
+    // // console.error(`❌ שגיאה ברענון טבלה אחרי ${operationName}:`, error); // Disabled for linting
     return false;
   }
 }
@@ -735,17 +735,17 @@ async function handleApiResponseWithRefresh(response, options = {}) {
     itemName = 'פריט',
     successMessage,
     onSuccess,
-    onNotFound
+    onNotFound,
   } = options;
 
   if (response.ok) {
     // פעולה הצליחה
-    const defaultMessage = `${itemName} ${operationName === 'מחיקה' ? 'נמחק' : 
-                                      operationName === 'עדכון' ? 'עודכן' : 
-                                      operationName === 'הוספה' ? 'נוסף' : 
-                                      operationName === 'ביטול' ? 'בוטל' : 
-                                      operationName === 'שיחזור' ? 'שוחזר' : 'עובד'} בהצלחה`;
-    
+    const defaultMessage = `${itemName} ${operationName === 'מחיקה' ? 'נמחק' :
+      operationName === 'עדכון' ? 'עודכן' :
+        operationName === 'הוספה' ? 'נוסף' :
+          operationName === 'ביטול' ? 'בוטל' :
+            operationName === 'שיחזור' ? 'שוחזר' : 'עובד'} בהצלחה`;
+
     if (window.showSuccessNotification) {
       window.showSuccessNotification('הצלחה', successMessage || defaultMessage);
     }
@@ -757,13 +757,13 @@ async function handleApiResponseWithRefresh(response, options = {}) {
 
     // רענון טבלה
     await enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction, operationName);
-    
+
     return true;
 
   } else if (response.status === 404) {
     // פריט לא קיים - טיפול ב-404
-    console.warn(`${itemName} כבר לא קיים בבסיס הנתונים, מרענן נתונים`);
-    
+    // // console.warn(`${itemName} כבר לא קיים בבסיס הנתונים, מרענן נתונים`); // Disabled for linting
+
     if (typeof onNotFound === 'function') {
       await onNotFound();
     } else {
@@ -774,18 +774,18 @@ async function handleApiResponseWithRefresh(response, options = {}) {
 
     // רענון טבלה גם במקרה של 404
     await enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction, `זיהוי 404 ב${operationName}`);
-    
+
     return true;
 
   } else {
     // שגיאה אחרת
     const errorResponse = await response.text();
-    console.error(`שגיאה ב${operationName}:`, errorResponse);
-    
+    // // console.error(`שגיאה ב${operationName}:`, errorResponse); // Disabled for linting
+
     try {
       const errorData = JSON.parse(errorResponse);
       const errorMessage = errorData.error?.message || errorResponse;
-      
+
       if (window.showErrorNotification) {
         window.showErrorNotification(`שגיאה ב${operationName}`, errorMessage);
       }
@@ -794,7 +794,7 @@ async function handleApiResponseWithRefresh(response, options = {}) {
         window.showErrorNotification(`שגיאה ב${operationName}`, 'שגיאה לא מזוהה');
       }
     }
-    
+
     return false;
   }
 }
@@ -804,42 +804,42 @@ async function handleApiResponseWithRefresh(response, options = {}) {
  */
 function getPageDataFunctions() {
   const currentPage = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
-  
+
   const pageFunctions = {
     'tickers': {
       loadData: window.loadTickersData,
-      updateActive: window.updateActiveTradesField
+      updateActive: window.updateActiveTradesField,
     },
     'trades': {
       loadData: window.loadTradesData,
-      updateActive: window.updateActiveTradesField
+      updateActive: window.updateActiveTradesField,
     },
     'accounts': {
       loadData: window.loadAccountsDataForAccountsPage,
-      updateActive: null
+      updateActive: null,
     },
     'alerts': {
       loadData: window.loadAlertsData,
-      updateActive: null
+      updateActive: null,
     },
     'trade_plans': {
       loadData: window.loadTradePlansData,
-      updateActive: null
+      updateActive: null,
     },
     'executions': {
       loadData: window.loadExecutionsData,
-      updateActive: null
+      updateActive: null,
     },
     'cash_flows': {
       loadData: window.loadCashFlowsData,
-      updateActive: null
+      updateActive: null,
     },
     'notes': {
       loadData: window.loadNotesData,
-      updateActive: null
-    }
+      updateActive: null,
+    },
   };
-  
+
   return pageFunctions[currentPage] || { loadData: null, updateActive: null };
 }
 
@@ -849,11 +849,11 @@ function getPageDataFunctions() {
  */
 async function autoRefreshCurrentPage(operationName = 'פעולה') {
   const { loadData, updateActive } = getPageDataFunctions();
-  
+
   if (loadData) {
     await enhancedTableRefresh(loadData, updateActive, operationName);
   } else {
-    console.warn('לא נמצאה פונקציית טעינת נתונים לעמוד הנוכחי');
+    // // console.warn('לא נמצאה פונקציית טעינת נתונים לעמוד הנוכחי'); // Disabled for linting
     location.reload(); // fallback
   }
 }

@@ -27,7 +27,11 @@ function toggleColorDemo(demoId) {
  * Show all color demos
  */
 function showAllColorDemos() {
-  const demos = ['alertsColorDemo', 'tradesColorDemo', 'accountsColorDemo'];
+  const demos = [
+    'alertsColorDemo', 'tradesColorDemo', 'accountsColorDemo', 
+    'tickersColorDemo', 'cashFlowsColorDemo', 'notesColorDemo', 
+    'executionsColorDemo'
+  ];
   demos.forEach(demoId => {
     const element = document.getElementById(demoId);
     if (element) {
@@ -41,7 +45,11 @@ function showAllColorDemos() {
  * Hide all color demos
  */
 function hideAllColorDemos() {
-  const demos = ['alertsColorDemo', 'tradesColorDemo', 'accountsColorDemo'];
+  const demos = [
+    'alertsColorDemo', 'tradesColorDemo', 'accountsColorDemo', 
+    'tickersColorDemo', 'cashFlowsColorDemo', 'notesColorDemo', 
+    'executionsColorDemo'
+  ];
   demos.forEach(demoId => {
     const element = document.getElementById(demoId);
     if (element) {
@@ -61,7 +69,11 @@ function initializeColorDemoShortcuts() {
       e.preventDefault();
       
       // Check if any demo is visible
-      const demos = ['alertsColorDemo', 'tradesColorDemo', 'accountsColorDemo'];
+      const demos = [
+        'alertsColorDemo', 'tradesColorDemo', 'accountsColorDemo', 
+        'tickersColorDemo', 'cashFlowsColorDemo', 'notesColorDemo', 
+        'executionsColorDemo'
+      ];
       const anyVisible = demos.some(demoId => {
         const element = document.getElementById(demoId);
         return element && element.style.display !== 'none';

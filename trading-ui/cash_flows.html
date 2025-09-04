@@ -85,6 +85,20 @@
 
                 <!-- Alert cards -->
                 <div class="section-body">
+                    <!-- Color Scheme Demo for Cash Flows -->
+                    <div id="cashFlowsColorDemo" class="mb-3" style="display: none;">
+                        <div class="d-flex gap-2 mb-2">
+                            <span class="entity-cash-flow-badge">תזרים חיובי</span>
+                            <span class="entity-account-badge">חשבון ראשי</span>
+                            <div class="entity-cash-flow-border p-2 border rounded">
+                                <small>סכום: <span class="numeric-text-positive">+₪5,750.00</span></small>
+                            </div>
+                        </div>
+                        <div class="alert alert-info">
+                            <small>🎨 דמונסטרציה למערכת הצבעים הדינמית - צבעים מיוחדים לתזרים מזומנים</small>
+                        </div>
+                    </div>
+                    
                     <active-alerts></active-alerts>
 
                     <!-- Data summary -->
@@ -496,6 +510,8 @@
     <!-- alerts.js הוסר - לא נחוץ בעמוד זה -->
     <script src="scripts/alert-service.js"></script>
     <script src="scripts/active-alerts-component.js"></script>
+    <script src="scripts/color-scheme-system.js"></script>
+    <script src="scripts/color-demo-toggle.js"></script>
     <script src="scripts/cash_flows.js?v=20250831_2"></script>
 
     <!-- Page initialization -->

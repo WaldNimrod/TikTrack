@@ -325,6 +325,55 @@ const color = window.getEntityColor('trade'); // אם swing ממופה ל-trade
 - **פונקציות ישנות**: כל הפונקציות הישנות עדיין עובדות
 - **מחלקות ישנות**: כל המחלקות הישנות עדיין עובדות
 
+## ⚡ יכולות חדשות (גרסה 2.1.0)
+
+### 🔥 אתחול CSS דינמי אוטומטי
+המערכת כעת יוצרת CSS דינמי באופן אוטומטי בכל עמוד:
+
+```javascript
+// נקרא אוטומטית בכל עמוד דרך main.js
+function initializeDynamicColorScheme() {
+  // יצירת CSS לישויות
+  const entityCSS = window.generateEntityCSS();
+  // יצירת CSS לערכים מספריים  
+  const numericCSS = window.generateNumericValueCSS();
+  // החלה על הדף באופן דינמי
+}
+```
+
+### 🎨 CSS Variables מלא
+הוספנו משתני CSS לכל הצבעים ב-`apple-theme.css`:
+
+```css
+:root {
+  /* צבעי ישויות */
+  --entity-trade-color: #007bff;
+  --entity-account-color: #28a745;
+  --entity-alert-color: #ff9c05;
+  
+  /* צבעי ערכים מספריים */
+  --numeric-positive-medium: #28a745;
+  --numeric-negative-medium: #dc3545;
+}
+```
+
+### 🖱️ מערכת דוגמאות אינטראקטיבית
+הוספנו דוגמאות צבעים בכל העמודים עם קיצור מקלדת:
+
+```
+Ctrl+Shift+D - הצגה/הסתרה של דוגמאות צבעים
+```
+
+### 📱 כיסוי מלא בכל העמודים
+המערכת כעת פעילה בכל העמודים הראשיים:
+- ✅ alerts.html - התראות (כתום)
+- ✅ trades.html - טריידים (כחול)  
+- ✅ accounts.html - חשבונות (ירוק)
+- ✅ tickers.html - טיקרים (אדום)
+- ✅ cash_flows.html - תזרים מזומנים (ירוק טורקיז)
+- ✅ notes.html - הערות (סגול)
+- ✅ executions.html - עסקאות (כחול טורקיז)
+
 ## 🚀 דוגמאות מתקדמות
 
 ### יצירת סולם צבעים מותאם
@@ -374,10 +423,31 @@ updateEntityColors({
 
 ## 📚 קבצים רלוונטיים
 
-### Frontend
-- **מערכת צבעים**: `trading-ui/scripts/color-scheme-system.js`
-- **סגנונות מקושרים**: `trading-ui/styles/linked-items.css`
-- **עמודים**: כל העמודים שמשתמשים במערכת
+### Frontend Core
+- **מערכת צבעים ראשית**: `trading-ui/scripts/color-scheme-system.js`
+- **אתחול דינמי**: `trading-ui/scripts/main.js` (פונקצית `initializeDynamicColorScheme`)
+- **CSS Variables**: `trading-ui/styles/apple-theme.css` (משתני :root)
+- **מערכת דוגמאות**: `trading-ui/scripts/color-demo-toggle.js`
+
+### דף דוגמאות מקיף
+- **דף דוגמאות**: `trading-ui/color-scheme-examples.html`
+- **דף בדיקות מספרים**: `trading-ui/numeric-value-colors-demo.html`
+
+### עמודים עם מערכת צבעים מלאה
+- **התראות**: `trading-ui/alerts.html` (כתום #ff9c05)
+- **טריידים**: `trading-ui/trades.html` (כחול #007bff)
+- **חשבונות**: `trading-ui/accounts.html` (ירוק #28a745)
+- **טיקרים**: `trading-ui/tickers.html` (אדום #dc3545)
+- **תזרים מזומנים**: `trading-ui/cash_flows.html` (ירוק טורקיז #20c997)
+- **הערות**: `trading-ui/notes.html` (סגול #6f42c1)
+- **עסקאות**: `trading-ui/executions.html` (כחול טורקיז #17a2b8)
+- **תכנוני טרייד**: `trading-ui/trade_plans.html` (כחול כהה #0056b3)
+
+### סגנונות וCSS
+- **סגנונות ראשיים**: `trading-ui/styles/styles.css` (צבעים דינמיים)
+- **ערכים מספריים**: `trading-ui/styles/numeric-value-colors.css`
+- **מודלים**: `trading-ui/styles/entity-details-modal.css`
+- **טבלאות**: `trading-ui/styles/table.css`
 
 ### דוקומנטציה
 - **דוקומנטציה ראשית**: [README.md](README.md)
@@ -437,7 +507,66 @@ window.ENTITY_COLORS['new_entity'] = '#ff6b6b';
 
 ---
 
-**גרסה**: 2.0.0  
-**תאריך עדכון**: 2 בספטמבר 2025  
+## 🔧 שינויים טכניים שבוצעו (גרסה 2.1.0)
+
+### 1. אתחול אוטומטי גלובלי
+```javascript
+// הוספה ל-main.js
+function initializeCoreSystems() {
+  // Initialize dynamic color scheme system
+  initializeDynamicColorScheme();
+}
+```
+
+### 2. עדכון CSS Variables
+```css
+/* הוספה ל-apple-theme.css */
+:root {
+  --entity-trade-color: #007bff;
+  --entity-trade-bg: rgba(0, 123, 255, 0.1);
+  /* ... כל הישויות */
+  
+  --numeric-positive-medium: #28a745;
+  --numeric-negative-medium: #dc3545;
+  /* ... כל הערכים המספריים */
+}
+```
+
+### 3. עדכון CSS קיים לדינמי
+```css
+/* לפני - styles.css */
+.alerts-page .section-header {
+  border-bottom: 2px solid #dc3545;
+}
+
+/* אחרי - styles.css */  
+.alerts-page .section-header {
+  border-bottom: 2px solid var(--entity-alert-color, #ff9c05);
+}
+```
+
+### 4. הוספת דוגמאות לכל עמוד
+```html
+<!-- דוגמה מ-alerts.html -->
+<div id="alertsColorDemo" style="display: none;">
+  <span class="entity-alert-badge">התראה פעילה</span>
+  <span class="entity-ticker-badge">טיקר AAPL</span>
+</div>
+```
+
+### 5. מערכת קיצורי מקלדת
+```javascript
+// Ctrl+Shift+D להצגה/הסתרה
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'D') {
+    // Toggle color demos
+  }
+});
+```
+
+---
+
+**גרסה**: 2.1.0  
+**תאריך עדכון**: 9 בינואר 2025  
 **מפתח**: TikTrack System  
-**תאימות**: כל הגרסאות הקיימות
+**תאימות**: כל הגרסאות הקיימות + שיפורים חדשים

@@ -93,6 +93,20 @@
 
         <!-- Alert cards -->
         <div class="section-body">
+          <!-- Color Scheme Demo for Tickers -->
+          <div id="tickersColorDemo" class="mb-3" style="display: none;">
+            <div class="d-flex gap-2 mb-2">
+              <span class="entity-ticker-badge">טיקר AAPL</span>
+              <span class="entity-alert-badge">התראה פעילה</span>
+              <div class="entity-ticker-border p-2 border rounded">
+                <small>שינוי: <span class="numeric-text-positive">+2.35%</span></small>
+              </div>
+            </div>
+            <div class="alert alert-info">
+              <small>🎨 דמונסטרציה למערכת הצבעים הדינמית - צבעים מותאמים לטיקרים והתראות</small>
+            </div>
+          </div>
+          
           <active-alerts></active-alerts>
 
           <!-- Data summary -->
@@ -496,6 +510,8 @@
     <script src="scripts/entity-details-renderer.js"></script>
     <script src="scripts/entity-details-modal.js"></script>
     
+    <script src="scripts/color-scheme-system.js"></script>
+    <script src="scripts/color-demo-toggle.js"></script>
     <script src="scripts/tickers.js?v=20250904_0049"></script>
     <script>
               // אתחול מערכת הכותרת החדשה

@@ -112,6 +112,20 @@
 
         <!-- Alert cards -->
         <div class="section-body">
+          <!-- Color Scheme Demo for Notes -->
+          <div id="notesColorDemo" class="mb-3" style="display: none;">
+            <div class="d-flex gap-2 mb-2">
+              <span class="entity-note-badge">הערה חשובה</span>
+              <span class="entity-trade-badge">טרייד קשור</span>
+              <div class="entity-note-border p-2 border rounded">
+                <small>מטרה: <span class="numeric-text-positive">+15%</span></small>
+              </div>
+            </div>
+            <div class="alert alert-info">
+              <small>🎨 דמונסטרציה למערכת הצבעים הדינמית - צבעים מיוחדים להערות ותיעוד</small>
+            </div>
+          </div>
+          
           <active-alerts></active-alerts>
 
           <!-- Data summary -->
@@ -569,6 +583,8 @@
     <!-- alerts.js הוסר - לא נחוץ בעמוד זה -->
     <script src="scripts/alert-service.js"></script>
     <script src="scripts/trade-plan-service.js"></script>
+    <script src="scripts/color-scheme-system.js"></script>
+    <script src="scripts/color-demo-toggle.js"></script>
     <script src="scripts/notes.js?v=20250831_2"></script>
     <script>
               // אתחול מערכת הכותרת החדשה

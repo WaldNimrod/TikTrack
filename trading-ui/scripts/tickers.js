@@ -1635,6 +1635,11 @@ function updateTickersTable(tickers) {
                     </td>
                     <td class="actions-cell">
                         <div class="btn-group btn-group-sm" role="group">
+                            <button class="btn btn-outline-primary" 
+                                    onclick="showEntityDetails('ticker', ${ticker.id})" 
+                                    title="פרטי טיקר">
+                                <i class="fas fa-info-circle"></i>
+                            </button>
                             <button class="btn btn-outline-info" 
                                     onclick="window.showLinkedItemsWarning('ticker', ${ticker.id})" 
                                     title="פריטים מקושרים">🔗</button>

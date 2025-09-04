@@ -71,8 +71,8 @@
   - Database constraint viewing
   - System data administration
 
-### 7. External Data Integration 🆕
-- **Status**: In Development (Stage-1)
+### 7. External Data Integration ✅
+- **Status**: Complete (Production Ready)
 - **Description**: Real-time market data integration system
 - **Features**:
   - Yahoo Finance provider integration
@@ -82,6 +82,20 @@
   - Modular provider architecture
 - **Documentation**: [External Data System](external_data/EXTERNAL_DATA_SYSTEM.md)
 - **Development Tasks**: [Development Tasks](external_data/DEVELOPMENT_TASKS.md)
+
+### 8. Entity Details System ✅ **NEW! COMPLETE**
+- **Status**: Complete (4 בספטמבר 2025)
+- **Description**: Advanced unified system for displaying detailed entity information
+- **Features**:
+  - Unified modal for all 8 entity types (ticker, trade, trade_plan, execution, account, alert, cash_flow, note)
+  - Dynamic rendering with custom colors and RTL support
+  - Real-time Yahoo Finance integration for tickers
+  - Quick actions: Edit, Open Page, Show Linked Items, Export
+  - Advanced caching with smart invalidation
+  - Apple Design System integration
+  - Full Hebrew RTL support with CSS Logical Properties
+- **Documentation**: [Entity Details System](entity-details-system/README.md)
+- **Integration Guide**: [Integration Guide](entity-details-system/INTEGRATION_GUIDE.md)
 
 ## Global System Features
 

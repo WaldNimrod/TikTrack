@@ -18,7 +18,7 @@ from services.advanced_cache_service import (
     get_cache_stats,
     cache_health_check,
     clear_cache,
-    invalidate_cache
+    advanced_cache_service
 )
 import logging
 
@@ -142,7 +142,7 @@ def invalidate_cache_by_dependency():
             }), 400
         
         dependency = data['dependency']
-        invalidate_cache(dependency)
+        advanced_cache_service.invalidate_by_dependency(dependency)
         
         logger.info(f"Cache invalidated for dependency: {dependency}")
         return jsonify({

@@ -9,8 +9,15 @@
 - **נתונים חיצוניים** נשמרים בהצלחה בבסיס הנתונים  
 - **TTL חכם** לפי סוג נתונים (30s/5min/1h)
 - **ביצועים משופרים** באופן משמעותי
+- **ממשק מוניטורינג מתקדם** עם dependencies tracking ובדיקות בזמן אמת
 
-## 🛠️ המערכת החדשה
+## 🛠️ המערכת החדשה + ממשק מוניטורינג
+
+### **🖥️ ממשק מוניטורינג חדש:**
+- **מיקום**: תפריט "כלי פיתוח" → "בדיקת Cache"
+- **URL**: `http://localhost:8080/cache-test`
+- **תכונות**: Dependencies tracking, TTL monitoring, invalidation testing
+- **מדריך מלא**: `documentation/development/CACHE_MONITORING_USER_GUIDE.md`
 
 ## ✅ פתרונות זמינים
 

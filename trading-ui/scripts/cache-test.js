@@ -35,6 +35,9 @@ class CacheTestSystem {
     document.getElementById('stats-btn')?.addEventListener('click', () => this.getCacheStats());
     document.getElementById('refresh-btn')?.addEventListener('click', () => this.refreshAllData());
 
+    // Dependencies system operations
+    document.getElementById('invalidate-dependency-btn')?.addEventListener('click', () => this.invalidateDependency());
+
     // Cache testing
     document.getElementById('set-cache-btn')?.addEventListener('click', () => this.testSetCache());
     document.getElementById('get-cache-btn')?.addEventListener('click', () => this.testGetCache());
@@ -362,6 +365,76 @@ class CacheTestSystem {
       const statsButton = document.getElementById('stats-btn');
       statsButton.innerHTML = originalText;
       statsButton.disabled = false;
+    }
+  }
+
+  /**
+     * Invalidate cache by dependency
+     */
+  async invalidateDependency() {
+    const dependencySelect = document.getElementById('dependency-select');
+    const button = document.getElementById('invalidate-dependency-btn');
+    const originalText = button.innerHTML;
+    
+    if (!dependencySelect) {
+      this.log('Dependency select not found', 'error');
+      return;
+    }
+
+    const dependency = dependencySelect.value;
+    
+    try {
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מבטל...';
+      button.disabled = true;
+
+      const response = await fetch('/api/v1/cache/invalidate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ dependency: dependency })
+      });
+
+      const data = await response.json();
+
+      if (data.status === 'success') {
+        this.log(`Cache invalidated for dependency: ${dependency}`, 'success');
+        this.showNotification(`Cache invalidation בוצע עבור ${dependency}`, 'success');
+
+        // Update results display
+        const resultsElement = document.getElementById('invalidation-results');
+        resultsElement.innerHTML = `
+          <div class="invalidation-result success">
+            <strong>✅ Invalidation בוצע בהצלחה!</strong><br>
+            Dependency: ${dependency}<br>
+            זמן: ${new Date().toLocaleTimeString()}<br>
+            <small>${data.message || 'Cache entries invalidated successfully'}</small>
+          </div>
+        `;
+
+        // Refresh cache stats to show updated data
+        await this.updateCacheStats();
+        await this.updatePerformanceStats();
+      } else {
+        throw new Error(data.message || 'Failed to invalidate dependency');
+      }
+    } catch (error) {
+      this.log(`Failed to invalidate dependency ${dependency}: ${error.message}`, 'error');
+      this.showNotification(`שגיאה ב-invalidation עבור ${dependency}`, 'error');
+      
+      // Update results with error
+      const resultsElement = document.getElementById('invalidation-results');
+      resultsElement.innerHTML = `
+        <div class="invalidation-result error">
+          <strong>❌ Invalidation נכשל!</strong><br>
+          Dependency: ${dependency}<br>
+          שגיאה: ${error.message}<br>
+          זמן: ${new Date().toLocaleTimeString()}
+        </div>
+      `;
+    } finally {
+      button.innerHTML = originalText;
+      button.disabled = false;
     }
   }
 

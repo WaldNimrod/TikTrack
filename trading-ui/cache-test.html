@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>בדיקת מערכת Cache - TikTrack</title>
+    <title>מוניטורינג מערכת Cache מתקדמת - TikTrack</title>
     
     <!-- CSS Files - Ordered by priority (weak to strong) -->
     <!-- 1. Apple theme (base) -->
@@ -40,8 +40,13 @@
     
     <div class="container">
         <header class="page-header">
-            <h1><i class="fas fa-memory"></i> בדיקת מערכת Cache מתקדמת</h1>
-            <p class="subtitle">בדיקה מקיפה של מערכת ה-Cache המתקדמת של TikTrack</p>
+            <h1><i class="fas fa-tachometer-alt"></i> מוניטורינג מערכת Cache מתקדמת</h1>
+            <p class="subtitle">ניטור וניהול מערכת Cache מתקדמת עם Dependencies ו-TTL חכם - TikTrack v2.0</p>
+            <div class="header-badges">
+                <span class="badge badge-success">✅ Dependencies System</span>
+                <span class="badge badge-info">⚡ Smart TTL</span>
+                <span class="badge badge-warning">🔗 Auto Invalidation</span>
+            </div>
         </header>
 
         <!-- Cache Status Dashboard -->
@@ -91,6 +96,100 @@
                     <div class="card-content">
                         <div id="hit-rate" class="hit-rate-display">
                             <i class="fas fa-spinner fa-spin"></i> טוען...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dependencies System Monitoring -->
+        <section class="dependencies-monitoring">
+            <h2><i class="fas fa-project-diagram"></i> מעקב Dependencies</h2>
+            
+            <div class="dependencies-grid">
+                <div class="dependency-card">
+                    <div class="card-header">
+                        <i class="fas fa-link"></i>
+                        <h3>Dependencies Matrix</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="dependencies-matrix" class="dependencies-display">
+                            <div class="dependency-item">
+                                <span class="dep-name">tickers</span>
+                                <span class="dep-arrow">→</span>
+                                <span class="dep-targets">dashboard</span>
+                            </div>
+                            <div class="dependency-item">
+                                <span class="dep-name">trades</span>
+                                <span class="dep-arrow">→</span>
+                                <span class="dep-targets">tickers, dashboard</span>
+                            </div>
+                            <div class="dependency-item">
+                                <span class="dep-name">executions</span>
+                                <span class="dep-arrow">→</span>
+                                <span class="dep-targets">trades, dashboard</span>
+                            </div>
+                            <div class="dependency-item">
+                                <span class="dep-name">preferences</span>
+                                <span class="dep-arrow">→</span>
+                                <span class="dep-targets">-</span>
+                            </div>
+                            <div class="dependency-item">
+                                <span class="dep-name">currencies</span>
+                                <span class="dep-arrow">→</span>
+                                <span class="dep-targets">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dependency-card">
+                    <div class="card-header">
+                        <i class="fas fa-clock"></i>
+                        <h3>TTL Strategy</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="ttl-strategy" class="ttl-display">
+                            <div class="ttl-item critical">
+                                <span class="ttl-type">🔥 קריטי</span>
+                                <span class="ttl-value">30s</span>
+                                <span class="ttl-entities">tickers, trades, executions</span>
+                            </div>
+                            <div class="ttl-item normal">
+                                <span class="ttl-type">⚡ רגיל</span>
+                                <span class="ttl-value">5min</span>
+                                <span class="ttl-entities">preferences</span>
+                            </div>
+                            <div class="ttl-item static">
+                                <span class="ttl-type">🏗️ סטטי</span>
+                                <span class="ttl-value">1h</span>
+                                <span class="ttl-entities">currencies</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dependency-card">
+                    <div class="card-header">
+                        <i class="fas fa-bolt"></i>
+                        <h3>Invalidation Testing</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="invalidation-controls">
+                            <select id="dependency-select" class="form-control">
+                                <option value="tickers">tickers</option>
+                                <option value="trades">trades</option>
+                                <option value="executions">executions</option>
+                                <option value="preferences">preferences</option>
+                                <option value="currencies">currencies</option>
+                                <option value="dashboard">dashboard</option>
+                            </select>
+                            <button id="invalidate-dependency-btn" class="btn btn-warning">
+                                <i class="fas fa-trash"></i> Invalidate Dependency
+                            </button>
+                        </div>
+                        <div id="invalidation-results" class="results-display">
+                            תוצאות invalidation יופיעו כאן...
                         </div>
                     </div>
                 </div>

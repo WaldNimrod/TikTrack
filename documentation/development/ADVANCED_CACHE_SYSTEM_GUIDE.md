@@ -162,10 +162,16 @@ def create_my_entity():
 
 ## 🔧 פתרון בעיות
 
+### **🖥️ ממשק מוניטורינג מתקדם:**
+- **מיקום**: תפריט "כלי פיתוח" → "בדיקת Cache"
+- **URL**: `http://localhost:8080/cache-test`
+- **מדריך מלא**: `documentation/development/CACHE_MONITORING_USER_GUIDE.md`
+
 ### **Cache לא מתבטל?**
-1. בדוק שה-endpoint יש `@invalidate_cache` decorator
-2. וודא שה-dependencies נכונים
-3. בדוק logs: `grep "Cache invalidated" logs/app.log`
+1. **השתמש בממשק המוניטורינג**: `/cache-test` לבדיקה חיה
+2. בדוק שה-endpoint יש `@invalidate_cache` decorator
+3. וודא שה-dependencies נכונים במערכת המוניטורינג
+4. בדוק logs במערכת המוניטורינג או: `grep "Cache invalidated" logs/app.log`
 
 ### **נתונים ישנים?**
 1. בדוק TTL - אולי צריך להקטין
@@ -179,15 +185,24 @@ def create_my_entity():
 
 ## 🔬 מעקב וניטור
 
-### **Endpoints לניטור:**
+### **🖥️ ממשק מוניטורינג ויזואלי (מומלץ):**
+- **URL**: `http://localhost:8080/cache-test`  
+- **תכונות**: Dashboard חי, Dependencies matrix, TTL strategy, Invalidation testing
+- **מיקום בתפריט**: "כלי פיתוח" → "פעולות מערכת" → "בדיקת Cache"
+- **מדריך מפורט**: `documentation/development/CACHE_MONITORING_USER_GUIDE.md`
+
+### **📡 API Endpoints לניטור:**
 - **`/api/v1/cache/stats`** - סטטיסטיקות cache
 - **`/api/v1/cache/health`** - בריאות המערכת
 - **`/api/v1/cache/status`** - מצב כללי
+- **`/api/v1/cache/clear`** - ניקוי cache
+- **`/api/v1/cache/invalidate`** - invalidation לפי dependency
 
-### **מדדי הצלחה:**
+### **📊 מדדי הצלחה:**
 - **Hit Rate** > 80%
 - **Memory Usage** < 50MB
 - **Invalidation Rate** מתאים לפעילות משתמשים
+- **Response Time** < 100ms (cache), < 500ms (database)
 
 ## 🎉 יתרונות המערכת החדשה
 

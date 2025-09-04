@@ -622,6 +622,9 @@ class YahooFinanceAdapter:
             logger.info(f"💾 Adding quote to database: {quote.symbol} = ${quote.price} ({quote.currency})")
             self.db_session.add(db_quote)
             
+            # Also update quotes_last table as required by specification Section 3.1
+            self._update_quotes_last(ticker.id, quote)
+            
             logger.info(f"🔄 Committing transaction for {quote.symbol}")
             self.db_session.commit()
             
@@ -1050,3 +1053,36 @@ class YahooFinanceAdapter:
         except Exception as e:
             logger.error(f"Error getting historical quote for {symbol}: {e}")
             return None
+    
+    def _update_quotes_last(self, ticker_id: int, quote: QuoteData):
+        """Update quotes_last table as required by specification Section 3.1"""
+        try:
+            logger.debug(f"🔄 Updating quotes_last table for ticker {ticker_id}")
+            
+            # Use raw SQL to update quotes_last with INSERT OR REPLACE
+            # This ensures we maintain the UNIQUE (ticker_id) constraint as specified
+            self.db_session.execute(
+                """
+                INSERT OR REPLACE INTO quotes_last 
+                (ticker_id, price, change_pct_day, change_amount_day, volume, currency, 
+                 asof_utc, fetched_at, source)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    ticker_id,
+                    quote.price,
+                    quote.change_pct,
+                    quote.change_amount,
+                    quote.volume,
+                    quote.currency,
+                    quote.asof_utc,
+                    datetime.now(timezone.utc),
+                    quote.source
+                )
+            )
+            
+            logger.debug(f"✅ Updated quotes_last for ticker {ticker_id}")
+            
+        except Exception as e:
+            logger.error(f"❌ Error updating quotes_last for ticker {ticker_id}: {e}")
+            # Don't raise - this is not critical enough to fail the whole operation

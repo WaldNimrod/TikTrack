@@ -25,8 +25,6 @@
     <!-- 6. Notification system styles -->
     <link rel="stylesheet" href="styles/notification-system.css">
     
-    <!-- 7. Page specific styles -->
-    <link rel="stylesheet" href="styles/system-management.css">
     
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -49,11 +47,11 @@
                 </div>
                 
                 <!-- Loading and Error States -->
-                <div class="loading-state" style="display: none;">
+                <div class="loading-state">
                     <div class="loading-spinner">🔄 טוען נתוני מערכת...</div>
                 </div>
                 
-                <div class="error-state" style="display: none; color: #ff3b30; text-align: center; padding: 1rem; background: rgba(255, 59, 48, 0.1); border-radius: 8px; margin-bottom: 1rem;"></div>
+                <div class="error-state"></div>
                 
                 <!-- בריאות מערכת -->
                 <div class="section-card">
@@ -95,28 +93,28 @@
                         <div class="performance-card">
                             <h3>מעבד (CPU)</h3>
                             <div class="performance-indicator" data-type="cpu">
-                                <div class="progress-bar" style="width: 0%">0%</div>
+                                <div class="progress-bar">0%</div>
                             </div>
                             <div class="performance-value cpu-usage">0%</div>
                         </div>
                         <div class="performance-card">
                             <h3>זיכרון (RAM)</h3>
                             <div class="performance-indicator" data-type="memory">
-                                <div class="progress-bar" style="width: 0%">0%</div>
+                                <div class="progress-bar">0%</div>
                             </div>
                             <div class="performance-value memory-usage">0%</div>
                         </div>
                         <div class="performance-card">
                             <h3>דיסק</h3>
                             <div class="performance-indicator" data-type="disk">
-                                <div class="progress-bar" style="width: 0%">0%</div>
+                                <div class="progress-bar">0%</div>
                             </div>
                             <div class="performance-value disk-usage">0%</div>
                         </div>
                         <div class="performance-card">
                             <h3>מטמון</h3>
                             <div class="performance-indicator" data-type="cache">
-                                <div class="progress-bar" style="width: 0%">0%</div>
+                                <div class="progress-bar">0%</div>
                             </div>
                             <div class="performance-value cache-usage">0%</div>
                         </div>

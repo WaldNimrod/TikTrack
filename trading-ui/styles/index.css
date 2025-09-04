@@ -467,7 +467,7 @@
 }
 
 .alert-card {
-    background: rgba(255, 193, 7, 0.1);
+    background: #ffffff;
     border: 1px solid #ffc107;
     padding: 1rem;
     border-radius: var(--apple-radius-small);
@@ -516,7 +516,7 @@
 
 /* באנר עיצובי עליון */
 .hero-banner {
-    background: linear-gradient(135deg, rgba(40, 167, 69, 0.08), rgba(0, 123, 255, 0.06));
+    background: #ffffff;
     padding: 2rem 0;
     margin: 2rem 0 2rem 0;
     border-bottom: 1px solid var(--apple-border-light);
@@ -571,9 +571,9 @@
 .hero-stat {
     text-align: center;
     padding: 0.8rem;
-    background: rgba(255, 255, 255, 0.15);
+    background: #ffffff;
     border-radius: var(--apple-radius-medium);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid #e0e0e0;
     backdrop-filter: blur(10px);
 }
 
@@ -620,7 +620,7 @@
     justify-content: center;
     width: 2.5rem;
     height: 2.5rem;
-    background: rgba(255, 255, 255, 0.9);
+    background: #ffffff;
     border-radius: 50%;
     text-decoration: none;
     font-size: 1.2rem;
@@ -636,7 +636,7 @@
 
 /* סקשן סקירה כללית צבעונית */
 .overview-section {
-    background: rgba(240, 248, 255, 0.3);
+    background: #ffffff;
     border-radius: var(--apple-radius-large);
     box-shadow: var(--apple-shadow-light);
     border: 1px solid var(--apple-border-light);
@@ -674,7 +674,7 @@
     display: flex;
     align-items: center;
     padding: 1.5rem;
-    background: rgba(240, 248, 255, 0.2);
+    background: #ffffff;
     border-radius: var(--apple-radius-medium);
     border: 1px solid var(--apple-border-light);
     transition: all 0.3s ease;
@@ -686,22 +686,22 @@
 }
 
 .overview-card.primary {
-    background: linear-gradient(135deg, rgba(255, 156, 5, 0.1), rgba(255, 156, 5, 0.05));
+    background: #ffffff;
     border-color: rgba(255, 156, 5, 0.3);
 }
 
 .overview-card.success {
-    background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(40, 167, 69, 0.05));
+    background: #ffffff;
     border-color: rgba(40, 167, 69, 0.3);
 }
 
 .overview-card.info {
-    background: linear-gradient(135deg, rgba(0, 123, 255, 0.1), rgba(0, 123, 255, 0.05));
+    background: #ffffff;
     border-color: rgba(0, 123, 255, 0.3);
 }
 
 .overview-card.warning {
-    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 193, 7, 0.05));
+    background: #ffffff;
     border-color: rgba(255, 193, 7, 0.3);
 }
 
@@ -743,7 +743,7 @@
 
 /* סקשן גרפים מתקדמים */
 .charts-section {
-    background: rgba(240, 248, 255, 0.3);
+    background: #ffffff;
     border-radius: var(--apple-radius-large);
     box-shadow: var(--apple-shadow-light);
     border: 1px solid var(--apple-border-light);
@@ -788,7 +788,7 @@
 }
 
 .chart-card {
-    background: rgba(240, 248, 255, 0.2);
+    background: #ffffff;
     padding: 1.5rem;
     border-radius: var(--apple-radius-medium);
     border: 1px solid var(--apple-border-light);
@@ -812,7 +812,7 @@
 
 /* סקשן טבלאות מפורטות */
 .tables-section {
-    background: rgba(240, 248, 255, 0.3);
+    background: #ffffff;
     border-radius: var(--apple-radius-large);
     box-shadow: var(--apple-shadow-light);
     border: 1px solid var(--apple-border-light);
@@ -869,7 +869,7 @@
 
 /* סקשן פעולות מהירות */
 .actions-section {
-    background: rgba(240, 248, 255, 0.3);
+    background: #ffffff;
     border-radius: var(--apple-radius-large);
     box-shadow: var(--apple-shadow-light);
     border: 1px solid var(--apple-border-light);
@@ -902,7 +902,7 @@
     flex-direction: column;
     align-items: center;
     padding: 1rem;
-    background: rgba(240, 248, 255, 0.2);
+    background: #ffffff;
     border: 1px solid var(--apple-border-light);
     border-radius: var(--apple-radius-medium);
     cursor: pointer;
@@ -934,7 +934,7 @@
 
 /* סקשן סטטיסטיקות נוספות */
 .stats-section {
-    background: rgba(240, 248, 255, 0.3);
+    background: #ffffff;
     border-radius: var(--apple-radius-large);
     box-shadow: var(--apple-shadow-light);
     border: 1px solid var(--apple-border-light);
@@ -961,7 +961,7 @@
 }
 
 .stat-card {
-    background: rgba(240, 248, 255, 0.2);
+    background: #ffffff;
     padding: 1.5rem;
     border-radius: var(--apple-radius-medium);
     border: 1px solid var(--apple-border-light);

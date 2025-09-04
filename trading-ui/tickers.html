@@ -60,8 +60,6 @@
   <!-- 8. Linked items modal styles -->
   <link rel="stylesheet" href="styles/linked-items.css">
 
-  <!-- 9. Entity details modal styles -->
-  <link rel="stylesheet" href="styles/entity-details-modal.css">
 
   <!-- Modular grid files - loaded at end of file -->
 </head>
@@ -84,11 +82,21 @@
             <img src="images/icons/tickers.svg" alt="טיקרים" class="table-icon">
             טיקרים
           </div>
-          <div class="table-actions">
-            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור עיצובים">
-              <span class="filter-icon">▲</span>
-            </button>
-          </div>
+                      <div class="table-actions">
+              <button class="refresh-btn" onclick="refreshYahooFinanceData()" title="רענן נתוני מחירים מ-Yahoo Finance" id="yahooRefreshBtn">
+                <span class="action-icon">🔄</span>
+                רענן נתונים
+              </button>
+              <div class="action-separator"></div>
+              <button class="refresh-btn" onclick="showAddTickerModal()" title="הוסף תיקר חדש">
+                <img src="images/icons/tickers.svg" alt="הוסף" class="action-icon">
+                הוסף טיקר
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור עיצובים">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
         </div>
 
         <!-- Alert cards -->
@@ -132,15 +140,24 @@
             </div>
             <div class="table-count">9 טיקרים</div>
             <div class="table-actions">
-              <button class="refresh-btn" onclick="showAddTickerModal()" title="הוסף תיקר חדש">
-                <img src="images/icons/tickers.svg" alt="הוסף" class="action-icon">
-                הוסף
-              </button>
-              <div class="action-separator"></div>
-              <button class="refresh-btn" onclick="refreshYahooFinanceData()" title="רענן נתוני מחירים מ-Yahoo Finance" id="yahooRefreshBtn">
-                <span class="action-icon">🔄</span>
-                רענן מחירים
-              </button>
+              <!-- פילטר סוג טיקר -->
+              <div class="ticker-type-filter" style="display: flex; gap: 4px; align-items: center; margin-left: 8px;">
+                <button class="btn btn-sm btn-outline-primary active" onclick="filterTickersByType('all')" data-type="all" title="כל הטיקרים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                  <span style="font-size: 12px;">כל</span>
+                </button>
+                <button class="btn btn-sm btn-outline-primary" onclick="filterTickersByType('stock')" data-type="stock" title="מניות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                  <span style="font-size: 10px;">מניה</span>
+                </button>
+                <button class="btn btn-sm btn-outline-primary" onclick="filterTickersByType('etf')" data-type="etf" title="ETF" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                  <span style="font-size: 10px;">ETF</span>
+                </button>
+                <button class="btn btn-sm btn-outline-primary" onclick="filterTickersByType('crypto')" data-type="crypto" title="קריפטו" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                  <span style="font-size: 10px;">₿</span>
+                </button>
+                <button class="btn btn-sm btn-outline-primary" onclick="filterTickersByType('other')" data-type="other" title="אחר" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                  <span style="font-size: 10px;">אחר</span>
+                </button>
+              </div>
               <div class="action-separator"></div>
               <button class="filter-toggle-btn" onclick="toggleTickersSection()" title="הצג/הסתר אזור טיקרים">
                 <span class="filter-icon">▲</span>
@@ -180,19 +197,19 @@
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }">
-                        מחיר נוכחי <span class="sort-icon">↕</span>
+                        סוג <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }">
-                        שינוי % <span class="sort-icon">↕</span>
+                        מחיר נוכחי <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }">
-                        סוג <span class="sort-icon">↕</span>
+                        שינוי % <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
@@ -204,13 +221,13 @@
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); }">
-                        הערות <span class="sort-icon">↕</span>
+                        נוצר ב <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
                         onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); }">
-                        נוצר ב <span class="sort-icon">↕</span>
+                        הערות <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th class="actions-cell">פעולות</th>
@@ -492,6 +509,8 @@
     <script src="scripts/entity-details-modal.js"></script>
     
     <script src="scripts/color-scheme-system.js"></script>
+    <script src="scripts/account-service.js"></script>
+    <script src="scripts/preferences.js"></script>
     <script src="scripts/color-demo-toggle.js"></script>
     <script src="scripts/tickers.js?v=20250904_0049"></script>
     <script>

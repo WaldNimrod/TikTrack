@@ -99,8 +99,16 @@ class DataRefreshLog(BaseModel):
     __tablename__ = 'data_refresh_logs'
     
     # Operation details
-    provider_id = Column(Integer, ForeignKey('external_data_providers.id'), nullable=False)
+    provider_id = Column(Integer, ForeignKey('external_data_providers.id'), nullable=True)  # Made nullable for group operations
     operation_type = Column(String(50), nullable=False)             # 'batch_fetch', 'single_fetch', 'cache_refresh'
+    
+    # Group refresh tracking (new fields)
+    category = Column(String(50), nullable=True)                    # 'active_trades', 'no_active_trades', 'closed'
+    time_period = Column(String(50), nullable=True)                 # 'in_hours', 'off_hours'
+    ticker_count = Column(Integer, nullable=True)                   # Number of tickers in group
+    successful_count = Column(Integer, nullable=True)               # Number of successful refreshes
+    failed_count = Column(Integer, nullable=True)                   # Number of failed refreshes
+    message = Column(Text, nullable=True)                           # Additional message
     
     # Request details
     symbols_requested = Column(Integer, nullable=False)             # Number of symbols requested

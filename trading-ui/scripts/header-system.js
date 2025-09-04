@@ -168,18 +168,16 @@ class HeaderSystem {
           color: #ff9c05;
           font-size: 0.8rem;
           cursor: pointer;
-          transition: bottom 0.3s ease;
-          position: absolute;
-          left: 50%;
-          transform: translateX(-50%);
-          bottom: -100px;
+          transition: all 0.3s ease;
+          position: relative;
           z-index: 1001;
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .filter-toggle-btn.collapsed {
-          bottom: -20px;
+          /* מצב קרוס - ללא שינוי מיוחד */
         }
+
 
         .filter-toggle-btn:hover {
           background: var(--apple-bg-secondary);
@@ -378,6 +376,9 @@ class HeaderSystem {
         padding: 1rem 2rem;
         background: var(--apple-bg);
         border-top: 1px solid var(--apple-border-light);
+        position: relative;
+        z-index: 1000;
+        min-height: 60px;
       }
 
               .filters-container {
@@ -387,6 +388,8 @@ class HeaderSystem {
           gap: 1rem;
           flex-wrap: wrap;
           direction: rtl;
+          min-height: 40px;
+          padding: 0.5rem 0;
         }
 
       .filter-group {
@@ -731,7 +734,7 @@ class HeaderSystem {
 
               <!-- כפתור פילטר עגול -->
               <div class="filter-toggle-section">
-                <button class="filter-toggle-btn" id="filterToggleBtn" title="הצג/הסתר פילטרים">
+                <button class="filter-toggle-btn" id="filterToggleBtn" title="הצג/הסתר פילטרים" onclick="toggleSection('filters')">
                   <span class="filter-arrow">▼</span>
                 </button>
               </div>
@@ -739,7 +742,7 @@ class HeaderSystem {
           </div>
 
         <!-- אזור פילטרים -->
-        <div class="header-filters" id="headerFilters">
+        <div class="header-filters" id="headerFilters" data-section="filters">
           <div class="filters-container">
             <!-- פילטר סטטוס -->
             <div class="filter-group status-filter">
@@ -781,16 +784,33 @@ class HeaderSystem {
                     <span class="option-text">הכול</span>
                     <span class="check-mark">●</span>
                   </div>
-                  <div class="type-filter-item" data-value="סווינג" onclick="selectTypeOption('סווינג')">
-                    <span class="option-text">סווינג</span>
+                  <!-- סוגי השקעות -->
+                  <div class="type-filter-item" data-value="מניה" onclick="selectTypeOption('מניה')">
+                    <span class="option-text">מניה</span>
                     <span class="check-mark">●</span>
                   </div>
-                  <div class="type-filter-item" data-value="השקעה" onclick="selectTypeOption('השקעה')">
-                    <span class="option-text">השקעה</span>
+                  <div class="type-filter-item" data-value="ETF" onclick="selectTypeOption('ETF')">
+                    <span class="option-text">ETF</span>
                     <span class="check-mark">●</span>
                   </div>
-                  <div class="type-filter-item" data-value="פסיבי" onclick="selectTypeOption('פסיבי')">
-                    <span class="option-text">פסיבי</span>
+                  <div class="type-filter-item" data-value="אג\"ח" onclick="selectTypeOption('אג\"ח')">
+                    <span class="option-text">אג"ח</span>
+                    <span class="check-mark">●</span>
+                  </div>
+                  <div class="type-filter-item" data-value="קריפטו" onclick="selectTypeOption('קריפטו')">
+                    <span class="option-text">קריפטו</span>
+                    <span class="check-mark">●</span>
+                  </div>
+                  <div class="type-filter-item" data-value="מטבע חוץ" onclick="selectTypeOption('מטבע חוץ')">
+                    <span class="option-text">מטבע חוץ</span>
+                    <span class="check-mark">●</span>
+                  </div>
+                  <div class="type-filter-item" data-value="סחורה" onclick="selectTypeOption('סחורה')">
+                    <span class="option-text">סחורה</span>
+                    <span class="check-mark">●</span>
+                  </div>
+                  <div class="type-filter-item" data-value="אחר" onclick="selectTypeOption('אחר')">
+                    <span class="option-text">אחר</span>
                     <span class="check-mark">●</span>
                   </div>
                 </div>
@@ -1108,15 +1128,6 @@ class HeaderSystem {
     });
 
     // כפתור הצג/הסתר פילטרים
-    document.addEventListener('click', e => {
-      if (e.target && typeof e.target.closest === 'function') {
-        if (e.target.closest('#filterToggleBtn')) {
-          this.toggleFiltersNew();
-          // סגירת התפריט הראשי כשפותחים פילטרים
-          this.closeMainMenu();
-        }
-      }
-    });
 
     // כפתור איפוס פילטרים
     document.addEventListener('click', e => {
@@ -1176,13 +1187,16 @@ class HeaderSystem {
     // הוספת event listeners לתפריטי ניווט
     this.setupNavigationDropdowns();
 
-    // שמירת מצב אזור הפילטרים
-    this.restoreFiltersSectionState();
 
     // שחזור מצב הפילטרים הספציפיים
     setTimeout(() => {
       HeaderSystem.restoreFilterStates();
     }, 100);
+
+    // שחזור מצב הסקשנים
+    setTimeout(() => {
+      this.restoreSectionStates();
+    }, 200);
   }
 
   showSubmenu(submenuItem) {
@@ -1618,25 +1632,6 @@ class HeaderSystem {
     // });
   }
 
-  toggleFilters() {
-    const filtersElement = document.getElementById('headerFilters');
-    const toggleBtn = document.getElementById('filterToggleBtn');
-    const arrow = toggleBtn.querySelector('.filter-arrow');
-
-    this.isFilterCollapsed = !this.isFilterCollapsed;
-
-    if (this.isFilterCollapsed) {
-      filtersElement.style.display = 'none';
-      arrow.textContent = '▶';
-      toggleBtn.classList.add('collapsed');
-    } else {
-      filtersElement.style.display = 'block';
-      arrow.textContent = '▼';
-      toggleBtn.classList.remove('collapsed');
-    }
-
-    this.saveState();
-  }
 
 
   loadSavedState() {
@@ -1645,21 +1640,8 @@ class HeaderSystem {
       const state = JSON.parse(savedState);
       this.isFilterCollapsed = state.isFilterCollapsed || false;
 
-      if (this.isFilterCollapsed) {
-        const filtersElement = document.getElementById('headerFilters');
-        const toggleBtn = document.getElementById('filterToggleBtn');
-        const arrow = toggleBtn?.querySelector('.filter-arrow');
-
-        if (filtersElement && toggleBtn && arrow) {
-          filtersElement.style.display = 'none';
-          arrow.textContent = '▶';
-          toggleBtn.classList.add('collapsed');
-        }
-      }
     }
 
-    // שחזור מצב אזור הפילטרים (גיבוי)
-    this.restoreFiltersSectionState();
   }
 
   saveState() {
@@ -2153,67 +2135,173 @@ class HeaderSystem {
     }
   }
 
-  // פונקציה חדשה לטוגל פילטרים עם חץ נכון
-  toggleFiltersNew() {
-    const filtersElement = document.getElementById('headerFilters');
-    const toggleBtn = document.getElementById('filterToggleBtn');
-    const arrow = toggleBtn.querySelector('.filter-arrow');
 
-    if (filtersElement) {
-      const isVisible = filtersElement.style.display !== 'none';
 
-      if (isVisible) {
-        filtersElement.style.display = 'none';
-        arrow.textContent = '▶';
-        toggleBtn.classList.add('collapsed');
-        this.isFilterCollapsed = true;
+
+  // פונקציה לפתיחה/סגירה של סקשנים
+  toggleSection(sectionId) {
+    console.log(`🔍 HeaderSystem.toggleSection called with sectionId: ${sectionId}`);
+    
+    const section = document.querySelector(`[data-section="${sectionId}"]`);
+    console.log(`🔍 Found section:`, section);
+    
+    const sectionBody = section ? section.querySelector('.section-body') : null;
+    console.log(`🔍 Found sectionBody:`, sectionBody);
+    
+    const toggleBtn = section ? section.querySelector(
+      `button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`) : null;
+    console.log(`🔍 Found toggleBtn:`, toggleBtn);
+    
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+    console.log(`🔍 Found icon:`, icon);
+
+    if (sectionBody && toggleBtn) {
+      console.log(`🔍 Both sectionBody and toggleBtn found, proceeding with toggle`);
+      const isCollapsed = sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none';
+      console.log(`🔍 isCollapsed:`, isCollapsed);
+
+      if (isCollapsed) {
+        console.log(`🔍 Opening section`);
+        sectionBody.classList.remove('collapsed');
+        sectionBody.style.display = 'block';
+        if (icon) {
+          icon.textContent = '▲';
+        }
       } else {
-        filtersElement.style.display = 'block';
-        arrow.textContent = '▼';
-        toggleBtn.classList.remove('collapsed');
-        this.isFilterCollapsed = false;
+        console.log(`🔍 Closing section`);
+        sectionBody.classList.add('collapsed');
+        sectionBody.style.display = 'none';
+        if (icon) {
+          icon.textContent = '▼';
+        }
       }
 
-      // שמירת מצב ב-localStorage
-      localStorage.setItem('filtersSectionOpen', this.isFilterCollapsed ? 'false' : 'true');
-
-      // שמירת מצב במערכת
-      this.saveState();
+      // Save state to localStorage
+      localStorage.setItem(`${sectionId}SectionCollapsed`, !isCollapsed);
+      console.log(`🔍 Saved state to localStorage: ${sectionId}SectionCollapsed = ${!isCollapsed}`);
+    } else {
+      console.log(`🔍 Missing elements - sectionBody: ${!!sectionBody}, toggleBtn: ${!!toggleBtn}`);
+      console.log(`🔍 For filters, we need to handle this differently`);
+      
+      // טיפול מיוחד לפילטרים
+      if (sectionId === 'filters' && section) {
+        console.log(`🔍 Handling filters section specially`);
+        const filtersElement = section; // הפילטרים הם ה-section עצמו
+        const toggleBtn = document.getElementById('filterToggleBtn');
+        const arrow = toggleBtn ? toggleBtn.querySelector('.filter-arrow') : null;
+        
+        console.log(`🔍 filtersElement:`, filtersElement);
+        console.log(`🔍 toggleBtn:`, toggleBtn);
+        console.log(`🔍 arrow:`, arrow);
+        
+        if (filtersElement && toggleBtn && arrow) {
+          const isCollapsed = filtersElement.style.display === 'none';
+          console.log(`🔍 filters isCollapsed:`, isCollapsed);
+          
+          if (isCollapsed) {
+            console.log(`🔍 Opening filters`);
+            filtersElement.style.display = 'block';
+            arrow.textContent = '▼';
+            toggleBtn.classList.remove('collapsed');
+            console.log(`🔍 Button classes after opening:`, toggleBtn.className);
+            console.log(`🔍 Button position after opening:`, toggleBtn.getBoundingClientRect());
+            console.log(`🔍 Button computed styles:`, {
+              transform: window.getComputedStyle(toggleBtn).transform,
+              top: window.getComputedStyle(toggleBtn).top,
+              position: window.getComputedStyle(toggleBtn).position
+            });
+          } else {
+            console.log(`🔍 Closing filters`);
+            filtersElement.style.display = 'none';
+            arrow.textContent = '▶';
+            toggleBtn.classList.add('collapsed');
+            console.log(`🔍 Button classes after closing:`, toggleBtn.className);
+            console.log(`🔍 Button position after closing:`, toggleBtn.getBoundingClientRect());
+            console.log(`🔍 Button computed styles:`, {
+              transform: window.getComputedStyle(toggleBtn).transform,
+              top: window.getComputedStyle(toggleBtn).top,
+              position: window.getComputedStyle(toggleBtn).position
+            });
+          }
+          
+          // Save state to localStorage
+          localStorage.setItem(`${sectionId}SectionCollapsed`, !isCollapsed);
+          console.log(`🔍 Saved filters state to localStorage: ${sectionId}SectionCollapsed = ${!isCollapsed}`);
+        } else {
+          console.log(`🔍 Missing filter elements - filtersElement: ${!!filtersElement}, toggleBtn: ${!!toggleBtn}, arrow: ${!!arrow}`);
+        }
+      }
     }
   }
 
-  // שמירת מצב אזור הפילטרים
-  static saveFiltersSectionState() {
-    const filtersElement = document.getElementById('headerFilters');
-    if (filtersElement) {
-      const isOpen = filtersElement.style.display !== 'none';
-      localStorage.setItem('filtersSectionOpen', isOpen.toString());
-    }
-  }
+  // פונקציה לשחזור מצב סקשנים
+  restoreSectionStates() {
+    console.log(`🔍 HeaderSystem.restoreSectionStates called`);
+    
+    // Restoring section states from localStorage
+    const sections = document.querySelectorAll('.content-section');
+    console.log(`🔍 Found ${sections.length} content sections`);
 
-  // שחזור מצב אזור הפילטרים
-  restoreFiltersSectionState() {
-    const filtersElement = document.getElementById('headerFilters');
-    const toggleBtn = document.getElementById('filterToggleBtn');
-    const arrow = toggleBtn?.querySelector('.filter-arrow');
+    sections.forEach(section => {
+      const sectionId = section.getAttribute('data-section');
+      const sectionBody = section.querySelector('.section-body');
+      const toggleBtn = section.querySelector(
+        `button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`);
+      const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
-    if (filtersElement && toggleBtn && arrow) {
-      const savedState = localStorage.getItem('filtersSectionOpen');
+      if (sectionId && sectionBody) {
+        const storageKey = `${sectionId}SectionCollapsed`;
+        const isCollapsed = localStorage.getItem(storageKey) === 'true';
+        console.log(`🔍 Section ${sectionId}: isCollapsed = ${isCollapsed}`);
 
-      if (savedState === 'true') {
-        filtersElement.style.display = 'block';
-        arrow.textContent = '▼';
-        toggleBtn.classList.remove('collapsed');
-        this.isFilterCollapsed = false;
-      } else {
-        filtersElement.style.display = 'none';
-        arrow.textContent = '▶';
-        toggleBtn.classList.add('collapsed');
-        this.isFilterCollapsed = true;
+        if (isCollapsed) {
+          sectionBody.classList.add('collapsed');
+          sectionBody.style.display = 'none';
+          if (icon) {
+            icon.textContent = '▼';
+          }
+          // Section restored as collapsed
+        } else {
+          sectionBody.classList.remove('collapsed');
+          sectionBody.style.display = 'block';
+          if (icon) {
+            icon.textContent = '▲';
+          }
+          // Section restored as expanded
+        }
       }
-
-      // עדכון הסטטוס במערכת
-      this.saveState();
+    });
+    
+    // שחזור מצב הפילטרים
+    const filtersSection = document.querySelector('[data-section="filters"]');
+    if (filtersSection) {
+      console.log(`🔍 Restoring filters state`);
+      const storageKey = 'filtersSectionCollapsed';
+      const isCollapsed = localStorage.getItem(storageKey) === 'true';
+      console.log(`🔍 Filters isCollapsed: ${isCollapsed}`);
+      
+      const toggleBtn = document.getElementById('filterToggleBtn');
+      const arrow = toggleBtn ? toggleBtn.querySelector('.filter-arrow') : null;
+      
+      if (isCollapsed) {
+        filtersSection.style.display = 'none';
+        if (arrow) {
+          arrow.textContent = '▶';
+        }
+        if (toggleBtn) {
+          toggleBtn.classList.add('collapsed');
+          console.log(`🔍 Restored button as collapsed:`, toggleBtn.className);
+        }
+      } else {
+        filtersSection.style.display = 'block';
+        if (arrow) {
+          arrow.textContent = '▼';
+        }
+        if (toggleBtn) {
+          toggleBtn.classList.remove('collapsed');
+          console.log(`🔍 Restored button as open:`, toggleBtn.className);
+        }
+      }
     }
   }
 
@@ -3053,6 +3141,14 @@ function selectStatusOption(status) {
   // Updating status filter text
   updateStatusFilterText();
 
+  // עדכון הפילטר במערכת
+  if (window.filterSystem) {
+    const selectedStatuses = Array.from(document.querySelectorAll('#statusFilterMenu .status-filter-item.selected'))
+      .map(item => item.getAttribute('data-value'));
+    window.filterSystem.currentFilters.status = selectedStatuses;
+    window.filterSystem.applyFilters();
+  }
+
   // הפעלת הפילטר
   // Applying status filter
   applyStatusFilter();
@@ -3103,6 +3199,14 @@ function selectTypeOption(type) {
   // עדכון הטקסט הנבחר
   // Updating type filter text
   updateTypeFilterText();
+
+  // עדכון הפילטר במערכת
+  if (window.filterSystem) {
+    const selectedTypes = Array.from(document.querySelectorAll('#typeFilterMenu .type-filter-item.selected'))
+      .map(item => item.getAttribute('data-value'));
+    window.filterSystem.currentFilters.type = selectedTypes;
+    window.filterSystem.applyFilters();
+  }
 
   // הפעלת הפילטר
   // Applying type filter
@@ -3916,6 +4020,8 @@ window.showAllRecordsInTable = showAllRecordsInTable;
 window.getAllVisibleContainers = getVisibleContainers;
 window.getVisibleContainers = getVisibleContainers;
 window.isDateInRange = isDateInRange;
+
+// פונקציה לבדיקה ידנית של הפילטרים
 
 /**
  * Get filter configuration for different filter types

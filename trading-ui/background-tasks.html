@@ -31,24 +31,6 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    
-    <style>
-        .status-running { color: green; font-weight: bold; }
-        .status-stopped { color: red; font-weight: bold; }
-        .console-output { 
-            background: #f8f9fa; 
-            border: 1px solid #dee2e6; 
-            padding: 15px; 
-            border-radius: 5px; 
-            font-family: monospace; 
-            white-space: pre-wrap;
-            max-height: 400px;
-            overflow-y: auto;
-            font-size: 12px;
-        }
-        .card-header h3 { margin: 0; }
-        .btn-group .btn { margin: 0 2px; }
-    </style>
 </head>
 <body>
     <!-- Header System -->
@@ -85,7 +67,7 @@
                                 <button id="start-scheduler" class="btn btn-success btn-sm" onclick="startScheduler()">
                                     <i class="fas fa-play me-1"></i> הפעל Scheduler
                                 </button>
-                                <button id="stop-scheduler" class="btn btn-danger btn-sm" onclick="stopScheduler()" style="display: none;">
+                                <button id="stop-scheduler" class="btn btn-danger btn-sm" onclick="stopScheduler()">
                                     <i class="fas fa-stop me-1"></i> עצור Scheduler
                                 </button>
                                 <button id="refresh-status" class="btn btn-primary btn-sm" onclick="refreshStatus()">

@@ -130,8 +130,14 @@
 }
 
 .linked-item-actions .btn {
-    padding: 0.25rem 0.5rem;
+    padding: 0.25rem;
     font-size: 0.8rem;
+    min-width: auto;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Modal Header Close Button */
@@ -375,7 +381,7 @@
 /* Modal content improvements */
 .linked-items-container {
     padding: 1.5rem;
-    background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,249,250,0.95));
+    background: #ffffff;
     border-radius: 8px;
     margin: 1rem 0;
 }
@@ -388,23 +394,16 @@
 }
 
 .alert-warning {
-    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(255, 193, 7, 0.05));
+    background: #ffffff;
     border-left: 4px solid #ffc107;
 }
 
 .alert-info {
-    background: linear-gradient(135deg, rgba(23, 162, 184, 0.1), rgba(23, 162, 184, 0.05));
+    background: #ffffff;
     border-left: 4px solid #17a2b8;
 }
 
-/* Section headers for view mode */
-.section-header {
-    margin: 2rem 0 1rem 0;
-    padding: 1rem;
-    background: linear-gradient(135deg, rgba(255, 156, 5, 0.1), rgba(255, 156, 5, 0.05));
-    border-left: 4px solid #ff9c05;
-    border-radius: 8px;
-}
+/* Section headers for view mode - רקע נקבע על ידי ההגדרה הכללית */
 
 .section-title {
     margin: 0 0 0.5rem 0;
@@ -425,7 +424,7 @@
     height: 48px !important;
     border-radius: 8px;
     padding: 4px;
-    background: rgba(255, 255, 255, 0.9);
+    background: #ffffff;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -446,7 +445,7 @@
 
 /* Trade items - Blue */
 .linked-item-trade {
-    background: linear-gradient(135deg, rgba(0, 123, 255, 0.1), rgba(0, 123, 255, 0.05));
+    background: #ffffff;
     border-color: rgba(0, 123, 255, 0.3);
 }
 
@@ -456,7 +455,7 @@
 
 /* Account items - Green */
 .linked-item-account {
-    background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(40, 167, 69, 0.05));
+    background: #ffffff;
     border-color: rgba(40, 167, 69, 0.3);
 }
 
@@ -466,7 +465,7 @@
 
 /* Ticker items - Red */
 .linked-item-ticker {
-    background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(220, 53, 69, 0.05));
+    background: #ffffff;
     border-color: rgba(220, 53, 69, 0.3);
 }
 
@@ -476,7 +475,7 @@
 
 /* Alert items - Orange */
 .linked-item-alert {
-    background: linear-gradient(135deg, rgba(255, 156, 5, 0.1), rgba(255, 156, 5, 0.05));
+    background: #ffffff;
     border-color: rgba(255, 156, 5, 0.3);
 }
 
@@ -486,7 +485,7 @@
 
 /* Cash flow items - Purple */
 .linked-item-cash_flow {
-    background: linear-gradient(135deg, rgba(111, 66, 193, 0.1), rgba(111, 66, 193, 0.05));
+    background: #ffffff;
     border-color: rgba(111, 66, 193, 0.3);
 }
 
@@ -496,7 +495,7 @@
 
 /* Note items - Orange */
 .linked-item-note {
-    background: linear-gradient(135deg, rgba(253, 126, 20, 0.1), rgba(253, 126, 20, 0.05));
+    background: #ffffff;
     border-color: rgba(253, 126, 20, 0.3);
 }
 
@@ -506,7 +505,7 @@
 
 /* Trade plan items - Teal */
 .linked-item-trade_plan {
-    background: linear-gradient(135deg, rgba(32, 201, 151, 0.1), rgba(32, 201, 151, 0.05));
+    background: #ffffff;
     border-color: rgba(32, 201, 151, 0.3);
 }
 
@@ -516,7 +515,7 @@
 
 /* Execution items - Dark blue */
 .linked-item-execution {
-    background: linear-gradient(135deg, rgba(23, 162, 184, 0.1), rgba(23, 162, 184, 0.05));
+    background: #ffffff;
     border-color: rgba(23, 162, 184, 0.3);
 }
 
@@ -526,7 +525,7 @@
 
 /* Default item style */
 .linked-item-row:not([class*="linked-item-"]) {
-    background: linear-gradient(135deg, rgba(108, 117, 125, 0.1), rgba(108, 117, 125, 0.05));
+    background: #ffffff;
     border-color: rgba(108, 117, 125, 0.3);
 }
 

@@ -51,7 +51,7 @@ def get_ticker_quote(ticker_id):
                     'suggestion': 'Data may not have been fetched yet. Try refreshing the data.'
                 }), 404
             
-            # Check if quote is stale (older than 5 minutes)
+            # Check if quote is stale (older than 24 hours)
             now = datetime.now(timezone.utc)
             
             # Ensure fetched_at has timezone info
@@ -63,10 +63,10 @@ def get_ticker_quote(ticker_id):
             
             quote_age = (now - fetched_at_utc).total_seconds() / 60  # minutes
             
-            if quote_age > 5:
+            if quote_age > 1440:  # 24 hours = 1440 minutes
                 return jsonify({
                     'status': 'error',
-                    'message': f'Quote data for {ticker.symbol} is stale ({quote_age:.1f} minutes old)',
+                    'message': f'Quote data for {ticker.symbol} is too old ({quote_age:.1f} minutes old)',
                     'error_code': 'STALE_QUOTE_DATA',
                     'ticker_symbol': ticker.symbol,
                     'quote_age_minutes': round(quote_age, 1),
@@ -169,7 +169,7 @@ def get_batch_quotes():
                         })
                         continue
                     
-                    # Check if quote is stale (older than 5 minutes)
+                    # Check if quote is stale (older than 24 hours)
                     now = datetime.now(timezone.utc)
                     
                     # Ensure fetched_at has timezone info
@@ -181,11 +181,11 @@ def get_batch_quotes():
                     
                     quote_age = (now - fetched_at_utc).total_seconds() / 60  # minutes
                     
-                    if quote_age > 5:
+                    if quote_age > 1440:  # 24 hours = 1440 minutes
                         errors.append({
                             'ticker_id': ticker_id,
                             'symbol': ticker.symbol,
-                            'error': f'Quote data is stale ({quote_age:.1f} minutes old)',
+                            'error': f'Quote data is too old ({quote_age:.1f} minutes old)',
                             'error_code': 'STALE_QUOTE_DATA',
                             'quote_age_minutes': round(quote_age, 1),
                             'last_fetched': quote.fetched_at.isoformat(),

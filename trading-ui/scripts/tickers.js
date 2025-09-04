@@ -676,10 +676,21 @@ async function updateTicker() {
       if (hasOpenTrades || hasOpenPlans) {
 
         // שימוש במערכת הכללית להצגת פריטים מקושרים
-        if (window.showLinkedItemsWarning) {
-          window.showLinkedItemsWarning('ticker', id);
+        if (window.showLinkedItemsModal) {
+          // טעינת נתוני פריטים מקושרים
+          try {
+            const response = await fetch(`/api/v1/linked-items/ticker/${id}`);
+            if (response.ok) {
+              const data = await response.json();
+              window.showLinkedItemsModal(data, 'ticker', id);
+            } else {
+              throw new Error('Failed to load linked items data');
+            }
+          } catch (error) {
+            handleDataLoadError(error, 'פריטים מקושרים');
+          }
         } else {
-          handleFunctionNotFound('showLinkedItemsWarning', 'פונקציית בדיקת פריטים מקושרים לא זמינה');
+          handleFunctionNotFound('showLinkedItemsModal', 'פונקציית בדיקת פריטים מקושרים לא זמינה');
           // Fallback - הצגת הודעת אזהרה
           if (window.showWarningNotification) {
             window.showWarningNotification(
@@ -881,8 +892,18 @@ async function performTickerCancellation(tickerId) {
                     errorData.error.message.includes('active trades')) {
 
           // הצגת אזהרת פריטים מקושרים
-          if (window.showLinkedItemsWarning) {
-            window.showLinkedItemsWarning('ticker', tickerId);
+          if (window.showLinkedItemsModal) {
+            try {
+              const response = await fetch(`/api/v1/linked-items/ticker/${tickerId}`);
+              if (response.ok) {
+                const data = await response.json();
+                window.showLinkedItemsModal(data, 'ticker', tickerId);
+              } else {
+                throw new Error('Failed to load linked items data');
+              }
+            } catch (error) {
+              handleDataLoadError(error, 'פריטים מקושרים');
+            }
           } else {
             if (window.showErrorNotification) {
               window.showErrorNotification('שגיאה בביטול', 'לא ניתן לבטל טיקר זה - יש טריידים פעילים מקושרים אליו');
@@ -1289,8 +1310,18 @@ async function performTickerDeletion(tickerId) {
                         errorData.error.message.includes('Cannot delete ticker with linked items'))) {
 
           // הצגת אזהרת פריטים מקושרים
-          if (window.showLinkedItemsWarning) {
-            window.showLinkedItemsWarning('ticker', tickerId);
+          if (window.showLinkedItemsModal) {
+            try {
+              const response = await fetch(`/api/v1/linked-items/ticker/${tickerId}`);
+              if (response.ok) {
+                const data = await response.json();
+                window.showLinkedItemsModal(data, 'ticker', tickerId);
+              } else {
+                throw new Error('Failed to load linked items data');
+              }
+            } catch (error) {
+              handleDataLoadError(error, 'פריטים מקושרים');
+            }
           } else {
             if (window.showErrorNotification) {
               window.showErrorNotification('שגיאה במחיקה', 'לא ניתן למחוק טיקר זה - יש פריטים מקושרים אליו');
@@ -1391,10 +1422,16 @@ async function confirmDeleteTicker(id) {
 
           // הצגת אזהרת פריטים מקושרים לפני מחיקה
           try {
-            if (window.showLinkedItemsWarning) {
-              window.showLinkedItemsWarning('ticker', id);
+            if (window.showLinkedItemsModal) {
+              const response = await fetch(`/api/v1/linked-items/ticker/${id}`);
+              if (response.ok) {
+                const data = await response.json();
+                window.showLinkedItemsModal(data, 'ticker', id);
+              } else {
+                throw new Error('Failed to load linked items data');
+              }
             } else {
-              handleFunctionNotFound('showLinkedItemsWarning', 'פונקציית בדיקת פריטים מקושרים לא נמצאה');
+              handleFunctionNotFound('showLinkedItemsModal', 'פונקציית בדיקת פריטים מקושרים לא נמצאה');
             }
           } catch (error) {
             handleSystemError(error, 'קריאה לפונקציית בדיקת פריטים מקושרים');
@@ -1661,10 +1698,10 @@ function updateTickersTable(tickers) {
                     <td class="actions-cell">
                         <div class="btn-group btn-group-sm" role="group">
                             <button class="btn btn-outline-info" 
-                                    onclick="window.showLinkedItemsWarning('ticker', ${ticker.id})" 
+                                    onclick="viewLinkedItemsForTicker(${ticker.id})" 
                                     title="פריטים מקושרים">🔗</button>
                             <button class="btn btn-outline-secondary" 
-                                    onclick="window.showEditTickerModal(${ticker.id})" 
+                                    onclick="editTicker(${ticker.id})" 
                                     title="ערוך">✏️</button>
                             ${ticker.status === 'cancelled' ?
     `<button class="btn btn-outline-success" 
@@ -1933,3 +1970,50 @@ async function refreshYahooFinanceDataSilently() {
     console.warn('Silent external data refresh failed:', error.message);
   }
 }
+
+// פונקציה לפילטר טיקרים לפי סוג
+function filterTickersByType(type) {
+  console.log(`🔍 Filtering tickers by type: ${type}`);
+  
+  // עדכון מצב הכפתורים
+  const buttons = document.querySelectorAll('.ticker-type-filter [data-type]');
+  buttons.forEach(btn => {
+    if (btn.getAttribute('data-type') === type) {
+      btn.classList.add('active');
+      btn.classList.remove('btn-outline-primary');
+      btn.style.backgroundColor = 'white';
+      btn.style.color = '#28a745';
+      btn.style.borderColor = '#28a745';
+    } else {
+      btn.classList.remove('active');
+      btn.classList.add('btn-outline-primary');
+      btn.style.backgroundColor = '';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }
+  });
+
+  // פילטור הנתונים
+  let filteredData = [...window.tickersData];
+  
+  if (type !== 'all') {
+    filteredData = filteredData.filter(ticker => ticker.type === type);
+  }
+
+  // עדכון הטבלה
+  if (typeof window.updateTickersTable === 'function') {
+    window.updateTickersTable(filteredData);
+  }
+
+  // עדכון ספירת הטיקרים
+  const countElement = document.querySelector('.table-count');
+  if (countElement) {
+    countElement.textContent = `${filteredData.length} טיקרים`;
+  }
+
+  console.log(`🔍 Filtered ${filteredData.length} tickers out of ${window.tickersData.length}`);
+}
+
+// ייצוא פונקציות לגלובל
+window.filterTickersByType = filterTickersByType;
+

@@ -84,11 +84,11 @@ class CacheTestSystem {
         statusElement.innerHTML = `
                     <div class="status-indicator ${statusData.status}">
                         <i class="fas fa-check-circle"></i>
-                        ${this.getStatusText(statusData.status)}
+                        ${CacheTestSystem.getStatusText(statusData.status)}
                     </div>
                     <div class="status-details">
                         <small>גרסה: ${statusData.version}</small><br>
-                        <small>בריאות: ${this.getHealthText(statusData.health)}</small>
+                        <small>בריאות: ${CacheTestSystem.getHealthText(statusData.health)}</small>
                     </div>
                 `;
 
@@ -96,7 +96,7 @@ class CacheTestSystem {
       }
     } catch (error) {
       this.log(`Failed to update system status: ${error.message}`, 'error');
-      this.updateSystemStatusError();
+      CacheTestSystem.updateSystemStatusError();
     }
   }
 
@@ -248,7 +248,7 @@ class CacheTestSystem {
         const analysisElement = document.getElementById('performance-analysis');
         const stats = data.data;
 
-        const analysis = this.analyzePerformance(stats);
+        const analysis = CacheTestSystem.analyzePerformance(stats);
 
         analysisElement.innerHTML = `
                     <div class="performance-data">
@@ -757,17 +757,17 @@ class CacheTestSystem {
   }
 
   /**
-     * Update test output
-     */
-  static updateTestOutput(type, message) {
+   * Update test output
+   */
+  updateTestOutput(type, message) {
     const testOutput = document.getElementById('test-output');
     testOutput.innerHTML = `<div class="test-result ${type}">${message}</div>`;
   }
 
   /**
-     * Show notification
-     */
-  static showNotification(message, type = 'info') {
+   * Show notification
+   */
+  showNotification(message, type = 'info') {
     if (window.showNotification) {
       window.showNotification(message, type);
     } else {

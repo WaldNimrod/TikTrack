@@ -97,20 +97,16 @@ class EntityDetailsModal {
                  data-bs-backdrop="true" data-bs-keyboard="true">
                 <div class="modal-dialog modal-xl modal-dialog-scrollable">
                     <div class="modal-content entity-details-modal">
-                        <div class="modal-header entity-details-header">
-                            <button type="button" class="btn-close" 
-                                    data-bs-dismiss="modal" aria-label="סגירה"
-                                    title="סגירה (ESC)">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
+                        <div class="modal-header modal-header-colored">
                             <h5 class="modal-title" id="${this.modalId}Label">
                                 פרטי ישות
                             </h5>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" 
-                                    data-bs-dismiss="modal" aria-label="סגירה"
-                                    title="סגירה">
-                                <i class="fas fa-times"></i>
-                            </button>
+                            <div class="d-flex align-items-center gap-2">
+                                <div id="quickActionButtons" class="btn-group btn-group-sm me-3" role="group">
+                                    <!-- כפתורי פעולות מהירות יוכנסו כאן דינמית -->
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
                         </div>
                         <div class="modal-body entity-details-body" id="entityDetailsContent">
                             <div class="entity-details-loading">
@@ -317,6 +313,9 @@ class EntityDetailsModal {
             }
         }
 
+        // עדכון כותרת המודל
+        this.updateModalTitle(entityType, entityData);
+
         // רנדור הנתונים
         const renderedContent = window.entityDetailsRenderer.render(entityType, entityData, options);
 
@@ -327,6 +326,58 @@ class EntityDetailsModal {
             console.error('Error loading entity data:', error);
             this.showErrorState(error.message);
         }
+    }
+
+    /**
+     * Update modal title - עדכון כותרת המודל
+     * 
+     * @param {string} entityType - סוג הישות
+     * @param {Object} entityData - נתוני הישות
+     * @private
+     */
+    updateModalTitle(entityType, entityData) {
+        const titleElement = document.getElementById(`${this.modalId}Label`);
+        if (!titleElement) return;
+
+        let title = 'פרטי ישות';
+        
+        if (entityType === 'ticker' && entityData.symbol) {
+            title = `פרטי טיקר: ${entityData.symbol}`;
+        } else if (entityType === 'trade' && entityData.symbol) {
+            title = `פרטי טרייד: ${entityData.symbol}`;
+        } else if (entityType === 'trade_plan' && entityData.symbol) {
+            title = `פרטי תכנית: ${entityData.symbol}`;
+        } else if (entityType === 'alert' && entityData.symbol) {
+            title = `פרטי התראה: ${entityData.symbol}`;
+        }
+
+        titleElement.textContent = title;
+        
+        // עדכון כפתורי פעולות מהירות
+        this.updateQuickActionButtons(entityType, entityData);
+    }
+
+    /**
+     * Update quick action buttons - עדכון כפתורי פעולות מהירות
+     * 
+     * @param {string} entityType - סוג הישות
+     * @param {Object} entityData - נתוני הישות
+     * @private
+     */
+    updateQuickActionButtons(entityType, entityData) {
+        const buttonsContainer = document.getElementById('quickActionButtons');
+        if (!buttonsContainer) return;
+
+        let buttonsHtml = '';
+        
+        if (entityType === 'ticker') {
+            buttonsHtml = `
+                <button class="btn btn-outline-info" onclick="viewLinkedItemsForTicker(${entityData.id})" title="פריטים מקושרים">🔗</button>
+                <button class="btn btn-outline-secondary" onclick="editTicker(${entityData.id})" title="ערוך טיקר">✏️</button>
+            `;
+        }
+        
+        buttonsContainer.innerHTML = buttonsHtml;
     }
 
     /**
@@ -724,8 +775,8 @@ function editTicker(tickerId) {
         }
         
         // פתיחת מודול עריכת טיקר
-        if (window.editTickerModal) {
-            window.editTickerModal(tickerId);
+        if (window.editTicker) {
+            window.editTicker(tickerId);
         } else if (window.openEditTickerModal) {
             window.openEditTickerModal(tickerId);
         } else {

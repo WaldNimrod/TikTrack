@@ -153,6 +153,24 @@ class UserService:
             if user_id is None:
                 user_id = UserService.DEFAULT_USER_ID
             
+            # Try to get preferences from the new user_preferences table
+            try:
+                from models.user_preferences import UserPreferences
+                user_prefs = db.query(UserPreferences).filter(UserPreferences.user_id == user_id).first()
+                if user_prefs:
+                    # Get current preferences and merge with new ones
+                    current_db_preferences = UserService.get_user_preferences(db, user_id)
+                    merged_preferences_to_save = UserService.deep_merge_dicts(current_db_preferences, preferences)
+                    
+                    # Update the preferences object
+                    user_prefs.from_dict(merged_preferences_to_save)
+                    db.commit()
+                    logger.info(f"Updated preferences for user {user_id} in user_preferences table")
+                    return True
+            except Exception as e:
+                logger.warning(f"Could not update preferences in user_preferences table: {e}")
+            
+            # Fallback to old method (user.set_preferences() from legacy JSON field)
             user = UserService.get_user_by_id(db, user_id)
             if user:
                 # Get current preferences and merge with new ones
@@ -164,7 +182,7 @@ class UserService:
                 merged_preferences.update(preferences)
                 user.set_preferences(merged_preferences)
                 db.commit()
-                logger.info(f"Updated preferences for user {user_id}")
+                logger.info(f"Updated preferences for user {user_id} in legacy field")
                 return True
             
             logger.error(f"User {user_id} not found, cannot update preferences")

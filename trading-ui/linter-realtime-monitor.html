@@ -17,308 +17,6 @@
     <link rel="stylesheet" href="styles/notification-system.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .monitor-dashboard {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .dashboard-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--apple-text-primary);
-            margin: 0;
-        }
-
-        .status-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            border-radius: 25px;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .status-active {
-            background: rgba(52, 199, 89, 0.1);
-            color: #34c759;
-            border: 1px solid rgba(52, 199, 89, 0.2);
-        }
-
-        .status-inactive {
-            background: rgba(255, 59, 48, 0.1);
-            color: #ff3b30;
-            border: 1px solid rgba(255, 59, 48, 0.2);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: var(--apple-bg-elevated);
-            border: 1px solid var(--apple-border-light);
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: var(--apple-shadow-light);
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--apple-shadow-medium);
-        }
-
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .stat-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--apple-text-primary);
-        }
-
-        .stat-icon {
-            font-size: 1.5rem;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--apple-text-primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-change {
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .stat-change.positive {
-            color: #34c759;
-        }
-
-        .stat-change.negative {
-            color: #ff3b30;
-        }
-
-        .stat-change.neutral {
-            color: var(--apple-text-secondary);
-        }
-
-        .chart-section {
-            background: var(--apple-bg-elevated);
-            border: 1px solid var(--apple-border-light);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--apple-shadow-light);
-        }
-
-        .chart-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--apple-text-primary);
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-bottom: 1rem;
-        }
-
-        .issues-section {
-            background: var(--apple-bg-elevated);
-            border: 1px solid var(--apple-border-light);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--apple-shadow-light);
-        }
-
-        .issues-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .issues-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--apple-text-primary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .filter-buttons {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: 0.5rem 1rem;
-            border: 1px solid var(--apple-border-light);
-            background: var(--apple-bg-primary);
-            color: var(--apple-text-primary);
-            border-radius: 20px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .filter-btn.active {
-            background: #007aff;
-            color: white;
-            border-color: #007aff;
-        }
-
-        .filter-btn:hover {
-            background: var(--apple-bg-secondary);
-        }
-
-        .issue-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            border: 1px solid var(--apple-border-light);
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .issue-item:hover {
-            background: var(--apple-bg-secondary);
-        }
-
-        .issue-severity {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .issue-severity.error {
-            background: #ff3b30;
-        }
-
-        .issue-severity.warning {
-            background: #ff9500;
-        }
-
-        .issue-severity.info {
-            background: #007aff;
-        }
-
-        .issue-content {
-            flex: 1;
-        }
-
-        .issue-message {
-            font-weight: 600;
-            color: var(--apple-text-primary);
-            margin-bottom: 0.25rem;
-        }
-
-        .issue-details {
-            font-size: 0.9rem;
-            color: var(--apple-text-secondary);
-        }
-
-        .issue-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .btn-sm {
-            padding: 0.25rem 0.75rem;
-            font-size: 0.8rem;
-            border-radius: 4px;
-        }
-
-        .loading-state {
-            text-align: center;
-            padding: 2rem;
-            color: var(--apple-text-secondary);
-        }
-
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--apple-border-light);
-            border-radius: 50%;
-            border-top-color: #007aff;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .auto-refresh {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-            color: var(--apple-text-secondary);
-        }
-
-        .refresh-toggle {
-            position: relative;
-            width: 40px;
-            height: 20px;
-            background: var(--apple-border-light);
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .refresh-toggle.active {
-            background: #34c759;
-        }
-
-        .refresh-toggle::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            width: 16px;
-            height: 16px;
-            background: white;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-
-        .refresh-toggle.active::after {
-            transform: translateX(-20px);
-        }
-    </style>
 </head>
 
 <body>
@@ -328,19 +26,10 @@
         
         <div class="monitor-dashboard">
             <div class="dashboard-header">
-                <h1 class="dashboard-title">📊 ניטור Linter בזמן אמת</h1>
-                <div class="auto-refresh">
-                    <span>עדכון אוטומטי:</span>
-                    <div class="refresh-toggle active" onclick="toggleAutoRefresh()"></div>
-                    <span id="refreshStatus">פעיל</span>
-                </div>
-            </div>
-
-            <!-- Status Indicator -->
-            <div class="text-center mb-4">
-                <div class="status-indicator status-active" id="monitorStatus">
-                    <span>🟢</span>
-                    <span>ניטור פעיל</span>
+                <h1 class="dashboard-title">🔍 ניטור Linter בזמן אמת</h1>
+                <div class="status-indicator" id="statusIndicator">
+                    <span class="status-dot"></span>
+                    <span class="status-text">מתחבר...</span>
                 </div>
             </div>
 
@@ -348,342 +37,122 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-title">סה"כ קבצים</div>
-                        <div class="stat-icon">📁</div>
+                        <h3 class="stat-title">שגיאות</h3>
+                        <i class="stat-icon bi bi-exclamation-triangle text-danger"></i>
                     </div>
-                    <div class="stat-value" id="totalFiles">0</div>
-                    <div class="stat-change neutral" id="filesChange">+0 מהשבוע שעבר</div>
+                    <div class="stat-value" id="errorCount">0</div>
+                    <div class="stat-change neutral" id="errorChange">+0</div>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-title">שגיאות</div>
-                        <div class="stat-icon">❌</div>
+                        <h3 class="stat-title">אזהרות</h3>
+                        <i class="stat-icon bi bi-exclamation-circle text-warning"></i>
                     </div>
-                    <div class="stat-value" id="totalErrors">0</div>
-                    <div class="stat-change negative" id="errorsChange">+0 מהשבוע שעבר</div>
+                    <div class="stat-value" id="warningCount">0</div>
+                    <div class="stat-change neutral" id="warningChange">+0</div>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-title">אזהרות</div>
-                        <div class="stat-icon">⚠️</div>
+                        <h3 class="stat-title">הצלחות</h3>
+                        <i class="stat-icon bi bi-check-circle text-success"></i>
                     </div>
-                    <div class="stat-value" id="totalWarnings">0</div>
-                    <div class="stat-change negative" id="warningsChange">+0 מהשבוע שעבר</div>
+                    <div class="stat-value" id="successCount">0</div>
+                    <div class="stat-change neutral" id="successChange">+0</div>
                 </div>
 
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-title">איכות קוד</div>
-                        <div class="stat-icon">⭐</div>
+                        <h3 class="stat-title">קבצים נסרקו</h3>
+                        <i class="stat-icon bi bi-file-text text-info"></i>
                     </div>
-                    <div class="stat-value" id="codeQuality">0%</div>
-                    <div class="stat-change positive" id="qualityChange">+0% מהשבוע שעבר</div>
+                    <div class="stat-value" id="filesScanned">0</div>
+                    <div class="stat-change neutral" id="filesChange">+0</div>
                 </div>
             </div>
 
-            <!-- Charts Section -->
+            <!-- Chart Section -->
             <div class="chart-section">
                 <h2 class="chart-title">
-                    📈 מגמות איכות קוד
+                    <i class="bi bi-graph-up"></i>
+                    סטטיסטיקות Linter
                 </h2>
                 <div class="chart-container">
-                    <canvas id="qualityChart"></canvas>
+                    <canvas id="linterChart"></canvas>
                 </div>
             </div>
 
-            <!-- Issues Section -->
-            <div class="issues-section">
-                <div class="issues-header">
-                    <h2 class="issues-title">
-                        🔍 בעיות נוכחיות
-                    </h2>
-                    <div class="filter-buttons">
-                        <button class="filter-btn active" onclick="filterIssues('all')">הכל</button>
-                        <button class="filter-btn" onclick="filterIssues('error')">שגיאות</button>
-                        <button class="filter-btn" onclick="filterIssues('warning')">אזהרות</button>
-                        <button class="filter-btn" onclick="filterIssues('info')">מידע</button>
+            <!-- Controls Section -->
+            <div class="controls-section">
+                <h2 class="chart-title">
+                    <i class="bi bi-gear"></i>
+                    הגדרות ניטור
+                </h2>
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label class="control-label">תדירות סריקה (שניות)</label>
+                        <input type="number" class="control-input" id="scanInterval" value="5" min="1" max="60">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">רמת לוג</label>
+                        <select class="control-select" id="logLevel">
+                            <option value="error">שגיאות בלבד</option>
+                            <option value="warning" selected>אזהרות ושגיאות</option>
+                            <option value="info">כל ההודעות</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">תיקיות לסריקה</label>
+                        <input type="text" class="control-input" id="scanPaths" value="trading-ui/">
                     </div>
                 </div>
+                <div class="controls-grid">
+                    <button class="btn btn-primary" id="startMonitoring">
+                        <i class="bi bi-play-fill"></i> התחל ניטור
+                    </button>
+                    <button class="btn btn-secondary" id="stopMonitoring" disabled>
+                        <i class="bi bi-stop-fill"></i> עצור ניטור
+                    </button>
+                    <button class="btn btn-success" id="clearLogs">
+                        <i class="bi bi-trash"></i> נקה לוגים
+                    </button>
+                    <button class="btn btn-danger" id="exportLogs">
+                        <i class="bi bi-download"></i> ייצא לוגים
+                    </button>
+                </div>
+            </div>
 
-                <div id="issuesList">
-                    <div class="loading-state">
-                        <div class="loading-spinner"></div>
-                        <p>טוען בעיות...</p>
+            <!-- Logs Section -->
+            <div class="logs-section">
+                <div class="logs-header">
+                    <h2 class="logs-title">
+                        <i class="bi bi-terminal"></i>
+                        לוגי Linter
+                    </h2>
+                    <div class="logs-controls">
+                        <div class="refresh-toggle" id="autoRefreshToggle">
+                            <span class="toggle-label">רענון אוטומטי</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="logs-container" id="logsContainer">
+                    <div class="log-entry">
+                        <span class="log-timestamp">[00:00:00]</span>
+                        <span class="log-level info">[INFO]</span>
+                        <span class="log-message">מערכת ניטור Linter אותחלה</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- TikTrack Scripts -->
-    <script src="scripts/main.js"></script>
-    <script src="scripts/page-utils.js"></script>
+    <!-- Scripts -->
+    <script src="scripts/console-cleanup.js"></script>
     <script src="scripts/header-system.js"></script>
     <script src="scripts/notification-system.js"></script>
-    <script src="scripts/console-cleanup.js"></script>
-
-    <script>
-        // Global variables
-        let qualityChart;
-        let autoRefreshInterval;
-        let isAutoRefreshActive = true;
-        let currentFilter = 'all';
-
-        // אתחול מערכת ראש הדף
-        document.addEventListener("DOMContentLoaded", () => {
-            console.log('🚀 טעינת דף ניטור Linter בזמן אמת...');
-
-            // אתחול HeaderSystem
-            if (window.headerSystem && !window.headerSystem.isInitialized) {
-                console.log('✅ אתחול HeaderSystem...');
-                window.headerSystem.init();
-            }
-
-            // בדיקת זמינות מערכת התראות
-            if (typeof window.showSuccessNotification === 'function') {
-                console.log('✅ מערכת התראות זמינה');
-            } else {
-                console.log('⚠️ מערכת התראות לא זמינה');
-            }
-
-            // אתחול הרכיבים
-            initializeChart();
-            loadInitialData();
-            startAutoRefresh();
-        });
-
-        function initializeChart() {
-            const ctx = document.getElementById('qualityChart').getContext('2d');
-            qualityChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'איכות קוד (%)',
-                        data: [],
-                        borderColor: '#007aff',
-                        backgroundColor: 'rgba(0, 122, 255, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: {
-                                callback: function(value) {
-                                    return value + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function loadInitialData() {
-            // סימולציה של נתונים
-            const mockData = {
-                totalFiles: 127,
-                totalErrors: 3,
-                totalWarnings: 12,
-                codeQuality: 87
-            };
-
-            updateStats(mockData);
-            updateChart(mockData);
-            loadIssues();
-        }
-
-        function updateStats(data) {
-            document.getElementById('totalFiles').textContent = data.totalFiles;
-            document.getElementById('totalErrors').textContent = data.totalErrors;
-            document.getElementById('totalWarnings').textContent = data.totalWarnings;
-            document.getElementById('codeQuality').textContent = data.codeQuality + '%';
-
-            // עדכון שינויים (סימולציה)
-            document.getElementById('filesChange').textContent = `+${Math.floor(Math.random() * 5)} מהשבוע שעבר`;
-            document.getElementById('errorsChange').textContent = `${Math.random() > 0.5 ? '+' : '-'}${Math.floor(Math.random() * 3)} מהשבוע שעבר`;
-            document.getElementById('warningsChange').textContent = `${Math.random() > 0.5 ? '+' : '-'}${Math.floor(Math.random() * 5)} מהשבוע שעבר`;
-            document.getElementById('qualityChange').textContent = `${Math.random() > 0.5 ? '+' : '-'}${Math.floor(Math.random() * 5)}% מהשבוע שעבר`;
-        }
-
-        function updateChart(data) {
-            const now = new Date();
-            const timeLabel = now.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
-            
-            qualityChart.data.labels.push(timeLabel);
-            qualityChart.data.datasets[0].data.push(data.codeQuality);
-            
-            // שמירה על 20 נקודות אחרונות
-            if (qualityChart.data.labels.length > 20) {
-                qualityChart.data.labels.shift();
-                qualityChart.data.datasets[0].data.shift();
-            }
-            
-            qualityChart.update('none');
-        }
-
-        function loadIssues() {
-            const mockIssues = [
-                {
-                    severity: 'error',
-                    message: 'Missing semicolon',
-                    file: 'trading-ui/scripts/main.js',
-                    line: 45,
-                    rule: 'semi'
-                },
-                {
-                    severity: 'warning',
-                    message: 'Unused variable',
-                    file: 'Backend/routes/api/trades.py',
-                    line: 23,
-                    rule: 'unused-variable'
-                },
-                {
-                    severity: 'info',
-                    message: 'Consider using const instead of let',
-                    file: 'trading-ui/scripts/header-system.js',
-                    line: 156,
-                    rule: 'prefer-const'
-                },
-                {
-                    severity: 'error',
-                    message: 'Function too complex',
-                    file: 'Backend/services/health_service.py',
-                    line: 89,
-                    rule: 'complexity'
-                },
-                {
-                    severity: 'warning',
-                    message: 'Long line detected',
-                    file: 'trading-ui/styles/apple-theme.css',
-                    line: 234,
-                    rule: 'max-len'
-                }
-            ];
-
-            displayIssues(mockIssues);
-        }
-
-        function displayIssues(issues) {
-            const issuesList = document.getElementById('issuesList');
-            
-            if (issues.length === 0) {
-                issuesList.innerHTML = `
-                    <div class="text-center py-4">
-                        <p class="text-muted">🎉 אין בעיות נוכחיות!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            const filteredIssues = currentFilter === 'all' ? issues : issues.filter(issue => issue.severity === currentFilter);
-            
-            issuesList.innerHTML = filteredIssues.map(issue => `
-                <div class="issue-item" data-severity="${issue.severity}">
-                    <div class="issue-severity ${issue.severity}"></div>
-                    <div class="issue-content">
-                        <div class="issue-message">${issue.message}</div>
-                        <div class="issue-details">
-                            ${issue.file}:${issue.line} | כלל: ${issue.rule}
-                        </div>
-                    </div>
-                    <div class="issue-actions">
-                        <button class="btn btn-sm btn-outline-primary" onclick="fixIssue('${issue.file}', ${issue.line})">
-                            🔧 תיקון
-                        </button>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="ignoreIssue('${issue.file}', ${issue.line})">
-                            👁️ התעלם
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function filterIssues(filter) {
-            currentFilter = filter;
-            
-            // עדכון כפתורי הפילטר
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // טעינה מחדש של הבעיות
-            loadIssues();
-        }
-
-        function fixIssue(file, line) {
-            if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('תיקון אוטומטי', `תיקון אוטומטי עבור ${file}:${line}`);
-            } else {
-                alert(`תיקון אוטומטי עבור ${file}:${line}`);
-            }
-        }
-
-        function ignoreIssue(file, line) {
-            if (typeof window.showInfoNotification === 'function') {
-                window.showInfoNotification('התעלמות מבעיה', `התעלמות מבעיה ב-${file}:${line}`);
-            } else {
-                alert(`התעלמות מבעיה ב-${file}:${line}`);
-            }
-        }
-
-        function toggleAutoRefresh() {
-            isAutoRefreshActive = !isAutoRefreshActive;
-            const toggle = document.querySelector('.refresh-toggle');
-            const status = document.getElementById('refreshStatus');
-            
-            if (isAutoRefreshActive) {
-                toggle.classList.add('active');
-                status.textContent = 'פעיל';
-                startAutoRefresh();
-            } else {
-                toggle.classList.remove('active');
-                status.textContent = 'לא פעיל';
-                stopAutoRefresh();
-            }
-        }
-
-        function startAutoRefresh() {
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-            }
-            
-            autoRefreshInterval = setInterval(() => {
-                if (isAutoRefreshActive) {
-                    loadInitialData();
-                }
-            }, 30000); // עדכון כל 30 שניות
-        }
-
-        function stopAutoRefresh() {
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-                autoRefreshInterval = null;
-            }
-        }
-
-        // ניקוי בעת סגירת הדף
-        window.addEventListener('beforeunload', () => {
-            stopAutoRefresh();
-        });
-    </script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/linter-realtime-monitor.js"></script>
 </body>
-
 </html>

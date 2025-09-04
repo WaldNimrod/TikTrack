@@ -690,6 +690,7 @@
     padding: 1rem 10px;
     background: var(--apple-bg-elevated);
     border-top: 1px solid var(--apple-border-light);
+    display: block;
 }
 
 #unified-header .filters-container {
@@ -1077,7 +1078,7 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    bottom: -100px;
+    bottom: -95px;
     z-index: 1001;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }

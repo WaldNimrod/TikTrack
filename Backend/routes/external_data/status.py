@@ -642,51 +642,160 @@ def optimize_cache_endpoint():
             'message': str(e)
         }), 500
 
+@status_bp.route('/group-refresh-history', methods=['GET'])
+def get_group_refresh_history():
+    """
+    Get group refresh history for dashboard
+    
+    Returns:
+    - JSON response with group refresh history
+    """
+    try:
+        from services.data_refresh_scheduler import data_refresh_scheduler
+        
+        # Get limit from query parameters
+        limit = request.args.get('limit', 50, type=int)
+        
+        if data_refresh_scheduler:
+            history = data_refresh_scheduler.get_group_refresh_history(limit)
+        else:
+            # Fallback: query database directly
+            from models.external_data import DataRefreshLog
+            from config.database import SessionLocal
+            
+            db_session = SessionLocal()
+            logs = db_session.query(DataRefreshLog).order_by(
+                DataRefreshLog.start_time.desc()
+            ).limit(limit).all()
+            
+            history = [
+                {
+                    'id': log.id,
+                    'category': log.category,
+                    'time_period': log.time_period,
+                    'ticker_count': log.ticker_count,
+                    'status': log.status,
+                    'started_at': log.start_time.isoformat() if log.start_time else None,
+                    'completed_at': log.end_time.isoformat() if log.end_time else None,
+                    'successful_count': log.successful_count,
+                    'failed_count': log.failed_count,
+                    'message': log.message
+                }
+                for log in logs
+            ]
+        
+        response = {
+            'success': True,
+            'timestamp': datetime.now(timezone.utc).isoformat(),
+            'group_refresh_history': history,
+            'total_entries': len(history),
+            'source': 'data_refresh_scheduler'
+        }
+        
+        return jsonify(response), 200
+        
+    except Exception as e:
+        logger.error(f"Error in get_group_refresh_history: {e}")
+        return jsonify({
+            'error': 'Internal server error',
+            'message': str(e)
+        }), 500
+
 @status_bp.route('/logs', methods=['GET'])
 def get_data_logs():
     """
-    Get data refresh logs for dashboard
+    Get data refresh logs for dashboard from server log files
     
     Returns:
     - JSON response with logs
     """
     try:
-        # Get database session
-        db_session = next(get_db())
+        import os
+        import re
+        from pathlib import Path
         
-        try:
-            # Get recent logs
-            logs = db_session.query(DataRefreshLog).order_by(DataRefreshLog.start_time.desc()).limit(100).all()
-            
-            logs_data = []
-            for log in logs:
-                log_data = {
-                    'id': log.id,
-                    'timestamp': log.start_time.isoformat() if log.start_time else None,
-                    'level': 'info' if log.status == 'success' else 'error',
-                    'message': f"{log.operation_type}: {log.status} - {log.symbols_successful}/{log.symbols_requested} symbols",
-                    'provider_id': log.provider_id,
-                    'status': log.status,
-                    'operation_type': log.operation_type,
-                    'symbols_requested': log.symbols_requested,
-                    'symbols_successful': log.symbols_successful,
-                    'symbols_failed': log.symbols_failed,
-                    'total_duration_ms': log.total_duration_ms,
-                    'error_message': log.error_message
-                }
-                logs_data.append(log_data)
-            
-            response = {
-                'success': True,
-                'timestamp': datetime.now(timezone.utc).isoformat(),
-                'logs': logs_data
-            }
-            
-            return jsonify(response), 200
-            
-        finally:
-            db_session.close()
-            
+        # Get logs directory
+        logs_dir = Path('logs')
+        app_log_file = logs_dir / 'app.log'
+        
+        logs_data = []
+        
+        if app_log_file.exists():
+            # Read last 5000 lines from app.log to get more historical data
+            with open(app_log_file, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+                # Get last 5000 lines to include more historical logs
+                recent_lines = lines[-5000:] if len(lines) > 5000 else lines
+                
+                # Filter for external data related logs
+                external_data_lines = []
+                for line in recent_lines:
+                    if any(keyword in line.lower() for keyword in ['yahoo', 'external', 'data', 'refresh', 'quote', 'symbol']):
+                        external_data_lines.append(line.strip())
+                
+                # Parse logs and create log entries
+                for line in external_data_lines:
+                    try:
+                        # Parse timestamp and log level
+                        timestamp_match = re.search(r'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3})', line)
+                        level_match = re.search(r' - (\w+) - ', line)
+                        
+                        if timestamp_match and level_match:
+                            timestamp_str = timestamp_match.group(1)
+                            level = level_match.group(1).lower()
+                            
+                            # Convert timestamp to ISO format
+                            try:
+                                from datetime import datetime
+                                dt = datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S,%f')
+                                timestamp_iso = dt.isoformat()
+                            except:
+                                timestamp_iso = timestamp_str
+                            
+                            # Extract message (everything after the log level)
+                            message_start = line.find(f' - {level_match.group(1)} - ') + len(f' - {level_match.group(1)} - ')
+                            message = line[message_start:].strip()
+                            
+                            # Determine log level for display
+                            if level in ['error', 'critical']:
+                                display_level = 'error'
+                            elif level in ['warning', 'warn']:
+                                display_level = 'warning'
+                            else:
+                                display_level = 'info'
+                            
+                            log_entry = {
+                                'timestamp': timestamp_iso,
+                                'level': display_level,
+                                'message': message,
+                                'raw_line': line
+                            }
+                            logs_data.append(log_entry)
+                            
+                    except Exception as e:
+                        # If parsing fails, create a basic log entry
+                        log_entry = {
+                            'timestamp': datetime.now(timezone.utc).isoformat(),
+                            'level': 'info',
+                            'message': line,
+                            'raw_line': line
+                        }
+                        logs_data.append(log_entry)
+                
+                # Sort by timestamp (newest first) and limit to 100
+                logs_data.sort(key=lambda x: x['timestamp'], reverse=True)
+                logs_data = logs_data[:100]
+        
+        response = {
+            'success': True,
+            'timestamp': datetime.now(timezone.utc).isoformat(),
+            'logs': logs_data,
+            'total_logs': len(logs_data),
+            'source': 'server_log_files'
+        }
+        
+        return jsonify(response), 200
+        
     except Exception as e:
         logger.error(f"Error in get_data_logs: {e}")
         return jsonify({
@@ -859,6 +968,130 @@ def update_external_data_settings():
         
     except Exception as e:
         logger.error(f"Error in update_external_data_settings: {e}")
+        return jsonify({
+            'error': 'Internal server error',
+            'message': str(e)
+        }), 500
+
+@status_bp.route('/groups/status', methods=['GET'])
+def get_group_refresh_status():
+    """
+    Get refresh status for all ticker groups
+    
+    Returns:
+    - JSON response with group refresh status
+    """
+    try:
+        # Get database session
+        db_session = next(get_db())
+        
+        try:
+            from models.ticker import Ticker
+            from models.trade import Trade
+            from models.market_data_quote import MarketDataQuote
+            
+            # Get current time
+            current_time = datetime.now()
+            
+            # Define groups and their refresh intervals (in minutes)
+            groups = {
+                'open_active_trades': {
+                    'name': 'Open + Active Trades',
+                    'refresh_interval': 5,  # 5 minutes for active trades
+                    'description': 'טיקרים פתוחים עם טריידים פעילים'
+                },
+                'open_no_active_trades': {
+                    'name': 'Open + No Active Trades', 
+                    'refresh_interval': 60,  # 60 minutes for no active trades
+                    'description': 'טיקרים פתוחים ללא טריידים פעילים'
+                },
+                'closed_cancelled': {
+                    'name': 'Closed/Cancelled',
+                    'refresh_interval': 1440,  # 24 hours (daily)
+                    'description': 'טיקרים סגורים או מבוטלים'
+                }
+            }
+            
+            group_status = {}
+            
+            for group_key, group_info in groups.items():
+                # Query tickers for this group
+                if group_key == 'open_active_trades':
+                    # Tickers with active trades
+                    tickers = db_session.query(Ticker).join(
+                        Trade, Ticker.id == Trade.ticker_id
+                    ).filter(
+                        Ticker.status == 'open',
+                        Trade.status == 'open'
+                    ).distinct().all()
+                    
+                elif group_key == 'open_no_active_trades':
+                    # Tickers without active trades
+                    tickers = db_session.query(Ticker).outerjoin(
+                        Trade, (Ticker.id == Trade.ticker_id) & (Trade.status == 'open')
+                    ).filter(
+                        Ticker.status == 'open',
+                        Trade.id.is_(None)
+                    ).all()
+                    
+                else:  # closed_cancelled
+                    # Closed or cancelled tickers
+                    tickers = db_session.query(Ticker).filter(
+                        Ticker.status.in_(['closed', 'cancelled'])
+                    ).all()
+                
+                # Get last refresh time for this group
+                if tickers:
+                    ticker_ids = [t.id for t in tickers]
+                    last_quote = db_session.query(MarketDataQuote).filter(
+                        MarketDataQuote.ticker_id.in_(ticker_ids)
+                    ).order_by(MarketDataQuote.asof_utc.desc()).first()
+                    
+                    last_refresh = last_quote.asof_utc if last_quote else None
+                else:
+                    last_refresh = None
+                
+                # Calculate next refresh time
+                if last_refresh:
+                    next_refresh = last_refresh + timedelta(minutes=group_info['refresh_interval'])
+                    time_since_refresh = (current_time - last_refresh).total_seconds() / 60
+                    needs_refresh = time_since_refresh >= group_info['refresh_interval']
+                else:
+                    next_refresh = None
+                    time_since_refresh = None
+                    needs_refresh = True
+                
+                group_status[group_key] = {
+                    'name': group_info['name'],
+                    'description': group_info['description'],
+                    'ticker_count': len(tickers),
+                    'symbols': [t.symbol for t in tickers[:10]],  # First 10 symbols
+                    'refresh_interval_minutes': group_info['refresh_interval'],
+                    'last_refresh': last_refresh.isoformat() if last_refresh else None,
+                    'next_refresh': next_refresh.isoformat() if next_refresh else None,
+                    'time_since_refresh_minutes': round(time_since_refresh, 2) if time_since_refresh else None,
+                    'needs_refresh': needs_refresh,
+                    'status': 'needs_refresh' if needs_refresh else 'up_to_date'
+                }
+            
+            response = {
+                'success': True,
+                'timestamp': current_time.isoformat(),
+                'groups': group_status,
+                'summary': {
+                    'total_groups': len(groups),
+                    'groups_needing_refresh': sum(1 for g in group_status.values() if g['needs_refresh']),
+                    'total_tickers': sum(g['ticker_count'] for g in group_status.values())
+                }
+            }
+            
+            return jsonify(response), 200
+            
+        finally:
+            db_session.close()
+            
+    except Exception as e:
+        logger.error(f"Error in get_group_refresh_status: {e}")
         return jsonify({
             'error': 'Internal server error',
             'message': str(e)

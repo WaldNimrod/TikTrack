@@ -172,6 +172,55 @@ function updatePreference(key, value) {
 }
 
 /**
+ * מעדכן העדפת רענון מקוננת (לא שומר בשרת)
+ */
+function updateRefreshPreference(path, value) {
+  try {
+    // עדכן את הזיכרון הזמני מיד
+    if (!currentPreferences.refresh_overrides) {
+      currentPreferences.refresh_overrides = {};
+    }
+    
+    // Parse the path and set the value
+    const keys = path.split('.');
+    let current = currentPreferences.refresh_overrides;
+    
+    for (let i = 0; i < keys.length - 1; i++) {
+      if (!current[keys[i]]) {
+        current[keys[i]] = {};
+      }
+      current = current[keys[i]];
+    }
+    
+    current[keys[keys.length - 1]] = parseInt(value);
+    
+    // הצג הודעת מידע שהערך עודכן
+    const label = getRefreshPreferenceLabel(path);
+    const message = `${label} עודכן (לא נשמר עדיין)`;
+    showPreferencesInfo('העדפות רענון', message);
+  } catch (error) {
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בעדכון העדפת רענון', 'error');
+    }
+    console.error('Error updating refresh preference:', error);
+  }
+}
+
+/**
+ * מקבל תווית עבור העדפת רענון
+ */
+function getRefreshPreferenceLabel(path) {
+  const labels = {
+    'open.active.in_minutes': 'טיקרים עם טרייד פעיל - בשעות מסחר',
+    'open.active.off_minutes': 'טיקרים עם טרייד פעיל - מחוץ לשעות מסחר',
+    'open.no_active.in_minutes': 'טיקרים ללא טרייד פעיל - בשעות מסחר',
+    'open.no_active.off_minutes': 'טיקרים ללא טרייד פעיל - מחוץ לשעות מסחר',
+    'closed.weekdays.offset_minutes_after_close': 'טיקרים סגורים/מבוטלים'
+  };
+  return labels[path] || path;
+}
+
+/**
  * שומר את כל ההעדפות
  */
 async function saveAllPreferences() {
@@ -400,6 +449,56 @@ function updateUI() {
   if (verboseLoggingCheckbox) {
     verboseLoggingCheckbox.checked = currentPreferences.verboseLogging || false;
   }
+
+  // עדכון הגדרות רענון מתקדמות
+  updateRefreshPreferencesUI();
+}
+
+/**
+ * מעדכן את ממשק הגדרות הרענון המתקדמות
+ */
+function updateRefreshPreferencesUI() {
+  try {
+    const refreshOverrides = currentPreferences.refresh_overrides || {};
+    
+    // טיקרים עם טרייד פעיל - בשעות מסחר
+    const activeInHoursInput = document.getElementById('activeInHours');
+    if (activeInHoursInput) {
+      const value = refreshOverrides.open?.active?.in_minutes || 5;
+      activeInHoursInput.value = value;
+    }
+    
+    // טיקרים עם טרייד פעיל - מחוץ לשעות מסחר
+    const activeOffHoursInput = document.getElementById('activeOffHours');
+    if (activeOffHoursInput) {
+      const value = refreshOverrides.open?.active?.off_minutes || 60;
+      activeOffHoursInput.value = value;
+    }
+    
+    // טיקרים ללא טרייד פעיל - בשעות מסחר
+    const noActiveInHoursInput = document.getElementById('noActiveInHours');
+    if (noActiveInHoursInput) {
+      const value = refreshOverrides.open?.no_active?.in_minutes || 60;
+      noActiveInHoursInput.value = value;
+    }
+    
+    // טיקרים ללא טרייד פעיל - מחוץ לשעות מסחר
+    const noActiveOffHoursInput = document.getElementById('noActiveOffHours');
+    if (noActiveOffHoursInput) {
+      const value = refreshOverrides.open?.no_active?.off_minutes || 60;
+      noActiveOffHoursInput.value = value;
+    }
+    
+    // טיקרים סגורים/מבוטלים
+    const closedOffsetInput = document.getElementById('closedOffset');
+    if (closedOffsetInput) {
+      const value = refreshOverrides.closed?.weekdays?.offset_minutes_after_close || 45;
+      closedOffsetInput.value = value;
+    }
+    
+  } catch (error) {
+    console.error('שגיאה בעדכון ממשק הגדרות רענון:', error);
+  }
 }
 
 /**
@@ -611,6 +710,7 @@ window.showPreferencesWarning = showPreferencesWarning;
 // Export utility functions
 window.getPreferenceLabel = getPreferenceLabel;
 window.loadAccountsToFilter = loadAccountsToFilter;
+window.updateRefreshPreferencesUI = updateRefreshPreferencesUI;
 
 // Export toggle functions
 window.toggleTopSection = function() {
@@ -1250,11 +1350,80 @@ function updateEntityHeaderCSS() {
     
     styleElement.textContent = newCSS;
     
+    // עדכון כותרות קיימות עם השקיפות החדשה
+    updateExistingHeadersWithNewOpacity();
+    
   } catch (error) {
     console.error('❌ שגיאה בעדכון CSS כותרות ישויות:', error);
   }
 }
 
+/**
+ * עדכון כותרות קיימות עם השקיפות החדשה
+ * Update existing headers with new opacity
+ */
+function updateExistingHeadersWithNewOpacity() {
+  try {
+    // עדכון כותרות ראשיות - תחת top-section
+    const mainHeaders = document.querySelectorAll('.top-section .section-header');
+    mainHeaders.forEach(header => {
+      // הסרת כל המחלקות הישנות
+      const classList = Array.from(header.classList);
+      classList.forEach(cls => {
+        if (cls.includes('-main-header') || cls.includes('-sub-header')) {
+          header.classList.remove(cls);
+        }
+      });
+      
+      // הוספת המחלקה החדשה לפי סוג העמוד
+      const pageClass = document.body.className;
+      let entityType = 'ticker'; // ברירת מחדל
+      
+      if (pageClass.includes('tickers-page')) entityType = 'ticker';
+      else if (pageClass.includes('trades-page')) entityType = 'trade';
+      else if (pageClass.includes('accounts-page')) entityType = 'account';
+      else if (pageClass.includes('alerts-page')) entityType = 'alert';
+      else if (pageClass.includes('cash-flows-page')) entityType = 'cash-flow';
+      else if (pageClass.includes('notes-page')) entityType = 'note';
+      else if (pageClass.includes('planning-page')) entityType = 'trade-plan';
+      else if (pageClass.includes('executions-page')) entityType = 'execution';
+      
+      header.classList.add(`entity-${entityType}-main-header`);
+    });
+    
+    // עדכון כותרות משניות - תחת content-section
+    const subHeaders = document.querySelectorAll('.content-section .section-header');
+    subHeaders.forEach(header => {
+      // הסרת כל המחלקות הישנות
+      const classList = Array.from(header.classList);
+      classList.forEach(cls => {
+        if (cls.includes('-main-header') || cls.includes('-sub-header')) {
+          header.classList.remove(cls);
+        }
+      });
+      
+      // הוספת המחלקה החדשה לפי סוג העמוד
+      const pageClass = document.body.className;
+      let entityType = 'ticker'; // ברירת מחדל
+      
+      if (pageClass.includes('tickers-page')) entityType = 'ticker';
+      else if (pageClass.includes('trades-page')) entityType = 'trade';
+      else if (pageClass.includes('accounts-page')) entityType = 'account';
+      else if (pageClass.includes('alerts-page')) entityType = 'alert';
+      else if (pageClass.includes('cash-flows-page')) entityType = 'cash-flow';
+      else if (pageClass.includes('notes-page')) entityType = 'note';
+      else if (pageClass.includes('planning-page')) entityType = 'trade-plan';
+      else if (pageClass.includes('executions-page')) entityType = 'execution';
+      
+      header.classList.add(`entity-${entityType}-sub-header`);
+    });
+    
+    console.log('✅ כותרות קיימות עודכנו עם השקיפות החדשה');
+    
+  } catch (error) {
+    console.error('❌ שגיאה בעדכון כותרות קיימות:', error);
+  }
+}
 
 /**
  * טעינת העדפות שקיפות
@@ -1267,7 +1436,7 @@ function loadHeaderOpacityPreferences() {
       return;
     }
     
-    const mainOpacity = currentPreferences.headerOpacity?.main || 60;
+    const mainOpacity = currentPreferences.headerOpacity?.main || 100;
     const subOpacity = currentPreferences.headerOpacity?.sub || 30;
     
     // עדכון ממשק המשתמש
@@ -1544,6 +1713,8 @@ function updateStatusColorsUI() {
 window.updateHeaderOpacity = updateHeaderOpacity;
 window.updateHeaderOpacityUI = updateHeaderOpacityUI;
 window.loadHeaderOpacityPreferences = loadHeaderOpacityPreferences;
+window.updateEntityHeaderCSS = updateEntityHeaderCSS;
+window.updateExistingHeadersWithNewOpacity = updateExistingHeadersWithNewOpacity;
 
 // ===== INVESTMENT TYPE COLOR FUNCTIONS =====
 // פונקציות לצבעי סוגי השקעה

@@ -165,6 +165,7 @@ class ExternalDataDashboard {
     this.loadProviders();
     this.loadCacheStats();
     this.loadLogs();
+    this.loadGroupRefreshHistory();
 
     // Setup auto-refresh
     this.setupAutoRefresh();
@@ -787,6 +788,160 @@ class ExternalDataDashboard {
     }
   }
 
+  async loadGroupRefreshHistory() {
+    try {
+      console.log('📊 Loading group refresh history...');
+      
+      const limit = document.getElementById('group-limit')?.value || 20;
+      const response = await fetch(`/api/external-data/status/group-refresh-history?limit=${limit}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success && data.group_refresh_history) {
+        this.renderGroupRefreshHistory(data.group_refresh_history);
+        console.log(`✅ Loaded ${data.group_refresh_history.length} group refresh entries`);
+      } else {
+        console.warn('⚠️ No group refresh history data received');
+        this.renderGroupRefreshHistory([]);
+      }
+      
+    } catch (error) {
+      console.error('❌ Error loading group refresh history:', error);
+      this.renderGroupRefreshHistory([]);
+    }
+  }
+
+  renderGroupRefreshHistory(history) {
+    const container = document.getElementById('group-refresh-content');
+    if (!container) return;
+
+    if (!history || history.length === 0) {
+      container.innerHTML = '<div class="text-center text-muted p-4">אין היסטוריית עדכונים קבוצתיים</div>';
+      return;
+    }
+
+    const html = history.map(entry => {
+      const categoryLabel = this.getCategoryLabel(entry.category);
+      const statusClass = entry.status;
+      const statusLabel = this.getStatusLabel(entry.status);
+      
+      const startTime = entry.started_at ? new Date(entry.started_at).toLocaleString('he-IL') : 'לא ידוע';
+      const endTime = entry.completed_at ? new Date(entry.completed_at).toLocaleString('he-IL') : 'בתהליך';
+      
+      const details = entry.successful_count !== null && entry.failed_count !== null 
+        ? `${entry.successful_count} הצליחו, ${entry.failed_count} נכשלו`
+        : entry.message || 'אין פרטים נוספים';
+
+      return `
+        <div class="group-refresh-item">
+          <div class="group-refresh-info">
+            <div class="group-refresh-category">${categoryLabel} - ${entry.time_period}</div>
+            <div class="group-refresh-details">${details}</div>
+            <div class="group-refresh-time">
+              התחיל: ${startTime} | הסתיים: ${endTime}
+            </div>
+          </div>
+          <div class="group-refresh-status ${statusClass}">${statusLabel}</div>
+        </div>
+      `;
+    }).join('');
+
+    container.innerHTML = html;
+  }
+
+  getCategoryLabel(category) {
+    const labels = {
+      'active_trades': 'טיקרים עם טרייד פעיל',
+      'no_active_trades': 'טיקרים ללא טרייד פעיל',
+      'closed': 'טיקרים סגורים/מבוטלים',
+      'unknown': 'לא ידוע'
+    };
+    return labels[category] || category;
+  }
+
+  getStatusLabel(status) {
+    const labels = {
+      'completed': 'הושלם',
+      'failed': 'נכשל',
+      'started': 'התחיל'
+    };
+    return labels[status] || status;
+  }
+
+  async exportGroupHistory() {
+    try {
+      console.log('📥 Exporting group refresh history...');
+      
+      const limit = document.getElementById('group-limit')?.value || 20;
+      const response = await fetch(`/api/external-data/status/group-refresh-history?limit=${limit}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success && data.group_refresh_history) {
+        // Create CSV content
+        const csvContent = this.createGroupHistoryCSV(data.group_refresh_history);
+        
+        // Download CSV
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `group_refresh_history_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        console.log('✅ Group refresh history exported successfully');
+      } else {
+        console.warn('⚠️ No data to export');
+      }
+      
+    } catch (error) {
+      console.error('❌ Error exporting group refresh history:', error);
+    }
+  }
+
+  createGroupHistoryCSV(history) {
+    const headers = [
+      'ID',
+      'קטגוריה',
+      'תקופה',
+      'מספר טיקרים',
+      'סטטוס',
+      'התחיל',
+      'הסתיים',
+      'הצליחו',
+      'נכשלו',
+      'הודעה'
+    ];
+
+    const rows = history.map(entry => [
+      entry.id,
+      this.getCategoryLabel(entry.category),
+      entry.time_period,
+      entry.ticker_count,
+      this.getStatusLabel(entry.status),
+      entry.started_at || '',
+      entry.completed_at || '',
+      entry.successful_count || '',
+      entry.failed_count || '',
+      entry.message || ''
+    ]);
+
+    return [headers, ...rows].map(row => 
+      row.map(field => `"${field}"`).join(',')
+    ).join('\n');
+  }
+
   destroy() {
     if (this.refreshInterval) {
       clearInterval(this.refreshInterval);
@@ -796,6 +951,14 @@ class ExternalDataDashboard {
 }
 
 // Global functions for button onclick handlers
+window.toggleTopSection = function() {
+  if (typeof window.toggleTopSectionGlobal === 'function') {
+    window.toggleTopSectionGlobal();
+  } else {
+    console.warn('פונקציית toggleTopSectionGlobal לא נמצאה ב-main.js');
+  }
+};
+
 window.testProvider = function(providerId) {
   // console.log('🧪 Testing provider:', providerId);
   // Implementation for testing specific provider
@@ -870,6 +1033,19 @@ window.exportData = function() {
 window.resetSettings = function() {
   if (window.externalDataDashboard) {
     window.externalDataDashboard.resetSettings();
+  }
+};
+
+// Group refresh history functions
+window.refreshGroupHistory = function() {
+  if (window.externalDataDashboard) {
+    window.externalDataDashboard.loadGroupRefreshHistory();
+  }
+};
+
+window.exportGroupHistory = function() {
+  if (window.externalDataDashboard) {
+    window.externalDataDashboard.exportGroupHistory();
   }
 };
 

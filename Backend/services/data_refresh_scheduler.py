@@ -157,13 +157,13 @@ class DataRefreshScheduler:
             active_tickers = self._get_tickers_needing_refresh('active_trades', 'in_hours')
             if active_tickers:
                 logger.info(f"Refreshing {len(active_tickers)} active tickers during trading hours")
-                self._refresh_tickers(active_tickers)
+                self._refresh_tickers(active_tickers, 'active_trades', 'in_hours')
             
             # Get inactive tickers that need refresh (less frequent)
             inactive_tickers = self._get_tickers_needing_refresh('no_active_trades', 'in_hours')
             if inactive_tickers:
                 logger.info(f"Refreshing {len(inactive_tickers)} inactive tickers during trading hours")
-                self._refresh_tickers(inactive_tickers)
+                self._refresh_tickers(inactive_tickers, 'no_active_trades', 'in_hours')
                 
         except Exception as e:
             logger.error(f"Error processing trading day refresh: {e}")
@@ -182,7 +182,7 @@ class DataRefreshScheduler:
             active_tickers = self._get_tickers_needing_refresh('active_trades', 'off_hours')
             if active_tickers:
                 logger.info(f"Refreshing {len(active_tickers)} active tickers during off-hours")
-                self._refresh_tickers(active_tickers)
+                self._refresh_tickers(active_tickers, 'active_trades', 'off_hours')
                 
         except Exception as e:
             logger.error(f"Error processing off-hours refresh: {e}")
@@ -205,35 +205,77 @@ class DataRefreshScheduler:
             # Get tickers that haven't been refreshed recently
             cutoff_time = datetime.now() - timedelta(minutes=refresh_minutes)
             
-            # Query for tickers needing refresh
-            # This is a simplified version - in practice, you'd query the database
-            return []  # Placeholder
+            # Query database for tickers needing refresh
+            from models.ticker import Ticker
+            from models.trade import Trade
+            
+            # Build query based on category
+            if category == 'active_trades':
+                # Tickers with active trades
+                query = self.db_session.query(Ticker).join(
+                    Trade, Ticker.id == Trade.ticker_id
+                ).filter(
+                    Ticker.status == 'open',
+                    Trade.status == 'open',
+                    (Ticker.updated_at.is_(None)) | (Ticker.updated_at < cutoff_time)
+                ).distinct()
+            else:  # no_active_trades
+                # Tickers without active trades
+                query = self.db_session.query(Ticker).outerjoin(
+                    Trade, (Ticker.id == Trade.ticker_id) & (Trade.status == 'open')
+                ).filter(
+                    Ticker.status == 'open',
+                    Trade.id.is_(None),
+                    (Ticker.updated_at.is_(None)) | (Ticker.updated_at < cutoff_time)
+                )
+            
+            # Execute query and return results
+            tickers = query.all()
+            return [{'id': t.id, 'symbol': t.symbol, 'name': t.name} for t in tickers]
             
         except Exception as e:
             logger.error(f"Error getting tickers needing refresh: {e}")
             return []
     
-    def _refresh_tickers(self, tickers: List[Dict]):
+    def _refresh_tickers(self, tickers: List[Dict], category: str = None, time_period: str = None):
         """
         Refresh data for a list of tickers.
         
         Args:
             tickers: List of tickers to refresh
+            category: Category of tickers being refreshed (for logging)
+            time_period: Time period of refresh (for logging)
         """
         try:
+            if not tickers:
+                return
+                
+            # Log group refresh start
+            group_id = self._log_group_refresh_start(category, time_period, len(tickers))
+            
             # Process tickers in batches
             batch_size = self.config['yahoo_finance']['batch_size']
+            successful_refreshes = 0
+            failed_refreshes = 0
             
             for i in range(0, len(tickers), batch_size):
                 batch = tickers[i:i + batch_size]
-                self._refresh_batch(batch)
+                batch_success, batch_failed = self._refresh_batch(batch)
+                successful_refreshes += batch_success
+                failed_refreshes += batch_failed
                 
                 # Rate limiting between batches
                 if i + batch_size < len(tickers):
                     time.sleep(0.2)  # 200ms delay between batches
+            
+            # Log group refresh completion
+            self._log_group_refresh_completion(group_id, successful_refreshes, failed_refreshes)
                     
         except Exception as e:
             logger.error(f"Error refreshing tickers: {e}")
+            # Log group refresh failure
+            if 'group_id' in locals():
+                self._log_group_refresh_failure(group_id, str(e))
     
     def _refresh_batch(self, tickers: List[Dict]):
         """
@@ -241,42 +283,178 @@ class DataRefreshScheduler:
         
         Args:
             tickers: Batch of tickers to refresh
+            
+        Returns:
+            tuple: (successful_refreshes, failed_refreshes)
         """
         try:
+            if not tickers:
+                return 0, 0
+                
+            # Initialize Yahoo Finance adapter if needed
+            if not self.yahoo_adapter:
+                from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
+                self.yahoo_adapter = YahooFinanceAdapter()
+            
             # Extract symbols for batch request
             symbols = [ticker['symbol'] for ticker in tickers]
+            logger.info(f"Refreshing batch of {len(symbols)} tickers: {', '.join(symbols)}")
             
             # Fetch data from Yahoo Finance
-            quotes_data = self.yahoo_adapter._fetch_batch_from_api(symbols)
+            quotes_data = self.yahoo_adapter.get_quotes_batch(symbols)
             
             # Update database with new data
+            successful_refreshes = 0
+            failed_refreshes = 0
+            
             for quote_data in quotes_data:
-                self._update_quote_in_database(quote_data)
+                try:
+                    self._update_quote_in_database(quote_data)
+                    successful_refreshes += 1
+                except Exception as e:
+                    logger.error(f"Failed to update quote for {quote_data.symbol}: {e}")
+                    failed_refreshes += 1
+                
+            # Log successful batch refresh
+            logger.info(f"Batch refresh completed: {successful_refreshes} successful, {failed_refreshes} failed")
+            return successful_refreshes, failed_refreshes
                 
         except Exception as e:
             logger.error(f"Error refreshing batch: {e}")
+            return 0, len(tickers)
     
     def _update_quote_in_database(self, quote_data):
         """Update quote data in database."""
         try:
-            # This would update the database with new quote data
-            # Implementation depends on your database models
-            logger.debug(f"Updated quote for {quote_data.symbol}")
+            from models.ticker import Ticker
+            from models.market_data_quote import MarketDataQuote
+            
+            # Find ticker by symbol
+            ticker = self.db_session.query(Ticker).filter(Ticker.symbol == quote_data.symbol).first()
+            if not ticker:
+                logger.warning(f"Ticker not found for symbol: {quote_data.symbol}")
+                return
+            
+            # Create new quote record
+            new_quote = MarketDataQuote(
+                ticker_id=ticker.id,
+                price=quote_data.price,
+                currency=quote_data.currency,
+                asof_utc=quote_data.asof_utc,
+                source=quote_data.source,
+                volume=quote_data.volume,
+                change_pct_day=quote_data.change_pct_day
+            )
+            
+            # Add to session and commit
+            self.db_session.add(new_quote)
+            self.db_session.commit()
+            
+            # Update ticker's updated_at timestamp
+            ticker.updated_at = datetime.now()
+            self.db_session.commit()
+            
+            logger.debug(f"Updated quote for {quote_data.symbol}: ${quote_data.price}")
             
         except Exception as e:
             logger.error(f"Error updating quote for {quote_data.symbol}: {e}")
+            self.db_session.rollback()
     
     def _get_last_refresh_time(self) -> Optional[datetime]:
         """Get the last time data was refreshed."""
         try:
-            # This would query the database for the last refresh time
-            # Implementation depends on your database models
-            return None  # Placeholder
+            from models.market_data_quote import MarketDataQuote
+            
+            # Get the most recent quote timestamp
+            last_quote = self.db_session.query(MarketDataQuote).order_by(
+                MarketDataQuote.asof_utc.desc()
+            ).first()
+            
+            if last_quote:
+                return last_quote.asof_utc
+            return None
             
         except Exception as e:
             logger.error(f"Error getting last refresh time: {e}")
             return None
     
+    def _log_group_refresh_start(self, category: str, time_period: str, ticker_count: int) -> int:
+        """Log the start of a group refresh operation."""
+        try:
+            from models.external_data import DataRefreshLog
+            
+            # Create new log entry
+            log_entry = DataRefreshLog(
+                category=category or 'unknown',
+                time_period=time_period or 'unknown',
+                ticker_count=ticker_count,
+                status='started',
+                start_time=datetime.now(),
+                operation_type='group_refresh',
+                symbols_requested=ticker_count,
+                symbols_successful=0,
+                symbols_failed=0,
+                message=f"Started refreshing {ticker_count} tickers in category '{category}' during '{time_period}'"
+            )
+            
+            self.db_session.add(log_entry)
+            self.db_session.commit()
+            
+            logger.info(f"Group refresh started: {category}/{time_period} - {ticker_count} tickers (ID: {log_entry.id})")
+            return log_entry.id
+            
+        except Exception as e:
+            logger.error(f"Error logging group refresh start: {e}")
+            return -1
+    
+    def _log_group_refresh_completion(self, group_id: int, successful: int, failed: int):
+        """Log the completion of a group refresh operation."""
+        try:
+            if group_id == -1:
+                return
+                
+            from models.external_data import DataRefreshLog
+            
+            # Update log entry
+            log_entry = self.db_session.query(DataRefreshLog).filter(DataRefreshLog.id == group_id).first()
+            if log_entry:
+                log_entry.status = 'completed'
+                log_entry.end_time = datetime.now()
+                log_entry.successful_count = successful
+                log_entry.failed_count = failed
+                log_entry.symbols_successful = successful
+                log_entry.symbols_failed = failed
+                log_entry.message = f"Completed: {successful} successful, {failed} failed"
+                
+                self.db_session.commit()
+                
+                logger.info(f"Group refresh completed: ID {group_id} - {successful} successful, {failed} failed")
+            
+        except Exception as e:
+            logger.error(f"Error logging group refresh completion: {e}")
+    
+    def _log_group_refresh_failure(self, group_id: int, error_message: str):
+        """Log the failure of a group refresh operation."""
+        try:
+            if group_id == -1:
+                return
+                
+            from models.external_data import DataRefreshLog
+            
+            # Update log entry
+            log_entry = self.db_session.query(DataRefreshLog).filter(DataRefreshLog.id == group_id).first()
+            if log_entry:
+                log_entry.status = 'failed'
+                log_entry.end_time = datetime.now()
+                log_entry.message = f"Failed: {error_message}"
+                
+                self.db_session.commit()
+                
+                logger.error(f"Group refresh failed: ID {group_id} - {error_message}")
+            
+        except Exception as e:
+            logger.error(f"Error logging group refresh failure: {e}")
+
     def get_scheduler_status(self) -> Dict[str, Any]:
         """Get current scheduler status."""
         current_ny_time = datetime.now(self.ny_timezone)
@@ -288,6 +466,36 @@ class DataRefreshScheduler:
             'refresh_policy': self.refresh_policy,
             'config': self.config
         }
+    
+    def get_group_refresh_history(self, limit: int = 50) -> List[Dict]:
+        """Get recent group refresh history."""
+        try:
+            from models.external_data import DataRefreshLog
+            
+            # Get recent refresh logs
+            logs = self.db_session.query(DataRefreshLog).order_by(
+                DataRefreshLog.start_time.desc()
+            ).limit(limit).all()
+            
+            return [
+                {
+                    'id': log.id,
+                    'category': log.category,
+                    'time_period': log.time_period,
+                    'ticker_count': log.ticker_count,
+                    'status': log.status,
+                    'started_at': log.start_time.isoformat() if log.start_time else None,
+                    'completed_at': log.end_time.isoformat() if log.end_time else None,
+                    'successful_count': log.successful_count,
+                    'failed_count': log.failed_count,
+                    'message': log.message
+                }
+                for log in logs
+            ]
+            
+        except Exception as e:
+            logger.error(f"Error getting group refresh history: {e}")
+            return []
 
 # Global scheduler instance
 data_refresh_scheduler = None

@@ -148,30 +148,27 @@ class EntityDetailsRenderer {
      */
     renderTicker(tickerData, options = {}) {
         console.log(`🎨 Rendering ticker data:`, tickerData);
-        const entityColor = this.entityColors.ticker || '#dc3545';
         
         return `
             <div class="entity-details-container ticker-details">
-                ${this.renderEntityHeader('טיקר', tickerData.symbol || tickerData.id, entityColor)}
+                <!-- נתוני שוק למעלה -->
+                <div class="mb-4">
+                    ${this.renderMarketData(tickerData)}
+                </div>
                 
+                <!-- מידע בסיסי בשתי עמודות -->
                 <div class="row">
                     <div class="col-md-6">
                         ${this.renderBasicInfo(tickerData, 'ticker')}
                     </div>
                     <div class="col-md-6">
-                        ${this.renderMarketData(tickerData)}
+                        ${this.renderAdditionalInfo(tickerData, 'ticker')}
                     </div>
                 </div>
                 
                 <div class="row mt-4">
                     <div class="col-12">
                         ${this.renderLinkedItems(tickerData.linked_items || [])}
-                    </div>
-                </div>
-                
-                <div class="row mt-4">
-                    <div class="col-12">
-                        ${this.renderActionButtons('ticker', tickerData.id)}
                     </div>
                 </div>
             </div>
@@ -265,9 +262,44 @@ class EntityDetailsRenderer {
      */
     renderBasicInfo(entityData, entityType) {
         const fields = this.getBasicFields(entityType);
+        // חלוקת השדות לשתי עמודות
+        const fieldsPerColumn = Math.ceil(fields.length / 2);
+        const firstColumnFields = fields.slice(0, fieldsPerColumn);
+        
         let html = '<div class="entity-basic-info"><h6 class="border-bottom pb-2 mb-3">מידע בסיסי</h6>';
         
-        fields.forEach(field => {
+        firstColumnFields.forEach(field => {
+            const value = entityData[field.key] || 'לא זמין';
+            const displayValue = this.formatFieldValue(value, field.type);
+            
+            html += `
+                <div class="row mb-2">
+                    <div class="col-5 text-muted">${field.label}:</div>
+                    <div class="col-7">${displayValue}</div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        return html;
+    }
+
+    /**
+     * Render additional info - רנדור מידע נוסף (עמודה שנייה)
+     */
+    renderAdditionalInfo(entityData, entityType) {
+        const fields = this.getBasicFields(entityType);
+        // חלוקת השדות לשתי עמודות
+        const fieldsPerColumn = Math.ceil(fields.length / 2);
+        const secondColumnFields = fields.slice(fieldsPerColumn);
+        
+        if (secondColumnFields.length === 0) {
+            return '<div class="entity-additional-info"></div>';
+        }
+        
+        let html = '<div class="entity-additional-info"><h6 class="border-bottom pb-2 mb-3">&nbsp;</h6>';
+        
+        secondColumnFields.forEach(field => {
             const value = entityData[field.key] || 'לא זמין';
             const displayValue = this.formatFieldValue(value, field.type);
             
@@ -355,12 +387,13 @@ class EntityDetailsRenderer {
             `;
         }
 
-        // תאריך עדכון אחרון
+        // תאריך עדכון אחרון של נתונים חיצוניים
         if (tickerData.yahoo_updated_at) {
+            const updateTime = new Date(tickerData.yahoo_updated_at).toLocaleString('he-IL');
             html += `
                 <div class="row mb-2">
-                    <div class="col-5 text-muted">עודכן ב:</div>
-                    <div class="col-7">${this.formatDateTime(tickerData.yahoo_updated_at)}</div>
+                    <div class="col-5 text-muted">עדכון נתונים:</div>
+                    <div class="col-7 text-info">${updateTime}</div>
                 </div>
             `;
         }
@@ -521,12 +554,8 @@ class EntityDetailsRenderer {
                     <td><small>${this.formatDateTime(item.created_at || item.updated_at)}</small></td>
                     <td>
                         <div class="btn-group btn-group-sm" role="group">
-                            <button class="btn btn-outline-primary btn-sm" onclick="window.showEntityDetails('${item.type}', ${item.id})" title="צפה בפרטים">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm" onclick="window.editTicker(${item.id})" title="ערוך">
-                                <i class="fas fa-edit"></i>
-                            </button>
+                            <button class="btn btn-outline-info" onclick="window.showEntityDetails('${item.type}', ${item.id})" title="צפה בפרטים">👁️</button>
+                            <button class="btn btn-outline-secondary" onclick="window.editTicker(${item.id})" title="ערוך">✏️</button>
                         </div>
                     </td>
                 </tr>
@@ -616,7 +645,32 @@ class EntityDetailsRenderer {
 
     formatStatus(status) {
         if (!status) return '<span class="badge bg-secondary">לא זמין</span>';
-        return `<span class="badge bg-primary">${status}</span>`;
+        
+        // תרגום סטטוסים לעברית
+        const statusTranslations = {
+            'open': 'פתוח',
+            'closed': 'סגור', 
+            'cancelled': 'מבוטל'
+        };
+        
+        const translatedStatus = statusTranslations[status] || status;
+        
+        // שימוש בצבעי סטטוס מהמערכת הגלובלית
+        if (window.getStatusColor && window.getStatusBackgroundColor) {
+            const textColor = window.getStatusColor(status);
+            const bgColor = window.getStatusBackgroundColor(status);
+            return `<span class="badge" style="color: ${textColor}; background-color: ${bgColor};">${translatedStatus}</span>`;
+        }
+        
+        // fallback לצבעים בסיסיים
+        const statusColors = {
+            'open': 'bg-success',
+            'closed': 'bg-secondary', 
+            'cancelled': 'bg-danger'
+        };
+        const badgeClass = statusColors[status] || 'bg-primary';
+        
+        return `<span class="badge ${badgeClass}">${translatedStatus}</span>`;
     }
 
     formatDateTime(datetime) {

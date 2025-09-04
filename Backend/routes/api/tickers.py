@@ -76,14 +76,30 @@ def get_tickers():
 
 @tickers_bp.route('/<int:ticker_id>', methods=['GET'])
 def get_ticker(ticker_id: int):
-    """Get ticker by ID"""
+    """Get ticker by ID with market data"""
     try:
         db: Session = next(get_db())
         ticker = TickerService.get_by_id(db, ticker_id)
         if ticker:
+            # Add market data like in get_all method
+            from models.external_data import MarketDataQuote
+            latest_quote = db.query(MarketDataQuote).filter(
+                MarketDataQuote.ticker_id == ticker.id
+            ).order_by(MarketDataQuote.fetched_at.desc()).first()
+            
+            ticker_dict = ticker.to_dict()
+            
+            if latest_quote:
+                ticker_dict['current_price'] = latest_quote.price
+                ticker_dict['change_percent'] = latest_quote.change_pct_day
+                ticker_dict['change_amount'] = latest_quote.change_amount_day
+                ticker_dict['volume'] = latest_quote.volume
+                ticker_dict['yahoo_updated_at'] = latest_quote.fetched_at.isoformat() if latest_quote.fetched_at else None
+                ticker_dict['data_source'] = latest_quote.source
+            
             return jsonify({
                 "status": "success",
-                "data": ticker.to_dict(),
+                "data": ticker_dict,
                 "message": "Ticker retrieved successfully",
                 "version": "v1"
             })

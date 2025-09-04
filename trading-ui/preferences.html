@@ -502,6 +502,82 @@
         </div>
       </div>
     </div>
+
+    <!-- Advanced Refresh Settings -->
+    <div class="preference-section">
+      <h3>⚙️ הגדרות עדכון מתקדמות</h3>
+      <p class="text-muted">הגדרות עדכון לפי סוג טיקר וסטטוס טרייד</p>
+    </div>
+
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🟢 טיקרים עם טרייד פעיל - בשעות מסחר</h4>
+        <p>מרווח עדכון לטיקרים עם טריידים פתוחים במהלך שעות המסחר</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="activeInHours" class="form-control" min="1" max="60" step="1" 
+                 onchange="updateRefreshPreference('open.active.in_minutes', this.value)" placeholder="5">
+          <span class="input-group-text">דקות</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🟡 טיקרים עם טרייד פעיל - מחוץ לשעות מסחר</h4>
+        <p>מרווח עדכון לטיקרים עם טריידים פתוחים מחוץ לשעות המסחר</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="activeOffHours" class="form-control" min="60" max="240" step="1" 
+                 onchange="updateRefreshPreference('open.active.off_minutes', this.value)" placeholder="60">
+          <span class="input-group-text">דקות</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🔵 טיקרים ללא טרייד פעיל - בשעות מסחר</h4>
+        <p>מרווח עדכון לטיקרים ללא טריידים פתוחים במהלך שעות המסחר</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="noActiveInHours" class="form-control" min="5" max="240" step="1" 
+                 onchange="updateRefreshPreference('open.no_active.in_minutes', this.value)" placeholder="60">
+          <span class="input-group-text">דקות</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🟠 טיקרים ללא טרייד פעיל - מחוץ לשעות מסחר</h4>
+        <p>מרווח עדכון לטיקרים ללא טריידים פתוחים מחוץ לשעות המסחר</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="noActiveOffHours" class="form-control" min="60" max="240" step="1" 
+                 onchange="updateRefreshPreference('open.no_active.off_minutes', this.value)" placeholder="60">
+          <span class="input-group-text">דקות</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="preference-item">
+      <div class="preference-label">
+        <h4>🔴 טיקרים סגורים/מבוטלים</h4>
+        <p>מרווח עדכון לטיקרים סגורים או מבוטלים (אחרי סגירת המסחר)</p>
+      </div>
+      <div class="preference-control">
+        <div class="input-group">
+          <input type="number" id="closedOffset" class="form-control" min="0" max="180" step="1" 
+                 onchange="updateRefreshPreference('closed.weekdays.offset_minutes_after_close', this.value)" placeholder="45">
+          <span class="input-group-text">דקות אחרי סגירה</span>
+        </div>
+      </div>
+    </div>
     
     <!-- מרווח בין בקשות -->
     <div class="preference-item">
@@ -1246,7 +1322,7 @@
           </div>
           <div class="col-md-4">
             <div class="preview-box" id="mainHeaderPreview" 
-                 style="background-color: rgba(23, 162, 184, 0.6); height: 40px; border-radius: 4px; border: 1px solid #17a2b8;">
+                 style="background-color: #ffffff; height: 40px; border-radius: 4px; border: 1px solid #17a2b8;">
               <div class="text-center text-white pt-2 small">תצוגה מקדימה</div>
             </div>
           </div>
@@ -1272,7 +1348,7 @@
           </div>
           <div class="col-md-4">
             <div class="preview-box" id="subHeaderPreview" 
-                 style="background-color: rgba(23, 162, 184, 0.3); height: 40px; border-radius: 4px; border: 1px solid #17a2b8;">
+                 style="background-color: #ffffff; height: 40px; border-radius: 4px; border: 1px solid #17a2b8;">
               <div class="text-center text-white pt-2 small">תצוגה מקדימה</div>
             </div>
           </div>

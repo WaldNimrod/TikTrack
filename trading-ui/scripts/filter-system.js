@@ -414,7 +414,9 @@ class FilterSystem {
     // Event listener לפילטר חיפוש
     document.addEventListener('input', e => {
       if (e.target.id === 'searchFilterInput') {
-        this.updateFilter('search', e.target.value);
+        this.currentFilters.search = e.target.value;
+        this.saveFilters();
+        this.applyFilters(); // קריאה לפונקציה החדשה
       }
     });
 
@@ -509,6 +511,120 @@ class FilterSystem {
     return Object.fromEntries(this.tables);
   }
 
+  // הפונקציה הראשית להפעלת פילטרים - נקראת מ-header-system.js
+  applyFilters() {
+    // בדיקה אם אנחנו בעמוד טיקרים
+    const isTickersPage = window.location.pathname.includes('tickers') ||
+                         document.querySelector('table[data-table-type="tickers"]') ||
+                         document.getElementById('tickersContainer');
+
+    if (isTickersPage && window.tickersData && typeof window.updateTickersTable === 'function') {
+      // פילטור נתוני הטיקרים
+      let filteredTickers = [...window.tickersData];
+
+      // פילטר חיפוש
+      if (this.currentFilters.search) {
+        filteredTickers = this.filterTickersBySearch(filteredTickers, this.currentFilters.search);
+      }
+
+      // פילטר סטטוס
+      if (this.currentFilters.status.length > 0) {
+        filteredTickers = this.filterTickersByStatus(filteredTickers, this.currentFilters.status);
+      }
+
+      // פילטר סוג (מתאים לסוגי טיקרים)
+      if (this.currentFilters.type.length > 0) {
+        filteredTickers = this.filterTickersByType(filteredTickers, this.currentFilters.type);
+      }
+
+      // עדכון הטבלה עם הנתונים המפולטרים
+      window.updateTickersTable(filteredTickers);
+      
+      console.log(`🔍 פילטר הטיקרים הופעל: ${filteredTickers.length}/${window.tickersData.length} טיקרים`);
+    } else {
+      // עבור דפים אחרים - השתמש במערכת הקיימת
+      this.applyAllFilters();
+    }
+  }
+
+  // פילטור טיקרים לפי חיפוש
+  filterTickersBySearch(tickers, searchTerm) {
+    if (!searchTerm) return tickers;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return tickers.filter(ticker => {
+      // תרגום סטטוס לעברית לחיפוש
+      const statusMap = {
+        'open': 'פתוח',
+        'closed': 'סגור',
+        'cancelled': 'מבוטל'
+      };
+      
+      const searchableFields = [
+        ticker.symbol || '',
+        ticker.name || '',
+        ticker.type || '',
+        ticker.remarks || '',
+        ticker.status || '',
+        statusMap[ticker.status] || ''
+      ];
+      
+      return searchableFields.some(field =>
+        field.toString().toLowerCase().includes(searchLower)
+      );
+    });
+  }
+
+  // פילטור טיקרים לפי סטטוס
+  filterTickersByStatus(tickers, selectedStatuses) {
+    if (selectedStatuses.length === 0 || selectedStatuses.includes('הכול')) {
+      return tickers;
+    }
+
+    // תרגום סטטוסים מעברית לאנגלית
+    const statusMap = {
+      'פתוח': 'open',
+      'סגור': 'closed', 
+      'מבוטל': 'cancelled'
+    };
+
+    const translatedStatuses = selectedStatuses.map(status => statusMap[status] || status);
+    
+    return tickers.filter(ticker => 
+      translatedStatuses.includes(ticker.status)
+    );
+  }
+
+  // פילטור טיקרים לפי סוג
+  filterTickersByType(tickers, selectedTypes) {
+    if (selectedTypes.length === 0 || selectedTypes.includes('הכול')) {
+      return tickers;
+    }
+
+    // מיפוי סוגי טיקרים מעברית לאנגלית
+    const typeMap = {
+      'מניה': 'stock',
+      'ETF': 'etf', 
+      'אג"ח': 'bond',
+      'קריפטו': 'crypto',
+      'מטבע חוץ': 'forex',
+      'סחורה': 'commodity',
+      'אחר': 'other'
+    };
+
+    const allowedTypes = selectedTypes.map(hebrewType => typeMap[hebrewType] || hebrewType);
+
+    return tickers.filter(ticker => 
+      allowedTypes.includes(ticker.type)
+    );
+  }
+
+  // פונקציה להפעלת פילטר חיפוש - נקראת מ-header-system.js
+  applySearchFilter(searchTerm) {
+    this.currentFilters.search = searchTerm || '';
+    this.saveFilters();
+    this.applyFilters();
+  }
 
   // עדכון אפשרויות חשבונות
   static updateAccountOptions(_accounts) {

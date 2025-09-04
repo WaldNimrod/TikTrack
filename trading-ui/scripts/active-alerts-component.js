@@ -128,7 +128,7 @@ class ActiveAlertsComponent extends HTMLElement {
                style="display: flex; gap: 8px; align-items: center; margin-bottom: 0px;">
             <div class="legend-item">
               <div class="legend-color" 
-                   style="background-color: rgba(220, 53, 69, 0.1); border-left: 4px solid #c82333; 
+                   style="background-color: #ffffff; border-left: 4px solid #c82333; 
                           padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; 
                           gap: 6px; min-width: 80px;">
                 <img src="images/icons/tickers.svg" alt="טיקר" style="width: 14px; height: 14px;">
@@ -137,7 +137,7 @@ class ActiveAlertsComponent extends HTMLElement {
             </div>
             <div class="legend-item">
               <div class="legend-color" 
-                   style="background-color: rgba(255, 149, 0, 0.1); border-left: 4px solid #e67e00; 
+                   style="background-color: #ffffff; border-left: 4px solid #e67e00; 
                           padding: 4px 8px; border-radius: 4px; display: inline-flex; align-items: center; 
                           gap: 6px; min-width: 80px;">
                 <img src="images/icons/trade_plans.svg" alt="תוכנית" style="width: 14px; height: 14px;">

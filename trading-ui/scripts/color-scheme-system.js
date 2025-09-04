@@ -516,39 +516,39 @@ function generateEntityCSS() {
 
     css += `
 .entity-${type} {
-  background-color: ${bgColor} !important;
-  border-color: ${borderColor} !important;
-  color: ${textColor} !important;
+  background-color: ${bgColor};
+  border-color: ${borderColor};
+  color: ${textColor};
 }
 
 .entity-${type}-badge {
-  background-color: ${color} !important;
-  color: white !important;
-  border: 1px solid ${color} !important;
+  background-color: ${color};
+  color: white;
+  border: 1px solid ${color};
 }
 
 .entity-${type}-border {
-  border-left: 4px solid ${color} !important;
+  border-left: 4px solid ${color};
 }
 
 .entity-${type}-text {
-  color: ${color} !important;
+  color: ${color};
 }
 
 .entity-${type}-header {
-  background: linear-gradient(135deg, ${color}, ${darkenColor(color, 20)}) !important;
-  color: white !important;
-  border-bottom: 2px solid ${darkenColor(color, 20)} !important;
+  background: linear-gradient(135deg, ${color}, ${darkenColor(color, 20)});
+  color: white;
+  border-bottom: 2px solid ${darkenColor(color, 20)};
 }
 
 .entity-${type}-main-header {
-  background-color: ${color}${getMainHeaderOpacityHex()} !important;
-  border-left: 4px solid ${color} !important;
+  background-color: ${color}${getMainHeaderOpacityHex()};
+  border-left: 4px solid ${color};
 }
 
 .entity-${type}-sub-header {
-  background-color: ${color}${getSubHeaderOpacityHex()} !important;
-  border-left: 3px solid ${color} !important;
+  background-color: ${color}${getSubHeaderOpacityHex()};
+  border-left: 3px solid ${color};
 }
 `;
   });
@@ -563,23 +563,23 @@ function generateEntityCSS() {
 
     css += `
 .investment-type-${type} {
-  background-color: ${bgColor} !important;
-  border-color: ${borderColor} !important;
-  color: ${textColor} !important;
+  background-color: ${bgColor};
+  border-color: ${borderColor};
+  color: ${textColor};
 }
 
 .investment-type-${type}-badge {
-  background-color: ${color} !important;
-  color: white !important;
-  border: 1px solid ${color} !important;
+  background-color: ${color};
+  color: white;
+  border: 1px solid ${color};
 }
 
 .investment-type-${type}-border {
-  border-left: 4px solid ${color} !important;
+  border-left: 4px solid ${color};
 }
 
 .investment-type-${type}-text {
-  color: ${color} !important;
+  color: ${color};
 }
 `;
   });
@@ -601,31 +601,31 @@ function generateStatusCSS() {
 
     css += `
 .status-${status} {
-  background-color: ${colors.light} !important;
-  border-color: ${colors.border} !important;
-  color: ${colors.medium} !important;
+  background-color: ${colors.light};
+  border-color: ${colors.border};
+  color: ${colors.medium};
 }
 
 .status-${status}-badge {
-  background-color: ${colors.medium} !important;
-  color: white !important;
-  border: 1px solid ${colors.medium} !important;
+  background-color: ${colors.medium};
+  color: white;
+  border: 1px solid ${colors.medium};
 }
 
 .status-${status}-text {
-  color: ${colors.medium} !important;
+  color: ${colors.medium};
 }
 
 .status-${status}-bg {
-  background-color: ${colors.light} !important;
+  background-color: ${colors.light};
 }
 
 .status-${status}-border {
-  border-color: ${colors.border} !important;
+  border-color: ${colors.border};
 }
 
 .status-${status}-dark {
-  color: ${colors.dark} !important;
+  color: ${colors.dark};
 }
     `;
   });
@@ -647,31 +647,31 @@ function generateInvestmentTypeCSS() {
 
     css += `
 .investment-type-${type} {
-  background-color: ${colors.light} !important;
-  border-color: ${colors.border} !important;
-  color: ${colors.medium} !important;
+  background-color: ${colors.light};
+  border-color: ${colors.border};
+  color: ${colors.medium};
 }
 
 .investment-type-${type}-badge {
-  background-color: ${colors.medium} !important;
-  color: white !important;
-  border: 1px solid ${colors.medium} !important;
+  background-color: ${colors.medium};
+  color: white;
+  border: 1px solid ${colors.medium};
 }
 
 .investment-type-${type}-text {
-  color: ${colors.medium} !important;
+  color: ${colors.medium};
 }
 
 .investment-type-${type}-bg {
-  background-color: ${colors.light} !important;
+  background-color: ${colors.light};
 }
 
 .investment-type-${type}-border {
-  border-color: ${colors.border} !important;
+  border-color: ${colors.border};
 }
 
 .investment-type-${type}-dark {
-  color: ${colors.dark} !important;
+  color: ${colors.dark};
 }
     `;
   });
@@ -935,59 +935,59 @@ function generateNumericValueCSS() {
   const css = `
         /* ערכים חיוביים */
         .numeric-value-positive {
-            color: ${NUMERIC_VALUE_COLORS.positive.medium} !important;
-            background-color: ${NUMERIC_VALUE_COLORS.positive.light} !important;
-            border-color: ${NUMERIC_VALUE_COLORS.positive.border} !important;
+            color: ${NUMERIC_VALUE_COLORS.positive.medium};
+            background-color: ${NUMERIC_VALUE_COLORS.positive.light};
+            border-color: ${NUMERIC_VALUE_COLORS.positive.border};
         }
         
         .numeric-value-positive.text-only {
-            color: ${NUMERIC_VALUE_COLORS.positive.medium} !important;
+            color: ${NUMERIC_VALUE_COLORS.positive.medium};
         }
         
         .numeric-value-positive.background-only {
-            background-color: ${NUMERIC_VALUE_COLORS.positive.light} !important;
+            background-color: ${NUMERIC_VALUE_COLORS.positive.light};
         }
         
         .numeric-value-positive.border-only {
-            border-color: ${NUMERIC_VALUE_COLORS.positive.border} !important;
+            border-color: ${NUMERIC_VALUE_COLORS.positive.border};
         }
         
         /* ערכים שליליים */
         .numeric-value-negative {
-            color: ${NUMERIC_VALUE_COLORS.negative.medium} !important;
-            background-color: ${NUMERIC_VALUE_COLORS.negative.light} !important;
-            border-color: ${NUMERIC_VALUE_COLORS.negative.border} !important;
+            color: ${NUMERIC_VALUE_COLORS.negative.medium};
+            background-color: ${NUMERIC_VALUE_COLORS.negative.light};
+            border-color: ${NUMERIC_VALUE_COLORS.negative.border};
         }
         
         .numeric-value-negative.text-only {
-            color: ${NUMERIC_VALUE_COLORS.negative.medium} !important;
+            color: ${NUMERIC_VALUE_COLORS.negative.medium};
         }
         
         .numeric-value-negative.background-only {
-            background-color: ${NUMERIC_VALUE_COLORS.negative.light} !important;
+            background-color: ${NUMERIC_VALUE_COLORS.negative.light};
         }
         
         .numeric-value-negative.border-only {
-            border-color: ${NUMERIC_VALUE_COLORS.negative.border} !important;
+            border-color: ${NUMERIC_VALUE_COLORS.negative.border};
         }
         
         /* ערך אפס */
         .numeric-value-zero {
-            color: ${NUMERIC_VALUE_COLORS.zero.medium} !important;
-            background-color: ${NUMERIC_VALUE_COLORS.zero.light} !important;
-            border-color: ${NUMERIC_VALUE_COLORS.zero.border} !important;
+            color: ${NUMERIC_VALUE_COLORS.zero.medium};
+            background-color: ${NUMERIC_VALUE_COLORS.zero.light};
+            border-color: ${NUMERIC_VALUE_COLORS.zero.border};
         }
         
         .numeric-value-zero.text-only {
-            color: ${NUMERIC_VALUE_COLORS.zero.medium} !important;
+            color: ${NUMERIC_VALUE_COLORS.zero.medium};
         }
         
         .numeric-value-zero.background-only {
-            background-color: ${NUMERIC_VALUE_COLORS.zero.light} !important;
+            background-color: ${NUMERIC_VALUE_COLORS.zero.light};
         }
         
         .numeric-value-zero.border-only {
-            border-color: ${NUMERIC_VALUE_COLORS.zero.border} !important;
+            border-color: ${NUMERIC_VALUE_COLORS.zero.border};
         }
     `;
 
@@ -1333,9 +1333,6 @@ async function loadColorPreferences() {
       const data = await response.json();
       const preferences = data.data || data;
 
-      // עדכון CSS Variables
-      updateCSSVariablesFromPreferences(preferences);
-
       // עדכון מערכת הצבעים
       if (preferences.numericValueColors) {
         Object.assign(NUMERIC_VALUE_COLORS, preferences.numericValueColors);
@@ -1343,6 +1340,28 @@ async function loadColorPreferences() {
 
       if (preferences.entityColors) {
         Object.assign(ENTITY_COLORS, preferences.entityColors);
+        console.log('✅ צבעי ישויות עודכנו:', preferences.entityColors);
+      }
+
+      // עדכון CSS Variables
+      updateCSSVariablesFromPreferences(preferences);
+
+      // עדכון כותרות עם הצבעים החדשים
+      const bodyClass = document.body.className;
+      if (bodyClass) {
+        const entityType = bodyClass.split(' ').find(cls => 
+          ['tickers-page', 'trades-page', 'accounts-page', 'alerts-page', 'cash-flows-page'].includes(cls)
+        );
+        
+        if (entityType) {
+          const type = entityType.replace('-page', '').replace('cash-flows', 'cash_flow');
+          console.log(`🎨 מעדכן כותרות עבור ${type}...`);
+          if (window.applyEntityColorsToHeaders) {
+            setTimeout(() => {
+              window.applyEntityColorsToHeaders(type);
+            }, 100);
+          }
+        }
       }
 
       console.log('✅ הגדרות צבע נטענו בהצלחה');
@@ -1389,8 +1408,8 @@ function applyEntityColorsToHeaders(entityType, excludeWarningModals = true) {
       return;
     }
 
-    // כותרת ראשית - שקיפות 0.6
-    const mainHeaders = document.querySelectorAll('.section-header:first-of-type');
+    // כותרת ראשית - תחת top-section
+    const mainHeaders = document.querySelectorAll('.top-section .section-header');
     mainHeaders.forEach(header => {
       if (excludeWarningModals && isWarningModal(header)) {
         return; // דלג על מודולי אזהרה
@@ -1400,8 +1419,8 @@ function applyEntityColorsToHeaders(entityType, excludeWarningModals = true) {
       console.log(`✅ כותרת ראשית קיבלה צבע ${entityType}`);
     });
 
-    // כותרות משניות - שקיפות 0.3
-    const subHeaders = document.querySelectorAll('.section-header:not(:first-of-type)');
+    // כותרות משניות - תחת content-section
+    const subHeaders = document.querySelectorAll('.content-section .section-header');
     subHeaders.forEach(header => {
       if (excludeWarningModals && isWarningModal(header)) {
         return; // דלג על מודולי אזהרה
@@ -1504,12 +1523,12 @@ function getMainHeaderOpacityHex() {
       return Math.round(opacity * 255 / 100).toString(16).padStart(2, '0');
     }
     
-    // ברירת מחדל: 60%
-    return '99'; // 60% of 255 = 153 = 99 in hex
+    // ברירת מחדל: 100%
+    return 'FF'; // 100% of 255 = 255 = FF in hex
     
   } catch (error) {
     console.error('❌ שגיאה בקבלת שקיפות כותרת ראשית:', error);
-    return '99'; // ברירת מחדל
+    return 'FF'; // ברירת מחדל 100%
   }
 }
 
@@ -1540,7 +1559,28 @@ function getSubHeaderOpacityHex() {
 // טעינת הגדרות צבע בטעינת הדף
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🎨 מאתחל מערכת צבעים...');
-  loadColorPreferences();
+  loadColorPreferences().then(() => {
+    // אחרי טעינת ההעדפות, עדכן את הכותרות עם הצבעים החדשים
+    const bodyClass = document.body.className;
+    if (bodyClass) {
+      // חילוץ סוג הישות מהקלאס של הגוף
+      const entityType = bodyClass.split(' ').find(cls => 
+        ['tickers-page', 'trades-page', 'accounts-page', 'alerts-page', 'cash-flows-page'].includes(cls)
+      );
+      
+      if (entityType) {
+        const type = entityType.replace('-page', '').replace('cash-flows', 'cash_flow');
+        console.log(`🎨 מעדכן כותרות עבור ${type}...`);
+        if (window.applyEntityColorsToHeaders) {
+          setTimeout(() => {
+            window.applyEntityColorsToHeaders(type);
+          }, 100);
+        }
+      }
+    }
+  }).catch(error => {
+    console.warn('⚠️ לא ניתן לטעון צבעי ישויות מההעדפות:', error);
+  });
 });
 
 // ===== EXPORTS =====

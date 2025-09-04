@@ -828,32 +828,11 @@ window.restoreDesignsSectionState = function () {
  * Handles opening/closing of individual content sections
  */
 window.toggleSection = function (sectionId) {
-  const section = document.querySelector(`[data-section="${sectionId}"]`);
-  const sectionBody = section ? section.querySelector('.section-body') : null;
-  const toggleBtn = section ? section.querySelector(
-    `button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`) : null;
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-  if (sectionBody && toggleBtn) {
-    const isCollapsed = sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none';
-
-    if (isCollapsed) {
-      sectionBody.classList.remove('collapsed');
-      sectionBody.style.display = 'block';
-      if (icon) {
-        icon.textContent = '▲';
-      }
-    } else {
-      sectionBody.classList.add('collapsed');
-      sectionBody.style.display = 'none';
-      if (icon) {
-        icon.textContent = '▼';
-      }
-    }
-
-    // Save state to localStorage
-    localStorage.setItem(`${sectionId}SectionCollapsed`, !isCollapsed);
+  // העברה ל-header-system.js
+  if (window.headerSystem && window.headerSystem.toggleSection) {
+    return window.headerSystem.toggleSection(sectionId);
   }
+  console.warn('HeaderSystem not available for toggleSection');
 };
 
 /**
@@ -910,38 +889,11 @@ window.toggleAllSections = function () {
  * This function restores the open/closed state of all content sections
  */
 window.restoreSectionStates = function () {
-  // Restoring section states from localStorage
-
-  const sections = document.querySelectorAll('.content-section');
-
-  sections.forEach(section => {
-    const sectionId = section.getAttribute('data-section');
-    const sectionBody = section.querySelector('.section-body');
-    const toggleBtn = section.querySelector(
-      `button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`);
-    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-    if (sectionId && sectionBody) {
-      const storageKey = `${sectionId}SectionCollapsed`;
-      const isCollapsed = localStorage.getItem(storageKey) === 'true';
-
-      if (isCollapsed) {
-        sectionBody.classList.add('collapsed');
-        sectionBody.style.display = 'none';
-        if (icon) {
-          icon.textContent = '▼';
-        }
-        // Section restored as collapsed
-      } else {
-        sectionBody.classList.remove('collapsed');
-        sectionBody.style.display = 'block';
-        if (icon) {
-          icon.textContent = '▲';
-        }
-        // Section restored as expanded
-      }
-    }
-  });
+  // העברה ל-header-system.js
+  if (window.headerSystem && window.headerSystem.restoreSectionStates) {
+    return window.headerSystem.restoreSectionStates();
+  }
+  console.warn('HeaderSystem not available for restoreSectionStates');
 };
 
 // ===== MODAL FUNCTIONS =====

@@ -498,9 +498,9 @@ table[data-table-type="tickers"] {
     white-space: nowrap;
 }
 
-/* מיכל הטבלה - גלילה אופקית */
+/* מיכל הטבלה - מניעת גלילה אופקית */
 .table-responsive {
-    overflow-x: auto;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
 }
 
@@ -711,7 +711,7 @@ table[data-table-type="tickers"] td:last-child {
   left: -100% !important;
   width: 100% !important;
   height: 100% !important;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
+  background: transparent !important;
   transition: left 0.5s ease !important;
 }
 
@@ -776,7 +776,7 @@ table[data-table-type="tickers"] td:last-child {
 }
 
 .sortable-header-btn:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
+  background: transparent !important;
   transform: translateY(-1px) !important;
 }
 
@@ -1216,6 +1216,12 @@ select:focus {
   position: relative !important;
 }
 
+/* כותרת ראשית - פונט גדול יותר */
+.top-section .table-title {
+  font-size: 1.6rem !important;
+  font-weight: 600 !important;
+}
+
 
 
 /* ביטול הקו התחתון של הכותרת */
@@ -1242,7 +1248,7 @@ select:focus {
   left: -100% !important;
   width: 100% !important;
   height: 100% !important;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent) !important;
+  background: transparent !important;
   transition: left 0.5s ease !important;
 }
 
@@ -2081,7 +2087,7 @@ th {
 }
 
 #executionsContainer {
-  overflow-x: auto !important;
+  overflow-x: hidden !important;
   overflow-y: hidden !important;
   -webkit-overflow-scrolling: touch !important;
 }
@@ -2200,7 +2206,7 @@ th {
 }
 
 #tradesContainer {
-  overflow-x: auto !important;
+  overflow-x: hidden !important;
   overflow-y: hidden !important;
 }
 
@@ -2280,7 +2286,7 @@ th {
 }
 
 #trade_plansContainer {
-  overflow-x: auto !important;
+  overflow-x: hidden !important;
   overflow-y: hidden !important;
 }
 
@@ -2360,7 +2366,7 @@ th {
 }
 
 #tickersContainer {
-  overflow-x: auto !important;
+  overflow-x: hidden !important;
   overflow-y: hidden !important;
 }
 
@@ -2434,7 +2440,7 @@ th {
 }
 
 #notesContainer {
-  overflow-x: auto !important;
+  overflow-x: hidden !important;
   overflow-y: hidden !important;
 }
 
@@ -2547,7 +2553,7 @@ th {
 
 /* מניעת גלילה אופקית בטבלת ההתראות */
 .table-responsive {
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 #alertsContainer {

@@ -79,6 +79,7 @@
   <script src="scripts/related-object-filters.js"></script>
             <script src="scripts/header-system.js?v=20250901_3"></script>
          <script src="scripts/color-scheme-system.js"></script>
+    <script src="scripts/color-demo-toggle.js"></script>
     <script src="scripts/alerts.js?v=20250831_1"></script>
   <script src="scripts/active-alerts-component.js?v=20250830_1"></script>
       <!-- accounts.js הוסר - לא נחוץ בעמוד זה -->
@@ -114,6 +115,18 @@
 
         <!-- Alert cards -->
         <div class="section-body">
+          <!-- Color Scheme Demo for Alerts -->
+          <div id="alertsColorDemo" class="mb-3" style="display: none;">
+            <div class="d-flex gap-2 mb-2">
+              <span class="entity-alert-badge">התראה פעילה</span>
+              <span class="entity-ticker-badge">טיקר AAPL</span>
+              <span class="entity-trade-badge">טרייד #123</span>
+            </div>
+            <div class="alert alert-info">
+              <small>🎨 דמונסטרציה למערכת הצבעים הדינמית - נוצרה אוטומטית עם מחלקות ישויות</small>
+            </div>
+          </div>
+          
           <!-- Active alerts web component -->
           <active-alerts></active-alerts>
 

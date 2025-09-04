@@ -67,6 +67,63 @@
   --apple-spacing-md: 16px;
   --apple-spacing-lg: 24px;
   --apple-spacing-xl: 32px;
+
+  /* צבעי ישויות דינמיים */
+  --entity-trade-color: #007bff;
+  --entity-trade-bg: rgba(0, 123, 255, 0.1);
+  --entity-trade-text: #0056b3;
+  --entity-trade-border: rgba(0, 123, 255, 0.3);
+  
+  --entity-trade-plan-color: #0056b3;
+  --entity-trade-plan-bg: rgba(0, 86, 179, 0.1);
+  --entity-trade-plan-text: #004085;
+  --entity-trade-plan-border: rgba(0, 86, 179, 0.3);
+  
+  --entity-execution-color: #17a2b8;
+  --entity-execution-bg: rgba(23, 162, 184, 0.1);
+  --entity-execution-text: #138496;
+  --entity-execution-border: rgba(23, 162, 184, 0.3);
+  
+  --entity-account-color: #28a745;
+  --entity-account-bg: rgba(40, 167, 69, 0.1);
+  --entity-account-text: #1e7e34;
+  --entity-account-border: rgba(40, 167, 69, 0.3);
+  
+  --entity-cash-flow-color: #20c997;
+  --entity-cash-flow-bg: rgba(32, 201, 151, 0.1);
+  --entity-cash-flow-text: #17a2b8;
+  --entity-cash-flow-border: rgba(32, 201, 151, 0.3);
+  
+  --entity-ticker-color: #dc3545;
+  --entity-ticker-bg: rgba(220, 53, 69, 0.1);
+  --entity-ticker-text: #c82333;
+  --entity-ticker-border: rgba(220, 53, 69, 0.3);
+  
+  --entity-alert-color: #ff9c05;
+  --entity-alert-bg: rgba(255, 156, 5, 0.1);
+  --entity-alert-text: #e55a00;
+  --entity-alert-border: rgba(255, 156, 5, 0.3);
+  
+  --entity-note-color: #6f42c1;
+  --entity-note-bg: rgba(111, 66, 193, 0.1);
+  --entity-note-text: #5a32a3;
+  --entity-note-border: rgba(111, 66, 193, 0.3);
+  
+  /* צבעי ערכים מספריים */
+  --numeric-positive-light: #d4edda;
+  --numeric-positive-medium: #28a745;
+  --numeric-positive-dark: #155724;
+  --numeric-positive-border: #c3e6cb;
+  
+  --numeric-negative-light: #f8d7da;
+  --numeric-negative-medium: #dc3545;
+  --numeric-negative-dark: #721c24;
+  --numeric-negative-border: #f5c6cb;
+  
+  --numeric-zero-light: #e2e3e5;
+  --numeric-zero-medium: #6c757d;
+  --numeric-zero-dark: #383d41;
+  --numeric-zero-border: #d6d8db;
 }
 
 /* סגנון בסיסי - font-family מנוהל ב-typography.css */

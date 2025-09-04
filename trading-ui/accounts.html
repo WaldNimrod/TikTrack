@@ -109,6 +109,7 @@
   <script src="scripts/validation-utils.js"></script>
   <script src="scripts/filter-system.js"></script>
   <script src="scripts/error-handlers.js"></script>
+  <script src="scripts/color-demo-toggle.js"></script>
   <script src="scripts/accounts.js?v=20250830_1"></script>
   
   <style>
@@ -222,6 +223,20 @@
 
         <!-- Data summary -->
         <div class="section-body">
+          <!-- Color Scheme Demo for Accounts -->
+          <div id="accountsColorDemo" class="mb-3" style="display: none;">
+            <div class="d-flex gap-2 mb-2">
+              <span class="entity-account-badge">חשבון פעיל</span>
+              <span class="entity-cash-flow-badge">תזרים חיובי</span>
+              <div class="entity-account-border p-2 border rounded">
+                <small>יתרה: <span class="numeric-text-positive">+$25,430.50</span></small>
+              </div>
+            </div>
+            <div class="alert alert-info">
+              <small>🎨 דמונסטרציה למערכת הצבעים הדינמית - צבעים עקביים לחשבונות ותזרים</small>
+            </div>
+          </div>
+          
           <!-- Active alerts component -->
           <active-alerts></active-alerts>
           

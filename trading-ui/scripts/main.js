@@ -189,6 +189,9 @@ function initializeCoreSystems() {
     window.headerSystem.init();
   }
 
+  // Initialize dynamic color scheme system
+  initializeDynamicColorScheme();
+
   // Initialize notifications center (if not on notifications-center page)
   if (window.NotificationsCenter && !window.notificationsCenter && !window.location.pathname.includes('notifications-center')) {
     try {
@@ -1202,6 +1205,7 @@ window.initializeApplication = initializeApplication;
 window.checkDependencies = checkDependencies;
 window.initializeCoreSystems = initializeCoreSystems;
 window.initializeCurrentPage = initializeCurrentPage;
+window.initializeDynamicColorScheme = initializeDynamicColorScheme;
 window.isModuleAvailable = isModuleAvailable;
 window.getSystemInfo = getSystemInfo;
 window.closeModalGlobal = closeModalGlobal;
@@ -1236,6 +1240,46 @@ function initializeDevelopmentShortcuts() {
       }
     }
   });
+}
+
+/**
+ * Initialize dynamic color scheme system
+ * Creates and applies dynamic CSS for entity and numeric value colors
+ */
+function initializeDynamicColorScheme() {
+  try {
+    console.log('🎨 מאתחל מערכת צבעים דינמית...');
+    
+    // Initialize entity color CSS
+    if (window.generateEntityCSS) {
+      const entityCSS = window.generateEntityCSS();
+      let entityStyleElement = document.getElementById('dynamic-entity-colors');
+      if (!entityStyleElement) {
+        entityStyleElement = document.createElement('style');
+        entityStyleElement.id = 'dynamic-entity-colors';
+        document.head.appendChild(entityStyleElement);
+      }
+      entityStyleElement.textContent = entityCSS;
+      console.log('✅ CSS ישויות דינמי נוצר');
+    }
+    
+    // Initialize numeric value color CSS
+    if (window.generateNumericValueCSS) {
+      const numericCSS = window.generateNumericValueCSS();
+      let numericStyleElement = document.getElementById('dynamic-numeric-colors');
+      if (!numericStyleElement) {
+        numericStyleElement = document.createElement('style');
+        numericStyleElement.id = 'dynamic-numeric-colors';
+        document.head.appendChild(numericStyleElement);
+      }
+      numericStyleElement.textContent = numericCSS;
+      console.log('✅ CSS ערכים מספריים דינמי נוצר');
+    }
+    
+    console.log('🎨 מערכת צבעים דינמית אותחלה בהצלחה');
+  } catch (error) {
+    console.error('❌ שגיאה באתחול מערכת צבעים דינמית:', error);
+  }
 }
 
 // ===== AUTO-INITIALIZATION =====

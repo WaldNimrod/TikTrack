@@ -131,6 +131,7 @@
   <script src="scripts/account-service.js"></script>
 
       <script src="scripts/color-scheme-system.js"></script>
+      <script src="scripts/color-demo-toggle.js"></script>
       <script src="scripts/trades.js?v=20250830_21"></script>
 </head>
 
@@ -159,6 +160,20 @@
 
         <!-- כרטיסיות התראות -->
         <div class="section-body">
+          <!-- Color Scheme Demo for Trades -->
+          <div id="tradesColorDemo" class="mb-3" style="display: none;">
+            <div class="d-flex gap-2 mb-2">
+              <span class="entity-trade-badge">טרייד פעיל</span>
+              <span class="entity-account-badge">Interactive Brokers</span>
+              <div class="entity-trade-border p-2 border rounded">
+                <small>עמלה: <span class="numeric-text-negative">-$5.00</span></small>
+              </div>
+            </div>
+            <div class="alert alert-info">
+              <small>🎨 דמונסטרציה למערכת הצבעים הדינמית - מתעדכנת אוטומטית לפי סוג הישות</small>
+            </div>
+          </div>
+          
           <!-- ווב קומפוננט של התראות פעילות -->
           <active-alerts></active-alerts>
 

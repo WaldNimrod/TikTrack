@@ -41,58 +41,58 @@
 /* עמוד מעקב טריידים - כתום */
 .tracking-page .section-header,
 .tracking-page .top-section .section-header {
-  border-bottom: 2px solid #ff9c05;
-  background: linear-gradient(135deg, rgba(255, 156, 5, 0.1) 0%, rgba(255, 156, 5, 0.05) 100%);
+  border-bottom: 2px solid var(--entity-trade-color, #007bff);
+  background: linear-gradient(135deg, var(--entity-trade-bg, rgba(0, 123, 255, 0.1)) 0%, var(--entity-trade-bg, rgba(0, 123, 255, 0.05)) 100%);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
 }
 
-/* עמוד חשבונות - כחול */
+/* עמוד חשבונות - ירוק */
 .accounts-page .section-header,
 .accounts-page .top-section .section-header {
-  border-bottom: 2px solid #007bff;
-  background: linear-gradient(135deg, rgba(0, 123, 255, 0.1) 0%, rgba(0, 123, 255, 0.05) 100%);
+  border-bottom: 2px solid var(--entity-account-color, #28a745);
+  background: linear-gradient(135deg, var(--entity-account-bg, rgba(40, 167, 69, 0.1)) 0%, var(--entity-account-bg, rgba(40, 167, 69, 0.05)) 100%);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
 }
 
-/* עמוד תכנון טריידים - ירוק */
+/* עמוד תכנון טריידים - כחול כהה */
 .planning-page .section-header,
 .planning-page .top-section .section-header {
-  border-bottom: 2px solid #28a745;
-  background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%);
+  border-bottom: 2px solid var(--entity-trade-plan-color, #0056b3);
+  background: linear-gradient(135deg, var(--entity-trade-plan-bg, rgba(0, 86, 179, 0.1)) 0%, var(--entity-trade-plan-bg, rgba(0, 86, 179, 0.05)) 100%);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
 }
 
-/* עמוד התראות - אדום */
+/* עמוד התראות - כתום */
 .alerts-page .section-header,
 .alerts-page .top-section .section-header {
-  border-bottom: 2px solid #dc3545;
-  background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+  border-bottom: 2px solid var(--entity-alert-color, #ff9c05);
+  background: linear-gradient(135deg, var(--entity-alert-bg, rgba(255, 156, 5, 0.1)) 0%, var(--entity-alert-bg, rgba(255, 156, 5, 0.05)) 100%);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
 }
 
-/* עמוד תזרים מזומנים - סגול */
+/* עמוד תזרים מזומנים - ירוק טורקיז */
 .cash-flows-page .section-header,
 .cash-flows-page .top-section .section-header {
-  border-bottom: 2px solid #6f42c1 !important;
-  background: linear-gradient(135deg, rgba(111, 66, 193, 0.1) 0%, rgba(111, 66, 193, 0.05) 100%) !important;
+  border-bottom: 2px solid var(--entity-cash-flow-color, #20c997) !important;
+  background: linear-gradient(135deg, var(--entity-cash-flow-bg, rgba(32, 201, 151, 0.1)) 0%, var(--entity-cash-flow-bg, rgba(32, 201, 151, 0.05)) 100%) !important;
   padding: 1rem !important;
   border-radius: 8px !important;
   margin-bottom: 1rem !important;
 }
 
-/* עמוד עסקאות - כחול כהה */
+/* עמוד עסקאות - כחול טורקיז */
 .executions-page .section-header,
 .executions-page .top-section .section-header {
-  border-bottom: 2px solid #17a2b8;
-  background: linear-gradient(135deg, rgba(23, 162, 184, 0.1) 0%, rgba(23, 162, 184, 0.05) 100%);
+  border-bottom: 2px solid var(--entity-execution-color, #17a2b8);
+  background: linear-gradient(135deg, var(--entity-execution-bg, rgba(23, 162, 184, 0.1)) 0%, var(--entity-execution-bg, rgba(23, 162, 184, 0.05)) 100%);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
@@ -101,18 +101,18 @@
 /* עמוד טיקרים - אדום */
 .tickers-page .section-header,
 .tickers-page .top-section .section-header {
-  border-bottom: 2px solid #dc3545;
-  background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+  border-bottom: 2px solid var(--entity-ticker-color, #dc3545);
+  background: linear-gradient(135deg, var(--entity-ticker-bg, rgba(220, 53, 69, 0.1)) 0%, var(--entity-ticker-bg, rgba(220, 53, 69, 0.05)) 100%);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
 }
 
-/* עמוד הערות - כתום */
+/* עמוד הערות - סגול */
 .notes-page .section-header,
 .notes-page .top-section .section-header {
-  border-bottom: 2px solid #fd7e14;
-  background: linear-gradient(135deg, rgba(253, 126, 20, 0.1) 0%, rgba(253, 126, 20, 0.05) 100%);
+  border-bottom: 2px solid var(--entity-note-color, #6f42c1);
+  background: linear-gradient(135deg, var(--entity-note-bg, rgba(111, 66, 193, 0.1)) 0%, var(--entity-note-bg, rgba(111, 66, 193, 0.05)) 100%);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
@@ -121,8 +121,8 @@
 /* עמוד בסיס נתונים - כחול כהה */
 .db-display-page .section-header,
 .db-display-page .top-section .section-header {
-  border-bottom: 2px solid #495057;
-  background: linear-gradient(135deg, rgba(73, 80, 87, 0.1) 0%, rgba(73, 80, 87, 0.05) 100%);
+  border-bottom: 2px solid var(--apple-gray-8, #495057);
+  background: linear-gradient(135deg, var(--apple-gray-3, rgba(73, 80, 87, 0.1)) 0%, var(--apple-gray-2, rgba(73, 80, 87, 0.05)) 100%);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
@@ -131,8 +131,8 @@
 /* עמוד טבלאות עזר - אפור */
 .extra-data-page .section-header,
 .extra-data-page .top-section .section-header {
-  border-bottom: 2px solid #6c757d;
-  background: linear-gradient(135deg, rgba(108, 117, 125, 0.1) 0%, rgba(108, 117, 125, 0.05) 100%);
+  border-bottom: 2px solid var(--apple-gray-6, #6c757d);
+  background: linear-gradient(135deg, var(--apple-gray-2, rgba(108, 117, 125, 0.1)) 0%, var(--apple-gray-1, rgba(108, 117, 125, 0.05)) 100%);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
@@ -158,11 +158,11 @@
   margin-bottom: 1rem;
 }
 
-/* עמוד מחקר - כחול בהיר */
+/* עמוד מחקר - אפור כהה */
 .research-page .section-header,
 .research-page .top-section .section-header {
-  border-bottom: 2px solid #0dcaf0;
-  background: linear-gradient(135deg, rgba(13, 202, 240, 0.1) 0%, rgba(13, 202, 240, 0.05) 100%);
+  border-bottom: 2px solid var(--apple-gray-8, #343a40);
+  background: linear-gradient(135deg, var(--apple-gray-2, rgba(52, 58, 64, 0.1)) 0%, var(--apple-gray-1, rgba(52, 58, 64, 0.05)) 100%);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;

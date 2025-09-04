@@ -653,42 +653,42 @@ function getRulesExplanation(itemType, data) {
 
     if (isDeletion) {
       // למחיקה - לא ניתן למחוק אם יש כל פריט מקושר
-      let explanation = 'לא ניתן למחוק תכנון זה כי יש פריטים מקושרים:';
+      let deleteExplanation = 'לא ניתן למחוק תכנון זה כי יש פריטים מקושרים:';
       if (activeTrades.length > 0) {
-        explanation += `<br>• ${activeTrades.length} טרייד(ים) פעיל(ים) - יש לבטל אותם קודם`;
+        deleteExplanation += `<br>• ${activeTrades.length} טרייד(ים) פעיל(ים) - יש לבטל אותם קודם`;
       }
       if (closedTrades.length > 0) {
-        explanation += `<br>• ${closedTrades.length} טרייד(ים) מבוטלים - יש למחוק אותם קודם`;
+        deleteExplanation += `<br>• ${closedTrades.length} טרייד(ים) מבוטלים - יש למחוק אותם קודם`;
       }
       if (notes.length > 0) {
-        explanation += `<br>• ${notes.length} הערה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
+        deleteExplanation += `<br>• ${notes.length} הערה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
       }
       if (alerts.length > 0) {
-        explanation += `<br>• ${alerts.length} התראה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
+        deleteExplanation += `<br>• ${alerts.length} התראה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
       }
       if (executions.length > 0) {
-        explanation += `<br>• ${executions.length} ביצוע(ים) מקושר(ים) - יש למחוק אותם קודם`;
+        deleteExplanation += `<br>• ${executions.length} ביצוע(ים) מקושר(ים) - יש למחוק אותם קודם`;
       }
-      return explanation;
+      return deleteExplanation;
     } else {
       // לביטול - רק טריידים פעילים מונעים ביטול
-      let explanation = 'ניתן לבטל רק תכנון ללא טרייד או מקושר לטריידים מבוטלים. לא ניתן לבטל תכנון זה כי יש:';
+      let cancelExplanation = 'ניתן לבטל רק תכנון ללא טרייד או מקושר לטריידים מבוטלים. לא ניתן לבטל תכנון זה כי יש:';
       if (activeTrades.length > 0) {
-        explanation += `<br>• ${activeTrades.length} טרייד(ים) פעיל(ים) - יש לבטל אותם קודם`;
+        cancelExplanation += `<br>• ${activeTrades.length} טרייד(ים) פעיל(ים) - יש לבטל אותם קודם`;
       }
       if (notes.length > 0) {
-        explanation += `<br>• ${notes.length} הערה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
+        cancelExplanation += `<br>• ${notes.length} הערה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
       }
       if (alerts.length > 0) {
-        explanation += `<br>• ${alerts.length} התראה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
+        cancelExplanation += `<br>• ${alerts.length} התראה(ות) מקושרת(ות) - יש למחוק אותן קודם`;
       }
       if (executions.length > 0) {
-        explanation += `<br>• ${executions.length} ביצוע(ים) מקושר(ים) - יש למחוק אותם קודם`;
+        cancelExplanation += `<br>• ${executions.length} ביצוע(ים) מקושר(ים) - יש למחוק אותם קודם`;
       }
       if (closedTrades.length > 0) {
-        explanation += `<br>• ${closedTrades.length} טרייד(ים) סגור(ים) - ניתן לבטל תכנון עם טריידים מבוטלים`;
+        cancelExplanation += `<br>• ${closedTrades.length} טרייד(ים) סגור(ים) - ניתן לבטל תכנון עם טריידים מבוטלים`;
       }
-      return explanation;
+      return cancelExplanation;
     }
   }
 

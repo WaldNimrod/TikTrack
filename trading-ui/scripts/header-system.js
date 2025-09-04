@@ -1939,7 +1939,7 @@ class HeaderSystem {
     });
   }
 
-  setupMenuAutoClose(menu) {
+  static setupMenuAutoClose(menu) {
     // ניקוי טיימרים קודמים
     HeaderSystem.clearMenuTimers(menu);
 
@@ -2065,7 +2065,7 @@ class HeaderSystem {
   }
 
   // פונקציה להוספת event listeners לאלמנט תפריט משנה
-  addSubmenuEventListenersToElement(submenu) {
+  static addSubmenuEventListenersToElement(submenu) {
     if (submenu._submenuEventListenersAdded) {return;}
 
     submenu.addEventListener('mouseenter', () => {
@@ -2096,7 +2096,7 @@ class HeaderSystem {
   }
 
 
-  updateAccountFilterMenu(accounts) {
+  static updateAccountFilterMenu(accounts) {
     const headerElement = document.getElementById('unified-header');
     if (!headerElement) {return;}
 

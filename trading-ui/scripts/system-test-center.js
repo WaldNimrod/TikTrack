@@ -328,7 +328,7 @@ class SimpleTestCenter {
     // Function completed
   }
 
-  async clearLog() {
+  clearLog() {
 
     this.log('🧹 מנקה יומן פעילות...');
     const logContent = document.getElementById('unified-log-content');
@@ -348,7 +348,7 @@ class SimpleTestCenter {
   }
 
   // Data loading functions
-  async loadCacheData() {
+  loadCacheData() {
 
 
     // Cache Stats
@@ -380,7 +380,7 @@ class SimpleTestCenter {
     // Function completed
   }
 
-  async loadQueryData() {
+  loadQueryData() {
 
 
     // Query Stats
@@ -405,7 +405,7 @@ class SimpleTestCenter {
     // Function completed
   }
 
-  async loadExternalData() {
+  loadExternalData() {
 
 
     // External Data Status
@@ -424,7 +424,7 @@ class SimpleTestCenter {
     // Function completed
   }
 
-  async loadPerformanceData() {
+  loadPerformanceData() {
 
 
     // Performance Metrics
@@ -703,7 +703,7 @@ class SimpleTestCenter {
     `;
   }
 
-  async delay(ms) {
+  static async delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 }

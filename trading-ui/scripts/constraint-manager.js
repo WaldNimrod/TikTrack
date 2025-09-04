@@ -86,7 +86,7 @@ class ConstraintManager {
       }
     } catch (error) {
       // Error loading constraints
-      console.error('שגיאה בטעינת constraints:', error);
+      // Error:('שגיאה בטעינת constraints:', error);
       this.showMessage('שגיאה בטעינת האילוצים מהשרת', 'error');
       // אין נתוני דמה - רק הודעת שגיאה
       this.constraints = [];

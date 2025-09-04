@@ -102,7 +102,6 @@ function getTickerTypeStyle(type) {
     fontSize: '0.875rem',
     fontWeight: '500',
     display: 'inline-block',
-    minWidth: '60px',
     textAlign: 'center',
   };
 }
@@ -126,7 +125,6 @@ function getTickerStatusStyle(status) {
     fontSize: '0.875rem',
     fontWeight: '500',
     display: 'inline-block',
-    minWidth: '60px',
     textAlign: 'center',
   };
 }
@@ -1671,7 +1669,6 @@ function updateTickersTable(tickers) {
                                      font-size: ${statusStyle.fontSize}; 
                                      font-weight: ${statusStyle.fontWeight}; 
                                      display: ${statusStyle.display}; 
-                                     min-width: ${statusStyle.minWidth}; 
                                      text-align: ${statusStyle.textAlign};">
                             ${statusLabel}
                         </span>
@@ -1685,7 +1682,6 @@ function updateTickersTable(tickers) {
                                      font-size: ${typeStyle.fontSize}; 
                                      font-weight: ${typeStyle.fontWeight}; 
                                      display: ${typeStyle.display}; 
-                                     min-width: ${typeStyle.minWidth}; 
                                      text-align: ${typeStyle.textAlign};">
                             ${typeLabel}
                         </span>
@@ -1971,34 +1967,56 @@ async function refreshYahooFinanceDataSilently() {
   }
 }
 
-// פונקציה לפילטר טיקרים לפי סוג
+// פונקציה לפילטר טיקרים לפי סוג (פילטר פשוט - סוג אחד בלבד)
 function filterTickersByType(type) {
   console.log(`🔍 Filtering tickers by type: ${type}`);
   
-  // עדכון מצב הכפתורים
+  // עדכון מצב הכפתורים - רק אחד פעיל בכל פעם
   const buttons = document.querySelectorAll('.ticker-type-filter [data-type]');
   buttons.forEach(btn => {
-    if (btn.getAttribute('data-type') === type) {
+    const btnType = btn.getAttribute('data-type');
+    if (btnType === type) {
+      // כפתור פעיל
       btn.classList.add('active');
-      btn.classList.remove('btn-outline-primary');
-      btn.style.backgroundColor = 'white';
-      btn.style.color = '#28a745';
-      btn.style.borderColor = '#28a745';
+      if (btnType === 'all') {
+        // כפתור איפוס - עיצוב מיוחד
+        btn.classList.remove('btn-outline-primary');
+        btn.style.backgroundColor = 'white';
+        btn.style.color = '#28a745';
+        btn.style.borderColor = '#28a745';
+      } else {
+        // כפתורים רגילים
+        btn.classList.remove('btn-outline-primary');
+        btn.style.backgroundColor = 'white';
+        btn.style.color = '#28a745';
+        btn.style.borderColor = '#28a745';
+      }
     } else {
+      // כפתורים לא פעילים
       btn.classList.remove('active');
-      btn.classList.add('btn-outline-primary');
-      btn.style.backgroundColor = '';
-      btn.style.color = '';
-      btn.style.borderColor = '';
+      if (btnType === 'all') {
+        // כפתור איפוס - עיצוב ברירת מחדל
+        btn.style.backgroundColor = '';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      } else {
+        // כפתורים רגילים
+        btn.classList.add('btn-outline-primary');
+        btn.style.backgroundColor = '';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }
     }
   });
 
-  // פילטור הנתונים
+  // פילטור הנתונים - סוג אחד בלבד
   let filteredData = [...window.tickersData];
   
   if (type !== 'all') {
+    // פילטר לפי סוג ספציפי
     filteredData = filteredData.filter(ticker => ticker.type === type);
   }
+  // אם type === 'all', מציג את כל הטיקרים
 
   // עדכון הטבלה
   if (typeof window.updateTickersTable === 'function') {
@@ -2008,12 +2026,28 @@ function filterTickersByType(type) {
   // עדכון ספירת הטיקרים
   const countElement = document.querySelector('.table-count');
   if (countElement) {
-    countElement.textContent = `${filteredData.length} טיקרים`;
+    const typeText = type === 'all' ? 'כל הטיקרים' : getTypeDisplayName(type);
+    countElement.textContent = `${filteredData.length} טיקרים${type !== 'all' ? ` (${typeText})` : ''}`;
   }
 
-  console.log(`🔍 Filtered ${filteredData.length} tickers out of ${window.tickersData.length}`);
+  console.log(`🔍 Filtered ${filteredData.length} tickers out of ${window.tickersData.length} for type: ${type}`);
+}
+
+// פונקציה עזר לקבלת שם תצוגה לסוג
+function getTypeDisplayName(type) {
+  const typeNames = {
+    'stock': 'מניות',
+    'etf': 'ETF',
+    'bond': 'אג"ח',
+    'crypto': 'קריפטו',
+    'forex': 'מטבע חוץ',
+    'commodity': 'סחורה',
+    'other': 'אחר'
+  };
+  return typeNames[type] || type;
 }
 
 // ייצוא פונקציות לגלובל
 window.filterTickersByType = filterTickersByType;
+window.getTypeDisplayName = getTypeDisplayName;
 

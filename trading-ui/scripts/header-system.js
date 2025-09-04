@@ -785,32 +785,16 @@ class HeaderSystem {
                     <span class="check-mark">●</span>
                   </div>
                   <!-- סוגי השקעות -->
-                  <div class="type-filter-item" data-value="מניה" onclick="selectTypeOption('מניה')">
-                    <span class="option-text">מניה</span>
+                  <div class="type-filter-item" data-value="סווינג" onclick="selectTypeOption('סווינג')">
+                    <span class="option-text">סווינג</span>
                     <span class="check-mark">●</span>
                   </div>
-                  <div class="type-filter-item" data-value="ETF" onclick="selectTypeOption('ETF')">
-                    <span class="option-text">ETF</span>
+                  <div class="type-filter-item" data-value="השקעה" onclick="selectTypeOption('השקעה')">
+                    <span class="option-text">השקעה</span>
                     <span class="check-mark">●</span>
                   </div>
-                  <div class="type-filter-item" data-value="אג\"ח" onclick="selectTypeOption('אג\"ח')">
-                    <span class="option-text">אג"ח</span>
-                    <span class="check-mark">●</span>
-                  </div>
-                  <div class="type-filter-item" data-value="קריפטו" onclick="selectTypeOption('קריפטו')">
-                    <span class="option-text">קריפטו</span>
-                    <span class="check-mark">●</span>
-                  </div>
-                  <div class="type-filter-item" data-value="מטבע חוץ" onclick="selectTypeOption('מטבע חוץ')">
-                    <span class="option-text">מטבע חוץ</span>
-                    <span class="check-mark">●</span>
-                  </div>
-                  <div class="type-filter-item" data-value="סחורה" onclick="selectTypeOption('סחורה')">
-                    <span class="option-text">סחורה</span>
-                    <span class="check-mark">●</span>
-                  </div>
-                  <div class="type-filter-item" data-value="אחר" onclick="selectTypeOption('אחר')">
-                    <span class="option-text">אחר</span>
+                  <div class="type-filter-item" data-value="פסיבי" onclick="selectTypeOption('פסיבי')">
+                    <span class="option-text">פסיבי</span>
                     <span class="check-mark">●</span>
                   </div>
                 </div>
@@ -2305,62 +2289,83 @@ class HeaderSystem {
     }
   }
 
-  // פונקציה לאיפוס כל הפילטרים
-  static resetAllFilters() {
+  // פונקציה לאיפוס כל הפילטרים למצב ברירת מחדל מהעדפות
+  static async resetAllFilters() {
+    console.log('🔄 Resetting filters to user defaults...');
+    
+    try {
+      // שימוש ב-FilterSystem החדש
+      if (window.filterSystem && typeof window.filterSystem.resetToUserDefaults === 'function') {
+        await window.filterSystem.resetToUserDefaults();
+        return;
+      }
+      
+      // Fallback - השיטה הישנה
+      console.warn('⚠️ FilterSystem not available, using fallback');
+      const defaultStatusFilter = await getCurrentPreference('defaultStatusFilter') || 'all';
+      const defaultTypeFilter = await getCurrentPreference('defaultTypeFilter') || 'all';
+      const defaultAccountFilter = await getCurrentPreference('defaultAccountFilter') || 'all';
+      const defaultDateRangeFilter = await getCurrentPreference('defaultDateRangeFilter') || 'all';
+      const defaultSearchFilter = await getCurrentPreference('defaultSearchFilter') || '';
 
+      // איפוס פילטר סטטוס
+      const statusMenu = document.getElementById('statusFilterMenu');
+      if (statusMenu) {
+        statusMenu.querySelectorAll('.status-filter-item.selected').forEach(item => {
+          item.classList.remove('selected');
+        });
+      }
 
-    // איפוס פילטר סטטוס
-    const statusMenu = document.getElementById('statusFilterMenu');
-    if (statusMenu) {
-      statusMenu.querySelectorAll('.status-filter-item.selected').forEach(item => {
-        item.classList.remove('selected');
-      });
+      // איפוס פילטר טיפוס
+      const typeMenu = document.getElementById('typeFilterMenu');
+      if (typeMenu) {
+        typeMenu.querySelectorAll('.type-filter-item.selected').forEach(item => {
+          item.classList.remove('selected');
+        });
+      }
+
+      // איפוס פילטר חשבונות
+      const accountMenu = document.getElementById('accountFilterMenu');
+      if (accountMenu) {
+        accountMenu.querySelectorAll('.account-filter-item.selected').forEach(item => {
+          item.classList.remove('selected');
+        });
+      }
+
+      // איפוס פילטר תאריכים
+      const dateMenu = document.getElementById('dateRangeFilterMenu');
+      if (dateMenu) {
+        dateMenu.querySelectorAll('.date-range-filter-item.selected').forEach(item => {
+          item.classList.remove('selected');
+        });
+      }
+
+      // איפוס חיפוש
+      const searchInput = document.getElementById('searchFilterInput');
+      if (searchInput) {
+        searchInput.value = '';
+      }
+
+      // עדכון טקסטים
+      HeaderSystem.updateFilterTexts();
+
+      // עדכון פילטרים
+      if (window.filterSystem) {
+        window.filterSystem.updateFilter('status', []);
+        window.filterSystem.updateFilter('type', []);
+        window.filterSystem.updateFilter('account', []);
+        window.filterSystem.updateFilter('dateRange', '');
+        window.filterSystem.updateFilter('search', '');
+      }
+
+      // שמירת מצב
+      HeaderSystem.saveFilterStates();
+      
+    } catch (error) {
+      console.warn('⚠️ Using fallback reset:', error);
+      // Fallback - איפוס פשוט
+      HeaderSystem.resetFiltersManually();
     }
-
-    // איפוס פילטר טיפוס
-    const typeMenu = document.getElementById('typeFilterMenu');
-    if (typeMenu) {
-      typeMenu.querySelectorAll('.type-filter-item.selected').forEach(item => {
-        item.classList.remove('selected');
-      });
-    }
-
-    // איפוס פילטר חשבונות
-    const accountMenu = document.getElementById('accountFilterMenu');
-    if (accountMenu) {
-      accountMenu.querySelectorAll('.account-filter-item.selected').forEach(item => {
-        item.classList.remove('selected');
-      });
-    }
-
-    // איפוס פילטר תאריכים
-    const dateMenu = document.getElementById('dateRangeFilterMenu');
-    if (dateMenu) {
-      dateMenu.querySelectorAll('.date-range-filter-item.selected').forEach(item => {
-        item.classList.remove('selected');
-      });
-    }
-
-    // איפוס חיפוש
-    const searchInput = document.getElementById('searchFilterInput');
-    if (searchInput) {
-      searchInput.value = '';
-    }
-
-    // עדכון טקסטים
-    HeaderSystem.updateFilterTexts();
-
-    // עדכון פילטרים
-    if (window.filterSystem) {
-      window.filterSystem.updateFilter('status', []);
-      window.filterSystem.updateFilter('type', []);
-      window.filterSystem.updateFilter('account', []);
-      window.filterSystem.updateFilter('dateRange', '');
-      window.filterSystem.updateFilter('search', '');
-    }
-
-    // שמירת מצב
-    HeaderSystem.saveFilterStates();
   }
 
   // פונקציה לניקוי כל הפילטרים (הצגת כל הרשומות)
@@ -4397,27 +4402,31 @@ function updateAccountFilterText() {
  * איפוס כל הפילטרים למצב ברירת מחדל מהעדפות
  */
 async function resetAllFilters() {
-
-
+  console.log('🔄 Resetting filters to user defaults...');
+  
   try {
+    // שימוש ב-FilterSystem החדש
+    if (window.filterSystem && typeof window.filterSystem.resetToUserDefaults === 'function') {
+      await window.filterSystem.resetToUserDefaults();
+      return;
+    }
+    
+    // Fallback - השיטה הישנה
+    console.warn('⚠️ FilterSystem not available, using fallback');
+    
     // קבלת הגדרות ברירת מחדל מהשרת
-    // Fetching default preferences from server
     const defaultStatusFilter = await getCurrentPreference('defaultStatusFilter') || 'all';
     const defaultTypeFilter = await getCurrentPreference('defaultTypeFilter') || 'all';
     const defaultAccountFilter = await getCurrentPreference('defaultAccountFilter') || 'all';
     const defaultDateRangeFilter = await getCurrentPreference('defaultDateRangeFilter') || 'all';
     const defaultSearchFilter = await getCurrentPreference('defaultSearchFilter') || '';
 
-    // Default preferences loaded
-
-    // About to call resetFiltersToDefaults with account value
-
     // הפעלת הפונקציה שמטפלת באיפוס לפי הגדרות
     resetFiltersToDefaults(defaultStatusFilter, defaultTypeFilter, defaultAccountFilter, defaultDateRangeFilter, defaultSearchFilter);
 
   } catch (error) {
     // שגיאה בקבלת הגדרות ברירת מחדל
-    console.warn('⚠️ Using fallback reset');
+    console.warn('⚠️ Using fallback reset:', error);
     // Fallback - איפוס ידני
     resetFiltersManually();
   }

@@ -38,6 +38,33 @@
 
 /* ===== סגנונות כלליים של הפרויקציה ===== */
 
+/* ===== Two-column layout for preference items ===== */
+.preference-items-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px; /* רווח בינוני בין העמודות */
+  align-items: start;
+  padding: 0 20px; /* רווח מהצדדים */
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .preference-items-grid {
+    grid-template-columns: 1fr;
+    gap: 15px; /* רווח קטן יותר במסכים קטנים */
+    padding: 0 10px;
+  }
+}
+
+/* Ensure preference items maintain proper spacing in grid */
+.preference-items-grid .preference-item {
+  margin-bottom: 0;
+  padding: 15px; /* רווח פנימי לכל פריט */
+  border-radius: 8px; /* פינות מעוגלות */
+  background: rgba(248, 249, 250, 0.5); /* רקע עדין */
+  border: 1px solid rgba(0, 0, 0, 0.05); /* גבול עדין */
+}
+
 /* ===== סגנונות כלי פיתוח ===== */
 
 /* ===== סגנונות Cache Test ===== */
@@ -4465,22 +4492,24 @@ button[onclick*="openDesignDetails"]:hover {
 /* תבנית בסיס לכל המודולים */
 .modal .modal-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start; /* יישור לשמאל ב-RTL - כפתורים משמאל */
   align-items: center;
   border-radius: 6px 6px 0 0;
   border-bottom: none;
+  direction: rtl; /* כיוון RTL */
   padding: 1rem 1.5rem;
 }
 
 .modal .modal-title {
   font-weight: 600;
   font-size: 1.25rem;
-  order: 1;
-  margin-left: auto;
+  order: 2; /* כותרת אחרי כפתור הסגירה */
+  text-align: right; /* יישור טקסט לימין ב-RTL */
+  margin: 0;
 }
 
 .modal .btn-close {
-  order: 2;
+  order: 1; /* כפתור סגירה ראשון (משמאל) */
   border: 1px solid white !important;
   border-radius: 4px;
   padding: 6px;
@@ -5977,7 +6006,7 @@ a:focus, .link:focus, .ticker-symbol-link:focus {
 
 /* כפתורי פעולות במודלים */
 .modal .btn {
-  min-width: 80px !important;
+  /* min-width הוסר - כפתורים גמישים */
 }
 
 .modal .btn-sm {

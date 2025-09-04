@@ -142,20 +142,29 @@
             <div class="table-actions">
               <!-- פילטר סוג טיקר -->
               <div class="ticker-type-filter" style="display: flex; gap: 4px; align-items: center; margin-left: 8px;">
-                <button class="btn btn-sm btn-outline-primary active" onclick="filterTickersByType('all')" data-type="all" title="כל הטיקרים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                  <span style="font-size: 12px;">כל</span>
+                <button class="reset-btn active" onclick="filterTickersByType('all')" data-type="all" title="כל הטיקרים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                  <span class="reset-icon">↻</span>
                 </button>
                 <button class="btn btn-sm btn-outline-primary" onclick="filterTickersByType('stock')" data-type="stock" title="מניות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                  <span style="font-size: 10px;">מניה</span>
+                  <span style="font-size: 16px;">📈</span>
                 </button>
                 <button class="btn btn-sm btn-outline-primary" onclick="filterTickersByType('etf')" data-type="etf" title="ETF" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                  <span style="font-size: 10px;">ETF</span>
+                  <span style="font-size: 16px;">🎒</span>
+                </button>
+                <button class="btn btn-sm btn-outline-primary" onclick="filterTickersByType('bond')" data-type="bond" title="אג\"ח" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                  <span style="font-size: 16px;">🏛️</span>
                 </button>
                 <button class="btn btn-sm btn-outline-primary" onclick="filterTickersByType('crypto')" data-type="crypto" title="קריפטו" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                  <span style="font-size: 10px;">₿</span>
+                  <span style="font-size: 16px;">₿</span>
+                </button>
+                <button class="btn btn-sm btn-outline-primary" onclick="filterTickersByType('forex')" data-type="forex" title="מטבע חוץ" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                  <span style="font-size: 16px;">💱</span>
+                </button>
+                <button class="btn btn-sm btn-outline-primary" onclick="filterTickersByType('commodity')" data-type="commodity" title="סחורה" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                  <span style="font-size: 16px;">🚛</span>
                 </button>
                 <button class="btn btn-sm btn-outline-primary" onclick="filterTickersByType('other')" data-type="other" title="אחר" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
-                  <span style="font-size: 10px;">אחר</span>
+                  <span style="font-size: 16px;">📋</span>
                 </button>
               </div>
               <div class="action-separator"></div>

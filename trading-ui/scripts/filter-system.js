@@ -645,3 +645,241 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 100);
 });
 
+// פונקציה לניקוי כל הפילטרים
+FilterSystem.prototype.clearFilters = function() {
+  console.log('🧹 Clearing all filters...');
+  
+  // איפוס הפילטרים הנוכחיים
+  this.currentFilters = {
+    status: [],
+    type: [],
+    account: [],
+    dateRange: '',
+    search: ''
+  };
+  
+  // איפוס ממשק המשתמש
+  this.resetFilterUI();
+  
+  // יישום הפילטרים (הצגת כל הנתונים)
+  this.applyAllFilters();
+  
+  console.log('✅ All filters cleared');
+};
+
+// פונקציה לאיפוס ממשק המשתמש
+FilterSystem.prototype.resetFilterUI = function() {
+  // איפוס שדה החיפוש
+  const searchInput = document.getElementById('searchFilterInput');
+  if (searchInput) {
+    searchInput.value = '';
+  }
+  
+  // איפוס פילטר סטטוס
+  const statusFilter = document.getElementById('selectedStatus');
+  if (statusFilter) {
+    statusFilter.textContent = 'כל הסטטוסים';
+  }
+  
+  // איפוס פילטר סוג
+  const typeFilter = document.getElementById('selectedType');
+  if (typeFilter) {
+    typeFilter.textContent = 'כל סוג השקעה';
+  }
+  
+  // איפוס פילטר חשבון
+  const accountFilter = document.getElementById('selectedAccount');
+  if (accountFilter) {
+    accountFilter.textContent = 'כל החשבונות';
+  }
+  
+  // איפוס פילטר תאריכים
+  const dateFilter = document.getElementById('selectedDateRange');
+  if (dateFilter) {
+    dateFilter.textContent = 'כל התאריכים';
+  }
+  
+  // סגירת תפריטים פתוחים
+  const openMenus = document.querySelectorAll('.filter-menu');
+  openMenus.forEach(menu => {
+    menu.style.display = 'none';
+  });
+  
+  // הסרת מצב פעיל מכפתורים
+  const activeButtons = document.querySelectorAll('.filter-toggle.active');
+  activeButtons.forEach(btn => {
+    btn.classList.remove('active');
+  });
+};
+
+// פונקציה לאיפוס פילטרים לפי העדפות המשתמש
+FilterSystem.prototype.resetToUserDefaults = async function() {
+  console.log('🔄 Resetting filters to user defaults...');
+  
+  try {
+    // קבלת העדפות המשתמש
+    const defaultStatusFilter = await this.getUserPreference('defaultStatusFilter') || 'all';
+    const defaultTypeFilter = await this.getUserPreference('defaultTypeFilter') || 'all';
+    const defaultAccountFilter = await this.getUserPreference('defaultAccountFilter') || 'all';
+    const defaultDateRangeFilter = await this.getUserPreference('defaultDateRangeFilter') || 'all';
+    const defaultSearchFilter = await this.getUserPreference('defaultSearchFilter') || '';
+    
+    console.log('📋 User preferences loaded:', {
+      status: defaultStatusFilter,
+      type: defaultTypeFilter,
+      account: defaultAccountFilter,
+      dateRange: defaultDateRangeFilter,
+      search: defaultSearchFilter
+    });
+    
+    // המרת ערכים מאנגלית לעברית
+    const statusTranslation = {
+      'all': 'הכול',
+      'open': 'פתוח',
+      'closed': 'סגור',
+      'canceled': 'מבוטל',
+    };
+
+    const typeTranslation = {
+      'all': 'הכול',
+      'swing': 'סווינג',
+      'investment': 'השקעה',
+      'passive': 'פסיבי'
+    };
+
+    const dateRangeTranslation = {
+      'all': 'כל התאריכים',
+      'today': 'היום',
+      'yesterday': 'אתמול',
+      'this_week': 'השבוע',
+      'last_week': 'שבוע קודם',
+      'this_month': 'החודש',
+      'last_month': 'חודש קודם',
+      'this_year': 'השנה',
+      'last_year': 'שנה קודמת',
+    };
+
+    // איפוס פילטר סטטוס
+    const statusValue = statusTranslation[defaultStatusFilter] || 'הכול';
+    this.setStatusFilter([statusValue]);
+    
+    // איפוס פילטר סוג
+    const typeValue = typeTranslation[defaultTypeFilter] || 'הכול';
+    this.setTypeFilter([typeValue]);
+    
+    // איפוס פילטר חשבון
+    if (defaultAccountFilter !== 'all') {
+      this.setAccountFilter([defaultAccountFilter]);
+    } else {
+      this.setAccountFilter([]);
+    }
+    
+    // איפוס פילטר תאריכים
+    const dateRangeValue = dateRangeTranslation[defaultDateRangeFilter] || 'כל התאריכים';
+    this.setDateRangeFilter(dateRangeValue);
+    
+    // איפוס פילטר חיפוש
+    this.setSearchFilter(defaultSearchFilter);
+    
+    // יישום הפילטרים
+    this.applyAllFilters();
+    
+    console.log('✅ Filters reset to user defaults');
+    
+  } catch (error) {
+    console.warn('⚠️ Failed to load user preferences, using fallback:', error);
+    // Fallback - ניקוי כל הפילטרים
+    this.clearFilters();
+  }
+};
+
+// פונקציה לקבלת העדפת משתמש
+FilterSystem.prototype.getUserPreference = async function(preferenceKey) {
+  try {
+    // נסיון לקבל מהשרת
+    if (typeof window.getCurrentPreference === 'function') {
+      return await window.getCurrentPreference(preferenceKey);
+    }
+    
+    // Fallback - localStorage
+    return localStorage.getItem(`preference_${preferenceKey}`) || null;
+  } catch (error) {
+    console.warn(`⚠️ Failed to get preference ${preferenceKey}:`, error);
+    return null;
+  }
+};
+
+// פונקציות עזר להגדרת פילטרים
+FilterSystem.prototype.setStatusFilter = function(statuses) {
+  this.currentFilters.status = statuses;
+  this.updateStatusFilterUI(statuses);
+};
+
+FilterSystem.prototype.setTypeFilter = function(types) {
+  this.currentFilters.type = types;
+  this.updateTypeFilterUI(types);
+};
+
+FilterSystem.prototype.setAccountFilter = function(accounts) {
+  this.currentFilters.account = accounts;
+  this.updateAccountFilterUI(accounts);
+};
+
+FilterSystem.prototype.setDateRangeFilter = function(dateRange) {
+  this.currentFilters.dateRange = dateRange;
+  this.updateDateRangeFilterUI(dateRange);
+};
+
+FilterSystem.prototype.setSearchFilter = function(search) {
+  this.currentFilters.search = search;
+  this.updateSearchFilterUI(search);
+};
+
+// פונקציות עזר לעדכון ממשק המשתמש
+FilterSystem.prototype.updateStatusFilterUI = function(statuses) {
+  const statusFilter = document.getElementById('selectedStatus');
+  if (statusFilter) {
+    if (statuses.length === 0 || statuses.includes('הכול')) {
+      statusFilter.textContent = 'כל הסטטוסים';
+    } else {
+      statusFilter.textContent = statuses.join(', ');
+    }
+  }
+};
+
+FilterSystem.prototype.updateTypeFilterUI = function(types) {
+  const typeFilter = document.getElementById('selectedType');
+  if (typeFilter) {
+    if (types.length === 0 || types.includes('הכול')) {
+      typeFilter.textContent = 'כל סוג השקעה';
+    } else {
+      typeFilter.textContent = types.join(', ');
+    }
+  }
+};
+
+FilterSystem.prototype.updateAccountFilterUI = function(accounts) {
+  const accountFilter = document.getElementById('selectedAccount');
+  if (accountFilter) {
+    if (accounts.length === 0 || accounts.includes('הכול')) {
+      accountFilter.textContent = 'כל החשבונות';
+    } else {
+      accountFilter.textContent = accounts.join(', ');
+    }
+  }
+};
+
+FilterSystem.prototype.updateDateRangeFilterUI = function(dateRange) {
+  const dateFilter = document.getElementById('selectedDateRange');
+  if (dateFilter) {
+    dateFilter.textContent = dateRange || 'כל התאריכים';
+  }
+};
+
+FilterSystem.prototype.updateSearchFilterUI = function(search) {
+  const searchInput = document.getElementById('searchFilterInput');
+  if (searchInput) {
+    searchInput.value = search || '';
+  }
+};
+

@@ -1,0 +1,17 @@
+# TikTrack Linter Automation - Cron Jobs
+# Add these lines to your crontab with: crontab -e
+
+# Daily linter check (Monday-Friday at 9 AM)
+0 9 * * 1-5 cd /path/to/tiktrack && npm run lint:scheduled
+
+# Weekly quality report (Sunday at 10 AM) 
+0 10 * * 0 cd /path/to/tiktrack && npm run quality:full
+
+# Hourly quick check during work hours (Monday-Friday 9 AM - 6 PM)
+0 9-18 * * 1-5 cd /path/to/tiktrack && npm run lint > /dev/null 2>&1
+
+# Example installation:
+# 1. Edit the paths above to match your installation
+# 2. Run: crontab -e
+# 3. Copy the lines above
+# 4. Save and exit

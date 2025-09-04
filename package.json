@@ -22,7 +22,17 @@
     "dev:normal": "TIKTRACK_DEV_MODE=true TIKTRACK_CACHE_DISABLED=false ./restart quick",
     "dev:no-cache": "TIKTRACK_DEV_MODE=true TIKTRACK_CACHE_DISABLED=true ./restart quick",
     "dev:production": "TIKTRACK_DEV_MODE=false TIKTRACK_CACHE_DISABLED=false ./restart quick",
-    "cache:clear": "curl -X POST http://localhost:8080/api/v1/cache/clear"
+    "cache:clear": "curl -X POST http://localhost:8080/api/v1/cache/clear",
+    "lint:watch": "nodemon --watch trading-ui/scripts --ext js --exec 'npm run lint'",
+    "lint:monitor": "concurrently 'npm run lint:watch' 'npm run dev:normal'",
+    "lint:dashboard": "npm run quality:report && echo 'Dashboard ready: open create_linter_dashboard.html'",
+    "lint:scheduled": "npm run lint && npm run quality:report && echo 'Scheduled linter check completed'",
+    "quality:full": "npm run validate:all && npm run performance:check",
+    "dev:lint": "concurrently 'npm run dev:normal' 'npm run lint:watch'",
+    "precommit:test": ".git/hooks/pre-commit",
+    "watch:linter": "node scripts/linter-watcher.js",
+    "monitor:realtime": "concurrently 'npm run watch:linter' 'npm run dev:normal'",
+    "setup:automation": "echo 'Setting up linter automation...' && npm run lint:dashboard"
   },
   "repository": {
     "type": "git",
@@ -39,6 +49,8 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^8.41.0",
     "@typescript-eslint/parser": "^8.41.0",
+    "chokidar-cli": "^3.0.0",
+    "concurrently": "^9.2.1",
     "eslint": "^9.34.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsdoc": "^54.1.1",
@@ -48,6 +60,7 @@
     "htmlhint": "^1.6.3",
     "htmlhint-stylish": "^1.0.3",
     "lighthouse": "^12.8.2",
+    "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
     "puppeteer": "^24.18.0",
     "stylelint": "^16.23.1",

@@ -687,6 +687,9 @@ class HeaderSystem {
                             <li><a class="tiktrack-dropdown-item" href="/server-monitor">ניטור שרת</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/cache-test">בדיקת Cache</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/constraints">אילוצים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/create_linter_dashboard.html">🏆 דשבורד לינטר</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/linter-realtime-monitor.html">🔍 מוניטור בזמן אמת</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/js-map">🗺️ מפת פונקציות JS</a></li>
                           </ul>
                         </li>
 

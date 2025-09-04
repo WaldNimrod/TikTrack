@@ -1,0 +1,5 @@
+#!/bin/bash
+# TikTrack Linter - Quick Access Script
+# קיצור דרך למערכת הלינטר
+
+./scripts/linter-lifecycle-manager.sh "$@"

@@ -479,7 +479,8 @@ class YahooFinanceAdapter:
             logger.info(f"📊 {symbol}: Available meta keys: {list(meta.keys())}")
             logger.info(f"📊 {symbol}: Current price: ${current_price}")
             
-            # Try to get change data directly from Yahoo
+            # Enhanced daily change calculation with multiple fallback mechanisms
+            # First, try to get change data directly from Yahoo
             if 'regularMarketChange' in meta:
                 quote.change_amount = float(meta['regularMarketChange'])
                 logger.info(f"📊 {symbol}: Direct change_amount from Yahoo = {quote.change_amount}")
@@ -489,8 +490,14 @@ class YahooFinanceAdapter:
                 quote.change_amount = current_price - previous_close
                 logger.info(f"📊 {symbol}: Calculated change_amount = {current_price} - {previous_close} = {quote.change_amount}")
             else:
-                logger.warning(f"📊 {symbol}: No previous close data available for change calculation")
+                # Fallback: Try to get previous close from cached data
+                quote.change_amount = self._calculate_change_from_cache(symbol, current_price)
+                if quote.change_amount is not None:
+                    logger.info(f"📊 {symbol}: Change calculated from cache: {quote.change_amount}")
+                else:
+                    logger.warning(f"📊 {symbol}: No previous close data available for change calculation")
             
+            # Calculate percentage change with enhanced logic
             if 'regularMarketChangePercent' in meta:
                 quote.change_pct = float(meta['regularMarketChangePercent'])
                 logger.info(f"📊 {symbol}: Direct change_pct from Yahoo = {quote.change_pct}%")
@@ -502,6 +509,13 @@ class YahooFinanceAdapter:
                     logger.info(f"📊 {symbol}: Calculated change_pct = ({quote.change_amount} / {previous_close}) * 100 = {quote.change_pct:.2f}%")
                 else:
                     logger.warning(f"📊 {symbol}: Previous close is 0, cannot calculate percentage change")
+            elif quote.change_amount is not None:
+                # Fallback: Calculate from cached data  
+                quote.change_pct = self._calculate_change_pct_from_cache(symbol, current_price, quote.change_amount)
+                if quote.change_pct is not None:
+                    logger.info(f"📊 {symbol}: Change percentage calculated from cache: {quote.change_pct:.2f}%")
+                else:
+                    logger.warning(f"📊 {symbol}: Cannot calculate percentage change - missing previous close data")
             else:
                 logger.warning(f"📊 {symbol}: Cannot calculate percentage change - missing data")
             
@@ -907,3 +921,132 @@ class YahooFinanceAdapter:
         except SQLAlchemyError as e:
             logger.error(f"Error cleaning up old data: {e}")
             self.db_session.rollback()
+    
+    def _calculate_change_from_cache(self, symbol: str, current_price: float) -> Optional[float]:
+        """Calculate change amount using cached previous close from database"""
+        try:
+            # Get ticker
+            ticker = self.db_session.query(Ticker).filter(Ticker.symbol == symbol).first()
+            if not ticker:
+                return None
+            
+            # Get most recent quote from yesterday or earlier (not today)
+            from datetime import date, timedelta
+            today = date.today()
+            yesterday = today - timedelta(days=1)
+            
+            # Look for previous day's close price
+            previous_quote = self.db_session.query(MarketDataQuote).filter(
+                MarketDataQuote.ticker_id == ticker.id,
+                MarketDataQuote.provider_id == self.provider_id,
+                MarketDataQuote.asof_utc < datetime.combine(today, datetime.min.time(), timezone.utc)
+            ).order_by(MarketDataQuote.asof_utc.desc()).first()
+            
+            if previous_quote:
+                change_amount = current_price - previous_quote.price
+                logger.info(f"📊 {symbol}: Calculated change from cache: current={current_price}, previous={previous_quote.price}, change={change_amount}")
+                return change_amount
+            else:
+                logger.debug(f"📊 {symbol}: No previous quote found in cache for change calculation")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Error calculating change from cache for {symbol}: {e}")
+            return None
+    
+    def _calculate_change_pct_from_cache(self, symbol: str, current_price: float, change_amount: float) -> Optional[float]:
+        """Calculate change percentage using cached data"""
+        try:
+            if change_amount is None:
+                return None
+                
+            previous_close = current_price - change_amount
+            if previous_close > 0:
+                change_pct = (change_amount / previous_close) * 100
+                logger.info(f"📊 {symbol}: Calculated change_pct from cache: change={change_amount}, previous_close={previous_close}, pct={change_pct:.2f}%")
+                return change_pct
+            else:
+                logger.warning(f"📊 {symbol}: Invalid previous close calculated: {previous_close}")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Error calculating change percentage from cache for {symbol}: {e}")
+            return None
+    
+    def _get_enhanced_quote_data(self, symbol: str) -> Optional[QuoteData]:
+        """Get quote data with enhanced fallback mechanisms for daily change"""
+        try:
+            # First try regular quote fetch
+            quote = self.get_quote(symbol)
+            if not quote:
+                return None
+            
+            # If we don't have daily change data, try enhanced calculation
+            if quote.change_amount is None or quote.change_pct is None:
+                logger.info(f"📊 {symbol}: Attempting enhanced daily change calculation")
+                
+                # Try to get historical data for better change calculation
+                historical_quote = self._get_historical_quote(symbol, days_back=1)
+                if historical_quote:
+                    if quote.change_amount is None:
+                        quote.change_amount = quote.price - historical_quote['close']
+                        logger.info(f"📊 {symbol}: Enhanced change_amount = {quote.price} - {historical_quote['close']} = {quote.change_amount}")
+                    
+                    if quote.change_pct is None and quote.change_amount is not None:
+                        if historical_quote['close'] > 0:
+                            quote.change_pct = (quote.change_amount / historical_quote['close']) * 100
+                            logger.info(f"📊 {symbol}: Enhanced change_pct = {quote.change_pct:.2f}%")
+            
+            return quote
+            
+        except Exception as e:
+            logger.error(f"Error getting enhanced quote data for {symbol}: {e}")
+            return None
+    
+    def _get_historical_quote(self, symbol: str, days_back: int = 1) -> Optional[Dict[str, Any]]:
+        """Get historical quote data for enhanced calculations"""
+        try:
+            from datetime import date, timedelta
+            
+            end_date = date.today()
+            start_date = end_date - timedelta(days=days_back + 5)  # Get more data for reliability
+            
+            url = f"{self.base_url}/v8/finance/chart/{symbol}"
+            params = {
+                'interval': '1d',
+                'period1': int(start_date.strftime('%s')),
+                'period2': int(end_date.strftime('%s'))
+            }
+            
+            data = self._make_request(url, params)
+            if not data:
+                return None
+            
+            if 'chart' not in data or 'result' not in data['chart'] or not data['chart']['result']:
+                return None
+            
+            result = data['chart']['result'][0]
+            if 'timestamp' not in result or 'indicators' not in result:
+                return None
+            
+            # Get the most recent historical close
+            timestamps = result['timestamp']
+            quotes = result['indicators']['quote'][0]
+            
+            if timestamps and quotes['close']:
+                # Find the most recent valid close price
+                for i in range(len(timestamps) - 1, -1, -1):
+                    if quotes['close'][i] is not None:
+                        close_price = float(quotes['close'][i])
+                        historical_date = datetime.fromtimestamp(timestamps[i], tz=timezone.utc)
+                        logger.info(f"📊 {symbol}: Found historical close: ${close_price} on {historical_date.date()}")
+                        return {
+                            'close': close_price,
+                            'date': historical_date
+                        }
+            
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error getting historical quote for {symbol}: {e}")
+            return None

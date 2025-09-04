@@ -38,5 +38,7 @@ pytest-html==4.1.1
 pytest-xdist==3.3.1
 psutil==5.9.6
 schedule==1.2.0
+pytz==2023.3
+yfinance==0.2.18
 
 

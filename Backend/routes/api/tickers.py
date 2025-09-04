@@ -207,8 +207,8 @@ def create_ticker():
             # Initialize adapter with database session
             yahoo_adapter = YahooFinanceAdapter(db, provider.id)
             
-            # Now try to get and cache quote for the newly created ticker
-            quote_data = yahoo_adapter.get_quote(data['symbol'])
+            # Now try to get and cache quote for the newly created ticker (using enhanced method)
+            quote_data = yahoo_adapter._get_enhanced_quote_data(data['symbol'])
             if quote_data and quote_data.price:
                 external_data_available = True
                 logger.info(f"✅ External data fetched and cached for new ticker {data['symbol']}: ${quote_data.price}")

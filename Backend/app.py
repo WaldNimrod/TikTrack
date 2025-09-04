@@ -627,28 +627,42 @@ def get_data_refresh_scheduler_status() -> Any:
 def get_yahoo_quote(symbol: str) -> Any:
     """Get real-time quote from Yahoo Finance"""
     try:
-        # Direct import and usage
-        import sys
-        import os
-        external_data_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'external_data_integration_server')
-        if external_data_path not in sys.path:
-            sys.path.insert(0, external_data_path)
+        # Use the enhanced YahooFinanceAdapter from services
+        from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
+        from models.external_data import ExternalDataProvider
+        from config.database import get_db
         
-        from providers.yahoo_finance import YahooFinanceAdapter
+        # Get database session
+        db = next(get_db())
         
-        adapter = YahooFinanceAdapter()
-        data = adapter.fetch_quote_data(symbol.upper())
+        # Get Yahoo Finance provider
+        provider = db.query(ExternalDataProvider).filter(
+            ExternalDataProvider.name == 'yahoo_finance'
+        ).first()
         
-        if data:
+        if not provider:
+            return jsonify({
+                "status": "error", 
+                "error": "Yahoo Finance provider not configured",
+                "timestamp": datetime.now().isoformat()
+            }), 503
+        
+        # Initialize adapter with enhanced functionality
+        adapter = YahooFinanceAdapter(db, provider.id)
+        quote_data = adapter._get_enhanced_quote_data(symbol.upper())
+        
+        if quote_data:
             return jsonify({
                 "status": "success",
                 "data": {
                     "symbol": symbol.upper(),
-                    "price": data.get("price"),
-                    "change_percent": data.get("change_percent"),
-                    "volume": data.get("volume"),
-                    "timestamp": data.get("timestamp"),
-                    "currency": data.get("currency", "USD")
+                    "price": quote_data.price,
+                    "change_amount": quote_data.change_amount,
+                    "change_percent": quote_data.change_pct,
+                    "volume": quote_data.volume,
+                    "asof_utc": quote_data.asof_utc.isoformat() if quote_data.asof_utc else None,
+                    "currency": quote_data.currency,
+                    "source": quote_data.source
                 },
                 "timestamp": datetime.now().isoformat()
             }), 200
@@ -666,6 +680,9 @@ def get_yahoo_quote(symbol: str) -> Any:
             "error": str(e),
             "timestamp": datetime.now().isoformat()
         }), 500
+    finally:
+        if 'db' in locals():
+            db.close()
 
 @app.route("/api/external-data/yahoo/quotes", methods=["POST"])
 @rate_limit_api(requests_per_minute=30)
@@ -717,21 +734,24 @@ def get_yahoo_quotes() -> Any:
             
             for symbol in symbols[:10]:  # Limit to 10 symbols
                 try:
-                    quote_data = adapter.get_quote(symbol.upper())
+                    # Use enhanced quote data method for better daily change calculation
+                    quote_data = adapter._get_enhanced_quote_data(symbol.upper())
                     if quote_data:
                         results[symbol.upper()] = {
                             "price": quote_data.price,
+                            "change_amount": quote_data.change_amount,
                             "change_percent": quote_data.change_pct,
                             "volume": quote_data.volume,
-                            "timestamp": quote_data.asof_utc.isoformat() if quote_data.asof_utc else None,
-                            "currency": quote_data.currency
+                            "asof_utc": quote_data.asof_utc.isoformat() if quote_data.asof_utc else None,
+                            "currency": quote_data.currency,
+                            "source": quote_data.source
                         }
-                        logger.info(f"✅ Fetched and cached quote for {symbol}: ${quote_data.price}")
+                        logger.info(f"✅ Fetched and cached enhanced quote for {symbol}: ${quote_data.price} (change: {quote_data.change_pct:.2f}%)" if quote_data.change_pct else f"✅ Fetched quote for {symbol}: ${quote_data.price}")
                     else:
                         results[symbol.upper()] = {"error": "No data available"}
-                        logger.warning(f"⚠️ No data available for {symbol}")
+                        logger.warning(f"⚠️ No enhanced data available for {symbol}")
                 except Exception as e:
-                    logger.warning(f"Failed to fetch data for {symbol}: {e}")
+                    logger.warning(f"Failed to fetch enhanced data for {symbol}: {e}")
                     results[symbol.upper()] = {"error": str(e)}
         finally:
             db_session.close()
@@ -755,7 +775,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
 
 # Path to UI files
-UI_DIR = "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui"
+UI_DIR = "/workspace/trading-ui"
 
 # Check if DB file exists
 if not os.path.exists(DB_PATH):

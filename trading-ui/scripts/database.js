@@ -1,6 +1,6 @@
 /**
  * ========================================
- * DB Display - Database Display Page Management
+ * Database Management - Database Display Page Management
  * ========================================
  *
  * This file contains all database display page functionality for the TikTrack application.
@@ -17,9 +17,10 @@
  * - Column mappings are centralized in table-mappings.js
  * - Sorting uses global window.sortTableData() function
  *
- * File: trading-ui/scripts/db_display.js
- * Version: 1.0
- * Last Updated: September 1, 2025
+ * File: trading-ui/scripts/database.js (renamed from db_display.js)
+ * Version: 1.1
+ * Last Updated: September 2025
+ * Note: Renamed from db_display.js as part of JavaScript architecture standardization
  */
 
 // ===== GLOBAL VARIABLES =====

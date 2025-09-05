@@ -150,6 +150,9 @@ async function loadPreferences() {
 
   // עדכון הממשק יבוצע אחרי טעינת החשבונות
   
+  // הגדרת currentPreferences כגלובלי
+  window.currentPreferences = currentPreferences;
+  
   // טעינת צבעים למערכת הצבעים הגלובלית
   if (window.loadAllColorsFromPreferences) {
     window.loadAllColorsFromPreferences(currentPreferences);
@@ -1420,12 +1423,10 @@ function updateExistingHeadersWithNewOpacity() {
     // עדכון כותרות ראשיות - תחת top-section
     const mainHeaders = document.querySelectorAll('.top-section .section-header');
     mainHeaders.forEach(header => {
-      // הסרת כל המחלקות הישנות
-      const classList = Array.from(header.classList);
-      classList.forEach(cls => {
-        if (cls.includes('-main-header') || cls.includes('-sub-header')) {
-          header.classList.remove(cls);
-        }
+      // הסרת כל המחלקות הישנות של ישויות
+      VALID_ENTITY_TYPES.forEach(type => {
+        header.classList.remove(`entity-${type}-main-header`);
+        header.classList.remove(`entity-${type}-sub-header`);
       });
       
       // הוספת המחלקה החדשה לפי סוג העמוד
@@ -1447,12 +1448,10 @@ function updateExistingHeadersWithNewOpacity() {
     // עדכון כותרות משניות - תחת content-section
     const subHeaders = document.querySelectorAll('.content-section .section-header');
     subHeaders.forEach(header => {
-      // הסרת כל המחלקות הישנות
-      const classList = Array.from(header.classList);
-      classList.forEach(cls => {
-        if (cls.includes('-main-header') || cls.includes('-sub-header')) {
-          header.classList.remove(cls);
-        }
+      // הסרת כל המחלקות הישנות של ישויות
+      VALID_ENTITY_TYPES.forEach(type => {
+        header.classList.remove(`entity-${type}-main-header`);
+        header.classList.remove(`entity-${type}-sub-header`);
       });
       
       // הוספת המחלקה החדשה לפי סוג העמוד

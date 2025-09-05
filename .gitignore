@@ -108,3 +108,11 @@ logs
 # Linter output
 lint-output.txt
 eslint-report.txt
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+Backend/db/*.db
+Backend/db/*.db-shm
+Backend/db/*.db-wal

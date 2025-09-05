@@ -28,9 +28,11 @@
 /* Linked Items Modal Styles */
 /* ========================= */
 
-/* Modal Container */
+/* RTL Support for Linked Items Modal */
 .linked-items-container {
     padding: 1rem;
+    direction: rtl !important;
+    text-align: right !important;
 }
 
 /* Linked Items List */
@@ -48,6 +50,8 @@
     border-radius: 8px;
     background-color: #f8f9fa;
     transition: all 0.3s ease;
+    direction: rtl !important;
+    text-align: right !important;
 }
 
 .linked-item-row:hover {
@@ -93,12 +97,16 @@
     font-size: 1.1rem;
     margin-bottom: 0.5rem;
     color: #495057;
+    text-align: right !important;
+    direction: rtl !important;
 }
 
 /* Linked Item Description */
 .linked-item-description {
     color: #6c757d;
     font-size: 0.9rem;
+    text-align: right !important;
+    direction: rtl !important;
     margin-bottom: 0.5rem;
 }
 
@@ -122,7 +130,8 @@
 /* Linked Item Actions */
 .linked-item-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start; /* ימין ב-RTL */
+    direction: rtl !important;
 }
 
 .linked-item-actions .btn-group {
@@ -171,6 +180,7 @@
 
     .linked-item-actions {
         justify-content: center;
+        direction: rtl !important;
     }
 }
 

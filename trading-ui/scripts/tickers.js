@@ -90,6 +90,26 @@ function getCurrencySymbol(currencyId) {
 }
 
 /**
+ * חישוב משך הזמן שעבר מתאריך נתון - פורמט אחיד מלא
+ */
+function getTimeDuration(dateString) {
+  if (!dateString) return 'N/A';
+  
+  const now = new Date();
+  const date = new Date(dateString);
+  
+  if (isNaN(date.getTime())) return 'N/A';
+  
+  const diffMs = now - date;
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  
+  // פורמט אחיד: ימים:שעות:דקות
+  return `${diffDays.toString().padStart(2, '0')}:${diffHours.toString().padStart(2, '0')}:${diffMinutes.toString().padStart(2, '0')}`;
+}
+
+/**
  * קבלת עיצוב סוג טיקר
  */
 function getTickerTypeStyle(type) {
@@ -1574,8 +1594,11 @@ function updateTickersSummaryStats(tickers) {
       const latest = new Date(Math.max(...validExternalDates));
       const oldest = new Date(Math.min(...validExternalDates));
 
-      latestUpdate = latest.toLocaleString('he-IL');
-      oldestUpdate = oldest.toLocaleString('he-IL');
+      const latestDuration = getTimeDuration(latest.toISOString());
+      const oldestDuration = getTimeDuration(oldest.toISOString());
+
+      latestUpdate = `${latest.toLocaleString('he-IL')} (${latestDuration})`;
+      oldestUpdate = `${oldest.toLocaleString('he-IL')} (${oldestDuration})`;
     }
 
     // עדכון השדות ב-HTML
@@ -1589,6 +1612,7 @@ function updateTickersSummaryStats(tickers) {
     handleSystemError(error, 'עדכון סטטיסטיקות סיכום');
   }
 }
+
 
 /**
  * עדכון טבלת טיקרים - גרסה פשוטה
@@ -1651,6 +1675,10 @@ function updateTickersTable(tickers) {
       const changeSign = changePercent >= 0 ? '+' : '';
       const changeDisplay = (changePercent !== 'N/A' && changePercent !== null && changePercent !== undefined) ?
         `${changeSign}${changePercent.toFixed(2)}%` : 'N/A';
+      
+      // עיגול מחיר לעד 2 ספרות אחרי הנקודה
+      const formattedPrice = (currentPrice !== 'N/A' && currentPrice !== null && currentPrice !== undefined) ?
+        `$${parseFloat(currentPrice).toFixed(2)}` : 'N/A';
 
       return `
                 <tr>
@@ -1673,7 +1701,14 @@ function updateTickersTable(tickers) {
                             ${statusLabel}
                         </span>
                     </td>
-                    <td title="${ticker.active_trades ? 'יש טריידים פעילים' : 'אין טריידים פעילים'}">${ticker.active_trades ? '✅' : '❌'}</td>
+                    <td title="${ticker.active_trades ? 'יש טריידים פעילים' : 'אין טריידים פעילים'}" style="text-align: center;">
+                        <span class="btn btn-sm ${ticker.active_trades ? 'btn-success' : 'btn-danger'}" 
+                              style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
+                            ${ticker.active_trades ? '✓' : '✗'}
+                        </span>
+                    </td>
+                    <td title="${formattedPrice !== 'N/A' ? `מחיר נוכחי: ${formattedPrice}` : 'אין נתוני מחיר'}" style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">${formattedPrice}</td>
+                    <td title="${changeDisplay !== 'N/A' ? `שינוי יומי: ${changeDisplay}` : 'אין נתוני שינוי'}" style="color: ${changeColor}; font-weight: bold; text-align: center; direction: ltr;">${changeDisplay}</td>
                     <td title="${typeLabel}">
                         <span style="background-color: ${typeStyle.backgroundColor}; 
                                      color: ${typeStyle.color}; 
@@ -1686,11 +1721,11 @@ function updateTickersTable(tickers) {
                             ${typeLabel}
                         </span>
                     </td>
-                    <td title="${currentPrice !== 'N/A' ? `מחיר נוכחי: ${currentPrice}` : 'אין נתוני מחיר'}" style="color: ${changeColor}; font-weight: bold;">${currentPrice !== 'N/A' ? `$${currentPrice}` : 'N/A'}</td>
-                    <td title="${changeDisplay !== 'N/A' ? `שינוי יומי: ${changeDisplay}` : 'אין נתוני שינוי'}" style="color: ${changeColor}; font-weight: bold;">${changeDisplay}</td>
                     <td title="${ticker.name || 'N/A'}">${ticker.name || 'N/A'}</td>
-                    <td title="${ticker.created_at ? new Date(ticker.created_at).toLocaleDateString('he-IL') : 'N/A'}">${ticker.created_at ? new Date(ticker.created_at).toLocaleDateString('he-IL') : 'N/A'}</td>
                     <td title="${ticker.remarks || '-'}">${ticker.remarks || '-'}</td>
+                    <td title="${ticker.yahoo_updated_at ? `עודכן: ${new Date(ticker.yahoo_updated_at).toLocaleString('he-IL')}` : 'אין נתוני עדכון'}" style="text-align: center;">
+                        ${ticker.yahoo_updated_at ? getTimeDuration(ticker.yahoo_updated_at) : 'N/A'}
+                    </td>
                     <td class="actions-cell">
                         <div class="btn-group btn-group-sm" role="group">
                             <button class="btn btn-outline-info" 
@@ -1728,6 +1763,11 @@ function updateTickersTable(tickers) {
     }
     
     console.log(`📊 טבלת טיקרים עודכנה עם ${tickers.length} פריטים`);
+
+    // סידור ברירת מחדל לפי העמודה הראשונה (סמל) - רק אם אין סידור קיים
+    if (typeof window.applyDefaultSort === 'function') {
+      window.applyDefaultSort('tickers', tickers, updateTickersTable);
+    }
 
     // עדכון סטטיסטיקות סיכום
     updateTickersSummaryStats(tickers);
@@ -1816,6 +1856,7 @@ function restoreSortState() {
 
 // הגדרת הפונקציות כגלובליות
 window.sortTable = sortTable;
+window.updateTickersTable = updateTickersTable;
 window.updateTickersSummaryStats = updateTickersSummaryStats;
 window.loadCurrenciesData = loadCurrenciesData;
 window.getCurrencySymbol = getCurrencySymbol;

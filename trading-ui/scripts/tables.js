@@ -149,7 +149,7 @@ function getColumnValue(item, columnIndex, tableType) {
       'id', 'name', 'currency_name', 'balance', 'status', 'created_at',
     ],
     'tickers': [
-      'id', 'symbol', 'name', 'price', 'change_percent', 'volume', 'market_cap',
+      'symbol', 'status', 'active_trades', 'current_price', 'change_percent', 'type', 'name', 'remarks', 'yahoo_updated_at',
     ],
     'trade_plans': [
       'id', 'symbol', 'side', 'investment_type', 'status', 'target_price', 'stop_loss', 'created_at',
@@ -186,6 +186,59 @@ function getColumnValue(item, columnIndex, tableType) {
   return item[fieldName] || '';
 }
 
+/**
+ * Get custom sort value for specific table types and columns
+ * Returns null if no custom logic applies
+ *
+ * @param {Object} a - First item
+ * @param {Object} b - Second item
+ * @param {number} columnIndex - Column index
+ * @param {string} tableType - Table type
+ * @param {*} aValue - First item value
+ * @param {*} bValue - Second item value
+ * @returns {number|null} Custom sort result or null
+ */
+function getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue) {
+  // Custom sorting for tickers table
+  if (tableType === 'tickers') {
+    // Status column (index 1) - פתוח > סגור > מבוטל
+    if (columnIndex === 1) {
+      const statusOrder = { 'open': 1, 'closed': 2, 'cancelled': 3 };
+      const aOrder = statusOrder[aValue] || 999;
+      const bOrder = statusOrder[bValue] || 999;
+      return aOrder - bOrder;
+    }
+
+    // Active trades column (index 2) - יש טריידים (true) > אין טריידים (false)
+    if (columnIndex === 2) {
+      const aHasTrades = aValue === true || aValue === 1 || aValue === 'true' || aValue === '1';
+      const bHasTrades = bValue === true || bValue === 1 || bValue === 'true' || bValue === '1';
+      if (aHasTrades && !bHasTrades) return -1;
+      if (!aHasTrades && bHasTrades) return 1;
+      return 0;
+    }
+
+    // Change percent column (index 4) - ערכים חיוביים ראשון, אחר כך שליליים
+    if (columnIndex === 4) {
+      const aNum = parseFloat(aValue) || 0;
+      const bNum = parseFloat(bValue) || 0;
+      
+      // אם אחד חיובי ואחד שלילי
+      if (aNum > 0 && bNum < 0) return -1;
+      if (aNum < 0 && bNum > 0) return 1;
+      
+      // אם שניהם באותו סימן, סדר לפי הערך
+      return aNum - bNum;
+    }
+  }
+
+  // Custom sorting for other table types can be added here
+  // if (tableType === 'trades') { ... }
+  // if (tableType === 'accounts') { ... }
+
+  return null; // No custom logic applies
+}
+
 window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
   // Global sortTableData called for table
 
@@ -202,30 +255,78 @@ window.sortTableData = function (columnIndex, data, tableType, updateFunction) {
   // Save new sort state
   window.saveSortState(tableType, columnIndex, newDirection);
 
-  // Sort the data
+  // Sort the data with custom logic for specific table types
   const sortedData = [...data].sort((a, b) => {
+    // Primary sort by current column
     let aValue = getColumnValue(a, columnIndex, tableType);
     let bValue = getColumnValue(b, columnIndex, tableType);
 
-    // Convert to numbers if possible
-    if (!isNaN(aValue) && !isNaN(bValue)) {
-      aValue = parseFloat(aValue);
-      bValue = parseFloat(bValue);
+    // Custom sorting logic for specific table types and columns
+    const customSortResult = getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue);
+    if (customSortResult !== null) {
+      const primaryResult = newDirection === 'asc' ? customSortResult : -customSortResult;
+      if (primaryResult !== 0) return primaryResult;
+    } else {
+      // Standard sorting logic
+      // Convert to numbers if possible
+      if (!isNaN(aValue) && !isNaN(bValue)) {
+        aValue = parseFloat(aValue);
+        bValue = parseFloat(bValue);
+      }
+
+      // Convert to dates if possible
+      if (isDateValue(aValue) && isDateValue(bValue)) {
+        aValue = new Date(aValue);
+        bValue = new Date(bValue);
+      }
+
+      // Perform sort comparison
+      if (aValue < bValue) {
+        const primaryResult = newDirection === 'asc' ? -1 : 1;
+        if (primaryResult !== 0) return primaryResult;
+      }
+      if (aValue > bValue) {
+        const primaryResult = newDirection === 'asc' ? 1 : -1;
+        if (primaryResult !== 0) return primaryResult;
+      }
     }
 
-    // Convert to dates if possible
-    if (isDateValue(aValue) && isDateValue(bValue)) {
-      aValue = new Date(aValue);
-      bValue = new Date(bValue);
+    // Secondary sort by previous column if exists
+    if (currentSortState.columnIndex !== null && currentSortState.columnIndex !== columnIndex) {
+      const prevColumnIndex = currentSortState.columnIndex;
+      const prevDirection = currentSortState.direction;
+      
+      let aPrevValue = getColumnValue(a, prevColumnIndex, tableType);
+      let bPrevValue = getColumnValue(b, prevColumnIndex, tableType);
+
+      // Custom sorting logic for previous column
+      const prevCustomSortResult = getCustomSortValue(a, b, prevColumnIndex, tableType, aPrevValue, bPrevValue);
+      if (prevCustomSortResult !== null) {
+        return prevDirection === 'asc' ? prevCustomSortResult : -prevCustomSortResult;
+      }
+
+      // Standard sorting logic for previous column
+      // Convert to numbers if possible
+      if (!isNaN(aPrevValue) && !isNaN(bPrevValue)) {
+        aPrevValue = parseFloat(aPrevValue);
+        bPrevValue = parseFloat(bPrevValue);
+      }
+
+      // Convert to dates if possible
+      if (isDateValue(aPrevValue) && isDateValue(bPrevValue)) {
+        aPrevValue = new Date(aPrevValue);
+        bPrevValue = new Date(bPrevValue);
+      }
+
+      // Perform secondary sort comparison
+      if (aPrevValue < bPrevValue) {
+        return prevDirection === 'asc' ? -1 : 1;
+      }
+      if (aPrevValue > bPrevValue) {
+        return prevDirection === 'asc' ? 1 : -1;
+      }
     }
 
-    // Perform sort comparison
-    if (aValue < bValue) {
-      return newDirection === 'asc' ? -1 : 1;
-    }
-    if (aValue > bValue) {
-      return newDirection === 'asc' ? 1 : -1;
-    }
     return 0;
   });
 
@@ -348,6 +449,22 @@ window.restoreAnyTableSort = function (tableType, data, updateFunction) {
 };
 
 /**
+ * Apply default sorting to table (first column, ascending)
+ * Only applies if no sort state exists
+ *
+ * @param {string} tableType - Type of table
+ * @param {Array} data - Data to sort
+ * @param {Function} updateFunction - Function to update table
+ */
+window.applyDefaultSort = function (tableType, data, updateFunction) {
+  const sortState = window.getSortState(tableType);
+  if (!sortState || sortState.columnIndex === null || sortState.columnIndex === undefined) {
+    // Apply default sort by first column (index 0)
+    window.sortTableData(0, data, tableType, updateFunction);
+  }
+};
+
+/**
  * Close modal - moved here as it's often table-related
  *
  * @param {string} modalId - ID of modal to close
@@ -411,6 +528,8 @@ window.tables = {
   sortAnyTable: window.sortAnyTable,
   sortTable: window.sortTable,
   restoreAnyTableSort: window.restoreAnyTableSort,
+  applyDefaultSort: window.applyDefaultSort,
+  getCustomSortValue: getCustomSortValue,
   closeModal: window.closeModal,
   getDefaultColumnDefs: window.getDefaultColumnDefs,
 };

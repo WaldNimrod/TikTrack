@@ -41,121 +41,41 @@ const VALID_ENTITY_TYPES = [
   'preference',       // העדפות
 ];
 
-// ===== UNIFIED COLOR SCHEME =====
-// מפתח צבעים מאוחד
+// ===== DYNAMIC COLOR SCHEME =====
+// מערכת צבעים דינמית
 
 /**
- * מפתח צבעים עיקרי לכל סוגי הישויות
- * Primary color scheme for all entity types
+ * צבעי ישויות דינמיים - נטענים מההעדפות
+ * Dynamic entity colors - loaded from preferences
  */
-const ENTITY_COLORS = {
-  // Trading & Investment - כחולים
-  'trade': '#007bff',           // כחול בהיר
-  'trade_plan': '#0056b3',      // כחול כהה
-  'execution': '#17a2b8',       // כחול טורקיז
-
-  // Financial - ירוקים
-  'account': '#28a745',         // ירוק בהיר
-  'cash_flow': '#20c997',       // ירוק טורקיז
-
-  // Market Data - אדומים וכתומים
-  'ticker': '#dc3545',          // אדום
-  'alert': '#ff9c05',           // כתום לוגו
-
-  // Documentation - סגולים
-  'note': '#6f42c1',            // סגול
-
-  // System - אפורים
-  'constraint': '#6c757d',      // אפור
-  'design': '#495057',          // אפור כהה
-  'research': '#343a40',        // אפור כהה מאוד
-  'preference': '#adb5bd',       // אפור בהיר
-};
+let ENTITY_COLORS = {};
 
 /**
- * מפתח צבעי רקע שקופים
- * Transparent background colors
+ * צבעי רקע שקופים דינמיים - מחושבים מהצבעים העיקריים
+ * Dynamic transparent background colors - calculated from main colors
  */
-const ENTITY_BACKGROUND_COLORS = {
-  'trade': 'rgba(0, 123, 255, 0.1)',
-  'trade_plan': 'rgba(0, 86, 179, 0.1)',
-  'execution': 'rgba(23, 162, 184, 0.1)',
-  'account': 'rgba(40, 167, 69, 0.1)',
-  'cash_flow': 'rgba(32, 201, 151, 0.1)',
-  'ticker': 'rgba(220, 53, 69, 0.1)',
-  'alert': 'rgba(255, 156, 5, 0.1)',
-  'note': 'rgba(111, 66, 193, 0.1)',
-  'constraint': 'rgba(108, 117, 125, 0.1)',
-  'design': 'rgba(73, 80, 87, 0.1)',
-  'research': 'rgba(52, 58, 64, 0.1)',
-  'preference': 'rgba(173, 181, 189, 0.1)',
-};
+let ENTITY_BACKGROUND_COLORS = {};
 
 /**
- * מפתח צבעי סטטוסים - מבנה מלא כמו ערכים מספריים
- * Status colors scheme - full structure like numeric values
+ * צבעי סטטוסים דינמיים - נטענים מההעדפות
+ * Dynamic status colors - loaded from preferences
  */
-const STATUS_COLORS = {
-  'open': {
-    light: 'rgba(40, 167, 69, 0.1)',    // רקע בהיר
-    medium: '#28a745',                   // צבע ראשי
-    dark: '#155724',                     // צבע כהה
-    border: 'rgba(40, 167, 69, 0.3)',   // צבע גבול
-  },
-  'closed': {
-    light: 'rgba(108, 117, 125, 0.1)',
-    medium: '#6c757d',
-    dark: '#383d41',
-    border: 'rgba(108, 117, 125, 0.3)',
-  },
-  'cancelled': {
-    light: 'rgba(220, 53, 69, 0.1)',
-    medium: '#dc3545',
-    dark: '#721c24',
-    border: 'rgba(220, 53, 69, 0.3)',
-  },
-};
+let STATUS_COLORS = {};
 
 /**
- * מפתח צבעי טקסט על רקע צבעוני
- * Text colors for colored backgrounds
+ * צבעי טקסט דינמיים - מחושבים מהצבעים העיקריים
+ * Dynamic text colors - calculated from main colors
  */
-const ENTITY_TEXT_COLORS = {
-  'trade': '#0056b3',
-  'trade_plan': '#004085',
-  'execution': '#138496',
-  'account': '#1e7e34',
-  'cash_flow': '#17a2b8',
-  'ticker': '#c82333',
-  'alert': '#e55a00',
-  'note': '#5a32a3',
-  'constraint': '#495057',
-  'design': '#343a40',
-  'research': '#212529',
-  'preference': '#6c757d',
-};
+let ENTITY_TEXT_COLORS = {};
 
 /**
- * מפתח צבעי גבולות
- * Border colors
+ * צבעי גבולות דינמיים - מחושבים מהצבעים העיקריים
+ * Dynamic border colors - calculated from main colors
  */
-const ENTITY_BORDER_COLORS = {
-  'trade': 'rgba(0, 123, 255, 0.3)',
-  'trade_plan': 'rgba(0, 86, 179, 0.3)',
-  'execution': 'rgba(23, 162, 184, 0.3)',
-  'account': 'rgba(40, 167, 69, 0.3)',
-  'cash_flow': 'rgba(32, 201, 151, 0.3)',
-  'ticker': 'rgba(220, 53, 69, 0.3)',
-  'alert': 'rgba(255, 156, 5, 0.3)',
-  'note': 'rgba(111, 66, 193, 0.3)',
-  'constraint': 'rgba(108, 117, 125, 0.3)',
-  'design': 'rgba(73, 80, 87, 0.3)',
-  'research': 'rgba(52, 58, 64, 0.3)',
-  'preference': 'rgba(173, 181, 189, 0.3)',
-};
+let ENTITY_BORDER_COLORS = {};
 
 // ===== INVESTMENT TYPE SPECIFIC COLORS =====
-// צבעים ספציפיים לסוגי השקעה (לשמירה על תאימות לאחור)
+// צבעים ספציפיים לסוגי השקעה
 
 /**
  * סוגי השקעה תקפים במערכת
@@ -188,29 +108,113 @@ const INVESTMENT_TYPE_DESCRIPTIONS = {
 };
 
 /**
- * מפתח צבעים לסוגי השקעה - מבנה מלא
- * Investment type colors - full structure
+ * צבעי סוגי השקעה דינמיים - נטענים מההעדפות
+ * Dynamic investment type colors - loaded from preferences
  */
-const INVESTMENT_TYPE_COLORS = {
-  'swing': {
-    light: 'rgba(0, 123, 255, 0.1)',     // רקע בהיר
-    medium: '#007bff',                    // צבע ראשי
-    dark: '#0056b3',                      // צבע כהה
-    border: 'rgba(0, 123, 255, 0.3)',   // צבע גבול
-  },
-  'investment': {
-    light: 'rgba(40, 167, 69, 0.1)',
-    medium: '#28a745',
-    dark: '#155724',
-    border: 'rgba(40, 167, 69, 0.3)',
-  },
-  'passive': {
-    light: 'rgba(111, 66, 193, 0.1)',
-    medium: '#6f42c1',
-    dark: '#4a2c7a',
-    border: 'rgba(111, 66, 193, 0.3)',
-  },
-};
+let INVESTMENT_TYPE_COLORS = {};
+
+// ===== DYNAMIC COLOR LOADING =====
+// טעינת צבעים דינמית
+
+/**
+ * טעינת צבעי ישויות מההעדפות
+ * Load entity colors from preferences
+ * 
+ * @param {Object} preferences - העדפות המשתמש
+ */
+function loadEntityColorsFromPreferences(preferences) {
+  if (preferences && preferences.entityColors) {
+    ENTITY_COLORS = { ...preferences.entityColors };
+    
+    // חישוב צבעי רקע שקופים
+    ENTITY_BACKGROUND_COLORS = {};
+    ENTITY_TEXT_COLORS = {};
+    ENTITY_BORDER_COLORS = {};
+    
+    for (const [entityType, color] of Object.entries(ENTITY_COLORS)) {
+      if (color) {
+        // המרת hex ל-rgba
+        const rgb = hexToRgb(color);
+        if (rgb) {
+          ENTITY_BACKGROUND_COLORS[entityType] = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`;
+          ENTITY_BORDER_COLORS[entityType] = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`;
+          ENTITY_TEXT_COLORS[entityType] = darkenColor(color, 0.2);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * טעינת צבעי סטטוסים מההעדפות
+ * Load status colors from preferences
+ * 
+ * @param {Object} preferences - העדפות המשתמש
+ */
+function loadStatusColorsFromPreferences(preferences) {
+  if (preferences && preferences.statusColors) {
+    STATUS_COLORS = { ...preferences.statusColors };
+  }
+}
+
+/**
+ * טעינת צבעי סוגי השקעה מההעדפות
+ * Load investment type colors from preferences
+ * 
+ * @param {Object} preferences - העדפות המשתמש
+ */
+function loadInvestmentTypeColorsFromPreferences(preferences) {
+  if (preferences && preferences.investmentTypeColors) {
+    INVESTMENT_TYPE_COLORS = { ...preferences.investmentTypeColors };
+  }
+}
+
+/**
+ * טעינת כל הצבעים מההעדפות
+ * Load all colors from preferences
+ * 
+ * @param {Object} preferences - העדפות המשתמש
+ */
+function loadAllColorsFromPreferences(preferences) {
+  loadEntityColorsFromPreferences(preferences);
+  loadStatusColorsFromPreferences(preferences);
+  loadInvestmentTypeColorsFromPreferences(preferences);
+}
+
+/**
+ * המרת hex ל-RGB
+ * Convert hex to RGB
+ * 
+ * @param {string} hex - קוד צבע hex
+ * @returns {Object|null} - אובייקט RGB או null
+ */
+function hexToRgb(hex) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+
+/**
+ * הכהת צבע
+ * Darken color
+ * 
+ * @param {string} hex - קוד צבע hex
+ * @param {number} factor - גורם הכהה (0-1)
+ * @returns {string} - צבע מוכהה
+ */
+function darkenColor(hex, factor) {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return hex;
+  
+  const r = Math.floor(rgb.r * (1 - factor));
+  const g = Math.floor(rgb.g * (1 - factor));
+  const b = Math.floor(rgb.b * (1 - factor));
+  
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
 
 // ===== UTILITY FUNCTIONS =====
 // פונקציות עזר
@@ -1700,6 +1704,14 @@ window.colorSchemeSystem = {
   getMainHeaderOpacityHex,
   getSubHeaderOpacityHex,
   updateNumericValueColors,
+
+  // Dynamic color loading functions
+  loadEntityColorsFromPreferences,
+  loadStatusColorsFromPreferences,
+  loadInvestmentTypeColorsFromPreferences,
+  loadAllColorsFromPreferences,
+  hexToRgb,
+  darkenColor,
 
   // Constants
   VALID_ENTITY_TYPES,

@@ -98,17 +98,17 @@ const TABLE_COLUMN_MAPPINGS = {
   // טבלת טיקרים (Tickers) - Enhanced with Yahoo Finance Data
   'tickers': [
     'symbol',                // 0 - סמל
-    'active_trades',         // 1 - יש טריידים
-    'type',                  // 2 - סוג
-    'currency',              // 3 - מטבע
-    'current_price',         // 4 - מחיר נוכחי
-    'change_percent',        // 5 - שינוי %
-    'volume',                // 6 - נפח מסחר
-    'yahoo_updated_at',      // 7 - עודכן ב (נתוני Yahoo)
-    'name',                  // 8 - שם
-    'created_at',            // 9 - נוצר ב
-    'remarks',               // 10 - הערות
-    'status',                // 11 - סטטוס
+    'status',                // 1 - סטטוס
+    'active_trades',         // 2 - יש טריידים
+    'current_price',         // 3 - מחיר נוכחי
+    'change_percent',        // 4 - שינוי %
+    'type',                  // 5 - סוג
+    'name',                  // 6 - שם
+    'remarks',               // 7 - הערות
+    'yahoo_updated_at',      // 8 - עודכן (נתוני Yahoo)
+    'currency',              // 9 - מטבע
+    'volume',                // 10 - נפח מסחר
+    'created_at',            // 11 - נוצר ב (לא מוצג)
   ],
 
   // טבלת טיקרים חלקית (Tickers Summary) - Executions Page Structure

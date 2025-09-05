@@ -106,7 +106,7 @@ const DEFAULT_PREFERENCES = {
   },
   // הגדרות שקיפות כותרות
   headerOpacity: {
-    main: 60,
+    main: 100,
     sub: 30,
   },
 };
@@ -149,6 +149,11 @@ async function loadPreferences() {
   }
 
   // עדכון הממשק יבוצע אחרי טעינת החשבונות
+  
+  // טעינת צבעים למערכת הצבעים הגלובלית
+  if (window.loadAllColorsFromPreferences) {
+    window.loadAllColorsFromPreferences(currentPreferences);
+  }
 }
 
 /**
@@ -1075,8 +1080,8 @@ function updateEntityColor(entityType, colorValue) {
     currentPreferences.entityColors[entityType] = colorValue;
 
     // עדכון הצבע במערכת הצבעים הגלובלית
-    if (window.updateEntityColors) {
-      window.updateEntityColors(currentPreferences.entityColors);
+    if (window.loadAllColorsFromPreferences) {
+      window.loadAllColorsFromPreferences(currentPreferences);
     }
 
     // עדכון השדה המקושר (אם קיים)

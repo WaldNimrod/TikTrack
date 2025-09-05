@@ -778,7 +778,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "db", "simpleTrade_new.db")
 
 # Path to UI files
-UI_DIR = "/workspace/trading-ui"
+UI_DIR = os.path.join(os.path.dirname(BASE_DIR), "trading-ui")
 
 # Check if DB file exists
 if not os.path.exists(DB_PATH):

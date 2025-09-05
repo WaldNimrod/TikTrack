@@ -52,6 +52,31 @@
   
   <!-- 9. Page-specific styles (highest priority) -->
   <link rel="stylesheet" href="styles/db-display.css">
+  
+  <!-- 10. Page-specific color scheme initialization -->
+  <script>
+    // Initialize entity colors for database display page
+    document.addEventListener('DOMContentLoaded', function() {
+      // Define entity colors for database tables
+      const entityColors = {
+        'account': '#28a745',
+        'trade': '#007bff', 
+        'trade_plan': '#0056b3',
+        'execution': '#17a2b8',
+        'ticker': '#6f42c1',
+        'alert': '#ffc107',
+        'note': '#6c757d',
+        'cash_flow': '#20c997',
+        'constraint': '#6c757d',
+        'design': '#495057'
+      };
+      
+      // Set entity colors if the system is available
+      if (window.ENTITY_COLORS) {
+        Object.assign(window.ENTITY_COLORS, entityColors);
+      }
+    });
+  </script>
 </head>
 
 <body class="db-display-page">
@@ -95,6 +120,7 @@
             <div>סה"כ טיקרים: <strong id="tickersStats">0</strong></div>
             <div>סה"כ תוכניות: <strong id="tradePlansStats">0</strong></div>
             <div>סה"כ התראות: <strong id="alertsStats">0</strong></div>
+            <div>סה"כ תזרימי מזומנים: <strong id="cashFlowsStats">0</strong></div>
           </div>
         </div>
       </div> <!-- End top-section -->
@@ -167,8 +193,14 @@
                 <li class="foreign-key">Foreign key: account_id references accounts(id)</li>
                 <li class="default">Side defaults to 'Long'</li>
                 <li class="default">Status defaults to 'open'</li>
+                <li class="default">Stop_percentage defaults to 0.1</li>
+                <li class="default">Target_percentage defaults to 2000</li>
+                <li class="default">Current_price defaults to 0</li>
                 <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
                 <li class="unique">ID is auto-incrementing primary key</li>
+                <li class="trigger">Trigger: trigger_trade_plan_insert_ticker_status</li>
+                <li class="trigger">Trigger: trigger_trade_plan_update_ticker_status</li>
+                <li class="trigger">Trigger: trigger_trade_plan_delete_ticker_status</li>
               </ul>
             </div>
           </div>
@@ -237,9 +269,12 @@
                 <li class="constraint">Account_id and ticker_id are required (NOT NULL)</li>
                 <li class="default">Side defaults to 'Long'</li>
                 <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
-                <li class="unique">ID is primary key</li>
+                <li class="unique">ID is auto-incrementing primary key</li>
                 <li class="foreign-key">Foreign key: account_id references accounts(id)</li>
                 <li class="foreign-key">Foreign key: ticker_id references tickers(id)</li>
+                <li class="trigger">Trigger: trigger_trade_insert_ticker_status</li>
+                <li class="trigger">Trigger: trigger_trade_update_ticker_status</li>
+                <li class="trigger">Trigger: trigger_trade_delete_ticker_status</li>
               </ul>
             </div>
           </div>
@@ -303,10 +338,10 @@
                 <li class="constraint">Name field is required (NOT NULL)</li>
                 <li class="constraint">Currency_id field is required (NOT NULL)</li>
                 <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
-                <li class="default">Status defaults to 'open'</li>
+                <li class="default">Status_default defaults to 'open'</li>
                 <li class="unique">ID is auto-incrementing primary key</li>
                 <li class="foreign-key">Foreign key: currency_id references currencies(id)</li>
-                <li class="trigger">Protection trigger for last account deletion</li>
+                <li class="trigger">Protection trigger: protect_last_account_delete</li>
               </ul>
             </div>
           </div>
@@ -373,13 +408,8 @@
                 <li class="constraint">ID field is required (NOT NULL)</li>
                 <li class="default">Status defaults to 'open'</li>
                 <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
-                <li class="unique">ID is primary key</li>
-                <li class="unique">Symbol has unique index</li>
-                <li class="index">Index on id: ix_tickers_id</li>
+                <li class="unique">ID is auto-incrementing primary key</li>
                 <li class="unique">Symbol has unique constraint</li>
-                <li class="unique">ID is primary key</li>
-                <li class="default">Status defaults to 'open'</li>
-                <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
                 <li class="index">Index on id: ix_tickers_id</li>
                 <li class="index">Unique index on symbol: ix_tickers_symbol</li>
               </ul>
@@ -449,7 +479,7 @@
                 <li class="constraint">Trade_id, action, and quantity are required (NOT NULL)</li>
                 <li class="constraint">Price is required (NOT NULL)</li>
                 <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
-                <li class="unique">ID is primary key</li>
+                <li class="unique">ID is auto-incrementing primary key</li>
                 <li class="foreign-key">Foreign key: trade_id references trades(id)</li>
                 <li class="index">Index on id: ix_executions_id</li>
               </ul>
@@ -585,6 +615,73 @@
         </div>
       </div>
 
+      <!-- Cash Flows Section -->
+      <div class="content-section" id="cashFlowsSection">
+        <!-- Cash Flows header -->
+        <div class="section-header">
+          <div class="table-title">
+            <img src="images/icons/cash_flows.svg" alt="תזרימי מזומנים"
+              style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+            תזרימי מזומנים
+          </div>
+          <div class="table-count" id="cashFlowsCount">טוען...</div>
+          <div class="table-actions">
+            <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
+              <img src="images/icons/cash_flows.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;"> הוסף
+            </button>
+            <div class="action-separator"></div>
+            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור תזרימי מזומנים">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="table-responsive" id="cashFlowsContainer">
+            <table class="table" data-table-type="cash_flows">
+              <thead>
+                <tr>
+                  <th onclick="sortTable(0, 'cashFlowsTable')" style="width: 4%;">ID</th>
+                  <th onclick="sortTable(1, 'cashFlowsTable')" style="width: 8%;">Account ID</th>
+                  <th onclick="sortTable(2, 'cashFlowsTable')" style="width: 8%;">Type</th>
+                  <th onclick="sortTable(3, 'cashFlowsTable')" style="width: 8%;">Amount</th>
+                  <th onclick="sortTable(4, 'cashFlowsTable')" style="width: 8%;">Date</th>
+                  <th onclick="sortTable(5, 'cashFlowsTable')" style="width: 15%;">Description</th>
+                  <th onclick="sortTable(6, 'cashFlowsTable')" style="width: 8%;">Currency ID</th>
+                  <th onclick="sortTable(7, 'cashFlowsTable')" style="width: 8%;">USD Rate</th>
+                  <th onclick="sortTable(8, 'cashFlowsTable')" style="width: 8%;">Source</th>
+                  <th onclick="sortTable(9, 'cashFlowsTable')" style="width: 8%;">External ID</th>
+                  <th onclick="sortTable(10, 'cashFlowsTable')" style="width: 8%;">Created At</th>
+                  <th style="width: 8%;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="12" class="text-center">טוען נתונים...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Table Rules -->
+          <div class="table-rules-container fade-in">
+            <div class="table-rules-header">
+              <span class="rules-icon">📋</span>
+              <h6 class="table-rules-title">Table Rules & Constraints</h6>
+            </div>
+            <ul class="table-rules-list">
+              <li class="constraint">Account_id, type, and amount are required (NOT NULL)</li>
+              <li class="default">Currency_id defaults to 1</li>
+              <li class="default">USD_rate defaults to 1.000000</li>
+              <li class="default">Source defaults to 'manual'</li>
+              <li class="default">External_id defaults to '0'</li>
+              <li class="default">Created_at defaults to CURRENT_TIMESTAMP</li>
+              <li class="unique">ID is auto-incrementing primary key</li>
+              <li class="foreign-key">Foreign key: account_id references accounts(id)</li>
+              <li class="index">Index on id: ix_cash_flows_id</li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
     </div>
 

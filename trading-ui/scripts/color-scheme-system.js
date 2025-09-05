@@ -143,6 +143,34 @@ function loadEntityColorsFromPreferences(preferences) {
       }
     }
   }
+  
+  // יצירת CSS דינמי
+  generateAndApplyEntityCSS();
+}
+
+/**
+ * יצירת CSS דינמי ויישום על הדף
+ * Generate dynamic CSS and apply to page
+ */
+function generateAndApplyEntityCSS() {
+  try {
+    // יצירת CSS חדש
+    const newCSS = generateEntityCSS();
+    
+    // עדכון אלמנט ה-CSS
+    let styleElement = document.getElementById('dynamic-entity-colors');
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = 'dynamic-entity-colors';
+      document.head.appendChild(styleElement);
+    }
+    
+    styleElement.textContent = newCSS;
+    
+    console.log('✅ CSS דינמי נוצר והוחל על הדף');
+  } catch (error) {
+    console.error('❌ שגיאה ביצירת CSS דינמי:', error);
+  }
 }
 
 /**
@@ -692,6 +720,9 @@ function generateInvestmentTypeCSS() {
  * @returns {string} צבע מוכהה
  */
 function darkenColor(color, percent) {
+  if (!color || typeof color !== 'string') {
+    return '#6c757d'; // Return default gray if color is invalid
+  }
   const num = parseInt(color.replace('#', ''), 16);
   const amt = Math.round(2.55 * percent);
   const R = (num >> 16) - amt;
@@ -1419,6 +1450,12 @@ function applyEntityColorsToHeaders(entityType, excludeWarningModals = true) {
         return; // דלג על מודולי אזהרה
       }
       
+      // הסרת כל המחלקות הישנות של ישויות
+      VALID_ENTITY_TYPES.forEach(type => {
+        header.classList.remove(`entity-${type}-main-header`);
+        header.classList.remove(`entity-${type}-sub-header`);
+      });
+      
       header.classList.add(`entity-${entityType}-main-header`);
       console.log(`✅ כותרת ראשית קיבלה צבע ${entityType}`);
     });
@@ -1429,6 +1466,12 @@ function applyEntityColorsToHeaders(entityType, excludeWarningModals = true) {
       if (excludeWarningModals && isWarningModal(header)) {
         return; // דלג על מודולי אזהרה
       }
+      
+      // הסרת כל המחלקות הישנות של ישויות
+      VALID_ENTITY_TYPES.forEach(type => {
+        header.classList.remove(`entity-${type}-main-header`);
+        header.classList.remove(`entity-${type}-sub-header`);
+      });
       
       header.classList.add(`entity-${entityType}-sub-header`);
       console.log(`✅ כותרת משנית קיבלה צבע ${entityType}`);
@@ -1710,6 +1753,7 @@ window.colorSchemeSystem = {
   loadStatusColorsFromPreferences,
   loadInvestmentTypeColorsFromPreferences,
   loadAllColorsFromPreferences,
+  generateAndApplyEntityCSS,
   hexToRgb,
   darkenColor,
 

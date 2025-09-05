@@ -1541,6 +1541,11 @@ async function loadTickersData() {
     handleDataLoadError(error, 'טעינת נתוני טיקרים');
 
   }
+
+  // יישום צבעי ישות על כותרות אחרי טעינת הנתונים
+  if (window.applyEntityColorsToHeaders) {
+    window.applyEntityColorsToHeaders('ticker');
+  }
 }
 
 /**
@@ -1874,15 +1879,37 @@ window.checkLinkedItemsBeforeCancelTicker = checkLinkedItemsBeforeCancelTicker;
 window.getTickerSymbol = getTickerSymbol;
 window.reactivateTicker = reactivateTicker;
 
+/**
+ * טעינת צבעים מההעדפות ויישום על הכותרות
+ */
+async function loadColorsAndApplyToHeaders() {
+  try {
+    // נסה לטעון העדפות אם הן לא נטענו
+    if (!window.currentPreferences && window.loadPreferences) {
+      await window.loadPreferences();
+    }
+
+    // טעינת צבעים מההעדפות
+    if (window.loadAllColorsFromPreferences && window.currentPreferences) {
+      window.loadAllColorsFromPreferences(window.currentPreferences);
+    }
+
+    // יישום צבעי ישות על כותרות
+    if (window.applyEntityColorsToHeaders) {
+      window.applyEntityColorsToHeaders('ticker');
+    }
+  } catch (error) {
+    console.error('שגיאה בטעינת צבעים:', error);
+  }
+}
+
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
   // שחזור מצב הסגירה
   restoreTickersSectionState();
 
-  // יישום צבעי ישות על כותרות
-  if (window.applyEntityColorsToHeaders) {
-    window.applyEntityColorsToHeaders('ticker');
-  }
+  // טעינת צבעים מההעדפות לפני יישום על הכותרות
+  loadColorsAndApplyToHeaders();
 
   // אתחול וולידציה - שימוש בפונקציות הגלובליות
   if (window.initializeValidation) {
@@ -1893,6 +1920,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // שחזור מצב סידור
   restoreSortState();
+
+  // טעינת נתוני טיקרים
+  loadTickersData();
 });
 
 // אתחול נוסף כשהדף נטען לחלוטין

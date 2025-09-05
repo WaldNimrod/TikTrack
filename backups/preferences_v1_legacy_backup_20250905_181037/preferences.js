@@ -1,17 +1,6 @@
 /**
- * Simple Preferences System V1 (LEGACY)
- * =====================================
- * ⚠️ DEPRECATED: This file is kept for backward compatibility.
- * 
- * 🚀 For new implementations, use:
- * - preferences-v2.js (main system)
- * - preferences-v2-compatibility.js (compatibility layer)
- * 
- * ניהול העדפות פשוט ובסיסי (גרסה ישנה)
- * 
- * Author: TikTrack Development Team
- * Version: 1.0 (LEGACY)
- * Deprecated: January 2025 (replaced by V2)
+ * Simple Preferences System
+ * ניהול העדפות פשוט ובסיסי
  */
 
 // ברירות מחדל - מותאמות למערכת החדשה

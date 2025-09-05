@@ -2052,25 +2052,83 @@ function getTypeClass(type) {
 
 /**
  * טעינת העדפות המשתמש
+ * ✨ עודכן לתמיכה במערכת העדפות V2!
  */
-function loadUserPreferences() {
+async function loadUserPreferences() {
   try {
-    const response = fetch('/config/preferences.json');
+    console.log('📋 Loading user preferences for trade_plans (V2/V1)...');
+    
+    // נסה ראשית מערכת V2 גלובלית
+    if (typeof window.getCurrentPreference === 'function') {
+      console.log('✅ Using global preferences system (V2/V1)');
+      return {
+        timezone: await window.getCurrentPreference('timezone') || 'Asia/Jerusalem',
+        primaryCurrency: await window.getCurrentPreference('primaryCurrency') || 'USD',
+        defaultStopLoss: await window.getCurrentPreference('defaultStopLoss') || 5,
+        defaultTargetPrice: await window.getCurrentPreference('defaultTargetPrice') || 10
+      };
+    }
+    
+    // Fallback ל-API V2
+    try {
+      const v2Response = await fetch('/api/v2/preferences/');
+      if (v2Response.ok) {
+        const v2Data = await v2Response.json();
+        if (v2Data.success && v2Data.data.preferences) {
+          console.log('✅ Using V2 API preferences');
+          const prefs = v2Data.data.preferences;
+          return {
+            timezone: prefs.general?.timezone || 'Asia/Jerusalem',
+            primaryCurrency: prefs.general?.primaryCurrency || 'USD',
+            defaultStopLoss: prefs.general?.defaultStopLoss || 5,
+            defaultTargetPrice: prefs.general?.defaultTargetPrice || 10
+          };
+        }
+      }
+    } catch (v2Error) {
+      console.log('🔄 V2 API not available, trying V1...');
+    }
+    
+    // Fallback ל-V1 API
+    try {
+      const v1Response = await fetch('/api/v1/preferences/');
+      if (v1Response.ok) {
+        const preferences = await v1Response.json();
+        console.log('✅ Using V1 API preferences');
+        return preferences;
+      }
+    } catch (v1Error) {
+      console.log('🔄 V1 API not available, trying local config...');
+    }
+    
+    // Fallback אחרון - קובץ JSON מקומי (legacy)
+    const response = await fetch('/config/preferences.json');
     if (response.ok) {
-      const preferences = response.json();
+      const preferences = await response.json();
+      console.log('🔄 Using local JSON preferences (legacy)');
       return preferences.user || preferences.defaults;
     }
+    
   } catch (error) {
     handleDataLoadError(error, 'העדפות משתמש');
   }
-  return null;
+  
+  // ברירת מחדל
+  console.log('🔄 Using default preferences');
+  return {
+    timezone: 'Asia/Jerusalem',
+    primaryCurrency: 'USD',
+    defaultStopLoss: 5,
+    defaultTargetPrice: 10
+  };
 }
 
 /**
  * יצירת תאריך עם timezone נכון
+ * ✨ עודכן לתמיכה במערכת העדפות V2!
  */
-function createDateWithTimezone(year, month, day) {
-  const preferences = loadUserPreferences();
+async function createDateWithTimezone(year, month, day) {
+  const preferences = await loadUserPreferences();
   const timezone = preferences?.timezone || 'Asia/Jerusalem';
 
   // Creating date with timezone

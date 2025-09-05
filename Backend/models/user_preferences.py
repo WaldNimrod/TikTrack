@@ -1,12 +1,16 @@
 """
-User Preferences Model - TikTrack
+User Preferences Model V1 - TikTrack (LEGACY)
+
+⚠️ DEPRECATED: This module is kept for backward compatibility.
+Use user_preferences_v2.py for new implementations.
 
 This module defines the UserPreferences model for storing all user preferences
 in the database instead of JSON files.
 
 Author: TikTrack Development Team
-Version: 1.0
+Version: 1.0 (LEGACY)
 Date: September 2025
+Deprecated: January 2025 (replaced by V2)
 """
 
 from sqlalchemy import Column, Integer, String, Boolean, Float, DateTime, Text, ForeignKey

@@ -400,16 +400,31 @@ function convertSharesToAmount(shares, price) {
 
 /**
  * Get user preference
+ * ✨ עודכן לתמיכה במערכת העדפות V2!
  * @param {string} key - Preference key
  * @param {*} defaultValue - Default value
  * @returns {*} User preference value
  */
-function getUserPreference(key, defaultValue = null) {
+async function getUserPreference(key, defaultValue = null) {
   try {
+    console.log(`🔍 data-utils getUserPreference(${key})`);
+    
+    // נסה מהמערכת הגלובלית החדשה
+    if (typeof window.getCurrentPreference === 'function') {
+      const value = await window.getCurrentPreference(key);
+      if (value !== null && value !== undefined) {
+        console.log(`✅ Got V2/V1 preference ${key}: ${value}`);
+        return value;
+      }
+    }
+    
+    // Fallback ל-localStorage מקומי
     const preferences = JSON.parse(localStorage.getItem('userPreferences') || '{}');
-    return preferences[key] !== undefined ? preferences[key] : defaultValue;
-  } catch {
-    // console.warn('Error reading user preference:', error);
+    const localValue = preferences[key] !== undefined ? preferences[key] : defaultValue;
+    console.log(`🔄 Using localStorage preference ${key}: ${localValue}`);
+    return localValue;
+  } catch (error) {
+    console.warn('⚠️ Error reading user preference:', error);
     return defaultValue;
   }
 }

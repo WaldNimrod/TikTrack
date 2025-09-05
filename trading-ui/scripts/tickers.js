@@ -1884,9 +1884,16 @@ window.reactivateTicker = reactivateTicker;
  */
 async function loadColorsAndApplyToHeaders() {
   try {
-    // נסה לטעון העדפות אם הן לא נטענו
-    if (!window.currentPreferences && window.loadPreferences) {
-      await window.loadPreferences();
+    // ✨ עדכון לתמיכה במערכת העדפות V2
+    // נסה לטעון העדפות V2 ראשית, ואז V1 כ-fallback
+    if (!window.currentPreferences) {
+      if (window.preferencesV2 && window.preferencesV2.loadPreferences) {
+        await window.preferencesV2.loadPreferences();
+        console.log('✅ Loaded V2 preferences for tickers');
+      } else if (window.loadPreferences) {
+        await window.loadPreferences();
+        console.log('🔄 Loaded V1 preferences for tickers (fallback)');
+      }
     }
 
     // טעינת צבעים מההעדפות

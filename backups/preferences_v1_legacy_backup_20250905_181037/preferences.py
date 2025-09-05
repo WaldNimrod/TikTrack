@@ -1,16 +1,12 @@
 """
-User Preferences API V1 - TikTrack (LEGACY)
-
-⚠️ DEPRECATED: This module is kept for backward compatibility.
-Use preferences_v2.py for new implementations.
+User Preferences API - TikTrack
 
 This module provides API endpoints for managing user preferences.
 Supports multi-user system with fallback to default user.
 
 Author: TikTrack Development Team
-Version: 1.0 (LEGACY)
+Version: 1.0
 Date: August 2025
-Deprecated: January 2025 (replaced by V2)
 """
 
 from flask import Blueprint, request, jsonify

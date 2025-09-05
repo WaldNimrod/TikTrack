@@ -653,8 +653,7 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/accounts">חשבונות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/preferences-v2.html">🚀 העדפות V2 (מתקדם)</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות V1 (מסורתי)</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><h6 class="dropdown-header">🔧 כלי פיתוח</h6></li>
                         <li><a class="tiktrack-dropdown-item" href="/test-preferences-v2-integration.html">בדיקת אינטגרציה V2</a></li>
@@ -719,7 +718,8 @@ class HeaderSystem {
                     </li>
 
                     <li class="tiktrack-nav-item">
-                      <a href="#" class="tiktrack-nav-link" onclick="clearDevelopmentCache(event)" title="נקה מטמון פיתוח">
+                      <a href="#" class="tiktrack-nav-link" onclick="clearDevelopmentCache(event)" 
+                         title="נקה מטמון פיתוח">
                         <span class="nav-text" style="color: #ff0000; font-size: 1.2rem;">🧹</span>
                       </a>
                     </li>
@@ -736,7 +736,8 @@ class HeaderSystem {
 
               <!-- כפתור פילטר עגול -->
               <div class="filter-toggle-section">
-                <button class="filter-toggle-btn" id="filterToggleBtn" title="הצג/הסתר פילטרים" onclick="toggleSection('filters')">
+                <button class="filter-toggle-btn" id="filterToggleBtn" title="הצג/הסתר פילטרים" 
+                        onclick="toggleSection('filters')">
                   <span class="filter-arrow">▼</span>
                 </button>
               </div>
@@ -749,7 +750,8 @@ class HeaderSystem {
             <!-- פילטר סטטוס -->
             <div class="filter-group status-filter">
               <div class="filter-dropdown">
-                <button class="filter-toggle status-filter-toggle" id="statusFilterToggle" onclick="toggleStatusFilter()">
+                <button class="filter-toggle status-filter-toggle" id="statusFilterToggle" 
+                        onclick="toggleStatusFilter()">
                   <span class="selected-value selected-status-text" id="selectedStatus">כל סטטוס</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>
@@ -806,7 +808,8 @@ class HeaderSystem {
             <!-- פילטר חשבון -->
             <div class="filter-group account-filter">
               <div class="filter-dropdown">
-                <button class="filter-toggle account-filter-toggle" id="accountFilterToggle" onclick="toggleAccountFilter()">
+                <button class="filter-toggle account-filter-toggle" id="accountFilterToggle" 
+                        onclick="toggleAccountFilter()">
                   <span class="selected-value selected-account-text" id="selectedAccount">כל חשבון</span>
                   <span class="dropdown-arrow">▼</span>
                 </button>

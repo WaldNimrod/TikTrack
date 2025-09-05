@@ -97,13 +97,17 @@
       <!-- Notes area - top-Section -->
       <div class="top-section">
         <!-- Main header -->
-        <div class="section-header">
+        <div class="section-header entity-note-main-header">
           <div class="table-title">
             <img src="images/icons/home.svg" alt="הערות"
               style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
             הערות
           </div>
           <div class="table-actions">
+            <button class="refresh-btn" onclick="showAddNoteModal()" title="הוסף הערה חדשה">
+              <span class="action-icon">➕</span> הוסף
+            </button>
+            <div class="action-separator"></div>
             <button class="filter-toggle-btn" onclick="toggleTopSection()" title="Show/hide notes area">
               <span class="filter-icon">▲</span>
             </button>

@@ -336,17 +336,21 @@ function displayIssues(issues) {
                         </div>
                         <div class="issue-actions">
                             ${issue.fixable ? `
-                                <button class="btn btn-success btn-sm" onclick="fixIssue(${issue.id})" title="תקן בעיה זו">
+                                <button class="btn btn-success btn-sm" onclick="fixIssue(${issue.id})" 
+                                        title="תקן בעיה זו">
                                     <i class="fas fa-wrench"></i> תיקון
                                 </button>
-                                <button class="btn btn-primary btn-sm" onclick="previewFix(${issue.id})" title="הצג תצוגה מקדימה של התיקון">
+                                <button class="btn btn-primary btn-sm" onclick="previewFix(${issue.id})" 
+                                        title="הצג תצוגה מקדימה של התיקון">
                                     <i class="fas fa-eye"></i> תצוגה מקדימה
                                 </button>
                             ` : ''}
-                            <button class="btn btn-secondary btn-sm" onclick="ignoreIssue(${issue.id})" title="התעלם מבעיה זו">
+                            <button class="btn btn-secondary btn-sm" onclick="ignoreIssue(${issue.id})" 
+                                    title="התעלם מבעיה זו">
                                 <i class="fas fa-eye-slash"></i> התעלם
                             </button>
-                            <button class="btn btn-info btn-sm" onclick="showIssueDetails(${issue.id})" title="הצג פרטים נוספים">
+                            <button class="btn btn-info btn-sm" onclick="showIssueDetails(${issue.id})" 
+                                    title="הצג פרטים נוספים">
                                 <i class="fas fa-info-circle"></i> פרטים
                             </button>
                         </div>
@@ -875,16 +879,29 @@ function resetSettings() {
     }
 }
 
-function updateSummaryStats(data) {
+function updateSummaryStats(data = null) {
     // Update the summary statistics in the top section
     const totalFilesStats = document.getElementById('totalFilesStats');
     const totalErrorsStats = document.getElementById('totalErrorsStats');
     const totalWarningsStats = document.getElementById('totalWarningsStats');
     const overallStatus = document.getElementById('overallStatus');
     
-    if (totalFilesStats) totalFilesStats.textContent = data.totalFiles;
-    if (totalErrorsStats) totalErrorsStats.textContent = data.totalErrors;
-    if (totalWarningsStats) totalWarningsStats.textContent = data.totalWarnings;
+    // If no data provided, calculate from current issues
+    if (!data) {
+        const errors = currentIssues.filter(issue => issue.severity === 'error').length;
+        const warnings = currentIssues.filter(issue => issue.severity === 'warning').length;
+        const files = new Set(currentIssues.map(issue => issue.file)).size;
+        
+        data = {
+            totalFiles: files,
+            totalErrors: errors,
+            totalWarnings: warnings
+        };
+    }
+    
+    if (totalFilesStats) totalFilesStats.textContent = data.totalFiles || 0;
+    if (totalErrorsStats) totalErrorsStats.textContent = data.totalErrors || 0;
+    if (totalWarningsStats) totalWarningsStats.textContent = data.totalWarnings || 0;
     
     // Determine overall status
     let status = 'מעולה';

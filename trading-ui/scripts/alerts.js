@@ -315,11 +315,17 @@ function updateAlertsTable(alerts) {
   loadAdditionalData().then(() => {
 
     const tableHTML = alerts.map(alert => {
+      // קבלת צבעי סטטוס דינמיים
       const statusClass = getStatusClass(alert.status);
+      const statusColor = window.getStatusColor ? window.getStatusColor(alert.status, 'medium') : '#6c757d';
+      const statusBgColor = window.getStatusBackgroundColor ? window.getStatusBackgroundColor(alert.status) : 'rgba(108, 117, 125, 0.1)';
+      
       // קביעת האובייקט המקושר
       let relatedDisplay = '';
       let relatedIcon = '';
       let relatedClass = '';
+      let relatedColor = '';
+      let relatedBgColor = '';
 
       // console.log('🔍 Alert details:', {
       //   id: alert.id,
@@ -357,7 +363,9 @@ function updateAlertsTable(alerts) {
             // console.log(`❌ Account not found for ID: ${alert.related_id}`);
           }
           relatedIcon = '🏦';
-          relatedClass = 'related-account';
+          relatedClass = 'related-account entity-account-badge';
+          relatedColor = window.getEntityColor ? window.getEntityColor('account') : '#28a745';
+          relatedBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('account') : 'rgba(40, 167, 69, 0.1)';
           break;
         }
         case 2: { // טרייד
@@ -379,7 +387,9 @@ function updateAlertsTable(alerts) {
             // console.log(`❌ Trade not found for ID: ${alert.related_id}`);
           }
           relatedIcon = '📈';
-          relatedClass = 'related-trade';
+          relatedClass = 'related-trade entity-trade-badge';
+          relatedColor = window.getEntityColor ? window.getEntityColor('trade') : '#007bff';
+          relatedBgColor = window.getEntityBackgroundColor ? window.getEntityBackgroundColor('trade') : 'rgba(0, 123, 255, 0.1)';
           break;
         }
         case 3: { // תוכנית

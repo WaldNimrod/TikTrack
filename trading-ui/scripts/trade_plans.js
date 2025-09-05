@@ -93,6 +93,21 @@
 // Global variables - now using trade-plan-service
 // trade_plansData is now managed by trade-plan-service
 
+// פונקציה לחישוב משך זמן
+function getTimeDuration(dateString) {
+    if (!dateString) return '00:00:00';
+    
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffMs = now - date;
+    
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return `${days.toString().padStart(2, '0')}:${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+
 // ===== CRUD Modal Functions =====
 
 /**
@@ -1120,6 +1135,7 @@ function updateTradePlansTable(trade_plans) {
         <td class="stop-cell"><span class="stop-text" style="color: ${window.getTableColors ? window.getTableColors().negative : '#dc3545'};">${stopDisplay}</span></td>
         <td><span class="current-text">${currentDisplay}</span></td>
         <td class="status-cell" data-status="${statusForFilter}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
+        <td>${getTimeDuration(design.updated_at || design.created_at)}</td>
         <td class="actions-cell">
           <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTradePlan(${design.id})" title="צפה באלמנטים מקושרים">
             🔗

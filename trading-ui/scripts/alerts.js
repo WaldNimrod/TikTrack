@@ -45,6 +45,21 @@
 // משתנים גלובליים
 let alertsData = [];
 
+// פונקציה לחישוב משך זמן
+function getTimeDuration(dateString) {
+    if (!dateString) return '00:00:00';
+    
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffMs = now - date;
+    
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return `${days.toString().padStart(2, '0')}:${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+
 // בדיקה שהפונקציות הגלובליות זמינות
 
 
@@ -524,6 +539,7 @@ function updateAlertsTable(alerts) {
 
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
+          <td>${getTimeDuration(alert.updated_at || alert.created_at)}</td>
           <td class="actions-cell">
             <div class="btn-group btn-group-sm" role="group" style="gap: 2px;">
               <button class="btn btn-info" 

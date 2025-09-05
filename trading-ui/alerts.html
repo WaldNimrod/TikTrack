@@ -94,7 +94,7 @@
       <!-- Alerts area - top-Section -->
       <div class="top-section" id="alertsTopSection">
         <!-- Alerts header -->
-        <div class="section-header">
+        <div class="section-header entity-alert-main-header">
           <div class="table-title">
             <img src="images/icons/alerts.svg" alt="התראות"
               style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
@@ -145,7 +145,7 @@
         <!-- Alerts area - content-section -->
         <div class="content-section alerts-page" id="alertsMainSection">
           <!-- Alerts header -->
-          <div class="section-header">
+          <div class="section-header entity-alert-sub-header">
             <div class="table-title">
               <img src="images/icons/alerts.svg" alt="ההתראות שלי"
                 style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
@@ -237,6 +237,13 @@
                         נוצר ב: <span class="sort-icon">↕</span>
                       </button>
                     </th>
+                    <th style="width: 10%;">
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTableData(7, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                        עודכן <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
                     <th class="actions-cell" style="width: 14%;">
                       פעולות
                     </th>
@@ -244,7 +251,7 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="8" class="loading">טוען התראות...</td>
+                    <td colspan="9" class="loading">טוען התראות...</td>
                   </tr>
                 </tbody>
               </table>

@@ -274,6 +274,13 @@
                         סטטוס <span class="sort-icon">↕</span>
                       </button>
                     </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(10); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        עודכן <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
                     <th class="actions-cell">
                       פעולות
                     </th>
@@ -281,7 +288,7 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="10" class="loading">טוען תכנונים...</td>
+                    <td colspan="11" class="loading">טוען תכנונים...</td>
                   </tr>
                 </tbody>
               </table>

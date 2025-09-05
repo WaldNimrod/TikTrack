@@ -38,6 +38,21 @@ let allExecutions = [];
 let filteredExecutions = [];
 let tradesData = []; // נתוני טריידים לשמירת מפת חשבונות
 
+// פונקציה לחישוב משך זמן
+function getTimeDuration(dateString) {
+    if (!dateString) return '00:00:00';
+    
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffMs = now - date;
+    
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return `${days.toString().padStart(2, '0')}:${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+
 // פונקציות בסיסיות
 function openExecutionDetails(_id) {
 
@@ -1687,7 +1702,7 @@ async function updateExecutionsTableMain(executions) {
   }
 
   if (executions.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10" class="text-center">לא נמצאו עסקעות</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="14" class="text-center">לא נמצאו עסקעות</td></tr>';
     return;
   }
 
@@ -1799,6 +1814,7 @@ async function updateExecutionsTableMain(executions) {
                 <td data-date="${execution.created_at}">${execution.created_at ? new Date(execution.created_at).toLocaleDateString('he-IL') : '-'}</td>
                 <td data-date="${execution.date || execution.execution_date}">${execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-'}</td>
                 <td style="text-align: left; direction: ltr;">${execution.source || '-'}</td>
+                <td>${getTimeDuration(execution.updated_at || execution.execution_date)}</td>
                 <td class="actions-cell">
                     <button class="btn btn-sm btn-info" 
                       onclick="console.log('🔗 [LINKED ITEMS] לחיצה על כפתור מקושרים עבור עסקה:', ${execution.id}); if(window.loadLinkedItemsData) { window.loadLinkedItemsData('execution', ${execution.id}).then(data => { console.log('🔗 [LINKED ITEMS] נתונים נטענו:', data); if(data) { console.log('🔗 [LINKED ITEMS] מציג מודל עם נתונים'); window.showLinkedItemsModal(data, 'execution', ${execution.id}, 'view'); } else { console.log('❌ [LINKED ITEMS] אין נתונים להצגה'); } }); } else { console.log('❌ [LINKED ITEMS] loadLinkedItemsData לא זמין'); }" 

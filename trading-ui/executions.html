@@ -215,12 +215,18 @@
                         מקור <span class="sort-icon">↕</span>
                       </button>
                     </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable('executions', 12, window.executionsData || [], updateExecutionsTableMain); }">
+                        עודכן <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
                     <th class="actions-cell">פעולות</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="13" class="text-center">טוען עסקאות...</td>
+                    <td colspan="14" class="text-center">טוען עסקאות...</td>
                   </tr>
                 </tbody>
               </table>

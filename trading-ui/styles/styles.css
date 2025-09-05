@@ -36,6 +36,32 @@
  * - transition: all 0.2s ease
  */
 
+:root {
+    /* Entity Colors with Default Values */
+    --entity-ticker-color: #019193;
+    --entity-ticker-bg: #01919399;
+    --entity-ticker-border: #019193;
+    
+    --entity-account-color: #1b0b75;
+    --entity-account-bg: #1b0b7599;
+    --entity-account-border: #1b0b75;
+    
+    --entity-trade-color: #28a745;
+    --entity-trade-bg: #28a74599;
+    --entity-trade-border: #28a745;
+    
+    --entity-alert-color: #ff9c05;
+    --entity-alert-bg: #ff9c0599;
+    --entity-alert-border: #ff9c05;
+    
+    --entity-cash-flow-color: #20c997;
+    --entity-cash-flow-bg: #20c99799;
+    --entity-cash-flow-border: #20c997;
+    
+    --entity-note-color: #6f42c1;
+    --entity-note-bg: #6f42c199;
+    --entity-note-border: #6f42c1;
+}
 /* ===== סגנונות כלליים של הפרויקציה ===== */
 
 /* ===== Two-column layout for preference items ===== */
@@ -6537,4 +6563,55 @@ button[onclick*="reactivate"]:hover .reactivate-icon,
 button[title*="החזר"]:hover .reactivate-icon,
 button[title*="הפעל מחדש"]:hover .reactivate-icon {
   color: #ffffff !important;
+}
+/* Entity Header Styles with CSS Variables */
+.entity-ticker-main-header {
+    background-color: var(--entity-ticker-bg);
+    border-left: 4px solid var(--entity-ticker-border);
+}
+
+.entity-trade-main-header {
+    background-color: var(--entity-trade-bg);
+    border-left: 4px solid var(--entity-trade-border);
+}
+
+.entity-account-main-header {
+    background-color: var(--entity-account-bg);
+    border-left: 4px solid var(--entity-account-border);
+}
+
+.entity-alert-main-header {
+    background-color: var(--entity-alert-bg);
+    border-left: 4px solid var(--entity-alert-border);
+}
+
+.entity-trade-sub-header {
+    background-color: var(--entity-trade-bg);
+    border-left: 3px solid var(--entity-trade-border);
+}
+
+.entity-account-sub-header {
+    background-color: var(--entity-account-bg);
+    border-left: 3px solid var(--entity-account-border);
+}
+
+.entity-alert-sub-header {
+    background-color: var(--entity-alert-bg);
+    border-left: 3px solid var(--entity-alert-border);
+}
+
+/* RTL למודלים */
+.modal-header {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+.modal-body {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+.modal-footer {
+    direction: rtl !important;
+    text-align: right !important;
 }

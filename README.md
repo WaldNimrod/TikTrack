@@ -81,7 +81,20 @@
 
 > 📋 **דוקומנטציה מערכת נתונים חיצוניים**: [EXTERNAL_DATA_INTEGRATION_MODULE_DOCUMENTATION.md](EXTERNAL_DATA_INTEGRATION_MODULE_DOCUMENTATION.md)
 
-## 🎉 **סיכום השינויים האחרונים (3 בספטמבר 2025)**
+> 🚀 **מערכת העדפות V2**: [PREFERENCES_V2_IMPLEMENTATION_REPORT.md](PREFERENCES_V2_IMPLEMENTATION_REPORT.md)
+
+> 📊 **השוואת V1 vs V2**: [PREFERENCES_V1_VS_V2_COMPARISON.md](PREFERENCES_V1_VS_V2_COMPARISON.md)
+
+## 🎉 **סיכום השינויים האחרונים (5 בינואר 2025)**
+
+### **🚀 מערכת העדפות V2 - הושלמה בהצלחה! 🎯**
+- **מערכת הגדרות מתקדמת**: פרופילים מרובים, יבוא/יצוא, היסטוריית שינויים
+- **50+ הגדרות חדשות**: הרחבה משמעותית מעבר ל-35 הגדרות הקיימות
+- **מיגרציה מוצלחת 100%**: כל הנתונים הקיימים הועברו ללא איבוד
+- **ממשק משתמש מתקדם**: עיצוב Apple-inspired עם אנימציות
+- **תאימות מלאה לאחור**: המערכת הישנה ממשיכה לעבוד
+- **8 API endpoints חדשים**: `/api/v2/preferences/*` 
+- **3 טבלאות חדשות**: `preference_profiles`, `user_preferences_v2`, `preference_history`
 
 ### **מערכת ניהול מצבי שרת - הושלמה בהצלחה! 🎯**
 - **ממשק מלא לניהול מצבים** - ללא צורך ב-terminal
@@ -99,6 +112,26 @@
 - **כפתור ניקוי מטמון** עובד בכל העמודים
 
 ### **קבצים שנוצרו/עודכנו:**
+
+#### **🚀 מערכת העדפות V2 (5 בינואר 2025) - 13 קבצים חדשים:**
+- **Backend חדש:**
+  - `Backend/models/user_preferences_v2.py` - מודל מתקדם 573 שורות
+  - `Backend/services/preferences_service_v2.py` - שירות מתקדם 633 שורות 
+  - `Backend/routes/api/preferences_v2.py` - API מלא 558 שורות
+  - `Backend/scripts/simple_migrate_v1_to_v2.py` - כלי מיגרציה
+  - `Backend/scripts/migrate_preferences_v1_to_v2.py` - מיגרציה מתקדמת
+  - `Backend/test_v2_system.py` - בדיקות מערכת
+- **Frontend חדש:**
+  - `trading-ui/preferences-v2.html` - ממשק מתקדם 1,056 שורות
+  - `trading-ui/scripts/preferences-v2.js` - JavaScript מתקדם 919 שורות
+  - `trading-ui/scripts/preferences-v2-compatibility.js` - שכבת תאימות
+  - `test-preferences-v2-integration.html` - עמוד בדיקות
+- **תיעוד מקיף:**
+  - `PREFERENCES_V2_IMPLEMENTATION_REPORT.md` - דוח יישום
+  - `PREFERENCES_V1_VS_V2_COMPARISON.md` - השוואה מפורטת
+  - `PREFERENCES_V2_FINAL_COMPLETION_REPORT.md` - דוח השלמה
+
+#### **מערכות קודמות:**
 - **חדש:** `Backend/routes/api/server_management.py`
 - **עודכן משמעותית:** `trading-ui/server-monitor.html`, CSS, JavaScript
 - **תוקן:** `Backend/utils/response_optimizer.py`

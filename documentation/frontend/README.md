@@ -79,7 +79,8 @@
 - **`executions.html`**: צבעים עקביים לעסקאות
 - **`alerts.html`**: צבעים עקביים להתראות
 - **`research.html`**: צבעים עקביים למחקר
-- **`preferences.html`**: ניהול צבעים לערכים מספריים
+- **`preferences.html`**: ניהול צבעים לערכים מספריים (V1 - מסורתי)
+- **`preferences-v2.html`**: מערכת הגדרות מתקדמת עם פרופילים ויבוא/יצוא (V2 - מתקדם)
 - **`numeric-value-colors-demo.html`**: דף דוגמה למערכת הצבעים
 
 ### 7. מערכת הולידציה (Validation System)

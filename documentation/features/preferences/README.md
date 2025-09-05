@@ -1,8 +1,25 @@
 # מערכת העדפות - TikTrack
 
-## סקירה כללית
+## 🚀 **מערכת V2 חדשה זמינה! (ינואר 2025)**
 
-מערכת ההעדפות מאפשרת למשתמשים להגדיר הגדרות מערכת מותאמות אישית, כולל מטבע ראשי, אזור זמן, ברירות מחדל לטריידים, והגדרות מערכת הנתונים החיצוניים.
+**מערכת העדפות V2** עכשיו זמינה עם תכונות מתקדמות:
+- ✅ **פרופילים מרובים** לכל משתמש
+- ✅ **יבוא/יצוא הגדרות** לקובצי JSON
+- ✅ **היסטוריית שינויים** מפורטת
+- ✅ **בדיקות תקינות** אוטומטיות
+- ✅ **ממשק מתקדם** Apple-inspired
+- ✅ **50+ הגדרות** (במקום 35)
+- ✅ **תאימות מלאה** עם V1
+
+**🔗 גישה:** `http://localhost:5000/preferences-v2.html`
+
+---
+
+## סקירה כללית - V1 & V2
+
+מערכת ההעדפות מאפשרת למשתמשים להגדיר הגדרות מערכת מותאמות אישית בשתי גרסאות:
+- **V1 (מסורתית)**: הגדרות בסיסיות עם ממשק HTML פשוט
+- **V2 (מתקדמת)**: פרופילים מרובים, יבוא/יצוא, והיסטוריה
 
 ## תכונות מרכזיות
 
@@ -33,17 +50,124 @@
 
 ## ארכיטקטורה
 
-### Frontend
+### 🚀 **V2 (מערכת חדשה ומתקדמת)**
+
+#### **Frontend V2:**
+- **קובץ HTML**: `trading-ui/preferences-v2.html` (1,056 שורות)
+- **JavaScript ראשי**: `trading-ui/scripts/preferences-v2.js` (919 שורות)
+- **שכבת תאימות**: `trading-ui/scripts/preferences-v2-compatibility.js`
+- **תכונות**: פרופילים, יבוא/יצוא, אנימציות, responsive design
+
+#### **Backend V2:**
+- **API Blueprint**: `Backend/routes/api/preferences_v2.py` (8 endpoints)
+- **Service מתקדם**: `Backend/services/preferences_service_v2.py`
+- **מודלים**: `Backend/models/user_preferences_v2.py` (3 classes)
+- **כלי מיגרציה**: `Backend/scripts/simple_migrate_v1_to_v2.py`
+
+#### **מסד נתונים V2:**
+- **`preference_profiles`**: פרופילים מרובים לכל משתמש
+- **`user_preferences_v2`**: 50+ שדות מובנים + JSON fields
+- **`preference_history`**: היסטוריית שינויים מלאה
+
+### 📋 **V1 (מערכת מסורתית - תאימות לאחור)**
+
+#### **Frontend V1:**
 - **קובץ HTML**: `trading-ui/preferences.html`
 - **קובץ JavaScript**: `trading-ui/scripts/preferences.js`
 - **תלויות**: `filter-system.js`, `main.js`, `tables.js`, `ui-utils.js`
 
-### Backend
+#### **Backend V1:**
 - **Blueprint**: `Backend/routes/api/preferences.py`
 - **Service**: `Backend/services/user_service.py`
-- **Model**: `Backend/models/user.py`
+- **Model**: `Backend/models/user.py`, `Backend/models/user_preferences.py`
 
 ## API Endpoints
+
+## 🚀 **V2 API Endpoints (מתקדם)**
+
+### GET /api/v2/preferences/
+קבלת הגדרות V2 עבור פרופיל ספציפי
+
+**פרמטרים:**
+- `profile_id` (optional): מזהה פרופיל
+
+**תגובה:**
+```json
+{
+  "success": true,
+  "data": {
+    "preferences": {
+      "general": {
+        "primaryCurrency": "USD",
+        "secondaryCurrency": "ILS", 
+        "timezone": "Asia/Jerusalem",
+        "defaultStopLoss": 5.0,
+        "riskPercentage": 2.0
+      },
+      "defaultFilters": {
+        "status": "open",
+        "type": "swing", 
+        "dateRange": "this_week"
+      },
+      "ui": {
+        "theme": "light",
+        "compactMode": false,
+        "showAnimations": true
+      },
+      "externalData": {
+        "providers": {
+          "primary": "yahoo",
+          "secondary": "google",
+          "fallback": "alpha_vantage"
+        }
+      }
+    },
+    "profile": {
+      "id": 1,
+      "name": "ברירת מחדל",
+      "isDefault": true
+    }
+  }
+}
+```
+
+### POST /api/v2/preferences/
+עדכון הגדרות V2
+
+**בקשה:**
+```json
+{
+  "profile_id": 1,
+  "preferences": {
+    "general": {
+      "primaryCurrency": "EUR",
+      "defaultStopLoss": 3.0
+    }
+  }
+}
+```
+
+### GET /api/v2/preferences/profiles
+קבלת כל פרופילי ההגדרות של המשתמש
+
+### POST /api/v2/preferences/profiles
+יצירת פרופיל חדש
+
+### POST /api/v2/preferences/migrate
+מיגרציה מV1 לV2
+
+### GET /api/v2/preferences/export
+יצוא הגדרות לקובץ JSON
+
+### POST /api/v2/preferences/import
+יבוא הגדרות מקובץ JSON
+
+### GET /api/v2/preferences/history
+קבלת היסטוריית שינויים
+
+---
+
+## 📋 **V1 API Endpoints (מסורתי)**
 
 ### GET /api/v1/preferences/
 מחזיר את כל ההעדפות של המשתמש הנוכחי

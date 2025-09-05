@@ -208,7 +208,9 @@ class DataRefreshScheduler:
             refresh_minutes = self.refresh_policy['open'][category][time_period]['minutes']
             
             # Get tickers that haven't been refreshed recently
-            cutoff_time = datetime.now() - timedelta(minutes=refresh_minutes)
+            # Use NY timezone for consistency
+            ny_tz = pytz.timezone('America/New_York')
+            cutoff_time = datetime.now(ny_tz) - timedelta(minutes=refresh_minutes)
             
             # Query database for tickers needing refresh
             from models.ticker import Ticker
@@ -299,7 +301,16 @@ class DataRefreshScheduler:
             # Initialize Yahoo Finance adapter if needed
             if not self.yahoo_adapter:
                 from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
-                self.yahoo_adapter = YahooFinanceAdapter()
+                # Get the primary provider (Yahoo Finance)
+                from models.external_data import ExternalDataProvider
+                provider = self.db_session.query(ExternalDataProvider).filter(
+                    ExternalDataProvider.name == 'yahoo_finance'
+                ).first()
+                if provider:
+                    self.yahoo_adapter = YahooFinanceAdapter(self.db_session, provider.id)
+                else:
+                    logger.error("Yahoo Finance provider not found")
+                    return 0, 0
             
             # Extract symbols for batch request
             symbols = [ticker['symbol'] for ticker in tickers]
@@ -332,7 +343,7 @@ class DataRefreshScheduler:
         """Update quote data in database."""
         try:
             from models.ticker import Ticker
-            from models.market_data_quote import MarketDataQuote
+            from models.external_data import MarketDataQuote
             
             # Find ticker by symbol
             ticker = self.db_session.query(Ticker).filter(Ticker.symbol == quote_data.symbol).first()
@@ -356,7 +367,9 @@ class DataRefreshScheduler:
             self.db_session.commit()
             
             # Update ticker's updated_at timestamp
-            ticker.updated_at = datetime.now()
+            # Use NY timezone for consistency
+            ny_tz = pytz.timezone('America/New_York')
+            ticker.updated_at = datetime.now(ny_tz)
             self.db_session.commit()
             
             logger.debug(f"Updated quote for {quote_data.symbol}: ${quote_data.price}")
@@ -368,7 +381,7 @@ class DataRefreshScheduler:
     def _get_last_refresh_time(self) -> Optional[datetime]:
         """Get the last time data was refreshed."""
         try:
-            from models.market_data_quote import MarketDataQuote
+            from models.external_data import MarketDataQuote
             
             # Get the most recent quote timestamp
             last_quote = self.db_session.query(MarketDataQuote).order_by(
@@ -376,7 +389,9 @@ class DataRefreshScheduler:
             ).first()
             
             if last_quote:
-                return last_quote.asof_utc
+                # Convert UTC to NY timezone for comparison
+                ny_tz = pytz.timezone('America/New_York')
+                return last_quote.asof_utc.astimezone(ny_tz)
             return None
             
         except Exception as e:
@@ -386,10 +401,16 @@ class DataRefreshScheduler:
     def _log_group_refresh_start(self, category: str, time_period: str, ticker_count: int) -> int:
         """Log the start of a group refresh operation."""
         try:
-            from models.external_data import DataRefreshLog
+            from models.external_data import DataRefreshLog, ExternalDataProvider
+            
+            # Get the primary provider (Yahoo Finance)
+            provider = self.db_session.query(ExternalDataProvider).filter(
+                ExternalDataProvider.name == 'yahoo_finance'
+            ).first()
             
             # Create new log entry
             log_entry = DataRefreshLog(
+                provider_id=provider.id if provider else None,
                 category=category or 'unknown',
                 time_period=time_period or 'unknown',
                 ticker_count=ticker_count,

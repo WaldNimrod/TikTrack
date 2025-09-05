@@ -141,8 +141,10 @@ background_task_manager = BackgroundTaskManager(realtime_notifications)
 data_refresh_scheduler = None
 if EXTERNAL_DATA_AVAILABLE and DataRefreshScheduler:
     try:
-        # Pass None as db_session for now - will be updated later
-        data_refresh_scheduler = DataRefreshScheduler(None)
+        # Create a database session for the scheduler
+        from config.database import SessionLocal
+        db_session = SessionLocal()
+        data_refresh_scheduler = DataRefreshScheduler(db_session)
         print("✅ Data Refresh Scheduler initialized successfully")
     except Exception as e:
         print(f"❌ Failed to initialize Data Refresh Scheduler: {e}")

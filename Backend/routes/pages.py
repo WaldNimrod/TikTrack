@@ -119,15 +119,11 @@ def test_header_only() -> Any:
     """Test header only page"""
     return send_from_directory(UI_DIR, "test-header-only.html")
 
-@pages_bp.route('/linter-dashboard-demo')
-def linter_dashboard_demo() -> Any:
-    """Linter dashboard demo page"""
+@pages_bp.route('/linter-realtime-monitor')
+def linter_realtime_monitor() -> Any:
+    """Linter realtime monitor page"""
     return send_from_directory(UI_DIR, "linter-realtime-monitor.html")
 
-@pages_bp.route('/create_linter_dashboard')
-def create_linter_dashboard() -> Any:
-    """Create linter dashboard page"""
-    return send_from_directory(UI_DIR, "linter-realtime-monitor.html")
 
 # Old external data test routes removed - now using /system-test-center
 
@@ -176,6 +172,11 @@ def external_data_scripts_files(filename: str) -> Any:
 @pages_bp.route('/<path:filename>')
 def static_files(filename: str) -> Any:
     """Static files"""
+    # Block access to deprecated routes
+    if filename in ['linter-dashboard-demo', 'create_linter_dashboard']:
+        from flask import abort
+        abort(404)
+    
     # Block access to deprecated external data test page
     if 'external_data_integration_client/pages/test_external_data' in filename:
         from flask import abort

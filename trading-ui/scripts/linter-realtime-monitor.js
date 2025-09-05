@@ -201,49 +201,82 @@ function updateChart(data) {
 function loadIssues() {
     const mockIssues = [
         {
+            id: 1,
             severity: 'error',
             message: 'Missing semicolon',
             file: 'trading-ui/scripts/main.js',
             line: 45,
-            rule: 'semi'
+            rule: 'semi',
+            fixable: true,
+            fixType: 'semicolon',
+            originalCode: 'const x = 5',
+            fixedCode: 'const x = 5;'
         },
         {
+            id: 2,
             severity: 'error',
             message: 'Undefined variable',
             file: 'trading-ui/scripts/linter-realtime-monitor.js',
             line: 12,
-            rule: 'no-undef'
+            rule: 'no-undef',
+            fixable: true,
+            fixType: 'variable',
+            originalCode: 'console.log(undefinedVar)',
+            fixedCode: 'console.log(window.undefinedVar || "default")'
         },
         {
+            id: 3,
             severity: 'warning',
             message: 'Unused variable',
             file: 'Backend/routes/api/trades.py',
             line: 23,
-            rule: 'unused-variable'
+            rule: 'unused-variable',
+            fixable: true,
+            fixType: 'remove',
+            originalCode: 'unused_var = "test"',
+            fixedCode: '# unused_var = "test"  # Removed unused variable'
         },
         {
+            id: 4,
             severity: 'warning',
             message: 'Long line detected',
             file: 'trading-ui/styles/styles.css',
             line: 234,
-            rule: 'max-len'
+            rule: 'max-len',
+            fixable: true,
+            fixType: 'format',
+            originalCode: 'very-long-line-with-many-characters-that-exceeds-the-maximum-length',
+            fixedCode: 'very-long-line-with-many-characters-that-exceeds-the-maximum-length'
         },
         {
+            id: 5,
             severity: 'info',
             message: 'Consider using const instead of let',
             file: 'trading-ui/scripts/header-system.js',
             line: 156,
-            rule: 'prefer-const'
+            rule: 'prefer-const',
+            fixable: true,
+            fixType: 'const',
+            originalCode: 'let x = 5',
+            fixedCode: 'const x = 5'
         },
         {
+            id: 6,
             severity: 'info',
             message: 'Missing JSDoc comment',
             file: 'trading-ui/scripts/notification-system.js',
             line: 89,
-            rule: 'require-jsdoc'
+            rule: 'require-jsdoc',
+            fixable: true,
+            fixType: 'jsdoc',
+            originalCode: 'function myFunction() {',
+            fixedCode: '/**\n * My function description\n */\nfunction myFunction() {'
         }
     ];
 
+    // Store issues globally
+    currentIssues = mockIssues;
+    
     displayIssues(mockIssues);
     updateLogsCount(mockIssues.length);
 }
@@ -266,10 +299,40 @@ function displayIssues(issues) {
     const filteredIssues = currentFilter === 'all' ? issues : issues.filter(issue => issue.severity === currentFilter);
     
     logsContainer.innerHTML = filteredIssues.map(issue => `
-        <div class="log-entry">
-            <span class="log-timestamp">[${new Date().toLocaleTimeString('he-IL')}]</span>
-            <span class="log-level ${issue.severity}">[${issue.severity.toUpperCase()}]</span>
-            <span class="log-message">${issue.message} - ${issue.file}:${issue.line}</span>
+        <div class="log-entry issue-item" data-issue-id="${issue.id}">
+            <div class="issue-header">
+                <span class="log-timestamp">[${new Date().toLocaleTimeString('he-IL')}]</span>
+                <span class="log-level ${issue.severity}">[${issue.severity.toUpperCase()}]</span>
+                <span class="issue-rule">${issue.rule}</span>
+            </div>
+            <div class="issue-content">
+                <div class="issue-message">${issue.message}</div>
+                <div class="issue-location">📁 ${issue.file}:${issue.line}</div>
+                <div class="issue-code">
+                    <div class="code-before">
+                        <strong>לפני:</strong> <code>${issue.originalCode}</code>
+                    </div>
+                    <div class="code-after">
+                        <strong>אחרי:</strong> <code>${issue.fixedCode}</code>
+                    </div>
+                </div>
+            </div>
+            <div class="issue-actions">
+                ${issue.fixable ? `
+                    <button class="btn btn-success btn-sm" onclick="fixIssue(${issue.id})" title="תקן בעיה זו">
+                        <i class="fas fa-wrench"></i> תיקון
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="previewFix(${issue.id})" title="הצג תצוגה מקדימה של התיקון">
+                        <i class="fas fa-eye"></i> תצוגה מקדימה
+                    </button>
+                ` : ''}
+                <button class="btn btn-secondary btn-sm" onclick="ignoreIssue(${issue.id})" title="התעלם מבעיה זו">
+                    <i class="fas fa-eye-slash"></i> התעלם
+                </button>
+                <button class="btn btn-info btn-sm" onclick="showIssueDetails(${issue.id})" title="הצג פרטים נוספים">
+                    <i class="fas fa-info-circle"></i> פרטים
+                </button>
+            </div>
         </div>
     `).join('');
 }
@@ -287,19 +350,348 @@ function filterIssues(filter) {
     loadIssues();
 }
 
-function fixIssue(file, line) {
-    if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('תיקון אוטומטי', `תיקון אוטומטי עבור ${file}:${line}`);
-    } else {
-        alert(`תיקון אוטומטי עבור ${file}:${line}`);
+// Global issues storage
+let currentIssues = [];
+
+function fixIssue(issueId) {
+    const issue = currentIssues.find(i => i.id === issueId);
+    if (!issue) return;
+    
+    // Show confirmation for single issue fix
+    showSingleFixConfirmationDialog(issue, () => {
+        // Simulate fixing the issue after confirmation
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('תיקון הושלם', `בעיה ${issueId} תוקנה בהצלחה`);
+        }
+        
+        // Remove the issue from the list
+        currentIssues = currentIssues.filter(i => i.id !== issueId);
+        
+        // Update the display
+        displayIssues(currentIssues);
+        updateLogsCount(currentIssues.length);
+        
+        // Update statistics
+        updateStatsAfterFix(issue);
+    });
+}
+
+function showSingleFixConfirmationDialog(issue, onConfirm) {
+    const confirmationHtml = `
+        <div class="single-fix-confirmation">
+            <div class="confirmation-header">
+                <i class="fas fa-wrench text-primary" style="font-size: 20px; margin-left: 10px;"></i>
+                <h4>תיקון בעיה בודדת</h4>
+            </div>
+            
+            <div class="confirmation-content">
+                <div class="issue-preview">
+                    <h5>פרטי הבעיה:</h5>
+                    <div class="issue-info">
+                        <div><strong>קובץ:</strong> ${issue.file}</div>
+                        <div><strong>שורה:</strong> ${issue.line}</div>
+                        <div><strong>הודעה:</strong> ${issue.message}</div>
+                        <div><strong>כלל:</strong> ${issue.rule}</div>
+                    </div>
+                </div>
+                
+                <div class="code-changes">
+                    <h5>שינויי קוד:</h5>
+                    <div class="code-comparison">
+                        <div class="code-before">
+                            <strong>לפני:</strong>
+                            <pre><code>${issue.originalCode}</code></pre>
+                        </div>
+                        <div class="code-after">
+                            <strong>אחרי:</strong>
+                            <pre><code>${issue.fixedCode}</code></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="backup-notice">
+                    <i class="fas fa-info-circle"></i>
+                    <span>מומלץ לבצע גיבוי לפני תיקון קבצים</span>
+                </div>
+                
+                <div class="confirmation-actions">
+                    <button class="btn btn-success" onclick="confirmSingleFix()">
+                        <i class="fas fa-check"></i> אישור - תיקון
+                    </button>
+                    <button class="btn btn-secondary" onclick="cancelSingleFix()">
+                        <i class="fas fa-times"></i> ביטול
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Store the callback function
+    window.pendingSingleFixCallback = onConfirm;
+    
+    // Show the modal
+    showModal('תיקון בעיה בודדת', confirmationHtml);
+}
+
+function confirmSingleFix() {
+    closeModal();
+    
+    // Execute the pending fix
+    if (window.pendingSingleFixCallback) {
+        window.pendingSingleFixCallback();
+        window.pendingSingleFixCallback = null;
     }
 }
 
-function ignoreIssue(file, line) {
+function cancelSingleFix() {
+    closeModal();
+    window.pendingSingleFixCallback = null;
+    
     if (typeof window.showInfoNotification === 'function') {
-        window.showInfoNotification('התעלמות מבעיה', `התעלמות מבעיה ב-${file}:${line}`);
-    } else {
-        alert(`התעלמות מבעיה ב-${file}:${line}`);
+        window.showInfoNotification('תיקון בוטל', 'התיקון בוטל על ידי המשתמש');
+    }
+}
+
+function previewFix(issueId) {
+    const issue = currentIssues.find(i => i.id === issueId);
+    if (!issue) return;
+    
+    // Show a modal or detailed preview
+    const previewHtml = `
+        <div class="fix-preview">
+            <h4>תצוגה מקדימה של התיקון</h4>
+            <div class="preview-content">
+                <div class="preview-before">
+                    <h5>קוד לפני התיקון:</h5>
+                    <pre><code>${issue.originalCode}</code></pre>
+                </div>
+                <div class="preview-after">
+                    <h5>קוד אחרי התיקון:</h5>
+                    <pre><code>${issue.fixedCode}</code></pre>
+                </div>
+                <div class="preview-actions">
+                    <button class="btn btn-success" onclick="fixIssue(${issueId}); closePreview()">אשר תיקון</button>
+                    <button class="btn btn-secondary" onclick="closePreview()">ביטול</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Create and show modal
+    showModal('תצוגה מקדימה של התיקון', previewHtml);
+}
+
+function ignoreIssue(issueId) {
+    const issue = currentIssues.find(i => i.id === issueId);
+    if (!issue) return;
+    
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('התעלמות מבעיה', `בעיה ${issueId} הועברה לרשימת ההתעלמות`);
+    }
+    
+    // Mark as ignored (in real implementation, save to ignored list)
+    issue.ignored = true;
+    
+    // Remove from display
+    currentIssues = currentIssues.filter(i => i.id !== issueId);
+    displayIssues(currentIssues);
+    updateLogsCount(currentIssues.length);
+}
+
+function showIssueDetails(issueId) {
+    const issue = currentIssues.find(i => i.id === issueId);
+    if (!issue) return;
+    
+    const detailsHtml = `
+        <div class="issue-details">
+            <h4>פרטי הבעיה</h4>
+            <div class="details-content">
+                <div class="detail-row">
+                    <strong>הודעה:</strong> ${issue.message}
+                </div>
+                <div class="detail-row">
+                    <strong>קובץ:</strong> ${issue.file}
+                </div>
+                <div class="detail-row">
+                    <strong>שורה:</strong> ${issue.line}
+                </div>
+                <div class="detail-row">
+                    <strong>כלל:</strong> ${issue.rule}
+                </div>
+                <div class="detail-row">
+                    <strong>חומרה:</strong> ${issue.severity}
+                </div>
+                <div class="detail-row">
+                    <strong>ניתן לתיקון:</strong> ${issue.fixable ? 'כן' : 'לא'}
+                </div>
+                <div class="detail-row">
+                    <strong>סוג תיקון:</strong> ${issue.fixType || 'לא זמין'}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    showModal('פרטי הבעיה', detailsHtml);
+}
+
+function updateStatsAfterFix(issue) {
+    // Update error/warning counts after fixing
+    const errorCount = document.getElementById('errorCount');
+    const warningCount = document.getElementById('warningCount');
+    
+    if (issue.severity === 'error' && errorCount) {
+        const current = parseInt(errorCount.textContent);
+        errorCount.textContent = Math.max(0, current - 1);
+    } else if (issue.severity === 'warning' && warningCount) {
+        const current = parseInt(warningCount.textContent);
+        warningCount.textContent = Math.max(0, current - 1);
+    }
+    
+    // Update chart
+    updateChart();
+    updateStatisticsCount();
+}
+
+function showModal(title, content) {
+    // Simple modal implementation
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>${title}</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                ${content}
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Close on overlay click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+}
+
+function closeModal() {
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function closePreview() {
+    closeModal();
+}
+
+function showFixConfirmationDialog(actionType, issueCount, onConfirm) {
+    const confirmationHtml = `
+        <div class="fix-confirmation-dialog">
+            <div class="confirmation-header">
+                <i class="fas fa-exclamation-triangle text-warning" style="font-size: 24px; margin-left: 10px;"></i>
+                <h4>אישור ${actionType}</h4>
+            </div>
+            
+            <div class="confirmation-content">
+                <div class="warning-box">
+                    <h5><i class="fas fa-shield-alt"></i> המלצה חשובה - ביצוע גיבוי</h5>
+                    <p>לפני ביצוע תיקונים אוטומטיים, מומלץ מאוד לבצע גיבוי של הקבצים.</p>
+                </div>
+                
+                <div class="action-details">
+                    <h5>פרטי הפעולה:</h5>
+                    <ul>
+                        <li><strong>פעולה:</strong> ${actionType}</li>
+                        <li><strong>מספר בעיות:</strong> ${issueCount}</li>
+                        <li><strong>סוג תיקון:</strong> אוטומטי</li>
+                        <li><strong>קבצים מושפעים:</strong> קבצי JavaScript, CSS, HTML</li>
+                    </ul>
+                </div>
+                
+                <div class="backup-recommendation">
+                    <h5><i class="fas fa-database"></i> המלצות גיבוי:</h5>
+                    <div class="backup-options">
+                        <button class="btn btn-info btn-sm" onclick="createBackup()">
+                            <i class="fas fa-save"></i> צור גיבוי עכשיו
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="showBackupInstructions()">
+                            <i class="fas fa-info-circle"></i> הוראות גיבוי
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="confirmation-actions">
+                    <button class="btn btn-success" onclick="confirmFix()">
+                        <i class="fas fa-check"></i> אישור - המשך עם התיקון
+                    </button>
+                    <button class="btn btn-secondary" onclick="cancelFix()">
+                        <i class="fas fa-times"></i> ביטול
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Store the callback function
+    window.pendingFixCallback = onConfirm;
+    
+    // Show the modal
+    showModal(`אישור ${actionType}`, confirmationHtml);
+}
+
+function createBackup() {
+    // Simulate backup creation
+    if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('גיבוי נוצר', 'גיבוי הקבצים נוצר בהצלחה');
+    }
+    
+    // In real implementation, this would create an actual backup
+    console.log('📦 גיבוי נוצר בהצלחה');
+}
+
+function showBackupInstructions() {
+    const instructionsHtml = `
+        <div class="backup-instructions">
+            <h5>הוראות גיבוי ידני:</h5>
+            <ol>
+                <li>עבור לתיקיית הפרויקט</li>
+                <li>העתק את התיקיות הבאות:
+                    <ul>
+                        <li><code>trading-ui/scripts/</code></li>
+                        <li><code>trading-ui/styles/</code></li>
+                        <li><code>trading-ui/*.html</code></li>
+                    </ul>
+                </li>
+                <li>שמור את ההעתקה בתיקיית גיבוי</li>
+                <li>או השתמש ב-Git: <code>git add . && git commit -m "Backup before linter fixes"</code></li>
+            </ol>
+        </div>
+    `;
+    
+    showModal('הוראות גיבוי', instructionsHtml);
+}
+
+function confirmFix() {
+    closeModal();
+    
+    // Execute the pending fix
+    if (window.pendingFixCallback) {
+        window.pendingFixCallback();
+        window.pendingFixCallback = null;
+    }
+}
+
+function cancelFix() {
+    closeModal();
+    window.pendingFixCallback = null;
+    
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('תיקון בוטל', 'התיקון בוטל על ידי המשתמש');
     }
 }
 
@@ -537,9 +929,103 @@ function initializeControlButtons() {
     }
 }
 
+// Global fix functions
+function fixAllIssues() {
+    const fixableIssues = currentIssues.filter(issue => issue.fixable);
+    
+    if (fixableIssues.length === 0) {
+        if (typeof window.showInfoNotification === 'function') {
+            window.showInfoNotification('אין בעיות לתיקון', 'אין בעיות הניתנות לתיקון אוטומטי');
+        }
+        return;
+    }
+    
+    // Show confirmation dialog with backup recommendation
+    showFixConfirmationDialog('תיקון כל הבעיות', fixableIssues.length, () => {
+        // Fix all issues after confirmation
+        fixableIssues.forEach(issue => {
+            fixIssue(issue.id);
+        });
+        
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('תיקון הושלם', `${fixableIssues.length} בעיות תוקנו בהצלחה`);
+        }
+    });
+}
+
+function fixAllErrors() {
+    const errorIssues = currentIssues.filter(issue => issue.severity === 'error' && issue.fixable);
+    
+    if (errorIssues.length === 0) {
+        if (typeof window.showInfoNotification === 'function') {
+            window.showInfoNotification('אין שגיאות לתיקון', 'אין שגיאות הניתנות לתיקון אוטומטי');
+        }
+        return;
+    }
+    
+    // Show confirmation dialog with backup recommendation
+    showFixConfirmationDialog('תיקון שגיאות', errorIssues.length, () => {
+        // Fix all errors after confirmation
+        errorIssues.forEach(issue => {
+            fixIssue(issue.id);
+        });
+        
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('תיקון שגיאות הושלם', `${errorIssues.length} שגיאות תוקנו בהצלחה`);
+        }
+    });
+}
+
+function fixAllWarnings() {
+    const warningIssues = currentIssues.filter(issue => issue.severity === 'warning' && issue.fixable);
+    
+    if (warningIssues.length === 0) {
+        if (typeof window.showInfoNotification === 'function') {
+            window.showInfoNotification('אין אזהרות לתיקון', 'אין אזהרות הניתנות לתיקון אוטומטי');
+        }
+        return;
+    }
+    
+    // Show confirmation dialog with backup recommendation
+    showFixConfirmationDialog('תיקון אזהרות', warningIssues.length, () => {
+        // Fix all warnings after confirmation
+        warningIssues.forEach(issue => {
+            fixIssue(issue.id);
+        });
+        
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('תיקון אזהרות הושלם', `${warningIssues.length} אזהרות תוקנו בהצלחה`);
+        }
+    });
+}
+
+function ignoreAllIssues() {
+    if (currentIssues.length === 0) {
+        if (typeof window.showInfoNotification === 'function') {
+            window.showInfoNotification('אין בעיות', 'אין בעיות להתעלם מהן');
+        }
+        return;
+    }
+    
+    // Confirm action
+    if (confirm(`האם אתה בטוח שברצונך להתעלם מ-${currentIssues.length} בעיות?`)) {
+        currentIssues.forEach(issue => {
+            ignoreIssue(issue.id);
+        });
+        
+        if (typeof window.showInfoNotification === 'function') {
+            window.showInfoNotification('התעלמות הושלמה', `${currentIssues.length} בעיות הועברו לרשימת ההתעלמות`);
+        }
+    }
+}
+
 window.toggleSection = toggleSection;
 window.resetSettings = resetSettings;
 window.copyDetailedLog = copyDetailedLog;
+window.fixAllIssues = fixAllIssues;
+window.fixAllErrors = fixAllErrors;
+window.fixAllWarnings = fixAllWarnings;
+window.ignoreAllIssues = ignoreAllIssues;
 
 // Cleanup on page unload
 window.addEventListener('beforeunload', () => {

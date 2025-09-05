@@ -359,23 +359,48 @@ function updateTradesTable(trades) {
 
     return `
     <tr>
-      <td class="ticker-cell"><strong><a href="#" onclick="viewTickerDetails('${trade.ticker_id}')" class="ticker-link">${trade.ticker_symbol || getTickerSymbol(trade.ticker_id) || 'טיקר לא ידוע'}</a></strong></td>
-      <td class="status-cell" data-status="${trade.status || ''}"><span class="status-badge status-${trade.status || 'open'}">${statusDisplay}</span></td>
+      <td class="ticker-cell">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button class="btn btn-sm btn-outline-info" 
+            onclick="showEntityDetails('trade', ${trade.id})" 
+            title="פרטי טרייד" 
+            style="background-color: white; font-size: 0.8em;">
+            🔗
+          </button>
+          <span class="entity-trade-badge" 
+                style="padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+            ${trade.ticker_symbol || getTickerSymbol(trade.ticker_id) || 'טיקר לא ידוע'}
+          </span>
+        </div>
+      </td>
+      <td class="status-cell" data-status="${trade.status || ''}">
+        <span class="status-${trade.status || 'open'}-badge" 
+              style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+          ${statusDisplay}
+        </span>
+      </td>
       <td class="type-cell" data-type="${typeForFilter}">
-        <span class='investment-type-badge' 
-          style='background-color: ${typeColor}; color: white; padding: 2px 8px; 
-            border-radius: 12px; font-size: 0.85em; font-weight: 500;'>
+        <span class="entity-trade-badge" 
+              style="padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
           ${typeDisplay || trade.investment_type || '-'}
         </span>
       </td>
       <td class="side-cell" data-side="${trade.side || 'Long'}">
-        <span class="side-badge ${trade.side === 'Long' ? 'side-long' : 'side-short'}">${trade.side || 'Long'}</span>
+        <span class="${trade.side === 'Long' ? 'numeric-value-positive' : 'numeric-value-negative'}" 
+              style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+          ${trade.side || 'Long'}
+        </span>
       </td>
       <td class="plan-cell">${trade.trade_plan_id ? `<a href="#" onclick="viewTradePlanDetails('${trade.trade_plan_id}')" class="plan-link" data-plan-id="${trade.trade_plan_id}">טוען...</a>` : '-'}</td>
                       <td class="pl-cell">${window.colorAmountByValue(trade.total_pl || 0, trade.total_pl ? `$${trade.total_pl.toFixed(2)}` : '$0.00')}</td>
       <td data-date="${trade.created_at}">${trade.created_at ? new Date(trade.created_at).toLocaleDateString('he-IL') : 'לא מוגדר'}</td>
       <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL') : ''}</td>
-      <td><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</a></strong></td>
+      <td>
+        <span class="entity-account-badge" 
+              style="padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+          ${trade.account_name || trade.account_id || 'חשבון לא ידוע'}
+        </span>
+      </td>
       <td>${trade.notes || ''}</td>
       <td class="actions-cell">
         <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">

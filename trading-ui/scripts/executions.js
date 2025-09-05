@@ -1788,28 +1788,39 @@ async function updateExecutionsTableMain(executions) {
 
     return `
             <tr data-execution-id="${execution.id}">
-                                   <td class="ticker-cell">
-                       <div style="display: flex; align-items: center; gap: 8px;">
-                           <button class="btn btn-sm btn-outline-success" 
-                             onclick="goToTickerPage('${symbol}')" 
-                             title="עבור לדף טיקר - בפיתוח" 
-                             style="background-color: white; border-color: ${positiveColor}; color: ${positiveColor};">
-                               🔗
-                           </button>
-                           <strong>${symbol}</strong>
-                       </div>
-                   </td>
+                <td class="ticker-cell">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <button class="btn btn-sm btn-outline-info" 
+                          onclick="showEntityDetails('execution', ${execution.id})" 
+                          title="פרטי עסקה" 
+                          style="background-color: white; border-color: ${colors.info}; color: ${colors.info};">
+                            🔗
+                        </button>
+                        <strong>${symbol}</strong>
+                    </div>
+                </td>
                 <td><small style="color: ${secondaryColor};">${tradeInfo}</small></td>
                 <td class="type-cell" data-type="${typeForFilter}">
-                    <span class="${(execution.action || execution.type) === 'buy' ? 'profit-positive' : 'profit-negative'}">
+                    <span class="${(execution.action || execution.type) === 'buy' ? 'numeric-value-positive' : 'numeric-value-negative'}" 
+                          style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
                         ${(execution.action || execution.type) === 'buy' ? 'קניה' : 'מכירה'}
                     </span>
                 </td>
-                <td data-account="${accountName}">${accountName}</td>
+                <td data-account="${accountName}">
+                    <span class="entity-account-badge" 
+                          style="padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+                        ${accountName}
+                    </span>
+                </td>
                 <td>${execution.quantity}</td>
                 <td>$${execution.price}</td>
                 <td>${execution.fee ? '$' + execution.fee : '-'}</td>
-                <td class="pl-cell">$0</td>
+                <td class="pl-cell">
+                    <span class="numeric-value-zero" 
+                          style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
+                        $0.00
+                    </span>
+                </td>
                 <td>${execution.notes || '-'}</td>
                 <td data-date="${execution.created_at}">${execution.created_at ? new Date(execution.created_at).toLocaleDateString('he-IL') : '-'}</td>
                 <td data-date="${execution.date || execution.execution_date}">${execution.date || execution.execution_date ? new Date(execution.date || execution.execution_date).toLocaleDateString('he-IL') : '-'}</td>

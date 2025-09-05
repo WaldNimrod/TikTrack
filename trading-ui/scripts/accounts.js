@@ -325,16 +325,45 @@ function updateAccountsTable(accounts) {
 
     return `
     <tr data-account-id="${account.id}">
-      <td class="ticker-cell" data-account="${account.name || '-'}"><strong>${account.name || '-'}</strong></td>
+      <td class="ticker-cell" data-account="${account.name || '-'}">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button class="btn btn-sm btn-outline-info" 
+            onclick="showEntityDetails('account', ${account.id})" 
+            title="פרטי חשבון" 
+            style="background-color: white; font-size: 0.8em;">
+            🔗
+          </button>
+          <span class="entity-account-badge" 
+                style="padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+            ${account.name || '-'}
+          </span>
+        </div>
+      </td>
       <td>${account.currency || '-'}</td>
       <td class="status-cell" data-status="${statusForFilter}">
-        <span class="status-badge status-${account.status}">
+        <span class="status-${account.status}-badge" 
+              style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
           ${statusForFilter}
         </span>
       </td>
-      <td>$${account.cash_balance ? account.cash_balance.toLocaleString() : '0'}</td>
-      <td>$${account.total_value ? account.total_value.toLocaleString() : '0'}</td>
-      <td>${account.total_pl ? `$${account.total_pl.toLocaleString()}` : '$0'}</td>
+      <td>
+        <span class="numeric-value-positive" 
+              style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
+          $${account.cash_balance ? account.cash_balance.toLocaleString() : '0'}
+        </span>
+      </td>
+      <td>
+        <span class="numeric-value-positive" 
+              style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
+          $${account.total_value ? account.total_value.toLocaleString() : '0'}
+        </span>
+      </td>
+      <td>
+        <span class="${account.total_pl >= 0 ? 'numeric-value-positive' : 'numeric-value-negative'}" 
+              style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
+          ${account.total_pl ? `$${account.total_pl.toLocaleString()}` : '$0'}
+        </span>
+      </td>
       <td>${account.notes || '-'}</td>
       <td class="actions-cell">
         <button class="btn btn-sm btn-info" 
@@ -1587,6 +1616,11 @@ async function loadAccountsDataForAccountsPage() {
       if (tbody && tbody.children.length === 0) {
         handleSystemError(new Error('הטבלה לא התעדכנה כראוי'), 'עדכון טבלה');
         throw new Error('הטבלה לא התעדכנה כראוי');
+      }
+      
+      // יישום צבעי ישויות על כותרות
+      if (window.applyEntityColorsToHeaders) {
+        window.applyEntityColorsToHeaders('account');
       }
     } else {
       handleFunctionNotFound('updateAccountsTable', 'פונקציית עדכון הטבלה לא נמצאה');

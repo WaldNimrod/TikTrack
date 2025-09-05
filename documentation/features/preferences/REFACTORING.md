@@ -37,10 +37,24 @@ This document describes the comprehensive refactoring of the TikTrack preference
 
 ```
 trading-ui/
-├── preferences.html          # Clean HTML structure (1,518 lines)
+├── preferences.html          # V1 - Clean HTML structure (1,518 lines)
+├── preferences-v2.html       # V2 - Advanced structure (1,056 lines) ✨ NEW
 └── scripts/
-    └── preferences.js        # All JavaScript logic (1,780 lines)
+    ├── preferences.js        # V1 - All JavaScript logic (1,780 lines)
+    ├── preferences-v2.js     # V2 - Modern JavaScript (919 lines) ✨ NEW
+    └── preferences-v2-compatibility.js  # V2 compatibility (313 lines) ✨ NEW
 ```
+
+### 🚀 **V2 System (NEW - January 2025)**
+
+#### **Major Improvements:**
+- **Modular Architecture**: Cleaner, more maintainable code
+- **Multiple Profiles**: Support for multiple preference profiles per user
+- **Import/Export**: JSON-based settings backup and restore
+- **Change History**: Complete audit trail of all changes
+- **Modern UI**: Apple-inspired design with animations
+- **Mobile Support**: Fully responsive design
+- **Advanced Validation**: Real-time settings validation
 
 ### 3. Code Organization
 

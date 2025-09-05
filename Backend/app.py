@@ -102,6 +102,7 @@ from routes.api.cash_flows import cash_flows_bp
 from routes.api.notes import notes_bp
 from routes.api.executions import executions_bp
 from routes.api.preferences import preferences_bp
+from routes.api.preferences_v2 import preferences_v2_bp
 from routes.api.users import users_bp
 from routes.api.background_tasks import background_tasks_bp
 from routes.api.entity_details import entity_details_bp
@@ -193,6 +194,7 @@ app.register_blueprint(cash_flows_bp)
 app.register_blueprint(notes_bp)
 app.register_blueprint(executions_bp)
 app.register_blueprint(preferences_bp)
+app.register_blueprint(preferences_v2_bp)
 app.register_blueprint(users_bp)
 app.register_blueprint(background_tasks_bp)
 app.register_blueprint(entity_details_bp)

@@ -138,13 +138,28 @@ async function showAddExecutionModal() {
   document.getElementById('addExecutionDate').value = todayString;
 
   // הגדרת עמלה ברירת מחדל לפי העדפות
+  // ✨ עודכן לתמיכה במערכת העדפות V2!
   try {
-    const defaultCommission = window.userPreferences && window.userPreferences.defaultCommission
-      ? window.userPreferences.defaultCommission
-      : 9.99; // ערך ברירת מחדל אם אין העדפות
+    let defaultCommission = 1.0; // ברירת מחדל משופרת
+    
+    // נסה לקבל מהמערכת החדשה V2/V1
+    if (typeof window.getCurrentPreference === 'function') {
+      const commissionFromPrefs = await window.getCurrentPreference('defaultCommission');
+      if (commissionFromPrefs !== null && commissionFromPrefs !== undefined) {
+        defaultCommission = commissionFromPrefs;
+        console.log(`✅ Using commission from V2/V1 preferences: ${defaultCommission}`);
+      }
+    } 
+    // Fallback לV1 userPreferences
+    else if (window.userPreferences && window.userPreferences.defaultCommission) {
+      defaultCommission = window.userPreferences.defaultCommission;
+      console.log(`✅ Using commission from V1 userPreferences: ${defaultCommission}`);
+    }
+    
     document.getElementById('addExecutionCommission').value = defaultCommission;
-  } catch {
-    document.getElementById('addExecutionCommission').value = 9.99;
+  } catch (error) {
+    console.warn('⚠️ Could not load default commission from preferences:', error);
+    document.getElementById('addExecutionCommission').value = 1.0;
   }
 
   // טעינת טיקרים לפי הצ'קבוקס

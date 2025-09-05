@@ -43,14 +43,17 @@
 
 ### Architecture Improvements
 
-#### File Structure
+#### File Structure V1 & V2
 ```
 trading-ui/
-├── preferences.html          # Clean HTML structure
+├── preferences.html          # V1 - Clean HTML structure (legacy)
+├── preferences-v2.html       # V2 - Advanced HTML with profiles (NEW)
 ├── scripts/
-│   └── preferences.js        # Complete JavaScript logic
+│   ├── preferences.js        # V1 - Complete JavaScript logic
+│   ├── preferences-v2.js     # V2 - Advanced JavaScript with profiles (NEW)
+│   └── preferences-v2-compatibility.js  # V2 compatibility layer (NEW)
 └── config/
-    └── preferences.json      # Configuration data
+    └── preferences.json      # Configuration data (legacy)
 ```
 
 #### Function Organization

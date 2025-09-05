@@ -653,7 +653,11 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/accounts">חשבונות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/preferences-v2.html">🚀 העדפות V2 (מתקדם)</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות V1 (מסורתי)</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">🔧 כלי פיתוח</h6></li>
+                        <li><a class="tiktrack-dropdown-item" href="/test-preferences-v2-integration.html">בדיקת אינטגרציה V2</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
@@ -4723,14 +4727,48 @@ function clearFiltersManually() {
 
 /**
  * קבלת הגדרה נוכחית מהשרת
+ * ✨ עודכן לתמיכה במערכת העדפות V2!
  */
 async function getCurrentPreference(key) {
   try {
+    console.log(`🔍 header-system getCurrentPreference(${key}) - checking V2 first...`);
+    
+    // עדיפות ראשונה - מערכת V2
+    try {
+      const response = await fetch('/api/v2/preferences/');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.data.preferences) {
+          // מיפוי מפתחות V1 ל-V2
+          const keyMappings = {
+            'defaultStatusFilter': 'defaultFilters.status',
+            'defaultTypeFilter': 'defaultFilters.type',
+            'defaultAccountFilter': 'defaultFilters.account',
+            'defaultDateRangeFilter': 'defaultFilters.dateRange',
+            'defaultSearchFilter': 'defaultFilters.search',
+            'primaryCurrency': 'general.primaryCurrency',
+            'timezone': 'general.timezone'
+          };
+          
+          const v2Path = keyMappings[key];
+          if (v2Path) {
+            const value = v2Path.split('.').reduce((obj, k) => obj?.[k], data.data.preferences);
+            if (value !== undefined) {
+              console.log(`✅ Found V2 preference ${key}: ${value}`);
+              return value;
+            }
+          }
+        }
+      }
+    } catch (v2Error) {
+      console.log(`🔄 V2 not available, trying V1: ${v2Error.message}`);
+    }
+    
+    // Fallback ל-V1 API
     const response = await fetch('/api/v1/preferences/');
     if (response.ok) {
       const preferences = await response.json();
-      console.log(`🔍 All preferences from server:`, preferences);
-      console.log(`🔍 Getting preference ${key}:`, preferences[key]);
+      console.log(`✅ Found V1 preference ${key}: ${preferences[key]}`);
       return preferences[key];
     }
     return null;

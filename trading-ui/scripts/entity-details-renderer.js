@@ -35,6 +35,7 @@ class EntityDetailsRenderer {
     
     /**
      * Constructor - אתחול מחלקת EntityDetailsRenderer
+     * ✨ עודכן לתמיכה במערכת העדפות V2!
      * 
      * @constructor
      */
@@ -42,37 +43,42 @@ class EntityDetailsRenderer {
         this.isInitialized = false;
         this.entityColors = {};
         
-        this.init();
+        // אתחול async (לא-בלוקינג)
+        this.init().catch(error => {
+            console.error('❌ EntityDetailsRenderer initialization failed:', error);
+        });
     }
 
     /**
      * Initialize renderer system - אתחול מערכת הרנדור
+     * ✨ עודכן לתמיכה במערכת העדפות V2!
      * 
      * @private
      */
-    init() {
+    async init() {
         try {
-            // טעינת צבעי ישויות מההעדפות
-            this.loadEntityColors();
+            // טעינת צבעי ישויות מההעדפות (V2/V1)
+            await this.loadEntityColors();
             
             this.isInitialized = true;
             
             // הוספה לאובייקט הגלובלי
             window.entityDetailsRenderer = this;
             
-            console.info('EntityDetailsRenderer initialized successfully');
+            console.info('✅ EntityDetailsRenderer initialized successfully with V2 support');
             
         } catch (error) {
-            console.error('Error initializing EntityDetailsRenderer:', error);
+            console.error('❌ Error initializing EntityDetailsRenderer:', error);
         }
     }
 
     /**
      * Load entity colors from preferences - טעינת צבעי ישויות מההעדפות
+     * ✨ עודכן לתמיכה במערכת העדפות V2!
      * 
      * @private
      */
-    loadEntityColors() {
+    async loadEntityColors() {
         // צבעי ברירת מחדל
         this.entityColors = {
             ticker: '#dc3545',
@@ -85,14 +91,54 @@ class EntityDetailsRenderer {
             note: '#6c757d'
         };
 
-        // ניסיון לטעון צבעים מהעדפות משתמש
+        // ניסיון לטעון צבעים מהעדפות V2 ראשית
         try {
+            console.log('🎨 Loading entity colors from preferences (V2/V1)...');
+            
+            // נסה מערכת V2
+            if (window.preferencesV2 && window.preferencesV2.preferences && window.preferencesV2.preferences.colorScheme) {
+                const colorScheme = window.preferencesV2.preferences.colorScheme;
+                if (colorScheme.entities) {
+                    Object.assign(this.entityColors, colorScheme.entities);
+                    console.log('✅ Loaded entity colors from V2 system');
+                    return;
+                }
+            }
+            
+            // נסה מערכת גלובלית (compatibility layer)
+            if (window.ENTITY_COLORS) {
+                Object.assign(this.entityColors, window.ENTITY_COLORS);
+                console.log('✅ Loaded entity colors from global system');
+                return;
+            }
+            
+            // Fallback ל-V1 userPreferences
             if (window.userPreferences && window.userPreferences.entityColors) {
                 Object.assign(this.entityColors, window.userPreferences.entityColors);
+                console.log('✅ Loaded entity colors from V1 userPreferences');
+                return;
             }
+            
+            // Fallback אחרון - API
+            try {
+                const response = await fetch('/api/v2/preferences/');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.data.preferences.colorScheme?.entities) {
+                        Object.assign(this.entityColors, data.data.preferences.colorScheme.entities);
+                        console.log('✅ Loaded entity colors from V2 API');
+                        return;
+                    }
+                }
+            } catch (apiError) {
+                console.debug('V2 API not available, using defaults');
+            }
+            
         } catch (error) {
             console.debug('Could not load entity colors from preferences, using defaults');
         }
+        
+        console.log('🔄 Using default entity colors');
     }
 
     /**

@@ -61,6 +61,9 @@
   <script src="scripts/entity-details-renderer.js"></script>
   <script src="scripts/entity-details-modal.js"></script>
   
+  <!-- ✨ תמיכה במערכת העדפות V2 לצבעי ישויות -->
+  <script src="scripts/preferences-v2-compatibility.js"></script>
+  
       <script src="scripts/alert-service.js"></script>
     <script src="scripts/trade-plan-service.js"></script>
     <script src="scripts/error-handlers.js"></script>
@@ -103,6 +106,10 @@
           <div class="table-actions">
             <button class="refresh-btn" onclick="showAddAlertModal()" title="הוסף התראה חדשה">
               <span class="action-icon">➕</span> הוסף
+            </button>
+            <div class="action-separator"></div>
+            <button class="refresh-btn" onclick="openPreferencesV2()" title="פתח מערכת העדפות V2 המתקדמת" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white; font-size: 0.8rem;">
+              <span class="action-icon">🚀</span> V2
             </button>
             <div class="action-separator"></div>
             <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור התראות">
@@ -534,6 +541,15 @@
 
         console.log('✅ מודולים הוגדרו לסגירה בלחיצה על הרקע');
       });
+      
+      // פונקציה לפתיחת מערכת העדפות V2
+      function openPreferencesV2() {
+        console.log('🚀 Opening Preferences V2 system from alerts page...');
+        if (typeof window.showInfoNotification === 'function') {
+          window.showInfoNotification('העדפות', 'עובר למערכת העדפות V2 המתקדמת...');
+        }
+        window.location.href = 'preferences-v2.html';
+      }
     </script>
 </body>
 

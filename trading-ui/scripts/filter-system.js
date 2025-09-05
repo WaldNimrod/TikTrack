@@ -4,11 +4,13 @@
  * ========================================
  *
  * מערכת פילטרים מאוחדת שמתאימה את עצמה לכל טבלה
+ * 🚀 תומך במערכת העדפות V2 החדשה!
  *
  * Dependencies:
  * - table-mappings.js (for column mappings)
  * - main.js (global utilities)
  * - translation-utils.js (translation functions)
+ * - preferences-v2-compatibility.js (V2 support)
  *
  * Table Mapping:
  * - Uses table types from table-mappings.js
@@ -841,16 +843,19 @@ FilterSystem.prototype.resetToUserDefaults = async function() {
 // פונקציה לקבלת העדפת משתמש
 FilterSystem.prototype.getUserPreference = async function(preferenceKey) {
   try {
-    // נסיון לקבל מהשרת
+    // ✨ עדכון לתמיכה במערכת V2!
+    console.log(`🔍 FilterSystem.getUserPreference(${preferenceKey}) - checking V2 first...`);
+    
+    // עדיפות ראשונה - מערכת V2 אם זמינה
     if (typeof window.getCurrentPreference === 'function') {
       const value = await window.getCurrentPreference(preferenceKey);
-      console.log(`🔍 FilterSystem.getUserPreference(${preferenceKey}):`, value);
+      console.log(`✅ V2 preference ${preferenceKey}: ${value}`);
       return value;
     }
     
     // Fallback - localStorage
     const localValue = localStorage.getItem(`preference_${preferenceKey}`) || null;
-    console.log(`🔍 FilterSystem.getUserPreference(${preferenceKey}) from localStorage:`, localValue);
+    console.log(`🔄 Fallback localStorage preference ${preferenceKey}:`, localValue);
     return localValue;
   } catch (error) {
     console.warn(`⚠️ Failed to get preference ${preferenceKey}:`, error);

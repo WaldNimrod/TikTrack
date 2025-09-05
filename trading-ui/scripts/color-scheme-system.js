@@ -1357,25 +1357,79 @@ function updateCSSVariablesFromPreferences(preferences) {
 
 /**
  * טעינת הגדרות צבע מהעדפות
+ * ✨ עודכן לתמיכה במערכת העדפות V2!
  * Load color settings from preferences
  */
 async function loadColorPreferences() {
   try {
-    console.log('🎨 טוען הגדרות צבע מהעדפות...');
+    console.log('🎨 טוען הגדרות צבע מהעדפות (V2/V1)...');
 
+    // נסה ראשית מערכת V2
+    try {
+      const v2Response = await fetch('/api/v2/preferences/');
+      if (v2Response.ok) {
+        const v2Data = await v2Response.json();
+        if (v2Data.success && v2Data.data.preferences) {
+          const prefs = v2Data.data.preferences;
+          console.log('🚀 Using V2 color preferences');
+          
+          // עדכון מערכת הצבעים מV2
+          if (prefs.colorScheme) {
+            if (prefs.colorScheme.numericValues) {
+              Object.assign(NUMERIC_VALUE_COLORS, prefs.colorScheme.numericValues);
+              console.log('✅ V2 numeric colors loaded');
+            }
+            if (prefs.colorScheme.entities) {
+              Object.assign(ENTITY_COLORS, prefs.colorScheme.entities);
+              console.log('✅ V2 entity colors loaded');
+            }
+            if (prefs.colorScheme.status) {
+              Object.assign(STATUS_COLORS, prefs.colorScheme.status);
+              console.log('✅ V2 status colors loaded');
+            }
+          }
+          
+          // עדכון CSS Variables
+          updateCSSVariablesFromPreferences(prefs);
+          
+          // עדכון כותרות עם הצבעים החדשים
+          const bodyClass = document.body.className;
+          if (bodyClass) {
+            const entityType = bodyClass.split(' ').find(cls => 
+              ['tickers-page', 'trades-page', 'accounts-page', 'alerts-page', 'cash-flows-page'].includes(cls)
+            );
+            
+            if (entityType) {
+              const entity = entityType.replace('-page', '').replace('tickers', 'ticker');
+              if (ENTITY_COLORS[entity]) {
+                applyEntityColorsToHeaders(entity);
+              }
+            }
+          }
+          
+          console.log('🎨 ✅ הגדרות צבע V2 נטענו בהצלחה');
+          return true;
+        }
+      }
+    } catch (v2Error) {
+      console.log('🔄 V2 colors not available, falling back to V1');
+    }
+
+    // Fallback ל-V1
+    console.log('🔄 Using V1 color preferences (fallback)');
     const response = await fetch('/api/v1/preferences/');
     if (response.ok) {
       const data = await response.json();
       const preferences = data.data || data;
 
-      // עדכון מערכת הצבעים
+      // עדכון מערכת הצבעים מV1
       if (preferences.numericValueColors) {
         Object.assign(NUMERIC_VALUE_COLORS, preferences.numericValueColors);
       }
 
       if (preferences.entityColors) {
         Object.assign(ENTITY_COLORS, preferences.entityColors);
-        console.log('✅ צבעי ישויות עודכנו:', preferences.entityColors);
+        console.log('✅ צבעי ישויות V1 עודכנו:', preferences.entityColors);
       }
 
       // עדכון CSS Variables

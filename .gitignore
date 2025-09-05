@@ -116,3 +116,4 @@ eslint-report.txt
 Backend/db/*.db
 Backend/db/*.db-shm
 Backend/db/*.db-wal
+core

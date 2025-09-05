@@ -68,7 +68,8 @@
             <div class="hero-content">
                 <div class="hero-text">
                     <div class="hero-quick-links">
-                        <a href="#" class="quick-link-icon" title="הגדרות">⚙️</a>
+                        <a href="preferences-v2.html" class="quick-link-icon" title="העדפות V2 (מתקדם)" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white;">🚀</a>
+                        <a href="preferences.html" class="quick-link-icon" title="הגדרות V1 (מסורתי)">⚙️</a>
                         <a href="#" class="quick-link-icon" title="עזרה">❓</a>
                         <a href="#" class="quick-link-icon" title="הודעות">🔔</a>
                         <a href="#" class="quick-link-icon" title="פרופיל">👤</a>
@@ -100,6 +101,33 @@
                             <div class="hero-stat-number">78.5%</div>
                             <div class="hero-stat-label">הצלחה</div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🚀 באנר מערכת העדפות V2 החדשה -->
+        <div class="v2-announcement-banner" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 0; margin-bottom: 20px;">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3" style="font-size: 2rem;">🚀</div>
+                            <div>
+                                <h5 class="mb-1" style="font-weight: 600;">מערכת העדפות V2 זמינה כעת!</h5>
+                                <p class="mb-0" style="opacity: 0.9; font-size: 0.9rem;">
+                                    פרופילים מרובים • יבוא/יצוא • היסטוריית שינויים • עיצוב מתקדם
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="preferences-v2.html" class="btn btn-light btn-sm me-2" style="font-weight: 600;">
+                            <i class="bi bi-stars"></i> נסה עכשיו
+                        </a>
+                        <a href="PREFERENCES_V2_IMPLEMENTATION_REPORT.md" target="_blank" class="btn btn-outline-light btn-sm" style="font-size: 0.8rem;">
+                            <i class="bi bi-info-circle"></i> מידע נוסף
+                        </a>
                     </div>
                 </div>
             </div>
@@ -408,9 +436,14 @@
                             <div class="action-btn-text">דוחות</div>
                         </button>
 
+                        <button class="action-btn" onclick="quickAction('preferences-v2')">
+                            <div class="action-btn-icon">🚀</div>
+                            <div class="action-btn-text">העדפות V2</div>
+                        </button>
+
                         <button class="action-btn" onclick="quickAction('settings')">
                             <div class="action-btn-icon">⚙️</div>
-                            <div class="action-btn-text">הגדרות</div>
+                            <div class="action-btn-text">הגדרות V1</div>
                         </button>
 
                         <button class="action-btn" onclick="quickAction('documentation')">
@@ -861,22 +894,27 @@
         function quickAction(action) {
             switch (action) {
                 case 'new-trade':
-                    console.log('יצירת טרייד חדש');
+                    window.location.href = 'trades.html';
                     break;
                 case 'new-alert':
-                    console.log('יצירת התראה חדשה');
+                    window.location.href = 'alerts.html';
                     break;
                 case 'new-account':
-                    console.log('יצירת חשבון חדש');
+                    window.location.href = 'accounts.html';
                     break;
                 case 'export-data':
-                    console.log('ייצוא נתונים');
+                    console.log('ייצוא נתונים - תכונה תתווסף בעתיד');
                     break;
                 case 'reports':
-                    console.log('פתיחת דוחות');
+                    console.log('דוחות - תכונה תתווסף בעתיד');
+                    break;
+                case 'preferences-v2':
+                    console.log('🚀 מעבר למערכת העדפות V2 המתקדמת');
+                    window.location.href = 'preferences-v2.html';
                     break;
                 case 'settings':
-                    console.log('פתיחת הגדרות');
+                    console.log('🔄 מעבר למערכת העדפות V1 המסורתית');
+                    window.location.href = 'preferences.html';
                     break;
                 case 'documentation':
                     window.open('../JAVASCRIPT_SCRIPTS_ARCHITECTURE.md', '_blank');

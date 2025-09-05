@@ -146,17 +146,34 @@ table {
     min-width: 100% !important;
 }
 
-/* הגדרה גלובלית לכל הטבלאות - תמיד למלא את כל הרוחב */
+/* הגדרות גלובליות לטבלאות */
+table {
+    table-layout: auto !important;
+    width: 100% !important;
+    min-width: 100% !important;
+}
+
 table, .table, .data-table {
     width: 100% !important;
     min-width: 100% !important;
     table-layout: auto !important;
 }
 
-/* וידוא שהתאים יתרחבו עם הטבלה */
 table td, .table td, .data-table td {
     width: auto !important;
     min-width: 0 !important;
+}
+
+/* עדכון ספציפי לכל טבלה */
+#tickersTable, #tradesTable, #trade_plansTable, #notesTable, #alertsTable, .trade-plans-table {
+    table-layout: auto !important;
+    width: 100% !important;
+    min-width: 100% !important;
+}
+
+/* יישור מרכז לכל הכותרות */
+table th, .table th, .data-table th {
+    text-align: center !important;
 }
 
 table td {
@@ -2452,19 +2469,14 @@ th {
   width: 14% !important;
 }
 
-/* ===== RTL ספציפי לטבלת הטיקרים ===== */
+/* RTL ספציפי לטבלת טיקרים */
 #tickersTable {
-  direction: rtl !important;
+    direction: rtl !important;
+    text-align: right !important;
 }
 
 #tickersTable th {
-  text-align: center !important;
-  direction: rtl !important;
-}
-
-#tickersTable td {
-  text-align: right !important;
-  direction: rtl !important;
+    text-align: center !important;
 }
 
 /* יישור מרכז לעמודות מספריות ואייקונים */

@@ -208,7 +208,7 @@
       <!-- Accounts area - top-Section -->
       <div class="top-section accounts-page">
         <!-- Accounts header -->
-        <div class="section-header">
+        <div class="section-header entity-account-main-header">
           <div class="table-title">
             <img src="images/icons/accounts.svg" alt="חשבונות" class="table-icon">
             חשבונות
@@ -254,7 +254,7 @@
         <!-- My accounts area - content-section -->
         <div class="content-section accounts-page" id="accountsMainSection">
           <!-- My accounts header -->
-          <div class="section-header">
+          <div class="section-header entity-account-sub-header">
             <div class="table-title">
               <img src="images/icons/accounts.svg" alt="החשבונות שלי" class="table-icon">
               החשבונות שלי
@@ -323,12 +323,18 @@
                         הערות <span class="sort-icon">↕</span>
                       </button>
                     </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); }">
+                        עודכן <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
                     <th class="actions-cell">פעולות</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="8" class="text-center text-muted">
+                    <td colspan="9" class="text-center text-muted">
                       <div class="no-data-message accounts">
                         <i class="fas fa-database no-data-icon"></i>
                         <h5>אין נתונים זמינים</h5>

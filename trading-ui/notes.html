@@ -97,7 +97,7 @@
       <!-- Notes area - top-Section -->
       <div class="top-section">
         <!-- Main header -->
-        <div class="section-header">
+        <div class="section-header entity-note-main-header">
           <div class="table-title">
             <img src="images/icons/home.svg" alt="הערות"
               style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
@@ -146,7 +146,7 @@
         <!-- Notes area - content-section -->
         <div class="content-section notes-page">
           <!-- Notes header -->
-          <div class="section-header">
+          <div class="section-header entity-note-sub-header">
             <div class="table-title">
               <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style="margin-left: 8px; vertical-align: middle;">
                 <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
@@ -229,6 +229,13 @@
                         נוצר ב <span class="sort-icon">↕</span>
                       </button>
                     </th>
+                    <th>
+                      <button class="btn btn-link sortable-header"
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        עודכן <span class="sort-icon">↕</span>
+                      </button>
+                    </th>
                     <th class="actions-cell">
                       פעולות
                     </th>
@@ -236,7 +243,7 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="6" class="text-center text-danger">
+                    <td colspan="7" class="text-center text-danger">
                       <div style="padding: 20px;">
                         <h5>⚠️ שגיאה בטעינת נתונים</h5>
                         <p>לא ניתן לטעון נתוני הערות מהשרת</p>

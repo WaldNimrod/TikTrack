@@ -27,6 +27,21 @@ if (!window.cashFlowsData) {
 }
 let cashFlowsData = window.cashFlowsData;
 
+// פונקציה לחישוב משך זמן
+function getTimeDuration(dateString) {
+    if (!dateString) return '00:00:00';
+    
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffMs = now - date;
+    
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return `${days.toString().padStart(2, '0')}:${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+
 // השתמש בפונקציה הכללית מ-translation-utils.js
 // הפונקציה colorAmount זמינה גלובלית מ-translation-utils.js
 
@@ -726,7 +741,7 @@ function renderCashFlowsTable() {
   tbody.innerHTML = '';
 
   if (!cashFlowsData || cashFlowsData.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="11" class="text-center">לא נמצאו תזרימי מזומנים</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="12" class="text-center">לא נמצאו תזרימי מזומנים</td></tr>';
     return;
   }
 

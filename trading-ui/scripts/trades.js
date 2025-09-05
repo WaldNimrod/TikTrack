@@ -273,6 +273,7 @@ async function loadTradesData() {
       cancelled_at: trade.cancelled_at,
       total_pl: trade.total_pl,
       notes: trade.notes,
+      updated_at: trade.updated_at, // הוספת שדה updated_at
     }));
 
     // עדכון המשתנה הגלובלי
@@ -377,6 +378,7 @@ function updateTradesTable(trades) {
       <td>${trade.closed_at ? new Date(trade.closed_at).toLocaleDateString('he-IL') : trade.cancelled_at ? new Date(trade.cancelled_at).toLocaleDateString('he-IL') : ''}</td>
       <td><strong><a href="#" onclick="viewAccountDetails('${trade.account_id}')" class="account-link">${trade.account_name || trade.account_id || 'חשבון לא ידוע'}</a></strong></td>
       <td>${trade.notes || ''}</td>
+      <td>${getTimeDuration(trade.updated_at || trade.created_at)}</td>
       <td class="actions-cell">
         <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
           ${createLinkButton(`viewLinkedItemsForTrade(${trade.id})`)}

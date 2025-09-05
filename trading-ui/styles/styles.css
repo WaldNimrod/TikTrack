@@ -36,6 +36,163 @@
  * - transition: all 0.2s ease
  */
 
+:root {
+    /* Entity Colors with Default Values */
+    --entity-ticker-color: #019193;
+    --entity-ticker-bg: #01919399;
+    --entity-ticker-border: #019193;
+    
+    --entity-account-color: #1b0b75;
+    --entity-account-bg: #1b0b7599;
+    --entity-account-border: #1b0b75;
+    
+    --entity-preference-color: #adb5bd;
+    --entity-preference-bg: #adb5bd99;
+    --entity-preference-border: #adb5bd;
+    
+    --entity-trade-color: #28a745;
+    --entity-trade-bg: #28a74599;
+    --entity-trade-border: #28a745;
+    
+    --entity-alert-color: #ff9c05;
+    --entity-alert-bg: #ff9c0599;
+    --entity-alert-border: #ff9c05;
+    
+    --entity-cash-flow-color: #20c997;
+    --entity-cash-flow-bg: #20c99799;
+    --entity-cash-flow-border: #20c997;
+    
+    --entity-note-color: #6f42c1;
+    --entity-note-bg: #6f42c199;
+    --entity-note-border: #6f42c1;
+    
+    --entity-trade-plan-color: #0056b3;
+    --entity-trade-plan-bg: #0056b399;
+    --entity-trade-plan-border: #0056b3;
+    
+    --entity-execution-color: #17a2b8;
+    --entity-execution-bg: #17a2b899;
+    --entity-execution-border: #17a2b8;
+}
+
+/* Entity Header Styles with CSS Variables */
+.entity-ticker-main-header {
+    background-color: var(--entity-ticker-bg);
+    border-left: 4px solid var(--entity-ticker-border);
+}
+
+.entity-ticker-sub-header {
+    background-color: var(--entity-ticker-bg);
+    border-left: 3px solid var(--entity-ticker-border);
+}
+
+/* תמיכה בפורמט plural (עם 's') לתאימות */
+.entity-tickers-main-header {
+    background-color: var(--entity-ticker-bg);
+    border-left: 4px solid var(--entity-ticker-border);
+}
+
+.entity-tickers-sub-header {
+    background-color: var(--entity-ticker-bg);
+    border-left: 3px solid var(--entity-ticker-border);
+}
+
+.entity-account-main-header {
+    background-color: var(--entity-account-bg);
+    border-left: 4px solid var(--entity-account-border);
+}
+
+.entity-account-sub-header {
+    background-color: var(--entity-account-bg);
+    border-left: 3px solid var(--entity-account-border);
+}
+
+.entity-preference-main-header {
+    background-color: var(--entity-preference-bg);
+    border-left: 4px solid var(--entity-preference-border);
+}
+
+.entity-preference-sub-header {
+    background-color: var(--entity-preference-bg);
+    border-left: 3px solid var(--entity-preference-border);
+}
+
+.entity-trade-main-header {
+    background-color: var(--entity-trade-bg);
+    border-left: 4px solid var(--entity-trade-border);
+}
+
+.entity-trade-sub-header {
+    background-color: var(--entity-trade-bg);
+    border-left: 3px solid var(--entity-trade-border);
+}
+
+.entity-alert-main-header {
+    background-color: var(--entity-alert-bg);
+    border-left: 4px solid var(--entity-alert-border);
+}
+
+.entity-alert-sub-header {
+    background-color: var(--entity-alert-bg);
+    border-left: 3px solid var(--entity-alert-border);
+}
+
+.entity-cash-flow-main-header {
+    background-color: var(--entity-cash-flow-bg);
+    border-left: 4px solid var(--entity-cash-flow-border);
+}
+
+.entity-cash-flow-sub-header {
+    background-color: var(--entity-cash-flow-bg);
+    border-left: 3px solid var(--entity-cash-flow-border);
+}
+
+.entity-note-main-header {
+    background-color: var(--entity-note-bg);
+    border-left: 4px solid var(--entity-note-border);
+}
+
+.entity-note-sub-header {
+    background-color: var(--entity-note-bg);
+    border-left: 3px solid var(--entity-note-border);
+}
+
+.entity-trade-plan-main-header {
+    background-color: var(--entity-trade-plan-bg);
+    border-left: 4px solid var(--entity-trade-plan-border);
+}
+
+.entity-trade-plan-sub-header {
+    background-color: var(--entity-trade-plan-bg);
+    border-left: 3px solid var(--entity-trade-plan-border);
+}
+
+.entity-execution-main-header {
+    background-color: var(--entity-execution-bg);
+    border-left: 4px solid var(--entity-execution-border);
+}
+
+.entity-execution-sub-header {
+    background-color: var(--entity-execution-bg);
+    border-left: 3px solid var(--entity-execution-border);
+}
+
+/* RTL למודלים */
+.modal-header {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+.modal-body {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
+.modal-footer {
+    direction: rtl !important;
+    text-align: right !important;
+}
+
 /* ===== סגנונות כלליים של הפרויקציה ===== */
 
 /* ===== Two-column layout for preference items ===== */

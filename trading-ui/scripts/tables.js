@@ -464,6 +464,31 @@ window.applyDefaultSort = function (tableType, data, updateFunction) {
   }
 };
 
+// פונקציה לסידור מותאם אישית
+window.getCustomSortValue = function(a, b, columnIndex, tableType, aValue, bValue) {
+  if (tableType === 'tickers') {
+    if (columnIndex === 1) { // Status
+      const statusOrder = { 'open': 1, 'closed': 2, 'cancelled': 3 };
+      return (statusOrder[aValue] || 999) - (statusOrder[bValue] || 999);
+    }
+    if (columnIndex === 2) { // Active trades
+      const aHasTrades = aValue === true || aValue === 1 || aValue === 'true' || aValue === '1';
+      const bHasTrades = bValue === true || bValue === 1 || bValue === 'true' || bValue === '1';
+      if (aHasTrades && !bHasTrades) return -1;
+      if (!aHasTrades && bHasTrades) return 1;
+      return 0;
+    }
+    if (columnIndex === 4) { // Change percent
+      const aNum = parseFloat(aValue) || 0;
+      const bNum = parseFloat(bValue) || 0;
+      if (aNum > 0 && bNum < 0) return -1;
+      if (aNum < 0 && bNum > 0) return 1;
+      return aNum - bNum;
+    }
+  }
+  return null;
+};
+
 /**
  * Close modal - moved here as it's often table-related
  *

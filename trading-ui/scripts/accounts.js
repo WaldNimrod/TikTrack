@@ -40,6 +40,21 @@ window.accountsLoaded = false;
 window.currenciesData = [];
 window.currenciesLoaded = false;
 
+// פונקציה לחישוב משך זמן
+function getTimeDuration(dateString) {
+    if (!dateString) return '00:00:00';
+    
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffMs = now - date;
+    
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return `${days.toString().padStart(2, '0')}:${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+
 // פונקציה לטעינת מטבעות מהשרת
 async function loadCurrenciesFromServer() {
   try {
@@ -1600,7 +1615,7 @@ async function loadAccountsDataForAccountsPage() {
     const tbody = document.querySelector('#accountsTable tbody');
     if (tbody) {
       const errorText = `שגיאה בטעינת נתונים: ${error.message}`;
-      const errorHtml = `<tr><td colspan="8" class="text-center text-danger">${errorText}</td></tr>`;
+      const errorHtml = `<tr><td colspan="9" class="text-center text-danger">${errorText}</td></tr>`;
       tbody.innerHTML = errorHtml;
     }
 

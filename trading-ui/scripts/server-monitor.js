@@ -671,7 +671,9 @@ class ServerMonitor {
   // הפעלת שרת מחדש
   async restartServer() {
     console.log('🔄 restartServer - כפתור נלחץ');
-    if (window.confirm('האם אתה בטוח שברצונך להפעיל את השרת מחדש?')) {
+    
+    // Function to execute restart
+    const executeRestart = async () => {
       console.log('✅ restartServer - משתמש אישר');
       try {
         window.showInfoNotification('ניטור שרת', 'מפעיל שרת מחדש...');
@@ -703,8 +705,22 @@ class ServerMonitor {
         console.error('💥 restartServer - שגיאה:', error);
         window.showErrorNotification('ניטור שרת', 'שגיאה בהפעלה מחדש');
       }
+    };
+    
+    // Use notification system or fallback to confirm
+    if (typeof window.showConfirmationDialog === 'function') {
+      window.showConfirmationDialog(
+        'הפעלת שרת מחדש',
+        'האם אתה בטוח שברצונך להפעיל את השרת מחדש?',
+        executeRestart,
+        () => console.log('❌ restartServer - משתמש ביטל')
+      );
     } else {
-      console.log('❌ restartServer - משתמש ביטל');
+      if (window.confirm('האם אתה בטוח שברצונך להפעיל את השרת מחדש?')) {
+        await executeRestart();
+      } else {
+        console.log('❌ restartServer - משתמש ביטל');
+      }
     }
   }
 
@@ -745,7 +761,9 @@ class ServerMonitor {
   // ניקוי Cache
   async clearCache() {
     console.log('🧹 clearCache - כפתור נלחץ');
-    if (window.confirm('האם אתה בטוח שברצונך לנקות את ה-Cache?')) {
+    
+    // Function to execute cache clearing
+    const executeClearCache = async () => {
       console.log('✅ clearCache - משתמש אישר');
       try {
         window.showInfoNotification('ניטור שרת', 'מנקה Cache...');
@@ -772,15 +790,31 @@ class ServerMonitor {
         console.error('💥 clearCache - שגיאה:', error);
         window.showErrorNotification('ניטור שרת', 'שגיאה בניקוי Cache');
       }
+    };
+    
+    // Use notification system or fallback to confirm
+    if (typeof window.showConfirmationDialog === 'function') {
+      window.showConfirmationDialog(
+        'ניקוי Cache',
+        'האם אתה בטוח שברצונך לנקות את ה-Cache?',
+        executeClearCache,
+        () => console.log('❌ clearCache - משתמש ביטל')
+      );
     } else {
-      console.log('❌ clearCache - משתמש ביטל');
+      if (window.confirm('האם אתה בטוח שברצונך לנקות את ה-Cache?')) {
+        await executeClearCache();
+      } else {
+        console.log('❌ clearCache - משתמש ביטל');
+      }
     }
   }
 
   // אופטימיזציית בסיס נתונים
   static async optimizeDatabase() {
     console.log('⚡ optimizeDatabase - כפתור נלחץ');
-    if (window.confirm('האם אתה בטוח שברצונך לבצע אופטימיזציה לבסיס הנתונים?')) {
+    
+    // Function to execute database optimization
+    const executeOptimization = async () => {
       console.log('✅ optimizeDatabase - משתמש אישר');
       try {
         window.showInfoNotification('ניטור שרת', 'מבצע אופטימיזציה...');
@@ -802,15 +836,31 @@ class ServerMonitor {
         console.error('💥 optimizeDatabase - שגיאה:', error);
         window.showErrorNotification('ניטור שרת', 'שגיאה באופטימיזציה');
       }
+    };
+    
+    // Use notification system or fallback to confirm
+    if (typeof window.showConfirmationDialog === 'function') {
+      window.showConfirmationDialog(
+        'אופטימיזציית בסיס נתונים',
+        'האם אתה בטוח שברצונך לבצע אופטימיזציה לבסיס הנתונים?',
+        executeOptimization,
+        () => console.log('❌ optimizeDatabase - משתמש ביטל')
+      );
     } else {
-      console.log('❌ optimizeDatabase - משתמש ביטל');
+      if (window.confirm('האם אתה בטוח שברצונך לבצע אופטימיזציה לבסיס הנתונים?')) {
+        await executeOptimization();
+      } else {
+        console.log('❌ optimizeDatabase - משתמש ביטל');
+      }
     }
   }
 
   // עצירת חירום
   async emergencyStop() {
     console.log('🛑 emergencyStop - כפתור נלחץ');
-    if (window.confirm('⚠️ אזהרה! עצירת חירום תעצור את השרת מיד. האם אתה בטוח?')) {
+    
+    // Function to execute emergency stop
+    const executeEmergencyStop = async () => {
       console.log('✅ emergencyStop - משתמש אישר');
       try {
         window.showWarningNotification('ניטור שרת', 'עוצר שרת בחירום...');
@@ -867,8 +917,22 @@ class ServerMonitor {
         console.error('💥 emergencyStop - שגיאה כללית:', error);
         window.showErrorNotification('ניטור שרת', 'שגיאה בעצירת חירום: ' + error.message);
       }
+    };
+    
+    // Use notification system or fallback to confirm
+    if (typeof window.showConfirmationDialog === 'function') {
+      window.showConfirmationDialog(
+        'עצירת חירום',
+        '⚠️ אזהרה! עצירת חירום תעצור את השרת מיד. האם אתה בטוח?',
+        executeEmergencyStop,
+        () => console.log('❌ emergencyStop - משתמש ביטל')
+      );
     } else {
-      console.log('❌ emergencyStop - משתמש ביטל');
+      if (window.confirm('⚠️ אזהרה! עצירת חירום תעצור את השרת מיד. האם אתה בטוח?')) {
+        await executeEmergencyStop();
+      } else {
+        console.log('❌ emergencyStop - משתמש ביטל');
+      }
     }
   }
 
@@ -1201,14 +1265,30 @@ class ServerMonitor {
   // ניקוי לוגים
   clearLogs() {
     console.log('🗑️ clearLogs - כפתור נלחץ');
-    if (window.confirm('האם אתה בטוח שברצונך לנקות את כל הלוגים?')) {
+    
+    // Function to execute log clearing
+    const executeClearLogs = () => {
       console.log('✅ clearLogs - משתמש אישר');
       this.logs = [];
       this.displayLogs();
       window.showSuccessNotification('ניטור שרת', 'לוגים נוקו');
       console.log('✅ clearLogs - לוגים נוקו');
+    };
+    
+    // Use notification system or fallback to confirm
+    if (typeof window.showConfirmationDialog === 'function') {
+      window.showConfirmationDialog(
+        'ניקוי לוגים',
+        'האם אתה בטוח שברצונך לנקות את כל הלוגים?',
+        executeClearLogs,
+        () => console.log('❌ clearLogs - משתמש ביטל')
+      );
     } else {
-      console.log('❌ clearLogs - משתמש ביטל');
+      if (window.confirm('האם אתה בטוח שברצונך לנקות את כל הלוגים?')) {
+        executeClearLogs();
+      } else {
+        console.log('❌ clearLogs - משתמש ביטל');
+      }
     }
   }
 

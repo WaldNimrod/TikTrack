@@ -1617,9 +1617,29 @@ function formatText(command, mode = 'add') {
     document.execCommand('insertOrderedList', false, null);
     break;
   case 'link': {
-    const url = prompt('הכנס כתובת URL:', 'http://');
-    if (url) {
-      document.execCommand('createLink', false, url);
+    // Function to handle link insertion
+    const insertLink = (url) => {
+      if (url && url.trim()) {
+        document.execCommand('createLink', false, url);
+        if (typeof window.showSuccessNotification === 'function') {
+          window.showSuccessNotification('עורך טקסט', 'לינק נוסף בהצלחה');
+        }
+      }
+    };
+    
+    // Use a custom prompt or fallback to browser prompt
+    if (typeof window.showCustomPrompt === 'function') {
+      window.showCustomPrompt(
+        'הוספת לינק',
+        'הכנס כתובת URL:',
+        'http://',
+        insertLink,
+        () => console.log('❌ הוספת לינק - משתמש ביטל')
+      );
+    } else {
+      // Fallback to browser prompt
+      const url = prompt('הכנס כתובת URL:', 'http://');
+      insertLink(url);
     }
     break;
   }

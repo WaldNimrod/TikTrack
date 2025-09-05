@@ -475,8 +475,8 @@ async function copyDetailedLog() {
       await navigator.clipboard.writeText(detailedLog);
       
       // Show success message
-      if (window.notificationSystem) {
-        window.notificationSystem.showSuccess('לוג מפורט הועתק ללוח!');
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('הצלחה', 'לוג מפורט הועתק ללוח!');
       } else {
         alert('לוג מפורט הועתק ללוח!');
       }
@@ -489,8 +489,8 @@ async function copyDetailedLog() {
   } catch (error) {
     console.error('❌ Error copying detailed log:', error);
     
-    if (window.notificationSystem) {
-      window.notificationSystem.showError(`שגיאה בהעתקת לוג: ${error.message}`);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', `שגיאה בהעתקת לוג: ${error.message}`);
     } else {
       alert(`שגיאה בהעתקת לוג: ${error.message}`);
     }

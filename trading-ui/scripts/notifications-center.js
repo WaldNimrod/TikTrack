@@ -612,7 +612,8 @@ class NotificationsCenter {
   // פונקציות ציבוריות
 
   clearHistory() {
-    if (window.confirm('האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?')) {
+    // Function to execute history clearing
+    const executeClearHistory = () => {
       this.history = [];
       this.stats = { success: 0, error: 0, warning: 0, info: 0 };
 
@@ -621,7 +622,23 @@ class NotificationsCenter {
       this.saveToLocalStorage();
 
       // הודעה ישירה לממשק ללא לולאה
-      // console.log('✅ היסטוריית ההתראות נוקתה בהצלחה');
+      console.log('✅ היסטוריית ההתראות נוקתה בהצלחה');
+    };
+    
+    // Use notification system or fallback to confirm
+    if (typeof window.showConfirmationDialog === 'function') {
+      window.showConfirmationDialog(
+        'ניקוי היסטוריה',
+        'האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?',
+        executeClearHistory,
+        () => console.log('❌ ניקוי היסטוריה - משתמש ביטל')
+      );
+    } else {
+      if (window.confirm('האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?')) {
+        executeClearHistory();
+      } else {
+        console.log('❌ ניקוי היסטוריה - משתמש ביטל');
+      }
     }
   }
 
@@ -929,11 +946,29 @@ function saveNotificationSettings() {
 }
 
 function resetNotificationSettings() {
-  if (window.confirm('האם אתה בטוח שברצונך לאפס את כל ההגדרות?')) {
+  // Function to execute settings reset
+  const executeReset = () => {
     if (window.notificationsCenter) {
       window.notificationsCenter.settings = NotificationsCenter.loadSettings();
       window.notificationsCenter.updateSettingsUI();
       window.notificationsCenter.saveSettings();
+      console.log('✅ הגדרות התראות אופסו');
+    }
+  };
+  
+  // Use notification system or fallback to confirm
+  if (typeof window.showConfirmationDialog === 'function') {
+    window.showConfirmationDialog(
+      'איפוס הגדרות',
+      'האם אתה בטוח שברצונך לאפס את כל ההגדרות?',
+      executeReset,
+      () => console.log('❌ איפוס הגדרות - משתמש ביטל')
+    );
+  } else {
+    if (window.confirm('האם אתה בטוח שברצונך לאפס את כל ההגדרות?')) {
+      executeReset();
+    } else {
+      console.log('❌ איפוס הגדרות - משתמש ביטל');
     }
   }
 }

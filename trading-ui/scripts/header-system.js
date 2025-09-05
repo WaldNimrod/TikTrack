@@ -927,6 +927,17 @@ class HeaderSystem {
             this.toggleDropdown(dropdownMenu);
           }
         }
+        
+        // Handle submenu toggle clicks
+        const submenuToggle = e.target.closest('.tiktrack-submenu-toggle');
+        if (submenuToggle) {
+          e.preventDefault();
+          e.stopPropagation();
+          const submenuItem = submenuToggle.closest('.dropdown-submenu');
+          if (submenuItem) {
+            this.toggleSubmenu(submenuItem);
+          }
+        }
       }
     });
 
@@ -961,7 +972,7 @@ class HeaderSystem {
         }
 
         // טיפול בתפריטי משנה (submenu)
-        const submenu = e.target.closest('.submenu');
+        const submenu = e.target.closest('.tiktrack-submenu');
         if (submenu && submenu.classList.contains('show')) {
           this.handleSubmenuMouseEnter(submenu);
         }
@@ -978,7 +989,7 @@ class HeaderSystem {
     document.addEventListener('mouseenter', e => {
       if (e.target && typeof e.target.closest === 'function') {
         // ביטול טיימרים כשהעכבר נכנס לתפריט משנה
-        if (e.target.closest('.submenu') || e.target.closest('.dropdown-submenu')) {
+        if (e.target.closest('.tiktrack-submenu') || e.target.closest('.dropdown-submenu')) {
           const parentMenu = e.target.closest('.tiktrack-dropdown-menu');
           if (parentMenu) {
             HeaderSystem.clearMenuTimers(parentMenu);
@@ -991,7 +1002,7 @@ class HeaderSystem {
     document.addEventListener('mouseover', e => {
       if (e.target && typeof e.target.closest === 'function') {
         // ביטול טיימרים כשהעכבר עובר לתפריט משנה
-        if (e.target.closest('.submenu') || e.target.closest('.dropdown-submenu')) {
+        if (e.target.closest('.tiktrack-submenu') || e.target.closest('.dropdown-submenu')) {
           const parentMenu = e.target.closest('.tiktrack-dropdown-menu');
           if (parentMenu) {
             HeaderSystem.clearMenuTimers(parentMenu);
@@ -1008,7 +1019,7 @@ class HeaderSystem {
         }
 
         // טיפול בתפריטי משנה (submenu)
-        const submenu = e.target.closest('.submenu');
+        const submenu = e.target.closest('.tiktrack-submenu');
         if (submenu && submenu.classList.contains('show')) {
           this.handleSubmenuMouseLeave(submenu);
         }
@@ -1018,7 +1029,7 @@ class HeaderSystem {
     // Handle submenu item clicks
     document.addEventListener('click', e => {
       if (e.target && typeof e.target.closest === 'function') {
-        const submenuItem = e.target.closest('.submenu .tiktrack-dropdown-item');
+        const submenuItem = e.target.closest('.tiktrack-submenu .tiktrack-dropdown-item');
         if (submenuItem) {
           const href = submenuItem.getAttribute('href');
           if (href) {
@@ -1102,7 +1113,7 @@ class HeaderSystem {
           e.target.closest('#searchClearBtn') ||
           e.target.closest('.tiktrack-dropdown-menu') ||
           e.target.closest('.tiktrack-toggle') ||
-          e.target.closest('.submenu');
+          e.target.closest('.tiktrack-submenu');
 
         if (!isClickInsideMenu) {
           // סגירת כל התפריטים
@@ -1184,7 +1195,7 @@ class HeaderSystem {
   }
 
   showSubmenu(submenuItem) {
-    const submenu = submenuItem.querySelector('.submenu');
+    const submenu = submenuItem.querySelector('.tiktrack-submenu');
     if (submenu) {
       submenu.style.display = 'block';
       submenu.classList.add('show');
@@ -1193,8 +1204,25 @@ class HeaderSystem {
     }
   }
 
+  toggleSubmenu(submenuItem) {
+    const submenu = submenuItem.querySelector('.tiktrack-submenu');
+    if (submenu) {
+      const isVisible = submenu.classList.contains('show');
+      
+      if (isVisible) {
+        submenu.style.display = 'none';
+        submenu.classList.remove('show');
+      } else {
+        submenu.style.display = 'block';
+        submenu.classList.add('show');
+        // ביטול טיימר סגירה של התפריט הראשי
+        this.clearDropdownTimer();
+      }
+    }
+  }
+
   static hideSubmenu(submenuItem) {
-    const submenu = submenuItem.querySelector('.submenu');
+    const submenu = submenuItem.querySelector('.tiktrack-submenu');
     if (submenu) {
       submenu.style.display = 'none';
       submenu.classList.remove('show');
@@ -1216,7 +1244,7 @@ class HeaderSystem {
     // בדיקה אם העכבר עבר לתפריט משנה אחר
     const relatedTarget = event.relatedTarget;
     if (relatedTarget && (
-      relatedTarget.closest('.submenu') ||
+      relatedTarget.closest('.tiktrack-submenu') ||
       relatedTarget.closest('.tiktrack-dropdown-menu') ||
       relatedTarget.closest('.dropdown-submenu')
     )) {
@@ -1265,7 +1293,7 @@ class HeaderSystem {
       dropdown.classList.remove('show');
     });
 
-    const submenus = document.querySelectorAll('.submenu.show');
+    const submenus = document.querySelectorAll('.tiktrack-submenu.show');
     submenus.forEach(submenu => {
       submenu.classList.remove('show');
       submenu.style.display = 'none';
@@ -1888,7 +1916,7 @@ class HeaderSystem {
   // פונקציה להגדרת event listeners לתפריטי משנה של תפריט ספציפי
   setupSubmenuEventListenersForMenu(menu) {
     // הוספת event listeners לתפריטי משנה קיימים
-    const submenus = menu.querySelectorAll('.submenu, .dropdown-submenu');
+    const submenus = menu.querySelectorAll('.tiktrack-submenu, .dropdown-submenu');
     submenus.forEach(submenu => {
       this.addSubmenuEventListenersToElement(submenu);
     });
@@ -1900,7 +1928,7 @@ class HeaderSystem {
 
     // הוספת event listener לתפריטי משנה
     menu.addEventListener('mouseover', e => {
-      if (e.target.closest('.submenu') || e.target.closest('.dropdown-submenu')) {
+      if (e.target.closest('.tiktrack-submenu') || e.target.closest('.dropdown-submenu')) {
         HeaderSystem.clearMenuTimers(menu);
       }
     });
@@ -1930,7 +1958,7 @@ class HeaderSystem {
       // בדיקה אם העכבר עבר לתפריט משנה
       const relatedTarget = e.relatedTarget;
       if (relatedTarget && (
-        relatedTarget.closest('.submenu') ||
+        relatedTarget.closest('.tiktrack-submenu') ||
         relatedTarget.closest('.tiktrack-dropdown-menu') ||
         relatedTarget.closest('.dropdown-submenu') ||
         relatedTarget.closest('.tiktrack-nav-item')
@@ -1986,7 +2014,7 @@ class HeaderSystem {
   // פונקציה עזר לבדיקה אם העכבר נמצא בתפריט משנה
   static isMouseInSubmenu() {
     // בדיקה אם העכבר נמצא בתפריט משנה כלשהו
-    const submenu = document.querySelector('.submenu:hover');
+    const submenu = document.querySelector('.tiktrack-submenu:hover');
     const dropdownSubmenu = document.querySelector('.dropdown-submenu:hover');
 
     // בדיקה אם העכבר נמצא בתפריט הראשי
@@ -2012,11 +2040,11 @@ class HeaderSystem {
         if (mutation.type === 'childList') {
           mutation.addedNodes.forEach(node => {
             if (node.nodeType === Node.ELEMENT_NODE) {
-              if (node.classList && (node.classList.contains('submenu') || node.classList.contains('dropdown-submenu'))) {
+              if (node.classList && (node.classList.contains('tiktrack-submenu') || node.classList.contains('dropdown-submenu'))) {
                 this.addSubmenuEventListenersToElement(node);
               }
               // בדיקה של ילדים שנוספו
-              const submenus = node.querySelectorAll('.submenu, .dropdown-submenu');
+              const submenus = node.querySelectorAll('.tiktrack-submenu, .dropdown-submenu');
               submenus.forEach(submenu => this.addSubmenuEventListenersToElement(submenu));
             }
           });
@@ -2056,7 +2084,7 @@ class HeaderSystem {
 
   // פונקציה להוספת event listeners לכל תפריטי המשנה הקיימים
   addSubmenuEventListeners() {
-    const submenus = document.querySelectorAll('.submenu, .dropdown-submenu');
+    const submenus = document.querySelectorAll('.tiktrack-submenu, .dropdown-submenu');
     submenus.forEach(submenu => {
       this.addSubmenuEventListenersToElement(submenu);
     });

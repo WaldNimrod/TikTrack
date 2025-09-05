@@ -199,6 +199,11 @@ class DataRefreshScheduler:
             List[Dict]: List of tickers needing refresh
         """
         try:
+            # Check if db_session is available
+            if not self.db_session:
+                logger.warning("Database session not available for ticker refresh")
+                return []
+            
             # Get refresh interval for this category and time period
             refresh_minutes = self.refresh_policy['open'][category][time_period]['minutes']
             

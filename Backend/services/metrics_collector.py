@@ -118,7 +118,12 @@ class MetricsCollector:
                 FROM sqlite_master 
                 WHERE type='table'
             """))
-            tables = [dict(row) for row in result]
+            tables = []
+            for row in result:
+                tables.append({
+                    'table_name': row[0],
+                    'fts_enabled': row[1]
+                })
             
             # Record counts
             record_counts = {}

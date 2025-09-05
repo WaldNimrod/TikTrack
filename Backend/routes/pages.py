@@ -119,6 +119,16 @@ def test_header_only() -> Any:
     """Test header only page"""
     return send_from_directory(UI_DIR, "test-header-only.html")
 
+@pages_bp.route('/linter-dashboard-demo')
+def linter_dashboard_demo() -> Any:
+    """Linter dashboard demo page"""
+    return send_from_directory(UI_DIR, "linter-realtime-monitor.html")
+
+@pages_bp.route('/create_linter_dashboard')
+def create_linter_dashboard() -> Any:
+    """Create linter dashboard page"""
+    return send_from_directory(UI_DIR, "linter-realtime-monitor.html")
+
 # Old external data test routes removed - now using /system-test-center
 
 @pages_bp.route('/styles/<path:filename>')

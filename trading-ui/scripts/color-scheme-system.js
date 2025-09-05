@@ -1389,7 +1389,17 @@ async function loadColorPreferences() {
         );
         
         if (entityType) {
-          const type = entityType.replace('-page', '').replace('cash-flows', 'cash_flow');
+          let type = entityType.replace('-page', '');
+          // תיקון שמות ישויות לפורמט יחיד
+          if (type === 'tickers') type = 'ticker';
+          else if (type === 'trades') type = 'trade';
+          else if (type === 'accounts') type = 'account';
+          else if (type === 'alerts') type = 'alert';
+          else if (type === 'cash-flows') type = 'cash-flow';
+          else if (type === 'notes') type = 'note';
+          else if (type === 'trade-plans') type = 'trade-plan';
+          else if (type === 'executions') type = 'execution';
+          
           console.log(`🎨 מעדכן כותרות עבור ${type}...`);
           if (window.applyEntityColorsToHeaders) {
             setTimeout(() => {
@@ -1616,7 +1626,17 @@ document.addEventListener('DOMContentLoaded', () => {
       );
       
       if (entityType) {
-        const type = entityType.replace('-page', '').replace('cash-flows', 'cash_flow');
+        let type = entityType.replace('-page', '');
+        // תיקון שמות ישויות לפורמט יחיד
+        if (type === 'tickers') type = 'ticker';
+        else if (type === 'trades') type = 'trade';
+        else if (type === 'accounts') type = 'account';
+        else if (type === 'alerts') type = 'alert';
+        else if (type === 'cash-flows') type = 'cash-flow';
+        else if (type === 'notes') type = 'note';
+        else if (type === 'trade-plans') type = 'trade-plan';
+        else if (type === 'executions') type = 'execution';
+        
         console.log(`🎨 מעדכן כותרות עבור ${type}...`);
         if (window.applyEntityColorsToHeaders) {
           setTimeout(() => {

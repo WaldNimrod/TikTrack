@@ -32,7 +32,7 @@ const tableData = {};
  * Initialize the database display page
  */
 function initDatabaseDisplay() {
-  // console.log('🔄 Initializing database display page...');
+  console.log('🔄 Initializing database display page...');
 
   // Load all tables
   loadAllTables();
@@ -45,22 +45,25 @@ function initDatabaseDisplay() {
     window.headerSystem.init();
   }
 
-  // console.log('✅ Database display page initialized successfully');
+  console.log('✅ Database display page initialized successfully');
 }
 
 /**
  * Load all tables data
  */
 async function loadAllTables() {
+  console.log('🔄 Loading all tables...');
   const tables = ['accounts', 'trades', 'tickers', 'trade_plans', 'executions', 'alerts', 'notes', 'cash_flows'];
   
   for (const table of tables) {
     try {
+      console.log(`📊 Loading ${table}...`);
       await loadTableData(table);
     } catch (error) {
       console.error(`Error loading ${table}:`, error);
     }
   }
+  console.log('✅ All tables loaded');
 }
 
 /**
@@ -93,7 +96,7 @@ function setupEventListeners() {
  */
 async function loadTableData(tableType) {
   try {
-    // console.log(`📊 Loading data for table type: ${tableType}`);
+    console.log(`📊 Loading data for table type: ${tableType}`);
 
     // Update current table type
     currentTableType = tableType;
@@ -116,10 +119,10 @@ async function loadTableData(tableType) {
     // Update summary statistics
     updateSummaryStats(tableType, data.length);
 
-    // console.log(`✅ Data loaded for ${tableType}: ${data.length} records`);
+    console.log(`✅ Data loaded for ${tableType}: ${data.length} records`);
 
   } catch (error) {
-    // console.error(`❌ Error loading data for ${tableType}:`, error);
+    console.error(`❌ Error loading data for ${tableType}:`, error);
     handleDataLoadError(error, tableType);
   }
 }
@@ -131,20 +134,22 @@ async function loadTableData(tableType) {
  */
 async function fetchTableData(tableType) {
   try {
+    console.log(`🌐 Fetching data for ${tableType} from /api/v1/${tableType}/`);
     const response = await fetch(`/api/v1/${tableType}/`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const result = await response.json();
+    console.log(`📥 Received response for ${tableType}:`, result);
 
     if (result.status === 'success') {
       return result.data || [];
     } else {
       throw new Error(result.error?.message || `Error fetching ${tableType} data`);
     }
-  } catch {
-    // console.error(`❌ Error fetching ${tableType} data:`, error);
+  } catch (error) {
+    console.error(`❌ Error fetching ${tableType} data:`, error);
     // Return empty array on error
     return [];
   }
@@ -159,34 +164,44 @@ async function fetchTableData(tableType) {
  */
 function updateTableDisplay(data, tableType) {
   // Find the correct container for this table type
-  const containerId = `${tableType}Container`;
+  let containerId = `${tableType}Container`;
+  
+  // Handle special cases for container IDs
+  if (tableType === 'trade_plans') {
+    containerId = 'tradePlansContainer';
+  } else if (tableType === 'cash_flows') {
+    containerId = 'cashFlowsContainer';
+  }
+  
   const tableContainer = document.getElementById(containerId);
 
   if (!tableContainer) {
-    // console.error(`❌ Table container not found for ${tableType}: ${containerId}`);
+    console.error(`❌ Table container not found for ${tableType}: ${containerId}`);
     return;
   }
 
   // Find the table within the container
   const table = tableContainer.querySelector('table');
   if (!table) {
-    // console.error(`❌ Table not found in container ${containerId}`);
+    console.error(`❌ Table not found in container ${containerId}`);
     return;
   }
 
   // Find the table body
   const tbody = table.querySelector('tbody');
   if (!tbody) {
-    // console.error(`❌ Table body not found in table ${tableType}`);
+    console.error(`❌ Table body not found in table ${tableType}`);
     return;
   }
 
   // Get table mappings
   const tableMapping = window.TABLE_COLUMN_MAPPINGS?.[tableType];
   if (!tableMapping) {
-    // console.error(`❌ No table mapping found for ${tableType}`);
+    console.error(`❌ No table mapping found for ${tableType}`);
     return;
   }
+
+  console.log(`🔧 Updating table display for ${tableType} with ${data.length} records`);
 
   // Create table body HTML
   const tbodyHTML = createTableBodyHTML(data, tableMapping, tableType);
@@ -206,24 +221,59 @@ function updateTableDisplay(data, tableType) {
  * @param {string} tableType - The table type
  * @returns {string} The table body HTML
  */
-function createTableBodyHTML(data, tableMapping, _tableType) {
+function createTableBodyHTML(data, tableMapping, tableType) {
   let tbodyHTML = '';
 
+  console.log(`🔨 Creating table body HTML for ${tableType} with ${data.length} records`);
+
   if (data.length === 0) {
-    tbodyHTML += `<tr><td colspan="${tableMapping.length}" class="text-center">אין נתונים</td></tr>`;
+    tbodyHTML += `<tr><td colspan="${tableMapping.length + 1}" class="text-center">אין נתונים</td></tr>`;
   } else {
-    data.forEach(row => {
+    data.forEach((row, index) => {
+      if (index < 3) { // Log first 3 rows for debugging
+        console.log(`📋 Row ${index} for ${tableType}:`, row);
+      }
       tbodyHTML += '<tr>';
       tableMapping.forEach(fieldName => {
         const value = row[fieldName] || '';
         const formattedValue = formatCellValue(value, { field: fieldName });
         tbodyHTML += `<td>${formattedValue}</td>`;
       });
+      
+      // Add actions column
+      const actionsHTML = createActionsHTML(row, tableType);
+      tbodyHTML += `<td class="actions-cell">${actionsHTML}</td>`;
+      
       tbodyHTML += '</tr>';
     });
   }
 
+  console.log(`✅ Created table body HTML for ${tableType}: ${tbodyHTML.length} characters`);
   return tbodyHTML;
+}
+
+/**
+ * Create actions HTML for a table row
+ * @param {Object} row - The row data
+ * @param {string} tableType - The table type
+ * @returns {string} The actions HTML
+ */
+function createActionsHTML(row, tableType) {
+  const recordId = row.id || row.ID || '';
+  if (!recordId) {
+    return '<span class="text-muted">-</span>';
+  }
+
+  return `
+    <div class="action-buttons">
+      <button class="btn btn-sm btn-outline-primary" onclick="editRecord('${tableType}', ${recordId})" title="ערוך">
+        <i class="fas fa-edit"></i>
+      </button>
+      <button class="btn btn-sm btn-outline-danger" onclick="deleteRecord('${tableType}', ${recordId})" title="מחק">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+  `;
 }
 
 /**
@@ -269,7 +319,15 @@ function applySortingFunctionality(_tableType) {
 function showLoadingState() {
   // Show loading state in the current table's tbody
   if (currentTableType) {
-    const containerId = `${currentTableType}Container`;
+    let containerId = `${currentTableType}Container`;
+    
+    // Handle special cases for container IDs
+    if (currentTableType === 'trade_plans') {
+      containerId = 'tradePlansContainer';
+    } else if (currentTableType === 'cash_flows') {
+      containerId = 'cashFlowsContainer';
+    }
+    
     const tableContainer = document.getElementById(containerId);
     if (tableContainer) {
       const tbody = tableContainer.querySelector('tbody');
@@ -287,9 +345,20 @@ function showLoadingState() {
  */
 function updateTableInfo(tableType, recordCount) {
   // Update the count display in the section header
-  const countElement = document.getElementById(`${tableType}Count`);
+  let countElementId = `${tableType}Count`;
+  
+  // Handle special cases for count element IDs
+  if (tableType === 'trade_plans') {
+    countElementId = 'tradePlansCount';
+  } else if (tableType === 'cash_flows') {
+    countElementId = 'cashFlowsCount';
+  }
+  
+  const countElement = document.getElementById(countElementId);
   if (countElement) {
     countElement.textContent = `${recordCount} רשומות`;
+  } else {
+    console.log(`ℹ️ No count element found for ${countElementId}`);
   }
 }
 
@@ -314,7 +383,12 @@ function updateSummaryStats(tableType, recordCount) {
     const statsElement = document.getElementById(statsElementId);
     if (statsElement) {
       statsElement.textContent = recordCount;
+      console.log(`📊 Updated stats for ${tableType}: ${recordCount} records`);
+    } else {
+      console.log(`ℹ️ No stats element found for ${statsElementId}`);
     }
+  } else {
+    console.log(`ℹ️ No stats mapping found for ${tableType}`);
   }
 }
 
@@ -408,7 +482,15 @@ function handleDataLoadError(error, tableType) {
 
   // Show error state in table
   if (currentTableType) {
-    const containerId = `${currentTableType}Container`;
+    let containerId = `${currentTableType}Container`;
+    
+    // Handle special cases for container IDs
+    if (currentTableType === 'trade_plans') {
+      containerId = 'tradePlansContainer';
+    } else if (currentTableType === 'cash_flows') {
+      containerId = 'cashFlowsContainer';
+    }
+    
     const tableContainer = document.getElementById(containerId);
     if (tableContainer) {
       const tbody = tableContainer.querySelector('tbody');
@@ -503,6 +585,89 @@ function sortTable(columnIndex, tableType) {
   updateTableDisplay(data, tableType);
 }
 
+// ===== ACTION FUNCTIONS =====
+
+/**
+ * Edit a record
+ * @param {string} tableType - The table type
+ * @param {number} recordId - The record ID
+ */
+function editRecord(tableType, recordId) {
+  console.log(`✏️ Edit record: ${tableType} ID ${recordId}`);
+  // TODO: Implement edit functionality
+  alert(`עריכת רשומה: ${tableType} ID ${recordId}`);
+}
+
+/**
+ * Delete a record
+ * @param {string} tableType - The table type
+ * @param {number} recordId - The record ID
+ */
+function deleteRecord(tableType, recordId) {
+  console.log(`🗑️ Delete record: ${tableType} ID ${recordId}`);
+  if (confirm(`האם אתה בטוח שברצונך למחוק את הרשומה ${recordId}?`)) {
+    // TODO: Implement delete functionality
+    alert(`מחיקת רשומה: ${tableType} ID ${recordId}`);
+  }
+}
+
+
+/**
+ * Copy detailed log with all data and status
+ */
+function copyDetailedLog() {
+  console.log('📋 Copying detailed log');
+  
+  let logText = '=== Database Display Log ===\n';
+  logText += `Date: ${new Date().toLocaleString('he-IL')}\n\n`;
+  
+  // Add summary stats
+  logText += '--- Summary Statistics ---\n';
+  const statsMapping = {
+    'accounts': 'חשבונות',
+    'trades': 'טריידים', 
+    'tickers': 'טיקרים',
+    'trade_plans': 'תוכניות מסחר',
+    'alerts': 'התראות',
+    'cash_flows': 'תזרימי מזומנים'
+  };
+  
+  Object.entries(statsMapping).forEach(([key, name]) => {
+    const data = tableData[key] || [];
+    logText += `${name}: ${data.length} רשומות\n`;
+  });
+  
+  logText += '\n--- Detailed Data ---\n';
+  
+  // Add detailed data for each table
+  Object.entries(tableData).forEach(([tableType, data]) => {
+    const tableName = statsMapping[tableType] || tableType;
+    logText += `\n=== ${tableName} (${data.length} רשומות) ===\n`;
+    
+    if (data.length > 0) {
+      // Add first few records as sample
+      const sampleSize = Math.min(3, data.length);
+      for (let i = 0; i < sampleSize; i++) {
+        logText += `Record ${i + 1}: ${JSON.stringify(data[i], null, 2)}\n`;
+      }
+      if (data.length > sampleSize) {
+        logText += `... and ${data.length - sampleSize} more records\n`;
+      }
+    } else {
+      logText += 'No data available\n';
+    }
+  });
+  
+  // Copy to clipboard
+  navigator.clipboard.writeText(logText).then(() => {
+    alert('הלוג הועתק ללוח!');
+    console.log('✅ Log copied to clipboard');
+  }).catch(err => {
+    console.error('❌ Failed to copy log:', err);
+    alert('שגיאה בהעתקת הלוג');
+  });
+}
+
 // ===== GLOBAL EXPORTS =====
 
 // Export functions to global scope
@@ -513,10 +678,13 @@ window.toggleTopSection = toggleTopSection;
 window.toggleMainSection = toggleMainSection;
 window.addRecord = addRecord;
 window.sortTable = sortTable;
+window.editRecord = editRecord;
+window.deleteRecord = deleteRecord;
+window.copyDetailedLog = copyDetailedLog;
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-  // console.log('➕ Database display page DOM loaded');
+  console.log('➕ Database display page DOM loaded');
   initDatabaseDisplay();
 });
 

@@ -62,24 +62,28 @@ const TABLE_COLUMN_MAPPINGS = {
     'reasons',               // 10 - Reasons
     'cancelled_at',          // 11 - Cancelled At
     'cancel_reason',         // 12 - Cancel Reason
-    'created_at',             // 13 - Created At
+    'created_at',            // 13 - Created At
+    'stop_percentage',       // 14 - Stop Percentage
+    'target_percentage',     // 15 - Target Percentage
+    'current_price',         // 16 - Current Price
   ],
 
   // טבלת טריידים (Trades) - Trades Page Structure (13 columns)
   'trades': [
-    'ticker_symbol',         // 0 - טיקר
-    'current_price',         // 1 - מחיר נוכחי
-    'change_percent',        // 2 - שינוי %
-    'status',                // 3 - סטטוס
-    'investment_type',       // 4 - סוג
-    'side',                  // 5 - צד
-    'trade_plan_id',         // 6 - תוכנית
-    'total_pl',              // 7 - רווח/הפסד
-    'created_at',            // 8 - נוצר ב
-    'closed_at',             // 9 - נסגר ב
-    'account_name',          // 10 - חשבון
-    'notes',                 // 11 - הערות
-    'actions',               // 12 - פעולות
+    'id',                    // 0 - ID
+    'account_id',            // 1 - Account ID
+    'ticker_id',             // 2 - Ticker ID
+    'trade_plan_id',         // 3 - Trade Plan ID
+    'status',                // 4 - Status
+    'investment_type',       // 5 - Investment Type
+    'side',                  // 6 - Side
+    'opened_at',             // 7 - Opened At
+    'closed_at',             // 8 - Closed At
+    'cancelled_at',          // 9 - Cancelled At
+    'cancel_reason',         // 10 - Cancel Reason
+    'total_pl',              // 11 - Total P&L
+    'notes',                 // 12 - Notes
+    'created_at',            // 13 - Created At
   ],
 
   // טבלת חשבונות (Accounts) - Database Display Page Structure
@@ -92,23 +96,23 @@ const TABLE_COLUMN_MAPPINGS = {
     'total_value',           // 5 - Total Value
     'total_pl',              // 6 - Total P&L
     'notes',                 // 7 - Notes
-    'created_at',             // 8 - Created At
+    'created_at',            // 8 - Created At
+    'status_default',        // 9 - Status Default
   ],
 
   // טבלת טיקרים (Tickers) - Enhanced with Yahoo Finance Data
   'tickers': [
-    'symbol',                // 0 - סמל
-    'status',                // 1 - סטטוס
-    'active_trades',         // 2 - יש טריידים
-    'current_price',         // 3 - מחיר נוכחי
-    'change_percent',        // 4 - שינוי %
-    'type',                  // 5 - סוג
-    'name',                  // 6 - שם
-    'remarks',               // 7 - הערות
-    'yahoo_updated_at',      // 8 - עודכן (נתוני Yahoo)
-    'currency',              // 9 - מטבע
-    'volume',                // 10 - נפח מסחר
-    'created_at',            // 11 - נוצר ב (לא מוצג)
+    'id',                    // 0 - ID
+    'symbol',                // 1 - סמל
+    'name',                  // 2 - שם
+    'type',                  // 3 - סוג
+    'remarks',               // 4 - הערות
+    'currency',              // 5 - מטבע
+    'active_trades',         // 6 - יש טריידים
+    'status',                // 7 - סטטוס
+    'created_at',            // 8 - נוצר ב
+    'updated_at',            // 9 - עודכן ב
+    'currency_id',           // 10 - מזהה מטבע
   ],
 
   // טבלת טיקרים חלקית (Tickers Summary) - Executions Page Structure
@@ -123,18 +127,17 @@ const TABLE_COLUMN_MAPPINGS = {
 
   // טבלת ביצועים (Executions) - Executions Page Structure (12 columns + actions)
   'executions': [
-    'ticker_symbol',         // 0 - סימבול
-    'trade_id',              // 1 - טרייד
-    'action',                // 2 - פעולה
-    'account_name',          // 3 - חשבון
-    'quantity',              // 4 - כמות
-    'price',                 // 5 - מחיר
-    'fee',                   // 6 - עמלה
-    'total_pl',              // 7 - רווח/הפסד
-    'notes',                 // 8 - הערות
-    'created_at',            // 9 - נוצר ב
-    'execution_date',        // 10 - תאריך ביצוע
-    'source',                // 11 - מקור
+    'id',                    // 0 - ID
+    'trade_id',              // 1 - Trade ID
+    'action',                // 2 - Action
+    'date',                  // 3 - Date
+    'quantity',              // 4 - Quantity
+    'price',                 // 5 - Price
+    'fee',                   // 6 - Fee
+    'source',                // 7 - Source
+    'created_at',            // 8 - Created At
+    'external_id',           // 9 - External ID
+    'notes',                 // 10 - Notes
   ],
 
   // טבלת תזרימי מזומנים (Cash Flows) - Database Display Page Structure
@@ -159,14 +162,14 @@ const TABLE_COLUMN_MAPPINGS = {
     'ticker_id',             // 2 - Ticker ID
     'message',               // 3 - Message
     'triggered_at',          // 4 - Triggered At
-    'status',                // 5 - Status
-    'is_triggered',          // 6 - Is Triggered
-    'related_type_id',       // 7 - Related Type ID
-    'related_id',            // 8 - Related ID
-    'condition_attribute',   // 9 - Condition Attribute
-    'condition_operator',    // 10 - Condition Operator
-    'condition_number',      // 11 - Condition Number
-    'created_at',             // 12 - Created At
+    'created_at',            // 5 - Created At
+    'status',                // 6 - Status
+    'is_triggered',          // 7 - Is Triggered
+    'related_type_id',       // 8 - Related Type ID
+    'related_id',            // 9 - Related ID
+    'condition_attribute',   // 10 - Condition Attribute
+    'condition_operator',    // 11 - Condition Operator
+    'condition_number',      // 12 - Condition Number
   ],
 
   // טבלת הערות (Notes) - Database Display Page Structure

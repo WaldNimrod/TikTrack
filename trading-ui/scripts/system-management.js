@@ -104,7 +104,7 @@ class SystemManagement {
   }
 
   updateHealthCards(data) {
-    const healthCards = document.querySelectorAll('.health-card');
+    const healthCards = document.querySelectorAll('.health-grid .status-card');
     
     // Server status
     const serverCard = healthCards[0];

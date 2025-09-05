@@ -559,183 +559,200 @@
           <h4 class="color-subsection-title">🏷️ צבעי ישויות</h4>
           <div class="preference-items-grid">
 
-          <!-- טריידים ותכנונים -->
+          <!-- טריידים -->
           <div class="preference-item">
             <div class="preference-label">
-              <h4>📈 טריידים ותכנונים</h4>
-              <p>צבעים לעסקי השקעה ותכנונים</p>
+              <h4>📈 טריידים</h4>
+              <p>צבע לטריידים</p>
             </div>
             <div class="preference-control">
-              <div class="row">
-                <div class="col-md-4 mb-2">
-                  <label class="form-label small">טריידים</label>
-                  <div class="input-group">
-                    <input type="color" id="entityTradeColor" class="form-control form-control-color" 
-                           onchange="updateEntityColor('trade', this.value)" 
-                           value="#007bff" title="בחר צבע לטריידים">
-                    <input type="text" id="entityTradeColorHex" class="form-control" 
-                           placeholder="#007bff" maxlength="7"
-                           onchange="updateEntityColorFromHex('trade', this.value)">
-                  </div>
-                </div>
-                <div class="col-md-4 mb-2">
-                  <label class="form-label small">תכנוני השקעה</label>
-                  <div class="input-group">
-                    <input type="color" id="entityTradePlanColor" class="form-control form-control-color" 
-                           onchange="updateEntityColor('trade_plan', this.value)" 
-                           value="#0056b3" title="בחר צבע לתכנוני השקעה">
-                    <input type="text" id="entityTradePlanColorHex" class="form-control" 
-                           placeholder="#0056b3" maxlength="7"
-                           onchange="updateEntityColorFromHex('trade_plan', this.value)">
-                  </div>
-                </div>
-                <div class="col-md-4 mb-2">
-                  <label class="form-label small">עסקאות</label>
-                  <div class="input-group">
-                    <input type="color" id="entityExecutionColor" class="form-control form-control-color" 
-                           onchange="updateEntityColor('execution', this.value)" 
-                           value="#17a2b8" title="בחר צבע לעסקאות">
-                    <input type="text" id="entityExecutionColorHex" class="form-control" 
-                           placeholder="#17a2b8" maxlength="7"
-                           onchange="updateEntityColorFromHex('execution', this.value)">
-                  </div>
-                </div>
+              <div class="input-group">
+                <input type="color" id="entityTradeColor" class="form-control form-control-color" 
+                       onchange="updateEntityColor('trade', this.value)" 
+                       value="#007bff" title="בחר צבע לטריידים">
+                <input type="text" id="entityTradeColorHex" class="form-control" 
+                       placeholder="#007bff" maxlength="7"
+                       onchange="updateEntityColorFromHex('trade', this.value)">
               </div>
             </div>
           </div>
           
-          <!-- חשבונות ותזרים מזומנים -->
+          <!-- תכנוני השקעה -->
           <div class="preference-item">
             <div class="preference-label">
-              <h4>💰 חשבונות ותזרים מזומנים</h4>
-              <p>צבעים לעניינים פיננסיים</p>
+              <h4>📋 תכנוני השקעה</h4>
+              <p>צבע לתכנוני השקעה</p>
             </div>
             <div class="preference-control">
-              <div class="row">
-                <div class="col-md-6 mb-2">
-                  <label class="form-label small">חשבונות</label>
-                  <div class="input-group">
-                    <input type="color" id="entityAccountColor" class="form-control form-control-color" 
-                           onchange="updateEntityColor('account', this.value)" 
-                           value="#28a745" title="בחר צבע לחשבונות">
-                    <input type="text" id="entityAccountColorHex" class="form-control" 
-                           placeholder="#28a745" maxlength="7"
-                           onchange="updateEntityColorFromHex('account', this.value)">
-                  </div>
-                </div>
-                <div class="col-md-6 mb-2">
-                  <label class="form-label small">תזרים מזומנים</label>
-                  <div class="input-group">
-                    <input type="color" id="entityCashFlowColor" class="form-control form-control-color" 
-                           onchange="updateEntityColor('cash_flow', this.value)" 
-                           value="#20c997" title="בחר צבע לתזרים מזומנים">
-                    <input type="text" id="entityCashFlowColorHex" class="form-control" 
-                           placeholder="#20c997" maxlength="7"
-                           onchange="updateEntityColorFromHex('cash_flow', this.value)">
-                  </div>
-                </div>
+              <div class="input-group">
+                <input type="color" id="entityTradePlanColor" class="form-control form-control-color" 
+                       onchange="updateEntityColor('trade_plan', this.value)" 
+                       value="#0056b3" title="בחר צבע לתכנוני השקעה">
+                <input type="text" id="entityTradePlanColorHex" class="form-control" 
+                       placeholder="#0056b3" maxlength="7"
+                       onchange="updateEntityColorFromHex('trade_plan', this.value)">
               </div>
             </div>
           </div>
           
-          <!-- טיקרים והתראות -->
+          <!-- עסקאות -->
           <div class="preference-item">
             <div class="preference-label">
-              <h4>📊 טיקרים והתראות</h4>
-              <p>צבעים לנתוני שוק והתראות</p>
+              <h4>💼 עסקאות</h4>
+              <p>צבע לעסקאות</p>
             </div>
             <div class="preference-control">
-              <div class="row">
-                <div class="col-md-6 mb-2">
-                  <label class="form-label small">טיקרים</label>
-                  <div class="input-group">
-                    <input type="color" id="entityTickerColor" class="form-control form-control-color" 
-                           onchange="updateEntityColor('ticker', this.value)" 
-                           value="#dc3545" title="בחר צבע לטיקרים">
-                    <input type="text" id="entityTickerColorHex" class="form-control" 
-                           placeholder="#dc3545" maxlength="7"
-                           onchange="updateEntityColorFromHex('ticker', this.value)">
-                  </div>
-                </div>
-                <div class="col-md-6 mb-2">
-                  <label class="form-label small">התראות</label>
-                  <div class="input-group">
-                    <input type="color" id="entityAlertColor" class="form-control form-control-color" 
-                           onchange="updateEntityColor('alert', this.value)" 
-                           value="#ff9c05" title="בחר צבע להתראות">
-                    <input type="text" id="entityAlertColorHex" class="form-control" 
-                           placeholder="#ff9c05" maxlength="7"
-                           onchange="updateEntityColorFromHex('alert', this.value)">
-                  </div>
-                </div>
+              <div class="input-group">
+                <input type="color" id="entityExecutionColor" class="form-control form-control-color" 
+                       onchange="updateEntityColor('execution', this.value)" 
+                       value="#17a2b8" title="בחר צבע לעסקאות">
+                <input type="text" id="entityExecutionColorHex" class="form-control" 
+                       placeholder="#17a2b8" maxlength="7"
+                       onchange="updateEntityColorFromHex('execution', this.value)">
               </div>
             </div>
           </div>
           
-          <!-- הערות ואילוצים -->
+          <!-- חשבונות -->
           <div class="preference-item">
             <div class="preference-label">
-              <h4>📝 הערות ואילוצים</h4>
-              <p>צבעים לתיעוד וניהול</p>
+              <h4>🏦 חשבונות</h4>
+              <p>צבע לחשבונות</p>
             </div>
             <div class="preference-control">
-              <div class="row">
-                <div class="col-md-6 mb-2">
-                  <label class="form-label small">הערות</label>
-                  <div class="input-group">
-                    <input type="color" id="entityNoteColor" class="form-control form-control-color" 
-                           onchange="updateEntityColor('note', this.value)" 
-                           value="#6f42c1" title="בחר צבע להערות">
-                    <input type="text" id="entityNoteColorHex" class="form-control" 
-                           placeholder="#6f42c1" maxlength="7"
-                           onchange="updateEntityColorFromHex('note', this.value)">
-                  </div>
-                </div>
-                <div class="col-md-6 mb-2">
-                  <label class="form-label small">אילוצים</label>
-                  <div class="input-group">
-                    <input type="color" id="entityConstraintColor" class="form-control form-control-color" 
-                           onchange="updateEntityColor('constraint', this.value)" 
-                           value="#6c757d" title="בחר צבע לאילוצים">
-                    <input type="text" id="entityConstraintColorHex" class="form-control" 
-                           placeholder="#6c757d" maxlength="7"
-                           onchange="updateEntityColorFromHex('constraint', this.value)">
-                  </div>
-                </div>
+              <div class="input-group">
+                <input type="color" id="entityAccountColor" class="form-control form-control-color" 
+                       onchange="updateEntityColor('account', this.value)" 
+                       value="#28a745" title="בחר צבע לחשבונות">
+                <input type="text" id="entityAccountColorHex" class="form-control" 
+                       placeholder="#28a745" maxlength="7"
+                       onchange="updateEntityColorFromHex('account', this.value)">
               </div>
             </div>
           </div>
           
-          <!-- עיצוב ומחקר -->
+          <!-- תזרים מזומנים -->
           <div class="preference-item">
             <div class="preference-label">
-              <h4>🎨 עיצוב ומחקר</h4>
-              <p>צבעים לפיתוח ותחזוקה</p>
+              <h4>💰 תזרים מזומנים</h4>
+              <p>צבע לתזרים מזומנים</p>
             </div>
             <div class="preference-control">
-              <div class="row">
-                <div class="col-md-6 mb-2">
-                  <label class="form-label small">עיצובים</label>
-                  <div class="input-group">
-                    <input type="color" id="entityDesignColor" class="form-control form-control-color" 
-                           onchange="updateEntityColor('design', this.value)" 
-                           value="#495057" title="בחר צבע לעיצובים">
-                    <input type="text" id="entityDesignColorHex" class="form-control" 
-                           placeholder="#495057" maxlength="7"
-                           onchange="updateEntityColorFromHex('design', this.value)">
-                  </div>
-                </div>
-                <div class="col-md-6 mb-2">
-                  <label class="form-label small">מחקר</label>
-                  <div class="input-group">
-                    <input type="color" id="entityResearchColor" class="form-control form-control-color" 
-                           onchange="updateEntityColor('research', this.value)" 
-                           value="#343a40" title="בחר צבע למחקר">
-                    <input type="text" id="entityResearchColorHex" class="form-control" 
-                           placeholder="#343a40" maxlength="7"
-                           onchange="updateEntityColorFromHex('research', this.value)">
-                  </div>
-                </div>
+              <div class="input-group">
+                <input type="color" id="entityCashFlowColor" class="form-control form-control-color" 
+                       onchange="updateEntityColor('cash_flow', this.value)" 
+                       value="#20c997" title="בחר צבע לתזרים מזומנים">
+                <input type="text" id="entityCashFlowColorHex" class="form-control" 
+                       placeholder="#20c997" maxlength="7"
+                       onchange="updateEntityColorFromHex('cash_flow', this.value)">
+              </div>
+            </div>
+          </div>
+          
+          <!-- טיקרים -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>📊 טיקרים</h4>
+              <p>צבע לטיקרים</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="color" id="entityTickerColor" class="form-control form-control-color" 
+                       onchange="updateEntityColor('ticker', this.value)" 
+                       value="#dc3545" title="בחר צבע לטיקרים">
+                <input type="text" id="entityTickerColorHex" class="form-control" 
+                       placeholder="#dc3545" maxlength="7"
+                       onchange="updateEntityColorFromHex('ticker', this.value)">
+              </div>
+            </div>
+          </div>
+          
+          <!-- התראות -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🔔 התראות</h4>
+              <p>צבע להתראות</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="color" id="entityAlertColor" class="form-control form-control-color" 
+                       onchange="updateEntityColor('alert', this.value)" 
+                       value="#ff9c05" title="בחר צבע להתראות">
+                <input type="text" id="entityAlertColorHex" class="form-control" 
+                       placeholder="#ff9c05" maxlength="7"
+                       onchange="updateEntityColorFromHex('alert', this.value)">
+              </div>
+            </div>
+          </div>
+          
+          <!-- הערות -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>📝 הערות</h4>
+              <p>צבע להערות</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="color" id="entityNoteColor" class="form-control form-control-color" 
+                       onchange="updateEntityColor('note', this.value)" 
+                       value="#6f42c1" title="בחר צבע להערות">
+                <input type="text" id="entityNoteColorHex" class="form-control" 
+                       placeholder="#6f42c1" maxlength="7"
+                       onchange="updateEntityColorFromHex('note', this.value)">
+              </div>
+            </div>
+          </div>
+          
+          <!-- אילוצים -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🔒 אילוצים</h4>
+              <p>צבע לאילוצים</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="color" id="entityConstraintColor" class="form-control form-control-color" 
+                       onchange="updateEntityColor('constraint', this.value)" 
+                       value="#6c757d" title="בחר צבע לאילוצים">
+                <input type="text" id="entityConstraintColorHex" class="form-control" 
+                       placeholder="#6c757d" maxlength="7"
+                       onchange="updateEntityColorFromHex('constraint', this.value)">
+              </div>
+            </div>
+          </div>
+          
+          <!-- עיצובים -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🎨 עיצובים</h4>
+              <p>צבע לעיצובים</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="color" id="entityDesignColor" class="form-control form-control-color" 
+                       onchange="updateEntityColor('design', this.value)" 
+                       value="#495057" title="בחר צבע לעיצובים">
+                <input type="text" id="entityDesignColorHex" class="form-control" 
+                       placeholder="#495057" maxlength="7"
+                       onchange="updateEntityColorFromHex('design', this.value)">
+              </div>
+            </div>
+          </div>
+          
+          <!-- מחקר -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🔬 מחקר</h4>
+              <p>צבע למחקר</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="color" id="entityResearchColor" class="form-control form-control-color" 
+                       onchange="updateEntityColor('research', this.value)" 
+                       value="#343a40" title="בחר צבע למחקר">
+                <input type="text" id="entityResearchColorHex" class="form-control" 
+                       placeholder="#343a40" maxlength="7"
+                       onchange="updateEntityColorFromHex('research', this.value)">
               </div>
             </div>
           </div>
@@ -744,36 +761,30 @@
           <div class="preference-item">
             <div class="preference-label">
               <h4>⚙️ העדפות</h4>
-              <p>צבע להגדרות מערכת</p>
+              <p>צבע להעדפות</p>
             </div>
             <div class="preference-control">
-              <div class="row">
-                <div class="col-md-6 mb-2">
-                  <label class="form-label small">העדפות</label>
-                  <div class="input-group">
-                    <input type="color" id="entityPreferenceColor" class="form-control form-control-color" 
-                           onchange="updateEntityColor('preference', this.value)" 
-                           value="#adb5bd" title="בחר צבע להעדפות">
-                    <input type="text" id="entityPreferenceColorHex" class="form-control" 
-                           placeholder="#adb5bd" maxlength="7"
-                           onchange="updateEntityColorFromHex('preference', this.value)">
-                  </div>
-                </div>
+              <div class="input-group">
+                <input type="color" id="entityPreferenceColor" class="form-control form-control-color" 
+                       onchange="updateEntityColor('preference', this.value)" 
+                       value="#adb5bd" title="בחר צבע להעדפות">
+                <input type="text" id="entityPreferenceColorHex" class="form-control" 
+                       placeholder="#adb5bd" maxlength="7"
+                       onchange="updateEntityColorFromHex('preference', this.value)">
               </div>
             </div>
           </div>
           
-            <!-- כפתור איפוס צבעי ישויות -->
-            <div class="preference-item">
-              <div class="preference-label">
-                <h5>🔄 איפוס צבעי ישויות</h5>
-                <p>איפוס צבעי ישויות לברירת המחדל</p>
-              </div>
-              <div class="preference-control">
-                <button type="button" class="btn btn-outline-secondary" onclick="resetEntityColors()">
-                  איפוס לברירת מחדל
-                </button>
-              </div>
+          <!-- כפתור איפוס צבעי ישויות -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🔄 איפוס צבעי ישויות</h4>
+              <p>איפוס צבעי ישויות לברירת המחדל</p>
+            </div>
+            <div class="preference-control">
+              <button type="button" class="btn btn-outline-secondary" onclick="resetEntityColors()">
+                איפוס לברירת מחדל
+              </button>
             </div>
           </div>
         </div>

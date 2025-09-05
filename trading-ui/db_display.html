@@ -89,20 +89,16 @@
     <div id="unified-header"></div>
     
     <!-- Page body - All content after header -->
-    <div class="page-body">
+    <div class="page-body db-display">
       <!-- Database area - top-Section -->
-      <div class="top-section">
+      <div class="top-section content-section" id="topSection">
         <!-- Main header -->
         <div class="section-header">
           <div class="table-title">
-            <img src="images/icons/db_display.svg" alt="בסיס נתונים"
-              style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+            <img src="images/icons/db_display.svg" alt="בסיס נתונים" class="table-icon">
             בסיס נתונים
           </div>
           <div class="table-actions">
-            <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
-              <i class="fas fa-copy"></i> העתק לוג מפורט
-            </button>
             <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור בסיס נתונים">
               <span class="filter-icon">▲</span>
             </button>
@@ -133,15 +129,13 @@
           <!-- Trade Plans header -->
           <div class="section-header">
             <div class="table-title">
-              <img src="images/icons/trade_plans.svg" alt="תוכניות מסחר"
-                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              <img src="images/icons/trade_plans.svg" alt="תוכניות מסחר" class="section-icon">
               תוכניות מסחר
             </div>
             <div class="table-count" id="tradePlansCount">טוען...</div>
             <div class="table-actions">
               <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
-                <img src="images/icons/trade_plans.svg" alt="הוסף" class="action-icon"
-                  style="width: 16px; height: 16px;"> הוסף
+                <img src="images/icons/trade_plans.svg" alt="הוסף" class="action-icon"> הוסף
               </button>
               <div class="action-separator"></div>
               <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור תוכניות מסחר">
@@ -156,26 +150,29 @@
               <table class="table" data-table-type="trade_plans">
                 <thead>
                   <tr>
-                    <th onclick="sortTable(0, 'tradePlansTable')" style="width: 3%;">ID</th>
-                    <th onclick="sortTable(1, 'tradePlansTable')" style="width: 5%;">Account ID</th>
-                    <th onclick="sortTable(2, 'tradePlansTable')" style="width: 5%;">Ticker ID</th>
-                    <th onclick="sortTable(3, 'tradePlansTable')" style="width: 7%;">Investment Type</th>
-                    <th onclick="sortTable(4, 'tradePlansTable')" style="width: 5%;">Side</th>
-                    <th onclick="sortTable(5, 'tradePlansTable')" style="width: 5%;">Status</th>
-                    <th onclick="sortTable(6, 'tradePlansTable')" style="width: 7%;">Planned Amount</th>
-                    <th onclick="sortTable(7, 'tradePlansTable')" style="width: 10%;">Entry Conditions</th>
-                    <th onclick="sortTable(8, 'tradePlansTable')" style="width: 7%;">Stop Price</th>
-                    <th onclick="sortTable(9, 'tradePlansTable')" style="width: 7%;">Target Price</th>
-                    <th onclick="sortTable(10, 'tradePlansTable')" style="width: 10%;">Reasons</th>
-                    <th onclick="sortTable(11, 'tradePlansTable')" style="width: 8%;">Cancelled At</th>
-                    <th onclick="sortTable(12, 'tradePlansTable')" style="width: 10%;">Cancel Reason</th>
-                    <th onclick="sortTable(13, 'tradePlansTable')" style="width: 7%;">Created At</th>
-                    <th style="width: 9%;">Actions</th>
+                    <th onclick="sortTable(0, 'tradePlansTable')">ID</th>
+                    <th onclick="sortTable(1, 'tradePlansTable')">Account ID</th>
+                    <th onclick="sortTable(2, 'tradePlansTable')">Ticker ID</th>
+                    <th onclick="sortTable(3, 'tradePlansTable')">Investment Type</th>
+                    <th onclick="sortTable(4, 'tradePlansTable')">Side</th>
+                    <th onclick="sortTable(5, 'tradePlansTable')">Status</th>
+                    <th onclick="sortTable(6, 'tradePlansTable')">Planned Amount</th>
+                    <th onclick="sortTable(7, 'tradePlansTable')">Entry Conditions</th>
+                    <th onclick="sortTable(8, 'tradePlansTable')">Stop Price</th>
+                    <th onclick="sortTable(9, 'tradePlansTable')">Target Price</th>
+                    <th onclick="sortTable(10, 'tradePlansTable')">Reasons</th>
+                    <th onclick="sortTable(11, 'tradePlansTable')">Cancelled At</th>
+                    <th onclick="sortTable(12, 'tradePlansTable')">Cancel Reason</th>
+                    <th onclick="sortTable(13, 'tradePlansTable')">Created At</th>
+                    <th onclick="sortTable(14, 'tradePlansTable')">Stop %</th>
+                    <th onclick="sortTable(15, 'tradePlansTable')">Target %</th>
+                    <th onclick="sortTable(16, 'tradePlansTable')">Current Price</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="14" class="text-center">טוען נתונים...</td>
+                    <td colspan="18" class="text-center">טוען נתונים...</td>
                   </tr>
                 </tbody>
               </table>
@@ -211,15 +208,13 @@
           <!-- Trades header -->
           <div class="section-header">
             <div class="table-title">
-              <img src="images/icons/trades.svg" alt="טריידים"
-                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              <img src="images/icons/trades.svg" alt="טריידים" class="section-icon">
               טריידים
             </div>
             <div class="table-count" id="tradesCount">טוען...</div>
             <div class="table-actions">
               <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
-                <img src="images/icons/trades.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;">
-                הוסף
+                <img src="images/icons/trades.svg" alt="הוסף" class="action-icon"> הוסף
               </button>
               <div class="action-separator"></div>
               <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור טריידים">
@@ -234,21 +229,21 @@
               <table class="table" data-table-type="trades">
                 <thead>
                   <tr>
-                    <th onclick="sortTable(0, 'tradesTable')" style="width: 3%;">ID</th>
-                    <th onclick="sortTable(1, 'tradesTable')" style="width: 5%;">Account ID</th>
-                    <th onclick="sortTable(2, 'tradesTable')" style="width: 5%;">Ticker ID</th>
-                    <th onclick="sortTable(3, 'tradesTable')" style="width: 5%;">Trade Plan ID</th>
-                    <th onclick="sortTable(4, 'tradesTable')" style="width: 5%;">Status</th>
-                    <th onclick="sortTable(5, 'tradesTable')" style="width: 7%;">Investment Type</th>
-                    <th onclick="sortTable(6, 'tradesTable')" style="width: 5%;">Side</th>
-                    <th onclick="sortTable(7, 'tradesTable')" style="width: 8%;">Opened At</th>
-                    <th onclick="sortTable(8, 'tradesTable')" style="width: 8%;">Closed At</th>
-                    <th onclick="sortTable(9, 'tradesTable')" style="width: 8%;">Cancelled At</th>
-                    <th onclick="sortTable(10, 'tradesTable')" style="width: 10%;">Cancel Reason</th>
-                    <th onclick="sortTable(11, 'tradesTable')" style="width: 6%;">Total P&L</th>
-                    <th onclick="sortTable(12, 'tradesTable')" style="width: 10%;">Notes</th>
-                    <th onclick="sortTable(13, 'tradesTable')" style="width: 7%;">Created At</th>
-                    <th style="width: 9%;">Actions</th>
+                    <th onclick="sortTable(0, 'tradesTable')">ID</th>
+                    <th onclick="sortTable(1, 'tradesTable')">Account ID</th>
+                    <th onclick="sortTable(2, 'tradesTable')">Ticker ID</th>
+                    <th onclick="sortTable(3, 'tradesTable')">Trade Plan ID</th>
+                    <th onclick="sortTable(4, 'tradesTable')">Status</th>
+                    <th onclick="sortTable(5, 'tradesTable')">Investment Type</th>
+                    <th onclick="sortTable(6, 'tradesTable')">Side</th>
+                    <th onclick="sortTable(7, 'tradesTable')">Opened At</th>
+                    <th onclick="sortTable(8, 'tradesTable')">Closed At</th>
+                    <th onclick="sortTable(9, 'tradesTable')">Cancelled At</th>
+                    <th onclick="sortTable(10, 'tradesTable')">Cancel Reason</th>
+                    <th onclick="sortTable(11, 'tradesTable')">Total P&L</th>
+                    <th onclick="sortTable(12, 'tradesTable')">Notes</th>
+                    <th onclick="sortTable(13, 'tradesTable')">Created At</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -285,15 +280,13 @@
           <!-- Accounts header -->
           <div class="section-header">
             <div class="table-title">
-              <img src="images/icons/accounts.svg" alt="חשבונות"
-                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              <img src="images/icons/accounts.svg" alt="חשבונות" class="section-icon">
               חשבונות
             </div>
             <div class="table-count" id="accountsCount">טוען...</div>
             <div class="table-actions">
               <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
-                <img src="images/icons/accounts.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;">
-                הוסף
+                <img src="images/icons/accounts.svg" alt="הוסף" class="action-icon"> הוסף
               </button>
               <div class="action-separator"></div>
               <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור חשבונות">
@@ -308,21 +301,22 @@
               <table class="table" data-table-type="accounts">
                 <thead>
                   <tr>
-                    <th onclick="sortTable(0, 'accountsTable')" style="width: 4%;">ID</th>
-                    <th onclick="sortTable(1, 'accountsTable')" style="width: 12%;">Name</th>
-                    <th onclick="sortTable(2, 'accountsTable')" style="width: 6%;">Currency ID</th>
-                    <th onclick="sortTable(3, 'accountsTable')" style="width: 6%;">Status</th>
-                    <th onclick="sortTable(4, 'accountsTable')" style="width: 10%;">Cash Balance</th>
-                    <th onclick="sortTable(5, 'accountsTable')" style="width: 10%;">Total Value</th>
-                    <th onclick="sortTable(6, 'accountsTable')" style="width: 10%;">Total P&L</th>
-                    <th onclick="sortTable(7, 'accountsTable')" style="width: 12%;">Notes</th>
-                    <th onclick="sortTable(8, 'accountsTable')" style="width: 7%;">Created At</th>
-                    <th style="width: 9%;">Actions</th>
+                    <th onclick="sortTable(0, 'accountsTable')">ID</th>
+                    <th onclick="sortTable(1, 'accountsTable')">Name</th>
+                    <th onclick="sortTable(2, 'accountsTable')">Currency ID</th>
+                    <th onclick="sortTable(3, 'accountsTable')">Status</th>
+                    <th onclick="sortTable(4, 'accountsTable')">Cash Balance</th>
+                    <th onclick="sortTable(5, 'accountsTable')">Total Value</th>
+                    <th onclick="sortTable(6, 'accountsTable')">Total P&L</th>
+                    <th onclick="sortTable(7, 'accountsTable')">Notes</th>
+                    <th onclick="sortTable(8, 'accountsTable')">Created At</th>
+                    <th onclick="sortTable(9, 'accountsTable')">Status Default</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="10" class="text-center">טוען נתונים...</td>
+                    <td colspan="11" class="text-center">טוען נתונים...</td>
                   </tr>
                 </tbody>
               </table>
@@ -353,15 +347,13 @@
           <!-- Tickers header -->
           <div class="section-header">
             <div class="table-title">
-              <img src="images/icons/tickers.svg" alt="טיקרים"
-                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              <img src="images/icons/tickers.svg" alt="טיקרים" class="section-icon">
               טיקרים
             </div>
             <div class="table-count" id="tickersCount">טוען...</div>
             <div class="table-actions">
               <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
-                <img src="images/icons/tickers.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;">
-                הוסף
+                <img src="images/icons/tickers.svg" alt="הוסף" class="action-icon"> הוסף
               </button>
               <div class="action-separator"></div>
               <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור טיקרים">
@@ -376,22 +368,23 @@
               <table class="table" data-table-type="tickers">
                 <thead>
                   <tr>
-                    <th onclick="sortTable(0, 'tickersTable')" style="width: 4%;">ID</th>
-                    <th onclick="sortTable(1, 'tickersTable')" style="width: 8%;">Symbol</th>
-                    <th onclick="sortTable(2, 'tickersTable')" style="width: 18%;">Name</th>
-                    <th onclick="sortTable(3, 'tickersTable')" style="width: 8%;">Type</th>
-                    <th onclick="sortTable(4, 'tickersTable')" style="width: 15%;">Remarks</th>
-                    <th onclick="sortTable(5, 'tickersTable')" style="width: 8%;">Currency ID</th>
-                    <th onclick="sortTable(6, 'tickersTable')" style="width: 8%;">Active Trades</th>
-                    <th onclick="sortTable(7, 'tickersTable')" style="width: 8%;">Status</th>
-                    <th onclick="sortTable(8, 'tickersTable')" style="width: 8%;">Created At</th>
-                    <th onclick="sortTable(9, 'tickersTable')" style="width: 8%;">Updated At</th>
-                    <th style="width: 9%;">Actions</th>
+                    <th onclick="sortTable(0, 'tickersTable')">ID</th>
+                    <th onclick="sortTable(1, 'tickersTable')">Symbol</th>
+                    <th onclick="sortTable(2, 'tickersTable')">Name</th>
+                    <th onclick="sortTable(3, 'tickersTable')">Type</th>
+                    <th onclick="sortTable(4, 'tickersTable')">Remarks</th>
+                    <th onclick="sortTable(5, 'tickersTable')">Currency</th>
+                    <th onclick="sortTable(6, 'tickersTable')">Active Trades</th>
+                    <th onclick="sortTable(7, 'tickersTable')">Status</th>
+                    <th onclick="sortTable(8, 'tickersTable')">Created At</th>
+                    <th onclick="sortTable(9, 'tickersTable')">Updated At</th>
+                    <th onclick="sortTable(10, 'tickersTable')">Currency ID</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="11" class="text-center">טוען נתונים...</td>
+                    <td colspan="12" class="text-center">טוען נתונים...</td>
                   </tr>
                 </tbody>
               </table>
@@ -424,15 +417,13 @@
           <!-- Executions header -->
           <div class="section-header">
             <div class="table-title">
-              <img src="images/icons/executions.svg" alt="ביצועים"
-                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              <img src="images/icons/executions.svg" alt="ביצועים" class="section-icon">
               ביצועים
             </div>
             <div class="table-count" id="executionsCount">טוען...</div>
             <div class="table-actions">
               <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
-                <img src="images/icons/executions.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;">
-                הוסף
+                <img src="images/icons/executions.svg" alt="הוסף" class="action-icon"> הוסף
               </button>
               <div class="action-separator"></div>
               <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור ביצועים">
@@ -447,18 +438,18 @@
               <table class="table" data-table-type="executions">
                 <thead>
                   <tr>
-                    <th onclick="sortTable(0, 'executionsTable')" style="width: 4%;">ID</th>
-                    <th onclick="sortTable(1, 'executionsTable')" style="width: 7%;">Trade ID</th>
-                    <th onclick="sortTable(2, 'executionsTable')" style="width: 8%;">Action</th>
-                    <th onclick="sortTable(3, 'executionsTable')" style="width: 10%;">Date</th>
-                    <th onclick="sortTable(4, 'executionsTable')" style="width: 8%;">Quantity</th>
-                    <th onclick="sortTable(5, 'executionsTable')" style="width: 8%;">Price</th>
-                    <th onclick="sortTable(6, 'executionsTable')" style="width: 7%;">Fee</th>
-                    <th onclick="sortTable(7, 'executionsTable')" style="width: 10%;">Source</th>
-                    <th onclick="sortTable(8, 'executionsTable')" style="width: 10%;">Created At</th>
-                    <th onclick="sortTable(9, 'executionsTable')" style="width: 10%;">External ID</th>
-                    <th onclick="sortTable(10, 'executionsTable')" style="width: 10%;">Notes</th>
-                    <th style="width: 8%;">Actions</th>
+                    <th onclick="sortTable(0, 'executionsTable')">ID</th>
+                    <th onclick="sortTable(1, 'executionsTable')">Trade ID</th>
+                    <th onclick="sortTable(2, 'executionsTable')">Action</th>
+                    <th onclick="sortTable(3, 'executionsTable')">Date</th>
+                    <th onclick="sortTable(4, 'executionsTable')">Quantity</th>
+                    <th onclick="sortTable(5, 'executionsTable')">Price</th>
+                    <th onclick="sortTable(6, 'executionsTable')">Fee</th>
+                    <th onclick="sortTable(7, 'executionsTable')">Source</th>
+                    <th onclick="sortTable(8, 'executionsTable')">Created At</th>
+                    <th onclick="sortTable(9, 'executionsTable')">External ID</th>
+                    <th onclick="sortTable(10, 'executionsTable')">Notes</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -494,15 +485,13 @@
           <!-- Alerts header -->
           <div class="section-header">
             <div class="table-title">
-              <img src="images/icons/alerts.svg" alt="התראות"
-                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              <img src="images/icons/alerts.svg" alt="התראות" class="section-icon">
               התראות
             </div>
             <div class="table-count" id="alertsCount">טוען...</div>
             <div class="table-actions">
               <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
-                <img src="images/icons/alerts.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;">
-                הוסף
+                <img src="images/icons/alerts.svg" alt="הוסף" class="action-icon"> הוסף
               </button>
               <div class="action-separator"></div>
               <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור התראות">
@@ -515,24 +504,25 @@
               <table class="table" data-table-type="alerts">
                 <thead>
                   <tr>
-                    <th onclick="sortTable(0, 'alertsTable')" style="width: 4%;">ID</th>
-                    <th onclick="sortTable(1, 'alertsTable')" style="width: 8%;">Condition</th>
-                    <th onclick="sortTable(2, 'alertsTable')" style="width: 12%;">Display Text</th>
-                    <th onclick="sortTable(3, 'alertsTable')" style="width: 8%;">Status</th>
-                    <th onclick="sortTable(4, 'alertsTable')" style="width: 8%;">Related Type</th>
-                    <th onclick="sortTable(5, 'alertsTable')" style="width: 8%;">Related ID</th>
-                    <th onclick="sortTable(6, 'alertsTable')" style="width: 8%;">Trade ID</th>
-                    <th onclick="sortTable(7, 'alertsTable')" style="width: 8%;">Trade Plan ID</th>
-                    <th onclick="sortTable(8, 'alertsTable')" style="width: 8%;">Account ID</th>
-                    <th onclick="sortTable(9, 'alertsTable')" style="width: 8%;">Ticker ID</th>
-                    <th onclick="sortTable(10, 'alertsTable')" style="width: 8%;">Is Triggered</th>
-                    <th onclick="sortTable(11, 'alertsTable')" style="width: 8%;">Created At</th>
-                    <th style="width: 8%;">Actions</th>
+                    <th onclick="sortTable(0, 'alertsTable')">ID</th>
+                    <th onclick="sortTable(1, 'alertsTable')">Account ID</th>
+                    <th onclick="sortTable(2, 'alertsTable')">Ticker ID</th>
+                    <th onclick="sortTable(3, 'alertsTable')">Message</th>
+                    <th onclick="sortTable(4, 'alertsTable')">Triggered At</th>
+                    <th onclick="sortTable(5, 'alertsTable')">Created At</th>
+                    <th onclick="sortTable(6, 'alertsTable')">Status</th>
+                    <th onclick="sortTable(7, 'alertsTable')">Is Triggered</th>
+                    <th onclick="sortTable(8, 'alertsTable')">Related Type ID</th>
+                    <th onclick="sortTable(9, 'alertsTable')">Related ID</th>
+                    <th onclick="sortTable(10, 'alertsTable')">Condition Attribute</th>
+                    <th onclick="sortTable(11, 'alertsTable')">Condition Operator</th>
+                    <th onclick="sortTable(12, 'alertsTable')">Condition Number</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="13" class="text-center">טוען נתונים...</td>
+                    <td colspan="14" class="text-center">טוען נתונים...</td>
                   </tr>
                 </tbody>
               </table>
@@ -561,14 +551,13 @@
         <!-- Notes header -->
         <div class="section-header">
           <div class="table-title">
-            <img src="images/icons/home.svg" alt="הערות"
-              style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+            <img src="images/icons/home.svg" alt="הערות" class="section-icon">
             הערות
           </div>
           <div class="table-count" id="notesCount">טוען...</div>
           <div class="table-actions">
             <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
-              <img src="images/icons/home.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;"> הוסף
+              <img src="images/icons/home.svg" alt="הוסף" class="action-icon"> הוסף
             </button>
             <div class="action-separator"></div>
             <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור הערות">
@@ -581,19 +570,18 @@
             <table class="table" data-table-type="notes">
                               <thead>
                   <tr>
-                    <th onclick="sortTable(0, 'notesTable')" style="width: 4%;">ID</th>
-                    <th onclick="sortTable(1, 'notesTable')" style="width: 30%;">Content</th>
-                    <th onclick="sortTable(2, 'notesTable')" style="width: 10%;">Related Type</th>
-                    <th onclick="sortTable(3, 'notesTable')" style="width: 8%;">Related ID</th>
-                    <th onclick="sortTable(4, 'notesTable')" style="width: 8%;">Type ID</th>
-                    <th onclick="sortTable(5, 'notesTable')" style="width: 10%;">Attachment</th>
-                    <th onclick="sortTable(6, 'notesTable')" style="width: 10%;">Created At</th>
-                    <th style="width: 8%;">Actions</th>
-                </tr>
+                    <th onclick="sortTable(0, 'notesTable')">ID</th>
+                    <th onclick="sortTable(1, 'notesTable')">Content</th>
+                    <th onclick="sortTable(2, 'notesTable')">Attachment</th>
+                    <th onclick="sortTable(3, 'notesTable')">Related Type ID</th>
+                    <th onclick="sortTable(4, 'notesTable')">Related ID</th>
+                    <th onclick="sortTable(5, 'notesTable')">Created At</th>
+                    <th>Actions</th>
+                  </tr>
                 </thead>
               <tbody>
                                   <tr>
-                    <td colspan="8" class="text-center">טוען נתונים...</td>
+                    <td colspan="7" class="text-center">טוען נתונים...</td>
                   </tr>
               </tbody>
             </table>
@@ -620,14 +608,13 @@
         <!-- Cash Flows header -->
         <div class="section-header">
           <div class="table-title">
-            <img src="images/icons/cash_flows.svg" alt="תזרימי מזומנים"
-              style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+            <img src="images/icons/cash_flows.svg" alt="תזרימי מזומנים" class="section-icon">
             תזרימי מזומנים
           </div>
           <div class="table-count" id="cashFlowsCount">טוען...</div>
           <div class="table-actions">
             <button class="refresh-btn" onclick="addRecord()" title="הוסף רשומה">
-              <img src="images/icons/cash_flows.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;"> הוסף
+              <img src="images/icons/cash_flows.svg" alt="הוסף" class="action-icon"> הוסף
             </button>
             <div class="action-separator"></div>
             <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור תזרימי מזומנים">
@@ -640,18 +627,18 @@
             <table class="table" data-table-type="cash_flows">
               <thead>
                 <tr>
-                  <th onclick="sortTable(0, 'cashFlowsTable')" style="width: 4%;">ID</th>
-                  <th onclick="sortTable(1, 'cashFlowsTable')" style="width: 8%;">Account ID</th>
-                  <th onclick="sortTable(2, 'cashFlowsTable')" style="width: 8%;">Type</th>
-                  <th onclick="sortTable(3, 'cashFlowsTable')" style="width: 8%;">Amount</th>
-                  <th onclick="sortTable(4, 'cashFlowsTable')" style="width: 8%;">Date</th>
-                  <th onclick="sortTable(5, 'cashFlowsTable')" style="width: 15%;">Description</th>
-                  <th onclick="sortTable(6, 'cashFlowsTable')" style="width: 8%;">Currency ID</th>
-                  <th onclick="sortTable(7, 'cashFlowsTable')" style="width: 8%;">USD Rate</th>
-                  <th onclick="sortTable(8, 'cashFlowsTable')" style="width: 8%;">Source</th>
-                  <th onclick="sortTable(9, 'cashFlowsTable')" style="width: 8%;">External ID</th>
-                  <th onclick="sortTable(10, 'cashFlowsTable')" style="width: 8%;">Created At</th>
-                  <th style="width: 8%;">Actions</th>
+                  <th onclick="sortTable(0, 'cashFlowsTable')">ID</th>
+                  <th onclick="sortTable(1, 'cashFlowsTable')">Account ID</th>
+                  <th onclick="sortTable(2, 'cashFlowsTable')">Type</th>
+                  <th onclick="sortTable(3, 'cashFlowsTable')">Amount</th>
+                  <th onclick="sortTable(4, 'cashFlowsTable')">Date</th>
+                  <th onclick="sortTable(5, 'cashFlowsTable')">Description</th>
+                  <th onclick="sortTable(6, 'cashFlowsTable')">Currency ID</th>
+                  <th onclick="sortTable(7, 'cashFlowsTable')">USD Rate</th>
+                  <th onclick="sortTable(8, 'cashFlowsTable')">Source</th>
+                  <th onclick="sortTable(9, 'cashFlowsTable')">External ID</th>
+                  <th onclick="sortTable(10, 'cashFlowsTable')">Created At</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>

@@ -409,6 +409,110 @@
     .backup-notice i {
       color: #007bff;
     }
+    
+    /* Enhanced log entry styles */
+    .log-entry {
+      background: #ffffff;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      padding: 15px;
+      transition: all 0.2s ease;
+    }
+    
+    .log-entry:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transform: translateY(-1px);
+    }
+    
+    .log-header {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .log-timestamp {
+      color: #6c757d;
+      font-size: 12px;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .log-level {
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .log-level.info {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+    
+    .log-level.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .log-level.warning {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .log-level.success {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .log-message {
+      color: #495057;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    
+    /* Enhanced status indicator */
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .status-indicator.status-active {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .status-indicator.status-inactive {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    /* Enhanced stat change indicators */
+    .stat-change {
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    
+    .stat-change.positive {
+      color: #28a745;
+    }
+    
+    .stat-change.negative {
+      color: #dc3545;
+    }
+    
+    .stat-change.neutral {
+      color: #6c757d;
+    }
   </style>
   
   <!-- 10. Page-specific color scheme initialization -->
@@ -468,12 +572,27 @@
         <div class="section-body">
           <active-alerts></active-alerts>
 
-          <!-- Linter summary -->
-          <div class="info-summary" id="summaryStats">
-            <div>קבצים נסרקו: <strong id="totalFilesStats">0</strong></div>
-            <div>שגיאות: <strong id="totalErrorsStats">0</strong></div>
-            <div>אזהרות: <strong id="totalWarningsStats">0</strong></div>
-            <div>סטטוס: <strong id="overallStatus">בדיקה...</strong></div>
+          <!-- Linter summary with improved design -->
+          <div class="status-grid" id="summaryStats">
+            <div class="status-item">
+              <span class="label">סטטוס:</span>
+              <span class="value">
+                <span class="status-dot connected"></span>
+                <strong id="overallStatus">בדיקה...</strong>
+              </span>
+            </div>
+            <div class="status-item">
+              <span class="label">קבצים נסרקו:</span>
+              <span class="value"><strong id="totalFilesStats">0</strong></span>
+            </div>
+            <div class="status-item">
+              <span class="label">שגיאות:</span>
+              <span class="value"><strong id="totalErrorsStats">0</strong></span>
+            </div>
+            <div class="status-item">
+              <span class="label">אזהרות:</span>
+              <span class="value"><strong id="totalWarningsStats">0</strong></span>
+            </div>
           </div>
         </div>
       </div> <!-- End top-section -->
@@ -513,40 +632,48 @@
 
             <!-- Statistics Grid -->
             <div class="stats-grid">
-              <div class="stat-card">
-                <div class="stat-header">
-                  <h3 class="stat-title">שגיאות</h3>
-                  <i class="stat-icon bi bi-exclamation-triangle text-danger"></i>
+              <div class="stat-item error">
+                <div class="stat-icon">
+                  <i class="fas fa-exclamation-triangle"></i>
                 </div>
-                <div class="stat-value" id="errorCount">0</div>
-                <div class="stat-change neutral" id="errorChange">+0</div>
+                <div class="stat-content">
+                  <div class="stat-value" id="errorCount">0</div>
+                  <div class="stat-label">שגיאות</div>
+                  <div class="stat-change neutral" id="errorChange">+0</div>
+                </div>
               </div>
 
-              <div class="stat-card">
-                <div class="stat-header">
-                  <h3 class="stat-title">אזהרות</h3>
-                  <i class="stat-icon bi bi-exclamation-circle text-warning"></i>
+              <div class="stat-item warning">
+                <div class="stat-icon">
+                  <i class="fas fa-exclamation-circle"></i>
                 </div>
-                <div class="stat-value" id="warningCount">0</div>
-                <div class="stat-change neutral" id="warningChange">+0</div>
+                <div class="stat-content">
+                  <div class="stat-value" id="warningCount">0</div>
+                  <div class="stat-label">אזהרות</div>
+                  <div class="stat-change neutral" id="warningChange">+0</div>
+                </div>
               </div>
 
-              <div class="stat-card">
-                <div class="stat-header">
-                  <h3 class="stat-title">הצלחות</h3>
-                  <i class="stat-icon bi bi-check-circle text-success"></i>
+              <div class="stat-item success">
+                <div class="stat-icon">
+                  <i class="fas fa-check-circle"></i>
                 </div>
-                <div class="stat-value" id="successCount">0</div>
-                <div class="stat-change neutral" id="successChange">+0</div>
+                <div class="stat-content">
+                  <div class="stat-value" id="successCount">0</div>
+                  <div class="stat-label">הצלחות</div>
+                  <div class="stat-change neutral" id="successChange">+0</div>
+                </div>
               </div>
 
-              <div class="stat-card">
-                <div class="stat-header">
-                  <h3 class="stat-title">קבצים נסרקו</h3>
-                  <i class="stat-icon bi bi-file-text text-info"></i>
+              <div class="stat-item info">
+                <div class="stat-icon">
+                  <i class="fas fa-file-code"></i>
                 </div>
-                <div class="stat-value" id="filesScanned">0</div>
-                <div class="stat-change neutral" id="filesChange">+0</div>
+                <div class="stat-content">
+                  <div class="stat-value" id="filesScanned">0</div>
+                  <div class="stat-label">קבצים נסרקו</div>
+                  <div class="stat-change neutral" id="filesChange">+0</div>
+                </div>
               </div>
             </div>
           </div>
@@ -678,9 +805,11 @@
           <div class="section-body">
             <div class="logs-container" id="logsContainer">
               <div class="log-entry">
-                <span class="log-timestamp">[${new Date().toLocaleTimeString('he-IL')}]</span>
-                <span class="log-level info">[INFO]</span>
-                <span class="log-message">מערכת ניטור Linter אותחלה</span>
+                <div class="log-header">
+                  <span class="log-timestamp">[${new Date().toLocaleTimeString('he-IL')}]</span>
+                  <span class="log-level info">[INFO]</span>
+                </div>
+                <div class="log-message">מערכת ניטור Linter אותחלה</div>
               </div>
             </div>
           </div>

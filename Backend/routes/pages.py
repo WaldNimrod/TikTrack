@@ -189,8 +189,9 @@ def static_files(filename: str) -> Any:
         if html_path.exists():
             return send_from_directory(UI_DIR, html_file)
     
-    # Otherwise, return the file as is
-    return send_from_directory(UI_DIR, filename)
+    # Otherwise, return 404 for unknown files
+    from flask import abort
+    abort(404)
 
 @pages_bp.after_request
 def add_cache_headers(response):

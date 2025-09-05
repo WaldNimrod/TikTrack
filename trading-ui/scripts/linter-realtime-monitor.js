@@ -286,55 +286,57 @@ function displayIssues(issues) {
     if (!logsContainer) return;
     
     if (issues.length === 0) {
-        logsContainer.innerHTML = `
-            <div class="log-entry">
-                <span class="log-timestamp">[${new Date().toLocaleTimeString('he-IL')}]</span>
-                <span class="log-level success">[SUCCESS]</span>
-                <span class="log-message">🎉 אין בעיות נוכחיות!</span>
-            </div>
-        `;
+                        logsContainer.innerHTML = `
+                    <div class="log-entry">
+                        <div class="log-header">
+                            <span class="log-timestamp">[${new Date().toLocaleTimeString('he-IL')}]</span>
+                            <span class="log-level success">[SUCCESS]</span>
+                        </div>
+                        <div class="log-message">🎉 אין בעיות נוכחיות!</div>
+                    </div>
+                `;
         return;
     }
 
     const filteredIssues = currentFilter === 'all' ? issues : issues.filter(issue => issue.severity === currentFilter);
     
-    logsContainer.innerHTML = filteredIssues.map(issue => `
-        <div class="log-entry issue-item" data-issue-id="${issue.id}">
-            <div class="issue-header">
-                <span class="log-timestamp">[${new Date().toLocaleTimeString('he-IL')}]</span>
-                <span class="log-level ${issue.severity}">[${issue.severity.toUpperCase()}]</span>
-                <span class="issue-rule">${issue.rule}</span>
-            </div>
-            <div class="issue-content">
-                <div class="issue-message">${issue.message}</div>
-                <div class="issue-location">📁 ${issue.file}:${issue.line}</div>
-                <div class="issue-code">
-                    <div class="code-before">
-                        <strong>לפני:</strong> <code>${issue.originalCode}</code>
+                    logsContainer.innerHTML = filteredIssues.map(issue => `
+                    <div class="log-entry issue-item" data-issue-id="${issue.id}">
+                        <div class="log-header">
+                            <span class="log-timestamp">[${new Date().toLocaleTimeString('he-IL')}]</span>
+                            <span class="log-level ${issue.severity}">[${issue.severity.toUpperCase()}]</span>
+                            <span class="issue-rule">${issue.rule}</span>
+                        </div>
+                        <div class="log-message">${issue.message}</div>
+                        <div class="issue-content">
+                            <div class="issue-location">📁 ${issue.file}:${issue.line}</div>
+                            <div class="issue-code">
+                                <div class="code-before">
+                                    <strong>לפני:</strong> <code>${issue.originalCode}</code>
+                                    </div>
+                                <div class="code-after">
+                                    <strong>אחרי:</strong> <code>${issue.fixedCode}</code>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="issue-actions">
+                            ${issue.fixable ? `
+                                <button class="btn btn-success btn-sm" onclick="fixIssue(${issue.id})" title="תקן בעיה זו">
+                                    <i class="fas fa-wrench"></i> תיקון
+                                </button>
+                                <button class="btn btn-primary btn-sm" onclick="previewFix(${issue.id})" title="הצג תצוגה מקדימה של התיקון">
+                                    <i class="fas fa-eye"></i> תצוגה מקדימה
+                                </button>
+                            ` : ''}
+                            <button class="btn btn-secondary btn-sm" onclick="ignoreIssue(${issue.id})" title="התעלם מבעיה זו">
+                                <i class="fas fa-eye-slash"></i> התעלם
+                            </button>
+                            <button class="btn btn-info btn-sm" onclick="showIssueDetails(${issue.id})" title="הצג פרטים נוספים">
+                                <i class="fas fa-info-circle"></i> פרטים
+                            </button>
+                        </div>
                     </div>
-                    <div class="code-after">
-                        <strong>אחרי:</strong> <code>${issue.fixedCode}</code>
-                    </div>
-                </div>
-            </div>
-            <div class="issue-actions">
-                ${issue.fixable ? `
-                    <button class="btn btn-success btn-sm" onclick="fixIssue(${issue.id})" title="תקן בעיה זו">
-                        <i class="fas fa-wrench"></i> תיקון
-                    </button>
-                    <button class="btn btn-primary btn-sm" onclick="previewFix(${issue.id})" title="הצג תצוגה מקדימה של התיקון">
-                        <i class="fas fa-eye"></i> תצוגה מקדימה
-                    </button>
-                ` : ''}
-                <button class="btn btn-secondary btn-sm" onclick="ignoreIssue(${issue.id})" title="התעלם מבעיה זו">
-                    <i class="fas fa-eye-slash"></i> התעלם
-                </button>
-                <button class="btn btn-info btn-sm" onclick="showIssueDetails(${issue.id})" title="הצג פרטים נוספים">
-                    <i class="fas fa-info-circle"></i> פרטים
-                </button>
-            </div>
-        </div>
-    `).join('');
+                `).join('');
 }
 
 function filterIssues(filter) {

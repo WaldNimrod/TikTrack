@@ -555,7 +555,8 @@ class NotificationsCenter {
   }
 
   clearHistory() {
-    if (confirm('האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?')) {
+    // Function to execute history clearing
+    const executeClearHistory = () => {
       this.history = [];
       this.stats = { success: 0, error: 0, warning: 0, info: 0 };
 
@@ -564,6 +565,22 @@ class NotificationsCenter {
       this.saveToLocalStorage();
 
       window.showSuccessNotification('מרכז התראות', 'היסטוריית ההתראות נוקתה בהצלחה');
+    };
+    
+    // Use notification system or fallback to confirm
+    if (typeof window.showConfirmationDialog === 'function') {
+      window.showConfirmationDialog(
+        'ניקוי היסטוריה',
+        'האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?',
+        executeClearHistory,
+        () => console.log('❌ ניקוי היסטוריה - משתמש ביטל')
+      );
+    } else {
+      if (confirm('האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?')) {
+        executeClearHistory();
+      } else {
+        console.log('❌ ניקוי היסטוריה - משתמש ביטל');
+      }
     }
   }
 
@@ -671,7 +688,8 @@ function saveNotificationSettings() {
 }
 
 function resetNotificationSettings() {
-  if (confirm('האם אתה בטוח שברצונך לאפס את כל ההגדרות?')) {
+  // Function to execute settings reset
+  const executeReset = () => {
     if (window.notificationsCenter) {
       window.notificationsCenter.settings = window.notificationsCenter.loadSettings();
       window.notificationsCenter.updateSettingsUI();
@@ -679,6 +697,22 @@ function resetNotificationSettings() {
     }
 
     window.showSuccessNotification('מרכז התראות', 'הגדרות אופסו בהצלחה');
+  };
+  
+  // Use notification system or fallback to confirm
+  if (typeof window.showConfirmationDialog === 'function') {
+    window.showConfirmationDialog(
+      'איפוס הגדרות',
+      'האם אתה בטוח שברצונך לאפס את כל ההגדרות?',
+      executeReset,
+      () => console.log('❌ איפוס הגדרות - משתמש ביטל')
+    );
+  } else {
+    if (confirm('האם אתה בטוח שברצונך לאפס את כל ההגדרות?')) {
+      executeReset();
+    } else {
+      console.log('❌ איפוס הגדרות - משתמש ביטל');
+    }
   }
 }
 

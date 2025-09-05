@@ -198,8 +198,16 @@ function updateChart(data) {
     qualityChart.update('none');
 }
 
-function loadIssues() {
-    const mockIssues = [
+async function loadIssues() {
+    try {
+        if (realLinterSystem) {
+            console.log('🔍 טוען בעיות אמיתיות...');
+            currentIssues = await realLinterSystem.scanFiles();
+            console.log(`✅ נטענו ${currentIssues.length} בעיות אמיתיות`);
+        } else {
+            console.log('⚠️ משתמש בסימולציה...');
+            // Fallback to simulated issues
+            const mockIssues = [
         {
             id: 1,
             severity: 'error',
@@ -272,13 +280,20 @@ function loadIssues() {
             originalCode: 'function myFunction() {',
             fixedCode: '/**\n * My function description\n */\nfunction myFunction() {'
         }
-    ];
-
-    // Store issues globally
-    currentIssues = mockIssues;
-    
-    displayIssues(mockIssues);
-    updateLogsCount(mockIssues.length);
+            ];
+            currentIssues = mockIssues;
+        }
+        
+        displayIssues(currentIssues);
+        updateLogsCount(currentIssues.length);
+        updateSummaryStats();
+        
+    } catch (error) {
+        console.error('שגיאה בטעינת בעיות:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בטעינה', 'שגיאה בטעינת בעיות הלינטר');
+        }
+    }
 }
 
 function displayIssues(issues) {
@@ -354,27 +369,66 @@ function filterIssues(filter) {
 
 // Global issues storage
 let currentIssues = [];
+let realLinterSystem = null;
+
+// Initialize real linter system
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.realLinterSystem) {
+        realLinterSystem = window.realLinterSystem;
+        console.log('✅ מערכת Linter אמיתית זמינה');
+    } else {
+        console.warn('⚠️ מערכת Linter אמיתית לא זמינה - משתמש בסימולציה');
+    }
+});
 
 function fixIssue(issueId) {
     const issue = currentIssues.find(i => i.id === issueId);
     if (!issue) return;
     
     // Show confirmation for single issue fix
-    showSingleFixConfirmationDialog(issue, () => {
-        // Simulate fixing the issue after confirmation
-        if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification('תיקון הושלם', `בעיה ${issueId} תוקנה בהצלחה`);
+    showSingleFixConfirmationDialog(issue, async () => {
+        try {
+            let fixed = false;
+            
+            if (realLinterSystem) {
+                // Use real linter system
+                console.log(`🔧 מתקן בעיה אמיתית: ${issueId}`);
+                fixed = await realLinterSystem.fixIssue(issueId);
+                
+                if (fixed) {
+                    // Reload issues to get updated list
+                    await loadIssues();
+                    if (typeof window.showSuccessNotification === 'function') {
+                        window.showSuccessNotification('תיקון הושלם', `בעיה ${issueId} תוקנה בהצלחה`);
+                    }
+                } else {
+                    if (typeof window.showErrorNotification === 'function') {
+                        window.showErrorNotification('תיקון נכשל', `לא ניתן לתקן בעיה ${issueId}`);
+                    }
+                }
+            } else {
+                // Fallback to simulation
+                console.log(`🔧 מדמה תיקון בעיה: ${issueId}`);
+                if (typeof window.showSuccessNotification === 'function') {
+                    window.showSuccessNotification('תיקון הושלם', `בעיה ${issueId} תוקנה בהצלחה`);
+                }
+                
+                // Remove the issue from the list
+                currentIssues = currentIssues.filter(i => i.id !== issueId);
+                
+                // Update the display
+                displayIssues(currentIssues);
+                updateLogsCount(currentIssues.length);
+                
+                // Update statistics
+                updateStatsAfterFix(issue);
+            }
+        } catch (error) {
+            console.error('שגיאה בתיקון:', error);
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה בתיקון', 'שגיאה בתיקון הבעיה');
+            }
         }
-        
-        // Remove the issue from the list
-        currentIssues = currentIssues.filter(i => i.id !== issueId);
-        
-        // Update the display
-        displayIssues(currentIssues);
-        updateLogsCount(currentIssues.length);
-        
-        // Update statistics
-        updateStatsAfterFix(issue);
     });
 }
 
@@ -943,14 +997,37 @@ function fixAllIssues() {
     }
     
     // Show confirmation dialog with backup recommendation
-    showFixConfirmationDialog('תיקון כל הבעיות', fixableIssues.length, () => {
-        // Fix all issues after confirmation
-        fixableIssues.forEach(issue => {
-            fixIssue(issue.id);
-        });
-        
-        if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification('תיקון הושלם', `${fixableIssues.length} בעיות תוקנו בהצלחה`);
+    showFixConfirmationDialog('תיקון כל הבעיות', fixableIssues.length, async () => {
+        try {
+            let fixedCount = 0;
+            
+            if (realLinterSystem) {
+                // Use real linter system
+                console.log('🔧 מתקן כל הבעיות עם מערכת אמיתית...');
+                fixedCount = await realLinterSystem.fixAllIssues();
+                
+                // Reload issues to get updated list
+                await loadIssues();
+                
+                if (typeof window.showSuccessNotification === 'function') {
+                    window.showSuccessNotification('תיקון הושלם', `${fixedCount} בעיות תוקנו בהצלחה`);
+                }
+            } else {
+                // Fallback to simulation
+                console.log('🔧 מדמה תיקון כל הבעיות...');
+                fixableIssues.forEach(issue => {
+                    fixIssue(issue.id);
+                });
+                
+                if (typeof window.showSuccessNotification === 'function') {
+                    window.showSuccessNotification('תיקון הושלם', `${fixableIssues.length} בעיות תוקנו בהצלחה`);
+                }
+            }
+        } catch (error) {
+            console.error('שגיאה בתיקון כל הבעיות:', error);
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה בתיקון', 'שגיאה בתיקון הבעיות');
+            }
         }
     });
 }

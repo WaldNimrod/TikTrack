@@ -7,6 +7,8 @@
   
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
   
   <!-- CSS Files - Ordered by priority (weak to strong) -->
   <!-- 1. Apple theme (base) -->
@@ -209,16 +211,33 @@
 
         <!-- Alert cards -->
         <div class="section-body">
-          <!-- ⚠️ התראת Deprecation -->
-          <div class="alert alert-warning" role="alert">
-            <h5><i class="bi bi-exclamation-triangle"></i> מערכת העדפות V1 (מסורתית)</h5>
-            <p>
-              <strong>🚀 מערכת העדפות חדשה זמינה!</strong> 
-              מערכת V2 מספקת פרופילים מרובים, יבוא/יצוא, היסטוריה ועיצוב מתקדם.
-            </p>
-            <a href="preferences-v2.html" class="btn btn-primary btn-sm">
-              <i class="bi bi-arrow-right-circle"></i> עבור למערכת החדשה
-            </a>
+          <!-- 🚀 בוחר מערכת העדפות -->
+          <div class="alert alert-info" role="alert">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <h5><i class="bi bi-gear"></i> בחר מערכת העדפות</h5>
+                <p class="mb-0">
+                  <strong>V1:</strong> ממשק מסורתי פשוט | 
+                  <strong>V2:</strong> ממשק מתקדם עם פרופילים, יבוא/יצוא, היסטוריה
+                </p>
+              </div>
+              <div class="col-md-4 text-end">
+                <div class="btn-group" role="group">
+                  <button type="button" class="btn btn-outline-secondary active" id="useV1Btn" onclick="useV1System()">
+                    <i class="bi bi-ui-radios"></i> V1
+                  </button>
+                  <button type="button" class="btn btn-primary" id="useV2Btn" onclick="useV2System()">
+                    <i class="bi bi-stars"></i> V2
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- מידע על המערכת הפעילה -->
+          <div class="alert alert-success d-none" id="v2ActiveAlert" role="alert">
+            <h5><i class="bi bi-check-circle"></i> מערכת העדפות V2 פעילה</h5>
+            <p class="mb-0">אתה משתמש במערכת המתקדמת עם פרופילים מרובים ותכונות חדשות</p>
           </div>
           
           <active-alerts></active-alerts>
@@ -1690,6 +1709,99 @@
         b: parseInt(result[3], 16)
       } : null;
     }
+    
+    // ===== פונקציות מעבר בין מערכות V1/V2 =====
+    
+    /**
+     * מעבר למערכת V1 (מסורתית)
+     */
+    function useV1System() {
+      console.log('🔄 Switching to V1 system...');
+      
+      // עדכן כפתורים
+      document.getElementById('useV1Btn').classList.add('active');
+      document.getElementById('useV2Btn').classList.remove('active');
+      
+      // הסתר התראת V2
+      document.getElementById('v2ActiveAlert').classList.add('d-none');
+      
+      // הצג ממשק V1 (כבר נטען)
+      document.querySelector('.main-content').style.display = 'block';
+      
+      // שמור בlocal storage
+      localStorage.setItem('preferredSystem', 'v1');
+      
+      if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('מערכת העדפות', 'עברת למערכת V1 המסורתית');
+      }
+    }
+    
+    /**
+     * מעבר למערכת V2 (מתקדמת)
+     */
+    function useV2System() {
+      console.log('🚀 Switching to V2 system...');
+      
+      // שמור בlocal storage
+      localStorage.setItem('preferredSystem', 'v2');
+      
+      // הצג הודעה ועבור לדף V2
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('מערכת העדפות', 'עובר למערכת V2 המתקדמת...');
+      }
+      
+      // המתן רגע ועבור לדף החדש
+      setTimeout(() => {
+        window.location.href = 'preferences-v2.html';
+      }, 1500);
+    }
+    
+    /**
+     * בדיקה איזו מערכת המשתמש מעדיף
+     */
+    function checkPreferredSystem() {
+      const preferred = localStorage.getItem('preferredSystem');
+      
+      if (preferred === 'v2') {
+        // אם המשתמש מעדיף V2, הצע לעבור
+        setTimeout(() => {
+          if (typeof window.showConfirmationDialog === 'function') {
+            window.showConfirmationDialog(
+              'מערכת מועדפת',
+              'זוהה שאתה מעדיף מערכת V2. ברצונך לעבור אליה?',
+              () => {
+                window.location.href = 'preferences-v2.html';
+              }
+            );
+          } else if (confirm('זוהה שאתה מעדיף מערכת V2. ברצונך לעבור אליה?')) {
+            window.location.href = 'preferences-v2.html';
+          }
+        }, 2000);
+      }
+    }
+    
+    /**
+     * אתחול מערכת העדפות עם בדיקת המערכת המועדפת
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+      // בדוק העדפת מערכת
+      checkPreferredSystem();
+      
+      // בדוק אם יש נתונים ב-V2
+      fetch('/api/v2/preferences/')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // יש נתונים ב-V2, הצע לעבור
+            document.getElementById('v2ActiveAlert').classList.remove('d-none');
+            document.getElementById('useV2Btn').innerHTML = '<i class="bi bi-stars"></i> V2 <span class="badge bg-success">פעיל</span>';
+          }
+        })
+        .catch(() => {
+          // V2 לא זמין, הישאר ב-V1
+          console.log('V2 API not available, staying in V1');
+        });
+    });
   </script>
 </body>
 </html>

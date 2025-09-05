@@ -653,7 +653,11 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/accounts">חשבונות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/preferences-v2.html">🚀 העדפות V2 (מתקדם)</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות V1 (מסורתי)</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">🔧 כלי פיתוח</h6></li>
+                        <li><a class="tiktrack-dropdown-item" href="/test-preferences-v2-integration.html">בדיקת אינטגרציה V2</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>

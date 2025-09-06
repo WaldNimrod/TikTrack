@@ -163,6 +163,11 @@ async function loadCashFlows() {
       cashFlowsData = result.data;
       renderCashFlowsTable();
       updatePageSummaryStats();
+      
+      // יישום צבעי ישויות על כותרות
+      if (window.applyEntityColorsToHeaders) {
+        window.applyEntityColorsToHeaders('cash_flow');
+      }
     } else {
       handleApiError('שגיאה בטעינת תזרימי מזומנים', result.error);
 
@@ -746,10 +751,28 @@ function renderCashFlowsTable() {
     // עיצוב שער עם 2 ספרות אחרי הנקודה
     const rateDisplay = formatUsdRate(cashFlow.usd_rate);
 
-    row.innerHTML = `
-            <td class="ticker-cell"><strong>${accountName}</strong></td>
+            row.innerHTML = `
+            <td class="ticker-cell">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button class="btn btn-sm btn-outline-info" 
+                      onclick="showEntityDetails('cash_flow', ${cashFlow.id})" 
+                      title="פרטי תזרים" 
+                      style="background-color: white; font-size: 0.8em;">
+                        🔗
+                    </button>
+                    <span class="entity-account-badge" 
+                          style="padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+                        ${accountName}
+                    </span>
+                </div>
+            </td>
             <td class="type-cell">${typeDisplay}</td>
-            <td style="text-align: left; direction: ltr;">${amountDisplay}</td>
+            <td style="text-align: left; direction: ltr;">
+                <span class="${cashFlow.amount >= 0 ? 'numeric-value-positive' : 'numeric-value-negative'}" 
+                      style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
+                    ${amountDisplay}
+                </span>
+            </td>
             <td style="text-align: center;">${currencyDisplay}</td>
             <td style="text-align: center;">${rateDisplay}</td>
             <td style="text-align: center;">${formatDate(cashFlow.date)}</td>
@@ -827,25 +850,25 @@ function formatAmount(amount) {
 function getCashFlowTypeWithColor(type) {
   const typeTranslation = window.translateCashFlowType ? window.translateCashFlowType(type) : type;
 
-  let typeClass = '';
+  let cssClass = '';
   switch (type) {
   case 'deposit':
-    typeClass = 'type-investment'; // ירוק - הפקדה
+    cssClass = 'numeric-value-positive'; // הפקדה - ירוק
     break;
   case 'withdrawal':
-    typeClass = 'type-swing'; // כחול - משיכה
+    cssClass = 'numeric-value-negative'; // משיכה - אדום
     break;
   case 'dividend':
-    typeClass = 'type-passive'; // צהוב - דיבידנד
+    cssClass = 'entity-account-badge'; // דיבידנד - צבע חשבון
     break;
   case 'fee':
-    typeClass = 'type-crypto'; // סגול - עמלה
+    cssClass = 'numeric-value-zero'; // עמלה - אפור
     break;
   default:
-    typeClass = 'type-other';
+    cssClass = 'numeric-value-zero';
   }
 
-  return `<span class="${typeClass}"><strong>${typeTranslation}</strong></span>`;
+  return `<span class="${cssClass}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;"><strong>${typeTranslation}</strong></span>`;
 }
 
 /**

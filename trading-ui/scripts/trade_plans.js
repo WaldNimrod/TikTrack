@@ -1101,9 +1101,9 @@ function updateTradePlansTable(trade_plans) {
     const currentDisplay = formatCurrency(design.current || 0);
     const statusDisplay = window.translateTradePlanStatus ? window.translateTradePlanStatus(design.status) : design.status;
 
-    // Displaying ticker symbol or name with link icon
+    // Displaying ticker symbol or name with Entity Details link
     const tickerDisplay = design.ticker ? design.ticker.symbol || design.ticker.name || 'לא מוגדר' : 'לא מוגדר';
-    const tickerLink = design.ticker ? '<a href="/tickers" title="מעבר לעמוד הטיקרים" style="color: #007bff; text-decoration: none; margin-right: 5px;">🔗</a>' : '';
+    const tickerLink = design.id ? `<button class="btn btn-sm btn-outline-info" onclick="showEntityDetails('trade_plan', ${design.id})" title="פרטי תכנון" style="background-color: white; font-size: 0.7em; margin-left: 5px;">🔗</button>` : '';
 
     // שמירת הערכים המקוריים באנגלית לפילטר
     const typeForFilter = design.investment_type || '';
@@ -1111,15 +1111,42 @@ function updateTradePlansTable(trade_plans) {
 
     return `
       <tr>
-        <td class="ticker-cell">${tickerLink}<span class="ticker-text">${tickerDisplay}</span></td>
+        <td class="ticker-cell">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            ${tickerLink}
+            <span class="entity-trade-plan-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+              ${tickerDisplay}
+            </span>
+          </div>
+        </td>
         <td data-date="${design.created_at}"><span class="date-text">${dateDisplay}</span></td>
-        <td class="type-cell" data-type="${typeForFilter}"><span class="type-badge ${typeClass}">${typeDisplay}</span></td>
-        <td class="side-cell" data-side="${design.side}"><span class="side-badge side-${design.side.toLowerCase()}">${sideDisplay}</span></td>
-        <td><span class="amount-text">${amountDisplay}</span></td>
+        <td class="type-cell" data-type="${typeForFilter}">
+          <span class="entity-trade-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+            ${typeDisplay}
+          </span>
+        </td>
+        <td class="side-cell" data-side="${design.side}">
+          <span class="${design.side === 'Long' ? 'numeric-value-positive' : 'numeric-value-negative'}" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+            ${sideDisplay}
+          </span>
+        </td>
+        <td>
+          <span class="numeric-value-positive" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
+            ${amountDisplay}
+          </span>
+        </td>
         <td class="target-cell"><span class="target-text" style="color: ${window.getTableColors ? window.getTableColors().positive : '#28a745'};">${targetDisplay}</span></td>
         <td class="stop-cell"><span class="stop-text" style="color: ${window.getTableColors ? window.getTableColors().negative : '#dc3545'};">${stopDisplay}</span></td>
-        <td><span class="current-text">${currentDisplay}</span></td>
-        <td class="status-cell" data-status="${statusForFilter}"><span class="status-badge ${statusClass}">${statusDisplay}</span></td>
+        <td>
+          <span class="numeric-value-zero" style="padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-weight: 500;">
+            ${currentDisplay}
+          </span>
+        </td>
+        <td class="status-cell" data-status="${statusForFilter}">
+          <span class="status-${design.status}-badge" style="padding: 2px 6px; border-radius: 4px; font-size: 0.85em; font-weight: 500;">
+            ${statusDisplay}
+          </span>
+        </td>
         <td class="actions-cell">
           <button class="btn btn-sm btn-info" onclick="viewLinkedItemsForTradePlan(${design.id})" title="צפה באלמנטים מקושרים">
             🔗
@@ -1134,14 +1161,19 @@ function updateTradePlansTable(trade_plans) {
 
   tbody.innerHTML = tableHTML;
 
-  // Updating record count
-  const countElement = document.querySelector('#trade_plansCount');
-  if (countElement) {
-    countElement.textContent = `${trade_plans.length} תכנונים`;
-  }
+      // Updating record count
+    const countElement = document.querySelector('#trade_plansCount');
+    if (countElement) {
+      countElement.textContent = `${trade_plans.length} תכנונים`;
+    }
 
-  // Updating statistics
-  updatePageSummaryStats();
+    // Updating statistics
+    updatePageSummaryStats();
+    
+    // יישום צבעי ישויות על כותרות
+    if (window.applyEntityColorsToHeaders) {
+      window.applyEntityColorsToHeaders('trade_plan');
+    }
 }
 
 /**

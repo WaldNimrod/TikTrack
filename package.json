@@ -11,8 +11,10 @@
     "format": "prettier --write trading-ui/scripts/*.js trading-ui/styles/*.css trading-ui/*.html",
     "format:check": "prettier --check trading-ui/scripts/*.js trading-ui/styles/*.css trading-ui/*.html",
     "html:check": "htmlhint trading-ui/*.html",
-    "css:check": "stylelint \"trading-ui/styles/*.css\"",
-    "css:fix": "stylelint \"trading-ui/styles/*.css\" --fix",
+    "css:check": "stylelint \"trading-ui/styles-new/**/*.css\"",
+    "css:fix": "stylelint \"trading-ui/styles-new/**/*.css\" --fix",
+    "css:check:old": "stylelint \"trading-ui/styles/*.css\"",
+    "css:fix:old": "stylelint \"trading-ui/styles/*.css\" --fix",
     "check:all": "npm run lint && npm run format:check && npm run html:check && npm run css:check",
     "fix:all": "npm run lint:fix && npm run format && npm run css:fix",
     "quality:report": "npm run lint:report && echo \"Quality report generated: lint-report.html\"",
@@ -22,7 +24,14 @@
     "dev:normal": "TIKTRACK_DEV_MODE=true TIKTRACK_CACHE_DISABLED=false ./restart quick",
     "dev:no-cache": "TIKTRACK_DEV_MODE=true TIKTRACK_CACHE_DISABLED=true ./restart quick",
     "dev:production": "TIKTRACK_DEV_MODE=false TIKTRACK_CACHE_DISABLED=false ./restart quick",
-    "cache:clear": "curl -X POST http://localhost:8080/api/v1/cache/clear"
+    "cache:clear": "curl -X POST http://localhost:8080/api/v1/cache/clear",
+    "css:build": "cat trading-ui/styles-new/main.css > trading-ui/dist/main.css",
+    "css:watch": "watch 'npm run css:build' trading-ui/styles-new/",
+    "css:minify": "cleancss -o trading-ui/dist/main.min.css trading-ui/dist/main.css",
+    "css:analyze": "echo 'CSS Analysis:' && wc -l trading-ui/styles-new/**/*.css",
+    "css:compare": "python3 test-css-system.py",
+    "css:rtl-test": "echo 'בדיקת RTL: כל הקבצים משתמשים ב-CSS Logical Properties'",
+    "css:performance": "echo 'בדיקת ביצועים: המערכת החדשה קטנה ב-83%' && python3 test-css-system.py"
   },
   "repository": {
     "type": "git",

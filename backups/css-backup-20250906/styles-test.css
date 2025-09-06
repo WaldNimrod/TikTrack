@@ -1,0 +1,275 @@
+/* ========================================
+   Styles Test Page - Custom Styles
+   ========================================
+   
+   קובץ זה מכיל סגנונות ייעודיים לעמוד הדגמת הסגנונות
+   כולל עיצוב טבלת הבקרה, דוגמאות סגנונות ועוד
+   
+   מחבר: Tik.track Development Team
+   תאריך עדכון אחרון: 2025
+   ======================================== */
+
+/* Page specific styles */
+.styles-test-page {
+  background: var(--apple-bg);
+  min-height: 100vh;
+}
+
+/* CSS Controls Table */
+.css-controls-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  background: var(--apple-bg-elevated);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.css-controls-table th {
+  background: var(--apple-bg-secondary);
+  color: var(--apple-text-primary);
+  padding: 1rem;
+  text-align: center;
+  font-weight: 600;
+  border-bottom: 1px solid var(--apple-border-light);
+}
+
+.css-controls-table td {
+  text-align: center;
+  vertical-align: middle;
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--apple-border-light);
+  background: var(--apple-bg-elevated);
+}
+
+.css-controls-table td.css-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--apple-bg-secondary);
+  font-weight: 500;
+}
+
+.css-controls-table td.css-header input[type="checkbox"] {
+  margin: 0;
+  transform: scale(1.2);
+}
+
+.css-controls-table tr:hover td {
+  background: var(--apple-bg-secondary);
+}
+
+/* Style Examples Section */
+.style-examples {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: var(--apple-bg-elevated);
+  border-radius: 16px;
+  border: 1px solid var(--apple-border-light);
+}
+
+.style-examples h3 {
+  color: var(--apple-text-primary);
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Button Examples */
+.button-examples {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
+.btn-example {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-example:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Color Examples */
+.color-examples {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.color-card {
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid var(--apple-border-light);
+}
+
+.color-name {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.color-value {
+  font-family: monospace;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Typography Examples */
+.typography-examples {
+  margin: 1rem 0;
+}
+
+.typography-examples h1,
+.typography-examples h2,
+.typography-examples h3,
+.typography-examples h4,
+.typography-examples h5,
+.typography-examples h6 {
+  margin: 0.5rem 0;
+  color: var(--apple-text-primary);
+}
+
+.typography-examples p {
+  margin: 0.5rem 0;
+  line-height: 1.6;
+  color: var(--apple-text-secondary);
+}
+
+/* Form Examples */
+.form-examples {
+  margin: 1rem 0;
+}
+
+.form-examples input,
+.form-examples select,
+.form-examples textarea {
+  width: 100%;
+  max-width: 300px;
+  padding: 0.75rem;
+  border: 1px solid var(--apple-border-light);
+  border-radius: 8px;
+  background: var(--apple-bg-elevated);
+  color: var(--apple-text-primary);
+  margin: 0.5rem 0;
+}
+
+.form-examples input:focus,
+.form-examples select:focus,
+.form-examples textarea:focus {
+  outline: none;
+  border-color: var(--apple-accent);
+  box-shadow: 0 0 0 2px var(--apple-accent-bg);
+}
+
+/* Table Examples */
+.table-examples {
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+
+.table-examples table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--apple-bg-elevated);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table-examples th,
+.table-examples td {
+  padding: 0.75rem;
+  text-align: right;
+  border-bottom: 1px solid var(--apple-border-light);
+}
+
+.table-examples th {
+  background: var(--apple-bg-secondary);
+  font-weight: 600;
+  color: var(--apple-text-primary);
+}
+
+.table-examples tr:hover {
+  background: var(--apple-bg-secondary);
+}
+
+/* Alert Examples */
+.alert-examples {
+  margin: 1rem 0;
+}
+
+.alert-example {
+  padding: 1rem;
+  margin: 0.5rem 0;
+  border-radius: 8px;
+  border: 1px solid;
+}
+
+.alert-success {
+  background: #d4edda;
+  border-color: #c3e6cb;
+  color: #155724;
+}
+
+.alert-error {
+  background: #f8d7da;
+  border-color: #f5c6cb;
+  color: #721c24;
+}
+
+.alert-warning {
+  background: #fff3cd;
+  border-color: #ffeaa7;
+  color: #856404;
+}
+
+.alert-info {
+  background: #d1ecf1;
+  border-color: #bee5eb;
+  color: #0c5460;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .css-controls-table {
+    font-size: 0.9rem;
+  }
+  
+  .css-controls-table th,
+  .css-controls-table td {
+    padding: 0.5rem;
+  }
+  
+  .button-examples {
+    flex-direction: column;
+  }
+  
+  .color-examples {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .css-controls-table {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+  
+  .style-examples {
+    border: 1px solid #000;
+    box-shadow: none;
+  }
+}

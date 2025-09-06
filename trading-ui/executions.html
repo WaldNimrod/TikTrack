@@ -6,56 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>עסקעות - Tik.track</title>
 
-  <!-- 
-    ===== דף תכנונים - TikTrack =====
+  
+    <!-- ===== CSS Architecture - ITCSS Based ===== -->
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    דף זה מכיל:
-    1. טבלת תכנונים (עיצובים) - הסקשן הראשון
-    2. טבלת חשבונות - הסקשן השני (נוסף לאחרונה)
-    3. כרטיסיות התראות - בחלק העליון
-    4. מערכת פילטרים ומיון מתקדמת
+    <!-- Bootstrap Framework -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    מבנה הדף:
-    - app-header: כותרת האפליקציה עם ניווט
-    - page-body: תוכן ראשי מוגבל ברוחב (1400px)
-      - top-section: כרטיסיות התראות וסיכום נתונים
-      - content-section (1): טבלת תכנונים
-      - content-section (2): טבלת חשבונות
+    <!-- TikTrack CSS - New ITCSS Architecture -->
+    <link rel="stylesheet" href="styles-new/main.css">
     
-    שינויים אחרונים:
-    - שינוי שם מ"עיצובים" ל"תכנונים"
-    - הוספת טבלת חשבונות מלאים
-    - שיפור עיצוב כרטיסיות התראות
-    - תיקון כפתורי סגירה עצמאיים
-  -->
 
-  <!-- CSS Files - Ordered by priority (weak to strong) -->
-  <!-- 1. Apple theme (base) -->
-  <link rel="stylesheet" href="styles/apple-theme.css">
-
-  <!-- 2. Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- 3. Header system -->
-  <link rel="stylesheet" href="styles/header-system.css">
-
-  <!-- 4. Typography -->
-  <link rel="stylesheet" href="styles/typography.css">
-
-  <!-- 5. Table styles -->
-  <link rel="stylesheet" href="styles/table.css">
-
-  <!-- 6. Warning system styles (new centralized warning system) -->
-  <link rel="stylesheet" href="styles/notification-system.css">
-
-  <!-- 7. Linked items modal styles -->
-  <link rel="stylesheet" href="styles/linked-items.css">
-
-  <!-- 8. General styles (highest priority - drops everything) -->
-  <link rel="stylesheet" href="styles/styles.css">
-
-  <!-- UI Utils - Global UI utilities -->
-  <script src="scripts/ui-utils.js"></script>
+  
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="scripts/ui-utils.js"></script>
 
   <!-- Modular grid files - loaded at end of file -->
 </head>
@@ -114,8 +80,6 @@
 
       <!-- Main content -->
       <div class="main-content">
-
-
 
         <!-- Executions area - content-section -->
         <div class="content-section executions-page">
@@ -229,7 +193,6 @@
         </div>
       </div>
 
-
     </div> <!-- End page-body -->
 
     <!-- Bottom page spacing -->
@@ -237,8 +200,6 @@
 
     <!-- Notification system -->
     <div class="notification-container" id="notificationContainer"></div>
-
-
 
     <!-- Add Execution Modal -->
     <div class="modal fade" id="addExecutionModal" tabindex="-1" aria-labelledby="addExecutionModalLabel"

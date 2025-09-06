@@ -36,60 +36,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>תכנון טריידים והשקעות - Tik.track</title>
 
-  <!-- 
-    ===== דף תכנון טריידים - TikTrack =====
+  
+    <!-- ===== CSS Architecture - ITCSS Based ===== -->
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    דף זה מכיל:
-    1. טבלת תכנונים (עיצובים) - הסקשן הראשון
-    2. טבלת חשבונות - הסקשן השני (נוסף לאחרונה)
-    3. כרטיסיות התראות - בחלק העליון
-    4. מערכת פילטרים ומיון מתקדמת
+    <!-- Bootstrap Framework -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    מבנה הדף:
-    - unified-header: כותרת האפליקציה החדשה עם ניווט ופילטרים מאוחדים
-    - page-body: תוכן ראשי מוגבל ברוחב (1400px)
-      - top-section: כרטיסיות התראות וסיכום נתונים
-      - content-section (1): טבלת תכנונים
-      - content-section (2): טבלת חשבונות
+    <!-- TikTrack CSS - New ITCSS Architecture -->
+    <link rel="stylesheet" href="styles-new/main.css">
     
-    שינויים אחרונים (31 באוגוסט 2025):
-    - תיקון ולידציה להוספה - הסרת כפילות הודעות שגיאה
-    - תיקון שינוי טיקר - אישור מידי עם דחיית שינוי
-    - תיקון ביטול תכנון - הסרת כפילות חלונות אישור
-    - תיקון שגיאות שרת - הפעלה מחדש וניקוי קבצי נעילה
-    - שימוש במערכת ולידציה גלובלית
-    - שימוש במערכת התראות גלובלית
-    - החלפת app-header במערכת header-system החדשה
-    - העתקת תוכן מדף עיצובים לדף תכנון טריידים
-    - הוספת טבלת חשבונות מלאים
-    - שיפור עיצוב כרטיסיות התראות
-    - תיקון כפתורי סגירה עצמאיים
-    - ריכוז פונקציות חשבונות ב-accounts.js?v=20250830_1
-  -->
 
-  <!-- CSS Files - Ordered by priority (weak to strong) -->
-  <!-- 1. Apple theme (base) -->
-  <link rel="stylesheet" href="styles/apple-theme.css">
-
-  <!-- 2. Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- 3. General styles -->
-  <link rel="stylesheet" href="styles/styles.css">
-    <link rel="stylesheet" href="styles/header-system.css">
-  <!-- 4. Typography -->
-  <link rel="stylesheet" href="styles/typography.css">
-
-  <!-- 5. Table styles -->
-  <link rel="stylesheet" href="styles/table.css">
-
-  <!-- 6. Notification system styles -->
-  <link rel="stylesheet" href="styles/notification-system.css">
-
-  <!-- 7. Header system styles (highest priority) -->
-
-  <!-- Bootstrap JS - חייב להיות ראשון -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Modular grid files -->
   <script src="scripts/button-icons.js"></script>
@@ -138,8 +100,6 @@
     <!-- Page body - All content after header -->
     <div class="page-body">
 
-
-
       <!-- Planning area - top-Section -->
       <div class="top-section planning-page">
         <!-- Planning header -->
@@ -178,8 +138,6 @@
             <div>השקעה ממוצעת: <strong id="avgInvestment">$0</strong></div>
             <div>רווח כולל: <strong id="totalProfit">$0</strong></div>
           </div>
-
-
 
         </div>
       </div> <!-- End top-section -->

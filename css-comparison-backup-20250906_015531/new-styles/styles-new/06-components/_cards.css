@@ -1,0 +1,240 @@
+/**
+ * כרטיסים - Cards
+ * 
+ * קובץ זה מכיל את הסגנונות של כל הכרטיסים במערכת
+ * מבוסס על הסגנונות הקיימים ב-apple-theme.css
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* כרטיסים בסיסיים - מבוסס על apple-theme.css */
+.card:not(.design-card) {
+  background: var(--apple-bg-elevated);
+  border-radius: var(--apple-radius-large);
+  border: 1px solid var(--apple-border-light);
+  box-shadow: var(--apple-shadow-light);
+  padding: var(--apple-spacing-lg);
+  margin-bottom: var(--apple-spacing-md);
+}
+
+/* כרטיסי התראות - מבוסס על index.css */
+.alert-card {
+  background: #ffffff;
+  border: 1px solid #ffc107;
+  padding: 1rem;
+  border-radius: var(--apple-radius-small);
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.alert-card:hover {
+  box-shadow: var(--apple-shadow-medium);
+  transform: translateY(-1px);
+}
+
+.alert-ticker {
+  font-weight: 600;
+  color: var(--apple-blue);
+  margin-bottom: 0.25rem;
+}
+
+.alert-description {
+  font-size: 0.9rem;
+  color: var(--apple-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.alert-status {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--apple-radius-small);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.alert-status.active {
+  background: var(--apple-green);
+  color: white;
+}
+
+.alert-status.pending {
+  background: var(--apple-orange);
+  color: white;
+}
+
+/* כרטיסי סטטוס - מבוסס על cache-test */
+.status-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.status-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* כרטיסי overview - מבוסס על index.css */
+.overview-card {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  background: #ffffff;
+  border-radius: var(--apple-radius-medium);
+  border: 1px solid var(--apple-border-light);
+  transition: all 0.3s ease;
+}
+
+.overview-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--apple-shadow-medium);
+}
+
+.overview-card.primary {
+  background: #ffffff;
+  border-color: rgba(255, 156, 5, 0.3);
+}
+
+.overview-card.success {
+  background: #ffffff;
+  border-color: rgba(40, 167, 69, 0.3);
+}
+
+.overview-card.info {
+  background: #ffffff;
+  border-color: rgba(0, 123, 255, 0.3);
+}
+
+.overview-card.warning {
+  background: #ffffff;
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+.overview-card-icon {
+  font-size: 2rem;
+  margin-inline-start: 1rem;
+  opacity: 0.8;
+}
+
+.overview-card-content {
+  flex: 1;
+}
+
+.overview-card-number {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.overview-card-label {
+  font-size: 0.9rem;
+  color: var(--apple-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.overview-card-change {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.overview-card-change.positive {
+  color: var(--apple-green);
+}
+
+.overview-card-change.negative {
+  color: var(--apple-red);
+}
+
+/* כרטיסי סטטיסטיקות */
+.compact-stat-card {
+  background: var(--apple-bg-secondary);
+  padding: 1rem;
+  border-radius: var(--apple-radius-medium);
+  border: 1px solid var(--apple-border-light);
+  text-align: center;
+}
+
+.compact-stat-number {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.compact-stat-number.positive {
+  color: var(--apple-green);
+}
+
+.compact-stat-number.negative {
+  color: var(--apple-red);
+}
+
+.compact-stat-label {
+  font-size: 0.9rem;
+  color: var(--apple-text-secondary);
+}
+
+/* כרטיסי גרף */
+.chart-card {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: var(--apple-radius-medium);
+  border: 1px solid var(--apple-border-light);
+}
+
+.chart-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  margin-top: 1rem;
+}
+
+/* כרטיסי סטטוס נוספים */
+.stat-card {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: var(--apple-radius-medium);
+  border: 1px solid var(--apple-border-light);
+}
+
+.stat-header {
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--apple-border-light);
+}
+
+.stat-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--apple-border-light);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}

@@ -1,0 +1,265 @@
+/**
+ * טפסים מתקדמים - Advanced Forms
+ * 
+ * קובץ זה מכיל את הסגנונות המתקדמים של טפסים
+ * כולל צ'קבוקסים, רדיו באטונים וטפסים מיוחדים
+ * מבוסס על הסגנונות הקיימים ב-styles.css ו-RTL guide
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* ===== צ'קבוקסים עם RTL ===== */
+/* הגדרות גלובליות עם Override מוחלט של Bootstrap */
+.form-check,
+div.form-check,
+.modal .form-check,
+body .form-check,
+html .form-check,
+#addTradeModal .form-check,
+.table .form-check,
+.filter-section .form-check,
+.form-check.form-check-inline {
+  display: flex !important;
+  flex-direction: row-reverse !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.5rem !important;
+  min-height: auto !important;
+  padding-inline-start: 0 !important;
+  padding-inline-end: 0 !important;
+  margin-bottom: 0 !important;
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+.form-check-input,
+input.form-check-input,
+.modal .form-check-input,
+body .form-check-input,
+html .form-check-input,
+#addTradeModal .form-check-input,
+.table .form-check-input,
+.filter-section .form-check-input,
+.form-check-input[type="checkbox"] {
+  order: 2 !important;
+  margin: 0 !important;
+  float: none !important;
+  margin-inline-start: 0 !important;
+  margin-inline-end: 0 !important;
+}
+
+.form-check-label,
+label.form-check-label,
+.modal .form-check-label,
+body .form-check-label,
+html .form-check-label,
+#addTradeModal .form-check-label,
+.table .form-check-label,
+.filter-section .form-check-label {
+  order: 1 !important;
+  margin: 0 !important;
+  float: none !important;
+  margin-inline-start: 0 !important;
+  margin-inline-end: 0 !important;
+  text-align: right !important;
+  direction: rtl !important;
+  cursor: pointer;
+}
+
+/* ===== רדיו באטונים ===== */
+.radio-group-item {
+  text-align: right;
+  margin-bottom: 10px;
+  direction: rtl;
+}
+
+.radio-group-item input[type="radio"] {
+  margin-inline-start: 10px;
+  margin-inline-end: 0;
+}
+
+.radio-group-item label {
+  margin: 0;
+  cursor: pointer;
+  text-align: right;
+  direction: rtl;
+}
+
+/* ===== שדות קלט מיוחדים ===== */
+/* מספרים - יישור לשמאל */
+input[type="number"] {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: embed;
+}
+
+/* תאריכים - יישור לשמאל */
+input[type="date"] {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: embed;
+}
+
+/* כתובות URL - יישור לשמאל */
+input[type="url"],
+input[type="email"] {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: embed;
+}
+
+/* רשימות נפתחות */
+select {
+  direction: rtl;
+  text-align: right;
+}
+
+select option {
+  direction: rtl;
+  text-align: right;
+}
+
+/* ===== קבוצות טפסים ===== */
+.form-group label {
+  font-family: var(--font-family-primary);
+  direction: rtl;
+  text-align: right;
+}
+
+/* ===== הגדרות מיוחדות ===== */
+.setting-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #0d6efd;
+}
+
+/* ===== קבוצות צ'קבוקסים ===== */
+.checkbox-group {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  direction: rtl;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--apple-text-secondary);
+  direction: rtl;
+  text-align: right;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--logo-orange);
+}
+
+/* ===== ולידציה ===== */
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.invalid-feedback {
+  display: block;
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  text-align: right;
+  direction: rtl;
+}
+
+/* ===== טפסים במודלים ===== */
+.modal .form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.modal .form-group label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-weight: 500;
+  color: var(--apple-text-primary);
+  font-size: 15px;
+  text-align: right;
+  direction: rtl;
+}
+
+.modal .form-group input,
+.modal .form-group select,
+.modal .form-group textarea {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--apple-radius-medium);
+  font-size: 15px;
+  background-color: var(--apple-bg-primary);
+  color: var(--apple-text-primary);
+  transition: all 0.2s ease;
+  font-family: var(--font-family-primary);
+  direction: rtl;
+  text-align: right;
+}
+
+.modal .form-group input:focus,
+.modal .form-group select:focus,
+.modal .form-group textarea:focus {
+  outline: none;
+  border-color: var(--apple-blue);
+  box-shadow: 0 0 0 3px rgba(41, 166, 168, 0.1);
+}
+
+/* ===== טפסי חיפוש ===== */
+.search-form {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  direction: rtl;
+}
+
+.search-input {
+  flex: 1;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--apple-border);
+  border-radius: var(--apple-radius-medium);
+  font-size: 14px;
+  direction: rtl;
+  text-align: right;
+}
+
+.search-btn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--logo-orange);
+  color: white;
+  border: none;
+  border-radius: var(--apple-radius-medium);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.search-btn:hover {
+  background: #e68a00;
+}
+
+/* ===== רספונסיביות ===== */
+@media (max-width: 768px) {
+  .checkbox-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .search-form {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .search-input {
+    width: 100%;
+  }
+}

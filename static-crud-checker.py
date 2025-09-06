@@ -107,7 +107,7 @@ class StaticCRUDChecker:
                 ],
                 'crud_level': 'full'
             },
-            'preferences.html': {
+            'preferences-v2.html': {
                 'name': 'העדפות V1',
                 'expected_elements': [
                     'savePreferencesBtn', 'resetBtn'
@@ -310,7 +310,7 @@ class StaticCRUDChecker:
         priority_order = [
             'index.html', 'trades.html', 'accounts.html', 'alerts.html',
             'tickers.html', 'executions.html', 'cash_flows.html', 'trade_plans.html',
-            'notes.html', 'preferences.html', 'preferences-v2.html', 'css-management.html'
+            'notes.html', 'preferences-v2.html', 'preferences-v2.html', 'css-management.html'
         ]
         
         for filename in priority_order:

@@ -6,7 +6,7 @@ from .api.alerts import alerts_bp
 from .api.cash_flows import cash_flows_bp
 from .api.notes import notes_bp
 from .api.executions import executions_bp
-from .api.preferences_v2 import preferences_v2_bp as preferences_bp
+from .api.preferences import preferences_bp
 
 
 from .pages import pages_bp

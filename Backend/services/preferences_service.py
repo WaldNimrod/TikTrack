@@ -193,7 +193,7 @@ class PreferencesService:
             # טען ברירות מחדל מקובץ JSON
             defaults = cls.load_defaults_from_file()
             
-            preferences = UserPreferencesV2(
+            preferences = UserPreferences(
                 user_id=user_id,
                 profile_id=profile_id,
                 version=defaults.get('version', '2.0')
@@ -242,14 +242,14 @@ class PreferencesService:
             raise
     
     @classmethod
-    def get_preferences_v2(cls, db: Session, user_id: int, profile_id: int = None) -> Optional[UserPreferencesV2]:
+    def get_preferences_v2(cls, db: Session, user_id: int, profile_id: int = None) -> Optional[UserPreferences]:
         """קבל הגדרות V2 עבור משתמש ופרופיל"""
         try:
             if profile_id:
                 # חפש לפי פרופיל מסוים
-                preferences = db.query(UserPreferencesV2).filter(
-                    UserPreferencesV2.user_id == user_id,
-                    UserPreferencesV2.profile_id == profile_id
+                preferences = db.query(UserPreferences).filter(
+                    UserPreferences.user_id == user_id,
+                    UserPreferences.profile_id == profile_id
                 ).first()
             else:
                 # חפש לפי פרופיל ברירת המחדל
@@ -257,9 +257,9 @@ class PreferencesService:
                 if not default_profile:
                     return None
                 
-                preferences = db.query(UserPreferencesV2).filter(
-                    UserPreferencesV2.user_id == user_id,
-                    UserPreferencesV2.profile_id == default_profile.id
+                preferences = db.query(UserPreferences).filter(
+                    UserPreferences.user_id == user_id,
+                    UserPreferences.profile_id == default_profile.id
                 ).first()
             
             return preferences
@@ -339,7 +339,7 @@ class PreferencesService:
                 db.commit()
             
             # צור V2 חדש
-            v2_preferences = UserPreferencesV2(
+            v2_preferences = UserPreferences(
                 user_id=user_id,
                 profile_id=default_profile.id,
                 migrated_from_v1=True,
@@ -400,7 +400,7 @@ class PreferencesService:
             return None
     
     @classmethod
-    def _map_v1_to_v2(cls, v1_data: Dict[str, Any], v2_prefs: UserPreferencesV2):
+    def _map_v1_to_v2(cls, v1_data: Dict[str, Any], v2_prefs: UserPreferences):
         """מפה נתונים מV1 לV2"""
         try:
             # הגדרות בסיסיות
@@ -561,7 +561,7 @@ class PreferencesService:
                 success = cls.update_preferences_v2(db, user_id, profile.id, preferences_data, user_id)
             else:
                 # צור חדש
-                new_prefs = UserPreferencesV2.import_settings(import_data)
+                new_prefs = UserPreferences.import_settings(import_data)
                 new_prefs.user_id = user_id
                 new_prefs.profile_id = profile.id
                 
@@ -629,7 +629,7 @@ class PreferencesService:
         try:
             results = {}
             
-            all_prefs = db.query(UserPreferencesV2).all()
+            all_prefs = db.query(UserPreferences).all()
             
             for pref in all_prefs:
                 errors = pref.validate()
@@ -677,9 +677,9 @@ class PreferencesService:
     def get_system_statistics(cls, db: Session) -> Dict[str, Any]:
         """קבל סטטיסטיקות מערכת העדפות"""
         try:
-            total_users_v2 = db.query(UserPreferencesV2.user_id).distinct().count()
+            total_users_v2 = db.query(UserPreferences.user_id).distinct().count()
             total_profiles = db.query(PreferenceProfile).filter(PreferenceProfile.is_active == True).count()
-            total_preferences = db.query(UserPreferencesV2).count()
+            total_preferences = db.query(UserPreferences).count()
             
             # התפלגות פרופילים
             profiles_per_user = db.query(PreferenceProfile.user_id).filter(
@@ -692,8 +692,8 @@ class PreferencesService:
             ).count()
             
             # תקלות בדיקות
-            validation_errors = db.query(UserPreferencesV2).filter(
-                UserPreferencesV2.validation_errors_json.isnot(None)
+            validation_errors = db.query(UserPreferences).filter(
+                UserPreferences.validation_errors_json.isnot(None)
             ).count()
             
             return {

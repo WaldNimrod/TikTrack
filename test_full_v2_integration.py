@@ -113,7 +113,7 @@ class V2IntegrationTester:
         html_files_with_preferences = [
             'trading-ui/tickers.html',
             'trading-ui/executions.html',
-            'trading-ui/preferences.html'
+            'trading-ui/preferences-v2.html'
         ]
         
         missing_integration = []
@@ -174,7 +174,7 @@ class V2IntegrationTester:
         latest_backup = sorted(backup_dirs)[-1]
         backup_path = f'backups/{latest_backup}'
         
-        expected_files = ['preferences.html', 'preferences.js', 'preferences.py']
+        expected_files = ['preferences-v2.html', 'preferences-v2.js', 'preferences.py']
         missing_files = []
         
         for file_name in expected_files:

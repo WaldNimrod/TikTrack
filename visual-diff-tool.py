@@ -58,7 +58,7 @@ def take_screenshots_new(screenshots_dir):
         'trades.html',
         'alerts.html', 
         'accounts.html',
-        'preferences.html',
+        'preferences-v2.html',
         'tickers.html',
         'external-data-dashboard.html'
     ]
@@ -173,7 +173,7 @@ def create_comparison_html(screenshots_dir):
         ('trades.html', 'טריידים'),
         ('alerts.html', 'התראות'),
         ('accounts.html', 'חשבונות'), 
-        ('preferences.html', 'העדפות'),
+        ('preferences-v2.html', 'העדפות'),
         ('tickers.html', 'טיקרים'),
         ('external-data-dashboard.html', 'דשבורד נתונים')
     ]

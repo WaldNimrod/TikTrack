@@ -56,7 +56,7 @@ class PreferenceProfile(BaseModel):
 
 class UserPreferences(BaseModel):
     """מודל הגדרות משתמש מתקדם V2"""
-    __tablename__ = 'user_preferences_v2'
+    __tablename__ = 'user_preferences'
     
     # יחסים בסיסיים
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)

@@ -192,7 +192,16 @@ async function switchToNewCSS() {
             
             // הצגת הוראות רענון
             setTimeout(() => {
-                if (confirm('העבירה למערכת חדשה הושלמה. האם לרענן את הדף?')) {
+                if (typeof showConfirmationDialog === 'function') {
+                    showConfirmationDialog(
+                        'העבירה למערכת חדשה הושלמה. האם לרענן את הדף?',
+                        () => location.reload(),
+                        null,
+                        'רענון דף',
+                        'רענן',
+                        'ביטול'
+                    );
+                } else if (confirm('העבירה למערכת חדשה הושלמה. האם לרענן את הדף?')) {
                     location.reload();
                 }
             }, 1000);
@@ -562,7 +571,11 @@ function downloadTools() {
    npm run css:analyze   - ספירת שורות
    npm run css:compare   - השוואה`;
     
-    alert(toolsInfo);
+    if (typeof showNotification === 'function') {
+        showNotification(toolsInfo, 'info');
+    } else {
+        alert(toolsInfo);
+    }
 }
 
 function downloadPythonTools() {
@@ -579,7 +592,7 @@ function openSamplePages() {
 
 function runVisualDiff() {
     """השוואה חזותית"""
-    alert(`להשוואה חזותית מלאה:
+    const visualDiffInfo = `להשוואה חזותית מלאה:
 
 1. הרץ: python3 css-toggle.py old
 2. צלם screenshots של העמודים (http://localhost:8080/trades וכו')
@@ -587,7 +600,13 @@ function runVisualDiff() {
 4. צלם screenshots שוב
 5. השווה את התמונות
 
-שתי המערכות אמורות להיראות זהות לחלוטין!`);
+שתי המערכות אמורות להיראות זהות לחלוטין!`;
+
+    if (typeof showNotification === 'function') {
+        showNotification(visualDiffInfo, 'info');
+    } else {
+        alert(visualDiffInfo);
+    }
 }
 
 function analyzeBundle() {
@@ -645,7 +664,11 @@ TikTrack CSS Management Log - ${new Date().toLocaleString('he-IL')}
 ================================================================`;
 
     navigator.clipboard.writeText(logData).then(() => {
-        alert('✅ לוג מפורט הועתק ללוח');
+        if (typeof showNotification === 'function') {
+            showNotification('✅ לוג מפורט הועתק ללוח', 'success');
+        } else {
+            alert('✅ לוג מפורט הועתק ללוח');
+        }
     }).catch(() => {
         // Fallback
         const textArea = document.createElement('textarea');
@@ -654,7 +677,11 @@ TikTrack CSS Management Log - ${new Date().toLocaleString('he-IL')}
         textArea.select();
         document.execCommand('copy');
         document.body.removeChild(textArea);
-        alert('✅ לוג מפורט הועתק ללוח');
+        if (typeof showNotification === 'function') {
+            showNotification('✅ לוג מפורט הועתק ללוח', 'success');
+        } else {
+            alert('✅ לוג מפורט הועתק ללוח');
+        }
     });
 }
 

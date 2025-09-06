@@ -31,7 +31,7 @@ def get_user_id_from_request() -> int:
     return 1  # Default user
 
 
-@preferences_v2_bp.route('/api/v2/preferences/', methods=['GET'])
+@preferences_bp.route('/api/v2/preferences/', methods=['GET'])
 @cache_with_deps(ttl=300, dependencies=['preferences_v2'])
 def get_preferences_v2():
     """קבל הגדרות V2 עבור המשתמש"""
@@ -76,7 +76,7 @@ def get_preferences_v2():
         }), 500
 
 
-@preferences_v2_bp.route('/api/v2/preferences/', methods=['POST'])
+@preferences_bp.route('/api/v2/preferences/', methods=['POST'])
 @invalidate_cache(['preferences_v2', 'preferences'])
 def update_preferences_v2():
     """עדכן הגדרות V2"""
@@ -130,7 +130,7 @@ def update_preferences_v2():
         }), 500
 
 
-@preferences_v2_bp.route('/api/v2/preferences/profiles', methods=['GET'])
+@preferences_bp.route('/api/v2/preferences/profiles', methods=['GET'])
 def get_user_profiles():
     """קבל את כל הפרופילים של המשתמש"""
     try:
@@ -165,7 +165,7 @@ def get_user_profiles():
         }), 500
 
 
-@preferences_v2_bp.route('/api/v2/preferences/profiles', methods=['POST'])
+@preferences_bp.route('/api/v2/preferences/profiles', methods=['POST'])
 @invalidate_cache(['preferences_v2'])
 def create_profile():
     """צור פרופיל חדש"""
@@ -214,7 +214,7 @@ def create_profile():
         }), 500
 
 
-@preferences_v2_bp.route('/api/v2/preferences/migrate', methods=['POST'])
+@preferences_bp.route('/api/v2/preferences/migrate', methods=['POST'])
 @invalidate_cache(['preferences_v2', 'preferences'])
 def migrate_from_v1():
     """מגרר הגדרות מV1 לV2"""
@@ -247,7 +247,7 @@ def migrate_from_v1():
         }), 500
 
 
-@preferences_v2_bp.route('/api/v2/preferences/export', methods=['GET'])
+@preferences_bp.route('/api/v2/preferences/export', methods=['GET'])
 def export_preferences():
     """יצא הגדרות לקובץ"""
     try:
@@ -299,7 +299,7 @@ def export_preferences():
                 pass
 
 
-@preferences_v2_bp.route('/api/v2/preferences/import', methods=['POST'])
+@preferences_bp.route('/api/v2/preferences/import', methods=['POST'])
 @invalidate_cache(['preferences_v2', 'preferences'])
 def import_preferences():
     """יבא הגדרות מקובץ"""
@@ -361,7 +361,7 @@ def import_preferences():
         }), 500
 
 
-@preferences_v2_bp.route('/api/v2/preferences/history', methods=['GET'])
+@preferences_bp.route('/api/v2/preferences/history', methods=['GET'])
 def get_preference_history():
     """קבל היסטוריית שינויים"""
     try:
@@ -402,7 +402,7 @@ def get_preference_history():
         }), 500
 
 
-@preferences_v2_bp.route('/api/v2/preferences/validate', methods=['GET'])
+@preferences_bp.route('/api/v2/preferences/validate', methods=['GET'])
 def validate_user_preferences():
     """בדוק תקינות הגדרות המשתמש"""
     try:
@@ -438,7 +438,7 @@ def validate_user_preferences():
         }), 500
 
 
-@preferences_v2_bp.route('/api/v2/preferences/system/validate', methods=['POST'])
+@preferences_bp.route('/api/v2/preferences/system/validate', methods=['POST'])
 def validate_all_preferences():
     """בדוק תקינות של כל ההגדרות במערכת (Admin only)"""
     try:
@@ -463,7 +463,7 @@ def validate_all_preferences():
         }), 500
 
 
-@preferences_v2_bp.route('/api/v2/preferences/system/stats', methods=['GET'])
+@preferences_bp.route('/api/v2/preferences/system/stats', methods=['GET'])
 def get_system_statistics():
     """קבל סטטיסטיקות מערכת העדפות"""
     try:
@@ -484,7 +484,7 @@ def get_system_statistics():
         }), 500
 
 
-@preferences_v2_bp.route('/api/v2/preferences/system/cleanup', methods=['POST'])
+@preferences_bp.route('/api/v2/preferences/system/cleanup', methods=['POST'])
 def cleanup_old_history():
     """נקה היסטוריה ישנה (Admin only)"""
     try:
@@ -516,7 +516,7 @@ def cleanup_old_history():
 
 
 # Routes לבדיקת תאימות לאחור עם V1
-@preferences_v2_bp.route('/api/v2/preferences/compatibility/v1', methods=['GET'])
+@preferences_bp.route('/api/v2/preferences/compatibility/v1', methods=['GET'])
 def check_v1_compatibility():
     """בדוק תאימות עם V1"""
     try:
@@ -558,7 +558,7 @@ def check_v1_compatibility():
         }), 500
 
 
-@preferences_v2_bp.route('/api/v2/preferences/defaults', methods=['GET'])
+@preferences_bp.route('/api/v2/preferences/defaults', methods=['GET'])
 @cache_with_deps(ttl=300, dependencies=['preferences_defaults'])
 def get_defaults():
     """קבל ברירות מחדל נוכחיות"""
@@ -582,7 +582,7 @@ def get_defaults():
         }), 500
 
 
-@preferences_v2_bp.route('/api/v2/preferences/defaults', methods=['POST'])
+@preferences_bp.route('/api/v2/preferences/defaults', methods=['POST'])
 def update_defaults():
     """עדכן ברירות מחדל"""
     try:
@@ -626,7 +626,7 @@ def update_defaults():
         }), 500
 
 
-@preferences_v2_bp.route('/api/v2/preferences/defaults/save-from-current', methods=['POST'])
+@preferences_bp.route('/api/v2/preferences/defaults/save-from-current', methods=['POST'])
 def save_current_as_defaults():
     """שמור את ההגדרות הנוכחיות כברירות מחדל"""
     try:

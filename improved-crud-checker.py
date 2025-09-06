@@ -52,7 +52,7 @@ class ImprovedCRUDChecker:
                 'name': 'הערות',
                 'crud_level': 'full'
             },
-            'preferences.html': {
+            'preferences-v2.html': {
                 'name': 'העדפות V1',
                 'crud_level': 'settings'
             },

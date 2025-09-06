@@ -13,7 +13,7 @@ from typing import Dict, Any, Optional, List
 from models.ticker import Ticker
 from models.external_data import MarketDataQuote, ExternalDataProvider
 from models.user import User
-from models.user_preferences_v2 import UserPreferencesV2 as UserPreferences
+from models.user_preferences import UserPreferences
 from services.user_service import UserService
 
 logger = logging.getLogger(__name__)

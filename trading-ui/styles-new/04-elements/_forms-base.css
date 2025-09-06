@@ -66,11 +66,11 @@ textarea:focus {
 /* מספרים - יישור לשמאל */
 input[type="number"] {
   direction: ltr;
-  text-align: left;
+  text-align: start;
 }
 
 /* תאריכים - יישור לשמאל */
 input[type="date"] {
   direction: ltr;
-  text-align: left;
+  text-align: start;
 }

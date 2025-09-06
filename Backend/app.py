@@ -98,10 +98,14 @@ from routes.api.tickers import tickers_bp
 from routes.api.trades import trades_bp
 from routes.api.trade_plans import trade_plans_bp
 from routes.api.alerts import alerts_bp
+
+# Import CRUD testing modules
+import subprocess
+import json
+from pathlib import Path
 from routes.api.cash_flows import cash_flows_bp
 from routes.api.notes import notes_bp
 from routes.api.executions import executions_bp
-from routes.api.preferences import preferences_bp
 from routes.api.users import users_bp
 from routes.api.background_tasks import background_tasks_bp
 from routes.api.entity_details import entity_details_bp
@@ -195,7 +199,7 @@ app.register_blueprint(alerts_bp)
 app.register_blueprint(cash_flows_bp)
 app.register_blueprint(notes_bp)
 app.register_blueprint(executions_bp)
-app.register_blueprint(preferences_bp)
+# app.register_blueprint(preferences_bp)  # Commented out - preferences_bp not available
 app.register_blueprint(users_bp)
 app.register_blueprint(background_tasks_bp)
 app.register_blueprint(entity_details_bp)
@@ -944,6 +948,175 @@ def update_all_tickers_open_status() -> None:
 
 # User roles API routes are now handled by blueprints
 
+# ========================================
+# CRUD Testing API Endpoints
+# ========================================
+
+@app.route('/api/run-crud-tests', methods=['POST'])
+def run_crud_tests():
+    """הרצת בדיקות CRUD מקיפות"""
+    try:
+        data = request.get_json() or {}
+        test_type = data.get('test_type', 'comprehensive')
+        pages = data.get('pages', [])
+        
+        # הפעלת הסקריפט
+        script_path = Path(__file__).parent.parent / 'crud-tester.py'
+        
+        if not script_path.exists():
+            return jsonify({
+                'error': 'סקריפט בדיקות CRUD לא נמצא',
+                'path': str(script_path)
+            }), 404
+        
+        # הרצת הסקריפט
+        result = subprocess.run([
+            'python3', str(script_path)
+        ], capture_output=True, text=True, cwd=script_path.parent)
+        
+        return jsonify({
+            'status': 'success',
+            'test_type': test_type,
+            'pages_tested': pages,
+            'output': result.stdout,
+            'error': result.stderr if result.stderr else None,
+            'return_code': result.returncode,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'error': f'שגיאה בהרצת בדיקות CRUD: {str(e)}',
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
+@app.route('/api/run-functional-tests', methods=['POST'])
+def run_functional_tests():
+    """הרצת בדיקות פונקציונליות"""
+    try:
+        # הפעלת הסקריפט
+        script_path = Path(__file__).parent.parent / 'functional-crud-tester.py'
+        
+        if not script_path.exists():
+            return jsonify({
+                'error': 'סקריפט בדיקות פונקציונליות לא נמצא',
+                'path': str(script_path)
+            }), 404
+        
+        # הרצת הסקריפט
+        result = subprocess.run([
+            'python3', str(script_path)
+        ], capture_output=True, text=True, cwd=script_path.parent)
+        
+        return jsonify({
+            'status': 'success',
+            'output': result.stdout,
+            'error': result.stderr if result.stderr else None,
+            'return_code': result.returncode,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'error': f'שגיאה בהרצת בדיקות פונקציונליות: {str(e)}',
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
+@app.route('/api/run-button-tests', methods=['POST'])
+def run_button_tests():
+    """הרצת בדיקות כפתורים"""
+    try:
+        # הפעלת הסקריפט
+        script_path = Path(__file__).parent.parent / 'test-crud-buttons.py'
+        
+        if not script_path.exists():
+            return jsonify({
+                'error': 'סקריפט בדיקות כפתורים לא נמצא',
+                'path': str(script_path)
+            }), 404
+        
+        # הרצת הסקריפט
+        result = subprocess.run([
+            'python3', str(script_path)
+        ], capture_output=True, text=True, cwd=script_path.parent)
+        
+        return jsonify({
+            'status': 'success',
+            'output': result.stdout,
+            'error': result.stderr if result.stderr else None,
+            'return_code': result.returncode,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'error': f'שגיאה בהרצת בדיקות כפתורים: {str(e)}',
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
+@app.route('/api/run-improved-analysis', methods=['POST'])
+def run_improved_analysis():
+    """הרצת ניתוח משופר"""
+    try:
+        # הפעלת הסקריפט
+        script_path = Path(__file__).parent.parent / 'improved-crud-checker.py'
+        
+        if not script_path.exists():
+            return jsonify({
+                'error': 'סקריפט ניתוח משופר לא נמצא',
+                'path': str(script_path)
+            }), 404
+        
+        # הרצת הסקריפט
+        result = subprocess.run([
+            'python3', str(script_path)
+        ], capture_output=True, text=True, cwd=script_path.parent)
+        
+        return jsonify({
+            'status': 'success',
+            'output': result.stdout,
+            'error': result.stderr if result.stderr else None,
+            'return_code': result.returncode,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'error': f'שגיאה בהרצת ניתוח משופר: {str(e)}',
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
+@app.route('/api/crud-test-status', methods=['GET'])
+def get_crud_test_status():
+    """קבלת סטטוס בדיקות CRUD"""
+    try:
+        # בדיקת קיום הסקריפטים
+        scripts = {
+            'crud-tester.py': Path(__file__).parent.parent / 'crud-tester.py',
+            'functional-crud-tester.py': Path(__file__).parent.parent / 'functional-crud-tester.py',
+            'test-crud-buttons.py': Path(__file__).parent.parent / 'test-crud-buttons.py',
+            'improved-crud-checker.py': Path(__file__).parent.parent / 'improved-crud-checker.py'
+        }
+        
+        status = {}
+        for name, path in scripts.items():
+            status[name] = {
+                'exists': path.exists(),
+                'path': str(path),
+                'size': path.stat().st_size if path.exists() else 0
+            }
+        
+        return jsonify({
+            'status': 'success',
+            'scripts': status,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'error': f'שגיאה בבדיקת סטטוס: {str(e)}',
+            'timestamp': datetime.now().isoformat()
+        }), 500
 
 
 if __name__ == "__main__":

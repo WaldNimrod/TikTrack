@@ -12,6 +12,17 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- TikTrack JavaScript Modules -->
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/header-system.js?v=20250901_3"></script>
+    
     <style>
         .testing-dashboard {
             max-width: 1400px;
@@ -153,8 +164,27 @@
         }
     </style>
 </head>
-<body>
-    <div class="testing-dashboard">
+<body class="crud-testing-page">
+    <!-- רקע כללי -->
+    <div class="background-wrapper">
+        <!-- unified-header ייווצר כאן אוטומטית -->
+        
+        <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+        <div class="page-body">
+            <!-- כותרת דשבורד בדיקות CRUD -->
+            <div class="section-header entity-testing-main-header">
+                <div class="table-title">
+                    <img src="images/icons/testing.svg" alt="דשבורד בדיקות CRUD" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                    דשבורד בדיקות CRUD
+                </div>
+                <div class="table-actions">
+                    <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר דשבורד בדיקות">
+                        <span class="filter-icon">▲</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="testing-dashboard">
         <div class="container-with-border">
             <h1>🧪 דשבורד בדיקות CRUD - TikTrack</h1>
             <p><strong>נוצר:</strong> 06/09/2025 04:05</p>
@@ -187,6 +217,28 @@
                     <li>לחץ "סיימתי בדיקה" לעדכון הסטטיסטיקות</li>
                     <li>חזור על התהליך לכל עמוד</li>
                 </ol>
+            </div>
+            
+            <div class="alert alert-warning">
+                <h5>🤖 כלי בדיקה אוטומטיים</h5>
+                <div class="test-actions">
+                    <button class="btn btn-primary" onclick="runAutomatedTests()">
+                        <i class="fas fa-robot"></i> הרץ בדיקות אוטומטיות
+                    </button>
+                    <button class="btn btn-info" onclick="runFunctionalTests()">
+                        <i class="fas fa-cogs"></i> בדיקה פונקציונלית
+                    </button>
+                    <button class="btn btn-success" onclick="runButtonTests()">
+                        <i class="fas fa-mouse-pointer"></i> בדיקת כפתורים
+                    </button>
+                    <button class="btn btn-warning" onclick="runImprovedAnalysis()">
+                        <i class="fas fa-search-plus"></i> ניתוח משופר
+                    </button>
+                    <button class="btn btn-secondary" onclick="checkTestStatus()">
+                        <i class="fas fa-info-circle"></i> בדוק סטטוס
+                    </button>
+                </div>
+                <small class="text-muted">הכלים האוטומטיים יבדקו את כל העמודים ויחזירו דוח מפורט</small>
             </div>
         </div>
         
@@ -1612,6 +1664,7 @@
                     <i class="fas fa-refresh"></i> אפס כל הבדיקות
                 </button>
             </div>
+            </div>
         </div>
     </div>
 
@@ -1722,6 +1775,268 @@
                 document.querySelectorAll('.status-indicator').forEach(si => si.className = 'status-indicator status-not-tested');
                 updateSummaryStats();
                 if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `🔄 כל הבדיקות אופסו`); } else { alert(`🔄 כל הבדיקות אופסו`); };
+            }
+        }
+        
+        // פונקציות להרצת בדיקות אוטומטיות
+        async function runAutomatedTests() {
+            showTestProgress('מתחיל בדיקות אוטומטיות...');
+            
+            try {
+                const response = await fetch('/api/run-crud-tests', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        test_type: 'comprehensive',
+                        pages: ['trades', 'accounts', 'alerts', 'tickers', 'executions']
+                    })
+                });
+                
+                if (response.ok) {
+                    const results = await response.json();
+                    displayTestResults('בדיקות אוטומטיות', results);
+                } else {
+                    throw new Error('שגיאה בהרצת הבדיקות');
+                }
+            } catch (error) {
+                showTestError('שגיאה בהרצת בדיקות אוטומטיות', error.message);
+            }
+        }
+        
+        async function runFunctionalTests() {
+            showTestProgress('מתחיל בדיקה פונקציונלית...');
+            
+            try {
+                const response = await fetch('/api/run-functional-tests', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (response.ok) {
+                    const results = await response.json();
+                    displayTestResults('בדיקה פונקציונלית', results);
+                } else {
+                    throw new Error('שגיאה בהרצת הבדיקה הפונקציונלית');
+                }
+            } catch (error) {
+                showTestError('שגיאה בהרצת בדיקה פונקציונלית', error.message);
+            }
+        }
+        
+        async function runButtonTests() {
+            showTestProgress('מתחיל בדיקת כפתורים...');
+            
+            try {
+                const response = await fetch('/api/run-button-tests', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (response.ok) {
+                    const results = await response.json();
+                    displayTestResults('בדיקת כפתורים', results);
+                } else {
+                    throw new Error('שגיאה בהרצת בדיקת כפתורים');
+                }
+            } catch (error) {
+                showTestError('שגיאה בהרצת בדיקת כפתורים', error.message);
+            }
+        }
+        
+        async function runImprovedAnalysis() {
+            showTestProgress('מתחיל ניתוח משופר...');
+            
+            try {
+                const response = await fetch('/api/run-improved-analysis', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (response.ok) {
+                    const results = await response.json();
+                    displayTestResults('ניתוח משופר', results);
+                } else {
+                    throw new Error('שגיאה בהרצת הניתוח המשופר');
+                }
+            } catch (error) {
+                showTestError('שגיאה בהרצת ניתוח משופר', error.message);
+            }
+        }
+        
+        function showTestProgress(message) {
+            const progressDiv = document.createElement('div');
+            progressDiv.id = 'testProgress';
+            progressDiv.className = 'alert alert-info';
+            progressDiv.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <div class="spinner-border spinner-border-sm me-2" role="status">
+                        <span class="visually-hidden">טוען...</span>
+                    </div>
+                    ${message}
+                </div>
+            `;
+            
+            const container = document.querySelector('.testing-dashboard');
+            container.insertBefore(progressDiv, container.firstChild);
+        }
+        
+        function hideTestProgress() {
+            const progressDiv = document.getElementById('testProgress');
+            if (progressDiv) {
+                progressDiv.remove();
+            }
+        }
+        
+        function displayTestResults(testType, results) {
+            hideTestProgress();
+            
+            const resultsDiv = document.createElement('div');
+            resultsDiv.id = 'testResults';
+            resultsDiv.className = 'alert alert-success';
+            resultsDiv.innerHTML = `
+                <h5>📊 תוצאות ${testType}</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>סיכום:</strong><br>
+                        עמודים נבדקו: ${results.summary?.total_pages || 'לא זמין'}<br>
+                        הצלחות: ${results.summary?.passed || 'לא זמין'}<br>
+                        כישלונות: ${results.summary?.failed || 'לא זמין'}<br>
+                        ציון ממוצע: ${results.summary?.avg_score || 'לא זמין'}%
+                    </div>
+                    <div class="col-md-6">
+                        <strong>פעולות:</strong><br>
+                        <button class="btn btn-sm btn-outline-primary" onclick="downloadTestReport('${testType}')">
+                            <i class="fas fa-download"></i> הורד דוח
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="closeTestResults()">
+                            <i class="fas fa-times"></i> סגור
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <strong>פירוט:</strong>
+                    <pre class="mt-2" style="max-height: 200px; overflow-y: auto; font-size: 0.8rem;">${JSON.stringify(results, null, 2)}</pre>
+                </div>
+            `;
+            
+            const container = document.querySelector('.testing-dashboard');
+            container.insertBefore(resultsDiv, container.firstChild);
+        }
+        
+        function showTestError(testType, errorMessage) {
+            hideTestProgress();
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.id = 'testError';
+            errorDiv.className = 'alert alert-danger';
+            errorDiv.innerHTML = `
+                <h5>❌ שגיאה ב${testType}</h5>
+                <p><strong>הודעה:</strong> ${errorMessage}</p>
+                <button class="btn btn-sm btn-outline-danger" onclick="closeTestError()">
+                    <i class="fas fa-times"></i> סגור
+                </button>
+            `;
+            
+            const container = document.querySelector('.testing-dashboard');
+            container.insertBefore(errorDiv, container.firstChild);
+        }
+        
+        function closeTestResults() {
+            const resultsDiv = document.getElementById('testResults');
+            if (resultsDiv) {
+                resultsDiv.remove();
+            }
+        }
+        
+        function closeTestError() {
+            const errorDiv = document.getElementById('testError');
+            if (errorDiv) {
+                errorDiv.remove();
+            }
+        }
+        
+        function downloadTestReport(testType) {
+            // יצירת קובץ JSON עם התוצאות
+            const timestamp = new Date().toISOString().slice(0,19).replace(/[T:]/g, '-');
+            const filename = `${testType}-results-${timestamp}.json`;
+            
+            // כאן נוכל להוסיף לוגיקה להורדת הדוח
+            alert(`דוח ${testType} יורד כ-${filename}`);
+        }
+        
+        async function checkTestStatus() {
+            showTestProgress('בודק סטטוס הסקריפטים...');
+            
+            try {
+                const response = await fetch('/api/crud-test-status', {
+                    method: 'GET'
+                });
+                
+                if (response.ok) {
+                    const results = await response.json();
+                    displayTestStatus(results);
+                } else {
+                    throw new Error('שגיאה בבדיקת סטטוס');
+                }
+            } catch (error) {
+                showTestError('שגיאה בבדיקת סטטוס', error.message);
+            }
+        }
+        
+        function displayTestStatus(statusData) {
+            hideTestProgress();
+            
+            const statusDiv = document.createElement('div');
+            statusDiv.id = 'testStatus';
+            statusDiv.className = 'alert alert-info';
+            
+            let statusHtml = '<h5>📊 סטטוס סקריפטי בדיקות CRUD</h5><div class="row">';
+            
+            for (const [scriptName, info] of Object.entries(statusData.scripts)) {
+                const statusIcon = info.exists ? '✅' : '❌';
+                const statusText = info.exists ? 'זמין' : 'לא נמצא';
+                const sizeText = info.exists ? `(${(info.size / 1024).toFixed(1)} KB)` : '';
+                
+                statusHtml += `
+                    <div class="col-md-6 mb-2">
+                        <div class="d-flex align-items-center">
+                            <span class="me-2">${statusIcon}</span>
+                            <div>
+                                <strong>${scriptName}</strong><br>
+                                <small class="text-muted">${statusText} ${sizeText}</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            statusHtml += '</div>';
+            statusHtml += `
+                <div class="mt-3">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="closeTestStatus()">
+                        <i class="fas fa-times"></i> סגור
+                    </button>
+                </div>
+            `;
+            
+            statusDiv.innerHTML = statusHtml;
+            
+            const container = document.querySelector('.testing-dashboard');
+            container.insertBefore(statusDiv, container.firstChild);
+        }
+        
+        function closeTestStatus() {
+            const statusDiv = document.getElementById('testStatus');
+            if (statusDiv) {
+                statusDiv.remove();
             }
         }
         

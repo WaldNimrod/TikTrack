@@ -346,7 +346,7 @@ class RealLinterSystem {
             '.html': [
                 'index.html',
                 'linter-realtime-monitor.html',
-                'preferences.html',
+                'preferences-v2.html',
                 'db_display.html'
             ]
         };

@@ -284,7 +284,7 @@ window.convertAlertStatusToHebrew = translateAlertStatus;
 window.convertIsTriggeredToHebrew = translateIsTriggered;
 window.getTypeDisplay = translateTradeType; // trades.js
 window.getTypeDisplayName = translateCashFlowType; // cash_flows.js
-window.getCategoryDisplayName = translateTestCategory; // preferences.js
+window.getCategoryDisplayName = translateTestCategory; // preferences-v2.js
 
 // ===== פונקציות פורמט מספרים =====
 

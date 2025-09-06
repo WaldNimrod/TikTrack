@@ -2134,7 +2134,7 @@ async function loadUserPreferences() {
     }
     
     // Fallback אחרון - קובץ JSON מקומי (legacy)
-    const response = await fetch('/config/preferences.json');
+    const response = await fetch('/api/v2/preferences/');
     if (response.ok) {
       const preferences = await response.json();
       console.log('🔄 Using local JSON preferences (legacy)');

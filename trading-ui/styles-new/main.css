@@ -52,6 +52,8 @@
 @import '06-components/_navigation.css';
 @import '06-components/_forms-advanced.css';
 @import '06-components/_badges-status.css';
+@import '06-components/_header-system.css';
+@import '06-components/_entity-colors.css';
 
 /* ===== 7. PAGES - עמודים ספציפיים ===== */
 /* (לא בשימוש כרגע) */

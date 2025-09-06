@@ -166,7 +166,7 @@ class JsMapSystem {
       'date-utils.js', 'tables.js', 'linked-items.js', 'page-utils.js',
       'alerts.js', 'active-alerts-component.js', 'trades.js', 'trade_plans.js',
       'research.js', 'executions.js', 'tickers.js', 'ticker-service.js',
-      'accounts.js', 'cash_flows.js', 'notes.js', 'preferences.js',
+      'accounts.js', 'cash_flows.js', 'notes.js', 'preferences-v2.js',
       'database.js', 'db-extradata.js', 'constraint-manager.js',
       'js-map.js', 'js-scanner.js',
     ];
@@ -277,7 +277,7 @@ class JsMapSystem {
       'accounts.js': 18,       // Account functions
       'cash_flows.js': 16,     // Cash flow functions
       'notes.js': 14,          // Note functions
-      'preferences.js': 12,    // Preference functions
+      'preferences-v2.js': 12,    // Preference functions
       'database.js': 20,       // Database functions
       'db-extradata.js': 15,   // Extra data functions
       'constraint-manager.js': 8, // Constraint functions
@@ -431,7 +431,7 @@ class JsMapSystem {
       // Specific page files
       'alerts.js', 'active-alerts-component.js', 'trades.js', 'trade_plans.js',
       'research.js', 'executions.js', 'tickers.js', 'ticker-service.js',
-      'accounts.js', 'cash_flows.js', 'notes.js', 'preferences.js',
+      'accounts.js', 'cash_flows.js', 'notes.js', 'preferences-v2.js',
       'database.js', 'db-extradata.js', 'constraint-manager.js',
       'currencies.js', 'auth.js',
     ];

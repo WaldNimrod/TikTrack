@@ -86,7 +86,7 @@ def db_extradata() -> Any:
 @pages_bp.route('/preferences')
 def preferences() -> Any:
     """Preferences page"""
-    return send_from_directory(UI_DIR, "preferences.html")
+    return send_from_directory(UI_DIR, "preferences-v2.html")
 
 @pages_bp.route('/external-data-dashboard')
 def external_data_dashboard() -> Any:

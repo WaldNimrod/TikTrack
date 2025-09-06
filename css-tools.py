@@ -12,16 +12,35 @@ def build_css():
     """בניית CSS מאוחד"""
     print("🔨 בונה CSS מאוחד...")
     
-    main_css = Path("/workspace/trading-ui/styles-new/main.css")
-    dist_css = Path("/workspace/trading-ui/dist/main.css")
+    main_css = Path("trading-ui/styles-new/main.css")
+    dist_css = Path("trading-ui/dist/main.css")
     
     # יצירת תיקיית dist
     dist_css.parent.mkdir(exist_ok=True)
     
-    # העתקת הקובץ הראשי
+    # קריאת הקובץ הראשי
     with open(main_css, 'r', encoding='utf-8') as f:
         content = f.read()
     
+    # החלפת @import statements בתוכן בפועל
+    import re
+    base_path = main_css.parent
+    
+    def replace_import(match):
+        import_path = match.group(1)
+        full_path = base_path / import_path
+        
+        if full_path.exists():
+            with open(full_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        else:
+            print(f"⚠️ קובץ לא נמצא: {full_path}")
+            return match.group(0)  # החזרת ה-@import המקורי
+    
+    # החלפת כל ה-@import statements
+    content = re.sub(r"@import\s+['\"]([^'\"]+)['\"];", replace_import, content)
+    
+    # כתיבת הקובץ המאוחד
     with open(dist_css, 'w', encoding='utf-8') as f:
         f.write(content)
     
@@ -32,8 +51,8 @@ def analyze_css():
     """ניתוח מערכת CSS"""
     print("📊 מנתח מערכת CSS...")
     
-    old_path = Path("/workspace/trading-ui/styles")
-    new_path = Path("/workspace/trading-ui/styles-new")
+    old_path = Path("trading-ui/styles")
+    new_path = Path("trading-ui/styles-new")
     
     # ספירת קבצים
     old_files = list(old_path.glob("*.css"))
@@ -58,7 +77,7 @@ def check_rtl_support():
     """בדיקת תמיכה ב-RTL"""
     print("🔄 בודק תמיכה ב-RTL...")
     
-    new_path = Path("/workspace/trading-ui/styles-new")
+    new_path = Path("trading-ui/styles-new")
     css_files = list(new_path.rglob("*.css"))
     
     rtl_count = 0
@@ -88,7 +107,7 @@ def validate_imports():
     """אימות ייבוא קבצים"""
     print("🔗 בודק ייבוא קבצים...")
     
-    main_css = Path("/workspace/trading-ui/styles-new/main.css")
+    main_css = Path("trading-ui/styles-new/main.css")
     base_path = main_css.parent
     
     with open(main_css, 'r', encoding='utf-8') as f:

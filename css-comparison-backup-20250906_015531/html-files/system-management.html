@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מנהל מערכת - TikTrack</title>
+    
+    
+    <!-- ===== CSS Architecture - ITCSS Based ===== -->
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Framework -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- TikTrack CSS - New ITCSS Architecture -->
+    <link rel="stylesheet" href="styles-new/main.css">
+    
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- 8. Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- 9. Page specific styles -->
+<!-- Error Handlers -->
+    <script src="scripts/error-handlers.js"></script>
+</head>
+<body class="system-management-page">
+    <div class="background-wrapper">
+        <!-- unified-header יווצר כאן אוטומטית -->
+        <div id="unified-header"></div>
+        
+        <!-- Page body - All content after header -->
+        <div class="page-body">
+            <!-- Page area - top-Section -->
+            <div class="top-section">
+                <!-- Main header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/development.svg?v=20250905" alt="מנהל מערכת" class="section-icon">
+                        מנהל מערכת
+                    </div>
+                    <div class="table-actions">
+                        <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                            <i class="fas fa-copy"></i> העתק לוג מפורט
+                        </button>
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור מנהל מערכת">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert cards -->
+                <div class="section-body">
+                    <active-alerts></active-alerts>
+
+                    <!-- Page summary -->
+                    <div class="info-summary" id="summaryStats">
+                        <div>סטטוס שרת: <strong id="serverHealthStats">בדיקה...</strong></div>
+                        <div>בסיס נתונים: <strong id="databaseHealthStats">בדיקה...</strong></div>
+                        <div>מטמון: <strong id="cacheHealthStats">בדיקה...</strong></div>
+                        <div>סטטוס: <strong id="overallStatus">בדיקה...</strong></div>
+                    </div>
+                </div>
+            </div> <!-- End top-section -->
+
+            <!-- Main content -->
+            <div class="main-content" data-section="system-management">
+                <div class="container">
+                
+                <!-- Loading and Error States -->
+                <div class="loading-state">
+                    <div class="loading-spinner">🔄 טוען נתוני מערכת...</div>
+                </div>
+                
+                <div class="error-state"></div>
+                
+                <!-- בריאות מערכת -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🏥 בריאות מערכת</h3>
+                        <div class="system-score-small">
+                            <span class="score-label">ציון כללי:</span>
+                            <span class="system-score excellent">טוען...</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="health-grid">
+                            <div class="status-card">
+                                <div class="card-header">
+                                    <h3>שרת</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="health-status active">פעיל</div>
+                                    <div class="health-details">זמן פעילות: 24 שעות</div>
+                                </div>
+                            </div>
+                            <div class="status-card">
+                                <div class="card-header">
+                                    <h3>בסיס נתונים</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="health-status active">מחובר</div>
+                                    <div class="health-details">גודל: 15.2 MB</div>
+                                </div>
+                            </div>
+                            <div class="status-card">
+                                <div class="card-header">
+                                    <h3>מטמון</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="health-status active">בריא</div>
+                                    <div class="health-details">אחוז פגיעות: 87%</div>
+                                </div>
+                            </div>
+                            <div class="status-card">
+                                <div class="card-header">
+                                    <h3>רשת</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="health-status active">יציב</div>
+                                    <div class="health-details">עיכוב: 12ms</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ביצועי מערכת -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📈 ביצועי מערכת</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="performance-grid">
+                            <div class="status-card">
+                                <div class="card-header">
+                                    <h3>מעבד (CPU)</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="performance-indicator" data-type="cpu">
+                                        <div class="progress-bar">0%</div>
+                                    </div>
+                                    <div class="performance-value cpu-usage">0%</div>
+                                </div>
+                            </div>
+                            <div class="status-card">
+                                <div class="card-header">
+                                    <h3>זיכרון (RAM)</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="performance-indicator" data-type="memory">
+                                        <div class="progress-bar">0%</div>
+                                    </div>
+                                    <div class="performance-value memory-usage">0%</div>
+                                </div>
+                            </div>
+                            <div class="status-card">
+                                <div class="card-header">
+                                    <h3>דיסק</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="performance-indicator" data-type="disk">
+                                        <div class="progress-bar">0%</div>
+                                    </div>
+                                    <div class="performance-value disk-usage">0%</div>
+                                </div>
+                            </div>
+                            <div class="status-card">
+                                <div class="card-header">
+                                    <h3>מטמון</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="performance-indicator" data-type="cache">
+                                        <div class="progress-bar">0%</div>
+                                    </div>
+                                    <div class="performance-value cache-usage">0%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                <!-- נתונים חיצוניים -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🌐 נתונים חיצוניים</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="external-data-grid">
+                            <div class="status-card">
+                                <div class="card-header">
+                                    <h3>Yahoo Finance</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="data-status active">פעיל</div>
+                                    <div class="data-details">
+                                        <div class="data-item">
+                                            <span class="data-label">עדכון אחרון:</span>
+                                            <span class="data-value" id="external-last-update">טוען...</span>
+                                        </div>
+                                        <div class="data-item">
+                                            <span class="data-label">רמת דיוק:</span>
+                                            <span class="data-value" id="external-accuracy">טוען...</span>
+                                        </div>
+                                        <div class="data-item">
+                                            <span class="data-label">טריות נתונים:</span>
+                                            <span class="data-value" id="external-freshness">טוען...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="status-card">
+                                <div class="card-header">
+                                    <h3>סטטיסטיקות כלליות</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="data-status active">בריא</div>
+                                    <div class="data-details">
+                                        <div class="data-item">
+                                            <span class="data-label">ספקים פעילים:</span>
+                                            <span class="data-value" id="external-providers">טוען...</span>
+                                        </div>
+                                        <div class="data-item">
+                                            <span class="data-label">אחוז הצלחה:</span>
+                                            <span class="data-value" id="external-success-rate">טוען...</span>
+                                        </div>
+                                        <div class="data-item">
+                                            <span class="data-label">סטטוס כללי:</span>
+                                            <span class="data-value" id="external-overall-status">טוען...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- התראות מערכת -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🚨 התראות מערכת</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="alerts-section">
+                            <div class="alerts-summary">
+                                <div class="alert-summary-item">
+                                    <span class="alert-count error" id="error-count">0</span>
+                                    <span class="alert-label">שגיאות</span>
+                                </div>
+                                <div class="alert-summary-item">
+                                    <span class="alert-count warning" id="warning-count">0</span>
+                                    <span class="alert-label">אזהרות</span>
+                                </div>
+                                <div class="alert-summary-item">
+                                    <span class="alert-count info" id="info-count">0</span>
+                                    <span class="alert-label">מידע</span>
+                                </div>
+                            </div>
+                            <div class="alerts-list" id="alerts-list">
+                                <div class="alert-item">
+                                    <div class="alert-timestamp">טוען...</div>
+                                    <div class="alert-level">INFO</div>
+                                    <div class="alert-message">טוען התראות...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- אבטחה -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🔒 אבטחה</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="security-grid">
+                            <div class="status-card">
+                                <div class="card-header">
+                                    <h3>ניטור איומים</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="security-status safe">מערכת מאובטחת</div>
+                                    <div class="security-details">סריקה אחרונה: לפני 5 דקות</div>
+                                </div>
+                            </div>
+                            <div class="status-card">
+                                <div class="card-header">
+                                    <h3>בקרת גישה</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="security-status safe">פעיל</div>
+                                    <div class="security-details">משתמשים מחוברים: 1</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- לוגים וניטור -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📋 לוגים וניטור</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="logs-section">
+                            <div class="log-filters">
+                                <select id="log-level-filter">
+                                    <option value="all">כל הרמות</option>
+                                    <option value="info">מידע</option>
+                                    <option value="warning">אזהרה</option>
+                                    <option value="error">שגיאה</option>
+                                </select>
+                                <input type="text" id="log-search" placeholder="חיפוש בלוגים...">
+                                <button class="refresh-btn" title="רענן נתונים">🔄 רענן</button>
+                            </div>
+                            <div class="log-content" id="log-content">
+                                <div class="log-entry log-info">
+                                    <div class="log-timestamp">טוען...</div>
+                                    <div class="log-level">INFO</div>
+                                    <div class="log-message">טוען נתוני מערכת...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- גיבויים ושחזור -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>💾 גיבויים ושחזור</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="backup-grid">
+                            <div class="status-card">
+                                <div class="card-header">
+                                    <h3>גיבויים אוטומטיים</h3>
+                                </div>
+                                <div class="card-body">
+                                    <p>גיבוי יומי בשעה 02:00</p>
+                                    <button class="btn btn-primary">הפעל גיבוי עכשיו</button>
+                                </div>
+                            </div>
+                            <div class="status-card">
+                                <div class="card-header">
+                                    <h3>שחזור מערכת</h3>
+                                </div>
+                                <div class="card-body">
+                                    <p>שחזור מגיבוי אחרון</p>
+                                    <button class="btn btn-warning">שחזר מערכת</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- End main-content -->
+        </div> <!-- End page-body -->
+    </div> <!-- End background-wrapper -->
+    
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- TikTrack JavaScript Files -->
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/header-system.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/system-management.js"></script>
+</body>
+</html>

@@ -677,6 +677,7 @@ class HeaderSystem {
                           </a>
                           <ul class="tiktrack-submenu">
                             <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 ניהול מערכת</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/css-management">🎨 מנהל CSS וארכיטקטורה</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/notifications-center">מרכז התראות</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/background-tasks">ניהול משימות ברקע</a></li>
                           </ul>

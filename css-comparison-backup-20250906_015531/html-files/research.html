@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>תחקיר - Tik.track</title>
+
+  
+    <!-- ===== CSS Architecture - ITCSS Based ===== -->
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Framework -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- TikTrack CSS - New ITCSS Architecture -->
+    <link rel="stylesheet" href="styles-new/main.css">
+    
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Modular files -->
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/error-handlers.js"></script>
+    <script src="scripts/table-mappings.js"></script>
+    <script src="scripts/date-utils.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/linked-items.js"></script>
+    <script src="scripts/page-utils.js"></script>
+          <script src="scripts/color-scheme-system.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/header-system.js?v=20250901_3"></script>
+  <script src="scripts/notification-system.js"></script>
+  <script src="scripts/validation-utils.js"></script>
+  
+
+    <!-- Page initialization -->
+    <script>
+      // אתחול הדף
+      document.addEventListener('DOMContentLoaded', function () {
+        console.log('🚀 טעינת דף תחקיר עם מערכת ראש דף חדשה...');
+
+        // אתחול HeaderSystem
+        if (window.headerSystem && !window.headerSystem.isInitialized) {
+          console.log('✅ אתחול HeaderSystem...');
+          window.headerSystem.init();
+        }
+
+        // אתחול דף התחקיר
+        if (typeof initializeResearchPage === 'function') {
+          initializeResearchPage();
+        }
+      });
+    </script>
+  </div> <!-- End background-wrapper -->
+</body>
+
+</html>

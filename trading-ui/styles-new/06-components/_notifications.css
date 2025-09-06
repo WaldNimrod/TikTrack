@@ -233,7 +233,7 @@
 .active-alert-time {
   font-size: 11px;
   color: var(--apple-text-tertiary);
-  text-align: left;
+  text-align: start;
   direction: ltr;
   min-width: fit-content;
 }

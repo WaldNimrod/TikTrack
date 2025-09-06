@@ -466,7 +466,7 @@ def create_tables(cursor):
         )
     """)
     
-    # User Preferences V2 table
+    # User Preferences table
     cursor.execute("""
         CREATE TABLE user_preferences_v2 (
             user_id INTEGER NOT NULL, 

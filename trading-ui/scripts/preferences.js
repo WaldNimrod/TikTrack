@@ -348,7 +348,7 @@ class PreferencesV2 {
     }
   }
   
-  async saveAllPreferencesV2() {
+  async saveAllPreferences() {
     try {
       if (!this.currentProfile) {
         throw new Error('No profile selected');
@@ -677,7 +677,7 @@ class PreferencesV2 {
   markDirty() {
     this.isDirty = true;
     // עדכן ויזואלי שיש שינויים לא שמורים
-    const saveBtn = document.querySelector('[onclick="saveAllPreferencesV2()"]');
+    const saveBtn = document.querySelector('[onclick="saveAllPreferences()"]');
     if (saveBtn && !saveBtn.classList.contains('btn-warning')) {
       saveBtn.classList.add('btn-warning');
       saveBtn.innerHTML = '<i class="bi bi-save"></i> שמור שינויים *';
@@ -686,7 +686,7 @@ class PreferencesV2 {
   
   markClean() {
     this.isDirty = false;
-    const saveBtn = document.querySelector('[onclick="saveAllPreferencesV2()"]');
+    const saveBtn = document.querySelector('[onclick="saveAllPreferences()"]');
     if (saveBtn) {
       saveBtn.classList.remove('btn-warning');
       saveBtn.innerHTML = '<i class="bi bi-save"></i> שמור הגדרות';
@@ -1110,9 +1110,9 @@ function deleteProfileV2(profileId) {
   }
 }
 
-function saveAllPreferencesV2() {
+function saveAllPreferences() {
   if (window.preferencesV2) {
-    window.preferencesV2.saveAllPreferencesV2();
+    window.preferencesV2.saveAllPreferences();
   }
 }
 

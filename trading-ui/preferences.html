@@ -25,11 +25,11 @@
   <div class="background-wrapper">
     
     <!-- כותרת ראשית -->
-    <div class="preferences-v2-container">
+    <div class="preferences-container">
       <div class="preferences-header slide-in">
         <div class="d-flex justify-content-between align-items-center">
           <div>
-            <h1><i class="bi bi-gear-fill"></i> הגדרות מערכת V2</h1>
+            <h1><i class="bi bi-gear-fill"></i> הגדרות מערכת</h1>
             <p>מערכת הגדרות מתקדמת עם פרופילים מרובים ואפשרויות יבוא/יצוא</p>
           </div>
           <div class="d-flex gap-3">
@@ -73,12 +73,12 @@
       <div class="alert alert-info-modern">
         <div class="d-flex justify-content-between align-items-center">
           <div>
-            <h5><i class="bi bi-stars"></i> ברוכים הבאים למערכת העדפות V2!</h5>
+            <h5><i class="bi bi-stars"></i> ברוכים הבאים למערכת ההעדפות!</h5>
             <p class="mb-0">מערכת מתקדמת עם פרופילים מרובים, יבוא/יצוא, היסטוריית שינויים ועוד תכונות חדשות</p>
           </div>
           <div class="text-end">
             <small class="text-muted">גרסה 2.0</small><br>
-            <a href="preferences-v2.html" class="btn btn-outline-secondary btn-sm">
+            <a href="preferences.html" class="btn btn-outline-secondary btn-sm">
               <i class="bi bi-arrow-left"></i> חזור ל-V1
             </a>
           </div>
@@ -429,14 +429,14 @@
                 <div class="col-3 text-center">
                   <label class="form-label small">חשבונות</label>
                   <div class="color-picker-group justify-content-center">
-                    <div class="color-preview" style="background-color: #28a745"
+                    <div class="color-preview" style="background-color: #1b0b75"
                          onclick="openEntityColorPicker('account')"></div>
                   </div>
                 </div>
                 <div class="col-3 text-center">
                   <label class="form-label small">טיקרים</label>
                   <div class="color-picker-group justify-content-center">
-                    <div class="color-preview" style="background-color: #dc3545"
+                    <div class="color-preview" style="background-color: #019193"
                          onclick="openEntityColorPicker('ticker')"></div>
                   </div>
                 </div>
@@ -618,7 +618,7 @@
           <button class="btn btn-outline-primary" onclick="previewSettings()">
             <i class="bi bi-eye"></i> תצוגה מקדימה
           </button>
-          <button class="btn btn-modern" onclick="saveAllPreferencesV2()">
+          <button class="btn btn-modern" onclick="saveAllPreferences()">
             <i class="bi bi-save"></i> שמור הגדרות
           </button>
         </div>
@@ -697,9 +697,9 @@
   <script src="scripts/notification-system.js"></script>
   <script src="scripts/main.js"></script>
   
-  <!-- V2 Preferences script -->
+  <!-- Preferences script -->
   <script src="scripts/central-refresh-system.js"></script>
-  <script src="scripts/preferences-v2.js"></script>
+  <script src="scripts/preferences.js"></script>
   <script src="scripts/preferences-v2-compatibility.js"></script>
   
 </body>

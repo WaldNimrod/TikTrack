@@ -1,0 +1,223 @@
+/* ===== סגנונות ייעודיים לעמוד עסקעות ===== */
+/*
+ * קובץ זה מכיל סגנונות ייעודיים לעמוד עסקעות
+ * כולל הגדרות רוחב עמודות מותאמות ל-98% סהכ
+ * 
+ * File: trading-ui/styles/executions.css
+ * Version: 1.0
+ * Last Updated: September 3, 2025
+ * 
+ * עמודות הטבלה (13 כולל פעולות):
+ * 1. סימבול (ticker_symbol)
+ * 2. טרייד (trade_id) 
+ * 3. פעולה (action)
+ * 4. חשבון (account_name)
+ * 5. כמות (quantity)
+ * 6. מחיר (price)
+ * 7. עמלה (fee)
+ * 8. רווח/הפסד (total_pl)
+ * 9. הערות (notes)
+ * 10. נוצר ב (created_at)
+ * 11. תאריך ביצוע (execution_date)
+ * 12. מקור (source)
+ * 13. פעולות (actions)
+ */
+
+/* ===== הגדרות רוחב עמודות מותאמות ===== */
+/* רוחב כולל: 98% (2% שמורים לעמודת הפעולות) */
+
+/* עמודת סימבול - 12% */
+#executionsTable th:nth-child(1),
+#executionsTable td:nth-child(1) {
+  width: 12% !important;
+  min-width: 120px !important;
+  max-width: 150px !important;
+}
+
+/* עמודת טרייד - 10% */
+#executionsTable th:nth-child(2),
+#executionsTable td:nth-child(2) {
+  width: 10% !important;
+  min-width: 100px !important;
+  max-width: 120px !important;
+}
+
+/* עמודת פעולה - 8% */
+#executionsTable th:nth-child(3),
+#executionsTable td:nth-child(3) {
+  width: 8% !important;
+  min-width: 80px !important;
+  max-width: 100px !important;
+}
+
+/* עמודת חשבון - 12% */
+#executionsTable th:nth-child(4),
+#executionsTable td:nth-child(4) {
+  width: 12% !important;
+  min-width: 120px !important;
+  max-width: 150px !important;
+}
+
+/* עמודת כמות - 8% */
+#executionsTable th:nth-child(5),
+#executionsTable td:nth-child(5) {
+  width: 8% !important;
+  min-width: 80px !important;
+  max-width: 100px !important;
+}
+
+/* עמודת מחיר - 10% */
+#executionsTable th:nth-child(6),
+#executionsTable td:nth-child(6) {
+  width: 10% !important;
+  min-width: 100px !important;
+  max-width: 120px !important;
+}
+
+/* עמודת עמלה - 8% */
+#executionsTable th:nth-child(7),
+#executionsTable td:nth-child(7) {
+  width: 8% !important;
+  min-width: 80px !important;
+  max-width: 100px !important;
+}
+
+/* עמודת רווח/הפסד - 10% */
+#executionsTable th:nth-child(8),
+#executionsTable td:nth-child(8) {
+  width: 10% !important;
+  min-width: 100px !important;
+  max-width: 120px !important;
+}
+
+/* עמודת הערות - 8% */
+#executionsTable th:nth-child(9),
+#executionsTable td:nth-child(9) {
+  width: 8% !important;
+  min-width: 80px !important;
+  max-width: 100px !important;
+}
+
+/* עמודת נוצר ב - 8% */
+#executionsTable th:nth-child(10),
+#executionsTable td:nth-child(10) {
+  width: 8% !important;
+  min-width: 100px !important;
+  max-width: 120px !important;
+}
+
+/* עמודת תאריך ביצוע - 8% */
+#executionsTable th:nth-child(11),
+#executionsTable td:nth-child(11) {
+  width: 8% !important;
+  min-width: 100px !important;
+  max-width: 120px !important;
+}
+
+/* עמודת מקור - 8% */
+#executionsTable th:nth-child(12),
+#executionsTable td:nth-child(12) {
+  width: 8% !important;
+  min-width: 80px !important;
+  max-width: 100px !important;
+}
+
+/* עמודת פעולות - 2% (שמורה) */
+#executionsTable th:nth-child(13),
+#executionsTable td:nth-child(13),
+#executionsTable .actions-cell {
+  width: 2% !important;
+  min-width: 80px !important;
+  max-width: 100px !important;
+}
+
+/* ===== התאמות נוספות ===== */
+
+/* וידוא שהטבלה לא עוברת את הרוחב המקסימלי */
+#executionsContainer {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+}
+
+/* התאמת טקסט בעמודות */
+#executionsTable td {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 0 !important;
+}
+
+/* התאמת כותרות */
+#executionsTable th {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 0 !important;
+}
+
+/* התאמת כפתורי מיון */
+#executionsTable .sortable-header {
+  width: 100% !important;
+  text-align: center !important;
+}
+
+/* התאמת עמודת פעולות */
+#executionsTable .actions-cell {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+/* התאמת כפתורי פעולה */
+#executionsTable .action-btn {
+  margin: 2px !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+}
+
+/* וידוא שהכפתורים יוצגו בשורה אחת */
+#executionsTable .actions-cell {
+  white-space: nowrap !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+}
+
+#executionsTable .actions-cell .btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  height: 28px !important;
+  font-size: 0.7rem !important;
+  margin: 0 1px !important;
+  flex-shrink: 0 !important;
+}
+
+/* ===== התאמות למסכים קטנים ===== */
+@media (max-width: 1200px) {
+  /* הקטנת רוחב מינימלי של עמודות */
+  #executionsTable th,
+  #executionsTable td {
+    min-width: 70px !important;
+  }
+  
+  /* הקטנת רוחב מינימלי של עמודת פעולות */
+  #executionsTable .actions-cell {
+    min-width: 60px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* הקטנה נוספת למסכים קטנים */
+  #executionsTable th,
+  #executionsTable td {
+    min-width: 60px !important;
+    font-size: 12px !important;
+  }
+  
+  #executionsTable .actions-cell {
+    min-width: 50px !important;
+  }
+}

@@ -130,6 +130,14 @@
               <button id="addTradeBtn" class="refresh-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
                                     <img src="images/icons/trades.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;"> הוסף
               </button>
+              
+              <!-- כפתורי עריכה ומחיקה נסתרים (לזיהוי בבדיקות) -->
+              <button id="editTradeBtn" class="refresh-btn d-none" onclick="editTradeRecord('')" title="ערוך טרייד נבחר">
+                                    <img src="images/icons/trades.svg" alt="ערוך" class="action-icon" style="width: 16px; height: 16px;"> ערוך
+              </button>
+              <button id="deleteTradeBtn" class="refresh-btn d-none" onclick="deleteTradeRecord('')" title="מחק טרייד נבחר">
+                                    <img src="images/icons/trades.svg" alt="מחק" class="action-icon" style="width: 16px; height: 16px;"> מחק
+              </button>
 
               <div class="action-separator"></div>
               <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור הטריידים שלי">

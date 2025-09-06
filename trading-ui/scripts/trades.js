@@ -2975,3 +2975,102 @@ async function reactivateTrade(tradeId) {
   }
 }
 
+/**
+ * רענון נתוני הטריידים
+ * מבצע טעינה מחדש של כל נתוני הטריידים ומעדכן את הטבלה
+ */
+async function refreshTrades() {
+  if (typeof console !== 'undefined') {
+    console.log('[Trades.js] רענון נתוני טריידים...');
+  }
+
+  try {
+    // בדיקה אם קיימת פונקציית טעינה
+    if (typeof loadTradesData === 'function') {
+      await loadTradesData();
+      
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('רענון טריידים', 'נתוני הטריידים עודכנו בהצלחה');
+      }
+    } else {
+      throw new Error('פונקציית loadTradesData לא זמינה');
+    }
+  } catch (error) {
+    if (typeof console !== 'undefined') {
+      console.error('[Trades.js] שגיאה ברענון טריידים:', error);
+    }
+    
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה ברענון', error.message);
+    }
+  }
+}
+
+/**
+ * עדכון טרייד ספציפי
+ * @param {string} tradeId - מזהה הטרייד לעדכון
+ * @param {Object} updateData - הנתונים החדשים לעדכון
+ */
+async function updateTrade(tradeId, updateData) {
+  if (!tradeId) {
+    if (typeof console !== 'undefined') {
+      console.error('[Trades.js] updateTrade: חסר מזהה טרייד');
+    }
+    return;
+  }
+
+  try {
+    if (typeof console !== 'undefined') {
+      console.log(`[Trades.js] מעדכן טרייד ${tradeId}:`, updateData);
+    }
+
+    // שליחה לשרת
+    const response = await fetch(`/api/v1/trades/${tradeId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updateData)
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      
+      // עדכון הנתונים המקומיים
+      if (window.tradesData && Array.isArray(window.tradesData)) {
+        const index = window.tradesData.findIndex(trade => trade.id === tradeId);
+        if (index !== -1) {
+          window.tradesData[index] = { ...window.tradesData[index], ...updateData };
+          
+          // עדכון הטבלה
+          if (typeof updateTradesTable === 'function') {
+            updateTradesTable(window.tradesData);
+          }
+        }
+      }
+      
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('עדכון טרייד', 'הטרייד עודכן בהצלחה');
+      }
+      
+      return result;
+    } else {
+      throw new Error(`שגיאה בעדכון טרייד: ${response.status}`);
+    }
+  } catch (error) {
+    if (typeof console !== 'undefined') {
+      console.error('[Trades.js] שגיאה בעדכון טרייד:', error);
+    }
+    
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון', error.message);
+    }
+    
+    throw error;
+  }
+}
+
+// חשיפת הפונקציות החדשות לחלון הגלובלי
+window.refreshTrades = refreshTrades;
+window.updateTrade = updateTrade;
+

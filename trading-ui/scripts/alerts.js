@@ -2468,6 +2468,66 @@ async function reactivateAlert(alertId) {
 // הוספת הפונקציה לחלון הגלובלי
 window.reactivateAlert = reactivateAlert;
 
+/**
+ * בדיקת תנאי התראה
+ * פונקציה המקבלת מזהה התראה ובודקת האם התנאי שלה התקיים
+ */
+async function checkAlertCondition(alertId) {
+  try {
+    if (typeof console !== 'undefined') {
+      console.log('[Alerts.js] בודק תנאי התראה:', alertId);
+    }
+
+    if (!alertId) {
+      throw new Error('מזהה התראה לא סופק');
+    }
+
+    // מציאת ההתראה ברשימה המקומית
+    const alert = alertsData?.find(a => a.id === alertId) || 
+                  window.alertsData?.find(a => a.id === alertId);
+    
+    if (!alert) {
+      throw new Error(`התראה עם מזהה ${alertId} לא נמצאה`);
+    }
+
+    // שליחה לשרת לבדיקת התנאי
+    const response = await fetch(`/api/v1/alerts/${alertId}/check`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      
+      if (typeof window.showSuccessNotification === 'function') {
+        const message = result.condition_met 
+          ? 'תנאי ההתראה התקיים!' 
+          : 'תנאי ההתראה לא התקיים';
+        window.showSuccessNotification('בדיקת תנאי', message);
+      }
+      
+      return result;
+    } else {
+      throw new Error(`שגיאה בבדיקת תנאי התראה: ${response.status}`);
+    }
+  } catch (error) {
+    if (typeof console !== 'undefined') {
+      console.error('[Alerts.js] שגיאה בבדיקת תנאי התראה:', error);
+    }
+    
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בבדיקה', error.message);
+    }
+    
+    throw error;
+  }
+}
+
+// חשיפת הפונקציה החדשה לחלון הגלובלי
+window.checkAlertCondition = checkAlertCondition;
+
 // console.log('✅ alerts.js הושלם בהצלחה - כל הפונקציות זמינות');
 
 // בדיקת ייצוא פונקציות
@@ -2480,3 +2540,4 @@ window.reactivateAlert = reactivateAlert;
 // console.log('- formatAlertCondition:', typeof window.formatAlertCondition);
 // console.log('- parseAlertCondition:', typeof window.parseAlertCondition);
 // console.log('- clearAlertValidation:', typeof window.clearAlertValidation);
+// console.log('- checkAlertCondition:', typeof window.checkAlertCondition);

@@ -1995,3 +1995,116 @@ function replaceCurrentAttachment() {
   window.replaceAttachmentFlag = true;
 }
 
+/**
+ * הוספת הערה חדשה
+ * פונקציה המקבלת נתוני הערה ושומרת אותם
+ */
+async function addNote(noteData) {
+  try {
+    if (typeof console !== 'undefined') {
+      console.log('[Notes.js] מוסיף הערה חדשה:', noteData);
+    }
+
+    // אם לא הועברו נתונים, פתח מודל הוספה
+    if (!noteData) {
+      return showAddNoteModal();
+    }
+
+    // שליחה לשרת
+    const response = await fetch('/api/v1/notes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(noteData)
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      
+      // עדכון הנתונים המקומיים
+      if (window.notesData && Array.isArray(window.notesData)) {
+        window.notesData.push(result.data);
+        
+        // עדכון הטבלה
+        if (typeof updateNotesTable === 'function') {
+          updateNotesTable(window.notesData);
+        }
+      }
+      
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('הוספת הערה', 'הערה נוספה בהצלחה');
+      }
+      
+      return result;
+    } else {
+      throw new Error(`שגיאה בהוספת הערה: ${response.status}`);
+    }
+  } catch (error) {
+    if (typeof console !== 'undefined') {
+      console.error('[Notes.js] שגיאה בהוספת הערה:', error);
+    }
+    
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהוספה', error.message);
+    }
+    
+    throw error;
+  }
+}
+
+/**
+ * העלאת קובץ להערה
+ * פונקציה לטיפול בהעלאת קבצים מצורפים
+ */
+async function uploadFile(fileData, noteId = null) {
+  try {
+    if (typeof console !== 'undefined') {
+      console.log('[Notes.js] מעלה קובץ:', fileData?.name || 'קובץ לא ידוע');
+    }
+
+    if (!fileData) {
+      throw new Error('לא נבחר קובץ להעלאה');
+    }
+
+    // יצירת FormData לעריכת קבצים
+    const formData = new FormData();
+    formData.append('file', fileData);
+    if (noteId) {
+      formData.append('noteId', noteId);
+    }
+
+    // שליחה לשרת
+    const response = await fetch('/api/v1/notes/upload', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('העלאת קובץ', 'הקובץ הועלה בהצלחה');
+      }
+      
+      return result;
+    } else {
+      throw new Error(`שגיאה בהעלאת קובץ: ${response.status}`);
+    }
+  } catch (error) {
+    if (typeof console !== 'undefined') {
+      console.error('[Notes.js] שגיאה בהעלאת קובץ:', error);
+    }
+    
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהעלאה', error.message);
+    }
+    
+    throw error;
+  }
+}
+
+// חשיפת הפונקציות החדשות לחלון הגלובלי
+window.addNote = addNote;
+window.uploadFile = uploadFile;
+

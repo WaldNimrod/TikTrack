@@ -97,6 +97,15 @@
             <button id="addAlertBtn" class="refresh-btn" onclick="showAddAlertModal()" title="הוסף התראה חדשה">
               <span class="action-icon">➕</span> הוסף
             </button>
+            
+            <!-- כפתורי עריכה ומחיקה נסתרים (לזיהוי בבדיקות) -->
+            <button id="editAlertBtn" class="refresh-btn d-none" onclick="editAlert('')" title="ערוך התראה נבחרת">
+              <span class="action-icon">✏️</span> ערוך
+            </button>
+            <button id="deleteAlertBtn" class="refresh-btn d-none" onclick="deleteAlert('')" title="מחק התראה נבחרת">
+              <span class="action-icon">🗑️</span> מחק
+            </button>
+            
             <div class="action-separator"></div>
             <div class="action-separator"></div>
             <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור התראות">

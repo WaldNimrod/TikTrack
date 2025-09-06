@@ -1626,8 +1626,25 @@ function showAddCashFlowModal() {
 
 function showEditCashFlowModal(cashFlowId) {
     console.log('showEditCashFlowModal called with ID:', cashFlowId);
-    // TODO: Implement edit cash flow modal
-    alert('פונקציית עריכת תזרים מזומנים תתווסף בקרוב');
+    // קריאה לפונקציה האמיתית
+    if (typeof _showEditCashFlowModal === 'function') {
+        return _showEditCashFlowModal(cashFlowId);
+    } else {
+        alert('פונקציית עריכת תזרים מזומנים אינה זמינה');
+    }
+}
+
+// יצירת aliases לפונקציות עם השמות הצפויים בבדיקות CRUD
+function loadCashFlowsData() {
+    if (typeof loadCashFlows === 'function') {
+        return loadCashFlows();
+    } else {
+        console.error('loadCashFlows function not found');
+    }
+}
+
+function editCashFlow(cashFlowId) {
+    return showEditCashFlowModal(cashFlowId);
 }
 
 // ייצוא פונקציות גלובליות נוספות
@@ -1637,6 +1654,12 @@ window.initializeExternalIdFields = initializeExternalIdFields;
 window.deleteCashFlow = deleteCashFlow;
 window.showAddCashFlowModal = showAddCashFlowModal;
 window.showEditCashFlowModal = showEditCashFlowModal;
+
+// ייצוא aliases לבדיקות CRUD
+window.loadCashFlowsData = loadCashFlowsData;
+window.editCashFlow = editCashFlow;
+window.updateCashFlowsTable = updateCashFlowsTable;
+window.confirmDeleteCashFlow = confirmDeleteCashFlow;
 
 // window.showLinkedItemsWarning = showLinkedItemsWarning; // הוסר - הוחלף ב-showLinkedItemsModal
 // window.checkLinkedItemsForCashFlow = checkLinkedItemsForCashFlow; // הוסר - לא נחוץ יותר

@@ -272,7 +272,7 @@ class PreferencesService:
                             data: Dict[str, Any], changed_by: int = None) -> bool:
         """עדכן הגדרות"""
         try:
-            preferences = cls.get_preferences_v2(db, user_id, profile_id)
+            preferences = cls.get_preferences(db, user_id, profile_id)
             if not preferences:
                 logger.error(f"Preferences not found for user {user_id}, profile {profile_id}")
                 return False
@@ -298,11 +298,11 @@ class PreferencesService:
             # רשום להיסטוריה
             cls._record_change(db, user_id, profile_id, 'update', old_data, data, changed_by)
             
-            logger.info(f"Updated preferences V2 for user {user_id}, profile {profile_id}")
+            logger.info(f"Updated preferences for user {user_id}, profile {profile_id}")
             return True
             
         except Exception as e:
-            logger.error(f"Error updating preferences V2 for user {user_id}: {e}")
+            logger.error(f"Error updating preferences for user {user_id}: {e}")
             db.rollback()
             return False
     
@@ -313,7 +313,7 @@ class PreferencesService:
             logger.info(f"Starting migration from V1 to V2 for user {user_id}")
             
             # בדוק אם כבר יש V2
-            existing_v2 = cls.get_preferences_v2(db, user_id)
+            existing_v2 = cls.get_preferences(db, user_id)
             if existing_v2 and not force:
                 logger.info(f"V2 preferences already exist for user {user_id}, skipping migration")
                 return True
@@ -499,7 +499,7 @@ class PreferencesService:
                           include_sensitive: bool = False) -> Optional[Dict[str, Any]]:
         """יצא הגדרות לקובץ"""
         try:
-            preferences = cls.get_preferences_v2(db, user_id, profile_id)
+            preferences = cls.get_preferences(db, user_id, profile_id)
             if not preferences:
                 return None
             
@@ -554,10 +554,10 @@ class PreferencesService:
                     return False
             
             # צור או עדכן הגדרות
-            existing_prefs = cls.get_preferences_v2(db, user_id, profile.id)
+            existing_prefs = cls.get_preferences(db, user_id, profile.id)
             if existing_prefs:
                 # עדכן קיים
-                success = cls.update_preferences_v2(db, user_id, profile.id, preferences_data, user_id)
+                success = cls.update_preferences(db, user_id, profile.id, preferences_data, user_id)
             else:
                 # צור חדש
                 new_prefs = UserPreferences.import_settings(import_data)

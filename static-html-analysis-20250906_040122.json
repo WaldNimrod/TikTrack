@@ -1,0 +1,820 @@
+{
+  "test_info": {
+    "type": "static_html_analysis",
+    "timestamp": "2025-09-06T04:01:22.097455",
+    "total_files": 12
+  },
+  "summary": {
+    "average_score": 75.70833333333333,
+    "excellent_count": 2,
+    "good_count": 8,
+    "warning_count": 2,
+    "error_count": 0,
+    "success_rate": 83.33333333333334
+  },
+  "detailed_results": {
+    "index.html": {
+      "info": {
+        "name": "דף הבית",
+        "expected_elements": [
+          "hero-banner",
+          "overview-section",
+          "charts-section",
+          "actions-section",
+          "quick-link"
+        ],
+        "expected_buttons": [
+          "btn-outline-primary",
+          "action-btn",
+          "quick-refresh"
+        ],
+        "crud_level": "view"
+      },
+      "analysis": {
+        "status": "excellent",
+        "grade": "מצוין",
+        "score": 100.0,
+        "basic_checks": {
+          "has_doctype": true,
+          "has_html_tag": true,
+          "has_head": true,
+          "has_body": true,
+          "has_title": true,
+          "rtl_support": true,
+          "hebrew_lang": true,
+          "css_new_system": true,
+          "bootstrap_included": true,
+          "scripts_included": true
+        },
+        "basic_score": 100.0,
+        "elements_score": 100.0,
+        "found_buttons": [
+          "class=\"filter-toggle-btn\"",
+          "class=\"action-btn-icon\"",
+          "switchTableTab(",
+          "refreshCharts()",
+          "quickAction(",
+          "class=\"btn btn-outline-light btn-sm\"",
+          "class=\"btn btn-sm btn-outline-primary\"",
+          "class=\"action-btn-text\"",
+          "צפה",
+          "exportOverview()"
+        ],
+        "found_ids": [],
+        "js_functions": [
+          "refreshCharts",
+          "quickAction",
+          "exportOverview",
+          "refreshOverview",
+          "updateChartPeriod",
+          "switchTableTab"
+        ],
+        "onclick_handlers": [
+          "toggleMainSection()",
+          "exportOverview()",
+          "switchTableTab(",
+          "refreshCharts()",
+          "quickAction("
+        ],
+        "issues": [],
+        "file_size": 45498,
+        "file_exists": true
+      },
+      "tested_at": "2025-09-06T04:01:22.080944"
+    },
+    "trades.html": {
+      "info": {
+        "name": "טריידים",
+        "expected_elements": [
+          "addTradeBtn",
+          "tradesTable",
+          "editTradeBtn",
+          "deleteTradeBtn"
+        ],
+        "expected_buttons": [
+          "הוסף טרייד חדש",
+          "ערוך",
+          "מחק",
+          "סגור",
+          "בטל"
+        ],
+        "crud_level": "full"
+      },
+      "analysis": {
+        "status": "good",
+        "grade": "טוב",
+        "score": 77.5,
+        "basic_checks": {
+          "has_doctype": true,
+          "has_html_tag": true,
+          "has_head": true,
+          "has_body": true,
+          "has_title": true,
+          "rtl_support": true,
+          "hebrew_lang": true,
+          "css_new_system": true,
+          "bootstrap_included": true,
+          "scripts_included": true
+        },
+        "basic_score": 100.0,
+        "elements_score": 25.0,
+        "found_buttons": [
+          "class=\"filter-toggle-btn\"",
+          "addImportantNote()",
+          "addEditReminder()",
+          "\n                ⏰\n              ",
+          "class=\"refresh-btn\"",
+          "\n                💰\n              ",
+          "class=\"btn btn-link sortable-header\"",
+          "toggleTopSection()",
+          "class=\"btn-close\"",
+          "addEditImportantNote()"
+        ],
+        "found_ids": [
+          "addTradeTickerId",
+          "addTradeModalLabel",
+          "addTradeAccountId",
+          "addTradeOpenedAt",
+          "linkedItemsModalBody",
+          "editTradeTradePlanId",
+          "addTradeForm",
+          "addTradeNotes",
+          "editTradeDailyChange",
+          "editTradeForm"
+        ],
+        "js_functions": [],
+        "onclick_handlers": [
+          "toggleMainSection()",
+          "addImportantNote()",
+          "showAddTradeModal()",
+          "viewLinkedItemsForTrade(document.getElementById(",
+          "addEditReminder()"
+        ],
+        "issues": [
+          "אלמנט חסר: addTradeBtn",
+          "אלמנט חסר: editTradeBtn",
+          "אלמנט חסר: deleteTradeBtn"
+        ],
+        "file_size": 34716,
+        "file_exists": true
+      },
+      "tested_at": "2025-09-06T04:01:22.083039"
+    },
+    "accounts.html": {
+      "info": {
+        "name": "חשבונות",
+        "expected_elements": [
+          "addAccountBtn",
+          "accountsTable",
+          "editAccountBtn",
+          "deleteAccountBtn"
+        ],
+        "expected_buttons": [
+          "הוסף חשבון חדש",
+          "ערוך",
+          "מחק"
+        ],
+        "crud_level": "full"
+      },
+      "analysis": {
+        "status": "good",
+        "grade": "טוב",
+        "score": 77.5,
+        "basic_checks": {
+          "has_doctype": true,
+          "has_html_tag": true,
+          "has_head": true,
+          "has_body": true,
+          "has_title": true,
+          "rtl_support": true,
+          "hebrew_lang": true,
+          "css_new_system": true,
+          "bootstrap_included": true,
+          "scripts_included": true
+        },
+        "basic_score": 100.0,
+        "elements_score": 25.0,
+        "found_buttons": [
+          "toggleMainSection()",
+          "class=\"filter-toggle-btn\"",
+          "class=\"refresh-btn\"",
+          "class=\"btn btn-link sortable-header\"",
+          "if (typeof window.sortTable === ",
+          "toggleTopSection()",
+          "console.log("
+        ],
+        "found_ids": [],
+        "js_functions": [
+          "loadAccountsData",
+          "sortTable",
+          "if"
+        ],
+        "onclick_handlers": [
+          "toggleMainSection()",
+          "toggleTopSection()",
+          "console.log(",
+          "if (typeof window.sortTable === "
+        ],
+        "issues": [
+          "אלמנט חסר: addAccountBtn",
+          "אלמנט חסר: editAccountBtn",
+          "אלמנט חסר: deleteAccountBtn"
+        ],
+        "file_size": 15927,
+        "file_exists": true
+      },
+      "tested_at": "2025-09-06T04:01:22.083970"
+    },
+    "alerts.html": {
+      "info": {
+        "name": "התראות",
+        "expected_elements": [
+          "addAlertBtn",
+          "alertsTable",
+          "editAlertBtn",
+          "deleteAlertBtn"
+        ],
+        "expected_buttons": [
+          "הוסף התראה חדשה",
+          "ערוך",
+          "מחק",
+          "בדוק תנאי"
+        ],
+        "crud_level": "full"
+      },
+      "analysis": {
+        "status": "good",
+        "grade": "טוב",
+        "score": 77.5,
+        "basic_checks": {
+          "has_doctype": true,
+          "has_html_tag": true,
+          "has_head": true,
+          "has_body": true,
+          "has_title": true,
+          "rtl_support": true,
+          "hebrew_lang": true,
+          "css_new_system": true,
+          "bootstrap_included": true,
+          "scripts_included": true
+        },
+        "basic_score": 100.0,
+        "elements_score": 25.0,
+        "found_buttons": [
+          "class=\"filter-toggle-btn\"",
+          "\n                הכל\n              ",
+          "class=\"refresh-btn\"",
+          "class=\"btn btn-sm btn-outline-primary\"",
+          "class=\"btn btn-sm active\"",
+          "class=\"btn btn-link sortable-header\"",
+          "if (typeof window.sortTable === ",
+          "toggleTopSection()",
+          "class=\"btn-close\"",
+          "filterAlertsByRelatedObjectType("
+        ],
+        "found_ids": [
+          "editConditionOperator",
+          "editAlertMessage",
+          "editAlertRelationAccount",
+          "editConditionAttribute",
+          "editAlertStatus",
+          "editAlertRelatedObjectSelect",
+          "editAlertIsTriggered",
+          "addAlertModal",
+          "editConditionNumber",
+          "editAlertState"
+        ],
+        "js_functions": [],
+        "onclick_handlers": [
+          "toggleMainSection()",
+          "filterAlertsByRelatedObjectType(",
+          "saveAlert()",
+          "showAddAlertModal()",
+          "updateAlert()"
+        ],
+        "issues": [
+          "אלמנט חסר: addAlertBtn",
+          "אלמנט חסר: editAlertBtn",
+          "אלמנט חסר: deleteAlertBtn"
+        ],
+        "file_size": 27142,
+        "file_exists": true
+      },
+      "tested_at": "2025-09-06T04:01:22.085545"
+    },
+    "tickers.html": {
+      "info": {
+        "name": "טיקרים",
+        "expected_elements": [
+          "addTickerBtn",
+          "tickersTable",
+          "editTickerBtn",
+          "deleteTickerBtn"
+        ],
+        "expected_buttons": [
+          "הוסף טיקר חדש",
+          "ערוך",
+          "מחק",
+          "רענן מחיר"
+        ],
+        "crud_level": "full"
+      },
+      "analysis": {
+        "status": "good",
+        "grade": "טוב",
+        "score": 70.0,
+        "basic_checks": {
+          "has_doctype": true,
+          "has_html_tag": true,
+          "has_head": true,
+          "has_body": true,
+          "has_title": true,
+          "rtl_support": true,
+          "hebrew_lang": true,
+          "css_new_system": true,
+          "bootstrap_included": true,
+          "scripts_included": true
+        },
+        "basic_score": 100.0,
+        "elements_score": 0.0,
+        "found_buttons": [
+          "updateTicker()",
+          "class=\"filter-toggle-btn\"",
+          "class=\"reset-btn active\"",
+          "class=\"refresh-btn\"",
+          "class=\"btn btn-sm btn-outline-primary\"",
+          "class=\"btn btn-link sortable-header\"",
+          "if (typeof window.sortTable === ",
+          "class=\"btn btn-success btn-success-outline\"",
+          "toggleTopSection()",
+          "class=\"btn-close\""
+        ],
+        "found_ids": [
+          "editTickerSymbol",
+          "addTickerName",
+          "deleteTickerId",
+          "yahooRefreshBtn",
+          "linkedItemsModalBody",
+          "editTickerType",
+          "addTickerRemarks",
+          "deleteTickerModalLabel",
+          "addTickerForm",
+          "editTickerModalLabel"
+        ],
+        "js_functions": [],
+        "onclick_handlers": [
+          "updateTicker()",
+          "toggleTickersSection()",
+          "refreshYahooFinanceData()",
+          "confirmDeleteTicker()",
+          "if (typeof window.sortTable === "
+        ],
+        "issues": [
+          "אלמנט חסר: addTickerBtn",
+          "אלמנט חסר: tickersTable",
+          "אלמנט חסר: editTickerBtn",
+          "אלמנט חסר: deleteTickerBtn"
+        ],
+        "file_size": 23978,
+        "file_exists": true
+      },
+      "tested_at": "2025-09-06T04:01:22.086942"
+    },
+    "executions.html": {
+      "info": {
+        "name": "ביצועים",
+        "expected_elements": [
+          "addExecutionBtn",
+          "executionsTable",
+          "editExecutionBtn"
+        ],
+        "expected_buttons": [
+          "הוסף ביצוע חדש",
+          "ערוך",
+          "מחק"
+        ],
+        "crud_level": "full"
+      },
+      "analysis": {
+        "status": "good",
+        "grade": "טוב מאוד",
+        "score": 80.0,
+        "basic_checks": {
+          "has_doctype": true,
+          "has_html_tag": true,
+          "has_head": true,
+          "has_body": true,
+          "has_title": true,
+          "rtl_support": true,
+          "hebrew_lang": true,
+          "css_new_system": true,
+          "bootstrap_included": true,
+          "scripts_included": true
+        },
+        "basic_score": 100.0,
+        "elements_score": 33.33333333333333,
+        "found_buttons": [
+          "class=\"filter-toggle-btn\"",
+          "\n              מחק עסקה\n            ",
+          "class=\"refresh-btn\"",
+          "class=\"btn btn-sm btn-outline-primary\"",
+          "class=\"btn btn-link sortable-header\"",
+          "if (typeof window.sortTable === ",
+          "class=\"btn btn-outline-success link-button\"",
+          "toggleTopSection()",
+          "class=\"btn btn-outline-success link-button hidden\"",
+          "class=\"btn-close\""
+        ],
+        "found_ids": [
+          "editExecutionModalLabel",
+          "addExecutionSourceError",
+          "editExecutionDateError",
+          "addExecutionPriceError",
+          "editExecutionTradeIdError",
+          "addExecutionTypeError",
+          "linkedItemsModalBody",
+          "addExecutionType",
+          "deleteExecutionId",
+          "addExecutionTicker"
+        ],
+        "js_functions": [],
+        "onclick_handlers": [
+          "toggleExecutionsSection()",
+          "updateExecution()",
+          "confirmDeleteExecution()",
+          "addNewPlan()",
+          "goToLinkedTrade()"
+        ],
+        "issues": [
+          "אלמנט חסר: addExecutionBtn",
+          "אלמנט חסר: editExecutionBtn"
+        ],
+        "file_size": 38038,
+        "file_exists": true
+      },
+      "tested_at": "2025-09-06T04:01:22.089384"
+    },
+    "cash_flows.html": {
+      "info": {
+        "name": "תזרימי מזומנים",
+        "expected_elements": [
+          "addCashFlowBtn",
+          "cashFlowsTable"
+        ],
+        "expected_buttons": [
+          "הוסף תזרים חדש",
+          "ערוך",
+          "מחק"
+        ],
+        "crud_level": "full"
+      },
+      "analysis": {
+        "status": "warning",
+        "grade": "בינוני",
+        "score": 62.99999999999999,
+        "basic_checks": {
+          "has_doctype": true,
+          "has_html_tag": true,
+          "has_head": true,
+          "has_body": false,
+          "has_title": true,
+          "rtl_support": true,
+          "hebrew_lang": true,
+          "css_new_system": true,
+          "bootstrap_included": true,
+          "scripts_included": true
+        },
+        "basic_score": 90.0,
+        "elements_score": 0.0,
+        "found_buttons": [],
+        "found_ids": [],
+        "js_functions": [],
+        "onclick_handlers": [],
+        "issues": [
+          "בדיקה בסיסית נכשלה: has_body",
+          "אלמנט חסר: addCashFlowBtn",
+          "אלמנט חסר: cashFlowsTable"
+        ],
+        "file_size": 3679,
+        "file_exists": true
+      },
+      "tested_at": "2025-09-06T04:01:22.089634"
+    },
+    "trade_plans.html": {
+      "info": {
+        "name": "תוכניות מסחר",
+        "expected_elements": [
+          "addTradePlanBtn",
+          "tradePlansTable"
+        ],
+        "expected_buttons": [
+          "הוסף תוכנית חדשה",
+          "ערוך",
+          "מחק",
+          "בצע"
+        ],
+        "crud_level": "full"
+      },
+      "analysis": {
+        "status": "good",
+        "grade": "טוב",
+        "score": 70.0,
+        "basic_checks": {
+          "has_doctype": true,
+          "has_html_tag": true,
+          "has_head": true,
+          "has_body": true,
+          "has_title": true,
+          "rtl_support": true,
+          "hebrew_lang": true,
+          "css_new_system": true,
+          "bootstrap_included": true,
+          "scripts_included": true
+        },
+        "basic_score": 100.0,
+        "elements_score": 0.0,
+        "found_buttons": [
+          "class=\"filter-toggle-btn\"",
+          "addImportantNote()",
+          "addEditReminder()",
+          "if (typeof window.confirmCancelTradePlan === ",
+          "class=\"refresh-btn\"",
+          "class=\"btn btn-link sortable-header\"",
+          "if (typeof window.sortTable === ",
+          "class=\"btn btn-info\"",
+          "toggleTopSection()",
+          "class=\"btn-close\""
+        ],
+        "found_ids": [
+          "deleteTradePlanDetails",
+          "editTradePlanSide",
+          "editTradePlanReasons",
+          "deleteTradePlanModal",
+          "deleteTradePlanModalLabel",
+          "editTradePlanStatus",
+          "linkedItemsModalBody",
+          "editSelectedTickerDisplay",
+          "editTradePlanTickerId",
+          "addTradePlanPlannedAmount"
+        ],
+        "js_functions": [],
+        "onclick_handlers": [
+          "toggleMainSection()",
+          "if (typeof window.saveEditTradePlan === ",
+          "addImportantNote()",
+          "if (typeof window.saveNewTradePlan === ",
+          "addEntryCondition()"
+        ],
+        "issues": [
+          "אלמנט חסר: addTradePlanBtn",
+          "אלמנט חסר: tradePlansTable"
+        ],
+        "file_size": 32248,
+        "file_exists": true
+      },
+      "tested_at": "2025-09-06T04:01:22.091501"
+    },
+    "notes.html": {
+      "info": {
+        "name": "הערות",
+        "expected_elements": [
+          "addNoteBtn",
+          "notesTable"
+        ],
+        "expected_buttons": [
+          "הוסף הערה חדשה",
+          "ערוך",
+          "מחק",
+          "צרף קובץ"
+        ],
+        "crud_level": "full"
+      },
+      "analysis": {
+        "status": "warning",
+        "grade": "בינוני",
+        "score": 62.99999999999999,
+        "basic_checks": {
+          "has_doctype": true,
+          "has_html_tag": true,
+          "has_head": true,
+          "has_body": false,
+          "has_title": true,
+          "rtl_support": true,
+          "hebrew_lang": true,
+          "css_new_system": true,
+          "bootstrap_included": true,
+          "scripts_included": true
+        },
+        "basic_score": 90.0,
+        "elements_score": 0.0,
+        "found_buttons": [],
+        "found_ids": [],
+        "js_functions": [],
+        "onclick_handlers": [],
+        "issues": [
+          "בדיקה בסיסית נכשלה: has_body",
+          "אלמנט חסר: addNoteBtn",
+          "אלמנט חסר: notesTable"
+        ],
+        "file_size": 2958,
+        "file_exists": true
+      },
+      "tested_at": "2025-09-06T04:01:22.091697"
+    },
+    "preferences.html": {
+      "info": {
+        "name": "העדפות V1",
+        "expected_elements": [
+          "savePreferencesBtn",
+          "resetBtn"
+        ],
+        "expected_buttons": [
+          "שמור העדפות",
+          "אפס לברירת מחדל"
+        ],
+        "crud_level": "settings"
+      },
+      "analysis": {
+        "status": "good",
+        "grade": "טוב",
+        "score": 70.0,
+        "basic_checks": {
+          "has_doctype": true,
+          "has_html_tag": true,
+          "has_head": true,
+          "has_body": true,
+          "has_title": true,
+          "rtl_support": true,
+          "hebrew_lang": true,
+          "css_new_system": true,
+          "bootstrap_included": true,
+          "scripts_included": true
+        },
+        "basic_score": 100.0,
+        "elements_score": 0.0,
+        "found_buttons": [
+          "runMigration()",
+          "viewHistory()",
+          "class=\"btn btn-outline-info\"",
+          "submitCreateProfile()",
+          "class=\"btn btn-outline-primary btn-sm\"",
+          "class=\"btn btn-outline-primary\"",
+          "class=\"btn btn-modern btn-export\"",
+          "class=\"btn-close\"",
+          "openEntityColorPicker(",
+          "סגור"
+        ],
+        "found_ids": [
+          "deleteProfileBtn"
+        ],
+        "js_functions": [],
+        "onclick_handlers": [
+          "renameProfile()",
+          "runMigration()",
+          "openEntityColorPicker(",
+          "validateSettings()",
+          "deleteCurrentProfile()"
+        ],
+        "issues": [
+          "אלמנט חסר: savePreferencesBtn",
+          "אלמנט חסר: resetBtn"
+        ],
+        "file_size": 29901,
+        "file_exists": true
+      },
+      "tested_at": "2025-09-06T04:01:22.093476"
+    },
+    "preferences-v2.html": {
+      "info": {
+        "name": "העדפות V2",
+        "expected_elements": [
+          "saveBtn",
+          "exportBtn",
+          "importBtn"
+        ],
+        "expected_buttons": [
+          "שמור",
+          "ייצא",
+          "ייבא",
+          "איפוס"
+        ],
+        "crud_level": "settings"
+      },
+      "analysis": {
+        "status": "good",
+        "grade": "טוב",
+        "score": 70.0,
+        "basic_checks": {
+          "has_doctype": true,
+          "has_html_tag": true,
+          "has_head": true,
+          "has_body": true,
+          "has_title": true,
+          "rtl_support": true,
+          "hebrew_lang": true,
+          "css_new_system": true,
+          "bootstrap_included": true,
+          "scripts_included": true
+        },
+        "basic_score": 100.0,
+        "elements_score": 0.0,
+        "found_buttons": [
+          "runMigration()",
+          "viewHistory()",
+          "class=\"btn btn-outline-info\"",
+          "submitCreateProfile()",
+          "class=\"btn btn-outline-primary btn-sm\"",
+          "class=\"btn btn-outline-primary\"",
+          "class=\"btn btn-modern btn-export\"",
+          "class=\"btn-close\"",
+          "openEntityColorPicker(",
+          "סגור"
+        ],
+        "found_ids": [
+          "deleteProfileBtn"
+        ],
+        "js_functions": [],
+        "onclick_handlers": [
+          "renameProfile()",
+          "runMigration()",
+          "openEntityColorPicker(",
+          "validateSettings()",
+          "deleteCurrentProfile()"
+        ],
+        "issues": [
+          "אלמנט חסר: saveBtn",
+          "אלמנט חסר: exportBtn",
+          "אלמנט חסר: importBtn"
+        ],
+        "file_size": 37729,
+        "file_exists": true
+      },
+      "tested_at": "2025-09-06T04:01:22.095740"
+    },
+    "css-management.html": {
+      "info": {
+        "name": "מנהל CSS",
+        "expected_elements": [
+          "switchOldBtn",
+          "switchNewBtn",
+          "runAnalysisBtn"
+        ],
+        "expected_buttons": [
+          "עבור למערכת ישנה",
+          "עבור למערכת חדשה",
+          "ניתוח CSS"
+        ],
+        "crud_level": "admin"
+      },
+      "analysis": {
+        "status": "excellent",
+        "grade": "מצוין",
+        "score": 90.0,
+        "basic_checks": {
+          "has_doctype": true,
+          "has_html_tag": true,
+          "has_head": true,
+          "has_body": true,
+          "has_title": true,
+          "rtl_support": true,
+          "hebrew_lang": true,
+          "css_new_system": true,
+          "bootstrap_included": true,
+          "scripts_included": true
+        },
+        "basic_score": 100.0,
+        "elements_score": 66.66666666666666,
+        "found_buttons": [
+          "class=\"filter-toggle-btn\"",
+          "downloadPythonTools()",
+          "class=\"btn btn-outline-info\"",
+          "runFullAnalysis()",
+          "runQuickTests()",
+          "class=\"btn btn-outline-primary btn-sm\"",
+          "class=\"btn btn-info\"",
+          "showFileStructure()",
+          "toggleTopSection()",
+          "class=\"btn-close\""
+        ],
+        "found_ids": [
+          "switchOldBtn",
+          "switchNewBtn"
+        ],
+        "js_functions": [],
+        "onclick_handlers": [
+          "downloadPythonTools()",
+          "runFullAnalysis()",
+          "runQuickTests()",
+          "showFileStructure()",
+          "toggleTopSection()"
+        ],
+        "issues": [
+          "אלמנט חסר: runAnalysisBtn"
+        ],
+        "file_size": 26194,
+        "file_exists": true
+      },
+      "tested_at": "2025-09-06T04:01:22.097220"
+    }
+  }
+}

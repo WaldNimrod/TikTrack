@@ -174,7 +174,7 @@ npm run performance:check
 5. **`linked-items.js`** - מ-15 ל-16 אזהרות (הוסרה פונקציה לא בשימוש)
 6. **`notification-system.js`** - מ-10 ל-5 אזהרות
 7. **`notifications-center.js`** - מ-42 ל-20+ אזהרות
-8. **`preferences.js`** - מ-20+ ל-15+ אזהרות
+8. **`preferences-v2.js`** - מ-20+ ל-15+ אזהרות
 9. **`trade_plans.js`** - מ-20+ ל-15+ אזהרות
 10. **`db-extradata.js`** - מ-20+ ל-15+ אזהרות
 11. **`active-alerts-component.js`** - מ-10+ ל-2 אזהרות

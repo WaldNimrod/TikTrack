@@ -61,17 +61,25 @@ class HeaderSystem {
   }
 
   static createHeader() {
+    console.log('🔄 Creating header...');
+    
     // מציאת אלמנט קיים או יצירת חדש
     let headerElement = document.getElementById('unified-header');
     if (!headerElement) {
+      console.log('📝 Creating new header element...');
       headerElement = document.createElement('div');
       headerElement.id = 'unified-header';
       // הכנסת הכותרת לתחילת הדף
       document.body.insertBefore(headerElement, document.body.firstChild);
+    } else {
+      console.log('✅ Found existing header element');
     }
 
     // הוספת התוכן לאלמנט
-    headerElement.innerHTML = HeaderSystem.getHeaderHTML();
+    const headerHTML = HeaderSystem.getHeaderHTML();
+    console.log('📝 Setting header HTML content...');
+    headerElement.innerHTML = headerHTML;
+    console.log('✅ Header created successfully');
   }
 
 
@@ -3031,15 +3039,15 @@ window.HeaderSystem = HeaderSystem;
 
 // אתחול אוטומטי
 document.addEventListener('DOMContentLoaded', () => {
-  // === DOM CONTENT LOADED (HEADER SYSTEM) ===
-  // HeaderSystem available
-
+  console.log('🔄 DOM Content Loaded - Header System Starting...');
+  
   if (typeof HeaderSystem === 'function') {
+    console.log('✅ HeaderSystem class found, creating instance...');
     window.headerSystem = new HeaderSystem();
     window.headerSystem.init();
-    // Header system initialized successfully
+    console.log('✅ Header system initialized successfully');
   } else {
-    // HeaderSystem class not found
+    console.error('❌ HeaderSystem class not found');
   }
 });
 

@@ -308,20 +308,20 @@ class PreferencesService:
     
     @classmethod
     def migrate_from_v1(cls, db: Session, user_id: int, force: bool = False) -> bool:
-        """מגרר הגדרות מV1 לV2"""
+        """מגרר הגדרות מהמערכת הישנה"""
         try:
-            logger.info(f"Starting migration from V1 to V2 for user {user_id}")
+            logger.info(f"Starting migration from old system for user {user_id}")
             
-            # בדוק אם כבר יש V2
-            existing_v2 = cls.get_preferences(db, user_id)
-            if existing_v2 and not force:
-                logger.info(f"V2 preferences already exist for user {user_id}, skipping migration")
+            # בדוק אם כבר יש הגדרות
+            existing_prefs = cls.get_preferences(db, user_id)
+            if existing_prefs and not force:
+                logger.info(f"Preferences already exist for user {user_id}, skipping migration")
                 return True
             
-            # קבל נתונים מV1
-            v1_preferences = cls._get_v1_preferences(db, user_id)
-            if not v1_preferences:
-                logger.warning(f"No V1 preferences found for user {user_id}")
+            # קבל נתונים מהמערכת הישנה
+            old_preferences = cls._get_v1_preferences(db, user_id)
+            if not old_preferences:
+                logger.warning(f"No old preferences found for user {user_id}")
                 return False
             
             # צור פרופיל ברירת מחדל אם לא קיים

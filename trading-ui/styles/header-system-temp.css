@@ -1,390 +1,394 @@
-/* ===== PART 1 - כללים 1-16 (16 כללים) ===== */
-#unified-header .logo-section {
-    display: flex;
-    align-items: flex-end;
-    gap: 0.5rem;
-    direction: ltr;
-    /* הלוגו צריך להיות LTR */
-}
-#unified-header .logo-text {
-    margin-bottom: 10px;
-}
-#unified-header .logo-icon {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    margin: 16px 0;
-}
-#unified-header .home-icon {
-    color: #09384d;
-    font-size: 48px;
-    font-weight: 500;
-}
-#unified-header .nav-item {
-    position: relative;
-    overflow: hidden;
-}
-#unified-header .nav-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(41, 166, 168, 0.1);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    border-radius: 6px;
-}
-#unified-header .nav-item:hover::before {
-    opacity: 1;
-}
-#unified-header .nav-item.active::before {
-    opacity: 0;
-    background: transparent;
-}
-#unified-header .dropdown-submenu {
-    position: relative;
-}
-#unified-header .dropdown-submenu .tiktrack-submenu-toggle {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-#unified-header .submenu-arrow {
-    font-size: 0.8em;
-    transition: transform 0.2s ease;
-    margin-right: 8px;
-}
-#unified-header .dropdown-submenu:hover .submenu-arrow {
-    transform: rotate(90deg);
-}
-#unified-header .tiktrack-submenu {
-    position: absolute;
-    left: 100%;
-    top: 0;
-    background: var(--apple-bg-elevated);
-    border: 1px solid var(--apple-border-light);
-    border-radius: 8px;
-    box-shadow: var(--apple-shadow-medium);
-    min-width: 200px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(-10px);
-    transition: all 0.2s ease;
-    z-index: 1001;
-    padding: 8px 0;
-}
-#unified-header .dropdown-submenu:hover .tiktrack-submenu {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(0);
-}
-#unified-header .tiktrack-submenu .tiktrack-dropdown-item {
-    padding: 8px 16px;
-    white-space: nowrap;
-    border: none;
-    background: transparent;
-    color: var(--apple-text-primary);
-    text-decoration: none;
-    display: block;
-    width: 100%;
-    text-align: right;
-    transition: background-color 0.2s ease;
-}
-#unified-header .tiktrack-submenu .tiktrack-dropdown-item:hover {
-    background-color: var(--apple-bg-hover);
-    color: var(--apple-text-primary);
-}
+/* ===== PART 1 - כללים 1-16 (16 כללים) - בהערה ===== */
+/* #unified-header .logo-section { */
+/*     display: flex; */
+/*     align-items: flex-end; */
+/*     gap: 0.5rem; */
+/*     direction: ltr; */
+/*     /* הלוגו צריך להיות LTR */ */
+/* } */
+/* #unified-header .logo-text { */
+/*     margin-bottom: 10px; */
+/* } */
+/* #unified-header .logo-icon { */
+/*     max-width: 100%; */
+/*     max-height: 100%; */
+/*     width: auto; */
+/*     height: auto; */
+/*     object-fit: contain; */
+/*     margin: 16px 0; */
+/* } */
+/* #unified-header .home-icon { */
+/*     color: #09384d; */
+/*     font-size: 48px; */
+/*     font-weight: 500; */
+/* } */
+/* #unified-header .nav-item { */
+/*     position: relative; */
+/*     overflow: hidden; */
+/* } */
+/* #unified-header .nav-item::before { */
+/*     content: ''; */
+/*     position: absolute; */
+/*     top: 0; */
+/*     left: 0; */
+/*     right: 0; */
+/*     bottom: 0; */
+/*     background: rgba(41, 166, 168, 0.1); */
+/*     opacity: 0; */
+/*     transition: opacity 0.2s ease; */
+/*     border-radius: 6px; */
+/* } */
+/* #unified-header .nav-item:hover::before { */
+/*     opacity: 1; */
+/* } */
+/* #unified-header .nav-item.active::before { */
+/*     opacity: 0; */
+/*     background: transparent; */
+/* } */
+/* #unified-header .dropdown-submenu { */
+/*     position: relative; */
+/* } */
+/* #unified-header .dropdown-submenu .tiktrack-submenu-toggle { */
+/*     display: flex; */
+/*     justify-content: space-between; */
+/*     align-items: center; */
+/*     width: 100%; */
+/* } */
+/* #unified-header .submenu-arrow { */
+/*     font-size: 0.8em; */
+/*     transition: transform 0.2s ease; */
+/*     margin-right: 8px; */
+/* } */
+/* #unified-header .dropdown-submenu:hover .submenu-arrow { */
+/*     transform: rotate(90deg); */
+/* } */
+/* #unified-header .tiktrack-submenu { */
+/*     position: absolute; */
+/*     left: 100%; */
+/*     top: 0; */
+/*     background: var(--apple-bg-elevated); */
+/*     border: 1px solid var(--apple-border-light); */
+/*     border-radius: 8px; */
+/*     box-shadow: var(--apple-shadow-medium); */
+/*     min-width: 200px; */
+/*     opacity: 0; */
+/*     visibility: hidden; */
+/*     transform: translateX(-10px); */
+/*     transition: all 0.2s ease; */
+/*     z-index: 1001; */
+/*     padding: 8px 0; */
+/* } */
+/* #unified-header .dropdown-submenu:hover .tiktrack-submenu { */
+/*     opacity: 1; */
+/*     visibility: visible; */
+/*     transform: translateX(0); */
+/* } */
+/* #unified-header .tiktrack-submenu .tiktrack-dropdown-item { */
+/*     padding: 8px 16px; */
+/*     white-space: nowrap; */
+/*     border: none; */
+/*     background: transparent; */
+/*     color: var(--apple-text-primary); */
+/*     text-decoration: none; */
+/*     display: block; */
+/*     width: 100%; */
+/*     text-align: right; */
+/*     transition: background-color 0.2s ease; */
+/* } */
+/* #unified-header .tiktrack-submenu .tiktrack-dropdown-item:hover { */
+/*     background-color: var(--apple-bg-hover); */
+/*     color: var(--apple-text-primary); */
+/* } */
 /* ===== סוף PART 1 ===== */
 
-/* ===== PART 2 - כללים 17-32 (16 כללים) ===== */
-@media (max-width: 768px) {
-    #unified-header .tiktrack-submenu {
-        position: static;
-        left: auto;
-        top: auto;
-        opacity: 1;
-        visibility: visible;
-        transform: none;
-        box-shadow: none;
-        border: none;
-        border-top: 1px solid var(--apple-border-light);
-        margin-top: 8px;
-        padding-top: 8px;
-    }
-    #unified-header .dropdown-submenu:hover .tiktrack-submenu {
-        transform: none;
-    }
-#unified-header {
-    background: var(--apple-bg-elevated);
-    border-bottom: 1px solid var(--apple-border-light);
-    box-shadow: var(--apple-shadow-light);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-#unified-header .header-container {
-    max-width: 1380px;
-    margin: 0 auto;
-    padding: 1rem 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    direction: rtl;
-}
-#unified-header .header-wrapper {
-    max-width: 1200px;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-#unified-header .header-top {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-bottom: 1px solid var(--apple-border-light);
-    position: relative;
-    min-height: 70px;
-    direction: rtl;
-    background: var(--apple-bg-elevated);
-}
-#unified-header .header-top .logo-section {
-    order: 3;
-    margin-right: auto;
-}
-#unified-header .header-top .header-nav {
-    order: 1;
-    margin-left: auto;
-}
-#unified-header .header-top .filter-toggle-section {
-    order: 2;
-}
-#unified-header .page-title {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-}
-#unified-header .page-title h1 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--apple-text-primary);
-    margin: 0;
-}
-#unified-header .logo-section {
-    display: flex;
-    align-items: flex-end;
-    gap: 0.5rem;
-    direction: ltr;
-    /* הלוגו צריך להיות LTR */
-}
-#unified-header .logo-text {
-    margin-bottom: 10px;
-}
-#unified-header .logo {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    direction: ltr;
-}
-#unified-header .logo-image {
-    width: 125px;
-    height: 37.5px;
-    object-fit: contain;
-}
+/* ===== PART 2 - כללים 17-32 (16 כללים) - בהערה ===== */
+/* @media (max-width: 768px) { */
+/*     #unified-header .tiktrack-submenu { */
+/*         position: static; */
+/*         left: auto; */
+/*         top: auto; */
+/*         opacity: 1; */
+/*         visibility: visible; */
+/*         transform: none; */
+/*         box-shadow: none; */
+/*         border: none; */
+/*         border-top: 1px solid var(--apple-border-light); */
+/*         margin-top: 8px; */
+/*         padding-top: 8px; */
+/*     } */
+/*     #unified-header .dropdown-submenu:hover .tiktrack-submenu { */
+/*         transform: none; */
+/*     } */
+/* #unified-header { */
+/*     background: var(--apple-bg-elevated); */
+/*     border-bottom: 1px solid var(--apple-border-light); */
+/*     box-shadow: var(--apple-shadow-light); */
+/*     position: sticky; */
+/*     top: 0; */
+/*     z-index: 1000; */
+/* } */
+/* #unified-header .header-container { */
+/*     max-width: 1380px; */
+/*     margin: 0 auto; */
+/*     padding: 1rem 10px; */
+/*     display: flex; */
+/*     justify-content: space-between; */
+/*     align-items: center; */
+/*     width: 100%; */
+/*     direction: rtl; */
+/* } */
+/* #unified-header .header-wrapper { */
+/*     max-width: 1200px; */
+/*     margin: 0; */
+/*     padding: 0; */
+/*     display: flex; */
+/*     justify-content: space-between; */
+/*     align-items: center; */
+/*     width: 100%; */
+/* } */
+/* #unified-header .header-top { */
+/*     margin: 0; */
+/*     padding: 0; */
+/*     display: flex; */
+/*     justify-content: center; */
+/*     align-items: center; */
+/*     border-bottom: 1px solid var(--apple-border-light); */
+/*     position: relative; */
+/*     min-height: 70px; */
+/*     direction: rtl; */
+/*     background: var(--apple-bg-elevated); */
+/* } */
+/* #unified-header .header-top .logo-section { */
+/*     order: 3; */
+/*     margin-right: auto; */
+/* } */
+/* #unified-header .header-top .header-nav { */
+/*     order: 1; */
+/*     margin-left: auto; */
+/* } */
+/* #unified-header .header-top .filter-toggle-section { */
+/*     order: 2; */
+/* } */
+/* #unified-header .page-title { */
+/*     position: absolute; */
+/*     left: 50%; */
+/*     transform: translateX(-50%); */
+/* } */
+/* #unified-header .page-title h1 { */
+/*     font-size: 1.25rem; */
+/*     font-weight: 600; */
+/*     color: var(--apple-text-primary); */
+/*     margin: 0; */
+/* } */
+/* #unified-header .logo-section { */
+/*     display: flex; */
+/*     align-items: flex-end; */
+/*     gap: 0.5rem; */
+/*     direction: ltr; */
+/*     /* הלוגו צריך להיות LTR */ */
+/* } */
+/* #unified-header .logo-text { */
+/*     margin-bottom: 10px; */
+/* } */
+/* #unified-header .logo { */
+/*     display: flex; */
+/*     align-items: center; */
+/*     gap: 1rem; */
+/*     direction: ltr; */
+/* } */
+/* #unified-header .logo-image { */
+/*     width: 125px; */
+/*     height: 37.5px; */
+/*     object-fit: contain; */
+/* } */
 /* ===== סוף PART 2 ===== */
 
-/* ===== PART 3 - כללים 33-48 (16 כללים) ===== */
-#unified-header .logo-text {
-    font-size: 1rem;
-    font-weight: 300;
-    color: #26baac;
-    direction: ltr;
-    text-align: left;
-    align-self: flex-end;
-    margin-bottom: -5px;
-}
-#unified-header .logo-section {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    direction: ltr;
-}
-#unified-header .logo {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    text-decoration: none;
-    color: inherit;
-}
-#unified-header .logo:hover {
-    text-decoration: none;
-    color: inherit;
-}
-#unified-header .logo-image {
-    width: 125px;
-    height: 37.5px;
-    object-fit: contain;
-    display: block;
-}
-#unified-header .logo-text {
-    font-size: 1rem;
-    font-weight: 300;
-    color: #26baac;
-    direction: ltr;
-    text-align: left;
-    align-self: flex-end;
-    margin-bottom: -5px;
-    white-space: nowrap;
-}
-#unified-header .logo-icon {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    margin: 16px 0;
-}
-#unified-header .home-icon {
-    color: #09384d;
-    font-size: 48px;
-    font-weight: 500;
-}
-#unified-header .dropdown-menu {
-    top: 100%;
-    right: 0;
-    margin: 0;
-    animation: dropdownFadeIn 0.2s ease-out;
-    display: none;
-    direction: ltr;
+/* ===== PART 3 - כללים 33-48 (16 כללים) - בהערה ===== */
+/* #unified-header .logo-text { */
+/*     font-size: 1rem; */
+/*     font-weight: 300; */
+/*     color: #26baac; */
+/*     direction: ltr; */
+/*     text-align: left; */
+/*     align-self: flex-end; */
+/*     margin-bottom: -5px; */
+/* } */
+/* #unified-header .logo-section { */
+/*     display: flex; */
+/*     align-items: center; */
+/*     gap: 1rem; */
+/*     direction: ltr; */
+/* } */
+/* #unified-header .logo { */
+/*     display: flex; */
+/*     align-items: center; */
+/*     gap: 1rem; */
+/*     text-decoration: none; */
+/*     color: inherit; */
+/* } */
+/* #unified-header .logo:hover { */
+/*     text-decoration: none; */
+/*     color: inherit; */
+/* } */
+/* #unified-header .logo-image { */
+/*     width: 125px; */
+/*     height: 37.5px; */
+/*     object-fit: contain; */
+/*     display: block; */
+/* } */
+/* #unified-header .logo-text { */
+/*     font-size: 1rem; */
+/*     font-weight: 300; */
+/*     color: #26baac; */
+/*     direction: ltr; */
+/*     text-align: left; */
+/*     align-self: flex-end; */
+/*     margin-bottom: -5px; */
+/*     white-space: nowrap; */
+/* } */
+/* #unified-header .logo-icon { */
+/*     max-width: 100%; */
+/*     max-height: 100%; */
+/*     width: auto; */
+/*     height: auto; */
+/*     object-fit: contain; */
+/*     margin: 16px 0; */
+/* } */
+/* #unified-header .home-icon { */
+/*     color: #09384d; */
+/*     font-size: 48px; */
+/*     font-weight: 500; */
+/* } */
+/* #unified-header .dropdown-menu { */
+/*     top: 100%; */
+/*     right: 0; */
+/*     margin: 0; */
+/*     animation: dropdownFadeIn 0.2s ease-out; */
+/*     display: none; */
+/*     direction: ltr; */
     /* הדרופדאון צריך להיות LTR */
-    z-index: 9999;
-    min-width: 200px;
-    padding: 0.5rem 0;
-}
-#unified-header .dropdown-menu.show {
-    position: relative !important;
-    z-index: 99999 !important;
-    display: block !important;
-}
-#unified-header .dropdown-menu:not(.show) {
-    display: none !important;
-}
-@keyframes dropdownFadeIn {
-    from {
-        transform: translateX(-2px);
-    }
-}
-#unified-header .dropdown-item:first-child {
-    border-radius: 12px 12px 0 0;
-}
-#unified-header .dropdown-item:last-child {
-    border-radius: 0 0 12px 12px;
-}
-#unified-header .dropdown-arrow {
-    margin-right: 0.5rem;
-    font-size: 0.8rem;
-    transition: transform 0.2s ease;
-}
-#unified-header .dropdown-toggle[aria-expanded="true"] .dropdown-arrow {
-    transform: rotate(180deg);
-}
+/*     z-index: 9999; */
+/*     min-width: 200px; */
+/*     padding: 0.5rem 0; */
+/* } */
+/* #unified-header .dropdown-menu.show { */
+/*     position: relative !important; */
+/*     z-index: 99999 !important; */
+/*     display: block !important; */
+/* } */
+/* #unified-header .dropdown-menu:not(.show) { */
+/*     display: none !important; */
+/* } */
+/* @keyframes dropdownFadeIn { */
+/*     from { */
+/*         transform: translateX(-2px); */
+/*     } */
+/* } */
+/* #unified-header .dropdown-item:first-child { */
+/*     border-radius: 12px 12px 0 0; */
+/* } */
+/* #unified-header .dropdown-item:last-child { */
+/*     border-radius: 0 0 12px 12px; */
+/* } */
+/* #unified-header .dropdown-arrow { */
+/*     margin-right: 0.5rem; */
+/*     font-size: 0.8rem; */
+/*     transition: transform 0.2s ease; */
+/* } */
+/* #unified-header .dropdown-toggle[aria-expanded="true"] .dropdown-arrow { */
+/*     transform: rotate(180deg); */
+/* } */
 /* ===== סוף PART 3 ===== */
 
-/* ===== PART 4 - כללים 49-64 (16 כללים) ===== */
-#unified-header .header-nav {
-    display: flex;
-    align-items: center;
-}
-#unified-header .main-nav {
-    display: flex;
-    align-items: center;
-}
-#unified-header .tiktrack-nav-list {
-    display: flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    gap: 0.5rem;
-}
-#unified-header .tiktrack-nav-item {
-    position: relative;
-}
-#unified-header .tiktrack-nav-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    color: #333333;
-    text-decoration: none;
-    border-radius: 8px;
-    transition: color 0.2s ease, background-color 0.2s ease;
-    font-size: 0.9rem;
-    font-weight: 400;
-    border: none;
-    position: relative;
-    margin: 0;
-}
-#unified-header .tiktrack-nav-link:hover {
-    background: transparent;
-    color: #ff9c05;
-    text-decoration: underline;
-    text-decoration-color: #ff9c05;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 4px;
-}
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link:hover {
-    background: transparent;
-    color: #333333;
-    border: none;
-    text-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-}
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/"]:hover {
-    text-shadow: none;
-}
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/index.html"]:hover {
-    text-shadow: none;
-}
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link {
-    background: transparent;
-    color: #333333;
-    font-weight: 600;
-    border: none;
-    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/"] {
-    text-shadow: none;
-}
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/index.html"] {
-    text-shadow: none;
-}
-#unified-header .nav-icon {
-    font-size: 1.2rem;
-}
-#unified-header .nav-text {
-    font-weight: 400;
-    color: #333333;
-}
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link .nav-text {
-    color: #333333;
-    font-weight: 600;
-    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/"] .nav-text {
-    text-shadow: none;
-}
+/* ===== סוף PART 3 ===== */
+
+/* ===== PART 4 - כללים 49-64 (16 כללים) - בהערה ===== */
+/* #unified-header .header-nav { */
+/*     display: flex; */
+/*     align-items: center; */
+/* } */
+/* #unified-header .main-nav { */
+/*     display: flex; */
+/*     align-items: center; */
+/* } */
+/* #unified-header .tiktrack-nav-list { */
+/*     display: flex; */
+/*     list-style: none; */
+/*     margin: 0; */
+/*     padding: 0; */
+/*     gap: 0.5rem; */
+/* } */
+/* #unified-header .tiktrack-nav-item { */
+/*     position: relative; */
+/* } */
+/* #unified-header .tiktrack-nav-link { */
+/*     display: flex; */
+/*     align-items: center; */
+/*     gap: 0.5rem; */
+/*     padding: 0.5rem 1rem; */
+/*     color: #333333; */
+/*     text-decoration: none; */
+/*     border-radius: 8px; */
+/*     transition: color 0.2s ease, background-color 0.2s ease; */
+/*     font-size: 0.9rem; */
+/*     font-weight: 400; */
+/*     border: none; */
+/*     position: relative; */
+/*     margin: 0; */
+/* } */
+/* #unified-header .tiktrack-nav-link:hover { */
+/*     background: transparent; */
+/*     color: #ff9c05; */
+/*     text-decoration: underline; */
+/*     text-decoration-color: #ff9c05; */
+/*     text-decoration-thickness: 2px; */
+/*     text-underline-offset: 4px; */
+/* } */
+/* #unified-header .tiktrack-nav-item.active .tiktrack-nav-link:hover { */
+/*     background: transparent; */
+/*     color: #333333; */
+/*     border: none; */
+/*     text-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); */
+/* } */
+/* #unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/"]:hover { */
+/*     text-shadow: none; */
+/* } */
+/* #unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/index.html"]:hover { */
+/*     text-shadow: none; */
+/* } */
+/* #unified-header .tiktrack-nav-item.active .tiktrack-nav-link { */
+/*     background: transparent; */
+/*     color: #333333; */
+/*     font-weight: 600; */
+/*     border: none; */
+/*     text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); */
+/* } */
+/* #unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/"] { */
+/*     text-shadow: none; */
+/* } */
+/* #unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/index.html"] { */
+/*     text-shadow: none; */
+/* } */
+/* #unified-header .nav-icon { */
+/*     font-size: 1.2rem; */
+/* } */
+/* #unified-header .nav-text { */
+/*     font-weight: 400; */
+/*     color: #333333; */
+/* } */
+/* #unified-header .tiktrack-nav-item.active .tiktrack-nav-link .nav-text { */
+/*     color: #333333; */
+/*     font-weight: 600; */
+/*     text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); */
+/* } */
+/* #unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/"] .nav-text { */
+/*     text-shadow: none; */
+/* } */
 /* ===== סוף PART 4 ===== */
 
-/* ===== PART 5 - כללים 65-80 (16 כללים) ===== */
+/* ===== סוף PART 4 ===== */
+
+/* ===== PART 5 - כללים 65-80 (16 כללים) - פעיל ===== */
 #unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/index.html"] .nav-text {
     text-shadow: none;
 }
@@ -488,7 +492,7 @@
 }
 /* ===== סוף PART 5 ===== */
 
-/* ===== PART 6 - כללים 81-96 (16 כללים) ===== */
+/* ===== PART 6 - כללים 81-96 (16 כללים) - פעיל ===== */
 #unified-header .submenu {
     list-style: none;
     padding: 0;
@@ -569,7 +573,7 @@
 }
 /* ===== סוף PART 6 ===== */
 
-/* ===== PART 7 - כללים 97-112 (16 כללים) ===== */
+/* ===== PART 7 - כללים 97-112 (16 כללים) - פעיל ===== */
 #unified-header .filter-dropdown {
     position: relative;
 }
@@ -678,7 +682,7 @@
 }
 /* ===== סוף PART 7 ===== */
 
-/* ===== PART 8 - כללים 113-128 (16 כללים) ===== */
+/* ===== PART 8 - כללים 113-128 (16 כללים) - פעיל ===== */
 #typeFilterMenu .type-filter-item:hover {
     background-color: #f8f9fa !important;
     color: #29a6a8 !important;
@@ -777,7 +781,7 @@
 }
 /* ===== סוף PART 8 ===== */
 
-/* ===== PART 9 - כללים 129-144 (16 כללים) ===== */
+/* ===== PART 9 - כללים 129-144 (16 כללים) - פעיל ===== */
 #unified-header .search-filter-input {
     width: 100%;
     padding: 0.5rem 1rem 0.5rem 2rem;
@@ -898,7 +902,7 @@
 }
 /* ===== סוף PART 9 ===== */
 
-/* ===== PART 10 - כללים 145-160 (16 כללים) ===== */
+/* ===== PART 10 - כללים 145-160 (16 כללים) - פעיל ===== */
 #unified-header .filter-toggle-btn:hover .filter-arrow {
     color: #ff9c05;
 }
@@ -962,3 +966,222 @@
     transition: all 0.3s ease;
 }
 /* ===== סוף PART 10 ===== */
+
+/* ===== הגדרות מחלקים 1+2 - פילטר ===== */
+#unified-header .dropdown-submenu {
+    position: relative;
+}
+
+#unified-header .dropdown-submenu .tiktrack-submenu-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+#unified-header .submenu-arrow {
+    font-size: 0.8em;
+    transition: transform 0.2s ease;
+    margin-right: 8px;
+}
+
+#unified-header .dropdown-submenu:hover .submenu-arrow {
+    transform: rotate(90deg);
+}
+
+#unified-header .tiktrack-submenu {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    background: var(--apple-bg-elevated);
+    border: 1px solid var(--apple-border-light);
+    border-radius: 8px;
+    box-shadow: var(--apple-shadow-medium);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-10px);
+    transition: all 0.2s ease;
+    z-index: 1001;
+    padding: 8px 0;
+}
+
+#unified-header .dropdown-submenu:hover .tiktrack-submenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+#unified-header .tiktrack-submenu .tiktrack-dropdown-item {
+    padding: 8px 16px;
+    white-space: nowrap;
+    border: none;
+    background: transparent;
+    color: var(--apple-text-primary);
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    text-align: right;
+    transition: background-color 0.2s ease;
+}
+
+#unified-header .tiktrack-submenu .tiktrack-dropdown-item:hover {
+    background-color: var(--apple-bg-hover);
+    color: var(--apple-text-primary);
+}
+
+@media (max-width: 768px) {
+    #unified-header .tiktrack-submenu {
+        position: static;
+        left: auto;
+        top: auto;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        border: none;
+        border-top: 1px solid var(--apple-border-light);
+        margin-top: 8px;
+        padding-top: 8px;
+    }
+
+    #unified-header .dropdown-submenu:hover .tiktrack-submenu {
+        transform: none;
+    }
+}
+
+#unified-header .header-top .filter-toggle-section {
+    order: 2;
+}
+
+/* ===== סוף הגדרות פילטר מחלקים 1+2 ===== */
+
+/* ===== הגדרות כפתורי reset ו-clear ===== */
+#unified-header .search-clear-btn {
+    position: absolute;
+    left: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--apple-text-secondary);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+#unified-header .search-clear-btn:hover {
+    background: var(--apple-bg-secondary);
+    color: var(--apple-text-primary);
+}
+
+#unified-header .reset-filter {
+    margin-left: auto;
+}
+
+#unified-header .reset-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    width: 30px;
+    height: 30px;
+    background: white;
+    border: 2px solid #26baac;
+    border-radius: 6px;
+    color: #26baac;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+#unified-header .reset-btn:hover {
+    background: #f8f9fa;
+    transform: rotate(180deg);
+    box-shadow: 0 2px 4px rgba(38, 186, 172, 0.3);
+}
+
+#unified-header .reset-icon {
+    font-size: 0.9rem;
+    transition: transform 0.2s ease;
+}
+
+#unified-header .action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+#unified-header .clear-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    width: 30px;
+    height: 30px;
+    background: white;
+    border: 2px solid #ff9c05;
+    border-radius: 6px;
+    color: #ff9c05;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+#unified-header .clear-btn:hover {
+    background: #fff8f0;
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(255, 156, 5, 0.3);
+}
+
+#unified-header .clear-icon {
+    font-size: 1rem;
+    font-weight: bold;
+    transition: transform 0.2s ease;
+}
+
+@media (max-width: 768px) {
+    #unified-header .reset-filter {
+        margin-left: 0;
+        align-self: center;
+    }
+}
+
+/* ===== סוף הגדרות כפתורי reset ו-clear ===== */
+
+/* ===== הגדרות שדה חיפוש ===== */
+#unified-header .search-filter {
+    flex: 0 0 200px;
+    position: relative;
+}
+
+#unified-header .search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 200px;
+}
+
+#unified-header .search-filter-input {
+    width: 100%;
+    padding: 0.5rem 1rem 0.5rem 2rem;
+    border: 1px solid var(--apple-border-light);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: var(--apple-bg-elevated);
+    color: var(--apple-text-primary);
+}
+
+#unified-header .search-filter-input:focus {
+    outline: none;
+    border-color: var(--apple-accent);
+    box-shadow: 0 0 0 2px var(--apple-accent-bg);
+}
+
+@media (max-width: 768px) {
+    #unified-header .search-filter {
+        min-width: auto;
+    }
+}
+
+/* ===== סוף הגדרות שדה חיפוש ===== */

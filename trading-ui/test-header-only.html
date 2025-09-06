@@ -769,7 +769,7 @@ function showActiveContainer() {
     console.log('🔍 Showing active container...');
     const activeContainer = getActiveTableContainer();
     console.log('Active container:', activeContainer);
-    alert(`הקונטיינר הפעיל: ${activeContainer || 'לא נמצא'}`);
+    if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', ``הקונטיינר הפעיל: ${activeContainer || 'לא נמצא'}``); } else { alert(``הקונטיינר הפעיל: ${activeContainer || 'לא נמצא'}``); };
 }
 
 function testDateFilter() {

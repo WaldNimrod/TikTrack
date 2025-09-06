@@ -113,6 +113,15 @@
                                 <img src="images/icons/cash_flows.svg" alt="הוסף" class="action-icon"
                                     style="width: 16px; height: 16px;"> הוסף
                             </button>
+                            
+                            <!-- כפתורי עריכה ומחיקה נסתרים (לזיהוי בבדיקות) -->
+                            <button id="editCashFlowBtn" class="refresh-btn d-none" onclick="editCashFlow('')" title="ערוך תזרים נבחר">
+                                <img src="images/icons/cash_flows.svg" alt="ערוך" class="action-icon" style="width: 16px; height: 16px;"> ערוך
+                            </button>
+                            <button id="deleteCashFlowBtn" class="refresh-btn d-none" onclick="deleteCashFlow('')" title="מחק תזרים נבחר">
+                                <img src="images/icons/cash_flows.svg" alt="מחק" class="action-icon" style="width: 16px; height: 16px;"> מחק
+                            </button>
+                            
                             <div class="action-separator"></div>
                                                     <button class="filter-toggle-btn" onclick="toggleTopSection()"
                             title="הצג/הסתר אזור תזרימי מזומנים">

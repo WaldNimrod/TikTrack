@@ -117,16 +117,59 @@ class FunctionalCRUDTester:
                     
                     if not found:
                         # חיפוש גם בסקריפטי JavaScript נפרדים
-                        js_pattern = f'{func_name.split("Modal")[0].lower()}.js'
-                        js_file = self.trading_ui_path / 'scripts' / js_pattern
-                        if js_file.exists():
-                            try:
-                                with open(js_file, 'r', encoding='utf-8') as js_f:
-                                    js_content = js_f.read()
-                                if func_name in js_content:
-                                    found_functions[crud_type].append(f"{func_name} (JS)")
-                            except:
-                                pass
+                        js_files_to_check = []
+                        
+                        # קובץ JS מתאים לפי שם הדף
+                        page_js = filename.replace('.html', '.js')
+                        js_files_to_check.append(page_js)
+                        
+                        # קבצי JS נוספים לבדוק
+                        additional_js = {
+                            'trades.html': ['trades.js'],
+                            'accounts.html': ['accounts.js'],
+                            'alerts.html': ['alerts.js', 'alert-service.js'],
+                            'cash_flows.html': ['cash_flows.js'],
+                            'notes.html': ['notes.js'],
+                            'tickers.html': ['tickers.js'],
+                            'executions.html': ['executions.js'],
+                            'trade_plans.html': ['trade_plans.js']
+                        }
+                        
+                        if filename in additional_js:
+                            js_files_to_check.extend(additional_js[filename])
+                        
+                        # חיפוש בכל הקבצי JS הרלוונטיים
+                        for js_file_name in js_files_to_check:
+                            js_file = self.trading_ui_path / 'scripts' / js_file_name
+                            if js_file.exists():
+                                try:
+                                    with open(js_file, 'r', encoding='utf-8') as js_f:
+                                        js_content = js_f.read()
+                                    
+                                    # חיפוש מתקדם יותר בקובץ JS
+                                    js_patterns = [
+                                        f'function\\s+{func_name}\\s*\\(',
+                                        f'{func_name}\\s*=\\s*function',
+                                        f'{func_name}\\s*=\\s*async\\s+function',
+                                        f'async\\s+function\\s+{func_name}\\s*\\(',
+                                        f'window\\.{func_name}\\s*=',
+                                        f'window\\["{func_name}"\\]\\s*=',
+                                        f'window\\[\'{func_name}\'\\]\\s*=',
+                                        f'// חשיפת.*{func_name}',
+                                        f'// ייצוא.*{func_name}',
+                                        f'window.{func_name} = {func_name}'
+                                    ]
+                                    
+                                    for js_pattern in js_patterns:
+                                        if re.search(js_pattern, js_content, re.IGNORECASE | re.MULTILINE):
+                                            found_functions[crud_type].append(f"{func_name}")
+                                            found = True
+                                            break
+                                    
+                                    if found:
+                                        break
+                                except:
+                                    pass
             
             # חישוב ציון פונקציונליות
             total_expected = sum(len(funcs) for funcs in expected.values())

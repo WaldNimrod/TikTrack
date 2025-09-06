@@ -786,7 +786,29 @@ function testSearchFilter() {
     applyTableFilter('search', [searchTerm]);
 }
 
-                // בדיקת זמינות המערכות
+                // אתחול ידני של התפריט
+                console.log('🔥 FORCING HEADER INITIALIZATION...');
+                
+                if (typeof HeaderSystem !== 'undefined') {
+                    console.log('✅ HeaderSystem class found');
+                    
+                    // יצירת instance ידני
+                    if (!window.headerSystem) {
+                        console.log('🔧 Creating HeaderSystem instance manually...');
+                        window.headerSystem = new HeaderSystem();
+                    }
+                    
+                    // אתחול התפריט
+                    if (window.headerSystem && typeof window.headerSystem.init === 'function') {
+                        console.log('🚀 Initializing header system...');
+                        window.headerSystem.init();
+                        console.log('✅ Header system initialized!');
+                    }
+                } else {
+                    console.log('❌ HeaderSystem class not found');
+                }
+
+        // בדיקת זמינות המערכות
                 setTimeout(() => {
                     if (typeof window.headerSystem !== 'undefined') {
                         updateStatus('headerStatus', '✅ זמין');
@@ -809,6 +831,24 @@ function testSearchFilter() {
                     if (headerElement) {
                         updateStatus('headerElementStatus', '✅ נוצר');
                         log('✅ אלמנט כותרת חדש נוצר');
+                        
+                        // בדיקת תוכן התפריט
+                        if (headerElement.innerHTML.trim() !== '') {
+                            log('🎉 תפריט נוצר בהצלחה!');
+                            log('📊 אורך תוכן התפריט: ' + headerElement.innerHTML.length + ' תווים');
+                            updateStatus('headerContentStatus', '✅ תוכן קיים');
+                        } else {
+                            log('❌ תפריט ריק - מנסה שוב...');
+                            updateStatus('headerContentStatus', '❌ ריק', false);
+                            
+                            // ניסיון נוסף
+                            setTimeout(() => {
+                                if (window.headerSystem && typeof window.headerSystem.init === 'function') {
+                                    console.log('🔄 Retrying header initialization...');
+                                    window.headerSystem.init();
+                                }
+                            }, 1000);
+                        }
                     } else {
                         updateStatus('headerElementStatus', '❌ לא נוצר', false);
                         log('❌ אלמנט כותרת חדש לא נוצר');

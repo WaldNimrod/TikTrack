@@ -1,0 +1,48 @@
+{
+  "timestamp": "20250906_065320",
+  "summary": {
+    "files_processed": 100,
+    "alerts_replaced": 25,
+    "confirms_replaced": 40,
+    "errors": [],
+    "files_modified": [
+      "trading-ui/scripts/constraint-manager.js",
+      "trading-ui/scripts/server-monitor.js",
+      "trading-ui/scripts/css-management.js",
+      "trading-ui/scripts/entity-details-renderer.js",
+      "trading-ui/scripts/notifications-center-backup.js",
+      "trading-ui/scripts/system-management.js",
+      "trading-ui/scripts/db_display.js",
+      "trading-ui/scripts/preferences.js",
+      "trading-ui/scripts/ui-utils.js",
+      "trading-ui/scripts/notifications-center.js",
+      "trading-ui/scripts/notes.js",
+      "trading-ui/scripts/linter-realtime-monitor.js",
+      "trading-ui/scripts/accounts.js",
+      "trading-ui/scripts/entity-details-api.js",
+      "trading-ui/scripts/trade_plans.js",
+      "trading-ui/scripts/preferences-v2.js",
+      "trading-ui/scripts/alerts.js",
+      "trading-ui/scripts/cash_flows.js",
+      "trading-ui/scripts/warning-system.js",
+      "trading-ui/scripts/trades.js",
+      "trading-ui/scripts/tickers.js",
+      "trading-ui/style_demonstration.html",
+      "trading-ui/test-header-only.html",
+      "trading-ui/crud-testing-dashboard.html"
+    ]
+  },
+  "upgrade_info": {
+    "old_methods": [
+      "alert()",
+      "confirm()"
+    ],
+    "new_methods": [
+      "showSuccessNotification(title, message)",
+      "showErrorNotification(title, message)",
+      "showWarningNotification(title, message)",
+      "showInfoNotification(title, message)",
+      "showConfirmationDialog(title, message, onConfirm, onCancel)"
+    ]
+  }
+}

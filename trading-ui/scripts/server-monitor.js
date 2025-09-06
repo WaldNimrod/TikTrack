@@ -716,7 +716,7 @@ class ServerMonitor {
         () => console.log('❌ restartServer - משתמש ביטל')
       );
     } else {
-      if (window.confirm('האם אתה בטוח שברצונך להפעיל את השרת מחדש?')) {
+      if ((typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך להפעיל את השרת מחדש?`, () => resolve(true), () => resolve(false))) : confirm(`האם אתה בטוח שברצונך להפעיל את השרת מחדש?`))) {
         await executeRestart();
       } else {
         console.log('❌ restartServer - משתמש ביטל');
@@ -801,7 +801,7 @@ class ServerMonitor {
         () => console.log('❌ clearCache - משתמש ביטל')
       );
     } else {
-      if (window.confirm('האם אתה בטוח שברצונך לנקות את ה-Cache?')) {
+      if ((typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך לנקות את ה-Cache?`, () => resolve(true), () => resolve(false))) : confirm(`האם אתה בטוח שברצונך לנקות את ה-Cache?`))) {
         await executeClearCache();
       } else {
         console.log('❌ clearCache - משתמש ביטל');
@@ -847,7 +847,7 @@ class ServerMonitor {
         () => console.log('❌ optimizeDatabase - משתמש ביטל')
       );
     } else {
-      if (window.confirm('האם אתה בטוח שברצונך לבצע אופטימיזציה לבסיס הנתונים?')) {
+      if ((typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך לבצע אופטימיזציה לבסיס הנתונים?`, () => resolve(true), () => resolve(false))) : confirm(`האם אתה בטוח שברצונך לבצע אופטימיזציה לבסיס הנתונים?`))) {
         await executeOptimization();
       } else {
         console.log('❌ optimizeDatabase - משתמש ביטל');
@@ -928,7 +928,7 @@ class ServerMonitor {
         () => console.log('❌ emergencyStop - משתמש ביטל')
       );
     } else {
-      if (window.confirm('⚠️ אזהרה! עצירת חירום תעצור את השרת מיד. האם אתה בטוח?')) {
+      if ((typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `⚠️ אזהרה! עצירת חירום תעצור את השרת מיד. האם אתה בטוח?`, () => resolve(true), () => resolve(false))) : confirm(`⚠️ אזהרה! עצירת חירום תעצור את השרת מיד. האם אתה בטוח?`))) {
         await executeEmergencyStop();
       } else {
         console.log('❌ emergencyStop - משתמש ביטל');
@@ -1284,7 +1284,7 @@ class ServerMonitor {
         () => console.log('❌ clearLogs - משתמש ביטל')
       );
     } else {
-      if (window.confirm('האם אתה בטוח שברצונך לנקות את כל הלוגים?')) {
+      if ((typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך לנקות את כל הלוגים?`, () => resolve(true), () => resolve(false))) : confirm(`האם אתה בטוח שברצונך לנקות את כל הלוגים?`))) {
         executeClearLogs();
       } else {
         console.log('❌ clearLogs - משתמש ביטל');

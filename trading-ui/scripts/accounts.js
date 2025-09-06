@@ -1282,7 +1282,7 @@ async function cancelAccount(accountId, accountName) {
               );
             });
             if (!confirmed) return;
-          } else if (!window.confirm(`האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`)) {
+          } else if (!(typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', ``האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?``, () => resolve(true), () => resolve(false))) : confirm(``האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?``))) {
             return;
           }
         }
@@ -1397,7 +1397,7 @@ async function deleteAccount(accountId, accountName) {
             );
           });
           if (!confirmed) return;
-        } else if (!window.confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?`)) {
+        } else if (!(typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', ``האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?``, () => resolve(true), () => resolve(false))) : confirm(``האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?``))) {
           return;
         }
       }
@@ -1918,7 +1918,7 @@ async function cancelAccountWithLinkedItemsCheck(accountId, _accountName) {
           );
         });
         if (!confirmed) return;
-      } else if (!window.confirm(`האם אתה בטוח שברצונך לבטל חשבון זה?${accountDetails}`)) {
+      } else if (!(typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', ``האם אתה בטוח שברצונך לבטל חשבון זה?${accountDetails}``, () => resolve(true), () => resolve(false))) : confirm(``האם אתה בטוח שברצונך לבטל חשבון זה?${accountDetails}``))) {
         return;
       }
       await checkLinkedItemsAndCancelAccount(accountId);
@@ -1978,7 +1978,7 @@ async function deleteAccountWithLinkedItemsCheck(accountId, _accountName) {
           );
         });
         if (!confirmed) return;
-      } else if (!window.confirm(`האם אתה בטוח שברצונך למחוק חשבון זה?${accountDetails}`)) {
+      } else if (!(typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', ``האם אתה בטוח שברצונך למחוק חשבון זה?${accountDetails}``, () => resolve(true), () => resolve(false))) : confirm(``האם אתה בטוח שברצונך למחוק חשבון זה?${accountDetails}``))) {
         return;
       }
       await checkLinkedItemsAndDeleteAccount(accountId);
@@ -2025,7 +2025,7 @@ async function restoreAccount(accountId, accountName) {
         );
       });
       if (!confirmed) return;
-    } else if (!window.confirm(`האם אתה בטוח שברצונך להחזיר את החשבון "${accountName}" לסטטוס סגור?`)) {
+    } else if (!(typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', ``האם אתה בטוח שברצונך להחזיר את החשבון "${accountName}" לסטטוס סגור?``, () => resolve(true), () => resolve(false))) : confirm(``האם אתה בטוח שברצונך להחזיר את החשבון "${accountName}" לסטטוס סגור?``))) {
       return;
     }
   }

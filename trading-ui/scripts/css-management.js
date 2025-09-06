@@ -120,7 +120,7 @@ class CSSManagement {
 async function switchToOldCSS() {
     """מעבר למערכת CSS ישנה"""
     if (window.cssManager.isAnalyzing) {
-        alert('אנא המתן לסיום הפעולה הנוכחית');
+        if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `אנא המתן לסיום הפעולה הנוכחית`); } else { alert(`אנא המתן לסיום הפעולה הנוכחית`); };
         return;
     }
     
@@ -138,7 +138,7 @@ async function switchToOldCSS() {
             
             // הצגת הוראות רענון
             setTimeout(() => {
-                if (confirm('העבירה למערכת ישנה הושלמה. האם לרענן את הדף?')) {
+                if ((typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `העבירה למערכת ישנה הושלמה. האם לרענן את הדף?`, () => resolve(true), () => resolve(false))) : confirm(`העבירה למערכת ישנה הושלמה. האם לרענן את הדף?`))) {
                     location.reload();
                 }
             }, 1000);
@@ -157,7 +157,7 @@ async function switchToOldCSS() {
 async function switchToNewCSS() {
     """מעבר למערכת CSS חדשה"""
     if (window.cssManager.isAnalyzing) {
-        alert('אנא המתן לסיום הפעולה הנוכחית');
+        if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `אנא המתן לסיום הפעולה הנוכחית`); } else { alert(`אנא המתן לסיום הפעולה הנוכחית`); };
         return;
     }
     
@@ -175,7 +175,7 @@ async function switchToNewCSS() {
             
             // הצגת הוראות רענון
             setTimeout(() => {
-                if (confirm('העבירה למערכת חדשה הושלמה. האם לרענן את הדף?')) {
+                if ((typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `העבירה למערכת חדשה הושלמה. האם לרענן את הדף?`, () => resolve(true), () => resolve(false))) : confirm(`העבירה למערכת חדשה הושלמה. האם לרענן את הדף?`))) {
                     location.reload();
                 }
             }, 1000);
@@ -545,7 +545,7 @@ function downloadTools() {
    npm run css:analyze   - ספירת שורות
    npm run css:compare   - השוואה`;
     
-    alert(toolsInfo);
+    if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `toolsInfo`); } else { alert(`toolsInfo`); };
 }
 
 function downloadPythonTools() {
@@ -562,13 +562,19 @@ function openSamplePages() {
 
 function runVisualDiff() {
     """השוואה חזותית"""
-    alert(`להשוואה חזותית מלאה:
+    const message = `להשוואה חזותית מלאה:
 
 1. הרץ: python3 css-toggle.py old
 2. צלם screenshots של העמודים (http://localhost:8080/trades וכו')
 3. הרץ: python3 css-toggle.py new  
 4. צלם screenshots שוב
-5. השווה את התמונות
+5. השווה את התמונות`;
+    
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('השוואה חזותית', message);
+    } else {
+        alert(message);
+    }
 
 שתי המערכות אמורות להיראות זהות לחלוטין!`);
 }
@@ -628,7 +634,7 @@ TikTrack CSS Management Log - ${new Date().toLocaleString('he-IL')}
 ================================================================`;
 
     navigator.clipboard.writeText(logData).then(() => {
-        alert('✅ לוג מפורט הועתק ללוח');
+        if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `✅ לוג מפורט הועתק ללוח`); } else { alert(`✅ לוג מפורט הועתק ללוח`); };
     }).catch(() => {
         // Fallback
         const textArea = document.createElement('textarea');
@@ -637,7 +643,7 @@ TikTrack CSS Management Log - ${new Date().toLocaleString('he-IL')}
         textArea.select();
         document.execCommand('copy');
         document.body.removeChild(textArea);
-        alert('✅ לוג מפורט הועתק ללוח');
+        if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `✅ לוג מפורט הועתק ללוח`); } else { alert(`✅ לוג מפורט הועתק ללוח`); };
     });
 }
 

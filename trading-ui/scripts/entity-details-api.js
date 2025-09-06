@@ -872,7 +872,7 @@ class EntityDetailsAPI {
                 );
             } else {
                 // fallback לconfirm רגיל
-                const result = confirm(`האם אתה בטוח שברצונך למחוק את ${entityType} #${entityId}?`);
+                const result = (typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', ``האם אתה בטוח שברצונך למחוק את ${entityType} #${entityId}?``, () => resolve(true), () => resolve(false))) : confirm(``האם אתה בטוח שברצונך למחוק את ${entityType} #${entityId}?``));
                 resolve(result);
             }
         });

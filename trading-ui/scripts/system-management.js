@@ -478,7 +478,7 @@ async function copyDetailedLog() {
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('הצלחה', 'לוג מפורט הועתק ללוח!');
       } else {
-        alert('לוג מפורט הועתק ללוח!');
+        if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `לוג מפורט הועתק ללוח!`); } else { alert(`לוג מפורט הועתק ללוח!`); };
       }
       
       console.log('✅ Detailed log copied to clipboard');
@@ -492,7 +492,7 @@ async function copyDetailedLog() {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', `שגיאה בהעתקת לוג: ${error.message}`);
     } else {
-      alert(`שגיאה בהעתקת לוג: ${error.message}`);
+      if (typeof window.showErrorNotification === 'function') { window.showErrorNotification('שגיאה', ``שגיאה בהעתקת לוג: ${error.message}``); } else { alert(``שגיאה בהעתקת לוג: ${error.message}``); };
     }
   } finally {
     // Reset button

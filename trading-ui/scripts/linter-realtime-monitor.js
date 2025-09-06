@@ -1104,7 +1104,7 @@ function ignoreAllIssues() {
     }
     
     // Confirm action
-    if (confirm(`האם אתה בטוח שברצונך להתעלם מ-${currentIssues.length} בעיות?`)) {
+    if ((typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', ``האם אתה בטוח שברצונך להתעלם מ-${currentIssues.length} בעיות?``, () => resolve(true), () => resolve(false))) : confirm(``האם אתה בטוח שברצונך להתעלם מ-${currentIssues.length} בעיות?``))) {
         currentIssues.forEach(issue => {
             ignoreIssue(issue.id);
         });

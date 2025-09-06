@@ -595,7 +595,7 @@ function sortTable(columnIndex, tableType) {
 function editRecord(tableType, recordId) {
   console.log(`✏️ Edit record: ${tableType} ID ${recordId}`);
   // TODO: Implement edit functionality
-  alert(`עריכת רשומה: ${tableType} ID ${recordId}`);
+  if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', ``עריכת רשומה: ${tableType} ID ${recordId}``); } else { alert(``עריכת רשומה: ${tableType} ID ${recordId}``); };
 }
 
 /**
@@ -605,9 +605,9 @@ function editRecord(tableType, recordId) {
  */
 function deleteRecord(tableType, recordId) {
   console.log(`🗑️ Delete record: ${tableType} ID ${recordId}`);
-  if (confirm(`האם אתה בטוח שברצונך למחוק את הרשומה ${recordId}?`)) {
+  if ((typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', ``האם אתה בטוח שברצונך למחוק את הרשומה ${recordId}?``, () => resolve(true), () => resolve(false))) : confirm(``האם אתה בטוח שברצונך למחוק את הרשומה ${recordId}?``))) {
     // TODO: Implement delete functionality
-    alert(`מחיקת רשומה: ${tableType} ID ${recordId}`);
+    if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', ``מחיקת רשומה: ${tableType} ID ${recordId}``); } else { alert(``מחיקת רשומה: ${tableType} ID ${recordId}``); };
   }
 }
 
@@ -660,11 +660,11 @@ function copyDetailedLog() {
   
   // Copy to clipboard
   navigator.clipboard.writeText(logText).then(() => {
-    alert('הלוג הועתק ללוח!');
+    if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `הלוג הועתק ללוח!`); } else { alert(`הלוג הועתק ללוח!`); };
     console.log('✅ Log copied to clipboard');
   }).catch(err => {
     console.error('❌ Failed to copy log:', err);
-    alert('שגיאה בהעתקת הלוג');
+    if (typeof window.showErrorNotification === 'function') { window.showErrorNotification('שגיאה', `שגיאה בהעתקת הלוג`); } else { alert(`שגיאה בהעתקת הלוג`); };
   });
 }
 

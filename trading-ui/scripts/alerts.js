@@ -573,7 +573,7 @@ function updateAlertsTable(alerts) {
                 ${symbolDisplay}
               </span>
               <span class="ticker-symbol-link" 
-                    onclick="if (${alert.related_id || 'false'}) { showEntityDetails('ticker', ${alert.related_id}); } else { if (window.showErrorNotification) { window.showErrorNotification('שגיאה', 'מזהה טיקר לא זמין'); } else { alert('מזהה טיקר לא זמין'); } } return false;" 
+                    onclick="if (${alert.related_id || 'false'}) { showEntityDetails('ticker', ${alert.related_id}); } else { if (window.showErrorNotification) { window.showErrorNotification('שגיאה', 'מזהה טיקר לא זמין'); } else { if (typeof window.showErrorNotification === 'function') { window.showErrorNotification('שגיאה', `מזהה טיקר לא זמין`); } else { alert(`מזהה טיקר לא זמין`); }; } } return false;" 
                     title="פרטי טיקר"
                     style="cursor: pointer; opacity: 0.6; transition: opacity 0.2s ease-in-out;">
                 🔗
@@ -2003,7 +2003,7 @@ async function _deleteAlert(alertId) {
       );
     } else {
       // fallback אחרון - confirm רגיל (אם מערכת התראות לא זמינה)
-      const confirmed = window.confirm('האם אתה בטוח שברצונך למחוק התראה זו?');
+      const confirmed = (typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך למחוק התראה זו?`, () => resolve(true), () => resolve(false))) : confirm(`האם אתה בטוח שברצונך למחוק התראה זו?`));
       if (confirmed) {
         await confirmDeleteAlert(alertId);
       }
@@ -2425,7 +2425,7 @@ async function reactivateAlert(alertId) {
     if (!confirmed) {return;}
   } else {
     // Fallback למקרה שמערכת התראות לא זמינה
-    if (!window.confirm('האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?')) {
+    if (!(typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?`, () => resolve(true), () => resolve(false))) : confirm(`האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?`))) {
       return;
     }
   }

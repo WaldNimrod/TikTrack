@@ -241,7 +241,7 @@ function deleteProfile() {
     return;
   }
   
-  if (confirm(`האם אתה בטוח שברצונך למחוק את הפרופיל "${currentProfile}"?`)) {
+  if ((typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', ``האם אתה בטוח שברצונך למחוק את הפרופיל "${currentProfile}"?``, () => resolve(true), () => resolve(false))) : confirm(``האם אתה בטוח שברצונך למחוק את הפרופיל "${currentProfile}"?``))) {
     showPreferencesInfo('פרופילים', `פרופיל "${currentProfile}" נמחק בהצלחה`);
     // כאן ניתן להוסיף לוגיקה למחיקת פרופיל
   }
@@ -297,7 +297,7 @@ function toggleAllPreferenceSections() {
  */
 async function updateSystemDefaults() {
   try {
-    if (!confirm('האם אתה בטוח שברצונך לעדכן את ברירות המחדל של המערכת לפי ההגדרות הנוכחיות?\n\nפעולה זו תשנה את ברירות המחדל לכל המשתמשים החדשים.')) {
+    if (!(typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך לעדכן את ברירות המחדל של המערכת לפי ההגדרות הנוכחיות?\n\nפעולה זו תשנה את ברירות המחדל לכל המשתמשים החדשים.`, () => resolve(true), () => resolve(false))) : confirm(`האם אתה בטוח שברצונך לעדכן את ברירות המחדל של המערכת לפי ההגדרות הנוכחיות?\n\nפעולה זו תשנה את ברירות המחדל לכל המשתמשים החדשים.`))) {
       return;
     }
 
@@ -447,7 +447,7 @@ async function resetToDefaults() {
       );
     } else {
       // Fallback למקרה שמערכת התראות לא זמינה
-      if (window.confirm('האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?')) {
+      if ((typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?`, () => resolve(true), () => resolve(false))) : confirm(`האם אתה בטוח שברצונך לאפס את כל ההעדפות לברירות מחדל?`))) {
         currentPreferences = { ...DEFAULT_PREFERENCES };
         updateUI();
 

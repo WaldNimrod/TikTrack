@@ -494,7 +494,7 @@ class PreferencesV2 {
       }
       
       const profileId = this.currentProfile.id;
-      const includeSensitive = confirm('האם לכלול הגדרות רגישות (אבטחה)?');
+      const includeSensitive = (typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `'האם לכלול הגדרות רגישות (אבטחה`, () => resolve(true), () => resolve(false))) : confirm(`'האם לכלול הגדרות רגישות (אבטחה`))?');
       
       const url = `/api/v2/preferences/export?profile_id=${profileId}&include_sensitive=${includeSensitive}`;
       
@@ -788,7 +788,7 @@ class PreferencesV2 {
           () => resolve(false)
         );
       } else {
-        resolve(confirm('יש לך שינויים לא שמורים. האם להמשיך בלי לשמור?'));
+        resolve((typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `יש לך שינויים לא שמורים. האם להמשיך בלי לשמור?`, () => resolve(true), () => resolve(false))) : confirm(`יש לך שינויים לא שמורים. האם להמשיך בלי לשמור?`)));
       }
     });
   }
@@ -978,7 +978,7 @@ function viewHistory() {
 }
 
 function resetToDefaults() {
-  if (window.preferencesV2 && confirm('האם אתה בטוח שברצונך לאפס את כל ההגדרות לברירת מחדל?')) {
+  if (window.preferencesV2 && (typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך לאפס את כל ההגדרות לברירת מחדל?`, () => resolve(true), () => resolve(false))) : confirm(`האם אתה בטוח שברצונך לאפס את כל ההגדרות לברירת מחדל?`))) {
     // יישום איפוס
     window.preferencesV2.preferences = window.preferencesV2.getDefaultPreferences();
     window.preferencesV2.updateUI();
@@ -993,7 +993,7 @@ async function saveCurrentAsDefaults() {
 }
 
 function previewSettings() {
-  alert('תכונה זו תתווסף בעתיד - תצוגה מקדימה של ההגדרות');
+  if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `תכונה זו תתווסף בעתיד - תצוגה מקדימה של ההגדרות`); } else { alert(`תכונה זו תתווסף בעתיד - תצוגה מקדימה של ההגדרות`); };
 }
 
 // אתחול כשהדף נטען

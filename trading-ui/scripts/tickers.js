@@ -835,7 +835,7 @@ async function cancelTicker(id) {
       );
     } else {
       // Fallback למקרה שהמערכת הגלובלית לא זמינה
-      if (!window.confirm(`האם אתה בטוח שברצונך לבטל טיקר זה?${tickerDetails}`)) {
+      if (!(typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', ``האם אתה בטוח שברצונך לבטל טיקר זה?${tickerDetails}``, () => resolve(true), () => resolve(false))) : confirm(``האם אתה בטוח שברצונך לבטל טיקר זה?${tickerDetails}``))) {
         return;
       }
       await checkLinkedItemsAndCancelTicker(id);

@@ -1647,7 +1647,7 @@
             
             updateSummaryStats();
             
-            alert(`✅ בדיקת ${pageId} הושלמה!\nציון: ${score.toFixed(1)}% (${checkedBoxes.length}/${checkboxes.length})`);
+            if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', ``✅ בדיקת ${pageId} הושלמה!\nציון: ${score.toFixed(1`); } else { alert(``✅ בדיקת ${pageId} הושלמה!\nציון: ${score.toFixed(1`); }}% (${checkedBoxes.length}/${checkboxes.length})`);
         }
         
         function markPagePartial(pageId) {
@@ -1700,7 +1700,7 @@
             
             // העתקה ללוח
             navigator.clipboard.writeText(report).then(() => {
-                alert('✅ דוח הועתק ללוח!');
+                if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `✅ דוח הועתק ללוח!`); } else { alert(`✅ דוח הועתק ללוח!`); };
             });
         }
         
@@ -1715,13 +1715,13 @@
         }
         
         function resetAllTests() {
-            if (confirm('⚠️ זה ימחק את כל התוצאות. להמשיך?')) {
+            if ((typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `⚠️ זה ימחק את כל התוצאות. להמשיך?`, () => resolve(true), () => resolve(false))) : confirm(`⚠️ זה ימחק את כל התוצאות. להמשיך?`))) {
                 pageResults = {};
                 document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
                 document.querySelectorAll('textarea').forEach(ta => ta.value = '');
                 document.querySelectorAll('.status-indicator').forEach(si => si.className = 'status-indicator status-not-tested');
                 updateSummaryStats();
-                alert('🔄 כל הבדיקות אופסו');
+                if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `🔄 כל הבדיקות אופסו`); } else { alert(`🔄 כל הבדיקות אופסו`); };
             }
         }
         

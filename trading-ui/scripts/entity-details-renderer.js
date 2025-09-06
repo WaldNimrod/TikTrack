@@ -899,9 +899,9 @@ class EntityDetailsRenderer {
             if (window.createDeleteButtonByType) {
                 return window.createDeleteButtonByType(type, id);
             } else if (window.createDeleteButton) {
-                return window.createDeleteButton(`alert('מחיקה לא זמינה')`);
+                return window.createDeleteButton(`if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `מחיקה לא זמינה`); } else { alert(`מחיקה לא זמינה`); }`);
             } else {
-                return `<button class="btn btn-sm btn-danger" onclick="alert('מחיקה לא זמינה')" title="מחק">🗑️</button>`;
+                return `<button class="btn btn-sm btn-danger" onclick="if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `מחיקה לא זמינה`); } else { alert(`מחיקה לא זמינה`); }" title="מחק">🗑️</button>`;
             }
         }
     }

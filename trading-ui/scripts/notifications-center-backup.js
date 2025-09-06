@@ -576,7 +576,7 @@ class NotificationsCenter {
         () => console.log('❌ ניקוי היסטוריה - משתמש ביטל')
       );
     } else {
-      if (confirm('האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?')) {
+      if ((typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?`, () => resolve(true), () => resolve(false))) : confirm(`האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?`))) {
         executeClearHistory();
       } else {
         console.log('❌ ניקוי היסטוריה - משתמש ביטל');
@@ -708,7 +708,7 @@ function resetNotificationSettings() {
       () => console.log('❌ איפוס הגדרות - משתמש ביטל')
     );
   } else {
-    if (confirm('האם אתה בטוח שברצונך לאפס את כל ההגדרות?')) {
+    if ((typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך לאפס את כל ההגדרות?`, () => resolve(true), () => resolve(false))) : confirm(`האם אתה בטוח שברצונך לאפס את כל ההגדרות?`))) {
       executeReset();
     } else {
       console.log('❌ איפוס הגדרות - משתמש ביטל');

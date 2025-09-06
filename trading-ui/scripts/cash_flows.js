@@ -465,7 +465,7 @@ async function deleteCashFlow(id) {
       }
     } else {
       // Fallback למקרה שמערכת התראות לא זמינה
-      if (!window.confirm(confirmMessage)) {
+      if (!(typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `confirmMessage`, () => resolve(true), () => resolve(false))) : confirm(`confirmMessage`))) {
         return;
       }
     }
@@ -1621,7 +1621,7 @@ async function updateCashFlow() {
 function showAddCashFlowModal() {
     console.log('showAddCashFlowModal called');
     // TODO: Implement add cash flow modal
-    alert('פונקציית הוספת תזרים מזומנים תתווסף בקרוב');
+    if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `פונקציית הוספת תזרים מזומנים תתווסף בקרוב`); } else { alert(`פונקציית הוספת תזרים מזומנים תתווסף בקרוב`); };
 }
 
 function showEditCashFlowModal(cashFlowId) {
@@ -1630,7 +1630,7 @@ function showEditCashFlowModal(cashFlowId) {
     if (typeof _showEditCashFlowModal === 'function') {
         return _showEditCashFlowModal(cashFlowId);
     } else {
-        alert('פונקציית עריכת תזרים מזומנים אינה זמינה');
+        if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `פונקציית עריכת תזרים מזומנים אינה זמינה`); } else { alert(`פונקציית עריכת תזרים מזומנים אינה זמינה`); };
     }
 }
 

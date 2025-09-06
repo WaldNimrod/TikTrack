@@ -1769,18 +1769,18 @@
             if (typeof window.showLinkedItems === 'function') {
                 window.showLinkedItems(type, id);
             } else {
-                alert(`הצגת פריטים מקושרים ל-${type} #${id}`);
+                if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', ``הצגת פריטים מקושרים ל-${type} #${id}``); } else { alert(``הצגת פריטים מקושרים ל-${type} #${id}``); };
             }
         }
 
         function editTrade(id) {
             console.log(`🔄 Editing trade #${id}`);
-            alert(`עריכת טרייד #${id}`);
+            if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', ``עריכת טרייד #${id}``); } else { alert(``עריכת טרייד #${id}``); };
         }
 
         function editAlert(id) {
             console.log(`🔄 Editing alert #${id}`);
-            alert(`עריכת התראה #${id}`);
+            if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', ``עריכת התראה #${id}``); } else { alert(``עריכת התראה #${id}``); };
         }
 
         // Initialize page

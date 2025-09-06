@@ -548,7 +548,7 @@ async function cancelTradeRecord(tradeId) {
           if (!confirmed) {return;}
         } else {
           // Fallback למקרה שמערכת התראות לא זמינה
-          if (!window.confirm(`האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`)) {
+if (!window.confirm(`האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`)) {
             return;
           }
         }
@@ -684,7 +684,7 @@ async function deleteTradeRecord(tradeId) {
           if (!confirmed) {return;}
         } else {
           // Fallback למקרה שמערכת התראות לא זמינה
-          if (!window.confirm('האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.')) {
+          if (!(typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.`, () => resolve(true), () => resolve(false))) : confirm(`האם אתה בטוח שברצונך למחוק טרייד זה? פעולה זו אינה הפיכה.`))) {
             return;
           }
         }
@@ -1872,11 +1872,11 @@ function validateTradeStatusChange(newStatus, tradeData) {
             );
           } else {
             // Fallback למקרה שמערכת התראות לא זמינה
-            firstWarning = window.confirm(
-              '⚠️ אזהרה: במערכת מופיע שיש פוזיציה פתוחה.\n' +
+            firstWarning = (typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `'⚠️ אזהרה: במערכת מופיע שיש פוזיציה פתוחה.\n' +
                     'האם אתה בטוח שברצונך לסגור את הטרייד?\n\n' +
-                    'פוזיציה נוכחית: ' + currentPosition.quantity + ' מניות',
-            );
+                    'פוזיציה נוכחית: ' + currentPosition.quantity + ' מניות',`, () => resolve(true), () => resolve(false))) : confirm(`'⚠️ אזהרה: במערכת מופיע שיש פוזיציה פתוחה.\n' +
+                    'האם אתה בטוח שברצונך לסגור את הטרייד?\n\n' +
+                    'פוזיציה נוכחית: ' + currentPosition.quantity + ' מניות',`));
           }
         }
       }
@@ -1914,11 +1914,11 @@ function validateTradeStatusChange(newStatus, tradeData) {
               );
             } else {
               // Fallback למקרה שמערכת התראות לא זמינה
-              secondWarning = window.confirm(
-                '🔒 ממשק הסגירה המלא כולל סגירת פוזיציה נמצא בפיתוח.\n\n' +
+              secondWarning = (typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `'🔒 ממשק הסגירה המלא כולל סגירת פוזיציה נמצא בפיתוח.\n\n' +
                           'כרגע ניתן לסגור את הטרייד אך יש לזכור לעדכן עסקה לסגירת פוזיציה.\n\n' +
-                          'האם אתה בטוח שברצונך להמשיך?',
-              );
+                          'האם אתה בטוח שברצונך להמשיך?',`, () => resolve(true), () => resolve(false))) : confirm(`'🔒 ממשק הסגירה המלא כולל סגירת פוזיציה נמצא בפיתוח.\n\n' +
+                          'כרגע ניתן לסגור את הטרייד אך יש לזכור לעדכן עסקה לסגירת פוזיציה.\n\n' +
+                          'האם אתה בטוח שברצונך להמשיך?',`));
             }
           }
         }
@@ -2729,7 +2729,7 @@ function showTickerChangeConfirmation(originalSymbol, newSymbol) {
           );
         } else {
           // Fallback למקרה שמערכת התראות לא זמינה
-          const confirmed = window.confirm(message);
+          const confirmed = (typeof window.showConfirmationDialog === 'function' ? await new Promise(resolve => window.showConfirmationDialog('אישור', `message`, () => resolve(true), () => resolve(false))) : confirm(`message`));
           resolve(confirmed);
         }
         resolve(confirmed);

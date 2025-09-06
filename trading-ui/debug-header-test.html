@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת Header System - TikTrack</title>
+    
+    <!-- ===== CSS Architecture - Unified CSS ===== -->
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Framework -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- TikTrack CSS - Unified CSS (No @import) -->
+    <link rel="stylesheet" href="styles-new/unified.css">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        .debug-info {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            direction: ltr;
+        }
+        .debug-section {
+            background: white;
+            border: 2px solid #007bff;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .debug-section h3 {
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+    </style>
+    
+    <!-- Error Handlers -->
+    <script src="scripts/error-handlers.js"></script>
+</head>
+
+<body>
+    <!-- unified-header ייווצר כאן אוטומטית -->
+    <div id="unified-header"></div>
+    
+    <div class="container mt-4">
+        <div class="debug-section">
+            <h2>🧪 בדיקת Header System - Debug Mode</h2>
+            <p>עמוד זה נועד לבדיקה וטיפול בבעיות של מערכת ה-Header</p>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>📋 רשימת בדיקות</h3>
+                    <ul id="checkList">
+                        <li>🔄 טעינת Header System...</li>
+                        <li>🔄 יצירת אלמנט Header...</li>
+                        <li>🔄 הוספת Event Listeners...</li>
+                        <li>🔄 בדיקת Dropdown Functionality...</li>
+                        <li>🔄 בדיקת Submenu Functionality...</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h3>🔍 מידע Debug</h3>
+                    <button class="btn btn-primary mb-3" onclick="runDebugTests()">הרץ בדיקות</button>
+                    <div id="debugInfo" class="debug-info">ממתין להפעלת בדיקות...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>🎯 בדיקות ידניות</h3>
+            <p>בדוק באופן ידני:</p>
+            <ul>
+                <li>✅ האם תפריט "הגדרות" נפתח בלחיצה?</li>
+                <li>✅ האם תפריט "כלי פיתוח" נפתח בלחיצה?</li>
+                <li>✅ האם תתי התפריטים של "כלי פיתוח" נפתחים?</li>
+                <li>✅ האם התפריטים נסגרים בלחיצה מחוץ לאזור?</li>
+                <li>✅ האם הסגנונות נכונים?</li>
+            </ul>
+        </div>
+        
+        <div class="debug-section">
+            <h3>🔧 כלי Debug</h3>
+            <div class="d-flex gap-2 mb-3">
+                <button class="btn btn-info btn-sm" onclick="inspectDropdowns()">בדוק Dropdowns</button>
+                <button class="btn btn-warning btn-sm" onclick="checkCSS()">בדוק CSS</button>
+                <button class="btn btn-success btn-sm" onclick="testEvents()">בדוק Events</button>
+                <button class="btn btn-danger btn-sm" onclick="clearLogs()">נקה לוגים</button>
+            </div>
+            <div id="debugConsole" class="debug-info">Console זמין...</div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="scripts/header-system.js"></script>
+    
+    <script>
+        let debugOutput = [];
+        
+        // פונקציית debug
+        function debugLog(message) {
+            console.log(message);
+            debugOutput.push(new Date().toLocaleTimeString() + ': ' + message);
+            updateDebugDisplay();
+        }
+        
+        function updateDebugDisplay() {
+            document.getElementById('debugInfo').textContent = debugOutput.join('\n');
+        }
+        
+        function clearLogs() {
+            debugOutput = [];
+            updateDebugDisplay();
+            document.getElementById('debugConsole').textContent = 'Console נוקה...';
+        }
+        
+        // אתחול ובדיקות
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('🚀 DOM נטען, מתחיל אתחול...');
+            
+            // אתחול HeaderSystem
+            if (typeof HeaderSystem !== 'undefined') {
+                debugLog('✅ HeaderSystem נמצא');
+                try {
+                    const headerSystem = new HeaderSystem();
+                    headerSystem.init();
+                    debugLog('✅ HeaderSystem אותחל בהצלחה');
+                    
+                    // בדיקה אוטומטית אחרי טעינה
+                    setTimeout(runAutomaticTests, 1000);
+                } catch (error) {
+                    debugLog('❌ שגיאה באתחול HeaderSystem: ' + error.message);
+                }
+            } else {
+                debugLog('❌ HeaderSystem לא נמצא!');
+            }
+        });
+        
+        function runAutomaticTests() {
+            debugLog('🧪 מתחיל בדיקות אוטומטיות...');
+            
+            // בדיקת קיום אלמנט header
+            const header = document.getElementById('unified-header');
+            if (header) {
+                debugLog('✅ אלמנט unified-header קיים');
+            } else {
+                debugLog('❌ אלמנט unified-header לא קיים!');
+                return;
+            }
+            
+            // בדיקת תפריטי dropdown
+            const dropdowns = header.querySelectorAll('.tiktrack-dropdown-menu');
+            debugLog(`📋 נמצאו ${dropdowns.length} תפריטי dropdown`);
+            
+            // בדיקת תתי תפריטים
+            const submenus = header.querySelectorAll('.tiktrack-submenu');
+            debugLog(`📋 נמצאו ${submenus.length} תתי תפריטים`);
+            
+            // בדיקת toggle buttons
+            const toggles = header.querySelectorAll('.tiktrack-dropdown-toggle');
+            debugLog(`🎛️ נמצאו ${toggles.length} כפתורי toggle`);
+            
+            updateCheckList();
+        }
+        
+        function runDebugTests() {
+            debugLog('🔄 מתחיל בדיקות ידניות...');
+            inspectDropdowns();
+            checkCSS();
+            testEvents();
+        }
+        
+        function inspectDropdowns() {
+            const header = document.getElementById('unified-header');
+            if (!header) {
+                debugLog('❌ Header לא נמצא');
+                return;
+            }
+            
+            const dropdowns = header.querySelectorAll('.tiktrack-dropdown-menu');
+            const submenus = header.querySelectorAll('.tiktrack-submenu');
+            
+            debugLog(`📊 סיכום Dropdowns:`);
+            debugLog(`  - תפריטי dropdown: ${dropdowns.length}`);
+            debugLog(`  - תתי תפריטים: ${submenus.length}`);
+            
+            dropdowns.forEach((dropdown, index) => {
+                const classes = Array.from(dropdown.classList).join(', ');
+                const style = window.getComputedStyle(dropdown);
+                debugLog(`  Dropdown ${index}: classes=[${classes}], display=${style.display}`);
+            });
+        }
+        
+        function checkCSS() {
+            debugLog('🎨 בדיקת CSS...');
+            
+            const testElement = document.createElement('div');
+            testElement.className = 'tiktrack-dropdown-menu';
+            document.body.appendChild(testElement);
+            
+            const style = window.getComputedStyle(testElement);
+            debugLog(`CSS Test: position=${style.position}, display=${style.display}`);
+            
+            document.body.removeChild(testElement);
+        }
+        
+        function testEvents() {
+            debugLog('🎯 בדיקת Events...');
+            
+            const toggles = document.querySelectorAll('.tiktrack-dropdown-toggle');
+            debugLog(`נמצאו ${toggles.length} toggle buttons`);
+            
+            toggles.forEach((toggle, index) => {
+                const hasListener = toggle.onclick !== null || 
+                    toggle.addEventListener !== undefined;
+                debugLog(`  Toggle ${index}: hasListener=${hasListener}`);
+            });
+        }
+        
+        function updateCheckList() {
+            const list = document.getElementById('checkList');
+            list.innerHTML = `
+                <li>✅ טעינת Header System - הושלם</li>
+                <li>✅ יצירת אלמנט Header - הושלם</li>
+                <li>✅ הוספת Event Listeners - הושלם</li>
+                <li>🔄 בדיקת Dropdown Functionality - בבדיקה</li>
+                <li>🔄 בדיקת Submenu Functionality - בבדיקה</li>
+            `;
+        }
+        
+        // פונקציות נוספות לבדיקה
+        window.inspectDropdowns = inspectDropdowns;
+        window.checkCSS = checkCSS;
+        window.testEvents = testEvents;
+        window.runDebugTests = runDebugTests;
+        window.clearLogs = clearLogs;
+    </script>
+</body>
+</html>

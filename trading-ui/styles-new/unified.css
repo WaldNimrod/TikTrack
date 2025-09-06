@@ -3093,6 +3093,60 @@ select option {
     display: none !important;
 }
 
+/* TikTrack Dropdown Menu - תוספת לתיקון אי-התאמה */
+#unified-header .tiktrack-dropdown-menu {
+    top: 100%;
+    right: 0;
+    margin: 0;
+    animation: dropdownFadeIn 0.2s ease-out;
+    display: none;
+    position: absolute;
+    background: var(--apple-bg-elevated);
+    border: 1px solid var(--apple-border-light);
+    border-radius: var(--apple-radius-large);
+    box-shadow: var(--apple-shadow-medium);
+    min-width: 200px;
+    z-index: 1001;
+}
+
+#unified-header .tiktrack-dropdown-menu.show {
+    position: absolute !important;
+    z-index: 99999 !important;
+    display: block !important;
+}
+
+#unified-header .tiktrack-dropdown-menu:not(.show) {
+    display: none !important;
+}
+
+/* TikTrack Dropdown Items - תוספת לתיקון אי-התאמה */
+#unified-header .tiktrack-dropdown-item {
+    padding: 8px 16px;
+    white-space: nowrap;
+    border: none;
+    background: transparent;
+    color: var(--apple-text-primary);
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    text-align: start;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#unified-header .tiktrack-dropdown-item:hover {
+    background-color: var(--apple-bg-secondary);
+    color: var(--apple-text-primary);
+}
+
+#unified-header .tiktrack-dropdown-item:first-child {
+    border-radius: 12px 12px 0 0;
+}
+
+#unified-header .tiktrack-dropdown-item:last-child {
+    border-radius: 0 0 12px 12px;
+}
+
 @keyframes dropdownFadeIn {
     from {
         opacity: 0;

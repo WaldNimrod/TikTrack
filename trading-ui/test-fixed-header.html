@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת תיקון Header - TikTrack</title>
+    
+    <!-- ===== CSS Architecture - Unified CSS ===== -->
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Framework -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- TikTrack CSS - Unified CSS (Updated) -->
+    <link rel="stylesheet" href="styles-new/unified.css">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Error Handlers -->
+    <script src="scripts/error-handlers.js"></script>
+    
+    <style>
+        .test-section {
+            background: white;
+            padding: 30px;
+            margin: 20px;
+            border-radius: var(--apple-radius-large);
+            box-shadow: var(--apple-shadow-light);
+        }
+        
+        .status-indicator {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .status-success {
+            background: var(--color-success-light);
+            color: var(--color-success-dark);
+            border-left: 4px solid var(--color-success);
+        }
+        
+        .status-error {
+            background: var(--color-danger-light);
+            color: var(--color-danger-dark);
+            border-left: 4px solid var(--color-danger);
+        }
+        
+        .status-warning {
+            background: var(--color-warning-light);
+            color: var(--color-warning-dark);
+            border-left: 4px solid var(--color-warning);
+        }
+        
+        .debug-log {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+            direction: ltr;
+        }
+        
+        .test-results {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- unified-header ייווצר כאן אוטומטית -->
+    <div id="unified-header"></div>
+    
+    <div class="container">
+        <div class="test-section">
+            <h1>✅ בדיקת תיקון Header System</h1>
+            <p>בדיקה אחרי התיקון של אי-התאמה בין JavaScript ל-CSS</p>
+            
+            <div class="alert alert-info">
+                <h5>🔧 תיקונים שבוצעו:</h5>
+                <ul>
+                    <li>הוספת סגנונות ל-<code>.tiktrack-dropdown-menu</code></li>
+                    <li>הוספת סגנונות ל-<code>.tiktrack-dropdown-item</code></li>
+                    <li>תיקון הצגת תפריטים עם <code>.show</code> class</li>
+                    <li>הוספת z-index נכון ל-dropdowns</li>
+                </ul>
+            </div>
+            
+            <div class="test-results">
+                <h3>🧪 תוצאות בדיקה</h3>
+                <div id="test-status">
+                    <div class="status-indicator status-warning">
+                        <i class="fas fa-spinner fa-spin"></i> מבצע בדיקות...
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h4>🎯 הוראות בדיקה ידנית</h4>
+                    <div class="alert alert-primary">
+                        <h6>בדוק באופן ידני:</h6>
+                        <ol>
+                            <li>✅ לחץ על תפריט "הגדרות" - האם נפתח?</li>
+                            <li>✅ לחץ על תפריט "כלי פיתוח" - האם נפתח?</li>
+                            <li>✅ נווט לתת-תפריטים של "כלי פיתוח" - האם נפתחים?</li>
+                            <li>✅ לחץ מחוץ לתפריט - האם נסגר?</li>
+                            <li>✅ בדוק שהסגנונות נכונים (רקע, גבולות, צללים)</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h4>🔍 לוגים טכניים</h4>
+                    <div class="debug-log" id="debug-log">
+ממתין לאתחול...
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary" onclick="runDetailedTests()">
+                            <i class="fas fa-play"></i> הרץ בדיקות מפורטות
+                        </button>
+                        <button class="btn btn-info" onclick="testDropdownClicks()">
+                            <i class="fas fa-mouse-pointer"></i> בדוק לחיצות
+                        </button>
+                        <button class="btn btn-success" onclick="testCSS()">
+                            <i class="fas fa-palette"></i> בדוק CSS
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearLog()">
+                            <i class="fas fa-trash"></i> נקה לוג
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="scripts/header-system.js"></script>
+    
+    <script>
+        let logs = [];
+        let testResults = [];
+        
+        function debugLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logMessage = `${timestamp} [${type.toUpperCase()}]: ${message}`;
+            logs.push(logMessage);
+            updateLogDisplay();
+            console.log(logMessage);
+        }
+        
+        function updateLogDisplay() {
+            document.getElementById('debug-log').textContent = logs.join('\n');
+        }
+        
+        function clearLog() {
+            logs = [];
+            testResults = [];
+            updateLogDisplay();
+            document.getElementById('test-status').innerHTML = '<div class="status-indicator status-warning"><i class="fas fa-info-circle"></i> לוג נוקה</div>';
+        }
+        
+        function updateTestStatus() {
+            const statusDiv = document.getElementById('test-status');
+            const passedTests = testResults.filter(r => r.passed).length;
+            const totalTests = testResults.length;
+            
+            if (totalTests === 0) return;
+            
+            let statusClass, statusIcon;
+            if (passedTests === totalTests) {
+                statusClass = 'status-success';
+                statusIcon = 'fas fa-check-circle';
+            } else if (passedTests > totalTests / 2) {
+                statusClass = 'status-warning';
+                statusIcon = 'fas fa-exclamation-triangle';
+            } else {
+                statusClass = 'status-error';
+                statusIcon = 'fas fa-times-circle';
+            }
+            
+            statusDiv.innerHTML = `
+                <div class="status-indicator ${statusClass}">
+                    <i class="${statusIcon}"></i> 
+                    עברו ${passedTests}/${totalTests} בדיקות 
+                    (${Math.round((passedTests/totalTests)*100)}%)
+                </div>
+            `;
+        }
+        
+        function runTest(testName, testFunction) {
+            debugLog(`🧪 מבצע בדיקה: ${testName}`);
+            try {
+                const result = testFunction();
+                const passed = !!result;
+                testResults.push({ name: testName, passed, result });
+                debugLog(passed ? `✅ ${testName} - עבר` : `❌ ${testName} - נכשל`, passed ? 'success' : 'error');
+                return result;
+            } catch (error) {
+                testResults.push({ name: testName, passed: false, error: error.message });
+                debugLog(`❌ ${testName} - שגיאה: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // אתחול
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('🚀 מתחיל אתחול מערכת Header');
+            
+            if (typeof HeaderSystem !== 'undefined') {
+                debugLog('✅ HeaderSystem נמצא');
+                try {
+                    const headerSystem = new HeaderSystem();
+                    headerSystem.init();
+                    debugLog('✅ HeaderSystem אותחל בהצלחה');
+                    
+                    // הרץ בדיקות אוטומטיות
+                    setTimeout(() => {
+                        runBasicTests();
+                    }, 2000);
+                } catch (error) {
+                    debugLog(`❌ שגיאה באתחול HeaderSystem: ${error.message}`, 'error');
+                }
+            } else {
+                debugLog('❌ HeaderSystem לא נמצא!', 'error');
+            }
+        });
+        
+        function runBasicTests() {
+            debugLog('🔄 מתחיל בדיקות בסיסיות...');
+            
+            runTest('קיום Header Element', () => {
+                return document.getElementById('unified-header') !== null;
+            });
+            
+            runTest('קיום Dropdown Menus', () => {
+                const header = document.getElementById('unified-header');
+                return header && header.querySelectorAll('.tiktrack-dropdown-menu').length > 0;
+            });
+            
+            runTest('קיום Toggle Buttons', () => {
+                const header = document.getElementById('unified-header');
+                return header && header.querySelectorAll('.tiktrack-dropdown-toggle').length > 0;
+            });
+            
+            runTest('CSS Classes זמינות', () => {
+                const testEl = document.createElement('div');
+                testEl.className = 'tiktrack-dropdown-menu';
+                document.body.appendChild(testEl);
+                const computed = window.getComputedStyle(testEl);
+                const hasDisplay = computed.display === 'none';
+                document.body.removeChild(testEl);
+                return hasDisplay;
+            });
+            
+            updateTestStatus();
+        }
+        
+        function runDetailedTests() {
+            debugLog('🔍 מתחיל בדיקות מפורטות...');
+            testResults = []; // נקה תוצאות קודמות
+            
+            runBasicTests();
+            
+            runTest('בדיקת Submenu Elements', () => {
+                const header = document.getElementById('unified-header');
+                return header && header.querySelectorAll('.tiktrack-submenu').length > 0;
+            });
+            
+            runTest('בדיקת Event Listeners', () => {
+                const header = document.getElementById('unified-header');
+                const toggles = header ? header.querySelectorAll('.tiktrack-dropdown-toggle') : [];
+                return toggles.length > 0;
+            });
+            
+            runTest('בדיקת CSS Variables', () => {
+                const root = getComputedStyle(document.documentElement);
+                const hasAppleVars = root.getPropertyValue('--apple-bg-elevated').trim() !== '';
+                return hasAppleVars;
+            });
+            
+            updateTestStatus();
+        }
+        
+        function testDropdownClicks() {
+            debugLog('🖱️ בדיקת לחיצות על Dropdowns...');
+            
+            const header = document.getElementById('unified-header');
+            if (!header) {
+                debugLog('❌ Header לא נמצא', 'error');
+                return;
+            }
+            
+            const toggles = header.querySelectorAll('.tiktrack-dropdown-toggle');
+            debugLog(`נמצאו ${toggles.length} כפתורי toggle`);
+            
+            toggles.forEach((toggle, index) => {
+                setTimeout(() => {
+                    debugLog(`🖱️ לוחץ על toggle ${index + 1}...`);
+                    toggle.click();
+                    
+                    setTimeout(() => {
+                        const menu = toggle.nextElementSibling;
+                        if (menu && menu.classList.contains('show')) {
+                            debugLog(`✅ Toggle ${index + 1} - תפריט נפתח!`, 'success');
+                            
+                            // סגור אחרי רגע
+                            setTimeout(() => {
+                                toggle.click();
+                                debugLog(`📤 Toggle ${index + 1} - תפריט נסגר`);
+                            }, 1500);
+                        } else {
+                            debugLog(`❌ Toggle ${index + 1} - תפריט לא נפתח`, 'error');
+                        }
+                    }, 300);
+                }, index * 3000);
+            });
+        }
+        
+        function testCSS() {
+            debugLog('🎨 בדיקת סגנונות CSS...');
+            
+            // בדוק את הסגנונות החדשים שהוספנו
+            const testMenu = document.createElement('div');
+            testMenu.className = 'tiktrack-dropdown-menu';
+            document.body.appendChild(testMenu);
+            
+            const computed = window.getComputedStyle(testMenu);
+            debugLog(`CSS tiktrack-dropdown-menu: display=${computed.display}, position=${computed.position}`);
+            
+            // בדוק עם .show
+            testMenu.classList.add('show');
+            const computedShow = window.getComputedStyle(testMenu);
+            debugLog(`CSS tiktrack-dropdown-menu.show: display=${computedShow.display}, z-index=${computedShow.zIndex}`);
+            
+            document.body.removeChild(testMenu);
+            
+            debugLog('✅ בדיקת CSS הושלמה', 'success');
+        }
+    </script>
+</body>
+</html>

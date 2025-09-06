@@ -5,103 +5,363 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>מטריצת סקריפטים ועמודים - TikTrack</title>
     
-    
-                                            <!-- ===== CSS Architecture - OLD SYSTEM ===== -->
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Apple Theme -->
-    <link rel="stylesheet" href="styles/apple-theme.css">
-    
-    <!-- Bootstrap Framework -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Main Styles -->
-    <link rel="stylesheet" href="styles/styles.css">
-    <link rel="stylesheet" href="styles/header-system.css">
-    <link rel="stylesheet" href="styles/typography.css">
-    <link rel="stylesheet" href="styles/table.css">
-    <link rel="stylesheet" href="styles/notification-system.css"> - OLD SYSTEM ===== -->
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Apple Theme -->
-    <link rel="stylesheet" href="styles/apple-theme.css">
-    
-    <!-- Bootstrap Framework -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Main Styles -->
-    <link rel="stylesheet" href="styles/styles.css">
-    <link rel="stylesheet" href="styles/header-system.css">
-    <link rel="stylesheet" href="styles/typography.css">
-    <link rel="stylesheet" href="styles/table.css">
-    <link rel="stylesheet" href="styles/notification-system.css"> - OLD SYSTEM ===== -->
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Apple Theme -->
-    <link rel="stylesheet" href="styles/apple-theme.css">
-    
-    <!-- Bootstrap Framework -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Main Styles -->
-    <link rel="stylesheet" href="styles/styles.css">
-    <link rel="stylesheet" href="styles/header-system.css">
-    <link rel="stylesheet" href="styles/typography.css">
-    <link rel="stylesheet" href="styles/table.css">
-    <link rel="stylesheet" href="styles/notification-system.css"> - OLD SYSTEM ===== -->
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Apple Theme -->
-    <link rel="stylesheet" href="styles/apple-theme.css">
-    
-    <!-- Bootstrap Framework -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Main Styles -->
-    <link rel="stylesheet" href="styles/styles.css">
-    <link rel="stylesheet" href="styles/header-system.css">
-    <link rel="stylesheet" href="styles/typography.css">
-    <link rel="stylesheet" href="styles/table.css">
-    <link rel="stylesheet" href="styles/notification-system.css"> - OLD SYSTEM ===== -->
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Apple Theme -->
-    <link rel="stylesheet" href="styles/apple-theme.css">
-    
-    <!-- Bootstrap Framework -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Main Styles -->
-    <link rel="stylesheet" href="styles/styles.css">
-    <link rel="stylesheet" href="styles/header-system.css">
-    <link rel="stylesheet" href="styles/typography.css">
-    <link rel="stylesheet" href="styles/table.css">
-    <link rel="stylesheet" href="styles/notification-system.css"> - ITCSS Based ===== -->
+    <!-- ===== CSS Architecture - Unified CSS ===== -->
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Bootstrap Framework -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- TikTrack CSS - New ITCSS Architecture -->
-    <link rel="stylesheet" href="dist/main.css">
-    
-
+    <!-- TikTrack CSS - Unified CSS (No @import) -->
+    <link rel="stylesheet" href="styles-new/unified.css">
     
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- TikTrack JavaScript Files -->
-    <script src="scripts/console-cleanup.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Error Handlers -->
+    <script src="scripts/error-handlers.js"></script>
+    
+    <style>
+        .matrix-table {
+            font-size: 0.9rem;
+        }
+        .matrix-table th {
+            background-color: var(--apple-bg-secondary);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .script-cell {
+            text-align: center;
+            vertical-align: middle;
+        }
+        .script-used {
+            background-color: var(--color-success-light);
+            color: var(--color-success-dark);
+        }
+        .script-not-used {
+            background-color: var(--apple-gray-1);
+            color: var(--apple-gray-6);
+        }
+        .page-name {
+            font-weight: 600;
+            background-color: var(--apple-bg-tertiary);
+        }
+        .summary-card {
+            background: white;
+            border-radius: var(--apple-radius-large);
+            box-shadow: var(--apple-shadow-light);
+            padding: var(--apple-spacing-lg);
+            margin-bottom: var(--apple-spacing-md);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- unified-header ייווצר כאן אוטומטית -->
+    <div id="unified-header"></div>
+    
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="summary-card">
+                    <h1 class="text-center mb-4">
+                        <i class="fas fa-project-diagram"></i>
+                        מטריצת סקריפטים ועמודים
+                    </h1>
+                    <p class="text-center text-muted">
+                        מפת התלות בין קבצי JavaScript לעמודי האתר
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="summary-card">
+                    <h3><i class="fas fa-chart-bar"></i> סטטיסטיקות</h3>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-primary" id="total-pages">0</h4>
+                                <small>סה"כ עמודים</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-info" id="total-scripts">0</h4>
+                                <small>סה"כ סקריפטים</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-success" id="active-connections">0</h4>
+                                <small>חיבורים פעילים</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <h4 class="text-warning" id="coverage-percent">0%</h4>
+                                <small>אחוז כיסוי</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="summary-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3><i class="fas fa-table"></i> מטריצת התלות</h3>
+                        <div>
+                            <button class="btn btn-primary btn-sm" onclick="generateMatrix()">
+                                <i class="fas fa-sync"></i> רענן מטריצה
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="exportMatrix()">
+                                <i class="fas fa-download"></i> יצוא CSV
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+                        <table class="table table-bordered matrix-table" id="dependency-matrix">
+                            <thead>
+                                <tr>
+                                    <th>עמוד</th>
+                                    <th>header-system.js</th>
+                                    <th>main.js</th>
+                                    <th>ui-utils.js</th>
+                                    <th>data-utils.js</th>
+                                    <th>tables.js</th>
+                                    <th>date-utils.js</th>
+                                    <th>notification-system.js</th>
+                                    <th>validation-utils.js</th>
+                                </tr>
+                            </thead>
+                            <tbody id="matrix-body">
+                                <tr>
+                                    <td colspan="9" class="text-center text-muted">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        טוען נתונים...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- כלי ניתוח -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="summary-card">
+                    <h4><i class="fas fa-search"></i> ניתוח תלות</h4>
+                    <div class="mb-3">
+                        <label for="script-select" class="form-label">בחר סקריפט לניתוח:</label>
+                        <select class="form-select" id="script-select" onchange="analyzeScript()">
+                            <option value="">-- בחר סקריפט --</option>
+                            <option value="header-system.js">header-system.js</option>
+                            <option value="main.js">main.js</option>
+                            <option value="ui-utils.js">ui-utils.js</option>
+                            <option value="data-utils.js">data-utils.js</option>
+                            <option value="tables.js">tables.js</option>
+                        </select>
+                    </div>
+                    <div id="script-analysis" class="alert alert-info" style="display: none;">
+                        <h6>תוצאות ניתוח:</h6>
+                        <div id="analysis-content"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="summary-card">
+                    <h4><i class="fas fa-exclamation-triangle"></i> בעיות שזוהו</h4>
+                    <div id="issues-list">
+                        <div class="alert alert-warning">
+                            <small><i class="fas fa-info-circle"></i> בודק בעיות...</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
     <script src="scripts/header-system.js"></script>
-    <script src="scripts/notification-system.js"></script>
-    <script src="scripts/main.js"></script>
+    
+    <script>
+        // נתוני מטריצה
+        const pageScriptMatrix = {
+            'index.html': ['header-system.js', 'main.js'],
+            'trades.html': ['header-system.js', 'main.js', 'ui-utils.js', 'tables.js'],
+            'alerts.html': ['header-system.js', 'main.js', 'ui-utils.js', 'data-utils.js'],
+            'accounts.html': ['header-system.js', 'main.js', 'ui-utils.js', 'data-utils.js'],
+            'preferences.html': ['header-system.js', 'main.js', 'ui-utils.js'],
+            'executions.html': ['header-system.js', 'main.js', 'tables.js'],
+            'tickers.html': ['header-system.js', 'main.js', 'tables.js'],
+            'cash_flows.html': ['header-system.js', 'main.js', 'date-utils.js'],
+            'notes.html': ['header-system.js', 'main.js', 'ui-utils.js'],
+            'test-header-only.html': ['header-system.js', 'main.js', 'validation-utils.js']
+        };
+        
+        const allScripts = [
+            'header-system.js',
+            'main.js', 
+            'ui-utils.js',
+            'data-utils.js',
+            'tables.js',
+            'date-utils.js',
+            'notification-system.js',
+            'validation-utils.js'
+        ];
+        
+        // אתחול
+        document.addEventListener('DOMContentLoaded', function() {
+            // אתחול Header System
+            if (typeof HeaderSystem !== 'undefined') {
+                const headerSystem = new HeaderSystem();
+                headerSystem.init();
+            }
+            
+            generateMatrix();
+            updateStatistics();
+            checkForIssues();
+        });
+        
+        function generateMatrix() {
+            const tbody = document.getElementById('matrix-body');
+            tbody.innerHTML = '';
+            
+            Object.keys(pageScriptMatrix).forEach(page => {
+                const row = document.createElement('tr');
+                
+                // שם העמוד
+                const pageCell = document.createElement('td');
+                pageCell.textContent = page;
+                pageCell.className = 'page-name';
+                row.appendChild(pageCell);
+                
+                // כל סקריפט
+                allScripts.forEach(script => {
+                    const cell = document.createElement('td');
+                    cell.className = 'script-cell';
+                    
+                    if (pageScriptMatrix[page].includes(script)) {
+                        cell.innerHTML = '<i class="fas fa-check text-success"></i>';
+                        cell.classList.add('script-used');
+                    } else {
+                        cell.innerHTML = '<i class="fas fa-times text-muted"></i>';
+                        cell.classList.add('script-not-used');
+                    }
+                    
+                    row.appendChild(cell);
+                });
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        function updateStatistics() {
+            const totalPages = Object.keys(pageScriptMatrix).length;
+            const totalScripts = allScripts.length;
+            let activeConnections = 0;
+            
+            Object.values(pageScriptMatrix).forEach(scripts => {
+                activeConnections += scripts.length;
+            });
+            
+            const coveragePercent = Math.round((activeConnections / (totalPages * totalScripts)) * 100);
+            
+            document.getElementById('total-pages').textContent = totalPages;
+            document.getElementById('total-scripts').textContent = totalScripts;
+            document.getElementById('active-connections').textContent = activeConnections;
+            document.getElementById('coverage-percent').textContent = coveragePercent + '%';
+        }
+        
+        function analyzeScript() {
+            const selectedScript = document.getElementById('script-select').value;
+            if (!selectedScript) return;
+            
+            const analysisDiv = document.getElementById('script-analysis');
+            const contentDiv = document.getElementById('analysis-content');
+            
+            let usedInPages = [];
+            Object.keys(pageScriptMatrix).forEach(page => {
+                if (pageScriptMatrix[page].includes(selectedScript)) {
+                    usedInPages.push(page);
+                }
+            });
+            
+            const usagePercent = Math.round((usedInPages.length / Object.keys(pageScriptMatrix).length) * 100);
+            
+            contentDiv.innerHTML = `
+                <strong>סקריפט:</strong> ${selectedScript}<br>
+                <strong>בשימוש ב-${usedInPages.length} עמודים (${usagePercent}%)</strong><br>
+                <strong>עמודים:</strong> ${usedInPages.join(', ')}<br>
+            `;
+            
+            analysisDiv.style.display = 'block';
+        }
+        
+        function checkForIssues() {
+            const issuesList = document.getElementById('issues-list');
+            let issues = [];
+            
+            // בדיקת עמודים ללא header-system.js
+            Object.keys(pageScriptMatrix).forEach(page => {
+                if (!pageScriptMatrix[page].includes('header-system.js')) {
+                    issues.push(`${page} - חסר header-system.js`);
+                }
+            });
+            
+            // בדיקת עמודים ללא main.js
+            Object.keys(pageScriptMatrix).forEach(page => {
+                if (!pageScriptMatrix[page].includes('main.js')) {
+                    issues.push(`${page} - חסר main.js`);
+                }
+            });
+            
+            if (issues.length === 0) {
+                issuesList.innerHTML = '<div class="alert alert-success"><i class="fas fa-check"></i> לא נמצאו בעיות!</div>';
+            } else {
+                let issuesHtml = '<div class="alert alert-warning"><h6>בעיות שנמצאו:</h6><ul>';
+                issues.forEach(issue => {
+                    issuesHtml += `<li>${issue}</li>`;
+                });
+                issuesHtml += '</ul></div>';
+                issuesList.innerHTML = issuesHtml;
+            }
+        }
+        
+        function exportMatrix() {
+            let csv = 'Page,' + allScripts.join(',') + '\n';
+            
+            Object.keys(pageScriptMatrix).forEach(page => {
+                let row = page + ',';
+                allScripts.forEach(script => {
+                    row += (pageScriptMatrix[page].includes(script) ? '1' : '0') + ',';
+                });
+                csv += row.slice(0, -1) + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'page-scripts-matrix.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
 </body>
 </html>
-

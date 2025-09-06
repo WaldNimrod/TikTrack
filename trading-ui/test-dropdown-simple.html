@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת Dropdown פשוטה - TikTrack</title>
+    
+    <!-- ===== CSS Architecture - Unified CSS ===== -->
+    <link rel="stylesheet" href="styles-new/unified.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            padding: 20px;
+            background-color: var(--apple-bg-secondary);
+        }
+        
+        .test-section {
+            background: white;
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: var(--apple-radius-large);
+            box-shadow: var(--apple-shadow-light);
+        }
+        
+        .debug-log {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            direction: ltr;
+        }
+        
+        /* Test dropdown styles */
+        .test-dropdown {
+            position: relative;
+            display: inline-block;
+            margin: 10px;
+        }
+        
+        .test-dropdown-toggle {
+            background: var(--apple-blue);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--apple-radius-medium);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .test-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid var(--apple-border);
+            border-radius: var(--apple-radius-medium);
+            box-shadow: var(--apple-shadow-medium);
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+            padding: 8px 0;
+        }
+        
+        .test-dropdown-menu.show {
+            display: block !important;
+        }
+        
+        .test-dropdown-item {
+            display: block;
+            padding: 8px 16px;
+            color: var(--apple-text-primary);
+            text-decoration: none;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: start;
+            cursor: pointer;
+        }
+        
+        .test-dropdown-item:hover {
+            background: var(--apple-bg-secondary);
+        }
+        
+        /* Header system specific styles */
+        .tiktrack-dropdown-menu {
+            display: none !important;
+        }
+        
+        .tiktrack-dropdown-menu.show {
+            display: block !important;
+            position: absolute !important;
+            z-index: 9999 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="test-section">
+            <h1>🧪 בדיקת מערכת Dropdown</h1>
+            <p>בדיקה פשוטה ומפורטת של מערכת התפריטים</p>
+            
+            <!-- בדיקת Header System -->
+            <h3>1. Header System (רשמי)</h3>
+            <div id="unified-header"></div>
+            
+            <!-- בדיקת Dropdown פשוט -->
+            <h3>2. Dropdown פשוט (בדיקה)</h3>
+            <div class="test-dropdown">
+                <button class="test-dropdown-toggle" onclick="toggleTestDropdown()">
+                    תפריט בדיקה
+                    <span>▼</span>
+                </button>
+                <div class="test-dropdown-menu" id="test-dropdown-menu">
+                    <a href="#" class="test-dropdown-item" onclick="logTest('פריט 1')">פריט 1</a>
+                    <a href="#" class="test-dropdown-item" onclick="logTest('פריט 2')">פריט 2</a>
+                    <a href="#" class="test-dropdown-item" onclick="logTest('פריט 3')">פריט 3</a>
+                </div>
+            </div>
+            
+            <!-- בדיקות אוטומטיות -->
+            <h3>3. בדיקות אוטומטיות</h3>
+            <div class="d-flex gap-2">
+                <button class="btn btn-primary" onclick="runTests()">הרץ בדיקות</button>
+                <button class="btn btn-secondary" onclick="clearLog()">נקה לוג</button>
+                <button class="btn btn-info" onclick="inspectDropdowns()">בדוק Dropdowns</button>
+                <button class="btn btn-warning" onclick="testHeaderDropdowns()">בדוק Header Dropdowns</button>
+            </div>
+            
+            <div class="debug-log" id="debug-log">
+ממתין לבדיקות...
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="scripts/header-system.js"></script>
+    
+    <script>
+        let logs = [];
+        
+        // פונקציות לוג
+        function debugLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logs.push(`${timestamp}: ${message}`);
+            updateLogDisplay();
+            console.log(message);
+        }
+        
+        function updateLogDisplay() {
+            document.getElementById('debug-log').textContent = logs.join('\n');
+        }
+        
+        function clearLog() {
+            logs = [];
+            updateLogDisplay();
+        }
+        
+        function logTest(item) {
+            debugLog(`✅ נלחץ על: ${item}`);
+        }
+        
+        // פונקציית בדיקת dropdown פשוטה
+        function toggleTestDropdown() {
+            const menu = document.getElementById('test-dropdown-menu');
+            const isVisible = menu.classList.contains('show');
+            
+            if (isVisible) {
+                menu.classList.remove('show');
+                debugLog('📤 תפריט בדיקה נסגר');
+            } else {
+                menu.classList.add('show');
+                debugLog('📥 תפריט בדיקה נפתח');
+            }
+        }
+        
+        // אתחול
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('🚀 DOM נטען, מתחיל אתחול...');
+            
+            // אתחול Header System
+            if (typeof HeaderSystem !== 'undefined') {
+                debugLog('✅ HeaderSystem נמצא');
+                try {
+                    const headerSystem = new HeaderSystem();
+                    headerSystem.init();
+                    debugLog('✅ HeaderSystem אותחל בהצלחה');
+                    
+                    setTimeout(() => {
+                        runTests();
+                    }, 2000);
+                } catch (error) {
+                    debugLog('❌ שגיאה באתחול HeaderSystem: ' + error.message);
+                }
+            } else {
+                debugLog('❌ HeaderSystem לא נמצא!');
+            }
+        });
+        
+        function runTests() {
+            debugLog('🧪 מתחיל בדיקות אוטומטיות...');
+            
+            // בדיקת קיום אלמנטים
+            const header = document.getElementById('unified-header');
+            debugLog(header ? '✅ unified-header קיים' : '❌ unified-header חסר');
+            
+            if (header) {
+                const dropdowns = header.querySelectorAll('.tiktrack-dropdown-menu');
+                debugLog(`📋 נמצאו ${dropdowns.length} תפריטי dropdown בheader`);
+                
+                const toggles = header.querySelectorAll('.tiktrack-dropdown-toggle');
+                debugLog(`🎛️ נמצאו ${toggles.length} כפתורי toggle בheader`);
+                
+                const submenus = header.querySelectorAll('.tiktrack-submenu');
+                debugLog(`📂 נמצאו ${submenus.length} תתי תפריטים בheader`);
+                
+                // בדיקת CSS classes
+                dropdowns.forEach((dropdown, index) => {
+                    const classes = Array.from(dropdown.classList).join(', ');
+                    const computed = window.getComputedStyle(dropdown);
+                    debugLog(`Dropdown ${index}: classes=[${classes}], display=${computed.display}, position=${computed.position}`);
+                });
+            }
+            
+            debugLog('✅ בדיקות הושלמו');
+        }
+        
+        function inspectDropdowns() {
+            debugLog('🔍 בודק את כל ה-dropdowns במערכת...');
+            
+            const allDropdowns = document.querySelectorAll('[class*="dropdown"]');
+            debugLog(`📊 נמצאו ${allDropdowns.length} אלמנטים עם "dropdown" בclass`);
+            
+            allDropdowns.forEach((element, index) => {
+                const classes = Array.from(element.classList).join(', ');
+                const computed = window.getComputedStyle(element);
+                debugLog(`Element ${index}: tag=${element.tagName}, classes=[${classes}], display=${computed.display}`);
+            });
+        }
+        
+        function testHeaderDropdowns() {
+            debugLog('🎯 בודק dropdowns של Header System...');
+            
+            const header = document.getElementById('unified-header');
+            if (!header) {
+                debugLog('❌ Header לא נמצא');
+                return;
+            }
+            
+            // נסה ללחוץ על כפתורי dropdown
+            const toggles = header.querySelectorAll('.tiktrack-dropdown-toggle');
+            debugLog(`🖱️ מצאתי ${toggles.length} כפתורי toggle, ננסה ללחוץ עליהם...`);
+            
+            toggles.forEach((toggle, index) => {
+                setTimeout(() => {
+                    debugLog(`🖱️ לוחץ על toggle ${index}...`);
+                    toggle.click();
+                    
+                    setTimeout(() => {
+                        const menu = toggle.nextElementSibling;
+                        if (menu && menu.classList.contains('show')) {
+                            debugLog(`✅ Toggle ${index} - תפריט נפתח בהצלחה!`);
+                        } else {
+                            debugLog(`❌ Toggle ${index} - תפריט לא נפתח`);
+                        }
+                    }, 300);
+                }, index * 1000);
+            });
+        }
+        
+        // סגירת תפריטים בלחיצה מחוץ לאזור
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.test-dropdown')) {
+                const menu = document.getElementById('test-dropdown-menu');
+                if (menu.classList.contains('show')) {
+                    menu.classList.remove('show');
+                    debugLog('📤 תפריט בדיקה נסגר (לחיצה חיצונית)');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

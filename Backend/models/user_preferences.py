@@ -54,7 +54,7 @@ class PreferenceProfile(BaseModel):
         return f"<PreferenceProfile(user_id={self.user_id}, name='{self.profile_name}')>"
 
 
-class UserPreferencesV2(BaseModel):
+class UserPreferences(BaseModel):
     """מודל הגדרות משתמש מתקדם V2"""
     __tablename__ = 'user_preferences_v2'
     

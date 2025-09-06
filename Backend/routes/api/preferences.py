@@ -13,7 +13,7 @@ Date: January 2025
 from flask import Blueprint, request, jsonify, send_file
 from sqlalchemy.orm import Session
 from config.database import get_db
-from services.preferences_service_v2 import PreferencesServiceV2
+from services.preferences_service import PreferencesService
 from services.advanced_cache_service import cache_with_deps, invalidate_cache
 from datetime import datetime
 import tempfile
@@ -22,7 +22,7 @@ import os
 from typing import Optional
 
 # Create blueprint
-preferences_v2_bp = Blueprint('preferences_v2', __name__)
+preferences_bp = Blueprint('preferences', __name__)
 
 
 def get_user_id_from_request() -> int:
@@ -41,7 +41,7 @@ def get_preferences_v2():
         profile_id = request.args.get('profile_id', type=int)
         
         # קבל הגדרות
-        preferences = PreferencesServiceV2.get_preferences_v2(db, user_id, profile_id)
+        preferences = PreferencesService.get_preferences_v2(db, user_id, profile_id)
         if not preferences:
             return jsonify({
                 'success': False,
@@ -52,7 +52,7 @@ def get_preferences_v2():
         # קבל פרופיל
         profile = None
         if preferences.profile_id:
-            profiles = PreferencesServiceV2.get_user_profiles(db, user_id)
+            profiles = PreferencesService.get_user_profiles(db, user_id)
             profile = next((p for p in profiles if p.id == preferences.profile_id), None)
         
         return jsonify({
@@ -97,7 +97,7 @@ def update_preferences_v2():
         
         if not profile_id:
             # השתמש בפרופיל ברירת המחדל
-            default_profile = PreferencesServiceV2.get_default_profile(db, user_id)
+            default_profile = PreferencesService.get_default_profile(db, user_id)
             if not default_profile:
                 return jsonify({
                     'success': False,
@@ -106,7 +106,7 @@ def update_preferences_v2():
                 }), 404
             profile_id = default_profile.id
         
-        success = PreferencesServiceV2.update_preferences_v2(
+        success = PreferencesService.update_preferences_v2(
             db, user_id, profile_id, preferences_data, user_id
         )
         
@@ -137,7 +137,7 @@ def get_user_profiles():
         db: Session = next(get_db())
         user_id = get_user_id_from_request()
         
-        profiles = PreferencesServiceV2.get_user_profiles(db, user_id)
+        profiles = PreferencesService.get_user_profiles(db, user_id)
         
         profiles_data = []
         for profile in profiles:
@@ -185,7 +185,7 @@ def create_profile():
         description = data.get('description', '')
         is_default = data.get('isDefault', False)
         
-        profile = PreferencesServiceV2.create_profile(
+        profile = PreferencesService.create_profile(
             db, user_id, profile_name, is_default, description
         )
         
@@ -225,7 +225,7 @@ def migrate_from_v1():
         data = request.get_json() or {}
         force = data.get('force', False)
         
-        success = PreferencesServiceV2.migrate_from_v1(db, user_id, force)
+        success = PreferencesService.migrate_from_v1(db, user_id, force)
         
         if success:
             return jsonify({
@@ -257,7 +257,7 @@ def export_preferences():
         profile_id = request.args.get('profile_id', type=int)
         include_sensitive = request.args.get('include_sensitive', 'false').lower() == 'true'
         
-        export_data = PreferencesServiceV2.export_preferences(
+        export_data = PreferencesService.export_preferences(
             db, user_id, profile_id, include_sensitive
         )
         
@@ -337,7 +337,7 @@ def import_preferences():
                 'code': 'INVALID_JSON'
             }), 400
         
-        success = PreferencesServiceV2.import_preferences(
+        success = PreferencesService.import_preferences(
             db, user_id, import_data, create_new_profile, profile_name
         )
         
@@ -374,7 +374,7 @@ def get_preference_history():
         # הגבל ל-365 ימים
         days = min(days, 365)
         
-        history = PreferencesServiceV2.get_preference_history(db, user_id, profile_id, days)
+        history = PreferencesService.get_preference_history(db, user_id, profile_id, days)
         
         history_data = []
         for entry in history:
@@ -410,7 +410,7 @@ def validate_user_preferences():
         user_id = get_user_id_from_request()
         profile_id = request.args.get('profile_id', type=int)
         
-        preferences = PreferencesServiceV2.get_preferences_v2(db, user_id, profile_id)
+        preferences = PreferencesService.get_preferences_v2(db, user_id, profile_id)
         if not preferences:
             return jsonify({
                 'success': False,
@@ -444,7 +444,7 @@ def validate_all_preferences():
     try:
         db: Session = next(get_db())
         
-        validation_results = PreferencesServiceV2.validate_all_preferences(db)
+        validation_results = PreferencesService.validate_all_preferences(db)
         
         return jsonify({
             'success': True,
@@ -469,7 +469,7 @@ def get_system_statistics():
     try:
         db: Session = next(get_db())
         
-        stats = PreferencesServiceV2.get_system_statistics(db)
+        stats = PreferencesService.get_system_statistics(db)
         
         return jsonify({
             'success': True,
@@ -496,7 +496,7 @@ def cleanup_old_history():
         # הגבל בין 7 ל-365 ימים
         days = max(7, min(days, 365))
         
-        deleted_count = PreferencesServiceV2.cleanup_old_history(db, days)
+        deleted_count = PreferencesService.cleanup_old_history(db, days)
         
         return jsonify({
             'success': True,
@@ -524,11 +524,11 @@ def check_v1_compatibility():
         user_id = get_user_id_from_request()
         
         # בדוק אם יש נתונים בV1
-        v1_data = PreferencesServiceV2._get_v1_preferences(db, user_id)
+        v1_data = PreferencesService._get_v1_preferences(db, user_id)
         has_v1_data = v1_data is not None
         
         # בדוק אם יש נתונים בV2
-        v2_prefs = PreferencesServiceV2.get_preferences_v2(db, user_id)
+        v2_prefs = PreferencesService.get_preferences_v2(db, user_id)
         has_v2_data = v2_prefs is not None
         
         # בדוק אם V2 נוצר ממיגרציה
@@ -563,7 +563,7 @@ def check_v1_compatibility():
 def get_defaults():
     """קבל ברירות מחדל נוכחיות"""
     try:
-        defaults = PreferencesServiceV2.load_defaults_from_file()
+        defaults = PreferencesService.load_defaults_from_file()
         
         return jsonify({
             'success': True,
@@ -597,7 +597,7 @@ def update_defaults():
         defaults = data['defaults']
         
         # שמור ברירות מחדל לקובץ
-        success = PreferencesServiceV2.save_defaults_to_file(defaults)
+        success = PreferencesService.save_defaults_to_file(defaults)
         
         if success:
             # בטל מטמון
@@ -637,7 +637,7 @@ def save_current_as_defaults():
         profile_id = data.get('profile_id') if data else None
         
         # קבל הגדרות נוכחיות
-        preferences = PreferencesServiceV2.get_preferences_v2(db, user_id, profile_id)
+        preferences = PreferencesService.get_preferences_v2(db, user_id, profile_id)
         if not preferences:
             return jsonify({
                 'success': False,
@@ -649,7 +649,7 @@ def save_current_as_defaults():
         defaults = preferences.to_dict()
         
         # שמור ברירות מחדל לקובץ
-        success = PreferencesServiceV2.save_defaults_to_file(defaults)
+        success = PreferencesService.save_defaults_to_file(defaults)
         
         if success:
             # בטל מטמון

@@ -13,8 +13,8 @@ Date: January 2025
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
 from models.user import User
-from models.user_preferences_v2 import UserPreferencesV2, PreferenceProfile, PreferenceHistory
-from models.user_preferences import UserPreferences  # V1 לצורך מיגרציה
+from models.user_preferences import UserPreferences, PreferenceProfile, PreferenceHistory
+# from models.user_preferences import UserPreferences  # V1 לצורך מיגרציה - מושבת זמנית
 from typing import List, Optional, Dict, Any, Tuple
 import json
 import logging
@@ -26,7 +26,7 @@ from sqlalchemy.exc import SQLAlchemyError
 logger = logging.getLogger(__name__)
 
 
-class PreferencesServiceV2:
+class PreferencesService:
     """
     שירות מתקדם למערכת הגדרות משתמש V2
     
@@ -368,15 +368,16 @@ class PreferencesServiceV2:
     
     @classmethod
     def _get_v1_preferences(cls, db: Session, user_id: int) -> Optional[Dict[str, Any]]:
-        """קבל הגדרות V1"""
+        """קבל הגדרות V1 - מושבת זמנית"""
         try:
-            # נסה קודם מטבלת user_preferences
-            v1_prefs = db.query(UserPreferences).filter(
-                UserPreferences.user_id == user_id
-            ).first()
+            # נסה קודם מטבלת user_preferences - מושבת זמנית
+            # v1_prefs = db.query(UserPreferences).filter(
+            #     UserPreferences.user_id == user_id
+            # ).first()
             
-            if v1_prefs:
-                return v1_prefs.to_dict()
+            # if v1_prefs:
+            #     return v1_prefs.to_dict()
+            return None
             
             # אחרת, נסה מהשדה JSON של המשתמש
             user = db.query(User).filter(User.id == user_id).first()

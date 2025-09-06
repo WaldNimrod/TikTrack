@@ -1,5 +1,9 @@
 # מדריך מהיר - CSS Architecture
 
+## דשבורד CSS Management
+**🌐 גישה**: `http://localhost:8080/css-management`  
+**📍 בתפריט**: פעולות מערכת → מנהל CSS וארכיטקטורה
+
 ## הוספת עמוד חדש
 
 ### 1. CSS לקופי הפן

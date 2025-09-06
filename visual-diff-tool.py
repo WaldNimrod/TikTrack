@@ -20,13 +20,13 @@ def take_screenshots_old():
     
     # רשימת עמודים לצילום
     pages = [
-        'index.html',
-        'trades.html', 
-        'alerts.html',
-        'accounts.html',
-        'preferences.html',
-        'tickers.html',
-        'external-data-dashboard.html'
+        ('', 'דף הבית'),
+        ('trades', 'טריידים'), 
+        ('alerts', 'התראות'),
+        ('accounts', 'חשבונות'),
+        ('preferences', 'העדפות'),
+        ('tickers', 'טיקרים'),
+        ('external-data-dashboard', 'דשבורד נתונים חיצוניים')
     ]
     
     # יצירת תיקייה
@@ -178,11 +178,12 @@ def create_comparison_html(screenshots_dir):
         ('external-data-dashboard.html', 'דשבורד נתונים')
     ]
     
-    for page, title in pages:
+    for page_url, title in pages:
+        display_url = f"/{page_url}" if page_url else "/"
         html_content += f"""
         <div class="page-comparison">
             <div class="comparison-header">
-                <h2>📄 {title} ({page})</h2>
+                <h2>📄 {title} ({display_url})</h2>
             </div>
             
             <div class="comparison-grid">
@@ -192,7 +193,7 @@ def create_comparison_html(screenshots_dir):
                         Screenshot של {title}<br>
                         (מערכת ישנה)
                         <br><br>
-                        <small>צלם ידנית: http://localhost:5000/{page}</small>
+                        <small>צלם ידנית: http://localhost:8080{display_url}</small>
                     </div>
                 </div>
                 
@@ -202,7 +203,7 @@ def create_comparison_html(screenshots_dir):
                         Screenshot של {title}<br>
                         (מערכת חדשה)
                         <br><br>
-                        <small>צלם ידנית: http://localhost:5000/{page}</small>
+                        <small>צלם ידנית: http://localhost:8080{display_url}</small>
                     </div>
                 </div>
             </div>

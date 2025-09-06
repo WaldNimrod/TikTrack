@@ -554,7 +554,7 @@ function downloadPythonTools() {
 
 function openSamplePages() {
     """פתיחת דפי דוגמה"""
-    const pages = ['index.html', 'trades.html', 'alerts.html', 'accounts.html'];
+    const pages = ['/', '/trades', '/alerts', '/accounts'];
     pages.forEach(page => {
         window.open(page, '_blank');
     });
@@ -565,7 +565,7 @@ function runVisualDiff() {
     alert(`להשוואה חזותית מלאה:
 
 1. הרץ: python3 css-toggle.py old
-2. צלם screenshots של העמודים
+2. צלם screenshots של העמודים (http://localhost:8080/trades וכו')
 3. הרץ: python3 css-toggle.py new  
 4. צלם screenshots שוב
 5. השווה את התמונות

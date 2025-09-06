@@ -12,12 +12,12 @@
 ./start_dev.sh
 
 # צלם את העמודים הראשיים (באופן ידני)
-# - http://localhost:5000/index.html
-# - http://localhost:5000/trades.html  
-# - http://localhost:5000/alerts.html
-# - http://localhost:5000/accounts.html
-# - http://localhost:5000/preferences.html
-# - http://localhost:5000/tickers.html
+# - http://localhost:8080/
+# - http://localhost:8080/trades  
+# - http://localhost:8080/alerts
+# - http://localhost:8080/accounts
+# - http://localhost:8080/preferences
+# - http://localhost:8080/tickers
 ```
 
 ### בדיקת פונקציונליות לפני
@@ -151,7 +151,7 @@ python3 css-toggle.py old
 ### דשבורד CSS
 גש לכלי הניהול החדש:
 ```
-http://localhost:5000/css-management.html
+http://localhost:8080/css-management
 ```
 
 תכונות הדשבורד:

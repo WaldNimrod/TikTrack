@@ -19,7 +19,7 @@ Last Updated: 2025-08-16
 from sqlalchemy import Column, String, Float, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from models.base import BaseModel
+from .base import BaseModel
 from typing import Dict, Any, Optional
 
 class Account(BaseModel):

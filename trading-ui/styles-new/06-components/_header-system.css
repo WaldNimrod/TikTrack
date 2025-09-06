@@ -407,7 +407,8 @@
     z-index: 1002;
 }
 
-#unified-header .dropdown-submenu:hover .tiktrack-submenu {
+#unified-header .dropdown-submenu:hover .tiktrack-submenu,
+#unified-header .tiktrack-submenu.show {
     opacity: 1;
     visibility: visible;
     transform: translateX(0);

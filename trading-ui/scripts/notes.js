@@ -1,4 +1,178 @@
 // ===== קובץ JavaScript פשוט לדף הערות =====
+
+/**
+ * הוספת הערה חדשה
+ * פותח מודל להוספת הערה חדשה
+ */
+function addNote() {
+  try {
+    console.log('➕ מוסיף הערה חדשה');
+    
+    // פתיחת מודל הוספת הערה
+    showAddNoteModal();
+    
+  } catch (error) {
+    console.error('שגיאה בהוספת הערה:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהוספת הערה', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בהוספת הערה', 'error');
+    }
+  }
+}
+
+/**
+ * העלאת קובץ
+ * מעלה קובץ להערה
+ * @param {number} noteId - מזהה ההערה
+ */
+function uploadFile(noteId) {
+  try {
+    console.log('📤 מעלה קובץ להערה:', noteId);
+    
+    // יצירת input file
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '*/*';
+    
+    fileInput.onchange = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      // יצירת FormData
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('note_id', noteId);
+      
+      // שליחה לשרת
+      fetch('/api/notes/' + noteId + '/upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('שגיאה בהעלאת קובץ');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('✅ קובץ הועלה:', data);
+        
+        // הודעת הצלחה
+        if (typeof window.showSuccessNotification === 'function') {
+          window.showSuccessNotification('קובץ הועלה בהצלחה');
+        } else if (typeof window.showNotification === 'function') {
+          window.showNotification('קובץ הועלה בהצלחה', 'success');
+        }
+      })
+      .catch(error => {
+        console.error('שגיאה בהעלאת קובץ:', error);
+        if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification('שגיאה בהעלאת קובץ', error.message);
+        } else if (typeof window.showNotification === 'function') {
+          window.showNotification('שגיאה בהעלאת קובץ', 'error');
+        }
+      });
+    };
+    
+    // הפעלת בחירת הקובץ
+    fileInput.click();
+    
+  } catch (error) {
+    console.error('שגיאה בהעלאת קובץ:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהעלאת קובץ', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בהעלאת קובץ', 'error');
+    }
+  }
+}
+
+/**
+ * הורדת קובץ
+ * מוריד קובץ מהערה
+ * @param {number} noteId - מזהה ההערה
+ * @param {string} fileName - שם הקובץ
+ */
+function downloadFile(noteId, fileName) {
+  try {
+    console.log('📥 מוריד קובץ:', noteId, fileName);
+    
+    // יצירת קישור להורדה
+    const downloadUrl = `/api/notes/${noteId}/download/${encodeURIComponent(fileName)}`;
+    
+    // יצירת אלמנט a להורדה
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = fileName;
+    link.target = '_blank';
+    
+    // הוספה לדף והפעלה
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // הודעת הצלחה
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification('הורדת קובץ החלה');
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('הורדת קובץ החלה', 'success');
+    }
+    
+  } catch (error) {
+    console.error('שגיאה בהורדת קובץ:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהורדת קובץ', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בהורדת קובץ', 'error');
+    }
+  }
+}
+
+/**
+ * צפייה בפריטים מקושרים
+ * מציג פריטים המקושרים להערה
+ * @param {number} noteId - מזהה ההערה
+ */
+function viewLinkedItems(noteId) {
+  try {
+    console.log('🔗 מציג פריטים מקושרים להערה:', noteId);
+    
+    // חיפוש ההערה בנתונים
+    const note = window.notesData.find(n => n.id === noteId);
+    if (!note) {
+      throw new Error('הערה לא נמצאה');
+    }
+    
+    // הצגת מודל פריטים מקושרים
+    if (typeof window.showLinkedItemsModal === 'function') {
+      window.showLinkedItemsModal('notes', noteId, note.title || 'הערה');
+    } else if (typeof window.showModalNotification === 'function') {
+      const content = `
+        <div class="linked-items">
+          <h5>פריטים מקושרים</h5>
+          <p>הערה: ${note.title || 'ללא כותרת'}</p>
+          <p>תוכן: ${note.content || 'ללא תוכן'}</p>
+          <p><em>פונקציונליות מקושרים זמינה במערכת הגלובלית</em></p>
+        </div>
+      `;
+      window.showModalNotification('פריטים מקושרים', content, 'info');
+    } else {
+      alert(`פריטים מקושרים להערה:\n\n` +
+        `כותרת: ${note.title || 'ללא כותרת'}\n` +
+        `תוכן: ${note.content || 'ללא תוכן'}\n\n` +
+        `פונקציונליות מקושרים זמינה במערכת הגלובלית`);
+    }
+    
+  } catch (error) {
+    console.error('שגיאה בהצגת פריטים מקושרים:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהצגת פריטים מקושרים', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בהצגת פריטים מקושרים', 'error');
+    }
+  }
+}
 /*
  * Notes.js - Notes Page Management
  * =================================

@@ -1,4 +1,25 @@
 // ===== קובץ JavaScript לדף עסקעות =====
+
+/**
+ * הוספת ביצוע חדש
+ * פותח מודל להוספת ביצוע חדש
+ */
+function addExecution() {
+  try {
+    console.log('➕ מוסיף ביצוע חדש');
+    
+    // פתיחת מודל הוספת ביצוע
+    showAddExecutionModal();
+    
+  } catch (error) {
+    console.error('שגיאה בהוספת ביצוע:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהוספת ביצוע', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בהוספת ביצוע', 'error');
+    }
+  }
+}
 /*
  * Executions.js - Executions Page Management
  * =========================================

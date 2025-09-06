@@ -2451,3 +2451,123 @@ function getAccountName(accountId) {
   return `חשבון ${accountId}`;
 }
 
+/**
+ * עדכון חשבון קיים
+ * @param {number} accountId - מזהה החשבון
+ * @param {Object} accountData - נתוני החשבון החדשים
+ */
+function updateAccount(accountId, accountData) {
+  try {
+    console.log('📝 מעדכן חשבון:', accountId, accountData);
+    
+    // ולידציה בסיסית
+    if (!accountId || !accountData) {
+      throw new Error('נתונים חסרים לעדכון חשבון');
+    }
+    
+    // שליחה לשרת
+    fetch('/api/accounts/' + accountId, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(accountData)
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('שגיאה בעדכון חשבון');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('✅ חשבון עודכן בהצלחה:', data);
+      
+      // רענון הטבלה
+      loadAccountsFromServer();
+      
+      // הודעת הצלחה
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('חשבון עודכן בהצלחה');
+      } else if (typeof window.showNotification === 'function') {
+        window.showNotification('חשבון עודכן בהצלחה', 'success');
+      }
+    })
+    .catch(error => {
+      console.error('שגיאה בעדכון חשבון:', error);
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה בעדכון חשבון', error.message);
+      } else if (typeof window.showNotification === 'function') {
+        window.showNotification('שגיאה בעדכון חשבון', 'error');
+      }
+    });
+    
+  } catch (error) {
+    console.error('שגיאה בעדכון חשבון:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון חשבון', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בעדכון חשבון', 'error');
+    }
+  }
+}
+
+/**
+ * צפייה בפרטי חשבון
+ * מציג חלון עם פרטים מפורטים של החשבון
+ * @param {number} accountId - מזהה החשבון
+ */
+function viewAccountDetails(accountId) {
+  try {
+    console.log('👁️ מציג פרטי חשבון:', accountId);
+    
+    // חיפוש החשבון בנתונים
+    const account = window.accountsData.find(a => a.id === accountId);
+    if (!account) {
+      throw new Error('חשבון לא נמצא');
+    }
+    
+    // יצירת תוכן פרטי החשבון
+    const detailsContent = `
+      <div class="account-details">
+        <h5>פרטי חשבון</h5>
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>שם החשבון:</strong> ${account.name || 'לא ידוע'}</p>
+            <p><strong>סוג:</strong> ${account.type || 'לא ידוע'}</p>
+            <p><strong>מטבע:</strong> ${account.currency || 'לא ידוע'}</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>יתרה:</strong> ${account.balance || '0'}</p>
+            <p><strong>סטטוס:</strong> ${account.status || 'פעיל'}</p>
+            <p><strong>תאריך יצירה:</strong> ${account.created_at || 'לא ידוע'}</p>
+          </div>
+        </div>
+        ${account.description ? `<p><strong>תיאור:</strong> ${account.description}</p>` : ''}
+      </div>
+    `;
+    
+    // הצגת מודל עם הפרטים
+    if (typeof window.showModalNotification === 'function') {
+      window.showModalNotification('פרטי חשבון', detailsContent, 'info');
+    } else {
+      // fallback - הצגה בחלון alert
+      alert(`פרטי חשבון:\n\n` +
+        `שם: ${account.name || 'לא ידוע'}\n` +
+        `סוג: ${account.type || 'לא ידוע'}\n` +
+        `מטבע: ${account.currency || 'לא ידוע'}\n` +
+        `יתרה: ${account.balance || '0'}\n` +
+        `סטטוס: ${account.status || 'פעיל'}\n` +
+        `תאריך יצירה: ${account.created_at || 'לא ידוע'}` +
+        (account.description ? `\nתיאור: ${account.description}` : ''));
+    }
+    
+  } catch (error) {
+    console.error('שגיאה בהצגת פרטי חשבון:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהצגת פרטי חשבון', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בהצגת פרטי חשבון', 'error');
+    }
+  }
+}
+

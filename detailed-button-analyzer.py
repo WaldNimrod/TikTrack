@@ -11,7 +11,7 @@ from pathlib import Path
 
 class DetailedButtonAnalyzer:
     def __init__(self):
-        self.trading_ui_path = Path("/workspace/trading-ui")
+        self.trading_ui_path = Path("/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui")
         self.results = {}
 
     def analyze_buttons_in_file(self, filename):

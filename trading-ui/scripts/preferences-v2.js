@@ -923,6 +923,193 @@ function openEntityColorPicker(entity) {
 }
 
 // פונקציות שיוצאו לגלובל
+/**
+ * טעינת העדפות V2
+ * טוען את כל ההעדפות מהשרת
+ */
+function loadPreferencesV2() {
+  try {
+    console.log('📊 טוען העדפות V2...');
+    
+    // הצגת אינדיקטור טעינה
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('טוען העדפות V2...', 'info');
+    }
+    
+    // טעינת העדפות
+    if (window.preferencesV2Instance) {
+      window.preferencesV2Instance.loadPreferences();
+    } else {
+      // יצירת instance חדש
+      window.preferencesV2Instance = new PreferencesV2();
+    }
+    
+    // הודעת הצלחה
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification('העדפות V2 נטענו בהצלחה');
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('העדפות V2 נטענו בהצלחה', 'success');
+    }
+    
+  } catch (error) {
+    console.error('שגיאה בטעינת העדפות V2:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בטעינת העדפות V2', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בטעינת העדפות V2', 'error');
+    }
+  }
+}
+
+/**
+ * עדכון העדפה V2
+ * מעדכן העדפה ספציפית
+ * @param {string} key - מפתח ההעדפה
+ * @param {any} value - ערך ההעדפה
+ */
+function updatePreferenceV2(key, value) {
+  try {
+    console.log('📝 מעדכן העדפה V2:', key, value);
+    
+    // עדכון ההעדפה
+    if (window.preferencesV2Instance) {
+      window.preferencesV2Instance.updatePreference(key, value);
+    } else {
+      throw new Error('Preferences V2 instance not initialized');
+    }
+    
+    // הודעת הצלחה
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification('העדפה עודכנה בהצלחה');
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('העדפה עודכנה בהצלחה', 'success');
+    }
+    
+  } catch (error) {
+    console.error('שגיאה בעדכון העדפה V2:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון העדפה V2', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בעדכון העדפה V2', 'error');
+    }
+  }
+}
+
+/**
+ * מחיקת העדפה V2
+ * מוחק העדפה ספציפית
+ * @param {string} key - מפתח ההעדפה
+ */
+function deletePreferenceV2(key) {
+  try {
+    console.log('🗑️ מוחק העדפה V2:', key);
+    
+    // הצגת חלון אישור
+    const confirmMessage = `האם אתה בטוח שברצונך למחוק את ההעדפה "${key}"?`;
+    
+    if (confirm(confirmMessage)) {
+      // מחיקת ההעדפה
+      if (window.preferencesV2Instance) {
+        window.preferencesV2Instance.deletePreference(key);
+      } else {
+        throw new Error('Preferences V2 instance not initialized');
+      }
+      
+      // הודעת הצלחה
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('העדפה נמחקה בהצלחה');
+      } else if (typeof window.showNotification === 'function') {
+        window.showNotification('העדפה נמחקה בהצלחה', 'success');
+      }
+    }
+    
+  } catch (error) {
+    console.error('שגיאה במחיקת העדפה V2:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה במחיקת העדפה V2', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה במחיקת העדפה V2', 'error');
+    }
+  }
+}
+
+/**
+ * יצירת פרופיל חדש V2
+ * יוצר פרופיל העדפות חדש
+ * @param {string} name - שם הפרופיל
+ * @param {string} description - תיאור הפרופיל
+ */
+function createProfileV2(name, description = '') {
+  try {
+    console.log('➕ יוצר פרופיל V2 חדש:', name);
+    
+    // ולידציה בסיסית
+    if (!name || name.trim() === '') {
+      throw new Error('שם הפרופיל נדרש');
+    }
+    
+    // יצירת הפרופיל
+    if (window.preferencesV2Instance) {
+      window.preferencesV2Instance.createProfile(name, description);
+    } else {
+      throw new Error('Preferences V2 instance not initialized');
+    }
+    
+    // הודעת הצלחה
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification('פרופיל נוצר בהצלחה');
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('פרופיל נוצר בהצלחה', 'success');
+    }
+    
+  } catch (error) {
+    console.error('שגיאה ביצירת פרופיל V2:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה ביצירת פרופיל V2', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה ביצירת פרופיל V2', 'error');
+    }
+  }
+}
+
+/**
+ * מחיקת פרופיל V2
+ * מוחק פרופיל העדפות
+ * @param {number} profileId - מזהה הפרופיל
+ */
+function deleteProfileV2(profileId) {
+  try {
+    console.log('🗑️ מוחק פרופיל V2:', profileId);
+    
+    // הצגת חלון אישור
+    const confirmMessage = `האם אתה בטוח שברצונך למחוק את הפרופיל?\n\nפעולה זו אינה ניתנת לביטול.`;
+    
+    if (confirm(confirmMessage)) {
+      // מחיקת הפרופיל
+      if (window.preferencesV2Instance) {
+        window.preferencesV2Instance.deleteProfile(profileId);
+      } else {
+        throw new Error('Preferences V2 instance not initialized');
+      }
+      
+      // הודעת הצלחה
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('פרופיל נמחק בהצלחה');
+      } else if (typeof window.showNotification === 'function') {
+        window.showNotification('פרופיל נמחק בהצלחה', 'success');
+      }
+    }
+    
+  } catch (error) {
+    console.error('שגיאה במחיקת פרופיל V2:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה במחיקת פרופיל V2', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה במחיקת פרופיל V2', 'error');
+    }
+  }
+}
+
 function saveAllPreferencesV2() {
   if (window.preferencesV2) {
     window.preferencesV2.saveAllPreferencesV2();

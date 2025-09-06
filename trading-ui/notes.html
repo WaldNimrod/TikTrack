@@ -1,77 +1,24 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>הערות - Tik.track</title>
-
-  <!-- 
-    ===== Notes Page - TikTrack =====
+            <!-- ===== CSS Architecture - Unified CSS ===== -->
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    This page contains:
-    1. Notes table - First section
-    2. Accounts table - Second section (recently added)
-    3. Alert cards - In the upper part
-    4. Advanced filtering and sorting system
+    <!-- Bootstrap Framework -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    Page structure:
-    - app-header: Application header with navigation
-    - page-body: Main content limited in width (1400px)
-      - top-section: Alert cards and data summary
-      - content-section (1): Notes table
-      - content-section (2): Accounts table
+    <!-- TikTrack CSS - Unified CSS (No @import) -->
+    <link rel="stylesheet" href="styles-new/unified.css">
     
-    Recent changes:
-    - Copying from trade plans page
-    - Adding complete accounts table
-    - Improving alert cards design
-    - Fixing independent close buttons
-    - Centralizing account functions in accounts.js?v=20250830_1
-  -->
-
-  <!-- ===== CSS Architecture - ITCSS Based ===== -->
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
-  <!-- Bootstrap Framework -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  
-  <!-- TikTrack CSS - New ITCSS Architecture -->
-  <link rel="stylesheet" href="dist/main.css">
-  
-  <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-
-  <style>
-    /* Quick filters styling */
-    .quick-filters .btn.active {
-      background-color: #007bff;
-      color: white;
-      border-color: #007bff;
-    }
-
-    .quick-filters .btn:hover {
-      background-color: #0056b3;
-      border-color: #0056b3;
-      color: white;
-    }
-
-
-
-    /* Table row hover effect */
-    #notesTable tbody tr:hover {
-      background-color: rgba(0, 123, 255, 0.1);
-      transition: background-color 0.2s ease;
-    }
-
-    /* Prevent action buttons from triggering row click */
-    .actions-cell button {
-      pointer-events: auto;
-    }
-  </style>
-
-</head>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Error Handlers -->
+    <script src="scripts/error-handlers.js"></script></head>
 
 <body class="notes-page">
   <!-- General background -->

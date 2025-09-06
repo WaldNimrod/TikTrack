@@ -22,10 +22,10 @@ class CSSManagement {
     }
 
     detectCurrentSystem() {
-        """זיהוי המערכת הנוכחית"""
+        // זיהוי המערכת הנוכחית
         const currentPageHead = document.head.innerHTML;
         
-        if (currentPageHead.includes('styles-new/main.css')) {
+        if (currentPageHead.includes('styles-new/unified.css')) {
             this.currentSystem = 'new';
             this.updateSystemStatus('חדשה (ITCSS)', 'excellent', 'מערכת מתקדמת פעילה');
         } else if (currentPageHead.includes('styles/')) {
@@ -40,7 +40,7 @@ class CSSManagement {
     }
 
     updateSystemStatus(systemName, statusClass, details) {
-        """עדכון סטטוס מערכת בממשק"""
+        // עדכון סטטוס מערכת בממשק
         const elements = {
             currentSystemStats: `${systemName}`,
             currentSystemTitle: `מערכת ${systemName}`,
@@ -64,7 +64,7 @@ class CSSManagement {
     }
 
     updateSwitchButtons() {
-        """עדכון מצב כפתורי המעבר"""
+        // עדכון מצב כפתורי המעבר
         const oldBtn = document.getElementById('switchOldBtn');
         const newBtn = document.getElementById('switchNewBtn');
         
@@ -82,7 +82,7 @@ class CSSManagement {
     }
 
     loadSystemInfo() {
-        """טעינת מידע מערכת"""
+        // טעינת מידע מערכת
         const stats = {
             cssSizeStats: this.currentSystem === 'new' ? '63.9 KB' : '386.2 KB',
             cssFilesStats: this.currentSystem === 'new' ? '23 קבצים' : '16 קבצים',
@@ -102,12 +102,12 @@ class CSSManagement {
     }
 
     setupEventListeners() {
-        """הגדרת מאזיני אירועים"""
+        // הגדרת מאזיני אירועים
         // כלום - הפונקציות כבר מוגדרות inline בHTML
     }
 
     startPeriodicUpdates() {
-        """עדכונים תקופתיים"""
+        // עדכונים תקופתיים
         setInterval(() => {
             this.detectCurrentSystem();
             this.loadSystemInfo();
@@ -118,7 +118,7 @@ class CSSManagement {
 // Global Functions - נגישות מהHTML
 
 async function switchToOldCSS() {
-    """מעבר למערכת CSS ישנה"""
+    // מעבר למערכת CSS ישנה
     if (window.cssManager.isAnalyzing) {
         if (typeof showNotification === 'function') {
             showNotification('אנא המתן לסיום הפעולה הנוכחית', 'warning');
@@ -168,7 +168,7 @@ async function switchToOldCSS() {
 }
 
 async function switchToNewCSS() {
-    """מעבר למערכת CSS חדשה"""
+    // מעבר למערכת CSS חדשה
     if (window.cssManager.isAnalyzing) {
         if (typeof showNotification === 'function') {
             showNotification('אנא המתן לסיום הפעולה הנוכחית', 'warning');
@@ -218,7 +218,7 @@ async function switchToNewCSS() {
 }
 
 function runCSSAnalysis() {
-    """הרצת ניתוח CSS"""
+    // הרצת ניתוח CSS
     const output = document.getElementById('comparisonOutput');
     output.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מריץ ניתוח...';
     
@@ -251,7 +251,7 @@ function runCSSAnalysis() {
 }
 
 function runRTLTest() {
-    """בדיקת תמיכה ב-RTL"""
+    // בדיקת תמיכה ב-RTL
     const output = document.getElementById('validationOutput');
     output.innerHTML = '<i class="fas fa-spinner fa-spin"></i> בודק תמיכת RTL...';
     
@@ -285,7 +285,7 @@ function runRTLTest() {
 }
 
 function measurePerformance() {
-    """מדידת ביצועים"""
+    // מדידת ביצועים
     const output = document.getElementById('performanceOutput');
     output.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מודד ביצועים...';
     
@@ -320,7 +320,7 @@ function measurePerformance() {
 }
 
 function compareSystems() {
-    """השוואת מערכות"""
+    // השוואת מערכות
     const output = document.getElementById('comparisonOutput');
     output.innerHTML = '<i class="fas fa-spinner fa-spin"></i> משווה מערכות...';
     
@@ -378,7 +378,7 @@ function compareSystems() {
 }
 
 function showFileStructure() {
-    """הצגת מבנה קבצים"""
+    // הצגת מבנה קבצים
     const modal = new bootstrap.Modal(document.getElementById('cssResultsModal'));
     document.getElementById('cssResultsModalTitle').textContent = 'מבנה קבצים - ITCSS';
     
@@ -491,7 +491,7 @@ function showFileStructure() {
 }
 
 function validateCSS() {
-    """אימות CSS"""
+    // אימות CSS
     const output = document.getElementById('validationOutput');
     output.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מאמת CSS...';
     
@@ -525,35 +525,35 @@ function validateCSS() {
 }
 
 function checkRTL() {
-    """בדיקת RTL מפורטת"""
+    // בדיקת RTL מפורטת
     runRTLTest(); // משתמש בפונקציה הקיימת
 }
 
 function runFullAnalysis() {
-    """ניתוח מלא"""
+    // ניתוח מלא
     runCSSAnalysis();
     setTimeout(() => runRTLTest(), 1000);
     setTimeout(() => measurePerformance(), 2000);
 }
 
 function runQuickTests() {
-    """בדיקות מהירות"""
+    // בדיקות מהירות
     validateCSS();
     setTimeout(() => checkRTL(), 800);
 }
 
 function openCSSGuide() {
-    """פתיחת מדריך CSS"""
+    // פתיחת מדריך CSS
     window.open('documentation/frontend/CSS_ARCHITECTURE_GUIDE.md', '_blank');
 }
 
 function openQuickReference() {
-    """פתיחת מדריך מהיר"""
+    // פתיחת מדריך מהיר
     window.open('documentation/frontend/CSS_QUICK_REFERENCE.md', '_blank');
 }
 
 function downloadTools() {
-    """הורדת כלי Python"""
+    // הורדת כלי Python
     const toolsInfo = `
 הכלים הבאים זמינים במחשב:
 
@@ -583,7 +583,7 @@ function downloadPythonTools() {
 }
 
 function openSamplePages() {
-    """פתיחת דפי דוגמה"""
+    // פתיחת דפי דוגמה
     const pages = ['/', '/trades', '/alerts', '/accounts'];
     pages.forEach(page => {
         window.open(page, '_blank');
@@ -591,7 +591,7 @@ function openSamplePages() {
 }
 
 function runVisualDiff() {
-    """השוואה חזותית"""
+    // השוואה חזותית
     const visualDiffInfo = `להשוואה חזותית מלאה:
 
 1. הרץ: python3 css-toggle.py old
@@ -610,12 +610,12 @@ function runVisualDiff() {
 }
 
 function analyzeBundle() {
-    """ניתוח Bundle"""
+    // ניתוח Bundle
     measurePerformance(); // משתמש בפונקציה הקיימת
 }
 
 function toggleTopSection() {
-    """הצג/הסתר אזור עליון"""
+    // הצג/הסתר אזור עליון
     const topSection = document.querySelector('.top-section');
     const icon = document.querySelector('.filter-icon');
     
@@ -629,7 +629,7 @@ function toggleTopSection() {
 }
 
 function copyDetailedLog() {
-    """העתקת לוג מפורט"""
+    // העתקת לוג מפורט
     const logData = `
 TikTrack CSS Management Log - ${new Date().toLocaleString('he-IL')}
 ================================================================

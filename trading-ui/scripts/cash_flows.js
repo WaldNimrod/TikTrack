@@ -1,4 +1,137 @@
 // ===== קובץ JavaScript לדף תזרימי מזומנים =====
+
+/**
+ * טעינת נתוני תזרימי מזומנים
+ * טוען את כל נתוני התזרימים מהשרת
+ */
+function loadCashFlowsData() {
+  try {
+    console.log('📊 טוען נתוני תזרימי מזומנים...');
+    
+    // הצגת אינדיקטור טעינה
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('טוען נתוני תזרימי מזומנים...', 'info');
+    }
+    
+    // שליחה לשרת
+    fetch('/api/cash_flows', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('שגיאה בטעינת נתוני תזרימי מזומנים');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('✅ נתוני תזרימי מזומנים נטענו:', data);
+      
+      // עדכון הנתונים הגלובליים
+      window.cashFlowsData = data;
+      cashFlowsData = data;
+      
+      // עדכון הטבלה
+      updateCashFlowsTable(data);
+      
+      // הודעת הצלחה
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('נתוני תזרימי מזומנים נטענו בהצלחה');
+      } else if (typeof window.showNotification === 'function') {
+        window.showNotification('נתוני תזרימי מזומנים נטענו בהצלחה', 'success');
+      }
+    })
+    .catch(error => {
+      console.error('שגיאה בטעינת נתוני תזרימי מזומנים:', error);
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים', error.message);
+      } else if (typeof window.showNotification === 'function') {
+        window.showNotification('שגיאה בטעינת נתוני תזרימי מזומנים', 'error');
+      }
+    });
+    
+  } catch (error) {
+    console.error('שגיאה בטעינת נתוני תזרימי מזומנים:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בטעינת נתוני תזרימי מזומנים', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בטעינת נתוני תזרימי מזומנים', 'error');
+    }
+  }
+}
+
+/**
+ * חישוב יתרה
+ * מחשב את היתרה הנוכחית על בסיס תזרימי המזומנים
+ */
+function calculateBalance() {
+  try {
+    console.log('🧮 מחשב יתרה...');
+    
+    if (!window.cashFlowsData || window.cashFlowsData.length === 0) {
+      if (typeof window.showWarningNotification === 'function') {
+        window.showWarningNotification('אין נתוני תזרימי מזומנים', 'לא ניתן לחשב יתרה ללא נתונים');
+      } else if (typeof window.showNotification === 'function') {
+        window.showNotification('אין נתוני תזרימי מזומנים', 'warning');
+      }
+      return;
+    }
+    
+    // חישוב היתרה
+    let totalBalance = 0;
+    let incomeTotal = 0;
+    let expenseTotal = 0;
+    
+    window.cashFlowsData.forEach(flow => {
+      const amount = parseFloat(flow.amount) || 0;
+      if (flow.type === 'income' || flow.type === 'הכנסה') {
+        incomeTotal += amount;
+        totalBalance += amount;
+      } else if (flow.type === 'expense' || flow.type === 'הוצאה') {
+        expenseTotal += amount;
+        totalBalance -= amount;
+      }
+    });
+    
+    // הצגת התוצאות
+    const balanceMessage = `\n` +
+      `סך הכנסות: ${incomeTotal.toFixed(2)}\n` +
+      `סך הוצאות: ${expenseTotal.toFixed(2)}\n` +
+      `יתרה נוכחית: ${totalBalance.toFixed(2)}`;
+    
+    if (typeof window.showModalNotification === 'function') {
+      const content = `
+        <div class="balance-calculation">
+          <h5>חישוב יתרה</h5>
+          <div class="row">
+            <div class="col-md-4">
+              <p><strong>סך הכנסות:</strong> ${incomeTotal.toFixed(2)}</p>
+            </div>
+            <div class="col-md-4">
+              <p><strong>סך הוצאות:</strong> ${expenseTotal.toFixed(2)}</p>
+            </div>
+            <div class="col-md-4">
+              <p><strong>יתרה נוכחית:</strong> ${totalBalance.toFixed(2)}</p>
+            </div>
+          </div>
+        </div>
+      `;
+      window.showModalNotification('חישוב יתרה', content, 'info');
+    } else {
+      alert(`חישוב יתרה:${balanceMessage}`);
+    }
+    
+  } catch (error) {
+    console.error('שגיאה בחישוב יתרה:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בחישוב יתרה', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בחישוב יתרה', 'error');
+    }
+  }
+}
 /*
  * Cash Flows.js - Cash Flows Page Management
  * ==========================================

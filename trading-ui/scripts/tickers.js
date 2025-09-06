@@ -1,4 +1,150 @@
 // ===== קובץ JavaScript לדף טיקרים =====
+
+/**
+ * עריכת טיקר קיים
+ * @param {number} tickerId - מזהה הטיקר
+ */
+function editTicker(tickerId) {
+  try {
+    console.log('✏️ עורך טיקר:', tickerId);
+    
+    // חיפוש הטיקר בנתונים
+    const ticker = window.tickersData.find(t => t.id === tickerId);
+    if (!ticker) {
+      throw new Error('טיקר לא נמצא');
+    }
+    
+    // פתיחת מודל עריכה עם נתוני הטיקר
+    showAddTickerModal(ticker);
+    
+  } catch (error) {
+    console.error('שגיאה בעריכת טיקר:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעריכת טיקר', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בעריכת טיקר', 'error');
+    }
+  }
+}
+
+/**
+ * צפייה בפרטי טיקר
+ * מציג חלון עם פרטים מפורטים של הטיקר
+ * @param {number} tickerId - מזהה הטיקר
+ */
+function viewTickerDetails(tickerId) {
+  try {
+    console.log('👁️ מציג פרטי טיקר:', tickerId);
+    
+    // חיפוש הטיקר בנתונים
+    const ticker = window.tickersData.find(t => t.id === tickerId);
+    if (!ticker) {
+      throw new Error('טיקר לא נמצא');
+    }
+    
+    // יצירת תוכן פרטי הטיקר
+    const detailsContent = `
+      <div class="ticker-details">
+        <h5>פרטי טיקר</h5>
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>סמל:</strong> ${ticker.symbol || 'לא ידוע'}</p>
+            <p><strong>שם:</strong> ${ticker.name || 'לא ידוע'}</p>
+            <p><strong>סוג:</strong> ${ticker.type || 'לא ידוע'}</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>מחיר:</strong> ${ticker.price || '0'}</p>
+            <p><strong>שינוי:</strong> ${ticker.change || '0'}</p>
+            <p><strong>אחוז שינוי:</strong> ${ticker.change_percent || '0%'}</p>
+          </div>
+        </div>
+        ${ticker.description ? `<p><strong>תיאור:</strong> ${ticker.description}</p>` : ''}
+      </div>
+    `;
+    
+    // הצגת מודל עם הפרטים
+    if (typeof window.showModalNotification === 'function') {
+      window.showModalNotification('פרטי טיקר', detailsContent, 'info');
+    } else {
+      // fallback - הצגה בחלון alert
+      alert(`פרטי טיקר:\n\n` +
+        `סמל: ${ticker.symbol || 'לא ידוע'}\n` +
+        `שם: ${ticker.name || 'לא ידוע'}\n` +
+        `סוג: ${ticker.type || 'לא ידוע'}\n` +
+        `מחיר: ${ticker.price || '0'}\n` +
+        `שינוי: ${ticker.change || '0'}\n` +
+        `אחוז שינוי: ${ticker.change_percent || '0%'}` +
+        (ticker.description ? `\nתיאור: ${ticker.description}` : ''));
+    }
+    
+  } catch (error) {
+    console.error('שגיאה בהצגת פרטי טיקר:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהצגת פרטי טיקר', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בהצגת פרטי טיקר', 'error');
+    }
+  }
+}
+
+/**
+ * רענון נתוני טיקר
+ * טוען מחדש את נתוני הטיקר מהשרת
+ * @param {number} tickerId - מזהה הטיקר
+ */
+function refreshTickerData(tickerId) {
+  try {
+    console.log('🔄 מרענן נתוני טיקר:', tickerId);
+    
+    // הצגת אינדיקטור טעינה
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('מרענן נתוני טיקר...', 'info');
+    }
+    
+    // שליחה לשרת לרענון נתוני הטיקר
+    fetch('/api/tickers/' + tickerId + '/refresh', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('שגיאה ברענון נתוני טיקר');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('✅ נתוני טיקר רוענו:', data);
+      
+      // רענון הטבלה
+      loadTickersData();
+      
+      // הודעת הצלחה
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('נתוני טיקר רוענו בהצלחה');
+      } else if (typeof window.showNotification === 'function') {
+        window.showNotification('נתוני טיקר רוענו בהצלחה', 'success');
+      }
+    })
+    .catch(error => {
+      console.error('שגיאה ברענון נתוני טיקר:', error);
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה ברענון נתוני טיקר', error.message);
+      } else if (typeof window.showNotification === 'function') {
+        window.showNotification('שגיאה ברענון נתוני טיקר', 'error');
+      }
+    });
+    
+  } catch (error) {
+    console.error('שגיאה ברענון נתוני טיקר:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה ברענון נתוני טיקר', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה ברענון נתוני טיקר', 'error');
+    }
+  }
+}
 /*
  * Tickers.js - Tickers Page Management
  * ====================================

@@ -1210,7 +1210,7 @@ class HeaderSystem {
   showSubmenu(submenuItem) {
     const submenu = submenuItem.querySelector('.tiktrack-submenu');
     if (submenu) {
-      submenu.style.display = 'block';
+      // השתמש ב-CSS classes במקום display style
       submenu.classList.add('show');
       // ביטול טיימר סגירה של התפריט הראשי
       this.clearDropdownTimer();
@@ -1223,10 +1223,10 @@ class HeaderSystem {
       const isVisible = submenu.classList.contains('show');
       
       if (isVisible) {
-        submenu.style.display = 'none';
+        // השתמש ב-CSS classes במקום display style
         submenu.classList.remove('show');
       } else {
-        submenu.style.display = 'block';
+        // השתמש ב-CSS classes במקום display style
         submenu.classList.add('show');
         // ביטול טיימר סגירה של התפריט הראשי
         this.clearDropdownTimer();
@@ -1237,7 +1237,7 @@ class HeaderSystem {
   static hideSubmenu(submenuItem) {
     const submenu = submenuItem.querySelector('.tiktrack-submenu');
     if (submenu) {
-      submenu.style.display = 'none';
+      // השתמש ב-CSS classes במקום display style
       submenu.classList.remove('show');
     }
   }

@@ -2987,3 +2987,133 @@ async function reactivateTrade(tradeId) {
   }
 }
 
+/**
+ * רענון נתוני טריידים
+ * טוען מחדש את כל נתוני הטריידים מהשרת
+ */
+function refreshTrades() {
+  try {
+    console.log('🔄 מרענן נתוני טריידים...');
+    
+    // הצגת אינדיקטור טעינה
+    if (typeof window.showNotification === 'function') {
+      window.showNotification('מרענן נתוני טריידים...', 'info');
+    }
+    
+    // טעינת נתונים מחדש
+    loadTradesData();
+    
+    // הודעת הצלחה
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification('נתוני טריידים רוענו בהצלחה');
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('נתוני טריידים רוענו בהצלחה', 'success');
+    }
+    
+  } catch (error) {
+    console.error('שגיאה ברענון טריידים:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה ברענון טריידים', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה ברענון טריידים', 'error');
+    }
+  }
+}
+
+/**
+ * עדכון טרייד קיים
+ * @param {number} tradeId - מזהה הטרייד
+ * @param {Object} tradeData - נתוני הטרייד החדשים
+ */
+function updateTrade(tradeId, tradeData) {
+  try {
+    console.log('📝 מעדכן טרייד:', tradeId, tradeData);
+    
+    // ולידציה בסיסית
+    if (!tradeId || !tradeData) {
+      throw new Error('נתונים חסרים לעדכון טרייד');
+    }
+    
+    // שליחה לשרת
+    fetch('/api/trades/' + tradeId, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(tradeData)
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('שגיאה בעדכון טרייד');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('✅ טרייד עודכן בהצלחה:', data);
+      
+      // רענון הטבלה
+      loadTradesData();
+      
+      // הודעת הצלחה
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('טרייד עודכן בהצלחה');
+      } else if (typeof window.showNotification === 'function') {
+        window.showNotification('טרייד עודכן בהצלחה', 'success');
+      }
+    })
+    .catch(error => {
+      console.error('שגיאה בעדכון טרייד:', error);
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה בעדכון טרייד', error.message);
+      } else if (typeof window.showNotification === 'function') {
+        window.showNotification('שגיאה בעדכון טרייד', 'error');
+      }
+    });
+    
+  } catch (error) {
+    console.error('שגיאה בעדכון טרייד:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בעדכון טרייד', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בעדכון טרייד', 'error');
+    }
+  }
+}
+
+/**
+ * אישור מחיקת טרייד
+ * מציג חלון אישור לפני מחיקת טרייד
+ * @param {number} tradeId - מזהה הטרייד למחיקה
+ */
+function confirmDeleteTrade(tradeId) {
+  try {
+    console.log('🗑️ מאשר מחיקת טרייד:', tradeId);
+    
+    // חיפוש הטרייד בנתונים
+    const trade = window.tradesData.find(t => t.id === tradeId);
+    if (!trade) {
+      throw new Error('טרייד לא נמצא');
+    }
+    
+    // יצירת הודעת אישור
+    const confirmMessage = `האם אתה בטוח שברצונך למחוק את הטרייד?\n\n` +
+      `חשבון: ${trade.account_name || 'לא ידוע'}\n` +
+      `טיקר: ${trade.ticker_symbol || 'לא ידוע'}\n` +
+      `סכום: ${trade.amount || 'לא ידוע'}`;
+    
+    // הצגת חלון אישור
+    if (confirm(confirmMessage)) {
+      // ביצוע המחיקה
+      deleteTradeRecord(tradeId);
+    }
+    
+  } catch (error) {
+    console.error('שגיאה באישור מחיקת טרייד:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה באישור מחיקת טרייד', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה באישור מחיקת טרייד', 'error');
+    }
+  }
+}
+

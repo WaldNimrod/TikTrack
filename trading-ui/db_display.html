@@ -20,54 +20,24 @@
 -->
 <html lang="he" dir="rtl">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>בסיס נתונים - Tik.track</title>
-
-  
-    <!-- ===== CSS Architecture - ITCSS Based ===== -->
+            <!-- ===== CSS Architecture - Unified CSS ===== -->
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <!-- Bootstrap Framework -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- TikTrack CSS - New ITCSS Architecture -->
-    <link rel="stylesheet" href="dist/main.css">
+    <!-- TikTrack CSS - Unified CSS (No @import) -->
+    <link rel="stylesheet" href="styles-new/unified.css">
     
-
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-  
-  <!-- 8. Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  
-  <!-- 9. Page-specific styles (highest priority) -->
-<!-- 10. Page-specific color scheme initialization -->
-  <script>
-    // Initialize entity colors for database display page
-    document.addEventListener('DOMContentLoaded', function() {
-      // Define entity colors for database tables
-      const entityColors = {
-        'account': '#28a745',
-        'trade': '#007bff', 
-        'trade_plan': '#0056b3',
-        'execution': '#17a2b8',
-        'ticker': '#6f42c1',
-        'alert': '#ffc107',
-        'note': '#6c757d',
-        'cash_flow': '#20c997',
-        'constraint': '#6c757d',
-        'design': '#495057'
-      };
-      
-      // Set entity colors if the system is available
-      if (window.ENTITY_COLORS) {
-        Object.assign(window.ENTITY_COLORS, entityColors);
-      }
-    });
-  </script>
-</head>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Error Handlers -->
+    <script src="scripts/error-handlers.js"></script></head>
 
 <body class="db-display-page">
   <!-- Web Component of the header -->

@@ -1,144 +1,23 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>דשבורד בדיקות CRUD - TikTrack</title>
+            <!-- ===== CSS Architecture - Unified CSS ===== -->
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap Framework -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- TikTrack CSS - Unified CSS (No @import) -->
+    <link rel="stylesheet" href="styles-new/unified.css">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="/static/css/main.css">
     
-    <style>
-        .testing-dashboard {
-            padding: 20px;
-        }
-        
-        .summary-stats {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-        
-        .summary-item {
-            text-align: center;
-        }
-        
-        .summary-number {
-            font-size: 2em;
-            font-weight: bold;
-            color: #007bff;
-        }
-        
-        .summary-label {
-            font-size: 0.9em;
-            color: #6c757d;
-        }
-        
-        .page-test-card {
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-        
-        .page-header {
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-        }
-        
-        .page-header.critical { background: #f8d7da; }
-        .page-header.high { background: #fff3cd; }
-        .page-header.medium { background: #d1ecf1; }
-        
-        .page-body {
-            padding: 20px;
-        }
-        
-        .test-section {
-            margin-bottom: 20px;
-        }
-        
-        .test-section h4, .test-section h5 {
-            color: #495057;
-            margin-bottom: 10px;
-        }
-        
-        .checklist {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .checklist li {
-            margin: 5px 0;
-        }
-        
-        .checklist input[type="checkbox"] {
-            margin-left: 10px;
-        }
-        
-        .buttons-list {
-            display: grid;
-            gap: 10px;
-        }
-        
-        .button-item {
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #dee2e6;
-        }
-        
-        .button-item.create { background: #d4edda; }
-        .button-item.update { background: #fff3cd; }
-        .button-item.delete { background: #f8d7da; }
-        .button-item.other { background: #e2e3e5; }
-        
-        .priority-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8em;
-            font-weight: bold;
-        }
-        
-        .status-indicator {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: inline-block;
-        }
-        
-        .status-not-tested { background: #6c757d; }
-        .status-testing { background: #ffc107; }
-        .status-passed { background: #28a745; }
-        .status-failed { background: #dc3545; }
-        
-        .test-actions {
-            margin-bottom: 20px;
-        }
-        
-        .test-actions .btn {
-            margin-left: 10px;
-        }
-        
-        .nav-tabs .nav-link {
-            color: #495057;
-        }
-        
-        .nav-tabs .nav-link.active {
-            background-color: #007bff;
-            color: white;
-        }
-    </style>
-</head>
+    <!-- Error Handlers -->
+    <script src="scripts/error-handlers.js"></script></head>
 <body>
     <div class="background-wrapper">
         <div class="page-body">

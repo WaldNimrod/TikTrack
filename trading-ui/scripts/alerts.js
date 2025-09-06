@@ -2480,3 +2480,167 @@ window.reactivateAlert = reactivateAlert;
 // console.log('- formatAlertCondition:', typeof window.formatAlertCondition);
 // console.log('- parseAlertCondition:', typeof window.parseAlertCondition);
 // console.log('- clearAlertValidation:', typeof window.clearAlertValidation);
+
+/**
+ * בדיקת תנאי התראה
+ * בודק אם תנאי התראה מתקיים עבור טיקר מסוים
+ * @param {Object} alert - אובייקט ההתראה
+ * @param {Object} tickerData - נתוני הטיקר הנוכחיים
+ */
+function checkAlertCondition(alert, tickerData) {
+  try {
+    console.log('🔍 בודק תנאי התראה:', alert.id, tickerData);
+    
+    if (!alert || !tickerData) {
+      throw new Error('נתונים חסרים לבדיקת תנאי התראה');
+    }
+    
+    // פרסור תנאי ההתראה
+    const condition = alert.condition || '';
+    const targetValue = parseFloat(alert.target_value) || 0;
+    const currentPrice = parseFloat(tickerData.price) || 0;
+    
+    let conditionMet = false;
+    let message = '';
+    
+    // בדיקת תנאים שונים
+    if (condition.includes('>') && condition.includes('price')) {
+      conditionMet = currentPrice > targetValue;
+      message = `מחיר ${tickerData.symbol} (${currentPrice}) גבוה מ-${targetValue}`;
+    } else if (condition.includes('<') && condition.includes('price')) {
+      conditionMet = currentPrice < targetValue;
+      message = `מחיר ${tickerData.symbol} (${currentPrice}) נמוך מ-${targetValue}`;
+    } else if (condition.includes('=') && condition.includes('price')) {
+      conditionMet = Math.abs(currentPrice - targetValue) < 0.01;
+      message = `מחיר ${tickerData.symbol} (${currentPrice}) שווה ל-${targetValue}`;
+    }
+    
+    // אם התנאי מתקיים, הצגת התראה
+    if (conditionMet) {
+      if (typeof window.showWarningNotification === 'function') {
+        window.showWarningNotification('התראה פעילה!', message);
+      } else if (typeof window.showNotification === 'function') {
+        window.showNotification(`התראה: ${message}`, 'warning');
+      }
+      
+      // עדכון סטטוס ההתראה
+      updateAlertStatus(alert.id, 'triggered');
+    }
+    
+    return conditionMet;
+    
+  } catch (error) {
+    console.error('שגיאה בבדיקת תנאי התראה:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בבדיקת תנאי התראה', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בבדיקת תנאי התראה', 'error');
+    }
+    return false;
+  }
+}
+
+/**
+ * הפעלה/כיבוי התראה
+ * מחליף את מצב ההפעלה של התראה
+ * @param {number} alertId - מזהה ההתראה
+ */
+function toggleAlert(alertId) {
+  try {
+    console.log('🔄 מחליף מצב התראה:', alertId);
+    
+    // חיפוש ההתראה בנתונים
+    const alert = alertsData.find(a => a.id === alertId);
+    if (!alert) {
+      throw new Error('התראה לא נמצאה');
+    }
+    
+    // החלפת מצב ההפעלה
+    const newStatus = alert.is_active ? 'inactive' : 'active';
+    const newIsActive = !alert.is_active;
+    
+    // עדכון בשרת
+    fetch('/api/alerts/' + alertId, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        is_active: newIsActive,
+        status: newStatus
+      })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('שגיאה בעדכון מצב התראה');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('✅ מצב התראה עודכן:', data);
+      
+      // עדכון הנתונים המקומיים
+      alert.is_active = newIsActive;
+      alert.status = newStatus;
+      
+      // רענון הטבלה
+      updateAlertsTable(alertsData);
+      
+      // הודעת הצלחה
+      const statusText = newIsActive ? 'הופעלה' : 'כובתה';
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification(`התראה ${statusText} בהצלחה`);
+      } else if (typeof window.showNotification === 'function') {
+        window.showNotification(`התראה ${statusText} בהצלחה`, 'success');
+      }
+    })
+    .catch(error => {
+      console.error('שגיאה בעדכון מצב התראה:', error);
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה בעדכון מצב התראה', error.message);
+      } else if (typeof window.showNotification === 'function') {
+        window.showNotification('שגיאה בעדכון מצב התראה', 'error');
+      }
+    });
+    
+  } catch (error) {
+    console.error('שגיאה בהחלפת מצב התראה:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהחלפת מצב התראה', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בהחלפת מצב התראה', 'error');
+    }
+  }
+}
+
+/**
+ * עדכון סטטוס התראה
+ * @param {number} alertId - מזהה ההתראה
+ * @param {string} status - הסטטוס החדש
+ */
+function updateAlertStatus(alertId, status) {
+  try {
+    fetch('/api/alerts/' + alertId + '/status', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status: status })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('שגיאה בעדכון סטטוס התראה');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('✅ סטטוס התראה עודכן:', data);
+    })
+    .catch(error => {
+      console.error('שגיאה בעדכון סטטוס התראה:', error);
+    });
+    
+  } catch (error) {
+    console.error('שגיאה בעדכון סטטוס התראה:', error);
+  }
+}

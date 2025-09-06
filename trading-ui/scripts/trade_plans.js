@@ -2,6 +2,150 @@
  * ========================================
  * Trade Plans Page - Trade Plans Page
  * ========================================
+
+/**
+ * ביצוע תוכנית מסחר
+ * מבצע את התוכנית המסחרית
+ * @param {number} planId - מזהה התוכנית
+ */
+function executeTradePlan(planId) {
+  try {
+    console.log('⚡ מבצע תוכנית מסחר:', planId);
+    
+    // חיפוש התוכנית בנתונים
+    const plan = window.tradePlansData.find(p => p.id === planId);
+    if (!plan) {
+      throw new Error('תוכנית מסחר לא נמצאה');
+    }
+    
+    // בדיקת תקינות התוכנית
+    if (!plan.is_active) {
+      throw new Error('תוכנית מסחר לא פעילה');
+    }
+    
+    // הצגת חלון אישור
+    const confirmMessage = `האם אתה בטוח שברצונך לבצע את התוכנית?\n\n` +
+      `שם התוכנית: ${plan.name || 'לא ידוע'}\n` +
+      `טיקר: ${plan.ticker_symbol || 'לא ידוע'}\n` +
+      `סכום: ${plan.amount || 'לא ידוע'}`;
+    
+    if (confirm(confirmMessage)) {
+      // שליחה לשרת לביצוע התוכנית
+      fetch('/api/trade_plans/' + planId + '/execute', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('שגיאה בביצוע תוכנית מסחר');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('✅ תוכנית מסחר בוצעה:', data);
+        
+        // רענון הטבלה
+        loadTradePlansData();
+        
+        // הודעת הצלחה
+        if (typeof window.showSuccessNotification === 'function') {
+          window.showSuccessNotification('תוכנית מסחר בוצעה בהצלחה');
+        } else if (typeof window.showNotification === 'function') {
+          window.showNotification('תוכנית מסחר בוצעה בהצלחה', 'success');
+        }
+      })
+      .catch(error => {
+        console.error('שגיאה בביצוע תוכנית מסחר:', error);
+        if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification('שגיאה בביצוע תוכנית מסחר', error.message);
+        } else if (typeof window.showNotification === 'function') {
+          window.showNotification('שגיאה בביצוע תוכנית מסחר', 'error');
+        }
+      });
+    }
+    
+  } catch (error) {
+    console.error('שגיאה בביצוע תוכנית מסחר:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בביצוע תוכנית מסחר', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בביצוע תוכנית מסחר', 'error');
+    }
+  }
+}
+
+/**
+ * העתקת תוכנית מסחר
+ * יוצר עותק של תוכנית מסחר קיימת
+ * @param {number} planId - מזהה התוכנית
+ */
+function copyTradePlan(planId) {
+  try {
+    console.log('📋 מעתיק תוכנית מסחר:', planId);
+    
+    // חיפוש התוכנית בנתונים
+    const plan = window.tradePlansData.find(p => p.id === planId);
+    if (!plan) {
+      throw new Error('תוכנית מסחר לא נמצאה');
+    }
+    
+    // יצירת עותק של התוכנית
+    const copiedPlan = {
+      ...plan,
+      id: null, // מזהה חדש ייווצר
+      name: (plan.name || 'תוכנית חדשה') + ' - עותק',
+      is_active: false, // התוכנית החדשה לא פעילה
+      created_at: null,
+      updated_at: null
+    };
+    
+    // שליחה לשרת ליצירת העותק
+    fetch('/api/trade_plans', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(copiedPlan)
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('שגיאה בהעתקת תוכנית מסחר');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('✅ תוכנית מסחר הועתקה:', data);
+      
+      // רענון הטבלה
+      loadTradePlansData();
+      
+      // הודעת הצלחה
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('תוכנית מסחר הועתקה בהצלחה');
+      } else if (typeof window.showNotification === 'function') {
+        window.showNotification('תוכנית מסחר הועתקה בהצלחה', 'success');
+      }
+    })
+    .catch(error => {
+      console.error('שגיאה בהעתקת תוכנית מסחר:', error);
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה בהעתקת תוכנית מסחר', error.message);
+      } else if (typeof window.showNotification === 'function') {
+        window.showNotification('שגיאה בהעתקת תוכנית מסחר', 'error');
+      }
+    });
+    
+  } catch (error) {
+    console.error('שגיאה בהעתקת תוכנית מסחר:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה בהעתקת תוכנית מסחר', error.message);
+    } else if (typeof window.showNotification === 'function') {
+      window.showNotification('שגיאה בהעתקת תוכנית מסחר', 'error');
+    }
+  }
+}
  *
  * Dedicated file for the trade plans page (trade_plans.html)
  *

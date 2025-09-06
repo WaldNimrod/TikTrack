@@ -48,6 +48,7 @@ class PreferenceProfile(BaseModel):
     
     # קשרים
     user = relationship("User", foreign_keys=[user_id], back_populates="preference_profiles")
+    created_by_user = relationship("User", foreign_keys=[created_by])
     preferences = relationship("UserPreferences", back_populates="profile", cascade="all, delete-orphan")
     
     def __repr__(self):

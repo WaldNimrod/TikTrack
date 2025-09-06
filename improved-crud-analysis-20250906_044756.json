@@ -1,0 +1,1343 @@
+{
+  "index.html": {
+    "info": {
+      "name": "דף הבית",
+      "crud_level": "view"
+    },
+    "analysis": {
+      "status": "very_good",
+      "grade": "טוב מאוד",
+      "score": 88.6,
+      "basic_checks": {
+        "has_doctype": true,
+        "has_html_tag": true,
+        "has_head": true,
+        "has_body": true,
+        "has_title": true,
+        "rtl_support": true,
+        "hebrew_lang": true,
+        "css_new_system": true,
+        "bootstrap_included": true,
+        "scripts_included": true,
+        "no_broken_html": false,
+        "proper_structure": true
+      },
+      "basic_score": 91.66666666666666,
+      "functionality_score": 84,
+      "real_buttons": [
+        {
+          "type": "html_button",
+          "text": "טריידים",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "התראות",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "חשבונות",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "ערוך",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "סגור",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "ערוך",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "סגור",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "ערוך",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "סגור",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "ערוך",
+          "source": "HTML"
+        }
+      ],
+      "real_modals": [],
+      "real_tables": [
+        {
+          "id": "ללא ID",
+          "class": "table table-hover",
+          "tag": "<table class=\"table table-hover\">"
+        },
+        {
+          "id": "ללא ID",
+          "class": "table table-hover",
+          "tag": "<table class=\"table table-hover\">"
+        },
+        {
+          "id": "ללא ID",
+          "class": "table table-hover",
+          "tag": "<table class=\"table table-hover\">"
+        }
+      ],
+      "crud_functions": [
+        {
+          "type": "js_function",
+          "function": "updateChartPeriod",
+          "full_call": "updateChartPeriod()"
+        }
+      ],
+      "issues": [
+        "בדיקה בסיסית: no_broken_html"
+      ],
+      "file_size": 45498
+    },
+    "tested_at": "2025-09-06T04:47:56.756611"
+  },
+  "trades.html": {
+    "info": {
+      "name": "טריידים",
+      "crud_level": "full"
+    },
+    "analysis": {
+      "status": "excellent",
+      "grade": "מצוין",
+      "score": 100.0,
+      "basic_checks": {
+        "has_doctype": true,
+        "has_html_tag": true,
+        "has_head": true,
+        "has_body": true,
+        "has_title": true,
+        "rtl_support": true,
+        "hebrew_lang": true,
+        "css_new_system": true,
+        "bootstrap_included": true,
+        "scripts_included": true,
+        "no_broken_html": true,
+        "proper_structure": true
+      },
+      "basic_score": 100.0,
+      "functionality_score": 100,
+      "real_buttons": [
+        {
+          "type": "html_button",
+          "text": "🔗",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "⏰",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "📝",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "💰",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "ביטול",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "שמור",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "ביטול",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "שמור",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "סגור",
+          "source": "HTML"
+        }
+      ],
+      "real_modals": [
+        "editTradeModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "addTradeModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "linkedItemsModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "linkedItemsModalBody",
+        "ללא ID"
+      ],
+      "real_tables": [
+        {
+          "id": "tradesTable",
+          "class": "table",
+          "tag": "<table class=\"table\" id=\"tradesTable\" data-table-type=\"trades\">"
+        },
+        {
+          "id": "ללא ID",
+          "class": "table table-sm table-striped table-bordered",
+          "tag": "<table class=\"table table-sm table-striped table-bordered\">"
+        }
+      ],
+      "crud_functions": [
+        {
+          "type": "onclick",
+          "function": "showAddTradeModal",
+          "full_call": "showAddTradeModal()"
+        },
+        {
+          "type": "onclick",
+          "function": "viewLinkedItemsForTrade",
+          "full_call": "viewLinkedItemsForTrade(document.getElementById("
+        },
+        {
+          "type": "onclick",
+          "function": "viewLinkedItemsForTrade",
+          "full_call": "viewLinkedItemsForTrade(document.getElementById("
+        },
+        {
+          "type": "onclick",
+          "function": "addEditReminder",
+          "full_call": "addEditReminder()"
+        },
+        {
+          "type": "onclick",
+          "function": "addEditImportantNote",
+          "full_call": "addEditImportantNote()"
+        },
+        {
+          "type": "onclick",
+          "function": "addEditBuySell",
+          "full_call": "addEditBuySell()"
+        },
+        {
+          "type": "onclick",
+          "function": "addEditBuySell",
+          "full_call": "addEditBuySell()"
+        },
+        {
+          "type": "onclick",
+          "function": "addEditImportantNote",
+          "full_call": "addEditImportantNote()"
+        },
+        {
+          "type": "onclick",
+          "function": "addEditReminder",
+          "full_call": "addEditReminder()"
+        },
+        {
+          "type": "onclick",
+          "function": "if ",
+          "full_call": "if (typeof window.saveEditTradeData === "
+        },
+        {
+          "type": "onclick",
+          "function": "addImportantNote",
+          "full_call": "addImportantNote()"
+        },
+        {
+          "type": "onclick",
+          "function": "addReminder",
+          "full_call": "addReminder()"
+        },
+        {
+          "type": "onclick",
+          "function": "saveNewTradeRecord",
+          "full_call": "saveNewTradeRecord()"
+        }
+      ],
+      "issues": [],
+      "file_size": 34733
+    },
+    "tested_at": "2025-09-06T04:47:56.757316"
+  },
+  "accounts.html": {
+    "info": {
+      "name": "חשבונות",
+      "crud_level": "full"
+    },
+    "analysis": {
+      "status": "warning",
+      "grade": "בינוני",
+      "score": 66.0,
+      "basic_checks": {
+        "has_doctype": true,
+        "has_html_tag": true,
+        "has_head": true,
+        "has_body": true,
+        "has_title": true,
+        "rtl_support": true,
+        "hebrew_lang": true,
+        "css_new_system": true,
+        "bootstrap_included": true,
+        "scripts_included": true,
+        "no_broken_html": true,
+        "proper_structure": true
+      },
+      "basic_score": 100.0,
+      "functionality_score": 15,
+      "real_buttons": [],
+      "real_modals": [],
+      "real_tables": [
+        {
+          "id": "accountsTable",
+          "class": "table",
+          "tag": "<table class=\"table\" id=\"accountsTable\" data-table-type=\"accounts\">"
+        }
+      ],
+      "crud_functions": [],
+      "issues": [
+        "מעט כפתורים - ייתכן בעיה בזיהוי",
+        "לא נמצאו פונקציות CRUD"
+      ],
+      "file_size": 15946
+    },
+    "tested_at": "2025-09-06T04:47:56.757621"
+  },
+  "alerts.html": {
+    "info": {
+      "name": "התראות",
+      "crud_level": "full"
+    },
+    "analysis": {
+      "status": "excellent",
+      "grade": "מצוין",
+      "score": 95.0,
+      "basic_checks": {
+        "has_doctype": true,
+        "has_html_tag": true,
+        "has_head": true,
+        "has_body": true,
+        "has_title": true,
+        "rtl_support": true,
+        "hebrew_lang": true,
+        "css_new_system": true,
+        "bootstrap_included": true,
+        "scripts_included": true,
+        "no_broken_html": false,
+        "proper_structure": true
+      },
+      "basic_score": 91.66666666666666,
+      "functionality_score": 100,
+      "real_buttons": [
+        {
+          "type": "html_button",
+          "text": "הכל",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "ביטול",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "שמור\n              התראה",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "ביטול",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "עדכן\n              התראה",
+          "source": "HTML"
+        }
+      ],
+      "real_modals": [
+        "addAlertModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "editAlertModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID"
+      ],
+      "real_tables": [
+        {
+          "id": "alertsTable",
+          "class": "table",
+          "tag": "<table class=\"table\" id=\"alertsTable\" data-table-type=\"alerts\">"
+        }
+      ],
+      "crud_functions": [
+        {
+          "type": "onclick",
+          "function": "showAddAlertModal",
+          "full_call": "showAddAlertModal()"
+        },
+        {
+          "type": "onclick",
+          "function": "saveAlert",
+          "full_call": "saveAlert()"
+        },
+        {
+          "type": "onclick",
+          "function": "updateAlert",
+          "full_call": "updateAlert()"
+        }
+      ],
+      "issues": [
+        "בדיקה בסיסית: no_broken_html"
+      ],
+      "file_size": 27159
+    },
+    "tested_at": "2025-09-06T04:47:56.758087"
+  },
+  "tickers.html": {
+    "info": {
+      "name": "טיקרים",
+      "crud_level": "full"
+    },
+    "analysis": {
+      "status": "excellent",
+      "grade": "מצוין",
+      "score": 95.0,
+      "basic_checks": {
+        "has_doctype": true,
+        "has_html_tag": true,
+        "has_head": true,
+        "has_body": true,
+        "has_title": true,
+        "rtl_support": true,
+        "hebrew_lang": true,
+        "css_new_system": true,
+        "bootstrap_included": true,
+        "scripts_included": true,
+        "no_broken_html": false,
+        "proper_structure": true
+      },
+      "basic_score": 91.66666666666666,
+      "functionality_score": 100,
+      "real_buttons": [
+        {
+          "type": "html_button",
+          "text": "ביטול",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "שמור טיקר",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "ביטול",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "עדכן טיקר",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "ביטול",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "מחק טיקר",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "סגור",
+          "source": "HTML"
+        }
+      ],
+      "real_modals": [
+        "addTickerModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "editTickerModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "deleteTickerModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "linkedItemsModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "linkedItemsModalBody",
+        "ללא ID"
+      ],
+      "real_tables": [
+        {
+          "id": "tickersTable",
+          "class": "table",
+          "tag": "<table id=\"tickersTable\" class=\"table\" data-table-type=\"tickers\">"
+        }
+      ],
+      "crud_functions": [
+        {
+          "type": "onclick",
+          "function": "showAddTickerModal",
+          "full_call": "showAddTickerModal()"
+        },
+        {
+          "type": "onclick",
+          "function": "saveTicker",
+          "full_call": "saveTicker()"
+        },
+        {
+          "type": "onclick",
+          "function": "updateTicker",
+          "full_call": "updateTicker()"
+        },
+        {
+          "type": "onclick",
+          "function": "confirmDeleteTicker",
+          "full_call": "confirmDeleteTicker()"
+        }
+      ],
+      "issues": [
+        "בדיקה בסיסית: no_broken_html"
+      ],
+      "file_size": 24014
+    },
+    "tested_at": "2025-09-06T04:47:56.758508"
+  },
+  "executions.html": {
+    "info": {
+      "name": "ביצועים",
+      "crud_level": "full"
+    },
+    "analysis": {
+      "status": "excellent",
+      "grade": "מצוין",
+      "score": 95.0,
+      "basic_checks": {
+        "has_doctype": true,
+        "has_html_tag": true,
+        "has_head": true,
+        "has_body": true,
+        "has_title": true,
+        "rtl_support": true,
+        "hebrew_lang": true,
+        "css_new_system": true,
+        "bootstrap_included": true,
+        "scripts_included": true,
+        "no_broken_html": false,
+        "proper_structure": true
+      },
+      "basic_score": 91.66666666666666,
+      "functionality_score": 100,
+      "real_buttons": [
+        {
+          "type": "html_button",
+          "text": "🔗",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "הוסף תכנון",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "הוסף טרייד",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "הוסף טיקר",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "ביטול",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "שמור עסקה",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "🔗",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "הוסף תכנון",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "הוסף טרייד",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "הוסף טיקר",
+          "source": "HTML"
+        }
+      ],
+      "real_modals": [
+        "addExecutionModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "editExecutionModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "deleteExecutionModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "linkedItemsModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "linkedItemsModalBody",
+        "ללא ID"
+      ],
+      "real_tables": [
+        {
+          "id": "executionsTable",
+          "class": "table",
+          "tag": "<table class=\"table\" id=\"executionsTable\" data-table-type=\"executions\">"
+        }
+      ],
+      "crud_functions": [
+        {
+          "type": "onclick",
+          "function": "addNewPlan",
+          "full_call": "addNewPlan()"
+        },
+        {
+          "type": "onclick",
+          "function": "addNewTrade",
+          "full_call": "addNewTrade()"
+        },
+        {
+          "type": "onclick",
+          "function": "addNewTicker",
+          "full_call": "addNewTicker()"
+        },
+        {
+          "type": "onclick",
+          "function": "saveExecution",
+          "full_call": "saveExecution()"
+        },
+        {
+          "type": "onclick",
+          "function": "addNewPlan",
+          "full_call": "addNewPlan()"
+        },
+        {
+          "type": "onclick",
+          "function": "addNewTrade",
+          "full_call": "addNewTrade()"
+        },
+        {
+          "type": "onclick",
+          "function": "addNewTicker",
+          "full_call": "addNewTicker()"
+        },
+        {
+          "type": "onclick",
+          "function": "updateExecution",
+          "full_call": "updateExecution()"
+        },
+        {
+          "type": "onclick",
+          "function": "confirmDeleteExecution",
+          "full_call": "confirmDeleteExecution()"
+        }
+      ],
+      "issues": [
+        "בדיקה בסיסית: no_broken_html"
+      ],
+      "file_size": 38059
+    },
+    "tested_at": "2025-09-06T04:47:56.759167"
+  },
+  "cash_flows.html": {
+    "info": {
+      "name": "תזרימי מזומנים",
+      "crud_level": "full"
+    },
+    "analysis": {
+      "status": "excellent",
+      "grade": "מצוין",
+      "score": 95.0,
+      "basic_checks": {
+        "has_doctype": true,
+        "has_html_tag": true,
+        "has_head": true,
+        "has_body": true,
+        "has_title": true,
+        "rtl_support": true,
+        "hebrew_lang": true,
+        "css_new_system": true,
+        "bootstrap_included": true,
+        "scripts_included": true,
+        "no_broken_html": false,
+        "proper_structure": true
+      },
+      "basic_score": 91.66666666666666,
+      "functionality_score": 100,
+      "real_buttons": [
+        {
+          "type": "html_button",
+          "text": "ביטול",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "שמור תזרים",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "ביטול",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "עדכן תזרים",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "סגור",
+          "source": "HTML"
+        }
+      ],
+      "real_modals": [
+        "addCashFlowModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "editCashFlowModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "linkedItemsModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "linkedItemsModalBody",
+        "ללא ID"
+      ],
+      "real_tables": [
+        {
+          "id": "cashFlowsTable",
+          "class": "table",
+          "tag": "<table id=\"cashFlowsTable\" class=\"table\" data-table-type=\"cash_flows\">"
+        }
+      ],
+      "crud_functions": [
+        {
+          "type": "onclick",
+          "function": "showAddCashFlowModal",
+          "full_call": "showAddCashFlowModal()"
+        },
+        {
+          "type": "onclick",
+          "function": "saveCashFlow",
+          "full_call": "saveCashFlow()"
+        },
+        {
+          "type": "onclick",
+          "function": "updateCashFlow",
+          "full_call": "updateCashFlow()"
+        }
+      ],
+      "issues": [
+        "בדיקה בסיסית: no_broken_html"
+      ],
+      "file_size": 29654
+    },
+    "tested_at": "2025-09-06T04:47:56.759635"
+  },
+  "trade_plans.html": {
+    "info": {
+      "name": "תוכניות מסחר",
+      "crud_level": "full"
+    },
+    "analysis": {
+      "status": "excellent",
+      "grade": "מצוין",
+      "score": 100.0,
+      "basic_checks": {
+        "has_doctype": true,
+        "has_html_tag": true,
+        "has_head": true,
+        "has_body": true,
+        "has_title": true,
+        "rtl_support": true,
+        "hebrew_lang": true,
+        "css_new_system": true,
+        "bootstrap_included": true,
+        "scripts_included": true,
+        "no_broken_html": true,
+        "proper_structure": true
+      },
+      "basic_score": 100.0,
+      "functionality_score": 100,
+      "real_buttons": [
+        {
+          "type": "html_button",
+          "text": "ביטול",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "שמור",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "ביטול",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "שמור",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "ביטול",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "בטל תכנון",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "ביטול",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "מחק",
+          "source": "HTML"
+        }
+      ],
+      "real_modals": [
+        "addTradePlanModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "editTradePlanModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "cancelTradePlanModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "deleteTradePlanModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "linkedItemsModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "linkedItemsModalBody"
+      ],
+      "real_tables": [
+        {
+          "id": "trade_plansTable",
+          "class": "table trade-plans-table",
+          "tag": "<table class=\"table trade-plans-table\" id=\"trade_plansTable\" data-table-type=\"trade_plans\">"
+        }
+      ],
+      "crud_functions": [
+        {
+          "type": "onclick",
+          "function": "if ",
+          "full_call": "if (typeof window.openAddTradePlanModal === "
+        },
+        {
+          "type": "onclick",
+          "function": "if ",
+          "full_call": "if (typeof window.showAddTradePlanModal === "
+        },
+        {
+          "type": "onclick",
+          "function": "addEntryCondition",
+          "full_call": "addEntryCondition()"
+        },
+        {
+          "type": "onclick",
+          "function": "addReason",
+          "full_call": "addReason()"
+        },
+        {
+          "type": "onclick",
+          "function": "addImportantNote",
+          "full_call": "addImportantNote()"
+        },
+        {
+          "type": "onclick",
+          "function": "addReminder",
+          "full_call": "addReminder()"
+        },
+        {
+          "type": "onclick",
+          "function": "if ",
+          "full_call": "if (typeof window.saveNewTradePlan === "
+        },
+        {
+          "type": "onclick",
+          "function": "addEditCondition",
+          "full_call": "addEditCondition()"
+        },
+        {
+          "type": "onclick",
+          "function": "addEditReason",
+          "full_call": "addEditReason()"
+        },
+        {
+          "type": "onclick",
+          "function": "addEditImportantNote",
+          "full_call": "addEditImportantNote()"
+        },
+        {
+          "type": "onclick",
+          "function": "addEditReminder",
+          "full_call": "addEditReminder()"
+        },
+        {
+          "type": "onclick",
+          "function": "if ",
+          "full_call": "if (typeof window.saveEditTradePlan === "
+        },
+        {
+          "type": "onclick",
+          "function": "if ",
+          "full_call": "if (typeof window.confirmDeleteTradePlan === "
+        }
+      ],
+      "issues": [],
+      "file_size": 32269
+    },
+    "tested_at": "2025-09-06T04:47:56.760193"
+  },
+  "notes.html": {
+    "info": {
+      "name": "הערות",
+      "crud_level": "full"
+    },
+    "analysis": {
+      "status": "excellent",
+      "grade": "מצוין",
+      "score": 95.0,
+      "basic_checks": {
+        "has_doctype": true,
+        "has_html_tag": true,
+        "has_head": true,
+        "has_body": true,
+        "has_title": true,
+        "rtl_support": true,
+        "hebrew_lang": true,
+        "css_new_system": true,
+        "bootstrap_included": true,
+        "scripts_included": true,
+        "no_broken_html": false,
+        "proper_structure": true
+      },
+      "basic_score": 91.66666666666666,
+      "functionality_score": 100,
+      "real_buttons": [
+        {
+          "type": "html_button",
+          "text": "הכל",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "נסה שוב",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "H1",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "H2",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "H3",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "•",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "1.",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "🔗",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "🧹",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "ביטול",
+          "source": "HTML"
+        }
+      ],
+      "real_modals": [
+        "addNoteModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "editNoteModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "viewNoteModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID"
+      ],
+      "real_tables": [
+        {
+          "id": "notesTable",
+          "class": "table",
+          "tag": "<table class=\"table\" id=\"notesTable\" data-table-type=\"notes\">"
+        }
+      ],
+      "crud_functions": [
+        {
+          "type": "onclick",
+          "function": "saveNote",
+          "full_call": "saveNote()"
+        },
+        {
+          "type": "onclick",
+          "function": "removeCurrentAttachment",
+          "full_call": "removeCurrentAttachment()"
+        },
+        {
+          "type": "onclick",
+          "function": "updateNoteFromModal",
+          "full_call": "updateNoteFromModal()"
+        },
+        {
+          "type": "onclick",
+          "function": "editCurrentNote",
+          "full_call": "editCurrentNote()"
+        }
+      ],
+      "issues": [
+        "בדיקה בסיסית: no_broken_html"
+      ],
+      "file_size": 30125
+    },
+    "tested_at": "2025-09-06T04:47:56.760767"
+  },
+  "preferences.html": {
+    "info": {
+      "name": "העדפות V1",
+      "crud_level": "settings"
+    },
+    "analysis": {
+      "status": "excellent",
+      "grade": "מצוין",
+      "score": 100.0,
+      "basic_checks": {
+        "has_doctype": true,
+        "has_html_tag": true,
+        "has_head": true,
+        "has_body": true,
+        "has_title": true,
+        "rtl_support": true,
+        "hebrew_lang": true,
+        "css_new_system": true,
+        "bootstrap_included": true,
+        "scripts_included": true,
+        "no_broken_html": true,
+        "proper_structure": true
+      },
+      "basic_score": 100.0,
+      "functionality_score": 100,
+      "real_buttons": [
+        {
+          "type": "html_button",
+          "text": "ביטול",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "צור פרופיל",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "סגור",
+          "source": "HTML"
+        }
+      ],
+      "real_modals": [
+        "createProfileModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "historyModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID"
+      ],
+      "real_tables": [],
+      "crud_functions": [
+        {
+          "type": "onclick",
+          "function": "createNewProfile",
+          "full_call": "createNewProfile()"
+        },
+        {
+          "type": "onclick",
+          "function": "deleteCurrentProfile",
+          "full_call": "deleteCurrentProfile()"
+        },
+        {
+          "type": "onclick",
+          "function": "saveAllPreferencesV2",
+          "full_call": "saveAllPreferencesV2()"
+        },
+        {
+          "type": "onclick",
+          "function": "submitCreateProfile",
+          "full_call": "submitCreateProfile()"
+        }
+      ],
+      "issues": [],
+      "file_size": 29901
+    },
+    "tested_at": "2025-09-06T04:47:56.761375"
+  },
+  "preferences-v2.html": {
+    "info": {
+      "name": "העדפות V2",
+      "crud_level": "settings"
+    },
+    "analysis": {
+      "status": "excellent",
+      "grade": "מצוין",
+      "score": 100.0,
+      "basic_checks": {
+        "has_doctype": true,
+        "has_html_tag": true,
+        "has_head": true,
+        "has_body": true,
+        "has_title": true,
+        "rtl_support": true,
+        "hebrew_lang": true,
+        "css_new_system": true,
+        "bootstrap_included": true,
+        "scripts_included": true,
+        "no_broken_html": true,
+        "proper_structure": true
+      },
+      "basic_score": 100.0,
+      "functionality_score": 100,
+      "real_buttons": [
+        {
+          "type": "html_button",
+          "text": "ביטול",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "צור פרופיל",
+          "source": "HTML"
+        },
+        {
+          "type": "html_button",
+          "text": "סגור",
+          "source": "HTML"
+        }
+      ],
+      "real_modals": [
+        "createProfileModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "historyModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID"
+      ],
+      "real_tables": [],
+      "crud_functions": [
+        {
+          "type": "onclick",
+          "function": "createNewProfile",
+          "full_call": "createNewProfile()"
+        },
+        {
+          "type": "onclick",
+          "function": "deleteCurrentProfile",
+          "full_call": "deleteCurrentProfile()"
+        },
+        {
+          "type": "onclick",
+          "function": "saveAllPreferencesV2",
+          "full_call": "saveAllPreferencesV2()"
+        },
+        {
+          "type": "onclick",
+          "function": "submitCreateProfile",
+          "full_call": "submitCreateProfile()"
+        }
+      ],
+      "issues": [],
+      "file_size": 37729
+    },
+    "tested_at": "2025-09-06T04:47:56.762136"
+  },
+  "css-management.html": {
+    "info": {
+      "name": "מנהל CSS",
+      "crud_level": "admin"
+    },
+    "analysis": {
+      "status": "very_good",
+      "grade": "טוב מאוד",
+      "score": 84.8,
+      "basic_checks": {
+        "has_doctype": true,
+        "has_html_tag": true,
+        "has_head": true,
+        "has_body": true,
+        "has_title": true,
+        "rtl_support": true,
+        "hebrew_lang": true,
+        "css_new_system": true,
+        "bootstrap_included": true,
+        "scripts_included": true,
+        "no_broken_html": true,
+        "proper_structure": true
+      },
+      "basic_score": 100.0,
+      "functionality_score": 62,
+      "real_buttons": [
+        {
+          "type": "html_button",
+          "text": "סגור",
+          "source": "HTML"
+        }
+      ],
+      "real_modals": [
+        "cssResultsModal",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID",
+        "ללא ID"
+      ],
+      "real_tables": [],
+      "crud_functions": [],
+      "issues": [],
+      "file_size": 26194
+    },
+    "tested_at": "2025-09-06T04:47:56.762585"
+  }
+}

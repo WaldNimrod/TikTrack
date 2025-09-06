@@ -224,9 +224,7 @@
             </div>
             <div class="table-count">טוען...</div>
             <div class="table-actions">
-              <button class="refresh-btn"
-                onclick="console.log('Button clicked'); console.log('showAddAccountModal exists:', typeof window.showAddAccountModal); if (typeof window.showAddAccountModal === 'function') { window.showAddAccountModal(); }"
-                title="הוסף חשבון חדש">
+              <button id="addAccountBtn" class="refresh-btn" onclick="showAddAccountModal()" title="הוסף חשבון חדש">
                 <img src="images/icons/accounts.svg" alt="הוסף" class="action-icon">
                 הוסף
               </button>
@@ -421,6 +419,140 @@
 
       // All functions moved to accounts.js?v=20250830_1 - using window functions from accounts.js?v=20250830_1
     </script>
+
+    <!-- Add Account Modal -->
+    <div class="modal fade" id="addAccountModal" tabindex="-1" aria-labelledby="addAccountModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header modal-header-colored">
+                    <h5 class="modal-title" id="addAccountModalLabel">הוספת חשבון חדש</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addAccountForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="addAccountName" class="form-label">שם חשבון *</label>
+                                    <input type="text" class="form-control" id="addAccountName" required placeholder="הכנס שם חשבון...">
+                                    <div class="invalid-feedback" id="addAccountNameError"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="addAccountCurrency" class="form-label">מטבע *</label>
+                                    <select class="form-control" id="addAccountCurrency" required>
+                                        <option value="">בחר מטבע...</option>
+                                        <option value="USD">דולר אמריקאי (USD)</option>
+                                        <option value="ILS">שקל ישראלי (ILS)</option>
+                                        <option value="EUR">יורו (EUR)</option>
+                                    </select>
+                                    <div class="invalid-feedback" id="addAccountCurrencyError"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="addAccountStatus" class="form-label">סטטוס *</label>
+                                    <select class="form-control" id="addAccountStatus" required>
+                                        <option value="active">פעיל</option>
+                                        <option value="inactive">לא פעיל</option>
+                                        <option value="closed">סגור</option>
+                                    </select>
+                                    <div class="invalid-feedback" id="addAccountStatusError"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="addAccountBroker" class="form-label">ברוקר</label>
+                                    <input type="text" class="form-control" id="addAccountBroker" placeholder="שם הברוקר...">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="addAccountNotes" class="form-label">הערות</label>
+                            <textarea class="form-control" id="addAccountNotes" rows="3" placeholder="הערות על החשבון..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" class="btn btn-success" onclick="saveNewAccount()">שמור חשבון</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Account Modal -->  
+    <div class="modal fade" id="editAccountModal" tabindex="-1" aria-labelledby="editAccountModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header modal-header-colored">
+                    <h5 class="modal-title" id="editAccountModalLabel">עריכת חשבון</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editAccountForm">
+                        <input type="hidden" id="editAccountId">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editAccountName" class="form-label">שם חשבון *</label>
+                                    <input type="text" class="form-control" id="editAccountName" required>
+                                    <div class="invalid-feedback" id="editAccountNameError"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editAccountCurrency" class="form-label">מטבע *</label>
+                                    <select class="form-control" id="editAccountCurrency" required>
+                                        <option value="">בחר מטבע...</option>
+                                        <option value="USD">דולר אמריקאי (USD)</option>
+                                        <option value="ILS">שקל ישראלי (ILS)</option>
+                                        <option value="EUR">יורו (EUR)</option>
+                                    </select>
+                                    <div class="invalid-feedback" id="editAccountCurrencyError"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editAccountStatus" class="form-label">סטטוס *</label>
+                                    <select class="form-control" id="editAccountStatus" required>
+                                        <option value="active">פעיל</option>
+                                        <option value="inactive">לא פעיל</option>
+                                        <option value="closed">סגור</option>
+                                    </select>
+                                    <div class="invalid-feedback" id="editAccountStatusError"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="editAccountBroker" class="form-label">ברוקר</label>
+                                    <input type="text" class="form-control" id="editAccountBroker">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editAccountNotes" class="form-label">הערות</label>
+                            <textarea class="form-control" id="editAccountNotes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" class="btn btn-success" onclick="saveEditAccount()">עדכן חשבון</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

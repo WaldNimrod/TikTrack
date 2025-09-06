@@ -77,7 +77,7 @@
                 רענן נתונים
               </button>
               <div class="action-separator"></div>
-              <button class="refresh-btn" onclick="showAddTickerModal()" title="הוסף תיקר חדש">
+              <button id="addTickerBtn" class="refresh-btn" onclick="showAddTickerModal()" title="הוסף תיקר חדש">
                 <img src="images/icons/tickers.svg" alt="הוסף" class="action-icon">
                 הוסף טיקר
               </button>
@@ -168,7 +168,7 @@
           <!-- Tickers table -->
           <div class="section-body">
             <div class="table-responsive" id="tickersContainer">
-              <table class="table" data-table-type="tickers">
+              <table id="tickersTable" class="table" data-table-type="tickers">
                 <colgroup>
                   
                 </colgroup>

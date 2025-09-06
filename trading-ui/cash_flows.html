@@ -109,7 +109,7 @@
                     </div>
                         <div class="table-count">0 תזרימים</div>
                         <div class="table-actions">
-                            <button class="refresh-btn" onclick="showAddCashFlowModal()" title="הוסף תזרים מזומנים חדש">
+                            <button id="addCashFlowBtn" class="refresh-btn" onclick="showAddCashFlowModal()" title="הוסף תזרים מזומנים חדש">
                                 <img src="images/icons/cash_flows.svg" alt="הוסף" class="action-icon"
                                     style="width: 16px; height: 16px;"> הוסף
                             </button>
@@ -124,7 +124,7 @@
                     <!-- Cash flows table -->
                     <div class="section-body">
                         <div class="table-responsive" id="cashFlowsContainer">
-                            <table class="table" data-table-type="cash_flows">
+                            <table id="cashFlowsTable" class="table" data-table-type="cash_flows">
                                 <thead>
                                     <tr>
 

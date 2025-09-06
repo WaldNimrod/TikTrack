@@ -27,7 +27,7 @@ trading-ui/scripts/
 ├── constraints.js            # Constraints management
 ├── designs.js                # Designs page functionality
 ├── research.js               # Research page functionality
-├── preferences.js            # Preferences management
+├── preferences-v2.js         # Preferences management V2
 
 ```
 
@@ -44,7 +44,7 @@ trading-ui/scripts/
 - **CRUD Modules**: `accounts.js`, `alerts.js`, `cash_flows.js`, `notes.js`
 - **Trading Modules**: `executions.js`, `tickers.js`, `trades.js`, `planning.js`
 - **System Modules**: `database.js`, `db-extradata.js`, `constraints.js`
-- **Utility Modules**: `designs.js`, `research.js`, `preferences.js`
+- **Utility Modules**: `designs.js`, `research.js`, `preferences-v2.js`
 
 #### 3. Support Modules
 - **`table-mappings.js`**: Column mappings for table rendering

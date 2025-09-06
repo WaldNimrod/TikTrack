@@ -6,7 +6,7 @@
 
 ## קבצים עיקריים
 
-### `trading-ui/scripts/preferences.js`
+### `trading-ui/scripts/preferences-v2.js`
 הקובץ הראשי המכיל את כל הלוגיקה של מערכת ההעדפות.
 
 ### תלויות
@@ -490,7 +490,7 @@ window.loadAccountsToFilter = loadAccountsToFilter;
 1. `filter-system.js`
 2. `tables.js`
 3. `main.js`
-4. `preferences.js`
+4. `preferences-v2.js`
 
 ### תלויות גלובליות
 - `window.showConfirmationDialog` - דיאלוג אישור

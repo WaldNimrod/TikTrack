@@ -222,7 +222,18 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
           onCancel,
         );
       } else {
-        const confirmed = window.confirm(message);
+        const confirmed = typeof showConfirmationDialog === 'function' ? 
+          await new Promise(resolve => {
+            showConfirmationDialog(
+              message,
+              () => resolve(true),
+              () => resolve(false),
+              'אישור',
+              'אישור',
+              'ביטול'
+            );
+          }) : 
+          window.confirm(message);
         if (confirmed && onConfirm) {
           onConfirm();
         } else if (!confirmed && onCancel) {

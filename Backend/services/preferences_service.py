@@ -14,7 +14,6 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
 from models.user import User
 from models.user_preferences import UserPreferences, PreferenceProfile, PreferenceHistory
-# from models.user_preferences import UserPreferences  # V1 לצורך מיגרציה - מושבת זמנית
 from typing import List, Optional, Dict, Any, Tuple
 import json
 import logging

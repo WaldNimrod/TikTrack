@@ -672,9 +672,9 @@ async function saveCurrentAsDefaults() {
 }
 ```
 
-### **5. ממשק המשתמש - preferences.html**
+### **5. ממשק המשתמש - preferences-v2.html**
 
-**מיקום**: `trading-ui/preferences.html`
+**מיקום**: `trading-ui/preferences-v2.html`
 
 #### **כפתור חדש**:
 

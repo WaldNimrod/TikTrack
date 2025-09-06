@@ -66,7 +66,18 @@ function deleteNote(id) {
           );
         } else {
           // Fallback למקרה שמערכת התראות לא זמינה
-          const confirmed = window.confirm('האם אתה בטוח שברצונך למחוק הערה זו?');
+          const confirmed = typeof showConfirmationDialog === 'function' ? 
+            await new Promise(resolve => {
+              showConfirmationDialog(
+                'האם אתה בטוח שברצונך למחוק הערה זו?',
+                () => resolve(true),
+                () => resolve(false),
+                'מחיקת הערה',
+                'מחק',
+                'ביטול'
+              );
+            }) : 
+            window.confirm('האם אתה בטוח שברצונך למחוק הערה זו?');
           if (confirmed) {
             confirmDeleteNote(id);
           }

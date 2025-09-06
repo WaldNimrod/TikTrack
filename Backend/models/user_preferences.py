@@ -46,9 +46,9 @@ class PreferenceProfile(BaseModel):
     last_used_at = Column(DateTime(timezone=True))
     usage_count = Column(Integer, default=0)
     
-    # קשרים - מושבתים עד יצירת הטבלאות
-    # user = relationship("User", foreign_keys=[user_id], back_populates="preference_profiles")
-    # preferences = relationship("UserPreferencesV2", back_populates="profile", cascade="all, delete-orphan")
+    # קשרים
+    user = relationship("User", foreign_keys=[user_id], back_populates="preference_profiles")
+    preferences = relationship("UserPreferences", back_populates="profile", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<PreferenceProfile(user_id={self.user_id}, name='{self.profile_name}')>"
@@ -56,7 +56,7 @@ class PreferenceProfile(BaseModel):
 
 class UserPreferences(BaseModel):
     """מודל הגדרות משתמש מתקדם V2"""
-    __tablename__ = 'user_preferences'
+    __tablename__ = 'user_preferences_v2'
     
     # יחסים בסיסיים
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
@@ -217,9 +217,9 @@ class UserPreferences(BaseModel):
     # זמני עדכון
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
-    # קשרים - מושבתים עד יצירת הטבלאות
-    # user = relationship("User", back_populates="user_preferences_v2")
-    # profile = relationship("PreferenceProfile", back_populates="preferences")
+    # קשרים
+    user = relationship("User", back_populates="user_preferences")
+    profile = relationship("PreferenceProfile", back_populates="preferences")
     
     def __repr__(self):
         return f"<UserPreferencesV2(user_id={self.user_id}, profile_id={self.profile_id})>"

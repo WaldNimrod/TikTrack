@@ -549,7 +549,7 @@ window.updateNumericValueColors({
 #### **קבצים קשורים:**
 - **JavaScript**: `trading-ui/scripts/color-scheme-system.js`
 - **CSS**: `trading-ui/styles/numeric-value-colors.css`
-- **HTML V1**: `trading-ui/preferences.html` (סקשן צבעים מסורתי)
+- **HTML V2**: `trading-ui/preferences-v2.html` (סקשן צבעים מתקדם)
 - **HTML V2**: `trading-ui/preferences-v2.html` (מערכת צבעים מתקדמת) ✨ **NEW**
 - **JavaScript V2**: `trading-ui/scripts/preferences-v2.js` (ניהול צבעים מתקדם) ✨ **NEW**
 - **דוגמה**: `trading-ui/numeric-value-colors-demo.html`

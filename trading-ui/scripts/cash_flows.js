@@ -1621,13 +1621,21 @@ async function updateCashFlow() {
 function showAddCashFlowModal() {
     console.log('showAddCashFlowModal called');
     // TODO: Implement add cash flow modal
-    alert('פונקציית הוספת תזרים מזומנים תתווסף בקרוב');
+    if (typeof showNotification === 'function') {
+      showNotification('פונקציית הוספת תזרים מזומנים תתווסף בקרוב', 'info');
+    } else {
+      alert('פונקציית הוספת תזרים מזומנים תתווסף בקרוב');
+    }
 }
 
 function showEditCashFlowModal(cashFlowId) {
     console.log('showEditCashFlowModal called with ID:', cashFlowId);
     // TODO: Implement edit cash flow modal
-    alert('פונקציית עריכת תזרים מזומנים תתווסף בקרוב');
+    if (typeof showNotification === 'function') {
+      showNotification('פונקציית עריכת תזרים מזומנים תתווסף בקרוב', 'info');
+    } else {
+      alert('פונקציית עריכת תזרים מזומנים תתווסף בקרוב');
+    }
 }
 
 // ייצוא פונקציות גלובליות נוספות

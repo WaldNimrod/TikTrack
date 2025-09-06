@@ -993,7 +993,11 @@ async function saveCurrentAsDefaults() {
 }
 
 function previewSettings() {
-  alert('תכונה זו תתווסף בעתיד - תצוגה מקדימה של ההגדרות');
+  if (typeof showNotification === 'function') {
+    showNotification('תכונה זו תתווסף בעתיד - תצוגה מקדימה של ההגדרות', 'info');
+  } else {
+    alert('תכונה זו תתווסף בעתיד - תצוגה מקדימה של ההגדרות');
+  }
 }
 
 // אתחול כשהדף נטען

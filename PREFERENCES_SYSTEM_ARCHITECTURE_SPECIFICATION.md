@@ -440,7 +440,7 @@ def update_preference_structure():
    - cache management
 
 2. **עדכון עמוד העדפות**
-   - `trading-ui/preferences.html`
+   - `trading-ui/preferences-v2.html`
    - הסרת קוד מורכב
    - שימוש ב-PreferencesManager
 
@@ -449,9 +449,9 @@ def update_preference_structure():
    - הסרת פונקציות ישנות
 
 **קבצים לעדכון:**
-- `trading-ui/scripts/preferences.js` (הסרה)
+- `trading-ui/scripts/preferences-v2.js` (עדכון)
 - `trading-ui/scripts/preferences-manager.js` (חדש)
-- `trading-ui/preferences.html` (עדכון)
+- `trading-ui/preferences-v2.html` (עדכון)
 - כל העמודים שמשתמשים בהעדפות
 
 ### שלב 5: ממשק ניהול (שבוע 5)
@@ -812,8 +812,8 @@ python Backend/scripts/validate_preferences_db.py
 ### קבצי קוד רלוונטיים
 - `Backend/models/user_preferences.py` - המודל הנוכחי
 - `Backend/routes/api/preferences.py` - API נוכחי
-- `trading-ui/scripts/preferences.js` - JavaScript נוכחי
-- `trading-ui/preferences.html` - עמוד העדפות
+- `trading-ui/scripts/preferences-v2.js` - JavaScript נוכחי
+- `trading-ui/preferences-v2.html` - עמוד העדפות
 
 ### קבצי תצורה
 - `Backend/config/database.py` - הגדרות בסיס נתונים

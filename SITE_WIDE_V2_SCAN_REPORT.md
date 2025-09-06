@@ -44,7 +44,7 @@ grep -r "getCurrentPreference|loadPreferences|savePreferences|updatePreference|r
    - **אחרי:** `window.getCurrentPreference('defaultCommission')` + fallbacks
    - **שיפור:** תמיכה ב-V2/V1 + שגיאות משופרות
 
-3. ✅ **`config/preferences.json`**
+3. ✅ **`config/preferences-v2.json`**
    - **שינוי:** עדכון ערכים לסינכרון עם V2 + סימון deprecated
    - **תוספות:** הערות deprecation, עדכון ערכים לפי V2
    - **מטרה:** תאימות לאחור לקבצים ישנים
@@ -87,7 +87,7 @@ grep -r "getCurrentPreference|loadPreferences|savePreferences|updatePreference|r
 ### **קבצי מערכת V2 (לא נדרשו עדכון):**
 - ✅ `preferences-v2.js` - מערכת V2 עצמה
 - ✅ `preferences-v2-compatibility.js` - שכבת התאימות
-- ✅ `preferences.js` - סומן deprecated במסגרת הסריקה הקודמת
+- ✅ `preferences-v2.js` - סומן deprecated במסגרת הסריקה הקודמת
 
 ---
 
@@ -96,17 +96,17 @@ grep -r "getCurrentPreference|loadPreferences|savePreferences|updatePreference|r
 ### **📄 HTML Pages:**
 
 #### **דפי נתונים עיקריים:**
-- **`tickers.html`** ✅ preferences.js + V2 compatibility + כפתור V2
+- **`tickers.html`** ✅ preferences-v2.js + V2 compatibility + כפתור V2
 - **`trades.html`** ✅ entity-details + V2 compatibility
 - **`accounts.html`** ✅ entity-details + V2 compatibility
 - **`alerts.html`** ✅ entity-details + V2 compatibility + כפתור V2
-- **`executions.html`** ✅ preferences.js + V2 compatibility
+- **`executions.html`** ✅ preferences-v2.js + V2 compatibility
 - **`cash_flows.html`** ✅ entity-details + V2 compatibility
 - **`trade_plans.html`** ✅ entity-details + V2 compatibility
 
 #### **דפי מערכת:**
 - **`index.html`** ✅ באנר V2 + קישורים מהירים + פעולות מהירות
-- **`preferences.html`** ✅ preferences.js + V2 compatibility + בוחר מערכת
+- **`preferences-v2.html`** ✅ preferences-v2.js + V2 compatibility + בוחר מערכת
 - **`preferences-v2.html`** ✅ מערכת V2 מלאה
 
 ### **📜 JavaScript Files:**
@@ -114,7 +114,7 @@ grep -r "getCurrentPreference|loadPreferences|savePreferences|updatePreference|r
 #### **קבצי מערכת העדפות:**
 - **`preferences-v2.js`** → מערכת V2 מלאה
 - **`preferences-v2-compatibility.js`** → שכבת תאימות V2/V1
-- **`preferences.js`** → V1 deprecated עם הפניות ל-V2
+- **`preferences-v2.js`** → V2 active עם הפניות ל-V2
 
 #### **קבצי מערכת כלליים:**
 - **`header-system.js`** → getCurrentPreference מעודכן ל-V2
@@ -264,7 +264,7 @@ if (typeof window.getCurrentPreference === 'function') {
 }
 ```
 
-### **3. `config/preferences.json` - עדכון ערכים**
+### **3. `config/preferences-v2.json` - עדכון ערכים**
 ```json
 // תוספות:
 "_note": "⚠️ LEGACY FILE: Use V2 API instead",
@@ -304,7 +304,7 @@ if (typeof window.getCurrentPreference === 'function') {
 
 ### **סיבה 2: מערכת V2 עצמה (3 קבצים)**
 - `preferences-v2.js`, `preferences-v2-compatibility.js`
-- `preferences.html` (עודכן עם בוחר מערכת)
+- `preferences-v2.html` (עודכן עם בוחר מערכת)
 
 ### **סיבה 3: לא משתמשים בהעדפות (26 קבצים)**
 - קבצים שהוזכרו בחיפוש אבל לא משתמשים באופן פעיל

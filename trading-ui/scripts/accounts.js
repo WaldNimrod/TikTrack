@@ -1282,7 +1282,20 @@ async function cancelAccount(accountId, accountName) {
               );
             });
             if (!confirmed) return;
-          } else if (!window.confirm(`האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`)) {
+          } else {
+            const confirmed = typeof showConfirmationDialog === 'function' ? 
+              await new Promise(resolve => {
+                showConfirmationDialog(
+                  `האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`,
+                  () => resolve(true),
+                  () => resolve(false),
+                  'ביטול חשבון',
+                  'בטל',
+                  'חזור'
+                );
+              }) : 
+              window.confirm(`האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`);
+            if (!confirmed) {
             return;
           }
         }

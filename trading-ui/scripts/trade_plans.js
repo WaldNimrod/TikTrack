@@ -314,7 +314,18 @@ async function updateEditTickerInfo() {
             );
           } else {
             // Fallback למקרה שמערכת התראות לא זמינה
-            const confirmed = window.confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?');
+            const confirmed = typeof showConfirmationDialog === 'function' ? 
+              await new Promise(resolve => {
+                showConfirmationDialog(
+                  'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?',
+                  () => resolve(true),
+                  () => resolve(false),
+                  'שינוי טיקר',
+                  'שנה',
+                  'ביטול'
+                );
+              }) : 
+              window.confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?');
             if (confirmed) {
               if (typeof window.showWarningNotification === 'function') {
                 window.showWarningNotification(

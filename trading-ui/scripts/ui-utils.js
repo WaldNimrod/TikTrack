@@ -662,7 +662,19 @@ function showSecondConfirmationModal(message, onConfirm) {
           );
         } else {
           // Fallback למקרה שמערכת התראות לא זמינה
-          if (window.confirm(message)) {
+          const confirmed = typeof showConfirmationDialog === 'function' ? 
+            await new Promise(resolve => {
+              showConfirmationDialog(
+                message,
+                () => resolve(true),
+                () => resolve(false),
+                'אישור',
+                'אישור',
+                'ביטול'
+              );
+            }) : 
+            window.confirm(message);
+          if (confirmed) {
             onConfirm();
           }
         }

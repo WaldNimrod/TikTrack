@@ -298,7 +298,7 @@ POST /api/v1/preferences/reset
 ### מיקום ברירות מחדל
 
 - **Backend**: `Backend/services/user_service.py` - `load_default_preferences()`
-- **JSON File**: `Backend/trading-ui/config/preferences.json`
+- **JSON File**: `Backend/trading-ui/config/preferences-v2.json`
 - **Fallback**: Hardcoded values in `UserService`
 
 ## לוגיקת Fallback

@@ -298,7 +298,7 @@ grep -r "!important" trading-ui/styles-new/ > important-rules.txt
 ### 5.1 עדכון קישורי CSS
 **עמודים לעדכון:**
 - `trading-ui/index.html`
-- `trading-ui/preferences.html`
+- `trading-ui/preferences-v2.html`
 - `trading-ui/alerts.html`
 - `trading-ui/trades.html`
 - `trading-ui/accounts.html`
@@ -416,7 +416,7 @@ grep -r "<style>" trading-ui/*.html > embedded-styles-to-remove.txt
 // בדיקת RTL בכל העמודים
 function testRTLSupport() {
   const pages = [
-    'index.html', 'preferences.html', 'alerts.html', 
+    'index.html', 'preferences-v2.html', 'alerts.html', 
     'trades.html', 'accounts.html', 'tickers.html'
   ];
   

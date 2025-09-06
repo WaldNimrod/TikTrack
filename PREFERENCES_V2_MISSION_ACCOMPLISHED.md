@@ -51,8 +51,8 @@
 - ✅ `trading-ui/preferences-v2.html` - 1,056 שורות
 - ✅ `trading-ui/scripts/preferences-v2.js` - 919 שורות
 - ✅ `trading-ui/scripts/preferences-v2-compatibility.js` - 313 שורות
-- 🔄 `trading-ui/preferences.html` - עודכן (הוספת deprecation notice)
-- 🔄 `trading-ui/scripts/preferences.js` - סומן DEPRECATED
+- 🔄 `trading-ui/preferences-v2.html` - עודכן (הוספת deprecation notice)
+- 🔄 `trading-ui/scripts/preferences-v2.js` - סומן DEPRECATED
 - 🔄 `trading-ui/scripts/header-system.js` - עודכן לV2
 - 🔄 `trading-ui/scripts/color-scheme-system.js` - עודכן לV2
 - 🔄 `trading-ui/scripts/data-utils.js` - עודכן לV2
@@ -74,7 +74,7 @@
 
 #### **💾 גיבויים (תיקייה + 3 קבצים):**
 - ✅ `backups/preferences_v1_legacy_backup_20250905_181037/` 
-  - `preferences.html`, `preferences.js`, `preferences.py`
+  - `preferences-v2.html`, `preferences-v2.js`, `preferences.py`
 
 ---
 

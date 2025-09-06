@@ -33,7 +33,7 @@
 - `executions.js` ✅ - קיים ופועל כראוי
 - `cash_flows.js` ✅ - קיים ופועל כראוי
 - `currencies.js` ✅ - קיים ופועל כראוי
-- `preferences.js` ✅ - קיים ופועל כראוי
+- `preferences-v2.js` ✅ - קיים ופועל כראוי
 - `research.js` ❌ - **לא קיים**
 - `database.js` ❌ - **לא קיים** (יש `db_display.js` במקום)
 - `auth.js` ✅ - קיים ופועל כראוי

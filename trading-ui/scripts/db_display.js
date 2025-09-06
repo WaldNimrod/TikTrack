@@ -595,7 +595,11 @@ function sortTable(columnIndex, tableType) {
 function editRecord(tableType, recordId) {
   console.log(`✏️ Edit record: ${tableType} ID ${recordId}`);
   // TODO: Implement edit functionality
-  alert(`עריכת רשומה: ${tableType} ID ${recordId}`);
+  if (typeof showNotification === 'function') {
+    showNotification(`עריכת רשומה: ${tableType} ID ${recordId}`, 'info');
+  } else {
+    alert(`עריכת רשומה: ${tableType} ID ${recordId}`);
+  }
 }
 
 /**
@@ -605,9 +609,29 @@ function editRecord(tableType, recordId) {
  */
 function deleteRecord(tableType, recordId) {
   console.log(`🗑️ Delete record: ${tableType} ID ${recordId}`);
-  if (confirm(`האם אתה בטוח שברצונך למחוק את הרשומה ${recordId}?`)) {
+  if (typeof showConfirmationDialog === 'function') {
+    showConfirmationDialog(
+      `האם אתה בטוח שברצונך למחוק את הרשומה ${recordId}?`,
+      () => {
+        // TODO: Implement delete functionality
+        if (typeof showNotification === 'function') {
+          showNotification(`מחיקת רשומה: ${tableType} ID ${recordId}`, 'info');
+        } else {
+          alert(`מחיקת רשומה: ${tableType} ID ${recordId}`);
+        }
+      },
+      null,
+      'מחיקת רשומה',
+      'מחק',
+      'ביטול'
+    );
+  } else if (confirm(`האם אתה בטוח שברצונך למחוק את הרשומה ${recordId}?`)) {
     // TODO: Implement delete functionality
-    alert(`מחיקת רשומה: ${tableType} ID ${recordId}`);
+    if (typeof showNotification === 'function') {
+      showNotification(`מחיקת רשומה: ${tableType} ID ${recordId}`, 'info');
+    } else {
+      alert(`מחיקת רשומה: ${tableType} ID ${recordId}`);
+    }
   }
 }
 
@@ -660,11 +684,19 @@ function copyDetailedLog() {
   
   // Copy to clipboard
   navigator.clipboard.writeText(logText).then(() => {
-    alert('הלוג הועתק ללוח!');
+    if (typeof showNotification === 'function') {
+      showNotification('הלוג הועתק ללוח!', 'success');
+    } else {
+      alert('הלוג הועתק ללוח!');
+    }
     console.log('✅ Log copied to clipboard');
   }).catch(err => {
     console.error('❌ Failed to copy log:', err);
-    alert('שגיאה בהעתקת הלוג');
+    if (typeof showNotification === 'function') {
+      showNotification('שגיאה בהעתקת הלוג', 'error');
+    } else {
+      alert('שגיאה בהעתקת הלוג');
+    }
   });
 }
 

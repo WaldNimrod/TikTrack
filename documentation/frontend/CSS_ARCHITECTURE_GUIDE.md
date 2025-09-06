@@ -866,7 +866,7 @@ module.exports = {
 // בדיקת RTL בכל העמודים
 function testRTLSupport() {
   const pages = [
-    'index.html', 'preferences.html', 'alerts.html', 
+    'index.html', 'preferences-v2.html', 'alerts.html', 
     'trades.html', 'accounts.html', 'tickers.html'
   ];
   

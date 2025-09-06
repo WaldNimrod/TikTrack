@@ -20,7 +20,7 @@
 
 ### **V1 Architecture:**
 ```
-User → preferences.html → preferences.js → preferences.py → user_preferences table
+User → preferences-v2.html → preferences-v2.js → preferences.py → user_preferences table
                                         ↓
                                    users.preferences_json (legacy)
 ```
@@ -235,7 +235,7 @@ preference_history (היסטוריה)
 
 #### **V1:**
 ```javascript
-// preferences.js - 2,104 שורות
+// preferences-v2.js - 2,104 שורות
 - פונקציות מונוליתיות
 - ערבוב HTML ו-JavaScript
 - אין ניהול state מתקדם

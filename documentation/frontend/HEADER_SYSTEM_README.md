@@ -48,7 +48,7 @@ trading-ui/
 │   ├── apple-theme.css           # Base theme
 │   └── styles.css                # General styles (UPDATED)
 └── config/
-    └── preferences.json          # Default preferences
+    └── preferences-v2.json       # Default preferences V2
 ```
 
 ## Key Features

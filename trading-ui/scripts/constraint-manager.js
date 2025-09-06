@@ -296,7 +296,19 @@ class ConstraintManager {
       if (!confirmed) {return;}
     } else {
       // Fallback למקרה שמערכת התראות לא זמינה
-      if (!window.confirm('האם אתה בטוח שברצונך למחוק את האילוץ הזה?')) {
+      const confirmed = typeof showConfirmationDialog === 'function' ? 
+        await new Promise(resolve => {
+          showConfirmationDialog(
+            'האם אתה בטוח שברצונך למחוק את האילוץ הזה?',
+            () => resolve(true),
+            () => resolve(false),
+            'מחיקת אילוץ',
+            'מחק',
+            'ביטול'
+          );
+        }) : 
+        window.confirm('האם אתה בטוח שברצונך למחוק את האילוץ הזה?');
+      if (!confirmed) {
         return;
       }
     }

@@ -548,7 +548,19 @@ async function cancelTradeRecord(tradeId) {
           if (!confirmed) {return;}
         } else {
           // Fallback למקרה שמערכת התראות לא זמינה
-          if (!window.confirm(`האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`)) {
+          const confirmed = typeof showConfirmationDialog === 'function' ? 
+            await new Promise(resolve => {
+              showConfirmationDialog(
+                `האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`,
+                () => resolve(true),
+                () => resolve(false),
+                'ביטול טרייד',
+                'בטל',
+                'חזור'
+              );
+            }) : 
+            window.confirm(`האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`);
+          if (!confirmed) {
             return;
           }
         }

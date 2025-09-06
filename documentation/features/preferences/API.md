@@ -425,7 +425,7 @@ curl -X PUT "http://localhost:8080/api/preferences/defaultStopLoss" \
 ## Storage Implementation
 
 ### File-Based Storage
-- Preferences stored in JSON file: `trading-ui/config/preferences.json`
+- Preferences stored in JSON file: `trading-ui/config/preferences-v2.json`
 - Automatic backup creation before modifications
 - Atomic write operations to prevent corruption
 

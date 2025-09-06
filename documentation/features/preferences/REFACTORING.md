@@ -7,7 +7,7 @@ This document describes the comprehensive refactoring of the TikTrack preference
 ## Project Information
 
 - **Project**: TikTrack Trading Application
-- **Component**: Preferences Page (`trading-ui/preferences.html`)
+- **Component**: Preferences Page (`trading-ui/preferences-v2.html`)
 - **Date**: August 2025
 - **Status**: Completed
 
@@ -30,17 +30,17 @@ This document describes the comprehensive refactoring of the TikTrack preference
 
 **After:**
 - Clean separation between HTML structure and JavaScript logic
-- All JavaScript moved to `trading-ui/scripts/preferences.js`
+- All JavaScript moved to `trading-ui/scripts/preferences-v2.js`
 - HTML contains only structure and `onclick` handlers
 
 ### 2. File Structure
 
 ```
 trading-ui/
-├── preferences.html          # V1 - Clean HTML structure (1,518 lines)
+├── preferences-v2.html       # V2 - Clean HTML structure (1,518 lines)
 ├── preferences-v2.html       # V2 - Advanced structure (1,056 lines) ✨ NEW
 └── scripts/
-    ├── preferences.js        # V1 - All JavaScript logic (1,780 lines)
+    ├── preferences-v2.js     # V2 - All JavaScript logic (1,780 lines)
     ├── preferences-v2.js     # V2 - Modern JavaScript (919 lines) ✨ NEW
     └── preferences-v2-compatibility.js  # V2 compatibility (313 lines) ✨ NEW
 ```
@@ -58,12 +58,12 @@ trading-ui/
 
 ### 3. Code Organization
 
-#### HTML File (`preferences.html`)
+#### HTML File (`preferences-v2.html`)
 - **Size**: 1,518 lines (reduced from ~3,300 lines)
 - **Content**: Pure HTML structure, CSS styles, and minimal `onclick` handlers
 - **Scripts**: External script references only
 
-#### JavaScript File (`preferences.js`)
+#### JavaScript File (`preferences-v2.js`)
 - **Size**: 1,780 lines
 - **Functions**: 64 total functions
 - **Exports**: 44 global window functions
@@ -218,8 +218,8 @@ document.addEventListener('click', function(e) {
 
 | File | Size | Content |
 |------|------|---------|
-| `preferences.html` | 1,518 lines | Clean HTML structure |
-| `preferences.js` | 1,780 lines | Complete JavaScript logic |
+| `preferences-v2.html` | 1,518 lines | Clean HTML structure |
+| `preferences-v2.js` | 1,780 lines | Complete JavaScript logic |
 | **Total** | **3,298 lines** | **Organized codebase** |
 
 ### Function Distribution

@@ -282,7 +282,7 @@ CREATE INDEX IF NOT EXISTS idx_users_active ON users(is_active);
 #### User Preferences Integration
 - **Preferences Storage**: User preferences stored in `users.preferences` (JSON TEXT)
 - **Fallback System**: Automatic fallback to default user (nimrod, ID: 1)
-- **Default Preferences**: Loaded from `Backend/trading-ui/config/preferences.json`
+- **Default Preferences**: Loaded from `Backend/trading-ui/config/preferences-v2.json`
 - **API Integration**: All external data operations use user context
 
 #### External Data Preferences Fields

@@ -348,7 +348,7 @@ if (typeof window.showConfirmationDialog === 'function') {
 ### **החלפת הודעות alert/confirm (31 באוגוסט 2025):**
 - ✅ `alerts.js` - הוחלפו כל הודעות `alert()` ו-`confirm()`
 - ✅ `trades.js` - הוחלפו כל הודעות `confirm()`
-- ✅ `preferences.js` - הוחלפו כל הודעות `confirm()`
+- ✅ `preferences-v2.js` - הוחלפו כל הודעות `confirm()`
 - ✅ `notes.js` - הוחלפו כל הודעות `confirm()`
 - ✅ `trade_plans.js` - הוחלפו כל הודעות `confirm()`
 - ✅ `cash_flows.js` - הוחלפו כל הודעות `confirm()`

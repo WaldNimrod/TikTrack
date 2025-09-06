@@ -61,19 +61,17 @@ class HeaderSystem {
   }
 
   static createHeader() {
-    // הסרת כותרת קיימת אם יש
-    const existingHeader = document.getElementById('unified-header');
-    if (existingHeader) {
-      existingHeader.remove();
+    // מציאת אלמנט קיים או יצירת חדש
+    let headerElement = document.getElementById('unified-header');
+    if (!headerElement) {
+      headerElement = document.createElement('div');
+      headerElement.id = 'unified-header';
+      // הכנסת הכותרת לתחילת הדף
+      document.body.insertBefore(headerElement, document.body.firstChild);
     }
 
-    // יצירת אלמנט חדש
-    const headerElement = document.createElement('div');
-    headerElement.id = 'unified-header';
+    // הוספת התוכן לאלמנט
     headerElement.innerHTML = HeaderSystem.getHeaderHTML();
-
-    // הכנסת הכותרת לתחילת הדף
-    document.body.insertBefore(headerElement, document.body.firstChild);
   }
 
 

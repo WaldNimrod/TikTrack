@@ -16,9 +16,13 @@ def switch_to_old_css():
     """מעבר למערכת CSS ישנה"""
     try:
         # הפעלת הסקריפט Python
+        # השרת רץ מתיקיית Backend, אז צריך לחזור לתיקיית הבסיס
+        base_dir = Path(__file__).parent.parent.parent.parent
+        css_toggle_script = base_dir / 'css-toggle.py'
+        
         result = subprocess.run([
-            sys.executable, 'css-toggle.py', 'old'
-        ], capture_output=True, text=True, cwd=os.getcwd())
+            sys.executable, str(css_toggle_script), 'old'
+        ], capture_output=True, text=True, cwd=str(base_dir))
         
         if result.returncode == 0:
             return jsonify({
@@ -45,9 +49,13 @@ def switch_to_new_css():
     """מעבר למערכת CSS חדשה"""
     try:
         # הפעלת הסקריפט Python
+        # השרת רץ מתיקיית Backend, אז צריך לחזור לתיקיית הבסיס
+        base_dir = Path(__file__).parent.parent.parent.parent
+        css_toggle_script = base_dir / 'css-toggle.py'
+        
         result = subprocess.run([
-            sys.executable, 'css-toggle.py', 'new'
-        ], capture_output=True, text=True, cwd=os.getcwd())
+            sys.executable, str(css_toggle_script), 'new'
+        ], capture_output=True, text=True, cwd=str(base_dir))
         
         if result.returncode == 0:
             return jsonify({
@@ -74,7 +82,9 @@ def get_css_status():
     """קבלת סטטוס מערכת CSS נוכחית"""
     try:
         # בדיקת איזה מערכת פעילה
-        trading_ui_path = Path('trading-ui')
+        # השרת רץ מתיקיית Backend, אז צריך לחזור לתיקיית הבסיס
+        base_dir = Path(__file__).parent.parent.parent.parent
+        trading_ui_path = base_dir / 'trading-ui'
         html_files = list(trading_ui_path.glob('*.html'))
         
         if not html_files:
@@ -88,7 +98,22 @@ def get_css_status():
         with open(first_html, 'r', encoding='utf-8') as f:
             content = f.read()
         
-        if 'styles-new/main.css' in content:
+        if 'dist/main.css' in content:
+            # בדיקה אם dist/main.css הוא המערכת החדשה או הישנה
+            # נבדוק את גודל הקובץ
+            dist_css_path = trading_ui_path / 'dist' / 'main.css'
+            if dist_css_path.exists():
+                file_size = dist_css_path.stat().st_size
+                if file_size < 100000:  # קטן מ-100KB = מערכת חדשה
+                    system = 'new'
+                    system_name = 'חדשה (ITCSS)'
+                else:  # גדול מ-100KB = מערכת ישנה
+                    system = 'old'
+                    system_name = 'ישנה'
+            else:
+                system = 'unknown'
+                system_name = 'לא ידועה'
+        elif 'styles-new/main.css' in content:
             system = 'new'
             system_name = 'חדשה (ITCSS)'
         elif 'styles/' in content:

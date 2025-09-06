@@ -635,7 +635,19 @@ class NotificationsCenter {
         () => console.log('❌ ניקוי היסטוריה - משתמש ביטל')
       );
     } else {
-      if (window.confirm('האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?')) {
+      const confirmed = typeof showConfirmationDialog === 'function' ? 
+        await new Promise(resolve => {
+          showConfirmationDialog(
+            'האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?',
+            () => resolve(true),
+            () => resolve(false),
+            'ניקוי היסטוריה',
+            'נקה',
+            'ביטול'
+          );
+        }) : 
+        window.confirm('האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?');
+      if (confirmed) {
         executeClearHistory();
       } else {
         console.log('❌ ניקוי היסטוריה - משתמש ביטל');
@@ -966,7 +978,19 @@ function resetNotificationSettings() {
       () => console.log('❌ איפוס הגדרות - משתמש ביטל')
     );
   } else {
-    if (window.confirm('האם אתה בטוח שברצונך לאפס את כל ההגדרות?')) {
+    const confirmed = typeof showConfirmationDialog === 'function' ? 
+      await new Promise(resolve => {
+        showConfirmationDialog(
+          'האם אתה בטוח שברצונך לאפס את כל ההגדרות?',
+          () => resolve(true),
+          () => resolve(false),
+          'איפוס הגדרות',
+          'אפס',
+          'ביטול'
+        );
+      }) : 
+      window.confirm('האם אתה בטוח שברצונך לאפס את כל ההגדרות?');
+    if (confirmed) {
       executeReset();
     } else {
       console.log('❌ איפוס הגדרות - משתמש ביטל');

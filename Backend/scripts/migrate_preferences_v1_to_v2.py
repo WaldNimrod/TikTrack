@@ -28,7 +28,7 @@ from config.database import get_db
 from models.user import User
 from models.user_preferences import UserPreferences  # V1
 from models.user_preferences_v2 import UserPreferencesV2, PreferenceProfile, PreferenceHistory
-from services.preferences_service_v2 import PreferencesServiceV2
+from services.preferences_service import PreferencesService
 from sqlalchemy.exc import SQLAlchemyError
 
 
@@ -100,7 +100,7 @@ class PreferencesMigrator:
         """מגרר משתמש ספציפי"""
         try:
             # בדוק אם יש כבר V2
-            existing_v2 = PreferencesServiceV2.get_preferences_v2(self.db, user_id)
+            existing_v2 = PreferencesService.get_preferences_v2(self.db, user_id)
             if existing_v2 and not self.force:
                 return {
                     'success': False,
@@ -180,9 +180,9 @@ class PreferencesMigrator:
         """בצע את המיגרציה בפועל"""
         try:
             # צור או עדכן פרופיל ברירת מחדל
-            default_profile = PreferencesServiceV2.get_default_profile(self.db, user_id)
+            default_profile = PreferencesService.get_default_profile(self.db, user_id)
             if not default_profile:
-                default_profile = PreferencesServiceV2.create_profile(
+                default_profile = PreferencesService.create_profile(
                     self.db, user_id, "ברירת מחדל", 
                     is_default=True,
                     description="פרופיל ברירת מחדל שנוצר ממיגרציה מV1"
@@ -191,7 +191,7 @@ class PreferencesMigrator:
             
             # מחק V2 קיים אם force
             if has_existing_v2 and self.force:
-                existing = PreferencesServiceV2.get_preferences_v2(self.db, user_id, default_profile.id)
+                existing = PreferencesService.get_preferences_v2(self.db, user_id, default_profile.id)
                 if existing:
                     self.db.delete(existing)
                     self.db.commit()
@@ -397,7 +397,7 @@ class PreferencesMigrator:
             
             for uid in users_to_check:
                 v1_data = self._extract_v1_data(uid)
-                v2_prefs = PreferencesServiceV2.get_preferences_v2(self.db, uid)
+                v2_prefs = PreferencesService.get_preferences_v2(self.db, uid)
                 
                 if not v1_data:
                     continue  # אין נתונים לבדוק

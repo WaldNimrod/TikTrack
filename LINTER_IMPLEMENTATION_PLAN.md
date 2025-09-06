@@ -74,7 +74,7 @@
 ✅ **`linked-items.js`** - מ-15 ל-16 אזהרות (הוסרה פונקציה לא בשימוש)
 ✅ **`notification-system.js`** - מ-10 ל-5 אזהרות
 ✅ **`notifications-center.js`** - מ-42 ל-20+ אזהרות
-✅ **`preferences.js`** - מ-20+ ל-15+ אזהרות
+✅ **`preferences-v2.js`** - מ-20+ ל-15+ אזהרות
 ✅ **`trade_plans.js`** - מ-20+ ל-15+ אזהרות
 ✅ **`db-extradata.js`** - מ-20+ ל-15+ אזהרות
 ✅ **`active-alerts-component.js`** - מ-10+ ל-2 אזהרות

@@ -299,7 +299,7 @@ table th, .table th, .data-table th {
 ### 3. תיקון בעיית Race Condition בצבעי כותרות
 **בעיה:** שתי פונקציות יצרו מחלקות שונות לאותה כותרת:
 - `color-scheme-system.js` יצרה `entity-tickers-main-header` (עם 's')
-- `preferences.js` יצרה `entity-ticker-main-header` (בלי 's')
+- `preferences-v2.js` יצרה `entity-ticker-main-header` (בלי 's')
 
 **תיקון:** `trading-ui/scripts/color-scheme-system.js`
 
@@ -543,7 +543,7 @@ const formattedChange = parseFloat(ticker.change_percent).toFixed(2);
 - `trading-ui/scripts/tables.js` - עדכון מערכת מיון גלובלית
 - `trading-ui/scripts/table-mappings.js` - עדכון מפת עמודות
 - `trading-ui/scripts/color-scheme-system.js` - עדכון מערכת צבעים + תיקון race condition
-- `trading-ui/scripts/preferences.js` - עדכון מערכת העדפות
+- `trading-ui/scripts/preferences-v2.js` - עדכון מערכת העדפות
 
 ### קבצי HTML (לכל עמוד)
 - הוספת עמודת "עודכן" אחרי עמודת הערות

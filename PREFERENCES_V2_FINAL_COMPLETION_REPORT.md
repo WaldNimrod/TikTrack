@@ -240,7 +240,7 @@ http://localhost:5000/test-preferences-v2-integration.html
 # 3. וודא שהתוצאות ירוקות
 
 # 4. בדוק במערכת הישנה שהכל עובד
-http://localhost:5000/preferences.html
+http://localhost:5000/preferences-v2.html
 ```
 
 ### **שלב 3: שימוש במערכת החדשה (ongoing)**

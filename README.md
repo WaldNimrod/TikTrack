@@ -64,7 +64,7 @@
   - `trading-ui/scripts/header-system.js`
 
 - **מערכת התראות (31 באוגוסט):**
-  - `alerts.js`, `trades.js`, `preferences.js`, `notes.js`
+  - `alerts.js`, `trades.js`, `preferences-v2.js`, `notes.js`
   - `trade_plans.js`, `cash_flows.js`, `constraint-manager.js`
   - `notification-system.js`, `header-system.js`, `main.js`, `ui-utils.js`
   - `console-cleanup.js` - תיקון ניקוי אוטומטי

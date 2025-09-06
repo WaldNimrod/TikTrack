@@ -872,7 +872,18 @@ class EntityDetailsAPI {
                 );
             } else {
                 // fallback לconfirm רגיל
-                const result = confirm(`האם אתה בטוח שברצונך למחוק את ${entityType} #${entityId}?`);
+                const result = typeof showConfirmationDialog === 'function' ? 
+                  await new Promise(resolve => {
+                    showConfirmationDialog(
+                      `האם אתה בטוח שברצונך למחוק את ${entityType} #${entityId}?`,
+                      () => resolve(true),
+                      () => resolve(false),
+                      'מחיקת ישות',
+                      'מחק',
+                      'ביטול'
+                    );
+                  }) : 
+                  confirm(`האם אתה בטוח שברצונך למחוק את ${entityType} #${entityId}?`);
                 resolve(result);
             }
         });

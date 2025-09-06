@@ -72,8 +72,8 @@
 ### 📋 **V1 (מערכת מסורתית - תאימות לאחור)**
 
 #### **Frontend V1:**
-- **קובץ HTML**: `trading-ui/preferences.html`
-- **קובץ JavaScript**: `trading-ui/scripts/preferences.js`
+- **קובץ HTML**: `trading-ui/preferences-v2.html`
+- **קובץ JavaScript**: `trading-ui/scripts/preferences-v2.js`
 - **תלויות**: `filter-system.js`, `main.js`, `tables.js`, `ui-utils.js`
 
 #### **Backend V1:**

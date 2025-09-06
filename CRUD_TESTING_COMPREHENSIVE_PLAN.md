@@ -27,7 +27,7 @@
 8. **notes.html** - ניהול הערות
 
 ### ⚙️ עמודי הגדרות ותצורה (2 עמודים)
-9. **preferences.html** - העדפות V1
+9. **preferences-v2.html** - העדפות V2
 10. **preferences-v2.html** - העדפות V2
 
 ### 🛠️ עמודי מערכת וכלי פיתוח (8 עמודים)
@@ -153,7 +153,7 @@
 8. notes.html
 
 ### שלב 2: עמודי הגדרות
-9. preferences.html
+9. preferences-v2.html
 10. preferences-v2.html
 
 ### שלב 3: עמודי מערכת

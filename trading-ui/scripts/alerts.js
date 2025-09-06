@@ -573,7 +573,7 @@ function updateAlertsTable(alerts) {
                 ${symbolDisplay}
               </span>
               <span class="ticker-symbol-link" 
-                    onclick="if (${alert.related_id || 'false'}) { showEntityDetails('ticker', ${alert.related_id}); } else { if (window.showErrorNotification) { window.showErrorNotification('שגיאה', 'מזהה טיקר לא זמין'); } else { alert('מזהה טיקר לא זמין'); } } return false;" 
+                    onclick="if (${alert.related_id || 'false'}) { showEntityDetails('ticker', ${alert.related_id}); } else { if (window.showErrorNotification) { window.showErrorNotification('שגיאה', 'מזהה טיקר לא זמין'); } else if (typeof showNotification === 'function') { showNotification('מזהה טיקר לא זמין', 'error'); } else { alert('מזהה טיקר לא זמין'); } } return false;" 
                     title="פרטי טיקר"
                     style="cursor: pointer; opacity: 0.6; transition: opacity 0.2s ease-in-out;">
                 🔗

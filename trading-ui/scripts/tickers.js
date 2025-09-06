@@ -835,7 +835,19 @@ async function cancelTicker(id) {
       );
     } else {
       // Fallback למקרה שהמערכת הגלובלית לא זמינה
-      if (!window.confirm(`האם אתה בטוח שברצונך לבטל טיקר זה?${tickerDetails}`)) {
+      const confirmed = typeof showConfirmationDialog === 'function' ? 
+        await new Promise(resolve => {
+          showConfirmationDialog(
+            `האם אתה בטוח שברצונך לבטל טיקר זה?${tickerDetails}`,
+            () => resolve(true),
+            () => resolve(false),
+            'ביטול טיקר',
+            'בטל',
+            'חזור'
+          );
+        }) : 
+        window.confirm(`האם אתה בטוח שברצונך לבטל טיקר זה?${tickerDetails}`);
+      if (!confirmed) {
         return;
       }
       await checkLinkedItemsAndCancelTicker(id);

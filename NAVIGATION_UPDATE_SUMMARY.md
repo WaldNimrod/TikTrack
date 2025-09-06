@@ -22,7 +22,7 @@
 - **בדיקות API** אוטומטיות
 - **דוח תוצאות** מפורט
 
-### **3. ⚙️ בוחר מערכת (`preferences.html` - מעודכן)**
+### **3. ⚙️ בוחר מערכת (`preferences-v2.html` - מעודכן)**
 - **בחירה חכמה** בין V1 ו-V2
 - **זיהוי העדפת משתמש** אוטומטי
 - **הפניה חלקה** למערכת המתקדמת
@@ -72,7 +72,7 @@
 ```javascript
 // עודכנו לניווט אמיתי:
 case 'preferences-v2': → 'preferences-v2.html' 
-case 'settings': → 'preferences.html'
+case 'settings': → 'preferences-v2.html'
 ```
 
 ---
@@ -178,7 +178,7 @@ useV2System() → הודעה + מעבר ל-preferences-v2.html
 - ✅ `trading-ui/index.html` - דף הבית עם באנר ופעולות מהירות
 - ✅ `trading-ui/tickers.html` - כפתור גישה מהירה ל-V2
 - ✅ `trading-ui/alerts.html` - כפתור גישה מהירה ל-V2
-- ✅ `trading-ui/preferences.html` - בוחר מערכת חכם + Bootstrap Icons
+- ✅ `trading-ui/preferences-v2.html` - בוחר מערכת חכם + Bootstrap Icons
 - ✅ `trading-ui/scripts/header-system.js` - תפריט מעודכן עם V2
 
 ### **תכונות נוספו:**

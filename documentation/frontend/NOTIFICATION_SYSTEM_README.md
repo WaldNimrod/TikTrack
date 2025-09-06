@@ -99,7 +99,7 @@ if (typeof window.showSuccessNotification === 'function') {
 - ✅ `notes.js` - ניהול הערות
 - ✅ `trade_plans.js` - תכנון עסקאות
 - ✅ `tickers.js` - ניהול טיקרים
-- ✅ `preferences.js` - העדפות משתמש
+- ✅ `preferences-v2.js` - העדפות משתמש V2
 - ✅ `executions.js` - ביצוע עסקאות
 - ✅ `cash_flows.js` - תזרימי מזומנים
 - ✅ `currencies.js` - ניהול מטבעות

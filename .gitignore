@@ -117,3 +117,9 @@ Backend/db/*.db
 Backend/db/*.db-shm
 Backend/db/*.db-wal
 core
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so

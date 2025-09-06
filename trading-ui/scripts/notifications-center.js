@@ -535,7 +535,8 @@ class NotificationsCenter {
 
   addTestNotifications() {
     // הוספת התראות בדיקה אם אין התראות קיימות
-    if (this.history.length === 0) {
+    // Disabled test notifications to reduce noise
+    if (false && this.history.length === 0) {
       console.log('📝 הוספת התראות בדיקה...');
       
       this.addNotification('success', 'מערכת', 'מרכז ההתראות אותחל בהצלחה', 'now');
@@ -577,7 +578,7 @@ class NotificationsCenter {
         this.updateConnectionStatus('disconnected');
       }
     } else {
-      console.log('⚠️ realtimeNotificationsClient לא זמין');
+      // realtimeNotificationsClient not available - this is normal in some contexts
       this.updateConnectionStatus('disconnected');
     }
   }

@@ -1711,6 +1711,12 @@ async function updateExecutionsTableMain(executions) {
   const positiveColor = colors.positive;
   const negativeColor = colors.negative;
   const secondaryColor = colors.secondary;
+  
+  // קבלת צבעי רקע ומסגרת לערכי חיובי/שלילי
+  const positiveBgColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'light') : 'rgba(40, 167, 69, 0.1)';
+  const positiveBorderColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'border') : 'rgba(40, 167, 69, 0.3)';
+  const negativeBgColor = window.getNumericValueColor ? window.getNumericValueColor(-1, 'light') : 'rgba(220, 53, 69, 0.1)';
+  const negativeBorderColor = window.getNumericValueColor ? window.getNumericValueColor(-1, 'border') : 'rgba(220, 53, 69, 0.3)';
 
   // טעינת נתוני טריידים וטיקרים
   let trades = [];
@@ -1791,21 +1797,28 @@ async function updateExecutionsTableMain(executions) {
                                    <td class="ticker-cell">
                        <div style="display: flex; align-items: center; gap: 8px;">
                            <button class="btn btn-sm btn-outline-success" 
-                             onclick="goToTickerPage('${symbol}')" 
-                             title="עבור לדף טיקר - בפיתוח" 
+                             onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('ticker', ${ticker ? ticker.id : 'null'}, 'view'); } else { console.log('Entity details modal not available'); }" 
+                             title="פתח פרטי סימבול" 
                              style="background-color: white; border-color: ${positiveColor}; color: ${positiveColor};">
                                🔗
                            </button>
-                           <strong>${symbol}</strong>
+                           <strong style="cursor: pointer; color: ${positiveColor};" 
+                             onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('execution', ${execution.id}, 'view'); } else { console.log('Entity details modal not available'); }" 
+                             title="פתח פרטי עסקה">${symbol}</strong>
                        </div>
                    </td>
-                <td><small style="color: ${secondaryColor};">${tradeInfo}</small></td>
-                <td class="type-cell" data-type="${typeForFilter}">
+                <td style="cursor: pointer;" 
+                  onclick="if(window.showEntityDetailsModal && ${trade ? trade.id : 'null'}) { window.showEntityDetailsModal('trade', ${trade ? trade.id : 'null'}, 'view'); } else { console.log('Trade details modal not available or no trade'); }" 
+                  title="פתח פרטי טרייד"><small style="color: ${secondaryColor};">${tradeInfo}</small></td>
+                <td class="type-cell" data-type="${typeForFilter}" 
+                  style="background-color: ${(execution.action || execution.type) === 'buy' ? positiveBgColor : negativeBgColor}; border: 1px solid ${(execution.action || execution.type) === 'buy' ? positiveBorderColor : negativeBorderColor};">
                     <span class="${(execution.action || execution.type) === 'buy' ? 'profit-positive' : 'profit-negative'}">
                         ${(execution.action || execution.type) === 'buy' ? 'קניה' : 'מכירה'}
                     </span>
                 </td>
-                <td data-account="${accountName}">${accountName}</td>
+                <td data-account="${accountName}" style="cursor: pointer;" 
+                  onclick="if(window.showEntityDetailsModal) { window.showEntityDetailsModal('account', '${accountName}', 'view'); } else { console.log('Entity details modal not available'); }" 
+                  title="פתח פרטי חשבון">${accountName}</td>
                 <td>${execution.quantity}</td>
                 <td>$${execution.price}</td>
                 <td>${execution.fee ? '$' + execution.fee : '-'}</td>
@@ -3546,3 +3559,22 @@ async function updateTickersList(mode, showClosedTrades = false) {
 }
 
 window.updateTickersList = updateTickersList;
+
+// Modal event listeners for form reset
+document.addEventListener('DOMContentLoaded', function() {
+  // Add execution modal - reset form when hidden
+  const addExecutionModal = document.getElementById('addExecutionModal');
+  if (addExecutionModal) {
+    addExecutionModal.addEventListener('hidden.bs.modal', function() {
+      resetAddExecutionForm();
+    });
+  }
+
+  // Edit execution modal - reset form when hidden
+  const editExecutionModal = document.getElementById('editExecutionModal');
+  if (editExecutionModal) {
+    editExecutionModal.addEventListener('hidden.bs.modal', function() {
+      resetEditExecutionForm();
+    });
+  }
+});

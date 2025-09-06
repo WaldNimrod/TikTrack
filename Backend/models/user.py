@@ -63,8 +63,7 @@ class User(BaseModel):
     # alerts = relationship("Alert", back_populates="user")
     # notes = relationship("Note", back_populates="user")
     user_preferences = relationship("UserPreferences", back_populates="user", uselist=False)
-    preference_profiles = relationship("PreferenceProfile", back_populates="user", foreign_keys="PreferenceProfile.user_id")
-    user_preferences_v2 = relationship("UserPreferencesV2", back_populates="user")
+    # user_preferences_v2 = relationship("UserPreferencesV2", back_populates="user")  # Disabled until V2 tables are created
     
     def __repr__(self) -> str:
         """String representation of the user"""

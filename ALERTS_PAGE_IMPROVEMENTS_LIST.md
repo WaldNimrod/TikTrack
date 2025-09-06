@@ -270,7 +270,121 @@ function sortByTranslatedCondition(a, b, columnIndex) {
 
 ---
 
+---
+
+## 13. עדכון עיצוב מודלים - רקע לבן וכותרת צבעונית
+
+### 13.1 דרישה חדשה
+- **רקע לבן לכל המודולים**: כל מודולי Entity Details צריכים להיות עם רקע לבן
+- **כותרת צבעונית**: כותרת המודל צריכה להיות בצבע בהתאם לסוג הישות
+
+### 13.2 יישום
+**קובץ: `entity-details-system.js`**
+- הוספת פונקציה `updateModalStyling()` לעדכון עיצוב המודל
+- הוספת פונקציה `getEntityColorScheme()` לקבלת סכמת צבעים לפי סוג ישות
+- עדכון `showModal()` לקריאה לעיצוב המודל
+
+**קובץ: `base-entity-module.js`**
+- עדכון `showModal()` להעברת סוג הישות למערכת העיצוב
+
+### 13.3 סכמת צבעים
+```javascript
+const colorSchemes = {
+    'account': { color: '#007bff', background: '#e3f2fd' },
+    'trade': { color: '#28a745', background: '#e8f5e8' },
+    'trade_plan': { color: '#ffc107', background: '#fff8e1' },
+    'ticker': { color: '#dc3545', background: '#fce4ec' },
+    'note': { color: '#6f42c1', background: '#f3e5f5' },
+    'alert': { color: '#fd7e14', background: '#fff3e0' }
+};
+```
+
+---
+
+## 14. עדכון כפתורי סגירה ל-RTL
+
+### 14.1 דרישה חדשה
+- **יישור כפתורי סגירה לשמאל**: כל כפתורי הסגירה של המודולים צריכים להיות מיושרים לשמאל (RTL)
+- **הסרת הגדרות ספציפיות**: הסרת כל הגדרה ספציפית לכפתורי סגירה והסתמכות על הגדרות גלובליות
+
+### 14.2 יישום לפי מדריך RTL
+**קובץ: `styles.css`**
+- עדכון `.modal .modal-header` עם `direction: rtl`
+- שינוי `.modal .btn-close` עם `position: absolute` ו-`inset-inline-start: 1rem`
+- הסרת הגדרות ספציפיות למודלי הערות
+
+**קבצים נוספים:**
+- `apple-theme.css`: הסרת הגדרות ספציפיות לכפתורי סגירה
+- `notification-system.css`: הסרת הגדרות ספציפיות למודלי התראות
+- `linked-items.css`: הסרת הגדרות ספציפיות לכפתורי סגירה
+
+### 14.3 עקרונות RTL שיושמו
+```css
+/* כיוון RTL */
+.modal .modal-header {
+  direction: rtl;
+  position: relative;
+}
+
+/* כפתור סגירה בפינה השמאלית העליונה */
+.modal .btn-close {
+  position: absolute;
+  top: 1rem;
+  inset-inline-start: 1rem; /* ימין ב-RTL */
+}
+```
+
+### 14.4 תוצאות
+- כפתורי סגירה מיושרים לשמאל בכל המודולים
+- עקביות עם מדריך RTL של הפרויקט
+- הסרת הגדרות ספציפיות מיותרות
+- עיצוב אחיד לכל המודולים במערכת
+
+---
+
+## 15. תיקון שגיאת מערכת הצבעים
+
+### 15.1 בעיה שזוהתה
+- **שגיאה**: `Cannot read properties of undefined (reading 'medium')` בפונקציה `getStatusColor`
+- **סיבה**: `STATUS_COLORS` היה object ריק ולא הכיל הגדרות ברירת מחדל
+- **השפעה**: שגיאות בקונסול ובעיות בהצגת צבעי סטטוס
+
+### 15.2 תיקון
+**קובץ: `color-scheme-system.js`**
+- תיקון פונקציה `getStatusColor()` עם optional chaining (`?.`)
+- הוספת הגדרות ברירת מחדל ל-`STATUS_COLORS` עם צבעים לכל הסטטוסים הנפוצים
+
+### 15.3 הגדרות ברירת מחדל שנוספו
+```javascript
+let STATUS_COLORS = {
+  'open': {
+    light: '#d4edda', medium: '#28a745', dark: '#1e7e34', border: '#c3e6cb'
+  },
+  'closed': {
+    light: '#f8d7da', medium: '#dc3545', dark: '#c82333', border: '#f5c6cb'
+  },
+  'pending': {
+    light: '#fff3cd', medium: '#ffc107', dark: '#e0a800', border: '#ffeaa7'
+  },
+  'active': {
+    light: '#d1ecf1', medium: '#17a2b8', dark: '#138496', border: '#bee5eb'
+  },
+  'inactive': {
+    light: '#e2e3e5', medium: '#6c757d', dark: '#545b62', border: '#d6d8db'
+  }
+};
+```
+
+### 15.4 תוצאות
+- ביטול שגיאות הקונסול
+- מערכת צבעים יציבה עם fallbacks
+- תמיכה בכל הסטטוסים הנפוצים
+- שיפור חוויית המשתמש
+
+---
+
 **תאריך יצירה:** 2025-01-09  
+**תאריך עדכון:** 2025-01-09  
 **מחבר:** TikTrack Development Team  
-**גרסה:** 1.0  
-**סטטוס:** מוכן ליישום
+**גרסה:** 2.3  
+**סטטוס:** יושם בהצלחה + עיצוב מודלים + RTL כפתורי סגירה + תיקון שגיאת צבעים

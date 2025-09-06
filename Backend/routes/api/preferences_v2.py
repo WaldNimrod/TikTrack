@@ -556,3 +556,123 @@ def check_v1_compatibility():
             'error': str(e),
             'code': 'INTERNAL_ERROR'
         }), 500
+
+
+@preferences_v2_bp.route('/api/v2/preferences/defaults', methods=['GET'])
+@cache_with_deps(ttl=300, dependencies=['preferences_defaults'])
+def get_defaults():
+    """קבל ברירות מחדל נוכחיות"""
+    try:
+        defaults = PreferencesServiceV2.load_defaults_from_file()
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'defaults': defaults,
+                'lastUpdated': defaults.get('lastUpdated'),
+                'version': defaults.get('version')
+            }
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'code': 'DEFAULTS_LOAD_FAILED'
+        }), 500
+
+
+@preferences_v2_bp.route('/api/v2/preferences/defaults', methods=['POST'])
+def update_defaults():
+    """עדכן ברירות מחדל"""
+    try:
+        data = request.get_json()
+        if not data or 'defaults' not in data:
+            return jsonify({
+                'success': False,
+                'error': 'Missing defaults data',
+                'code': 'INVALID_REQUEST'
+            }), 400
+        
+        defaults = data['defaults']
+        
+        # שמור ברירות מחדל לקובץ
+        success = PreferencesServiceV2.save_defaults_to_file(defaults)
+        
+        if success:
+            # בטל מטמון
+            invalidate_cache('preferences_defaults')
+            
+            return jsonify({
+                'success': True,
+                'message': 'Defaults updated successfully',
+                'data': {
+                    'lastUpdated': defaults.get('lastUpdated'),
+                    'version': defaults.get('version')
+                }
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to save defaults',
+                'code': 'SAVE_FAILED'
+            }), 500
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'code': 'DEFAULTS_UPDATE_FAILED'
+        }), 500
+
+
+@preferences_v2_bp.route('/api/v2/preferences/defaults/save-from-current', methods=['POST'])
+def save_current_as_defaults():
+    """שמור את ההגדרות הנוכחיות כברירות מחדל"""
+    try:
+        db: Session = next(get_db())
+        user_id = get_user_id_from_request()
+        data = request.get_json()
+        
+        profile_id = data.get('profile_id') if data else None
+        
+        # קבל הגדרות נוכחיות
+        preferences = PreferencesServiceV2.get_preferences_v2(db, user_id, profile_id)
+        if not preferences:
+            return jsonify({
+                'success': False,
+                'error': 'No preferences found to save as defaults',
+                'code': 'PREFERENCES_NOT_FOUND'
+            }), 404
+        
+        # המר להגדרות ברירת מחדל
+        defaults = preferences.to_dict()
+        
+        # שמור ברירות מחדל לקובץ
+        success = PreferencesServiceV2.save_defaults_to_file(defaults)
+        
+        if success:
+            # בטל מטמון
+            invalidate_cache('preferences_defaults')
+            
+            return jsonify({
+                'success': True,
+                'message': 'Current preferences saved as defaults',
+                'data': {
+                    'lastUpdated': defaults.get('lastUpdated'),
+                    'version': defaults.get('version')
+                }
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to save defaults',
+                'code': 'SAVE_FAILED'
+            }), 500
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'code': 'SAVE_DEFAULTS_FAILED'
+        }), 500

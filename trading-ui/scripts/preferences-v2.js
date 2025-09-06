@@ -103,7 +103,7 @@ class PreferencesV2 {
       }
     } catch (error) {
       console.error('❌ Error loading preferences:', error);
-      this.preferences = this.getDefaultPreferences();
+      this.preferences = await this.getDefaultPreferences();
       return false;
     }
   }
@@ -721,8 +721,33 @@ class PreferencesV2 {
     return labels[changeType] || changeType;
   }
   
-  getDefaultPreferences() {
+  async getDefaultPreferences() {
+    try {
+      // נסה לטעון ברירות מחדל מהשרת
+      const response = await fetch('/api/v2/preferences/defaults');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          console.log('✅ Loaded defaults from server');
+          return data.data.defaults;
+        }
+      }
+      
+      // Fallback לברירות מחדל מקומיות
+      console.warn('⚠️ Using fallback defaults');
+      return this.getFallbackDefaults();
+      
+    } catch (error) {
+      console.error('❌ Error loading defaults:', error);
+      return this.getFallbackDefaults();
+    }
+  }
+  
+  getFallbackDefaults() {
     return {
+      version: '2.0',
+      lastUpdated: new Date().toISOString(),
+      description: 'Fallback defaults - server loading failed',
       general: {
         primaryCurrency: 'USD',
         timezone: 'Asia/Jerusalem',
@@ -768,6 +793,59 @@ class PreferencesV2 {
     });
   }
   
+  // פונקציות ברירות מחדל
+  async saveCurrentAsDefaults() {
+    try {
+      if (!this.currentProfile) {
+        this.showError('אין פרופיל נבחר');
+        return false;
+      }
+      
+      const response = await fetch('/api/v2/preferences/defaults/save-from-current', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          profile_id: this.currentProfile.id
+        })
+      });
+      
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      
+      const data = await response.json();
+      if (data.success) {
+        this.showSuccess('ברירות המחדל נשמרו בהצלחה');
+        return true;
+      } else {
+        throw new Error(data.error || 'Failed to save defaults');
+      }
+      
+    } catch (error) {
+      console.error('❌ Error saving defaults:', error);
+      this.showError('שגיאה בשמירת ברירות מחדל: ' + error.message);
+      return false;
+    }
+  }
+  
+  async loadDefaultsFromServer() {
+    try {
+      const response = await fetch('/api/v2/preferences/defaults');
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      
+      const data = await response.json();
+      if (data.success) {
+        return data.data.defaults;
+      } else {
+        throw new Error(data.error || 'Failed to load defaults');
+      }
+      
+    } catch (error) {
+      console.error('❌ Error loading defaults:', error);
+      return null;
+    }
+  }
+
   // פונקציות התראות
   showSuccess(message) {
     if (typeof window.showSuccessNotification === 'function') {
@@ -905,6 +983,12 @@ function resetToDefaults() {
     window.preferencesV2.preferences = window.preferencesV2.getDefaultPreferences();
     window.preferencesV2.updateUI();
     window.preferencesV2.markDirty();
+  }
+}
+
+async function saveCurrentAsDefaults() {
+  if (window.preferencesV2) {
+    await window.preferencesV2.saveCurrentAsDefaults();
   }
 }
 

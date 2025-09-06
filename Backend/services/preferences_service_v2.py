@@ -18,6 +18,7 @@ from models.user_preferences import UserPreferences  # V1 לצורך מיגרצ�
 from typing import List, Optional, Dict, Any, Tuple
 import json
 import logging
+import os
 from datetime import datetime, timedelta
 from services.user_service import UserService
 from sqlalchemy.exc import SQLAlchemyError
@@ -39,6 +40,76 @@ class PreferencesServiceV2:
     
     # ברירות מחדל מתקדמות
     DEFAULT_PROFILE_NAME = "ברירת מחדל"
+    DEFAULTS_FILE_PATH = os.path.join(os.path.dirname(__file__), '..', 'config', 'preferences_defaults.json')
+    
+    @classmethod
+    def load_defaults_from_file(cls) -> Dict[str, Any]:
+        """טען ברירות מחדל מקובץ JSON"""
+        try:
+            if not os.path.exists(cls.DEFAULTS_FILE_PATH):
+                logger.warning(f"Defaults file not found: {cls.DEFAULTS_FILE_PATH}")
+                return cls.get_fallback_defaults()
+            
+            with open(cls.DEFAULTS_FILE_PATH, 'r', encoding='utf-8') as f:
+                defaults = json.load(f)
+            
+            logger.info(f"✅ Loaded defaults from file: {cls.DEFAULTS_FILE_PATH}")
+            return defaults
+            
+        except (json.JSONDecodeError, IOError) as e:
+            logger.error(f"❌ Error loading defaults from file: {e}")
+            return cls.get_fallback_defaults()
+    
+    @classmethod
+    def save_defaults_to_file(cls, defaults: Dict[str, Any]) -> bool:
+        """שמור ברירות מחדל לקובץ JSON"""
+        try:
+            # עדכן תאריך עדכון אחרון
+            defaults['lastUpdated'] = datetime.utcnow().isoformat() + 'Z'
+            
+            # וודא שהתיקייה קיימת
+            os.makedirs(os.path.dirname(cls.DEFAULTS_FILE_PATH), exist_ok=True)
+            
+            with open(cls.DEFAULTS_FILE_PATH, 'w', encoding='utf-8') as f:
+                json.dump(defaults, f, indent=2, ensure_ascii=False)
+            
+            logger.info(f"✅ Saved defaults to file: {cls.DEFAULTS_FILE_PATH}")
+            return True
+            
+        except (IOError, TypeError) as e:
+            logger.error(f"❌ Error saving defaults to file: {e}")
+            return False
+    
+    @classmethod
+    def get_fallback_defaults(cls) -> Dict[str, Any]:
+        """ברירות מחדל גיבוי במקרה של כשל בטעינת הקובץ"""
+        return {
+            "version": "2.0",
+            "lastUpdated": datetime.utcnow().isoformat() + 'Z',
+            "description": "Fallback defaults - file loading failed",
+            "general": {
+                "primaryCurrency": "USD",
+                "timezone": "Asia/Jerusalem",
+                "defaultStopLoss": 5.0,
+                "defaultTargetPrice": 10.0,
+                "defaultCommission": 1.0
+            },
+            "defaultFilters": {
+                "status": "open",
+                "type": "swing",
+                "dateRange": "this_week"
+            },
+            "externalData": {
+                "providers": {
+                    "primary": "yahoo",
+                    "secondary": "google"
+                },
+                "refresh": {
+                    "interval": 5,
+                    "cacheTTL": 5
+                }
+            }
+        }
     
     @classmethod
     def get_user_profiles(cls, db: Session, user_id: int) -> List[PreferenceProfile]:
@@ -119,11 +190,17 @@ class PreferencesServiceV2:
     def _create_default_preferences_for_profile(cls, db: Session, user_id: int, profile_id: int):
         """צור הגדרות ברירת מחדל לפרופיל חדש"""
         try:
+            # טען ברירות מחדל מקובץ JSON
+            defaults = cls.load_defaults_from_file()
+            
             preferences = UserPreferencesV2(
                 user_id=user_id,
                 profile_id=profile_id,
-                version='2.0'
+                version=defaults.get('version', '2.0')
             )
+            
+            # עדכן הגדרות מברירות מחדל
+            preferences.from_dict(defaults)
             
             # הגדר צבעים ברירת מחדל
             default_colors = {

@@ -101,12 +101,10 @@ class EntityDetailsModal {
                             <h5 class="modal-title" id="${this.modalId}Label">
                                 פרטי ישות
                             </h5>
-                            <div class="d-flex align-items-center gap-2">
-                                <div id="quickActionButtons" class="btn-group btn-group-sm me-3" role="group">
-                                    <!-- כפתורי פעולות מהירות יוכנסו כאן דינמית -->
-                                </div>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <div id="quickActionButtons" class="btn-group btn-group-sm" role="group">
+                                <!-- כפתורי פעולות מהירות יוכנסו כאן דינמית -->
                             </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body entity-details-body" id="entityDetailsContent">
                             <div class="entity-details-loading">
@@ -178,8 +176,22 @@ class EntityDetailsModal {
             this.currentEntityType = entityType;
             this.currentEntityId = entityId;
 
-            // עדכון כותרת המודל
-            this.updateModalTitle(entityType, entityId);
+            // עדכון כותרת המודל (זמנית עד לטעינת הנתונים)
+            const titleElement = document.getElementById(`${this.modalId}Label`);
+            if (titleElement) {
+                const entityNames = {
+                    ticker: 'טיקר',
+                    trade: 'טרייד', 
+                    trade_plan: 'תכנית השקעה',
+                    execution: 'ביצוע עסקה',
+                    account: 'חשבון',
+                    alert: 'התראה',
+                    cash_flow: 'תזרים מזומנים',
+                    note: 'הערה'
+                };
+                const entityName = entityNames[entityType] || 'ישות';
+                titleElement.textContent = `פרטי ${entityName} #${entityId}`;
+            }
 
             // הצגת מצב טעינה
             this.showLoadingState();
@@ -239,24 +251,6 @@ class EntityDetailsModal {
      * @param {number|string} entityId - מזהה הישות  
      * @private
      */
-    updateModalTitle(entityType, entityId) {
-        const titleElement = document.getElementById(`${this.modalId}Label`);
-        if (!titleElement) return;
-
-        const entityNames = {
-            ticker: 'טיקר',
-            trade: 'טרייד', 
-            trade_plan: 'תכנית השקעה',
-            execution: 'ביצוע עסקה',
-            account: 'חשבון',
-            alert: 'התראה',
-            cash_flow: 'תזרים מזומנים',
-            note: 'הערה'
-        };
-
-        const entityName = entityNames[entityType] || 'ישות';
-        titleElement.textContent = `פרטי ${entityName} #${entityId}`;
-    }
 
     /**
      * Show loading state - הצגת מצב טעינה
@@ -337,7 +331,19 @@ class EntityDetailsModal {
      */
     updateModalTitle(entityType, entityData) {
         const titleElement = document.getElementById(`${this.modalId}Label`);
-        if (!titleElement) return;
+        const headerElement = this.modal?.querySelector('.modal-header');
+        
+        console.log('🎯 updateModalTitle called:', { entityType, entityData, titleElement, headerElement });
+        
+        if (!titleElement) {
+            console.warn('⚠️ Title element not found:', `${this.modalId}Label`);
+            return;
+        }
+        
+        if (!headerElement) {
+            console.warn('⚠️ Header element not found');
+            return;
+        }
 
         let title = 'פרטי ישות';
         
@@ -351,10 +357,54 @@ class EntityDetailsModal {
             title = `פרטי התראה: ${entityData.symbol}`;
         }
 
+        console.log('🎯 Setting title to:', title);
         titleElement.textContent = title;
+        
+        // עדכון צבע כותרת המודל לפי סוג הישות
+        this.updateModalHeaderColor(entityType);
         
         // עדכון כפתורי פעולות מהירות
         this.updateQuickActionButtons(entityType, entityData);
+    }
+
+    /**
+     * Update modal header color - עדכון צבע כותרת המודל
+     * 
+     * @param {string} entityType - סוג הישות
+     * @private
+     */
+    updateModalHeaderColor(entityType) {
+        const headerElement = this.modal?.querySelector('.modal-header');
+        if (!headerElement) return;
+
+        // קבלת צבע הישות מהמערכת הגלובלית
+        let entityColor = '#019193'; // ברירת מחדל
+        
+        console.log('🎨 Modal header color debug:');
+        console.log('🔍 entityType:', entityType);
+        console.log('🔍 window.entityDetailsRenderer?.entityColors:', window.entityDetailsRenderer?.entityColors);
+        console.log('🔍 window.ENTITY_COLORS:', window.ENTITY_COLORS);
+        console.log('🔍 window.currentPreferences?.entityColors:', window.currentPreferences?.entityColors);
+        
+        if (window.entityDetailsRenderer && window.entityDetailsRenderer.entityColors) {
+            entityColor = window.entityDetailsRenderer.entityColors[entityType] || entityColor;
+            console.log('✅ Using entityDetailsRenderer color:', entityColor);
+        } else if (window.ENTITY_COLORS && window.ENTITY_COLORS[entityType]) {
+            entityColor = window.ENTITY_COLORS[entityType];
+            console.log('✅ Using ENTITY_COLORS color:', entityColor);
+        } else if (window.currentPreferences && window.currentPreferences.entityColors && window.currentPreferences.entityColors[entityType]) {
+            entityColor = window.currentPreferences.entityColors[entityType];
+            console.log('✅ Using currentPreferences color:', entityColor);
+        } else {
+            console.log('⚠️ Using default color:', entityColor);
+        }
+
+        // עדכון צבע הרקע של הכותרת
+        headerElement.style.backgroundColor = entityColor;
+        headerElement.style.color = 'white';
+        headerElement.style.borderBottom = `2px solid ${entityColor}`;
+        
+        console.log('🎨 Applied color to modal header:', entityColor);
     }
 
     /**
@@ -372,8 +422,12 @@ class EntityDetailsModal {
         
         if (entityType === 'ticker') {
             buttonsHtml = `
-                <button class="btn btn-outline-info" onclick="viewLinkedItemsForTicker(${entityData.id})" title="פריטים מקושרים">🔗</button>
-                <button class="btn btn-outline-secondary" onclick="editTicker(${entityData.id})" title="ערוך טיקר">✏️</button>
+                <button class="btn btn-outline-light btn-sm" onclick="viewLinkedItemsForTicker(${entityData.id})" title="פריטים מקושרים">
+                    <i class="fas fa-link"></i>
+                </button>
+                <button class="btn btn-outline-light btn-sm" onclick="editTicker(${entityData.id})" title="ערוך טיקר">
+                    <i class="fas fa-edit"></i>
+                </button>
             `;
         }
         

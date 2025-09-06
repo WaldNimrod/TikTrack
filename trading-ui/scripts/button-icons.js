@@ -116,9 +116,10 @@ function createLinkButton(onClick, _additionalClasses = '') {
 // פונקציה ליצירת כפתור ביטול/הפעלה מחדש
 function createCancelButton(itemType, itemId, status = 'open', size = 'sm', additionalClasses = '') {
   const isCancelled = status === 'cancelled' || status === 'canceled';
-  const buttonClass = isCancelled ? 'btn-success' : 'btn-warning';
+  const buttonClass = isCancelled ? 'btn-success' : 'btn-danger';
+  const buttonSize = isCancelled ? '' : size; // כפתור שיחזור גדול יותר
   const title = isCancelled ? 'הפעל מחדש' : 'בטל';
-  const icon = isCancelled ? '✓' : '❌';
+  const icon = isCancelled ? '✓' : 'X';
 
   // יצירת onclick בהתאם לסטטוס וסוג האובייקט
   let onclick = '';
@@ -186,7 +187,7 @@ function createCancelButton(itemType, itemId, status = 'open', size = 'sm', addi
     }
   }
 
-  return `<button class="btn btn-${size} ${buttonClass} ${additionalClasses}" ${onclick} title="${title}">` +
+  return `<button class="btn ${buttonSize ? 'btn-' + buttonSize : ''} ${buttonClass} ${additionalClasses}" ${onclick} title="${title}">` +
          `<span class="cancel-icon">${icon}</span></button>`;
 }
 

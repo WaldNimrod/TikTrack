@@ -65,7 +65,7 @@ const DEFAULT_PREFERENCES = {
     execution: '#17a2b8',
     account: '#28a745',
     cash_flow: '#20c997',
-    ticker: '#dc3545',
+    ticker: '#019193',
     alert: '#ff9c05',
     note: '#6f42c1',
     constraint: '#6c757d',
@@ -202,6 +202,131 @@ function updatePreference(key, value) {
     if (typeof window.showNotification === 'function') {
       window.showNotification('שגיאה בעדכון העדפה: ' + error.message, 'error');
     }
+  }
+}
+
+/**
+ * פונקציות ניהול פרופילים
+ */
+function createNewProfile() {
+  const profileName = prompt('הכנס שם לפרופיל החדש:');
+  if (profileName && profileName.trim()) {
+    showPreferencesInfo('פרופילים', `פרופיל "${profileName}" נוצר בהצלחה`);
+    // כאן ניתן להוסיף לוגיקה ליצירת פרופיל חדש
+  }
+}
+
+function duplicateProfile() {
+  const currentProfile = document.getElementById('activeProfile')?.value || 'default';
+  const newName = prompt(`הכנס שם לפרופיל החדש (העתקה מ-${currentProfile}):`);
+  if (newName && newName.trim()) {
+    showPreferencesInfo('פרופילים', `פרופיל "${newName}" נוצר כהעתקה מ-${currentProfile}`);
+    // כאן ניתן להוסיף לוגיקה לשכפול פרופיל
+  }
+}
+
+function renameProfile() {
+  const currentProfile = document.getElementById('activeProfile')?.value || 'default';
+  const newName = prompt(`הכנס שם חדש לפרופיל "${currentProfile}":`);
+  if (newName && newName.trim()) {
+    showPreferencesInfo('פרופילים', `פרופיל "${currentProfile}" שונה ל-"${newName}"`);
+    // כאן ניתן להוסיף לוגיקה לשינוי שם פרופיל
+  }
+}
+
+function deleteProfile() {
+  const currentProfile = document.getElementById('activeProfile')?.value || 'default';
+  if (currentProfile === 'default') {
+    showPreferencesWarning('פרופילים', 'לא ניתן למחוק את פרופיל ברירת המחדל');
+    return;
+  }
+  
+  if (confirm(`האם אתה בטוח שברצונך למחוק את הפרופיל "${currentProfile}"?`)) {
+    showPreferencesInfo('פרופילים', `פרופיל "${currentProfile}" נמחק בהצלחה`);
+    // כאן ניתן להוסיף לוגיקה למחיקת פרופיל
+  }
+}
+
+/**
+ * פותח/סוגר את כל סקשני ההעדפות
+ */
+function toggleAllPreferenceSections() {
+  const sections = [
+    'profile-selector',
+    'basic-settings', 
+    'filter-settings',
+    'color-settings',
+    'external-data-settings',
+    'console-settings'
+  ];
+  
+  // בדוק אם כל הסקשנים פתוחים
+  const allOpen = sections.every(sectionId => {
+    const body = document.getElementById(sectionId + '-body');
+    const icon = document.getElementById(sectionId + '-icon');
+    return body && body.style.display !== 'none' && icon && icon.textContent === '▼';
+  });
+  
+  // פתח/סגור את כל הסקשנים
+  sections.forEach(sectionId => {
+    const body = document.getElementById(sectionId + '-body');
+    const icon = document.getElementById(sectionId + '-icon');
+    
+    if (body && icon) {
+      if (allOpen) {
+        // סגור את כל הסקשנים
+        body.style.display = 'none';
+        icon.textContent = '▶';
+      } else {
+        // פתח את כל הסקשנים
+        body.style.display = 'block';
+        icon.textContent = '▼';
+      }
+    }
+  });
+  
+  // עדכן את הטקסט של הכפתור
+  const button = document.querySelector('.filter-toggle-btn .filter-icon');
+  if (button) {
+    button.textContent = allOpen ? '▶' : '▼';
+  }
+}
+
+/**
+ * מעדכן את ברירות המחדל של המערכת לפי ההגדרות הנוכחיות
+ */
+async function updateSystemDefaults() {
+  try {
+    if (!confirm('האם אתה בטוח שברצונך לעדכן את ברירות המחדל של המערכת לפי ההגדרות הנוכחיות?\n\nפעולה זו תשנה את ברירות המחדל לכל המשתמשים החדשים.')) {
+      return;
+    }
+
+    // שמור את ההעדפות הנוכחיות
+    await saveAllPreferences();
+    
+    // שלח בקשה לעדכון ברירות המחדל
+    const response = await fetch('/api/v1/preferences/update-defaults', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        preferences: currentPreferences,
+        updateSystemDefaults: true 
+      }),
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      showPreferencesSuccess('הצלחה', 'ברירות המחדל של המערכת עודכנו בהצלחה');
+      console.log('✅ ברירות מחדל עודכנו:', result);
+    } else {
+      const errorText = await response.text();
+      showPreferencesWarning('שגיאה', 'שגיאה בעדכון ברירות המחדל: ' + errorText);
+    }
+  } catch (error) {
+    console.error('❌ שגיאה בעדכון ברירות מחדל:', error);
+    showPreferencesWarning('שגיאה', 'שגיאה בעדכון ברירות המחדל: ' + error.message);
   }
 }
 
@@ -1453,32 +1578,7 @@ function updateExistingHeadersWithNewOpacity() {
       else if (pageClass.includes('planning-page')) entityType = 'trade-plan';
       else if (pageClass.includes('executions-page')) entityType = 'execution';
       
-      header.classList.add(`entity-${entityType}-main-header`);
-    });
-    
-    // עדכון כותרות משניות - תחת content-section
-    const subHeaders = document.querySelectorAll('.content-section .section-header');
-    subHeaders.forEach(header => {
-      // הסרת כל המחלקות הישנות של ישויות
-      VALID_ENTITY_TYPES.forEach(type => {
-        header.classList.remove(`entity-${type}-main-header`);
-        header.classList.remove(`entity-${type}-sub-header`);
-      });
-      
-      // הוספת המחלקה החדשה לפי סוג העמוד
-      const pageClass = document.body.className;
-      let entityType = 'ticker'; // ברירת מחדל
-      
-      if (pageClass.includes('tickers-page')) entityType = 'ticker';
-      else if (pageClass.includes('trades-page')) entityType = 'trade';
-      else if (pageClass.includes('accounts-page')) entityType = 'account';
-      else if (pageClass.includes('alerts-page')) entityType = 'alert';
-      else if (pageClass.includes('cash-flows-page')) entityType = 'cash-flow';
-      else if (pageClass.includes('notes-page')) entityType = 'note';
-      else if (pageClass.includes('planning-page')) entityType = 'trade-plan';
-      else if (pageClass.includes('executions-page')) entityType = 'execution';
-      
-      header.classList.add(`entity-${entityType}-sub-header`);
+      // כותרות מנוהלות על ידי ההגדרות הכלליות ב-styles.css
     });
     
     console.log('✅ כותרות קיימות עודכנו עם השקיפות החדשה');

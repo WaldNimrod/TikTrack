@@ -232,6 +232,15 @@ function getCustomSortValue(a, b, columnIndex, tableType, aValue, bValue) {
     }
   }
 
+  // Custom sorting for alerts table
+  if (tableType === 'alerts') {
+    // Condition column (index 1) - Hebrew alphabetical sorting
+    if (columnIndex === 1) {
+      // Use Hebrew locale for proper alphabetical sorting
+      return aValue.localeCompare(bValue, 'he-IL');
+    }
+  }
+
   // Custom sorting for other table types can be added here
   // if (tableType === 'trades') { ... }
   // if (tableType === 'accounts') { ... }

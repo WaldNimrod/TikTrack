@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מוניטורינג מערכת Cache מתקדמת - TikTrack</title>
+    
+    <!-- CSS Files - Ordered by priority (weak to strong) -->
+    <!-- 1. Apple theme (base) -->
+    <link rel="stylesheet" href="styles/apple-theme.css">
+    
+    <!-- 2. Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- 3. General styles -->
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/header-system.css">
+    
+    <!-- 4. Typography -->
+    <link rel="stylesheet" href="styles/typography.css">
+    
+    <!-- 5. Table styles -->
+    <link rel="stylesheet" href="styles/table.css">
+    
+    <!-- 6. Notification system styles -->
+    <link rel="stylesheet" href="styles/notification-system.css">
+    
+    <!-- 7. Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- 8. Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- 9. Linked items styles -->
+    <link rel="stylesheet" href="styles/linked-items.css">
+    
+<<<<<<< HEAD
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+=======
+    <!-- 10. Page specific styles -->
+    <link rel="stylesheet" href="styles/cache-test.css">
+>>>>>>> origin/cursor/update-git-after-tool-standardization-a017
+</head>
+<body class="cache-test-page">
+    <div class="background-wrapper">
+        <!-- unified-header יווצר כאן אוטומטית -->
+        <div id="unified-header"></div>
+        
+        <!-- Page body - All content after header -->
+        <div class="page-body">
+            <!-- Page area - top-Section -->
+            <div class="top-section">
+                <!-- Main header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/development.svg?v=20250905" alt="מוניטורינג Cache"
+                            style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                        מוניטורינג Cache מתקדם
+                    </div>
+                    <div class="table-actions">
+                        <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                            <i class="fas fa-copy"></i> העתק לוג מפורט
+                        </button>
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור Cache">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Alert cards -->
+                <div class="section-body">
+                    <active-alerts></active-alerts>
+
+                    <!-- Page summary -->
+                    <div class="info-summary" id="summaryStats">
+                        <div>מצב מערכת: <strong id="systemStatusStats">בדיקה...</strong></div>
+                        <div>Hit Rate: <strong id="hitRateStats">בדיקה...</strong></div>
+                        <div>זיכרון: <strong id="memoryUsageStats">בדיקה...</strong></div>
+                        <div>סטטוס: <strong id="overallStatus">בדיקה...</strong></div>
+                    </div>
+                </div>
+            </div> <!-- End top-section -->
+
+            <!-- Main content -->
+            <div class="main-content" data-section="cache-test">
+                <div class="container">
+
+        <!-- Cache Status Dashboard -->
+        <section class="cache-dashboard">
+            <div class="dashboard-grid">
+                <div class="status-card">
+                    <div class="card-header">
+                        <i class="fas fa-heartbeat"></i>
+                        <h3>מצב המערכת</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="system-status" class="status-indicator">
+                            <i class="fas fa-spinner fa-spin"></i> בודק...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-line"></i>
+                        <h3>ביצועים</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="performance-stats" class="stats-display">
+                            <i class="fas fa-spinner fa-spin"></i> טוען...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <div class="card-header">
+                        <i class="fas fa-database"></i>
+                        <h3>זיכרון</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="memory-usage" class="memory-display">
+                            <i class="fas fa-spinner fa-spin"></i> טוען...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <div class="card-header">
+                        <i class="fas fa-bullseye"></i>
+                        <h3>Hit Rate</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="hit-rate" class="hit-rate-display">
+                            <i class="fas fa-spinner fa-spin"></i> טוען...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dependencies System Monitoring -->
+        <section class="dependencies-monitoring">
+            <h2><i class="fas fa-project-diagram"></i> מעקב Dependencies</h2>
+            
+            <div class="dependencies-grid">
+                <div class="dependency-card">
+                    <div class="card-header">
+                        <i class="fas fa-link"></i>
+                        <h3>Dependencies Matrix</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="dependencies-matrix" class="dependencies-display">
+                            <div class="dependency-item">
+                                <span class="dep-name">tickers</span>
+                                <span class="dep-arrow">→</span>
+                                <span class="dep-targets">dashboard</span>
+                            </div>
+                            <div class="dependency-item">
+                                <span class="dep-name">trades</span>
+                                <span class="dep-arrow">→</span>
+                                <span class="dep-targets">tickers, dashboard</span>
+                            </div>
+                            <div class="dependency-item">
+                                <span class="dep-name">executions</span>
+                                <span class="dep-arrow">→</span>
+                                <span class="dep-targets">trades, dashboard</span>
+                            </div>
+                            <div class="dependency-item">
+                                <span class="dep-name">preferences</span>
+                                <span class="dep-arrow">→</span>
+                                <span class="dep-targets">-</span>
+                            </div>
+                            <div class="dependency-item">
+                                <span class="dep-name">currencies</span>
+                                <span class="dep-arrow">→</span>
+                                <span class="dep-targets">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dependency-card">
+                    <div class="card-header">
+                        <i class="fas fa-clock"></i>
+                        <h3>TTL Strategy</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="ttl-strategy" class="ttl-display">
+                            <div class="ttl-item critical">
+                                <span class="ttl-type">🔥 קריטי</span>
+                                <span class="ttl-value">30s</span>
+                                <span class="ttl-entities">tickers, trades, executions</span>
+                            </div>
+                            <div class="ttl-item normal">
+                                <span class="ttl-type">⚡ רגיל</span>
+                                <span class="ttl-value">5min</span>
+                                <span class="ttl-entities">preferences</span>
+                            </div>
+                            <div class="ttl-item static">
+                                <span class="ttl-type">🏗️ סטטי</span>
+                                <span class="ttl-value">1h</span>
+                                <span class="ttl-entities">currencies</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dependency-card">
+                    <div class="card-header">
+                        <i class="fas fa-bolt"></i>
+                        <h3>Invalidation Testing</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="invalidation-controls">
+                            <select id="dependency-select" class="form-control">
+                                <option value="tickers">tickers</option>
+                                <option value="trades">trades</option>
+                                <option value="executions">executions</option>
+                                <option value="preferences">preferences</option>
+                                <option value="currencies">currencies</option>
+                                <option value="dashboard">dashboard</option>
+                            </select>
+                            <button id="invalidate-dependency-btn" class="btn btn-warning">
+                                <i class="fas fa-trash"></i> Invalidate Dependency
+                            </button>
+                        </div>
+                        <div id="invalidation-results" class="results-display">
+                            תוצאות invalidation יופיעו כאן...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cache Operations -->
+        <section class="cache-operations">
+            <h2><i class="fas fa-tools"></i> פעולות Cache</h2>
+            
+            <div class="operations-grid">
+                <div class="operation-card">
+                    <h3>ניקוי Cache</h3>
+                    <p>מחיקת כל רשומות ה-Cache</p>
+                    <button id="clear-cache-btn" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> נקה Cache
+                    </button>
+                </div>
+
+                <div class="operation-card">
+                    <h3>בדיקת בריאות</h3>
+                    <p>בדיקת מצב המערכת</p>
+                    <button id="health-check-btn" class="btn btn-info">
+                        <i class="fas fa-stethoscope"></i> בדיקת בריאות
+                    </button>
+                </div>
+
+                <div class="operation-card">
+                    <h3>סטטיסטיקות</h3>
+                    <p>קבלת נתונים מפורטים</p>
+                    <button id="stats-btn" class="btn btn-success">
+                        <i class="fas fa-chart-bar"></i> סטטיסטיקות
+                    </button>
+                </div>
+
+                <div class="operation-card">
+                    <h3>רענון נתונים</h3>
+                    <p>עדכון כל הנתונים</p>
+                    <button id="refresh-btn" class="btn btn-primary">
+                        <i class="fas fa-sync-alt"></i> רענן
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cache Testing -->
+        <section class="cache-testing">
+            <h2><i class="fas fa-vial"></i> בדיקות Cache</h2>
+            
+            <div class="test-controls">
+                <div class="test-input-group">
+                    <label for="test-key">מפתח בדיקה:</label>
+                    <input type="text" id="test-key" placeholder="הכנס מפתח לבדיקה" value="test_key_123">
+                </div>
+                
+                <div class="test-input-group">
+                    <label for="test-value">ערך בדיקה:</label>
+                    <input type="text" id="test-value" placeholder="הכנס ערך לבדיקה" value="test_value_456">
+                </div>
+                
+                <div class="test-input-group">
+                    <label for="test-ttl">TTL (שניות):</label>
+                    <input type="number" id="test-ttl" placeholder="300" value="300" min="1" max="3600">
+                </div>
+            </div>
+
+            <div class="test-actions">
+                <button id="set-cache-btn" class="btn btn-success">
+                    <i class="fas fa-save"></i> שמור ב-Cache
+                </button>
+                <button id="get-cache-btn" class="btn btn-info">
+                    <i class="fas fa-search"></i> קבל מ-Cache
+                </button>
+                <button id="delete-cache-btn" class="btn btn-warning">
+                    <i class="fas fa-trash"></i> מחק מ-Cache
+                </button>
+            </div>
+
+            <div class="test-results">
+                <h3>תוצאות הבדיקה:</h3>
+                <div id="test-output" class="test-output">
+                    <p class="placeholder">התוצאות יופיעו כאן...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Performance Monitoring -->
+        <section class="performance-monitoring">
+            <h2><i class="fas fa-tachometer-alt"></i> ניטור ביצועים</h2>
+            
+            <div class="performance-grid">
+                <div class="performance-card">
+                    <h3>זמני תגובה</h3>
+                    <div id="response-times" class="performance-data">
+                        <i class="fas fa-spinner fa-spin"></i> טוען...
+                    </div>
+                </div>
+
+                <div class="performance-card">
+                    <h3>סטטיסטיקות Cache</h3>
+                    <div id="cache-stats" class="performance-data">
+                        <i class="fas fa-spinner fa-spin"></i> טוען...
+                    </div>
+                </div>
+
+                <div class="performance-card">
+                    <h3>ניתוח ביצועים</h3>
+                    <div id="performance-analysis" class="performance-data">
+                        <i class="fas fa-spinner fa-spin"></i> טוען...
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Logs and Debugging -->
+        <section class="logs-debugging">
+            <h2><i class="fas fa-bug"></i> לוגים ודיבוג</h2>
+            
+            <div class="logs-controls">
+                <button id="clear-logs-btn" class="btn btn-secondary">
+                    <i class="fas fa-eraser"></i> נקה לוגים
+                </button>
+                <button id="export-logs-btn" class="btn btn-outline">
+                    <i class="fas fa-download"></i> ייצא לוגים
+                </button>
+            </div>
+
+            <div class="logs-display">
+                <div id="logs-content" class="logs-content">
+                    <p class="placeholder">הלוגים יופיעו כאן...</p>
+                </div>
+            </div>
+        </section>
+                </div>
+            </div> <!-- End main-content -->
+        </div> <!-- End page-body -->
+    </div> <!-- End background-wrapper -->
+
+    <!-- Scripts -->
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/header-system.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/cache-test.js"></script>
+</body>
+</html>

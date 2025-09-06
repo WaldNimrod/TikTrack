@@ -80,6 +80,47 @@ const demoAlerts = [
 /**
  * טעינת נתוני התראות מהשרת
  *
+ * פונקציה זו מחזירה נתוני דמו להתראות
+ * @returns {Array} מערך של התראות דמו
+ */
+function getDemoAlertsData() {
+  return [
+    {
+      id: 1,
+      title: 'התראה על מחיר AAPL',
+      status: 'open',
+      related_type_id: 4, // טיקר
+      related_id: 1, // מזהה טיקר AAPL
+      related_object_id: 1, // מזהה הטיקר הספציפי
+      ticker_id: 1, // מזהה הטיקר
+      condition: 'מחיר יותר מ 150',
+      condition_attribute: 'price',
+      condition_operator: 'more_than',
+      condition_number: 150,
+      message: 'מחיר AAPL עלה מעל 150$',
+      created_at: '2025-01-09T10:00:00Z',
+      is_triggered: false
+    },
+    {
+      id: 2,
+      title: 'התראה על שינוי TSLA',
+      status: 'closed',
+      related_type_id: 4, // טיקר
+      related_id: 2, // מזהה טיקר TSLA
+      related_object_id: 2, // מזהה הטיקר הספציפי
+      ticker_id: 2, // מזהה הטיקר
+      condition: 'שינוי יותר מ 5%',
+      condition_attribute: 'change',
+      condition_operator: 'more_than',
+      condition_number: 5,
+      message: 'שינוי TSLA מעל 5%',
+      created_at: '2025-01-09T09:30:00Z',
+      is_triggered: true
+    }
+  ];
+}
+
+/**
  * פונקציה זו טוענת את כל ההתראות מהשרת ומעדכנת את הטבלה
  * אם השרת לא זמין, משתמשת בנתוני דמו
  *
@@ -90,7 +131,17 @@ async function loadAlertsData() {
     const response = await fetch('/api/v1/alerts/');
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      console.warn(`⚠️ Server error ${response.status}, using demo data`);
+      // שימוש בנתוני דמו במקרה של שגיאת שרת
+      alertsData = getDemoAlertsData();
+      updateAlertsTable(alertsData);
+      
+      // רענון כפוי של הטבלה
+      setTimeout(() => {
+        updateAlertsTable(alertsData);
+      }, 100);
+      
+      return alertsData;
     }
 
     const data = await response.json();
@@ -118,6 +169,7 @@ async function loadAlertsData() {
 
 
     updateAlertsTable(alertsData);
+    
 
     return alertsData;
 
@@ -127,6 +179,7 @@ async function loadAlertsData() {
     // שימוש בנתוני דמו
     alertsData = demoAlerts;
     updateAlertsTable(alertsData);
+    
 
     return alertsData;
   }
@@ -313,8 +366,16 @@ function updateAlertsTable(alerts) {
 
   // טעינת נתונים ועדכון הטבלה
   loadAdditionalData().then(() => {
+    // בדיקה שהנתונים קיימים
+    if (!alerts || !Array.isArray(alerts)) {
+      console.warn('⚠️ alerts parameter is not available or not an array');
+      return;
+    }
 
     const tableHTML = alerts.map(alert => {
+      // לוג לבדיקת מבנה הנתונים
+      console.log('🔍 Alert data structure:', alert);
+      
       // קבלת צבעי סטטוס דינמיים
       const statusClass = getStatusClass(alert.status);
       const statusColor = window.getStatusColor ? window.getStatusColor(alert.status, 'medium') : '#6c757d';
@@ -504,10 +565,20 @@ function updateAlertsTable(alerts) {
       return `
         <tr data-status="${alert.status || ''}" data-date="${alert.created_at || ''}">
           <td class="ticker-cell">
-            <span class="link-icon" 
-              title="חיבור לעמוד טרייד - בפיתוח" 
-              style="cursor: pointer; margin-left: 5px;">🔗</span>
-            <span class="symbol-text">${symbolDisplay}</span>
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <span class="ticker-symbol-link" 
+                    onclick="showEntityDetails('alert', ${alert.id}); return false;" 
+                    title="פרטי התראה"
+                    style="cursor: pointer; font-weight: 500;">
+                ${symbolDisplay}
+              </span>
+              <span class="ticker-symbol-link" 
+                    onclick="if (${alert.related_id || 'false'}) { showEntityDetails('ticker', ${alert.related_id}); } else { if (window.showErrorNotification) { window.showErrorNotification('שגיאה', 'מזהה טיקר לא זמין'); } else { alert('מזהה טיקר לא זמין'); } } return false;" 
+                    title="פרטי טיקר"
+                    style="cursor: pointer; opacity: 0.6; transition: opacity 0.2s ease-in-out;">
+                🔗
+              </span>
+            </div>
           </td>
           <td><span class="condition-text">${(() => {
     if (alert.condition_attribute && alert.condition_operator &&
@@ -521,12 +592,12 @@ function updateAlertsTable(alerts) {
     return alert.condition || '-';
   })()}</span></td>
           <td class="status-cell" data-status="${alert.status || ''}">
-          <span class="status-badge ${statusClass}">${statusDisplay}</span>
+          <span class="status-badge ${statusClass}" style="color: ${statusColor}; background-color: ${statusBgColor}; border: 1px solid ${statusColor};">${statusDisplay}</span>
         </td>
-          <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
+          <td><span class="triggered-badge ${triggeredClass}" style="background-color: white; border: 1px solid #6c757d; color: #6c757d; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem;">${triggeredDisplay}</span></td>
           <td style="padding: 0;">
             <div class="related-object-cell ${relatedClass}" 
-             style="justify-content: flex-start; text-align: right; min-width: 150px; cursor: pointer;" 
+             style="justify-content: flex-start; text-align: right; min-width: 150px; cursor: pointer; background-color: ${relatedBgColor || 'rgba(108, 117, 125, 0.1)'}; color: black; padding: 0.25rem 0.5rem; border-radius: 0.25rem; border: 1px solid ${relatedColor || '#6c757d'};" 
              title="קישור לדף אובייקט - בפיתוח">
               ${relatedDisplay}
             </div>
@@ -570,7 +641,7 @@ function updateAlertsTable(alerts) {
 
     // עדכון סטטיסטיקות
     updatePageSummaryStats();
-
+    
 
   });
 }
@@ -1273,18 +1344,28 @@ function parseAlertCondition(condition) {
  * משתמשת במערכת ההתראות הגלובלית להודעות
  */
 async function saveAlert() {
+  console.log('🔧 saveAlert function called');
+  
+  // ניקוי מטמון לפני פעולת CRUD - הוספה
+  if (window.clearCacheBeforeCRUD) {
+    window.clearCacheBeforeCRUD('alerts', 'add');
+  }
+  
   const form = document.getElementById('addAlertForm');
   if (!form) {
-    // console.warn('⚠️ Form element not found - skipping save operation');
+    console.warn('⚠️ Form element not found - skipping save operation');
     return;
   }
+  console.log('🔧 Form found, proceeding with validation');
 
 
   // בדיקת תקינות הטופס
   if (!form.checkValidity()) {
+    console.log('🔧 Form validation failed');
     form.reportValidity();
     return;
   }
+  console.log('🔧 Form validation passed');
 
   // בדיקת שדות חובה
   const formData = new FormData(form);
@@ -1408,6 +1489,12 @@ async function saveAlert() {
   // console.log('🔧 Request body:', JSON.stringify(alertData, null, 2));
 
   try {
+    console.log('🔧 === SAVING ALERT ===');
+    console.log('🔧 Alert data:', alertData);
+    console.log('🔧 Request URL:', '/api/v1/alerts/');
+    console.log('🔧 Request method:', 'POST');
+    console.log('🔧 Request body:', JSON.stringify(alertData, null, 2));
+
     const response = await fetch('/api/v1/alerts/', {
       method: 'POST',
       headers: {
@@ -1416,32 +1503,39 @@ async function saveAlert() {
       body: JSON.stringify(alertData),
     });
 
-    // console.log('🔧 Response status:', response.status);
-    // console.log('🔧 Response ok:', response.ok);
+    console.log('🔧 Response status:', response.status);
+    console.log('🔧 Response ok:', response.ok);
 
     if (response.ok) {
-      await response.json();
-      // console.log('🔧 New alert created:', newAlert);
+      const newAlert = await response.json();
+      console.log('🔧 New alert created:', newAlert);
 
       // התראה נשמרה בהצלחה
 
+      // שימוש במערכת הריענון המרכזית
+      if (window.centralRefresh) {
+        await window.centralRefresh.showSuccessAndRefresh('alerts', 'התראה נשמרה בהצלחה!');
+      } else {
+        // Fallback למערכת הישנה
+        // הצגת הודעה
+        if (window.showSuccessNotification) {
+          window.showSuccessNotification('הצלחה', 'התראה נשמרה בהצלחה!');
+        }
+
+        // רענון הנתונים
+        await loadAlertsData();
+      }
+
       // סגירת המודל
       closeModal('addAlertModal');
-
-      // רענון הנתונים
-      loadAlertsData();
-
-      // הצגת הודעה
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('הצלחה', 'התראה נשמרה בהצלחה!');
-      }
+      
     } else {
       const errorText = await response.text();
-      // console.error('🔧 Server error response:', errorText);
+      console.error('🔧 Server error response:', errorText);
       throw new Error(`שגיאה בשמירת התראה: ${response.status} - ${errorText}`);
     }
   } catch (error) {
-    // console.error('🔧 Error saving alert:', error);
+    console.error('🔧 Error saving alert:', error);
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה בשמירת התראה', 'שגיאה בשמירת התראה: ' + error.message);
     }
@@ -1465,23 +1559,17 @@ function editAlert(alertId) {
     return;
   }
 
-  // טעינת נתונים למודל
-  loadModalData();
-
   // ניקוי ולידציה
   clearAlertValidation();
 
   // מילוי הטופס
   const editAlertId = document.getElementById('editAlertId');
-
   const editAlertMessage = document.getElementById('editAlertMessage');
   const editAlertStatus = document.getElementById('editAlertStatus');
   const editAlertIsTriggered = document.getElementById('editAlertIsTriggered');
   const editAlertState = document.getElementById('editAlertState');
 
   if (editAlertId) {editAlertId.value = alert.id;}
-
-
   if (editAlertMessage) {editAlertMessage.value = alert.message || '';}
   if (editAlertStatus) {editAlertStatus.value = alert.status || 'open';}
   if (editAlertIsTriggered) {editAlertIsTriggered.value = alert.is_triggered || 'false';}
@@ -1499,29 +1587,32 @@ function editAlert(alertId) {
   const currentState = getAlertState(alert.status, alert.is_triggered);
   if (editAlertState) {editAlertState.value = currentState;}
 
-  // בחירת סוג הקשר
-  const relationType = alert.related_type_id;
-  const radioButton = document.querySelector(`input[name="editAlertRelationType"][value="${relationType}"]`);
-  if (radioButton) {
-    radioButton.checked = true;
-    // הפעלת אירוע change לטעינת האובייקטים
-    radioButton.dispatchEvent(new Event('change'));
-  }
-
-  // בחירת האובייקט המקושר
-  setTimeout(() => {
-    const relatedObjectSelect = document.getElementById('editAlertRelatedObjectSelect');
-    if (relatedObjectSelect && alert.related_id) {
-      relatedObjectSelect.value = alert.related_id;
-      // הפעלת אירוע change להפעלת שדות נוספים
-      relatedObjectSelect.dispatchEvent(new Event('change'));
+  // טעינת נתונים למודל ואז מילוי השדות
+  loadModalData().then(() => {
+    // בחירת סוג הקשר
+    const relationType = alert.related_type_id;
+    const radioButton = document.querySelector(`input[name="editAlertRelationType"][value="${relationType}"]`);
+    if (radioButton) {
+      radioButton.checked = true;
+      // הפעלת אירוע change לטעינת האובייקטים
+      radioButton.dispatchEvent(new Event('change'));
     }
-  }, 200);
 
-  // הפעלת שדות התנאי
-  setTimeout(() => {
-    enableEditConditionFields();
-  }, 300);
+    // בחירת האובייקט המקושר
+    setTimeout(() => {
+      const relatedObjectSelect = document.getElementById('editAlertRelatedObjectSelect');
+      if (relatedObjectSelect && alert.related_id) {
+        relatedObjectSelect.value = alert.related_id;
+        // הפעלת אירוע change להפעלת שדות נוספים
+        relatedObjectSelect.dispatchEvent(new Event('change'));
+      }
+    }, 200);
+
+    // הפעלת שדות התנאי
+    setTimeout(() => {
+      enableEditConditionFields();
+    }, 300);
+  });
 
   // הוספת event listeners לשדות התנאי במודל העריכה
   setTimeout(() => {
@@ -1712,6 +1803,11 @@ function updateStatusAndTriggered() {
  * משתמשת במערכת ההתראות הגלובלית להודעות
  */
 async function updateAlert() {
+  // ניקוי מטמון לפני פעולת CRUD - עריכה
+  if (window.clearCacheBeforeCRUD) {
+    window.clearCacheBeforeCRUD('alerts', 'edit');
+  }
+  
   const form = document.getElementById('editAlertForm');
   if (!form) {
     // console.warn('⚠️ Form element not found - skipping update operation');
@@ -1855,16 +1951,23 @@ async function updateAlert() {
       await response.json();
       // התראה עודכנה בהצלחה
 
+      // שימוש במערכת הריענון המרכזית
+      if (window.centralRefresh) {
+        await window.centralRefresh.showSuccessAndRefresh('alerts', 'התראה עודכנה בהצלחה!');
+      } else {
+        // Fallback למערכת הישנה
+        // הצגת הודעה
+        if (window.showSuccessNotification) {
+          window.showSuccessNotification('הצלחה', 'התראה עודכנה בהצלחה!');
+        }
+
+        // רענון הנתונים
+        await loadAlertsData();
+      }
+
       // סגירת המודל
       closeModal('editAlertModal');
-
-      // רענון הנתונים
-      loadAlertsData();
-
-      // הצגת הודעה
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('הצלחה', 'התראה עודכנה בהצלחה!');
-      }
+      
     } else {
       throw new Error(`שגיאה בעדכון התראה: ${response.status}`);
     }
@@ -1928,6 +2031,7 @@ async function confirmDeleteAlert(alertId) {
         window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!');
       }
       loadAlertsData();
+      
     } else {
       // console.error('❌ שגיאה במחיקת התראה:', result);
 
@@ -2109,6 +2213,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // טעינת נתונים
   loadAlertsData();
+  
 
   // טעינת מצב המיון
   if (typeof window.loadSortState === 'function') {
@@ -2150,6 +2255,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // טעינת נתונים
   loadAlertsData();
+  
 
   // טעינת מצב המיון
   if (typeof window.loadSortState === 'function') {
@@ -2168,6 +2274,7 @@ if (window.location.pathname.includes('/alerts')) {
     // טעינת נתונים מחדש עם הפילטרים החדשים
     if (typeof window.loadAlertsData === 'function') {
       window.loadAlertsData();
+      
     } else {
       // console.error('❌ loadAlertsData function not found');
     }
@@ -2230,6 +2337,7 @@ function filterAlertsByRelatedObjectType(type) {
 
   // עדכון הטבלה עם הנתונים המסוננים
   updateAlertsTable(filteredAlerts);
+  
 
   // עדכון ספירת רשומות
   const countElement = document.querySelector('.table-count');
@@ -2264,7 +2372,10 @@ window.clearAlertValidation = clearAlertValidation;
 
 // פונקציה לטעינת התראות (alias ל-loadAlertsData)
 function loadAlerts() {
-  return loadAlertsData();
+  const result = loadAlertsData();
+  
+  
+  return result;
 }
 
 // חשיפת פונקציית loadAlerts
@@ -2336,6 +2447,13 @@ async function reactivateAlert(alertId) {
       // רענון הטבלה
       if (typeof window.loadAlertsData === 'function') {
         await window.loadAlertsData();
+        
+        // רענון כפוי של הטבלה
+        setTimeout(() => {
+          if (window.loadAlertsData) {
+            window.loadAlertsData();
+          }
+        }, 500);
       }
     } else {
       const data = await response.json();

@@ -93,11 +93,6 @@
                 הוסף טיקר
               </button>
               <div class="action-separator"></div>
-              <button class="refresh-btn" onclick="openPreferencesV2()" title="פתח מערכת העדפות V2 המתקדמת" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white;">
-                <span class="action-icon">🚀</span>
-                העדפות V2
-              </button>
-              <div class="action-separator"></div>
               <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור עיצובים">
                 <span class="filter-icon">▲</span>
               </button>
@@ -529,16 +524,9 @@
     <!-- ✨ תמיכה במערכת העדפות V2 החדשה -->
     <script src="scripts/preferences-v2-compatibility.js"></script>
     <script src="scripts/color-demo-toggle.js"></script>
+    <script src="scripts/central-refresh-system.js"></script>
     <script src="scripts/tickers.js?v=20250904_0049"></script>
     <script>
-        // פונקציה לפתיחת מערכת העדפות V2
-        function openPreferencesV2() {
-          console.log('🚀 Opening Preferences V2 system...');
-          if (typeof window.showInfoNotification === 'function') {
-            window.showInfoNotification('העדפות', 'עובר למערכת העדפות V2 המתקדמת...');
-          }
-          window.location.href = 'preferences-v2.html';
-        }
         
         document.addEventListener("DOMContentLoaded", () => {
           console.log("🔄 Initializing unified header system...");

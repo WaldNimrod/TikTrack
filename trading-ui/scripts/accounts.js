@@ -889,6 +889,11 @@ function showFormError(message) {
  */
 async function saveAccount(mode, accountId = null) {
   try {
+    // ניקוי מטמון לפני פעולת CRUD - הוספה/עריכה
+    if (window.clearCacheBeforeCRUD) {
+      window.clearCacheBeforeCRUD('accounts', mode === 'add' ? 'add' : 'edit');
+    }
+    
     // איסוף נתונים מהטופס
     const form = document.getElementById('accountForm');
     const formData = new FormData(form);
@@ -917,12 +922,25 @@ async function saveAccount(mode, accountId = null) {
 
     // רענון הנתונים לפני סגירת המודל
     try {
-      if (typeof window.loadAccountsDataForAccountsPage === 'function') {
-        await window.loadAccountsDataForAccountsPage();
-      } else if (typeof window.loadAccountsData === 'function') {
-        const accounts = await window.loadAccountsData();
-        if (typeof window.updateAccountsTable === 'function') {
-          window.updateAccountsTable(accounts);
+      // שימוש במערכת הריענון המרכזית
+      if (window.centralRefresh) {
+        const message = mode === 'add' ? 'חשבון נוסף בהצלחה' : 'חשבון עודכן בהצלחה';
+        await window.centralRefresh.showSuccessAndRefresh('accounts', message);
+      } else {
+        // Fallback למערכת הישנה
+        if (typeof window.loadAccountsDataForAccountsPage === 'function') {
+          await window.loadAccountsDataForAccountsPage();
+        } else if (typeof window.loadAccountsData === 'function') {
+          const accounts = await window.loadAccountsData();
+          if (typeof window.updateAccountsTable === 'function') {
+            window.updateAccountsTable(accounts);
+          }
+        }
+
+        // הצגת הודעה
+        const message = mode === 'add' ? 'חשבון נוסף בהצלחה' : 'חשבון עודכן בהצלחה';
+        if (typeof window.showSuccessNotification === 'function') {
+          window.showSuccessNotification('הצלחה', message);
         }
       }
 
@@ -935,14 +953,6 @@ async function saveAccount(mode, accountId = null) {
         }
         // הסרת המודל מה-DOM
         modal.remove();
-      }
-
-      // הצגת הודעה
-      const message = mode === 'add' ? 'חשבון נוסף בהצלחה' : 'חשבון עודכן בהצלחה';
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('הצלחה', message);
-      } else {
-        // Success message handled by notification system
       }
 
     } catch (refreshError) {
@@ -1233,10 +1243,17 @@ async function cancelAccount(accountId, accountName) {
           if (!confirmed) {return;}
         } else {
           // Fallback למקרה שמערכת התראות לא זמינה
-          if (!window.confirm(`האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`)) {
-            return;
-          }
-          if (!window.confirm(`הסטטוס ישתנה ל"מבוטל". האם אתה בטוח שברצונך להמשיך בביטול החשבון "${accountName}"?`)) {
+          if (window.showConfirmationDialog) {
+            const confirmed = await new Promise(resolve => {
+              window.showConfirmationDialog(
+                'ביטול חשבון',
+                `האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`,
+                () => resolve(true),
+                () => resolve(false)
+              );
+            });
+            if (!confirmed) return;
+          } else if (!window.confirm(`האם אתה בטוח שברצונך לבטל את החשבון "${accountName}"?`)) {
             return;
           }
         }
@@ -1295,6 +1312,10 @@ async function cancelAccount(accountId, accountName) {
  * @param {string} accountName - שם החשבון
  */
 async function deleteAccount(accountId, accountName) {
+  // ניקוי מטמון לפני פעולת CRUD - מחיקה
+  if (window.clearCacheBeforeCRUD) {
+    window.clearCacheBeforeCRUD('accounts', 'delete');
+  }
 
   // בדיקת פריטים מקושרים לפני מחיקה
   if (typeof window.checkLinkedItemsBeforeDelete === 'function') {
@@ -1337,10 +1358,17 @@ async function deleteAccount(accountId, accountName) {
         });
         if (!confirmed) {return;}
       } else {
-        if (!window.confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?`)) {
-          return;
-        }
-        if (!window.confirm(`פעולה זו אינה הפיכה. האם אתה בטוח שברצונך להמשיך במחיקת החשבון "${accountName}"?`)) {
+        if (window.showConfirmationDialog) {
+          const confirmed = await new Promise(resolve => {
+            window.showConfirmationDialog(
+              'מחיקת חשבון',
+              `האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?\n\nפעולה זו אינה הפיכה.`,
+              () => resolve(true),
+              () => resolve(false)
+            );
+          });
+          if (!confirmed) return;
+        } else if (!window.confirm(`האם אתה בטוח שברצונך למחוק את החשבון "${accountName}"?`)) {
           return;
         }
       }
@@ -1356,15 +1384,21 @@ async function deleteAccount(accountId, accountName) {
     });
 
     if (response.ok) {
-      showSuccessMessage('חשבון נמחק בהצלחה!');
+      // שימוש במערכת הריענון המרכזית
+      if (window.centralRefresh) {
+        await window.centralRefresh.showSuccessAndRefresh('accounts', 'חשבון נמחק בהצלחה!');
+      } else {
+        // Fallback למערכת הישנה
+        showSuccessMessage('חשבון נמחק בהצלחה!');
 
-      // רענון הטבלה
-      if (typeof window.loadAccountsDataForAccountsPage === 'function') {
-        await window.loadAccountsDataForAccountsPage();
-      } else if (typeof window.loadAccountsData === 'function') {
-        const accounts = await window.loadAccountsData();
-        if (typeof window.updateAccountsTable === 'function') {
-          window.updateAccountsTable(accounts);
+        // רענון הטבלה
+        if (typeof window.loadAccountsDataForAccountsPage === 'function') {
+          await window.loadAccountsDataForAccountsPage();
+        } else if (typeof window.loadAccountsData === 'function') {
+          const accounts = await window.loadAccountsData();
+          if (typeof window.updateAccountsTable === 'function') {
+            window.updateAccountsTable(accounts);
+          }
         }
       }
     } else {
@@ -1840,7 +1874,17 @@ async function cancelAccountWithLinkedItemsCheck(accountId, _accountName) {
       );
     } else {
       // Fallback למקרה שהמערכת הגלובלית לא זמינה
-      if (!window.confirm(`האם אתה בטוח שברצונך לבטל חשבון זה?${accountDetails}`)) {
+      if (window.showConfirmationDialog) {
+        const confirmed = await new Promise(resolve => {
+          window.showConfirmationDialog(
+            'ביטול חשבון',
+            `האם אתה בטוח שברצונך לבטל חשבון זה?${accountDetails}`,
+            () => resolve(true),
+            () => resolve(false)
+          );
+        });
+        if (!confirmed) return;
+      } else if (!window.confirm(`האם אתה בטוח שברצונך לבטל חשבון זה?${accountDetails}`)) {
         return;
       }
       await checkLinkedItemsAndCancelAccount(accountId);
@@ -1890,7 +1934,17 @@ async function deleteAccountWithLinkedItemsCheck(accountId, _accountName) {
       );
     } else {
       // Fallback למקרה שהמערכת הגלובלית לא זמינה
-      if (!window.confirm(`האם אתה בטוח שברצונך למחוק חשבון זה?${accountDetails}`)) {
+      if (window.showConfirmationDialog) {
+        const confirmed = await new Promise(resolve => {
+          window.showConfirmationDialog(
+            'מחיקת חשבון',
+            `האם אתה בטוח שברצונך למחוק חשבון זה?${accountDetails}`,
+            () => resolve(true),
+            () => resolve(false)
+          );
+        });
+        if (!confirmed) return;
+      } else if (!window.confirm(`האם אתה בטוח שברצונך למחוק חשבון זה?${accountDetails}`)) {
         return;
       }
       await checkLinkedItemsAndDeleteAccount(accountId);
@@ -1910,6 +1964,11 @@ async function deleteAccountWithLinkedItemsCheck(accountId, _accountName) {
  * @param {string} accountName - שם החשבון
  */
 async function restoreAccount(accountId, accountName) {
+  // ניקוי מטמון לפני פעולת CRUD - עריכה
+  if (window.clearCacheBeforeCRUD) {
+    window.clearCacheBeforeCRUD('accounts', 'edit');
+  }
+  
   // אישור מהמשתמש
   if (typeof window.showConfirmationDialog === 'function') {
     const confirmed = await new Promise(resolve => {
@@ -1922,7 +1981,17 @@ async function restoreAccount(accountId, accountName) {
     });
     if (!confirmed) {return;}
   } else {
-    if (!window.confirm(`האם אתה בטוח שברצונך להחזיר את החשבון "${accountName}" לסטטוס סגור?`)) {
+    if (window.showConfirmationDialog) {
+      const confirmed = await new Promise(resolve => {
+        window.showConfirmationDialog(
+          'החזרת חשבון',
+          `האם אתה בטוח שברצונך להחזיר את החשבון "${accountName}" לסטטוס סגור?`,
+          () => resolve(true),
+          () => resolve(false)
+        );
+      });
+      if (!confirmed) return;
+    } else if (!window.confirm(`האם אתה בטוח שברצונך להחזיר את החשבון "${accountName}" לסטטוס סגור?`)) {
       return;
     }
   }
@@ -1939,15 +2008,21 @@ async function restoreAccount(accountId, accountName) {
     });
 
     if (response.ok) {
-      showSuccessMessage('חשבון הוחזר בהצלחה לסטטוס סגור!');
+      // שימוש במערכת הריענון המרכזית
+      if (window.centralRefresh) {
+        await window.centralRefresh.showSuccessAndRefresh('accounts', 'חשבון הוחזר בהצלחה לסטטוס סגור!');
+      } else {
+        // Fallback למערכת הישנה
+        showSuccessMessage('חשבון הוחזר בהצלחה לסטטוס סגור!');
 
-      // רענון הטבלה
-      if (typeof window.loadAccountsDataForAccountsPage === 'function') {
-        await window.loadAccountsDataForAccountsPage();
-      } else if (typeof window.loadAccountsData === 'function') {
-        const accounts = await window.loadAccountsData();
-        if (typeof window.updateAccountsTable === 'function') {
-          window.updateAccountsTable(accounts);
+        // רענון הטבלה
+        if (typeof window.loadAccountsDataForAccountsPage === 'function') {
+          await window.loadAccountsDataForAccountsPage();
+        } else if (typeof window.loadAccountsData === 'function') {
+          const accounts = await window.loadAccountsData();
+          if (typeof window.updateAccountsTable === 'function') {
+            window.updateAccountsTable(accounts);
+          }
         }
       }
     } else {
@@ -1987,6 +2062,11 @@ async function checkLinkedItemsAndCancelAccount(accountId) {
  */
 async function performAccountCancellation(accountId) {
   try {
+    // ניקוי מטמון לפני פעולת CRUD - ביטול
+    if (window.clearCacheBeforeCRUD) {
+      window.clearCacheBeforeCRUD('accounts', 'cancel');
+    }
+    
     // שליחה לשרת
     const response = await fetch(`/api/v1/accounts/${accountId}`, {
       method: 'PUT',
@@ -1997,18 +2077,24 @@ async function performAccountCancellation(accountId) {
     if (response.ok) {
       await response.json(); // result not used
 
-      // הצגת הודעת הצלחה
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('הצלחה', 'החשבון בוטל בהצלחה');
-      }
+      // שימוש במערכת הריענון המרכזית
+      if (window.centralRefresh) {
+        await window.centralRefresh.showSuccessAndRefresh('accounts', 'החשבון בוטל בהצלחה');
+      } else {
+        // Fallback למערכת הישנה
+        // הצגת הודעת הצלחה
+        if (window.showSuccessNotification) {
+          window.showSuccessNotification('הצלחה', 'החשבון בוטל בהצלחה');
+        }
 
-      // רענון הנתונים
-      if (typeof loadAccountsDataForAccountsPage === 'function') {
-        await loadAccountsDataForAccountsPage();
-      } else if (typeof window.loadAccountsData === 'function') {
-        const accounts = await window.loadAccountsData();
-        if (typeof window.updateAccountsTable === 'function') {
-          window.updateAccountsTable(accounts);
+        // רענון הנתונים
+        if (typeof loadAccountsDataForAccountsPage === 'function') {
+          await loadAccountsDataForAccountsPage();
+        } else if (typeof window.loadAccountsData === 'function') {
+          const accounts = await window.loadAccountsData();
+          if (typeof window.updateAccountsTable === 'function') {
+            window.updateAccountsTable(accounts);
+          }
         }
       }
 
@@ -2055,6 +2141,11 @@ async function checkLinkedItemsAndDeleteAccount(accountId) {
  */
 async function performAccountDeletion(accountId) {
   try {
+    // ניקוי מטמון לפני פעולת CRUD - מחיקה
+    if (window.clearCacheBeforeCRUD) {
+      window.clearCacheBeforeCRUD('accounts', 'delete');
+    }
+    
     // שליחה לשרת
     const response = await fetch(`/api/v1/accounts/${accountId}`, {
       method: 'DELETE',
@@ -2063,18 +2154,24 @@ async function performAccountDeletion(accountId) {
     if (response.ok) {
       await response.json(); // result not used
 
-      // הצגת הודעת הצלחה
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('הצלחה', 'החשבון נמחק בהצלחה');
-      }
+      // שימוש במערכת הריענון המרכזית
+      if (window.centralRefresh) {
+        await window.centralRefresh.showSuccessAndRefresh('accounts', 'החשבון נמחק בהצלחה');
+      } else {
+        // Fallback למערכת הישנה
+        // הצגת הודעת הצלחה
+        if (window.showSuccessNotification) {
+          window.showSuccessNotification('הצלחה', 'החשבון נמחק בהצלחה');
+        }
 
-      // רענון הנתונים
-      if (typeof loadAccountsDataForAccountsPage === 'function') {
-        await loadAccountsDataForAccountsPage();
-      } else if (typeof window.loadAccountsData === 'function') {
-        const accounts = await window.loadAccountsData();
-        if (typeof window.updateAccountsTable === 'function') {
-          window.updateAccountsTable(accounts);
+        // רענון הנתונים
+        if (typeof loadAccountsDataForAccountsPage === 'function') {
+          await loadAccountsDataForAccountsPage();
+        } else if (typeof window.loadAccountsData === 'function') {
+          const accounts = await window.loadAccountsData();
+          if (typeof window.updateAccountsTable === 'function') {
+            window.updateAccountsTable(accounts);
+          }
         }
       }
 

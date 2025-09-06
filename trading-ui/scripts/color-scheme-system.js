@@ -60,7 +60,38 @@ let ENTITY_BACKGROUND_COLORS = {};
  * צבעי סטטוסים דינמיים - נטענים מההעדפות
  * Dynamic status colors - loaded from preferences
  */
-let STATUS_COLORS = {};
+let STATUS_COLORS = {
+  'open': {
+    light: '#d4edda',
+    medium: '#28a745',
+    dark: '#1e7e34',
+    border: '#c3e6cb'
+  },
+  'closed': {
+    light: '#f8d7da',
+    medium: '#dc3545',
+    dark: '#c82333',
+    border: '#f5c6cb'
+  },
+  'pending': {
+    light: '#fff3cd',
+    medium: '#ffc107',
+    dark: '#e0a800',
+    border: '#ffeaa7'
+  },
+  'active': {
+    light: '#d1ecf1',
+    medium: '#17a2b8',
+    dark: '#138496',
+    border: '#bee5eb'
+  },
+  'inactive': {
+    light: '#e2e3e5',
+    medium: '#6c757d',
+    dark: '#545b62',
+    border: '#d6d8db'
+  }
+};
 
 /**
  * צבעי טקסט דינמיים - מחושבים מהצבעים העיקריים
@@ -273,11 +304,11 @@ function getEntityColor(entityType) {
  */
 function getStatusColor(status, intensity = 'medium') {
   if (!status) {
-    return STATUS_COLORS['closed'][intensity] || '#6c757d';
+    return STATUS_COLORS['closed']?.[intensity] || '#6c757d';
   }
 
   const normalizedStatus = status.toLowerCase().trim();
-  return STATUS_COLORS[normalizedStatus]?.[intensity] || STATUS_COLORS['closed'][intensity] || '#6c757d';
+  return STATUS_COLORS[normalizedStatus]?.[intensity] || STATUS_COLORS['closed']?.[intensity] || '#6c757d';
 }
 
 /**
@@ -1412,6 +1443,7 @@ async function loadColorPreferences() {
         }
       }
     } catch (v2Error) {
+      // V2 preferences not available (likely database tables not created yet)
       console.log('🔄 V2 colors not available, falling back to V1');
     }
 
@@ -1514,6 +1546,11 @@ function applyEntityColorsToHeaders(entityType, excludeWarningModals = true) {
         return; // דלג על מודולי אזהרה
       }
       
+      // דלג על כותרות מודלים - הן מנוהלות על ידי ההגדרות הכלליות
+      if (header.closest('.modal')) {
+        return;
+      }
+      
       // הסרת כל המחלקות הישנות של ישויות
       VALID_ENTITY_TYPES.forEach(type => {
         header.classList.remove(`entity-${type}-main-header`);
@@ -1531,6 +1568,11 @@ function applyEntityColorsToHeaders(entityType, excludeWarningModals = true) {
         return; // דלג על מודולי אזהרה
       }
       
+      // דלג על כותרות מודלים - הן מנוהלות על ידי ההגדרות הכלליות
+      if (header.closest('.modal')) {
+        return;
+      }
+      
       // הסרת כל המחלקות הישנות של ישויות
       VALID_ENTITY_TYPES.forEach(type => {
         header.classList.remove(`entity-${type}-main-header`);
@@ -1541,16 +1583,7 @@ function applyEntityColorsToHeaders(entityType, excludeWarningModals = true) {
       console.log(`✅ כותרת משנית קיבלה צבע ${entityType}`);
     });
 
-    // כותרות מודלים (למעט אזהרות)
-    const modalHeaders = document.querySelectorAll('.modal-header');
-    modalHeaders.forEach(header => {
-      if (excludeWarningModals && isWarningModal(header)) {
-        return; // דלג על מודולי אזהרה
-      }
-      
-      header.classList.add(`entity-${entityType}-sub-header`);
-      console.log(`✅ כותרת מודל קיבלה צבע ${entityType}`);
-    });
+    // כותרות מודלים מנוהלות על ידי ההגדרות הכלליות ב-styles.css
 
     console.log(`✅ צבעי ישות ${entityType} יושמו על כל הכותרות`);
     
@@ -1598,29 +1631,6 @@ function isWarningModal(element) {
   return warningKeywords.some(keyword => text.includes(keyword));
 }
 
-/**
- * הסרת צבעי ישות מכל הכותרות
- * Remove entity colors from all headers
- */
-function removeEntityColorsFromHeaders() {
-  try {
-    console.log('🎨 מסיר צבעי ישות מכל הכותרות...');
-    
-    // הסרת מחלקות צבע מכל הכותרות
-    const allHeaders = document.querySelectorAll('.section-header, .modal-header');
-    allHeaders.forEach(header => {
-      VALID_ENTITY_TYPES.forEach(type => {
-        header.classList.remove(`entity-${type}-main-header`);
-        header.classList.remove(`entity-${type}-sub-header`);
-      });
-    });
-    
-    console.log('✅ צבעי ישות הוסרו מכל הכותרות');
-    
-  } catch (error) {
-    console.error('❌ שגיאה בהסרת צבעי ישות:', error);
-  }
-}
 
 /**
  * קבלת שקיפות כותרת ראשית כ-hex
@@ -1749,7 +1759,6 @@ window.getColorPreferences = getColorPreferences;
 
 // Export header styling functions
 window.applyEntityColorsToHeaders = applyEntityColorsToHeaders;
-window.removeEntityColorsFromHeaders = removeEntityColorsFromHeaders;
 window.isWarningModal = isWarningModal;
 window.getMainHeaderOpacityHex = getMainHeaderOpacityHex;
 window.getSubHeaderOpacityHex = getSubHeaderOpacityHex;
@@ -1816,7 +1825,6 @@ window.colorSchemeSystem = {
 
   // Header styling functions
   applyEntityColorsToHeaders,
-  removeEntityColorsFromHeaders,
   isWarningModal,
   getMainHeaderOpacityHex,
   getSubHeaderOpacityHex,

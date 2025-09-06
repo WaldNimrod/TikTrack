@@ -3,705 +3,1743 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>הגדרות מערכת - TikTrack</title>
+  <title>העדפות מערכת - Tik.track</title>
   
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   
-  <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-  
-  <!-- CSS Files -->
+  <!-- CSS Files - Ordered by priority (weak to strong) -->
+  <!-- 1. Apple theme (base) -->
   <link rel="stylesheet" href="styles/apple-theme.css">
+  
+  <!-- 2. Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- 3. Header system -->
   <link rel="stylesheet" href="styles/header-system.css">
+  
+  <!-- 4. Typography -->
   <link rel="stylesheet" href="styles/typography.css">
+
+  <!-- 5. Table styles -->
   <link rel="stylesheet" href="styles/table.css">
+
+  <!-- 6. Warning system styles -->
   <link rel="stylesheet" href="styles/notification-system.css">
+
+  <!-- 7. Linked items modal styles -->
+  <link rel="stylesheet" href="styles/linked-items.css">
+
+  <!-- 8. General styles (highest priority - drops everything) -->
   <link rel="stylesheet" href="styles/styles.css">
+  
+  <!-- 9. Numeric value colors system -->
   <link rel="stylesheet" href="styles/numeric-value-colors.css">
+  
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f8f9fa;
+    }
+    
+    .page-body {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    
+    .preference-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .preference-item:last-child {
+      border-bottom: none;
+    }
+    
+    .preference-label {
+      flex: 1;
+    }
+    
+    .preference-label h4 {
+      margin: 0 0 5px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .preference-label p {
+      margin: 0;
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .preference-control {
+      min-width: 200px;
+    }
+    
+    .btn-save {
+      background-color: #28a745;
+      border-color: #28a745;
+      color: white;
+    }
+    
+    .btn-save:hover {
+      background-color: #218838;
+      border-color: #1e7e34;
+      color: white;
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      min-width: 300px;
+    }
+    
+    /* סגנונות לסקשנים */
+    .main-preferences-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #eee;
+    }
+    
+    .preference-section {
+      margin-bottom: 25px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: white;
+    }
+    
+    .color-subsection {
+      margin-bottom: 2rem;
+      padding: 1rem;
+      border: 1px solid #f0f0f0;
+      border-radius: 6px;
+      background-color: #fafafa;
+    }
+    
+    .color-subsection-title {
+      color: #333;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #007bff;
+    }
+    
+    .preference-section-header {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      padding: 15px 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e0e0e0;
+      transition: background-color 0.3s ease;
+    }
+    
+    .preference-section-header:hover {
+      background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    }
+    
+    .preference-section-header h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #495057;
+      display: flex;
+      align-items: center;
+    }
+    
+    .section-icon {
+      margin-left: 10px;
+      font-size: 20px;
+    }
+    
+    .toggle-icon {
+      font-size: 16px;
+      transition: transform 0.3s ease;
+      color: #6c757d;
+    }
+    
+    .toggle-icon.collapsed {
+      transform: rotate(-90deg);
+    }
+    
+    .preference-section-body {
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+    
+    .preference-section-body.collapsed {
+      display: none;
+    }
+    
+  </style>
 </head>
 
 <body>
+  <!-- רקע כללי -->
   <div class="background-wrapper">
     
     <!-- unified-header ייווצר כאן אוטומטית -->
     
-    <!-- כותרת ראשית -->
-    <div class="preferences-v2-container">
-      <div class="preferences-header slide-in">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <h1><i class="bi bi-gear-fill"></i> הגדרות מערכת</h1>
-            <p>מערכת הגדרות מתקדמת עם פרופילים מרובים ואפשרויות יבוא/יצוא</p>
-          </div>
-          <div class="d-flex gap-3">
-            <button class="btn btn-modern btn-export" onclick="exportPreferences()">
-              <i class="bi bi-download"></i> יצא הגדרות
-            </button>
-            <button class="btn btn-modern btn-import" onclick="importPreferences()">
-              <i class="bi bi-upload"></i> יבא הגדרות
-            </button>
+    <!-- גוף הדף - כל התוכן אחרי הכותרת -->
+    <div class="page-body">
+      <!-- top-section -->
+      <div class="top-section">
+        <!-- Main header -->
+        <div class="section-header">
+          <div class="table-title">
+            <img src="images/icons/development.svg?v=20250905" alt="העדפות מערכת" class="section-icon"> העדפות מערכת
           </div>
         </div>
+
+        <!-- Alert cards -->
+        <div class="section-body">
+          <active-alerts></active-alerts>
+
+          <!-- Data summary -->
+          <div class="info-summary" id="summaryStats">
+            <div>פרופילים: <strong id="totalProfiles">5</strong></div>
+            <div>הגדרות: <strong id="settingsCount">64</strong></div>
+            <div>עדכון אחרון: <strong id="lastUpdate">2025-09-05 22:50</strong></div>
+            <div>תקינות: <strong id="validationStatus">✅</strong></div>
+          </div>
+        </div>
+      </div> <!-- End top-section -->
+
+      <!-- Main content -->
+      <div class="main-content">
+        <div class="content-section">
+          <div class="section-header">
+            <div class="table-title">
+              <img src="images/icons/development.svg?v=20250905" alt="הגדרות מערכת" class="section-icon"> הגדרות מערכת
+            </div>
+            <div class="table-actions">
+              <button class="btn btn-info btn-sm me-2" onclick="validateAllPreferencesSaved()"
+                  title="בדוק שכל ההעדפות נשמרו">
+                <i class="bi bi-check-circle"></i> בדוק הכל
+              </button>
+              <button class="btn btn-success btn-sm me-2" onclick="saveAllPreferences()"
+                  title="שמור את כל ההעדפות">
+                <i class="bi bi-save"></i> שמור הכל
+              </button>
+              <button class="btn btn-primary btn-sm me-2" onclick="saveCurrentAsDefaults()"
+                  title="שמור את ההגדרות הנוכחיות כברירות מחדל">
+                <i class="bi bi-bookmark-star"></i> שמור ברירות מחדל
+              </button>
+              <button class="filter-toggle-btn" onclick="toggleAllPreferenceSections()"
+                  title="פתח/סגור את כל הסקשנים">
+                <span class="filter-icon">▼</span>
+              </button>
+            </div>
+          </div>
+          <div class="section-body">
+            
+            <!-- ===== בחירת פרופיל ===== -->
+            <div class="preference-section">
+              <div class="preference-section-header" onclick="togglePreferenceSection('profile-selector')">
+                <h3><span class="section-icon">👤</span> בחירת פרופיל</h3>
+                <span class="toggle-icon" id="profile-selector-icon">▼</span>
+              </div>
+              <div class="preference-section-body" id="profile-selector-body">
+                <div class="preference-items-grid">
+                  <!-- פרופיל פעיל -->
+                  <div class="preference-item">
+                    <div class="preference-label">
+                      <h4>🎯 פרופיל פעיל</h4>
+                      <p>הפרופיל שישמש כברירת מחדל</p>
+                    </div>
+                    <div class="preference-control">
+                      <select id="activeProfile" class="form-select" onchange="updatePreference('activeProfile', this.value)">
+                        <option value="default">Default - ברירת מחדל</option>
+                        <option value="conservative">Conservative - שמרני</option>
+                        <option value="aggressive">Aggressive - אגרסיבי</option>
+                        <option value="day_trading">Day Trading - מסחר יומי</option>
+                        <option value="swing_trading">Swing Trading - מסחר סווינג</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <!-- יצירת פרופיל חדש -->
+                  <div class="preference-item">
+                    <div class="preference-label">
+                      <h4>➕ יצירת פרופיל חדש</h4>
+                      <p>צור פרופיל העדפות חדש</p>
+                    </div>
+                    <div class="preference-control">
+                      <button class="btn btn-outline-primary btn-sm" onclick="createNewProfile()">
+                        <i class="bi bi-plus-circle"></i> צור פרופיל
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- ניהול פרופילים -->
+                  <div class="preference-item">
+                    <div class="preference-label">
+                      <h4>⚙️ ניהול פרופילים</h4>
+                      <p>שכפל, מחק או שנה שם פרופיל</p>
+                    </div>
+                    <div class="preference-control">
+                      <button class="btn btn-outline-secondary btn-sm me-2" onclick="duplicateProfile()">
+                        <i class="bi bi-files"></i> שכפל
+                      </button>
+                      <button class="btn btn-outline-warning btn-sm me-2" onclick="renameProfile()">
+                        <i class="bi bi-pencil"></i> שנה שם
+                      </button>
+                      <button class="btn btn-outline-danger btn-sm" onclick="deleteProfile()">
+                        <i class="bi bi-trash"></i> מחק
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+    <!-- ===== הגדרות בסיסיות ===== -->
+    <div class="preference-section">
+      <div class="preference-section-header" onclick="togglePreferenceSection('basic-settings')">
+        <h3><span class="section-icon">⚙️</span> הגדרות בסיסיות</h3>
+        <span class="toggle-icon" id="basic-settings-icon">▼</span>
       </div>
-      
-      <!-- בחירת פרופיל -->
-      <div class="profile-selector slide-in">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h4><i class="bi bi-person-circle"></i> פרופילי הגדרות</h4>
-          <button class="btn btn-outline-primary btn-sm" onclick="createNewProfile()">
-            <i class="bi bi-plus-circle"></i> פרופיל חדש
-          </button>
+      <div class="preference-section-body" id="basic-settings-body">
+        <div class="preference-items-grid">
+          <!-- מטבע ראשי -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>💰 מטבע ראשי</h4>
+              <p>המטבע הראשי שיוצג במערכת</p>
+            </div>
+            <div class="preference-control">
+              <select id="primaryCurrency" class="form-select" onchange="updatePreference('primaryCurrency', this.value)">
+                <option value="USD">USD - דולר אמריקאי</option>
+                <option value="ILS">ILS - שקל ישראלי</option>
+                <option value="EUR">EUR - יורו</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- אזור זמן -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🌍 אזור זמן</h4>
+              <p>אזור הזמן שישמש לחישובי תאריכים</p>
+            </div>
+            <div class="preference-control">
+              <select id="timezone" class="form-select" onchange="updatePreference('timezone', this.value)">
+                <option value="Asia/Jerusalem">Asia/Jerusalem - ישראל</option>
+                <option value="UTC">UTC - זמן אוניברסלי</option>
+                <option value="America/New_York">America/New_York - ניו יורק</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- סטופ לוס ברירת מחדל -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🛑 סטופ לוס ברירת מחדל</h4>
+              <p>אחוז הסטופ לוס לטריידים חדשים</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="number" id="defaultStopLoss" class="form-control" min="0" max="100" step="0.1" 
+                       onchange="updatePreference('defaultStopLoss', this.value)" placeholder="5">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- יעד ברירת מחדל -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🎯 יעד ברירת מחדל</h4>
+              <p>אחוז היעד לטריידים חדשים</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="number" id="defaultTargetPrice" class="form-control" min="0" max="100" step="0.1" 
+                       onchange="updatePreference('defaultTargetPrice', this.value)" placeholder="10">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- עמלה ברירת מחדל -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>💵 עמלה ברירת מחדל</h4>
+              <p>עמלה לעסקאות קניה/מכירה</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="number" id="defaultCommission" class="form-control" min="0" step="0.01" 
+                       onchange="updatePreference('defaultCommission', this.value)" placeholder="1">
+                <span class="input-group-text">$</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> <!-- סוף basic-settings-body -->
+    </div> <!-- סוף preference-section -->
+
+    <!-- ===== הגדרות פילטרים ברירת מחדל ===== -->
+    <div class="preference-section">
+      <div class="preference-section-header" onclick="togglePreferenceSection('filter-settings')">
+        <h3><span class="section-icon">🔍</span> הגדרות פילטרים ברירת מחדל</h3>
+        <span class="toggle-icon" id="filter-settings-icon">▼</span>
+      </div>
+      <div class="preference-section-body" id="filter-settings-body">
+        <div class="preference-items-grid">
+          <!-- פילטר סטטוס ברירת מחדל -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>📊 פילטר סטטוס ברירת מחדל</h4>
+              <p>סטטוס שיוצג כברירת מחדל</p>
+            </div>
+            <div class="preference-control">
+              <select id="defaultStatusFilter" class="form-select" onchange="updatePreference('defaultStatusFilter', this.value)">
+                <option value="open">פתוח</option>
+                <option value="closed">סגור</option>
+                <option value="cancelled">מבוטל</option>
+                <option value="all">הכול</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- פילטר סוג ברירת מחדל -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🏷️ פילטר סוג ברירת מחדל</h4>
+              <p>סוג שיוצג כברירת מחדל</p>
+            </div>
+            <div class="preference-control">
+              <select id="defaultTypeFilter" class="form-select" onchange="updatePreference('defaultTypeFilter', this.value)">
+                <option value="swing">סווינג</option>
+                <option value="investment">השקעה</option>
+                <option value="passive">פאסיבי</option>
+                <option value="all">הכול</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- פילטר חשבון ברירת מחדל -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🏦 פילטר חשבון ברירת מחדל</h4>
+              <p>חשבון שיוצג כברירת מחדל</p>
+            </div>
+            <div class="preference-control">
+              <select id="defaultAccountFilter" class="form-select" onchange="updatePreference('defaultAccountFilter', this.value)">
+                <option value="all">הכול</option>
+                <!-- חשבונות יטענו דינמית -->
+              </select>
+            </div>
+          </div>
+          
+          <!-- פילטר טווח תאריכים ברירת מחדל -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>📅 פילטר טווח תאריכים ברירת מחדל</h4>
+              <p>טווח תאריכים שיוצג כברירת מחדל</p>
+            </div>
+            <div class="preference-control">
+              <select id="defaultDateRangeFilter" class="form-select" onchange="updatePreference('defaultDateRangeFilter', this.value)">
+                <option value="today">היום</option>
+                <option value="yesterday">אתמול</option>
+                <option value="this_week">השבוע</option>
+                <option value="last_week">שבוע אחרון</option>
+                <option value="last_month">חודש אחרון</option>
+                <option value="3_months">3 חודשים</option>
+                <option value="mtd">MTD</option>
+                <option value="30_days">30 יום</option>
+                <option value="60_days">60 יום</option>
+                <option value="90_days">90 יום</option>
+                <option value="ytd">YTD</option>
+                <option value="year">שנה</option>
+                <option value="last_year">שנה קודמת</option>
+                <option value="all">כל זמן</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- פילטר חיפוש ברירת מחדל -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🔍 פילטר חיפוש ברירת מחדל</h4>
+              <p>טקסט חיפוש שיוצג כברירת מחדל</p>
+            </div>
+            <div class="preference-control">
+              <input type="text" id="defaultSearchFilter" class="form-control" 
+                     onchange="updatePreference('defaultSearchFilter', this.value)" placeholder="השאר ריק">
+            </div>
+          </div>
+        </div>
+      </div> <!-- סוף filter-settings-body -->
+    </div> <!-- סוף preference-section -->
+
+    <!-- ===== סולמות צבעים ===== -->
+    <div class="preference-section">
+      <div class="preference-section-header" onclick="togglePreferenceSection('color-settings')">
+        <h3><span class="section-icon">🎨</span> סולמות צבעים</h3>
+        <span class="toggle-icon" id="color-settings-icon">▼</span>
+      </div>
+      <div class="preference-section-body" id="color-settings-body">
+        
+        <!-- ===== ערכים מספריים ===== -->
+        <div class="color-subsection">
+          <h4 class="color-subsection-title">📊 ערכים מספריים</h4>
+        <div class="preference-items-grid">
+          <!-- ערכים חיוביים -->
+          <div class="preference-item">
+            <div class="preference-label">
+                <h5>🟢 ערכים חיוביים</h5>
+              <p>צבעים לערכים חיוביים (רווחים, עליות)</p>
+            </div>
+            <div class="preference-control">
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע טקסט</label>
+                  <div class="input-group">
+                    <input type="color" id="positiveTextColor" class="form-control form-control-color" 
+                           onchange="updateNumericValueColor('positive', 'medium', this.value)" 
+                           value="#28a745" title="בחר צבע טקסט לערכים חיוביים">
+                    <input type="text" id="positiveTextColorHex" class="form-control" 
+                           placeholder="#28a745" maxlength="7"
+                           onchange="updateNumericValueColorFromHex('positive', 'medium', this.value)">
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע רקע</label>
+                  <div class="input-group">
+                    <input type="color" id="positiveBackgroundColor" class="form-control form-control-color" 
+                           onchange="updateNumericValueColor('positive', 'light', this.value)" 
+                           value="#d4edda" title="בחר צבע רקע לערכים חיוביים">
+                    <input type="text" id="positiveBackgroundColorHex" class="form-control" 
+                           placeholder="#d4edda" maxlength="7"
+                           onchange="updateNumericValueColorFromHex('positive', 'light', this.value)">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- ערכים שליליים -->
+          <div class="preference-item">
+            <div class="preference-label">
+                <h5>🔴 ערכים שליליים</h5>
+              <p>צבעים לערכים שליליים (הפסדים, ירידות)</p>
+            </div>
+            <div class="preference-control">
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע טקסט</label>
+                  <div class="input-group">
+                    <input type="color" id="negativeTextColor" class="form-control form-control-color" 
+                           onchange="updateNumericValueColor('negative', 'medium', this.value)" 
+                           value="#dc3545" title="בחר צבע טקסט לערכים שליליים">
+                    <input type="text" id="negativeTextColorHex" class="form-control" 
+                           placeholder="#dc3545" maxlength="7"
+                           onchange="updateNumericValueColorFromHex('negative', 'medium', this.value)">
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע רקע</label>
+                  <div class="input-group">
+                    <input type="color" id="negativeBackgroundColor" class="form-control form-control-color" 
+                           onchange="updateNumericValueColor('negative', 'light', this.value)" 
+                           value="#f8d7da" title="בחר צבע רקע לערכים שליליים">
+                    <input type="text" id="negativeBackgroundColorHex" class="form-control" 
+                           placeholder="#f8d7da" maxlength="7"
+                           onchange="updateNumericValueColorFromHex('negative', 'light', this.value)">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- ערך אפס -->
+          <div class="preference-item">
+            <div class="preference-label">
+                <h5>⚪ ערך אפס</h5>
+              <p>צבעים לערך אפס (אין שינוי)</p>
+            </div>
+            <div class="preference-control">
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע טקסט</label>
+                  <div class="input-group">
+                    <input type="color" id="zeroTextColor" class="form-control form-control-color" 
+                           onchange="updateNumericValueColor('zero', 'medium', this.value)" 
+                           value="#6c757d" title="בחר צבע טקסט לערך אפס">
+                    <input type="text" id="zeroTextColorHex" class="form-control" 
+                           placeholder="#6c757d" maxlength="7"
+                           onchange="updateNumericValueColorFromHex('zero', 'medium', this.value)">
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע רקע</label>
+                  <div class="input-group">
+                    <input type="color" id="zeroBackgroundColor" class="form-control form-control-color" 
+                           onchange="updateNumericValueColor('zero', 'light', this.value)" 
+                           value="#e2e3e5" title="בחר צבע רקע לערך אפס">
+                    <input type="text" id="zeroBackgroundColorHex" class="form-control" 
+                           placeholder="#e2e3e5" maxlength="7"
+                           onchange="updateNumericValueColorFromHex('zero', 'light', this.value)">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- כפתור איפוס צבעים -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🔄 איפוס צבעים</h4>
+              <p>איפוס צבעים לברירת המחדל</p>
+            </div>
+            <div class="preference-control">
+              <button type="button" class="btn btn-outline-secondary" onclick="resetNumericValueColors()">
+                איפוס לברירת מחדל
+              </button>
+            </div>
+          </div>
+        </div>
         </div>
         
-        <div class="profile-tabs" id="profileTabs">
-          <!-- פרופילים יטענו דינמית -->
-        </div>
-        
-        <div class="d-flex gap-3 mt-3">
-          <button class="btn btn-outline-danger btn-sm" onclick="deleteCurrentProfile()" id="deleteProfileBtn">
-            <i class="bi bi-trash"></i> מחק פרופיל
-          </button>
-          <button class="btn btn-outline-secondary btn-sm" onclick="duplicateProfile()">
-            <i class="bi bi-files"></i> שכפל פרופיל
-          </button>
-          <button class="btn btn-outline-info btn-sm" onclick="renameProfile()">
-            <i class="bi bi-pencil"></i> שנה שם
-          </button>
-        </div>
-      </div>
-      
-      <!-- התראת מערכת חדשה -->
-      <div class="alert alert-info-modern">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <h5><i class="bi bi-stars"></i> ברוכים הבאים למערכת העדפות החדשה!</h5>
-            <p class="mb-0">מערכת מתקדמת עם פרופילים מרובים, יבוא/יצוא, היסטוריית שינויים ועוד תכונות חדשות</p>
-          </div>
-          <div class="text-end">
-            <small class="text-muted">גרסה 2.0</small>
-          </div>
-        </div>
-      </div>
-      
-      <!-- התראת מיגרציה -->
-      <div class="alert alert-info-modern d-none" id="migrationAlert">
-        <div class="d-flex justify-content-between align-items-center">
-          <div>
-            <h5><i class="bi bi-info-circle"></i> מיגרציה מV1</h5>
-            <p class="mb-0">זוהו הגדרות ישנות. ברצונך לעדכן למערכת החדשה?</p>
-          </div>
-          <button class="btn btn-modern btn-sm" onclick="runMigration()">
-            <i class="bi bi-arrow-clockwise"></i> העבר עכשיו
-          </button>
-        </div>
-      </div>
-      
-      <!-- סטטיסטיקות מערכת -->
-      <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-          <div class="stats-card">
-            <h4 id="totalProfiles">0</h4>
-            <p>פרופילים</p>
-          </div>
-        </div>
-        <div class="col-md-3 mb-3">
-          <div class="stats-card">
-            <h4 id="settingsCount">0</h4>
-            <p>הגדרות</p>
-          </div>
-        </div>
-        <div class="col-md-3 mb-3">
-          <div class="stats-card">
-            <h4 id="lastUpdate">-</h4>
-            <p>עדכון אחרון</p>
-          </div>
-        </div>
-        <div class="col-md-3 mb-3">
-          <div class="stats-card">
-            <h4 id="validationStatus">✅</h4>
-            <p>תקינות</p>
-          </div>
-        </div>
-      </div>
-      
-      <!-- ===== הגדרות בסיסיות ===== -->
-      <div class="settings-section slide-in">
-        <div class="section-header" onclick="toggleSection('general')">
-          <h3><span class="section-icon">⚙️</span> הגדרות בסיסיות</h3>
-          <span class="section-toggle" id="general-toggle">▼</span>
-        </div>
-        <div class="section-body" id="general-body">
-          <div class="settings-grid">
-            
-            <!-- מטבעות -->
-            <div class="setting-item">
-              <div class="setting-label">
-                <h5>💰 מטבעות</h5>
-                <p>מטבע ראשי ומשני לתצוגת נתונים</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                  <div class="col-6">
-                    <label class="form-label small">ראשי</label>
-                    <select id="primaryCurrency" class="form-select form-control-modern">
-                      <option value="USD">USD - דולר</option>
-                      <option value="ILS">ILS - שקל</option>
-                      <option value="EUR">EUR - יורו</option>
-                    </select>
-                  </div>
-                  <div class="col-6">
-                    <label class="form-label small">משני</label>
-                    <select id="secondaryCurrency" class="form-select form-control-modern">
-                      <option value="ILS">ILS - שקל</option>
-                      <option value="USD">USD - דולר</option>
-                      <option value="EUR">EUR - יורו</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
+        <!-- ===== צבעי ישויות ===== -->
+        <div class="color-subsection">
+          <h4 class="color-subsection-title">🏷️ צבעי ישויות</h4>
+          <div class="preference-items-grid">
+
+          <!-- טריידים ותכנונים -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>📈 טריידים ותכנונים</h4>
+              <p>צבעים לעסקי השקעה ותכנונים</p>
             </div>
-            
-            <!-- אזור וזמן -->
-            <div class="setting-item">
-              <div class="setting-label">
-                <h5>🌍 אזור זמן ושפה</h5>
-                <p>הגדרות אזור זמן ושפה</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                  <div class="col-6">
-                    <label class="form-label small">אזור זמן</label>
-                    <select id="timezone" class="form-select form-control-modern">
-                      <option value="Asia/Jerusalem">ישראל</option>
-                      <option value="UTC">UTC</option>
-                      <option value="America/New_York">ניו יורק</option>
-                    </select>
-                  </div>
-                  <div class="col-6">
-                    <label class="form-label small">שפה</label>
-                    <select id="language" class="form-select form-control-modern">
-                      <option value="he">עברית</option>
-                      <option value="en">English</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- הגדרות מסחר -->
-            <div class="setting-item">
-              <div class="setting-label">
-                <h5>📈 הגדרות מסחר</h5>
-                <p>ערכי ברירת מחדל למסחר</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                  <div class="col-4">
-                    <label class="form-label small">סטופ לוס</label>
-                    <div class="input-group">
-                      <input type="number" id="defaultStopLoss" class="form-control form-control-modern" 
-                             min="0" max="100" step="0.1" value="5">
-                      <span class="input-group-text">%</span>
-                    </div>
-                  </div>
-                  <div class="col-4">
-                    <label class="form-label small">יעד</label>
-                    <div class="input-group">
-                      <input type="number" id="defaultTargetPrice" class="form-control form-control-modern"
-                             min="0" max="1000" step="0.1" value="10">
-                      <span class="input-group-text">%</span>
-                    </div>
-                  </div>
-                  <div class="col-4">
-                    <label class="form-label small">עמלה</label>
-                    <div class="input-group">
-                      <input type="number" id="defaultCommission" class="form-control form-control-modern"
-                             min="0" step="0.01" value="1">
-                      <span class="input-group-text">$</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- ניהול סיכונים -->
-            <div class="setting-item">
-              <div class="setting-label">
-                <h5>⚡ ניהול סיכונים</h5>
-                <p>הגדרות ניהול סיכונים מתקדמות</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                  <div class="col-6">
-                    <label class="form-label small">סיכון לעסקה</label>
-                    <div class="input-group">
-                      <input type="number" id="riskPercentage" class="form-control form-control-modern"
-                             min="0.1" max="10" step="0.1" value="2">
-                      <span class="input-group-text">%</span>
-                    </div>
-                  </div>
-                  <div class="col-6">
-                    <label class="form-label small">סכום ברירת מחדל</label>
-                    <div class="input-group">
-                      <input type="number" id="defaultTradeAmount" class="form-control form-control-modern"
-                             min="100" step="100" placeholder="אוטומטי">
-                      <span class="input-group-text">$</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </div>
-        </div>
-      </div>
-      
-      <!-- ===== פילטרים ברירת מחדל ===== -->
-      <div class="settings-section slide-in">
-        <div class="section-header" onclick="toggleSection('filters')">
-          <h3><span class="section-icon">🔍</span> פילטרים ברירת מחדל</h3>
-          <span class="section-toggle" id="filters-toggle">▼</span>
-        </div>
-        <div class="section-body" id="filters-body">
-          <div class="settings-grid">
-            
-            <!-- פילטרים בסיסיים -->
-            <div class="setting-item">
-              <div class="setting-label">
-                <h5>📊 פילטרים בסיסיים</h5>
-                <p>ברירות מחדל לפילטרים הראשיים</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                  <div class="col-6">
-                    <label class="form-label small">סטטוס</label>
-                    <select id="defaultStatusFilter" class="form-select form-control-modern">
-                      <option value="open">פתוח</option>
-                      <option value="closed">סגור</option>
-                      <option value="cancelled">מבוטל</option>
-                      <option value="all">הכול</option>
-                    </select>
-                  </div>
-                  <div class="col-6">
-                    <label class="form-label small">סוג השקעה</label>
-                    <select id="defaultTypeFilter" class="form-select form-control-modern">
-                      <option value="swing">סווינג</option>
-                      <option value="investment">השקעה</option>
-                      <option value="passive">פאסיבי</option>
-                      <option value="all">הכול</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- טווח תאריכים -->
-            <div class="setting-item">
-              <div class="setting-label">
-                <h5>📅 טווח תאריכים</h5>
-                <p>ברירת מחדל לפילטר תאריכים</p>
-              </div>
-              <div class="setting-control">
-                <select id="defaultDateRangeFilter" class="form-select form-control-modern">
-                  <option value="today">היום</option>
-                  <option value="this_week">השבוע</option>
-                  <option value="last_month">חודש אחרון</option>
-                  <option value="ytd">YTD</option>
-                  <option value="all">כל זמן</option>
-                </select>
-              </div>
-            </div>
-            
-            <!-- פילטרים מתקדמים -->
-            <div class="setting-item">
-              <div class="setting-label">
-                <h5>💎 פילטרים מתקדמים</h5>
-                <p>הגדרות פילטרים נוספות</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                  <div class="col-6">
-                    <label class="form-label small">רווחיות</label>
-                    <select id="defaultProfitFilter" class="form-select form-control-modern">
-                      <option value="all">הכול</option>
-                      <option value="profit">רווח</option>
-                      <option value="loss">הפסד</option>
-                    </select>
-                  </div>
-                  <div class="col-6">
-                    <label class="form-label small">חיפוש ברירת מחדל</label>
-                    <input type="text" id="defaultSearchFilter" class="form-control form-control-modern"
-                           placeholder="השאר ריק">
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </div>
-        </div>
-      </div>
-      
-      <!-- ===== מערכת צבעים מתקדמת ===== -->
-      <div class="settings-section slide-in">
-        <div class="section-header" onclick="toggleSection('colors')">
-          <h3><span class="section-icon">🎨</span> מערכת צבעים מתקדמת</h3>
-          <span class="section-toggle" id="colors-toggle">▼</span>
-        </div>
-        <div class="section-body" id="colors-body">
-          
-          <!-- Theme selector -->
-          <div class="setting-item">
-            <div class="setting-label">
-              <h5>🌓 ערכת נושא</h5>
-              <p>בחר ערכת נושא עיקרית למערכת</p>
-            </div>
-            <div class="setting-control">
-              <div class="d-flex gap-3">
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="theme" value="light" id="themeLight" checked>
-                  <label class="form-check-label" for="themeLight">🌞 בהיר</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="theme" value="dark" id="themeDark">
-                  <label class="form-check-label" for="themeDark">🌙 כהה</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="theme" value="auto" id="themeAuto">
-                  <label class="form-check-label" for="themeAuto">🔄 אוטומטי</label>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- צבעי ערכים מספריים -->
-          <div class="setting-item">
-            <div class="setting-label">
-              <h5>📊 ערכים מספריים</h5>
-              <p>צבעי רווחים, הפסדים וערך אפס</p>
-            </div>
-            <div class="setting-control">
-              <div class="row g-2">
-                <div class="col-4 text-center">
-                  <label class="form-label small">רווחים</label>
-                  <div class="color-picker-group justify-content-center">
-                    <div class="color-preview" style="background-color: #28a745"
-                         onclick="openColorPicker('positive')"></div>
-                    <input type="color" id="positiveColor" class="d-none" value="#28a745">
-                  </div>
-                </div>
-                <div class="col-4 text-center">
-                  <label class="form-label small">הפסדים</label>
-                  <div class="color-picker-group justify-content-center">
-                    <div class="color-preview" style="background-color: #dc3545"
-                         onclick="openColorPicker('negative')"></div>
-                    <input type="color" id="negativeColor" class="d-none" value="#dc3545">
-                  </div>
-                </div>
-                <div class="col-4 text-center">
-                  <label class="form-label small">אפס</label>
-                  <div class="color-picker-group justify-content-center">
-                    <div class="color-preview" style="background-color: #6c757d"
-                         onclick="openColorPicker('zero')"></div>
-                    <input type="color" id="zeroColor" class="d-none" value="#6c757d">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- צבעי ישויות -->
-          <div class="setting-item">
-            <div class="setting-label">
-              <h5>🏷️ צבעי ישויות</h5>
-              <p>צבעי טריידים, חשבונות, טיקרים והתראות</p>
-            </div>
-            <div class="setting-control">
-              <div class="row g-2">
-                <div class="col-3 text-center">
+            <div class="preference-control">
+              <div class="row">
+                <div class="col-md-4 mb-2">
                   <label class="form-label small">טריידים</label>
-                  <div class="color-picker-group justify-content-center">
-                    <div class="color-preview" style="background-color: #007bff"
-                         onclick="openEntityColorPicker('trade')"></div>
+                  <div class="input-group">
+                    <input type="color" id="entityTradeColor" class="form-control form-control-color" 
+                           onchange="updateEntityColor('trade', this.value)" 
+                           value="#007bff" title="בחר צבע לטריידים">
+                    <input type="text" id="entityTradeColorHex" class="form-control" 
+                           placeholder="#007bff" maxlength="7"
+                           onchange="updateEntityColorFromHex('trade', this.value)">
                   </div>
                 </div>
-                <div class="col-3 text-center">
-                  <label class="form-label small">חשבונות</label>
-                  <div class="color-picker-group justify-content-center">
-                    <div class="color-preview" style="background-color: #28a745"
-                         onclick="openEntityColorPicker('account')"></div>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small">תכנוני השקעה</label>
+                  <div class="input-group">
+                    <input type="color" id="entityTradePlanColor" class="form-control form-control-color" 
+                           onchange="updateEntityColor('trade_plan', this.value)" 
+                           value="#0056b3" title="בחר צבע לתכנוני השקעה">
+                    <input type="text" id="entityTradePlanColorHex" class="form-control" 
+                           placeholder="#0056b3" maxlength="7"
+                           onchange="updateEntityColorFromHex('trade_plan', this.value)">
                   </div>
                 </div>
-                <div class="col-3 text-center">
-                  <label class="form-label small">טיקרים</label>
-                  <div class="color-picker-group justify-content-center">
-                    <div class="color-preview" style="background-color: #dc3545"
-                         onclick="openEntityColorPicker('ticker')"></div>
-                  </div>
-                </div>
-                <div class="col-3 text-center">
-                  <label class="form-label small">התראות</label>
-                  <div class="color-picker-group justify-content-center">
-                    <div class="color-preview" style="background-color: #ff9c05"
-                         onclick="openEntityColorPicker('alert')"></div>
+                <div class="col-md-4 mb-2">
+                  <label class="form-label small">עסקאות</label>
+                  <div class="input-group">
+                    <input type="color" id="entityExecutionColor" class="form-control form-control-color" 
+                           onchange="updateEntityColor('execution', this.value)" 
+                           value="#17a2b8" title="בחר צבע לעסקאות">
+                    <input type="text" id="entityExecutionColorHex" class="form-control" 
+                           placeholder="#17a2b8" maxlength="7"
+                           onchange="updateEntityColorFromHex('execution', this.value)">
                   </div>
                 </div>
               </div>
             </div>
           </div>
           
-        </div>
-      </div>
-      
-      <!-- ===== ממשק משתמש ===== -->
-      <div class="settings-section slide-in">
-        <div class="section-header" onclick="toggleSection('ui')">
-          <h3><span class="section-icon">🖥️</span> ממשק משתמש</h3>
-          <span class="section-toggle" id="ui-toggle">▼</span>
-        </div>
-        <div class="section-body" id="ui-body">
-          <div class="settings-grid">
-            
-            <!-- תצוגה כללית -->
-            <div class="setting-item">
-              <div class="setting-label">
-                <h5>👁️ תצוגה כללית</h5>
-                <p>הגדרות תצוגה ואנימציות</p>
-              </div>
-              <div class="setting-control">
-                <div class="d-flex gap-4 align-items-center">
-                  <div>
-                    <label class="custom-switch">
-                      <input type="checkbox" id="compactMode">
-                      <span class="slider"></span>
-                    </label>
-                    <small class="text-muted d-block mt-1">מצב קומפקטי</small>
+          <!-- חשבונות ותזרים מזומנים -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>💰 חשבונות ותזרים מזומנים</h4>
+              <p>צבעים לעניינים פיננסיים</p>
+            </div>
+            <div class="preference-control">
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">חשבונות</label>
+                  <div class="input-group">
+                    <input type="color" id="entityAccountColor" class="form-control form-control-color" 
+                           onchange="updateEntityColor('account', this.value)" 
+                           value="#28a745" title="בחר צבע לחשבונות">
+                    <input type="text" id="entityAccountColorHex" class="form-control" 
+                           placeholder="#28a745" maxlength="7"
+                           onchange="updateEntityColorFromHex('account', this.value)">
                   </div>
-                  <div>
-                    <label class="custom-switch">
-                      <input type="checkbox" id="showAnimations" checked>
-                      <span class="slider"></span>
-                    </label>
-                    <small class="text-muted d-block mt-1">אנימציות</small>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">תזרים מזומנים</label>
+                  <div class="input-group">
+                    <input type="color" id="entityCashFlowColor" class="form-control form-control-color" 
+                           onchange="updateEntityColor('cash_flow', this.value)" 
+                           value="#20c997" title="בחר צבע לתזרים מזומנים">
+                    <input type="text" id="entityCashFlowColorHex" class="form-control" 
+                           placeholder="#20c997" maxlength="7"
+                           onchange="updateEntityColorFromHex('cash_flow', this.value)">
                   </div>
                 </div>
               </div>
             </div>
-            
-            <!-- הגדרות טבלאות -->
-            <div class="setting-item">
-              <div class="setting-label">
-                <h5>📋 הגדרות טבלאות</h5>
-                <p>מספר שורות ורענון אוטומטי</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                  <div class="col-6">
-                    <label class="form-label small">שורות לעמוד</label>
-                    <select id="tablePageSize" class="form-select form-control-modern">
-                      <option value="10">10</option>
-                      <option value="25" selected>25</option>
-                      <option value="50">50</option>
-                      <option value="100">100</option>
-                    </select>
+          </div>
+          
+          <!-- טיקרים והתראות -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>📊 טיקרים והתראות</h4>
+              <p>צבעים לנתוני שוק והתראות</p>
+            </div>
+            <div class="preference-control">
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">טיקרים</label>
+                  <div class="input-group">
+                    <input type="color" id="entityTickerColor" class="form-control form-control-color" 
+                           onchange="updateEntityColor('ticker', this.value)" 
+                           value="#dc3545" title="בחר צבע לטיקרים">
+                    <input type="text" id="entityTickerColorHex" class="form-control" 
+                           placeholder="#dc3545" maxlength="7"
+                           onchange="updateEntityColorFromHex('ticker', this.value)">
                   </div>
-                  <div class="col-6">
-                    <label class="form-label small">רענון (שניות)</label>
-                    <input type="number" id="tableRefreshInterval" class="form-control form-control-modern"
-                           min="10" max="300" value="30">
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">התראות</label>
+                  <div class="input-group">
+                    <input type="color" id="entityAlertColor" class="form-control form-control-color" 
+                           onchange="updateEntityColor('alert', this.value)" 
+                           value="#ff9c05" title="בחר צבע להתראות">
+                    <input type="text" id="entityAlertColorHex" class="form-control" 
+                           placeholder="#ff9c05" maxlength="7"
+                           onchange="updateEntityColorFromHex('alert', this.value)">
                   </div>
                 </div>
               </div>
             </div>
-            
           </div>
-        </div>
-      </div>
-      
-      <!-- ===== נתונים חיצוניים ===== -->
-      <div class="settings-section slide-in">
-        <div class="section-header" onclick="toggleSection('external')">
-          <h3><span class="section-icon">🌐</span> נתונים חיצוניים</h3>
-          <span class="section-toggle" id="external-toggle">▼</span>
-        </div>
-        <div class="section-body" id="external-body">
-          <div class="settings-grid">
-            
-            <!-- ספקי נתונים -->
-            <div class="setting-item">
-              <div class="setting-label">
-                <h5>📡 ספקי נתונים</h5>
-                <p>ספק ראשי, משני וגיבוי</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                  <div class="col-4">
-                    <label class="form-label small">ראשי</label>
-                    <select id="primaryDataProvider" class="form-select form-control-modern">
-                      <option value="yahoo">Yahoo Finance</option>
-                      <option value="google">Google Finance</option>
-                      <option value="alpha_vantage">Alpha Vantage</option>
-                    </select>
+          
+          <!-- הערות ואילוצים -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>📝 הערות ואילוצים</h4>
+              <p>צבעים לתיעוד וניהול</p>
+            </div>
+            <div class="preference-control">
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">הערות</label>
+                  <div class="input-group">
+                    <input type="color" id="entityNoteColor" class="form-control form-control-color" 
+                           onchange="updateEntityColor('note', this.value)" 
+                           value="#6f42c1" title="בחר צבע להערות">
+                    <input type="text" id="entityNoteColorHex" class="form-control" 
+                           placeholder="#6f42c1" maxlength="7"
+                           onchange="updateEntityColorFromHex('note', this.value)">
                   </div>
-                  <div class="col-4">
-                    <label class="form-label small">משני</label>
-                    <select id="secondaryDataProvider" class="form-select form-control-modern">
-                      <option value="google">Google Finance</option>
-                      <option value="yahoo">Yahoo Finance</option>
-                      <option value="alpha_vantage">Alpha Vantage</option>
-                    </select>
-                  </div>
-                  <div class="col-4">
-                    <label class="form-label small">גיבוי</label>
-                    <select id="fallbackDataProvider" class="form-select form-control-modern">
-                      <option value="alpha_vantage">Alpha Vantage</option>
-                      <option value="yahoo">Yahoo Finance</option>
-                      <option value="google">Google Finance</option>
-                    </select>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">אילוצים</label>
+                  <div class="input-group">
+                    <input type="color" id="entityConstraintColor" class="form-control form-control-color" 
+                           onchange="updateEntityColor('constraint', this.value)" 
+                           value="#6c757d" title="בחר צבע לאילוצים">
+                    <input type="text" id="entityConstraintColorHex" class="form-control" 
+                           placeholder="#6c757d" maxlength="7"
+                           onchange="updateEntityColorFromHex('constraint', this.value)">
                   </div>
                 </div>
               </div>
             </div>
-            
-            <!-- הגדרות רענון -->
-            <div class="setting-item">
-              <div class="setting-label">
-                <h5>🔄 הגדרות רענון</h5>
-                <p>מרווחי רענון וגודל batch</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                  <div class="col-4">
-                    <label class="form-label small">מרווח רענון</label>
-                    <div class="input-group">
-                      <input type="number" id="dataRefreshInterval" class="form-control form-control-modern"
-                             min="1" max="60" value="5">
-                      <span class="input-group-text">דק'</span>
-                    </div>
+          </div>
+          
+          <!-- עיצוב ומחקר -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🎨 עיצוב ומחקר</h4>
+              <p>צבעים לפיתוח ותחזוקה</p>
+            </div>
+            <div class="preference-control">
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">עיצובים</label>
+                  <div class="input-group">
+                    <input type="color" id="entityDesignColor" class="form-control form-control-color" 
+                           onchange="updateEntityColor('design', this.value)" 
+                           value="#495057" title="בחר צבע לעיצובים">
+                    <input type="text" id="entityDesignColorHex" class="form-control" 
+                           placeholder="#495057" maxlength="7"
+                           onchange="updateEntityColorFromHex('design', this.value)">
                   </div>
-                  <div class="col-4">
-                    <label class="form-label small">Cache TTL</label>
-                    <div class="input-group">
-                      <input type="number" id="cacheTtl" class="form-control form-control-modern"
-                             min="1" max="1440" value="5">
-                      <span class="input-group-text">דק'</span>
-                    </div>
-                  </div>
-                  <div class="col-4">
-                    <label class="form-label small">Batch Size</label>
-                    <input type="number" id="maxBatchSize" class="form-control form-control-modern"
-                           min="1" max="100" value="25">
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">מחקר</label>
+                  <div class="input-group">
+                    <input type="color" id="entityResearchColor" class="form-control form-control-color" 
+                           onchange="updateEntityColor('research', this.value)" 
+                           value="#343a40" title="בחר צבע למחקר">
+                    <input type="text" id="entityResearchColorHex" class="form-control" 
+                           placeholder="#343a40" maxlength="7"
+                           onchange="updateEntityColorFromHex('research', this.value)">
                   </div>
                 </div>
               </div>
             </div>
-            
           </div>
-        </div>
-      </div>
-      
-      <!-- כפתורי פעולה -->
-      <div class="d-flex justify-content-between align-items-center mt-5">
-        <div class="d-flex gap-3">
-          <button class="btn btn-modern btn-reset" onclick="resetToDefaults()">
-            <i class="bi bi-arrow-clockwise"></i> אפס לברירת מחדל
-          </button>
-          <button class="btn btn-outline-secondary" onclick="viewHistory()">
-            <i class="bi bi-clock-history"></i> היסטוריה
-          </button>
-          <button class="btn btn-outline-info" onclick="validateSettings()">
-            <i class="bi bi-check2-circle"></i> בדוק תקינות
-          </button>
-        </div>
-        <div class="d-flex gap-3">
-          <button class="btn btn-outline-primary" onclick="previewSettings()">
-            <i class="bi bi-eye"></i> תצוגה מקדימה
-          </button>
-          <button class="btn btn-modern" onclick="saveAllPreferencesV2()">
-            <i class="bi bi-save"></i> שמור הגדרות
-          </button>
-        </div>
-      </div>
-      
-    </div>
-  </div>
-  
-  <!-- Modals -->
-  
-  <!-- Modal יצירת פרופיל -->
-  <div class="modal fade" id="createProfileModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">יצירת פרופיל חדש</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label">שם הפרופיל</label>
-            <input type="text" class="form-control form-control-modern" id="newProfileName" 
-                   placeholder="הכנס שם לפרופיל">
+          
+          <!-- העדפות -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>⚙️ העדפות</h4>
+              <p>צבע להגדרות מערכת</p>
+            </div>
+            <div class="preference-control">
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">העדפות</label>
+                  <div class="input-group">
+                    <input type="color" id="entityPreferenceColor" class="form-control form-control-color" 
+                           onchange="updateEntityColor('preference', this.value)" 
+                           value="#adb5bd" title="בחר צבע להעדפות">
+                    <input type="text" id="entityPreferenceColorHex" class="form-control" 
+                           placeholder="#adb5bd" maxlength="7"
+                           onchange="updateEntityColorFromHex('preference', this.value)">
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="mb-3">
-            <label class="form-label">תיאור</label>
-            <textarea class="form-control form-control-modern" id="newProfileDescription" 
-                      rows="3" placeholder="תיאור אופציונלי לפרופיל"></textarea>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="newProfileIsDefault">
-            <label class="form-check-label" for="newProfileIsDefault">
-              הגדר כפרופיל ברירת מחדל
-            </label>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-          <button type="button" class="btn btn-modern" onclick="submitCreateProfile()">צור פרופיל</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Modal היסטוריה -->
-  <div class="modal fade" id="historyModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">היסטוריית שינויים</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <div id="historyContent">
-            <div class="text-center">
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">טוען...</span>
+          
+            <!-- כפתור איפוס צבעי ישויות -->
+            <div class="preference-item">
+              <div class="preference-label">
+                <h5>🔄 איפוס צבעי ישויות</h5>
+                <p>איפוס צבעי ישויות לברירת המחדל</p>
+              </div>
+              <div class="preference-control">
+                <button type="button" class="btn btn-outline-secondary" onclick="resetEntityColors()">
+                  איפוס לברירת מחדל
+                </button>
               </div>
             </div>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+        
+        <!-- ===== צבעי סטטוסים ===== -->
+        <div class="color-subsection">
+          <h4 class="color-subsection-title">🏷️ צבעי סטטוסים</h4>
+          <div class="preference-items-grid">
+
+          <!-- סטטוס פתוח -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🟢 סטטוס פתוח</h4>
+              <p>צבעים לסטטוס פתוח (פעיל)</p>
+            </div>
+            <div class="preference-control">
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע טקסט</label>
+                  <div class="input-group">
+                    <input type="color" id="statusOpenMediumColor" class="form-control form-control-color" 
+                           onchange="updateStatusColorIntensity('open', 'medium', this.value)" 
+                           value="#28a745" title="בחר צבע טקסט לסטטוס פתוח">
+                    <input type="text" id="statusOpenMediumColorHex" class="form-control" 
+                           placeholder="#28a745" maxlength="7"
+                           onchange="updateStatusColorIntensityFromHex('open', 'medium', this.value)">
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע רקע</label>
+                  <div class="input-group">
+                    <input type="color" id="statusOpenLightColor" class="form-control form-control-color" 
+                           onchange="updateStatusColorIntensity('open', 'light', this.value)" 
+                           value="#28a745" title="בחר צבע רקע לסטטוס פתוח">
+                    <input type="text" id="statusOpenLightColorHex" class="form-control" 
+                           placeholder="rgba(40, 167, 69, 0.1)" maxlength="20"
+                           onchange="updateStatusColorIntensityFromHex('open', 'light', this.value)">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- סטטוס סגור -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>⚫ סטטוס סגור</h4>
+              <p>צבעים לסטטוס סגור (הושלם)</p>
+            </div>
+            <div class="preference-control">
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע טקסט</label>
+                  <div class="input-group">
+                    <input type="color" id="statusClosedMediumColor" class="form-control form-control-color" 
+                           onchange="updateStatusColorIntensity('closed', 'medium', this.value)" 
+                           value="#6c757d" title="בחר צבע טקסט לסטטוס סגור">
+                    <input type="text" id="statusClosedMediumColorHex" class="form-control" 
+                           placeholder="#6c757d" maxlength="7"
+                           onchange="updateStatusColorIntensityFromHex('closed', 'medium', this.value)">
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע רקע</label>
+                  <div class="input-group">
+                    <input type="color" id="statusClosedLightColor" class="form-control form-control-color" 
+                           onchange="updateStatusColorIntensity('closed', 'light', this.value)" 
+                           value="#6c757d" title="בחר צבע רקע לסטטוס סגור">
+                    <input type="text" id="statusClosedLightColorHex" class="form-control" 
+                           placeholder="rgba(108, 117, 125, 0.1)" maxlength="20"
+                           onchange="updateStatusColorIntensityFromHex('closed', 'light', this.value)">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- סטטוס מבוטל -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🔴 סטטוס מבוטל</h4>
+              <p>צבעים לסטטוס מבוטל (בוטל)</p>
+            </div>
+            <div class="preference-control">
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע טקסט</label>
+                  <div class="input-group">
+                    <input type="color" id="statusCancelledMediumColor" class="form-control form-control-color" 
+                           onchange="updateStatusColorIntensity('cancelled', 'medium', this.value)" 
+                           value="#dc3545" title="בחר צבע טקסט לסטטוס מבוטל">
+                    <input type="text" id="statusCancelledMediumColorHex" class="form-control" 
+                           placeholder="#dc3545" maxlength="7"
+                           onchange="updateStatusColorIntensityFromHex('cancelled', 'medium', this.value)">
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע רקע</label>
+                  <div class="input-group">
+                    <input type="color" id="statusCancelledLightColor" class="form-control form-control-color" 
+                           onchange="updateStatusColorIntensity('cancelled', 'light', this.value)" 
+                           value="#dc3545" title="בחר צבע רקע לסטטוס מבוטל">
+                    <input type="text" id="statusCancelledLightColorHex" class="form-control" 
+                           placeholder="rgba(220, 53, 69, 0.1)" maxlength="20"
+                           onchange="updateStatusColorIntensityFromHex('cancelled', 'light', this.value)">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+            <!-- כפתור איפוס צבעי סטטוסים -->
+            <div class="preference-item">
+              <div class="preference-label">
+                <h5>🔄 איפוס צבעי סטטוסים</h5>
+                <p>איפוס צבעי סטטוסים לברירת המחדל</p>
+              </div>
+              <div class="preference-control">
+                <button type="button" class="btn btn-outline-secondary" onclick="resetStatusColors()">
+                  איפוס לברירת מחדל
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
+        
+        <!-- ===== צבעי סוגי השקעה ===== -->
+        <div class="color-subsection">
+          <h4 class="color-subsection-title">📊 צבעי סוגי השקעה</h4>
+          <div class="preference-items-grid">
+
+          <!-- סוג השקעה: סווינג -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>📈 סווינג</h4>
+              <p>צבעים להשקעות סווינג (לטווח קצר-בינוני)</p>
+            </div>
+            <div class="preference-control">
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע טקסט</label>
+                  <div class="input-group">
+                    <input type="color" id="investmentTypeSwingMediumColor" class="form-control form-control-color" 
+                           onchange="updateInvestmentTypeColorIntensity('swing', 'medium', this.value)" 
+                           value="#007bff" title="בחר צבע טקסט לסווינג">
+                    <input type="text" id="investmentTypeSwingMediumColorHex" class="form-control" 
+                           placeholder="#007bff" maxlength="7"
+                           onchange="updateInvestmentTypeColorIntensityFromHex('swing', 'medium', this.value)">
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע רקע</label>
+                  <div class="input-group">
+                    <input type="color" id="investmentTypeSwingLightColor" class="form-control form-control-color" 
+                           onchange="updateInvestmentTypeColorIntensity('swing', 'light', this.value)" 
+                           value="#007bff" title="בחר צבע רקע לסווינג">
+                    <input type="text" id="investmentTypeSwingLightColorHex" class="form-control" 
+                           placeholder="rgba(0, 123, 255, 0.1)" maxlength="20"
+                           onchange="updateInvestmentTypeColorIntensityFromHex('swing', 'light', this.value)">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- סוג השקעה: השקעה -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>💰 השקעה</h4>
+              <p>צבעים להשקעות ארוכות טווח</p>
+            </div>
+            <div class="preference-control">
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע טקסט</label>
+                  <div class="input-group">
+                    <input type="color" id="investmentTypeInvestmentMediumColor" class="form-control form-control-color" 
+                           onchange="updateInvestmentTypeColorIntensity('investment', 'medium', this.value)" 
+                           value="#28a745" title="בחר צבע טקסט להשקעה">
+                    <input type="text" id="investmentTypeInvestmentMediumColorHex" class="form-control" 
+                           placeholder="#28a745" maxlength="7"
+                           onchange="updateInvestmentTypeColorIntensityFromHex('investment', 'medium', this.value)">
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע רקע</label>
+                  <div class="input-group">
+                    <input type="color" id="investmentTypeInvestmentLightColor" class="form-control form-control-color" 
+                           onchange="updateInvestmentTypeColorIntensity('investment', 'light', this.value)" 
+                           value="#28a745" title="בחר צבע רקע להשקעה">
+                    <input type="text" id="investmentTypeInvestmentLightColorHex" class="form-control" 
+                           placeholder="rgba(40, 167, 69, 0.1)" maxlength="20"
+                           onchange="updateInvestmentTypeColorIntensityFromHex('investment', 'light', this.value)">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- סוג השקעה: פאסיבי -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>😴 פאסיבי</h4>
+              <p>צבעים להשקעות פאסיביות</p>
+            </div>
+            <div class="preference-control">
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע טקסט</label>
+                  <div class="input-group">
+                    <input type="color" id="investmentTypePassiveMediumColor" class="form-control form-control-color" 
+                           onchange="updateInvestmentTypeColorIntensity('passive', 'medium', this.value)" 
+                           value="#6f42c1" title="בחר צבע טקסט לפאסיבי">
+                    <input type="text" id="investmentTypePassiveMediumColorHex" class="form-control" 
+                           placeholder="#6f42c1" maxlength="7"
+                           onchange="updateInvestmentTypeColorIntensityFromHex('passive', 'medium', this.value)">
+                  </div>
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label class="form-label small">צבע רקע</label>
+                  <div class="input-group">
+                    <input type="color" id="investmentTypePassiveLightColor" class="form-control form-control-color" 
+                           onchange="updateInvestmentTypeColorIntensity('passive', 'light', this.value)" 
+                           value="#6f42c1" title="בחר צבע רקע לפאסיבי">
+                    <input type="text" id="investmentTypePassiveLightColorHex" class="form-control" 
+                           placeholder="rgba(111, 66, 193, 0.1)" maxlength="20"
+                           onchange="updateInvestmentTypeColorIntensityFromHex('passive', 'light', this.value)">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+            <!-- כפתור איפוס צבעי סוגי השקעה -->
+            <div class="preference-item">
+              <div class="preference-label">
+                <h5>🔄 איפוס צבעי סוגי השקעה</h5>
+                <p>איפוס צבעי סוגי השקעה לברירת המחדל</p>
+              </div>
+              <div class="preference-control">
+                <button type="button" class="btn btn-outline-secondary" onclick="resetInvestmentTypeColors()">
+                  איפוס לברירת מחדל
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- ===== שקיפות כותרות ===== -->
+        <div class="color-subsection">
+          <h4 class="color-subsection-title">👁️ שקיפות כותרות</h4>
+          <div class="preference-items-grid">
+
+          <!-- שקיפות כותרת ראשית -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🎯 כותרת ראשית</h4>
+              <p>שקיפות כותרת ראשית (top-section)</p>
+            </div>
+            <div class="preference-control">
+              <div class="row">
+                <div class="col-md-8 mb-2">
+                  <label class="form-label small">שקיפות: <span id="mainHeaderOpacityValue">100%</span></label>
+                  <input type="range" id="mainHeaderOpacity" class="form-range" 
+                         min="10" max="100" step="5" value="100"
+                         onchange="updateHeaderOpacity('main', this.value)">
+                </div>
+                <div class="col-md-4 mb-2">
+                  <div id="mainHeaderPreview" class="border rounded p-2" 
+                       style="background-color: rgba(23, 162, 184, 1); height: 30px;">
+                    תצוגה מקדימה
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- שקיפות כותרת משנית -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>📋 כותרת משנית</h4>
+              <p>שקיפות כותרת משנית (content-section)</p>
+            </div>
+            <div class="preference-control">
+              <div class="row">
+                <div class="col-md-8 mb-2">
+                  <label class="form-label small">שקיפות: <span id="subHeaderOpacityValue">30%</span></label>
+                  <input type="range" id="subHeaderOpacity" class="form-range" 
+                         min="10" max="100" step="5" value="30"
+                         onchange="updateHeaderOpacity('sub', this.value)">
+                </div>
+                <div class="col-md-4 mb-2">
+                  <div id="subHeaderPreview" class="border rounded p-2" 
+                       style="background-color: rgba(23, 162, 184, 0.3); height: 30px;">
+                    תצוגה מקדימה
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div> <!-- סוף color-settings-body -->
+    </div> <!-- סוף preference-section -->
+
+    <!-- ===== הגדרות מערכת הנתונים החיצוניים ===== -->
+    <div class="preference-section">
+      <div class="preference-section-header" onclick="togglePreferenceSection('external-data-settings')">
+        <h3><span class="section-icon">🌐</span> הגדרות מערכת הנתונים החיצוניים</h3>
+        <span class="toggle-icon" id="external-data-settings-icon">▼</span>
       </div>
-    </div>
-  </div>
-  
-  <!-- Hidden file input for import -->
-  <input type="file" id="importFileInput" class="d-none" accept=".json" onchange="handleFileImport(event)">
-  
-  <!-- Scripts -->
+      <div class="preference-section-body" id="external-data-settings-body">
+        <div class="preference-items-grid">
+          <!-- מרווח רענון נתונים -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>⏱️ מרווח רענון נתונים</h4>
+              <p>מרווח זמן בין רענון נתונים חיצוניים (בדקות)</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="number" id="dataRefreshInterval" class="form-control" min="1" max="60" step="1" 
+                       onchange="updatePreference('dataRefreshInterval', this.value)" placeholder="5">
+                <span class="input-group-text">דקות</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- ספק נתונים ראשי -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>📡 ספק נתונים ראשי</h4>
+              <p>ספק הנתונים שישמש כברירת מחדל</p>
+            </div>
+            <div class="preference-control">
+              <select id="primaryDataProvider" class="form-select" onchange="updatePreference('primaryDataProvider', this.value)">
+                <option value="yahoo">Yahoo Finance</option>
+                <option value="google">Google Finance</option>
+                <option value="alpha_vantage">Alpha Vantage</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- ספק נתונים משני -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>📡 ספק נתונים משני</h4>
+              <p>ספק נתונים גיבוי במקרה של כשל</p>
+            </div>
+            <div class="preference-control">
+              <select id="secondaryDataProvider" class="form-select" onchange="updatePreference('secondaryDataProvider', this.value)">
+                <option value="google">Google Finance</option>
+                <option value="yahoo">Yahoo Finance</option>
+                <option value="alpha_vantage">Alpha Vantage</option>
+                <option value="none">ללא</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- מרווח זמן Cache -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>💾 מרווח זמן Cache</h4>
+              <p>זמן שמירת נתונים במטמון (בדקות)</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="number" id="cacheTTL" class="form-control" min="1" max="1440" step="1" 
+                       onchange="updatePreference('cacheTTL', this.value)" placeholder="5">
+                <span class="input-group-text">דקות</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- מספר מקסימלי של טיקרים לרענון -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>📊 מספר מקסימלי של טיקרים לרענון</h4>
+              <p>מספר הטיקרים המקסימלי שירענן בבת אחת</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="number" id="maxBatchSize" class="form-control" min="1" max="100" step="1" 
+                       onchange="updatePreference('maxBatchSize', this.value)" placeholder="25">
+                <span class="input-group-text">טיקרים</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- הגדרות נוספות -->
+        <div class="preference-items-grid">
+          <!-- מרווח בין בקשות -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>⏳ מרווח בין בקשות</h4>
+              <p>מרווח זמן בין בקשות לספקי נתונים (במילישניות)</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="number" id="requestDelay" class="form-control" min="0" max="5000" step="100" 
+                       onchange="updatePreference('requestDelay', this.value)" placeholder="1000">
+                <span class="input-group-text">מ"ש</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- מספר ניסיונות חוזרים -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🔄 מספר ניסיונות חוזרים</h4>
+              <p>מספר הניסיונות החוזרים במקרה של כשל</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="number" id="retryAttempts" class="form-control" min="0" max="5" step="1" 
+                       onchange="updatePreference('retryAttempts', this.value)" placeholder="2">
+                <span class="input-group-text">ניסיונות</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- זמן פסקה בין ניסיונות -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>⏸️ זמן פסקה בין ניסיונות</h4>
+              <p>זמן המתנה בין ניסיונות חוזרים (בשניות)</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="number" id="retryDelay" class="form-control" min="1" max="60" step="1" 
+                       onchange="updatePreference('retryDelay', this.value)" placeholder="5">
+                <span class="input-group-text">שניות</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- הפעלת רענון אוטומטי -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🔄 רענון אוטומטי</h4>
+              <p>הפעלת רענון אוטומטי של נתונים</p>
+            </div>
+            <div class="preference-control">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="autoRefresh" 
+                       onchange="updatePreference('autoRefresh', this.checked)" style="transform: scale(1.2);">
+                <label class="form-check-label" for="autoRefresh">
+                  הפעל רענון אוטומטי
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <!-- הצגת לוגים מפורטים -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>📝 לוגים מפורטים</h4>
+              <p>הצגת לוגים מפורטים של פעולות נתונים</p>
+            </div>
+            <div class="preference-control">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="verboseLogging" 
+                       onchange="updatePreference('verboseLogging', this.checked)" style="transform: scale(1.2);">
+                <label class="form-check-label" for="verboseLogging">
+                  הצג לוגים מפורטים
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- קו מפריד -->
+        <div style="border-top: 2px solid #e9ecef; margin: 30px 0; padding-top: 20px;">
+          <h4 style="color: #6c757d; margin-bottom: 20px; text-align: center;">
+            ⚙️ הגדרות מרווחי עדכון מתקדמות
+          </h4>
+        </div>
+
+        <!-- הגדרות מרווחי עדכון מתקדמות -->
+        <div class="preference-items-grid">
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🟢 טיקרים עם טרייד פעיל - בשעות מסחר</h4>
+              <p>מרווח עדכון לטיקרים עם טריידים פתוחים במהלך שעות המסחר</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="number" id="activeInHours" class="form-control" min="1" max="60" step="1" 
+                       onchange="updateRefreshPreference('open.active.in_minutes', this.value)" placeholder="5">
+                <span class="input-group-text">דקות</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🟡 טיקרים עם טרייד פעיל - מחוץ לשעות מסחר</h4>
+              <p>מרווח עדכון לטיקרים עם טריידים פתוחים מחוץ לשעות המסחר</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="number" id="activeOffHours" class="form-control" min="60" max="240" step="1" 
+                       onchange="updateRefreshPreference('open.active.off_minutes', this.value)" placeholder="60">
+                <span class="input-group-text">דקות</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🔵 טיקרים ללא טרייד פעיל - בשעות מסחר</h4>
+              <p>מרווח עדכון לטיקרים ללא טריידים פתוחים במהלך שעות המסחר</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="number" id="noActiveInHours" class="form-control" min="5" max="240" step="1" 
+                       onchange="updateRefreshPreference('open.no_active.in_minutes', this.value)" placeholder="60">
+                <span class="input-group-text">דקות</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🟠 טיקרים ללא טרייד פעיל - מחוץ לשעות מסחר</h4>
+              <p>מרווח עדכון לטיקרים ללא טריידים פתוחים מחוץ לשעות המסחר</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="number" id="noActiveOffHours" class="form-control" min="60" max="240" step="1" 
+                       onchange="updateRefreshPreference('open.no_active.off_minutes', this.value)" placeholder="60">
+                <span class="input-group-text">דקות</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🔴 טיקרים סגורים/מבוטלים</h4>
+              <p>מרווח עדכון לטיקרים סגורים או מבוטלים (אחרי סגירת המסחר)</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="number" id="closedOffset" class="form-control" min="0" max="180" step="1" 
+                       onchange="updateRefreshPreference('closed.weekdays.offset_minutes_after_close', this.value)" placeholder="45">
+                <span class="input-group-text">דקות אחרי סגירה</span>
+              </div>
+            </div>
+          </div>
+        </div>
+    
+      </div> <!-- סוף external-data-settings-body -->
+    </div> <!-- סוף preference-section -->
+
+
+    <!-- ===== הגדרות ניהול קונסול ===== -->
+    <div class="preference-section">
+      <div class="preference-section-header" onclick="togglePreferenceSection('console-settings')">
+        <h3><span class="section-icon">🖥️</span> הגדרות ניהול קונסול</h3>
+        <span class="toggle-icon" id="console-settings-icon">▼</span>
+      </div>
+      <div class="preference-section-body" id="console-settings-body">
+        <div class="preference-items-grid">
+          <!-- ניקוי אוטומטי של קונסול -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🧹 ניקוי אוטומטי של קונסול</h4>
+              <p>הפעלת ניקוי אוטומטי של הודעות קונסול</p>
+            </div>
+            <div class="preference-control">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="consoleAutoClear" 
+                       onchange="updateConsolePreference('autoClear', this.checked)" style="transform: scale(1.2);">
+                <label class="form-check-label" for="consoleAutoClear">
+                  הפעל ניקוי אוטומטי
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <!-- מרווח ניקוי קונסול -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>⏱️ מרווח ניקוי קונסול</h4>
+              <p>מרווח זמן בין ניקויי קונסול אוטומטיים (בשניות)</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="number" id="consoleClearInterval" class="form-control" min="10" max="3600" step="10" 
+                       onchange="updateConsolePreference('clearInterval', this.value)" placeholder="60">
+                <span class="input-group-text">שניות</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- הסתרת הודעות קונסול -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🔇 הסתרת הודעות קונסול</h4>
+              <p>הסתרת הודעות קונסול זמנית</p>
+            </div>
+            <div class="preference-control">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="consoleSuppressMessages" 
+                       onchange="updateConsolePreference('suppressMessages', this.checked)" style="transform: scale(1.2);">
+                <label class="form-check-label" for="consoleSuppressMessages">
+                  הסתר הודעות זמנית
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <!-- משך הסתרת הודעות -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>⏳ משך הסתרת הודעות</h4>
+              <p>משך זמן הסתרת הודעות קונסול (בשניות)</p>
+            </div>
+            <div class="preference-control">
+              <div class="input-group">
+                <input type="number" id="consoleSuppressDuration" class="form-control" min="1" max="60" step="1" 
+                       onchange="updateConsolePreference('suppressDuration', this.value)" placeholder="5">
+                <span class="input-group-text">שניות</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- כפתור ניקוי ידני -->
+          <div class="preference-item">
+            <div class="preference-label">
+              <h4>🧹 ניקוי ידני</h4>
+              <p>ניקוי מיידי של הקונסול</p>
+            </div>
+            <div class="preference-control">
+              <button class="btn btn-outline-warning" onclick="manualClearConsole()">
+                🧹 נקה קונסול עכשיו
+              </button>
+            </div>
+          </div>
+        </div>
+      </div> <!-- סוף console-settings-body -->
+    </div> <!-- סוף preference-section -->
+
+    <!-- כפתורי פעולה -->
+    <div class="d-flex justify-content-between mt-4 pt-4 border-top">
+      <button class="btn btn-outline-secondary" onclick="resetToDefaults()">
+        🔄 אופס לברירות מחדל
+      </button>
+      <button class="btn btn-success" onclick="saveAllPreferences()">
+        💾 שמור שינויים
+      </button>
+        </div>
+        </div> <!-- סוף section-body -->
+      </div> <!-- סוף content-section -->
+    </div> <!-- סוף main-content -->
+  </div> <!-- סוף page-body -->
+
+  <!-- Bottom page spacing -->
+  <div class="bottom-spacer"></div>
+
+  <!-- Notification system -->
+  <div class="notification-container" id="notificationContainer"></div>
+
+  </div> <!-- סוף background-wrapper -->
+
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
-  <!-- Core scripts -->
-  <script src="scripts/notification-system.js"></script>
-  <script src="scripts/main.js"></script>
+  <!-- קבצים מודולריים של הגריד -->
+  <script src="scripts/button-icons.js"></script>
+  <script src="scripts/translation-utils.js"></script>
+  <script src="scripts/data-utils.js"></script>
+  <script src="scripts/ui-utils.js"></script>
+  <script src="scripts/validation-utils.js"></script>
+  <script src="scripts/crud-utils.js"></script>
+  <script src="scripts/table-mappings.js"></script>
+  <script src="scripts/date-utils.js"></script>
   
-  <!-- V2 Preferences script -->
-  <script src="scripts/preferences-v2.js"></script>
-  <script src="scripts/preferences-v2-compatibility.js"></script>
+  <!-- Scripts -->
+  <script src="scripts/console-cleanup.js"></script>
+  <script src="scripts/notification-system.js"></script>
+  <script src="scripts/error-handlers.js"></script>
+  <script src="scripts/linked-items.js"></script>
+  <script src="scripts/page-utils.js"></script>
+  <script src="scripts/account-service.js"></script>
+  <script src="scripts/color-scheme-system.js"></script>
+  <script src="scripts/filter-system.js"></script>
+
+  <script src="scripts/tables.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/central-refresh-system.js"></script>
+  <script src="scripts/preferences.js"></script>
   
   <!-- Header System Scripts -->
-  <script src="scripts/header-system.js"></script>
+  <script src="scripts/header-system.js?v=20250901_3"></script>
+  <!-- alerts.js הוסר - לא נחוץ בעמוד זה -->
+    <script src="scripts/alert-service.js"></script>
+  <script src="scripts/active-alerts-component.js?v=20250830_1"></script>
   
+  <!-- Page initialization -->
+  <script>
+    // פונקציות לניהול סקשנים
+    function togglePreferenceSection(sectionId) {
+      const body = document.getElementById(sectionId + '-body');
+      const icon = document.getElementById(sectionId + '-icon');
+      
+      if (body && icon) {
+        if (body.classList.contains('collapsed')) {
+          body.classList.remove('collapsed');
+          icon.classList.remove('collapsed');
+          icon.textContent = '▼';
+        } else {
+          body.classList.add('collapsed');
+          icon.classList.add('collapsed');
+          icon.textContent = '◀';
+        }
+      }
+    }
+    
+    function toggleAllPreferenceSections() {
+      const sections = ['profile-selector', 'basic-settings', 'filter-settings', 'color-settings', 'external-data-settings', 'console-settings'];
+      const toggleAllIcon = document.querySelector('.filter-toggle-btn .filter-icon');
+      
+      // בדוק אם יש סקשן פתוח
+      const hasOpenSection = sections.some(sectionId => {
+        const body = document.getElementById(sectionId + '-body');
+        return body && !body.classList.contains('collapsed');
+      });
+      
+      // אם יש סקשן פתוח, סגור את כולם. אחרת, פתח את כולם
+      sections.forEach(sectionId => {
+        const body = document.getElementById(sectionId + '-body');
+        const icon = document.getElementById(sectionId + '-icon');
+        
+        if (body && icon) {
+          if (hasOpenSection) {
+            // סגור הכל
+            body.classList.add('collapsed');
+            icon.classList.add('collapsed');
+            icon.textContent = '◀';
+          } else {
+            // פתח הכל
+            body.classList.remove('collapsed');
+            icon.classList.remove('collapsed');
+            icon.textContent = '▼';
+          }
+        }
+      });
+      
+      // עדכן את האיקון הכללי
+      if (toggleAllIcon) {
+        toggleAllIcon.textContent = hasOpenSection ? '▶' : '▼';
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function () {
+      // אתחול מערכת הכותרת החדשה
+      console.log("🔄 Initializing unified header system...");
+      if (window.headerSystem) {
+        window.headerSystem.init();
+      }
+      
+      // אתחול מערכת הצבעים לערכים מספריים
+      console.log("🎨 Initializing numeric value color system...");
+      if (window.generateNumericValueCSS) {
+        const css = window.generateNumericValueCSS();
+        const styleElement = document.createElement('style');
+        styleElement.id = 'numeric-value-colors';
+        styleElement.textContent = css;
+        document.head.appendChild(styleElement);
+      }
+      
+      // אתחול מערכת הצבעים לסטטוסים
+      console.log("🎨 Initializing status color system...");
+      if (window.generateStatusCSS) {
+        const css = window.generateStatusCSS();
+        const styleElement = document.createElement('style');
+        styleElement.id = 'status-colors';
+        styleElement.textContent = css;
+        document.head.appendChild(styleElement);
+      }
+      
+      // אתחול סקשנים - כולם פתוחים בברירת מחדל
+      console.log("📂 Initializing preference sections...");
+    });
+
+    // ===== פונקציות צבעי סטטוסים =====
+    
+    /**
+     * עדכון צבע סטטוס
+     * @param {string} status - שם הסטטוס
+     * @param {string} color - קוד הצבע החדש
+     */
+    function updateStatusColor(status, color) {
+      try {
+        console.log(`🎨 Updating status color: ${status} = ${color}`);
+        
+        // עדכון הצבע במערכת הצבעים הגלובלית
+        if (window.STATUS_COLORS) {
+          window.STATUS_COLORS[status] = color;
+          
+          // עדכון צבע רקע שקוף
+          if (window.STATUS_BACKGROUND_COLORS) {
+            const rgb = hexToRgb(color);
+            if (rgb) {
+              window.STATUS_BACKGROUND_COLORS[status] = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`;
+            }
+          }
+          
+          // עדכון CSS דינמי
+          if (window.generateStatusCSS) {
+            const css = window.generateStatusCSS();
+            let styleElement = document.getElementById('status-colors');
+            if (!styleElement) {
+              styleElement = document.createElement('style');
+              styleElement.id = 'status-colors';
+              document.head.appendChild(styleElement);
+            }
+            styleElement.textContent = css;
+          }
+          
+          // עדכון שדה הטקסט
+          const hexField = document.getElementById(`status${status.charAt(0).toUpperCase() + status.slice(1)}ColorHex`);
+          if (hexField) {
+            hexField.value = color;
+          }
+          
+          console.log(`✅ Status color updated: ${status} = ${color}`);
+        } else {
+          console.error('❌ STATUS_COLORS not available');
+        }
+      } catch (error) {
+        console.error('❌ Error updating status color:', error);
+      }
+    }
+    
+    /**
+     * איפוס צבעי סטטוסים לברירת המחדל
+     */
+    function resetStatusColors() {
+      try {
+        console.log('🔄 Resetting status colors to default...');
+        
+        // איפוס הצבעים לברירת המחדל
+        if (window.STATUS_COLORS) {
+          window.STATUS_COLORS.open = '#28a745';
+          window.STATUS_COLORS.closed = '#6c757d';
+          window.STATUS_COLORS.cancelled = '#dc3545';
+        }
+        
+        if (window.STATUS_BACKGROUND_COLORS) {
+          window.STATUS_BACKGROUND_COLORS.open = 'rgba(40, 167, 69, 0.1)';
+          window.STATUS_BACKGROUND_COLORS.closed = 'rgba(108, 117, 125, 0.1)';
+          window.STATUS_BACKGROUND_COLORS.cancelled = 'rgba(220, 53, 69, 0.1)';
+        }
+        
+        // עדכון שדות הטופס
+        const statusFields = [
+          { id: 'statusOpenColor', value: '#28a745' },
+          { id: 'statusClosedColor', value: '#6c757d' },
+          { id: 'statusCancelledColor', value: '#dc3545' }
+        ];
+        
+        statusFields.forEach(field => {
+          const colorInput = document.getElementById(field.id);
+          const hexInput = document.getElementById(field.id + 'Hex');
+          
+          if (colorInput) colorInput.value = field.value;
+          if (hexInput) hexInput.value = field.value;
+        });
+        
+        // עדכון CSS דינמי
+        if (window.generateStatusCSS) {
+          const css = window.generateStatusCSS();
+          let styleElement = document.getElementById('status-colors');
+          if (!styleElement) {
+            styleElement = document.createElement('style');
+            styleElement.id = 'status-colors';
+            document.head.appendChild(styleElement);
+          }
+          styleElement.textContent = css;
+        }
+        
+        console.log('✅ Status colors reset to default');
+      } catch (error) {
+        console.error('❌ Error resetting status colors:', error);
+      }
+    }
+    
+    /**
+     * המרת hex ל-RGB
+     * @param {string} hex - קוד צבע hex
+     * @returns {Object|null} - אובייקט RGB או null
+     */
+    function hexToRgb(hex) {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+      } : null;
+    }
+  </script>
 </body>
 </html>

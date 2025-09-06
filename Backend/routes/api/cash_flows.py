@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 cash_flows_bp = Blueprint('cash_flows', __name__, url_prefix='/api/v1/cash_flows')
 
 @cash_flows_bp.route('/', methods=['GET'])
-@cache_for(ttl=60)  # Cache for 1 minute - cash flows don't change frequently
+# @cache_for(ttl=60)  # Cache for 1 minute - cash flows don't change frequently - temporarily disabled
 def get_cash_flows():
     """Get all cash flows"""
     try:

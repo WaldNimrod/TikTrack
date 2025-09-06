@@ -1594,11 +1594,26 @@ async function updateCashFlow() {
 
 // הפונקציה הוסרה - קיימת כבר בשורה 909
 
+// פונקציות מודל חסרות
+function showAddCashFlowModal() {
+    console.log('showAddCashFlowModal called');
+    // TODO: Implement add cash flow modal
+    alert('פונקציית הוספת תזרים מזומנים תתווסף בקרוב');
+}
+
+function showEditCashFlowModal(cashFlowId) {
+    console.log('showEditCashFlowModal called with ID:', cashFlowId);
+    // TODO: Implement edit cash flow modal
+    alert('פונקציית עריכת תזרים מזומנים תתווסף בקרוב');
+}
+
 // ייצוא פונקציות גלובליות נוספות
 window.manageExternalIdField = manageExternalIdField;
 window.setupSourceFieldListeners = setupSourceFieldListeners;
 window.initializeExternalIdFields = initializeExternalIdFields;
 window.deleteCashFlow = deleteCashFlow;
+window.showAddCashFlowModal = showAddCashFlowModal;
+window.showEditCashFlowModal = showEditCashFlowModal;
 
 // window.showLinkedItemsWarning = showLinkedItemsWarning; // הוסר - הוחלף ב-showLinkedItemsModal
 // window.checkLinkedItemsForCashFlow = checkLinkedItemsForCashFlow; // הוסר - לא נחוץ יותר

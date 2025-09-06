@@ -32,8 +32,34 @@ def get_trades():
         else:
             trades = TradeService.get_all(db)
         
-        # Convert trades to dict and log the first one
-        trade_dicts = [trade.to_dict() for trade in trades]
+        # Convert trades to dict with market data
+        trade_dicts = []
+        for trade in trades:
+            trade_dict = trade.to_dict()
+            
+            # Add market data from ticker if available
+            if hasattr(trade, 'ticker') and trade.ticker:
+                # Get latest market data for the ticker
+                from models.external_data import MarketDataQuote
+                latest_quote = db.query(MarketDataQuote).filter(
+                    MarketDataQuote.ticker_id == trade.ticker.id
+                ).order_by(MarketDataQuote.fetched_at.desc()).first()
+                
+                if latest_quote:
+                    trade_dict['current_price'] = latest_quote.price
+                    trade_dict['daily_change'] = latest_quote.change_pct_day
+                    trade_dict['change_amount'] = latest_quote.change_amount_day
+                else:
+                    trade_dict['current_price'] = None
+                    trade_dict['daily_change'] = None
+                    trade_dict['change_amount'] = None
+            else:
+                trade_dict['current_price'] = None
+                trade_dict['daily_change'] = None
+                trade_dict['change_amount'] = None
+            
+            trade_dicts.append(trade_dict)
+        
         if trade_dicts:
             logger.info(f"First trade data: {trade_dicts[0]}")
         

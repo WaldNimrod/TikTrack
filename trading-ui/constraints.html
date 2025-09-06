@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מוניטור אילוצים - Tik.track</title>
+
+  <!-- CSS Files - Ordered by priority (weak to strong) -->
+  <link rel="stylesheet" href="styles/apple-theme.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles/styles.css">
+  <link rel="stylesheet" href="styles/header-system.css">
+  <link rel="stylesheet" href="styles/typography.css">
+  <link rel="stylesheet" href="styles/table.css">
+  <link rel="stylesheet" href="styles/notification-system.css">
+  <link rel="stylesheet" href="styles/linked-items.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="scripts/console-cleanup.js"></script>
+  <script src="scripts/translation-utils.js"></script>
+  <script src="scripts/data-utils.js"></script>
+  <script src="scripts/ui-utils.js"></script>
+  <script src="scripts/table-mappings.js"></script>
+  <script src="scripts/date-utils.js"></script>
+  <script src="scripts/tables.js"></script>
+  <script src="scripts/linked-items.js"></script>
+  <script src="scripts/page-utils.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/alert-service.js"></script>
+  <script src="scripts/header-system.js"></script>
+  <script src="scripts/active-alerts-component.js"></script>
+
+  <style>
+    .constraints-monitor-container {
+      padding: 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .layer-section {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .layer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .layer-title {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #ff9c05;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .layer-stats {
+      display: flex;
+      gap: 15px;
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .constraint-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .constraint-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 15px;
+      background: #fafafa;
+      transition: all 0.3s ease;
+    }
+
+    .constraint-card:hover {
+      border-color: #ff9c05;
+      box-shadow: 0 2px 8px rgba(255, 156, 5, 0.2);
+      background: white;
+    }
+
+    .constraint-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .constraint-name {
+      font-weight: bold;
+      color: #333;
+      font-size: 0.95em;
+    }
+
+    .constraint-type-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+
+    .badge-enum {
+      background-color: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .badge-not-null {
+      background-color: #f3e5f5;
+      color: #7b1fa2;
+    }
+
+    .badge-foreign-key {
+      background-color: #e8f5e8;
+      color: #388e3c;
+    }
+
+    .badge-unique {
+      background-color: #fff3e0;
+      color: #f57c00;
+    }
+
+    .badge-range {
+      background-color: #fce4ec;
+      color: #c2185b;
+    }
+
+    .constraint-details {
+      font-size: 0.85em;
+      color: #666;
+      line-height: 1.4;
+    }
+
+    .constraint-table {
+      font-weight: bold;
+      color: #ff9c05;
+    }
+
+    .constraint-column {
+      color: #666;
+    }
+
+    .constraint-definition {
+      background: #f8f9fa;
+      padding: 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.8em;
+      margin-top: 8px;
+      border-left: 3px solid #ff9c05;
+    }
+
+    .table-constraints-section {
+      margin-top: 20px;
+    }
+
+    .table-header {
+      background: #f8f9fa;
+      padding: 10px 15px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-constraint-count {
+      background: #ff9c05;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.8em;
+    }
+
+    .loading-spinner {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+
+    .error-message {
+      background-color: #f8d7da;
+      color: #721c24;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 15px 0;
+      border-left: 4px solid #dc3545;
+    }
+
+    .success-message {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 15px 0;
+      border-left: 4px solid #28a745;
+    }
+
+    .stats-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-number {
+      font-size: 2em;
+      font-weight: bold;
+      color: #ff9c05;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      color: #666;
+      font-size: 0.9em;
+    }
+
+    .filter-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+
+    .filter-controls select,
+    .filter-controls input {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+
+    .layer-toggle {
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: all 0.3s ease;
+    }
+
+    .layer-toggle:hover {
+      background: #e9ecef;
+    }
+
+    .layer-toggle.active {
+      background: #ff9c05;
+      color: white;
+      border-color: #ff9c05;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="background-wrapper">
+    <div class="page-body">
+      <!-- Constraints Monitor - top-Section -->
+      <div class="top-section">
+        <div class="section-header">
+          <div class="table-title">
+            <img src="images/icons/development.svg?v=20250905" alt="מוניטור אילוצים" class="section-icon"> מוניטור אילוצים
+          </div>
+          <div class="table-actions">
+            <button class="filter-toggle-btn" onclick="window.toggleTopSection()" title="הצג/הסתר אזור סטטיסטיקה">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="section-body">
+          <div class="stats-cards">
+            <div class="stat-card">
+              <div class="stat-number" id="total-constraints">-</div>
+              <div class="stat-label">סה"כ אילוצים</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number" id="total-tables">-</div>
+              <div class="stat-label">טבלאות עם אילוצים</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number" id="constraint-types">-</div>
+              <div class="stat-label">סוגי אילוצים</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number" id="active-constraints">-</div>
+              <div class="stat-label">אילוצים פעילים</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="main-content">
+        <div class="content-section constraints-monitor-page">
+          <div class="section-header">
+            <div class="table-title">
+              <img src="images/icons/development.svg?v=20250905" alt="מוניטור אילוצים בשכבות" class="section-icon"> מוניטור אילוצים בשכבות<br><span style="font-weight: normal; font-size: 0.8em; color: #666;">Constraints Monitor by Layers</span>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <div class="search-input-wrapper">
+                <input type="text" class="search-filter-input" placeholder="חיפוש אילוצים..."
+                  onkeyup="window.filterConstraints(this.value)">
+              </div>
+              <button class="refresh-btn" onclick="window.refreshConstraints()" title="רענן נתונים">
+                <span class="action-icon">🔄</span> רענן
+              </button>
+              <button class="filter-toggle-btn" onclick="window.toggleMainSection()"
+                title="הצג/הסתר אזור מוניטור אילוצים">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="section-body">
+            <div class="constraints-monitor-container">
+              <div id="messages"></div>
+
+              <!-- Filter Controls -->
+              <div class="filter-controls">
+                <select id="table-filter" onchange="window.filterByTable(this.value)">
+                  <option value="">כל הטבלאות</option>
+                </select>
+                <select id="type-filter" onchange="window.filterByType(this.value)">
+                  <option value="">כל סוגי האילוצים</option>
+                  <option value="ENUM">ENUM</option>
+                  <option value="NOT_NULL">NOT NULL</option>
+                  <option value="FOREIGN_KEY">FOREIGN KEY</option>
+                  <option value="UNIQUE">UNIQUE</option>
+                  <option value="RANGE">RANGE</option>
+                </select>
+                <div class="layer-toggle active" onclick="window.toggleLayer('overview')">סקירה כללית</div>
+                <div class="layer-toggle" onclick="window.toggleLayer('by-table')">לפי טבלאות</div>
+                <div class="layer-toggle" onclick="window.toggleLayer('by-type')">לפי סוג</div>
+              </div>
+
+              <!-- Overview Layer -->
+              <div id="overview-layer" class="layer-section">
+                <div class="layer-header">
+                  <div class="layer-title">
+                    <i class="fas fa-chart-pie"></i>
+                    סקירה כללית
+                  </div>
+                  <div class="layer-stats">
+                    <div class="stat-item">
+                      <i class="fas fa-database"></i>
+                      <span id="overview-tables-count">-</span> טבלאות
+                    </div>
+                    <div class="stat-item">
+                      <i class="fas fa-shield-alt"></i>
+                      <span id="overview-constraints-count">-</span> אילוצים
+                    </div>
+                  </div>
+                </div>
+                <div id="overview-content">
+                  <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i> טוען סקירה כללית...
+                  </div>
+                </div>
+              </div>
+
+              <!-- By Table Layer -->
+              <div id="by-table-layer" class="layer-section" style="display: none;">
+                <div class="layer-header">
+                  <div class="layer-title">
+                    <i class="fas fa-table"></i>
+                    אילוצים לפי טבלאות
+                  </div>
+                  <div class="layer-stats">
+                    <div class="stat-item">
+                      <i class="fas fa-list"></i>
+                      <span id="table-layer-count">-</span> טבלאות
+                    </div>
+                  </div>
+                </div>
+                <div id="by-table-content">
+                  <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i> טוען אילוצים לפי טבלאות...
+                  </div>
+                </div>
+              </div>
+
+              <!-- By Type Layer -->
+              <div id="by-type-layer" class="layer-section" style="display: none;">
+                <div class="layer-header">
+                  <div class="layer-title">
+                    <i class="fas fa-tags"></i>
+                    אילוצים לפי סוג
+                  </div>
+                  <div class="layer-stats">
+                    <div class="stat-item">
+                      <i class="fas fa-layer-group"></i>
+                      <span id="type-layer-count">-</span> סוגים
+                    </div>
+                  </div>
+                </div>
+                <div id="by-type-content">
+                  <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i> טוען אילוצים לפי סוג...
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="height: 3rem;"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="scripts/translation-utils.js"></script>
+  <script src="scripts/linked-items.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/header-system.js?v=20250901_3"></script>
+  <script src="scripts/notification-system.js"></script>
+  <script src="scripts/validation-utils.js"></script>
+  <script src="scripts/error-handlers.js"></script>
+
+  <script>
+    // Constraints Monitor JavaScript
+    class ConstraintsMonitor {
+      constructor() {
+        this.apiBase = 'http://localhost:8080/api/v1/constraints';
+        this.constraints = [];
+        this.tables = [];
+        this.currentLayer = 'overview';
+        this.filters = {
+          table: '',
+          type: '',
+          search: ''
+        };
+        
+        this.init();
+      }
+
+      async init() {
+        try {
+          await this.loadData();
+          this.setupEventListeners();
+          this.renderCurrentLayer();
+        } catch (error) {
+          this.showMessage('שגיאה בטעינת נתוני האילוצים', 'error');
+          console.error('Error initializing constraints monitor:', error);
+        }
+      }
+
+      async loadData() {
+        try {
+          // Load constraints
+          const constraintsResponse = await fetch(`${this.apiBase}/`);
+          const constraintsData = await constraintsResponse.json();
+          
+          if (constraintsData.status === 'success') {
+            this.constraints = constraintsData.data;
+          }
+
+          // Load tables
+          const tablesResponse = await fetch(`${this.apiBase}/tables`);
+          const tablesData = await tablesResponse.json();
+          
+          if (tablesData.status === 'success') {
+            this.tables = tablesData.data;
+          }
+
+          this.updateStats();
+          this.populateFilters();
+        } catch (error) {
+          console.error('Error loading data:', error);
+          throw error;
+        }
+      }
+
+      updateStats() {
+        const totalConstraints = this.constraints.length;
+        const totalTables = this.tables.length;
+        const constraintTypes = [...new Set(this.constraints.map(c => c.constraint_type))].length;
+        const activeConstraints = this.constraints.filter(c => c.is_active).length;
+
+        document.getElementById('total-constraints').textContent = totalConstraints;
+        document.getElementById('total-tables').textContent = totalTables;
+        document.getElementById('constraint-types').textContent = constraintTypes;
+        document.getElementById('active-constraints').textContent = activeConstraints;
+      }
+
+      populateFilters() {
+        const tableFilter = document.getElementById('table-filter');
+        tableFilter.innerHTML = '<option value="">כל הטבלאות</option>';
+        
+        this.tables.forEach(table => {
+          const option = document.createElement('option');
+          option.value = table;
+          option.textContent = table;
+          tableFilter.appendChild(option);
+        });
+      }
+
+      getBadgeClass(constraintType) {
+        const classes = {
+          'ENUM': 'badge-enum',
+          'NOT_NULL': 'badge-not-null',
+          'FOREIGN_KEY': 'badge-foreign-key',
+          'UNIQUE': 'badge-unique',
+          'RANGE': 'badge-range'
+        };
+        return classes[constraintType] || 'badge-enum';
+      }
+
+      renderOverviewLayer() {
+        const content = document.getElementById('overview-content');
+        
+        // Group constraints by table
+        const constraintsByTable = {};
+        this.constraints.forEach(constraint => {
+          if (!constraintsByTable[constraint.table_name]) {
+            constraintsByTable[constraint.table_name] = [];
+          }
+          constraintsByTable[constraint.table_name].push(constraint);
+        });
+
+        let html = '<div class="constraint-grid">';
+        
+        Object.entries(constraintsByTable).forEach(([tableName, constraints]) => {
+          html += `
+            <div class="constraint-card">
+              <div class="constraint-header">
+                <div class="constraint-name">${tableName}</div>
+                <div class="table-constraint-count">${constraints.length}</div>
+              </div>
+              <div class="constraint-details">
+                <div>סה"כ אילוצים: <strong>${constraints.length}</strong></div>
+                <div>סוגי אילוצים: <strong>${[...new Set(constraints.map(c => c.constraint_type))].length}</strong></div>
+                <div>אילוצים פעילים: <strong>${constraints.filter(c => c.is_active).length}</strong></div>
+              </div>
+            </div>
+          `;
+        });
+        
+        html += '</div>';
+        content.innerHTML = html;
+      }
+
+      renderByTableLayer() {
+        const content = document.getElementById('by-table-content');
+        
+        // Group constraints by table
+        const constraintsByTable = {};
+        this.constraints.forEach(constraint => {
+          if (!constraintsByTable[constraint.table_name]) {
+            constraintsByTable[constraint.table_name] = [];
+          }
+          constraintsByTable[constraint.table_name].push(constraint);
+        });
+
+        let html = '';
+        
+        Object.entries(constraintsByTable).forEach(([tableName, constraints]) => {
+          html += `
+            <div class="table-constraints-section">
+              <div class="table-header">
+                <span>${tableName}</span>
+                <span class="table-constraint-count">${constraints.length} אילוצים</span>
+              </div>
+              <div class="constraint-grid">
+          `;
+          
+          constraints.forEach(constraint => {
+            html += `
+              <div class="constraint-card">
+                <div class="constraint-header">
+                  <div class="constraint-name">${constraint.constraint_name}</div>
+                  <div class="constraint-type-badge ${this.getBadgeClass(constraint.constraint_type)}">
+                    ${constraint.constraint_type}
+                  </div>
+                </div>
+                <div class="constraint-details">
+                  <div class="constraint-table">טבלה: ${constraint.table_name}</div>
+                  <div class="constraint-column">עמודה: ${constraint.column_name}</div>
+                  <div class="constraint-definition">${constraint.constraint_definition}</div>
+                </div>
+              </div>
+            `;
+          });
+          
+          html += `
+              </div>
+            </div>
+          `;
+        });
+        
+        content.innerHTML = html;
+      }
+
+      renderByTypeLayer() {
+        const content = document.getElementById('by-type-content');
+        
+        // Group constraints by type
+        const constraintsByType = {};
+        this.constraints.forEach(constraint => {
+          if (!constraintsByType[constraint.constraint_type]) {
+            constraintsByType[constraint.constraint_type] = [];
+          }
+          constraintsByType[constraint.constraint_type].push(constraint);
+        });
+
+        let html = '';
+        
+        Object.entries(constraintsByType).forEach(([type, constraints]) => {
+          html += `
+            <div class="table-constraints-section">
+              <div class="table-header">
+                <span>${type} - ${constraints.length} אילוצים</span>
+                <span class="table-constraint-count">${constraints.length}</span>
+              </div>
+              <div class="constraint-grid">
+          `;
+          
+          constraints.forEach(constraint => {
+            html += `
+              <div class="constraint-card">
+                <div class="constraint-header">
+                  <div class="constraint-name">${constraint.constraint_name}</div>
+                  <div class="constraint-type-badge ${this.getBadgeClass(constraint.constraint_type)}">
+                    ${constraint.constraint_type}
+                  </div>
+                </div>
+                <div class="constraint-details">
+                  <div class="constraint-table">טבלה: ${constraint.table_name}</div>
+                  <div class="constraint-column">עמודה: ${constraint.column_name}</div>
+                  <div class="constraint-definition">${constraint.constraint_definition}</div>
+                </div>
+              </div>
+            `;
+          });
+          
+          html += `
+              </div>
+            </div>
+          `;
+        });
+        
+        content.innerHTML = html;
+      }
+
+      renderCurrentLayer() {
+        switch (this.currentLayer) {
+          case 'overview':
+            this.renderOverviewLayer();
+            break;
+          case 'by-table':
+            this.renderByTableLayer();
+            break;
+          case 'by-type':
+            this.renderByTypeLayer();
+            break;
+        }
+      }
+
+      setupEventListeners() {
+        // Add any additional event listeners here
+      }
+
+      showMessage(message, type = 'info') {
+        const messagesContainer = document.getElementById('messages');
+        const messageClass = type === 'error' ? 'error-message' : 'success-message';
+        
+        messagesContainer.innerHTML = `
+          <div class="${messageClass}">
+            ${message}
+          </div>
+        `;
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+          messagesContainer.innerHTML = '';
+        }, 5000);
+      }
+    }
+
+    // Global functions
+    let constraintsMonitor;
+
+    window.toggleLayer = function(layer) {
+      // Update active layer toggle
+      document.querySelectorAll('.layer-toggle').forEach(toggle => {
+        toggle.classList.remove('active');
+      });
+      event.target.classList.add('active');
+      
+      // Hide all layers
+      document.querySelectorAll('.layer-section').forEach(section => {
+        section.style.display = 'none';
+      });
+      
+      // Show selected layer
+      document.getElementById(`${layer}-layer`).style.display = 'block';
+      
+      // Update current layer and render
+      constraintsMonitor.currentLayer = layer;
+      constraintsMonitor.renderCurrentLayer();
+    };
+
+    window.filterByTable = function(table) {
+      constraintsMonitor.filters.table = table;
+      constraintsMonitor.renderCurrentLayer();
+    };
+
+    window.filterByType = function(type) {
+      constraintsMonitor.filters.type = type;
+      constraintsMonitor.renderCurrentLayer();
+    };
+
+    window.filterConstraints = function(searchText) {
+      constraintsMonitor.filters.search = searchText;
+      constraintsMonitor.renderCurrentLayer();
+    };
+
+    window.refreshConstraints = function() {
+      constraintsMonitor.loadData().then(() => {
+        constraintsMonitor.renderCurrentLayer();
+        constraintsMonitor.showMessage('נתונים רועננו בהצלחה', 'success');
+      });
+    };
+
+    window.toggleTopSection = function() {
+      const topSection = document.querySelector('.top-section');
+      const sectionBody = topSection.querySelector('.section-body');
+      const filterIcon = topSection.querySelector('.filter-icon');
+
+      if (sectionBody.style.display === 'none') {
+        sectionBody.style.display = 'block';
+        filterIcon.textContent = '▲';
+      } else {
+        sectionBody.style.display = 'none';
+        filterIcon.textContent = '▼';
+      }
+    };
+
+    window.toggleMainSection = function() {
+      const mainSection = document.querySelector('.content-section');
+      const sectionBody = mainSection.querySelector('.section-body');
+      const filterIcon = mainSection.querySelector('.filter-icon');
+
+      if (sectionBody.style.display === 'none') {
+        sectionBody.style.display = 'block';
+        filterIcon.textContent = '▲';
+      } else {
+        sectionBody.style.display = 'none';
+        filterIcon.textContent = '▼';
+      }
+    };
+
+    // Initialize when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('מוניטור אילוצים נטען');
+      constraintsMonitor = new ConstraintsMonitor();
+    });
+  </script>
+
+  <script src="scripts/console-cleanup.js"></script>
+  <script src="scripts/header-system.js"></script>
+  <script src="scripts/notification-system.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/active-alerts-component.js"></script>
+
+</body>
+
+</html>

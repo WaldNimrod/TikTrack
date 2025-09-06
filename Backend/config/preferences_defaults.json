@@ -1,0 +1,244 @@
+{
+  "version": "2.0",
+  "lastUpdated": "2025-09-05T00:00:00Z",
+  "description": "ברירות מחדל למערכת העדפות TikTrack V2",
+  
+  "general": {
+    "primaryCurrency": "USD",
+    "secondaryCurrency": "ILS",
+    "timezone": "Asia/Jerusalem",
+    "language": "he",
+    "dateFormat": "DD/MM/YYYY",
+    "numberFormat": "1,234.56",
+    "defaultStopLoss": 5.0,
+    "defaultTargetPrice": 10.0,
+    "defaultCommission": 1.0,
+    "defaultTradeAmount": null,
+    "riskPercentage": 2.0,
+    "tradingHours": {
+      "start": "09:30",
+      "end": "16:00"
+    }
+  },
+  
+  "defaultFilters": {
+    "status": "open",
+    "type": "swing",
+    "account": "all",
+    "dateRange": "this_week",
+    "search": "",
+    "profit": "all",
+    "minAmount": null,
+    "maxAmount": null
+  },
+  
+  "ui": {
+    "theme": "light",
+    "compactMode": false,
+    "showAnimations": true,
+    "sidebarPosition": "right",
+    "defaultPage": "dashboard",
+    "table": {
+      "pageSize": 25,
+      "showIcons": true,
+      "autoRefresh": false,
+      "refreshInterval": 30
+    },
+    "charts": {
+      "theme": "modern",
+      "animation": true,
+      "showGrid": true,
+      "defaultPeriod": "1M"
+    }
+  },
+  
+  "externalData": {
+    "providers": {
+      "primary": "yahoo",
+      "secondary": "google",
+      "fallback": "alpha_vantage"
+    },
+    "refresh": {
+      "interval": 5,
+      "cacheTTL": 5,
+      "maxBatchSize": 25,
+      "requestDelay": 200
+    },
+    "reliability": {
+      "retryAttempts": 3,
+      "retryDelay": 5,
+      "timeoutDuration": 30
+    },
+    "display": {
+      "showPercentageChanges": true,
+      "showVolume": true,
+      "showMarketCap": false,
+      "show52WeekRange": false
+    }
+  },
+  
+  "notifications": {
+    "general": {
+      "enabled": true,
+      "sound": true,
+      "popup": true,
+      "email": false
+    },
+    "trading": {
+      "tradeExecuted": true,
+      "stopLoss": true,
+      "targetReached": true,
+      "marginCall": true
+    },
+    "data": {
+      "dataFailures": true,
+      "staleData": false,
+      "priceAlerts": true
+    }
+  },
+  
+  "console": {
+    "cleanupInterval": 60,
+    "autoClear": true,
+    "maxEntries": 1000,
+    "verboseLogging": false,
+    "logLevel": "INFO"
+  },
+  
+  "advanced": {
+    "performance": {
+      "enableCaching": true,
+      "prefetchData": true,
+      "lazyLoading": true
+    },
+    "security": {
+      "sessionTimeout": 30,
+      "autoBackup": true,
+      "backupInterval": 24
+    },
+    "analytics": {
+      "trackUserActivity": true,
+      "generateReports": false
+    }
+  },
+  
+  "colorScheme": {
+    "numericValues": {
+      "positive": {
+        "light": "#d4edda",
+        "medium": "#28a745",
+        "dark": "#155724",
+        "border": "#c3e6cb"
+      },
+      "negative": {
+        "light": "#f8d7da",
+        "medium": "#dc3545",
+        "dark": "#721c24",
+        "border": "#f5c6cb"
+      },
+      "zero": {
+        "light": "#e2e3e5",
+        "medium": "#6c757d",
+        "dark": "#383d41",
+        "border": "#d6d8db"
+      }
+    },
+    "entities": {
+      "trade": "#007bff",
+      "tradePlan": "#0056b3",
+      "account": "#28a745",
+      "cashFlow": "#20c997",
+      "ticker": "#dc3545",
+      "alert": "#ff9c05",
+      "note": "#6f42c1",
+      "constraint": "#6c757d",
+      "design": "#495057",
+      "research": "#343a40",
+      "preference": "#adb5bd",
+      "execution": "#17a2b8"
+    },
+    "statuses": {
+      "open": {
+        "light": "rgba(40, 167, 69, 0.1)",
+        "medium": "#28a745",
+        "dark": "#155724",
+        "border": "rgba(40, 167, 69, 0.3)"
+      },
+      "closed": {
+        "light": "rgba(108, 117, 125, 0.1)",
+        "medium": "#6c757d",
+        "dark": "#383d41",
+        "border": "rgba(108, 117, 125, 0.3)"
+      },
+      "cancelled": {
+        "light": "rgba(220, 53, 69, 0.1)",
+        "medium": "#dc3545",
+        "dark": "#721c24",
+        "border": "rgba(220, 53, 69, 0.3)"
+      }
+    },
+    "investmentTypes": {
+      "swing": {
+        "light": "rgba(0, 123, 255, 0.1)",
+        "medium": "#007bff",
+        "dark": "#0056b3",
+        "border": "rgba(0, 123, 255, 0.3)"
+      },
+      "investment": {
+        "light": "rgba(40, 167, 69, 0.1)",
+        "medium": "#28a745",
+        "dark": "#155724",
+        "border": "rgba(40, 167, 69, 0.3)"
+      },
+      "passive": {
+        "light": "rgba(111, 66, 193, 0.1)",
+        "medium": "#6f42c1",
+        "dark": "#4a2c7a",
+        "border": "rgba(111, 66, 193, 0.3)"
+      }
+    }
+  },
+  
+  "opacitySettings": {
+    "mainHeader": 100,
+    "subHeader": 30
+  },
+  
+  "refreshOverrides": {
+    "activeTickersTradingHours": 5,
+    "activeTickersOffHours": 60,
+    "inactiveTickersTradingHours": 60,
+    "inactiveTickersOffHours": 60,
+    "closedTickersOffset": 45
+  },
+  
+  "dashboardLayout": {
+    "defaultWidgets": ["portfolio", "recentTrades", "marketOverview"],
+    "widgetPositions": {},
+    "autoRefresh": true,
+    "refreshInterval": 30
+  },
+  
+  "keyboardShortcuts": {
+    "savePreferences": "Ctrl+S",
+    "resetToDefaults": "Ctrl+R",
+    "exportPreferences": "Ctrl+E",
+    "importPreferences": "Ctrl+I",
+    "newProfile": "Ctrl+N",
+    "duplicateProfile": "Ctrl+D"
+  },
+  
+  "advancedAlerts": {
+    "priceChangeThreshold": 5.0,
+    "volumeSpikeThreshold": 200.0,
+    "marketHoursOnly": true,
+    "alertCooldown": 300
+  },
+  
+  "importExportSettings": {
+    "defaultFormat": "json",
+    "includeSensitiveData": false,
+    "compressExports": true,
+    "backupBeforeImport": true
+  }
+}

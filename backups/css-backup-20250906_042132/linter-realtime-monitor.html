@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<!--
+  ========================================
+  דף ניטור Linter בזמן אמת - Linter Realtime Monitor
+  ========================================
+  
+  דף זה מציג ניטור בזמן אמת של Linter
+  כולל סטטיסטיקות, גרפים וניהול לוגים
+  
+  תכונות:
+  - ניטור בזמן אמת של שגיאות Linter
+  - גרפים אינטראקטיביים
+  - ניהול לוגים
+  - העתקת לוגים מפורטים
+  - רענון אוטומטי
+  
+  מחבר: Tik.track Development Team
+  תאריך עדכון אחרון: 2025
+  ========================================
+-->
+<html lang="he" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ניטור Linter בזמן אמת - Tik.track</title>
+
+  <!-- CSS Files - Ordered by priority (weak to strong) -->
+  <!-- 1. Apple theme (base) -->
+  <link rel="stylesheet" href="styles/apple-theme.css">
+
+  <!-- 2. Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- 3. General styles -->
+  <link rel="stylesheet" href="styles/styles.css">
+  <link rel="stylesheet" href="styles/header-system.css">
+  
+  <!-- 4. Typography -->
+  <link rel="stylesheet" href="styles/typography.css">
+
+  <!-- 5. Table styles -->
+  <link rel="stylesheet" href="styles/table.css">
+
+  <!-- 6. Notification system -->
+  <link rel="stylesheet" href="styles/notification-system.css">
+  
+  <!-- 7. Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  
+  <!-- 8. Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <!-- 9. Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- 10. Custom styles for linter monitor -->
+  <style>
+    /* Modal styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 8px;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+    }
+    
+    .modal-body {
+      padding: 20px;
+    }
+    
+    /* Issue item styles */
+    .issue-item {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      padding: 15px;
+      background: #f9f9f9;
+    }
+    
+    .issue-header {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+    
+    .issue-rule {
+      background: #e9ecef;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #495057;
+    }
+    
+    .issue-content {
+      margin-bottom: 15px;
+    }
+    
+    .issue-location {
+      color: #666;
+      font-size: 14px;
+      margin: 5px 0;
+    }
+    
+    .issue-code {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 4px;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    
+    .code-before, .code-after {
+      margin: 5px 0;
+    }
+    
+    .code-before code, .code-after code {
+      background: #fff;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .issue-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    /* Fix actions styles */
+    .fix-actions {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    }
+    
+    .fix-actions h5 {
+      margin-bottom: 15px;
+      color: #495057;
+    }
+    
+    .fix-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    
+    /* Preview styles */
+    .preview-before, .preview-after {
+      margin: 15px 0;
+    }
+    
+    .preview-before pre, .preview-after pre {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 4px;
+      padding: 10px;
+      overflow-x: auto;
+    }
+    
+    .preview-actions {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    
+    /* Details styles */
+    .detail-row {
+      margin: 8px 0;
+      padding: 5px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+    
+    /* Confirmation dialog styles */
+    .fix-confirmation-dialog {
+      max-width: 500px;
+    }
+    
+    .confirmation-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #e9ecef;
+    }
+    
+    .confirmation-header h4 {
+      margin: 0;
+      color: #495057;
+    }
+    
+    .warning-box {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .warning-box h5 {
+      color: #856404;
+      margin-bottom: 10px;
+    }
+    
+    .warning-box p {
+      color: #856404;
+      margin: 0;
+    }
+    
+    .action-details {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .action-details h5 {
+      color: #495057;
+      margin-bottom: 10px;
+    }
+    
+    .action-details ul {
+      margin: 0;
+      padding-right: 20px;
+    }
+    
+    .action-details li {
+      margin-bottom: 5px;
+      color: #6c757d;
+    }
+    
+    .backup-recommendation {
+      background: #e7f3ff;
+      border: 1px solid #b3d9ff;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .backup-recommendation h5 {
+      color: #004085;
+      margin-bottom: 10px;
+    }
+    
+    .backup-options {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .confirmation-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e9ecef;
+    }
+    
+    .backup-instructions {
+      max-width: 400px;
+    }
+    
+    .backup-instructions h5 {
+      color: #495057;
+      margin-bottom: 15px;
+    }
+    
+    .backup-instructions ol {
+      margin: 0;
+      padding-right: 20px;
+    }
+    
+    .backup-instructions li {
+      margin-bottom: 10px;
+      color: #6c757d;
+    }
+    
+    .backup-instructions ul {
+      margin: 5px 0;
+      padding-right: 20px;
+    }
+    
+    .backup-instructions code {
+      background: #f8f9fa;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      color: #e83e8c;
+    }
+    
+    /* Single fix confirmation styles */
+    .single-fix-confirmation {
+      max-width: 600px;
+    }
+    
+    .issue-preview {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .issue-preview h5 {
+      color: #495057;
+      margin-bottom: 10px;
+    }
+    
+    .issue-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    
+    .issue-info div {
+      color: #6c757d;
+      font-size: 14px;
+    }
+    
+    .code-changes {
+      margin-bottom: 20px;
+    }
+    
+    .code-changes h5 {
+      color: #495057;
+      margin-bottom: 15px;
+    }
+    
+    .code-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    
+    .code-before, .code-after {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 15px;
+    }
+    
+    .code-before strong {
+      color: #dc3545;
+    }
+    
+    .code-after strong {
+      color: #28a745;
+    }
+    
+    .code-before pre, .code-after pre {
+      background: #fff;
+      border: 1px solid #e9ecef;
+      border-radius: 4px;
+      padding: 10px;
+      margin: 10px 0 0 0;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+    
+    .backup-notice {
+      background: #e7f3ff;
+      border: 1px solid #b3d9ff;
+      border-radius: 8px;
+      padding: 10px 15px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #004085;
+    }
+    
+    .backup-notice i {
+      color: #007bff;
+    }
+    
+    /* Enhanced log entry styles */
+    .log-entry {
+      background: #ffffff;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      padding: 15px;
+      transition: all 0.2s ease;
+    }
+    
+    .log-entry:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transform: translateY(-1px);
+    }
+    
+    .log-header {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .log-timestamp {
+      color: #6c757d;
+      font-size: 12px;
+      font-family: 'Courier New', monospace;
+    }
+    
+    .log-level {
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .log-level.info {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+    
+    .log-level.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .log-level.warning {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .log-level.success {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .log-message {
+      color: #495057;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    
+    /* Enhanced status indicator */
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    .status-indicator.status-active {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .status-indicator.status-inactive {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    /* Enhanced stat change indicators */
+    .stat-change {
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    
+    .stat-change.positive {
+      color: #28a745;
+    }
+    
+    .stat-change.negative {
+      color: #dc3545;
+    }
+    
+    .stat-change.neutral {
+      color: #6c757d;
+    }
+  </style>
+  
+  <!-- 10. Page-specific color scheme initialization -->
+  <script>
+    // Initialize entity colors for linter monitor page
+    document.addEventListener('DOMContentLoaded', function() {
+      // Define entity colors for linter monitoring
+      const entityColors = {
+        'linter': '#29a6a8',
+        'error': '#dc3545', 
+        'warning': '#ffc107',
+        'success': '#28a745',
+        'info': '#17a2b8'
+      };
+      
+      // Set entity colors if the system is available
+      if (window.ENTITY_COLORS) {
+        Object.assign(window.ENTITY_COLORS, entityColors);
+      }
+    });
+  </script>
+</head>
+
+<body class="linter-realtime-monitor-page">
+  <!-- Web Component of the header -->
+  <!-- Unified Header System -->
+  <!-- Unified Header System will create header automatically -->
+
+  <div class="background-wrapper">
+    <!-- unified-header יווצר כאן אוטומטית -->
+    <div id="unified-header"></div>
+    
+    <!-- Page body - All content after header -->
+    <div class="page-body">
+      <!-- Linter Monitor area - top-Section -->
+      <div class="top-section content-section" id="topSection">
+        <!-- Main header -->
+        <div class="section-header">
+          <div class="table-title">
+            <img src="images/icons/development.svg" alt="ניטור Linter" class="table-icon">
+            ניטור Linter בזמן אמת
+          </div>
+          <div class="table-actions">
+            <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" 
+                    title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+              <i class="fas fa-copy"></i> העתק לוג מפורט
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="toggleAutoRefresh()" 
+                    title="הפעל/בטל רענון אוטומטי" id="autoRefreshBtn">
+              <i class="fas fa-sync-alt"></i> רענון אוטומטי
+            </button>
+            <button class="filter-toggle-btn" onclick="toggleSection('topSection')" title="הצג/הסתר אזור ניטור Linter">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Alert cards -->
+        <div class="section-body">
+          <active-alerts></active-alerts>
+
+          <!-- Linter summary with improved design -->
+          <div class="status-grid" id="summaryStats">
+            <div class="status-item">
+              <span class="label">סטטוס:</span>
+              <span class="value">
+                <span class="status-dot connected"></span>
+                <strong id="overallStatus">בדיקה...</strong>
+              </span>
+            </div>
+            <div class="status-item">
+              <span class="label">קבצים נסרקו:</span>
+              <span class="value"><strong id="totalFilesStats">0</strong></span>
+            </div>
+            <div class="status-item">
+              <span class="label">שגיאות:</span>
+              <span class="value"><strong id="totalErrorsStats">0</strong></span>
+            </div>
+            <div class="status-item">
+              <span class="label">אזהרות:</span>
+              <span class="value"><strong id="totalWarningsStats">0</strong></span>
+            </div>
+          </div>
+        </div>
+      </div> <!-- End top-section -->
+
+      <!-- Main content -->
+      <div class="main-content" data-section="linter-monitor">
+
+        <!-- Statistics Section -->
+        <div class="content-section" id="statisticsSection">
+          <!-- Statistics header -->
+          <div class="section-header">
+            <div class="table-title">
+              <img src="images/icons/development.svg" alt="סטטיסטיקות" class="section-icon">
+              סטטיסטיקות Linter
+            </div>
+            <div class="table-count" id="statisticsCount">טוען...</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="loadInitialData()" title="רענן נתונים">
+                <i class="fas fa-sync-alt"></i> רענן
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleSection('statisticsSection')" 
+                      title="הצג/הסתר אזור סטטיסטיקות">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Statistics body -->
+          <div class="section-body">
+            <!-- Status Indicator -->
+            <div class="text-center mb-4">
+              <div class="status-indicator status-active" id="monitorStatus">
+                <span>🟢</span>
+                <span>ניטור פעיל</span>
+              </div>
+            </div>
+
+            <!-- Statistics Grid -->
+            <div class="stats-grid">
+              <div class="stat-item error">
+                <div class="stat-icon">
+                  <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-value" id="errorCount">0</div>
+                  <div class="stat-label">שגיאות</div>
+                  <div class="stat-change neutral" id="errorChange">+0</div>
+                </div>
+              </div>
+
+              <div class="stat-item warning">
+                <div class="stat-icon">
+                  <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-value" id="warningCount">0</div>
+                  <div class="stat-label">אזהרות</div>
+                  <div class="stat-change neutral" id="warningChange">+0</div>
+                </div>
+              </div>
+
+              <div class="stat-item success">
+                <div class="stat-icon">
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-value" id="successCount">0</div>
+                  <div class="stat-label">הצלחות</div>
+                  <div class="stat-change neutral" id="successChange">+0</div>
+                </div>
+              </div>
+
+              <div class="stat-item info">
+                <div class="stat-icon">
+                  <i class="fas fa-file-code"></i>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-value" id="filesScanned">0</div>
+                  <div class="stat-label">קבצים נסרקו</div>
+                  <div class="stat-change neutral" id="filesChange">+0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> <!-- End statistics section -->
+
+        <!-- Chart Section -->
+        <div class="content-section" id="chartSection">
+          <!-- Chart header -->
+          <div class="section-header">
+            <div class="table-title">
+              <img src="images/icons/development.svg" alt="גרפים" class="section-icon">
+              גרפי ניטור Linter
+            </div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="updateChart()" title="רענן גרף">
+                <i class="fas fa-chart-line"></i> רענן גרף
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleSection('chartSection')" title="הצג/הסתר אזור גרפים">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Chart body -->
+          <div class="section-body">
+            <div class="chart-container">
+              <canvas id="linterChart"></canvas>
+            </div>
+          </div>
+        </div> <!-- End chart section -->
+
+        <!-- Controls Section -->
+        <div class="content-section" id="controlsSection">
+          <!-- Controls header -->
+          <div class="section-header">
+            <div class="table-title">
+              <img src="images/icons/development.svg" alt="הגדרות" class="section-icon">
+              הגדרות ניטור
+            </div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="resetSettings()" title="איפוס הגדרות">
+                <i class="fas fa-undo"></i> איפוס
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleSection('controlsSection')" title="הצג/הסתר אזור הגדרות">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Controls body -->
+          <div class="section-body">
+            <div class="controls-grid">
+              <div class="control-group">
+                <label class="control-label">תדירות סריקה (שניות)</label>
+                <input type="number" class="control-input" id="scanInterval" value="5" min="1" max="60">
+              </div>
+              <div class="control-group">
+                <label class="control-label">רמת לוג</label>
+                <select class="control-select" id="logLevel">
+                  <option value="error">שגיאות בלבד</option>
+                  <option value="warning" selected>אזהרות ושגיאות</option>
+                  <option value="info">כל ההודעות</option>
+                </select>
+              </div>
+              <div class="control-group">
+                <label class="control-label">תיקיות לסריקה</label>
+                <input type="text" class="control-input" id="scanPaths" value="trading-ui/">
+              </div>
+            </div>
+            <div class="controls-actions">
+              <button class="btn btn-primary" id="startMonitoring">
+                <i class="bi bi-play-fill"></i> התחל ניטור
+              </button>
+              <button class="btn btn-secondary" id="stopMonitoring" disabled>
+                <i class="bi bi-stop-fill"></i> עצור ניטור
+              </button>
+              <button class="btn btn-success" id="clearLogs">
+                <i class="bi bi-trash"></i> נקה לוגים
+              </button>
+              <button class="btn btn-danger" id="exportLogs">
+                <i class="bi bi-download"></i> ייצא לוגים
+              </button>
+            </div>
+            
+            <!-- Fix Actions -->
+            <div class="fix-actions">
+              <h5>פעולות תיקון</h5>
+              <div class="fix-buttons">
+                <button class="btn btn-success" onclick="fixAllIssues()" title="תקן את כל הבעיות הניתנות לתיקון">
+                  <i class="fas fa-magic"></i> תיקון אוטומטי לכל הבעיות
+                </button>
+                <button class="btn btn-warning" onclick="fixAllErrors()" title="תקן רק שגיאות">
+                  <i class="fas fa-exclamation-triangle"></i> תיקון שגיאות בלבד
+                </button>
+                <button class="btn btn-info" onclick="fixAllWarnings()" title="תקן רק אזהרות">
+                  <i class="fas fa-exclamation-circle"></i> תיקון אזהרות בלבד
+                </button>
+                <button class="btn btn-secondary" onclick="ignoreAllIssues()" title="התעלם מכל הבעיות">
+                  <i class="fas fa-eye-slash"></i> התעלם מהכל
+                </button>
+              </div>
+            </div>
+          </div>
+        </div> <!-- End controls section -->
+
+        <!-- Logs Section -->
+        <div class="content-section" id="logsSection">
+          <!-- Logs header -->
+          <div class="section-header">
+            <div class="table-title">
+              <img src="images/icons/development.svg" alt="לוגים" class="section-icon">
+              לוגי Linter
+            </div>
+            <div class="table-count" id="logsCount">טוען...</div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="loadIssues()" title="רענן לוגים">
+                <i class="fas fa-list"></i> רענן לוגים
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleSection('logsSection')" title="הצג/הסתר אזור לוגים">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Logs body -->
+          <div class="section-body">
+            <div class="logs-container" id="logsContainer">
+              <div class="log-entry">
+                <div class="log-header">
+                  <span class="log-timestamp">[${new Date().toLocaleTimeString('he-IL')}]</span>
+                  <span class="log-level info">[INFO]</span>
+                </div>
+                <div class="log-message">מערכת ניטור Linter אותחלה</div>
+              </div>
+            </div>
+          </div>
+        </div> <!-- End logs section -->
+
+      </div> <!-- End main-content -->
+    </div> <!-- End page-body -->
+  </div> <!-- End background-wrapper -->
+
+    <!-- Scripts -->
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/header-system.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/real-linter-system.js"></script>
+    <script src="scripts/linter-realtime-monitor.js"></script>
+</body>
+</html>

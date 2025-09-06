@@ -349,21 +349,33 @@ td, th {
 
 ## מודלים ודיאלוגים
 
-### 1. מודלים
+### 1. מודלים - הגדרה כללית לכל המודולים
 ```css
-/* מודל עם RTL */
-.modal {
-  direction: rtl;
+/* תבנית בסיס לכל המודולים */
+.modal .modal-header {
+  display: flex;
+  justify-content: space-between; /* פיזור שווה בין כותרת לכפתור סגירה */
+  align-items: center;
+  border-radius: 6px 6px 0 0;
+  border-bottom: none;
+  direction: rtl; /* RTL למודולים */
+  padding: 1rem 1.5rem;
+  position: relative;
 }
 
 /* כותרת מודל */
-.modal-header {
-  text-align: right;
+.modal .modal-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+  text-align: right; /* יישור טקסט לימין ב-RTL */
+  margin: 0;
+  flex: 1; /* תופס את כל המקום הזמין */
 }
 
 /* תוכן מודל */
 .modal-body {
   text-align: right;
+  direction: rtl;
 }
 
 /* כפתורי מודל */
@@ -372,15 +384,59 @@ td, th {
 }
 ```
 
-### 2. כפתורי סגירה
+### 2. כפתורי פעולות במודולים
 ```css
-/* כפתור סגירה - פינה שמאלית עליונה */
+/* כפתורי פעולות במודולים - גובה זהה לכפתור סגירה */
+.modal .modal-header .btn-group .btn,
+.modal .modal-header .btn {
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 6px !important;
+}
+
+/* כפתור סגירה עם עיצוב מיוחד */
 .modal .btn-close {
-  position: absolute;
-  top: 1rem;
-  inset-inline-start: 1rem; /* ימין ב-RTL */
+  background-color: white !important;
+  border: 1px solid #ff9c05 !important; /* מסגרת כתומה */
+  color: #ff9c05 !important; /* תוכן כתום */
+  border-radius: 4px;
+  padding: 6px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 0;
 }
 ```
+
+### 3. מבנה HTML נכון למודלים
+```html
+<!-- מבנה נכון - זהה לכל המודולים -->
+<div class="modal-header modal-header-colored">
+    <h5 class="modal-title" id="modalLabel">כותרת המודול</h5>
+    <div id="quickActionButtons" class="btn-group btn-group-sm" role="group">
+        <!-- כפתורי פעולות עם איקונים -->
+        <button class="btn btn-outline-light btn-sm" title="פריטים מקושרים">
+            <i class="fas fa-link"></i>
+        </button>
+        <button class="btn btn-outline-light btn-sm" title="ערוך">
+            <i class="fas fa-edit"></i>
+        </button>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+```
+
+### 4. עקרונות חשובים למודלים
+- **מבנה פשוט**: כותרת, כפתורי פעולות, כפתור סגירה באותו רמה
+- **justify-content: space-between**: עובד נכון עם 3 אלמנטים
+- **direction: rtl**: מיישר נכון - כותרת מימין, כפתורים משמאל
+- **גובה אחיד**: כל הכפתורים 32px
+- **איקונים**: כפתורי פעולות עם איקונים מתאימים
 
 ---
 
@@ -458,26 +514,131 @@ td, th {
 }
 ```
 
-### 2. כפתורים עם איקונים
+### 2. כפתורים עם איקונים - סטנדרטים
 ```css
-/* כפתור עם איקון */
+/* כפתור עם איקון - גובה אחיד */
 .btn-with-icon {
-  display: flex;
-  align-items: center;
-  direction: rtl;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 6px !important;
 }
 
+/* איקונים בכפתורים */
 .btn-icon {
   margin-inline-start: 0.5rem;
   margin-inline-end: 0;
 }
 ```
 
-### 3. איקונים מתהפכים
+### 3. איקונים סטנדרטיים בפרויקט
+```html
+<!-- איקונים נפוצים בפרויקט -->
+<i class="fas fa-link"></i>     <!-- פריטים מקושרים -->
+<i class="fas fa-edit"></i>     <!-- ערוך -->
+<i class="fas fa-plus"></i>     <!-- הוספה -->
+<i class="fas fa-trash"></i>    <!-- מחיקה -->
+<i class="fas fa-eye"></i>      <!-- צפייה -->
+<i class="fas fa-save"></i>     <!-- שמירה -->
+<i class="fas fa-times"></i>    <!-- ביטול/סגירה -->
+```
+
+### 4. כפתורי פעולות סטנדרטיים
+```css
+/* כפתור ביטול/שיחזור */
+.btn-cancel {
+  background-color: #dc3545 !important; /* אדום */
+  border-color: #dc3545 !important;
+  color: white !important;
+}
+
+/* כפתור שיחזור */
+.btn-restore {
+  background-color: #28a745 !important; /* ירוק */
+  border-color: #28a745 !important;
+  color: white !important;
+}
+
+/* כפתור סגירה */
+.btn-close {
+  background-color: white !important;
+  border: 1px solid #ff9c05 !important; /* מסגרת כתומה */
+  color: #ff9c05 !important; /* תוכן כתום */
+}
+```
+
+### 5. איקונים מתהפכים
 ```css
 /* איקונים שצריכים להתהפך ב-RTL */
 .flip-rtl {
   transform: scaleX(-1);
+}
+```
+
+---
+
+## לקחים חשובים מהפרויקט
+
+### 1. עקרון הפשטות (KISS Principle)
+> **"פשוט זה הכי טוב"** - זה הכלל החשוב ביותר בתכנות ועיצוב RTL
+
+**מה למדנו:**
+- התחיל תמיד מהפתרון הפשוט ביותר
+- הימנע מהגדרות מורכבות עם `order`, `!important`, ו-div-ים נוספים
+- השתמש במבנה HTML זהה למודלים שעובדים
+- הגדרה כללית אחת לכל המודולים עדיפה על הגדרות ספציפיות
+
+**דוגמה:**
+```css
+/* ✅ נכון - פשוט ויעיל */
+.modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  direction: rtl;
+}
+
+/* ❌ שגוי - מורכב מדי */
+.modal .modal-header .modal-title { order: 2; }
+.modal .modal-header .d-flex { order: 1; }
+```
+
+### 2. מבנה HTML אחיד
+**עקרון:** כל המודולים צריכים להיות עם מבנה HTML זהה
+
+```html
+<!-- מבנה נכון לכל המודולים -->
+<div class="modal-header">
+    <h5 class="modal-title">כותרת</h5>
+    <div class="btn-group">כפתורי פעולות</div>
+    <button class="btn-close">סגירה</button>
+</div>
+```
+
+### 3. הימנעות מהגדרות דורסות
+**עקרון:** הסר הגדרות ספציפיות שמדרסות את ההגדרה הכללית
+
+```css
+/* ❌ שגוי - הגדרות דורסות */
+#addTickerModal .modal-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ✅ נכון - הגדרה כללית בלבד */
+.modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+}
+```
+
+### 4. טיפול בשגיאות API
+**עקרון:** הוסף טיפול בשגיאות נפוצות כמו 410 (GONE)
+
+```javascript
+if (response.status === 404 || response.status === 410) {
+    console.debug(`No data found (status: ${response.status})`);
+    return null;
 }
 ```
 
@@ -595,8 +756,17 @@ function checkTextAlignment() {
 3. **תשומת לב לפרטים** כמו מספרים, תאריכים וקוד
 4. **בדיקות מקיפות** בכל שלב של הפיתוח
 5. **תמיכה בדפדפנים ישנים** עם fallbacks מתאימים
+6. **עקרון הפשטות** - התחל מהפתרון הפשוט ביותר
+7. **מבנה HTML אחיד** לכל המודולים והרכיבים
+8. **הימנעות מהגדרות דורסות** - הגדרה כללית עדיפה על ספציפית
 
-זכור: RTL הוא לא רק "להפוך את הכיוון" - זה דורש חשיבה מחדש על הממשק והתאמה מלאה לחוויית המשתמש העברית.
+### לקחים מהפרויקט TikTrack:
+- **מודלים**: מבנה HTML זהה + `justify-content: space-between` + `direction: rtl`
+- **כפתורים**: גובה אחיד (32px) + איקונים סטנדרטיים + צבעים עקביים
+- **צ'קבוקסים**: Override מוחלט של Bootstrap עם `flex-direction: row-reverse`
+- **API**: טיפול בשגיאות נפוצות (404, 410) עם fallbacks מתאימים
+
+זכור: RTL הוא לא רק "להפוך את הכיוון" - זה דורש חשיבה מחדש על הממשק והתאמה מלאה לחוויית המשתמש העברית. **פשוט זה הכי טוב!**
 
 ---
 

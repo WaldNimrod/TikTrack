@@ -200,3 +200,36 @@ def reset_preferences():
     except Exception as e:
         print(f"❌ Error resetting preferences: {e}")
         return jsonify({"success": False, "message": "Error resetting preferences"}), 500
+
+@preferences_bp.route('/api/v1/preferences/update-defaults', methods=['POST'])
+@invalidate_cache(['preferences'])  # Invalidate cache after updating defaults
+def update_system_defaults():
+    """Update system default preferences based on current user preferences"""
+    try:
+        db: Session = next(get_db())
+        user_id = get_user_id_from_request()
+        
+        # Get current user preferences
+        current_preferences = UserService.get_user_preferences(db, user_id)
+        
+        # Update the DEFAULT_PREFERENCES with current user preferences
+        # This will affect new users and users who reset their preferences
+        global DEFAULT_PREFERENCES
+        DEFAULT_PREFERENCES.update(current_preferences)
+        
+        # Log the update
+        print(f"✅ System defaults updated by user {user_id}")
+        print(f"📊 Updated {len(current_preferences)} default preferences")
+        
+        # Invalidate cache so changes take effect immediately
+        invalidate_cache('preferences')
+        
+        return jsonify({
+            "success": True, 
+            "message": "System defaults updated successfully",
+            "updated_count": len(current_preferences)
+        })
+        
+    except Exception as e:
+        print(f"❌ Error updating system defaults: {e}")
+        return jsonify({"success": False, "message": "Error updating system defaults"}), 500

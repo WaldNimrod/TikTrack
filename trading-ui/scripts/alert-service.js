@@ -159,6 +159,7 @@ window.isAlertTriggered = isAlertTriggered;
 window.canAlertBeCancelled = canAlertBeCancelled;
 window.formatAlertCondition = formatAlertCondition;
 window.parseAlertCondition = parseAlertCondition;
+window.cancelAlert = cancelAlert;
 window.deleteAlert = deleteAlert;
 
 // ===== ALERT CONDITION FUNCTIONS =====
@@ -259,11 +260,74 @@ function parseAlertCondition(condition) {
 }
 
 /**
+ * ביטול התראה - שינוי סטטוס למבוטל
+ * @param {number} alertId - מזהה ההתראה
+ */
+async function cancelAlert(alertId) {
+  try {
+    // ניקוי מטמון לפני פעולת CRUD - ביטול
+    if (window.clearCacheBeforeCRUD) {
+      window.clearCacheBeforeCRUD('alerts', 'cancel');
+    }
+    
+    const response = await fetch(`/api/v1/alerts/${alertId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        status: 'cancelled',
+        is_triggered: 'false'
+      }),
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      // שימוש במערכת הריענון המרכזית
+      if (window.centralRefresh) {
+        await window.centralRefresh.showSuccessAndRefresh('alerts', 'התראה בוטלה בהצלחה!');
+      } else {
+        // Fallback למערכת הישנה
+        // התראה בוטלה בהצלחה
+        if (window.showSuccessNotification) {
+          window.showSuccessNotification('הצלחה', 'התראה בוטלה בהצלחה!');
+        }
+        
+        // רענון הטבלה
+        if (window.loadAlertsData) {
+          await window.loadAlertsData();
+        }
+      }
+      
+      return true;
+    } else {
+      // שגיאה בביטול התראה
+      if (window.showErrorNotification) {
+        window.showErrorNotification('שגיאה בביטול', 'שגיאה בביטול התראה - בדוק את הנתונים');
+      }
+      return false;
+    }
+  } catch (error) {
+    // שגיאה בביטול התראה
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', 'שגיאה בביטול התראה - בדוק את חיבור השרת');
+    }
+    return false;
+  }
+}
+
+/**
  * מחיקת התראה - גרסה פשוטה לשימוש כללי
  * @param {number} alertId - מזהה ההתראה
  */
 async function deleteAlert(alertId) {
   try {
+    // ניקוי מטמון לפני פעולת CRUD - מחיקה
+    if (window.clearCacheBeforeCRUD) {
+      window.clearCacheBeforeCRUD('alerts', 'delete');
+    }
+    
     const response = await fetch(`/api/v1/alerts/${alertId}`, {
       method: 'DELETE',
     });
@@ -271,10 +335,22 @@ async function deleteAlert(alertId) {
     const result = await response.json();
 
     if (response.ok && result.status === 'success') {
-      // התראה נמחקה בהצלחה
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!');
+      // שימוש במערכת הריענון המרכזית
+      if (window.centralRefresh) {
+        await window.centralRefresh.showSuccessAndRefresh('alerts', 'התראה נמחקה בהצלחה!');
+      } else {
+        // Fallback למערכת הישנה
+        // התראה נמחקה בהצלחה
+        if (window.showSuccessNotification) {
+          window.showSuccessNotification('הצלחה', 'התראה נמחקה בהצלחה!');
+        }
+        
+        // רענון הטבלה
+        if (window.loadAlertsData) {
+          await window.loadAlertsData();
+        }
       }
+      
       return true;
     } else {
       // שגיאה במחיקת התראה
@@ -319,6 +395,7 @@ window.alertService = {
   canAlertBeCancelled,
   formatAlertCondition,
   parseAlertCondition,
+  cancelAlert,
   deleteAlert,
 };
 

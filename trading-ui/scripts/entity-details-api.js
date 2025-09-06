@@ -593,8 +593,8 @@ class EntityDetailsAPI {
             console.log(`📈 Market data response status: ${response.status}`);
 
             if (!response.ok) {
-                if (response.status === 404) {
-                    console.debug(`No market data found for ticker ${tickerId}`);
+                if (response.status === 404 || response.status === 410) {
+                    console.debug(`No market data found for ticker ${tickerId} (status: ${response.status})`);
                     return null;
                 }
                 throw new Error(`שגיאת שרת בקבלת נתוני שוק: ${response.status}`);

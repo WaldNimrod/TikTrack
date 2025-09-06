@@ -46,9 +46,9 @@ class PreferenceProfile(BaseModel):
     last_used_at = Column(DateTime(timezone=True))
     usage_count = Column(Integer, default=0)
     
-    # קשרים
-    user = relationship("User", foreign_keys=[user_id], back_populates="preference_profiles")
-    preferences = relationship("UserPreferencesV2", back_populates="profile", cascade="all, delete-orphan")
+    # קשרים - מושבתים עד יצירת הטבלאות
+    # user = relationship("User", foreign_keys=[user_id], back_populates="preference_profiles")
+    # preferences = relationship("UserPreferencesV2", back_populates="profile", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<PreferenceProfile(user_id={self.user_id}, name='{self.profile_name}')>"
@@ -217,9 +217,9 @@ class UserPreferencesV2(BaseModel):
     # זמני עדכון
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
-    # קשרים
-    user = relationship("User", back_populates="user_preferences_v2")
-    profile = relationship("PreferenceProfile", back_populates="preferences")
+    # קשרים - מושבתים עד יצירת הטבלאות
+    # user = relationship("User", back_populates="user_preferences_v2")
+    # profile = relationship("PreferenceProfile", back_populates="preferences")
     
     def __repr__(self):
         return f"<UserPreferencesV2(user_id={self.user_id}, profile_id={self.profile_id})>"
@@ -550,10 +550,10 @@ class PreferenceHistory(BaseModel):
     ip_address = Column(String(45))
     user_agent = Column(String(500))
     
-    # קשרים
-    user = relationship("User", foreign_keys=[user_id])
-    profile = relationship("PreferenceProfile", foreign_keys=[profile_id])
-    changed_by_user = relationship("User", foreign_keys=[changed_by])
+    # קשרים - מושבתים עד יצירת הטבלאות
+    # user = relationship("User", foreign_keys=[user_id])
+    # profile = relationship("PreferenceProfile", foreign_keys=[profile_id])
+    # changed_by_user = relationship("User", foreign_keys=[changed_by])
     
     def __repr__(self):
         return f"<PreferenceHistory(user_id={self.user_id}, type='{self.change_type}')>"
@@ -565,9 +565,9 @@ def add_relationships():
     try:
         from .user import User
         
-        # הוסף קשרים חדשים
-        User.preference_profiles = relationship("PreferenceProfile", foreign_keys="PreferenceProfile.user_id", back_populates="user")
-        User.user_preferences_v2 = relationship("UserPreferencesV2", back_populates="user")
+        # הוסף קשרים חדשים - רק אם הטבלאות קיימות
+        # User.preference_profiles = relationship("PreferenceProfile", foreign_keys="PreferenceProfile.user_id", back_populates="user")
+        # User.user_preferences_v2 = relationship("UserPreferencesV2", back_populates="user")
         
     except ImportError:
         pass  # User model לא זמין עדיין

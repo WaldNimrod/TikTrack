@@ -116,6 +116,7 @@ from routes.api.cache_management import cache_management_bp
 from routes.api.query_optimization import query_optimization_bp
 from routes.api.server_management import server_management_bp
 from routes.api.system_overview import system_overview_bp
+from routes.api.css_management import css_management_bp
 
 # External Data Integration blueprints
 from routes.external_data.quotes import quotes_bp
@@ -211,6 +212,7 @@ app.register_blueprint(cache_management_bp)
 app.register_blueprint(query_optimization_bp)
 app.register_blueprint(server_management_bp)
 app.register_blueprint(system_overview_bp)
+app.register_blueprint(css_management_bp)
 
 # Register External Data Integration blueprints - DISABLED due to import issues
 # External Data Integration blueprints

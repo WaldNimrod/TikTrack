@@ -120,7 +120,11 @@ class CSSManagement {
 async function switchToOldCSS() {
     """מעבר למערכת CSS ישנה"""
     if (window.cssManager.isAnalyzing) {
-        alert('אנא המתן לסיום הפעולה הנוכחית');
+        if (typeof showNotification === 'function') {
+            showNotification('אנא המתן לסיום הפעולה הנוכחית', 'warning');
+        } else {
+            alert('אנא המתן לסיום הפעולה הנוכחית');
+        }
         return;
     }
     
@@ -138,7 +142,16 @@ async function switchToOldCSS() {
             
             // הצגת הוראות רענון
             setTimeout(() => {
-                if (confirm('העבירה למערכת ישנה הושלמה. האם לרענן את הדף?')) {
+                if (typeof showConfirmationDialog === 'function') {
+                    showConfirmationDialog(
+                        'העבירה למערכת ישנה הושלמה. האם לרענן את הדף?',
+                        () => location.reload(),
+                        null,
+                        'רענון דף',
+                        'רענן',
+                        'ביטול'
+                    );
+                } else if (confirm('העבירה למערכת ישנה הושלמה. האם לרענן את הדף?')) {
                     location.reload();
                 }
             }, 1000);
@@ -157,7 +170,11 @@ async function switchToOldCSS() {
 async function switchToNewCSS() {
     """מעבר למערכת CSS חדשה"""
     if (window.cssManager.isAnalyzing) {
-        alert('אנא המתן לסיום הפעולה הנוכחית');
+        if (typeof showNotification === 'function') {
+            showNotification('אנא המתן לסיום הפעולה הנוכחית', 'warning');
+        } else {
+            alert('אנא המתן לסיום הפעולה הנוכחית');
+        }
         return;
     }
     

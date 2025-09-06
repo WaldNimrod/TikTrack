@@ -1,362 +1,185 @@
-#unified-header .logo-section {
-    display: flex;
-    align-items: flex-end;
-    gap: 0.5rem;
-    direction: ltr;
-    /* הלוגו צריך להיות LTR */
-}
-
-#unified-header .logo-text {
-    margin-bottom: 10px;
-}
-
-#unified-header .logo-icon {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    margin: 16px 0;
-}
-
-#unified-header .home-icon {
-    color: #09384d;
-    font-size: 48px;
-    font-weight: 500;
-}
-
-/* אנימציות נוספות לפריטי ניווט - מועברים מ-menu.css */
-#unified-header .nav-item {
-    position: relative;
-    overflow: hidden;
-}
-
-#unified-header .nav-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(41, 166, 168, 0.1);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    border-radius: 6px;
-}
-
-#unified-header .nav-item:hover::before {
-    opacity: 1;
-}
-
-#unified-header .nav-item.active::before {
-    opacity: 0;
-    background: transparent;
-}
-
-/* סגנונות בסיסיים לכותרת */
-
-/* ===== תפריטי משנה עם שלוש רמות ===== */
-#unified-header .dropdown-submenu {
-    position: relative;
-}
-
-#unified-header .dropdown-submenu .tiktrack-submenu-toggle {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-#unified-header .submenu-arrow {
-    font-size: 0.8em;
-    transition: transform 0.2s ease;
-    margin-right: 8px;
-}
-
-#unified-header .dropdown-submenu:hover .submenu-arrow {
-    transform: rotate(90deg);
-}
-
-#unified-header .tiktrack-submenu {
-    position: absolute;
-    left: 100%;
-    top: 0;
-    background: var(--apple-bg-elevated);
-    border: 1px solid var(--apple-border-light);
-    border-radius: 8px;
-    box-shadow: var(--apple-shadow-medium);
-    min-width: 200px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(-10px);
-    transition: all 0.2s ease;
-    z-index: 1001;
-    padding: 8px 0;
-}
-
-#unified-header .dropdown-submenu:hover .tiktrack-submenu {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(0);
-}
-
-#unified-header .tiktrack-submenu .tiktrack-dropdown-item {
-    padding: 8px 16px;
-    white-space: nowrap;
-    border: none;
-    background: transparent;
-    color: var(--apple-text-primary);
-    text-decoration: none;
-    display: block;
-    width: 100%;
-    text-align: right;
-    transition: background-color 0.2s ease;
-}
-
-#unified-header .tiktrack-submenu .tiktrack-dropdown-item:hover {
-    background-color: var(--apple-bg-hover);
-    color: var(--apple-text-primary);
-}
-
-/* התאמה למסכים קטנים */
-@media (max-width: 768px) {
-    #unified-header .tiktrack-submenu {
-        position: static;
-        left: auto;
-        top: auto;
-        opacity: 1;
-        visibility: visible;
-        transform: none;
-        box-shadow: none;
-        border: none;
-        border-top: 1px solid var(--apple-border-light);
-        margin-top: 8px;
-        padding-top: 8px;
-    }
-    
-    #unified-header .dropdown-submenu:hover .tiktrack-submenu {
-        transform: none;
-    }
-}
-#unified-header {
-    background: var(--apple-bg-elevated);
-    border-bottom: 1px solid var(--apple-border-light);
-    box-shadow: var(--apple-shadow-light);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-/* הגבלת סגנונות לאלמנט הספציפי */
-#unified-header .header-container {
-    max-width: 1380px;
-    margin: 0 auto;
-    padding: 1rem 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    direction: rtl;
-}
-
-#unified-header .header-wrapper {
-    max-width: 1200px;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-#unified-header .header-top {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-bottom: 1px solid var(--apple-border-light);
-    position: relative;
-    min-height: 70px;
-    direction: rtl;
-    background: var(--apple-bg-elevated);
-}
-
-#unified-header .header-top .logo-section {
-    order: 3;
-    margin-right: auto;
-}
-
-#unified-header .header-top .header-nav {
-    order: 1;
-    margin-left: auto;
-}
-
-#unified-header .header-top .filter-toggle-section {
-    order: 2;
-}
-
-#unified-header .page-title {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-#unified-header .page-title h1 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--apple-text-primary);
-    margin: 0;
-}
-
-#unified-header .logo-section {
-    display: flex;
-    align-items: flex-end;
-    gap: 0.5rem;
-    direction: ltr;
-    /* הלוגו צריך להיות LTR */
-}
-
-#unified-header .logo-text {
-    margin-bottom: 10px;
-}
-
-#unified-header .logo {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    direction: ltr;
-}
-
-#unified-header .logo-image {
-    width: 125px;
-    height: 37.5px;
-    object-fit: contain;
-}
-
-#unified-header .logo-text {
-    font-size: 1rem;
-    font-weight: 300;
-    color: #26baac;
-    direction: ltr;
-    text-align: left;
-    align-self: flex-end;
-    margin-bottom: -5px;
-}
-
-/* סגנונות לוגו מורחבים */
-#unified-header .logo-section {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    direction: ltr;
-}
-
-#unified-header .logo {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    text-decoration: none;
-    color: inherit;
-}
-
-#unified-header .logo:hover {
-    text-decoration: none;
-    color: inherit;
-}
-
-#unified-header .logo-image {
-    width: 125px;
-    height: 37.5px;
-    object-fit: contain;
-    display: block;
-}
-
-#unified-header .logo-text {
-    font-size: 1rem;
-    font-weight: 300;
-    color: #26baac;
-    direction: ltr;
-    text-align: left;
-    align-self: flex-end;
-    margin-bottom: -5px;
-    white-space: nowrap;
-}
-
-#unified-header .logo-icon {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    margin: 16px 0;
-}
-
-#unified-header .home-icon {
-    color: #09384d;
-    font-size: 48px;
-    font-weight: 500;
-}
-
-/* Dropdown menu styles */
-#unified-header .dropdown-menu {
-    top: 100%;
-    right: 0;
-    margin: 0;
-    animation: dropdownFadeIn 0.2s ease-out;
-    display: none;
-    direction: ltr;
-    /* הדרופדאון צריך להיות LTR */
-    z-index: 9999;
-    min-width: 200px;
-    padding: 0.5rem 0;
-}
-
-#unified-header .dropdown-menu.show {
-    position: relative !important;
-    z-index: 99999 !important;
-    display: block !important;
-}
-
-#unified-header .dropdown-menu:not(.show) {
-    display: none !important;
-}
-
-@keyframes dropdownFadeIn {
-    from {
-        transform: translateX(-2px);
-    }
-}
-
-#unified-header .dropdown-item:first-child {
-    border-radius: 12px 12px 0 0;
-}
-
-#unified-header .dropdown-item:last-child {
-    border-radius: 0 0 12px 12px;
-}
-
-#unified-header .dropdown-arrow {
-    margin-right: 0.5rem;
-    font-size: 0.8rem;
-    transition: transform 0.2s ease;
-}
-
-#unified-header .dropdown-toggle[aria-expanded="true"] .dropdown-arrow {
-    transform: rotate(180deg);
-}
-
-/* סגנונות ניווט */
-#unified-header .header-nav {
-    display: flex;
-    align-items: center;
-}
-
-#unified-header .main-nav {
-    display: flex;
-    align-items: center;
-}
-
+/* ===== BATCH 2 - 10 כללים שלמים (11-20) ===== */
+/* #unified-header .header-container { */
+/*     max-width: 1380px; */
+/*     margin: 0 auto; */
+/*     padding: 1rem 10px; */
+/*     display: flex; */
+/*     justify-content: space-between; */
+/*     align-items: center; */
+/*     width: 100%; */
+/*     direction: rtl; */
+/* } */
+/* #unified-header .header-wrapper { */
+/*     max-width: 1200px; */
+/*     margin: 0; */
+/*     padding: 0; */
+/*     display: flex; */
+/*     justify-content: space-between; */
+/*     align-items: center; */
+/*     width: 100%; */
+/* } */
+/* #unified-header .header-top { */
+/*     margin: 0; */
+/*     padding: 0; */
+/*     display: flex; */
+/*     justify-content: center; */
+/*     align-items: center; */
+/*     border-bottom: 1px solid var(--apple-border-light); */
+/*     position: relative; */
+/*     min-height: 70px; */
+/*     direction: rtl; */
+/*     background: var(--apple-bg-elevated); */
+/* } */
+/* #unified-header .header-top .logo-section { */
+/*     order: 3; */
+/*     margin-right: auto; */
+/* } */
+/* #unified-header .header-top .header-nav { */
+/*     order: 1; */
+/*     margin-left: auto; */
+/* } */
+/* #unified-header .header-top .filter-toggle-section { */
+/*     order: 2; */
+/* } */
+/* #unified-header .page-title { */
+/*     position: absolute; */
+/*     left: 50%; */
+/*     transform: translateX(-50%); */
+/* } */
+/* #unified-header .page-title h1 { */
+/*     font-size: 1.25rem; */
+/*     font-weight: 600; */
+/*     color: var(--apple-text-primary); */
+/*     margin: 0; */
+/* } */
+/* #unified-header .logo-section { */
+/*     display: flex; */
+/*     align-items: flex-end; */
+/*     gap: 0.5rem; */
+/*     direction: ltr; */
+/*     /* הלוגו צריך להיות LTR */ */
+/* } */
+/* #unified-header .logo-text { */
+/*     margin-bottom: 10px; */
+/* } */
+/* ===== סוף BATCH 2 ===== */
+/* ===== BATCH 3 - 10 כללים שלמים (21-30) ===== */
+/* #unified-header .logo { */
+/*     display: flex; */
+/*     align-items: center; */
+/*     gap: 1rem; */
+/*     direction: ltr; */
+/* } */
+/* #unified-header .logo-image { */
+/*     width: 125px; */
+/*     height: 37.5px; */
+/*     object-fit: contain; */
+/* } */
+/* #unified-header .logo-text { */
+/*     font-size: 1rem; */
+/*     font-weight: 300; */
+/*     color: #26baac; */
+/*     direction: ltr; */
+/*     text-align: left; */
+/*     align-self: flex-end; */
+/*     margin-bottom: -5px; */
+/* } */
+/* #unified-header .logo-section { */
+/*     display: flex; */
+/*     align-items: center; */
+/*     gap: 1rem; */
+/*     direction: ltr; */
+/* } */
+/* #unified-header .logo { */
+/*     display: flex; */
+/*     align-items: center; */
+/*     gap: 1rem; */
+/*     text-decoration: none; */
+/*     color: inherit; */
+/* } */
+/* #unified-header .logo:hover { */
+/*     text-decoration: none; */
+/*     color: inherit; */
+/* } */
+/* #unified-header .logo-image { */
+/*     width: 125px; */
+/*     height: 37.5px; */
+/*     object-fit: contain; */
+/*     display: block; */
+/* } */
+/* #unified-header .logo-text { */
+/*     font-size: 1rem; */
+/*     font-weight: 300; */
+/*     color: #26baac; */
+/*     direction: ltr; */
+/*     text-align: left; */
+/*     align-self: flex-end; */
+/*     margin-bottom: -5px; */
+/*     white-space: nowrap; */
+/* } */
+/* #unified-header .logo-icon { */
+/*     max-width: 100%; */
+/*     max-height: 100%; */
+/*     width: auto; */
+/*     height: auto; */
+/*     object-fit: contain; */
+/*     margin: 16px 0; */
+/* } */
+/* #unified-header .home-icon { */
+/*     color: #09384d; */
+/*     font-size: 48px; */
+/*     font-weight: 500; */
+/* } */
+/* ===== סוף BATCH 3 ===== */
+/* ===== BATCH 4 - 10 כללים שלמים (31-40) ===== */
+/* #unified-header .dropdown-menu { */
+/*     top: 100%; */
+/*     right: 0; */
+/*     margin: 0; */
+/*     animation: dropdownFadeIn 0.2s ease-out; */
+/*     display: none; */
+/*     direction: ltr; */
+/*     /* הדרופדאון צריך להיות LTR */ */
+/*     z-index: 9999; */
+/*     min-width: 200px; */
+/*     padding: 0.5rem 0; */
+/* } */
+/* #unified-header .dropdown-menu.show { */
+/*     position: relative !important; */
+/*     z-index: 99999 !important; */
+/*     display: block !important; */
+/* } */
+/* #unified-header .dropdown-menu:not(.show) { */
+/*     display: none !important; */
+/* } */
+/* @keyframes dropdownFadeIn { */
+/*     from { */
+/*         transform: translateX(-2px); */
+/*     } */
+/* } */
+/* #unified-header .dropdown-item:first-child { */
+/*     border-radius: 12px 12px 0 0; */
+/* } */
+/* #unified-header .dropdown-item:last-child { */
+/*     border-radius: 0 0 12px 12px; */
+/* } */
+/* #unified-header .dropdown-arrow { */
+/*     margin-right: 0.5rem; */
+/*     font-size: 0.8rem; */
+/*     transition: transform 0.2s ease; */
+/* } */
+/* #unified-header .dropdown-toggle[aria-expanded="true"] .dropdown-arrow { */
+/*     transform: rotate(180deg); */
+/* } */
+/* #unified-header .header-nav { */
+/*     display: flex; */
+/*     align-items: center; */
+/* } */
+/* #unified-header .main-nav { */
+/*     display: flex; */
+/*     align-items: center; */
+/* } */
+/* ===== סוף BATCH 4 ===== */
 #unified-header .tiktrack-nav-list {
     display: flex;
     list-style: none;
@@ -1128,3 +951,4 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
 }
+

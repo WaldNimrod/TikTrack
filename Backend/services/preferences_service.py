@@ -1,5 +1,5 @@
 """
-Preferences Service V2 - TikTrack New Architecture
+Preferences Service - TikTrack New Architecture
 =================================================
 
 שירות מתקדם למערכת הגדרות משתמש עם תמיכה בפרופילים מרובים,
@@ -27,11 +27,11 @@ logger = logging.getLogger(__name__)
 
 class PreferencesService:
     """
-    שירות מתקדם למערכת הגדרות משתמש V2
+    שירות מתקדם למערכת הגדרות משתמש
     
     תכונות מרכזיות:
     - פרופילים מרובים לכל משתמש
-    - מיגרציה מV1 לV2
+    - מיגרציה מהמערכת הישנה
     - יבוא/יצוא הגדרות
     - בדיקות תקינות מתקדמות
     - היסטוריית שינויים
@@ -241,8 +241,8 @@ class PreferencesService:
             raise
     
     @classmethod
-    def get_preferences_v2(cls, db: Session, user_id: int, profile_id: int = None) -> Optional[UserPreferences]:
-        """קבל הגדרות V2 עבור משתמש ופרופיל"""
+    def get_preferences(cls, db: Session, user_id: int, profile_id: int = None) -> Optional[UserPreferences]:
+        """קבל הגדרות עבור משתמש ופרופיל"""
         try:
             if profile_id:
                 # חפש לפי פרופיל מסוים
@@ -264,13 +264,13 @@ class PreferencesService:
             return preferences
             
         except Exception as e:
-            logger.error(f"Error getting preferences V2 for user {user_id}, profile {profile_id}: {e}")
+            logger.error(f"Error getting preferences for user {user_id}, profile {profile_id}: {e}")
             return None
     
     @classmethod
-    def update_preferences_v2(cls, db: Session, user_id: int, profile_id: int, 
+    def update_preferences(cls, db: Session, user_id: int, profile_id: int, 
                             data: Dict[str, Any], changed_by: int = None) -> bool:
-        """עדכן הגדרות V2"""
+        """עדכן הגדרות"""
         try:
             preferences = cls.get_preferences_v2(db, user_id, profile_id)
             if not preferences:

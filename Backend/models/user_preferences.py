@@ -1,5 +1,5 @@
 """
-User Preferences V2 Model - TikTrack New Architecture
+User Preferences Model - TikTrack New Architecture
 =====================================================
 
 מודל מתקדם למערכת הגדרות משתמש עם תמיכה בפרופילים מרובים,
@@ -55,8 +55,8 @@ class PreferenceProfile(BaseModel):
 
 
 class UserPreferences(BaseModel):
-    """מודל הגדרות משתמש מתקדם V2"""
-    __tablename__ = 'user_preferences_v2'
+    """מודל הגדרות משתמש מתקדם"""
+    __tablename__ = 'user_preferences'
     
     # יחסים בסיסיים
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
@@ -222,7 +222,7 @@ class UserPreferences(BaseModel):
     profile = relationship("PreferenceProfile", back_populates="preferences")
     
     def __repr__(self):
-        return f"<UserPreferencesV2(user_id={self.user_id}, profile_id={self.profile_id})>"
+        return f"<UserPreferences(user_id={self.user_id}, profile_id={self.profile_id})>"
     
     # ===== מתודות עזר =====
     
@@ -518,7 +518,7 @@ class UserPreferences(BaseModel):
         }
     
     @classmethod
-    def import_settings(cls, data: Dict[str, Any]) -> 'UserPreferencesV2':
+    def import_settings(cls, data: Dict[str, Any]) -> 'UserPreferences':
         """יבא הגדרות מקובץ"""
         instance = cls()
         
@@ -567,7 +567,7 @@ def add_relationships():
         
         # הוסף קשרים חדשים - רק אם הטבלאות קיימות
         # User.preference_profiles = relationship("PreferenceProfile", foreign_keys="PreferenceProfile.user_id", back_populates="user")
-        # User.user_preferences_v2 = relationship("UserPreferencesV2", back_populates="user")
+        # User.user_preferences = relationship("UserPreferences", back_populates="user")
         
     except ImportError:
         pass  # User model לא זמין עדיין

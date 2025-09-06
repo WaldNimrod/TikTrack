@@ -192,7 +192,8 @@ class PreferencesService:
             # טען ברירות מחדל מקובץ JSON
             defaults = cls.load_defaults_from_file()
             
-            preferences = UserPreferences(
+            # Temporarily disabled due to relationship issues
+            # preferences = UserPreferences(
                 user_id=user_id,
                 profile_id=profile_id,
                 version=defaults.get('version', '2.0')
@@ -332,13 +333,13 @@ class PreferencesService:
                     description="פרופיל ברירת מחדל שנוצר ממיגרציה מV1"
                 )
             
-            # מחק V2 קיים אם force
+            # מחק העדפות קיימות אם force
             if force and existing_v2:
                 db.delete(existing_v2)
                 db.commit()
             
-            # צור V2 חדש
-            v2_preferences = UserPreferences(
+            # צור העדפות חדשות
+            new_preferences = UserPreferences(
                 user_id=user_id,
                 profile_id=default_profile.id,
                 migrated_from_v1=True,
@@ -346,22 +347,22 @@ class PreferencesService:
                 version='2.0'
             )
             
-            # העבר נתונים מV1 לV2
-            cls._map_v1_to_v2(v1_preferences, v2_preferences)
+            # העבר נתונים מV1 להעדפות החדשות
+            cls._map_v1_to_v2(v1_preferences, new_preferences)
             
-            db.add(v2_preferences)
+            db.add(new_preferences)
             db.commit()
-            db.refresh(v2_preferences)
+            db.refresh(new_preferences)
             
             # רשום להיסטוריה
             cls._record_change(db, user_id, default_profile.id, 'migrate_from_v1', 
-                             {}, v2_preferences.to_dict(), user_id)
+                             {}, new_preferences.to_dict(), user_id)
             
-            logger.info(f"Successfully migrated user {user_id} from V1 to V2")
+            logger.info(f"Successfully migrated user {user_id} from V1 to new preferences")
             return True
             
         except Exception as e:
-            logger.error(f"Error migrating user {user_id} from V1 to V2: {e}")
+            logger.error(f"Error migrating user {user_id} from V1 to new preferences: {e}")
             db.rollback()
             return False
     
@@ -400,7 +401,7 @@ class PreferencesService:
     
     @classmethod
     def _map_v1_to_v2(cls, v1_data: Dict[str, Any], v2_prefs: UserPreferences):
-        """מפה נתונים מV1 לV2"""
+        """מפה נתונים מV1 להעדפות חדשות"""
         try:
             # הגדרות בסיסיות
             if 'primaryCurrency' in v1_data:
@@ -488,10 +489,10 @@ class PreferencesService:
             if unified_colors:
                 v2_prefs.color_scheme_json = json.dumps(unified_colors)
             
-            logger.info(f"Mapped V1 data to V2 for user {v2_prefs.user_id}")
+            logger.info(f"Mapped V1 data to new preferences for user {v2_prefs.user_id}")
             
         except Exception as e:
-            logger.error(f"Error mapping V1 to V2 data: {e}")
+            logger.error(f"Error mapping V1 to new preferences data: {e}")
             raise
     
     @classmethod

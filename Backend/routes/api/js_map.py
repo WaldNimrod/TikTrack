@@ -125,7 +125,7 @@ def get_page_mapping():
             'accounts.html': ['accounts.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
             'cash_flows.html': ['cash_flows.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
             'notes.html': ['notes.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'preferences-v2.html': ['preferences-v2.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
+            'preferences.html': ['preferences.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
             'db_display.html': ['database.js', 'db-extradata.js', 'header-system.js', 'simple-filter.js'],
             'db_extradata.html': ['db-extradata.js', 'header-system.js', 'simple-filter.js'],
             'constraints.html': ['constraint-manager.js', 'header-system.js', 'simple-filter.js'],
@@ -199,7 +199,7 @@ def sort_js_files_by_generality(js_files):
         # Specific page files
         'alerts.js', 'active-alerts-component.js', 'trades.js', 'trade_plans.js',
         'research.js', 'executions.js', 'tickers.js', 'ticker-service.js',
-        'accounts.js', 'cash_flows.js', 'notes.js', 'preferences-v2.js',
+        'accounts.js', 'cash_flows.js', 'notes.js', 'preferences.js',
         'database.js', 'db-extradata.js', 'constraint-manager.js',
         'currencies.js', 'auth.js'
     ]

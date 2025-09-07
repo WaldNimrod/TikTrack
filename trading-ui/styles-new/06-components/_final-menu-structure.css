@@ -1,45 +1,73 @@
 /* Final Menu Structure - Apple Style with TikTrack Colors */
 
-/* עיצוב בסגנון אפל - נקי ומינימליסטי */
-.apple-navbar {
-    background-color: #ffffff;
+/* Main Header */
+.unified-header {
+    background: #ffffff;
     border-bottom: 1px solid #e5e5e5;
-    padding: 0.75rem 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
     max-width: 1200px;
     margin: 0 auto;
 }
 
-.apple-navbar .navbar-brand {
-    font-weight: 600;
-    font-size: 1.25rem;
-    color: #1d1d1f;
-    text-decoration: none;
+/* Header Top */
+.header-top {
+    padding: 0.75rem 0;
 }
 
-.apple-navbar .nav-link {
-    color: #1d1d1f;
-    font-size: 0.875rem;
-    font-weight: 400;
-    padding: 0.5rem 1rem;
-    text-decoration: none;
-    transition: color 0.2s ease;
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.apple-navbar .nav-link:hover {
-    color: #ff9500; /* TikTrack orange */
+/* Navigation */
+.header-nav {
+    padding: 0;
+    margin-left: auto;
+    margin-right: 60px;
 }
 
-.apple-navbar .nav-link.active {
-    color: #26baac; /* TikTrack green */
+.tiktrack-nav-list {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
-/* תפריט נפתח בסגנון אפל */
-.apple-dropdown {
+.tiktrack-nav-item {
     position: relative;
 }
 
-.apple-dropdown-menu {
+.tiktrack-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    color: #1d1d1f;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 400;
+    transition: color 0.2s ease;
+}
+
+.tiktrack-nav-link:hover {
+    color: #ff9500; /* TikTrack orange */
+}
+
+.tiktrack-nav-link.active {
+    color: #26baac; /* TikTrack green */
+}
+
+/* Dropdown Menus */
+.tiktrack-dropdown-menu {
     position: absolute;
     top: 100%;
     right: 0;
@@ -51,9 +79,15 @@
     padding: 0.5rem 0;
     display: none;
     z-index: 1000;
+    list-style: none;
+    margin: 0;
 }
 
-.apple-dropdown-item {
+.tiktrack-nav-item:hover .tiktrack-dropdown-menu {
+    display: block;
+}
+
+.tiktrack-dropdown-item {
     display: block;
     padding: 0.5rem 1rem;
     color: #1d1d1f;
@@ -62,13 +96,17 @@
     transition: background-color 0.2s ease;
 }
 
-.apple-dropdown-item:hover {
+.tiktrack-dropdown-item:hover {
     background-color: #f5f5f7;
     color: #ff9500; /* TikTrack orange */
 }
 
-/* תפריט משנה */
-.apple-submenu {
+/* Submenu */
+.dropdown-submenu {
+    position: relative;
+}
+
+.submenu {
     position: absolute;
     top: 0;
     right: 100%;
@@ -81,59 +119,22 @@
     display: none;
     z-index: 1001;
     margin-right: 0;
+    list-style: none;
 }
 
-.apple-submenu-item {
+.dropdown-submenu:hover .submenu {
     display: block;
-    padding: 0.5rem 1rem;
-    color: #1d1d1f;
-    text-decoration: none;
-    font-size: 0.875rem;
-    transition: background-color 0.2s ease;
 }
 
-.apple-submenu-item:hover {
-    background-color: #f5f5f7;
-    color: #ff9500; /* TikTrack orange */
-}
-
-/* חץ לתפריט נפתח */
-.apple-arrow {
+/* Dropdown Arrow */
+.tiktrack-dropdown-arrow {
     font-size: 0.75rem;
     margin-right: 0.25rem;
     transition: transform 0.2s ease;
 }
 
-.apple-dropdown:hover .apple-arrow {
+.tiktrack-nav-item:hover .tiktrack-dropdown-arrow {
     transform: rotate(90deg);
-}
-
-/* הצגת תפריטים */
-.apple-dropdown:hover .apple-dropdown-menu {
-    display: block;
-}
-
-.apple-submenu-trigger:hover .apple-submenu {
-    display: block;
-}
-
-/* פריט שמפעיל תפריט משנה */
-.apple-submenu-trigger {
-    position: relative;
-}
-
-.apple-submenu-trigger-link {
-    display: block;
-    padding: 0.5rem 1rem;
-    color: #1d1d1f;
-    text-decoration: none;
-    font-size: 0.875rem;
-    transition: background-color 0.2s ease;
-}
-
-.apple-submenu-trigger-link:hover {
-    background-color: #f5f5f7;
-    color: #ff9500; /* TikTrack orange */
 }
 
 /* רקע כללי */
@@ -150,21 +151,27 @@ body {
     margin: 0 auto;
 }
 
-/* TikTrack Logo */
-.tiktrack-logo {
+/* Logo Section */
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo {
     display: flex;
     align-items: center;
     gap: 1rem;
     direction: ltr;
 }
 
-.tiktrack-logo-image {
+.logo-image {
     width: 125px;
     height: 37.5px;
     object-fit: contain;
 }
 
-.tiktrack-logo-text {
+.logo-text {
     font-size: 1rem;
     font-weight: 300;
     color: #26baac;
@@ -194,6 +201,214 @@ body {
     color: #ff9500;
     border: none !important;
     box-shadow: none !important;
+}
+
+/* Filter Toggle Button */
+.filter-toggle-section {
+    display: flex;
+    align-items: center;
+}
+
+.filter-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    color: #ff9c05;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1001;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.filter-toggle-btn:hover {
+    background: #f5f5f7;
+    border-color: #e5e5e5;
+}
+
+.filter-toggle-btn.collapsed .filter-arrow {
+    transform: rotate(180deg);
+}
+
+.filter-arrow {
+    transition: transform 0.2s ease;
+    color: #ff9c05;
+}
+
+/* Filters Section */
+.header-filters {
+    padding: 1rem 2rem;
+    background: #f5f5f7;
+    border-top: 1px solid #e5e5e5;
+    position: relative;
+    z-index: 1000;
+    min-height: 60px;
+    display: none;
+}
+
+.header-filters.show {
+    display: block;
+}
+
+.filters-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+    direction: rtl;
+    min-height: 40px;
+    padding: 0.5rem 0;
+}
+
+.filter-group {
+    position: relative;
+}
+
+/* Search Filter */
+.search-filter {
+    flex: 0 0 200px;
+    min-width: 200px;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 200px;
+}
+
+.search-filter-input {
+    width: 100%;
+    padding: 0.5rem 1rem 0.5rem 2rem;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: white;
+    color: #1d1d1f;
+}
+
+.search-filter-input:focus {
+    outline: none;
+    border-color: #26baac;
+    box-shadow: 0 0 0 2px rgba(38, 186, 172, 0.1);
+}
+
+.search-clear-btn {
+    position: absolute;
+    left: 0.5rem;
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.search-clear-btn:hover {
+    background: #f5f5f7;
+    color: #1d1d1f;
+}
+
+/* Filter Dropdowns */
+.filter-dropdown {
+    position: relative;
+}
+
+.filter-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    color: #1d1d1f;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 120px;
+}
+
+.filter-toggle:hover {
+    background: #f5f5f7;
+    border-color: #e5e5e5;
+}
+
+.selected-value {
+    color: #666;
+}
+
+.dropdown-arrow {
+    font-size: 0.75rem;
+    transition: transform 0.2s ease;
+}
+
+.filter-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 150px;
+    display: none;
+    z-index: 1000;
+}
+
+.filter-dropdown:hover .filter-menu {
+    display: block;
+}
+
+.status-filter-item, .type-filter-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.status-filter-item:hover, .type-filter-item:hover {
+    background: #f5f5f7;
+}
+
+.check-mark {
+    color: #26baac;
+    font-size: 0.8rem;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.reset-btn, .clear-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.reset-btn:hover, .clear-btn:hover {
+    background: #f5f5f7;
+    color: #1d1d1f;
 }
 
 /* Separator line */

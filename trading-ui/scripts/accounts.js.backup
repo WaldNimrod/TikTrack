@@ -1,6 +1,4 @@
 /* ===== מערכת ניהול חשבונות ===== */
-console.log('📁 accounts.js נטען - מתחיל אתחול');
-
 /*
  * קובץ זה מכיל את כל הפונקציות הקשורות לניהול חשבונות
  * כולל טעינת נתונים, עדכון טבלאות, מודלים ופעולות CRUD
@@ -54,7 +52,7 @@ async function loadCurrenciesFromServer() {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch('http://127.0.0.1:8080/api/v1/currencies/', {
+    const response = await fetch('/api/v1/currencies/', {
       method: 'GET',
       headers,
     });
@@ -147,7 +145,7 @@ function generateCurrencyOptions(account = null) {
 
 // פונקציה לטעינת חשבונות מהשרת
 async function loadAccountsFromServer() {
-  console.log('🚀🚀🚀 loadAccountsFromServer התחיל 🚀🚀🚀');
+  console.log('🔄 loadAccountsFromServer - התחלת טעינת חשבונות מהשרת');
   try {
     // בדיקה אם יש token שמור
     const token = localStorage.getItem('authToken');
@@ -280,7 +278,7 @@ function loadDefaultAccounts() {
 
 // פונקציה לטעינת נתוני חשבונות מהשרת
 async function loadAccountsData() {
-  console.log('🚀🚀🚀 loadAccountsData התחיל 🚀🚀🚀');
+  console.log('🔄 loadAccountsData - התחלת טעינת נתוני חשבונות');
   try {
     // טוען נתוני חשבונות מהשרת
 
@@ -295,8 +293,7 @@ async function loadAccountsData() {
     } else {
       console.log('📡 apiCall לא זמין - משתמש ב-loadAccountsFromServer');
       // קריאה ישירה ל-API
-      const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const response = await fetch(`${base}/api/v1/accounts/`);
+      const response = await fetch('/api/v1/accounts/');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -321,11 +318,8 @@ async function loadAccountsData() {
  * updateAccountsTable(accounts);
  */
 function updateAccountsTable(accounts) {
-  console.log('🚀🚀🚀 updateAccountsTable התחיל עם', accounts ? accounts.length : 0, 'חשבונות 🚀🚀🚀');
-  
   // בדיקה שהפרמטר תקין
   if (!accounts || !Array.isArray(accounts)) {
-    console.error('❌ פרמטר חשבונות לא תקין:', accounts);
     handleValidationError('updateAccountsTable', 'פרמטר חשבונות לא תקין');
     return;
   }
@@ -586,7 +580,7 @@ window.debugAccountsFilter = function () {
   window.checkAccountsStatus();
 
   // בדיקה מהירה של השרת
-  fetch('http://127.0.0.1:8080/api/v1/accounts/')
+  fetch('/api/v1/accounts/')
     .then(response => response.json())
     .then(data => {
       const accounts = data.data || data;
@@ -1168,7 +1162,7 @@ function showEditAccountModal(account) {
  * @returns {Promise<Array>} מערך של חשבונות
  */
 async function loadAccountsDataFromAPI() {
-  console.log('🚀🚀🚀 loadAccountsDataFromAPI התחיל 🚀🚀🚀');
+  console.log('🔄 loadAccountsDataFromAPI - התחלת טעינת נתונים מ-API');
   try {
     console.log('📡 שליחת בקשה ל-API:', '/api/v1/accounts/');
     const response = await fetch('/api/v1/accounts/');
@@ -1639,7 +1633,7 @@ if (window.location.pathname.includes('/accounts')) {
  * פונקציה זו מיועדת לדף החשבונות (accounts.html)
  */
 async function loadAccountsDataForAccountsPage() {
-  console.log('🚀🚀🚀 loadAccountsDataForAccountsPage התחיל 🚀🚀🚀');
+  console.log('📊 טעינת נתוני חשבונות לדף החשבונות...');
   try {
     // טעינת נתונים מהשרת
     let accounts;
@@ -1896,7 +1890,7 @@ window.restoreAccountsSectionState = restoreAccountsSectionState;
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-  console.log('🚀🚀🚀 DOMContentLoaded התחיל 🚀🚀🚀');
+  console.log('🔄 אתחול דף החשבונות...');
   console.log('📍 נתיב הדף:', window.location.pathname);
   
   // טעינת מטבעות
@@ -2515,7 +2509,7 @@ function updateAccount(accountId, accountData) {
     }
     
     // שליחה לשרת
-    fetch('/api/accounts/' + accountId, {
+    fetch('/api/v1/accounts/' + accountId, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -2652,6 +2646,3 @@ window.showAccountDetails = showAccountDetails;
 
 // סיום הקובץ
 console.log('✅ accounts.js נטען בהצלחה');
-
-// End of file marker
-}

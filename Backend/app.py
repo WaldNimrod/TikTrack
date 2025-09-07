@@ -1122,15 +1122,17 @@ def get_crud_test_status():
 
 # Route for serving HTML files from trading-ui directory
 @app.route('/<path:filename>')
-def serve_html(filename):
-    """Serve HTML files from trading-ui directory"""
+def serve_static_files(filename):
+    """Serve static files (HTML, CSS, JS) from trading-ui directory"""
     import os
     from flask import send_from_directory
     
     # Check if file exists in trading-ui directory
     file_path = os.path.join(UI_DIR, filename)
-    if os.path.exists(file_path) and filename.endswith('.html'):
-        return send_from_directory(UI_DIR, filename)
+    if os.path.exists(file_path):
+        # Serve HTML, CSS, JS, and other static files
+        if filename.endswith(('.html', '.css', '.js', '.svg', '.png', '.jpg', '.jpeg', '.gif', '.ico')):
+            return send_from_directory(UI_DIR, filename)
     
     # If not found, return 404
     return "File not found", 404

@@ -5,107 +5,738 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>תפריט TikTrack - מבנה סופי</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles-new/06-components/_final-menu-structure.css">
+    
+    <style>
+        /* Final Menu Structure - Apple Style with TikTrack Colors */
+        
+        /* Main Header */
+        .unified-header {
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        /* Header Top */
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            position: relative;
+            min-height: 70px;
+            direction: rtl;
+        }
+        
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Navigation */
+        .header-nav {
+            padding: 0;
+            margin-left: auto;
+            margin-right: 0;
+        }
+        
+        .tiktrack-nav-list {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .tiktrack-nav-item {
+            position: relative;
+        }
+        
+        .tiktrack-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            color: #1d1d1f;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-weight: 400;
+            font-size: 16px;
+        }
+        
+        .tiktrack-nav-link:hover {
+            color: #ff9500;
+        }
+        
+        .tiktrack-nav-item.active .tiktrack-nav-link {
+            color: #26baac;
+            font-weight: 500;
+        }
+        
+        .tiktrack-nav-item.active .tiktrack-nav-link:hover {
+            color: #ff9500;
+        }
+        
+        /* Home icon spacing */
+        .tiktrack-nav-item:first-child {
+            margin-right: 0;
+        }
+        
+        .tiktrack-nav-item:first-child .tiktrack-nav-link {
+            padding-right: 0;
+        }
+        
+        .tiktrack-nav-item:nth-child(2) {
+            margin-right: 1rem;
+        }
+        
+        /* Logo Section */
+        .logo-section {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+            direction: ltr;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            color: inherit;
+            direction: ltr;
+        }
+        
+        .logo:hover {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .logo-image {
+            width: 125px;
+            height: 37.5px;
+            object-fit: contain;
+            display: block;
+        }
+        
+        .logo-text {
+            font-size: 1rem;
+            font-weight: 300;
+            color: #26baac;
+            direction: ltr;
+            text-align: left;
+            align-self: flex-end;
+            margin-bottom: -5px;
+            white-space: nowrap;
+        }
+        
+        /* Dropdown Menus */
+        .tiktrack-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            padding: 0.5rem 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 1001;
+            list-style: none;
+        }
+        
+        .tiktrack-dropdown-arrow {
+            font-size: 0.75rem;
+            color: #666;
+            margin-right: 0.25rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .tiktrack-nav-item:hover .tiktrack-dropdown-arrow {
+            transform: rotate(90deg);
+        }
+        
+        .tiktrack-nav-item:hover .tiktrack-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .tiktrack-dropdown-item {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #1d1d1f;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+        
+        .tiktrack-dropdown-menu li,
+        .submenu li {
+            list-style: none;
+        }
+        
+        .tiktrack-dropdown-item:hover {
+            background: #f5f5f7;
+            color: #ff9500;
+        }
+        
+        /* Submenus */
+        .dropdown-submenu {
+            position: relative;
+        }
+        
+        .dropdown-submenu .submenu {
+            position: absolute;
+            top: 0;
+            right: 100%;
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 180px;
+            padding: 0.5rem 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(10px);
+            transition: all 0.2s ease;
+            z-index: 1002;
+            list-style: none;
+        }
+        
+        .dropdown-submenu:hover .submenu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+        
+        /* Cache clear button */
+        .cache-clear-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: transparent !important;
+            border: none !important;
+            color: #1d1d1f;
+            text-decoration: none;
+            transition: color 0.2s ease;
+            font-size: 16px;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .cache-clear-btn:hover {
+            background: transparent !important;
+            color: #ff9500;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
+        /* Filter Toggle Section */
+        .filter-toggle-section {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            height: 0;
+            margin-top: -16px;
+            width: 100%;
+        }
+        
+        /* Filter Toggle Button */
+        .filter-toggle-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            color: #ff9c05;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1001;
+            box-shadow: none;
+            transform: translateY(5px);
+        }
+        
+        .filter-toggle-btn.collapsed {
+            transform: translateY(5px);
+        }
+        
+        .filter-toggle-btn:not(.collapsed) {
+            transform: translateY(calc(5px + var(--filter-height, 0px) - 15px));
+        }
+        
+        .filter-toggle-btn:not(.collapsed) .filter-arrow {
+            transform: rotate(180deg) translateY(-5px);
+        }
+        
+        /* Filters Section */
+        .header-filters {
+            padding: 1rem 2rem;
+            background: white;
+            border-top: 1px solid #e5e5e5;
+            border-bottom: 1px solid #e5e5e5;
+            position: relative;
+            z-index: 1000;
+            min-height: 60px;
+            display: none; /* Hidden by default */
+        }
+        
+        .header-filters.show {
+            display: block; /* Shown when 'show' class is added */
+        }
+        
+        .filters-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+        }
+        
+        .filter-dropdown {
+            position: relative;
+        }
+        
+        .filter-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            color: #1d1d1f;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+        
+        .filter-toggle:hover {
+            border-color: #ff9500;
+            color: #ff9500;
+        }
+        
+        .filter-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 150px;
+            padding: 0.5rem 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 1001;
+        }
+        
+        .filter-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .status-filter-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .status-filter-item:hover {
+            background: #f5f5f7;
+        }
+        
+        .search-input-wrapper {
+            position: relative;
+        }
+        
+        .search-filter-input {
+            padding: 0.5rem 2rem 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 200px;
+        }
+        
+        .search-filter-input:focus {
+            outline: none;
+            border-color: #ff9500;
+        }
+        
+        /* Search Clear Button inside input */
+        .search-clear-btn {
+            position: absolute;
+            left: 0.5rem;
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .search-clear-btn:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .reset-btn, .clear-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            color: #26baac;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .reset-btn:hover, .clear-btn:hover {
+            border-color: #ff9500;
+            color: #ff9500;
+        }
+        
+        /* Ensure submenus display above filters */
+        .submenu {
+            z-index: 1001 !important;
+        }
+        
+        /* Separator */
+        .separator {
+            height: 1px;
+            background: #e5e5e5;
+            margin: 0.5rem 0;
+        }
+    </style>
 </head>
 <body>
     <!-- תפריט בסגנון אפל -->
-    <nav class="apple-navbar">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center">
+    <div class="unified-header">
+        <!-- אזור לוגו ותפריט -->
+        <div class="header-top">
+            <div class="header-container">
                 <!-- תפריט ניווט -->
-                <ul class="nav d-flex align-items-center">
-                    <li class="nav-item">
-                        <a href="index.html" class="nav-link active">
-                            <img src="images/icons/home.svg" alt="בית" style="width: 32px; height: 32px;">
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="trade_plans.html" class="nav-link">תכנון</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="trades.html" class="nav-link">מעקב</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="research.html" class="nav-link">מחקר</a>
-                    </li>
-                    <li class="nav-item apple-dropdown">
-                        <a href="#" class="nav-link">
-                            הגדרות
-                            <span class="apple-arrow">›</span>
-                        </a>
-                        <div class="apple-dropdown-menu">
-                            <a href="alerts.html" class="apple-dropdown-item">1. התראות</a>
-                            <a href="notes.html" class="apple-dropdown-item">2. הערות</a>
-                            <a href="accounts.html" class="apple-dropdown-item">3. חשבונות</a>
-                            <a href="tickers.html" class="apple-dropdown-item">4. טיקרים</a>
-                            <a href="executions.html" class="apple-dropdown-item">5. עסקאות</a>
-                            <a href="cash_flows.html" class="apple-dropdown-item">6. תזרימי מזומנים</a>
-                            <a href="preferences.html" class="apple-dropdown-item">7. העדפות</a>
-                            <div class="separator"></div>
-                            <a href="db_display.html" class="apple-dropdown-item">9. בסיס נתונים</a>
-                            <a href="db_extradata.html" class="apple-dropdown-item">10. טבלאות עזר</a>
-                        </div>
-                    </li>
-                    <li class="nav-item apple-dropdown">
-                        <a href="#" class="nav-link">
-                            כלי פיתוח
-                            <span class="apple-arrow">›</span>
-                        </a>
-                        <div class="apple-dropdown-menu">
-                            <div class="apple-dropdown-item apple-submenu-trigger">
-                                <a href="#" class="apple-submenu-trigger-link">
-                                    ניתור וניהול
-                                    <span class="apple-arrow">›</span>
+                <div class="header-nav">
+                    <nav class="main-nav">
+                        <ul class="tiktrack-nav-list">
+                        <li class="tiktrack-nav-item">
+                            <a href="/" class="tiktrack-nav-link active" data-page="home">
+                                <img src="images/icons/home.svg" alt="בית" style="width: 32px; height: 32px;">
+                            </a>
+                        </li>
+                            <li class="tiktrack-nav-item">
+                                <a href="/trade_plans" class="tiktrack-nav-link" data-page="trade_plans">
+                                    <span class="nav-text">תכנון</span>
                                 </a>
-                                <div class="apple-submenu">
-                                    <a href="system-management.html" class="apple-submenu-item">1. ניהול מערכת</a>
-                                    <a href="server-monitor.html" class="apple-submenu-item">2. ניטור שרת</a>
-                                    <a href="notifications-center.html" class="apple-submenu-item">3. מרכז התראות</a>
-                                    <a href="constraints.html" class="apple-submenu-item">4. אילוצים</a>
-                                </div>
-                            </div>
-                            <div class="apple-dropdown-item apple-submenu-trigger">
-                                <a href="#" class="apple-submenu-trigger-link">
-                                    ממשק משתמש
-                                    <span class="apple-arrow">›</span>
+                            </li>
+                            <li class="tiktrack-nav-item">
+                                <a href="/trades" class="tiktrack-nav-link" data-page="trades">
+                                    <span class="nav-text">מעקב</span>
                                 </a>
-                                <div class="apple-submenu">
-                                    <a href="css-management.html" class="apple-submenu-item">1. ניהול CSS</a>
-                                    <a href="numeric-value-colors-demo.html" class="apple-submenu-item">2. צבעי ערכים</a>
-                                    <a href="style_demonstration.html" class="apple-submenu-item">3. הדגמת סגנונות</a>
-                                    <a href="color-scheme-examples.html" class="apple-submenu-item">4. דוגמאות צבעים</a>
-                                    <a href="designs.html" class="apple-submenu-item">5. עיצובים</a>
-                                </div>
-                            </div>
-                            <div class="apple-dropdown-item apple-submenu-trigger">
-                                <a href="#" class="apple-submenu-trigger-link">
-                                    כלים
-                                    <span class="apple-arrow">›</span>
+                            </li>
+                            <li class="tiktrack-nav-item">
+                                <a href="/research" class="tiktrack-nav-link" data-page="research">
+                                    <span class="nav-text">מחקר</span>
                                 </a>
-                                <div class="apple-submenu">
-                                    <a href="external-data-dashboard.html" class="apple-submenu-item">1. נתונים חיצוניים</a>
-                                    <a href="linter-realtime-monitor.html" class="apple-submenu-item">2. ניטור Linter</a>
-                                    <a href="crud-testing-dashboard.html" class="apple-submenu-item">3. בדיקות CRUD</a>
-                                    <a href="cache-test.html" class="apple-submenu-item">4. בדיקת Cache</a>
-                                    <a href="js-map.html" class="apple-submenu-item">5. מפת JavaScript</a>
-                                    <a href="page-scripts-matrix.html" class="apple-submenu-item">6. מטריצת סקריפטים</a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="cache-clear-btn" title="ניקוי מטמון מלא">🧹</a>
-                    </li>
-                </ul>
-                
+                            </li>
+                            <li class="tiktrack-nav-item dropdown">
+                                <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="settings">
+                                    <span class="nav-text">הגדרות</span>
+                                    <span class="tiktrack-dropdown-arrow">›</span>
+                                </a>
+                                <ul class="tiktrack-dropdown-menu">
+                                    <li><a class="tiktrack-dropdown-item" href="/alerts">התראות</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/accounts">חשבונות</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/executions">עסקאות</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
+                                    <li class="separator"></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
+                                </ul>
+                            </li>
+                            <li class="tiktrack-nav-item dropdown">
+                                <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="dev_tools">
+                                    <span class="nav-text">כלי פיתוח</span>
+                                    <span class="tiktrack-dropdown-arrow">›</span>
+                                </a>
+                                <ul class="tiktrack-dropdown-menu">
+                                    <!-- ניטור וניהול -->
+                                    <li class="dropdown-submenu">
+                                        <a class="tiktrack-dropdown-item" href="#">ניטור וניהול</a>
+                                        <ul class="submenu">
+                                            <li><a class="tiktrack-dropdown-item" href="/system-management">system-management</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/server-monitor">server-monitor</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/notifications-center">notifications-center</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/constraints">constraints</a></li>
+                                        </ul>
+                                    </li>
+                                    
+                                    <!-- ממשק משתמש -->
+                                    <li class="dropdown-submenu">
+                                        <a class="tiktrack-dropdown-item" href="#">ממשק משתמש</a>
+                                        <ul class="submenu">
+                                            <li><a class="tiktrack-dropdown-item" href="/css-management">css-management</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/numeric-value-colors-demo">numeric-value-colors-demo</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/style_demonstration">style_demonstration</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/color-scheme-examples">color-scheme-examples</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/designs">designs</a></li>
+                                        </ul>
+                                    </li>
+                                    
+                                    <!-- כלים -->
+                                    <li class="dropdown-submenu">
+                                        <a class="tiktrack-dropdown-item" href="#">כלים</a>
+                                        <ul class="submenu">
+                                            <li><a class="tiktrack-dropdown-item" href="/external-data-dashboard">external-data-dashboard</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/linter-realtime-monitor">linter-realtime-monitor</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/crud-testing-dashboard">crud-testing-dashboard</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/cache-test">cache-test</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/js-map">js-map</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">page-scripts-matrix</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="tiktrack-nav-item">
+                                <a href="#" class="cache-clear-btn" title="ניקוי מטמון מלא">🧹</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
                 <!-- לוגו TikTrack -->
-                <div class="tiktrack-logo">
-                    <img src="images/logo.svg" alt="TikTrack Logo" class="tiktrack-logo-image">
-                    <span class="tiktrack-logo-text">פשוט לנהל תיק</span>
+                <div class="logo-section">
+                    <div class="logo">
+                        <img src="images/logo.svg" alt="TikTrack Logo" class="logo-image">
+                        <span class="logo-text">פשוט לנהל תיק</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- כפתור פילטר עגול - במרכז הקו התחתון -->
+        <div class="filter-toggle-section">
+            <button class="filter-toggle-btn" id="filterToggleBtn" title="הצג/הסתר פילטרים"
+                    onclick="toggleSection('filters')">
+                <span class="filter-arrow">▼</span>
+            </button>
+        </div>
+
+        <!-- אזור פילטרים -->
+        <div class="header-filters" id="headerFilters" data-section="filters">
+            <div class="filters-container">
+                <!-- פילטר סטטוס -->
+                <div class="filter-group status-filter">
+                    <div class="filter-dropdown">
+                        <button class="filter-toggle status-filter-toggle" id="statusFilterToggle" 
+                                onclick="toggleStatusFilter()">
+                            <span class="selected-value selected-status-text" id="selectedStatus">כל סטטוס</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="filter-menu" id="statusFilterMenu">
+                            <div class="status-filter-item" data-value="הכול" onclick="selectStatusOption('הכול')">
+                                <span class="option-text">הכול</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="status-filter-item" data-value="פתוח" onclick="selectStatusOption('פתוח')">
+                                <span class="option-text">פתוח</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="status-filter-item" data-value="סגור" onclick="selectStatusOption('סגור')">
+                                <span class="option-text">סגור</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="status-filter-item" data-value="מבוטל" onclick="selectStatusOption('מבוטל')">
+                                <span class="option-text">מבוטל</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- פילטר סוג השקעה -->
+                <div class="filter-group type-filter">
+                    <div class="filter-dropdown">
+                        <button class="filter-toggle type-filter-toggle" id="typeFilterToggle" onclick="toggleTypeFilter()">
+                            <span class="selected-value selected-type-text" id="selectedType">כל סוג השקעה</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="filter-menu" id="typeFilterMenu">
+                            <div class="type-filter-item" data-value="הכול" onclick="selectTypeOption('הכול')">
+                                <span class="option-text">הכול</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <!-- סוגי השקעות -->
+                            <div class="type-filter-item" data-value="סווינג" onclick="selectTypeOption('סווינג')">
+                                <span class="option-text">סווינג</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="type-filter-item" data-value="השקעה" onclick="selectTypeOption('השקעה')">
+                                <span class="option-text">השקעה</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="type-filter-item" data-value="פסיבי" onclick="selectTypeOption('פסיבי')">
+                                <span class="option-text">פסיבי</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- פילטר חשבון -->
+                <div class="filter-group account-filter">
+                    <div class="filter-dropdown">
+                        <button class="filter-toggle account-filter-toggle" id="accountFilterToggle" 
+                                onclick="toggleAccountFilter()">
+                            <span class="selected-value selected-account-text" id="selectedAccount">כל חשבון</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="filter-menu" id="accountFilterMenu">
+                            <!-- חשבונות יטענו דינמית -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- פילטר תאריכים -->
+                <div class="filter-group date-filter">
+                    <div class="filter-dropdown">
+                        <button class="filter-toggle date-range-filter-toggle" id="dateRangeFilterToggle" onclick="toggleDateRangeFilter()">
+                            <span class="selected-value selected-date-range-text" id="selectedDateRange">כל זמן</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </button>
+                        <div class="filter-menu" id="dateRangeFilterMenu">
+                            <div class="date-range-filter-item" data-value="כל זמן" onclick="selectDateRangeOption('כל זמן')">
+                                <span class="option-text">כל זמן</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="date-range-filter-item" data-value="היום" onclick="selectDateRangeOption('היום')">
+                                <span class="option-text">היום</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="date-range-filter-item" data-value="אתמול" onclick="selectDateRangeOption('אתמול')">
+                                <span class="option-text">אתמול</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="date-range-filter-item" data-value="השבוע" onclick="selectDateRangeOption('השבוע')">
+                                <span class="option-text">השבוע</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="date-range-filter-item" data-value="שבוע" onclick="selectDateRangeOption('שבוע')">
+                                <span class="option-text">שבוע</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="date-range-filter-item" data-value="MTD" onclick="selectDateRangeOption('MTD')">
+                                <span class="option-text">MTD</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="date-range-filter-item" data-value="30 יום" onclick="selectDateRangeOption('30 יום')">
+                                <span class="option-text">30 יום</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="date-range-filter-item" data-value="60 יום" onclick="selectDateRangeOption('60 יום')">
+                                <span class="option-text">60 יום</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="date-range-filter-item" data-value="90 יום" onclick="selectDateRangeOption('90 יום')">
+                                <span class="option-text">90 יום</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="date-range-filter-item" data-value="YTD" onclick="selectDateRangeOption('YTD')">
+                                <span class="option-text">YTD</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="date-range-filter-item" data-value="שנה" onclick="selectDateRangeOption('שנה')">
+                                <span class="option-text">שנה</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="date-range-filter-item" data-value="שבוע קודם" onclick="selectDateRangeOption('שבוע קודם')">
+                                <span class="option-text">שבוע קודם</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="date-range-filter-item" data-value="חודש קודם" onclick="selectDateRangeOption('חודש קודם')">
+                                <span class="option-text">חודש קודם</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                            <div class="date-range-filter-item" data-value="שנה קודמת" onclick="selectDateRangeOption('שנה קודמת')">
+                                <span class="option-text">שנה קודמת</span>
+                                <span class="check-mark">●</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- פילטר חיפוש -->
+                <div class="filter-group search-filter">
+                    <div class="search-input-wrapper">
+                        <input
+                            type="text"
+                            id="searchFilterInput"
+                            class="search-filter-input"
+                            placeholder="חיפוש..."
+                            autocomplete="off"
+                        >
+                        <button class="search-clear-btn" id="searchClearBtn" title="נקה חיפוש">
+                            <span class="search-clear-icon">×</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- כפתורי איפוס וניקוי -->
+                <div class="filter-group action-buttons">
+                    <button class="reset-btn" id="resetFiltersBtn" title="נקה פילטרים" onclick="resetFilters()">
+                        <span class="reset-icon">↻</span>
+                    </button>
+                    <button class="clear-btn" id="clearFiltersBtn" title="נקה הכל" onclick="clearAll()">
+                        <span class="clear-icon">×</span>
+                    </button>
                 </div>
             </div>
         </div>
-    </nav>
+    </div>
 
     <div class="content">
         <h1>תפריט TikTrack - מבנה סופי</h1>
@@ -115,5 +746,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts/final-menu-structure.js"></script>
 </body>
 </html>

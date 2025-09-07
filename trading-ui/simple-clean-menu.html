@@ -139,6 +139,25 @@
             display: block;
         }
         
+        /* פריט שמפעיל תפריט משנה */
+        .submenu-trigger {
+            position: relative;
+        }
+        
+        .submenu-trigger-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #1d1d1f;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: background-color 0.2s ease;
+        }
+        
+        .submenu-trigger-link:hover {
+            background-color: #f5f5f7;
+            color: #0071e3;
+        }
+        
         /* תוכן הדף */
         .content {
             max-width: 1200px;
@@ -181,11 +200,13 @@
                     <div class="dropdown-menu">
                         <a href="#" class="dropdown-item">הגדרות כללי</a>
                         <a href="#" class="dropdown-item">הגדרות חשבון</a>
-                        <a href="#" class="dropdown-item submenu-trigger">ניהול נתונים</a>
-                        <div class="submenu">
-                            <a href="#" class="submenu-item">התראות</a>
-                            <a href="#" class="submenu-item">חשבונות</a>
-                            <a href="#" class="submenu-item">עסקאות</a>
+                        <div class="dropdown-item submenu-trigger">
+                            <a href="#" class="submenu-trigger-link">ניהול נתונים</a>
+                            <div class="submenu">
+                                <a href="#" class="submenu-item">התראות</a>
+                                <a href="#" class="submenu-item">חשבונות</a>
+                                <a href="#" class="submenu-item">עסקאות</a>
+                            </div>
                         </div>
                         <a href="#" class="dropdown-item">אבטחה</a>
                     </div>
@@ -195,11 +216,13 @@
                     <div class="dropdown-menu">
                         <a href="#" class="dropdown-item">מסד נתונים</a>
                         <a href="#" class="dropdown-item">לוגים</a>
-                        <a href="#" class="dropdown-item submenu-trigger">כלים מתקדמים</a>
-                        <div class="submenu">
-                            <a href="#" class="submenu-item">ניקוי מטמון</a>
-                            <a href="#" class="submenu-item">גיבויים</a>
-                            <a href="#" class="submenu-item">ביצועים</a>
+                        <div class="dropdown-item submenu-trigger">
+                            <a href="#" class="submenu-trigger-link">כלים מתקדמים</a>
+                            <div class="submenu">
+                                <a href="#" class="submenu-item">ניקוי מטמון</a>
+                                <a href="#" class="submenu-item">גיבויים</a>
+                                <a href="#" class="submenu-item">ביצועים</a>
+                            </div>
                         </div>
                     </div>
                 </li>

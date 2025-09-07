@@ -1120,6 +1120,21 @@ def get_crud_test_status():
         }), 500
 
 
+# Route for serving HTML files from trading-ui directory
+@app.route('/<path:filename>')
+def serve_html(filename):
+    """Serve HTML files from trading-ui directory"""
+    import os
+    from flask import send_from_directory
+    
+    # Check if file exists in trading-ui directory
+    file_path = os.path.join(UI_DIR, filename)
+    if os.path.exists(file_path) and filename.endswith('.html'):
+        return send_from_directory(UI_DIR, filename)
+    
+    # If not found, return 404
+    return "File not found", 404
+
 if __name__ == "__main__":
     # 🎯 **New Configuration - Flask-SocketIO Development Server**
     # 

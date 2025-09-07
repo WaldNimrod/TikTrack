@@ -1,4 +1,6 @@
 /* ===== מערכת ניהול חשבונות ===== */
+console.log('📁 accounts.js נטען - מתחיל אתחול');
+
 /*
  * קובץ זה מכיל את כל הפונקציות הקשורות לניהול חשבונות
  * כולל טעינת נתונים, עדכון טבלאות, מודלים ופעולות CRUD
@@ -145,7 +147,7 @@ function generateCurrencyOptions(account = null) {
 
 // פונקציה לטעינת חשבונות מהשרת
 async function loadAccountsFromServer() {
-  console.log('🔄 loadAccountsFromServer - התחלת טעינת חשבונות מהשרת');
+  console.log('🚀🚀🚀 loadAccountsFromServer התחיל 🚀🚀🚀');
   try {
     // בדיקה אם יש token שמור
     const token = localStorage.getItem('authToken');
@@ -278,7 +280,7 @@ function loadDefaultAccounts() {
 
 // פונקציה לטעינת נתוני חשבונות מהשרת
 async function loadAccountsData() {
-  console.log('🔄 loadAccountsData - התחלת טעינת נתוני חשבונות');
+  console.log('🚀🚀🚀 loadAccountsData התחיל 🚀🚀🚀');
   try {
     // טוען נתוני חשבונות מהשרת
 
@@ -319,8 +321,11 @@ async function loadAccountsData() {
  * updateAccountsTable(accounts);
  */
 function updateAccountsTable(accounts) {
+  console.log('🚀🚀🚀 updateAccountsTable התחיל עם', accounts ? accounts.length : 0, 'חשבונות 🚀🚀🚀');
+  
   // בדיקה שהפרמטר תקין
   if (!accounts || !Array.isArray(accounts)) {
+    console.error('❌ פרמטר חשבונות לא תקין:', accounts);
     handleValidationError('updateAccountsTable', 'פרמטר חשבונות לא תקין');
     return;
   }
@@ -1163,7 +1168,7 @@ function showEditAccountModal(account) {
  * @returns {Promise<Array>} מערך של חשבונות
  */
 async function loadAccountsDataFromAPI() {
-  console.log('🔄 loadAccountsDataFromAPI - התחלת טעינת נתונים מ-API');
+  console.log('🚀🚀🚀 loadAccountsDataFromAPI התחיל 🚀🚀🚀');
   try {
     console.log('📡 שליחת בקשה ל-API:', '/api/v1/accounts/');
     const response = await fetch('/api/v1/accounts/');
@@ -1634,7 +1639,7 @@ if (window.location.pathname.includes('/accounts')) {
  * פונקציה זו מיועדת לדף החשבונות (accounts.html)
  */
 async function loadAccountsDataForAccountsPage() {
-  console.log('📊 טעינת נתוני חשבונות לדף החשבונות...');
+  console.log('🚀🚀🚀 loadAccountsDataForAccountsPage התחיל 🚀🚀🚀');
   try {
     // טעינת נתונים מהשרת
     let accounts;
@@ -1891,7 +1896,7 @@ window.restoreAccountsSectionState = restoreAccountsSectionState;
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
-  console.log('🔄 אתחול דף החשבונות...');
+  console.log('🚀🚀🚀 DOMContentLoaded התחיל 🚀🚀🚀');
   console.log('📍 נתיב הדף:', window.location.pathname);
   
   // טעינת מטבעות

@@ -2262,10 +2262,13 @@ function getTypeClass(type) {
   }
 
   // Use dynamic color system from preferences
+  // Note: type comes from backend in English, so we use English values for CSS classes
   switch (type) {
   case 'swing': return 'type-swing';
   case 'investment': return 'type-investment';
   case 'passive': return 'type-passive';
+  case 'day_trading': return 'type-day_trading';
+  case 'scalping': return 'type-scalping';
   default: return 'type-other';
   }
 }

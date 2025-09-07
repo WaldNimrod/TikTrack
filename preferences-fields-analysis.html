@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ניתוח שדות העדפות - TikTrack</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .status-active { background-color: #d4edda; color: #155724; }
+        .status-development { background-color: #fff3cd; color: #856404; }
+        .status-disabled { background-color: #f8d7da; color: #721c24; }
+        .status-not-needed { background-color: #e2e3e5; color: #6c757d; }
+        .version-header { background: linear-gradient(135deg, #007bff, #0056b3); color: white; }
+        .field-row:hover { background-color: #f8f9fa; }
+        .status-select { min-width: 120px; }
+        .export-btn { background: linear-gradient(135deg, #28a745, #20c997); border: none; }
+        .summary-card { border-left: 4px solid #007bff; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="text-center mb-4">📊 ניתוח שדות העדפות - TikTrack</h1>
+                <p class="text-center text-muted">ניתוח מפורט של שדות ההעדפות בגרסאות השונות מתחילת החודש</p>
+            </div>
+        </div>
+
+        <!-- סיכום כללי -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card summary-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">גרסאות נבדקות</h5>
+                        <h2 class="text-primary">4</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card summary-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">שדות פעילים</h5>
+                        <h2 class="text-success" id="activeCount">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card summary-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">בפיתוח</h5>
+                        <h2 class="text-warning" id="developmentCount">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card summary-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">לא נחוץ</h5>
+                        <h2 class="text-secondary" id="notNeededCount">0</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- כפתורי פעולה -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex gap-3 justify-content-center">
+                    <button class="btn btn-primary" onclick="exportToCSV()">
+                        📊 ייצא ל-CSV
+                    </button>
+                    <button class="btn btn-success" onclick="exportToJSON()">
+                        💾 ייצא ל-JSON
+                    </button>
+                    <button class="btn btn-info" onclick="generateReport()">
+                        📋 צור דוח
+                    </button>
+                    <button class="btn btn-warning" onclick="resetAllStatuses()">
+                        🔄 אפס הכל
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- טבלה ראשית -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header version-header">
+                        <h4 class="mb-0">📋 טבלת ניתוח שדות העדפות</h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="preferencesTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width: 25%;">שדה</th>
+                                        <th style="width: 15%;">גרסה 1<br><small>2.0.1 (01/09)</small></th>
+                                        <th style="width: 15%;">גרסה 2<br><small>2.2 (03/09)</small></th>
+                                        <th style="width: 15%;">גרסה 3<br><small>Legacy (05/09)</small></th>
+                                        <th style="width: 15%;">גרסה 4<br><small>Current</small></th>
+                                        <th style="width: 15%;">סטטוס מומלץ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="preferencesTableBody">
+                                    <!-- השדות יטענו דינמית -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- הסבר סטטוסים -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>📖 הסבר סטטוסים</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="badge status-active me-2">פעיל</span>
+                                    <small>יש להוסיף לעמוד העדפות ולבדוק CRUD מלא</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="badge status-development me-2">בפיתוח</span>
+                                    <small>מוצג כפעיל עם הודעה "הפיצ'ר בפיתוח"</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="badge status-disabled me-2">לא פעיל</span>
+                                    <small>מוצג במצב disabled ללא פונקציונליות</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="badge status-not-needed me-2">לא נחוץ</span>
+                                    <small>לא לכלול בעמוד העדפות</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // נתוני השדות מכל גרסה
+        const preferencesData = {
+            // גרסה 1: 2.0.1 Performance Improvements (01/09)
+            version1: {
+                name: "2.0.1 Performance",
+                date: "01/09/2025",
+                fields: [
+                    "primaryCurrency", "timezone", "defaultStopLoss", "defaultTargetPrice", 
+                    "defaultCommission", "defaultStatusFilter", "defaultTypeFilter", 
+                    "defaultAccountFilter", "defaultDateRangeFilter", "dataRefreshInterval",
+                    "primaryDataProvider", "secondaryDataProvider", "cacheTTL", "maxBatchSize",
+                    "requestDelay", "retryAttempts", "retryDelay", "autoRefresh", "verboseLogging"
+                ]
+            },
+            // גרסה 2: 2.2 Unified Notification System (03/09)
+            version2: {
+                name: "2.2 Unified",
+                date: "03/09/2025", 
+                fields: [
+                    "primaryCurrency", "timezone", "defaultStopLoss", "defaultTargetPrice",
+                    "defaultCommission", "defaultStatusFilter", "defaultTypeFilter",
+                    "defaultAccountFilter", "defaultDateRangeFilter", "dataRefreshInterval",
+                    "primaryDataProvider", "secondaryDataProvider", "cacheTTL", "maxBatchSize",
+                    "requestDelay", "retryAttempts", "retryDelay", "autoRefresh", "verboseLogging",
+                    "positiveTextColor", "positiveBackgroundColor", "negativeTextColor", "negativeBackgroundColor",
+                    "zeroTextColor", "zeroBackgroundColor", "entityTradeColor", "entityTradePlanColor",
+                    "entityExecutionColor", "entityAccountColor", "entityCashFlowColor", "entityTickerColor",
+                    "entityAlertColor", "consoleAutoClear", "consoleClearInterval", "consoleSuppressMessages",
+                    "consoleSuppressDuration"
+                ]
+            },
+            // גרסה 3: Legacy Backup (05/09)
+            version3: {
+                name: "Legacy Backup",
+                date: "05/09/2025",
+                fields: [
+                    "primaryCurrency", "timezone", "defaultStopLoss", "defaultTargetPrice",
+                    "defaultCommission", "defaultStatusFilter", "defaultTypeFilter",
+                    "defaultAccountFilter", "defaultDateRangeFilter", "defaultSearchFilter",
+                    "dataRefreshInterval", "primaryDataProvider", "secondaryDataProvider", "cacheTTL",
+                    "maxBatchSize", "requestDelay", "retryAttempts", "retryDelay", "autoRefresh",
+                    "verboseLogging", "positiveTextColor", "positiveBackgroundColor", "negativeTextColor",
+                    "negativeBackgroundColor", "zeroTextColor", "zeroBackgroundColor", "entityTradeColor",
+                    "entityTradePlanColor", "entityExecutionColor", "entityAccountColor", "entityCashFlowColor",
+                    "entityTickerColor", "entityAlertColor", "entityNoteColor", "entityConstraintColor",
+                    "entityDesignColor", "entityResearchColor", "entityPreferenceColor", "statusOpenMediumColor",
+                    "statusOpenLightColor", "statusClosedMediumColor", "statusClosedLightColor",
+                    "statusCancelledMediumColor", "statusCancelledLightColor", "investmentTypeSwingMediumColor",
+                    "investmentTypeSwingLightColor", "investmentTypeInvestmentMediumColor", "investmentTypeInvestmentLightColor",
+                    "investmentTypePassiveMediumColor", "investmentTypePassiveLightColor", "mainHeaderOpacity",
+                    "subHeaderOpacity", "activeInHours", "activeOffHours", "noActiveInHours", "noActiveOffHours",
+                    "closedOffset", "consoleAutoClear", "consoleClearInterval", "consoleSuppressMessages",
+                    "consoleSuppressDuration"
+                ]
+            },
+            // גרסה 4: Current (נוכחית)
+            version4: {
+                name: "Current V2",
+                date: "נוכחית",
+                fields: [
+                    "primaryCurrency", "secondaryCurrency", "timezone", "language", "defaultStopLoss",
+                    "defaultTargetPrice", "defaultCommission", "riskPercentage", "defaultTradeAmount",
+                    "defaultStatusFilter", "defaultTypeFilter", "defaultDateRangeFilter", "defaultProfitFilter",
+                    "defaultSearchFilter", "theme", "positiveColor", "negativeColor", "zeroColor",
+                    "entityTradeColor", "entityAccountColor", "entityTickerColor", "entityAlertColor",
+                    "compactMode", "showAnimations", "tablePageSize", "tableRefreshInterval",
+                    "primaryDataProvider", "secondaryDataProvider", "fallbackDataProvider", "dataRefreshInterval",
+                    "cacheTtl", "maxBatchSize"
+                ]
+            }
+        };
+
+        // מיפוי שמות שדות לעברית
+        const fieldNames = {
+            // הגדרות בסיסיות
+            "primaryCurrency": "מטבע ראשי",
+            "secondaryCurrency": "מטבע משני", 
+            "timezone": "אזור זמן",
+            "language": "שפה",
+            "defaultStopLoss": "סטופ לוס ברירת מחדל",
+            "defaultTargetPrice": "יעד ברירת מחדל",
+            "defaultCommission": "עמלה ברירת מחדל",
+            "riskPercentage": "אחוז סיכון לעסקה",
+            "defaultTradeAmount": "סכום ברירת מחדל",
+            
+            // פילטרים
+            "defaultStatusFilter": "פילטר סטטוס ברירת מחדל",
+            "defaultTypeFilter": "פילטר סוג ברירת מחדל", 
+            "defaultAccountFilter": "פילטר חשבון ברירת מחדל",
+            "defaultDateRangeFilter": "פילטר טווח תאריכים ברירת מחדל",
+            "defaultSearchFilter": "פילטר חיפוש ברירת מחדל",
+            "defaultProfitFilter": "פילטר רווחיות ברירת מחדל",
+            
+            // צבעים
+            "theme": "ערכת נושא",
+            "positiveColor": "צבע ערכים חיוביים",
+            "negativeColor": "צבע ערכים שליליים", 
+            "zeroColor": "צבע ערך אפס",
+            "positiveTextColor": "צבע טקסט חיובי",
+            "positiveBackgroundColor": "צבע רקע חיובי",
+            "negativeTextColor": "צבע טקסט שלילי",
+            "negativeBackgroundColor": "צבע רקע שלילי",
+            "zeroTextColor": "צבע טקסט אפס",
+            "zeroBackgroundColor": "צבע רקע אפס",
+            
+            // צבעי ישויות
+            "entityTradeColor": "צבע טריידים",
+            "entityTradePlanColor": "צבע תכנוני השקעה",
+            "entityExecutionColor": "צבע עסקאות",
+            "entityAccountColor": "צבע חשבונות",
+            "entityCashFlowColor": "צבע תזרים מזומנים",
+            "entityTickerColor": "צבע טיקרים",
+            "entityAlertColor": "צבע התראות",
+            "entityNoteColor": "צבע הערות",
+            "entityConstraintColor": "צבע אילוצים",
+            "entityDesignColor": "צבע עיצובים",
+            "entityResearchColor": "צבע מחקר",
+            "entityPreferenceColor": "צבע העדפות",
+            
+            // צבעי סטטוסים
+            "statusOpenMediumColor": "צבע סטטוס פתוח",
+            "statusOpenLightColor": "צבע רקע סטטוס פתוח",
+            "statusClosedMediumColor": "צבע סטטוס סגור",
+            "statusClosedLightColor": "צבע רקע סטטוס סגור",
+            "statusCancelledMediumColor": "צבע סטטוס מבוטל",
+            "statusCancelledLightColor": "צבע רקע סטטוס מבוטל",
+            
+            // צבעי סוגי השקעה
+            "investmentTypeSwingMediumColor": "צבע סווינג",
+            "investmentTypeSwingLightColor": "צבע רקע סווינג",
+            "investmentTypeInvestmentMediumColor": "צבע השקעה",
+            "investmentTypeInvestmentLightColor": "צבע רקע השקעה",
+            "investmentTypePassiveMediumColor": "צבע פאסיבי",
+            "investmentTypePassiveLightColor": "צבע רקע פאסיבי",
+            
+            // שקיפות
+            "mainHeaderOpacity": "שקיפות כותרת ראשית",
+            "subHeaderOpacity": "שקיפות כותרת משנית",
+            
+            // נתונים חיצוניים
+            "dataRefreshInterval": "מרווח רענון נתונים",
+            "primaryDataProvider": "ספק נתונים ראשי",
+            "secondaryDataProvider": "ספק נתונים משני",
+            "fallbackDataProvider": "ספק נתונים גיבוי",
+            "cacheTTL": "מרווח זמן Cache",
+            "cacheTtl": "מרווח זמן Cache (חדש)",
+            "maxBatchSize": "מספר מקסימלי של טיקרים לרענון",
+            "requestDelay": "מרווח בין בקשות",
+            "retryAttempts": "מספר ניסיונות חוזרים",
+            "retryDelay": "זמן פסקה בין ניסיונות",
+            "autoRefresh": "רענון אוטומטי",
+            "verboseLogging": "לוגים מפורטים",
+            
+            // מרווחי עדכון מתקדמים
+            "activeInHours": "טיקרים עם טרייד פעיל - בשעות מסחר",
+            "activeOffHours": "טיקרים עם טרייד פעיל - מחוץ לשעות מסחר",
+            "noActiveInHours": "טיקרים ללא טרייד פעיל - בשעות מסחר",
+            "noActiveOffHours": "טיקרים ללא טרייד פעיל - מחוץ לשעות מסחר",
+            "closedOffset": "טיקרים סגורים/מבוטלים",
+            
+            // ממשק משתמש
+            "compactMode": "מצב קומפקטי",
+            "showAnimations": "אנימציות",
+            "tablePageSize": "שורות לעמוד",
+            "tableRefreshInterval": "רענון טבלאות",
+            
+            // קונסול
+            "consoleAutoClear": "ניקוי אוטומטי של קונסול",
+            "consoleClearInterval": "מרווח ניקוי קונסול",
+            "consoleSuppressMessages": "הסתרת הודעות קונסול",
+            "consoleSuppressDuration": "משך הסתרת הודעות"
+        };
+
+        // סטטוסים מומלצים
+        const recommendedStatuses = {
+            // פעילים - שדות חיוניים
+            "primaryCurrency": "active",
+            "timezone": "active", 
+            "defaultStopLoss": "active",
+            "defaultTargetPrice": "active",
+            "defaultCommission": "active",
+            "defaultStatusFilter": "active",
+            "defaultTypeFilter": "active",
+            "defaultDateRangeFilter": "active",
+            "dataRefreshInterval": "active",
+            "primaryDataProvider": "active",
+            "autoRefresh": "active",
+            
+            // בפיתוח - שדות מתקדמים
+            "secondaryCurrency": "development",
+            "language": "development",
+            "riskPercentage": "development",
+            "defaultTradeAmount": "development",
+            "defaultProfitFilter": "development",
+            "theme": "development",
+            "positiveColor": "development",
+            "negativeColor": "development",
+            "zeroColor": "development",
+            "entityTradeColor": "development",
+            "entityAccountColor": "development",
+            "entityTickerColor": "development",
+            "entityAlertColor": "development",
+            "compactMode": "development",
+            "showAnimations": "development",
+            "tablePageSize": "development",
+            "tableRefreshInterval": "development",
+            "secondaryDataProvider": "development",
+            "fallbackDataProvider": "development",
+            "cacheTtl": "development",
+            "maxBatchSize": "development",
+            
+            // לא פעיל - שדות מורכבים
+            "defaultAccountFilter": "disabled",
+            "defaultSearchFilter": "disabled",
+            "requestDelay": "disabled",
+            "retryAttempts": "disabled",
+            "retryDelay": "disabled",
+            "verboseLogging": "disabled",
+            "consoleAutoClear": "disabled",
+            "consoleClearInterval": "disabled",
+            "consoleSuppressMessages": "disabled",
+            "consoleSuppressDuration": "disabled",
+            
+            // לא נחוץ - שדות מיוחדים
+            "positiveTextColor": "not-needed",
+            "positiveBackgroundColor": "not-needed",
+            "negativeTextColor": "not-needed",
+            "negativeBackgroundColor": "not-needed",
+            "zeroTextColor": "not-needed",
+            "zeroBackgroundColor": "not-needed",
+            "entityTradePlanColor": "not-needed",
+            "entityExecutionColor": "not-needed",
+            "entityCashFlowColor": "not-needed",
+            "entityNoteColor": "not-needed",
+            "entityConstraintColor": "not-needed",
+            "entityDesignColor": "not-needed",
+            "entityResearchColor": "not-needed",
+            "entityPreferenceColor": "not-needed",
+            "statusOpenMediumColor": "not-needed",
+            "statusOpenLightColor": "not-needed",
+            "statusClosedMediumColor": "not-needed",
+            "statusClosedLightColor": "not-needed",
+            "statusCancelledMediumColor": "not-needed",
+            "statusCancelledLightColor": "not-needed",
+            "investmentTypeSwingMediumColor": "not-needed",
+            "investmentTypeSwingLightColor": "not-needed",
+            "investmentTypeInvestmentMediumColor": "not-needed",
+            "investmentTypeInvestmentLightColor": "not-needed",
+            "investmentTypePassiveMediumColor": "not-needed",
+            "investmentTypePassiveLightColor": "not-needed",
+            "mainHeaderOpacity": "not-needed",
+            "subHeaderOpacity": "not-needed",
+            "activeInHours": "not-needed",
+            "activeOffHours": "not-needed",
+            "noActiveInHours": "not-needed",
+            "noActiveOffHours": "not-needed",
+            "closedOffset": "not-needed",
+            "cacheTTL": "not-needed"
+        };
+
+        // איסוף כל השדות הייחודיים
+        const allFields = new Set();
+        Object.values(preferencesData).forEach(version => {
+            version.fields.forEach(field => allFields.add(field));
+        });
+
+        // יצירת הטבלה
+        function generateTable() {
+            const tbody = document.getElementById('preferencesTableBody');
+            tbody.innerHTML = '';
+
+            Array.from(allFields).sort().forEach(field => {
+                const row = document.createElement('tr');
+                row.className = 'field-row';
+                
+                const fieldName = fieldNames[field] || field;
+                const recommendedStatus = recommendedStatuses[field] || 'not-needed';
+                
+                row.innerHTML = `
+                    <td><strong>${fieldName}</strong><br><small class="text-muted">${field}</small></td>
+                    <td class="text-center">${preferencesData.version1.fields.includes(field) ? '✅' : '❌'}</td>
+                    <td class="text-center">${preferencesData.version2.fields.includes(field) ? '✅' : '❌'}</td>
+                    <td class="text-center">${preferencesData.version3.fields.includes(field) ? '✅' : '❌'}</td>
+                    <td class="text-center">${preferencesData.version4.fields.includes(field) ? '✅' : '❌'}</td>
+                    <td>
+                        <select class="form-select form-select-sm status-select" data-field="${field}" onchange="updateStatus('${field}', this.value)">
+                            <option value="active" ${recommendedStatus === 'active' ? 'selected' : ''}>פעיל</option>
+                            <option value="development" ${recommendedStatus === 'development' ? 'selected' : ''}>בפיתוח</option>
+                            <option value="disabled" ${recommendedStatus === 'disabled' ? 'selected' : ''}>לא פעיל</option>
+                            <option value="not-needed" ${recommendedStatus === 'not-needed' ? 'selected' : ''}>לא נחוץ</option>
+                        </select>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            updateCounts();
+        }
+
+        // עדכון סטטוס
+        function updateStatus(field, status) {
+            recommendedStatuses[field] = status;
+            updateCounts();
+        }
+
+        // עדכון מונים
+        function updateCounts() {
+            const counts = {
+                active: 0,
+                development: 0,
+                disabled: 0,
+                'not-needed': 0
+            };
+            
+            Object.values(recommendedStatuses).forEach(status => {
+                counts[status]++;
+            });
+            
+            document.getElementById('activeCount').textContent = counts.active;
+            document.getElementById('developmentCount').textContent = counts.development;
+            document.getElementById('notNeededCount').textContent = counts['not-needed'];
+        }
+
+        // ייצוא ל-CSV
+        function exportToCSV() {
+            const csvContent = generateCSV();
+            downloadFile(csvContent, 'preferences-analysis.csv', 'text/csv');
+        }
+
+        // ייצוא ל-JSON
+        function exportToJSON() {
+            const jsonContent = JSON.stringify({
+                analysis: {
+                    versions: preferencesData,
+                    fieldNames: fieldNames,
+                    recommendedStatuses: recommendedStatuses,
+                    summary: {
+                        totalFields: Object.keys(allFields).length,
+                        active: Object.values(recommendedStatuses).filter(s => s === 'active').length,
+                        development: Object.values(recommendedStatuses).filter(s => s === 'development').length,
+                        disabled: Object.values(recommendedStatuses).filter(s => s === 'disabled').length,
+                        notNeeded: Object.values(recommendedStatuses).filter(s => s === 'not-needed').length
+                    }
+                }
+            }, null, 2);
+            downloadFile(jsonContent, 'preferences-analysis.json', 'application/json');
+        }
+
+        // יצירת CSV
+        function generateCSV() {
+            let csv = 'שדה,שם עברי,גרסה 1,גרסה 2,גרסה 3,גרסה 4,סטטוס מומלץ\n';
+            
+            Array.from(allFields).sort().forEach(field => {
+                const fieldName = fieldNames[field] || field;
+                const recommendedStatus = recommendedStatuses[field] || 'not-needed';
+                
+                csv += `"${field}","${fieldName}",`;
+                csv += `${preferencesData.version1.fields.includes(field) ? 'כן' : 'לא'},`;
+                csv += `${preferencesData.version2.fields.includes(field) ? 'כן' : 'לא'},`;
+                csv += `${preferencesData.version3.fields.includes(field) ? 'כן' : 'לא'},`;
+                csv += `${preferencesData.version4.fields.includes(field) ? 'כן' : 'לא'},`;
+                csv += `"${recommendedStatus}"\n`;
+            });
+            
+            return csv;
+        }
+
+        // הורדת קובץ
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // יצירת דוח
+        function generateReport() {
+            const report = `
+דוח ניתוח שדות העדפות - TikTrack
+=====================================
+
+סיכום כללי:
+- גרסאות נבדקות: 4
+- שדות פעילים: ${Object.values(recommendedStatuses).filter(s => s === 'active').length}
+- שדות בפיתוח: ${Object.values(recommendedStatuses).filter(s => s === 'development').length}
+- שדות לא פעילים: ${Object.values(recommendedStatuses).filter(s => s === 'disabled').length}
+- שדות לא נחוצים: ${Object.values(recommendedStatuses).filter(s => s === 'not-needed').length}
+
+המלצות יישום:
+1. התחל עם השדות הפעילים - אלו חיוניים למערכת
+2. הוסף שדות בפיתוח עם הודעת "בפיתוח"
+3. הצג שדות לא פעילים במצב disabled
+4. השמט שדות לא נחוצים מהעמוד
+
+תאריך יצירת הדוח: ${new Date().toLocaleDateString('he-IL')}
+            `;
+            
+            downloadFile(report, 'preferences-report.txt', 'text/plain');
+        }
+
+        // איפוס כל הסטטוסים
+        function resetAllStatuses() {
+            if (confirm('האם אתה בטוח שברצונך לאפס את כל הסטטוסים?')) {
+                Object.keys(recommendedStatuses).forEach(field => {
+                    const select = document.querySelector(`[data-field="${field}"]`);
+                    if (select) {
+                        select.value = 'not-needed';
+                        recommendedStatuses[field] = 'not-needed';
+                    }
+                });
+                updateCounts();
+            }
+        }
+
+        // אתחול
+        document.addEventListener('DOMContentLoaded', function() {
+            generateTable();
+        });
+    </script>
+</body>
+</html>

@@ -145,12 +145,14 @@ function generateCurrencyOptions(account = null) {
 
 // פונקציה לטעינת חשבונות מהשרת
 async function loadAccountsFromServer() {
+  console.log('🔄 loadAccountsFromServer - התחלת טעינת חשבונות מהשרת');
   try {
     // בדיקה אם יש token שמור
     const token = localStorage.getItem('authToken');
+    console.log('🔑 Token זמין:', !!token);
 
     if (!token) {
-      // נסיון לטעון ללא token
+      console.log('⚠️ אין token - מנסה לטעון ללא הרשאה');
     }
 
     // Fetching accounts from server
@@ -162,19 +164,26 @@ async function loadAccountsFromServer() {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
+    console.log('📡 שליחת בקשה ל-API:', '/api/v1/accounts/');
     const response = await fetch('/api/v1/accounts/', {
       method: 'GET',
       headers,
     });
+    
+    console.log('📡 תגובת שרת:', response.status, response.ok);
 
     if (response.ok) {
       const responseData = await response.json();
+      console.log('📊 נתונים גולמיים מהשרת:', responseData);
 
       // טיפול במבנה התשובה - יכול להיות ישירות מערך או בתוך data
       const allAccounts = responseData.data || responseData;
+      console.log('📊 כל החשבונות:', allAccounts.length, 'חשבונות');
 
       // סינון רק חשבונות בסטטוס open
       const openAccounts = allAccounts.filter(account => account.status === 'open');
+      console.log('📊 חשבונות פתוחים:', openAccounts.length, 'חשבונות');
+      
       window.accountsData = openAccounts;
       window.accountsLoaded = true;
 
@@ -186,10 +195,12 @@ async function loadAccountsFromServer() {
       // החזרת הנתונים לטעינה חוזרת
       return openAccounts;
     } else {
+      console.warn('⚠️ תגובת שרת לא תקינה:', response.status);
       loadDefaultAccounts();
     }
 
-  } catch {
+  } catch (error) {
+    console.error('❌ שגיאה בטעינת חשבונות מהשרת:', error);
     loadDefaultAccounts();
   }
 }
@@ -267,16 +278,20 @@ function loadDefaultAccounts() {
 
 // פונקציה לטעינת נתוני חשבונות מהשרת
 async function loadAccountsData() {
+  console.log('🔄 loadAccountsData - התחלת טעינת נתוני חשבונות');
   try {
     // טוען נתוני חשבונות מהשרת
 
     // בדיקה אם יש פונקציה apiCall זמינה
     if (typeof window.apiCall === 'function') {
+      console.log('📡 משתמש ב-apiCall');
       const response = await window.apiCall('/api/v1/accounts/');
       const accounts = response.data || response;
+      console.log('📊 חשבונות מ-apiCall:', accounts.length, 'חשבונות');
       // חשבונות שהתקבלו
       return accounts;
     } else {
+      console.log('📡 apiCall לא זמין - משתמש ב-loadAccountsFromServer');
       // קריאה ישירה ל-API
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const response = await fetch(`${base}/api/v1/accounts/`);
@@ -1148,26 +1163,34 @@ function showEditAccountModal(account) {
  * @returns {Promise<Array>} מערך של חשבונות
  */
 async function loadAccountsDataFromAPI() {
+  console.log('🔄 loadAccountsDataFromAPI - התחלת טעינת נתונים מ-API');
   try {
+    console.log('📡 שליחת בקשה ל-API:', '/api/v1/accounts/');
     const response = await fetch('/api/v1/accounts/');
+    console.log('📡 תגובת שרת:', response.status, response.ok);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const result = await response.json();
+    console.log('📊 תוצאה מ-API:', result);
 
     // בדיקה אם התוצאה מכילה מערך נתונים
     if (result.data && Array.isArray(result.data)) {
+      console.log('📊 החזרת נתונים מ-result.data:', result.data.length, 'חשבונות');
       return result.data;
     } else if (Array.isArray(result)) {
+      console.log('📊 החזרת נתונים מ-result:', result.length, 'חשבונות');
       return result;
     } else {
+      console.error('❌ פורמט תגובה לא תקין:', result);
       handleSystemError(new Error('מבנה נתונים לא צפוי'), 'מבנה נתונים לא צפוי מה-API');
       throw new Error('מבנה נתונים לא צפוי מה-API');
     }
 
   } catch (error) {
+    console.error('❌ שגיאה ב-loadAccountsDataFromAPI:', error);
     handleApiError('שגיאה בקריאה ל-API', error.message);
     throw error;
   }
@@ -1616,8 +1639,10 @@ async function loadAccountsDataForAccountsPage() {
     // טעינת נתונים מהשרת
     let accounts;
     if (typeof window.loadAccountsDataFromAPI === 'function') {
+      console.log('📡 משתמש ב-loadAccountsDataFromAPI');
       accounts = await window.loadAccountsDataFromAPI();
     } else {
+      console.log('📡 משתמש ב-loadAccountsData');
       accounts = await loadAccountsData();
     }
     
@@ -1633,6 +1658,7 @@ async function loadAccountsDataForAccountsPage() {
     // שמירת הנתונים במשתנה גלובלי
     window.accountsData = accounts;
     window.allAccountsData = accounts;
+    console.log('💾 נתונים נשמרו ב-window.accountsData:', accounts.length, 'חשבונות');
 
     // החלת פילטרים על הנתונים
     let filteredAccounts = [...accounts];
@@ -1668,6 +1694,8 @@ async function loadAccountsDataForAccountsPage() {
       const tbody = document.querySelector('#accountsTable tbody');
       if (tbody && tbody.children.length === 0 && filteredAccounts.length > 0) {
         console.warn('⚠️ הטבלה לא התעדכנה כראוי - אין שורות בטבלה');
+      } else {
+        console.log('✅ הטבלה התעדכנה בהצלחה');
       }
       
       // יישום צבעי ישויות על כותרות
@@ -1863,29 +1891,41 @@ window.restoreAccountsSectionState = restoreAccountsSectionState;
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
+  console.log('🔄 אתחול דף החשבונות...');
+  console.log('📍 נתיב הדף:', window.location.pathname);
+  
   // טעינת מטבעות
+  console.log('💰 טעינת מטבעות...');
   loadCurrenciesFromServer();
 
   // יישום צבעי ישות על כותרות
   if (window.applyEntityColorsToHeaders) {
+    console.log('🎨 יישום צבעי ישות על כותרות');
     window.applyEntityColorsToHeaders('account');
   }
 
   // בדיקה אם אנחנו בדף החשבונות
   if (window.location.pathname.includes('/accounts')) {
+    console.log('🎯 נמצאים בדף החשבונות - מתחיל טעינת נתונים');
     // טעינת נתוני חשבונות
     if (typeof window.loadAccountsDataForAccountsPage === 'function') {
+      console.log('📡 קורא ל-loadAccountsDataForAccountsPage');
       window.loadAccountsDataForAccountsPage();
     } else {
+      console.error('❌ loadAccountsDataForAccountsPage לא נמצאה');
       handleFunctionNotFound('loadAccountsDataForAccountsPage', 'פונקציית טעינת נתוני חשבונות לא נמצאה');
     }
 
     // שחזור מצב הסקשנים
     if (typeof window.restoreAccountsSectionState === 'function') {
+      console.log('🔄 שחזור מצב הסקשנים');
       window.restoreAccountsSectionState();
     } else {
+      console.error('❌ restoreAccountsSectionState לא נמצאה');
       handleFunctionNotFound('restoreAccountsSectionState', 'פונקציית שחזור מצב סקשנים לא נמצאה');
     }
+  } else {
+    console.log('📍 לא נמצאים בדף החשבונות - דילוג על טעינת נתונים');
   }
 });
 

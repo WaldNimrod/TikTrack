@@ -30,7 +30,7 @@
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <h1><i class="bi bi-gear-fill"></i> הגדרות מערכת</h1>
-            <p>מערכת הגדרות מתקדמת עם פרופילים מרובים ואפשרויות יבוא/יצוא</p>
+            <p>מערכת הגדרות מתקדמת עם כל השדות הנדרשים - בסיסיות, עיצובים, מערכת, נתונים חיצוניים ומתקדמות</p>
           </div>
           <div class="d-flex gap-3">
             <button class="btn btn-modern btn-export" onclick="exportPreferences()">
@@ -153,11 +153,12 @@
                   </div>
                   <div class="col-6">
                     <label class="form-label small">משני</label>
-                    <select id="secondaryCurrency" class="form-select form-control-modern">
+                    <select id="secondaryCurrency" class="form-select form-control-modern" disabled>
                       <option value="ILS">ILS - שקל</option>
                       <option value="USD">USD - דולר</option>
                       <option value="EUR">EUR - יורו</option>
                     </select>
+                    <small class="text-muted">בפיתוח</small>
                   </div>
                 </div>
               </div>
@@ -181,10 +182,11 @@
                   </div>
                   <div class="col-6">
                     <label class="form-label small">שפה</label>
-                    <select id="language" class="form-select form-control-modern">
+                    <select id="language" class="form-select form-control-modern" disabled>
                       <option value="he">עברית</option>
                       <option value="en">English</option>
                     </select>
+                    <small class="text-muted">בפיתוח</small>
                   </div>
                 </div>
               </div>
@@ -238,17 +240,39 @@
                     <label class="form-label small">סיכון לעסקה</label>
                     <div class="input-group">
                       <input type="number" id="riskPercentage" class="form-control form-control-modern"
-                             min="0.1" max="10" step="0.1" value="2">
+                             min="0.1" max="10" step="0.1" value="2" disabled>
                       <span class="input-group-text">%</span>
                     </div>
+                    <small class="text-muted">בפיתוח</small>
                   </div>
                   <div class="col-6">
                     <label class="form-label small">סכום ברירת מחדל</label>
                     <div class="input-group">
                       <input type="number" id="defaultTradeAmount" class="form-control form-control-modern"
-                             min="100" step="100" placeholder="אוטומטי">
+                             min="100" step="100" placeholder="אוטומטי" disabled>
                       <span class="input-group-text">$</span>
                     </div>
+                    <small class="text-muted">לא נחוץ</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- הגדרות חשבון -->
+            <div class="setting-item">
+              <div class="setting-label">
+                <h5>🏦 הגדרות חשבון</h5>
+                <p>פילטר חשבון ברירת מחדל</p>
+              </div>
+              <div class="setting-control">
+                <div class="row g-2">
+                  <div class="col-12">
+                    <label class="form-label small">חשבון ברירת מחדל</label>
+                    <select id="defaultAccountFilter" class="form-select form-control-modern">
+                      <option value="all">כל החשבונות</option>
+                      <option value="main">חשבון ראשי</option>
+                      <option value="secondary">חשבון משני</option>
+                    </select>
                   </div>
                 </div>
               </div>
@@ -324,16 +348,68 @@
                 <div class="row g-2">
                   <div class="col-6">
                     <label class="form-label small">רווחיות</label>
-                    <select id="defaultProfitFilter" class="form-select form-control-modern">
+                    <select id="defaultProfitFilter" class="form-select form-control-modern" disabled>
                       <option value="all">הכול</option>
                       <option value="profit">רווח</option>
                       <option value="loss">הפסד</option>
                     </select>
+                    <small class="text-muted">לא נחוץ</small>
                   </div>
                   <div class="col-6">
                     <label class="form-label small">חיפוש ברירת מחדל</label>
                     <input type="text" id="defaultSearchFilter" class="form-control form-control-modern"
                            placeholder="השאר ריק">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- פילטרים נוספים -->
+            <div class="setting-item">
+              <div class="setting-label">
+                <h5>🔍 פילטרים נוספים</h5>
+                <p>פילטרים מתקדמים לטיקרים</p>
+              </div>
+              <div class="setting-control">
+                <div class="row g-2">
+                  <div class="col-6">
+                    <label class="form-label small">טיקרים עם טרייד פעיל - בשעות מסחר</label>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" id="activeInHours">
+                      <label class="form-check-label" for="activeInHours">פעיל</label>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small">טיקרים עם טרייד פעיל - מחוץ לשעות מסחר</label>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" id="activeOffHours">
+                      <label class="form-check-label" for="activeOffHours">פעיל</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="row g-2 mt-2">
+                  <div class="col-6">
+                    <label class="form-label small">טיקרים ללא טרייד פעיל - בשעות מסחר</label>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" id="noActiveInHours">
+                      <label class="form-check-label" for="noActiveInHours">פעיל</label>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small">טיקרים ללא טרייד פעיל - מחוץ לשעות מסחר</label>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" id="noActiveOffHours">
+                      <label class="form-check-label" for="noActiveOffHours">פעיל</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="row g-2 mt-2">
+                  <div class="col-12">
+                    <label class="form-label small">טיקרים סגורים/מבוטלים</label>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" id="closedOffset">
+                      <label class="form-check-label" for="closedOffset">פעיל</label>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -448,6 +524,102 @@
                   </div>
                 </div>
               </div>
+              <div class="row g-2 mt-2">
+                <div class="col-3 text-center">
+                  <label class="form-label small">עסקאות</label>
+                  <div class="color-picker-group justify-content-center">
+                    <div class="color-preview" style="background-color: #6f42c1"
+                         onclick="openEntityColorPicker('execution')"></div>
+                  </div>
+                </div>
+                <div class="col-3 text-center">
+                  <label class="form-label small">תזרים מזומנים</label>
+                  <div class="color-picker-group justify-content-center">
+                    <div class="color-preview" style="background-color: #20c997"
+                         onclick="openEntityColorPicker('cashflow')"></div>
+                  </div>
+                </div>
+                <div class="col-3 text-center">
+                  <label class="form-label small">תכנוני השקעה</label>
+                  <div class="color-picker-group justify-content-center">
+                    <div class="color-preview" style="background-color: #fd7e14"
+                         onclick="openEntityColorPicker('tradeplan')"></div>
+                  </div>
+                </div>
+                <div class="col-3 text-center">
+                  <label class="form-label small">הערות</label>
+                  <div class="color-picker-group justify-content-center">
+                    <div class="color-preview" style="background-color: #6c757d"
+                         onclick="openEntityColorPicker('note')"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- צבעי סטטוסים -->
+          <div class="setting-item">
+            <div class="setting-label">
+              <h5>📊 צבעי סטטוסים</h5>
+              <p>צבעי סטטוסי טריידים (פתוח, סגור, מבוטל)</p>
+            </div>
+            <div class="setting-control">
+              <div class="row g-2">
+                <div class="col-4 text-center">
+                  <label class="form-label small">פתוח</label>
+                  <div class="color-picker-group justify-content-center">
+                    <div class="color-preview" style="background-color: #28a745"
+                         onclick="openStatusColorPicker('open')"></div>
+                  </div>
+                </div>
+                <div class="col-4 text-center">
+                  <label class="form-label small">סגור</label>
+                  <div class="color-picker-group justify-content-center">
+                    <div class="color-preview" style="background-color: #6c757d"
+                         onclick="openStatusColorPicker('closed')"></div>
+                  </div>
+                </div>
+                <div class="col-4 text-center">
+                  <label class="form-label small">מבוטל</label>
+                  <div class="color-picker-group justify-content-center">
+                    <div class="color-preview" style="background-color: #dc3545"
+                         onclick="openStatusColorPicker('cancelled')"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- צבעי סוגי השקעה -->
+          <div class="setting-item">
+            <div class="setting-label">
+              <h5>💼 צבעי סוגי השקעה</h5>
+              <p>צבעי סוגי השקעה (סווינג, השקעה, פאסיבי)</p>
+            </div>
+            <div class="setting-control">
+              <div class="row g-2">
+                <div class="col-4 text-center">
+                  <label class="form-label small">סווינג</label>
+                  <div class="color-picker-group justify-content-center">
+                    <div class="color-preview" style="background-color: #007bff"
+                         onclick="openInvestmentColorPicker('swing')"></div>
+                  </div>
+                </div>
+                <div class="col-4 text-center">
+                  <label class="form-label small">השקעה</label>
+                  <div class="color-picker-group justify-content-center">
+                    <div class="color-preview" style="background-color: #28a745"
+                         onclick="openInvestmentColorPicker('investment')"></div>
+                  </div>
+                </div>
+                <div class="col-4 text-center">
+                  <label class="form-label small">פאסיבי</label>
+                  <div class="color-picker-group justify-content-center">
+                    <div class="color-preview" style="background-color: #ffc107"
+                         onclick="openInvestmentColorPicker('passive')"></div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           
@@ -473,17 +645,19 @@
                 <div class="d-flex gap-4 align-items-center">
                   <div>
                     <label class="custom-switch">
-                      <input type="checkbox" id="compactMode">
+                      <input type="checkbox" id="compactMode" disabled>
                       <span class="slider"></span>
                     </label>
                     <small class="text-muted d-block mt-1">מצב קומפקטי</small>
+                    <small class="text-muted">לא פעיל</small>
                   </div>
                   <div>
                     <label class="custom-switch">
-                      <input type="checkbox" id="showAnimations" checked>
+                      <input type="checkbox" id="showAnimations" checked disabled>
                       <span class="slider"></span>
                     </label>
                     <small class="text-muted d-block mt-1">אנימציות</small>
+                    <small class="text-muted">בפיתוח</small>
                   </div>
                 </div>
               </div>
@@ -499,17 +673,123 @@
                 <div class="row g-2">
                   <div class="col-6">
                     <label class="form-label small">שורות לעמוד</label>
-                    <select id="tablePageSize" class="form-select form-control-modern">
+                    <select id="tablePageSize" class="form-select form-control-modern" disabled>
                       <option value="10">10</option>
                       <option value="25" selected>25</option>
                       <option value="50">50</option>
                       <option value="100">100</option>
                     </select>
+                    <small class="text-muted">לא פעיל</small>
                   </div>
                   <div class="col-6">
                     <label class="form-label small">רענון (שניות)</label>
                     <input type="number" id="tableRefreshInterval" class="form-control form-control-modern"
-                           min="10" max="300" value="30">
+                           min="10" max="300" value="30" disabled>
+                    <small class="text-muted">לא פעיל</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+      
+      <!-- ===== הגדרות מערכת ושרת ===== -->
+      <div class="settings-section slide-in">
+        <div class="section-header" onclick="toggleSection('system')">
+          <h3><span class="section-icon">⚙️</span> הגדרות מערכת ושרת</h3>
+          <span class="section-toggle" id="system-toggle">▼</span>
+        </div>
+        <div class="section-body" id="system-body">
+          <div class="settings-grid">
+            
+            <!-- מערכת קונסול -->
+            <div class="setting-item">
+              <div class="setting-label">
+                <h5>🖥️ מערכת קונסול</h5>
+                <p>הגדרות קונסול וניקוי אוטומטי</p>
+              </div>
+              <div class="setting-control">
+                <div class="row g-2">
+                  <div class="col-6">
+                    <label class="form-label small">ניקוי אוטומטי</label>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" id="consoleAutoClear" checked>
+                      <label class="form-check-label" for="consoleAutoClear">פעיל</label>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small">מרווח ניקוי (דקות)</label>
+                    <input type="number" id="consoleClearInterval" class="form-control form-control-modern"
+                           min="1" max="60" value="5">
+                  </div>
+                </div>
+                <div class="row g-2 mt-2">
+                  <div class="col-6">
+                    <label class="form-label small">הסתרת הודעות</label>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" id="consoleSuppressMessages" checked>
+                      <label class="form-check-label" for="consoleSuppressMessages">פעיל</label>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small">משך הסתרה (שניות)</label>
+                    <input type="number" id="consoleSuppressDuration" class="form-control form-control-modern"
+                           min="1" max="300" value="10">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- לוגים ורענון -->
+            <div class="setting-item">
+              <div class="setting-label">
+                <h5>📝 לוגים ורענון</h5>
+                <p>הגדרות לוגים ורענון אוטומטי</p>
+              </div>
+              <div class="setting-control">
+                <div class="row g-2">
+                  <div class="col-6">
+                    <label class="form-label small">לוגים מפורטים</label>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" id="verboseLogging">
+                      <label class="form-check-label" for="verboseLogging">פעיל</label>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small">רענון אוטומטי</label>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
+                      <label class="form-check-label" for="autoRefresh">פעיל</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- הגדרות רשת -->
+            <div class="setting-item">
+              <div class="setting-label">
+                <h5>🌐 הגדרות רשת</h5>
+                <p>מרווחים וניסיונות חוזרים</p>
+              </div>
+              <div class="setting-control">
+                <div class="row g-2">
+                  <div class="col-4">
+                    <label class="form-label small">מרווח בין בקשות (ms)</label>
+                    <input type="number" id="requestDelay" class="form-control form-control-modern"
+                           min="100" max="5000" value="1000">
+                  </div>
+                  <div class="col-4">
+                    <label class="form-label small">ניסיונות חוזרים</label>
+                    <input type="number" id="retryAttempts" class="form-control form-control-modern"
+                           min="1" max="10" value="3">
+                  </div>
+                  <div class="col-4">
+                    <label class="form-label small">זמן פסקה (ms)</label>
+                    <input type="number" id="retryDelay" class="form-control form-control-modern"
+                           min="1000" max="30000" value="5000">
                   </div>
                 </div>
               </div>
@@ -538,27 +818,30 @@
                 <div class="row g-2">
                   <div class="col-4">
                     <label class="form-label small">ראשי</label>
-                    <select id="primaryDataProvider" class="form-select form-control-modern">
+                    <select id="primaryDataProvider" class="form-select form-control-modern" disabled>
                       <option value="yahoo">Yahoo Finance</option>
                       <option value="google">Google Finance</option>
                       <option value="alpha_vantage">Alpha Vantage</option>
                     </select>
+                    <small class="text-muted">בפיתוח</small>
                   </div>
                   <div class="col-4">
                     <label class="form-label small">משני</label>
-                    <select id="secondaryDataProvider" class="form-select form-control-modern">
+                    <select id="secondaryDataProvider" class="form-select form-control-modern" disabled>
                       <option value="google">Google Finance</option>
                       <option value="yahoo">Yahoo Finance</option>
                       <option value="alpha_vantage">Alpha Vantage</option>
                     </select>
+                    <small class="text-muted">בפיתוח</small>
                   </div>
                   <div class="col-4">
                     <label class="form-label small">גיבוי</label>
-                    <select id="fallbackDataProvider" class="form-select form-control-modern">
+                    <select id="fallbackDataProvider" class="form-select form-control-modern" disabled>
                       <option value="alpha_vantage">Alpha Vantage</option>
                       <option value="yahoo">Yahoo Finance</option>
                       <option value="google">Google Finance</option>
                     </select>
+                    <small class="text-muted">בפיתוח</small>
                   </div>
                 </div>
               </div>
@@ -592,6 +875,66 @@
                     <label class="form-label small">Batch Size</label>
                     <input type="number" id="maxBatchSize" class="form-control form-control-modern"
                            min="1" max="100" value="25">
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+      
+      <!-- ===== הגדרות מתקדמות ===== -->
+      <div class="settings-section slide-in">
+        <div class="section-header" onclick="toggleSection('advanced')">
+          <h3><span class="section-icon">🔧</span> הגדרות מתקדמות</h3>
+          <span class="section-toggle" id="advanced-toggle">▼</span>
+        </div>
+        <div class="section-body" id="advanced-body">
+          <div class="settings-grid">
+            
+            <!-- הגדרות שקיפות -->
+            <div class="setting-item">
+              <div class="setting-label">
+                <h5>👁️ שקיפות כותרות</h5>
+                <p>הגדרות שקיפות כותרות ראשיות ומשניות</p>
+              </div>
+              <div class="setting-control">
+                <div class="row g-2">
+                  <div class="col-6">
+                    <label class="form-label small">שקיפות כותרת ראשית</label>
+                    <input type="range" id="mainHeaderOpacity" class="form-range" 
+                           min="0.1" max="1" step="0.1" value="0.9">
+                    <small class="text-muted">90%</small>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small">שקיפות כותרת משנית</label>
+                    <input type="range" id="subHeaderOpacity" class="form-range" 
+                           min="0.1" max="1" step="0.1" value="0.8">
+                    <small class="text-muted">80%</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- הגדרות Cache -->
+            <div class="setting-item">
+              <div class="setting-label">
+                <h5>💾 הגדרות Cache</h5>
+                <p>הגדרות Cache ו-TTL</p>
+              </div>
+              <div class="setting-control">
+                <div class="row g-2">
+                  <div class="col-6">
+                    <label class="form-label small">מרווח זמן Cache (דקות)</label>
+                    <input type="number" id="cacheTTL" class="form-control form-control-modern"
+                           min="1" max="1440" value="30" disabled>
+                    <small class="text-muted">לא נחוץ</small>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small">Cache TTL (דקות)</label>
+                    <input type="number" id="cacheTtl" class="form-control form-control-modern"
+                           min="1" max="1440" value="5">
                   </div>
                 </div>
               </div>

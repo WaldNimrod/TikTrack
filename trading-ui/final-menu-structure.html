@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>תפריט סופי - TikTrack</title>
+    
+    <style>
+        /* עיצוב פשוט ונקי */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+        }
+        
+        /* תפריט ראשי */
+        .menu {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 1rem 0;
+        }
+        
+        .menu-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0 2rem;
+            gap: 2rem;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1d1d1f;
+            text-decoration: none;
+            margin-right: auto;
+        }
+        
+        .logo.active {
+            color: #26baac; /* ירוק של הלוגו */
+        }
+        
+        .nav-list {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-link {
+            color: #1d1d1f;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 400;
+            padding: 0.5rem 0;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-link:hover {
+            color: #ff9c05; /* כתום */
+        }
+        
+        .nav-link.active {
+            color: #26baac; /* ירוק של הלוגו */
+        }
+        
+        /* איקון בית */
+        .home-icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+        
+        /* תפריט נפתח */
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            padding: 0.5rem 0;
+            display: none;
+            z-index: 1000;
+        }
+        
+        .dropdown-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #1d1d1f;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: background-color 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f5f5f7;
+            color: #ff9c05; /* כתום */
+        }
+        
+        .dropdown-item.active {
+            color: #26baac; /* ירוק של הלוגו */
+        }
+        
+        /* תפריט משנה */
+        .submenu {
+            position: absolute;
+            top: 0;
+            right: 100%;
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            min-width: 180px;
+            padding: 0.5rem 0;
+            display: none;
+            z-index: 1001;
+            margin-right: 0;
+        }
+        
+        .submenu-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #1d1d1f;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: background-color 0.2s ease;
+        }
+        
+        .submenu-item:hover {
+            background-color: #f5f5f7;
+            color: #ff9c05; /* כתום */
+        }
+        
+        .submenu-item.active {
+            color: #26baac; /* ירוק של הלוגו */
+        }
+        
+        /* מפריד */
+        .dropdown-divider {
+            height: 1px;
+            background-color: #e5e5e5;
+            margin: 0.5rem 0;
+        }
+        
+        /* הצגת תפריטים */
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        
+        .submenu-trigger:hover .submenu {
+            display: block;
+        }
+        
+        /* פריט שמפעיל תפריט משנה */
+        .submenu-trigger {
+            position: relative;
+        }
+        
+        .submenu-trigger-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #1d1d1f;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: background-color 0.2s ease;
+        }
+        
+        .submenu-trigger-link:hover {
+            background-color: #f5f5f7;
+            color: #ff9c05; /* כתום */
+        }
+        
+        /* תוכן הדף */
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .alert-info {
+            background-color: #e3f2fd;
+            border: 1px solid #bbdefb;
+            color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <!-- תפריט סופי -->
+    <nav class="menu">
+        <div class="menu-container">
+            <a href="#" class="logo active">TikTrack</a>
+            
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">
+                        <svg class="home-icon" viewBox="0 0 24 24">
+                            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                        </svg>
+                        בית
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">תכנון</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">מעקב</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">מחקר</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link">הגדרות</a>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-item submenu-trigger">
+                            <a href="#" class="submenu-trigger-link">התראות</a>
+                            <div class="submenu">
+                                <a href="#" class="submenu-item">הודעות</a>
+                                <a href="#" class="submenu-item">טיקרים</a>
+                            </div>
+                        </div>
+                        <a href="#" class="dropdown-item">חשבונות</a>
+                        <a href="#" class="dropdown-item">עסקאות</a>
+                        <a href="#" class="dropdown-item">תזרימי מזומן</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item">בסיס נתונים</a>
+                        <a href="#" class="dropdown-item">טבלאות עזר</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link">כלי פיתוח</a>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-item submenu-trigger">
+                            <a href="#" class="submenu-trigger-link">ניתור וניהול</a>
+                            <div class="submenu">
+                                <a href="#" class="submenu-item">דשבורד מערכת</a>
+                                <a href="#" class="submenu-item">מרכז התראות</a>
+                            </div>
+                        </div>
+                        <div class="dropdown-item submenu-trigger">
+                            <a href="#" class="submenu-trigger-link">ממשק משתמש</a>
+                            <div class="submenu">
+                                <a href="#" class="submenu-item">דשבור CSS</a>
+                                <a href="#" class="submenu-item">דוגמאות</a>
+                            </div>
+                        </div>
+                        <div class="dropdown-item submenu-trigger">
+                            <a href="#" class="submenu-trigger-link">כלים</a>
+                            <div class="submenu">
+                                <a href="#" class="submenu-item">נתונים חיצוניים</a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- תוכן הדף -->
+    <div class="content">
+        <div class="card">
+            <h1>תפריט סופי - TikTrack</h1>
+            <p>זהו התפריט הסופי עם כל הדיוקים שביקשת.</p>
+            
+            <div class="alert alert-info">
+                <h5>הוראות בדיקה:</h5>
+                <ul>
+                    <li>✅ התפריט מיושר לימין</li>
+                    <li>✅ בית עם איקון home</li>
+                    <li>✅ דף פעיל מסומן בירוק</li>
+                    <li>✅ Hover מסומן בכתום</li>
+                    <li>✅ עץ העמודים הנכון</li>
+                    <li>✅ מפריד בין קבוצות</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

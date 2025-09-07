@@ -2619,3 +2619,4 @@ function viewAccountDetails(accountId) {
 window.showAccountDetails = showAccountDetails;
 
 // סיום הקובץ
+console.log('✅ accounts.js נטען בהצלחה');

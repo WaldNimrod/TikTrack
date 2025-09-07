@@ -247,59 +247,7 @@
       // Define function as global
       window.sortTable = sortTable;
 
-      // ===== Account functions =====
-
-      // Account data - will be loaded from server
-      let accountsData = [];
-
-      // Function to load account data - simplified like database.js
-      async function loadAccountsData() {
-        console.log('🚀🚀🚀 accounts.html loadAccountsData STARTED 🚀🚀🚀');
-        try {
-          console.log('🔄 טוען נתוני חשבונות...');
-          console.log('🔄 About to fetch /api/v1/accounts/ directly...');
-
-          const response = await fetch('/api/v1/accounts/');
-          console.log('🚀 Response received:', response.status);
-
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-
-          const data = await response.json();
-          console.log('🚀 Data received:', data);
-          console.log('🚀 Data type:', typeof data);
-          console.log('🚀 Data has data property:', data && data.hasOwnProperty('data'));
-
-          const accounts = data.data || data || [];
-          console.log('🚀 Accounts extracted:', accounts);
-          console.log('🚀 Accounts type:', typeof accounts);
-          console.log('🚀 Accounts is array:', Array.isArray(accounts));
-          console.log('🚀 Accounts length:', accounts.length);
-
-          if (Array.isArray(accounts)) {
-            accountsData = accounts;
-            console.log('🔄 נתונים נטענו בהצלחה:', accounts.length, 'חשבונות');
-            console.log('🚀🚀🚀 accounts.html loadAccountsData SUCCESS 🚀🚀🚀');
-
-            // Update the table
-            if (typeof window.updateAccountsTable === 'function') {
-              window.updateAccountsTable(accounts);
-            }
-
-            // Update statistics
-            if (typeof window.updateAccountStatistics === 'function') {
-              window.updateAccountStatistics(accounts);
-            }
-          } else {
-            throw new Error('הנתונים שהתקבלו אינם מערך');
-          }
-        } catch (error) {
-          showNotification('שגיאה בטעינת נתוני חשבונות', 'error');
-        }
-      }
-
-      // All functions moved to accounts.js?v=20250830_1 - using window functions from accounts.js?v=20250830_1
+      // All functions moved to accounts.js - using window functions from accounts.js
     </script>
 
     <!-- Add Account Modal -->

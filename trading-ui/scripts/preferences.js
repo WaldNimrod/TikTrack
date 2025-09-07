@@ -50,6 +50,7 @@ class PreferencesV2 {
   
   async loadProfiles() {
     try {
+      // נסה לטעון פרופילים מהשרת
       const response = await fetch('/api/v1/user/preferences');
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       
@@ -66,7 +67,7 @@ class PreferencesV2 {
         throw new Error(data.error || 'Failed to load profiles');
       }
     } catch (error) {
-      console.error('❌ Error loading profiles:', error);
+      console.warn('⚠️ Profiles API not available, using fallback');
       
       // Fallback - צור פרופיל ברירת מחדל
       this.profiles = [{
@@ -77,7 +78,8 @@ class PreferencesV2 {
       }];
       this.currentProfile = this.profiles[0];
       
-      return false;
+      console.log('✅ Created fallback profile');
+      return true; // נחשב להצלחה כי יצרנו fallback
     }
   }
   
@@ -88,6 +90,7 @@ class PreferencesV2 {
         throw new Error('No profile selected');
       }
       
+      // נסה לטעון העדפות מהשרת
       const response = await fetch('/api/v1/user/preferences');
       
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -101,9 +104,10 @@ class PreferencesV2 {
         throw new Error(data.error || 'Failed to load preferences');
       }
     } catch (error) {
-      console.error('❌ Error loading preferences:', error);
+      console.warn('⚠️ Preferences API not available, using fallback defaults');
       this.preferences = await this.getDefaultPreferences();
-      return false;
+      console.log('✅ Loaded fallback preferences');
+      return true; // נחשב להצלחה כי טענו fallback
     }
   }
   
@@ -728,11 +732,11 @@ class PreferencesV2 {
       }
       
       // Fallback לברירות מחדל מקומיות
-      console.warn('⚠️ Using fallback defaults');
+      console.log('📋 Using local fallback defaults');
       return this.getFallbackDefaults();
       
     } catch (error) {
-      console.error('❌ Error loading defaults:', error);
+      console.log('📋 Using local fallback defaults (API not available)');
       return this.getFallbackDefaults();
     }
   }

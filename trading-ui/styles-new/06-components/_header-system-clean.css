@@ -1,21 +1,9 @@
 /**
- * TikTrack Header System Stylesheet - Clean Version
- * קובץ הסגנונות למערכת ראש הדף החדשה - גרסה נקייה
- * 
- * File: trading-ui/styles-new/06-components/_header-system.css
- * Version: 3.0.0 - Clean
- * Last Updated: September 6, 2025
+ * TikTrack Header System - Clean CSS
+ * מערכת ראש הדף החדשה - CSS נקי ופשוט
  * 
  * מבוסס על התפריט הישן שעובד מושלם
- * HTML פשוט, CSS נקי, JavaScript בסיסי
- * 
- * Features:
- * - עיצוב אלמנט unified-header בלבד
- * - סגנונות לוגו וניווט פשוטים
- * - תת-תפריטים עם hover פשוט
- * - התאמה למסכים קטנים
- * 
- * SCOPE RULE: כל selector חייב להתחיל ב-#unified-header
+ * רק ההגדרות הבסיסיות הנדרשות
  */
 
 /* ===== סגנונות בסיסיים לכותרת ===== */
@@ -214,6 +202,8 @@
     font-weight: 300;
     font-size: 0.85rem;
     list-style: none;
+    direction: rtl;
+    text-align: right;
 }
 
 #unified-header .tiktrack-dropdown-item:hover {
@@ -248,7 +238,7 @@
     border: 1px solid var(--apple-border-light);
     border-radius: 12px;
     box-shadow: var(--apple-shadow-medium);
-    min-width: 200px;
+    min-width: 150px;
     padding: 0.5rem 0;
     display: none;
     z-index: 1001;
@@ -257,6 +247,18 @@
 
 #unified-header .dropdown-submenu:hover .submenu {
     display: block;
+    animation: submenuFadeIn 0.2s ease-out;
+}
+
+@keyframes submenuFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 #unified-header .submenu .tiktrack-dropdown-item {
@@ -264,13 +266,11 @@
     font-size: 0.8rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     list-style: none;
+    direction: rtl;
+    text-align: right;
 }
 
-#unified-header .submenu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
+/* כפילות הוסרה - הכלל הספציפי יותר נמצא למעלה */
 
 #unified-header .submenu .tiktrack-dropdown-item:last-child {
     border-bottom: none;

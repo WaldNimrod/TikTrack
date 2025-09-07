@@ -653,36 +653,19 @@ class HeaderSystem {
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
-                        <!-- 📊 ניהול נתונים -->
-                        <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">📊 ניהול נתונים</a>
-                          <ul class="submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/alerts">התראות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/executions">עסקעות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/accounts">חשבונות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
-                          </ul>
-                        </li>
-                        
-                        <!-- ⚙️ הגדרות מערכת -->
-                        <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">⚙️ הגדרות מערכת</a>
-                          <ul class="submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/test-preferences-v2-integration.html">בדיקת אינטגרציה V2</a></li>
-                          </ul>
-                        </li>
-                        
-                        <!-- 🔧 כלי פיתוח -->
-                        <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">🔧 כלי פיתוח</a>
-                          <ul class="submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
-                          </ul>
-                        </li>
+                        <li><a class="tiktrack-dropdown-item" href="/alerts">התראות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/executions">עסקעות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/accounts">חשבונות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">🔧 כלי פיתוח</h6></li>
+                        <li><a class="tiktrack-dropdown-item" href="/test-preferences-v2-integration.html">בדיקת אינטגרציה V2</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
                       </ul>
                     </li>
 
@@ -694,8 +677,11 @@ class HeaderSystem {
                       <ul class="tiktrack-dropdown-menu">
                         <!-- 🗑️ פעולות מערכת -->
                         <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">🗑️ פעולות מערכת</a>
-                          <ul class="submenu">
+                          <a href="#" class="tiktrack-dropdown-item tiktrack-submenu-toggle">
+                            <span>🗑️ פעולות מערכת</span>
+                            <span class="submenu-arrow">▶</span>
+                          </a>
+                          <ul class="tiktrack-submenu">
                             <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 ניהול מערכת</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/css-management">🎨 מנהל CSS וארכיטקטורה</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/crud-testing-dashboard">🧪 דשבורד בדיקות CRUD</a></li>
@@ -706,8 +692,11 @@ class HeaderSystem {
 
                         <!-- 🔍 בדיקות ונתונים -->
                         <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">🔍 בדיקות ונתונים</a>
-                          <ul class="submenu">
+                          <a href="#" class="tiktrack-dropdown-item tiktrack-submenu-toggle">
+                            <span>🔍 בדיקות ונתונים</span>
+                            <span class="submenu-arrow">▶</span>
+                          </a>
+                          <ul class="tiktrack-submenu">
                             <li><a class="tiktrack-dropdown-item" href="/external-data-dashboard">דשבורד נתונים חיצוניים</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/server-monitor">ניטור שרת</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/cache-test">בדיקת Cache</a></li>
@@ -718,8 +707,11 @@ class HeaderSystem {
 
                         <!-- 🎨 ממשק משתמש -->
                         <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">🎨 ממשק משתמש</a>
-                          <ul class="submenu">
+                          <a href="#" class="tiktrack-dropdown-item tiktrack-submenu-toggle">
+                            <span>🎨 ממשק משתמש</span>
+                            <span class="submenu-arrow">▶</span>
+                          </a>
+                          <ul class="tiktrack-submenu">
                             <li><a class="tiktrack-dropdown-item" href="/style_demonstration">הדגמת סגנונות</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/numeric-value-colors-demo">הדגמת צבעים לערכים מספריים</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
@@ -950,7 +942,7 @@ class HeaderSystem {
         }
         
         // Handle submenu toggle clicks
-        const submenuToggle = e.target.closest('.dropdown-submenu > a');
+        const submenuToggle = e.target.closest('.tiktrack-submenu-toggle');
         if (submenuToggle) {
           e.preventDefault();
           e.stopPropagation();
@@ -993,7 +985,7 @@ class HeaderSystem {
         }
 
         // טיפול בתפריטי משנה (submenu)
-        const submenu = e.target.closest('.submenu');
+        const submenu = e.target.closest('.tiktrack-submenu');
         if (submenu && submenu.classList.contains('show')) {
           this.handleSubmenuMouseEnter(submenu);
         }
@@ -1010,7 +1002,7 @@ class HeaderSystem {
     document.addEventListener('mouseenter', e => {
       if (e.target && typeof e.target.closest === 'function') {
         // ביטול טיימרים כשהעכבר נכנס לתפריט משנה
-        if (e.target.closest('.submenu') || e.target.closest('.dropdown-submenu')) {
+        if (e.target.closest('.tiktrack-submenu') || e.target.closest('.dropdown-submenu')) {
           const parentMenu = e.target.closest('.tiktrack-dropdown-menu');
           if (parentMenu) {
             HeaderSystem.clearMenuTimers(parentMenu);
@@ -1023,7 +1015,7 @@ class HeaderSystem {
     document.addEventListener('mouseover', e => {
       if (e.target && typeof e.target.closest === 'function') {
         // ביטול טיימרים כשהעכבר עובר לתפריט משנה
-        if (e.target.closest('.submenu') || e.target.closest('.dropdown-submenu')) {
+        if (e.target.closest('.tiktrack-submenu') || e.target.closest('.dropdown-submenu')) {
           const parentMenu = e.target.closest('.tiktrack-dropdown-menu');
           if (parentMenu) {
             HeaderSystem.clearMenuTimers(parentMenu);
@@ -1040,7 +1032,7 @@ class HeaderSystem {
         }
 
         // טיפול בתפריטי משנה (submenu)
-        const submenu = e.target.closest('.submenu');
+        const submenu = e.target.closest('.tiktrack-submenu');
         if (submenu && submenu.classList.contains('show')) {
           this.handleSubmenuMouseLeave(submenu);
         }
@@ -1050,7 +1042,7 @@ class HeaderSystem {
     // Handle submenu item clicks
     document.addEventListener('click', e => {
       if (e.target && typeof e.target.closest === 'function') {
-        const submenuItem = e.target.closest('.submenu .tiktrack-dropdown-item');
+        const submenuItem = e.target.closest('.tiktrack-submenu .tiktrack-dropdown-item');
         if (submenuItem) {
           const href = submenuItem.getAttribute('href');
           if (href) {
@@ -1134,7 +1126,7 @@ class HeaderSystem {
           e.target.closest('#searchClearBtn') ||
           e.target.closest('.tiktrack-dropdown-menu') ||
           e.target.closest('.tiktrack-toggle') ||
-          e.target.closest('.submenu');
+          e.target.closest('.tiktrack-submenu');
 
         if (!isClickInsideMenu) {
           // סגירת כל התפריטים
@@ -1216,7 +1208,7 @@ class HeaderSystem {
   }
 
   showSubmenu(submenuItem) {
-    const submenu = submenuItem.querySelector('.submenu');
+    const submenu = submenuItem.querySelector('.tiktrack-submenu');
     if (submenu) {
       // השתמש ב-CSS classes במקום display style
       submenu.classList.add('show');
@@ -1226,7 +1218,7 @@ class HeaderSystem {
   }
 
   toggleSubmenu(submenuItem) {
-    const submenu = submenuItem.querySelector('.submenu');
+    const submenu = submenuItem.querySelector('.tiktrack-submenu');
     if (submenu) {
       const isVisible = submenu.classList.contains('show');
       
@@ -1243,7 +1235,7 @@ class HeaderSystem {
   }
 
   static hideSubmenu(submenuItem) {
-    const submenu = submenuItem.querySelector('.submenu');
+    const submenu = submenuItem.querySelector('.tiktrack-submenu');
     if (submenu) {
       // השתמש ב-CSS classes במקום display style
       submenu.classList.remove('show');
@@ -1265,7 +1257,7 @@ class HeaderSystem {
     // בדיקה אם העכבר עבר לתפריט משנה אחר
     const relatedTarget = event.relatedTarget;
     if (relatedTarget && (
-      relatedTarget.closest('.submenu') ||
+      relatedTarget.closest('.tiktrack-submenu') ||
       relatedTarget.closest('.tiktrack-dropdown-menu') ||
       relatedTarget.closest('.dropdown-submenu')
     )) {
@@ -1314,7 +1306,7 @@ class HeaderSystem {
       dropdown.classList.remove('show');
     });
 
-    const submenus = document.querySelectorAll('.submenu.show');
+    const submenus = document.querySelectorAll('.tiktrack-submenu.show');
     submenus.forEach(submenu => {
       submenu.classList.remove('show');
       submenu.style.display = 'none';
@@ -1937,7 +1929,7 @@ class HeaderSystem {
   // פונקציה להגדרת event listeners לתפריטי משנה של תפריט ספציפי
   setupSubmenuEventListenersForMenu(menu) {
     // הוספת event listeners לתפריטי משנה קיימים
-    const submenus = menu.querySelectorAll('.submenu, .dropdown-submenu');
+    const submenus = menu.querySelectorAll('.tiktrack-submenu, .dropdown-submenu');
     submenus.forEach(submenu => {
       this.addSubmenuEventListenersToElement(submenu);
     });
@@ -1979,7 +1971,7 @@ class HeaderSystem {
       // בדיקה אם העכבר עבר לתפריט משנה
       const relatedTarget = e.relatedTarget;
       if (relatedTarget && (
-        relatedTarget.closest('.submenu') ||
+        relatedTarget.closest('.tiktrack-submenu') ||
         relatedTarget.closest('.tiktrack-dropdown-menu') ||
         relatedTarget.closest('.dropdown-submenu') ||
         relatedTarget.closest('.tiktrack-nav-item')
@@ -2035,7 +2027,7 @@ class HeaderSystem {
   // פונקציה עזר לבדיקה אם העכבר נמצא בתפריט משנה
   static isMouseInSubmenu() {
     // בדיקה אם העכבר נמצא בתפריט משנה כלשהו
-    const submenu = document.querySelector('.submenu:hover');
+    const submenu = document.querySelector('.tiktrack-submenu:hover');
     const dropdownSubmenu = document.querySelector('.dropdown-submenu:hover');
 
     // בדיקה אם העכבר נמצא בתפריט הראשי
@@ -2061,7 +2053,7 @@ class HeaderSystem {
         if (mutation.type === 'childList') {
           mutation.addedNodes.forEach(node => {
             if (node.nodeType === Node.ELEMENT_NODE) {
-              if (node.classList && (node.classList.contains('submenu') || node.classList.contains('dropdown-submenu'))) {
+              if (node.classList && (node.classList.contains('tiktrack-submenu') || node.classList.contains('dropdown-submenu'))) {
                 this.addSubmenuEventListenersToElement(node);
               }
               // בדיקה של ילדים שנוספו
@@ -3045,60 +3037,9 @@ window.closeDateRangeFilter = closeDateRangeFilter;
 // ייצוא הקלאס לגלובל
 window.HeaderSystem = HeaderSystem;
 
-// אתחול אוטומטי - מחכה לטעינת כל המשאבים כולל CSS
-window.addEventListener('load', () => {
-  console.log('🔄 All Resources Loaded (including CSS) - Header System Starting...');
-  
-  // בדיקת זמינות סגנונות
-  console.log('🔍 Checking if unified.css is loaded...');
-  const stylesheets = document.styleSheets;
-  let unifiedCssFound = false;
-  for (let i = 0; i < stylesheets.length; i++) {
-    if (stylesheets[i].href && stylesheets[i].href.includes('unified.css')) {
-      unifiedCssFound = true;
-      console.log('✅ unified.css found in stylesheets');
-      break;
-    }
-  }
-  if (!unifiedCssFound) {
-    console.error('❌ unified.css not found in stylesheets');
-  }
-  
-  // בדיקה ישירה של הסגנונות
-  const testElement = document.createElement('div');
-  testElement.id = 'unified-header';
-  testElement.innerHTML = '<div class="tiktrack-dropdown-menu"></div>';
-  testElement.style.display = 'none';
-  document.body.appendChild(testElement);
-  
-  const dropdownElement = testElement.querySelector('.tiktrack-dropdown-menu');
-  const computedStyle = window.getComputedStyle(dropdownElement);
-  console.log('🔍 CSS Test - tiktrack-dropdown-menu styles:');
-  console.log('  - position:', computedStyle.position);
-  console.log('  - display:', computedStyle.display);
-  console.log('  - background:', computedStyle.background);
-  console.log('  - border:', computedStyle.border);
-  console.log('  - z-index:', computedStyle.zIndex);
-  
-  // בדיקה אם הסגנונות נטענים בכלל (ללא קריאת rules בגלל CORS)
-  console.log('🔍 CSS rules check skipped due to CORS security');
-  
-  // בדיקה אם המשתנים CSS עובדים
-  const testVar = document.createElement('div');
-  testVar.style.setProperty('background', 'var(--apple-bg-elevated)');
-  testVar.style.setProperty('border', '1px solid var(--apple-border-light)');
-  testVar.style.setProperty('box-shadow', 'var(--apple-shadow-medium)');
-  testVar.style.display = 'none';
-  document.body.appendChild(testVar);
-  
-  const varStyle = window.getComputedStyle(testVar);
-  console.log('🔍 CSS Variables Test:');
-  console.log('  - background:', varStyle.background);
-  console.log('  - border:', varStyle.border);
-  console.log('  - box-shadow:', varStyle.boxShadow);
-  
-  document.body.removeChild(testElement);
-  document.body.removeChild(testVar);
+// אתחול אוטומטי
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🔄 DOM Content Loaded - Header System Starting...');
   
   if (typeof HeaderSystem === 'function') {
     console.log('✅ HeaderSystem class found, creating instance...');

@@ -2,10 +2,10 @@
  * כותרות - Headings
  * 
  * קובץ זה מכיל את הסגנונות של כל הכותרות במערכת
- * מבוסס על הסגנונות הקיימים
+ * מבוסס על הסגנונות הקיימים מהמערכת הישנה
  * 
- * @version 1.0.0
- * @lastUpdated January 5, 2025
+ * @version 1.1.0
+ * @lastUpdated January 6, 2025
  */
 
 /* כל הכותרות */
@@ -48,4 +48,37 @@ h5 {
 h6 {
   font-size: var(--font-size-sm);    /* 14px */
   font-weight: var(--font-weight-medium);
+}
+
+/* ===== סגנונות כותרות ספציפיים מהמערכת הישנה ===== */
+
+/* כותרת סקשן */
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* כותרת עם איקון */
+.section-title img,
+.table-title img {
+  width: 20px;
+  height: 20px;
+  margin-inline-start: 8px;
+  vertical-align: middle;
+}
+
+/* כותרת עם ספירה */
+.section-count {
+  background: #29a6a8;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-inline-start: 0.5rem;
 }

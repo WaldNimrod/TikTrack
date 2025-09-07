@@ -52,10 +52,10 @@
 @import '06-components/_navigation.css';
 @import '06-components/_forms-advanced.css';
 @import '06-components/_badges-status.css';
+@import '06-components/_page-headers.css';
+@import '06-components/_bootstrap-overrides.css';
 @import '06-components/_header-system.css';
 @import '06-components/_entity-colors.css';
-@import '06-components/_missing-styles.css';
-@import '06-components/_complete-missing-styles.css';
 
 /* ===== 7. PAGES - עמודים ספציפיים ===== */
 /* (לא בשימוש כרגע) */

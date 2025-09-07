@@ -48,13 +48,41 @@ const VALID_ENTITY_TYPES = [
  * צבעי ישויות דינמיים - נטענים מההעדפות
  * Dynamic entity colors - loaded from preferences
  */
-let ENTITY_COLORS = {};
+let ENTITY_COLORS = {
+  // ברירות מחדל
+  'trade': '#007bff',
+  'trade_plan': '#0056b3',
+  'execution': '#17a2b8',
+  'account': '#1b0b75',
+  'cash_flow': '#20c997',
+  'ticker': '#019193',
+  'alert': '#ff9c05',
+  'note': '#6f42c1',
+  'constraint': '#6c757d',
+  'design': '#495057',
+  'research': '#343a40',
+  'preference': '#adb5bd',
+};
 
 /**
  * צבעי רקע שקופים דינמיים - מחושבים מהצבעים העיקריים
  * Dynamic transparent background colors - calculated from main colors
  */
-let ENTITY_BACKGROUND_COLORS = {};
+let ENTITY_BACKGROUND_COLORS = {
+  // ברירות מחדל
+  'trade': 'rgba(0, 123, 255, 0.1)',
+  'trade_plan': 'rgba(0, 86, 179, 0.1)',
+  'execution': 'rgba(23, 162, 184, 0.1)',
+  'account': 'rgba(27, 11, 117, 0.1)',
+  'cash_flow': 'rgba(32, 201, 151, 0.1)',
+  'ticker': 'rgba(1, 145, 147, 0.1)',
+  'alert': 'rgba(255, 156, 5, 0.1)',
+  'note': 'rgba(111, 66, 193, 0.1)',
+  'constraint': 'rgba(108, 117, 125, 0.1)',
+  'design': 'rgba(73, 80, 87, 0.1)',
+  'research': 'rgba(52, 58, 64, 0.1)',
+  'preference': 'rgba(173, 181, 189, 0.1)',
+};
 
 /**
  * צבעי סטטוסים דינמיים - נטענים מההעדפות
@@ -97,13 +125,41 @@ let STATUS_COLORS = {
  * צבעי טקסט דינמיים - מחושבים מהצבעים העיקריים
  * Dynamic text colors - calculated from main colors
  */
-let ENTITY_TEXT_COLORS = {};
+let ENTITY_TEXT_COLORS = {
+  // ברירות מחדל
+  'trade': '#0056b3',
+  'trade_plan': '#004085',
+  'execution': '#138496',
+  'account': '#0f0642',
+  'cash_flow': '#1a9f7a',
+  'ticker': '#017a7c',
+  'alert': '#e55a00',
+  'note': '#5a32a3',
+  'constraint': '#545b62',
+  'design': '#343a40',
+  'research': '#212529',
+  'preference': '#6c757d',
+};
 
 /**
  * צבעי גבולות דינמיים - מחושבים מהצבעים העיקריים
  * Dynamic border colors - calculated from main colors
  */
-let ENTITY_BORDER_COLORS = {};
+let ENTITY_BORDER_COLORS = {
+  // ברירות מחדל
+  'trade': 'rgba(0, 123, 255, 0.3)',
+  'trade_plan': 'rgba(0, 86, 179, 0.3)',
+  'execution': 'rgba(23, 162, 184, 0.3)',
+  'account': 'rgba(27, 11, 117, 0.3)',
+  'cash_flow': 'rgba(32, 201, 151, 0.3)',
+  'ticker': 'rgba(1, 145, 147, 0.3)',
+  'alert': 'rgba(255, 156, 5, 0.3)',
+  'note': 'rgba(111, 66, 193, 0.3)',
+  'constraint': 'rgba(108, 117, 125, 0.3)',
+  'design': 'rgba(73, 80, 87, 0.3)',
+  'research': 'rgba(52, 58, 64, 0.3)',
+  'preference': 'rgba(173, 181, 189, 0.3)',
+};
 
 // ===== INVESTMENT TYPE SPECIFIC COLORS =====
 // צבעים ספציפיים לסוגי השקעה

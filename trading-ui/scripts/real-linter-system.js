@@ -340,7 +340,7 @@ class RealLinterSystem {
             '.css': [
                 'styles/styles.css',
                 'styles/apple-theme.css',
-                'styles/header-system.css',
+                'styles-new/unified.css',
                 'styles/notification-system.css'
             ],
             '.html': [

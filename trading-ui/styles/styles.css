@@ -39,28 +39,83 @@
 :root {
     /* Entity Colors with Default Values */
     --entity-ticker-color: #019193;
-    --entity-ticker-bg: #01919399;
+    --entity-ticker-bg: rgba(1, 145, 147, 0.1);
     --entity-ticker-border: #019193;
     
     --entity-account-color: #1b0b75;
-    --entity-account-bg: #1b0b7599;
+    --entity-account-bg: rgba(27, 11, 117, 0.1);
     --entity-account-border: #1b0b75;
     
-    --entity-trade-color: #28a745;
-    --entity-trade-bg: #28a74599;
-    --entity-trade-border: #28a745;
+    --entity-trade-color: #007bff;
+    --entity-trade-bg: rgba(0, 123, 255, 0.1);
+    --entity-trade-border: #007bff;
     
     --entity-alert-color: #ff9c05;
-    --entity-alert-bg: #ff9c0599;
+    --entity-alert-bg: rgba(255, 156, 5, 0.1);
     --entity-alert-border: #ff9c05;
     
     --entity-cash-flow-color: #20c997;
-    --entity-cash-flow-bg: #20c99799;
+    --entity-cash-flow-bg: rgba(32, 201, 151, 0.1);
     --entity-cash-flow-border: #20c997;
     
     --entity-note-color: #6f42c1;
-    --entity-note-bg: #6f42c199;
+    --entity-note-bg: rgba(111, 66, 193, 0.1);
     --entity-note-border: #6f42c1;
+    
+    /* צבעי ישויות נוספות */
+    --entity-trade-plan-color: #0056b3;
+    --entity-trade-plan-bg: rgba(0, 86, 179, 0.1);
+    --entity-trade-plan-border: #0056b3;
+    
+    --entity-execution-color: #17a2b8;
+    --entity-execution-bg: rgba(23, 162, 184, 0.1);
+    --entity-execution-border: #17a2b8;
+    
+    --entity-constraint-color: #6c757d;
+    --entity-constraint-bg: rgba(108, 117, 125, 0.1);
+    --entity-constraint-border: #6c757d;
+    
+    --entity-design-color: #495057;
+    --entity-design-bg: rgba(73, 80, 87, 0.1);
+    --entity-design-border: #495057;
+    
+    --entity-research-color: #343a40;
+    --entity-research-bg: rgba(52, 58, 64, 0.1);
+    --entity-research-border: #343a40;
+    
+    --entity-preference-color: #adb5bd;
+    --entity-preference-bg: rgba(173, 181, 189, 0.1);
+    --entity-preference-border: #adb5bd;
+    
+    /* צבעי סטטוסים */
+    --status-open-color: #28a745;
+    --status-open-bg: rgba(40, 167, 69, 0.1);
+    --status-open-border: #28a745;
+    
+    --status-closed-color: #dc3545;
+    --status-closed-bg: rgba(220, 53, 69, 0.1);
+    --status-closed-border: #dc3545;
+    
+    --status-pending-color: #ffc107;
+    --status-pending-bg: rgba(255, 193, 7, 0.1);
+    --status-pending-border: #ffc107;
+    
+    --status-canceled-color: #6c757d;
+    --status-canceled-bg: rgba(108, 117, 125, 0.1);
+    --status-canceled-border: #6c757d;
+    
+    /* צבעי ערכים מספריים */
+    --numeric-positive-color: #28a745;
+    --numeric-positive-bg: rgba(40, 167, 69, 0.1);
+    --numeric-positive-border: #28a745;
+    
+    --numeric-negative-color: #dc3545;
+    --numeric-negative-bg: rgba(220, 53, 69, 0.1);
+    --numeric-negative-border: #dc3545;
+    
+    --numeric-zero-color: #6c757d;
+    --numeric-zero-bg: rgba(108, 117, 125, 0.1);
+    --numeric-zero-border: #6c757d;
 }
 /* ===== סגנונות כלליים של הפרויקציה ===== */
 
@@ -3376,43 +3431,6 @@ button.btn-primary-emphasized {
   /* צבע כתום לסטטוס ממתין */
   :root {
     --apple-orange: #ff9500;
-    
-    /* Entity Colors with Default Values */
-    --entity-ticker-color: #019193;
-    --entity-ticker-bg: #01919399;
-    --entity-ticker-border: #019193;
-    
-    --entity-account-color: #1b0b75;
-    --entity-account-bg: #1b0b7599;
-    --entity-account-border: #1b0b75;
-    
-    --entity-preference-color: #adb5bd;
-    --entity-preference-bg: #adb5bd99;
-    --entity-preference-border: #adb5bd;
-    
-    --entity-trade-color: #28a745;
-    --entity-trade-bg: #28a74599;
-    --entity-trade-border: #28a745;
-    
-    --entity-alert-color: #ff9c05;
-    --entity-alert-bg: #ff9c0599;
-    --entity-alert-border: #ff9c05;
-    
-    --entity-cash-flow-color: #20c997;
-    --entity-cash-flow-bg: #20c99799;
-    --entity-cash-flow-border: #20c997;
-    
-    --entity-note-color: #6f42c1;
-    --entity-note-bg: #6f42c199;
-    --entity-note-border: #6f42c1;
-    
-    --entity-trade-plan-color: #0056b3;
-    --entity-trade-plan-bg: #0056b399;
-    --entity-trade-plan-border: #0056b3;
-    
-    --entity-execution-color: #17a2b8;
-    --entity-execution-bg: #17a2b899;
-    --entity-execution-border: #17a2b8;
   }
 
 

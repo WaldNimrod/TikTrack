@@ -25,6 +25,9 @@
     
     <!-- Error Handlers -->
     <script src="scripts/error-handlers.js"></script>
+    
+    <!-- Research Page Specific Styles -->
+    <link rel="stylesheet" href="styles/research-summary.css">
     <script src="scripts/table-mappings.js"></script>
     <script src="scripts/date-utils.js"></script>
     <script src="scripts/tables.js"></script>
@@ -35,6 +38,7 @@
     <script src="scripts/header-system.js?v=20250901_3"></script>
   <script src="scripts/notification-system.js"></script>
   <script src="scripts/validation-utils.js"></script>
+    <script src="scripts/research.js"></script>
   
 
     <!-- Page initialization -->
@@ -57,6 +61,7 @@
     </script>
   </div> <!-- End background-wrapper -->
 
+<body class="research-page">
   <!-- Main Content -->
   <div class="container-fluid">
     <div class="row">
@@ -127,9 +132,147 @@
               </div>
               <div class="card-body">
                 <div id="researchResults">
-                  <div class="text-center text-muted">
-                    <i class="bi bi-search" style="font-size: 3rem;"></i>
-                    <p>לחץ על אחד מכלי התחקיר כדי להתחיל</p>
+                       <!-- Summary Cards -->
+                       <div class="summary-cards">
+                         <div class="summary-card">
+                           <div class="card-icon">
+                             <i class="bi bi-graph-up"></i>
+                           </div>
+                           <div class="card-content">
+                             <div class="card-title">רווח כולל</div>
+                             <div class="card-value">₪12,450</div>
+                             <div class="card-change positive">+₪1,250 (11.2%)</div>
+                           </div>
+                         </div>
+                         
+                         <div class="summary-card">
+                           <div class="card-icon">
+                             <i class="bi bi-pie-chart"></i>
+                           </div>
+                           <div class="card-content">
+                             <div class="card-title">טריידים פעילים</div>
+                             <div class="card-value">8</div>
+                             <div class="card-change neutral">0 (0%)</div>
+                           </div>
+                         </div>
+                         
+                         <div class="summary-card">
+                           <div class="card-icon">
+                             <i class="bi bi-trophy"></i>
+                           </div>
+                           <div class="card-content">
+                             <div class="card-title">אחוז הצלחה</div>
+                             <div class="card-value">73.5%</div>
+                             <div class="card-change positive">+2.1%</div>
+                           </div>
+                         </div>
+                         
+                         <div class="summary-card">
+                           <div class="card-icon">
+                             <i class="bi bi-currency-dollar"></i>
+                           </div>
+                           <div class="card-content">
+                             <div class="card-title">ערך תיק</div>
+                             <div class="card-value">₪89,200</div>
+                             <div class="card-change positive">+₪3,400 (3.9%)</div>
+                           </div>
+                         </div>
+                       </div>
+                       
+                       <!-- Summary Table -->
+                       <div class="summary-table">
+                         <table class="table table-striped">
+                           <thead>
+                             <tr>
+                               <th>סוג טרייד</th>
+                               <th>כמות</th>
+                               <th>רווח ממוצע</th>
+                               <th>אחוז הצלחה</th>
+                               <th>סטטוס</th>
+                             </tr>
+                           </thead>
+                           <tbody>
+                             <tr>
+                               <td><span class="trade-type-badge type-stock">מניות</span></td>
+                               <td>15</td>
+                               <td class="profit-positive">₪850</td>
+                               <td>80%</td>
+                               <td><span class="badge bg-success">פעיל</span></td>
+                             </tr>
+                             <tr>
+                               <td><span class="trade-type-badge type-etf">ETF</span></td>
+                               <td>8</td>
+                               <td class="profit-positive">₪420</td>
+                               <td>75%</td>
+                               <td><span class="badge bg-success">פעיל</span></td>
+                             </tr>
+                             <tr>
+                               <td><span class="trade-type-badge type-crypto">קריפטו</span></td>
+                               <td>5</td>
+                               <td class="profit-negative">-₪180</td>
+                               <td>40%</td>
+                               <td><span class="badge bg-warning">ממתין</span></td>
+                             </tr>
+                             <tr>
+                               <td><span class="trade-type-badge type-commodity">סחורות</span></td>
+                               <td>3</td>
+                               <td class="profit-positive">₪1,200</td>
+                               <td>100%</td>
+                               <td><span class="badge bg-success">פעיל</span></td>
+                             </tr>
+                           </tbody>
+                         </table>
+                       </div>
+                       
+                       <!-- Daily Changes Section -->
+                       <div class="daily-changes-section">
+                         <h6 class="section-subtitle">
+                           <i class="bi bi-calendar-day"></i>
+                           שינויים יומיים
+                         </h6>
+                         <div class="table-responsive">
+                           <table class="table table-sm daily-table">
+                             <thead>
+                               <tr>
+                                 <th>נכס</th>
+                                 <th>שינוי יומי</th>
+                                 <th>אחוז שינוי</th>
+                                 <th>נפח</th>
+                                 <th>מגמה</th>
+                               </tr>
+                             </thead>
+                             <tbody>
+                               <tr>
+                                 <td>AAPL</td>
+                                 <td class="profit-positive">+₪2.50</td>
+                                 <td class="profit-positive">+1.8%</td>
+                                 <td>1.2M</td>
+                                 <td><i class="bi bi-arrow-up text-success"></i></td>
+                               </tr>
+                               <tr>
+                                 <td>TSLA</td>
+                                 <td class="profit-negative">-₪15.20</td>
+                                 <td class="profit-negative">-2.1%</td>
+                                 <td>850K</td>
+                                 <td><i class="bi bi-arrow-down text-danger"></i></td>
+                               </tr>
+                               <tr>
+                                 <td>SPY</td>
+                                 <td class="profit-positive">+₪0.85</td>
+                                 <td class="profit-positive">+0.3%</td>
+                                 <td>2.1M</td>
+                                 <td><i class="bi bi-arrow-up text-success"></i></td>
+                               </tr>
+                               <tr>
+                                 <td>BTC</td>
+                                 <td class="profit-positive">+₪1,200</td>
+                                 <td class="profit-positive">+3.2%</td>
+                                 <td>45K</td>
+                                 <td><i class="bi bi-arrow-up text-success"></i></td>
+                               </tr>
+                             </tbody>
+                           </table>
+                         </div>
                   </div>
                 </div>
               </div>

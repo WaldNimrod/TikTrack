@@ -542,6 +542,143 @@ function runQuickTests() {
     setTimeout(() => checkRTL(), 800);
 }
 
+// פונקציות בדיקת כפילויות חדשות
+function runCSSDuplicateAnalysis() {
+    console.log('🔍 מריץ בדיקת כפילויות CSS...');
+    const output = document.getElementById('testResults');
+    output.innerHTML = '<i class="fas fa-spinner fa-spin"></i> בודק כפילויות CSS...';
+    
+    // הרצת הסקריפט Python
+    fetch('/api/run-script', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            script: 'css-duplicate-analyzer.py'
+        })
+    })
+    .then(response => response.text())
+    .then(result => {
+        output.innerHTML = `
+            <div class="analysis-result">
+                <h5>🔍 תוצאות בדיקת כפילויות CSS</h5>
+                <pre style="background: #f8f9fa; padding: 15px; border-radius: 5px; font-size: 12px; max-height: 400px; overflow-y: auto;">${result}</pre>
+            </div>
+        `;
+    })
+    .catch(error => {
+        output.innerHTML = `<div class="alert alert-danger">שגיאה: ${error.message}</div>`;
+    });
+}
+
+function runJSDuplicateAnalysis() {
+    console.log('🔍 מריץ בדיקת כפילויות JavaScript...');
+    const output = document.getElementById('testResults');
+    output.innerHTML = '<i class="fas fa-spinner fa-spin"></i> בודק כפילויות JavaScript...';
+    
+    // הרצת הסקריפט Python
+    fetch('/api/run-script', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            script: 'js-duplicate-analyzer.py'
+        })
+    })
+    .then(response => response.text())
+    .then(result => {
+        output.innerHTML = `
+            <div class="analysis-result">
+                <h5>🔍 תוצאות בדיקת כפילויות JavaScript</h5>
+                <pre style="background: #f8f9fa; padding: 15px; border-radius: 5px; font-size: 12px; max-height: 400px; overflow-y: auto;">${result}</pre>
+            </div>
+        `;
+    })
+    .catch(error => {
+        output.innerHTML = `<div class="alert alert-danger">שגיאה: ${error.message}</div>`;
+    });
+}
+
+function runHTMLDuplicateAnalysis() {
+    console.log('🔍 מריץ בדיקת כפילויות HTML...');
+    const output = document.getElementById('testResults');
+    output.innerHTML = '<i class="fas fa-spinner fa-spin"></i> בודק כפילויות HTML...';
+    
+    // הרצת הסקריפט Python
+    fetch('/api/run-script', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            script: 'html-duplicate-analyzer.py'
+        })
+    })
+    .then(response => response.text())
+    .then(result => {
+        output.innerHTML = `
+            <div class="analysis-result">
+                <h5>🔍 תוצאות בדיקת כפילויות HTML</h5>
+                <pre style="background: #f8f9fa; padding: 15px; border-radius: 5px; font-size: 12px; max-height: 400px; overflow-y: auto;">${result}</pre>
+            </div>
+        `;
+    })
+    .catch(error => {
+        output.innerHTML = `<div class="alert alert-danger">שגיאה: ${error.message}</div>`;
+    });
+}
+
+function runAllDuplicateAnalysis() {
+    console.log('🔍 מריץ בדיקת כפילויות מלאה...');
+    const output = document.getElementById('testResults');
+    output.innerHTML = '<i class="fas fa-spinner fa-spin"></i> בודק כפילויות בכל הקבצים...';
+    
+    // הרצת כל הבדיקות
+    Promise.all([
+        fetch('/api/run-script', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ script: 'css-duplicate-analyzer.py' })
+        }).then(r => r.text()),
+        fetch('/api/run-script', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ script: 'js-duplicate-analyzer.py' })
+        }).then(r => r.text()),
+        fetch('/api/run-script', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ script: 'html-duplicate-analyzer.py' })
+        }).then(r => r.text())
+    ])
+    .then(([cssResult, jsResult, htmlResult]) => {
+        output.innerHTML = `
+            <div class="analysis-result">
+                <h5>🔍 תוצאות בדיקת כפילויות מלאה</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6>CSS</h6>
+                        <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px; font-size: 11px; max-height: 300px; overflow-y: auto;">${cssResult}</pre>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>JavaScript</h6>
+                        <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px; font-size: 11px; max-height: 300px; overflow-y: auto;">${jsResult}</pre>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>HTML</h6>
+                        <pre style="background: #f8f9fa; padding: 10px; border-radius: 5px; font-size: 11px; max-height: 300px; overflow-y: auto;">${htmlResult}</pre>
+                    </div>
+                </div>
+            </div>
+        `;
+    })
+    .catch(error => {
+        output.innerHTML = `<div class="alert alert-danger">שגיאה: ${error.message}</div>`;
+    });
+}
+
 function openCSSGuide() {
     // פתיחת מדריך CSS
     window.open('documentation/frontend/CSS_ARCHITECTURE_GUIDE.md', '_blank');

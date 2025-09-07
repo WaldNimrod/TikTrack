@@ -159,6 +159,25 @@
                                         <i class="fas fa-tachometer-alt"></i> ביצועים
                                     </button>
                                 </div>
+                                
+                                <!-- כפתורי בדיקת כפילויות -->
+                                <div class="tool-section mt-3">
+                                    <h5>🔍 בדיקת כפילויות</h5>
+                                    <div class="tool-buttons">
+                                        <button class="btn btn-warning" onclick="runCSSDuplicateAnalysis()">
+                                            <i class="fas fa-copy"></i> כפילויות CSS
+                                        </button>
+                                        <button class="btn btn-danger" onclick="runJSDuplicateAnalysis()">
+                                            <i class="fas fa-code"></i> כפילויות JS
+                                        </button>
+                                        <button class="btn btn-dark" onclick="runHTMLDuplicateAnalysis()">
+                                            <i class="fas fa-file-code"></i> כפילויות HTML
+                                        </button>
+                                        <button class="btn btn-success" onclick="runAllDuplicateAnalysis()">
+                                            <i class="fas fa-search"></i> בדיקה מלאה
+                                        </button>
+                                    </div>
+                                </div>
                                 <div class="test-results" id="testResults"></div>
                             </div>
                             

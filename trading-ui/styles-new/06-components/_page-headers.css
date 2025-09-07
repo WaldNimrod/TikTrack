@@ -1,0 +1,201 @@
+/**
+ * Page Headers - כותרות עמודים
+ * 
+ * קובץ זה מכיל את הסגנונות הספציפיים לכותרות כל עמוד
+ * מבוסס על הסגנונות מהמערכת הישנה
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 6, 2025
+ */
+
+/* ===== סגנונות כותרות עמודים עם צבעים ספציפיים ===== */
+
+/* עמוד מעקב טריידים - כחול */
+.tracking-page .section-header,
+.tracking-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-trade-color, #007bff);
+}
+
+/* עמוד חשבונות - ירוק */
+.accounts-page .section-header,
+.accounts-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-account-color, #28a745);
+}
+
+/* עמוד תכנון טריידים - כחול כהה */
+.planning-page .section-header,
+.planning-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-trade-plan-color, #0056b3);
+}
+
+/* עמוד התראות - כתום */
+.alerts-page .section-header,
+.alerts-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-alert-color, #ff9c05);
+}
+
+/* עמוד תזרים מזומנים - ירוק טורקיז */
+.cash-flows-page .section-header,
+.cash-flows-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-cash-flow-color, #20c997) !important;
+}
+
+/* עמוד עסקאות - כחול טורקיז */
+.executions-page .section-header,
+.executions-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-execution-color, #17a2b8);
+}
+
+/* עמוד הערות - סגול */
+.notes-page .section-header,
+.notes-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-note-color, #6f42c1);
+}
+
+/* עמוד בסיס נתונים - כחול כהה */
+.db-display-page .section-header,
+.db-display-page .top-section .section-header {
+  border-bottom: 2px solid var(--apple-gray-8, #495057);
+}
+
+/* עמוד טבלאות עזר - אפור */
+.extra-data-page .section-header,
+.extra-data-page .top-section .section-header {
+  border-bottom: 2px solid var(--apple-gray-6, #6c757d);
+}
+
+/* עמוד אילוצים - כתום כהה */
+.constraints-page .section-header,
+.constraints-page .top-section .section-header {
+  border-bottom: 2px solid #fd7e14;
+}
+
+/* עמוד עיצובים - ירוק כהה */
+.designs-page .section-header,
+.designs-page .top-section .section-header {
+  border-bottom: 2px solid #20c997;
+}
+
+/* עמוד מחקר - אפור כהה */
+.research-page .section-header,
+.research-page .top-section .section-header {
+  border-bottom: 2px solid var(--apple-gray-8, #343a40);
+}
+
+/* ===== סגנונות כותרות עם איקונים ===== */
+
+/* התאמה לכותרת הסקשן */
+.section-header .table-title,
+.section-header .section-title,
+.alerts-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* התאמה לכותרת עם איקון התראות */
+.section-header .table-title .section-alert-icon,
+.section-header .section-title .section-alert-icon,
+.alerts-header h3 .section-alert-icon {
+  margin: 0;
+}
+
+/* ===== סגנונות איקון התראות בכותרת הסקשן ===== */
+.section-alert-icon {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-end: 20px;
+  margin-inline-start: 0;
+  color: var(--entity-alert-color, #ff9c05);
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+}
+
+.section-alert-icon:hover {
+  transform: scale(1.1);
+  color: var(--entity-alert-text, #e55a00);
+}
+
+/* ===== סגנונות איקון בכותרת הקומפוננט ===== */
+.title-bell-icon {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  margin-inline-start: 8px;
+  color: var(--entity-alert-color, #ff9c05);
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+.title-bell-icon:hover {
+  transform: scale(1.1);
+  color: var(--entity-alert-text, #e55a00);
+}
+
+/* ===== סגנונות אייקון טריידים פעילים ===== */
+.active-trades-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: var(--entity-trade-bg, rgba(0, 123, 255, 0.1));
+  border: 1px solid var(--entity-trade-border, rgba(0, 123, 255, 0.3));
+  border-radius: 50%;
+  color: var(--entity-trade-color, #007bff);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-inline-start: 8px;
+  transition: all 0.3s ease;
+}
+
+.active-trades-icon:hover {
+  background: var(--entity-trade-color, #007bff);
+  color: white;
+  transform: scale(1.1);
+}
+
+/* ===== סגנונות איקון טבלה ===== */
+.table-icon {
+  width: 20px;
+  height: 20px;
+  margin-inline-start: 8px;
+  vertical-align: middle;
+}
+
+/* ===== סגנונות כותרות דינמיות ===== */
+.entity-account-main-header {
+  border-bottom: 2px solid var(--entity-account-color, #28a745) !important;
+}
+
+.entity-trade-main-header {
+  border-bottom: 2px solid var(--entity-trade-color, #007bff) !important;
+}
+
+.entity-alert-main-header {
+  border-bottom: 2px solid var(--entity-alert-color, #ff9c05) !important;
+}
+
+.entity-cash-flow-main-header {
+  border-bottom: 2px solid var(--entity-cash-flow-color, #20c997) !important;
+}
+
+.entity-note-main-header {
+  border-bottom: 2px solid var(--entity-note-color, #6f42c1) !important;
+}
+
+.entity-ticker-main-header {
+  border-bottom: 2px solid var(--entity-ticker-color, #dc3545) !important;
+}
+
+.entity-execution-main-header {
+  border-bottom: 2px solid var(--entity-execution-color, #17a2b8) !important;
+}
+
+.entity-trade-plan-main-header {
+  border-bottom: 2px solid var(--entity-trade-plan-color, #0056b3) !important;
+}
+
+
+
+

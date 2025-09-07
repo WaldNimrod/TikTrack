@@ -8052,3 +8052,89 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
     transition: all 0.3s ease;
 }
 /* ===== סוף כל ההגדרות מהקובץ המקורי ===== */
+
+/* ===== Final Menu Structure - Additional Styles ===== */
+/* Cache clear button */
+.unified-header .cache-clear-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: transparent !important;
+    border: none !important;
+    color: #1d1d1f;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    font-size: 16px;
+    padding: 0;
+    margin: 0;
+}
+
+.unified-header .cache-clear-btn:hover {
+    background: transparent !important;
+    color: #ff9500;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Filter Toggle Button */
+.unified-header .filter-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    color: #ff9c05;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1001;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.unified-header .filter-toggle-btn.collapsed .filter-arrow {
+    transform: rotate(180deg);
+}
+
+/* Filters Section */
+.unified-header .header-filters {
+    padding: 1rem 2rem;
+    background: #f5f5f7;
+    border-top: 1px solid #e5e5e5;
+    position: relative;
+    z-index: 1000;
+    min-height: 60px;
+    display: none; /* Hidden by default */
+}
+
+.unified-header .header-filters.show {
+    display: block; /* Shown when 'show' class is added */
+}
+
+/* Search Clear Button inside input */
+.unified-header .search-clear-btn {
+    position: absolute;
+    left: 0.5rem;
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.unified-header .search-clear-btn:hover {
+    background: #f0f0f0;
+    color: #333;
+}
+
+/* Ensure submenus display above filters */
+.unified-header .submenu {
+    z-index: 1001 !important;
+}

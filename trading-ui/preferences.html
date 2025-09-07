@@ -19,13 +19,16 @@
     <!-- Error Handlers -->
     <script src="scripts/error-handlers.js"></script></head>
 
-<body>
+<body class="preferences-page">
   <!-- unified-header ייווצר כאן אוטומטית -->
   <div id="unified-header"></div>
   <div class="background-wrapper">
     
-    <!-- כותרת ראשית -->
-    <div class="preferences-container">
+    <!-- Page body - all content after header -->
+    <div class="page-body">
+      
+      <!-- כותרת ראשית -->
+      <div class="top-section preferences-page">
       <div class="preferences-header slide-in">
         <div class="d-flex justify-content-between align-items-center">
           <div>
@@ -33,10 +36,10 @@
             <p>מערכת הגדרות מתקדמת עם כל השדות הנדרשים - בסיסיות, עיצובים, מערכת, נתונים חיצוניים ומתקדמות</p>
           </div>
           <div class="d-flex gap-3">
-            <button class="btn btn-modern btn-export" onclick="exportPreferences()">
+            <button class="btn btn-outline-success" onclick="exportPreferences()">
               <i class="bi bi-download"></i> יצא הגדרות
             </button>
-            <button class="btn btn-modern btn-import" onclick="importPreferences()">
+            <button class="btn btn-outline-primary" onclick="importPreferences()">
               <i class="bi bi-upload"></i> יבא הגדרות
             </button>
           </div>
@@ -92,7 +95,7 @@
             <h5><i class="bi bi-info-circle"></i> מיגרציה מV1</h5>
             <p class="mb-0">זוהו הגדרות ישנות. ברצונך לעדכן למערכת החדשה?</p>
           </div>
-          <button class="btn btn-modern btn-sm" onclick="runMigration()">
+          <button class="btn btn-success btn-sm" onclick="runMigration()">
             <i class="bi bi-arrow-clockwise"></i> העבר עכשיו
           </button>
         </div>
@@ -127,7 +130,7 @@
       </div>
       
       <!-- ===== הגדרות בסיסיות ===== -->
-      <div class="settings-section slide-in">
+      <div class="content-section preferences-page" id="generalSection">
         <div class="section-header" onclick="toggleSection('general')">
           <h3><span class="section-icon">⚙️</span> הגדרות בסיסיות</h3>
           <span class="section-toggle" id="general-toggle">▼</span>
@@ -283,7 +286,7 @@
       </div>
       
       <!-- ===== פילטרים ברירת מחדל ===== -->
-      <div class="settings-section slide-in">
+      <div class="content-section preferences-page" id="filtersSection">
         <div class="section-header" onclick="toggleSection('filters')">
           <h3><span class="section-icon">🔍</span> פילטרים ברירת מחדל</h3>
           <span class="section-toggle" id="filters-toggle">▼</span>
@@ -420,7 +423,7 @@
       </div>
       
       <!-- ===== מערכת צבעים מתקדמת ===== -->
-      <div class="settings-section slide-in">
+      <div class="content-section preferences-page" id="colorsSection">
         <div class="section-header" onclick="toggleSection('colors')">
           <h3><span class="section-icon">🎨</span> מערכת צבעים מתקדמת</h3>
           <span class="section-toggle" id="colors-toggle">▼</span>
@@ -627,7 +630,7 @@
       </div>
       
       <!-- ===== ממשק משתמש ===== -->
-      <div class="settings-section slide-in">
+      <div class="content-section preferences-page" id="uiSection">
         <div class="section-header" onclick="toggleSection('ui')">
           <h3><span class="section-icon">🖥️</span> ממשק משתמש</h3>
           <span class="section-toggle" id="ui-toggle">▼</span>
@@ -696,7 +699,7 @@
       </div>
       
       <!-- ===== הגדרות מערכת ושרת ===== -->
-      <div class="settings-section slide-in">
+      <div class="content-section preferences-page" id="systemSection">
         <div class="section-header" onclick="toggleSection('system')">
           <h3><span class="section-icon">⚙️</span> הגדרות מערכת ושרת</h3>
           <span class="section-toggle" id="system-toggle">▼</span>
@@ -800,7 +803,7 @@
       </div>
       
       <!-- ===== נתונים חיצוניים ===== -->
-      <div class="settings-section slide-in">
+      <div class="content-section preferences-page" id="externalSection">
         <div class="section-header" onclick="toggleSection('external')">
           <h3><span class="section-icon">🌐</span> נתונים חיצוניים</h3>
           <span class="section-toggle" id="external-toggle">▼</span>
@@ -885,7 +888,7 @@
       </div>
       
       <!-- ===== הגדרות מתקדמות ===== -->
-      <div class="settings-section slide-in">
+      <div class="content-section preferences-page" id="advancedSection">
         <div class="section-header" onclick="toggleSection('advanced')">
           <h3><span class="section-icon">🔧</span> הגדרות מתקדמות</h3>
           <span class="section-toggle" id="advanced-toggle">▼</span>
@@ -947,7 +950,7 @@
       <!-- כפתורי פעולה -->
       <div class="d-flex justify-content-between align-items-center mt-5">
         <div class="d-flex gap-3">
-          <button class="btn btn-modern btn-reset" onclick="resetToDefaults()">
+          <button class="btn btn-outline-danger" onclick="resetToDefaults()">
             <i class="bi bi-arrow-clockwise"></i> אפס לברירת מחדל
           </button>
           <button class="btn btn-outline-secondary" onclick="viewHistory()">
@@ -961,12 +964,13 @@
           <button class="btn btn-outline-primary" onclick="previewSettings()">
             <i class="bi bi-eye"></i> תצוגה מקדימה
           </button>
-          <button class="btn btn-modern" onclick="saveAllPreferences()">
+          <button class="btn btn-success" onclick="saveAllPreferences()">
             <i class="bi bi-save"></i> שמור הגדרות
           </button>
         </div>
       </div>
       
+    </div>
     </div>
   </div>
   
@@ -1000,7 +1004,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-          <button type="button" class="btn btn-modern" onclick="submitCreateProfile()">צור פרופיל</button>
+          <button type="button" class="btn btn-success" onclick="submitCreateProfile()">צור פרופיל</button>
         </div>
       </div>
     </div>

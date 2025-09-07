@@ -2800,6 +2800,8 @@ select option {
 /* ===== סגנונות אלמנט ראש הדף החדש ===== */
 /* סגנונות אלה מיועדים רק לאלמנט unified-header */
 
+/* ===== מפריע לתפריט הראשי - הגדרות ישנות ===== */
+
 #unified-header {
     background: var(--apple-bg-elevated);
     border-bottom: 1px solid var(--apple-border-light);
@@ -3073,6 +3075,8 @@ select option {
     color: #333333;
 }
 
+/* מפריע לתפריט הראשי - הגדרות ישנות של dropdown-menu
+/* מפריע לתפריט הראשי - הגדרות dropdown-menu נוספות
 /* תפריט נפתח */
 #unified-header .dropdown-menu {
     top: 100%;
@@ -3098,7 +3102,10 @@ select option {
 #unified-header .dropdown-menu:not(.show) {
     display: none !important;
 }
+*/
+*/
 
+/* מפריע לתפריט הראשי - keyframes ישנים
 @keyframes dropdownFadeIn {
     from {
         opacity: 0;
@@ -3109,7 +3116,9 @@ select option {
         transform: translateY(0);
     }
 }
+*/
 
+/* מפריע לתפריט הראשי - הגדרות dropdown-item ישנות
 #unified-header .dropdown-item {
     padding: 8px 16px;
     white-space: nowrap;
@@ -3135,7 +3144,9 @@ select option {
 #unified-header .dropdown-item:last-child {
     border-radius: 0 0 12px 12px;
 }
+*/
 
+/* מפריע לתפריט הראשי - הגדרות dropdown-arrow ו-dropdown-toggle ישנות
 #unified-header .dropdown-arrow {
     margin-inline-end: 0.5rem;
     font-size: 0.8rem;
@@ -3163,7 +3174,9 @@ select option {
 #unified-header .dropdown-toggle[aria-expanded="true"] .dropdown-arrow {
     transform: rotate(180deg);
 }
+*/
 
+/* מפריע לתפריט הראשי - הגדרות תת-תפריטים ישנות
 /* תת-תפריטים */
 #unified-header .dropdown-submenu {
     position: relative;
@@ -3247,6 +3260,7 @@ select option {
         display: block;
     }
 }
+*/
 
 /* ===== סגנונות תת-תפריט רגיל - חסרים ===== */
 
@@ -3301,6 +3315,7 @@ select option {
     color: #26baac;
 }
 
+/* מפריע לתפריט הראשי - הגדרות filter-toggle ישנות
 /* סגנונות פילטרים */
 #unified-header .filter-toggle-section {
     display: flex;
@@ -3332,6 +3347,7 @@ select option {
     border-color: #ff9c05;
     color: white;
 }
+*/
 
 /* סגנונות התראות */
 #unified-header .notification-icon {
@@ -3388,6 +3404,7 @@ select option {
     position: relative;
 }
 
+/* מפריע לתפריט הראשי - הגדרות filter-dropdown ו-filter-toggle ישנות
 #unified-header .filter-dropdown {
     position: relative;
 }
@@ -3434,7 +3451,9 @@ select option {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+*/
 
+/* מפריע לתפריט הראשי - הגדרות filter-menu ישנות
 /* סגנונות בסיס לפילטרים */
 #unified-header .filter-menu {
     position: absolute !important;
@@ -3461,6 +3480,7 @@ select option {
 #unified-header .filter-menu:not(.show) {
     display: none !important;
 }
+*/
 
 /* סגנונות רספונסיביים */
 @media (max-width: 1200px) {
@@ -6925,6 +6945,7 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
     display: none;
 }
 
+/* מפריע לתפריט הראשי - הגדרות submenu ישנות
 #unified-header .dropdown-submenu:hover > .submenu,
 #unified-header .dropdown-submenu > .submenu.show {
     display: block;
@@ -6974,6 +6995,7 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
 .dropdown-submenu .submenu.show {
     display: block !important;
 }
+*/
 
 /* ===== תפריטי משנה עם שלוש רמות ===== */
 #unified-header .dropdown-submenu {
@@ -7221,6 +7243,7 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
     font-weight: 500;
 }
 
+/* מפריע לתפריט הראשי - הגדרות dropdown-menu כפולות
 /* Dropdown menu styles */
 #unified-header .dropdown-menu {
     top: 100%;
@@ -7244,7 +7267,9 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
 #unified-header .dropdown-menu:not(.show) {
     display: none !important;
 }
+*/
 
+/* מפריע לתפריט הראשי - keyframes כפולים
 @keyframes dropdownFadeIn {
     from {
         transform: translateX(-2px);
@@ -7395,6 +7420,7 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
     color: #333333;
 }
 
+/* מפריע לתפריט הראשי - הגדרות tiktrack-dropdown-menu ישנות
 #unified-header .tiktrack-dropdown-menu {
     position: absolute;
     top: 100%;
@@ -7436,6 +7462,7 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
     font-weight: 600;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
+*/
 
 #unified-header .tiktrack-dropdown-item.active:hover {
     background: rgba(0, 0, 0, 0.08);
@@ -7644,6 +7671,7 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
     transform: rotate(180deg);
 }
 
+/* מפריע לתפריט הראשי - הגדרות filter-menu כפולות
 /* סגנונות בסיס לפילטרים */
 #unified-header .filter-menu {
     position: absolute !important;
@@ -7664,6 +7692,7 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
 #unified-header .filter-menu.show {
     display: block !important;
 }
+*/
 
 /* פריטי פילטר סטטוס */
 #statusFilterMenu .status-filter-item {
@@ -7805,6 +7834,7 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
     box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
 }
 
+/* מפריע לתפריט הראשי - הגדרות filter-menu נוספות
 /* הסתרת הנקודה במצב לא נבחר */
 #unified-header .filter-menu .check-mark {
     opacity: 0 !important;
@@ -7819,7 +7849,9 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
     font-size: 1.2rem !important;
     text-shadow: 0 0 2px rgba(40, 167, 69, 0.3) !important;
 }
+*/
 
+/* מפריע לתפריט הראשי - הגדרות search-filter ישנות
 /* סגנונות חיפוש */
 #unified-header .search-filter {
     flex: 0 0 200px;
@@ -7865,7 +7897,9 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
     background: var(--apple-bg-secondary);
     color: var(--apple-text-primary);
 }
+*/
 
+/* מפריע לתפריט הראשי - הגדרות reset-btn ו-clear-btn ישנות
 /* כפתור איפוס - רקע לבן, מסגרת ואיקון ירוק */
 #unified-header .reset-filter {
     margin-left: auto;
@@ -7933,7 +7967,9 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
     font-weight: bold;
     transition: transform 0.2s ease;
 }
+*/
 
+/* מפריע לתפריט הראשי - הגדרות filter-toggle-section נוספות
 /* כפתור הצג/הסתר פילטרים - עגול ללא מסגרת, רקע לבן + צל */
 #unified-header .filter-toggle-section {
     display: flex;
@@ -7983,6 +8019,7 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
     color: #ff9c05;
     font-weight: bold;
 }
+*/
 
 /* התאמה למסכים קטנים */
 @media (max-width: 768px) {
@@ -8052,89 +8089,3 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
     transition: all 0.3s ease;
 }
 /* ===== סוף כל ההגדרות מהקובץ המקורי ===== */
-
-/* ===== Final Menu Structure - Additional Styles ===== */
-/* Cache clear button */
-.unified-header .cache-clear-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: transparent !important;
-    border: none !important;
-    color: #1d1d1f;
-    text-decoration: none;
-    transition: color 0.2s ease;
-    font-size: 16px;
-    padding: 0;
-    margin: 0;
-}
-
-.unified-header .cache-clear-btn:hover {
-    background: transparent !important;
-    color: #ff9500;
-    border: none !important;
-    box-shadow: none !important;
-}
-
-/* Filter Toggle Button */
-.unified-header .filter-toggle-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 50%;
-    color: #ff9c05;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    z-index: 1001;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.unified-header .filter-toggle-btn.collapsed .filter-arrow {
-    transform: rotate(180deg);
-}
-
-/* Filters Section */
-.unified-header .header-filters {
-    padding: 1rem 2rem;
-    background: #f5f5f7;
-    border-top: 1px solid #e5e5e5;
-    position: relative;
-    z-index: 1000;
-    min-height: 60px;
-    display: none; /* Hidden by default */
-}
-
-.unified-header .header-filters.show {
-    display: block; /* Shown when 'show' class is added */
-}
-
-/* Search Clear Button inside input */
-.unified-header .search-clear-btn {
-    position: absolute;
-    left: 0.5rem;
-    background: none;
-    border: none;
-    color: #666;
-    cursor: pointer;
-    padding: 0.25rem;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-}
-
-.unified-header .search-clear-btn:hover {
-    background: #f0f0f0;
-    color: #333;
-}
-
-/* Ensure submenus display above filters */
-.unified-header .submenu {
-    z-index: 1001 !important;
-}

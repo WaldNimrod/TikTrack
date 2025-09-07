@@ -157,6 +157,27 @@
     text-underline-offset: 4px;
 }
 
+/* 12.1. מצב ריחוף (hover) על פריט תפריט משני */
+#unified-header .tiktrack-dropdown-item:hover {
+    background: rgba(38, 186, 172, 0.1);
+    color: #26baac;
+}
+
+/* 12.2. מצב פעיל של פריט תפריט משני */
+#unified-header .tiktrack-dropdown-item.active {
+    background: rgba(0, 0, 0, 0.05);
+    color: #333333;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 12.3. מצב ריחוף על פריט תפריט משני פעיל */
+#unified-header .tiktrack-dropdown-item.active:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: #333333;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
 /* 13. מצב פתוח של תפריט נפתח ראשי */
 #unified-header .tiktrack-dropdown-menu.show {
     display: block;

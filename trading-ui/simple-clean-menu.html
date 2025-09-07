@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>תפריט פשוט ונקי - TikTrack</title>
+    
+    <style>
+        /* עיצוב פשוט ונקי */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+        }
+        
+        /* תפריט ראשי */
+        .menu {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 1rem 0;
+        }
+        
+        .menu-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1d1d1f;
+            text-decoration: none;
+        }
+        
+        .nav-list {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-link {
+            color: #1d1d1f;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 400;
+            padding: 0.5rem 0;
+            transition: color 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            color: #0071e3;
+        }
+        
+        /* תפריט נפתח */
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            padding: 0.5rem 0;
+            display: none;
+            z-index: 1000;
+        }
+        
+        .dropdown-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #1d1d1f;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: background-color 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f5f5f7;
+            color: #0071e3;
+        }
+        
+        /* תפריט משנה */
+        .submenu {
+            position: absolute;
+            top: 0;
+            right: 100%;
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            min-width: 180px;
+            padding: 0.5rem 0;
+            display: none;
+            z-index: 1001;
+            margin-right: 0.5rem;
+        }
+        
+        .submenu-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: #1d1d1f;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: background-color 0.2s ease;
+        }
+        
+        .submenu-item:hover {
+            background-color: #f5f5f7;
+            color: #0071e3;
+        }
+        
+        /* הצגת תפריטים */
+        .dropdown:hover .dropdown-menu {
+            display: block;
+        }
+        
+        .submenu-trigger:hover .submenu {
+            display: block;
+        }
+        
+        /* תוכן הדף */
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .alert-info {
+            background-color: #e3f2fd;
+            border: 1px solid #bbdefb;
+            color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <!-- תפריט פשוט ונקי -->
+    <nav class="menu">
+        <div class="menu-container">
+            <a href="#" class="logo">TikTrack</a>
+            
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="#" class="nav-link">בית</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link">הגדרות</a>
+                    <div class="dropdown-menu">
+                        <a href="#" class="dropdown-item">הגדרות כללי</a>
+                        <a href="#" class="dropdown-item">הגדרות חשבון</a>
+                        <a href="#" class="dropdown-item submenu-trigger">ניהול נתונים</a>
+                        <div class="submenu">
+                            <a href="#" class="submenu-item">התראות</a>
+                            <a href="#" class="submenu-item">חשבונות</a>
+                            <a href="#" class="submenu-item">עסקאות</a>
+                        </div>
+                        <a href="#" class="dropdown-item">אבטחה</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link">כלי פיתוח</a>
+                    <div class="dropdown-menu">
+                        <a href="#" class="dropdown-item">מסד נתונים</a>
+                        <a href="#" class="dropdown-item">לוגים</a>
+                        <a href="#" class="dropdown-item submenu-trigger">כלים מתקדמים</a>
+                        <div class="submenu">
+                            <a href="#" class="submenu-item">ניקוי מטמון</a>
+                            <a href="#" class="submenu-item">גיבויים</a>
+                            <a href="#" class="submenu-item">ביצועים</a>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">עזרה</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- תוכן הדף -->
+    <div class="content">
+        <div class="card">
+            <h1>תפריט פשוט ונקי - TikTrack</h1>
+            <p>זהו תפריט פשוט ונקי בסגנון מינימליסטי, ללא תלות בספריות חיצוניות.</p>
+            
+            <div class="alert alert-info">
+                <h5>הוראות בדיקה:</h5>
+                <ul>
+                    <li>✅ לחץ על "הגדרות" ובדוק שהתת-תפריטים מופיעים בצד ימין</li>
+                    <li>✅ לחץ על "כלי פיתוח" ובדוק שהתת-תפריטים מופיעים בצד ימין</li>
+                    <li>✅ בדוק שהתת-תפריטים מופיעים כטיפות (dropdowns) ולא כרשימה שטוחה</li>
+                    <li>✅ בדוק שהעיצוב נקי ומינימליסטי</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

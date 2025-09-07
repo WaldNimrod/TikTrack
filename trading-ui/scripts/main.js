@@ -1228,6 +1228,32 @@ function initializeDynamicColorScheme() {
       console.log('✅ CSS ערכים מספריים דינמי נוצר');
     }
     
+    // Initialize status color CSS
+    if (window.generateStatusCSS) {
+      const statusCSS = window.generateStatusCSS();
+      let statusStyleElement = document.getElementById('dynamic-status-colors');
+      if (!statusStyleElement) {
+        statusStyleElement = document.createElement('style');
+        statusStyleElement.id = 'dynamic-status-colors';
+        document.head.appendChild(statusStyleElement);
+      }
+      statusStyleElement.textContent = statusCSS;
+      console.log('✅ CSS סטטוסים דינמי נוצר');
+    }
+    
+    // Initialize investment type color CSS
+    if (window.generateInvestmentTypeCSS) {
+      const typeCSS = window.generateInvestmentTypeCSS();
+      let typeStyleElement = document.getElementById('dynamic-type-colors');
+      if (!typeStyleElement) {
+        typeStyleElement = document.createElement('style');
+        typeStyleElement.id = 'dynamic-type-colors';
+        document.head.appendChild(typeStyleElement);
+      }
+      typeStyleElement.textContent = typeCSS;
+      console.log('✅ CSS סוגי השקעה דינמי נוצר');
+    }
+    
     console.log('🎨 מערכת צבעים דינמית אותחלה בהצלחה');
   } catch (error) {
     console.error('❌ שגיאה באתחול מערכת צבעים דינמית:', error);

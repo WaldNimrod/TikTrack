@@ -23,8 +23,12 @@ function clearConsole() {
   }
 }
 
-// פונקציה להסתרת הודעות console בפיתוח
+// פונקציה להסתרת הודעות console בפיתוח - מבוטלת זמנית לצורך פיתוח
 function suppressConsoleMessages() {
+  // ❌ פונקציה מבוטלת זמנית לצורך פיתוח
+  console.log('⚠️ suppressConsoleMessages מבוטלת - הקונסולה פעילה לצורך פיתוח');
+  return;
+  
   if (typeof console !== 'undefined') {
     const settings = getConsoleSettings();
     const duration = (settings.suppressDuration || 5) * 1000;
@@ -128,7 +132,7 @@ function getConsoleSettings() {
   const defaultSettings = {
     autoClear: false, // ברירת מחדל: לא לפעיל ניקוי אוטומטי
     clearInterval: 60, // שניות
-    suppressMessages: false,
+    suppressMessages: false, // ❌ מבוטל זמנית לצורך פיתוח
     suppressDuration: 5, // שניות
   };
 

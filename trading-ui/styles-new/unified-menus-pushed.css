@@ -3244,7 +3244,6 @@ select option {
 
     #unified-header .dropdown-submenu:hover .tiktrack-submenu {
         transform: none;
-        display: block;
     }
 }
 
@@ -6910,69 +6909,53 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
 
 /* סגנונות בסיסיים לכותרת */
 
-/* ===== Bootstrap 5 Submenu Support - Adapted for existing structure ===== */
+/* ===== Bootstrap 5 Submenu Support ===== */
 #unified-header .dropdown-submenu {
     position: relative;
 }
 
-#unified-header .dropdown-submenu > .submenu {
+#unified-header .dropdown-submenu > .dropdown-menu {
+    position: absolute;
     top: 0;
-    right: 100%;
-    left: auto;
+    left: 100%;
     margin-top: -1px;
-    margin-right: 0.125rem;
-    margin-left: 0;
+    margin-left: 0.125rem;
     display: none;
+    z-index: 1002;
 }
 
-#unified-header .dropdown-submenu:hover > .submenu,
-#unified-header .dropdown-submenu > .submenu.show {
+#unified-header .dropdown-submenu:hover > .dropdown-menu,
+#unified-header .dropdown-submenu > .dropdown-menu.show {
     display: block;
 }
 
-/* וידוא שהתפריטים המשניים סגורים כברירת מחדל */
-#unified-header .dropdown-submenu .submenu {
-    display: none !important;
+/* Bootstrap 5 arrow styling */
+#unified-header .dropdown-submenu > .dropdown-toggle::after {
+    display: inline-block;
+    margin-left: 0.255em;
+    vertical-align: 0.255em;
+    content: "";
+    border-top: 0.3em solid;
+    border-right: 0.3em solid transparent;
+    border-bottom: 0;
+    border-left: 0.3em solid transparent;
+    transform: rotate(-90deg);
 }
 
-#unified-header .dropdown-submenu .submenu.show {
-    display: block !important;
-}
-
-/* Bootstrap override for submenu positioning - adapted for existing structure */
-.dropdown-submenu > .submenu {
-    position: absolute !important;
-    top: 0 !important;
+/* RTL positioning for level 2 submenus */
+#unified-header .dropdown-submenu > .dropdown-menu {
     right: 100% !important;
     left: auto !important;
-    margin-top: -1px !important;
     margin-right: 0.125rem !important;
     margin-left: 0 !important;
-    display: none !important;
-    z-index: 1002 !important;
 }
 
-.dropdown-submenu:hover > .submenu,
-.dropdown-submenu > .submenu.show {
-    display: block !important;
-}
-
-/* Additional Bootstrap override for submenu positioning */
-.dropdown-submenu .submenu {
-    position: absolute !important;
-    top: 0 !important;
-    right: 100% !important;
-    left: auto !important;
-    margin-top: -1px !important;
-    margin-right: 0.125rem !important;
-    margin-left: 0 !important;
-    display: none !important;
-    z-index: 1002 !important;
-}
-
-.dropdown-submenu:hover .submenu,
-.dropdown-submenu .submenu.show {
-    display: block !important;
+/* LTR positioning for level 3 submenus */
+#unified-header .dropdown-submenu .tiktrack-submenu {
+    left: 100% !important;
+    right: auto !important;
+    margin-left: 0.125rem !important;
+    margin-right: 0 !important;
 }
 
 /* ===== תפריטי משנה עם שלוש רמות ===== */
@@ -7004,14 +6987,13 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
     background: var(--apple-bg-elevated);
     border: 1px solid var(--apple-border-light);
     border-radius: 8px;
-    display: none;
     box-shadow: var(--apple-shadow-medium);
     min-width: 200px;
     opacity: 0;
     visibility: hidden;
     transform: translateX(-10px);
-    z-index: 1003;
     transition: all 0.2s ease;
+    z-index: 1001;
     padding: 8px 0;
 }
 
@@ -7019,7 +7001,6 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
     opacity: 1;
     visibility: visible;
     transform: translateX(0);
-    display: block;
 }
 
 #unified-header .tiktrack-submenu .tiktrack-dropdown-item {
@@ -7058,7 +7039,6 @@ border-bottom: 2px solid var(--entity-trade-color, #007bff);
     
     #unified-header .dropdown-submenu:hover .tiktrack-submenu {
         transform: none;
-        display: block;
     }
 }
 #unified-header {

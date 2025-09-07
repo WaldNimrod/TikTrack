@@ -198,7 +198,26 @@ const INVESTMENT_TYPE_DESCRIPTIONS = {
  * צבעי סוגי השקעה דינמיים - נטענים מההעדפות
  * Dynamic investment type colors - loaded from preferences
  */
-let INVESTMENT_TYPE_COLORS = {};
+let INVESTMENT_TYPE_COLORS = {
+  'swing': {
+    light: 'rgba(0, 123, 255, 0.1)',
+    medium: '#007bff',
+    dark: '#0056b3',
+    border: 'rgba(0, 123, 255, 0.3)'
+  },
+  'investment': {
+    light: 'rgba(40, 167, 69, 0.1)',
+    medium: '#28a745',
+    dark: '#1e7e34',
+    border: 'rgba(40, 167, 69, 0.3)'
+  },
+  'passive': {
+    light: 'rgba(111, 66, 193, 0.1)',
+    medium: '#6f42c1',
+    dark: '#5a32a3',
+    border: 'rgba(111, 66, 193, 0.3)'
+  }
+};
 
 // ===== DYNAMIC COLOR LOADING =====
 // טעינת צבעים דינמית
@@ -749,6 +768,37 @@ function generateStatusCSS() {
     `;
   });
 
+  // מחלקה לסטטוס לא מוגדר
+  css += `
+.status-other {
+  background-color: rgba(108, 117, 125, 0.1);
+  border-color: rgba(108, 117, 125, 0.3);
+  color: #6c757d;
+}
+
+.status-other-badge {
+  background-color: #6c757d;
+  color: white;
+  border: 1px solid #6c757d;
+}
+
+.status-other-text {
+  color: #6c757d;
+}
+
+.status-other-bg {
+  background-color: rgba(108, 117, 125, 0.1);
+}
+
+.status-other-border {
+  border-color: rgba(108, 117, 125, 0.3);
+}
+
+.status-other-dark {
+  color: #495057;
+}
+  `;
+
   return css;
 }
 
@@ -792,8 +842,68 @@ function generateInvestmentTypeCSS() {
 .investment-type-${type}-dark {
   color: ${colors.dark};
 }
+
+/* מחלקות קצרות לסוגי השקעה */
+.type-${type} {
+  background-color: ${colors.light};
+  border-color: ${colors.border};
+  color: ${colors.medium};
+}
+
+.type-${type}-badge {
+  background-color: ${colors.medium};
+  color: white;
+  border: 1px solid ${colors.medium};
+}
+
+.type-${type}-text {
+  color: ${colors.medium};
+}
+
+.type-${type}-bg {
+  background-color: ${colors.light};
+}
+
+.type-${type}-border {
+  border-color: ${colors.border};
+}
+
+.type-${type}-dark {
+  color: ${colors.dark};
+}
     `;
   });
+
+  // מחלקה לסוג לא מוגדר
+  css += `
+.type-other {
+  background-color: rgba(108, 117, 125, 0.1);
+  border-color: rgba(108, 117, 125, 0.3);
+  color: #6c757d;
+}
+
+.type-other-badge {
+  background-color: #6c757d;
+  color: white;
+  border: 1px solid #6c757d;
+}
+
+.type-other-text {
+  color: #6c757d;
+}
+
+.type-other-bg {
+  background-color: rgba(108, 117, 125, 0.1);
+}
+
+.type-other-border {
+  border-color: rgba(108, 117, 125, 0.3);
+}
+
+.type-other-dark {
+  color: #495057;
+}
+  `;
 
   return css;
 }

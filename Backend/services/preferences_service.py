@@ -194,45 +194,45 @@ class PreferencesService:
             
             # Temporarily disabled due to relationship issues
             # preferences = UserPreferences(
-                user_id=user_id,
-                profile_id=profile_id,
-                version=defaults.get('version', '2.0')
-            )
+            #     user_id=user_id,
+            #     profile_id=profile_id,
+            #     version=defaults.get('version', '2.0')
+            # )
             
             # עדכן הגדרות מברירות מחדל
-            preferences.from_dict(defaults)
+            # preferences.from_dict(defaults)
             
             # הגדר צבעים ברירת מחדל
-            default_colors = {
-                'theme': 'light',
-                'numericValues': {
-                    'positive': {'text': '#28a745', 'background': '#d4edda'},
-                    'negative': {'text': '#dc3545', 'background': '#f8d7da'},
-                    'zero': {'text': '#6c757d', 'background': '#e2e3e5'}
-                },
-                'entities': {
-                    'trade': '#007bff',
-                    'account': '#28a745',
-                    'ticker': '#dc3545',
-                    'alert': '#ff9c05'
-                },
-                'status': {
-                    'open': {'text': '#28a745', 'background': 'rgba(40, 167, 69, 0.1)'},
-                    'closed': {'text': '#6c757d', 'background': 'rgba(108, 117, 125, 0.1)'},
-                    'cancelled': {'text': '#dc3545', 'background': 'rgba(220, 53, 69, 0.1)'}
-                }
-            }
-            preferences.color_scheme_json = json.dumps(default_colors)
+            # default_colors = {
+            #     'theme': 'light',
+            #     'numericValues': {
+            #         'positive': {'text': '#28a745', 'background': '#d4edda'},
+            #         'negative': {'text': '#dc3545', 'background': '#f8d7da'},
+            #         'zero': {'text': '#6c757d', 'background': '#e2e3e5'}
+            #     },
+            #     'entities': {
+            #         'trade': '#007bff',
+            #         'account': '#28a745',
+            #         'ticker': '#dc3545',
+            #         'alert': '#ff9c05'
+            #     },
+            #     'status': {
+            #         'open': {'text': '#28a745', 'background': 'rgba(40, 167, 69, 0.1)'},
+            #         'closed': {'text': '#6c757d', 'background': 'rgba(108, 117, 125, 0.1)'},
+            #         'cancelled': {'text': '#dc3545', 'background': 'rgba(220, 53, 69, 0.1)'}
+            #     }
+            # }
+            # preferences.color_scheme_json = json.dumps(default_colors)
             
             # הגדרות שקיפות ברירת מחדל
-            default_opacity = {
-                'header': {'main': 100, 'sub': 30},
-                'cards': {'background': 95, 'border': 80}
-            }
-            preferences.opacity_settings_json = json.dumps(default_opacity)
+            # default_opacity = {
+            #     'header': {'main': 100, 'sub': 30},
+            #     'cards': {'background': 95, 'border': 80}
+            # }
+            # preferences.opacity_settings_json = json.dumps(default_opacity)
             
-            db.add(preferences)
-            db.commit()
+            # db.add(preferences)
+            # db.commit()
             
             logger.info(f"Created default preferences for profile {profile_id}")
             

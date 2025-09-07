@@ -172,6 +172,8 @@ const VALID_INVESTMENT_TYPES = [
   'swing',      // השקעות סווינג - Swing Trading
   'investment', // השקעות ארוכות טווח - Long-term Investment
   'passive',     // השקעות פאסיביות - Passive Investment
+  'day_trading', // מסחר יומי - Day Trading
+  'scalping',   // סקלפינג - Scalping
 ];
 
 /**
@@ -216,6 +218,18 @@ let INVESTMENT_TYPE_COLORS = {
     medium: '#6f42c1',
     dark: '#5a32a3',
     border: 'rgba(111, 66, 193, 0.3)'
+  },
+  'day_trading': {
+    light: 'rgba(255, 193, 7, 0.1)',
+    medium: '#ffc107',
+    dark: '#e0a800',
+    border: 'rgba(255, 193, 7, 0.3)'
+  },
+  'scalping': {
+    light: 'rgba(220, 53, 69, 0.1)',
+    medium: '#dc3545',
+    dark: '#c82333',
+    border: 'rgba(220, 53, 69, 0.3)'
   }
 };
 

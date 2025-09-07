@@ -13,7 +13,7 @@ from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import Session
 from config.database import SessionLocal
 from services.preferences_service import PreferencesService
-from utils.response_optimizer import optimize_response
+# from utils.response_optimizer import optimize_response
 from utils.rate_limiter import rate_limit_api
 from typing import Any
 import logging

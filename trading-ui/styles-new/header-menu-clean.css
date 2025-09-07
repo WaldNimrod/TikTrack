@@ -14,129 +14,182 @@
 
 /* 1. קונטיינר ראשי של התפריט */
 #unified-header .tiktrack-dropdown-menu {
-    /* תפקיד: קונטיינר ראשי של התפריט הנפתח */
-    /* מיקום: מוצב יחסית לתפריט הראשי */
-    /* תצוגה: נסתר כברירת מחדל, מוצג על hover/click */
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--apple-bg-elevated);
+    border: 1px solid var(--apple-border-light);
+    border-radius: 12px;
+    box-shadow: var(--apple-shadow-medium);
+    min-width: 200px;
+    padding: 0.5rem 0;
+    display: none;
+    z-index: 1000;
 }
 
 /* 2. פריטי התפריט הראשי */
 #unified-header .tiktrack-nav-item {
-    /* תפקיד: פריט בתפריט הראשי */
-    /* מיקום: בתוך התפריט הראשי */
-    /* תצוגה: תמיד מוצג */
+    position: relative;
 }
 
 /* 3. קישורי התפריט הראשי */
 #unified-header .tiktrack-nav-link {
-    /* תפקיד: קישור בפריט התפריט הראשי */
-    /* מיקום: בתוך .tiktrack-nav-item */
-    /* תצוגה: תמיד מוצג */
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    color: #333333;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: color 0.2s ease, background-color 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 400;
+    border: none;
+    position: relative;
+    margin: 0;
 }
 
 /* 4. חץ התפריט הנפתח */
 #unified-header .tiktrack-dropdown-arrow {
-    /* תפקיד: חץ המציין שיש תפריט משני */
-    /* מיקום: בתוך .tiktrack-nav-link */
-    /* תצוגה: מוצג רק לפריטים עם תפריט משני */
+    font-size: 0.8rem;
+    transition: transform 0.2s ease;
+    color: #333333;
 }
 
 /* 5. פריטי התפריט המשני */
 #unified-header .tiktrack-dropdown-item {
-    /* תפקיד: פריט בתפריט המשני */
-    /* מיקום: בתוך .tiktrack-dropdown-menu */
-    /* תצוגה: מוצג רק כשהתפריט פתוח */
+    display: block;
+    padding: 0.5rem 1rem;
+    color: #000000;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-weight: 300;
+    font-size: 0.85rem;
+    list-style: none;
 }
 
 /* ===== מבנה תפריטי משנה (רמה 2) ===== */
 
 /* 6. קונטיינר תפריט משנה */
 #unified-header .dropdown-submenu {
-    /* תפקיד: קונטיינר לתפריט משנה */
-    /* מיקום: בתוך .tiktrack-dropdown-item */
-    /* תצוגה: מוצב יחסית */
+    position: relative;
+    list-style: none;
 }
 
 /* 7. תפריט משנה (רמה 2) */
 #unified-header .submenu {
-    /* תפקיד: רשימת פריטי התפריט ברמה 2 */
-    /* מיקום: בתוך .dropdown-submenu */
-    /* תצוגה: נפתח בהובר/קליק, ממוקם לצד שמאל (RTL) */
+    position: absolute;
+    top: 0;
+    right: 100%;
+    background: var(--apple-bg-elevated);
+    border: 1px solid var(--apple-border-light);
+    border-radius: 12px;
+    box-shadow: var(--apple-shadow-medium);
+    min-width: 150px;
+    padding: 0.5rem 0;
+    display: none;
+    z-index: 1001;
+    list-style: none;
+    margin-right: 0.125rem;
 }
 
 /* 8. פריטי תפריט משנה (רמה 2) */
 #unified-header .submenu .tiktrack-dropdown-item {
-    /* תפקיד: כל פריט בתוך תפריט משנה רמה 2 */
-    /* מיקום: בתוך .submenu */
-    /* תצוגה: גלוי כאשר תפריט רמה 2 פתוח */
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    list-style: none;
 }
 
 /* ===== מבנה תפריטי משנה שלישי (רמה 3) ===== */
 
 /* 9. תפריט משנה שלישי (רמה 3) */
 #unified-header .tiktrack-submenu {
-    /* תפקיד: רשימת פריטי התפריט ברמה 3 */
-    /* מיקום: בתוך .dropdown-submenu (שנמצא בתוך .submenu) */
-    /* תצוגה: נפתח בהובר/קליק, ממוקם לצד ימין (LTR) */
+    position: absolute;
+    left: 100%;
+    top: 0;
+    background: var(--apple-bg-elevated);
+    border: 1px solid var(--apple-border-light);
+    border-radius: 8px;
+    display: none;
+    box-shadow: var(--apple-shadow-medium);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-10px);
+    z-index: 1003;
+    transition: all 0.2s ease;
+    padding: 8px 0;
 }
 
 /* 10. פריטי תפריט משנה שלישי (רמה 3) */
 #unified-header .tiktrack-submenu .tiktrack-dropdown-item {
-    /* תפקיד: כל פריט בתוך תפריט משנה רמה 3 */
-    /* מיקום: בתוך .tiktrack-submenu */
-    /* תצוגה: גלוי כאשר תפריט רמה 3 פתוח */
+    padding: 8px 16px;
+    white-space: nowrap;
+    border: none;
+    background: transparent;
+    color: var(--apple-text-primary);
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    text-align: right;
+    transition: background-color 0.2s ease;
 }
 
 /* ===== מצבי תצוגה ===== */
 
 /* 11. מצב פעיל של פריט תפריט ראשי */
-#unified-header .tiktrack-nav-item.active {
-    /* תפקיד: מדגיש את הפריט הפעיל בתפריט הראשי */
-    /* מיקום: על .tiktrack-nav-item */
-    /* תצוגה: כאשר הפריט פעיל */
+#unified-header .tiktrack-nav-item.active .tiktrack-nav-link {
+    background: transparent;
+    color: #333333;
+    font-weight: 600;
+    border: none;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 /* 12. מצב ריחוף (hover) על פריט תפריט ראשי */
-#unified-header .tiktrack-nav-item:hover {
-    /* תפקיד: משנה סגנון כאשר העכבר מרחף מעל פריט תפריט ראשי */
-    /* מיקום: על .tiktrack-nav-item */
-    /* תצוגה: כאשר העכבר מרחף */
+#unified-header .tiktrack-nav-link:hover {
+    background: transparent;
+    color: #ff9c05;
+    text-decoration: underline;
+    text-decoration-color: #ff9c05;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
 }
 
 /* 13. מצב פתוח של תפריט נפתח ראשי */
 #unified-header .tiktrack-dropdown-menu.show {
-    /* תפקיד: מציג את התפריט הראשי כשהוא פתוח */
-    /* מיקום: על .tiktrack-dropdown-menu */
-    /* תצוגה: כאשר התפריט פתוח */
+    display: block;
 }
 
 /* 14. מצב פתוח של תפריט משנה (רמה 2) */
-#unified-header .submenu.show {
-    /* תפקיד: מציג את תפריט המשנה רמה 2 כשהוא פתוח */
-    /* מיקום: על .submenu */
-    /* תצוגה: כאשר תפריט רמה 2 פתוח */
+#unified-header .dropdown-submenu:hover .submenu {
+    display: block;
+    animation: submenuFadeIn 0.2s ease-out;
 }
 
 /* ===== אלמנטים נוספים ===== */
 
 /* 15. מפריד בין פריטי תפריט */
 #unified-header .dropdown-divider {
-    /* תפקיד: קו הפרדה בין פריטים בתפריט */
-    /* מיקום: בתוך תפריט נפתח */
-    /* תצוגה: גלוי */
+    margin: 0.5rem 0;
+    border: none;
+    border-top: 1px solid var(--apple-border-light);
 }
 
 /* 16. חץ תפריט משנה */
 #unified-header .submenu-arrow {
-    /* תפקיד: חץ קטן המציין פתיחת תפריט משנה */
-    /* מיקום: בתוך .tiktrack-dropdown-item */
-    /* תצוגה: גלוי ליד פריטים עם תפריט משנה */
+    font-size: 0.8em;
+    transition: transform 0.2s ease;
+    margin-right: 8px;
 }
 
 /* 17. כפתור פתיחת תפריט משנה */
-#unified-header .tiktrack-submenu-toggle {
-    /* תפקיד: עוטף את הקישור והחץ של פריט תפריט משנה */
-    /* מיקום: בתוך .dropdown-submenu */
-    /* תצוגה: גלוי */
+#unified-header .dropdown-submenu .tiktrack-submenu-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
 
 /* ===== התאמה למסכים קטנים ===== */
@@ -144,18 +197,36 @@
 /* 18. התאמה למסכים קטנים - תפריט משנה (רמה 2) */
 @media (max-width: 768px) {
     #unified-header .dropdown-submenu .submenu {
-        /* תפקיד: שינוי מיקום ותצוגה של תפריט רמה 2 במסכים קטנים */
-        /* מיקום: בתוך @media (max-width: 768px) */
-        /* תצוגה: במסכים קטנים */
+        position: static;
+        right: auto;
+        top: auto;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        border: none;
+        border-top: 1px solid var(--apple-border-light);
+        margin-top: 8px;
+        padding-top: 8px;
+        margin-right: 0;
     }
 }
 
 /* 19. התאמה למסכים קטנים - תפריט משנה שלישי (רמה 3) */
 @media (max-width: 768px) {
     #unified-header .tiktrack-submenu {
-        /* תפקיד: שינוי מיקום ותצוגה של תפריט רמה 3 במסכים קטנים */
-        /* מיקום: בתוך @media (max-width: 768px) */
-        /* תצוגה: במסכים קטנים */
+        position: static;
+        left: auto;
+        top: auto;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        border: none;
+        border-top: 1px solid var(--apple-border-light);
+        margin-top: 8px;
+        padding-top: 8px;
+        margin-left: 0;
     }
 }
 
@@ -163,7 +234,12 @@
 
 /* 20. אנימציה לפתיחת תפריטי משנה */
 @keyframes submenuFadeIn {
-    /* תפקיד: אנימציה חלקה לפתיחת תפריטי משנה */
-    /* מיקום: מוגדר כ-@keyframes */
-    /* תצוגה: בעת פתיחת תפריט משנה */
+    from {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }

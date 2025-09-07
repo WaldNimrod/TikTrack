@@ -722,7 +722,7 @@ class PreferencesV2 {
   async getDefaultPreferences() {
     try {
       // נסה לטעון ברירות מחדל מהשרת
-      const response = await fetch('/api/v2/preferences/defaults');
+      const response = await fetch('/api/v1/preferences/defaults');
       if (response.ok) {
         const data = await response.json();
         if (data.success) {

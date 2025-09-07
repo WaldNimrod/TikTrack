@@ -1,0 +1,204 @@
+/* Final Menu Structure - Apple Style with TikTrack Colors */
+
+/* עיצוב בסגנון אפל - נקי ומינימליסטי */
+.apple-navbar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e5e5;
+    padding: 0.75rem 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.apple-navbar .navbar-brand {
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: #1d1d1f;
+    text-decoration: none;
+}
+
+.apple-navbar .nav-link {
+    color: #1d1d1f;
+    font-size: 0.875rem;
+    font-weight: 400;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.apple-navbar .nav-link:hover {
+    color: #ff9500; /* TikTrack orange */
+}
+
+.apple-navbar .nav-link.active {
+    color: #26baac; /* TikTrack green */
+}
+
+/* תפריט נפתח בסגנון אפל */
+.apple-dropdown {
+    position: relative;
+}
+
+.apple-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    padding: 0.5rem 0;
+    display: none;
+    z-index: 1000;
+}
+
+.apple-dropdown-item {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: #1d1d1f;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: background-color 0.2s ease;
+}
+
+.apple-dropdown-item:hover {
+    background-color: #f5f5f7;
+    color: #ff9500; /* TikTrack orange */
+}
+
+/* תפריט משנה */
+.apple-submenu {
+    position: absolute;
+    top: 0;
+    right: 100%;
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    padding: 0.5rem 0;
+    display: none;
+    z-index: 1001;
+    margin-right: 0;
+}
+
+.apple-submenu-item {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: #1d1d1f;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: background-color 0.2s ease;
+}
+
+.apple-submenu-item:hover {
+    background-color: #f5f5f7;
+    color: #ff9500; /* TikTrack orange */
+}
+
+/* חץ לתפריט נפתח */
+.apple-arrow {
+    font-size: 0.75rem;
+    margin-right: 0.25rem;
+    transition: transform 0.2s ease;
+}
+
+.apple-dropdown:hover .apple-arrow {
+    transform: rotate(90deg);
+}
+
+/* הצגת תפריטים */
+.apple-dropdown:hover .apple-dropdown-menu {
+    display: block;
+}
+
+.apple-submenu-trigger:hover .apple-submenu {
+    display: block;
+}
+
+/* פריט שמפעיל תפריט משנה */
+.apple-submenu-trigger {
+    position: relative;
+}
+
+.apple-submenu-trigger-link {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: #1d1d1f;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: background-color 0.2s ease;
+}
+
+.apple-submenu-trigger-link:hover {
+    background-color: #f5f5f7;
+    color: #ff9500; /* TikTrack orange */
+}
+
+/* רקע כללי */
+body {
+    background-color: #f5f5f7;
+    margin: 0;
+    padding: 0;
+    direction: rtl;
+}
+
+.content {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* TikTrack Logo */
+.tiktrack-logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    direction: ltr;
+}
+
+.tiktrack-logo-image {
+    width: 125px;
+    height: 37.5px;
+    object-fit: contain;
+}
+
+.tiktrack-logo-text {
+    font-size: 1rem;
+    font-weight: 300;
+    color: #26baac;
+    direction: ltr;
+    text-align: left;
+}
+
+/* Cache clear button */
+.cache-clear-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: transparent !important;
+    border: none !important;
+    color: #1d1d1f;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    font-size: 16px;
+    padding: 0;
+    margin: 0;
+}
+
+.cache-clear-btn:hover {
+    background: transparent !important;
+    color: #ff9500;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Separator line */
+.separator {
+    height: 1px;
+    background: #e5e5e5;
+    margin: 0.5rem 0;
+}

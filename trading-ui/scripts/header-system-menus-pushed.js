@@ -40,6 +40,65 @@ class HeaderSystem {
     this.isInitialized = false;
   }
 
+  // Bootstrap 5 submenu support
+  static initBootstrapSubmenu() {
+    // Handle Bootstrap 5 submenu toggles
+    document.addEventListener('click', function(e) {
+      const toggle = e.target.closest('.dropdown-toggle[data-bs-toggle="dropdown"]');
+      if (toggle) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const submenu = toggle.closest('.dropdown-submenu');
+        if (submenu) {
+          const dropdownMenu = submenu.querySelector('.dropdown-menu');
+          if (dropdownMenu) {
+            // Close other open submenus
+            document.querySelectorAll('.dropdown-submenu .dropdown-menu.show').forEach(menu => {
+              if (menu !== dropdownMenu) {
+                menu.classList.remove('show');
+              }
+            });
+            
+            // Toggle current submenu
+            dropdownMenu.classList.toggle('show');
+          }
+        }
+      }
+      
+      // Close submenus when clicking outside or on regular dropdown items
+      if (!e.target.closest('.dropdown-submenu')) {
+        document.querySelectorAll('.dropdown-submenu .dropdown-menu.show').forEach(menu => {
+          menu.classList.remove('show');
+        });
+      }
+    });
+
+    // Handle hover behavior with delay
+    let hoverTimer;
+    document.addEventListener('mouseenter', function(e) {
+      const submenu = e.target.closest('.dropdown-submenu');
+      if (submenu) {
+        clearTimeout(hoverTimer);
+        const dropdownMenu = submenu.querySelector('.dropdown-menu');
+        if (dropdownMenu) {
+          dropdownMenu.classList.add('show');
+        }
+      }
+    });
+
+    document.addEventListener('mouseleave', function(e) {
+      const submenu = e.target.closest('.dropdown-submenu');
+      if (submenu) {
+        hoverTimer = setTimeout(() => {
+          const dropdownMenu = submenu.querySelector('.dropdown-menu');
+          if (dropdownMenu) {
+            dropdownMenu.classList.remove('show');
+          }
+        }, 150);
+      }
+    });
+  }
 
   init() {
     if (this.isInitialized) {
@@ -48,6 +107,9 @@ class HeaderSystem {
 
     // יצירת אלמנט הכותרת
     HeaderSystem.createHeader();
+    
+    // הוספת תמיכה ב-Bootstrap 5 submenu
+    HeaderSystem.initBootstrapSubmenu();
 
     // טעינת חשבונות לפילטר
     this.loadAccountsForFilter();
@@ -656,32 +718,32 @@ class HeaderSystem {
                       <ul class="tiktrack-dropdown-menu">
                         <!-- 📊 ניהול נתונים -->
                         <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">📊 ניהול נתונים</a>
-                          <ul class="submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/alerts">התראות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/executions">עסקעות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/accounts">חשבונות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
+                          <a class="tiktrack-dropdown-item dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">📊 ניהול נתונים</a>
+                          <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/alerts">התראות</a></li>
+                            <li><a class="dropdown-item" href="/executions">עסקעות</a></li>
+                            <li><a class="dropdown-item" href="/tickers">טיקרים</a></li>
+                            <li><a class="dropdown-item" href="/accounts">חשבונות</a></li>
+                            <li><a class="dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
+                            <li><a class="dropdown-item" href="/notes">הערות</a></li>
                           </ul>
                         </li>
                         
                         <!-- ⚙️ הגדרות מערכת -->
                         <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">⚙️ הגדרות מערכת</a>
-                          <ul class="submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/test-preferences-v2-integration.html">בדיקת אינטגרציה V2</a></li>
+                          <a class="tiktrack-dropdown-item dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">⚙️ הגדרות מערכת</a>
+                          <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/preferences">העדפות</a></li>
+                            <li><a class="dropdown-item" href="/test-preferences-v2-integration.html">בדיקת אינטגרציה V2</a></li>
                           </ul>
                         </li>
                         
                         <!-- 🔧 כלי פיתוח -->
                         <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">🔧 כלי פיתוח</a>
-                          <ul class="submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
+                          <a class="tiktrack-dropdown-item dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">🔧 כלי פיתוח</a>
+                          <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/db_display">בסיס נתונים</a></li>
+                            <li><a class="dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
                           </ul>
                         </li>
                       </ul>
@@ -695,38 +757,38 @@ class HeaderSystem {
                       <ul class="tiktrack-dropdown-menu">
                         <!-- 🗑️ פעולות מערכת -->
                         <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">🗑️ פעולות מערכת</a>
-                          <ul class="submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 ניהול מערכת</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/css-management">🎨 מנהל CSS וארכיטקטורה</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/crud-testing-dashboard">🧪 דשבורד בדיקות CRUD</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/notifications-center">מרכז התראות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/background-tasks">ניהול משימות ברקע</a></li>
+                          <a class="tiktrack-dropdown-item dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">🗑️ פעולות מערכת</a>
+                          <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/system-management">🔧 ניהול מערכת</a></li>
+                            <li><a class="dropdown-item" href="/css-management">🎨 מנהל CSS וארכיטקטורה</a></li>
+                            <li><a class="dropdown-item" href="/crud-testing-dashboard">🧪 דשבורד בדיקות CRUD</a></li>
+                            <li><a class="dropdown-item" href="/notifications-center">מרכז התראות</a></li>
+                            <li><a class="dropdown-item" href="/background-tasks">ניהול משימות ברקע</a></li>
                           </ul>
                         </li>
 
                         <!-- 🔍 בדיקות ונתונים -->
                         <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">🔍 בדיקות ונתונים</a>
-                          <ul class="submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/external-data-dashboard">דשבורד נתונים חיצוניים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/server-monitor">ניטור שרת</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/cache-test">בדיקת Cache</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/constraints">אילוצים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/linter-realtime-monitor">ניטור Linter בזמן אמת</a></li>
+                          <a class="tiktrack-dropdown-item dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">🔍 בדיקות ונתונים</a>
+                          <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/external-data-dashboard">דשבורד נתונים חיצוניים</a></li>
+                            <li><a class="dropdown-item" href="/server-monitor">ניטור שרת</a></li>
+                            <li><a class="dropdown-item" href="/cache-test">בדיקת Cache</a></li>
+                            <li><a class="dropdown-item" href="/constraints">אילוצים</a></li>
+                            <li><a class="dropdown-item" href="/linter-realtime-monitor">ניטור Linter בזמן אמת</a></li>
                           </ul>
                         </li>
 
                         <!-- 🎨 ממשק משתמש -->
                         <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">🎨 ממשק משתמש</a>
-                          <ul class="submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/style_demonstration">הדגמת סגנונות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/numeric-value-colors-demo">הדגמת צבעים לערכים מספריים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/designs">עיצובים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">מיפוי סקריפטים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/js-map">מפת JS</a></li>
+                          <a class="tiktrack-dropdown-item dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">🎨 ממשק משתמש</a>
+                          <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/style_demonstration">הדגמת סגנונות</a></li>
+                            <li><a class="dropdown-item" href="/numeric-value-colors-demo">הדגמת צבעים לערכים מספריים</a></li>
+                            <li><a class="dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
+                            <li><a class="dropdown-item" href="/designs">עיצובים</a></li>
+                            <li><a class="dropdown-item" href="/page-scripts-matrix">מיפוי סקריפטים</a></li>
+                            <li><a class="dropdown-item" href="/js-map">מפת JS</a></li>
                           </ul>
                         </li>
 

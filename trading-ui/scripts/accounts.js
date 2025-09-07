@@ -162,7 +162,7 @@ async function loadAccountsFromServer() {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch('http://127.0.0.1:8080/api/v1/accounts/', {
+    const response = await fetch('/api/v1/accounts/', {
       method: 'GET',
       headers,
     });
@@ -206,7 +206,7 @@ async function loadAllAccountsFromServer() {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch('http://127.0.0.1:8080/api/v1/accounts/', {
+    const response = await fetch('/api/v1/accounts/', {
       method: 'GET',
       headers,
     });
@@ -312,11 +312,12 @@ function updateAccountsTable(accounts) {
 
   const tbody = document.querySelector('#accountsTable tbody');
   if (!tbody) {
-    handleElementNotFound('updateAccountsTable', 'לא נמצא tbody לטבלת חשבונות');
-    throw new Error('טבלת החשבונות לא נמצאה בדף');
+    console.warn('⚠️ לא נמצא tbody לטבלת חשבונות - ייתכן שהדף לא נטען עדיין');
+    return;
   }
 
   // בניית הטבלה מחדש לפי הכותרות בדיוק
+  console.log('📊 עדכון טבלת חשבונות עם', accounts.length, 'חשבונות');
   tbody.innerHTML = accounts.map(account => {
     // המרת סטטוס לעברית לפילטר
     const statusForFilter = account.status === 'open' ? 'פתוח' :
@@ -391,7 +392,7 @@ function updateAccountsTable(accounts) {
     countElement.textContent = `${accounts.length} חשבונות`;
   }
 
-  // טבלת חשבונות עודכנה בהצלחה עם
+  console.log('✅ טבלת חשבונות עודכנה בהצלחה עם', accounts.length, 'חשבונות');
   // END UPDATE ACCOUNTS TABLE
 }
 
@@ -1610,6 +1611,7 @@ if (window.location.pathname.includes('/accounts')) {
  * פונקציה זו מיועדת לדף החשבונות (accounts.html)
  */
 async function loadAccountsDataForAccountsPage() {
+  console.log('📊 טעינת נתוני חשבונות לדף החשבונות...');
   try {
     // טעינת נתונים מהשרת
     let accounts;
@@ -1618,11 +1620,14 @@ async function loadAccountsDataForAccountsPage() {
     } else {
       accounts = await loadAccountsData();
     }
+    
+    console.log('📊 נתונים שהתקבלו:', accounts ? accounts.length : 0, 'חשבונות');
 
     // בדיקה שהנתונים תקינים
     if (!accounts || !Array.isArray(accounts)) {
-      handleValidationError('loadAccountsDataForAccountsPage', 'נתונים לא תקינים התקבלו מהשרת');
-      throw new Error('נתונים לא תקינים התקבלו מהשרת');
+      console.warn('⚠️ נתונים לא תקינים התקבלו מהשרת:', accounts);
+      // במקום לזרוק שגיאה, נשתמש בנתוני דמו
+      accounts = [];
     }
 
     // שמירת הנתונים במשתנה גלובלי
@@ -1656,13 +1661,13 @@ async function loadAccountsDataForAccountsPage() {
 
     // עדכון הטבלה עם הנתונים המסוננים
     if (typeof window.updateAccountsTable === 'function') {
+      console.log('📊 עדכון טבלה עם', filteredAccounts.length, 'חשבונות');
       window.updateAccountsTable(filteredAccounts);
 
       // בדיקה שהטבלה התעדכנה כראוי
       const tbody = document.querySelector('#accountsTable tbody');
-      if (tbody && tbody.children.length === 0) {
-        handleSystemError(new Error('הטבלה לא התעדכנה כראוי'), 'עדכון טבלה');
-        throw new Error('הטבלה לא התעדכנה כראוי');
+      if (tbody && tbody.children.length === 0 && filteredAccounts.length > 0) {
+        console.warn('⚠️ הטבלה לא התעדכנה כראוי - אין שורות בטבלה');
       }
       
       // יישום צבעי ישויות על כותרות
@@ -1670,12 +1675,11 @@ async function loadAccountsDataForAccountsPage() {
         window.applyEntityColorsToHeaders('account');
       }
     } else {
-      handleFunctionNotFound('updateAccountsTable', 'פונקציית עדכון הטבלה לא נמצאה');
-      throw new Error('פונקציית עדכון הטבלה לא נמצאה');
+      console.error('❌ פונקציית עדכון הטבלה לא נמצאה');
     }
 
   } catch (error) {
-    handleDataLoadError(error, 'טעינת נתוני חשבונות לדף החשבונות');
+    console.error('❌ שגיאה בטעינת נתוני חשבונות:', error);
 
     // הצגת הודעת שגיאה בטבלה
     const tbody = document.querySelector('#accountsTable tbody');
@@ -2571,3 +2575,7 @@ function viewAccountDetails(accountId) {
   }
 }
 
+// ייצוא הפונקציה לגלובל
+window.showAccountDetails = showAccountDetails;
+
+// סיום הקובץ

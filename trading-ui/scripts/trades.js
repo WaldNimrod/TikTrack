@@ -266,6 +266,7 @@ function addInvestmentTypeColorLegend() {
  */
 async function loadTradesData() {
   try {
+    console.log('🚀 loadTradesData: Starting to fetch trades data...');
 
     const response = await fetch('/api/v1/trades/');
 
@@ -274,6 +275,7 @@ async function loadTradesData() {
     }
 
     const responseData = await response.json();
+    console.log('📊 loadTradesData: Received data:', responseData?.data?.length || 0, 'trades');
 
     if (responseData.status !== 'success') {
       throw new Error(`API error: ${responseData.message || 'Unknown error'}`);
@@ -303,7 +305,9 @@ async function loadTradesData() {
 
     // עדכון המשתנה הגלובלי
     window.tradesData = localTradesData;
+    console.log('💾 loadTradesData: Stored', localTradesData.length, 'trades in window.tradesData');
 
+    console.log('🔄 loadTradesData: Calling updateTradesTable...');
     updateTradesTable(localTradesData);
 
     // עדכון סטטיסטיקות
@@ -349,20 +353,28 @@ async function loadTradesData() {
  * - Automatic row count updates
  */
 function updateTradesTable(trades) {
+  console.log('🔍 updateTradesTable called with:', trades?.length || 0, 'trades');
+  
   // בדיקה שהנתונים תקינים
   if (!trades || !Array.isArray(trades)) {
+    console.error('❌ Invalid trades data:', trades);
     handleValidationError('trades data', 'נתוני טריידים לא תקינים');
     return;
   }
 
   // בדיקה אם אנחנו בדף הנכון
-  if (!document.querySelector('#tradesTable')) {
-    // Not on trades page, skipping table update
+  const tradesTable = document.querySelector('#tradesTable');
+  if (!tradesTable) {
+    console.warn('⚠️ #tradesTable not found - not on trades page');
     return;
   }
+  
+  console.log('✅ Found #tradesTable, proceeding with update');
 
   const tbody = document.querySelector('#tradesTable tbody');
+  console.log('🔍 Looking for tbody:', tbody);
   if (!tbody) {
+    console.error('❌ tbody not found!');
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('#tradesTable tbody', 'CRITICAL');
     } else {
@@ -370,6 +382,7 @@ function updateTradesTable(trades) {
     }
     return;
   }
+  console.log('✅ Found tbody, proceeding with HTML generation');
 
   const tableHTML = trades.map(trade => {
     const statusDisplay = trade.status === 'closed' ? 'סגור' : trade.status === 'cancelled' ? 'מבוטל' : 'פתוח';

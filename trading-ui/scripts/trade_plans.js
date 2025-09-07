@@ -146,7 +146,8 @@ function copyTradePlan(planId) {
     }
   }
 }
- *
+
+/**
  * Dedicated file for the trade plans page (trade_plans.html)
  *
  * RECENT UPDATES (August 31, 2025):
@@ -234,8 +235,9 @@ function copyTradePlan(planId) {
  * ========================================
  */
 
-// Global variables - now using trade-plan-service
-// trade_plansData is now managed by trade-plan-service
+// Global variables
+window.tradePlansData = [];
+window.tradePlansLoaded = false;
 
 // ===== CRUD Modal Functions =====
 
@@ -262,7 +264,7 @@ function openAddTradePlanModal() {
  * פתיחת מודל עריכת תכנון קיים
  */
 async function openEditTradePlanModal(tradePlanId) {
-  const tradePlan = trade_plansData.find(tp => tp.id === tradePlanId);
+  const tradePlan = window.tradePlansData.find(tp => tp.id === tradePlanId);
   if (!tradePlan) {
     handleElementNotFound('trade plan', 'CRITICAL');
     return;
@@ -384,7 +386,7 @@ async function updateEditTickerInfo() {
 
   // בדיקה אם הטיקר השתנה (רק אם יש תכנון נבחר)
   if (tradePlanId) {
-    const originalTradePlan = trade_plansData.find(tp => tp.id === tradePlanId);
+    const originalTradePlan = window.tradePlansData.find(tp => tp.id === tradePlanId);
     if (originalTradePlan && originalTradePlan.ticker_id !== tickerId) {
       // Ticker changed from original to new
 
@@ -604,7 +606,7 @@ async function saveEditTradePlan() {
     };
 
     // בדיקה אם הסטטוס משתנה ל-'cancelled'
-    const originalTradePlan = trade_plansData.find(tp => tp.id === formData.id);
+    const originalTradePlan = window.tradePlansData.find(tp => tp.id === formData.id);
     const isStatusChangingToCancelled = originalTradePlan &&
                                            originalTradePlan.status !== 'cancelled' &&
                                            formData.status === 'cancelled';
@@ -753,7 +755,7 @@ async function reactivateTradePlan(tradePlanId) {
   try {
 
     // מציאת התכנון בנתונים
-    const tradePlan = trade_plansData.find(tp => tp.id === tradePlanId);
+    const tradePlan = window.tradePlansData.find(tp => tp.id === tradePlanId);
     if (!tradePlan) {
       handleElementNotFound('trade plan', 'CRITICAL');
       throw new Error('תכנון לא נמצא');
@@ -838,7 +840,7 @@ function addEditReminder() {
  */
 function openCancelTradePlanModal(tradePlanId) {
 
-  const tradePlan = trade_plansData.find(tp => tp.id === tradePlanId);
+  const tradePlan = window.tradePlansData.find(tp => tp.id === tradePlanId);
   if (!tradePlan) {
     handleElementNotFound('trade plan', 'CRITICAL');
     return;
@@ -863,7 +865,7 @@ function openCancelTradePlanModal(tradePlanId) {
  */
 function openDeleteTradePlanModal(tradePlanId) {
 
-  const tradePlan = trade_plansData.find(tp => tp.id === tradePlanId);
+  const tradePlan = window.tradePlansData.find(tp => tp.id === tradePlanId);
   if (!tradePlan) {
     handleElementNotFound('trade plan', 'CRITICAL');
     return;
@@ -1037,15 +1039,36 @@ async function loadTradePlansData() {
     if (typeof window.tradePlanService?.loadTradePlansData === 'function') {
       const data = await window.tradePlanService.loadTradePlansData();
 
+      // Update global data
+      window.tradePlansData = data;
+      window.tradePlansLoaded = true;
+
       // Update the table
       updateTradePlansTable(data);
 
       return data;
     } else {
-      if (typeof window.showNotification === 'function') {
-        window.showNotification('Trade Plan Service not available', 'error');
+      // Fallback: load data directly from API
+      console.log('🔄 Loading trade plans data directly from API...');
+      const response = await fetch('/api/v1/trade_plans/');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-      return [];
+      
+      const result = await response.json();
+      const data = result.data || [];
+      
+      // Update global data
+      window.tradePlansData = data;
+      window.tradePlansLoaded = true;
+      
+      // Update the table
+      console.log(`🔄 Updating table with ${data.length} trade plans...`);
+      updateTradePlansTable(data);
+      
+      console.log(`✅ Loaded ${data.length} trade plans`);
+      return data;
     }
   } catch (error) {
     handleDataLoadError(error, 'נתוני תכנונים');
@@ -1137,8 +1160,10 @@ function filterTradePlansData(filters) {
  */
 function updateTradePlansTable(trade_plans) {
   // === UPDATE TRADE PLANS TABLE FUNCTION CALLED ===
+  console.log(`🔄 updateTradePlansTable called with ${trade_plans ? trade_plans.length : 0} trade plans`);
 
   const tbody = document.querySelector('#trade_plansTable tbody');
+  console.log(`🔍 Looking for tbody:`, tbody);
   // Looking for table body
 
   if (!tbody) {
@@ -1147,11 +1172,14 @@ function updateTradePlansTable(trade_plans) {
   }
 
   // Checking if there is data to display
+  console.log(`🔍 Checking data: trade_plans =`, trade_plans, `length =`, trade_plans?.length);
+  console.log(`🔍 Condition check: !trade_plans =`, !trade_plans, `trade_plans.length === 0 =`, trade_plans?.length === 0);
   if (!trade_plans || trade_plans.length === 0) {
+    console.log(`❌ No data to display - entering error condition`);
     // No trade plans to display
 
     // Checking if it's because of filters or if there are no data at all
-    const hasOriginalData = window.tradePlanService?.getTradePlans()?.length > 0 || trade_plansData && trade_plansData.length > 0;
+    const hasOriginalData = window.tradePlanService?.getTradePlans()?.length > 0 || window.tradePlansData && window.tradePlansData.length > 0;
     // Has original data check
 
     // Checking if there are active filters
@@ -1216,15 +1244,16 @@ function updateTradePlansTable(trade_plans) {
     return;
   }
 
-
-  const tableHTML = trade_plans.map(design => {
-    // Safeguarding against invalid data
-    if (!design || typeof design !== 'object') {
-      if (typeof window.showNotification === 'function') {
-        window.showNotification('Invalid design data in table', 'warning');
+  console.log(`✅ Data exists, proceeding to build table HTML`);
+  const tableHTML = trade_plans.map((design, index) => {
+    try {
+      // Safeguarding against invalid data
+      if (!design || typeof design !== 'object') {
+        if (typeof window.showNotification === 'function') {
+          window.showNotification('Invalid design data in table', 'warning');
+        }
+        return '';
       }
-      return '';
-    }
 
 
     const statusClass = getStatusClass(design.status);
@@ -1312,9 +1341,16 @@ function updateTradePlansTable(trade_plans) {
         </td>
       </tr>
     `;
+    } catch (error) {
+      console.error(`❌ Error processing design ${index + 1}:`, error);
+      return `<tr><td colspan="10" class="text-center text-danger">שגיאה בעיבוד תכנון ${index + 1}</td></tr>`;
+    }
   }).join('');
 
+  console.log(`🔄 Table HTML built successfully, length: ${tableHTML.length}`);
+  console.log(`🔄 Setting tbody.innerHTML with ${trade_plans.length} rows`);
   tbody.innerHTML = tableHTML;
+  console.log(`✅ Table updated successfully`);
 
       // Updating record count
     const countElement = document.querySelector('#trade_plansCount');
@@ -1336,7 +1372,7 @@ function updateTradePlansTable(trade_plans) {
  */
 function updatePageSummaryStats() {
   // Using filtered data if available, otherwise all data
-  const dataToUse = window.filteredTradePlansData || trade_plansData;
+  const dataToUse = window.filteredTradePlansData || window.tradePlansData;
   const totalDesigns = dataToUse.length;
   const openDesigns = dataToUse.filter(design => design.status === 'open').length;
   const closedDesigns = dataToUse.filter(design => design.status === 'closed').length;
@@ -1346,7 +1382,7 @@ function updatePageSummaryStats() {
   let totalInvestment = 0;
   let totalProfit = 0;
 
-  trade_plansData.forEach(design => {
+  window.tradePlansData.forEach(design => {
     // Safeguarding against invalid data
     if (!design || typeof design !== 'object') {
       if (typeof window.showNotification === 'function') {
@@ -2083,7 +2119,7 @@ function sortTable(columnIndex) {
   if (typeof window.sortTableData === 'function') {
     window.sortTableData(
       columnIndex,
-      window.filteredTradePlansData || trade_plansData,
+      window.filteredTradePlansData || window.tradePlansData,
       'trade_plans',
       updateDesignsTable,
     );
@@ -2099,7 +2135,7 @@ function sortTable(columnIndex) {
  * Local sorting function (fallback)
  */
 function performLocalSort(columnIndex) {
-  const data = window.filteredTradePlansData || trade_plansData;
+  const data = window.filteredTradePlansData || window.tradePlansData;
   const currentSortState = window.getSortState ? window.getSortState('trade_plans') : { columnIndex: -1, direction: 'asc' };
 
   // קביעת כיוון הסידור
@@ -2185,9 +2221,14 @@ function isDateValue(value) {
  * @deprecated Use window.restoreAnyTableSort from main.js instead
  */
 function restoreSortState() {
+  // Check if data is available
+  if (!window.tradePlansData || window.tradePlansData.length === 0) {
+    console.log('⚠️ No trade plans data available for sort restoration');
+    return;
+  }
 
   if (typeof window.restoreAnyTableSort === 'function') {
-    window.restoreAnyTableSort('planning', trade_plansData, updateDesignsTable);
+    window.restoreAnyTableSort('planning', window.tradePlansData, updateDesignsTable);
   } else {
     handleFunctionNotFound('restoreAnyTableSort');
   }
@@ -2199,14 +2240,15 @@ function restoreSortState() {
 function getStatusClass(status) {
   // Safeguarding against invalid values
   if (status === null || status === undefined) {
-    return 'status-cancelled';
+    return 'status-other';
   }
 
+  // Use dynamic color system from preferences
   switch (status) {
   case 'open': return 'status-open';
   case 'closed': return 'status-closed';
   case 'cancelled': return 'status-cancelled';
-  default: return 'status-cancelled';
+  default: return 'status-other';
   }
 }
 
@@ -2219,6 +2261,7 @@ function getTypeClass(type) {
     return 'type-other';
   }
 
+  // Use dynamic color system from preferences
   switch (type) {
   case 'swing': return 'type-swing';
   case 'investment': return 'type-investment';

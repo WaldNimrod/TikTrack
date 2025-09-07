@@ -18,7 +18,53 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Error Handlers -->
-    <script src="scripts/error-handlers.js"></script></head>
+    <script src="scripts/error-handlers.js"></script>
+    
+    <!-- Core JavaScript Files - Header System -->
+    <script src="scripts/header-system.js?v=20250907_fix"></script>
+    
+    <!-- Console System -->
+    <script src="scripts/console-cleanup.js"></script>
+    
+    <!-- Core System Files -->
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/ui-utils.js?v=20250907_fix"></script>
+    <script src="scripts/table-mappings.js"></script>
+    <script src="scripts/date-utils.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/linked-items.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/color-scheme-system.js"></script>
+    <script src="scripts/main.js"></script>
+    
+    <!-- Page-specific Files -->
+    <script src="scripts/button-icons.js"></script>
+    <script src="scripts/trades.js?v=20250907_debug2"></script>
+    <script src="scripts/validation-utils.js"></script>
+    
+    <!-- Page initialization -->
+    <script>
+      // אתחול הדף
+      document.addEventListener('DOMContentLoaded', function () {
+        console.log('🚀 טעינת דף מעקב טריידים...');
+
+        // אתחול HeaderSystem
+        if (window.headerSystem && !window.headerSystem.isInitialized) {
+          console.log('✅ אתחול HeaderSystem...');
+          window.headerSystem.init();
+        }
+
+        // אתחול דף הטריידים
+        if (typeof loadTradesData === 'function') {
+          console.log('✅ טעינת נתוני טריידים...');
+          loadTradesData();
+        } else {
+          console.error('❌ loadTradesData לא נמצאה!');
+        }
+      });
+    </script></head>
 
 <body class="tracking-page">
   <!-- רקע כללי -->

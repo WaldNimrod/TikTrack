@@ -638,47 +638,10 @@ function showSecondConfirmationModal(message, onConfirm) {
   if (window.showConfirmationDialog) {
     window.showConfirmationDialog('אישור', message, onConfirm, () => {});
   } else {
-    // גיבוי למערכת הישנה
-    if (typeof window.showSecondConfirmationModal === 'function') {
-      window.showSecondConfirmationModal(
-        'אישור פעולה',
-        message,
-        onConfirm,
-        () => {},
-      );
-    } else {
-      if (typeof window.showConfirmationDialog === 'function') {
-        window.showConfirmationDialog(
-          'אישור',
-          message,
-          onConfirm,
-        );
-      } else {
-        if (typeof window.showConfirmationDialog === 'function') {
-          window.showConfirmationDialog(
-            'אישור',
-            message,
-            onConfirm,
-          );
-        } else {
-          // Fallback למקרה שמערכת התראות לא זמינה
-          const confirmed = typeof showConfirmationDialog === 'function' ? 
-            await new Promise(resolve => {
-              showConfirmationDialog(
-                message,
-                () => resolve(true),
-                () => resolve(false),
-                'אישור',
-                'אישור',
-                'ביטול'
-              );
-            }) : 
-            window.confirm(message);
-          if (confirmed) {
-            onConfirm();
-          }
-        }
-      }
+    // Fallback למקרה שמערכת התראות לא זמינה
+    const confirmed = window.confirm(message);
+    if (confirmed) {
+      onConfirm();
     }
   }
 }

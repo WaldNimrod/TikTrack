@@ -50,7 +50,7 @@ class PreferencesV2 {
   
   async loadProfiles() {
     try {
-      const response = await fetch('/api/v2/preferences/profiles');
+      const response = await fetch('/api/v1/user/preferences');
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       
       const data = await response.json();
@@ -88,8 +88,7 @@ class PreferencesV2 {
         throw new Error('No profile selected');
       }
       
-      const url = `/api/v2/preferences/?profile_id=${targetProfileId}`;
-      const response = await fetch(url);
+      const response = await fetch('/api/v1/user/preferences');
       
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       
@@ -110,13 +109,8 @@ class PreferencesV2 {
   
   async checkV1Compatibility() {
     try {
-      const response = await fetch('/api/v2/preferences/compatibility/v1');
-      if (!response.ok) return;
-      
-      const data = await response.json();
-      if (data.success && data.data.recommendation === 'migration_needed') {
-        this.showMigrationAlert();
-      }
+      // Skip V1 compatibility check - using V1 API directly
+      return;
     } catch (error) {
       console.warn('⚠️ Could not check V1 compatibility:', error);
     }

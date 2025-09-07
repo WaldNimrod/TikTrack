@@ -127,8 +127,10 @@ function getDemoAlertsData() {
  * @returns {Array} מערך של התראות
  */
 async function loadAlertsData() {
+  console.log('📊 טעינת נתוני התראות מהשרת...');
   try {
     const response = await fetch('/api/v1/alerts/');
+    console.log('📊 תגובת שרת:', response.status, response.ok);
 
     if (!response.ok) {
       console.warn(`⚠️ Server error ${response.status}, using demo data`);
@@ -146,6 +148,7 @@ async function loadAlertsData() {
 
     const data = await response.json();
     const alerts = data.data || data;
+    console.log('📊 נתונים שהתקבלו:', alerts.length, 'התראות');
 
     // עדכון המשתנה הגלובלי
     alertsData = alerts.map(alert => ({
@@ -163,24 +166,25 @@ async function loadAlertsData() {
       is_triggered: alert.is_triggered,
     }));
 
+    console.log('📊 נתונים מעובדים:', alertsData.length, 'התראות');
+    
     // עדכון הטבלה
-
-    // בדיקה אם יש פילטרים פעילים
-
-
     updateAlertsTable(alertsData);
     
 
     return alertsData;
 
-  } catch {
-    // משתמש בנתוני דמו
-
-    // שימוש בנתוני דמו
-    alertsData = demoAlerts;
+  } catch (error) {
+    console.error('שגיאה בטעינת התראות:', error);
+    // שימוש בנתוני דמו במקרה של שגיאה
+    alertsData = getDemoAlertsData();
     updateAlertsTable(alertsData);
     
-
+    // הצגת הודעת שגיאה
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה בטעינת התראות', 'לא ניתן לטעון התראות מהשרת. מוצגים נתוני דמו.');
+    }
+    
     return alertsData;
   }
 }
@@ -369,12 +373,13 @@ function updateAlertsTable(alerts) {
     // בדיקה שהנתונים קיימים
     if (!alerts || !Array.isArray(alerts)) {
       console.warn('⚠️ alerts parameter is not available or not an array');
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center">אין התראות להצגה</td></tr>';
       return;
     }
 
     const tableHTML = alerts.map(alert => {
       // לוג לבדיקת מבנה הנתונים
-      console.log('🔍 Alert data structure:', alert);
+      // console.log('🔍 Alert data structure:', alert);
       
       // קבלת צבעי סטטוס דינמיים
       const statusClass = getStatusClass(alert.status);
@@ -641,6 +646,8 @@ function updateAlertsTable(alerts) {
 
     // עדכון סטטיסטיקות
     updatePageSummaryStats();
+    
+    console.log('✅ טבלת התראות עודכנה בהצלחה עם', alerts.length, 'התראות');
     
 
   });
@@ -2195,8 +2202,9 @@ if (typeof window.toggleMainSection !== 'function') {
   };
 }
 
-// אתחול הדף
+  // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
+  console.log('🚀 אתחול דף התראות...');
 
   // שחזור מצב הסקשנים
   restoreAlertsSectionState();
@@ -2212,6 +2220,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // טעינת נתונים
+  console.log('📊 טעינת נתוני התראות...');
   loadAlertsData();
   
 
@@ -2219,51 +2228,15 @@ document.addEventListener('DOMContentLoaded', function () {
   if (typeof window.loadSortState === 'function') {
     window.loadSortState('alerts');
   }
-});
-
-// אתחול הדף
-document.addEventListener('DOMContentLoaded', function () {
-  // console.log('🔄 === DOM CONTENT LOADED (ALERTS) ===');
-
-  // בדיקת זמינות מערכות
-  // console.log('🔍 בדיקת זמינות מערכות:');
-  // console.log('showSuccessNotification:', typeof window.showSuccessNotification);
-  // console.log('showErrorNotification:', typeof window.showErrorNotification);
-  // console.log('showValidationWarning:', typeof window.showValidationWarning);
-  // console.log('showDeleteWarning:', typeof window.showDeleteWarning);
-
-  // בדיקה שהמערכת זמינה
-  if (typeof window.showSuccessNotification !== 'function') {
-    // console.error('❌ מערכת התראות לא זמינה!');
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification(
-        'שגיאה',
-        'מערכת התראות לא זמינה. בדוק את טעינת הקבצים.',
-      );
-    } else {
-      // console.error('שגיאה: מערכת התראות לא זמינה. בדוק את טעינת הקבצים.');
-    }
-    return;
-  }
-
-  // console.log('✅ מערכת התראות זמינה');
-
-  // שחזור מצב הסגירה
-  if (typeof window.restoreAllSectionStates === 'function') {
-    window.restoreAllSectionStates();
-  }
-
-  // טעינת נתונים
-  loadAlertsData();
   
-
-  // טעינת מצב המיון
-  if (typeof window.loadSortState === 'function') {
-    window.loadSortState('alerts');
-  }
-
-  // console.log('דף התראות נטען בהצלחה');
+  console.log('✅ דף התראות אותחל בהצלחה');
 });
+
+// אתחול הדף - גרסה שנייה (מוסרת)
+// document.addEventListener('DOMContentLoaded', function () {
+//   // console.log('🔄 === DOM CONTENT LOADED (ALERTS) ===');
+//   // ... קוד מוסר ...
+// });
 
 // פונקציה לעדכון הטבלה מפילטרים
 if (window.location.pathname.includes('/alerts')) {

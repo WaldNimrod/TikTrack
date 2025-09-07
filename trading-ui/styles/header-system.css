@@ -100,9 +100,7 @@
 /* סגנונות בסיסיים לכותרת */
 
 /* ===== תפריטי משנה עם שלוש רמות ===== */
-#unified-header .dropdown-submenu {
-    position: relative;
-}
+/* הגדרה זו מועברת למטה עם שאר הגדרות התפריט */
 
 #unified-header .dropdown-submenu .tiktrack-submenu-toggle {
     display: flex;
@@ -121,49 +119,58 @@
     transform: rotate(90deg);
 }
 
-#unified-header .tiktrack-submenu {
-    position: absolute;
-    left: 100%;
-    top: 0;
-    background: var(--apple-bg-elevated);
-    border: 1px solid var(--apple-border-light);
-    border-radius: 8px;
-    box-shadow: var(--apple-shadow-medium);
-    min-width: 200px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(-10px);
-    transition: all 0.2s ease;
-    z-index: 1001;
-    padding: 8px 0;
+/* ===== הגדרות חסרות לתפריטי משנה ===== */
+
+/* הגדרות לרמה 2 - submenu */
+#unified-header .submenu .tiktrack-dropdown-item {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    list-style: none;
 }
 
-#unified-header .dropdown-submenu:hover .tiktrack-submenu {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(0);
+#unified-header .submenu .tiktrack-dropdown-item:last-child {
+    border-bottom: none;
 }
 
-#unified-header .tiktrack-submenu .tiktrack-dropdown-item {
-    padding: 8px 16px;
-    white-space: nowrap;
-    border: none;
-    background: transparent;
-    color: var(--apple-text-primary);
-    text-decoration: none;
-    display: block;
-    width: 100%;
-    text-align: right;
-    transition: background-color 0.2s ease;
+#unified-header .submenu .tiktrack-dropdown-item:hover {
+    background: rgba(38, 186, 172, 0.1);
+    color: #26baac;
+}
+
+/* הגדרות לרמה 3 - tiktrack-submenu */
+#unified-header .tiktrack-submenu .tiktrack-dropdown-item:last-child {
+    border-bottom: none;
 }
 
 #unified-header .tiktrack-submenu .tiktrack-dropdown-item:hover {
-    background-color: var(--apple-bg-hover);
-    color: var(--apple-text-primary);
+    background: rgba(38, 186, 172, 0.1);
+    color: #26baac;
 }
 
-/* התאמה למסכים קטנים */
+/* ===== התאמה למסכים קטנים ===== */
 @media (max-width: 768px) {
+    /* רמה 2 - submenu */
+    #unified-header .dropdown-submenu .submenu {
+        position: static;
+        right: auto;
+        top: auto;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        border: none;
+        border-top: 1px solid var(--apple-border-light);
+        margin-top: 8px;
+        padding-top: 8px;
+        margin-right: 0;
+    }
+    
+    #unified-header .dropdown-submenu:hover .submenu {
+        transform: none;
+    }
+    
+    /* רמה 3 - tiktrack-submenu */
     #unified-header .tiktrack-submenu {
         position: static;
         left: auto;
@@ -176,6 +183,7 @@
         border-top: 1px solid var(--apple-border-light);
         margin-top: 8px;
         padding-top: 8px;
+        margin-left: 0;
     }
     
     #unified-header .dropdown-submenu:hover .tiktrack-submenu {
@@ -564,7 +572,7 @@
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* Submenu styles */
+/* ===== תפריטי משנה - הגדרות בסיסיות ===== */
 #unified-header .dropdown-submenu {
     position: relative;
     list-style: none;
@@ -583,6 +591,7 @@
     display: none;
     z-index: 1001;
     list-style: none;
+    margin-right: 0.125rem;
 }
 
 #unified-header .dropdown-submenu:hover .submenu {
@@ -620,6 +629,81 @@
 }
 
 #unified-header .submenu .tiktrack-dropdown-item:hover {
+    background: rgba(38, 186, 172, 0.1);
+    color: #26baac;
+}
+
+/* ===== תפריטי משנה רמה 3 - tiktrack-submenu ===== */
+#unified-header .tiktrack-submenu {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    background: var(--apple-bg-elevated);
+    border: 1px solid var(--apple-border-light);
+    border-radius: 8px;
+    display: none;
+    box-shadow: var(--apple-shadow-medium);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-10px);
+    z-index: 1003;
+    transition: all 0.2s ease;
+    padding: 8px 0;
+    margin-left: 0.125rem;
+}
+
+#unified-header .dropdown-submenu:hover .tiktrack-submenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    display: block;
+}
+
+#unified-header .tiktrack-submenu .tiktrack-dropdown-item {
+    padding: 8px 16px;
+    white-space: nowrap;
+    border: none;
+    background: transparent;
+    color: var(--apple-text-primary);
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    text-align: right;
+    transition: background-color 0.2s ease;
+    font-size: 0.8rem;
+}
+
+#unified-header .tiktrack-submenu .tiktrack-dropdown-item:hover {
+    background-color: var(--apple-bg-hover);
+    color: var(--apple-text-primary);
+}
+
+/* ===== הגדרות חסרות לתפריטי משנה ===== */
+
+/* הגדרות לרמה 2 - submenu */
+#unified-header .submenu .tiktrack-dropdown-item {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    list-style: none;
+}
+
+#unified-header .submenu .tiktrack-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+#unified-header .submenu .tiktrack-dropdown-item:hover {
+    background: rgba(38, 186, 172, 0.1);
+    color: #26baac;
+}
+
+/* הגדרות לרמה 3 - tiktrack-submenu */
+#unified-header .tiktrack-submenu .tiktrack-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+#unified-header .tiktrack-submenu .tiktrack-dropdown-item:hover {
     background: rgba(38, 186, 172, 0.1);
     color: #26baac;
 }

@@ -84,20 +84,20 @@
   --entity-execution-text: #138496;
   --entity-execution-border: rgba(23, 162, 184, 0.3);
   
-  --entity-account-color: #28a745;
-  --entity-account-bg: rgba(40, 167, 69, 0.1);
-  --entity-account-text: #1e7e34;
-  --entity-account-border: rgba(40, 167, 69, 0.3);
+  --entity-account-color: #1b0b75;
+  --entity-account-bg: rgba(27, 11, 117, 0.1);
+  --entity-account-text: #0f0642;
+  --entity-account-border: rgba(27, 11, 117, 0.3);
   
   --entity-cash-flow-color: #20c997;
   --entity-cash-flow-bg: rgba(32, 201, 151, 0.1);
   --entity-cash-flow-text: #17a2b8;
   --entity-cash-flow-border: rgba(32, 201, 151, 0.3);
   
-  --entity-ticker-color: #dc3545;
-  --entity-ticker-bg: rgba(220, 53, 69, 0.1);
-  --entity-ticker-text: #c82333;
-  --entity-ticker-border: rgba(220, 53, 69, 0.3);
+  --entity-ticker-color: #019193;
+  --entity-ticker-bg: rgba(1, 145, 147, 0.1);
+  --entity-ticker-text: #017a7c;
+  --entity-ticker-border: rgba(1, 145, 147, 0.3);
   
   --entity-alert-color: #ff9c05;
   --entity-alert-bg: rgba(255, 156, 5, 0.1);
@@ -108,6 +108,64 @@
   --entity-note-bg: rgba(111, 66, 193, 0.1);
   --entity-note-text: #5a32a3;
   --entity-note-border: rgba(111, 66, 193, 0.3);
+  
+  /* צבעי ישויות נוספות */
+  --entity-constraint-color: #6c757d;
+  --entity-constraint-bg: rgba(108, 117, 125, 0.1);
+  --entity-constraint-text: #545b62;
+  --entity-constraint-border: rgba(108, 117, 125, 0.3);
+  
+  --entity-design-color: #495057;
+  --entity-design-bg: rgba(73, 80, 87, 0.1);
+  --entity-design-text: #343a40;
+  --entity-design-border: rgba(73, 80, 87, 0.3);
+  
+  --entity-research-color: #343a40;
+  --entity-research-bg: rgba(52, 58, 64, 0.1);
+  --entity-research-text: #212529;
+  --entity-research-border: rgba(52, 58, 64, 0.3);
+  
+  --entity-preference-color: #adb5bd;
+  --entity-preference-bg: rgba(173, 181, 189, 0.1);
+  --entity-preference-text: #6c757d;
+  --entity-preference-border: rgba(173, 181, 189, 0.3);
+  
+  /* צבעי סטטוסים */
+  --status-open-color: #28a745;
+  --status-open-bg: rgba(40, 167, 69, 0.1);
+  --status-open-text: #1e7e34;
+  --status-open-border: rgba(40, 167, 69, 0.3);
+  
+  --status-closed-color: #dc3545;
+  --status-closed-bg: rgba(220, 53, 69, 0.1);
+  --status-closed-text: #c82333;
+  --status-closed-border: rgba(220, 53, 69, 0.3);
+  
+  --status-pending-color: #ffc107;
+  --status-pending-bg: rgba(255, 193, 7, 0.1);
+  --status-pending-text: #e0a800;
+  --status-pending-border: rgba(255, 193, 7, 0.3);
+  
+  --status-canceled-color: #6c757d;
+  --status-canceled-bg: rgba(108, 117, 125, 0.1);
+  --status-canceled-text: #545b62;
+  --status-canceled-border: rgba(108, 117, 125, 0.3);
+  
+  /* צבעי ערכים מספריים */
+  --numeric-positive-color: #28a745;
+  --numeric-positive-bg: rgba(40, 167, 69, 0.1);
+  --numeric-positive-text: #1e7e34;
+  --numeric-positive-border: rgba(40, 167, 69, 0.3);
+  
+  --numeric-negative-color: #dc3545;
+  --numeric-negative-bg: rgba(220, 53, 69, 0.1);
+  --numeric-negative-text: #c82333;
+  --numeric-negative-border: rgba(220, 53, 69, 0.3);
+  
+  --numeric-zero-color: #6c757d;
+  --numeric-zero-bg: rgba(108, 117, 125, 0.1);
+  --numeric-zero-text: #545b62;
+  --numeric-zero-border: rgba(108, 117, 125, 0.3);
   
   /* צבעי ערכים מספריים */
   --numeric-positive-light: #d4edda;

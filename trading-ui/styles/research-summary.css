@@ -32,7 +32,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #ff9c05 0%, #ffb74d 100%);
+    background: linear-gradient(135deg, var(--entity-research-color, #ff9c05) 0%, var(--entity-research-bg, #ffb74d) 100%);
     border-radius: 12px;
     color: white;
     flex-shrink: 0;
@@ -264,7 +264,7 @@
 
 .summary-table tbody tr:hover,
 .daily-table tbody tr:hover {
-    background-color: rgba(255, 156, 5, 0.05);
+    background-color: var(--entity-research-bg, rgba(255, 156, 5, 0.05));
 }
 
 /* כפתור רענון - משתמש בסגנונות הגלובליים מ-styles.css */

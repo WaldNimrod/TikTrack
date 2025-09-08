@@ -37,9 +37,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Error Handlers -->
-    <script src="scripts/error-handlers.js"></script></head>
+    <script src="scripts/error-handlers.js"></script>
+    
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css"></head>
 
 <body class="alerts-page">
+    <!-- Unified Header Container -->
+    <div id="unified-header"></div>
   <!-- General background -->
   <div class="background-wrapper">
 
@@ -52,7 +57,8 @@
         <!-- Alerts header -->
         <div class="section-header">
           <div class="table-title">
-            <img src="images/icons/alerts.svg" alt="התראות" class="section-icon">
+            <img src="images/icons/alerts.svg" alt="התראות"
+              style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
             התראות
           </div>
           <div class="table-actions">
@@ -79,7 +85,7 @@
         <!-- Alert cards -->
         <div class="section-body">
           <!-- Color Scheme Demo for Alerts -->
-          <div id="alertsColorDemo" class="mb-3 d-none">
+          <div id="alertsColorDemo" class="mb-3" style="display: none;">
             <div class="d-flex gap-2 mb-2">
               <span class="entity-alert-badge">התראה פעילה</span>
               <span class="entity-ticker-badge">טיקר AAPL</span>
@@ -112,29 +118,30 @@
           <!-- Alerts header -->
           <div class="section-header">
             <div class="table-title">
-              <img src="images/icons/alerts.svg" alt="ההתראות שלי" class="section-icon">
+              <img src="images/icons/alerts.svg" alt="ההתראות שלי"
+                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
               ההתראות שלי
             </div>
             <div class="table-count">טוען...</div>
             <div class="table-actions">
               <!-- Quick filters -->
-              <button class="btn btn-sm active" onclick="filterAlertsByRelatedObjectType('all')" data-type="all" title="הצג הכל">
+              <button class="btn btn-sm active" onclick="filterAlertsByRelatedObjectType('all')" data-type="all" title="הצג הכל" style="background-color: white; color: #28a745; border-color: #28a745;">
                 הכל
               </button>
-              <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('account')" data-type="account" title="חשבונות">
-                <img src="images/icons/accounts.svg" alt="חשבונות" class="filter-icon">
+              <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('account')" data-type="account" title="חשבונות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                <img src="images/icons/accounts.svg" alt="חשבונות" style="width: 14px; height: 14px;">
               </button>
-              <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('trade')" data-type="trade" title="טריידים">
-                <img src="images/icons/trades.svg" alt="טריידים" class="filter-icon">
+              <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('trade')" data-type="trade" title="טריידים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                <img src="images/icons/trades.svg" alt="טריידים" style="width: 14px; height: 14px;">
               </button>
-              <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('trade_plan')" data-type="trade_plan" title="תוכניות">
-                <img src="images/icons/trade_plans.svg" alt="תוכניות" class="filter-icon">
+              <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('trade_plan')" data-type="trade_plan" title="תוכניות" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                <img src="images/icons/trade_plans.svg" alt="תוכניות" style="width: 14px; height: 14px;">
               </button>
-              <button class="btn btn-sm btn-outline-primary filter-icon-btn" onclick="filterAlertsByRelatedObjectType('ticker')" data-type="ticker" title="טיקרים">
-                <img src="images/icons/tickers.svg" alt="טיקרים" class="filter-icon">
+              <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('ticker')" data-type="ticker" title="טיקרים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                <img src="images/icons/tickers.svg" alt="טיקרים" style="width: 14px; height: 14px;">
               </button>
               
-              <span class="filter-separator">|</span>
+              <span style="margin: 0 10px; color: #666;">|</span>
               
               <div class="action-separator"></div>
               <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור התראות">
@@ -149,49 +156,56 @@
               <table class="table" id="alertsTable" data-table-type="alerts">
                 <thead>
                   <tr>
-                    <th class="col-10">
+                    <th style="width: 10%;">
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                        onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(0, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
                         טיקר <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th class="col-18">
+                    <th style="width: 18%;">
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTableData(1, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTableData(1, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
                         תנאי <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th class="col-8">
+                    <th style="width: 8%;">
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTableData(2, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTableData(2, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
                         סטטוס <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th class="col-8">
+                    <th style="width: 8%;">
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTableData(3, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTableData(3, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
                         הופעל <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th class="col-20">
+                    <th style="width: 20%;">
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTableData(4, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTableData(4, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
                         קשור ל: <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th class="col-12">
+                    <th style="width: 12%;">
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTableData(5, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTableData(5, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
                         הודעה <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th class="col-10">
+                    <th style="width: 10%;">
                       <button class="btn btn-link sortable-header"
-                        onclick="if (typeof window.sortTable === 'function') { window.sortTableData(6, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }">
+                        onclick="if (typeof window.sortTable === 'function') { window.sortTableData(6, window.filteredAlertsData || alertsData, 'alerts', updateAlertsTable); }"
+                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
                         נוצר ב: <span class="sort-icon">↕</span>
                       </button>
                     </th>
-                    <th class="actions-cell col-14">
+                    <th class="actions-cell" style="width: 14%;">
                       פעולות
                     </th>
                   </tr>
@@ -209,13 +223,13 @@
     </div> <!-- End page-body -->
 
     <!-- Bottom page spacing -->
-    <div class="bottom-spacing"></div>
+    <div style="height: 3rem;"></div>
 
     <!-- Notification system -->
     <div class="notification-container" id="notificationContainer"></div>
 
     <!-- Toast container for notifications -->
-    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3 toast-high-z-index"></div>
+    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1000000002;"></div>
 
     <!-- Add Alert Modal -->
     <div class="modal fade" id="addAlertModal" tabindex="-1" aria-labelledby="addAlertModalLabel" aria-hidden="true"
@@ -256,7 +270,7 @@
                         </div>
                       </div>
                       <div class="col-md-6">
-                        <select class="form-select" id="alertRelatedObjectSelect" disabled
+                        <select class="form-select" id="alertRelatedObjectSelect" style="width: 100%;" disabled
                           onchange="onRelatedObjectChange(this)">
                           <option value="">בחר אובייקט לשיוך...</option>
                         </select>
@@ -315,7 +329,8 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-            <button type="button" class="btn btn-success btn-save" onclick="saveAlert()">שמור
+            <button type="button" class="btn btn-success" onclick="saveAlert()"
+              style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">שמור
               התראה</button>
           </div>
         </div>
@@ -364,7 +379,7 @@
                         </div>
                       </div>
                       <div class="col-md-6">
-                        <select class="form-select" id="editAlertRelatedObjectSelect"
+                        <select class="form-select" id="editAlertRelatedObjectSelect" style="width: 100%;"
                           onchange="onEditRelatedObjectChange(this)">
                           <option value="">בחר אובייקט לשיוך...</option>
                         </select>
@@ -435,7 +450,8 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-            <button type="button" class="btn btn-success btn-save" onclick="updateAlert()">עדכן
+            <button type="button" class="btn btn-success" onclick="updateAlert()"
+              style="border: 2px solid #28a745; background-color: white; color: #28a745; font-size: 0.9rem; padding: 0.375rem 0.75rem;">עדכן
               התראה</button>
           </div>
         </div>
@@ -448,7 +464,7 @@
 
     <!-- Modular files -->
     <script src="scripts/main.js"></script>
-    <script src="scripts/header-system.js"></script>
+    <script src="scripts/header-system.js?v=20250115_navigation_fix"></script>
     <script src="scripts/alert-service.js"></script>
     <script src="scripts/alerts.js"></script>
     <script src="scripts/active-alerts-component.js"></script>

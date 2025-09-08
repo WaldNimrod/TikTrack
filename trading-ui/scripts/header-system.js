@@ -3106,10 +3106,269 @@ window.addEventListener('load', () => {
     window.headerSystem = new HeaderSystem();
     window.headerSystem.init();
     console.log('✅ Header system initialized successfully');
+    
+    // יצירת תפריט דינמי
+    createUnifiedHeader();
   } else {
     console.error('❌ HeaderSystem class not found');
   }
 });
+
+// ===== פונקציות יצירת תפריט דינמי =====
+
+/**
+ * יצירת HTML לתפריט הניווט
+ */
+function createMenuHTML() {
+    return `
+        <div class="header-top">
+            <div class="header-container">
+                <!-- תפריט ניווט -->
+                <div class="header-nav">
+                    <nav class="main-nav">
+                        <ul class="tiktrack-nav-list">
+                            <li class="tiktrack-nav-item">
+                                <a href="/" class="tiktrack-nav-link active" data-page="home">
+                                    <img src="images/icons/home.svg" alt="בית" style="width: 32px; height: 32px;">
+                                </a>
+                            </li>
+                            <li class="tiktrack-nav-item">
+                                <a href="/trade_plans" class="tiktrack-nav-link" data-page="trade_plans">
+                                    <span class="nav-text">תכנון</span>
+                                </a>
+                            </li>
+                            <li class="tiktrack-nav-item">
+                                <a href="/trades" class="tiktrack-nav-link" data-page="trades">
+                                    <span class="nav-text">מעקב</span>
+                                </a>
+                            </li>
+                            <li class="tiktrack-nav-item">
+                                <a href="/research" class="tiktrack-nav-link" data-page="research">
+                                    <span class="nav-text">מחקר</span>
+                                </a>
+                            </li>
+                            <li class="tiktrack-nav-item dropdown">
+                                <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="settings">
+                                    <span class="nav-text">הגדרות</span>
+                                    <span class="tiktrack-dropdown-arrow">›</span>
+                                </a>
+                                <ul class="tiktrack-dropdown-menu">
+                                    <li><a class="tiktrack-dropdown-item" href="/alerts">התראות</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/accounts">חשבונות</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/executions">עסקאות</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
+                                    <li class="separator"></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
+                                </ul>
+                            </li>
+                            <li class="tiktrack-nav-item dropdown">
+                                <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="dev_tools">
+                                    <span class="nav-text">כלי פיתוח</span>
+                                    <span class="tiktrack-dropdown-arrow">›</span>
+                                </a>
+                                <ul class="tiktrack-dropdown-menu">
+                                    <!-- ניטור וניהול -->
+                                    <li class="dropdown-submenu">
+                                        <a class="tiktrack-dropdown-item" href="#">ניטור וניהול</a>
+                                        <ul class="submenu">
+                                            <li><a class="tiktrack-dropdown-item" href="/system-management">system-management</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/server-monitor">server-monitor</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/notifications-center">notifications-center</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/constraints">constraints</a></li>
+                                        </ul>
+                                    </li>
+                                    
+                                    <!-- ממשק משתמש -->
+                                    <li class="dropdown-submenu">
+                                        <a class="tiktrack-dropdown-item" href="#">ממשק משתמש</a>
+                                        <ul class="submenu">
+                                            <li><a class="tiktrack-dropdown-item" href="/css-management">css-management</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/numeric-value-colors-demo">numeric-value-colors-demo</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/style_demonstration">style_demonstration</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/color-scheme-examples">color-scheme-examples</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/designs">designs</a></li>
+                                        </ul>
+                                    </li>
+                                    
+                                    <!-- כלים -->
+                                    <li class="dropdown-submenu">
+                                        <a class="tiktrack-dropdown-item" href="#">כלים</a>
+                                        <ul class="submenu">
+                                            <li><a class="tiktrack-dropdown-item" href="/external-data-dashboard">external-data-dashboard</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/linter-realtime-monitor">linter-realtime-monitor</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/crud-testing-dashboard">crud-testing-dashboard</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/cache-test">cache-test</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/js-map">js-map</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">page-scripts-matrix</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/test-header-only">test-header-only</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="tiktrack-nav-item">
+                                <a href="#" class="cache-clear-btn" title="ניקוי מטמון מלא">🧹</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+                <!-- לוגו -->
+                <div class="logo-section">
+                    <div class="logo">
+                        <img src="images/logo.svg" alt="TikTrack Logo" class="logo-image">
+                        <span class="logo-text">פשוט לנהל תיק</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * יצירת HTML לפילטרים
+ */
+function createFiltersHTML() {
+    return `
+        <!-- כפתור פתיחה/סגירה של פילטר -->
+        <div class="menu-filter-toggle-section">
+            <button class="filter-toggle-btn" id="filterToggleBtn" title="הצג/הסתר פילטרים"
+                    onclick="toggleSection('filters')">
+                <span class="filter-arrow">▼</span>
+            </button>
+        </div>
+        
+        <!-- פילטרים -->
+        <div class="header-filters" id="headerFilters" data-section="filters">
+            <div class="filters-container">
+                <div class="filter-group">
+                    <button class="filter-toggle" onclick="toggleStatusFilter()">
+                        <span>סטטוס</span>
+                        <span class="filter-arrow">▼</span>
+                    </button>
+                    <div class="filter-menu" id="statusFilterMenu">
+                        <div class="filter-option" onclick="selectStatusOption('all')">הכל</div>
+                        <div class="filter-option" onclick="selectStatusOption('open')">פתוח</div>
+                        <div class="filter-option" onclick="selectStatusOption('closed')">סגור</div>
+                        <div class="filter-option" onclick="selectStatusOption('cancelled')">מבוטל</div>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <button class="filter-toggle" onclick="toggleTypeFilter()">
+                        <span>סוג השקעה</span>
+                        <span class="filter-arrow">▼</span>
+                    </button>
+                    <div class="filter-menu" id="typeFilterMenu">
+                        <div class="filter-option" onclick="selectTypeOption('all')">הכל</div>
+                        <div class="filter-option" onclick="selectTypeOption('swing')">סווינג</div>
+                        <div class="filter-option" onclick="selectTypeOption('investment')">השקעה</div>
+                        <div class="filter-option" onclick="selectTypeOption('passive')">פסיבי</div>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <button class="filter-toggle" onclick="toggleAccountFilter()">
+                        <span>חשבון</span>
+                        <span class="filter-arrow">▼</span>
+                    </button>
+                    <div class="filter-menu" id="accountFilterMenu">
+                        <div class="filter-option" onclick="selectAccountOption('הכל')">הכל</div>
+                        <!-- חשבונות יטענו דינמית -->
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <button class="filter-toggle" onclick="toggleDateRangeFilter()">
+                        <span>טווח תאריכים</span>
+                        <span class="filter-arrow">▼</span>
+                    </button>
+                    <div class="filter-menu" id="dateRangeFilterMenu">
+                        <div class="filter-option" onclick="selectDateRangeOption('all')">הכל</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('today')">היום</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('yesterday')">אתמול</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('this_week')">השבוע</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('last_week')">שבוע שעבר</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('this_month')">החודש</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('last_month')">חודש שעבר</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('this_year')">השנה</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('last_year')">שנה שעברה</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('mtd')">מתחילת החודש</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('ytd')">מתחילת השנה</div>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <div class="search-input-wrapper">
+                        <input type="text" id="searchFilterInput" placeholder="חיפוש חופשי..." class="search-filter-input">
+                        <button class="search-clear-btn" onclick="clearSearch()" title="נקה חיפוש">✕</button>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="reset-btn" onclick="resetFilters()" title="איפוס פילטרים">↻</button>
+                    <button class="clear-btn" onclick="clearAll()" title="נקה הכל">✕</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * יצירת התפריט המאוחד (תפריט + פילטרים)
+ */
+function createUnifiedHeader() {
+    const unifiedHeaderElement = document.getElementById('unified-header');
+    
+    if (!unifiedHeaderElement) {
+        console.error('❌ unified-header element not found');
+        return;
+    }
+    
+    // יצירת התוכן המלא
+    const headerHTML = createMenuHTML() + createFiltersHTML();
+    
+    // הוספת התוכן לאלמנט
+    unifiedHeaderElement.innerHTML = headerHTML;
+    
+    console.log('✅ Unified header created successfully');
+    
+    // הוספת event listeners לניווט
+    setupNavigationEventListeners();
+}
+
+/**
+ * הוספת event listeners לקישורי הניווט
+ */
+function setupNavigationEventListeners() {
+    // שימוש ב-event delegation כדי לתפוס קישורים שנוצרים דינמית
+    document.addEventListener('click', function(e) {
+        // בדיקה אם זה קישור תפריט
+        const navLink = e.target.closest('.tiktrack-nav-link[data-page]');
+        const dropdownLink = e.target.closest('.tiktrack-dropdown-item[href]');
+        
+        const link = navLink || dropdownLink;
+        if (!link) return;
+        
+        const href = link.getAttribute('href');
+        
+        // אם זה לא קישור עם href תקין, אל תעשה כלום
+        if (!href || href === '#') {
+            return;
+        }
+        
+        e.preventDefault();
+        
+        // ניווט לעמוד
+        console.log('🔗 Navigating to:', href);
+        window.location.href = href;
+    });
+    
+    console.log('✅ Navigation event listeners added (delegation)');
+}
 
 // ===== פונקציות עזר לתפריטי פילטרים =====
 

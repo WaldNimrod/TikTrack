@@ -17,8 +17,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Error Handlers -->
-    <script src="scripts/error-handlers.js"></script></head>
+    <script src="scripts/error-handlers.js"></script>
+    
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css"></head>
 <body class="notifications-center-page">
+    <!-- Unified Header Container -->
+    <div id="unified-header"></div>
     <div class="background-wrapper">
         <!-- unified-header יווצר כאן אוטומטית -->
         <div id="unified-header"></div>
@@ -249,7 +254,7 @@
     <script src="scripts/tables.js"></script>
     <script src="scripts/linked-items.js"></script>
     <script src="scripts/page-utils.js"></script>
-    <script src="scripts/header-system.js"></script>
+    <script src="scripts/header-system.js?v=20250115_navigation_fix"></script>
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/realtime-notifications-client.js"></script>
     <script src="scripts/main.js"></script>

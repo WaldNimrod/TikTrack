@@ -593,7 +593,7 @@
                                     <button class="btn btn-secondary" disabled>כפתור מושבת</button>
                                 </div>
                                 <div class="button-group">
-                                    <button class="filter-toggle-btn">▲ הצג/הסתר</button>
+                                    <button class="filter-toggle-btn">▲</button>
                                     <button class="button-primary">כפתור ראשי מותאם</button>
                                     <button class="button-secondary">כפתור משני מותאם</button>
                                 </div>
@@ -1336,6 +1336,152 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Dynamic Colors Section -->
+            <div class="content-section styles-test-page" id="dynamicColorsSection">
+                <!-- Dynamic Colors header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="images/icons/home.svg" alt="סגנונות"
+                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                        צבעים דינמיים
+                    </div>
+                    <div class="table-count">מערכת צבעים מהעדפות</div>
+                    <div class="table-actions">
+                        <button class="filter-toggle-btn" onclick="toggleDynamicColorsSection()" title="הצג/הסתר צבעים דינמיים">
+                            <span class="filter-icon">▲</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dynamic Colors body -->
+                <div class="section-body">
+                    <div class="styles-test-container">
+                        <h3 class="style-section-title">צבעים דינמיים - מערכת ההעדפות</h3>
+                        <div class="style-examples">
+                            
+                            <!-- Numeric Values Colors -->
+                            <div class="mb-4">
+                                <h5>צבעי ערכים מספריים</h5>
+                                <div class="d-flex flex-wrap gap-3">
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--numeric-positive-color, #28a745);"></div>
+                                        <span class="numeric-text-positive">רווחים (+5.6%)</span>
+                                    </div>
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--numeric-negative-color, #dc3545);"></div>
+                                        <span class="numeric-text-negative">הפסדים (-2.3%)</span>
+                                    </div>
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--numeric-zero-color, #6c757d);"></div>
+                                        <span class="numeric-text-zero">אפס (0.0%)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Entity Colors -->
+                            <div class="mb-4">
+                                <h5>צבעי ישויות</h5>
+                                <div class="d-flex flex-wrap gap-3">
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--entity-trade-color, #007bff);"></div>
+                                        <span class="entity-link">טריידים</span>
+                                    </div>
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--entity-account-color, #28a745);"></div>
+                                        <span class="entity-link">חשבונות</span>
+                                    </div>
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--entity-ticker-color, #dc3545);"></div>
+                                        <span class="entity-link">טיקרים</span>
+                                    </div>
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--entity-alert-color, #ff9c05);"></div>
+                                        <span class="entity-link">התראות</span>
+                                    </div>
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--entity-execution-color, #17a2b8);"></div>
+                                        <span class="entity-link">עסקאות</span>
+                                    </div>
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--entity-cash-flow-color, #20c997);"></div>
+                                        <span class="entity-link">תזרים מזומנים</span>
+                                    </div>
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--entity-trade-plan-color, #17a2b8);"></div>
+                                        <span class="entity-link">תכנוני השקעה</span>
+                                    </div>
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--entity-note-color, #6f42c1);"></div>
+                                        <span class="entity-link">הערות</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Status Colors -->
+                            <div class="mb-4">
+                                <h5>צבעי סטטוס</h5>
+                                <div class="d-flex flex-wrap gap-3">
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--status-open-color, #28a745);"></div>
+                                        <span class="status-badge status-open">פתוח</span>
+                                    </div>
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--status-closed-color, #6c757d);"></div>
+                                        <span class="status-badge status-closed">סגור</span>
+                                    </div>
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--status-cancelled-color, #dc3545);"></div>
+                                        <span class="status-badge status-cancelled">מבוטל</span>
+                                    </div>
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--status-pending-color, #ffc107);"></div>
+                                        <span class="status-badge status-pending">ממתין</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Investment Type Colors -->
+                            <div class="mb-4">
+                                <h5>צבעי סוגי השקעה</h5>
+                                <div class="d-flex flex-wrap gap-3">
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--type-swing-color, #007bff);"></div>
+                                        <span class="type-swing">סווינג</span>
+                                    </div>
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--type-investment-color, #28a745);"></div>
+                                        <span class="type-investment">השקעה</span>
+                                    </div>
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--type-passive-color, #6f42c1);"></div>
+                                        <span class="type-passive">פאסיבי</span>
+                                    </div>
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--type-day-trading-color, #fd7e14);"></div>
+                                        <span class="type-day-trading">דיי טריידינג</span>
+                                    </div>
+                                    <div class="color-demo-item">
+                                        <div class="color-preview" style="background-color: var(--type-scalping-color, #dc3545);"></div>
+                                        <span class="type-scalping">סקלפינג</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Color Controls -->
+                            <div class="mb-4">
+                                <h5>בקרת צבעים</h5>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <button class="btn btn-primary" onclick="loadDynamicColors()">טען צבעים מהעדפות</button>
+                                    <button class="btn btn-secondary" onclick="resetDynamicColors()">איפוס צבעים</button>
+                                    <button class="btn btn-info" onclick="openPreferencesPage()">פתח העדפות</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1379,6 +1525,31 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+        }
+
+        /* Dynamic Colors Section Styles */
+        .color-demo-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: var(--surface-color, #ffffff);
+            border: 1px solid var(--border-color, #e5e5ea);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .color-demo-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .color-preview {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color, #e5e5ea);
+            flex-shrink: 0;
         }
 
         /* Button Groups */
@@ -1835,6 +2006,106 @@
                 icon.textContent = '▼';
             }
         }
+
+        function toggleDynamicColorsSection() {
+            const section = document.getElementById('dynamicColorsSection');
+            const toggleBtn = section.querySelector('button[onclick="toggleDynamicColorsSection()"]');
+            const icon = toggleBtn.querySelector('.filter-icon');
+            const body = section.querySelector('.section-body');
+
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                icon.textContent = '▲';
+            } else {
+                body.style.display = 'none';
+                icon.textContent = '▼';
+            }
+        }
+
+        // Dynamic Colors Functions
+        async function loadDynamicColors() {
+            try {
+                const response = await fetch('/api/v1/preferences/colors');
+                if (!response.ok) {
+                    throw new Error('Failed to load colors from preferences');
+                }
+                
+                const colors = await response.json();
+                
+                // Update CSS Variables
+                Object.entries(colors).forEach(([key, value]) => {
+                    if (value) {
+                        document.documentElement.style.setProperty(`--user-${key}`, value);
+                    }
+                });
+                
+                // Show success notification
+                if (typeof showSuccessNotification === 'function') {
+                    showSuccessNotification('צבעים נטענו בהצלחה מהעדפות');
+                } else {
+                    alert('צבעים נטענו בהצלחה מהעדפות');
+                }
+                
+                console.log('Dynamic colors loaded successfully:', colors);
+            } catch (error) {
+                console.error('Failed to load dynamic colors:', error);
+                if (typeof showErrorNotification === 'function') {
+                    showErrorNotification('שגיאה בטעינת צבעים מהעדפות');
+                } else {
+                    alert('שגיאה בטעינת צבעים מהעדפות');
+                }
+            }
+        }
+
+        async function resetDynamicColors() {
+            try {
+                // Reset to default values by removing custom CSS variables
+                const colorKeys = [
+                    'numeric-positive-color', 'numeric-negative-color', 'numeric-zero-color',
+                    'entity-trade-color', 'entity-account-color', 'entity-ticker-color',
+                    'entity-alert-color', 'entity-execution-color', 'entity-cash-flow-color',
+                    'entity-trade-plan-color', 'entity-note-color',
+                    'status-open-color', 'status-closed-color', 'status-cancelled-color',
+                    'status-pending-color',
+                    'type-swing-color', 'type-investment-color', 'type-passive-color',
+                    'type-day-trading-color', 'type-scalping-color'
+                ];
+                
+                colorKeys.forEach(key => {
+                    document.documentElement.style.removeProperty(`--${key}`);
+                });
+                
+                // Show success notification
+                if (typeof showSuccessNotification === 'function') {
+                    showSuccessNotification('צבעים אופסו לברירות מחדל');
+                } else {
+                    alert('צבעים אופסו לברירות מחדל');
+                }
+                
+                console.log('Dynamic colors reset successfully');
+            } catch (error) {
+                console.error('Failed to reset dynamic colors:', error);
+                if (typeof showErrorNotification === 'function') {
+                    showErrorNotification('שגיאה באיפוס צבעים');
+                } else {
+                    alert('שגיאה באיפוס צבעים');
+                }
+            }
+        }
+
+        function openPreferencesPage() {
+            window.open('/preferences.html', '_blank');
+        }
+
+        // Load dynamic colors on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await loadDynamicColors();
+                console.log('Dynamic colors loaded on page load');
+            } catch (error) {
+                console.error('Failed to load dynamic colors on page load:', error);
+            }
+        });
 
         function refreshTradesTable() {
             console.log('🔄 Refreshing trades table');

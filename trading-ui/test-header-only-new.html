@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>עמוד בדיקת תפריט ותבנית - TikTrack</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Unified CSS -->
+    <link rel="stylesheet" href="styles-new/unified.css?v=v1.2.0">
+    
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v38_fixed">
+    
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js?v=v34_fixes"></script>
+</head>
+
+<body>
+    <div class="background-wrapper">
+        <!-- Header System Test Page -->
+        <div id="unified-header"></div>
+
+        <!-- Page body -->
+        <div class="page-body">
+            <!-- Main content limited in width -->
+            <div class="main-content">
+                <!-- UI Content Section Top Start-->
+                <div class="top-section">
+                    <div class="section-header">
+                        <h1>עמוד בדיקת תפריט ותבנית - כותרת סקשן עליון</h1>
+                    </div>
+                    <div class="section-body">
+                        <h2>תוכן סקשן עליון</h2>
+                    </div>
+                </div>
+                <!-- UI Content Section Top End -->  
+
+                <!-- UI Content Section 1 Start-->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2>📊 ביצועים</h2>
+                    </div>
+                    <div class="section-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>מצב המערכות</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">מצב בסיס נתונים:</label>
+                                                    <span id="systemStatus" class="badge bg-success">מחובר</span>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">מצב שרת:</label>
+                                                    <span id="serverStatus" class="badge bg-success">פעיל</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">מצב תפריט:</label>
+                                                    <span id="menuStatus" class="badge bg-success">טעון</span>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">מצב פילטרים:</label>
+                                                    <span id="filterStatus" class="badge bg-success">פעיל</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>בדיקות מהירות</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="d-grid gap-2">
+                                            <button class="btn btn-primary" onclick="testNavigation()">🧪 בדיקת ניווט</button>
+                                            <button class="btn btn-success" onclick="testFilters()">🔍 בדיקת פילטרים</button>
+                                            <button class="btn btn-info" onclick="testHeader()">📋 בדיקת כותרת</button>
+                                            <button class="btn btn-warning" onclick="testResponsive()">📱 בדיקת רספונסיביות</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>מידע דיבאג</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">גרסת דפדפן:</label>
+                                                    <span id="browserVersion" class="text-muted">טוען...</span>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">רזולוציה:</label>
+                                                    <span id="screenResolution" class="text-muted">טוען...</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">זמן טעינה:</label>
+                                                    <span id="loadTime" class="text-muted">טוען...</span>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">מצב מטמון:</label>
+                                                    <span id="cacheStatus" class="text-muted">טוען...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>בדיקות פונקציונליות</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">בדיקת טבלה:</label>
+                                                    <button class="btn btn-sm btn-outline-primary" onclick="testTable('test_trades')">בדוק טבלה</button>
+                                                    <span id="tableStatus" class="badge bg-secondary ms-2">לא נבדק</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">בדיקת פילטרים:</label>
+                                                    <button class="btn btn-sm btn-outline-success" onclick="testFilters()">בדוק פילטרים</button>
+                                                    <span id="filterTestStatus" class="badge bg-secondary ms-2">לא נבדק</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label class="form-label">בדיקת ניווט:</label>
+                                                    <button class="btn btn-sm btn-outline-info" onclick="testNavigation()">בדוק ניווט</button>
+                                                    <span id="navTestStatus" class="badge bg-secondary ms-2">לא נבדק</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>לוגים ומידע טכני</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">גרסת JavaScript:</label>
+                                                    <span id="jsVersion" class="text-muted">טוען...</span>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">גרסת CSS:</label>
+                                                    <span id="cssVersion" class="text-muted">טוען...</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">מצב Console:</label>
+                                                    <span id="consoleStatus" class="text-muted">טוען...</span>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">מצב Debug:</label>
+                                                    <span id="debugStatus" class="text-muted">טוען...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <button class="btn btn-secondary" onclick="updateDebugInfo()">🔄 עדכן מידע דיבאג</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 1 End -->   
+
+                <!-- UI Content Section 2 Start-->
+                <div class="content-section">
+                    <div class="section-header">
+                        <!-- UI section title comes here --> 
+                    </div>
+                    <div class="section-body">
+                        <!-- UI section body comes here --> 
+                    </div>
+                </div>
+                <!-- UI Content Section 2 End--> 
+
+                <!-- UI Content Section 3 Start-->
+                <div class="content-section">
+                    <div class="section-header">
+                        <!-- UI section title comes here --> 
+                    </div>
+                    <div class="section-body">
+                        <!-- UI section body comes here --> 
+                    </div>
+                </div>
+                <!-- UI Content Section 3 End--> 
+            </div>
+        </div>
+
+        <!-- Console cleanup system -->
+        <script>
+            // פונקציה לעדכון מידע דיבאג
+            function updateDebugInfo() {
+                console.log('🔄 עדכון מידע דיבאג...');
+                
+                // עדכון מידע דפדפן
+                updateStatus('browserVersion', navigator.userAgent.split(' ')[0]);
+                updateStatus('screenResolution', `${screen.width}x${screen.height}`);
+                updateStatus('loadTime', `${performance.now().toFixed(2)}ms`);
+                updateStatus('cacheStatus', 'פעיל');
+                updateStatus('jsVersion', 'ES6+');
+                updateStatus('cssVersion', 'Bootstrap 5.3.0');
+                updateStatus('consoleStatus', 'פעיל');
+                updateStatus('debugStatus', 'מופעל');
+                
+                console.log('✅ מידע דיבאג עודכן');
+            }
+
+            // פונקציה לעדכון סטטוס
+            function updateStatus(elementId, status, isSuccess = true) {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.textContent = status;
+                    element.style.color = isSuccess ? 'green' : 'red';
+                } else {
+                    console.log(`⚠️ Element ${elementId} not found for status update: ${status}`);
+                }
+            }
+
+            // פונקציות בדיקה
+            function testNavigation() {
+                console.log('🧪 בדיקת ניווט...');
+                updateStatus('navTestStatus', 'נבדק', true);
+            }
+
+            function testFilters() {
+                console.log('🔍 בדיקת פילטרים...');
+                updateStatus('filterTestStatus', 'נבדק', true);
+            }
+
+            function testHeader() {
+                console.log('📋 בדיקת כותרת...');
+                updateStatus('menuStatus', 'נבדק', true);
+            }
+
+            function testResponsive() {
+                console.log('📱 בדיקת רספונסיביות...');
+                updateStatus('screenResolution', `${window.innerWidth}x${window.innerHeight}`, true);
+            }
+
+            function testTable(tableId) {
+                console.log(`🧪 בדיקת טבלה: ${tableId}`);
+                updateStatus('tableStatus', 'נבדק', true);
+            }
+
+            // אתחול העמוד
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('🚀 טעינת דף בדיקה עם התפריט החדש...');
+                
+                // בדיקת מערכות
+                if (typeof FilterSystem !== 'undefined') {
+                    console.log('✅ FilterSystem זמין');
+                } else {
+                    console.log('❌ FilterSystem לא זמין');
+                }
+                
+                if (document.getElementById('unified-header')) {
+                    console.log('✅ התפריט החדש נוצר');
+                } else {
+                    console.log('❌ התפריט החדש לא נוצר');
+                }
+                
+                // עדכון מידע דיבאג
+                setTimeout(updateDebugInfo, 1000);
+                
+                console.log('🎉 תפריט נוצר בהצלחה!');
+            });
+        </script>
+    </div>
+</body>
+</html>

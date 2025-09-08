@@ -14,17 +14,584 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- TikTrack CSS - Unified CSS (No @import) -->
-    <link rel="stylesheet" href="styles-new/unified.css?v=v1.2.0">
-    
-    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v38_fixed">
+    <link rel="stylesheet" href="styles-new/unified.css">
     
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
-    <!-- Font Awesome - Removed (not needed) -->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@6.0.0/css/all.min.css">
 
-    <!-- Additional styles for test page - Removed to match other pages -->
+    <!-- Additional styles for test page -->
+    <style>
+        .test-page {
+            padding: 2rem 0;
+        }
+
+        .test-card {
+            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-card .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px 12px 0 0 !important;
+            border: none;
+        }
+
+        .test-log {
+            background: #1a1a1a !important;
+            color: #00ff00 !important;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+
+        .test-log p {
+            margin: 0.25rem 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .status-indicator {
+            font-weight: bold;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* סגנונות נוספים לדף הבדיקה */
+        
+        /* Menu - Apple Style with TikTrack Colors */
+        
+        /* Main Header */
+        .unified-header {
+            background: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        /* Header Top */
+        .header-top {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0.5rem 0 1rem 0;
+            position: relative;
+            min-height: 70px;
+            direction: rtl;
+            width: 100%; /* כל הרוחב */
+            background: white; /* רקע לבן שיסתיר את הפס האדום */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* צל עדין להפרדה בין תפריט לפילטר */
+            z-index: 1001; /* מעל הפילטר כדי שהפס יישאר נראה */
+        }
+        
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1200px; /* רוחב מקסימלי */
+        }
+        
+        /* Navigation */
+        .header-nav {
+            padding: 0;
+            margin-left: auto;
+            margin-right: 0;
+        }
+        
+        .tiktrack-nav-list {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .tiktrack-nav-item {
+            position: relative;
+        }
+        
+        .tiktrack-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            color: #1d1d1f;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-weight: 400;
+            font-size: 16px;
+        }
+        
+        .tiktrack-nav-link:hover {
+            color: #ff9500;
+        }
+        
+        .tiktrack-nav-item.active .tiktrack-nav-link {
+            color: #26baac;
+            font-weight: 500;
+        }
+        
+        .tiktrack-nav-item.active .tiktrack-link:hover {
+            color: #ff9500;
+        }
+        
+        /* Home icon spacing */
+        .tiktrack-nav-item:first-child {
+            margin-right: 0;
+        }
+        
+        .tiktrack-nav-item:first-child .tiktrack-nav-link {
+            padding-right: 0;
+        }
+        
+        .tiktrack-nav-item:nth-child(2) {
+            margin-right: 0.5rem;
+        }
+        
+        /* Logo Section */
+        .logo-section {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+            direction: ltr;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            text-decoration: none;
+            color: inherit;
+            direction: ltr;
+        }
+        
+        .logo:hover {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .logo-image {
+            width: 125px;
+            height: 37.5px;
+            object-fit: contain;
+            display: block;
+        }
+        
+        .logo-text {
+            font-size: 1rem;
+            font-weight: 300;
+            color: #26baac;
+            direction: ltr;
+            text-align: left;
+            align-self: flex-end;
+            margin-bottom: -5px;
+            white-space: nowrap;
+        }
+        
+        /* Dropdown Menus */
+        .tiktrack-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            padding: 0.5rem 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 1001;
+            list-style: none;
+        }
+        
+        .tiktrack-dropdown-arrow {
+            font-size: 0.75rem;
+            color: #666;
+            margin-right: 0.25rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .tiktrack-nav-item:hover .tiktrack-dropdown-arrow {
+            transform: rotate(90deg);
+        }
+        
+        .tiktrack-nav-item:hover .tiktrack-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .tiktrack-dropdown-item {
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #1d1d1f;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+        
+        .tiktrack-dropdown-menu li,
+        .submenu li {
+            list-style: none;
+        }
+        
+        .tiktrack-dropdown-item:hover {
+            background: #f5f5f7;
+            color: #ff9500;
+        }
+        
+        /* Submenus */
+        .dropdown-submenu {
+            position: relative;
+        }
+        
+        .dropdown-submenu .submenu {
+            position: absolute;
+            top: 0;
+            right: 100%;
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 180px;
+            padding: 0.5rem 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(10px);
+            transition: all 0.2s ease;
+            z-index: 1002;
+            list-style: none;
+        }
+        
+        .dropdown-submenu:hover .submenu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+        
+        /* Cache clear button */
+        .cache-clear-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: transparent !important;
+            border: none !important;
+            color: #1d1d1f;
+            text-decoration: none;
+            transition: color 0.2s ease;
+            font-size: 16px;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .cache-clear-btn:hover {
+            background: transparent !important;
+            color: #ff9500;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
+        /* Filter Toggle Section */
+        .menu-filter-toggle-section {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 951;
+            height: 0;
+            margin-top: -16px;
+            width: 100%;
+        }
+        
+        /* Filter Toggle Button */
+        .filter-toggle-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: white !important;
+            border: none !important;
+            border-radius: 50% !important;
+            color: #ff9c05 !important;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 951;
+            box-shadow: none !important;
+            outline: none !important;
+            transform: translateY(5px);
+        }
+        
+        .filter-toggle-btn.collapsed {
+            transform: translateY(20px);
+        }
+        
+        .filter-toggle-btn:not(.collapsed) {
+            transform: translateY(calc(5px + var(--filter-height, 0px) + 10px));
+        }
+        
+        .filter-toggle-btn:not(.collapsed) .filter-arrow {
+            transform: rotate(180deg) translateY(-5px);
+        }
+        
+        /* Filters Section */
+        .header-filters {
+            padding: 1rem 2rem;
+            background: white;
+            position: relative;
+            z-index: 950; /* מתחת לכפתור */
+            min-height: 60px;
+            display: none; /* Hidden by default */
+            margin-top: 15px; /* רווח מהכפתור - הורדה של 5px */
+        }
+        
+        .header-filters.show {
+            display: block; /* Shown when 'show' class is added */
+        }
+        
+        /* פס אפור עדין בסוף הפילטר */
+        .header-filters::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0.5px;
+            background: rgba(0, 0, 0, 0.03); /* דק ושקוף יותר מהפס העליון */
+        }
+        
+        .filters-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+            position: relative;
+        }
+        
+        .filter-dropdown {
+            position: relative;
+        }
+        
+        .filter-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.45rem 0.9rem;
+            background: white !important;
+            border: 1px solid #ddd !important;
+            border-radius: 5.4px !important;
+            color: #1d1d1f !important;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 12.6px;
+            box-shadow: none !important;
+            outline: none !important;
+            width: 120px; /* גודל קבוע */
+            white-space: nowrap; /* מניעת שבירת שורה */
+            overflow: hidden; /* הסתרת טקסט חורג */
+            text-overflow: ellipsis; /* שלוש נקודות לטקסט חורג */
+        }
+        
+        .filter-toggle:hover {
+            border-color: #ff9500 !important;
+            color: #ff9500 !important;
+            background: white !important;
+            box-shadow: none !important;
+        }
+        
+        .filter-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 150px;
+            padding: 0.5rem 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 1003;
+            display: block !important;
+        }
+        
+        /* תיקון - שימוש באותה גישה כמו התפריט הראשי */
+        .filter-group:hover .filter-menu,
+        .filter-menu.show {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateY(0) !important;
+            display: block !important;
+        }
+        
+        
+        .filter-option {
+            padding: 0.45rem 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #1d1d1f;
+            font-size: 0.9em;
+        }
+        
+        .filter-option:hover {
+            background: #f5f5f7;
+        }
+        
+        .filter-option.selected {
+            background: #e3f2fd !important;
+            color: #1976d2 !important;
+            font-weight: bold !important;
+        }
+        
+        .status-filter-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .status-filter-item:hover {
+            background: #f5f5f7;
+        }
+        
+        .search-input-wrapper {
+            position: relative;
+            font-size: 0.9em;
+        }
+        
+        .search-filter-input {
+            padding: 0.45rem 2.5rem 0.45rem 0.9rem; /* יותר מקום לכפתור הניקוי */
+            border: 1px solid #ddd !important;
+            border-radius: 5.4px !important;
+            font-size: 12.6px;
+            width: 120px !important; /* גודל קבוע כמו שאר הפילטרים */
+            background: white !important;
+            box-shadow: none !important;
+        }
+        
+        .search-filter-input:focus {
+            outline: none !important;
+            border-color: #ff9500 !important;
+            box-shadow: none !important;
+        }
+        
+        /* Search Clear Button inside input */
+        .search-clear-btn {
+            position: absolute;
+            right: 0.5rem; /* שינוי מ-left ל-right */
+            top: 50%;
+            transform: translateY(-50%);
+            background: none !important;
+            border: none !important;
+            color: #666 !important;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            box-shadow: none !important;
+            outline: none !important;
+            font-size: 0.8rem;
+        }
+        
+        .search-clear-btn:hover {
+            background: #f0f0f0 !important;
+            color: #333 !important;
+            box-shadow: none !important;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .reset-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: white !important;
+            border: none !important;
+            border-radius: 6px !important;
+            color: #26baac !important;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: none !important;
+            outline: none !important;
+            font-size: 18px !important;
+            font-weight: bold !important;
+        }
+        
+        .clear-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: white !important;
+            border: none !important;
+            border-radius: 6px !important;
+            color: #ff9500 !important;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: none !important;
+            outline: none !important;
+            font-size: 18px !important;
+            font-weight: bold !important;
+        }
+        
+        .reset-btn:hover, .clear-btn:hover {
+            border-color: #ff9500 !important;
+            color: #ff9500 !important;
+            background: white !important;
+            box-shadow: none !important;
+        }
+        
+        /* Ensure submenus display above filters */
+        .submenu {
+            z-index: 1001 !important;
+        }
+        
+        /* Separator */
+        .separator {
+            height: 1px;
+            background: #e5e5e5;
+            margin: 0.5rem 0;
+        }
+    </style>
 
     <!-- Scripts - Using new Header System -->
     <script src="scripts/header-component.js"></script>
@@ -68,8 +635,196 @@
 </head>
 
 <body>
-    <!-- Unified Header Container -->
-    <div id="unified-header"></div>
+    <!-- תפריט בסגנון אפל -->
+    <div class="unified-header">
+        <!-- אזור לוגו ותפריט -->
+        <div class="header-top">
+            <div class="header-container">
+                <!-- תפריט ניווט -->
+                <div class="header-nav">
+                    <nav class="main-nav">
+                        <ul class="tiktrack-nav-list">
+                        <li class="tiktrack-nav-item">
+                            <a href="/" class="tiktrack-nav-link active" data-page="home">
+                                <img src="images/icons/home.svg" alt="בית" style="width: 32px; height: 32px;">
+                            </a>
+                        </li>
+                            <li class="tiktrack-nav-item">
+                                <a href="/trade_plans" class="tiktrack-nav-link" data-page="trade_plans">
+                                    <span class="nav-text">תכנון</span>
+                                </a>
+                            </li>
+                            <li class="tiktrack-nav-item">
+                                <a href="/trades" class="tiktrack-nav-link" data-page="trades">
+                                    <span class="nav-text">מעקב</span>
+                                </a>
+                            </li>
+                            <li class="tiktrack-nav-item">
+                                <a href="/research" class="tiktrack-nav-link" data-page="research">
+                                    <span class="nav-text">מחקר</span>
+                                </a>
+                            </li>
+                            <li class="tiktrack-nav-item dropdown">
+                                <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="settings">
+                                    <span class="nav-text">הגדרות</span>
+                                    <span class="tiktrack-dropdown-arrow">›</span>
+                                </a>
+                                <ul class="tiktrack-dropdown-menu">
+                                    <li><a class="tiktrack-dropdown-item" href="/alerts">התראות</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/accounts">חשבונות</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/executions">עסקאות</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
+                                    <li class="separator"></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
+                                    <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
+                                </ul>
+                            </li>
+                            <li class="tiktrack-nav-item dropdown">
+                                <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="dev_tools">
+                                    <span class="nav-text">כלי פיתוח</span>
+                                    <span class="tiktrack-dropdown-arrow">›</span>
+                                </a>
+                                <ul class="tiktrack-dropdown-menu">
+                                    <!-- ניטור וניהול -->
+                                    <li class="dropdown-submenu">
+                                        <a class="tiktrack-dropdown-item" href="#">ניטור וניהול</a>
+                                        <ul class="submenu">
+                                            <li><a class="tiktrack-dropdown-item" href="/system-management">system-management</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/server-monitor">server-monitor</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/notifications-center">notifications-center</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/constraints">constraints</a></li>
+                                        </ul>
+                                    </li>
+                                    
+                                    <!-- ממשק משתמש -->
+                                    <li class="dropdown-submenu">
+                                        <a class="tiktrack-dropdown-item" href="#">ממשק משתמש</a>
+                                        <ul class="submenu">
+                                            <li><a class="tiktrack-dropdown-item" href="/css-management">css-management</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/numeric-value-colors-demo">numeric-value-colors-demo</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/style_demonstration">style_demonstration</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/color-scheme-examples">color-scheme-examples</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/designs">designs</a></li>
+                                        </ul>
+                                    </li>
+                                    
+                                    <!-- כלים -->
+                                    <li class="dropdown-submenu">
+                                        <a class="tiktrack-dropdown-item" href="#">כלים</a>
+                                        <ul class="submenu">
+                                            <li><a class="tiktrack-dropdown-item" href="/external-data-dashboard">external-data-dashboard</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/linter-realtime-monitor">linter-realtime-monitor</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/crud-testing-dashboard">crud-testing-dashboard</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/cache-test">cache-test</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/js-map">js-map</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">page-scripts-matrix</a></li>
+                                            <li><a class="tiktrack-dropdown-item" href="/test-header-only">test-header-only</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="tiktrack-nav-item">
+                                <a href="#" class="cache-clear-btn" title="ניקוי מטמון מלא">🧹</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+                <!-- לוגו -->
+                <div class="logo-section">
+                    <div class="logo">
+                        <img src="images/logo.svg" alt="TikTrack Logo" class="logo-image">
+                        <span class="logo-text">פשוט לנהל תיק</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- כפתור פתיחה/סגירה של פילטר -->
+        <div class="menu-filter-toggle-section">
+            <button class="filter-toggle-btn" id="filterToggleBtn" title="הצג/הסתר פילטרים"
+                    onclick="toggleSection('filters')">
+                <span class="filter-arrow">▼</span>
+            </button>
+        </div>
+        
+        <!-- פילטרים -->
+        <div class="header-filters" id="headerFilters" data-section="filters">
+            <div class="filters-container">
+                <div class="filter-group">
+                    <button class="filter-toggle" onclick="toggleStatusFilter()">
+                        <span>סטטוס</span>
+                        <span class="filter-arrow">▼</span>
+                    </button>
+                    <div class="filter-menu" id="statusFilterMenu">
+                        <div class="filter-option" onclick="selectStatusOption('all')">הכל</div>
+                        <div class="filter-option" onclick="selectStatusOption('open')">פתוח</div>
+                        <div class="filter-option" onclick="selectStatusOption('closed')">סגור</div>
+                        <div class="filter-option" onclick="selectStatusOption('cancelled')">מבוטל</div>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <button class="filter-toggle" onclick="toggleTypeFilter()">
+                        <span>סוג השקעה</span>
+                        <span class="filter-arrow">▼</span>
+                    </button>
+                    <div class="filter-menu" id="typeFilterMenu">
+                        <div class="filter-option" onclick="selectTypeOption('all')">הכל</div>
+                        <div class="filter-option" onclick="selectTypeOption('swing')">סווינג</div>
+                        <div class="filter-option" onclick="selectTypeOption('investment')">השקעה</div>
+                        <div class="filter-option" onclick="selectTypeOption('passive')">פסיבי</div>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <button class="filter-toggle" onclick="toggleAccountFilter()">
+                        <span>חשבון</span>
+                        <span class="filter-arrow">▼</span>
+                    </button>
+                    <div class="filter-menu" id="accountFilterMenu">
+                        <div class="filter-option" onclick="selectAccountOption('הכל')">הכל</div>
+                        <!-- חשבונות יטענו דינמית -->
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <button class="filter-toggle" onclick="toggleDateRangeFilter()">
+                        <span>טווח תאריכים</span>
+                        <span class="filter-arrow">▼</span>
+                    </button>
+                    <div class="filter-menu" id="dateRangeFilterMenu">
+                        <div class="filter-option" onclick="selectDateRangeOption('all')">הכל</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('today')">היום</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('yesterday')">אתמול</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('this_week')">השבוע</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('last_week')">שבוע שעבר</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('this_month')">החודש</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('last_month')">חודש שעבר</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('this_year')">השנה</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('last_year')">שנה שעברה</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('mtd')">מתחילת החודש</div>
+                        <div class="filter-option" onclick="selectDateRangeOption('ytd')">מתחילת השנה</div>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <div class="search-input-wrapper">
+                        <input type="text" id="searchFilterInput" placeholder="חיפוש חופשי..." class="search-filter-input">
+                        <button class="search-clear-btn" onclick="clearSearch()" title="נקה חיפוש">✕</button>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="reset-btn" onclick="resetFilters()" title="איפוס פילטרים">↻</button>
+                    <button class="clear-btn" onclick="clearAll()" title="נקה הכל">✕</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <div class="background-wrapper">
         <!-- Header System Test Page -->
@@ -78,22 +833,11 @@
         <div class="page-body">
             <!-- Main content limited in width -->
             <div class="main-content">
-                <!-- UI Content Section Top Start-->
-                <div class="top-section">
-                    <div class="section-header">
-                        <h1>עמוד בדיקת תפריט ותבנית - כותרת סקשן עליון</h1>
-                    </div>
-                    <div class="section-body">
-                        <h2>תוכן סקשן עליון</h2>
-                    </div>
-                </div>
-                <!-- UI Content Section Top End -->  
-
-                <!-- UI Content Section 1 Start-->
                 <div class="content-section">
                     <div class="section-header">
                         <h2>📊 ביצועים</h2>
                     </div>
+
                     <div class="section-body">
                         <div class="row">
                             <div class="col-md-6">
@@ -450,370 +1194,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- UI Content Section 1 End -->   
-
-                <!-- UI Content Section 2 Start-->
-                <div class="content-section">
-                    <div class="section-header">
-                        <!-- UI section title comes here --> 
-                    </div>
-                    <div class="section-body">
-                        <!-- UI section body comes here --> 
-                    </div>
-                </div>
-                <!-- UI Content Section 2 End--> 
-
-                <!-- UI Content Section 3 Start-->
-                <div class="content-section">
-                    <div class="section-header">
-                        <!-- UI section title comes here --> 
-                    </div>
-                    <div class="section-body">
-                        <!-- UI section body comes here --> 
-                    </div>
-                </div>
-                <!-- UI Content Section 3 End--> 
-            </div>
-        </div>
-
-        <!-- Console cleanup system -->
-                                        <h5>🔍 מצב פילטרים (Debug)</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="filterDebugInfo2"
-                                            style="font-family: monospace; font-size: 11px; background: #f8f9fa; padding: 10px; border-radius: 5px; max-height: 200px; overflow-y: auto;">
-                                                            <div><strong>Status:</strong> <span id="statusDebug2">-</span></div>
-                <div><strong>Type:</strong> <span id="typeDebug2">-</span></div>
-                <div><strong>Account:</strong> <span id="accountDebug2">-</span></div>
-                <div><strong>Date:</strong> <span id="dateDebug2">-</span></div>
-            </div>
-            <button onclick="updateDebugInfo2()" class="btn btn-sm btn-primary mt-2">🔄
-            <button onclick="testStatusFilter2()" class="btn btn-sm btn-info mt-2">🧪 בדוק פילטר סטטוס</button>
-            <button onclick="testTypeFilter2()" class="btn btn-sm btn-success mt-2">🧪 בדוק פילטר סוג</button>
-            <button onclick="testAccountFilter2()" class="btn btn-sm btn-primary mt-2">🧪 בדוק פילטר חשבון</button>
-            <button onclick="testDateFilter2()" class="btn btn-sm btn-secondary mt-2">🧪 בדוק פילטר תאריך</button>
-            <button onclick="testSearchFilter2()" class="btn btn-sm btn-dark mt-2">🧪 בדוק חיפוש חופשי</button>
-            <button onclick="showActiveContainer2()" class="btn btn-sm btn-warning mt-2">🔍 הצג קונטיינר פעיל</button>
-                                            עדכן</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>טבלת ביצועים</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive" id="tradesContainer2">
-                                            <table class="table table-striped"
-                                                data-table-type="test_trades2">
-                                            <thead>
-                                                <tr>
-                                                    <th>טיקר</th>
-                                                    <th>סטטוס</th>
-                                                    <th>טיפוס</th>
-                                                    <th>חשבון</th>
-                                                    <th>תאריך פתיחה</th>
-                                                    <th>כמות</th>
-                                                    <th>מחיר</th>
-                                                    <th>ערך</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>AAPL</td>
-                                                    <td data-status="פתוח">פתוח</td>
-                                                    <td data-investment-type="swing">סווינג</td>
-                                                    <td data-account="Trading Account 1">Trading Account 1</td>
-                                                    <td data-created-at="2025-08-22">2025-08-22</td>
-                                                    <td>100</td>
-                                                    <td>150.50</td>
-                                                    <td>15,050</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>TSLA</td>
-                                                    <td data-status="סגור">סגור</td>
-                                                    <td data-investment-type="investment">השקעה</td>
-                                                    <td data-account="Investment Account">Investment Account</td>
-                                                    <td data-created-at="2025-08-21">2025-08-21</td>
-                                                    <td>50</td>
-                                                    <td>200.00</td>
-                                                    <td>10,000</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>SPY</td>
-                                                    <td data-status="פתוח">פתוח</td>
-                                                    <td data-investment-type="passive">פסיבי</td>
-                                                    <td data-account="Trading Account 1">Trading Account 1</td>
-                                                    <td data-created-at="2025-08-20">2025-08-20</td>
-                                                    <td>200</td>
-                                                    <td>450.25</td>
-                                                    <td>90,050</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>BTC</td>
-                                                    <td data-status="מבוטל">מבוטל</td>
-                                                    <td data-investment-type="swing">סווינג</td>
-                                                    <td data-account="Retirement Account">Retirement Account</td>
-                                                    <td data-created-at="2025-08-15">2025-08-15</td>
-                                                    <td>0.5</td>
-                                                    <td>45,000</td>
-                                                    <td>22,500</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>MSFT</td>
-                                                    <td data-status="פתוח">פתוח</td>
-                                                    <td data-investment-type="investment">השקעה</td>
-                                                    <td data-account="Investment Account">Investment Account</td>
-                                                    <td data-created-at="2025-08-10">2025-08-10</td>
-                                                    <td>75</td>
-                                                    <td>300.75</td>
-                                                    <td>22,556</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>QQQ</td>
-                                                    <td data-status="סגור">סגור</td>
-                                                    <td data-investment-type="passive">פסיבי</td>
-                                                    <td data-account="Trading Account 1">Trading Account 1</td>
-                                                    <td data-created-at="2025-08-18">2025-08-18</td>
-                                                    <td>150</td>
-                                                    <td>380.00</td>
-                                                    <td>57,000</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>NVDA</td>
-                                                    <td data-status="פתוח">פתוח</td>
-                                                    <td data-investment-type="swing">סווינג</td>
-                                                    <td data-account="Retirement Account">Retirement Account</td>
-                                                    <td data-created-at="2025-08-16">2025-08-16</td>
-                                                    <td>25</td>
-                                                    <td>450.00</td>
-                                                    <td>11,250</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>טבלת בדיקה כללית</h5>
-                        </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive" id="testContainer2">
-                                            <table class="table table-striped"
-                                                data-table-type="test_general2">
-                                            <thead>
-                                                <tr>
-                                                    <th>שם</th>
-                                                    <th>סטטוס</th>
-                                                    <th>טיפוס</th>
-                                                    <th>חשבון</th>
-                                                    <th>תאריך</th>
-                                                    <th>סכום</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>טרייד 1</td>
-                                                    <td data-status="פתוח">פתוח</td>
-                                                    <td data-investment-type="swing">סווינג</td>
-                                                    <td data-account="Trading Account 1">Trading Account 1</td>
-                                                    <td data-created-at="2025-08-22">2025-08-22</td>
-                                                    <td>1000</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>טרייד 2</td>
-                                                    <td data-status="סגור">סגור</td>
-                                                    <td data-investment-type="passive">פסיבי</td>
-                                                    <td data-account="Investment Account">Investment Account</td>
-                                                    <td data-created-at="2025-08-21">2025-08-21</td>
-                                                    <td>2000</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>טרייד 3</td>
-                                                    <td data-status="מבוטל">מבוטל</td>
-                                                    <td data-investment-type="investment">השקעה</td>
-                                                    <td data-account="Trading Account 1">Trading Account 1</td>
-                                                    <td data-created-at="2025-08-20">2025-08-20</td>
-                                                    <td>500</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>טבלת הערות (ללא פילטר סטטוס)</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive" id="notificationsContainer2">
-                                            <table class="table table-striped"
-                                                data-table-type="test_notifications2">
-                                            <thead>
-                                                <tr>
-                                                    <th>סימבול</th>
-                                                    <th>קשור ל</th>
-                                                    <th>תוכן</th>
-                                                    <th>קובץ מצורף</th>
-                                                    <th>נוצר ב</th>
-                                                    <th>פעולות</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>AAPL</td>
-                                                    <td>טיקר</td>
-                                                    <td>המחיר עלה מעל 150$ - הזדמנות למכירה</td>
-                                                    <td>-</td>
-                                                    <td data-created-at="2025-01-15 10:30">2025-01-15 10:30</td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-secondary">ערוך</button>
-                                                        <button class="btn btn-sm btn-danger">מחק</button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>TSLA</td>
-                                                    <td>תוכנית טרייד</td>
-                                                    <td>נסגר ברווח של 15% - תוכנית מוצלחת</td>
-                                                    <td>chart.png</td>
-                                                    <td data-created-at="2025-01-15 09:15">2025-01-15 09:15</td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-secondary">ערוך</button>
-                                                        <button class="btn btn-sm btn-danger">מחק</button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>SPY</td>
-                                                    <td>חשבון</td>
-                                                    <td>עדכון יתרה - הפקדה חדשה התקבלה</td>
-                                                    <td>-</td>
-                                                    <td data-created-at="2025-01-14 16:45">2025-01-14 16:45</td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-secondary">ערוך</button>
-                                                        <button class="btn btn-sm btn-danger">מחק</button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>BTC</td>
-                                                    <td>טיקר</td>
-                                                    <td>המחיר ירד מתחת ל-40,000$ - הזדמנות לקנייה</td>
-                                                    <td>analysis.pdf</td>
-                                                    <td data-created-at="2025-01-14 14:20">2025-01-14 14:20</td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-secondary">ערוך</button>
-                                                        <button class="btn btn-sm btn-danger">מחק</button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>MSFT</td>
-                                                    <td>הערה כללית</td>
-                                                    <td>עדכון מערכת - המערכת עודכנה לגרסה 2.1</td>
-                                                    <td>-</td>
-                                                    <td data-created-at="2025-01-14 11:30">2025-01-14 11:30</td>
-                                                    <td>
-                                                        <button class="btn btn-sm btn-secondary">ערוך</button>
-                                                        <button class="btn btn-sm btn-danger">מחק</button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>מידע דיבאג - מערכת הכותרת החדשה</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <h6>מצב מערכת הכותרת</h6>
-                                                <p><strong>מערכת הכותרת מאותחלת:</strong> <span
-                                                        id="headerSystemStatus2">בדיקה...</span></p>
-                                                <p><strong>מערכת הפילטרים מאותחלת:</strong> <span
-                                                        id="filterSystemStatus2">בדיקה...</span></p>
-                                                <p><strong>אזור פילטרים פתוח:</strong> <span
-                                                        id="filtersSectionStatus2">בדיקה...</span></p>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <h6>מצב פילטרים נוכחי</h6>
-                                                <p><strong>פילטר סטטוס:</strong> <span id="currentStatusFilter2">כל
-                                                        סטטוס</span></p>
-                                                                                        <p><strong>פילטר סוג:</strong> <span id="currentTypeFilter2">כל
-                                            סוג</span></p>
-                                                <p><strong>פילטר חשבון:</strong> <span id="currentAccountFilter2">כל
-                                                        חשבון</span></p>
-                                                <p><strong>פילטר תאריכים:</strong> <span id="currentDateRangeFilter2">כל
-                                                        זמן</span></p>
-                                                <p><strong>פילטר חיפוש:</strong> <span
-                                                        id="currentSearchFilter2">אין</span></p>
-                                            </div>
-                                        </div>
-
-                                        <div class="row mt-3">
-                                            <div class="col-md-6">
-                                                <h6>טווח תאריכים פעיל</h6>
-                                                <p><strong>תאריך התחלה:</strong> <span id="dateRangeStart2">לא
-                                                        נבחר</span></p>
-                                                <p><strong>תאריך סיום:</strong> <span id="dateRangeEnd2">לא נבחר</span>
-                                                </p>
-                                                <p><strong>טווח תאריכים:</strong> <span id="dateRangeDescription2">לא
-                                                        נבחר</span></p>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <h6>סטטיסטיקות טבלאות</h6>
-                                                <p><strong>טבלת טריידים:</strong> <span id="tradesTableStats2">0/0 שורות
-                                                        נראות</span></p>
-                                                <p><strong>טבלת בדיקה:</strong> <span id="testTableStats2">0/0 שורות
-                                                        נראות</span></p>
-                                                <p><strong>טבלת הודעות:</strong> <span id="notificationsTableStats2">0/0
-                                                        שורות
-                                                        נראות</span></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>לוג בדיקות</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="testLog2"
-                                            style="height: 200px; overflow-y: auto; background: #f8f9fa; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px;">
-                                            <p>🚀 התחלת בדיקת מערכת ראש דף חדשה (ללא app-header)...</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Content Section 2 End - סקשן 2 -->
-                </div>
-                <!-- UI Sections End -->
             </div>
         </div>
 
@@ -847,12 +1227,8 @@
 
         function updateStatus(elementId, status, isSuccess = true) {
             const element = document.getElementById(elementId);
-            if (element) {
             element.textContent = status;
             element.style.color = isSuccess ? 'green' : 'red';
-            } else {
-                console.log(`⚠️ Element ${elementId} not found for status update: ${status}`);
-            }
         }
 
 
@@ -1149,9 +1525,6 @@ function testSearchFilter() {
             }, 1500);
         });
     </script>
-    
-    <!-- Header System Script -->
-    <script src="scripts/header-system.js?v=v34_fixes"></script>
     </div>
 </div> <!-- End background-wrapper -->
 </body>

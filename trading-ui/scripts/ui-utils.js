@@ -833,6 +833,279 @@ async function autoRefreshCurrentPage(operationName = 'פעולה') {
   }
 }
 
+// ===== SECTION TOGGLE SYSTEM =====
+// Centralized section toggle functionality for all pages
+
+/**
+ * Toggle top section (header section with alerts/summary)
+ * Handles opening/closing of top sections across all pages
+ */
+window.toggleTopSection = function () {
+  const currentPath = window.location.pathname;
+
+  // Special handling for notes page
+  if (currentPath.includes('/notes')) {
+    const section = document.getElementById('notesTopSection');
+    const toggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+    if (section && toggleBtn) {
+      const isHidden = section.style.display === 'none';
+      section.style.display = isHidden ? 'block' : 'none';
+
+      // Update icon only
+      if (icon) {
+        icon.textContent = isHidden ? '▲' : '▼';
+      }
+
+      // Save state
+      localStorage.setItem('notesTopSectionHidden', !isHidden);
+    }
+    return;
+  }
+
+  // Regular handling for other pages
+  const section = document.querySelector('.top-section .section-body');
+  const toggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+  if (section) {
+    const isCollapsed = section.classList.contains('collapsed') || section.style.display === 'none';
+
+    if (isCollapsed) {
+      section.classList.remove('collapsed');
+      section.style.display = 'block';
+    } else {
+      section.classList.add('collapsed');
+      section.style.display = 'none';
+    }
+
+    // Update icon
+    if (icon) {
+      icon.textContent = section.style.display === 'none' ? '▼' : '▲';
+    }
+
+    // Save state
+    localStorage.setItem('topSectionHidden', section.style.display === 'none');
+  }
+};
+
+/**
+ * Toggle main section (content section with tables)
+ * Handles opening/closing of main content sections across all pages
+ */
+window.toggleMainSection = function () {
+  const currentPath = window.location.pathname;
+
+  // Special handling for notes page
+  if (currentPath.includes('/notes')) {
+    const section = document.getElementById('notesMainSection');
+    const toggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+    if (section && toggleBtn) {
+      const isHidden = section.style.display === 'none';
+      section.style.display = isHidden ? 'block' : 'none';
+
+      // Update icon only
+      if (icon) {
+        icon.textContent = isHidden ? '▲' : '▼';
+      }
+
+      // Save state
+      localStorage.setItem('notesMainSectionHidden', !isHidden);
+    }
+    return;
+  }
+
+  // Special handling for database display page (multiple sections)
+  if (currentPath.includes('/db_display')) {
+    // Find the specific section that was clicked
+    const clickedButton = window.event ? window.event.target.closest('button') : null;
+    const currentSection = clickedButton ? clickedButton.closest('.content-section') : null;
+
+    if (currentSection) {
+      const sectionBody = currentSection.querySelector('.section-body');
+      const toggleBtn = currentSection.querySelector('button[onclick*="toggleMainSection"]');
+      const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+      const sectionTitle = currentSection.querySelector('.table-title').textContent.trim();
+
+      if (sectionBody) {
+        const isCollapsed = sectionBody.style.display === 'none';
+
+        if (isCollapsed) {
+          sectionBody.style.display = 'block';
+          if (icon) {icon.textContent = '▲';}
+        } else {
+          sectionBody.style.display = 'none';
+          if (icon) {icon.textContent = '▼';}
+        }
+
+        // Save state for this specific section
+        localStorage.setItem(`databaseSectionHidden_${sectionTitle}`, !isCollapsed);
+      }
+    }
+    return;
+  }
+
+  // Regular handling for other pages
+  const section = document.querySelector('.content-section .section-body');
+  const toggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
+  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
+
+  if (section) {
+    const isCollapsed = section.classList.contains('collapsed') || section.style.display === 'none';
+
+    if (isCollapsed) {
+      section.classList.remove('collapsed');
+      section.style.display = 'block';
+    } else {
+      section.classList.add('collapsed');
+      section.style.display = 'none';
+    }
+
+    // Update icon
+    if (icon) {
+      icon.textContent = section.style.display === 'none' ? '▼' : '▲';
+    }
+
+    // Save state
+    localStorage.setItem('mainSectionHidden', section.style.display === 'none');
+  }
+};
+
+/**
+ * Toggle specific section by ID
+ * Generic function for toggling any section by its ID
+ * @param {string} sectionId - The ID of the section to toggle
+ */
+window.toggleSection = function (sectionId) {
+  console.log('🔧 ui-utils.js toggleSection called with:', sectionId);
+  
+  // Try to find section by ID first
+  let section = document.getElementById(sectionId);
+  let sectionBody = null;
+  let toggleBtn = null;
+  let icon = null;
+
+  if (section) {
+    // Section found by ID
+    sectionBody = section.querySelector('.section-body');
+    toggleBtn = section.querySelector('button[onclick*="toggleSection"]');
+    icon = toggleBtn ? toggleBtn.querySelector('.filter-icon, .filter-arrow') : null;
+  } else {
+    // Try to find by data-section attribute
+    section = document.querySelector(`[data-section="${sectionId}"]`);
+    if (section) {
+      sectionBody = section.querySelector('.section-body');
+      toggleBtn = section.querySelector('button[onclick*="toggleSection"]');
+      icon = toggleBtn ? toggleBtn.querySelector('.filter-icon, .filter-arrow') : null;
+    }
+  }
+
+  if (section && sectionBody) {
+    const isCollapsed = sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none';
+
+    if (isCollapsed) {
+      sectionBody.classList.remove('collapsed');
+      sectionBody.style.display = 'block';
+    } else {
+      sectionBody.classList.add('collapsed');
+      sectionBody.style.display = 'none';
+    }
+
+    // Update icon
+    if (icon) {
+      icon.textContent = sectionBody.style.display === 'none' ? '▼' : '▲';
+    }
+
+    // Save state
+    localStorage.setItem(`${sectionId}SectionHidden`, sectionBody.style.display === 'none');
+    
+    console.log(`✅ Section ${sectionId} toggled:`, sectionBody.style.display === 'none' ? 'collapsed' : 'expanded');
+  } else {
+    console.warn(`❌ Section ${sectionId} not found`);
+  }
+};
+
+/**
+ * Toggle all sections at once
+ * Handles opening/closing of all content sections at once
+ */
+window.toggleAllSections = function () {
+  const sections = document.querySelectorAll('.content-section');
+  const allCollapsed = Array.from(sections).every(section => {
+    const sectionBody = section.querySelector('.section-body');
+    return sectionBody && (sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none');
+  });
+
+  sections.forEach(section => {
+    const sectionId = section.getAttribute('data-section') || section.id;
+    const sectionBody = section.querySelector('.section-body');
+    const toggleBtn = section.querySelector('button[onclick*="toggleSection"]');
+    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon, .filter-arrow') : null;
+
+    if (sectionBody) {
+      if (allCollapsed) {
+        // Open all sections
+        sectionBody.classList.remove('collapsed');
+        sectionBody.style.display = 'block';
+        if (icon) { icon.textContent = '▲'; }
+      } else {
+        // Close all sections
+        sectionBody.classList.add('collapsed');
+        sectionBody.style.display = 'none';
+        if (icon) { icon.textContent = '▼'; }
+      }
+
+      // Save state
+      if (sectionId) {
+        localStorage.setItem(`${sectionId}SectionHidden`, sectionBody.style.display === 'none');
+      }
+    }
+  });
+
+  console.log(`✅ All sections ${allCollapsed ? 'opened' : 'closed'}`);
+};
+
+/**
+ * Restore section states from localStorage
+ * Called on page load to restore previous section states
+ */
+window.restoreSectionStates = function () {
+  // Restore top section state
+  const topSectionHidden = localStorage.getItem('topSectionHidden') === 'true';
+  const topSection = document.querySelector('.top-section .section-body');
+  const topToggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
+  const topIcon = topToggleBtn ? topToggleBtn.querySelector('.filter-icon, .filter-arrow') : null;
+
+  if (topSection && topSectionHidden) {
+    topSection.classList.add('collapsed');
+    topSection.style.display = 'none';
+    if (topIcon) { topIcon.textContent = '▼'; }
+  }
+
+  // Restore main section states
+  const sections = document.querySelectorAll('.content-section');
+  sections.forEach(section => {
+    const sectionId = section.getAttribute('data-section') || section.id;
+    if (sectionId) {
+      const sectionHidden = localStorage.getItem(`${sectionId}SectionHidden`) === 'true';
+      const sectionBody = section.querySelector('.section-body');
+      const toggleBtn = section.querySelector('button[onclick*="toggleSection"]');
+      const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon, .filter-arrow') : null;
+
+      if (sectionBody && sectionHidden) {
+        sectionBody.classList.add('collapsed');
+        sectionBody.style.display = 'none';
+        if (icon) { icon.textContent = '▼'; }
+      }
+    }
+  });
+
+  console.log('✅ Section states restored from localStorage');
+};
+
 // ===== EXPORTS =====
 
 // Export table refresh system functions
@@ -844,7 +1117,21 @@ window.autoRefreshCurrentPage = autoRefreshCurrentPage;
 // Export account utility functions
 window.showSecondConfirmationModal = showSecondConfirmationModal;
 
-// Initialize modal backdrop when DOM is loaded
+// Export section toggle system functions
+window.toggleTopSection = window.toggleTopSection;
+window.toggleMainSection = window.toggleMainSection;
+window.toggleSection = window.toggleSection;
+window.toggleAllSections = window.toggleAllSections;
+window.restoreSectionStates = window.restoreSectionStates;
+
+// Initialize modal backdrop and restore section states when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
   initializeModalBackdrop();
+  
+  // Restore section states after a short delay to ensure all elements are loaded
+  setTimeout(() => {
+    if (typeof window.restoreSectionStates === 'function') {
+      window.restoreSectionStates();
+    }
+  }, 100);
 });

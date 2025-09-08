@@ -37,7 +37,22 @@
                         </button>
                     </div>
                     <div class="section-body">
-                        <h2>מצב המערכות והפילטרים</h2>
+                        <!-- כאן נכנס התוכן של גוף הסקשן -->
+                        <h4>תוכן סקשן עליון</h4>
+                    </div>
+                </div>
+                <!-- UI Content Section Top End -->  
+
+                <!-- UI Content Section 1 Start-->
+                <div class="content-section">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>📊 מצב המערכות - כותרת סקשן 1</h2>
+                        <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
+                            <span class="filter-arrow">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="card">
@@ -79,14 +94,13 @@
                         </div>
                     </div>
                 </div>
-                <!-- UI Content Section Top End -->  
+                <!-- UI Content Section 1 End -->   
 
-
-                <!-- UI Content Section 1 Start-->
+                <!-- UI Content Section 2 Start-->
                 <div class="content-section">
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-                        <h2>📈 טבלת ביצועים - כותרת סקשן 1</h2>
+                        <h2>📈 טבלת ביצועים - כותרת סקשן 2</h2>
                         <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
                             <span class="filter-arrow">▼</span>
                         </button>
@@ -193,13 +207,13 @@
                         </div>
                     </div>
                 </div>
-                <!-- UI Content Section 1 End--> 
+                <!-- UI Content Section 2 End--> 
 
-                <!-- UI Content Section 2 Start-->
+                <!-- UI Content Section 3 Start-->
                 <div class="content-section">
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-                        <h2>🔍 מידע דיבאג - כותרת סקשן 2</h2>
+                        <h2>🔍 מידע דיבאג - כותרת סקשן 3</h2>
                         <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
                             <span class="filter-arrow">▼</span>
                         </button>
@@ -248,7 +262,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- UI Content Section 2 End--> 
+                <!-- UI Content Section 3 End--> 
             </div>
         </div>
     </div>
@@ -474,34 +488,6 @@
             }
         }
 
-        // פונקציה לעדכון סטטיסטיקות מהירות
-        function updateQuickStats() {
-            const tradesTable = document.querySelector('table[data-table-type="test_trades"]');
-            if (tradesTable) {
-                const rows = tradesTable.querySelectorAll('tbody tr');
-                let openCount = 0;
-                let closedCount = 0;
-                
-                rows.forEach(row => {
-                    const statusCell = row.querySelector('td[data-status]');
-                    if (statusCell) {
-                        const status = statusCell.getAttribute('data-status');
-                        if (status === 'פתוח') {
-                            openCount++;
-                        } else if (status === 'סגור') {
-                            closedCount++;
-                        }
-                    }
-                });
-                
-                const totalCount = rows.length;
-                
-                document.getElementById('openTradesCount').textContent = openCount;
-                document.getElementById('closedTradesCount').textContent = closedCount;
-                document.getElementById('totalTradesCount').textContent = totalCount;
-            }
-        }
-
         // פונקציות בדיקה
         function testStatusFilter() {
             log('בדיקת פילטר סטטוס...');
@@ -537,7 +523,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             log('עמוד בדיקת ראש הדף נטען');
             updateDebugInfo();
-            updateQuickStats();
         });
     </script>
 </body>

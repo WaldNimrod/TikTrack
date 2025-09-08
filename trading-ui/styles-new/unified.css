@@ -341,7 +341,6 @@ line-height: 1.5;
 /* HTML root settings */
 html {
 direction: rtl;
-lang: he;
 }
 
 /* Body base styles - מבוסס על apple-theme.css */
@@ -1046,6 +1045,7 @@ overflow: hidden !important;
 box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08) !important;
 border: 2px solid #e9ecef !important;
 }
+
 
 /* כפתורי מיון */
 .sortable-header,
@@ -2830,66 +2830,15 @@ transform: translateY(0);
 }
 */
 
-/* מפריע לתפריט הראשי - הגדרות dropdown-item ישנות
 
-*/
 
-/* מפריע לתפריט הראשי - הגדרות dropdown-arrow ו-dropdown-toggle ישנות
-
-*/
-
-/* מפריע לתפריט הראשי - הגדרות תת-תפריטים ישנות
-/* תת-תפריטים */
-
-/* התאמה למסכים קטנים */
-@media (max-width: 768px) {
-
-}
-*/
-
-/* ===== סגנונות תת-תפריט רגיל - חסרים ===== */
-
-/* סגנונות .submenu רגיל */
-
-@keyframes submenuFadeIn {
-from {
-opacity: 0;
-transform: translateX(10px);
-}
-to {
-opacity: 1;
-transform: translateX(0);
-}
-}
-
-/* מפריע לתפריט הראשי - הגדרות filter-toggle ישנות
-/* סגנונות פילטרים */
-
-*/
 
 /* סגנונות התראות */
 
 /* אזור פילטרים */
 
-/* מפריע לתפריט הראשי - הגדרות filter-dropdown ו-filter-toggle ישנות
 
-*/
 
-/* מפריע לתפריט הראשי - הגדרות filter-menu ישנות
-/* סגנונות בסיס לפילטרים */
-
-/* סגנונות לפילטרים פתוחים */
-
-*/
-
-/* סגנונות רספונסיביים */
-@media (max-width: 1200px) {
-
-}
-
-@media (max-width: 768px) {
-
-}
 
 /* ===== 06-components/_entity-colors.css ===== */
 /**
@@ -6276,11 +6225,6 @@ display: block !important;
 */
 
 /* ===== תפריטי משנה עם שלוש רמות ===== */
-
-/* התאמה למסכים קטנים */
-@media (max-width: 768px) {
-
-}
 #unified-header {
 background: var(--apple-bg-elevated);
 border-bottom: 1px solid var(--apple-border-light);
@@ -6294,53 +6238,15 @@ z-index: 1000;
 
 /* סגנונות לוגו מורחבים */
 
-/* מפריע לתפריט הראשי - הגדרות dropdown-menu כפולות
-/* Dropdown menu styles */
 
-*/
-
-/* מפריע לתפריט הראשי - keyframes כפולים
-
-}
 
 /* סגנונות ניווט */
 
-/* חריגה לדף הבית - אין צל */
 
-/* חריגה לדף הבית - אין צל */
 
-/* חריגה לדף הבית - אין צל */
 
-/* מפריע לתפריט הראשי - הגדרות tiktrack-dropdown-menu ישנות
 
-*/
 
-/* Submenu styles */
-
-@keyframes submenuFadeIn {
-from {
-opacity: 0;
-transform: translateX(10px);
-}
-
-to {
-opacity: 1;
-transform: translateX(0);
-}
-}
-
-/* אפקט נוסף לתפריט הנפתח */
-
-/* תמיכה במכשירים ניידים */
-@media (max-width: 768px) {
-
-#unified-header .nav-menu {
-gap: 0;
-}
-
-}
-
-/* אנימציות נוספות */
 
 /* ===== סגנונות פילטרים ===== */
 
@@ -6519,10 +6425,6 @@ box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
 
 */
 
-/* התאמה למסכים קטנים */
-@media (max-width: 768px) {
-
-}
 
 /* ===== סגנונות כרטיסי התראות - רק בתוך ראש הדף ===== */
 #unified-header .alert-card-price {

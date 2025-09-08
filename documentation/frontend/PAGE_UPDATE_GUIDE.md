@@ -6,10 +6,12 @@
 
 מדריך זה מתאר את התהליך המלא לבניית עמוד חדש או עדכון עמוד קיים לתבנית הבסיס החדשה עם מבנה סקשנים נכון, תפריט מאוחד, וסגנונות מופרדים.
 
-## גרסאות קודמות
+## קבצים קשורים
 
-- **גרסה 1**: `PAGE_UPDATE_GUIDE_v1.md` - מדריך עדכון עמוד קיים לתבנית בסיס נכונה
-- **גרסה 2**: `PAGE_UPDATE_GUIDE.md` (נוכחי) - מדריך בניית עמוד מקיף
+- **תבנית בסיס**: `trading-ui/designs.html` - קובץ התבנית הבסיסי לכל עמוד
+- **תבנית מבנה**: `documentation/frontend/PAGE_STRUCTURE_TEMPLATE.md` - דוקומנטציה של מבנה העמוד הסטנדרטי
+- **גרסה 1**: `documentation/frontend/PAGE_UPDATE_GUIDE_v1.md` - מדריך עדכון עמוד קיים לתבנית בסיס נכונה
+- **גרסה 2**: `documentation/frontend/PAGE_UPDATE_GUIDE.md` (נוכחי) - מדריך בניית עמוד מקיף
 
 ## שלב 1: יישום נכון של התפריט ואלמנט הראש
 
@@ -59,7 +61,11 @@
 
 ### 2.1 העתקת קובץ התבנית
 ```bash
+# העתק את קובץ התבנית הבסיסי
 cp trading-ui/designs.html trading-ui/[page-name]-template.html
+
+# ראה גם: documentation/frontend/PAGE_STRUCTURE_TEMPLATE.md
+# למידע מפורט על מבנה העמוד הסטנדרטי
 ```
 
 ### 2.2 עדכון כותרת העמוד
@@ -179,6 +185,9 @@ rm trading-ui/header-test-template.html
 
 # העתק תבנית נקייה
 cp trading-ui/designs.html trading-ui/header-test-template.html
+
+# ראה גם: documentation/frontend/PAGE_STRUCTURE_TEMPLATE.md
+# למידע מפורט על מבנה העמוד הסטנדרטי
 ```
 
 ### צעד 2: עדכון כותרת העמוד

@@ -206,7 +206,7 @@
         .dropdown-submenu .submenu {
             position: absolute;
             top: 0;
-            right: calc(100% - 10px); /* הזזה ימינה ליצירת חפיפה */
+            right: calc(100% + 10px); /* הזזה שמאלה ליצירת חפיפה */
             background: white;
             border: 1px solid #e5e5e5;
             border-radius: 8px;

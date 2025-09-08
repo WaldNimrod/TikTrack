@@ -738,6 +738,7 @@ class HeaderSystem {
                       <a href="#" class="tiktrack-nav-link" onclick="clearDevelopmentCache(event)" 
                          title="נקה מטמון פיתוח">
                         <span class="nav-text" style="color: #ff0000; font-size: 1.2rem;">🧹</span>
+                        <span class="nav-text" style="color: #ff0000; font-size: 0.9rem; margin-right: 5px;">נקה Cache (פיתוח)</span>
                       </a>
                     </li>
                   </ul>
@@ -3210,7 +3211,7 @@ function createMenuHTML() {
                                 </ul>
                             </li>
                             <li class="tiktrack-nav-item">
-                                <a href="#" class="cache-clear-btn" title="ניקוי מטמון מלא">🧹</a>
+                                <a href="#" class="cache-clear-btn" title="ניקוי מטמון מלא" onclick="clearDevelopmentCache(event)">🧹 נקה Cache (פיתוח)</a>
                             </li>
                         </ul>
                     </nav>
@@ -5375,18 +5376,13 @@ async function clearDevelopmentCache(event) {
     }
 
     setTimeout(() => {
-      if (typeof window.showInfoNotification === 'function') {
-        console.log('✅ קורא ל-showInfoNotification - רענון בעוד רגע');
-        window.showInfoNotification('מידע', 'הדף ירענן בעוד רגע...');
-      } else {
-        console.log('❌ showInfoNotification לא זמין - רענון בעוד רגע');
-      }
+      console.log('🔄 רענון בעוד שנייה...');
       setTimeout(() => {
         // forced reload - bypass all cache
         console.log('🔄 מבצע רענון כפוי של הדף...');
         window.location.reload(true);
       }, 1000);
-    }, 3000);
+    }, 2000);
 
   } catch (error) {
     console.error('❌ שגיאה כללית בניקוי Cache:', error);

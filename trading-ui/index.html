@@ -17,12 +17,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Error Handlers -->
-    <script src="scripts/error-handlers.js"></script></head>
+    <script src="scripts/error-handlers.js"></script>
+    
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css"></head>
 
 <body>
+    <!-- Unified Header Container -->
+    <div id="unified-header"></div>
     <div class="page-body">
         <!-- unified-header ייווצר כאן אוטומטית -->
-        <div id="unified-header"></div>
+        <!-- <div id="unified-header"></div> -->
         <!-- באנר עיצובי עליון -->
         <div class="hero-banner">
             <div class="hero-bg-illustration">
@@ -66,15 +71,16 @@
                 </svg>
             </div>
 
+            <div class="hero-quick-links">
+                <a href="preferences-v2.html" class="quick-link-icon gradient-bg" title="העדפות V2 (מתקדם)">🚀</a>
+                <a href="preferences-v2.html" class="quick-link-icon" title="הגדרות V2 (מתקדם)">⚙️</a>
+                <a href="#" class="quick-link-icon" title="עזרה">❓</a>
+                <a href="#" class="quick-link-icon" title="הודעות">🔔</a>
+                <a href="#" class="quick-link-icon" title="פרופיל">👤</a>
+            </div>
+
             <div class="hero-content">
                 <div class="hero-text">
-                    <div class="hero-quick-links">
-                        <a href="preferences-v2.html" class="quick-link-icon gradient-bg" title="העדפות V2 (מתקדם)">🚀</a>
-                        <a href="preferences-v2.html" class="quick-link-icon" title="הגדרות V2 (מתקדם)">⚙️</a>
-                        <a href="#" class="quick-link-icon" title="עזרה">❓</a>
-                        <a href="#" class="quick-link-icon" title="הודעות">🔔</a>
-                        <a href="#" class="quick-link-icon" title="פרופיל">👤</a>
-                    </div>
                     <h1 class="hero-title">ברוכים הבאים ל-TikTrack</h1>
                     <p class="hero-subtitle">המערכת המתקדמת לניהול תיק השקעות אישי</p>
                     <div class="hero-stats">
@@ -706,7 +712,7 @@
     <script src="scripts/linked-items.js"></script>
     <script src="scripts/page-utils.js"></script>
     <script src="scripts/main.js"></script>
-            <script src="scripts/header-system.js?v=20250901_3"></script>
+            <!-- <script src="scripts/header-system.js?v=20250115_navigation_fix?v=20250901_3"></script> -->
   <script src="scripts/notification-system.js"></script>
   <script src="scripts/validation-utils.js"></script>    <!-- alerts.js הוסר - לא נחוץ בעמוד זה -->
     <script src="scripts/alert-service.js"></script>
@@ -924,8 +930,8 @@
             }
         }
 
-        // HeaderSystem יאתחל אוטומטית דרך header-system.js
-        
+        // HeaderSystem מוסר - לא נחוץ לדף הבית
+        /*
         // אתחול ידני של התפריט
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🔄 DOM Content Loaded - Manual Header Init');
@@ -962,6 +968,7 @@
                 console.log('❌ HeaderSystem class not loaded');
             }
         });
+        */
         
         // לוג שגיאות
         window.addEventListener('error', function(e) {

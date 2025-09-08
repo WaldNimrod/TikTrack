@@ -828,11 +828,18 @@ window.restoreDesignsSectionState = function () {
  * Handles opening/closing of individual content sections
  */
 window.toggleSection = function (sectionId) {
-  // העברה ל-header-system.js
+  console.log('🔧 main.js toggleSection called with:', sectionId);
+  // העברה למערכת התפריט החדשה
+  if (window.toggleFilterSection) {
+    console.log('✅ Using toggleFilterSection');
+    return window.toggleFilterSection(sectionId);
+  }
+  // Fallback למערכת הישנה
   if (window.headerSystem && window.headerSystem.toggleSection) {
+    console.log('✅ Using headerSystem.toggleSection');
     return window.headerSystem.toggleSection(sectionId);
   }
-  console.warn('HeaderSystem not available for toggleSection');
+  console.warn('❌ No toggle function available for toggleSection');
 };
 
 /**

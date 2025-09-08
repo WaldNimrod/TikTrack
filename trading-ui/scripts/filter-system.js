@@ -149,17 +149,17 @@ class FilterSystem {
 
     // פילטר סטטוס (דינמי)
     if (this.currentFilters.status.length > 0 && table.fields.includes('status')) {
-      filteredData = this.applyStatusFilter(filteredData, this.currentFilters.status);
+      filteredData = FilterSystem.applyStatusFilter(filteredData, this.currentFilters.status);
     }
 
     // פילטר סוג (דינמי)
     if (this.currentFilters.type.length > 0 && table.fields.includes('type')) {
-      filteredData = this.applyTypeFilter(filteredData, this.currentFilters.type);
+      filteredData = FilterSystem.applyTypeFilter(filteredData, this.currentFilters.type);
     }
 
     // פילטר חשבון (דינמי)
     if (this.currentFilters.account.length > 0 && table.fields.includes('account_id')) {
-      filteredData = this.applyAccountFilter(filteredData, this.currentFilters.account);
+      filteredData = FilterSystem.applyAccountFilter(filteredData, this.currentFilters.account);
     }
 
     table.filteredData = filteredData;
@@ -265,6 +265,12 @@ class FilterSystem {
     if (selectedTypes.length === 0) {return data;}
 
     return data.filter(item => selectedTypes.includes(item.type));
+  }
+
+  static applyStatusFilter(data, selectedStatuses) {
+    if (selectedStatuses.length === 0) {return data;}
+
+    return data.filter(item => selectedStatuses.includes(item.status));
   }
 
   // פילטר חשבון

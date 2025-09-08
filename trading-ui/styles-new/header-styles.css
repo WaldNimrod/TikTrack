@@ -236,6 +236,7 @@
             visibility: hidden;
             transform: translateX(0); /* ללא הזזה נוספת */
             transition: all 0.3s ease;
+            transition-delay: 0.1s; /* עיכוב בפתיחה */
             z-index: 1002;
             list-style: none;
         }
@@ -246,10 +247,7 @@
             transform: translateX(0);
         }
         
-        /* הארכת זמן הסגירה - הוספת delay */
-        .dropdown-submenu .dropdown-menu {
-            transition-delay: 0.1s; /* עיכוב בפתיחה */
-        }
+        /* הארכת זמן הסגירה - הוספת delay - REMOVED DUPLICATE */
         
         .dropdown-submenu:hover .dropdown-menu {
             transition-delay: 0s; /* ללא עיכוב בפתיחה */

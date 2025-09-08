@@ -78,9 +78,6 @@
 --secondary-color: var(--apple-gray-6);
 --success-color: var(--apple-green);
 --text-muted: var(--apple-text-tertiary);
---background-color-dark: #1a1a1a;
---border-color-dark: #404040;
---surface-color-dark: #2a2a2a;
 }
 
 /* ===== 01-settings/_colors-dynamic.css ===== */
@@ -1763,7 +1760,7 @@ font-weight: 600;
 font-size: 14px;
 margin-bottom: 4px;
 line-height: 1.3;
-color: #1a1a1a;
+color: var(--apple-text-primary);
 }
 
 .notification-message {

@@ -657,7 +657,7 @@ class HeaderSystem {
                         <!-- 📊 ניהול נתונים -->
                         <li class="dropdown-submenu">
                           <a class="tiktrack-dropdown-item" href="#">📊 ניהול נתונים</a>
-                          <ul class="submenu">
+                          <ul class="level3-submenu">
                             <li><a class="tiktrack-dropdown-item" href="/alerts">התראות</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/executions">עסקעות</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
@@ -670,7 +670,7 @@ class HeaderSystem {
                         <!-- ⚙️ הגדרות מערכת -->
                         <li class="dropdown-submenu">
                           <a class="tiktrack-dropdown-item" href="#">⚙️ הגדרות מערכת</a>
-                          <ul class="submenu">
+                          <ul class="level3-submenu">
                             <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/test-preferences-v2-integration.html">בדיקת אינטגרציה V2</a></li>
                           </ul>
@@ -679,7 +679,7 @@ class HeaderSystem {
                         <!-- 🔧 כלי פיתוח -->
                         <li class="dropdown-submenu">
                           <a class="tiktrack-dropdown-item" href="#">🔧 כלי פיתוח</a>
-                          <ul class="submenu">
+                          <ul class="level3-submenu">
                             <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
                           </ul>
@@ -696,7 +696,7 @@ class HeaderSystem {
                         <!-- 🗑️ פעולות מערכת -->
                         <li class="dropdown-submenu">
                           <a class="tiktrack-dropdown-item" href="#">🗑️ פעולות מערכת</a>
-                          <ul class="submenu">
+                          <ul class="level3-submenu">
                             <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 ניהול מערכת</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/css-management">🎨 מנהל CSS וארכיטקטורה</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/crud-testing-dashboard">🧪 דשבורד בדיקות CRUD</a></li>
@@ -708,7 +708,7 @@ class HeaderSystem {
                         <!-- 🔍 בדיקות ונתונים -->
                         <li class="dropdown-submenu">
                           <a class="tiktrack-dropdown-item" href="#">🔍 בדיקות ונתונים</a>
-                          <ul class="submenu">
+                          <ul class="level3-submenu">
                             <li><a class="tiktrack-dropdown-item" href="/external-data-dashboard">דשבורד נתונים חיצוניים</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/server-monitor">ניטור שרת</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/cache-test">בדיקת Cache</a></li>
@@ -720,7 +720,7 @@ class HeaderSystem {
                         <!-- 🎨 ממשק משתמש -->
                         <li class="dropdown-submenu">
                           <a class="tiktrack-dropdown-item" href="#">🎨 ממשק משתמש</a>
-                          <ul class="submenu">
+                          <ul class="level3-submenu">
                             <li><a class="tiktrack-dropdown-item" href="/style_demonstration">הדגמת סגנונות</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/numeric-value-colors-demo">הדגמת צבעים לערכים מספריים</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
@@ -3175,7 +3175,7 @@ function createMenuHTML() {
                                     <!-- ניטור וניהול -->
                                     <li class="dropdown-submenu">
                                         <a class="tiktrack-dropdown-item" href="#">ניטור וניהול</a>
-                                        <ul class="submenu">
+                                        <ul class="level3-submenu">
                                             <li><a class="tiktrack-dropdown-item" href="/system-management">system-management</a></li>
                                             <li><a class="tiktrack-dropdown-item" href="/server-monitor">server-monitor</a></li>
                                             <li><a class="tiktrack-dropdown-item" href="/notifications-center">notifications-center</a></li>
@@ -3186,7 +3186,7 @@ function createMenuHTML() {
                                     <!-- ממשק משתמש -->
                                     <li class="dropdown-submenu">
                                         <a class="tiktrack-dropdown-item" href="#">ממשק משתמש</a>
-                                        <ul class="submenu">
+                                        <ul class="level3-submenu">
                                             <li><a class="tiktrack-dropdown-item" href="/css-management">css-management</a></li>
                                             <li><a class="tiktrack-dropdown-item" href="/numeric-value-colors-demo">numeric-value-colors-demo</a></li>
                                             <li><a class="tiktrack-dropdown-item" href="/style_demonstration">style_demonstration</a></li>
@@ -3198,7 +3198,7 @@ function createMenuHTML() {
                                     <!-- כלים -->
                                     <li class="dropdown-submenu">
                                         <a class="tiktrack-dropdown-item" href="#">כלים</a>
-                                        <ul class="submenu">
+                                        <ul class="level3-submenu">
                                             <li><a class="tiktrack-dropdown-item" href="/external-data-dashboard">external-data-dashboard</a></li>
                                             <li><a class="tiktrack-dropdown-item" href="/linter-realtime-monitor">linter-realtime-monitor</a></li>
                                             <li><a class="tiktrack-dropdown-item" href="/crud-testing-dashboard">crud-testing-dashboard</a></li>

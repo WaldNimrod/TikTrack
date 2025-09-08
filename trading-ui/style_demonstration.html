@@ -37,11 +37,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Error Handlers -->
-    <script src="scripts/error-handlers.js"></script></head>
+    <script src="scripts/error-handlers.js"></script>
+    
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_dropdown_fix_v2"></head>
 
 <body class="styles-test-page">
     <!-- General background -->
     <div class="background-wrapper">
+        <!-- Unified Header Container -->
+        <div id="unified-header"></div>
 
         <!-- unified-header ייווצר כאן אוטומטית -->
 
@@ -1566,8 +1571,8 @@
         /* Dark Mode Support */
         @media (prefers-color-scheme: dark) {
             .style-section {
-                background: var(--background-color-dark, #1a1a1a);
-                border-color: var(--border-color-dark, #404040);
+                background: var(--apple-bg-elevated);
+                border-color: var(--apple-border-light);
             }
 
             .button-group,
@@ -1928,6 +1933,9 @@
             }
         });
     </script>
+    
+    <!-- Header System -->
+    <script src="scripts/header-system.js?v=20250115_navigation_fix"></script>
 
 </body>
 

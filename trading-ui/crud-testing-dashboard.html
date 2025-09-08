@@ -16,10 +16,14 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
+    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_dropdown_fix_v2">
+    
     <!-- Error Handlers -->
     <script src="scripts/error-handlers.js"></script></head>
 <body>
-    <div class="background-wrapper">
+    <!-- Unified Header Container -->
+    <div id="unified-header"></div>    <div class="background-wrapper">
         <div class="page-body">
             <!-- Header placeholder -->
             <div id="unified-header"></div>
@@ -104,7 +108,7 @@
     <script src="/static/js/notification-system.js"></script>
     <script src="/static/js/ui-utils.js"></script>
     <script src="/static/js/main.js"></script>
-    <script src="/static/js/header-system.js"></script>
+    <script src="scripts/header-system.js?v=20250115_navigation_fix"></script>
     
     <script>
         // פונקציות JavaScript יוכנסו כאן

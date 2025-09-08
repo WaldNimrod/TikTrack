@@ -39,57 +39,7 @@
   left: 100% !important;
 }
 
-/* סטטוסים בסיסיים */
-.status-badge.status-open {
-  background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(67, 160, 71, 0.15) 100%) !important;
-  color: #2e7d32 !important;
-  border: 1px solid rgba(76, 175, 80, 0.3) !important;
-  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.15) !important;
-}
-
-.status-badge.status-closed {
-  background: linear-gradient(135deg, rgba(33, 150, 243, 0.15) 0%, rgba(30, 136, 229, 0.15) 100%) !important;
-  color: #1565c0 !important;
-  border: 1px solid rgba(33, 150, 243, 0.3) !important;
-  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15) !important;
-}
-
-.status-badge.status-cancelled {
-  background: linear-gradient(135deg, rgba(255, 152, 0, 0.15) 0%, rgba(255, 143, 0, 0.15) 100%) !important;
-  color: #ef6c00 !important;
-  border: 1px solid rgba(255, 152, 0, 0.3) !important;
-  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.15) !important;
-}
-
-.status-badge.status-active {
-  background: linear-gradient(135deg, rgba(100, 181, 246, 0.2) 0%, rgba(66, 165, 245, 0.2) 100%) !important;
-  color: #1976d2 !important;
-  box-shadow: 0 2px 6px rgba(100, 181, 246, 0.1) !important;
-}
-
-.status-badge.status-inactive {
-  background: linear-gradient(135deg, rgba(158, 158, 158, 0.2) 0%, rgba(117, 117, 117, 0.2) 100%) !important;
-  color: #616161 !important;
-  box-shadow: 0 2px 6px rgba(158, 158, 158, 0.1) !important;
-}
-
-.status-badge.status-pending {
-  background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(255, 143, 0, 0.2) 100%) !important;
-  color: #f57c00 !important;
-  box-shadow: 0 2px 6px rgba(255, 152, 0, 0.1) !important;
-}
-
-.status-badge.status-completed {
-  background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(67, 160, 71, 0.2) 100%) !important;
-  color: #388e3c !important;
-  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.1) !important;
-}
-
-.status-badge.status-archived {
-  background: linear-gradient(135deg, rgba(158, 158, 158, 0.2) 0%, rgba(117, 117, 117, 0.2) 100%) !important;
-  color: #616161 !important;
-  box-shadow: 0 2px 6px rgba(158, 158, 158, 0.1) !important;
-}
+/* סטטוסים בסיסיים - מוגדרים ב-unified.css */
 
 /* ===== תגיות חשיבות ===== */
 .priority-badge {

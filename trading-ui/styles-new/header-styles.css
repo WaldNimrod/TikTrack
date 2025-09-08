@@ -195,12 +195,12 @@
         
         /* Bootstrap 5 submenu positioning - RTL version - REMOVED DUPLICATE */
         
-        .tiktrack-dropdown-menu .dropdown-submenu:hover .submenu {
+        .tiktrack-dropdown-menu .dropdown-submenu:hover .level3-submenu {
             transform: translateX(0);
         }
 
 .tiktrack-dropdown-menu li,
-.submenu li {
+.level3-submenu li {
     list-style: none;
 }
 
@@ -488,8 +488,44 @@
     box-shadow: none !important;
 }
 
-.submenu {
-    z-index: 1001 !important;
+/* Level 3 Submenu - רמה 3 של התפריט */
+.level3-submenu {
+    position: absolute !important;
+    top: 0 !important;
+    right: calc(100% - 10px) !important; /* RTL: הזזה ימינה לחפיפה */
+    left: auto !important;
+    margin-top: -1px !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    background: white !important;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    min-width: 180px !important;
+    padding: 0.5rem 0 !important;
+    display: none !important;
+    z-index: 1002 !important;
+    list-style: none !important;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(0);
+    transition: all 0.3s ease;
+    transition-delay: 0.1s;
+}
+
+.level3-submenu:hover {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    transition-delay: 0s;
+}
+
+.dropdown-submenu:hover .level3-submenu {
+    display: block !important;
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    transition-delay: 0s;
 }
 
 .separator {

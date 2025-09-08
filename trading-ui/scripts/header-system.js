@@ -1078,8 +1078,15 @@ class HeaderSystem {
           e.preventDefault();
           e.stopPropagation();
 
-          if (window.resetAllFilters) {
+          console.log('🔄 Reset filters button clicked');
+          if (window.resetFiltersToDefaults) {
+            window.resetFiltersToDefaults().catch(error => {
+              console.error('❌ Error resetting filters to defaults:', error);
+            });
+          } else if (window.resetAllFilters) {
             window.resetAllFilters();
+          } else {
+            console.warn('⚠️ Reset filters function not found');
           }
           return;
         }
@@ -1088,8 +1095,11 @@ class HeaderSystem {
           e.preventDefault();
           e.stopPropagation();
 
+          console.log('🧹 Clear filters button clicked');
           if (window.clearAllFilters) {
             window.clearAllFilters();
+          } else {
+            console.warn('⚠️ Clear filters function not found');
           }
           return;
         }
@@ -1147,23 +1157,7 @@ class HeaderSystem {
 
     // כפתור הצג/הסתר פילטרים
 
-    // כפתור איפוס פילטרים
-    document.addEventListener('click', e => {
-      if (e.target && typeof e.target.closest === 'function') {
-        if (e.target.closest('#resetFiltersBtn')) {
-          HeaderSystem.resetAllFilters();
-        }
-      }
-    });
-
-    // כפתור ניקוי פילטרים
-    document.addEventListener('click', e => {
-      if (e.target && typeof e.target.closest === 'function') {
-        if (e.target.closest('#clearFiltersBtn')) {
-          this.clearAllFilters();
-        }
-      }
-    });
+    // כפתורי איפוס וניקוי פילטרים - מועברים למעלה עם שאר ה-event listeners
 
     // כפתור נקה חיפוש
     document.addEventListener('click', e => {
@@ -1761,9 +1755,14 @@ class HeaderSystem {
 
   setupFilterItemEventListeners() {
     // Event listeners לפריטי פילטר תאריכים
-    const dateItems = document.querySelectorAll('#dateRangeFilterMenu .filter-item');
+    const dateItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
     dateItems.forEach(item => {
       item.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('🔧 Date range filter item clicked:', item.getAttribute('data-range'));
+        
         const range = item.getAttribute('data-range');
         const text = item.textContent.trim();
 
@@ -1781,17 +1780,22 @@ class HeaderSystem {
     });
 
     // Event listeners לפריטי פילטר סטטוס
-    const statusItems = document.querySelectorAll('#statusFilterMenu .filter-item');
+    const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
     statusItems.forEach(item => {
       item.addEventListener('click', e => {
-        // const _status = item.getAttribute('data-value');
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('🔧 Status filter item clicked:', item.getAttribute('data-value'));
 
         // toggle selection
         item.classList.toggle('selected');
 
         // collect all selected statuses
-        const selectedStatuses = Array.from(document.querySelectorAll('#statusFilterMenu .filter-item.selected'))
+        const selectedStatuses = Array.from(document.querySelectorAll('#statusFilterMenu .status-filter-item.selected'))
           .map(selectedItem => selectedItem.getAttribute('data-value'));
+
+        console.log('📋 Selected statuses:', selectedStatuses);
 
         // update display text
         const statusElement = document.getElementById('selectedStatus');
@@ -1815,16 +1819,19 @@ class HeaderSystem {
     });
 
     // Event listeners לפריטי פילטר טיפוס
-    const typeItems = document.querySelectorAll('#typeFilterMenu .filter-item');
+    const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
     typeItems.forEach(item => {
       item.addEventListener('click', e => {
-        // const _type = item.getAttribute('data-value');
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('🔧 Type filter item clicked:', item.getAttribute('data-value'));
 
         // toggle selection
         item.classList.toggle('selected');
 
         // collect all selected types
-        const selectedTypes = Array.from(document.querySelectorAll('#typeFilterMenu .filter-item.selected'))
+        const selectedTypes = Array.from(document.querySelectorAll('#typeFilterMenu .type-filter-item.selected'))
           .map(selectedTypeItem => selectedTypeItem.getAttribute('data-value'));
 
         // update display text
@@ -1852,13 +1859,16 @@ class HeaderSystem {
     const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
     accountItems.forEach(item => {
       item.addEventListener('click', e => {
-        // const _account = item.getAttribute('data-value');
+        e.preventDefault();
+        e.stopPropagation();
+        
+        console.log('🔧 Account filter item clicked:', item.getAttribute('data-value'));
 
         // toggle selection
         item.classList.toggle('selected');
 
         // collect all selected accounts
-        const selectedAccounts = Array.from(document.querySelectorAll('#accountFilterMenu .filter-item.selected'))
+        const selectedAccounts = Array.from(document.querySelectorAll('#accountFilterMenu .account-filter-item.selected'))
           .map(selectedAccountItem => selectedAccountItem.getAttribute('data-value'));
 
         // update display text
@@ -4855,117 +4865,154 @@ window.getActiveTableContainer = getActiveTableContainer;
 /**
  * איפוס פילטרים לפי הגדרות ברירת מחדל
  */
-function resetFiltersToDefaults(defaultStatus, defaultType, defaultAccount, defaultDateRange, defaultSearch) {
-  // resetFiltersToDefaults called with
+async function resetFiltersToDefaults() {
+  console.log('🔄 Resetting filters to user defaults...');
+  
+  try {
+    // שימוש במערכת העדפות V2 החדשה
+    if (window.filterSystem && typeof window.filterSystem.resetToUserDefaults === 'function') {
+      await window.filterSystem.resetToUserDefaults();
+      return;
+    }
+    
+    // Fallback - השיטה הישנה
+    console.warn('⚠️ FilterSystem not available, using fallback');
+    
+    // קבלת העדפות מהמערכת החדשה
+    const defaultStatusFilter = await getCurrentPreference('defaultStatusFilter') || 'all';
+    const defaultTypeFilter = await getCurrentPreference('defaultTypeFilter') || 'all';
+    const defaultAccountFilter = await getCurrentPreference('defaultAccountFilter') || 'all';
+    const defaultDateRangeFilter = await getCurrentPreference('defaultDateRangeFilter') || 'all';
+    const defaultSearchFilter = await getCurrentPreference('defaultSearchFilter') || '';
 
-  // המרת ערכים מאנגלית לעברית
-  const statusTranslation = {
-    'all': 'הכול',
-    'open': 'פתוח',
-    'closed': 'סגור',
-    'canceled': 'מבוטל',
-  };
+    // המרת ערכים מאנגלית לעברית
+    const statusTranslation = {
+      'all': 'הכול',
+      'open': 'פתוח',
+      'closed': 'סגור',
+      'canceled': 'מבוטל',
+    };
 
-  const typeTranslation = {
-    'all': 'הכול',
-    'swing': 'סווינג',
-    'investment': 'השקעה',
-    'passive': 'פסיבי',
-  };
+    const typeTranslation = {
+      'all': 'הכול',
+      'swing': 'סווינג',
+      'investment': 'השקעה',
+      'passive': 'פסיבי',
+    };
 
-  const dateRangeTranslation = {
-    'all': 'כל זמן',
-    'today': 'היום',
-    'yesterday': 'אתמול',
-    'this_week': 'השבוע',
-    'last_week': 'שבוע קודם',
-    'this_month': 'החודש',
-    'last_month': 'חודש קודם',
-    'this_year': 'השנה',
-    'last_year': 'שנה קודמת',
-  };
+    const dateRangeTranslation = {
+      'all': 'כל זמן',
+      'today': 'היום',
+      'yesterday': 'אתמול',
+      'this_week': 'השבוע',
+      'last_week': 'שבוע קודם',
+      'this_month': 'החודש',
+      'last_month': 'חודש קודם',
+      'this_year': 'השנה',
+      'last_year': 'שנה קודמת',
+    };
 
-  // איפוס פילטר סטטוס
-  const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
-  statusItems.forEach(item => item.classList.remove('selected'));
+    // איפוס פילטר סטטוס
+    const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
+    statusItems.forEach(item => item.classList.remove('selected'));
 
-  const statusValue = statusTranslation[defaultStatus] || 'הכול';
-  // Looking for status value
-  const selectedStatusItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === statusValue);
-  if (selectedStatusItem) {
-    selectedStatusItem.classList.add('selected');
-    // Found and selected status item
-  } else {
-    // אם לא נמצא, בחר "הכול"
-    const allStatusItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === 'הכול');
-    if (allStatusItem) {
-      allStatusItem.classList.add('selected');
-      // Status not found, selected "הכול"
+    const statusValue = statusTranslation[defaultStatusFilter] || 'הכול';
+    // Looking for status value
+    const selectedStatusItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === statusValue);
+    if (selectedStatusItem) {
+      selectedStatusItem.classList.add('selected');
+      // Found and selected status item
+    } else {
+      // אם לא נמצא, בחר "הכול"
+      const allStatusItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === 'הכול');
+      if (allStatusItem) {
+        allStatusItem.classList.add('selected');
+        // Status not found, selected "הכול"
+      }
+    }
+
+    // איפוס פילטר טיפוס
+    const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
+    typeItems.forEach(item => item.classList.remove('selected'));
+
+    const typeValue = typeTranslation[defaultTypeFilter] || 'הכול';
+    // Looking for type value
+    const selectedTypeItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === typeValue);
+    if (selectedTypeItem) {
+      selectedTypeItem.classList.add('selected');
+      // Found and selected type item
+    } else {
+      // אם לא נמצא, בחר "הכול"
+      const allTypeItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === 'הכול');
+      if (allTypeItem) {
+        allTypeItem.classList.add('selected');
+        // Type not found, selected "הכול"
+      }
+    }
+
+    // איפוס פילטר חשבון - נדלג על זה כרגע כי יש בעיות
+    // Skipping account filter reset for now
+
+    // איפוס פילטר תאריכים
+    const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+    dateRangeItems.forEach(item => item.classList.remove('selected'));
+
+    const dateRangeValue = dateRangeTranslation[defaultDateRangeFilter] || 'כל זמן';
+    // Looking for date range value
+    const selectedDateRangeItem = Array.from(dateRangeItems).find(item => item.getAttribute('data-value') === dateRangeValue);
+    if (selectedDateRangeItem) {
+      selectedDateRangeItem.classList.add('selected');
+      // Found and selected date range item
+    } else {
+      // אם לא נמצא, בחר "כל זמן"
+      const allDateRangeItem = Array.from(dateRangeItems).find(item => item.getAttribute('data-value') === 'כל זמן');
+      if (allDateRangeItem) {
+        allDateRangeItem.classList.add('selected');
+        // Date range not found, selected "כל זמן"
+      }
+    }
+
+    // איפוס פילטר חיפוש
+    const searchInput = document.querySelector('#searchFilterInput');
+    if (searchInput) {
+      searchInput.value = defaultSearchFilter || '';
+    }
+
+    // עדכון טקסטים
+    updateStatusFilterText();
+    updateTypeFilterText();
+    updateAccountFilterText();
+
+    // עדכון טקסט פילטר תאריכים - הפעלת הפונקציה במקום עדכון ישיר
+    const selectedDateRangeElement = document.getElementById('selectedDateRange');
+    if (selectedDateRangeElement && dateRangeValue !== 'כל זמן') {
+      // הפעלת הפונקציה שמטפלת בתרגום התאריכים
+      selectDateRangeOption(dateRangeValue);
+    } else if (selectedDateRangeElement) {
+      selectedDateRangeElement.textContent = 'כל זמן';
+    }
+
+    // הפעלת פילטרים
+    if (window.filterSystem) {
+      window.filterSystem.updateFilter('status', []);
+      window.filterSystem.updateFilter('type', []);
+      window.filterSystem.updateFilter('account', []);
+      window.filterSystem.updateFilter('dateRange', '');
+      window.filterSystem.updateFilter('search', '');
+    }
+
+    // שמירת מצב
+    HeaderSystem.saveFilterStates();
+    
+    console.log('✅ Filters reset to user defaults successfully');
+    
+  } catch (error) {
+    console.error('❌ Error resetting filters to defaults:', error);
+    // Fallback - ניקוי כל הפילטרים
+    if (window.clearAllFilters) {
+      window.clearAllFilters();
     }
   }
-
-  // איפוס פילטר טיפוס
-  const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
-  typeItems.forEach(item => item.classList.remove('selected'));
-
-  const typeValue = typeTranslation[defaultType] || 'הכול';
-  // Looking for type value
-  const selectedTypeItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === typeValue);
-  if (selectedTypeItem) {
-    selectedTypeItem.classList.add('selected');
-    // Found and selected type item
-  } else {
-    // אם לא נמצא, בחר "הכול"
-    const allTypeItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === 'הכול');
-    if (allTypeItem) {
-      allTypeItem.classList.add('selected');
-      // Type not found, selected "הכול"
-    }
-  }
-
-  // איפוס פילטר חשבון - נדלג על זה כרגע כי יש בעיות
-  // Skipping account filter reset for now
-
-  // איפוס פילטר תאריכים
-  const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
-  dateRangeItems.forEach(item => item.classList.remove('selected'));
-
-  const dateRangeValue = dateRangeTranslation[defaultDateRange] || 'כל זמן';
-  // Looking for date range value
-  const selectedDateRangeItem = Array.from(dateRangeItems).find(item => item.getAttribute('data-value') === dateRangeValue);
-  if (selectedDateRangeItem) {
-    selectedDateRangeItem.classList.add('selected');
-    // Found and selected date range item
-  } else {
-    // אם לא נמצא, בחר "כל זמן"
-    const allDateRangeItem = Array.from(dateRangeItems).find(item => item.getAttribute('data-value') === 'כל זמן');
-    if (allDateRangeItem) {
-      allDateRangeItem.classList.add('selected');
-      // Date range not found, selected "כל זמן"
-    }
-  }
-
-  // איפוס פילטר חיפוש
-  const searchInput = document.querySelector('#searchFilterInput');
-  if (searchInput) {
-    searchInput.value = defaultSearch || '';
-  }
-
-  // עדכון טקסטים
-  updateStatusFilterText();
-  updateTypeFilterText();
-  updateAccountFilterText();
-
-  // עדכון טקסט פילטר תאריכים - הפעלת הפונקציה במקום עדכון ישיר
-  const selectedDateRangeElement = document.getElementById('selectedDateRange');
-  if (selectedDateRangeElement && dateRangeValue !== 'כל זמן') {
-    // הפעלת הפונקציה שמטפלת בתרגום התאריכים
-    selectDateRangeOption(dateRangeValue);
-  } else if (selectedDateRangeElement) {
-    selectedDateRangeElement.textContent = 'כל זמן';
-  }
-
-  // Filters reset to default preferences
 }
 
 /**
@@ -5091,6 +5138,27 @@ async function getCurrentPreference(key) {
       }
     } catch (v2Error) {
       console.log(`🔄 V2 not available, trying V1: ${v2Error.message}`);
+    }
+    
+    // נסה גם עם preferences-v2-compatibility.js
+    if (window.preferencesV2 && window.preferencesV2.preferences) {
+      const v2Preferences = window.preferencesV2.preferences;
+      const keyMappings = {
+        'defaultStatusFilter': 'defaultFilters.status',
+        'defaultTypeFilter': 'defaultFilters.type',
+        'defaultAccountFilter': 'defaultFilters.account',
+        'defaultDateRangeFilter': 'defaultFilters.dateRange',
+        'defaultSearchFilter': 'defaultFilters.search'
+      };
+      
+      const v2Path = keyMappings[key];
+      if (v2Path) {
+        const value = v2Path.split('.').reduce((obj, k) => obj?.[k], v2Preferences);
+        if (value !== undefined) {
+          console.log(`✅ Found V2 compatibility preference ${key}: ${value}`);
+          return value;
+        }
+      }
     }
     
     // Fallback ל-V1 API

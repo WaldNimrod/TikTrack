@@ -90,34 +90,22 @@ let ENTITY_BACKGROUND_COLORS = {
  */
 let STATUS_COLORS = {
   'open': {
-    light: '#d4edda',
-    medium: '#28a745',
-    dark: '#1e7e34',
-    border: '#c3e6cb'
+    light: '#cce7ff',
+    medium: '#0066cc',
+    dark: '#004499',
+    border: '#b3d9ff'
   },
   'closed': {
-    light: '#f8d7da',
-    medium: '#dc3545',
-    dark: '#c82333',
-    border: '#f5c6cb'
+    light: '#e6ccff',
+    medium: '#8c00cc',
+    dark: '#660099',
+    border: '#d9b3ff'
   },
-  'pending': {
-    light: '#fff3cd',
-    medium: '#ffc107',
-    dark: '#e0a800',
-    border: '#ffeaa7'
-  },
-  'active': {
-    light: '#d1ecf1',
-    medium: '#17a2b8',
-    dark: '#138496',
-    border: '#bee5eb'
-  },
-  'inactive': {
-    light: '#e2e3e5',
-    medium: '#6c757d',
-    dark: '#545b62',
-    border: '#d6d8db'
+  'cancelled': {
+    light: '#ffe6cc',
+    medium: '#ff6600',
+    dark: '#cc4400',
+    border: '#ffd9b3'
   }
 };
 

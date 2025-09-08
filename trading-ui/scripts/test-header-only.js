@@ -20,7 +20,7 @@ function testStatusColors() {
         console.log('✅ getStatusColor function available');
         
         // בדיקת צבעי סטטוס שונים
-        const statuses = ['open', 'closed', 'cancelled', 'pending', 'active', 'inactive'];
+        const statuses = ['open', 'closed', 'cancelled'];
         statuses.forEach(status => {
             const color = getStatusColor(status, 'medium');
             const bgColor = getStatusBackgroundColor(status);
@@ -44,10 +44,7 @@ function testStatusColors() {
     const statusVars = [
         '--status-open-color',
         '--status-closed-color', 
-        '--status-cancelled-color',
-        '--status-pending-color',
-        '--status-active-color',
-        '--status-inactive-color'
+        '--status-cancelled-color'
     ];
     
     statusVars.forEach(varName => {
@@ -70,7 +67,7 @@ function updateStatusColorDisplay() {
         
         if (statusBadge) {
             // הסרת מחלקות סטטוס קיימות
-            statusBadge.classList.remove('status-open', 'status-closed', 'status-cancelled', 'status-pending', 'status-active', 'status-inactive');
+            statusBadge.classList.remove('status-open', 'status-closed', 'status-cancelled');
             
             // הוספת מחלקת סטטוס נכונה
             switch(status) {
@@ -82,15 +79,6 @@ function updateStatusColorDisplay() {
                     break;
                 case 'מבוטל':
                     statusBadge.classList.add('status-cancelled');
-                    break;
-                case 'ממתין':
-                    statusBadge.classList.add('status-pending');
-                    break;
-                case 'פעיל':
-                    statusBadge.classList.add('status-active');
-                    break;
-                case 'לא פעיל':
-                    statusBadge.classList.add('status-inactive');
                     break;
             }
         }

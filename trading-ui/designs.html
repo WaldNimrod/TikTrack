@@ -16,6 +16,16 @@
     
     <!-- Header System Script -->
     <script src="scripts/header-system.js?v=v34_fixes"></script>
+    
+    <!-- Dynamic Color System Scripts -->
+    <script src="scripts/color-scheme-system.js"></script>
+    
+    <!-- Preferences System Scripts -->
+    <script src="scripts/preferences-v2.js"></script>
+    <script src="scripts/preferences-v2-compatibility.js"></script>
+    
+    <!-- Color Demo Toggle Script -->
+    <script src="scripts/color-demo-toggle.js"></script>
 </head>
 
 <body>
@@ -32,7 +42,7 @@
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>🏠 עמוד עיצובים - כותרת סקשן עליון</h2>
-                        <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
                             <span class="filter-arrow">▼</span>
                         </button>
                     </div>
@@ -44,11 +54,11 @@
                 <!-- UI Content Section Top End -->  
 
                 <!-- UI Content Section 1 Start-->
-                <div class="content-section">
+                <div class="content-section" id="section1">
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>📊 ביצועים - כותרת סקשן 1</h2>
-                        <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
                             <span class="filter-arrow">▼</span>
                         </button>
                     </div>
@@ -60,11 +70,11 @@
                 <!-- UI Content Section 1 End -->   
 
                 <!-- UI Content Section 2 Start-->
-                <div class="content-section">
+                <div class="content-section" id="section2">
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>🎨 עיצוב וסגנונות - כותרת סקשן 2</h2>
-                        <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
                             <span class="filter-arrow">▼</span>
                         </button>
                     </div>
@@ -76,11 +86,11 @@
                 <!-- UI Content Section 2 End--> 
 
                 <!-- UI Content Section 3 Start-->
-                <div class="content-section">
+                <div class="content-section" id="section3">
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>📋 רכיבי ממשק - כותרת סקשן 3</h2>
-                        <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
                             <span class="filter-arrow">▼</span>
                         </button>
                     </div>
@@ -93,5 +103,19 @@
             </div>
         </div>
     </div>
+
+    <!-- Core System Scripts -->
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/table-mappings.js"></script>
+    <script src="scripts/date-utils.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/linked-items.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/main.js"></script>
+    
+    <!-- Page-specific scripts will be added here -->
 </body>
 </html>

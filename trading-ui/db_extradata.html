@@ -16,6 +16,16 @@
     
     <!-- Header System Script -->
     <script src="scripts/header-system.js?v=v36_updated"></script>
+    
+    <!-- Dynamic Color System Scripts -->
+    <script src="scripts/color-scheme-system.js"></script>
+    
+    <!-- Preferences System Scripts -->
+    <script src="scripts/preferences-v2.js"></script>
+    <script src="scripts/preferences-v2-compatibility.js"></script>
+    
+    <!-- Color Demo Toggle Script -->
+    <script src="scripts/color-demo-toggle.js"></script>
 </head>
 
 <body>
@@ -32,7 +42,7 @@
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h1>📋 טבלאות עזר - כותרת סקשן עליון</h1>
-                        <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
                             <span class="filter-arrow">▼</span>
                         </button>
                     </div>
@@ -53,11 +63,11 @@
                 <!-- UI Content Section Top End -->  
 
                 <!-- UI Content Section 1 Start-->
-                <div class="content-section">
+                <div class="content-section extra-data-page" data-section="currencies">
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>💱 טבלת מטבעות - כותרת סקשן 1</h2>
-                        <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="toggleSection('currencies')" title="הצג/הסתר סקשן">
                             <span class="filter-arrow">▼</span>
                         </button>
                     </div>
@@ -109,11 +119,11 @@
                 <!-- UI Content Section 1 End -->   
 
                 <!-- UI Content Section 2 Start-->
-                <div class="content-section">
+                <div class="content-section extra-data-page" data-section="note_relation_types">
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>🔗 טבלת סוגי קישור הערות - כותרת סקשן 2</h2>
-                        <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="toggleSection('note_relation_types')" title="הצג/הסתר סקשן">
                             <span class="filter-arrow">▼</span>
                         </button>
                     </div>
@@ -158,11 +168,11 @@
                 <!-- UI Content Section 2 End--> 
 
                 <!-- UI Content Section 3 Start-->
-                <div class="content-section">
+                <div class="content-section extra-data-page" data-section="trigger_buttons">
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>🔘 כפתורי טריגרים - כותרת סקשן 3</h2>
-                        <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="toggleSection('trigger_buttons')" title="הצג/הסתר סקשן">
                             <span class="filter-arrow">▼</span>
                         </button>
                     </div>
@@ -240,19 +250,7 @@
     <script src="scripts/header-system.js?v=20250115_level3_fix"></script>
     <script src="scripts/alert-service.js"></script>
     <script src="scripts/active-alerts-component.js?v=20250830_1"></script>
+    <!-- Page-specific script -->
     <script src="scripts/db-extradata.js"></script>
-
-    <!-- Page initialization -->
-    <script>
-        // Page initialization
-        document.addEventListener('DOMContentLoaded', function () {
-            console.log('טבלאות עזר - עמוד נטען');
-            
-            // Initialize filter system if available
-            if (window.filterSystem) {
-                window.filterSystem.initialize();
-            }
-        });
-    </script>
 </body>
 </html>

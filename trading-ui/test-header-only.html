@@ -16,6 +16,16 @@
     
     <!-- Header System Script -->
     <script src="scripts/header-system.js?v=v35_updated"></script>
+    
+    <!-- Dynamic Color System Scripts -->
+    <script src="scripts/color-scheme-system.js"></script>
+    
+    <!-- Preferences System Scripts -->
+    <script src="scripts/preferences-v2.js"></script>
+    <script src="scripts/preferences-v2-compatibility.js"></script>
+    
+    <!-- Color Demo Toggle Script -->
+    <script src="scripts/color-demo-toggle.js"></script>
 </head>
 
 <body>
@@ -32,7 +42,7 @@
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h1>🔧 בדיקת ראש הדף - כותרת סקשן עליון</h1>
-                        <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
                             <span class="filter-arrow">▼</span>
                         </button>
                     </div>
@@ -83,11 +93,11 @@
 
 
                 <!-- UI Content Section 1 Start-->
-                <div class="content-section">
+                <div class="content-section" id="performance">
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>📈 טבלת ביצועים - כותרת סקשן 1</h2>
-                        <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="toggleSection('performance')" title="הצג/הסתר סקשן">
                             <span class="filter-arrow">▼</span>
                         </button>
                     </div>
@@ -196,11 +206,11 @@
                 <!-- UI Content Section 1 End--> 
 
                 <!-- UI Content Section 2 Start-->
-                <div class="content-section">
+                <div class="content-section" id="debug">
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>🔍 מידע דיבאג - כותרת סקשן 2</h2>
-                        <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="toggleSection('debug')" title="הצג/הסתר סקשן">
                             <span class="filter-arrow">▼</span>
                         </button>
                     </div>
@@ -253,292 +263,19 @@
         </div>
     </div>
 
-    <script>
-        // פונקציה לעדכון מידע דיבאג פילטרים
-        function updateFilterDebugInfo() {
-            // עדכון מידע דיבאג - קורא ישירות מה-DOM
-            const statusText = document.getElementById('selectedStatus');
-            const typeText = document.getElementById('selectedType');
-            const accountText = document.getElementById('selectedAccount');
-            const dateRangeText = document.getElementById('selectedDateRange');
-            const searchInput = document.getElementById('searchFilterInput');
-
-            // עדכון מידע דיבאג
-            document.getElementById('statusDebug').textContent = statusText ? statusText.textContent : 'כל הסטטוסים';
-            document.getElementById('typeDebug').textContent = typeText ? typeText.textContent : 'כל הסוגים';
-            document.getElementById('accountDebug').textContent = accountText ? accountText.textContent : 'כל החשבונות';
-            document.getElementById('dateDebug').textContent = dateRangeText ? dateRangeText.textContent : 'כל התאריכים';
-        }
-
-        // פונקציות בדיקה
-        function log(message) {
-            const logElement = document.getElementById('testLog');
-            if (logElement) {
-                const timestamp = new Date().toLocaleTimeString();
-                logElement.innerHTML += `<p>[${timestamp}] ${message}</p>`;
-                logElement.scrollTop = logElement.scrollHeight;
-            }
-            console.log(message);
-        }
-
-        function updateStatus(elementId, status, isSuccess = true) {
-            const element = document.getElementById(elementId);
-            if (element) {
-                element.textContent = status;
-                element.style.color = isSuccess ? 'green' : 'red';
-            }
-        }
-
-        // פונקציית debug למצב פילטרים
-        function updateDebugInfo() {
-            // עדכון מצב מערכות
-            if (typeof window.filterSystem !== 'undefined') {
-                updateStatus('filterSystemStatus', '✅ זמין');
-            } else {
-                updateStatus('filterSystemStatus', '❌ לא זמין', false);
-            }
-
-            // עדכון מצב אזור פילטרים
-            const filtersSection = document.getElementById('headerFilters');
-            if (filtersSection) {
-                const isVisible = filtersSection.style.display !== 'none';
-                updateStatus('filtersSectionStatus', isVisible ? '✅ פתוח' : '❌ סגור', isVisible);
-            }
-
-            // עדכון מצב פילטרים נוכחי
-            updateCurrentFilterStatus();
-
-            // עדכון טווח תאריכים
-            updateDateRangeInfo();
-
-            // עדכון סטטיסטיקות טבלאות
-            updateTableStats();
-
-            // עדכון מידע דיבאג פילטרים
-            updateFilterDebugInfo();
-        }
-
-        // פונקציה לעדכון מצב פילטרים נוכחי
-        function updateCurrentFilterStatus() {
-            // פילטר סטטוס
-            const statusText = document.getElementById('selectedStatus');
-            if (statusText) {
-                document.getElementById('currentStatusFilter').textContent = statusText.textContent;
-            }
-
-            // פילטר טיפוס
-            const typeText = document.getElementById('selectedType');
-            if (typeText) {
-                document.getElementById('currentTypeFilter').textContent = typeText.textContent;
-            }
-
-            // פילטר חשבון
-            const accountText = document.getElementById('selectedAccount');
-            if (accountText) {
-                document.getElementById('currentAccountFilter').textContent = accountText.textContent;
-            }
-
-            // פילטר תאריכים
-            const dateRangeText = document.getElementById('selectedDateRange');
-            if (dateRangeText) {
-                document.getElementById('currentDateRangeFilter').textContent = dateRangeText.textContent;
-            }
-
-            // פילטר חיפוש
-            const searchInput = document.getElementById('searchFilterInput');
-            if (searchInput) {
-                const searchValue = searchInput.value.trim();
-                document.getElementById('currentSearchFilter').textContent = searchValue || 'אין';
-            }
-        }
-
-        // פונקציה לעדכון מידע טווח תאריכים
-        function updateDateRangeInfo() {
-            // בדיקה אם יש מערכת פילטרים פעילה
-            if (!window.filterSystem || !window.filterSystem.currentFilters) {
-                document.getElementById('dateRangeStart').textContent = 'לא נבחר';
-                document.getElementById('dateRangeEnd').textContent = 'לא נבחר';
-                document.getElementById('dateRangeDescription').textContent = 'לא נבחר';
-                return;
-            }
-
-            const dateRange = window.filterSystem.currentFilters.dateRange;
-            if (!dateRange || dateRange === 'כל זמן') {
-                document.getElementById('dateRangeStart').textContent = 'לא נבחר';
-                document.getElementById('dateRangeEnd').textContent = 'לא נבחר';
-                document.getElementById('dateRangeDescription').textContent = 'לא נבחר';
-                return;
-            }
-
-            const today = new Date();
-            let startDate, endDate, description;
-
-            switch (dateRange) {
-                case 'היום':
-                    startDate = endDate = today;
-                    description = 'היום בלבד';
-                    break;
-                case 'אתמול':
-                    startDate = endDate = new Date(today.getTime() - 24 * 60 * 60 * 1000);
-                    description = 'אתמול בלבד';
-                    break;
-                case 'השבוע':
-                    startDate = new Date(today.getTime() - today.getDay() * 24 * 60 * 60 * 1000);
-                    endDate = today;
-                    description = 'מתחילת השבוע הקלנדרי ועד היום';
-                    break;
-                case 'שבוע':
-                    startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-                    endDate = today;
-                    description = '7 ימים אחרונים';
-                    break;
-                case 'MTD':
-                    startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-                    endDate = today;
-                    description = 'מתחילת החודש';
-                    break;
-                case 'YTD':
-                    startDate = new Date(today.getFullYear(), 0, 1);
-                    endDate = today;
-                    description = 'מתחילת השנה';
-                    break;
-                case '30 יום':
-                    startDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-                    endDate = today;
-                    description = '30 יום אחרונים';
-                    break;
-                case '60 יום':
-                    startDate = new Date(today.getTime() - 60 * 24 * 60 * 60 * 1000);
-                    endDate = today;
-                    description = '60 יום אחרונים';
-                    break;
-                case '90 יום':
-                    startDate = new Date(today.getTime() - 90 * 24 * 60 * 60 * 1000);
-                    endDate = today;
-                    description = '90 יום אחרונים';
-                    break;
-                case 'שנה':
-                    startDate = new Date(today.getTime() - 365 * 24 * 60 * 60 * 1000);
-                    endDate = today;
-                    description = '365 יום אחרונים';
-                    break;
-                case 'שבוע קודם':
-                    const startOfThisWeek = new Date(today.getTime() - today.getDay() * 24 * 60 * 60 * 1000);
-                    const startOfLastWeek = new Date(startOfThisWeek.getTime() - 7 * 24 * 60 * 60 * 1000);
-                    const endOfLastWeek = new Date(startOfLastWeek.getTime() + 6 * 24 * 60 * 60 * 1000);
-                    startDate = startOfLastWeek;
-                    endDate = endOfLastWeek;
-                    description = 'השבוע הקודם';
-                    break;
-                case 'חודש קודם':
-                    const startOfThisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-                    const startOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-                    const endOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-                    startDate = startOfLastMonth;
-                    endDate = endOfLastMonth;
-                    description = 'החודש הקודם';
-                    break;
-                case 'שנה קודמת':
-                    startDate = new Date(today.getFullYear() - 1, 0, 1);
-                    endDate = new Date(today.getFullYear() - 1, 11, 31);
-                    description = 'השנה הקודמת';
-                    break;
-                default:
-                    startDate = endDate = null;
-                    description = 'לא מוגדר';
-            }
-
-            if (startDate && endDate) {
-                document.getElementById('dateRangeStart').textContent = startDate.toLocaleDateString('he-IL');
-                document.getElementById('dateRangeEnd').textContent = endDate.toLocaleDateString('he-IL');
-                document.getElementById('dateRangeDescription').textContent = description;
-            }
-        }
-
-        // פונקציה לעדכון סטטיסטיקות טבלאות
-        function updateTableStats() {
-            // סטטיסטיקות טבלת טריידים
-            const tradesTable = document.querySelector('table[data-table-type="test_trades"]');
-            if (tradesTable) {
-                const totalRows = tradesTable.querySelectorAll('tbody tr').length;
-                const visibleRows = tradesTable.querySelectorAll('tbody tr:not([style*="display: none"])').length;
-                document.getElementById('tradesTableStats').textContent = `${visibleRows}/${totalRows} שורות נראות`;
-            }
-
-            // סטטיסטיקות טבלת בדיקה
-            const testTable = document.querySelector('table[data-table-type="test_table"]');
-            if (testTable) {
-                const totalRows = testTable.querySelectorAll('tbody tr').length;
-                const visibleRows = testTable.querySelectorAll('tbody tr:not([style*="display: none"])').length;
-                document.getElementById('testTableStats').textContent = `${visibleRows}/${totalRows} שורות נראות`;
-            }
-        }
-
-        // פונקציה לעדכון סטטיסטיקות מהירות
-        function updateQuickStats() {
-            const tradesTable = document.querySelector('table[data-table-type="test_trades"]');
-            if (tradesTable) {
-                const rows = tradesTable.querySelectorAll('tbody tr');
-                let openCount = 0;
-                let closedCount = 0;
-                
-                rows.forEach(row => {
-                    const statusCell = row.querySelector('td[data-status]');
-                    if (statusCell) {
-                        const status = statusCell.getAttribute('data-status');
-                        if (status === 'פתוח') {
-                            openCount++;
-                        } else if (status === 'סגור') {
-                            closedCount++;
-                        }
-                    }
-                });
-                
-                const totalCount = rows.length;
-                
-                document.getElementById('openTradesCount').textContent = openCount;
-                document.getElementById('closedTradesCount').textContent = closedCount;
-                document.getElementById('totalTradesCount').textContent = totalCount;
-            }
-        }
-
-        // פונקציות בדיקה
-        function testStatusFilter() {
-            log('בדיקת פילטר סטטוס...');
-            // כאן תוכל להוסיף לוגיקה לבדיקת פילטר סטטוס
-        }
-
-        function testTypeFilter() {
-            log('בדיקת פילטר סוג...');
-            // כאן תוכל להוסיף לוגיקה לבדיקת פילטר סוג
-        }
-
-        function testAccountFilter() {
-            log('בדיקת פילטר חשבון...');
-            // כאן תוכל להוסיף לוגיקה לבדיקת פילטר חשבון
-        }
-
-        function testDateFilter() {
-            log('בדיקת פילטר תאריך...');
-            // כאן תוכל להוסיף לוגיקה לבדיקת פילטר תאריך
-        }
-
-        function testSearchFilter() {
-            log('בדיקת חיפוש חופשי...');
-            // כאן תוכל להוסיף לוגיקה לבדיקת חיפוש חופשי
-        }
-
-        function showActiveContainer() {
-            log('הצגת קונטיינר פעיל...');
-            // כאן תוכל להוסיף לוגיקה להצגת קונטיינר פעיל
-        }
-
-        // אתחול העמוד
-        document.addEventListener('DOMContentLoaded', function() {
-            log('עמוד בדיקת ראש הדף נטען');
-            updateDebugInfo();
-            updateQuickStats();
-        });
-    </script>
+    <!-- Core System Scripts -->
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/table-mappings.js"></script>
+    <script src="scripts/date-utils.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/linked-items.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/main.js"></script>
+    
+    <!-- Page-specific script -->
+    <script src="scripts/test-header-only.js"></script>
 </body>
 </html>

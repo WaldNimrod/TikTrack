@@ -438,7 +438,344 @@ grep "UI Content Section.*Start\|UI Content Section.*End" trading-ui/page-name.h
 - **אין כפילות**: כל תוכן פעם אחת בלבד
 - **מספור מדויק**: סקשנים ממוספרים 1, 2, 3... ללא קפיצות
 
-### צעד 13: בדיקות חובה אחרי עדכון עמוד
+### צעד 13: הוספת מזהי טבלאות
+
+#### 13.1 זיהוי מזהי הטבלאות הנדרשים
+לפני הבדיקות הסופיות, יש להוסיף לכל הקונטיינרים המכילים טבלאות את המזהה הנכון בהתאם לעמוד עליו עובדים או כותרת הטבלה במידה ויש מספר טבלאות.
+
+#### 13.2 טבלת מזהי עמודים
+| שם העמוד בעברית | כתובת | מזהה סגנון | הערות |
+|------------------|--------|-------------|-------|
+| **טיקרים** | `/tickers` | `tickers-page` | ✅ |
+| **חשבונות** | `/accounts` | `accounts-page` | ✅ |
+| **התראות** | `/alerts` | `alerts-page` | ✅ |
+| **ביצועים** | `/executions` | `executions-page` | ✅ |
+| **מעקב** | `/trades` | `tracking-page` | ✅ |
+| **העדפות** | `/preferences` | `preferences-page` | ✅ |
+| **תזרימי מזומנים** | `/cash_flows` | `cash-flows-page` | ✅ |
+| **תוכניות מסחר** | `/trade_plans` | `planning-page` | ✅ |
+| **הערות** | `/notes` | `notes-page` | ✅ |
+| **טבלאות עזר** | `/db_extradata` | `extra-data-page` | ✅ עם data-section |
+
+#### 13.3 עמודים ללא מזהה ספציפי
+- **עמוד ראשי** (`/`) - אין מזהה ספציפי
+- **דוחות** (`/research`) - אין מזהה ספציפי  
+- **בדיקת כותרת** (`/test-header-only`) - אין מזהה ספציפי
+- **מסד נתונים** (`/db_display`) - אין מזהה ספציפי
+
+#### 13.4 הוספת המזהה לקונטיינר
+```html
+<!-- דוגמה: עמוד טיקרים -->
+<div class="content-section tickers-page" data-section="tickers">
+    <!-- תוכן הטבלה -->
+</div>
+
+<!-- דוגמה: עמוד טבלאות עזר עם מספר סקשנים -->
+<div class="content-section extra-data-page" data-section="currencies">
+    <!-- תוכן טבלת מטבעות -->
+</div>
+
+<div class="content-section extra-data-page" data-section="note_relation_types">
+    <!-- תוכן טבלת סוגי קישור הערות -->
+</div>
+```
+
+#### 13.5 בדיקת הוספת המזהה
+```bash
+# בדוק שהמזהה נוסף נכון
+grep "content-section.*-page" trading-ui/page-name.html
+
+# בדוק data-section אם קיים
+grep "data-section=" trading-ui/page-name.html
+```
+
+#### 13.6 עדכון רשימת המשימות
+אם אין מזהה בטבלה למעלה - לא להוסיף אבל לסמן את זה בטבלת המשימות הכללית.
+
+### צעד 14: בדיקה ותיקון כפתורי פתיחה וסגירה
+
+#### 14.1 בדיקת כפתורים קיימים
+לאחר שילוב התוכן, יש לבדוק ולתקן את כל כפתורי הפתיחה והסגירה של הסקשנים.
+
+```bash
+# בדוק שכל הכפתורים קיימים
+grep "filter-toggle-btn" trading-ui/page-name.html
+
+# בדוק שכל הכפתורים מחוברים לפונקציות
+grep "onclick.*toggle" trading-ui/page-name.html
+```
+
+#### 14.2 הוספת כפתורים חסרים
+אם חסרים כפתורים, יש להוסיף אותם לפי התבנית:
+
+**כפתור סקשן עליון:**
+```html
+<button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
+    <span class="filter-arrow">▼</span>
+</button>
+```
+
+**כפתור סקשן תוכן:**
+```html
+<button class="filter-toggle-btn" onclick="toggleSection('sectionId')" title="הצג/הסתר סקשן">
+    <span class="filter-arrow">▼</span>
+</button>
+```
+
+#### 14.3 הוספת מזהים לסקשנים
+כל סקשן תוכן צריך מזהה ייחודי:
+
+**אפשרות 1: ID**
+```html
+<div class="content-section" id="sectionId">
+```
+
+**אפשרות 2: data-section (מומלץ לעמודים עם מזהי טבלאות)**
+```html
+<div class="content-section extra-data-page" data-section="sectionId">
+```
+
+#### 14.4 ניהול מצבים שונים
+
+##### **הוספת סקשן חדש:**
+1. הוסף את הסקשן עם ID או data-section ייחודי
+2. הוסף כפתור פתיחה/סגירה עם `onclick="toggleSection('sectionId')"`
+3. עדכן את מספור הסקשנים והערות
+
+##### **הסרת סקשן:**
+1. הסר את כל הסקשן (div, כפתור, תוכן)
+2. עדכן את מספור הסקשנים הנותרים
+3. עדכן את כל ההערות והמספור
+
+##### **שינוי סדר סקשנים:**
+1. העבר את הסקשנים בסדר הנכון
+2. עדכן את מספור הסקשנים (1, 2, 3...)
+3. עדכן את כל ההערות והמספור
+4. **שמור על ה-ID או data-section המקורי** - אל תשנה אותם!
+
+##### **שינוי שם סקשן:**
+1. עדכן את הכותרת בסקשן
+2. **אל תשנה את ה-ID או data-section** - זה ישבור את שמירת המצב
+3. אם חייב לשנות, עדכן גם את ה-onclick בכפתור
+
+#### 14.5 בדיקת תפקוד הכפתורים
+```bash
+# בדוק שכל הכפתורים מחוברים נכון
+grep "onclick.*toggleSection" trading-ui/page-name.html
+
+# בדוק שכל הסקשנים יש להם מזהים
+grep "id=\|data-section=" trading-ui/page-name.html
+
+# בדוק שאין כפילות במזהים
+grep "id=" trading-ui/page-name.html | sort | uniq -d
+```
+
+#### 14.6 כללים חשובים
+- **סקשן עליון**: תמיד `onclick="toggleTopSection()"`
+- **סקשני תוכן**: תמיד `onclick="toggleSection('sectionId')"`
+- **מזהים ייחודיים**: כל סקשן צריך מזהה ייחודי
+- **שמירת מצב**: המזהים נשמרים ב-localStorage - אל תשנה אותם!
+- **עקביות**: השתמש באותו סוג מזהה (ID או data-section) בכל העמוד
+
+### צעד 15: חיבור מערכת הצבעים הדינמית ומערכת ההעדפות
+
+#### 15.1 סקריפטים שכבר כלולים בתבנית
+התבנית הבסיס (`designs.html`) כבר כוללת את הסקריפטים הנדרשים:
+
+**בחלק ה-HEAD:**
+```html
+<!-- Dynamic Color System Scripts -->
+<script src="scripts/color-scheme-system.js"></script>
+
+<!-- Preferences System Scripts -->
+<script src="scripts/preferences-v2.js"></script>
+<script src="scripts/preferences-v2-compatibility.js"></script>
+
+<!-- Color Demo Toggle Script -->
+<script src="scripts/color-demo-toggle.js"></script>
+```
+
+**בסוף העמוד (לפני סגירת body):**
+```html
+<!-- Core System Scripts -->
+<script src="scripts/console-cleanup.js"></script>
+<script src="scripts/translation-utils.js"></script>
+<script src="scripts/data-utils.js"></script>
+<script src="scripts/ui-utils.js"></script>
+<script src="scripts/table-mappings.js"></script>
+<script src="scripts/date-utils.js"></script>
+<script src="scripts/tables.js"></script>
+<script src="scripts/linked-items.js"></script>
+<script src="scripts/page-utils.js"></script>
+<script src="scripts/main.js"></script>
+```
+
+#### 15.2 בדיקת סקריפטים קיימים
+לפני הוספת סקריפטים, בדוק אם הם כבר קיימים:
+
+```bash
+# בדוק סקריפטים בחלק ה-HEAD
+grep "color-scheme-system\|preferences-v2" trading-ui/page-name.html
+
+# בדוק סקריפטים בסוף העמוד
+grep "console-cleanup\|ui-utils\|main.js" trading-ui/page-name.html
+```
+
+#### 15.3 הוספת סקריפטים חסרים
+אם חסרים סקריפטים, הוסף אותם לפי הסדר הנכון:
+
+**אם חסרים סקריפטים בחלק ה-HEAD:**
+```html
+<!-- Dynamic Color System Scripts -->
+<script src="scripts/color-scheme-system.js"></script>
+
+<!-- Preferences System Scripts -->
+<script src="scripts/preferences-v2.js"></script>
+<script src="scripts/preferences-v2-compatibility.js"></script>
+
+<!-- Color Demo Toggle Script -->
+<script src="scripts/color-demo-toggle.js"></script>
+```
+
+**אם חסרים סקריפטים בסוף העמוד:**
+```html
+<!-- Core System Scripts -->
+<script src="scripts/console-cleanup.js"></script>
+<script src="scripts/translation-utils.js"></script>
+<script src="scripts/data-utils.js"></script>
+<script src="scripts/ui-utils.js"></script>
+<script src="scripts/table-mappings.js"></script>
+<script src="scripts/date-utils.js"></script>
+<script src="scripts/tables.js"></script>
+<script src="scripts/linked-items.js"></script>
+<script src="scripts/page-utils.js"></script>
+<script src="scripts/main.js"></script>
+```
+
+#### 15.4 מה המערכות מספקות
+
+**מערכת הצבעים הדינמית:**
+- צבעים מותאמים אישית לכל משתמש
+- ערכות נושא (light/dark/high-contrast)
+- צבעי ישויות (טריידים, חשבונות, טיקרים, וכו')
+- צבעי סטטוס (פתוח, סגור, בוטל, וכו')
+- עדכון בזמן אמת ללא טעינה מחדש
+
+**מערכת ההעדפות:**
+- הגדרות מערכת מותאמות אישית
+- פילטרים ברירת מחדל
+- הגדרות נתונים חיצוניים
+- תמיכה ב-V1 ו-V2
+- שמירה ב-API ובמסד נתונים
+
+#### 15.5 בדיקת תפקוד המערכות
+```bash
+# בדוק שהעמוד נטען ללא שגיאות JavaScript
+# פתח את העמוד בדפדפן ובדוק את הקונסול
+
+# בדוק שהמערכות מאותחלות
+# חפש הודעות: "Dynamic colors loaded successfully", "Preferences system initialized"
+```
+
+#### 15.6 כללים חשובים
+- **סדר טעינה**: הסקריפטים חייבים להיטען בסדר הנכון
+- **תאימות**: המערכות תואמות ל-V1 ו-V2 של ההעדפות
+- **ביצועים**: הצבעים מתעדכנים בזמן אמת ללא טעינה מחדש
+- **נגישות**: תמיכה בערכות נושא לנגישות
+
+### צעד 16: ניקוי סקריפטים אינליין ו-CSS אינליין
+
+#### 16.1 חיפוש סקריפטים אינליין
+```bash
+# חפש סקריפטים אינליין בעמוד
+grep -n "<script>" trading-ui/page-name.html
+
+# חפש פונקציות JavaScript בעמוד
+grep -n "function" trading-ui/page-name.html
+
+# חפש onclick handlers
+grep -n "onclick=" trading-ui/page-name.html
+```
+
+#### 16.2 העברת סקריפטים לקבצים חיצוניים
+**כלל חשוב**: אין סקריפטים אינליין בעמודים! כל הפונקציות חייבות להיות בקבצים חיצוניים.
+
+**תהליך העברה:**
+1. **צור קובץ סקריפט ספציפי לעמוד**: `trading-ui/scripts/page-name.js`
+2. **העבר את כל הפונקציות** מהסקריפט האינליין לקובץ החיצוני
+3. **הוסף exports ל-window scope**:
+   ```javascript
+   // Export functions to global scope
+   window.functionName = functionName;
+   ```
+4. **החלף את הסקריפט האינליין** בקישור לקובץ החיצוני:
+   ```html
+   <!-- Page-specific script -->
+   <script src="scripts/page-name.js"></script>
+   ```
+
+#### 16.3 חיפוש CSS אינליין
+```bash
+# חפש הגדרות style אינליין
+grep -n "style=" trading-ui/page-name.html
+
+# חפש הגדרות CSS בתוך תגיות
+grep -n "style.*:" trading-ui/page-name.html
+```
+
+#### 16.4 דוגמה לתהליך ניקוי
+**לפני:**
+```html
+<script>
+    function updateDebugInfo() {
+        // קוד פונקציה
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        updateDebugInfo();
+    });
+</script>
+```
+
+**אחרי:**
+```html
+<!-- Page-specific script -->
+<script src="scripts/page-name.js"></script>
+```
+
+**קובץ `scripts/page-name.js`:**
+```javascript
+function updateDebugInfo() {
+    // קוד פונקציה
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    updateDebugInfo();
+});
+
+// Export functions to global scope
+window.updateDebugInfo = updateDebugInfo;
+```
+
+#### 16.5 בדיקות אחרי ניקוי
+```bash
+# בדוק שאין סקריפטים אינליין
+grep -n "<script>" trading-ui/page-name.html
+
+# בדוק שאין פונקציות בעמוד
+grep -n "function" trading-ui/page-name.html
+
+# בדוק שהקובץ החיצוני קיים
+ls -la trading-ui/scripts/page-name.js
+```
+
+#### 16.6 כללים חשובים
+- **אין סקריפטים אינליין**: כל JavaScript חייב להיות בקבצים חיצוניים
+- **קובץ ספציפי לעמוד**: כל עמוד צריך קובץ סקריפט משלו
+- **Exports נדרשים**: פונקציות שצריכות להיות זמינות גלובלית
+- **CSS אינליין**: יש לזהות ולהציג בדוח (לא לתקן אוטומטית)
+- **שמירת פונקציונליות**: וודא שהעמוד עובד אחרי ההעברה
+
+### צעד 17: בדיקות חובה אחרי עדכון עמוד
 
 #### בדיקות מבנה חובה:
 ```bash
@@ -458,7 +795,7 @@ read_lints trading-ui/page-name.html
 # פתח את העמוד בדפדפן ובדוק את הקונסול
 ```
 
-### צעד 14: בדיקה חוזרת מול תבנית הבסיס
+### צעד 18: בדיקה חוזרת מול תבנית הבסיס
 
 #### וידוא שהמבנה תואם לתבנית:
 ```bash
@@ -478,7 +815,7 @@ grep "unified-header" trading-ui/page-name.html
 grep "unified.css\|header-styles.css" trading-ui/page-name.html
 ```
 
-### צעד 15: גיבוי לגיט האב
+### צעד 19: גיבוי לגיט האב
 
 #### תהליך גיבוי מלא:
 ```bash
@@ -508,7 +845,7 @@ git tag -a "page-name-v2.0" -m "Page name updated to unified structure v2.0"
 git push origin "page-name-v2.0"
 ```
 
-### צעד 16: עדכון רשימת המשימות
+### צעד 20: עדכון רשימת המשימות
 
 #### עדכון הטבלה הדו-מימדית:
 ```bash
@@ -522,7 +859,7 @@ git push origin "page-name-v2.0"
 # | **טבלאות עזר** | `/db_extradata` | ✅ הושלם | 2025-01-15 | 4 סקשנים: כרטיסיות התראות, מטבעות, סוגי קישור, כפתורי טריגרים |
 ```
 
-### צעד 17: בדיקות נוספות לאימות מבנה תקין
+### צעד 21: בדיקות נוספות לאימות מבנה תקין
 
 #### בדיקות מתקדמות:
 ```bash
@@ -748,7 +1085,11 @@ read_lints trading-ui/db_extradata.html
 מדריך זה מספק תהליך מפורט לעדכון עמוד קיים לתבנית הבסיס החדשה. הקפד על כל הצעדים כדי להבטיח עקביות ואיכות במערכת.
 
 ### נקודות מפתח:
-- **תהליך מובנה**: 17 שלבים מוגדרים בבירור
+- **תהליך מובנה**: 21 שלבים מוגדרים בבירור
+- **מזהי טבלאות**: טבלה מלאה עם כל המזהים הנדרשים לכל עמוד
+- **כפתורי פתיחה/סגירה**: מערכת מרוכזת עם הוראות מפורטות לכל מצב
+- **ניקוי סקריפטים**: הוראות מפורטות להעברת סקריפטים אינליין לקבצים חיצוניים
+- **זיהוי CSS אינליין**: כלים לזיהוי והצגת הגדרות CSS אינליין
 - **בדיקות חובה**: 5 בדיקות מבנה + בדיקה חוזרת מול תבנית + 7 בדיקות מתקדמות
 - **גיבוי מלא**: גיבוי מקומי + גיט האב + תגים
 - **מעקב מתמיד**: רשימת משימות דו-מימדית לכל העמודים
@@ -763,7 +1104,46 @@ read_lints trading-ui/db_extradata.html
 
 ## היסטוריית גרסאות
 
-### גרסה 2.5 (נוכחית)
+### גרסה 2.8 (נוכחית)
+- **תאריך**: 2025-01-15
+- **שינויים**: 
+  - הוספת צעד 16: ניקוי סקריפטים אינליין ו-CSS אינליין
+  - הוספת הוראות מפורטות להעברת סקריפטים אינליין לקבצים חיצוניים
+  - הוספת כלים לזיהוי CSS אינליין (לא תיקון אוטומטי)
+  - הוספת דוגמאות לתהליך ניקוי סקריפטים
+  - הוספת הוראות ליצירת קבצי סקריפט ספציפיים לעמודים
+  - הוספת הוראות ל-exports של פונקציות ל-window scope
+  - הוספת בדיקות אחרי ניקוי סקריפטים
+  - עדכון מספור הצעדים (16-21)
+  - הרחבת התהליך ל-21 שלבים מקיפים
+  - ניקוי סקריפטים אינליין מעמודים קיימים
+
+### גרסה 2.7
+- **תאריך**: 2025-01-15
+- **שינויים**: 
+  - הוספת צעד 14: בדיקה ותיקון כפתורי פתיחה וסגירה
+  - הוספת הוראות מפורטות לניהול כפתורי פתיחה/סגירה
+  - הוספת הוראות למצבים שונים: הוספת סקשן, הסרת סקשן, שינוי סדר, שינוי שם
+  - הוספת דוגמאות HTML לכפתורים נכונים
+  - הוספת פקודות בדיקה לתפקוד הכפתורים
+  - הוספת כללים חשובים לשמירת מצב וייחודיות מזהים
+  - עדכון דף התבנית עם כפתורים נכונים
+  - עדכון מספור הצעדים (14-19)
+  - הרחבת התהליך ל-19 שלבים מקיפים
+
+### גרסה 2.6
+- **תאריך**: 2025-01-15
+- **שינויים**: 
+  - הוספת צעד 13: הוספת מזהי טבלאות
+  - הוספת טבלת מזהי עמודים מלאה עם כל העמודים המרכזיים
+  - הוספת הוראות להוספת מזהה לקונטיינרים המכילים טבלאות
+  - הוספת דוגמאות HTML להוספת מזהים
+  - הוספת פקודות בדיקה למזהי טבלאות
+  - הוספת הוראות לעדכון רשימת המשימות עבור עמודים ללא מזהה
+  - עדכון מספור הצעדים (13-18)
+  - הרחבת התהליך ל-18 שלבים מקיפים
+
+### גרסה 2.5
 - **תאריך**: 2025-01-15
 - **שינויים**: 
   - הוספת בדיקות חובה אחרי עדכון עמוד

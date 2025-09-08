@@ -13,6 +13,9 @@
     --text-gray: #666;
     --text-light-gray: #333;
     --active-bg: #d4edda;
+    --shadow-light: rgba(0, 0, 0, 0.1);
+    --shadow-medium: rgba(0, 0, 0, 0.15);
+    --shadow-very-light: rgba(0, 0, 0, 0.03);
 }
 
 /* Menu - Apple Style with TikTrack Colors */
@@ -36,7 +39,7 @@
     direction: rtl;
     width: 100%;
     background: var(--white);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px var(--shadow-light);
     z-index: 1001;
 }
 
@@ -151,7 +154,7 @@
             background: var(--white);
             border: 1px solid var(--border-gray);
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 12px var(--shadow-medium);
             min-width: 200px;
             padding: 0.5rem 0;
             opacity: 0;
@@ -212,7 +215,7 @@
             background: var(--white);
             border: 1px solid var(--border-gray);
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 12px var(--shadow-medium);
             min-width: 180px;
             padding: 0.5rem 0;
             opacity: 0;
@@ -249,10 +252,6 @@
         /* Submenus */
         .dropdown-submenu {
             position: relative;
-        }
-        
-        .tiktrack-dropdown-menu .dropdown-submenu:hover .dropdown-menu {
-            transition-delay: 0s; /* ללא עיכוב בפתיחה */
         }
         
         /* עיכוב בסגירה */
@@ -351,7 +350,7 @@
     left: 0;
     right: 0;
     height: 0.5px;
-    background: rgba(0, 0, 0, 0.03);
+    background: var(--shadow-very-light);
 }
 
 .filters-container {
@@ -403,7 +402,7 @@
     background: var(--white);
     border: 1px solid var(--border-gray);
     border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px var(--shadow-medium);
     min-width: 150px;
     padding: 0.5rem 0;
     opacity: 0;
@@ -533,7 +532,7 @@
 }
 
 .submenu {
-    z-index: 1001 !important;
+    z-index: 1003 !important;
 }
 
 .separator {

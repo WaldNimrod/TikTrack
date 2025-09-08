@@ -129,41 +129,55 @@
     white-space: nowrap;
 }
 
-/* Dropdown Menus */
-.tiktrack-dropdown-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: white;
-    border: 1px solid #e5e5e5;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    min-width: 200px;
-    padding: 0.5rem 0;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.2s ease;
-    z-index: 1001;
-    list-style: none;
-}
-
-.tiktrack-dropdown-arrow {
-    font-size: 0.75rem;
-    color: #666;
-    margin-right: 0.25rem;
-    transition: transform 0.2s ease;
-}
-
-.tiktrack-nav-item:hover .tiktrack-dropdown-arrow {
-    transform: rotate(90deg);
-}
-
-.tiktrack-nav-item:hover .tiktrack-dropdown-menu {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
+        /* Dropdown Menus */
+        .tiktrack-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            padding: 0.5rem 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease; /* הארכת זמן המעבר */
+            z-index: 1001;
+            list-style: none;
+        }
+        
+        .tiktrack-dropdown-arrow {
+            font-size: 0.75rem;
+            color: #666;
+            margin-right: 0.25rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .tiktrack-nav-item:hover .tiktrack-dropdown-arrow {
+            transform: rotate(90deg);
+        }
+        
+        .tiktrack-nav-item:hover .tiktrack-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        /* הארכת זמן הסגירה לתפריטים הראשיים */
+        .tiktrack-dropdown-menu {
+            transition-delay: 0.1s; /* עיכוב בפתיחה */
+        }
+        
+        .tiktrack-nav-item:hover .tiktrack-dropdown-menu {
+            transition-delay: 0s; /* ללא עיכוב בפתיחה */
+        }
+        
+        /* עיכוב בסגירה */
+        .tiktrack-nav-item:not(:hover) .tiktrack-dropdown-menu {
+            transition-delay: 0.2s; /* עיכוב בסגירה */
+        }
 
 .tiktrack-dropdown-item {
     display: block;
@@ -184,34 +198,48 @@
     color: #ff9500;
 }
 
-/* Submenus */
-.dropdown-submenu {
-    position: relative;
-}
-
-.dropdown-submenu .submenu {
-    position: absolute;
-    top: 0;
-    right: 100%;
-    background: white;
-    border: 1px solid #e5e5e5;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    min-width: 180px;
-    padding: 0.5rem 0;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(10px);
-    transition: all 0.2s ease;
-    z-index: 1002;
-    list-style: none;
-}
-
-.dropdown-submenu:hover .submenu {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(0);
-}
+        /* Submenus */
+        .dropdown-submenu {
+            position: relative;
+        }
+        
+        .dropdown-submenu .submenu {
+            position: absolute;
+            top: 0;
+            right: calc(100% - 10px); /* הזזה ימינה ליצירת חפיפה */
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 180px;
+            padding: 0.5rem 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(10px);
+            transition: all 0.3s ease; /* הארכת זמן המעבר */
+            z-index: 1002;
+            list-style: none;
+        }
+        
+        .dropdown-submenu:hover .submenu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+        
+        /* הארכת זמן הסגירה - הוספת delay */
+        .dropdown-submenu .submenu {
+            transition-delay: 0.1s; /* עיכוב בפתיחה */
+        }
+        
+        .dropdown-submenu:hover .submenu {
+            transition-delay: 0s; /* ללא עיכוב בפתיחה */
+        }
+        
+        /* עיכוב בסגירה */
+        .dropdown-submenu:not(:hover) .submenu {
+            transition-delay: 0.2s; /* עיכוב בסגירה */
+        }
 
 /* Cache clear button */
 .cache-clear-btn {

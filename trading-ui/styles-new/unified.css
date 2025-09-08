@@ -69,6 +69,18 @@
 --apple-radius-small: 6px;
 --apple-radius-medium: 10px;
 --apple-radius-large: 16px;
+
+/* ===== משתנים לתאימות לאחור ===== */
+--background-color: var(--apple-bg-secondary);
+--border-color: var(--apple-border-light);
+--primary-color: var(--apple-blue);
+--surface-color: var(--apple-bg-elevated);
+--secondary-color: var(--apple-gray-6);
+--success-color: var(--apple-green);
+--text-muted: var(--apple-text-tertiary);
+--background-color-dark: #1a1a1a;
+--border-color-dark: #404040;
+--surface-color-dark: #2a2a2a;
 }
 
 /* ===== 01-settings/_colors-dynamic.css ===== */

@@ -208,6 +208,74 @@ function testSearchFilter() {
 // ===== INITIALIZATION =====
 
 /**
+ * טעינת כפתורי פעולות לטבלה
+ */
+function loadActionButtons() {
+    console.log('🔧 loadActionButtons called');
+    console.log('🔧 generateActionButtons function available:', typeof generateActionButtons);
+    
+    // טעינת כפתורים לשורה 1 (AAPL)
+    const cell1 = document.getElementById('actions-cell-1');
+    console.log('🔧 Cell 1 found:', !!cell1);
+    if (cell1 && typeof generateActionButtons === 'function') {
+        console.log('🔧 Loading buttons for cell 1...');
+        const buttonsHtml = generateActionButtons(1, 'ticker', 'פתוח', 'viewTickerDetails', 'viewLinkedItems', 'editTicker', 'cancelTicker', 'restoreTicker', 'deleteTicker', true, true, true, true, true);
+        cell1.innerHTML = buttonsHtml;
+        console.log('🔧 Cell 1 HTML set:', cell1.innerHTML.length, 'characters');
+    } else {
+        console.log('❌ Cell 1 not found or function not available');
+    }
+    
+    // טעינת כפתורים לשורה 2 (MSFT)
+    const cell2 = document.getElementById('actions-cell-2');
+    console.log('🔧 Cell 2 found:', !!cell2);
+    if (cell2 && typeof generateActionButtons === 'function') {
+        console.log('🔧 Loading buttons for cell 2...');
+        const buttonsHtml = generateActionButtons(2, 'ticker', 'פתוח', 'viewTickerDetails', 'viewLinkedItems', 'editTicker', 'cancelTicker', 'restoreTicker', 'deleteTicker', true, true, true, true, true);
+        cell2.innerHTML = buttonsHtml;
+        console.log('🔧 Cell 2 HTML set:', cell2.innerHTML.length, 'characters');
+    } else {
+        console.log('❌ Cell 2 not found or function not available');
+    }
+    
+    // טעינת כפתורים לשורה 3 (GOOGL)
+    const cell3 = document.getElementById('actions-cell-3');
+    console.log('🔧 Cell 3 found:', !!cell3);
+    if (cell3 && typeof generateActionButtons === 'function') {
+        console.log('🔧 Loading buttons for cell 3...');
+        const buttonsHtml = generateActionButtons(3, 'ticker', 'סגור', 'viewTickerDetails', 'viewLinkedItems', 'editTicker', 'cancelTicker', 'restoreTicker', 'deleteTicker', true, true, true, true, true);
+        cell3.innerHTML = buttonsHtml;
+        console.log('🔧 Cell 3 HTML set:', cell3.innerHTML.length, 'characters');
+    } else {
+        console.log('❌ Cell 3 not found or function not available');
+    }
+    
+    // טעינת כפתורים לשורה 4 (TSLA)
+    const cell4 = document.getElementById('actions-cell-4');
+    console.log('🔧 Cell 4 found:', !!cell4);
+    if (cell4 && typeof generateActionButtons === 'function') {
+        console.log('🔧 Loading buttons for cell 4...');
+        const buttonsHtml = generateActionButtons(4, 'ticker', 'פתוח', 'viewTickerDetails', 'viewLinkedItems', 'editTicker', 'cancelTicker', 'restoreTicker', 'deleteTicker', true, true, true, true, true);
+        cell4.innerHTML = buttonsHtml;
+        console.log('🔧 Cell 4 HTML set:', cell4.innerHTML.length, 'characters');
+    } else {
+        console.log('❌ Cell 4 not found or function not available');
+    }
+    
+    // טעינת כפתורים לשורה 5 (NVDA)
+    const cell5 = document.getElementById('actions-cell-5');
+    console.log('🔧 Cell 5 found:', !!cell5);
+    if (cell5 && typeof generateActionButtons === 'function') {
+        console.log('🔧 Loading buttons for cell 5...');
+        const buttonsHtml = generateActionButtons(5, 'ticker', 'פתוח', 'viewTickerDetails', 'viewLinkedItems', 'editTicker', 'cancelTicker', 'restoreTicker', 'deleteTicker', true, true, true, true, true);
+        cell5.innerHTML = buttonsHtml;
+        console.log('🔧 Cell 5 HTML set:', cell5.innerHTML.length, 'characters');
+    } else {
+        console.log('❌ Cell 5 not found or function not available');
+    }
+}
+
+/**
  * אתחול העמוד
  */
 document.addEventListener('DOMContentLoaded', function() {
@@ -215,6 +283,8 @@ document.addEventListener('DOMContentLoaded', function() {
     updateDebugInfo();
     updateQuickStats();
     
+    // טעינת כפתורי פעולות אחרי שהדף נטען
+    setTimeout(loadActionButtons, 100);
 });
 
 // ===== TICKER TABLE FUNCTIONS =====
@@ -222,6 +292,7 @@ document.addEventListener('DOMContentLoaded', function() {
 /**
  * פונקציות לטבלת טיקרים
  */
+
 
 /**
  * פילטר טיקרים לפי סוג
@@ -240,23 +311,7 @@ function toggleTickersSection() {
     // פונקציה בסיסית - תיושם בעתיד
 }
 
-/**
- * עריכת טיקר
- * @param {number} id - מזהה הטיקר
- */
-function editTicker(id) {
-    console.log('Editing ticker:', id);
-    // פונקציה בסיסית - תיושם בעתיד
-}
 
-/**
- * מחיקת טיקר
- * @param {number} id - מזהה הטיקר
- */
-function deleteTicker(id) {
-    console.log('Deleting ticker:', id);
-    // פונקציה בסיסית - תיושם בעתיד
-}
 
 // Toggle functions are now handled by the global system in ui-utils.js
 // No local functions needed - using window.toggleTopSection() and window.toggleSection()
@@ -282,7 +337,6 @@ window.testSearchFilter = testSearchFilter;
 // Export ticker functions
 window.filterTickersByType = filterTickersByType;
 window.toggleTickersSection = toggleTickersSection;
-window.editTicker = editTicker;
-window.deleteTicker = deleteTicker;
+window.loadActionButtons = loadActionButtons;
 window.toggleTopSection = toggleTopSection;
 window.toggleSection = toggleSection;

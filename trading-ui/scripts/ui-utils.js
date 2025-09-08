@@ -1128,6 +1128,112 @@ window.restoreSectionStates = function () {
   console.log('✅ Section states restored from localStorage');
 };
 
+// ===== ACTION BUTTONS SYSTEM =====
+
+/**
+ * Generate action buttons HTML for table rows
+ * @param {string} entityId - Entity ID for the row
+ * @param {string} entityType - Entity type (e.g., 'ticker', 'trade', 'account')
+ * @param {string} status - Current status (for cancel/restore logic)
+ * @param {string} detailsFunction - Function name for details button
+ * @param {string} linkedFunction - Function name for linked items button
+ * @param {string} editFunction - Function name for edit button
+ * @param {string} cancelFunction - Function name for cancel button
+ * @param {string} restoreFunction - Function name for restore button
+ * @param {string} deleteFunction - Function name for delete button
+ * @param {boolean} showDetails - Show details button (default: true)
+ * @param {boolean} showLinked - Show linked items button (default: true)
+ * @param {boolean} showEdit - Show edit button (default: true)
+ * @param {boolean} showCancel - Show cancel/restore button (default: true)
+ * @param {boolean} showDelete - Show delete button (default: true)
+ * @returns {string} HTML string for action buttons
+ */
+function generateActionButtons(entityId, entityType, status, detailsFunction, linkedFunction, editFunction, cancelFunction, restoreFunction, deleteFunction, showDetails = true, showLinked = true, showEdit = true, showCancel = true, showDelete = true) {
+  console.log('🔧 generateActionButtons called with:', {entityId, entityType, status, detailsFunction, linkedFunction, editFunction, cancelFunction, restoreFunction, deleteFunction, showDetails, showLinked, showEdit, showCancel, showDelete});
+  let buttonsHtml = '<div class="btn-group">';
+
+  // Details button
+  if (showDetails) {
+    buttonsHtml += `
+      <button class="btn btn-sm btn-outline-success" onclick="${detailsFunction}('${entityType}', ${entityId})" title="פרטים">
+        <i class="bi bi-info-circle"></i>
+      </button>`;
+  }
+
+  // Linked items button
+  if (showLinked) {
+    buttonsHtml += `
+      <button class="btn btn-sm btn-outline-success" onclick="${linkedFunction}('${entityType}', ${entityId})" title="אובייקטים מקושרים">
+        <i class="bi bi-link-45deg"></i>
+      </button>`;
+  }
+
+  // Edit button
+  if (showEdit) {
+    buttonsHtml += `
+      <button class="btn btn-sm btn-outline-warning" onclick="${editFunction}('${entityType}', ${entityId})" title="ערוך">
+        <i class="bi bi-pencil"></i>
+      </button>`;
+  }
+
+  // Cancel/Restore button
+  if (showCancel) {
+    const isCancelled = status === 'בוטל' || status === 'סגור';
+    const buttonClass = isCancelled ? 'btn-outline-success' : 'btn-outline-danger';
+    const buttonTitle = isCancelled ? 'שיחזר' : 'בטל';
+    const buttonIcon = isCancelled ? 'bi-arrow-clockwise' : 'bi-x-circle';
+    const buttonFunction = isCancelled ? restoreFunction : cancelFunction;
+
+    buttonsHtml += `
+      <button class="btn btn-sm ${buttonClass}" onclick="${buttonFunction}('${entityType}', ${entityId})" title="${buttonTitle}">
+        <i class="bi ${buttonIcon}"></i>
+      </button>`;
+  }
+
+  // Delete button
+  if (showDelete) {
+    buttonsHtml += `
+      <button class="btn btn-sm btn-outline-danger" onclick="${deleteFunction}('${entityType}', ${entityId})" title="מחק">
+        <i class="bi bi-trash"></i>
+      </button>`;
+  }
+
+  buttonsHtml += '</div>';
+  console.log('🔧 generateActionButtons returning HTML:', buttonsHtml);
+  return buttonsHtml;
+}
+
+// ===== DEMO FUNCTIONS FOR TESTING =====
+
+/**
+ * Demo functions for testing action buttons
+ * These are temporary functions for demonstration purposes
+ */
+
+function viewTickerDetails(entityType, id) {
+    alert(`🔍 פונקציה: viewTickerDetails\n📊 פרמטרים: entityType='${entityType}', id=${id}\n📈 שורה: טיקר ${id}`);
+}
+
+function viewLinkedItems(entityType, id) {
+    alert(`🔗 פונקציה: viewLinkedItems\n📊 פרמטרים: entityType='${entityType}', id=${id}\n📈 שורה: טיקר ${id}`);
+}
+
+function editTicker(entityType, id) {
+    alert(`✏️ פונקציה: editTicker\n📊 פרמטרים: entityType='${entityType}', id=${id}\n📈 שורה: טיקר ${id}`);
+}
+
+function cancelTicker(entityType, id) {
+    alert(`❌ פונקציה: cancelTicker\n📊 פרמטרים: entityType='${entityType}', id=${id}\n📈 שורה: טיקר ${id}`);
+}
+
+function restoreTicker(entityType, id) {
+    alert(`🔄 פונקציה: restoreTicker\n📊 פרמטרים: entityType='${entityType}', id=${id}\n📈 שורה: טיקר ${id}`);
+}
+
+function deleteTicker(entityType, id) {
+    alert(`🗑️ פונקציה: deleteTicker\n📊 פרמטרים: entityType='${entityType}', id=${id}\n📈 שורה: טיקר ${id}`);
+}
+
 // ===== EXPORTS =====
 
 // Export table refresh system functions
@@ -1145,6 +1251,18 @@ window.toggleMainSection = window.toggleMainSection;
 window.toggleSection = window.toggleSection;
 window.toggleAllSections = window.toggleAllSections;
 window.restoreSectionStates = window.restoreSectionStates;
+
+// Export action buttons system
+window.generateActionButtons = generateActionButtons;
+console.log('✅ generateActionButtons function exported to window');
+
+// Export demo functions for testing
+window.viewTickerDetails = viewTickerDetails;
+window.viewLinkedItems = viewLinkedItems;
+window.editTicker = editTicker;
+window.cancelTicker = cancelTicker;
+window.restoreTicker = restoreTicker;
+window.deleteTicker = deleteTicker;
 
 // Initialize modal backdrop and restore section states when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {

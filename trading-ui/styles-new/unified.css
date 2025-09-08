@@ -1628,9 +1628,6 @@ button:disabled,
     order: 1;
     margin-inline-start: auto;
 }
-#unified-header .header-top .filter-toggle-section {
-    order: 2;
-}
 #unified-header .page-title {
     position: absolute;
     left: 50%;
@@ -1956,11 +1953,6 @@ button:disabled,
         transform: none;
     }
 }
-#unified-header .filter-toggle-section {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
 #unified-header .filter-toggle-btn {
     background: transparent;
     border: 1px solid var(--apple-border);
@@ -2116,10 +2108,6 @@ button:disabled,
     }
     #unified-header .header-top .header-nav {
         order: 2;
-        margin: 0;
-    }
-    #unified-header .header-top .filter-toggle-section {
-        order: 3;
         margin: 0;
     }
     #unified-header .tiktrack-nav-list {
@@ -2990,8 +2978,14 @@ body {
     box-shadow: none !important;
 }
 .filter-toggle-section {
-    display: flex;
-    align-items: center;
+    position: fixed !important;
+    top: calc(100vh - 60px) !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 .filter-toggle-btn {
     display: flex;

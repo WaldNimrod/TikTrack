@@ -70,8 +70,19 @@ class HeaderSystem {
       console.log('📝 Creating new header element...');
       headerElement = document.createElement('div');
       headerElement.id = 'unified-header';
-      // הכנסת הכותרת לתחילת הדף
-      document.body.insertBefore(headerElement, document.body.firstChild);
+    // הכנסת הכותרת לתחילת הדף
+    document.body.insertBefore(headerElement, document.body.firstChild);
+    
+    // הוספת כפתור הפילטר מחוץ ל-header
+    const filterToggleSection = document.createElement('div');
+    filterToggleSection.className = 'filter-toggle-section';
+    filterToggleSection.innerHTML = `
+      <button class="filter-toggle-btn" id="filterToggleBtn" title="הצג/הסתר פילטרים" 
+              onclick="toggleSection('filters')">
+        <span class="filter-arrow">▼</span>
+      </button>
+    `;
+    document.body.appendChild(filterToggleSection);
     } else {
       console.log('✅ Found existing header element');
     }
@@ -158,10 +169,6 @@ class HeaderSystem {
         }
 
               /* Filter Toggle */
-        .filter-toggle-section {
-          display: flex;
-          align-items: center;
-        }
 
         .filter-toggle-btn {
           display: flex;
@@ -169,6 +176,7 @@ class HeaderSystem {
           justify-content: center;
           width: 32px;
           height: 32px;
+          margin-top: -6px; /* 20% מהכפתור מוסתר מאחורי הפילטר */
           background: white;
           border: 1px solid #ddd;
           border-radius: 50%;
@@ -752,13 +760,6 @@ class HeaderSystem {
                 </div>
               </div>
 
-              <!-- כפתור פילטר עגול -->
-              <div class="filter-toggle-section">
-                <button class="filter-toggle-btn" id="filterToggleBtn" title="הצג/הסתר פילטרים" 
-                        onclick="toggleSection('filters')">
-                  <span class="filter-arrow">▼</span>
-                </button>
-              </div>
             </div>
           </div>
 
@@ -843,40 +844,40 @@ class HeaderSystem {
                   <div class="date-range-filter-item" data-value="היום" >
                     <span class="option-text">היום</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="אתמול" אתמול')">
+                  <div class="date-range-filter-item" data-value="אתמול">
                     <span class="option-text">אתמול</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="השבוע" השבוע')">
+                  <div class="date-range-filter-item" data-value="השבוע">
                     <span class="option-text">השבוע</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="שבוע" שבוע')">
+                  <div class="date-range-filter-item" data-value="שבוע">
                     <span class="option-text">שבוע</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="MTD" MTD')">
+                  <div class="date-range-filter-item" data-value="MTD">
                     <span class="option-text">MTD</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="30 יום" 30 יום')">
+                  <div class="date-range-filter-item" data-value="30 יום">
                     <span class="option-text">30 יום</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="60 יום" 60 יום')">
+                  <div class="date-range-filter-item" data-value="60 יום">
                     <span class="option-text">60 יום</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="90 יום" 90 יום')">
+                  <div class="date-range-filter-item" data-value="90 יום">
                     <span class="option-text">90 יום</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="YTD" YTD')">
+                  <div class="date-range-filter-item" data-value="YTD">
                     <span class="option-text">YTD</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="שנה" שנה')">
+                  <div class="date-range-filter-item" data-value="שנה">
                     <span class="option-text">שנה</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="שבוע קודם" שבוע קודם')">
+                  <div class="date-range-filter-item" data-value="שבוע קודם">
                     <span class="option-text">שבוע קודם</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="חודש קודם" חודש קודם')">
+                  <div class="date-range-filter-item" data-value="חודש קודם">
                     <span class="option-text">חודש קודם</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="שנה קודמת" שנה קודמת')">
+                  <div class="date-range-filter-item" data-value="שנה קודמת">
                     <span class="option-text">שנה קודמת</span>
                   </div>
                 </div>
@@ -910,6 +911,7 @@ class HeaderSystem {
             </div>
           </div>
         </div>
+
       </div>
     `;
   }

@@ -60,7 +60,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    color: #ff9e04; /* צבע הלוגו - כתום */
+    color: #28a745; /* ירוק - צבע הלוגו */
     text-decoration: none;
     border-radius: 8px;
     transition: all 0.2s ease;
@@ -69,12 +69,13 @@
 }
 
 .tiktrack-nav-link:hover {
-    color: #e6850e; /* צבע הלוגו כהה יותר ב-hover */
+    color: #ff9e04; /* כתום - רק למעבר עכבר */
 }
 
 .tiktrack-nav-item.active .tiktrack-nav-link {
-    color: #cc7a00; /* צבע הלוגו כהה מאוד לפריט פעיל */
+    color: #28a745; /* ירוק - פריט פעיל */
     font-weight: 600; /* משקל כבד יותר לפריט פעיל */
+    text-decoration: underline; /* קו תחתון לפריטים ראשיים */
 }
 
 .tiktrack-nav-item:first-child {
@@ -182,7 +183,7 @@
         .tiktrack-dropdown-item {
             display: block;
             padding: 0.5rem 1rem;
-            color: #ff9e04; /* צבע הלוגו - כתום */
+            color: #28a745; /* ירוק - צבע הלוגו */
             text-decoration: none;
             transition: all 0.2s ease;
             font-size: 14px;
@@ -213,7 +214,13 @@
 
 .tiktrack-dropdown-item:hover {
     background: #f5f5f7;
-    color: #e6850e; /* צבע הלוגו כהה יותר ב-hover */
+    color: #ff9e04; /* כתום - רק למעבר עכבר */
+}
+
+/* פריט פעיל בתפריטי משנה - רקע ירוק */
+.tiktrack-dropdown-item.active {
+    background: #d4edda; /* רקע ירוק בהיר לפריט פעיל */
+    color: #28a745; /* ירוק לפריט פעיל */
 }
 
         /* Submenus */

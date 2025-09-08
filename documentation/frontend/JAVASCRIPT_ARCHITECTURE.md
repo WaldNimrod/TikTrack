@@ -357,11 +357,21 @@ function translateTableData(data, tableType) {
 ## 🛠️ Utility Files
 
 ### ui-utils.js
-**Purpose**: Shared UI functions
+**Purpose**: Shared UI functions and Section Toggle System
 - Modal management
 - Button handling
 - Form validation
 - UI state management
+- **Section Toggle System** - Centralized system for opening/closing page sections
+  - `toggleTopSection()` - Toggle top sections
+  - `toggleMainSection()` - Toggle main sections
+  - `toggleSection(sectionId)` - Toggle specific sections
+  - `toggleAllSections()` - Toggle all sections at once
+  - State persistence with localStorage
+  - Visual feedback with icon rotation
+  - Page-specific behavior handling
+
+**Documentation**: [Section Toggle System](SECTION_TOGGLE_SYSTEM.md)
 
 ### data-utils.js
 **Purpose**: Shared data functions

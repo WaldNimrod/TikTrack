@@ -7,85 +7,6 @@
  * @author TikTrack Development Team
  */
 
-// ===== STATUS COLORS TESTING =====
-
-/**
- * בדיקת צבעי סטטוס דינמיים
- */
-function testStatusColors() {
-    console.log('🧪 Testing dynamic status colors...');
-    
-    // בדיקת פונקציות צבעי סטטוס
-    if (typeof getStatusColor === 'function') {
-        console.log('✅ getStatusColor function available');
-        
-        // בדיקת צבעי סטטוס שונים
-        const statuses = ['open', 'closed', 'cancelled'];
-        statuses.forEach(status => {
-            const color = getStatusColor(status, 'medium');
-            const bgColor = getStatusBackgroundColor(status);
-            const textColor = getStatusTextColor(status);
-            const borderColor = getStatusBorderColor(status);
-            
-            console.log(`Status: ${status}`);
-            console.log(`  Color: ${color}`);
-            console.log(`  Background: ${bgColor}`);
-            console.log(`  Text: ${textColor}`);
-            console.log(`  Border: ${borderColor}`);
-        });
-    } else {
-        console.log('❌ getStatusColor function not available');
-    }
-    
-    // בדיקת CSS Variables
-    const root = document.documentElement;
-    const computedStyle = getComputedStyle(root);
-    
-    const statusVars = [
-        '--status-open-color',
-        '--status-closed-color', 
-        '--status-cancelled-color'
-    ];
-    
-    statusVars.forEach(varName => {
-        const value = computedStyle.getPropertyValue(varName);
-        console.log(`CSS Variable ${varName}: ${value}`);
-    });
-}
-
-/**
- * עדכון תצוגת צבעי סטטוס
- */
-function updateStatusColorDisplay() {
-    console.log('🎨 Updating status color display...');
-    
-    // עדכון תגיות סטטוס בטבלה
-    const statusElements = document.querySelectorAll('[data-status]');
-    statusElements.forEach(element => {
-        const status = element.getAttribute('data-status');
-        const statusBadge = element.querySelector('.status-badge');
-        
-        if (statusBadge) {
-            // הסרת מחלקות סטטוס קיימות
-            statusBadge.classList.remove('status-open', 'status-closed', 'status-cancelled');
-            
-            // הוספת מחלקת סטטוס נכונה
-            switch(status) {
-                case 'פתוח':
-                    statusBadge.classList.add('status-open');
-                    break;
-                case 'סגור':
-                    statusBadge.classList.add('status-closed');
-                    break;
-                case 'מבוטל':
-                    statusBadge.classList.add('status-cancelled');
-                    break;
-            }
-        }
-    });
-    
-    console.log('✅ Status color display updated');
-}
 
 // ===== DEBUG FUNCTIONS =====
 
@@ -294,19 +215,56 @@ document.addEventListener('DOMContentLoaded', function() {
     updateDebugInfo();
     updateQuickStats();
     
-    // בדיקת צבעי סטטוס דינמיים
-    setTimeout(() => {
-        testStatusColors();
-        updateStatusColorDisplay();
-    }, 1000);
 });
+
+// ===== TICKER TABLE FUNCTIONS =====
+
+/**
+ * פונקציות לטבלת טיקרים
+ */
+
+/**
+ * פילטר טיקרים לפי סוג
+ * @param {string} type - סוג הטיקר
+ */
+function filterTickersByType(type) {
+    console.log('Filtering tickers by type:', type);
+    // פונקציה בסיסית - תיושם בעתיד
+}
+
+/**
+ * פתיחה/סגירה של סקשן הטיקרים
+ */
+function toggleTickersSection() {
+    console.log('Toggling tickers section');
+    // פונקציה בסיסית - תיושם בעתיד
+}
+
+/**
+ * עריכת טיקר
+ * @param {number} id - מזהה הטיקר
+ */
+function editTicker(id) {
+    console.log('Editing ticker:', id);
+    // פונקציה בסיסית - תיושם בעתיד
+}
+
+/**
+ * מחיקת טיקר
+ * @param {number} id - מזהה הטיקר
+ */
+function deleteTicker(id) {
+    console.log('Deleting ticker:', id);
+    // פונקציה בסיסית - תיושם בעתיד
+}
+
+// Toggle functions are now handled by the global system in ui-utils.js
+// No local functions needed - using window.toggleTopSection() and window.toggleSection()
 
 // ===== EXPORTS =====
 
 // Export functions to global scope
 window.updateFilterDebugInfo = updateFilterDebugInfo;
-window.testStatusColors = testStatusColors;
-window.updateStatusColorDisplay = updateStatusColorDisplay;
 window.log = log;
 window.updateStatus = updateStatus;
 window.updateDebugInfo = updateDebugInfo;
@@ -320,3 +278,11 @@ window.testTypeFilter = testTypeFilter;
 window.testAccountFilter = testAccountFilter;
 window.testDateFilter = testDateFilter;
 window.testSearchFilter = testSearchFilter;
+
+// Export ticker functions
+window.filterTickersByType = filterTickersByType;
+window.toggleTickersSection = toggleTickersSection;
+window.editTicker = editTicker;
+window.deleteTicker = deleteTicker;
+window.toggleTopSection = toggleTopSection;
+window.toggleSection = toggleSection;

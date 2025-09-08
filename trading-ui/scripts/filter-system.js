@@ -1002,3 +1002,249 @@ window.resetToUserDefaults = function() {
   }
 };
 
+// ===== EVENT LISTENERS FOR FILTERS =====
+
+// Event listeners for date range filter (single selection)
+document.addEventListener('DOMContentLoaded', function() {
+  const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+  dateRangeItems.forEach(item => {
+    item.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const dateRange = item.getAttribute('data-value');
+      console.log('🔧 Date range filter item clicked:', dateRange);
+
+      // Single selection - remove selected from all others
+      dateRangeItems.forEach(otherItem => {
+        otherItem.classList.remove('selected');
+      });
+      item.classList.add('selected');
+
+      // Update display text
+      const dateRangeElement = document.getElementById('selectedDateRange');
+      if (dateRangeElement) {
+        let displayText = 'כל זמן';
+        
+        if (dateRange === 'היום') {
+          const today = new Date();
+          const todayStr = today.toLocaleDateString('he-IL');
+          displayText = `${todayStr} - ${todayStr}`;
+        } else if (dateRange === 'אתמול') {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          const yesterdayStr = yesterday.toLocaleDateString('he-IL');
+          displayText = `${yesterdayStr} - ${yesterdayStr}`;
+        } else if (dateRange !== 'כל זמן') {
+          displayText = dateRange;
+        }
+        
+        dateRangeElement.textContent = displayText;
+      }
+
+      // Update filter system
+      if (window.filterSystem && typeof window.filterSystem.applyFilters === 'function') {
+        window.filterSystem.currentFilters.dateRange = dateRange;
+        window.filterSystem.applyFilters();
+      } else {
+        console.warn('⚠️ FilterSystem not available or applyFilters not a function');
+      }
+    });
+  });
+});
+
+// ===== FILTER SELECTION FUNCTIONS =====
+
+// Status filter (multi-select)
+function selectStatusOption(status) {
+  console.log('🔧 selectStatusOption called with:', status);
+  
+  const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
+  const clickedItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === status);
+  
+  if (clickedItem) {
+    if (status === 'הכול') {
+      // Selecting "הכול" - clear all others
+      statusItems.forEach(item => item.classList.remove('selected'));
+      clickedItem.classList.add('selected');
+    } else {
+      // Multi-select - toggle selection
+      const allItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === 'הכול');
+      if (allItem) {
+        allItem.classList.remove('selected');
+      }
+      clickedItem.classList.toggle('selected');
+      
+      // If no items selected, select "הכול"
+      const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
+      if (selectedItems.length === 0 && allItem) {
+        allItem.classList.add('selected');
+      }
+    }
+  }
+  
+  updateStatusFilterText();
+  applyStatusFilter();
+}
+
+// Type filter (multi-select)
+function selectTypeOption(type) {
+  console.log('🔧 selectTypeOption called with:', type);
+  
+  const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
+  const clickedItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === type);
+  
+  if (clickedItem) {
+    if (type === 'הכול') {
+      // Selecting "הכול" - clear all others
+      typeItems.forEach(item => item.classList.remove('selected'));
+      clickedItem.classList.add('selected');
+    } else {
+      // Multi-select - toggle selection
+      const allItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === 'הכול');
+      if (allItem) {
+        allItem.classList.remove('selected');
+      }
+      clickedItem.classList.toggle('selected');
+      
+      // If no items selected, select "הכול"
+      const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
+      if (selectedItems.length === 0 && allItem) {
+        allItem.classList.add('selected');
+      }
+    }
+  }
+  
+  updateTypeFilterText();
+  applyTypeFilter();
+}
+
+// Account filter (multi-select)
+function selectAccountOption(account) {
+  console.log('🔧 selectAccountOption called with:', account);
+  
+  const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
+  const clickedItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === account);
+  
+  if (clickedItem) {
+    if (account === 'הכול') {
+      // Selecting "הכול" - clear all others
+      accountItems.forEach(item => item.classList.remove('selected'));
+      clickedItem.classList.add('selected');
+    } else {
+      // Multi-select - toggle selection
+      const allItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === 'הכול');
+      if (allItem) {
+        allItem.classList.remove('selected');
+      }
+      clickedItem.classList.toggle('selected');
+      
+      // If no items selected, select "הכול"
+      const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
+      if (selectedItems.length === 0 && allItem) {
+        allItem.classList.add('selected');
+      }
+    }
+  }
+  
+  updateAccountFilterText();
+  applyAccountFilter();
+}
+
+// ===== FILTER TEXT UPDATE FUNCTIONS =====
+
+function updateStatusFilterText() {
+  const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
+  const statusElement = document.getElementById('selectedStatus');
+  
+  if (statusElement) {
+    if (selectedItems.length === 0 || (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')) {
+      statusElement.textContent = 'כל סטטוס';
+    } else if (selectedItems.length === 1) {
+      statusElement.textContent = selectedItems[0].getAttribute('data-value');
+    } else {
+      statusElement.textContent = `${selectedItems.length} סטטוסים`;
+    }
+  }
+}
+
+function updateTypeFilterText() {
+  const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
+  const typeElement = document.getElementById('selectedType');
+  
+  if (typeElement) {
+    if (selectedItems.length === 0 || (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')) {
+      typeElement.textContent = 'כל סוג השקעה';
+    } else if (selectedItems.length === 1) {
+      typeElement.textContent = selectedItems[0].getAttribute('data-value');
+    } else {
+      typeElement.textContent = `${selectedItems.length} סוגים`;
+    }
+  }
+}
+
+function updateAccountFilterText() {
+  const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
+  const accountElement = document.getElementById('selectedAccount');
+  
+  if (accountElement) {
+    if (selectedItems.length === 0 || (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')) {
+      accountElement.textContent = 'כל החשבונות';
+    } else if (selectedItems.length === 1) {
+      accountElement.textContent = selectedItems[0].getAttribute('data-value');
+    } else {
+      accountElement.textContent = `${selectedItems.length} חשבונות`;
+    }
+  }
+}
+
+// ===== FILTER APPLICATION FUNCTIONS =====
+
+function applyStatusFilter() {
+  const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
+  const selectedStatuses = Array.from(selectedItems)
+    .map(item => item.getAttribute('data-value'))
+    .filter(value => value !== 'הכול');
+  
+  if (window.filterSystem && typeof window.filterSystem.applyFilters === 'function') {
+    window.filterSystem.currentFilters.status = selectedStatuses;
+    window.filterSystem.applyFilters();
+  }
+}
+
+function applyTypeFilter() {
+  const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
+  const selectedTypes = Array.from(selectedItems)
+    .map(item => item.getAttribute('data-value'))
+    .filter(value => value !== 'הכול');
+  
+  if (window.filterSystem && typeof window.filterSystem.applyFilters === 'function') {
+    window.filterSystem.currentFilters.type = selectedTypes;
+    window.filterSystem.applyFilters();
+  }
+}
+
+function applyAccountFilter() {
+  const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
+  const selectedAccounts = Array.from(selectedItems)
+    .map(item => item.getAttribute('data-value'))
+    .filter(value => value !== 'הכול');
+  
+  if (window.filterSystem && typeof window.filterSystem.applyFilters === 'function') {
+    window.filterSystem.currentFilters.account = selectedAccounts;
+    window.filterSystem.applyFilters();
+  }
+}
+
+// ===== EXPORT FUNCTIONS TO WINDOW =====
+
+window.selectStatusOption = selectStatusOption;
+window.selectTypeOption = selectTypeOption;
+window.selectAccountOption = selectAccountOption;
+window.updateStatusFilterText = updateStatusFilterText;
+window.updateTypeFilterText = updateTypeFilterText;
+window.updateAccountFilterText = updateAccountFilterText;
+window.applyStatusFilter = applyStatusFilter;
+window.applyTypeFilter = applyTypeFilter;
+window.applyAccountFilter = applyAccountFilter;
+

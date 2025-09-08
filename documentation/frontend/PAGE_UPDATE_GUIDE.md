@@ -20,6 +20,42 @@
 - **מערכת צבעים**: `documentation/frontend/DYNAMIC_COLORS_GUIDE.md`
 - **מערכת העדפות**: `documentation/features/preferences/README.md`
 
+## 📋 אינדקס שלבים
+
+### שלבים בסיסיים (1-5)
+- [שלב 1: יישום נכון של התפריט ואלמנט הראש](#שלב-1-יישום-נכון-של-התפריט-ואלמנט-הראש)
+- [שלב 2: הבנת התבנית הנעולה](#שלב-2-הבנת-התבנית-הנעולה)
+- [שלב 3: ניהול סקשנים בתבנית הנעולה](#שלב-3-ניהול-סקשנים-בתבנית-הנעולה)
+- [שלב 4: הזרקת תוכן לסקשנים](#שלב-4-הזרקת-תוכן-לסקשנים)
+- [שלב 5: בדיקות התבנית הנעולה](#שלב-5-בדיקות-התבנית-הנעולה)
+
+### שלבים פונקציונליים (6-10)
+- [שלב 6: הפעלת כפתורי הפתיחה/סגירה](#שלב-6-הפעלת-כפתורי-הפתיחהסגירה)
+- [שלב 7: יצירת תבנית בסיס](#שלב-7-יצירת-תבנית-בסיס)
+- [שלב 8: העברת תוכן קיים](#שלב-8-העברת-תוכן-קיים)
+- [שלב 9: עדכון איקונים](#שלב-9-עדכון-איקונים)
+- [שלב 10: עדכון גרסאות cache busting](#שלב-10-עדכון-גרסאות-cache-busting)
+
+### שלבים טכניים (11-15)
+- [שלב 11: בדיקה ואימות](#שלב-11-בדיקה-ואימות)
+- [שלב 12: עדכון דוקומנטציה](#שלב-12-עדכון-דוקומנטציה)
+- [שלב 13: הוספת מזהי טבלאות](#שלב-13-הוספת-מזהי-טבלאות)
+- [שלב 14: בדיקה ותיקון כפתורי פתיחה וסגירה](#שלב-14-בדיקה-ותיקון-כפתורי-פתיחה-וסגירה)
+- [שלב 15: הפעלת מערכת הצבעים הדינמית](#שלב-15-הפעלת-מערכת-הצבעים-הדינמית)
+- [שלב 15.5: צביעת עמודת מחיר לפי השינוי](#שלב-155-צביעת-עמודת-מחיר-לפי-השינוי)
+
+### שלבים מתקדמים (16-20)
+- [שלב 16: יישום כפתורי כן/לא (Yes/No Buttons)](#שלב-16-יישום-כפתורי-כןלא-yesno-buttons)
+- [שלב 17: חיבור מערכת הצבעים הדינמית ומערכת ההעדפות](#שלב-17-חיבור-מערכת-הצבעים-הדינמית-ומערכת-ההעדפות)
+- [שלב 18: ניקוי סקריפטים אינליין ו-CSS אינליין](#שלב-18-ניקוי-סקריפטים-אינליין-ו-css-אינליין)
+- [שלב 19: בדיקות חובה אחרי עדכון עמוד](#שלב-19-בדיקות-חובה-אחרי-עדכון-עמוד)
+- [שלב 20: בדיקה חוזרת מול תבנית הבסיס](#שלב-20-בדיקה-חוזרת-מול-תבנית-הבסיס)
+
+### שלבים סופיים (21-23)
+- [שלב 21: גיבוי לגיט האב](#שלב-21-גיבוי-לגיט-האב)
+- [שלב 22: עדכון רשימת המשימות](#שלב-22-עדכון-רשימת-המשימות)
+- [שלב 23: בדיקות נוספות לאימות מבנה תקין](#שלב-23-בדיקות-נוספות-לאימות-מבנה-תקין)
+
 ## 🎯 תובנות מעשיות מהעבודה על עמודים
 
 > **חשוב**: לפני התחלת העבודה, מומלץ לקרוא את [סעיף 22: תובנות ודיוקים מהעבודה המעשית](#22-תובנות-מהעבודה-על-עמוד-בדיקת-כותרת-טבלאות-עזר-ותבנית-בסיס) שמכיל ניסיון מעשי מהעבודה על 3 עמודים, שגיאות נפוצות ופתרונות, ותהליך אופטימלי שפותח מהניסיון. כמו כן, מומלץ לקרוא את [סעיף 23: צביעת סטטוסים לפי סולם הצבעים הדינמי](#23-שימוש-במערכת-הצבעים-הדינמית-לצביעת-סטטוסים) לשימוש נכון במערכת הצבעים.
@@ -50,27 +86,457 @@
 <script src="scripts/header-system.js?v=v34_fixes"></script>
 ```
 
-### 1.4 מבנה HTML בסיסי
+### 1.4 מבנה HTML בסיסי עם תבנית נעולה
 ```html
 <body>
+    <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
     <div class="background-wrapper">
-        <!-- Header System -->
+        <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
         <div id="unified-header"></div>
 
-        <!-- Page body -->
+        <!-- ===== TEMPLATE ZONE 3: PAGE BODY (LOCKED) ===== -->
         <div class="page-body">
-            <!-- Main content limited in width -->
+            <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT (EDITABLE) ===== -->
             <div class="main-content">
-                <!-- תוכן העמוד כאן -->
+                <!-- ===== CONTENT SECTIONS START (EDITABLE) ===== -->
+                <!-- כאן מוסיפים סקשנים -->
+                <!-- ===== CONTENT SECTIONS END (EDITABLE) ===== -->
             </div>
+            <!-- ===== END MAIN CONTENT ===== -->
         </div>
+        <!-- ===== END PAGE BODY ===== -->
     </div>
+    <!-- ===== END BACKGROUND WRAPPER ===== -->
 </body>
 ```
 
-## שלב 2: יצירת תבנית בסיס
+## שלב 2: הבנת התבנית הנעולה
 
-### 2.1 העתקת קובץ התבנית
+### 2.1 עקרונות התבנית הנעולה
+
+התבנית החדשה כוללת **הערות נעילה ברורות** שמגנות על המבנה הבסיסי:
+
+#### 🔒 **אזורים נעולים (LOCKED):**
+- **TEMPLATE ZONE 1**: `background-wrapper` - המעטפת החיצונית
+- **TEMPLATE ZONE 2**: `unified-header` - מערכת התפריט (DO NOT TOUCH!)
+- **TEMPLATE ZONE 3**: `page-body` - המעטפת הפנימית
+
+#### ✏️ **אזור עריכה (EDITABLE):**
+- **TEMPLATE ZONE 4**: `main-content` - התוכן הראשי
+- **CONTENT SECTIONS**: בין ההערות המיוחדות
+
+### 2.2 כללי עבודה עם התבנית
+
+#### ✅ **מה מותר לעשות:**
+- להוסיף/להסיר סקשנים בין ההערות `CONTENT SECTIONS START/END`
+- לשנות תוכן בתוך סקשנים קיימים
+- להוסיף כיתות CSS לסקשנים
+- לשנות כותרות וטקסט
+
+#### ❌ **מה אסור לעשות:**
+- לגעת ב-`unified-header` או בכל TEMPLATE ZONE נעול
+- לשנות את מבנה ה-divs הבסיסי
+- להסיר או לשנות את ההערות הנעילות
+- להוסיף divs מחוץ לאזור העריכה
+
+### 2.3 מבנה הסקשנים
+
+כל סקשן צריך להיות במבנה הבא:
+```html
+<!-- UI Content Section X Start-->
+<div class="content-section" id="sectionId">
+    <div class="section-header entity-test-sub-header">
+        <h2>📊 כותרת הסקשן - כותרת סקשן X</h2>
+        <button class="filter-toggle-btn" onclick="toggleSection('sectionId')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+        </button>
+    </div>
+    <div class="section-body">
+        <!-- תוכן הסקשן כאן -->
+    </div>
+</div>
+<!-- UI Content Section X End -->
+```
+
+## שלב 3: ניהול סקשנים בתבנית הנעולה
+
+### 3.1 הוספת סקשן חדש
+
+#### שלב 1: זיהוי מיקום
+```bash
+# חפש את ההערות המיוחדות
+grep -n "CONTENT SECTIONS START\|CONTENT SECTIONS END" trading-ui/page-name.html
+```
+
+#### שלב 2: הוספת הסקשן
+```html
+<!-- הוסף בין ההערות המיוחדות -->
+<!-- ===== CONTENT SECTIONS START (EDITABLE) ===== -->
+
+<!-- UI Content Section X Start-->
+<div class="content-section" id="newSectionId">
+    <div class="section-header entity-test-sub-header">
+        <h2>📊 כותרת חדשה - כותרת סקשן X</h2>
+        <button class="filter-toggle-btn" onclick="toggleSection('newSectionId')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+        </button>
+    </div>
+    <div class="section-body">
+        <!-- תוכן הסקשן כאן -->
+    </div>
+</div>
+<!-- UI Content Section X End -->
+
+<!-- ===== CONTENT SECTIONS END (EDITABLE) ===== -->
+```
+
+### 3.2 הסרת סקשן
+
+#### שלב 1: זיהוי הסקשן
+```bash
+# חפש את הסקשן להסרה
+grep -n "UI Content Section.*Start" trading-ui/page-name.html
+```
+
+#### שלב 2: הסרה מלאה
+```html
+<!-- הסר את כל הסקשן כולל ההערות -->
+<!-- UI Content Section X Start-->
+<div class="content-section" id="sectionToRemove">
+    <!-- כל התוכן -->
+</div>
+<!-- UI Content Section X End -->
+```
+
+### 3.3 שינוי סדר סקשנים
+
+#### שלב 1: זיהוי הסקשנים
+```bash
+# בדוק את הסדר הנוכחי
+grep "UI Content Section.*Start" trading-ui/page-name.html | sort
+```
+
+#### שלב 2: העברת סקשנים
+```html
+<!-- העבר את הסקשנים בסדר הנכון -->
+<!-- UI Content Section 1 Start-->
+<div class="content-section" id="section1">
+    <!-- תוכן סקשן 1 -->
+</div>
+<!-- UI Content Section 1 End -->
+
+<!-- UI Content Section 2 Start-->
+<div class="content-section" id="section2">
+    <!-- תוכן סקשן 2 -->
+</div>
+<!-- UI Content Section 2 End -->
+```
+
+#### שלב 3: עדכון מספור
+```bash
+# עדכן את כל ההערות והכותרות בהתאם לסדר החדש
+# UI Content Section 1 Start/End
+# UI Content Section 2 Start/End
+# כותרת סקשן 1, כותרת סקשן 2
+```
+
+### 3.4 שינוי שם סקשן
+
+#### שלב 1: עדכון הכותרת
+```html
+<!-- עדכן רק את הכותרת -->
+<h2>📊 שם חדש - כותרת סקשן X</h2>
+```
+
+#### שלב 2: שמירת ה-ID
+```html
+<!-- אל תשנה את ה-ID! -->
+<div class="content-section" id="originalSectionId">
+```
+
+#### שלב 3: עדכון ה-onclick
+```html
+<!-- עדכן את ה-onclick אם שינית את ה-ID -->
+<button class="filter-toggle-btn" onclick="toggleSection('newSectionId')" title="הצג/הסתר סקשן">
+```
+
+### 3.5 כללים חשובים לניהול סקשנים
+
+#### ✅ **חובה לעשות:**
+- **שמור על מספור עקבי**: 1, 2, 3... ללא קפיצות
+- **עדכן הערות HTML**: כל סקשן עם התחלה וסיום
+- **שמור על מזהים ייחודיים**: כל סקשן עם ID ייחודי
+- **עדכן כותרות**: בהתאם למספור החדש
+
+#### ❌ **אסור לעשות:**
+- **אל תשנה מזהים קיימים**: זה ישבור את שמירת המצב
+- **אל תמחק הערות HTML**: זה ישבור את המבנה
+- **אל תעבור את הגבולות**: רק בין ההערות המיוחדות
+
+## שלב 4: הזרקת תוכן לסקשנים
+
+### 4.1 זיהוי תוכן קיים
+
+#### שלב 1: ניתוח התוכן
+```bash
+# זהה את התוכן הקיים בעמוד
+grep -n "class.*card\|class.*table\|class.*row" trading-ui/page-name.html
+```
+
+#### שלב 2: חלוקה לסקשנים
+```bash
+# זהה נקודות חיתוך לסקשנים
+grep -n "h1\|h2\|h3\|class.*card-header" trading-ui/page-name.html
+```
+
+### 4.2 הזרקת תוכן לסקשן עליון (Top Section)
+
+#### שלב 1: זיהוי תוכן מתאים
+```html
+<!-- תוכן מתאים לסקשן עליון: -->
+- מצב מערכות
+- סטטיסטיקות מהירות  
+- כפתורי פעולה מהירה
+- מידע דיבאג בסיסי
+```
+
+#### שלב 2: הזרקה
+```html
+<!-- UI Content Section Top Start-->
+<div class="top-section">
+    <div class="section-header">
+        <h1>🔧 שם העמוד - כותרת סקשן עליון</h1>
+        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+        </button>
+    </div>
+    <div class="section-body">
+        <h2>כותרת משנה</h2>
+        
+        <!-- העבר כאן את התוכן המתאים -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>מצב המערכות</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- תוכן הכרטיס -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- UI Content Section Top End -->
+```
+
+### 4.3 הזרקת תוכן לסקשני תוכן
+
+#### שלב 1: זיהוי תוכן לסקשנים
+```html
+<!-- תוכן מתאים לסקשני תוכן: -->
+- טבלאות מפורטות
+- טפסים ארוכים
+- רשימות ארוכות
+- מידע טכני מפורט
+```
+
+#### שלב 2: הזרקה לסקשן
+```html
+<!-- UI Content Section X Start-->
+<div class="content-section" id="sectionX">
+    <div class="section-header entity-test-sub-header">
+        <h2>📊 כותרת הסקשן - כותרת סקשן X</h2>
+        <button class="filter-toggle-btn" onclick="toggleSection('sectionX')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+        </button>
+    </div>
+    <div class="section-body">
+        <!-- העבר כאן את התוכן -->
+        <div class="table-responsive">
+            <table class="table" data-table-type="tableType">
+                <thead>
+                    <tr>
+                        <th>עמודה 1</th>
+                        <th>עמודה 2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- שורות הטבלה -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- UI Content Section X End -->
+```
+
+### 4.4 כללים להזרקת תוכן
+
+#### ✅ **חובה לעשות:**
+- **העתק רק תוכן פנימי**: אל תעתיק `<div class="row">` או קונטיינרים חיצוניים
+- **שמור על מבנה התבנית**: השתמש במבנה הסקשנים הקיים
+- **עדכן כותרות סקשנים**: החלף כותרות דוגמה בכותרות אמיתיות
+- **הוסף איקונים מתאימים**: לכל כותרת סקשן
+
+#### ❌ **אסור לעשות:**
+- **אל תעתיק קונטיינרים חיצוניים**: רק התוכן הפנימי
+- **אל תשנה את מבנה הסקשנים**: השתמש במבנה הקיים
+- **אל תמחק הערות HTML**: זה ישבור את המבנה
+
+## שלב 5: בדיקות התבנית הנעולה
+
+### 5.1 בדיקות מבנה חובה
+
+#### בדיקה 1: מבנה divs מאוזן
+```bash
+# בדוק שמספר ה-divs הפתוחות שווה לסגורות
+grep -c "<div" trading-ui/page-name.html
+grep -c "</div>" trading-ui/page-name.html
+# התוצאות חייבות להיות זהות
+```
+
+#### בדיקה 2: הערות סקשנים תקינות
+```bash
+# בדוק שכל הסקשנים מתחילים ונגמרים עם הערות
+grep "UI Content Section.*Start\|UI Content Section.*End" trading-ui/page-name.html
+# חייב להיות מספר זוגי של הערות (התחלה + סיום לכל סקשן)
+```
+
+#### בדיקה 3: מספור סקשנים תקין
+```bash
+# בדוק שמספור הסקשנים עקבי
+grep "UI Content Section.*Start" trading-ui/page-name.html | sort
+# חייב להיות: Top, 1, 2, 3... ללא קפיצות
+```
+
+#### בדיקה 4: מבנה main-content תקין
+```bash
+# בדוק ש-main-content נפתח ונגמר במקום הנכון
+grep -A 5 -B 5 "main-content" trading-ui/page-name.html
+# חייב להיות: פתיחה אחרי page-body, סגירה לפני page-body
+```
+
+#### בדיקה 5: תבנית נעולה שמורה
+```bash
+# בדוק שההערות הנעילות קיימות
+grep "TEMPLATE ZONE.*LOCKED\|CONTENT SECTIONS.*EDITABLE" trading-ui/page-name.html
+# חייב להיות: 4 TEMPLATE ZONE + 2 CONTENT SECTIONS
+```
+
+### 5.2 בדיקות פונקציונליות
+
+#### בדיקה 6: כפתורי פתיחה/סגירה
+```bash
+# בדוק שכל הכפתורים מחוברים לפונקציות
+grep "onclick.*toggle" trading-ui/page-name.html
+# חייב להיות: toggleTopSection() + toggleSection('id') לכל סקשן
+```
+
+#### בדיקה 7: מזהים ייחודיים
+```bash
+# בדוק שאין כפילות במזהים
+grep "id=" trading-ui/page-name.html | sort | uniq -d
+# חייב להיות: אין תוצאות (אין כפילות)
+```
+
+#### בדיקה 8: שגיאות לינטר
+```bash
+# בדוק שאין שגיאות לינטר
+read_lints trading-ui/page-name.html
+# חייב להיות: No linter errors found
+```
+
+### 5.3 בדיקות רספונסיביות
+
+#### בדיקה 9: רוחב מקסימלי
+```bash
+# בדוק שהרוחב המקסימלי מוגדר נכון
+grep "max-width.*1360px" trading-ui/styles-new/unified.css
+grep "max-width.*1360px" trading-ui/styles-new/header-styles.css
+# חייב להיות: הגדרות ל-main-content ו-unified-header
+```
+
+#### בדיקה 10: media queries
+```bash
+# בדוק שיש הגדרות רספונסיביות
+grep "@media.*max-width.*1200px\|@media.*max-width.*768px" trading-ui/styles-new/
+# חייב להיות: הגדרות למסכים קטנים
+```
+
+## שלב 6: הפעלת כפתורי הפתיחה/סגירה
+
+### 6.1 וידוא שהמערכת הגלובלית נטענת
+```bash
+# בדוק שהקובץ נטען בתבנית
+grep -n "ui-utils.js" trading-ui/designs.html
+# חייב להיות: <script src="scripts/ui-utils.js"></script>
+```
+
+**חשוב**: המערכת הגלובלית כבר כוללת את הפונקציות ב-`ui-utils.js`:
+- `window.toggleTopSection()` - לסקשן העליון
+- `window.toggleMainSection()` - לסקשן הראשי
+- `window.toggleSection(sectionId)` - לסקשנים רגילים
+- `window.toggleAllSections()` - לפתיחה/סגירה של כל הסקשנים
+
+**אין צורך להוסיף פונקציות מקומיות!**
+
+**דוקומנטציה מפורטת**: [Section Toggle System](SECTION_TOGGLE_SYSTEM.md)
+
+### 6.2 הוספת כפתורי פתיחה/סגירה לסקשנים
+
+#### 6.2.1 כפתור לסקשן עליון
+```html
+<button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
+    <span class="section-toggle-icon">▼</span>
+</button>
+```
+
+#### 6.2.2 כפתור לסקשן רגיל
+```html
+<button class="filter-toggle-btn" onclick="toggleSection('sectionId')" title="הצג/הסתר סקשן">
+    <span class="section-toggle-icon">▼</span>
+</button>
+```
+
+**חשוב**: החלף `sectionId` במזהה האמיתי של הסקשן (ID או data-section).
+
+### 6.3 בדיקת תפקוד הכפתורים
+
+#### בדיקה 1: כפתורי סקשן עליון
+```bash
+# בדוק שכפתור הסקשן העליון מחובר נכון
+grep "onclick.*toggleTopSection" trading-ui/page-name.html
+# חייב להיות: onclick="toggleTopSection()"
+```
+
+#### בדיקה 2: כפתורי סקשנים רגילים
+```bash
+# בדוק שכל הכפתורים מחוברים לפונקציה
+grep "onclick.*toggleSection" trading-ui/page-name.html
+# חייב להיות: onclick="toggleSection('sectionId')" לכל סקשן
+```
+
+#### בדיקה 3: מזהים ייחודיים
+```bash
+# בדוק שכל הסקשנים יש להם מזהים
+grep "id=" trading-ui/page-name.html | grep "content-section\|top-section"
+# חייב להיות: id ייחודי לכל סקשן
+```
+
+#### בדיקה 4: בדיקת תפקוד בדפדפן
+1. פתח את הדף בדפדפן
+2. פתח את הקונסול (F12)
+3. לחץ על כפתורי הפתיחה/סגירה
+4. וודא שאתה רואה לוגים:
+   - ` ui-utils.js toggleTopSection called` (לסקשן עליון)
+   - ` ui-utils.js toggleSection called with: sectionId` (לסקשנים רגילים)
+5. וודא שהסקשנים נפתחים/נסגרים והאייקונים משתנים
+
+## שלב 7: יצירת תבנית בסיס
+
+### 7.1 העתקת קובץ התבנית
 ```bash
 # העתק את קובץ התבנית הבסיסי
 cp trading-ui/designs.html trading-ui/[page-name]-template.html
@@ -79,18 +545,18 @@ cp trading-ui/designs.html trading-ui/[page-name]-template.html
 # למידע מפורט על מבנה העמוד הסטנדרטי
 ```
 
-### 2.2 עדכון כותרת העמוד
+### 7.2 עדכון כותרת העמוד
 ```html
 <title>[שם העמוד] - TikTrack</title>
 ```
 
-### 2.3 עדכון כותרת הסקשן העליון
+### 7.3 עדכון כותרת הסקשן העליון
 ```html
 <div class="top-section">
     <div class="section-header">
         <h1>[שם העמוד] - כותרת סקשן עליון</h1>
         <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
-            <span class="filter-arrow">▼</span>
+            <span class="section-toggle-icon">▼</span>
         </button>
     </div>
     <div class="section-body">
@@ -99,20 +565,20 @@ cp trading-ui/designs.html trading-ui/[page-name]-template.html
 </div>
 ```
 
-## שלב 3: העברת תוכן קיים
+## שלב 8: העברת תוכן קיים
 
-### 3.1 זיהוי תוכן קיים
+### 8.1 זיהוי תוכן קיים
 - זהה את התוכן הקיים בעמוד
 - הפרד בין כותרת לתוכן
 - זהה סקשנים נפרדים
 
-### 3.2 העברת תוכן לסקשן 1
+### 8.2 העברת תוכן לסקשן 1
 ```html
 <div class="content-section">
     <div class="section-header">
         <h2>[כותרת הסקשן]</h2>
         <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
-            <span class="filter-arrow">▼</span>
+            <span class="section-toggle-icon">▼</span>
         </button>
     </div>
     <div class="section-body">
@@ -121,19 +587,19 @@ cp trading-ui/designs.html trading-ui/[page-name]-template.html
 </div>
 ```
 
-### 3.3 עדכון כותרות סקשנים
+### 8.3 עדכון כותרות סקשנים
 - סקשן 1: `[כותרת הסקשן] - כותרת סקשן 1`
 - סקשן 2: `[כותרת הסקשן] - כותרת סקשן 2`
 - סקשן 3: `[כותרת הסקשן] - כותרת סקשן 3`
 
-## שלב 4: עדכון איקונים
+## שלב 9: עדכון איקונים
 
-### 4.1 זיהוי איקון מתאים
+### 9.1 זיהוי איקון מתאים
 - חפש איקון מתאים בתיקיות הפרויקט
 - השתמש באיקונים קיימים במערכת
 - הוסף איקון לכותרות הסקשנים
 
-### 4.2 דוגמאות איקונים
+### 9.2 דוגמאות איקונים
 ```html
 <h1>🔧 בדיקת ראש הדף - כותרת סקשן עליון</h1>
 <h2>📊 ביצועים - כותרת סקשן 1</h2>
@@ -141,9 +607,9 @@ cp trading-ui/designs.html trading-ui/[page-name]-template.html
 <h2>📋 רכיבי ממשק - כותרת סקשן 3</h2>
 ```
 
-## שלב 5: עדכון גרסאות cache busting
+## שלב 10: עדכון גרסאות cache busting
 
-### 5.1 עדכון גרסאות CSS
+### 10.1 עדכון גרסאות CSS
 ```html
 <!-- Unified CSS -->
 <link rel="stylesheet" href="styles-new/unified.css?v=v1.4.0">
@@ -152,37 +618,37 @@ cp trading-ui/designs.html trading-ui/[page-name]-template.html
 <link rel="stylesheet" href="styles-new/header-styles.css?v=v38_fixed">
 ```
 
-### 5.2 עדכון גרסאות JavaScript
+### 10.2 עדכון גרסאות JavaScript
 ```html
 <!-- Header System Script -->
 <script src="scripts/header-system.js?v=v34_fixes"></script>
 ```
 
-## שלב 6: בדיקה ואימות
+## שלב 11: בדיקה ואימות
 
-### 6.1 בדיקת תפריט
+### 11.1 בדיקת תפריט
 - וודא שהתפריט נטען
 - בדוק ניווט בין עמודים
 - וודא שכפתורי הפילטרים עובדים
 
-### 6.2 בדיקת סגנונות
+### 11.2 בדיקת סגנונות
 - וודא שהסגנונות נטענים
 - בדוק שהתפריט נראה נכון
 - וודא שהתוכן מוצג כראוי
 
-### 6.3 בדיקת פונקציונליות
+### 11.3 בדיקת פונקציונליות
 - בדוק שכל הפונקציות עובדות
 - וודא שאין שגיאות JavaScript
 - בדוק שהעמוד נטען מהר
 
-## שלב 7: עדכון דוקומנטציה
+## שלב 12: עדכון דוקומנטציה
 
-### 7.1 עדכון רשימת עמודים
+### 12.1 עדכון רשימת עמודים
 - עדכן את רשימת העמודים במערכת
 - הוסף את העמוד החדש לתפריט
 - עדכן קישורים פנימיים
 
-### 7.2 עדכון דוקומנטציה טכנית
+### 12.2 עדכון דוקומנטציה טכנית
 - עדכן את הדוקומנטציה הטכנית
 - הוסף הערות על השינויים
 - עדכן את רשימת הקבצים
@@ -235,7 +701,7 @@ grep "UI Content Section.*Start" trading-ui/test-header-only.html
 #     <div class="section-header">
 #         <h2>📋 רכיבי ממשק - כותרת סקשן 4</h2>
 #         <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
-#             <span class="filter-arrow">▼</span>
+#             <span class="section-toggle-icon">▼</span>
 #         </button>
 #     </div>
 #     <div class="section-body">
@@ -248,7 +714,7 @@ grep "UI Content Section.*Start" trading-ui/test-header-only.html
 #     <div class="section-header">
 #         <h2>🔧 כלי פיתוח - כותרת סקשן 5</h2>
 #         <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
-#             <span class="filter-arrow">▼</span>
+#             <span class="section-toggle-icon">▼</span>
 #         </button>
 #     </div>
 #     <div class="section-body">
@@ -335,7 +801,7 @@ grep -A 10 "תוכן סקשן מספר" trading-ui/header-test-template.html
 #     <div class="section-header">
 #         <h2>🎨 עיצוב וסגנונות - כותרת סקשן 2</h2>
 #         <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
-#             <span class="filter-arrow">▼</span>
+#             <span class="section-toggle-icon">▼</span>
 #         </button>
 #     </div>
 #     <div class="section-body">
@@ -505,9 +971,9 @@ grep "data-section=" trading-ui/page-name.html
 
 ### צעד 14: בדיקה ותיקון כפתורי פתיחה וסגירה
 
-#### 14.1 בדיקת כפתורים קיימים
-לאחר שילוב התוכן, יש לבדוק ולתקן את כל כפתורי הפתיחה והסגירה של הסקשנים.
+**הערה**: שלב זה מבוצע רק אחרי שכל הקונטיינרים והסקשנים כבר קיימים בעמוד.
 
+#### 14.1 בדיקת כפתורים קיימים
 ```bash
 # בדוק שכל הכפתורים קיימים
 grep "filter-toggle-btn" trading-ui/page-name.html
@@ -522,14 +988,14 @@ grep "onclick.*toggle" trading-ui/page-name.html
 **כפתור סקשן עליון:**
 ```html
 <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
-    <span class="filter-arrow">▼</span>
+    <span class="section-toggle-icon">▼</span>
 </button>
 ```
 
 **כפתור סקשן תוכן:**
 ```html
 <button class="filter-toggle-btn" onclick="toggleSection('sectionId')" title="הצג/הסתר סקשן">
-    <span class="filter-arrow">▼</span>
+    <span class="section-toggle-icon">▼</span>
 </button>
 ```
 
@@ -546,30 +1012,7 @@ grep "onclick.*toggle" trading-ui/page-name.html
 <div class="content-section extra-data-page" data-section="sectionId">
 ```
 
-#### 14.4 ניהול מצבים שונים
-
-##### **הוספת סקשן חדש:**
-1. הוסף את הסקשן עם ID או data-section ייחודי
-2. הוסף כפתור פתיחה/סגירה עם `onclick="toggleSection('sectionId')"`
-3. עדכן את מספור הסקשנים והערות
-
-##### **הסרת סקשן:**
-1. הסר את כל הסקשן (div, כפתור, תוכן)
-2. עדכן את מספור הסקשנים הנותרים
-3. עדכן את כל ההערות והמספור
-
-##### **שינוי סדר סקשנים:**
-1. העבר את הסקשנים בסדר הנכון
-2. עדכן את מספור הסקשנים (1, 2, 3...)
-3. עדכן את כל ההערות והמספור
-4. **שמור על ה-ID או data-section המקורי** - אל תשנה אותם!
-
-##### **שינוי שם סקשן:**
-1. עדכן את הכותרת בסקשן
-2. **אל תשנה את ה-ID או data-section** - זה ישבור את שמירת המצב
-3. אם חייב לשנות, עדכן גם את ה-onclick בכפתור
-
-#### 14.5 בדיקת תפקוד הכפתורים
+#### 14.4 בדיקת תפקוד הכפתורים
 ```bash
 # בדוק שכל הכפתורים מחוברים נכון
 grep "onclick.*toggleSection" trading-ui/page-name.html
@@ -581,47 +1024,547 @@ grep "id=\|data-section=" trading-ui/page-name.html
 grep "id=" trading-ui/page-name.html | sort | uniq -d
 ```
 
+#### 14.5 בדיקת תפקוד בדפדפן
+1. פתח את הדף בדפדפן
+2. פתח את הקונסול (F12)
+3. לחץ על כפתורי הפתיחה/סגירה
+4. וודא שאתה רואה לוגים:
+   - ` ui-utils.js toggleTopSection called` (לסקשן עליון)
+   - ` ui-utils.js toggleSection called with: sectionId` (לסקשנים רגילים)
+5. וודא שהסקשנים נפתחים/נסגרים והאייקונים משתנים
+
 #### 14.6 כללים חשובים
 - **סקשן עליון**: תמיד `onclick="toggleTopSection()"`
 - **סקשני תוכן**: תמיד `onclick="toggleSection('sectionId')"`
 - **מזהים ייחודיים**: כל סקשן צריך מזהה ייחודי
 - **שמירת מצב**: המזהים נשמרים ב-localStorage - אל תשנה אותם!
 - **עקביות**: השתמש באותו סוג מזהה (ID או data-section) בכל העמוד
+- **אין פונקציות מקומיות**: המערכת הגלובלית ב-`ui-utils.js` מטפלת בהכל
 
-### צעד 15: חיבור מערכת הצבעים הדינמית ומערכת ההעדפות
+### צעד 15: הפעלת מערכת הצבעים הדינמית
 
-#### 15.1 סקריפטים שכבר כלולים בתבנית
-התבנית הבסיס (`designs.html`) כבר כוללת את הסקריפטים הנדרשים:
+#### 15.1 מבוא למערכת הצבעים הדינמית
 
-**בחלק ה-HEAD:**
-```html
-<!-- Dynamic Color System Scripts -->
-<script src="scripts/color-scheme-system.js"></script>
+מערכת הצבעים הדינמית מאפשרת התאמה אישית של צבעים לכל משתמש, עם שמירה ב-API ועדכון בזמן אמת. המערכת מבוססת על CSS Custom Properties וממשקת עם מערכת ההעדפות.
 
-<!-- Preferences System Scripts -->
-<script src="scripts/preferences-v2.js"></script>
-<script src="scripts/preferences-v2-compatibility.js"></script>
+**עקרונות המערכת:**
+- **CSS Custom Properties** - כל הצבעים מוגדרים כמשתנים
+- **API Integration** - שמירה וטעינה מ-API
+- **Fallback Values** - ערכי ברירת מחדל לכל צבע
+- **Real-time Updates** - עדכון מיידי של הצבעים
+- **Theme Support** - תמיכה בערכות נושא שונות
 
-<!-- Color Demo Toggle Script -->
-<script src="scripts/color-demo-toggle.js"></script>
+**דוקומנטציה מפורטת**: [Dynamic Colors Guide](DYNAMIC_COLORS_GUIDE.md)
+
+#### 15.2 סקריפטים נדרשים
+
+התבנית הבסיס (`designs.html`) כבר כוללת את כל הסקריפטים הנדרשים:
+
+```bash
+# בדוק שכל הסקריפטים קיימים בתבנית
+grep "scripts/" trading-ui/designs.html
+
+# בדוק סקריפטים ספציפיים:
+grep "color-scheme-system.js" trading-ui/designs.html
+grep "preferences-v2.js" trading-ui/designs.html
+grep "ui-utils.js" trading-ui/designs.html
+grep "main.js" trading-ui/designs.html
 ```
 
-**בסוף העמוד (לפני סגירת body):**
+**כל הסקריפטים הבאים כבר כלולים בתבנית:**
+- מערכת צבעים דינמית (`color-scheme-system.js`)
+- מערכת העדפות (`preferences-v2.js`)
+- מערכת פתיחה/סגירה (`ui-utils.js`)
+- מערכת טבלאות (`tables.js`)
+- מערכת תרגומים (`translation-utils.js`)
+- מערכת נתונים (`data-utils.js`)
+- מערכת קישורים (`linked-items.js`)
+- מערכת עמודים (`page-utils.js`)
+
+#### 15.3 יישום צבעי סטטוס
+
+**כיתות CSS זמינות לסטטוסים:**
+
 ```html
-<!-- Core System Scripts -->
-<script src="scripts/console-cleanup.js"></script>
-<script src="scripts/translation-utils.js"></script>
-<script src="scripts/data-utils.js"></script>
-<script src="scripts/ui-utils.js"></script>
-<script src="scripts/table-mappings.js"></script>
-<script src="scripts/date-utils.js"></script>
-<script src="scripts/tables.js"></script>
-<script src="scripts/linked-items.js"></script>
-<script src="scripts/page-utils.js"></script>
-<script src="scripts/main.js"></script>
+<!-- תגיות סטטוס עם צבעים דינמיים -->
+<span class="status-badge status-open">פתוח</span>
+<span class="status-badge status-closed">סגור</span>
+<span class="status-badge status-cancelled">מבוטל</span>
+<span class="status-badge status-pending">ממתין</span>
+<span class="status-badge status-active">פעיל</span>
+<span class="status-badge status-inactive">לא פעיל</span>
 ```
 
-#### 15.2 בדיקת סקריפטים קיימים
+**שימוש עם data-status:**
+```html
+<!-- עמודת סטטוס בטבלה -->
+<td data-status="פתוח">
+    <span class="status-badge status-open">פתוח</span>
+</td>
+<td data-status="סגור">
+    <span class="status-badge status-closed">סגור</span>
+</td>
+```
+
+**סטטוסים זמינים:**
+- `open` - פתוח (ירוק)
+- `closed` - סגור (אפור)
+- `cancelled` - מבוטל (אדום)
+- `pending` - ממתין (צהוב)
+- `active` - פעיל (כחול)
+- `inactive` - לא פעיל (אפור)
+
+#### 15.4 יישום צבעי ערכים מספריים
+
+**כיתות CSS זמינות לערכים מספריים:**
+
+```html
+<!-- ערכים חיוביים -->
+<span class="numeric-text-positive">+2.35%</span>
+<span class="numeric-text-positive">+₪1,250</span>
+
+<!-- ערכים שליליים -->
+<span class="numeric-text-negative">-0.75%</span>
+<span class="numeric-text-negative">-₪850</span>
+
+<!-- ערך אפס -->
+<span class="numeric-text-zero">0.00%</span>
+```
+
+**שימוש בעמודות טבלה:**
+```html
+<!-- עמודת שינוי יומי -->
+<td><span class="numeric-text-positive">+2.35%</span></td>
+<td><span class="numeric-text-negative">-0.75%</span></td>
+
+<!-- עמודת רווח/הפסד -->
+<td><span class="numeric-text-positive">+₪1,250</span></td>
+<td><span class="numeric-text-negative">-₪850</span></td>
+```
+
+#### 15.5 יישום צבעי סוגי השקעה
+
+**כיתות CSS זמינות לסוגי השקעה:**
+
+```html
+<!-- סוגי השקעה -->
+<span class="type-stock">מניה</span>
+<span class="type-etf">ETF</span>
+<span class="type-crypto">קריפטו</span>
+<span class="type-bond">אג"ח</span>
+```
+
+**שימוש עם data-investment-type:**
+```html
+<!-- עמודת סוג השקעה בטבלה -->
+<td data-investment-type="stock">
+    <span class="type-stock">מניה</span>
+</td>
+<td data-investment-type="etf">
+    <span class="type-etf">ETF</span>
+</td>
+```
+
+#### 15.6 בדיקת תפקוד המערכת
+
+**בדיקת טעינת צבעים:**
+```bash
+# בדוק שהעמוד נטען ללא שגיאות JavaScript
+# פתח את העמוד בדפדפן ובדוק את הקונסול
+
+# בדוק שהמערכות מאותחלות
+# חפש הודעות: "Dynamic colors loaded successfully", "Preferences system initialized"
+```
+
+**בדיקת עדכון צבעים:**
+```javascript
+// בדיקת עדכון צבעים בזמן אמת
+function testColorUpdate() {
+  const testElement = document.querySelector('.status-open');
+  if (testElement) {
+    const computedStyle = getComputedStyle(testElement);
+    const color = computedStyle.getPropertyValue('--status-open-color');
+    console.log('צבע סטטוס פתוח:', color);
+  }
+}
+```
+
+#### 15.7 כללים חשובים
+
+**כללים לשימוש נכון:**
+1. **עקביות** - השתמש באותם צבעי סטטוס בכל העמודים
+2. **נגישות** - וודא שיש ניגודיות מספקת בין הטקסט לרקע
+3. **משמעות** - השתמש בצבעים שמתאימים למשמעות הסטטוס
+4. **עדכון** - המערכת מתעדכנת אוטומטית כשהמשתמש משנה העדפות
+
+**דוגמאות לשימוש נכון:**
+```html
+<!-- נכון - שימוש במחלקות סטטוס -->
+<td class="status-cell">
+  <span class="status-badge status-open">פתוח</span>
+</td>
+
+<!-- נכון - שימוש עם ערכים מספריים -->
+<td><span class="numeric-text-positive">+2.35%</span></td>
+
+<!-- שגוי - שימוש בצבעים קבועים -->
+<td class="status-cell" style="background-color: #28a745;">
+  <span style="color: white;">פתוח</span>
+</td>
+```
+
+### צעד 15.5: צביעת עמודת מחיר לפי השינוי
+
+#### 15.5.1 מבוא לצביעת עמודת מחיר
+
+כאשר יש עמודת מחיר ליד עמודת שינוי (אחוז או ערך), עמודת המחיר צריכה לקבל את אותו צבע כמו השינוי - חיובי, שלילי או אפס. זה עוזר למשתמש להבין במהירות את הכיוון של השינוי.
+
+**עקרונות המערכת:**
+- **עקביות צבעים** - עמודת מחיר ועמודת שינוי באותו צבע
+- **הבנה מהירה** - המשתמש רואה מיד אם השינוי חיובי או שלילי
+- **עיצוב אחיד** - אותו עיצוב בכל העמודים
+
+#### 15.5.2 יישום צביעת עמודת מחיר
+
+**HTML לעמודת מחיר עם שינוי חיובי:**
+```html
+<!-- עמודת מחיר -->
+<td><span class="numeric-text-positive">$150.50</span></td>
+
+<!-- עמודת שינוי (באותו צבע) -->
+<td><span class="numeric-text-positive">+2.35%</span></td>
+```
+
+**HTML לעמודת מחיר עם שינוי שלילי:**
+```html
+<!-- עמודת מחיר -->
+<td><span class="numeric-text-negative">$2,850.00</span></td>
+
+<!-- עמודת שינוי (באותו צבע) -->
+<td><span class="numeric-text-negative">-0.75%</span></td>
+```
+
+**HTML לעמודת מחיר עם שינוי אפס:**
+```html
+<!-- עמודת מחיר -->
+<td><span class="numeric-text-zero">$100.00</span></td>
+
+<!-- עמודת שינוי (באותו צבע) -->
+<td><span class="numeric-text-zero">0.00%</span></td>
+```
+
+#### 15.5.3 שימוש בטבלאות
+
+**דוגמה מלאה של שורה בטבלה:**
+```html
+<tr>
+    <td>AAPL</td>
+    <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
+    <td title="יש טריידים פעילים" style="text-align: center;">
+        <span class="btn btn-sm btn-success" 
+              style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
+            ✓
+        </span>
+    </td>
+    <!-- עמודת מחיר עם צבע חיובי -->
+    <td><span class="numeric-text-positive">$150.50</span></td>
+    <!-- עמודת שינוי עם אותו צבע -->
+    <td><span class="numeric-text-positive">+2.35%</span></td>
+    <td data-investment-type="stock">מניה</td>
+    <td>Apple Inc.</td>
+    <td>טיקר טכנולוגיה</td>
+    <td>2025-01-15 10:30</td>
+    <td class="actions-cell">
+        <div class="btn-group">
+            <button class="btn btn-sm btn-outline-primary" onclick="editTicker(1)" title="ערוך">
+                <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteTicker(1)" title="מחק">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </td>
+</tr>
+```
+
+#### 15.5.4 כללים חשובים
+
+**כללים לשימוש נכון:**
+1. **עקביות** - עמודת מחיר ועמודת שינוי באותו צבע
+2. **לוגיקה** - הצבע נקבע לפי השינוי, לא לפי המחיר
+3. **עיצוב אחיד** - אותו עיצוב בכל העמודים
+4. **קריאות** - וודא שהצבעים נראים טוב על הרקע
+
+**דוגמאות לשימוש נכון:**
+```html
+<!-- נכון - מחיר ושינוי באותו צבע חיובי -->
+<td><span class="numeric-text-positive">$150.50</span></td>
+<td><span class="numeric-text-positive">+2.35%</span></td>
+
+<!-- נכון - מחיר ושינוי באותו צבע שלילי -->
+<td><span class="numeric-text-negative">$2,850.00</span></td>
+<td><span class="numeric-text-negative">-0.75%</span></td>
+
+<!-- נכון - מחיר ושינוי באותו צבע אפס -->
+<td><span class="numeric-text-zero">$100.00</span></td>
+<td><span class="numeric-text-zero">0.00%</span></td>
+```
+
+**דוגמאות לשימוש שגוי:**
+```html
+<!-- שגוי - מחיר ושינוי בצבעים שונים -->
+<td><span class="numeric-text-positive">$150.50</span></td>
+<td><span class="numeric-text-negative">+2.35%</span></td>
+
+<!-- שגוי - מחיר ללא צבע ושינוי עם צבע -->
+<td>$150.50</td>
+<td><span class="numeric-text-positive">+2.35%</span></td>
+
+<!-- שגוי - מחיר עם צבע ושינוי ללא צבע -->
+<td><span class="numeric-text-positive">$150.50</span></td>
+<td>+2.35%</td>
+```
+
+#### 15.5.5 בדיקות ואימות
+
+**בדיקת עיצוב:**
+```bash
+# בדוק שהעמודות נראות נכון
+# פתח את העמוד בדפדפן ובדוק את העמודות
+
+# בדוק שהמחיר והשינוי באותו צבע
+# בדוק שהצבעים נכונים (ירוק/אדום/אפור)
+# בדוק שהצבעים נראים טוב על הרקע
+```
+
+**בדיקת פונקציונליות:**
+```bash
+# בדוק שהעמודות לא שבורות
+# בדוק שהעמודות לא משפיעות על הפונקציונליות
+# בדוק שהעמודות נראות נכון בכל הדפדפנים
+```
+
+#### 15.5.6 אינטגרציה עם מערכת הצבעים הדינמית
+
+העמודות משתמשות באותן מחלקות CSS כמו עמודת השינוי (`numeric-text-positive`, `numeric-text-negative`, `numeric-text-zero`) שמתעדכנות אוטומטית עם מערכת הצבעים הדינמית.
+
+**יתרונות:**
+- **עדכון אוטומטי** - הצבעים מתעדכנים עם מערכת הצבעים
+- **עקביות** - כל העמודות נראות זהה
+- **תחזוקה קלה** - אין צורך בהגדרות נוספות
+
+### צעד 16: יישום כפתורי כן/לא (Yes/No Buttons)
+
+#### 16.1 מבוא למערכת כפתורי כן/לא
+
+מערכת כפתורי ה"כן/לא" מספקת עיצוב אחיד לכפתורים שמציגים מצב בינארי (כן/לא, פעיל/לא פעיל, וכו'). הכפתורים משתמשים בעיצוב Bootstrap עם צבעים דינמיים מהמערכת.
+
+**עקרונות המערכת:**
+- **עיצוב אחיד** - כל הכפתורים נראים זהה בכל המערכת
+- **צבעים דינמיים** - ירוק לכן, אדום ללא
+- **איקונים ברורים** - ✓ לכן, ✗ ללא
+- **גודל אחיד** - 30x30 פיקסלים
+- **תמיכה ב-hover** - אפקטים ויזואליים
+
+#### 16.2 יישום כפתורי כן/לא
+
+**HTML לכפתור "כן":**
+```html
+<td title="יש טריידים פעילים" style="text-align: center;">
+    <span class="btn btn-sm btn-success" 
+          style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
+        ✓
+    </span>
+</td>
+```
+
+**HTML לכפתור "לא":**
+```html
+<td title="אין טריידים פעילים" style="text-align: center;">
+    <span class="btn btn-sm btn-danger" 
+          style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
+        ✗
+    </span>
+</td>
+```
+
+#### 16.3 שימוש בעמודות טבלה
+
+**עמודת "יש טריידים":**
+```html
+<th>יש טריידים</th>
+```
+
+**שורות הטבלה:**
+```html
+<!-- שורה עם טריידים פעילים -->
+<tr>
+    <td>AAPL</td>
+    <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
+    <td title="יש טריידים פעילים" style="text-align: center;">
+        <span class="btn btn-sm btn-success" 
+              style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
+            ✓
+        </span>
+    </td>
+    <!-- שאר העמודות -->
+</tr>
+
+<!-- שורה ללא טריידים פעילים -->
+<tr>
+    <td>GOOGL</td>
+    <td data-status="סגור"><span class="status-badge status-closed">סגור</span></td>
+    <td title="אין טריידים פעילים" style="text-align: center;">
+        <span class="btn btn-sm btn-danger" 
+              style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
+            ✗
+        </span>
+    </td>
+    <!-- שאר העמודות -->
+</tr>
+```
+
+#### 16.4 שימוש בעמודות אחרות
+
+**עמודת "פעיל":**
+```html
+<!-- פעיל -->
+<td title="פעיל" style="text-align: center;">
+    <span class="btn btn-sm btn-success" 
+          style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
+        ✓
+    </span>
+</td>
+
+<!-- לא פעיל -->
+<td title="לא פעיל" style="text-align: center;">
+    <span class="btn btn-sm btn-danger" 
+          style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
+        ✗
+    </span>
+</td>
+```
+
+**עמודת "מאושר":**
+```html
+<!-- מאושר -->
+<td title="מאושר" style="text-align: center;">
+    <span class="btn btn-sm btn-success" 
+          style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
+        ✓
+    </span>
+</td>
+
+<!-- לא מאושר -->
+<td title="לא מאושר" style="text-align: center;">
+    <span class="btn btn-sm btn-danger" 
+          style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
+        ✗
+    </span>
+</td>
+```
+
+#### 16.5 כללים חשובים
+
+**כללים לשימוש נכון:**
+1. **עקביות** - השתמש באותו עיצוב בכל העמודים
+2. **גודל אחיד** - תמיד 30x30 פיקסלים
+3. **צבעים נכונים** - ירוק לכן, אדום ללא
+4. **איקונים ברורים** - ✓ לכן, ✗ ללא
+5. **title מתאים** - הוסף title מתאים לכל כפתור
+
+**דוגמאות לשימוש נכון:**
+```html
+<!-- נכון - כפתור כן -->
+<td title="יש טריידים פעילים" style="text-align: center;">
+    <span class="btn btn-sm btn-success" 
+          style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
+        ✓
+    </span>
+</td>
+
+<!-- נכון - כפתור לא -->
+<td title="אין טריידים פעילים" style="text-align: center;">
+    <span class="btn btn-sm btn-danger" 
+          style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
+        ✗
+    </span>
+</td>
+```
+
+**דוגמאות לשימוש שגוי:**
+```html
+<!-- שגוי - גודל לא אחיד -->
+<td>
+    <span class="btn btn-sm btn-success" style="width: 25px; height: 25px;">✓</span>
+</td>
+
+<!-- שגוי - צבעים לא נכונים -->
+<td>
+    <span class="btn btn-sm btn-primary">✓</span>
+</td>
+
+<!-- שגוי - איקונים לא ברורים -->
+<td>
+    <span class="btn btn-sm btn-success">Y</span>
+</td>
+```
+
+#### 16.6 בדיקות ואימות
+
+**בדיקת עיצוב:**
+```bash
+# בדוק שהכפתורים נראים נכון
+# פתח את העמוד בדפדפן ובדוק את הכפתורים
+
+# בדוק שהכפתורים בגודל נכון (30x30)
+# בדוק שהצבעים נכונים (ירוק/אדום)
+# בדוק שהאיקונים ברורים (✓/✗)
+```
+
+**בדיקת פונקציונליות:**
+```bash
+# בדוק שהכפתורים לא שבורים
+# בדוק שהכפתורים לא משפיעים על הפונקציונליות
+# בדוק שהכפתורים נראים נכון בכל הדפדפנים
+```
+
+#### 16.7 אינטגרציה עם מערכת הצבעים הדינמית
+
+הכפתורים משתמשים בצבעי Bootstrap (`btn-success`, `btn-danger`) שמתעדכנים אוטומטית עם מערכת הצבעים הדינמית. אין צורך בהגדרות נוספות.
+
+**יתרונות:**
+- **עדכון אוטומטי** - הצבעים מתעדכנים עם מערכת הצבעים
+- **עקביות** - כל הכפתורים נראים זהה
+- **תחזוקה קלה** - אין צורך בהגדרות נוספות
+
+### צעד 17: חיבור מערכת הצבעים הדינמית ומערכת ההעדפות
+
+#### 17.1 בדיקת סקריפטים בתבנית
+התבנית הבסיס (`designs.html`) כבר כוללת את כל הסקריפטים הנדרשים:
+
+```bash
+# בדוק שכל הסקריפטים קיימים בתבנית
+grep "scripts/" trading-ui/designs.html
+
+# בדוק סקריפטים ספציפיים:
+grep "color-scheme-system.js" trading-ui/designs.html
+grep "preferences-v2.js" trading-ui/designs.html
+grep "ui-utils.js" trading-ui/designs.html
+grep "main.js" trading-ui/designs.html
+```
+
+**כל הסקריפטים הבאים כבר כלולים בתבנית:**
+- מערכת צבעים דינמית
+- מערכת העדפות
+- מערכת פתיחה/סגירה
+- מערכת טבלאות
+- מערכת תרגומים
+- מערכת נתונים
+- מערכת קישורים
+- מערכת עמודים
+
+#### 17.2 בדיקת סקריפטים קיימים
 לפני הוספת סקריפטים, בדוק אם הם כבר קיימים:
 
 ```bash
@@ -632,7 +1575,7 @@ grep "color-scheme-system\|preferences-v2" trading-ui/page-name.html
 grep "console-cleanup\|ui-utils\|main.js" trading-ui/page-name.html
 ```
 
-#### 15.3 הוספת סקריפטים חסרים
+#### 17.3 הוספת סקריפטים חסרים
 אם חסרים סקריפטים, הוסף אותם לפי הסדר הנכון:
 
 **אם חסרים סקריפטים בחלק ה-HEAD:**
@@ -663,7 +1606,7 @@ grep "console-cleanup\|ui-utils\|main.js" trading-ui/page-name.html
 <script src="scripts/main.js"></script>
 ```
 
-#### 15.4 מה המערכות מספקות
+#### 17.4 מה המערכות מספקות
 
 **מערכת הצבעים הדינמית:**
 - צבעים מותאמים אישית לכל משתמש
@@ -679,7 +1622,7 @@ grep "console-cleanup\|ui-utils\|main.js" trading-ui/page-name.html
 - תמיכה ב-V1 ו-V2
 - שמירה ב-API ובמסד נתונים
 
-#### 15.5 בדיקת תפקוד המערכות
+#### 17.5 בדיקת תפקוד המערכות
 ```bash
 # בדוק שהעמוד נטען ללא שגיאות JavaScript
 # פתח את העמוד בדפדפן ובדוק את הקונסול
@@ -688,15 +1631,15 @@ grep "console-cleanup\|ui-utils\|main.js" trading-ui/page-name.html
 # חפש הודעות: "Dynamic colors loaded successfully", "Preferences system initialized"
 ```
 
-#### 15.6 כללים חשובים
+#### 17.6 כללים חשובים
 - **סדר טעינה**: הסקריפטים חייבים להיטען בסדר הנכון
 - **תאימות**: המערכות תואמות ל-V1 ו-V2 של ההעדפות
 - **ביצועים**: הצבעים מתעדכנים בזמן אמת ללא טעינה מחדש
 - **נגישות**: תמיכה בערכות נושא לנגישות
 
-### צעד 16: ניקוי סקריפטים אינליין ו-CSS אינליין
+### צעד 18: ניקוי סקריפטים אינליין ו-CSS אינליין
 
-#### 16.1 חיפוש סקריפטים אינליין
+#### 18.1 חיפוש סקריפטים אינליין
 ```bash
 # חפש סקריפטים אינליין בעמוד
 grep -n "<script>" trading-ui/page-name.html
@@ -708,7 +1651,7 @@ grep -n "function" trading-ui/page-name.html
 grep -n "onclick=" trading-ui/page-name.html
 ```
 
-#### 16.2 העברת סקריפטים לקבצים חיצוניים
+#### 18.2 העברת סקריפטים לקבצים חיצוניים
 **כלל חשוב**: אין סקריפטים אינליין בעמודים! כל הפונקציות חייבות להיות בקבצים חיצוניים.
 
 **תהליך העברה:**
@@ -719,13 +1662,13 @@ grep -n "onclick=" trading-ui/page-name.html
    // Export functions to global scope
    window.functionName = functionName;
    ```
-4. **החלף את הסקריפט האינליין** בקישור לקובץ החיצוני:
+4. **הוסף את הקובץ לעמוד** (במקום הסקריפט האינליין):
    ```html
    <!-- Page-specific script -->
    <script src="scripts/page-name.js"></script>
    ```
 
-#### 16.3 חיפוש CSS אינליין
+#### 18.3 חיפוש CSS אינליין
 ```bash
 # חפש הגדרות style אינליין
 grep -n "style=" trading-ui/page-name.html
@@ -734,7 +1677,7 @@ grep -n "style=" trading-ui/page-name.html
 grep -n "style.*:" trading-ui/page-name.html
 ```
 
-#### 16.4 דוגמה לתהליך ניקוי
+#### 18.4 דוגמה לתהליך ניקוי
 **לפני:**
 ```html
 <script>
@@ -767,7 +1710,7 @@ document.addEventListener('DOMContentLoaded', function() {
 window.updateDebugInfo = updateDebugInfo;
 ```
 
-#### 16.5 בדיקות אחרי ניקוי
+#### 18.5 בדיקות אחרי ניקוי
 ```bash
 # בדוק שאין סקריפטים אינליין
 grep -n "<script>" trading-ui/page-name.html
@@ -779,14 +1722,14 @@ grep -n "function" trading-ui/page-name.html
 ls -la trading-ui/scripts/page-name.js
 ```
 
-#### 16.6 כללים חשובים
+#### 18.6 כללים חשובים
 - **אין סקריפטים אינליין**: כל JavaScript חייב להיות בקבצים חיצוניים
 - **קובץ ספציפי לעמוד**: כל עמוד צריך קובץ סקריפט משלו
 - **Exports נדרשים**: פונקציות שצריכות להיות זמינות גלובלית
 - **CSS אינליין**: יש לזהות ולהציג בדוח (לא לתקן אוטומטית)
 - **שמירת פונקציונליות**: וודא שהעמוד עובד אחרי ההעברה
 
-### צעד 17: בדיקות חובה אחרי עדכון עמוד
+### צעד 19: בדיקות חובה אחרי עדכון עמוד
 
 #### בדיקות מבנה חובה:
 ```bash
@@ -806,7 +1749,7 @@ read_lints trading-ui/page-name.html
 # פתח את העמוד בדפדפן ובדוק את הקונסול
 ```
 
-### צעד 18: בדיקה חוזרת מול תבנית הבסיס
+### צעד 20: בדיקה חוזרת מול תבנית הבסיס
 
 #### וידוא שהמבנה תואם לתבנית:
 ```bash
@@ -826,7 +1769,7 @@ grep "unified-header" trading-ui/page-name.html
 grep "unified.css\|header-styles.css" trading-ui/page-name.html
 ```
 
-### צעד 19: גיבוי לגיט האב
+### צעד 21: גיבוי לגיט האב
 
 #### תהליך גיבוי מלא:
 ```bash
@@ -856,7 +1799,7 @@ git tag -a "page-name-v2.0" -m "Page name updated to unified structure v2.0"
 git push origin "page-name-v2.0"
 ```
 
-### צעד 20: עדכון רשימת המשימות
+### צעד 22: עדכון רשימת המשימות
 
 #### עדכון הטבלה הדו-מימדית:
 ```bash
@@ -870,7 +1813,7 @@ git push origin "page-name-v2.0"
 # | **טבלאות עזר** | `/db_extradata` | ✅ הושלם | 2025-01-15 | 4 סקשנים: כרטיסיות התראות, מטבעות, סוגי קישור, כפתורי טריגרים |
 ```
 
-### צעד 21: בדיקות נוספות לאימות מבנה תקין
+### צעד 23: בדיקות נוספות לאימות מבנה תקין
 
 #### בדיקות מתקדמות:
 ```bash
@@ -997,7 +1940,7 @@ read_lints trading-ui/page-name.html
 
 ### כפתורי פתיחה/סגירה
 - השתמש ב-`filter-toggle-btn`
-- הוסף `filter-arrow` עם `▼`
+- הוסף `section-toggle-icon` עם `▼`
 - הוסף `title` מתאים
 
 ## רשימת משימות דו-מימדית - כל העמודים במערכת
@@ -1094,21 +2037,32 @@ read_lints trading-ui/db_extradata.html
 
 ## סיכום
 
-מדריך זה מספק תהליך מפורט לעדכון עמוד קיים לתבנית הבסיס החדשה. הקפד על כל הצעדים כדי להבטיח עקביות ואיכות במערכת.
+מדריך זה מספק תהליך מפורט לעדכון עמוד קיים לתבנית הבסיס החדשה עם **תבנית נעולה** שמגנה על המבנה הבסיסי. הקפד על כל הצעדים כדי להבטיח עקביות ואיכות במערכת.
 
 ### נקודות מפתח:
-- **תהליך מובנה**: 23 שלבים מוגדרים בבירור + תובנות מעשיות
+- **תבנית נעולה**: הערות ברורות שמגנות על המבנה הבסיסי
+- **אזורים נעולים**: TEMPLATE ZONE 1-3 מוגנים מפני שינויים
+- **אזור עריכה מוגבל**: רק בין ההערות המיוחדות
+- **ניהול סקשנים**: הוראות מפורטות להוספה, הסרה ושינוי סדר
+- **הזרקת תוכן**: כללים ברורים להעברת תוכן לסקשנים
+- **בדיקות מקיפות**: 10 בדיקות חובה למבנה, פונקציונליות ורספונסיביות
 - **מזהי טבלאות**: טבלה מלאה עם כל המזהים הנדרשים לכל עמוד
 - **כפתורי פתיחה/סגירה**: מערכת מרוכזת עם הוראות מפורטות לכל מצב
 - **ניקוי סקריפטים**: הוראות מפורטות להעברת סקריפטים אינליין לקבצים חיצוניים
 - **זיהוי CSS אינליין**: כלים לזיהוי והצגת הגדרות CSS אינליין
 - **צביעת סטטוסים**: מערכת צבעים דינמית עם הוראות מפורטות לשימוש
 - **תובנות מעשיות**: שגיאות נפוצות ופתרונות מהעבודה על עמודים אמיתיים
-- **בדיקות חובה**: 5 בדיקות מבנה + בדיקה חוזרת מול תבנית + 7 בדיקות מתקדמות
 - **גיבוי מלא**: גיבוי מקומי + גיט האב + תגים
 - **מעקב מתמיד**: רשימת משימות דו-מימדית לכל העמודים
-- **דוגמאות מעשיות**: 3 עמודים שהושלמו בהצלחה עם תובנות מפורטות (כל 23 הסעיפים)
+- **דוגמאות מעשיות**: 3 עמודים שהושלמו בהצלחה עם תובנות מפורטות
 - **תהליך אופטימלי**: כל המידע הדרוש לביצוע מושלם של התהליך
+
+### יתרונות התבנית הנעולה:
+- 🛡️ **הגנה מלאה** על המבנה הבסיסי
+- ✏️ **עריכה בטוחה** רק באזורים המותרים
+- 🔒 **בלתי ניתן לשבירה** - המבנה הבסיסי מוגן
+- 📋 **הוראות ברורות** - ברור מה מותר ומה אסור
+- 🎯 **עקביות** - כל העמודים עם אותו מבנה
 
 ---
 

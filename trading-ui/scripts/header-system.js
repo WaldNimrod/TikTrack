@@ -774,21 +774,17 @@ class HeaderSystem {
                   <span class="dropdown-arrow">▼</span>
                 </button>
                 <div class="filter-menu" id="statusFilterMenu">
-                  <div class="status-filter-item" data-value="הכול" onclick="selectStatusOption('הכול')">
+                  <div class="status-filter-item" data-value="הכול">
                     <span class="option-text">הכול</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="status-filter-item" data-value="פתוח" onclick="selectStatusOption('פתוח')">
+                  <div class="status-filter-item" data-value="פתוח">
                     <span class="option-text">פתוח</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="status-filter-item" data-value="סגור" onclick="selectStatusOption('סגור')">
+                  <div class="status-filter-item" data-value="סגור">
                     <span class="option-text">סגור</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="status-filter-item" data-value="מבוטל" onclick="selectStatusOption('מבוטל')">
+                  <div class="status-filter-item" data-value="מבוטל">
                     <span class="option-text">מבוטל</span>
-                    <span class="check-mark">●</span>
                   </div>
                 </div>
               </div>
@@ -802,22 +798,18 @@ class HeaderSystem {
                   <span class="dropdown-arrow">▼</span>
                 </button>
                 <div class="filter-menu" id="typeFilterMenu">
-                  <div class="type-filter-item" data-value="הכול" onclick="selectTypeOption('הכול')">
+                  <div class="type-filter-item" data-value="הכול">
                     <span class="option-text">הכול</span>
-                    <span class="check-mark">●</span>
                   </div>
                   <!-- סוגי השקעות -->
-                  <div class="type-filter-item" data-value="סווינג" onclick="selectTypeOption('סווינג')">
+                  <div class="type-filter-item" data-value="סווינג">
                     <span class="option-text">סווינג</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="type-filter-item" data-value="השקעה" onclick="selectTypeOption('השקעה')">
+                  <div class="type-filter-item" data-value="השקעה">
                     <span class="option-text">השקעה</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="type-filter-item" data-value="פסיבי" onclick="selectTypeOption('פסיבי')">
+                  <div class="type-filter-item" data-value="פסיבי">
                     <span class="option-text">פסיבי</span>
-                    <span class="check-mark">●</span>
                   </div>
                 </div>
               </div>
@@ -845,61 +837,47 @@ class HeaderSystem {
                   <span class="dropdown-arrow">▼</span>
                 </button>
                 <div class="filter-menu" id="dateRangeFilterMenu">
-                  <div class="date-range-filter-item" data-value="כל זמן" onclick="selectDateRangeOption('כל זמן')">
+                  <div class="date-range-filter-item" data-value="כל זמן" >
                     <span class="option-text">כל זמן</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="היום" onclick="selectDateRangeOption('היום')">
+                  <div class="date-range-filter-item" data-value="היום" >
                     <span class="option-text">היום</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="אתמול" onclick="selectDateRangeOption('אתמול')">
+                  <div class="date-range-filter-item" data-value="אתמול" אתמול')">
                     <span class="option-text">אתמול</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="השבוע" onclick="selectDateRangeOption('השבוע')">
+                  <div class="date-range-filter-item" data-value="השבוע" השבוע')">
                     <span class="option-text">השבוע</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="שבוע" onclick="selectDateRangeOption('שבוע')">
+                  <div class="date-range-filter-item" data-value="שבוע" שבוע')">
                     <span class="option-text">שבוע</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="MTD" onclick="selectDateRangeOption('MTD')">
+                  <div class="date-range-filter-item" data-value="MTD" MTD')">
                     <span class="option-text">MTD</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="30 יום" onclick="selectDateRangeOption('30 יום')">
+                  <div class="date-range-filter-item" data-value="30 יום" 30 יום')">
                     <span class="option-text">30 יום</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="60 יום" onclick="selectDateRangeOption('60 יום')">
+                  <div class="date-range-filter-item" data-value="60 יום" 60 יום')">
                     <span class="option-text">60 יום</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="90 יום" onclick="selectDateRangeOption('90 יום')">
+                  <div class="date-range-filter-item" data-value="90 יום" 90 יום')">
                     <span class="option-text">90 יום</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="YTD" onclick="selectDateRangeOption('YTD')">
+                  <div class="date-range-filter-item" data-value="YTD" YTD')">
                     <span class="option-text">YTD</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="שנה" onclick="selectDateRangeOption('שנה')">
+                  <div class="date-range-filter-item" data-value="שנה" שנה')">
                     <span class="option-text">שנה</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="שבוע קודם" onclick="selectDateRangeOption('שבוע קודם')">
+                  <div class="date-range-filter-item" data-value="שבוע קודם" שבוע קודם')">
                     <span class="option-text">שבוע קודם</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="חודש קודם" onclick="selectDateRangeOption('חודש קודם')">
+                  <div class="date-range-filter-item" data-value="חודש קודם" חודש קודם')">
                     <span class="option-text">חודש קודם</span>
-                    <span class="check-mark">●</span>
                   </div>
-                  <div class="date-range-filter-item" data-value="שנה קודמת" onclick="selectDateRangeOption('שנה קודמת')">
+                  <div class="date-range-filter-item" data-value="שנה קודמת" שנה קודמת')">
                     <span class="option-text">שנה קודמת</span>
-                    <span class="check-mark">●</span>
                   </div>
                 </div>
               </div>
@@ -1693,7 +1671,6 @@ class HeaderSystem {
     allItem.setAttribute('data-value', 'הכול');
     allItem.innerHTML = `
       <span class="option-text">הכול</span>
-      <span class="check-mark">●</span>
     `;
 
     // הוספת event listener לאופציית "הכול"
@@ -1726,7 +1703,6 @@ class HeaderSystem {
       item.setAttribute('data-value', account.name);
       item.innerHTML = `
         <span class="option-text">${account.name}</span>
-        <span class="check-mark">●</span>
       `;
 
       // הוספת event listener
@@ -1779,7 +1755,7 @@ class HeaderSystem {
       });
     });
 
-    // Event listeners לפריטי פילטר סטטוס
+    // Event listeners לפריטי פילטר סטטוס - מולטיסלקט
     const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
     statusItems.forEach(item => {
       item.addEventListener('click', e => {
@@ -1788,7 +1764,7 @@ class HeaderSystem {
         
         console.log('🔧 Status filter item clicked:', item.getAttribute('data-value'));
 
-        // toggle selection
+        // toggle selection - מולטיסלקט
         item.classList.toggle('selected');
 
         // collect all selected statuses
@@ -1800,7 +1776,7 @@ class HeaderSystem {
         // update display text
         const statusElement = document.getElementById('selectedStatus');
         if (selectedStatuses.length === 0) {
-          statusElement.textContent = 'כל הסטטוסים';
+          statusElement.textContent = 'כל סטטוס';  // ✅ יחיד
         } else if (selectedStatuses.length === 1) {
           statusElement.textContent = selectedStatuses[0];
         } else {
@@ -1814,9 +1790,6 @@ class HeaderSystem {
         } else {
           console.warn('⚠️ FilterSystem not available or applyFilters not a function');
         }
-
-        // לא סוגרים את הדרופדאון - מאפשרים בחירה מרובה
-        // this.closeAllDropdowns();
       });
     });
 
@@ -1839,11 +1812,11 @@ class HeaderSystem {
         // update display text
         const typeElement = document.getElementById('selectedType');
         if (selectedTypes.length === 0) {
-          typeElement.textContent = 'כל הסוגים';
+          typeElement.textContent = 'כל סוג השקעה';  // ✅ יחיד
         } else if (selectedTypes.length === 1) {
           typeElement.textContent = selectedTypes[0];
         } else {
-          typeElement.textContent = `${selectedTypes.length} סוגים`;
+          typeElement.textContent = `${selectedTypes.length} סוגי השקעה`;
         }
 
         // עדכון הפילטר במערכת
@@ -2787,7 +2760,6 @@ class HeaderSystem {
     allOption.setAttribute('data-value', 'הכול');
     allOption.innerHTML = `
       <span class="option-text">כל החשבונות</span>
-      <span class="check-mark">●</span>
     `;
     allOption.addEventListener('click', e => {
       e.stopPropagation();
@@ -2803,7 +2775,6 @@ class HeaderSystem {
       option.setAttribute('data-value', account.name);
       option.innerHTML = `
         <span class="option-text">${account.name}</span>
-        <span class="check-mark">●</span>
       `;
       option.addEventListener('click', e => {
         e.stopPropagation();
@@ -3251,314 +3222,22 @@ function clearFilterMenuTimers(menu) {
 /**
  * בחירת אפשרות פילטר סטטוס
  */
-function selectStatusOption(status) {
-  console.log('🔍 selectStatusOption called with:', status);
-
-  // עדכון סימון ויזואלי
-  const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
-  // Found status items
-
-  const clickedItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === status);
-  // Clicked item found
-
-  if (clickedItem) {
-    if (status === 'הכול') {
-      // Selecting "הכול" - clearing all others
-      // אם בוחרים "הכול" - מסירים סימון מכל השאר
-      statusItems.forEach(item => item.classList.remove('selected'));
-      clickedItem.classList.add('selected');
-    } else {
-      // Selecting specific status - toggling selection
-      // אם בוחרים סטטוס ספציפי - מסירים סימון מ"הכול" ומוסיפים/מסירים מהסטטוס
-      const allItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === 'הכול');
-      if (allItem) {
-        allItem.classList.remove('selected');
-        // Removed "הכול" selection
-      }
-
-      // בדיקה אם יש פריטים נבחרים אחרים
-      const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
-
-      clickedItem.classList.toggle('selected');
-
-      // אם אין פריטים נבחרים, בחר "הכול"
-      const newSelectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
-      if (newSelectedItems.length === 0) {
-        // No items selected, selecting "הכול"
-        if (allItem) {allItem.classList.add('selected');}
-      }
-    }
-  } else {
-    // Clicked item not found for status
-  }
-
-  // עדכון הטקסט הנבחר
-  // Updating status filter text
-  updateStatusFilterText();
-
-  // עדכון הפילטר במערכת
-  if (window.filterSystem && typeof window.filterSystem.applyFilters === 'function') {
-    const selectedStatuses = Array.from(document.querySelectorAll('#statusFilterMenu .status-filter-item.selected'))
-      .map(item => item.getAttribute('data-value'));
-    window.filterSystem.currentFilters.status = selectedStatuses;
-    window.filterSystem.applyFilters();
-  } else {
-    console.warn('⚠️ FilterSystem not available or applyFilters not a function');
-  }
-
-  // הפעלת הפילטר
-  // Applying status filter
-  applyStatusFilter();
-}
+// selectStatusOption function moved to filter-system.js
 
 /**
  * בחירת אפשרות פילטר טיפוס
  */
-function selectTypeOption(type) {
-  console.log('🔍 selectTypeOption called with:', type);
-
-  // עדכון סימון ויזואלי
-  const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
-
-  const clickedItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === type);
-
-  if (clickedItem) {
-    if (type === 'הכול') {
-      // Selecting "הכול" - clearing all others
-      // אם בוחרים "הכול" - מסירים סימון מכל השאר
-      typeItems.forEach(item => item.classList.remove('selected'));
-      clickedItem.classList.add('selected');
-    } else {
-      // Selecting specific type - toggling selection
-      // אם בוחרים טיפוס ספציפי - מסירים סימון מ"הכול" ומוסיפים/מסירים מהטיפוס
-      const allItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === 'הכול');
-      if (allItem) {
-        allItem.classList.remove('selected');
-        // Removed "הכול" selection
-      }
-
-      // בדיקה אם יש פריטים נבחרים אחרים
-      const selectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
-
-      clickedItem.classList.toggle('selected');
-
-      // אם אין פריטים נבחרים, בחר "הכול"
-      const newSelectedItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
-      if (newSelectedItems.length === 0) {
-        // No items selected, selecting "הכול"
-        if (allItem) {allItem.classList.add('selected');}
-      }
-    }
-  } else {
-    // Clicked item not found for type
-  }
-
-  // עדכון הטקסט הנבחר
-  // Updating type filter text
-  updateTypeFilterText();
-
-  // עדכון הפילטר במערכת
-  if (window.filterSystem && typeof window.filterSystem.applyFilters === 'function') {
-    const selectedTypes = Array.from(document.querySelectorAll('#typeFilterMenu .type-filter-item.selected'))
-      .map(item => item.getAttribute('data-value'));
-    window.filterSystem.currentFilters.type = selectedTypes;
-    window.filterSystem.applyFilters();
-  } else {
-    console.warn('⚠️ FilterSystem not available or applyFilters not a function');
-  }
-
-  // הפעלת הפילטר
-  // Applying type filter
-  applyTypeFilter();
-}
+// selectTypeOption function moved to filter-system.js
 
 /**
  * בחירת אפשרות פילטר חשבון
  */
-function selectAccountOption(account) {
-
-
-  // עדכון סימון ויזואלי
-  const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
-
-  const clickedItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === account);
-
-  if (clickedItem) {
-    if (account === 'הכול') {
-      // Selecting "הכול" - clearing all others
-      // אם בוחרים "הכול" - מסירים סימון מכל השאר
-      accountItems.forEach(item => item.classList.remove('selected'));
-      clickedItem.classList.add('selected');
-    } else {
-      // Selecting specific account - toggling selection
-      // אם בוחרים חשבון ספציפי - מסירים סימון מ"הכול" ומוסיפים/מסירים מהחשבון
-      const allItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === 'הכול');
-      if (allItem) {
-        allItem.classList.remove('selected');
-        // Removed "הכול" selection
-      }
-
-      // בדיקה אם יש פריטים נבחרים אחרים
-      const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
-
-      clickedItem.classList.toggle('selected');
-
-      // אם אין פריטים נבחרים, בחר "הכול"
-      const newSelectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
-      if (newSelectedItems.length === 0) {
-        // No items selected, selecting "הכול"
-        if (allItem) {allItem.classList.add('selected');}
-      }
-    }
-  } else {
-    // Clicked item not found for account
-  }
-
-  // עדכון הטקסט הנבחר
-  // Updating account filter text
-  updateAccountFilterText();
-
-  // הפעלת הפילטר
-  applyAccountFilter();
-}
+// selectAccountOption function moved to filter-system.js
 
 /**
  * בחירת אפשרות פילטר תאריכים
  */
-function selectDateRangeOption(dateRange) {
-
-
-  // עדכון הטקסט הנבחר - הצגת טווח תאריכים
-  const selectedDateRangeElement = document.getElementById('selectedDateRange');
-  if (selectedDateRangeElement) {
-    let displayText = 'כל זמן';
-
-    if (dateRange === 'היום') {
-      const today = new Date();
-      const todayStr = today.toLocaleDateString('he-IL');
-      displayText = `${todayStr} - ${todayStr}`;
-    } else if (dateRange === 'אתמול') {
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayStr = yesterday.toLocaleDateString('he-IL');
-      displayText = `${yesterdayStr} - ${yesterdayStr}`;
-    } else if (dateRange === 'השבוע') {
-      // השבוע = מתחילת השבוע הקלנדארי ועד היום
-      const today = new Date();
-      const startOfWeek = new Date(today);
-      startOfWeek.setDate(today.getDate() - today.getDay());
-
-      const startStr = startOfWeek.toLocaleDateString('he-IL');
-      const endStr = today.toLocaleDateString('he-IL');
-      displayText = `${startStr} - ${endStr}`;
-    } else if (dateRange === 'שבוע') {
-      // שבוע = 7 ימים אחרונים
-      const today = new Date();
-      const startDate = new Date(today);
-      startDate.setDate(today.getDate() - 7);
-
-      const startStr = startDate.toLocaleDateString('he-IL');
-      const endStr = today.toLocaleDateString('he-IL');
-      displayText = `${startStr} - ${endStr}`;
-    } else if (dateRange === 'MTD') {
-      // MTD = מתחילת החודש הקלנדארי ועד היום
-      const today = new Date();
-      const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-
-      const startStr = startOfMonth.toLocaleDateString('he-IL');
-      const endStr = today.toLocaleDateString('he-IL');
-      displayText = `${startStr} - ${endStr}`;
-    } else if (dateRange === '30 יום') {
-      const today = new Date();
-      const startDate = new Date(today);
-      startDate.setDate(today.getDate() - 30);
-
-      const startStr = startDate.toLocaleDateString('he-IL');
-      const endStr = today.toLocaleDateString('he-IL');
-      displayText = `${startStr} - ${endStr}`;
-    } else if (dateRange === '60 יום') {
-      const today = new Date();
-      const startDate = new Date(today);
-      startDate.setDate(today.getDate() - 60);
-
-      const startStr = startDate.toLocaleDateString('he-IL');
-      const endStr = today.toLocaleDateString('he-IL');
-      displayText = `${startStr} - ${endStr}`;
-    } else if (dateRange === '90 יום') {
-      const today = new Date();
-      const startDate = new Date(today);
-      startDate.setDate(today.getDate() - 90);
-
-      const startStr = startDate.toLocaleDateString('he-IL');
-      const endStr = today.toLocaleDateString('he-IL');
-      displayText = `${startStr} - ${endStr}`;
-    } else if (dateRange === 'YTD') {
-      // YTD = מתחילת השנה הקלנדארית ועד היום
-      const today = new Date();
-      const startOfYear = new Date(today.getFullYear(), 0, 1);
-
-      const startStr = startOfYear.toLocaleDateString('he-IL');
-      const endStr = today.toLocaleDateString('he-IL');
-      displayText = `${startStr} - ${endStr}`;
-    } else if (dateRange === 'שנה') {
-      // שנה = 365 יום
-      const today = new Date();
-      const startDate = new Date(today);
-      startDate.setDate(today.getDate() - 365);
-
-      const startStr = startDate.toLocaleDateString('he-IL');
-      const endStr = today.toLocaleDateString('he-IL');
-      displayText = `${startStr} - ${endStr}`;
-    } else if (dateRange === 'שבוע קודם') {
-      const today = new Date();
-      const startOfLastWeek = new Date(today);
-      startOfLastWeek.setDate(today.getDate() - today.getDay() - 7);
-      const endOfLastWeek = new Date(startOfLastWeek);
-      endOfLastWeek.setDate(startOfLastWeek.getDate() + 6);
-
-      const startStr = startOfLastWeek.toLocaleDateString('he-IL');
-      const endStr = endOfLastWeek.toLocaleDateString('he-IL');
-      displayText = `${startStr} - ${endStr}`;
-    } else if (dateRange === 'חודש קודם') {
-      const today = new Date();
-      const startOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-      const endOfLastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-
-      const startStr = startOfLastMonth.toLocaleDateString('he-IL');
-      const endStr = endOfLastMonth.toLocaleDateString('he-IL');
-      displayText = `${startStr} - ${endStr}`;
-    } else if (dateRange === 'שנה קודמת') {
-      const today = new Date();
-      const startOfLastYear = new Date(today.getFullYear() - 1, 0, 1);
-      const endOfLastYear = new Date(today.getFullYear() - 1, 11, 31);
-
-      const startStr = startOfLastYear.toLocaleDateString('he-IL');
-      const endStr = endOfLastYear.toLocaleDateString('he-IL');
-      displayText = `${startStr} - ${endStr}`;
-    } else if (dateRange !== 'כל זמן') {
-      displayText = dateRange;
-    }
-
-    selectedDateRangeElement.textContent = displayText;
-  }
-
-  // עדכון סימון ויזואלי
-  const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
-  dateRangeItems.forEach(item => {
-    const itemValue = item.getAttribute('data-value');
-    if (itemValue === dateRange) {
-      item.classList.add('selected');
-    } else {
-      item.classList.remove('selected');
-    }
-  });
-
-  // סגירת התפריט
-  closeDateRangeFilter();
-
-  // הפעלת הפילטר
-  applyDateRangeFilter(dateRange);
-}
+// selectDateRangeOption function moved to filter-system.js
 
 // ===== פונקציות הפעלת פילטרים =====
 
@@ -4088,8 +3767,14 @@ function showAllRecordsInTable(containerId) {
  * הפעלת פילטר סטטוס (לשמירה על תאימות לאחור)
  */
 function applyStatusFilter() {
+  console.log('🔍 applyStatusFilter called');
+  
   const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
+  console.log('🔍 Found selected items in applyStatusFilter:', selectedItems.length);
+  
   const selectedStatuses = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
+  console.log('🔍 Selected statuses array:', selectedStatuses);
+  
   applyFilter('status', selectedStatuses);
 }
 
@@ -4500,6 +4185,8 @@ window.filterAlertsByType = filterAlertsByType;
  * עדכון טקסט פילטר סטטוס
  */
 function updateStatusFilterText() {
+  console.log('🔍 updateStatusFilterText called');
+  
   const selectedStatusElement = document.getElementById('selectedStatus');
   if (!selectedStatusElement) {
     console.warn('⚠️ selectedStatus element not found - header may not be created yet');
@@ -4507,15 +4194,18 @@ function updateStatusFilterText() {
   }
   
   const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
+  console.log('🔍 Found selected items:', selectedItems.length);
 
   if (selectedItems.length === 0) {
+    console.log('🔍 No items selected, setting text to: כל סטטוס');
     selectedStatusElement.textContent = 'כל סטטוס';
-  } else if (selectedItems.length === 1) {
+  } else {
+    // עבור בחירה יחידה - תמיד נציג את הפריט הנבחר הראשון
     const item = selectedItems[0];
     const value = item.getAttribute('data-value');
-    selectedStatusElement.textContent = value === 'הכול' ? 'כל סטטוס' : value;
-  } else {
-    selectedStatusElement.textContent = `${selectedItems.length} סטטוסים`;
+    const displayText = value === 'הכול' ? 'כל סטטוס' : value;
+    console.log('🔍 Selected item value:', value, 'Display text:', displayText);
+    selectedStatusElement.textContent = displayText;
   }
 }
 
@@ -4533,12 +4223,11 @@ function updateTypeFilterText() {
 
   if (selectedItems.length === 0) {
     selectedTypeElement.textContent = 'כל סוג השקעה';
-  } else if (selectedItems.length === 1) {
+  } else {
+    // עבור בחירה יחידה - תמיד נציג את הפריט הנבחר הראשון
     const item = selectedItems[0];
     const value = item.getAttribute('data-value');
     selectedTypeElement.textContent = value === 'הכול' ? 'כל סוג השקעה' : value;
-  } else {
-    selectedTypeElement.textContent = `${selectedItems.length} סוגי השקעה`;
   }
 }
 

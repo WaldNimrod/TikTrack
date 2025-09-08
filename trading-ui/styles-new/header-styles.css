@@ -2,27 +2,11 @@
 /* This file contains all styles for the header component */
 /* It's separate from unified.css as per design decision */
 
-/* CSS Variables for consistent colors */
-:root {
-    --logo-green: #26baac;
-    --logo-orange: #ff9e04;
-    --white: #ffffff;
-    --light-gray: #f5f5f7;
-    --border-gray: #e5e5e5;
-    --text-dark: #1d1d1f;
-    --text-gray: #666;
-    --text-light-gray: #333;
-    --active-bg: #d4edda;
-    --shadow-light: rgba(0, 0, 0, 0.1);
-    --shadow-medium: rgba(0, 0, 0, 0.15);
-    --shadow-very-light: rgba(0, 0, 0, 0.03);
-}
-
 /* Menu - Apple Style with TikTrack Colors */
 
 /* Main Header */
 .unified-header {
-    background: var(--white);
+    background: #ffffff;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -38,8 +22,8 @@
     min-height: 70px;
     direction: rtl;
     width: 100%;
-    background: var(--white);
-    box-shadow: 0 1px 3px var(--shadow-light);
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     z-index: 1001;
 }
 
@@ -76,7 +60,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    color: var(--logo-green); /* ירוק - צבע הלוגו */
+    color: #ff9e04; /* צבע הלוגו - כתום */
     text-decoration: none;
     border-radius: 8px;
     transition: all 0.2s ease;
@@ -85,13 +69,12 @@
 }
 
 .tiktrack-nav-link:hover {
-    color: var(--logo-orange); /* כתום - רק למעבר עכבר */
+    color: #e6850e; /* צבע הלוגו כהה יותר ב-hover */
 }
 
 .tiktrack-nav-item.active .tiktrack-nav-link {
-    color: var(--logo-green); /* ירוק - פריט פעיל */
+    color: #cc7a00; /* צבע הלוגו כהה מאוד לפריט פעיל */
     font-weight: 600; /* משקל כבד יותר לפריט פעיל */
-    text-decoration: underline; /* קו תחתון לפריטים ראשיים */
 }
 
 .tiktrack-nav-item:first-child {
@@ -138,7 +121,7 @@
 .logo-text {
     font-size: 1rem;
     font-weight: 300;
-    color: var(--logo-green);
+    color: #26baac;
     direction: ltr;
     text-align: left;
     align-self: flex-end;
@@ -151,10 +134,10 @@
             position: absolute;
             top: 100%;
             right: 0;
-            background: var(--white);
-            border: 1px solid var(--border-gray);
+            background: white;
+            border: 1px solid #e5e5e5;
             border-radius: 8px;
-            box-shadow: 0 4px 12px var(--shadow-medium);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             min-width: 200px;
             padding: 0.5rem 0;
             opacity: 0;
@@ -167,7 +150,7 @@
         
         .tiktrack-dropdown-arrow {
             font-size: 0.75rem;
-            color: var(--text-gray);
+            color: #666;
             margin-right: 0.25rem;
             transition: transform 0.2s ease;
         }
@@ -182,6 +165,11 @@
             transform: translateY(0);
         }
         
+        /* הארכת זמן הסגירה לתפריטים הראשיים */
+        .tiktrack-dropdown-menu {
+            transition-delay: 0.1s; /* עיכוב בפתיחה */
+        }
+        
         .tiktrack-nav-item:hover .tiktrack-dropdown-menu {
             transition-delay: 0s; /* ללא עיכוב בפתיחה */
         }
@@ -194,7 +182,7 @@
         .tiktrack-dropdown-item {
             display: block;
             padding: 0.5rem 1rem;
-            color: var(--logo-green); /* ירוק - צבע הלוגו */
+            color: #ff9e04; /* צבע הלוגו - כתום */
             text-decoration: none;
             transition: all 0.2s ease;
             font-size: 14px;
@@ -212,24 +200,9 @@
             left: auto; /* Override Bootstrap default */
             margin-top: -1px;
             margin-right: -1px; /* RTL: margin-right instead of margin-left */
-            background: var(--white);
-            border: 1px solid var(--border-gray);
-            border-radius: 8px;
-            box-shadow: 0 4px 12px var(--shadow-medium);
-            min-width: 180px;
-            padding: 0.5rem 0;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateX(10px);
-            transition: all 0.3s ease;
-            transition-delay: 0.1s; /* עיכוב בפתיחה */
-            z-index: 1002;
-            list-style: none;
         }
         
-        .tiktrack-dropdown-menu .dropdown-submenu:hover .dropdown-menu {
-            opacity: 1;
-            visibility: visible;
+        .tiktrack-dropdown-menu .dropdown-submenu:hover .submenu {
             transform: translateX(0);
         }
 
@@ -239,14 +212,8 @@
 }
 
 .tiktrack-dropdown-item:hover {
-    background: var(--light-gray);
-    color: var(--logo-orange); /* כתום - רק למעבר עכבר */
-}
-
-/* פריט פעיל בתפריטי משנה - רקע ירוק */
-.tiktrack-dropdown-item.active {
-    background: var(--active-bg); /* רקע ירוק בהיר לפריט פעיל */
-    color: var(--logo-green); /* ירוק לפריט פעיל */
+    background: #f5f5f7;
+    color: #e6850e; /* צבע הלוגו כהה יותר ב-hover */
 }
 
         /* Submenus */
@@ -254,8 +221,49 @@
             position: relative;
         }
         
+        /* Bootstrap 5 submenu base positioning */
+        .dropdown-submenu {
+            position: relative;
+        }
+        
+        .dropdown-submenu .dropdown-menu {
+            position: absolute;
+            top: 0;
+            right: 100%; /* RTL: right instead of left */
+            left: auto; /* Override Bootstrap default */
+            margin-top: -1px;
+            margin-right: -1px; /* RTL: margin-right instead of margin-left */
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 180px;
+            padding: 0.5rem 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(10px); /* הזזה ימינה לפי עברית */
+            transition: all 0.3s ease;
+            z-index: 1002;
+            list-style: none;
+        }
+        
+        .dropdown-submenu:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+        
+        /* הארכת זמן הסגירה - הוספת delay */
+        .dropdown-submenu .dropdown-menu {
+            transition-delay: 0.1s; /* עיכוב בפתיחה */
+        }
+        
+        .dropdown-submenu:hover .dropdown-menu {
+            transition-delay: 0s; /* ללא עיכוב בפתיחה */
+        }
+        
         /* עיכוב בסגירה */
-        .tiktrack-dropdown-menu .dropdown-submenu:not(:hover) .dropdown-menu {
+        .dropdown-submenu:not(:hover) .dropdown-menu {
             transition-delay: 0.5s; /* עיכוב ארוך יותר בסגירה */
         }
 
@@ -268,7 +276,7 @@
     height: 40px;
     background: transparent !important;
     border: none !important;
-    color: var(--text-dark);
+    color: #1d1d1f;
     text-decoration: none;
     transition: color 0.2s ease;
     font-size: 16px;
@@ -278,7 +286,7 @@
 
 .cache-clear-btn:hover {
     background: transparent !important;
-    color: var(--logo-orange);
+    color: #ff9500;
     border: none !important;
     box-shadow: none !important;
 }
@@ -302,10 +310,10 @@
     justify-content: center;
     width: 32px;
     height: 32px;
-    background: var(--white) !important;
+    background: white !important;
     border: none !important;
     border-radius: 50% !important;
-    color: var(--logo-orange) !important;
+    color: #ff9c05 !important;
     font-size: 0.8rem;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -331,7 +339,7 @@
 /* Filters Section */
 .header-filters {
     padding: 1rem 2rem;
-    background: var(--white);
+    background: white;
     position: relative;
     z-index: 950;
     min-height: 60px;
@@ -350,7 +358,7 @@
     left: 0;
     right: 0;
     height: 0.5px;
-    background: var(--shadow-very-light);
+    background: rgba(0, 0, 0, 0.03);
 }
 
 .filters-container {
@@ -373,10 +381,10 @@
     align-items: center;
     gap: 0.45rem;
     padding: 0.45rem 0.9rem;
-    background: var(--white) !important;
-    border: 1px solid var(--border-gray) !important;
+    background: white !important;
+    border: 1px solid #ddd !important;
     border-radius: 5.4px !important;
-    color: var(--text-dark) !important;
+    color: #1d1d1f !important;
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 12.6px;
@@ -389,9 +397,9 @@
 }
 
 .filter-toggle:hover {
-    border-color: var(--logo-orange) !important;
-    color: var(--logo-orange) !important;
-    background: var(--white) !important;
+    border-color: #ff9500 !important;
+    color: #ff9500 !important;
+    background: white !important;
     box-shadow: none !important;
 }
 
@@ -399,10 +407,10 @@
     position: absolute;
     top: 100%;
     right: 0;
-    background: var(--white);
-    border: 1px solid var(--border-gray);
+    background: white;
+    border: 1px solid #ddd;
     border-radius: 6px;
-    box-shadow: 0 4px 12px var(--shadow-medium);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     min-width: 150px;
     padding: 0.5rem 0;
     opacity: 0;
@@ -425,17 +433,17 @@
     padding: 0.45rem 0.9rem;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: var(--text-dark);
+    color: #1d1d1f;
     font-size: 0.9em;
 }
 
 .filter-option:hover {
-    background: var(--light-gray);
+    background: #f5f5f7;
 }
 
 .filter-option.selected {
-    background: var(--active-bg) !important;
-    color: var(--logo-green) !important;
+    background: #e3f2fd !important;
+    color: #1976d2 !important;
     font-weight: bold !important;
 }
 
@@ -446,17 +454,17 @@
 
 .search-filter-input {
     padding: 0.45rem 2.5rem 0.45rem 0.9rem;
-    border: 1px solid var(--border-gray) !important;
+    border: 1px solid #ddd !important;
     border-radius: 5.4px !important;
     font-size: 12.6px;
     width: 120px !important;
-    background: var(--white) !important;
+    background: white !important;
     box-shadow: none !important;
 }
 
 .search-filter-input:focus {
     outline: none !important;
-    border-color: var(--logo-orange) !important;
+    border-color: #ff9500 !important;
     box-shadow: none !important;
 }
 
@@ -467,7 +475,7 @@
     transform: translateY(-50%);
     background: none !important;
     border: none !important;
-    color: var(--text-gray) !important;
+    color: #666 !important;
     cursor: pointer;
     padding: 0.25rem;
     border-radius: 4px;
@@ -478,8 +486,8 @@
 }
 
 .search-clear-btn:hover {
-    background: var(--light-gray) !important;
-    color: var(--text-light-gray) !important;
+    background: #f0f0f0 !important;
+    color: #333 !important;
     box-shadow: none !important;
 }
 
@@ -494,10 +502,10 @@
     justify-content: center;
     width: 32px;
     height: 32px;
-    background: var(--white) !important;
+    background: white !important;
     border: none !important;
     border-radius: 6px !important;
-    color: var(--logo-green) !important;
+    color: #26baac !important;
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: none !important;
@@ -512,10 +520,10 @@
     justify-content: center;
     width: 32px;
     height: 32px;
-    background: var(--white) !important;
+    background: white !important;
     border: none !important;
     border-radius: 6px !important;
-    color: var(--logo-orange) !important;
+    color: #ff9500 !important;
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: none !important;
@@ -525,18 +533,18 @@
 }
 
 .reset-btn:hover, .clear-btn:hover {
-    border-color: var(--logo-orange) !important;
-    color: var(--logo-orange) !important;
-    background: var(--white) !important;
+    border-color: #ff9500 !important;
+    color: #ff9500 !important;
+    background: white !important;
     box-shadow: none !important;
 }
 
 .submenu {
-    z-index: 1003 !important;
+    z-index: 1001 !important;
 }
 
 .separator {
     height: 1px;
-    background: var(--border-gray);
+    background: #e5e5e5;
     margin: 0.5rem 0;
 }

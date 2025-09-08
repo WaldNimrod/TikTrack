@@ -40,7 +40,7 @@
     <script src="scripts/error-handlers.js"></script>
     
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_final_working"></head>
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_dropdown_fix_v2"></head>
 
 <body class="styles-test-page">
     <!-- General background -->
@@ -1568,29 +1568,6 @@
             }
         }
 
-        /* Dark Mode Support */
-        @media (prefers-color-scheme: dark) {
-            .style-section {
-                background: var(--apple-bg-elevated);
-                border-color: var(--apple-border-light);
-            }
-
-            .button-group,
-            .badge-group,
-            .spinner-group,
-            .test-form {
-                background: var(--surface-color-dark, #2a2a2a);
-                border-color: var(--border-color-dark, #404040);
-            }
-
-            .css-controls-table {
-                background: var(--background-color-dark, #1a1a1a);
-            }
-
-            .css-controls-table th,
-            .css-controls-table td {
-                border-color: var(--border-color-dark, #404040);
-            }
 
             .page-name {
                 background: var(--surface-color-dark, #2a2a2a);

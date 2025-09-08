@@ -48,6 +48,47 @@
                     </div>
                     <div class="section-body">
                         <h2>מצב המערכות והפילטרים</h2>
+                        
+                        <!-- דוגמאות צבעי סטטוס -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6>תגיות סטטוס עם רקע:</h6>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="status-open">פתוח</span>
+                                    <span class="status-closed">סגור</span>
+                                    <span class="status-cancelled">מבוטל</span>
+                                    <span class="status-pending">ממתין</span>
+                                    <span class="status-active">פעיל</span>
+                                    <span class="status-inactive">לא פעיל</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>טקסט צבעוני בלבד:</h6>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="status-open-text">פתוח</span>
+                                    <span class="status-closed-text">סגור</span>
+                                    <span class="status-cancelled-text">מבוטל</span>
+                                    <span class="status-pending-text">ממתין</span>
+                                    <span class="status-active-text">פעיל</span>
+                                    <span class="status-inactive-text">לא פעיל</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <h6>רקע צבעוני בלבד:</h6>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="status-open-bg p-2 rounded">פתוח</span>
+                                    <span class="status-closed-bg p-2 rounded">סגור</span>
+                                    <span class="status-cancelled-bg p-2 rounded">מבוטל</span>
+                                    <span class="status-pending-bg p-2 rounded">ממתין</span>
+                                    <span class="status-active-bg p-2 rounded">פעיל</span>
+                                    <span class="status-inactive-bg p-2 rounded">לא פעיל</span>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="card">
@@ -82,6 +123,8 @@
                                         <button onclick="testAccountFilter()" class="btn btn-sm btn-primary mt-2">🧪 בדוק פילטר חשבון</button>
                                         <button onclick="testDateFilter()" class="btn btn-sm btn-secondary mt-2">🧪 בדוק פילטר תאריך</button>
                                         <button onclick="testSearchFilter()" class="btn btn-sm btn-dark mt-2">🧪 בדוק חיפוש חופשי</button>
+                                        <button onclick="testStatusColors()" class="btn btn-sm btn-success mt-2">🎨 בדוק צבעי סטטוס</button>
+                                        <button onclick="updateStatusColorDisplay()" class="btn btn-sm btn-info mt-2">🔄 עדכן תצוגת צבעים</button>
                                         <button onclick="showActiveContainer()" class="btn btn-sm btn-warning mt-2">🔍 הצג קונטיינר פעיל</button>
                                     </div>
                                 </div>
@@ -126,7 +169,7 @@
                                                 <tbody>
                                                     <tr>
                                                         <td>AAPL</td>
-                                                        <td data-status="פתוח">פתוח</td>
+                                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
                                                         <td data-investment-type="swing">סווינג</td>
                                                         <td data-account="Trading Account 1">Trading Account 1</td>
                                                         <td data-created-at="2025-08-22">2025-08-22</td>
@@ -136,7 +179,7 @@
                                                     </tr>
                                                     <tr>
                                                         <td>TSLA</td>
-                                                        <td data-status="סגור">סגור</td>
+                                                        <td data-status="סגור"><span class="status-badge status-closed">סגור</span></td>
                                                         <td data-investment-type="investment">השקעה</td>
                                                         <td data-account="Investment Account">Investment Account</td>
                                                         <td data-created-at="2025-08-21">2025-08-21</td>
@@ -146,7 +189,7 @@
                                                     </tr>
                                                     <tr>
                                                         <td>SPY</td>
-                                                        <td data-status="פתוח">פתוח</td>
+                                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
                                                         <td data-investment-type="passive">פסיבי</td>
                                                         <td data-account="Trading Account 1">Trading Account 1</td>
                                                         <td data-created-at="2025-08-20">2025-08-20</td>
@@ -156,7 +199,7 @@
                                                     </tr>
                                                     <tr>
                                                         <td>BTC</td>
-                                                        <td data-status="מבוטל">מבוטל</td>
+                                                        <td data-status="מבוטל"><span class="status-badge status-cancelled">מבוטל</span></td>
                                                         <td data-investment-type="swing">סווינג</td>
                                                         <td data-account="Retirement Account">Retirement Account</td>
                                                         <td data-created-at="2025-08-15">2025-08-15</td>
@@ -166,7 +209,7 @@
                                                     </tr>
                                                     <tr>
                                                         <td>MSFT</td>
-                                                        <td data-status="פתוח">פתוח</td>
+                                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
                                                         <td data-investment-type="investment">השקעה</td>
                                                         <td data-account="Investment Account">Investment Account</td>
                                                         <td data-created-at="2025-08-10">2025-08-10</td>
@@ -176,7 +219,7 @@
                                                     </tr>
                                                     <tr>
                                                         <td>QQQ</td>
-                                                        <td data-status="סגור">סגור</td>
+                                                        <td data-status="סגור"><span class="status-badge status-closed">סגור</span></td>
                                                         <td data-investment-type="passive">פסיבי</td>
                                                         <td data-account="Trading Account 1">Trading Account 1</td>
                                                         <td data-created-at="2025-08-18">2025-08-18</td>
@@ -186,13 +229,33 @@
                                                     </tr>
                                                     <tr>
                                                         <td>NVDA</td>
-                                                        <td data-status="פתוח">פתוח</td>
+                                                        <td data-status="ממתין"><span class="status-badge status-pending">ממתין</span></td>
                                                         <td data-investment-type="swing">סווינג</td>
                                                         <td data-account="Retirement Account">Retirement Account</td>
                                                         <td data-created-at="2025-08-16">2025-08-16</td>
                                                         <td>25</td>
                                                         <td>450.00</td>
                                                         <td>11,250</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>GOOGL</td>
+                                                        <td data-status="פעיל"><span class="status-badge status-active">פעיל</span></td>
+                                                        <td data-investment-type="day-trading">דיי טריידינג</td>
+                                                        <td data-account="Trading Account 1">Trading Account 1</td>
+                                                        <td data-created-at="2025-08-17">2025-08-17</td>
+                                                        <td>10</td>
+                                                        <td>2800.00</td>
+                                                        <td>28,000</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>META</td>
+                                                        <td data-status="לא פעיל"><span class="status-badge status-inactive">לא פעיל</span></td>
+                                                        <td data-investment-type="passive">פסיבי</td>
+                                                        <td data-account="Investment Account">Investment Account</td>
+                                                        <td data-created-at="2025-08-15">2025-08-15</td>
+                                                        <td>5</td>
+                                                        <td>320.00</td>
+                                                        <td>1,600</td>
                                                     </tr>
                                                 </tbody>
                                             </table>

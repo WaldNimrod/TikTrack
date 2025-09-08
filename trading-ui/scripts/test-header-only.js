@@ -7,6 +7,98 @@
  * @author TikTrack Development Team
  */
 
+// ===== STATUS COLORS TESTING =====
+
+/**
+ * בדיקת צבעי סטטוס דינמיים
+ */
+function testStatusColors() {
+    console.log('🧪 Testing dynamic status colors...');
+    
+    // בדיקת פונקציות צבעי סטטוס
+    if (typeof getStatusColor === 'function') {
+        console.log('✅ getStatusColor function available');
+        
+        // בדיקת צבעי סטטוס שונים
+        const statuses = ['open', 'closed', 'cancelled', 'pending', 'active', 'inactive'];
+        statuses.forEach(status => {
+            const color = getStatusColor(status, 'medium');
+            const bgColor = getStatusBackgroundColor(status);
+            const textColor = getStatusTextColor(status);
+            const borderColor = getStatusBorderColor(status);
+            
+            console.log(`Status: ${status}`);
+            console.log(`  Color: ${color}`);
+            console.log(`  Background: ${bgColor}`);
+            console.log(`  Text: ${textColor}`);
+            console.log(`  Border: ${borderColor}`);
+        });
+    } else {
+        console.log('❌ getStatusColor function not available');
+    }
+    
+    // בדיקת CSS Variables
+    const root = document.documentElement;
+    const computedStyle = getComputedStyle(root);
+    
+    const statusVars = [
+        '--status-open-color',
+        '--status-closed-color', 
+        '--status-cancelled-color',
+        '--status-pending-color',
+        '--status-active-color',
+        '--status-inactive-color'
+    ];
+    
+    statusVars.forEach(varName => {
+        const value = computedStyle.getPropertyValue(varName);
+        console.log(`CSS Variable ${varName}: ${value}`);
+    });
+}
+
+/**
+ * עדכון תצוגת צבעי סטטוס
+ */
+function updateStatusColorDisplay() {
+    console.log('🎨 Updating status color display...');
+    
+    // עדכון תגיות סטטוס בטבלה
+    const statusElements = document.querySelectorAll('[data-status]');
+    statusElements.forEach(element => {
+        const status = element.getAttribute('data-status');
+        const statusBadge = element.querySelector('.status-badge');
+        
+        if (statusBadge) {
+            // הסרת מחלקות סטטוס קיימות
+            statusBadge.classList.remove('status-open', 'status-closed', 'status-cancelled', 'status-pending', 'status-active', 'status-inactive');
+            
+            // הוספת מחלקת סטטוס נכונה
+            switch(status) {
+                case 'פתוח':
+                    statusBadge.classList.add('status-open');
+                    break;
+                case 'סגור':
+                    statusBadge.classList.add('status-closed');
+                    break;
+                case 'מבוטל':
+                    statusBadge.classList.add('status-cancelled');
+                    break;
+                case 'ממתין':
+                    statusBadge.classList.add('status-pending');
+                    break;
+                case 'פעיל':
+                    statusBadge.classList.add('status-active');
+                    break;
+                case 'לא פעיל':
+                    statusBadge.classList.add('status-inactive');
+                    break;
+            }
+        }
+    });
+    
+    console.log('✅ Status color display updated');
+}
+
 // ===== DEBUG FUNCTIONS =====
 
 /**
@@ -213,12 +305,20 @@ document.addEventListener('DOMContentLoaded', function() {
     log('עמוד בדיקת ראש הדף נטען');
     updateDebugInfo();
     updateQuickStats();
+    
+    // בדיקת צבעי סטטוס דינמיים
+    setTimeout(() => {
+        testStatusColors();
+        updateStatusColorDisplay();
+    }, 1000);
 });
 
 // ===== EXPORTS =====
 
 // Export functions to global scope
 window.updateFilterDebugInfo = updateFilterDebugInfo;
+window.testStatusColors = testStatusColors;
+window.updateStatusColorDisplay = updateStatusColorDisplay;
 window.log = log;
 window.updateStatus = updateStatus;
 window.updateDebugInfo = updateDebugInfo;

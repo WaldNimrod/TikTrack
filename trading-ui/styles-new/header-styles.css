@@ -31,10 +31,11 @@ box-shadow: var(--apple-shadow-light);
 position: sticky;
 top: 0;
 z-index: 1000;
+max-width: 1360px;
+margin: 0 auto;
 }
 
 #unified-header .header-container {
-    max-width: 1400px;
     margin: 0 auto;
     padding: 1rem 10px;
     display: flex;
@@ -46,7 +47,7 @@ z-index: 1000;
 
 /* Filters Container - Same max-width and padding as header-container */
 .filters-container {
-    max-width: 1400px;
+    max-width: 1360px;
     margin: 0 auto;
     padding: 0 10px;
 }
@@ -136,10 +137,34 @@ z-index: 1000;
 }
 
 /* ===== התאמה למסכים קטנים ===== */
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
+    #unified-header {
+        max-width: 100%;
+    }
+    
     #unified-header .header-container {
-        padding: 0;
+        padding: 1rem 20px;
+    }
+    
+    .filters-container {
+        max-width: 100%;
+        padding: 0 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    #unified-header {
+        max-width: 100%;
+    }
+    
+    #unified-header .header-container {
+        padding: 0.5rem 15px;
         height: 44px;
+    }
+    
+    .filters-container {
+        max-width: 100%;
+        padding: 0 15px;
     }
 
     #unified-header .logo-text {
@@ -539,6 +564,52 @@ z-index: 1000;
     background: #e3f2fd !important;
     color: #1976d2 !important;
     font-weight: bold !important;
+}
+
+/* הגדרות עבור כל סוגי הפילטרים */
+.status-filter-item, .type-filter-item, .account-filter-item, .date-range-filter-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.45rem 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #1d1d1f;
+    font-size: 0.9em;
+}
+
+.status-filter-item:hover, .type-filter-item:hover, 
+.account-filter-item:hover, .date-range-filter-item:hover {
+    background: #f5f5f7;
+}
+
+.status-filter-item.selected, .type-filter-item.selected,
+.account-filter-item.selected, .date-range-filter-item.selected {
+    background: #e3f2fd !important;
+    color: #1976d2 !important;
+    font-weight: bold !important;
+}
+
+.status-filter-item.selected .check-mark, .type-filter-item.selected .check-mark,
+.account-filter-item.selected .check-mark, .date-range-filter-item.selected .check-mark {
+    color: #1976d2 !important;
+    font-weight: bold !important;
+}
+
+.check-mark {
+    color: #26baac;
+    font-size: 0.8rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.status-filter-item.selected .check-mark, 
+.type-filter-item.selected .check-mark,
+.account-filter-item.selected .check-mark,
+.date-range-filter-item.selected .check-mark {
+    opacity: 1;
+    color: #26baac;
+    font-weight: bold;
 }
 
 .search-input-wrapper {

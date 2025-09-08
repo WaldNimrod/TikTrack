@@ -9,10 +9,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Unified CSS -->
-    <link rel="stylesheet" href="styles-new/unified.css?v=v1.5.0">
+    <link rel="stylesheet" href="styles-new/unified.css?v=v1.5.7">
     
     <!-- Header Styles -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v39_updated">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v42_unified_header">
+    
+    <!-- Filter System Script -->
+    <script src="scripts/filter-system.js"></script>
     
     <!-- Header System Script -->
     <script src="scripts/header-system.js?v=v35_updated"></script>
@@ -26,37 +29,46 @@
     
     <!-- Color Demo Toggle Script -->
     <script src="scripts/color-demo-toggle.js"></script>
+    
 </head>
 
 <body class="test-header-only">
+    <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
     <div class="background-wrapper">
-        <!-- Header System -->
+        <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
         <div id="unified-header"></div>
 
-        <!-- Page body -->
+        <!-- ===== TEMPLATE ZONE 3: PAGE BODY (LOCKED) ===== -->
         <div class="page-body">
-            <!-- Main content limited in width -->
+            <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT (EDITABLE) ===== -->
             <div class="main-content">
+                <!-- ===== CONTENT SECTIONS START (EDITABLE) ===== -->
                 <!-- UI Content Section Top Start-->
                 <div class="top-section">
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h1>🔧 בדיקת ראש הדף - כותרת סקשן עליון</h1>
                         <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
-                            <span class="filter-arrow">▼</span>
+                            <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
                         <h2>מצב המערכות והפילטרים</h2>
+                        
+                        <div class="alert alert-info">
+                            <h5>🔧 סקשן עליון - בדיקת כפתורי פתיחה/סגירה</h5>
+                            <p>זהו הסקשן העליון שמכיל מידע על מצב המערכות והפילטרים.</p>
+                            <p>לחץ על כפתור הפתיחה/סגירה כדי לבדוק שהמערכת הגלובלית עובדת.</p>
+                        </div>
                         
                         <!-- דוגמאות צבעי סטטוס -->
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <h6>תגיות סטטוס עם רקע:</h6>
                                 <div class="d-flex flex-wrap gap-2">
-                                    <span class="status-open">פתוח</span>
-                                    <span class="status-closed">סגור</span>
-                                    <span class="status-cancelled">בוטל</span>
+                                    <span class="status-badge status-open">פתוח</span>
+                                    <span class="status-badge status-closed">סגור</span>
+                                    <span class="status-badge status-cancelled">בוטל</span>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -125,65 +137,91 @@
                 <!-- UI Content Section Top End -->  
 
                 <!-- UI Content Section 1 Start-->
-                <div class="content-section" id="tickers">
-                    <div class="section-header">
+                <div class="content-section" id="section1">
+                    <div class="section-header entity-test-sub-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-                        <h2>📈 טבלת טיקרים - כותרת סקשן 1</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('tickers')" title="הצג/הסתר סקשן">
-                            <span class="filter-arrow">▼</span>
+                        <h2>📊 סקשן 1 - כותרת סקשן 1</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="tickersContainer">
                             <table id="tickersTable" class="table" data-table-type="tickers">
+                                <colgroup>
+                                    
+                                </colgroup>
                                 <thead>
                                     <tr>
-                                        <th class="sortable" data-sort="symbol">
-                                            <span>טיקר</span>
-                                            <i class="sort-icon">↕</i>
+                                        <th>
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }">
+                                                סמל <span class="sort-icon">↕</span>
+                                            </button>
                                         </th>
-                                        <th class="sortable" data-sort="status">
-                                            <span>סטטוס</span>
-                                            <i class="sort-icon">↕</i>
+                                        <th>
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }">
+                                                סטטוס <span class="sort-icon">↕</span>
+                                            </button>
                                         </th>
-                                        <th class="sortable" data-sort="has_trades">
-                                            <span>יש טריידים</span>
-                                            <i class="sort-icon">↕</i>
+                                        <th>
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }">
+                                                יש טריידים <span class="sort-icon">↕</span>
+                                            </button>
                                         </th>
-                                        <th class="sortable" data-sort="current_price">
-                                            <span>מחיר נוכחי</span>
-                                            <i class="sort-icon">↕</i>
+                                        <th>
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }">
+                                                מחיר נוכחי <span class="sort-icon">↕</span>
+                                            </button>
                                         </th>
-                                        <th class="sortable" data-sort="daily_change_percent">
-                                            <span>שינוי %</span>
-                                            <i class="sort-icon">↕</i>
+                                        <th>
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }">
+                                                שינוי % <span class="sort-icon">↕</span>
+                                            </button>
                                         </th>
-                                        <th class="sortable" data-sort="type">
-                                            <span>סוג</span>
-                                            <i class="sort-icon">↕</i>
+                                        <th>
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }">
+                                                סוג <span class="sort-icon">↕</span>
+                                            </button>
                                         </th>
-                                        <th class="sortable" data-sort="name">
-                                            <span>שם</span>
-                                            <i class="sort-icon">↕</i>
+                                        <th>
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); }">
+                                                שם <span class="sort-icon">↕</span>
+                                            </button>
                                         </th>
-                                        <th class="sortable" data-sort="notes">
-                                            <span>הערות</span>
-                                            <i class="sort-icon">↕</i>
+                                        <th>
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(7); }">
+                                                הערות <span class="sort-icon">↕</span>
+                                            </button>
                                         </th>
-                                        <th class="sortable" data-sort="updated_at">
-                                            <span>עודכן</span>
-                                            <i class="sort-icon">↕</i>
+                                        <th>
+                                            <button class="btn btn-link sortable-header"
+                                                onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); }">
+                                                עודכן <span class="sort-icon">↕</span>
+                                            </button>
                                         </th>
-                                        <th class="actions-header">פעולות</th>
+                                        <th class="actions-cell">פעולות</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td>AAPL</td>
                                         <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
-                                        <td>כן</td>
-                                        <td>$150.50</td>
-                                        <td class="numeric-value-positive">+2.35%</td>
+                    <td title="יש טריידים פעילים" style="text-align: center;">
+                        <span class="btn btn-sm btn-success" 
+                              style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
+                            ✓
+                        </span>
+                    </td>
+                    <td><span class="numeric-text-positive">$150.50</span></td>
+                    <td><span class="numeric-text-positive">+2.35%</span></td>
                                         <td data-investment-type="stock">מניה</td>
                                         <td>Apple Inc.</td>
                                         <td>טיקר טכנולוגיה</td>
@@ -202,30 +240,40 @@
                                     <tr>
                                         <td>MSFT</td>
                                         <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
-                                        <td>כן</td>
-                                        <td>$420.75</td>
-                                        <td class="numeric-value-positive">+1.85%</td>
-                                        <td data-investment-type="stock">מניה</td>
-                                        <td>Microsoft Corporation</td>
-                                        <td>טיקר טכנולוגיה</td>
-                                        <td>2025-01-15 10:25</td>
-                                        <td class="actions-cell">
-                                            <div class="btn-group">
-                                                <button class="btn btn-sm btn-outline-primary" onclick="editTicker(2)" title="ערוך">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteTicker(2)" title="מחק">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>GOOGL</td>
-                                        <td data-status="סגור"><span class="status-badge status-closed">סגור</span></td>
-                                        <td>לא</td>
-                                        <td>$2,850.00</td>
-                                        <td class="numeric-value-negative">-0.75%</td>
+                    <td title="יש טריידים פעילים" style="text-align: center;">
+                        <span class="btn btn-sm btn-success" 
+                              style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
+                            ✓
+                        </span>
+                    </td>
+                    <td><span class="numeric-text-positive">$420.75</span></td>
+                    <td><span class="numeric-text-positive">+1.85%</span></td>
+                    <td data-investment-type="stock">מניה</td>
+                    <td>Microsoft Corporation</td>
+                    <td>טיקר טכנולוגיה</td>
+                    <td>2025-01-15 10:25</td>
+                    <td class="actions-cell">
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editTicker(2)" title="ערוך">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteTicker(2)" title="מחק">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>GOOGL</td>
+                    <td data-status="סגור"><span class="status-badge status-closed">סגור</span></td>
+                    <td title="אין טריידים פעילים" style="text-align: center;">
+                        <span class="btn btn-sm btn-danger" 
+                              style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
+                            ✗
+                        </span>
+                    </td>
+                                        <td><span class="numeric-text-negative">$2,850.00</span></td>
+                                        <td><span class="numeric-text-negative">-0.75%</span></td>
                                         <td data-investment-type="stock">מניה</td>
                                         <td>Alphabet Inc.</td>
                                         <td>טיקר טכנולוגיה</td>
@@ -241,6 +289,56 @@
                                             </div>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td>TSLA</td>
+                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
+                                        <td>
+                                            <button class="btn-yes-no btn-yes" title="יש טריידים">
+                                                ✓
+                                            </button>
+                                        </td>
+                                        <td>$245.30</td>
+                                        <td><span class="numeric-text-positive">+3.20%</span></td>
+                                        <td data-investment-type="stock">מניה</td>
+                                        <td>Tesla Inc.</td>
+                                        <td>טיקר רכב חשמלי</td>
+                                        <td>2025-01-15 11:15</td>
+                                        <td class="actions-cell">
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="editTicker(4)" title="ערוך">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteTicker(4)" title="מחק">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>NVDA</td>
+                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
+                                        <td>
+                                            <button class="btn-yes-no btn-yes" title="יש טריידים">
+                                                ✓
+                                            </button>
+                                        </td>
+                                        <td>$875.40</td>
+                                        <td><span class="numeric-text-positive">+4.15%</span></td>
+                                        <td data-investment-type="stock">מניה</td>
+                                        <td>NVIDIA Corporation</td>
+                                        <td>טיקר AI וצ'יפים</td>
+                                        <td>2025-01-15 11:00</td>
+                                        <td class="actions-cell">
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="editTicker(5)" title="ערוך">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteTicker(5)" title="מחק">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -249,63 +347,110 @@
                 <!-- UI Content Section 1 End -->   
 
                 <!-- UI Content Section 2 Start-->
-                <div class="content-section" id="debug">
-                    <div class="section-header">
+                <div class="content-section" id="section2">
+                    <div class="section-header entity-test-sub-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-                        <h2>🔍 מידע דיבאג - כותרת סקשן 2</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('debug')" title="הצג/הסתר סקשן">
-                            <span class="filter-arrow">▼</span>
+                        <h2>🔍 סקשן 2 - כותרת סקשן 2</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
+                        <div class="alert alert-warning">
+                            <h5>🔍 סקשן 2 - בדיקת כפתורי פתיחה/סגירה</h5>
+                            <p>זהו סקשן תוכן רגיל עם ID: <code>section2</code></p>
+                            <p>לחץ על כפתור הפתיחה/סגירה כדי לבדוק שהמערכת הגלובלית עובדת.</p>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>תוכן דמה לסקשן 2</h6>
+                                <p>זהו תוכן דמה שמדגים איך הסקשן נראה כשהוא פתוח.</p>
                         <div class="row">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>מידע דיבאג - מערכת הכותרת החדשה</h5>
+                                    <div class="col-md-6">
+                                        <h6>רשימה 1:</h6>
+                                        <ul>
+                                            <li>אלמנט A</li>
+                                            <li>אלמנט B</li>
+                                            <li>אלמנט C</li>
+                                        </ul>
                                     </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <h6>מצב מערכת הכותרת</h6>
-                                                <p><strong>מערכת הכותרת מאותחלת:</strong> <span id="headerSystemStatus">בדיקה...</span></p>
-                                                <p><strong>מערכת הפילטרים מאותחלת:</strong> <span id="filterSystemStatus">בדיקה...</span></p>
-                                                <p><strong>אזור פילטרים פתוח:</strong> <span id="filtersSectionStatus">בדיקה...</span></p>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <h6>מצב פילטרים נוכחי</h6>
-                                                <p><strong>פילטר סטטוס:</strong> <span id="currentStatusFilter">כל סטטוס</span></p>
-                                                <p><strong>פילטר סוג:</strong> <span id="currentTypeFilter">כל סוג</span></p>
-                                                <p><strong>פילטר חשבון:</strong> <span id="currentAccountFilter">כל חשבון</span></p>
-                                                <p><strong>פילטר תאריכים:</strong> <span id="currentDateRangeFilter">כל זמן</span></p>
-                                                <p><strong>פילטר חיפוש:</strong> <span id="currentSearchFilter">אין</span></p>
-                                            </div>
-                                        </div>
-
-                                        <div class="row mt-3">
-                                            <div class="col-md-6">
-                                                <h6>טווח תאריכים פעיל</h6>
-                                                <p><strong>תאריך התחלה:</strong> <span id="dateRangeStart">לא נבחר</span></p>
-                                                <p><strong>תאריך סיום:</strong> <span id="dateRangeEnd">לא נבחר</span></p>
-                                                <p><strong>טווח תאריכים:</strong> <span id="dateRangeDescription">לא נבחר</span></p>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <h6>סטטיסטיקות טבלאות</h6>
-                                                <p><strong>טבלת טריידים:</strong> <span id="tradesTableStats">0/0 שורות נראות</span></p>
-                                                <p><strong>טבלת בדיקה:</strong> <span id="testTableStats">0/0 שורות נראות</span></p>
-                                            </div>
-                                        </div>
+                                    <div class="col-md-6">
+                                        <h6>רשימה 2:</h6>
+                                        <ul>
+                                            <li>אלמנט X</li>
+                                            <li>אלמנט Y</li>
+                                            <li>אלמנט Z</li>
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- UI Content Section 2 End--> 
+                <!-- UI Content Section 2 End -->
 
+                <!-- UI Content Section 3 Start-->
+                <div class="content-section" id="section3">
+                    <div class="section-header entity-test-sub-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>⚙️ סקשן 3 - כותרת סקשן 3</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="alert alert-danger">
+                            <h5>⚙️ סקשן 3 - בדיקת כפתורי פתיחה/סגירה</h5>
+                            <p>זהו סקשן תוכן רגיל עם ID: <code>section3</code></p>
+                            <p>לחץ על כפתור הפתיחה/סגירה כדי לבדוק שהמערכת הגלובלית עובדת.</p>
+                                        </div>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>תוכן דמה לסקשן 3</h6>
+                                <p>זהו תוכן דמה שמדגים איך הסקשן נראה כשהוא פתוח.</p>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>עמודה 1</th>
+                                                <th>עמודה 2</th>
+                                                <th>עמודה 3</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>שורה 1</td>
+                                                <td>נתון A</td>
+                                                <td>ערך 1</td>
+                                            </tr>
+                                            <tr>
+                                                <td>שורה 2</td>
+                                                <td>נתון B</td>
+                                                <td>ערך 2</td>
+                                            </tr>
+                                            <tr>
+                                                <td>שורה 3</td>
+                                                <td>נתון C</td>
+                                                <td>ערך 3</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 3 End -->
+
+                <!-- ===== CONTENT SECTIONS END (EDITABLE) ===== -->
             </div>
+            <!-- ===== END MAIN CONTENT ===== -->
         </div>
+        <!-- ===== END PAGE BODY ===== -->
     </div>
+    <!-- ===== END BACKGROUND WRAPPER ===== -->
 
     <!-- Core System Scripts -->
     <script src="scripts/console-cleanup.js"></script>
@@ -320,6 +465,6 @@
     <script src="scripts/main.js"></script>
     
     <!-- Page-specific script -->
-    <script src="scripts/test-header-only.js"></script>
+    <script src="scripts/test-header-only.js?v=1.0.1"></script>
 </body>
 </html>

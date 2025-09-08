@@ -1007,6 +1007,12 @@ window.resetToUserDefaults = function() {
 // Event listeners for date range filter (single selection)
 document.addEventListener('DOMContentLoaded', function() {
   const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+  
+  // Initialize with "כל זמן" selected by default
+  const defaultItem = Array.from(dateRangeItems).find(item => item.getAttribute('data-value') === 'כל זמן');
+  if (defaultItem) {
+    defaultItem.classList.add('selected');
+  }
   dateRangeItems.forEach(item => {
     item.addEventListener('click', e => {
       e.preventDefault();
@@ -1018,8 +1024,10 @@ document.addEventListener('DOMContentLoaded', function() {
       // Single selection - remove selected from all others
       dateRangeItems.forEach(otherItem => {
         otherItem.classList.remove('selected');
+        console.log('🔧 Removed selected from:', otherItem.getAttribute('data-value'));
       });
       item.classList.add('selected');
+      console.log('🔧 Added selected to:', item.getAttribute('data-value'));
 
       // Update display text
       const dateRangeElement = document.getElementById('selectedDateRange');
@@ -1049,8 +1057,41 @@ document.addEventListener('DOMContentLoaded', function() {
       } else {
         console.warn('⚠️ FilterSystem not available or applyFilters not a function');
       }
+
+      // Close the date range filter menu after selection
+      const dateRangeMenu = document.getElementById('dateRangeFilterMenu');
+      if (dateRangeMenu) {
+        dateRangeMenu.classList.remove('show');
+        console.log('🔧 Closed date range filter menu');
+      } else {
+        console.log('🔧 Date range filter menu not found');
+      }
     });
   });
+});
+
+// Initialize all filters with default selections
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize status filter with "הכול" selected
+  const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item');
+  const statusDefaultItem = Array.from(statusItems).find(item => item.getAttribute('data-value') === 'הכול');
+  if (statusDefaultItem) {
+    statusDefaultItem.classList.add('selected');
+  }
+
+  // Initialize type filter with "הכול" selected
+  const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item');
+  const typeDefaultItem = Array.from(typeItems).find(item => item.getAttribute('data-value') === 'הכול');
+  if (typeDefaultItem) {
+    typeDefaultItem.classList.add('selected');
+  }
+
+  // Initialize account filter with "הכול" selected
+  const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
+  const accountDefaultItem = Array.from(accountItems).find(item => item.getAttribute('data-value') === 'הכול');
+  if (accountDefaultItem) {
+    accountDefaultItem.classList.add('selected');
+  }
 });
 
 // ===== FILTER SELECTION FUNCTIONS =====
@@ -1085,6 +1126,12 @@ function selectStatusOption(status) {
   
   updateStatusFilterText();
   applyStatusFilter();
+  
+  // Close the status filter menu after selection
+  const statusMenu = document.getElementById('statusFilterMenu');
+  if (statusMenu) {
+    statusMenu.classList.remove('show');
+  }
 }
 
 // Type filter (multi-select)
@@ -1117,6 +1164,12 @@ function selectTypeOption(type) {
   
   updateTypeFilterText();
   applyTypeFilter();
+  
+  // Close the type filter menu after selection
+  const typeMenu = document.getElementById('typeFilterMenu');
+  if (typeMenu) {
+    typeMenu.classList.remove('show');
+  }
 }
 
 // Account filter (multi-select)
@@ -1149,6 +1202,12 @@ function selectAccountOption(account) {
   
   updateAccountFilterText();
   applyAccountFilter();
+  
+  // Close the account filter menu after selection
+  const accountMenu = document.getElementById('accountFilterMenu');
+  if (accountMenu) {
+    accountMenu.classList.remove('show');
+  }
 }
 
 // ===== FILTER TEXT UPDATE FUNCTIONS =====

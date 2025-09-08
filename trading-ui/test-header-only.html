@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Unified CSS -->
-    <link rel="stylesheet" href="styles-new/unified.css?v=v1.5.7">
+    <link rel="stylesheet" href="styles-new/unified.css?v=v1.12.0">
     
     <!-- Header Styles -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=v42_unified_header">
@@ -24,7 +24,6 @@
     <script src="scripts/color-scheme-system.js"></script>
     
     <!-- Preferences System Scripts -->
-    <script src="scripts/preferences-v2.js"></script>
     <script src="scripts/preferences-v2-compatibility.js"></script>
     
     <!-- Color Demo Toggle Script -->
@@ -147,12 +146,12 @@
                     </div>
                     <div class="section-body">
                         <div class="table-responsive" id="tickersContainer">
-                            <table id="tickersTable" class="table" data-table-type="tickers">
+                            <table id="tickersTable" class="table" data-table-type="tickers" style="width: 100%; table-layout: auto;">
                                 <colgroup>
-                                    
+                                    <!-- עמודות דינמיות - ללא רוחב קבוע -->
                                 </colgroup>
-                                <thead>
-                                    <tr>
+                                                <thead>
+                                                    <tr>
                                         <th>
                                             <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }">
@@ -208,12 +207,12 @@
                                             </button>
                                         </th>
                                         <th class="actions-cell">פעולות</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>AAPL</td>
-                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>AAPL</td>
+                                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
                     <td title="יש טריידים פעילים" style="text-align: center;">
                         <span class="btn btn-sm btn-success" 
                               style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
@@ -226,20 +225,13 @@
                                         <td>Apple Inc.</td>
                                         <td>טיקר טכנולוגיה</td>
                                         <td>2025-01-15 10:30</td>
-                                        <td class="actions-cell">
-                                            <div class="btn-group">
-                                                <button class="btn btn-sm btn-outline-primary" onclick="editTicker(1)" title="ערוך">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteTicker(1)" title="מחק">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>MSFT</td>
-                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
+                    <td class="actions-cell" id="actions-cell-1">
+                        <!-- Actions will be populated by JavaScript -->
+                    </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>MSFT</td>
+                                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
                     <td title="יש טריידים פעילים" style="text-align: center;">
                         <span class="btn btn-sm btn-success" 
                               style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
@@ -252,20 +244,13 @@
                     <td>Microsoft Corporation</td>
                     <td>טיקר טכנולוגיה</td>
                     <td>2025-01-15 10:25</td>
-                    <td class="actions-cell">
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-outline-primary" onclick="editTicker(2)" title="ערוך">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteTicker(2)" title="מחק">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
+                    <td class="actions-cell" id="actions-cell-2">
+                        <!-- Actions will be populated by JavaScript -->
                     </td>
-                </tr>
-                <tr>
-                    <td>GOOGL</td>
-                    <td data-status="סגור"><span class="status-badge status-closed">סגור</span></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>GOOGL</td>
+                                                        <td data-status="סגור"><span class="status-badge status-closed">סגור</span></td>
                     <td title="אין טריידים פעילים" style="text-align: center;">
                         <span class="btn btn-sm btn-danger" 
                               style="min-width: 30px; width: 30px; height: 30px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: bold;">
@@ -278,16 +263,9 @@
                                         <td>Alphabet Inc.</td>
                                         <td>טיקר טכנולוגיה</td>
                                         <td>2025-01-15 09:45</td>
-                                        <td class="actions-cell">
-                                            <div class="btn-group">
-                                                <button class="btn btn-sm btn-outline-primary" onclick="editTicker(3)" title="ערוך">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteTicker(3)" title="מחק">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
+                    <td class="actions-cell" id="actions-cell-3">
+                        <!-- Actions will be populated by JavaScript -->
+                    </td>
                                     </tr>
                                     <tr>
                                         <td>TSLA</td>
@@ -303,20 +281,13 @@
                                         <td>Tesla Inc.</td>
                                         <td>טיקר רכב חשמלי</td>
                                         <td>2025-01-15 11:15</td>
-                                        <td class="actions-cell">
-                                            <div class="btn-group">
-                                                <button class="btn btn-sm btn-outline-primary" onclick="editTicker(4)" title="ערוך">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteTicker(4)" title="מחק">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </div>
+                                        <td class="actions-cell" id="actions-cell-4">
+                                            <!-- Actions will be populated by JavaScript -->
                                         </td>
-                                    </tr>
-                                    <tr>
+                                                    </tr>
+                                                    <tr>
                                         <td>NVDA</td>
-                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
+                                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
                                         <td>
                                             <button class="btn-yes-no btn-yes" title="יש טריידים">
                                                 ✓
@@ -328,20 +299,13 @@
                                         <td>NVIDIA Corporation</td>
                                         <td>טיקר AI וצ'יפים</td>
                                         <td>2025-01-15 11:00</td>
-                                        <td class="actions-cell">
-                                            <div class="btn-group">
-                                                <button class="btn btn-sm btn-outline-primary" onclick="editTicker(5)" title="ערוך">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteTicker(5)" title="מחק">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            </div>
+                                        <td class="actions-cell" id="actions-cell-5">
+                                            <!-- Actions will be populated by JavaScript -->
                                         </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                     </div>
                 </div>
                 <!-- UI Content Section 1 End -->   
@@ -456,7 +420,7 @@
     <script src="scripts/console-cleanup.js"></script>
     <script src="scripts/translation-utils.js"></script>
     <script src="scripts/data-utils.js"></script>
-    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/ui-utils.js?v=1.2.0"></script>
     <script src="scripts/table-mappings.js"></script>
     <script src="scripts/date-utils.js"></script>
     <script src="scripts/tables.js"></script>
@@ -465,6 +429,6 @@
     <script src="scripts/main.js"></script>
     
     <!-- Page-specific script -->
-    <script src="scripts/test-header-only.js?v=1.0.1"></script>
+    <script src="scripts/test-header-only.js?v=1.5.0"></script>
 </body>
 </html>

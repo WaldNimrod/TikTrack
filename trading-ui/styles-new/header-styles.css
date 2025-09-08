@@ -192,6 +192,16 @@
         .dropdown-submenu > .tiktrack-dropdown-item {
             padding-right: 0.5rem; /* פחות רווח מימין */
         }
+        
+        /* תיקון נוסף לתפריטים בתוך tiktrack-dropdown-menu */
+        .tiktrack-dropdown-menu .dropdown-submenu .submenu {
+            right: calc(100% + 2px); /* רווח קטן יותר */
+            transform: translateX(2px); /* פחות הזזה */
+        }
+        
+        .tiktrack-dropdown-menu .dropdown-submenu:hover .submenu {
+            transform: translateX(0);
+        }
 
 .tiktrack-dropdown-menu li,
 .submenu li {

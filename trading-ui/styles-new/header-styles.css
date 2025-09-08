@@ -2,11 +2,24 @@
 /* This file contains all styles for the header component */
 /* It's separate from unified.css as per design decision */
 
+/* CSS Variables for consistent colors */
+:root {
+    --logo-green: #26baac;
+    --logo-orange: #ff9e04;
+    --white: #ffffff;
+    --light-gray: #f5f5f7;
+    --border-gray: #e5e5e5;
+    --text-dark: #1d1d1f;
+    --text-gray: #666;
+    --text-light-gray: #333;
+    --active-bg: #d4edda;
+}
+
 /* Menu - Apple Style with TikTrack Colors */
 
 /* Main Header */
 .unified-header {
-    background: #ffffff;
+    background: var(--white);
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -22,7 +35,7 @@
     min-height: 70px;
     direction: rtl;
     width: 100%;
-    background: white;
+    background: var(--white);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     z-index: 1001;
 }
@@ -60,7 +73,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    color: #26baac; /* ירוק - צבע הלוגו */
+    color: var(--logo-green); /* ירוק - צבע הלוגו */
     text-decoration: none;
     border-radius: 8px;
     transition: all 0.2s ease;
@@ -69,11 +82,11 @@
 }
 
 .tiktrack-nav-link:hover {
-    color: #ff9e04; /* כתום - רק למעבר עכבר */
+    color: var(--logo-orange); /* כתום - רק למעבר עכבר */
 }
 
 .tiktrack-nav-item.active .tiktrack-nav-link {
-    color: #26baac; /* ירוק - פריט פעיל */
+    color: var(--logo-green); /* ירוק - פריט פעיל */
     font-weight: 600; /* משקל כבד יותר לפריט פעיל */
     text-decoration: underline; /* קו תחתון לפריטים ראשיים */
 }
@@ -122,7 +135,7 @@
 .logo-text {
     font-size: 1rem;
     font-weight: 300;
-    color: #26baac;
+    color: var(--logo-green);
     direction: ltr;
     text-align: left;
     align-self: flex-end;
@@ -135,7 +148,7 @@
             position: absolute;
             top: 100%;
             right: 0;
-            background: white;
+            background: var(--white);
             border: 1px solid #e5e5e5;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -151,7 +164,7 @@
         
         .tiktrack-dropdown-arrow {
             font-size: 0.75rem;
-            color: #666;
+            color: var(--text-gray);
             margin-right: 0.25rem;
             transition: transform 0.2s ease;
         }
@@ -183,7 +196,7 @@
         .tiktrack-dropdown-item {
             display: block;
             padding: 0.5rem 1rem;
-            color: #26baac; /* ירוק - צבע הלוגו */
+            color: var(--logo-green); /* ירוק - צבע הלוגו */
             text-decoration: none;
             transition: all 0.2s ease;
             font-size: 14px;
@@ -201,7 +214,7 @@
             left: auto; /* Override Bootstrap default */
             margin-top: -1px;
             margin-right: -1px; /* RTL: margin-right instead of margin-left */
-            background: white;
+            background: var(--white);
             border: 1px solid #e5e5e5;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -227,14 +240,14 @@
 }
 
 .tiktrack-dropdown-item:hover {
-    background: #f5f5f7;
-    color: #ff9e04; /* כתום - רק למעבר עכבר */
+    background: var(--light-gray);
+    color: var(--logo-orange); /* כתום - רק למעבר עכבר */
 }
 
 /* פריט פעיל בתפריטי משנה - רקע ירוק */
 .tiktrack-dropdown-item.active {
-    background: #d4edda; /* רקע ירוק בהיר לפריט פעיל */
-    color: #26baac; /* ירוק לפריט פעיל */
+    background: var(--active-bg); /* רקע ירוק בהיר לפריט פעיל */
+    color: var(--logo-green); /* ירוק לפריט פעיל */
 }
 
         /* Submenus */
@@ -265,7 +278,7 @@
     height: 40px;
     background: transparent !important;
     border: none !important;
-    color: #1d1d1f;
+    color: var(--text-dark);
     text-decoration: none;
     transition: color 0.2s ease;
     font-size: 16px;
@@ -328,7 +341,7 @@
 /* Filters Section */
 .header-filters {
     padding: 1rem 2rem;
-    background: white;
+    background: var(--white);
     position: relative;
     z-index: 950;
     min-height: 60px;
@@ -396,7 +409,7 @@
     position: absolute;
     top: 100%;
     right: 0;
-    background: white;
+    background: var(--white);
     border: 1px solid #ddd;
     border-radius: 6px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -422,12 +435,12 @@
     padding: 0.45rem 0.9rem;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: #1d1d1f;
+    color: var(--text-dark);
     font-size: 0.9em;
 }
 
 .filter-option:hover {
-    background: #f5f5f7;
+    background: var(--light-gray);
 }
 
 .filter-option.selected {
@@ -476,7 +489,7 @@
 
 .search-clear-btn:hover {
     background: #f0f0f0 !important;
-    color: #333 !important;
+    color: var(--text-light-gray) !important;
     box-shadow: none !important;
 }
 
@@ -534,6 +547,6 @@
 
 .separator {
     height: 1px;
-    background: #e5e5e5;
+    background: var(--border-gray);
     margin: 0.5rem 0;
 }

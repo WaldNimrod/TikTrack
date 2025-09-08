@@ -5,8 +5,8 @@
 * נבנה אוטומטית מקבצי ITCSS נפרדים
 * ללא @import - כל הסגנונות בקובץ אחד
 *
-* @version 1.0.0
-* @lastUpdated September 6, 2025
+* @version 1.2.0
+* @lastUpdated January 15, 2025
 * @author TikTrack Development Team
 */
 
@@ -27,6 +27,7 @@
 --apple-blue: #007AFF;
 --apple-blue-dark: #0056CC;
 --logo-orange: #ff9e04;
+  --logo-green: #29a6a8;
 --apple-gray-1: #F2F2F7;
 --apple-gray-2: #E5E5EA;
 --apple-gray-3: #D1D1D6;
@@ -87,49 +88,49 @@
 /* ===== צבעי ישויות דינמיים ===== */
 
 /* טרייד - Trade */
---entity-trade-color: #007bff;
+--entity-trade-color: var(--user-entity-trade-color, #007bff);
 --entity-trade-bg: rgba(0, 123, 255, 0.1);
 --entity-trade-text: #0056b3;
 --entity-trade-border: rgba(0, 123, 255, 0.3);
 
 /* תוכנית מסחר - Trade Plan */
---entity-trade-plan-color: #0056b3;
+--entity-trade-plan-color: var(--user-entity-trade-plan-color, #0056b3);
 --entity-trade-plan-bg: rgba(0, 86, 179, 0.1);
 --entity-trade-plan-text: #004085;
 --entity-trade-plan-border: rgba(0, 86, 179, 0.3);
 
 /* ביצוע - Execution */
---entity-execution-color: #17a2b8;
+--entity-execution-color: var(--user-entity-execution-color, #17a2b8);
 --entity-execution-bg: rgba(23, 162, 184, 0.1);
 --entity-execution-text: #138496;
 --entity-execution-border: rgba(23, 162, 184, 0.3);
 
 /* חשבון - Account */
---entity-account-color: #28a745;
+--entity-account-color: var(--user-entity-account-color, #28a745);
 --entity-account-bg: rgba(40, 167, 69, 0.1);
 --entity-account-text: #1e7e34;
 --entity-account-border: rgba(40, 167, 69, 0.3);
 
 /* תזרים מזומנים - Cash Flow */
---entity-cash-flow-color: #20c997;
+--entity-cash-flow-color: var(--user-entity-cash-flow-color, #20c997);
 --entity-cash-flow-bg: rgba(32, 201, 151, 0.1);
 --entity-cash-flow-text: #17a2b8;
 --entity-cash-flow-border: rgba(32, 201, 151, 0.3);
 
 /* טיקר - Ticker */
---entity-ticker-color: #dc3545;
+--entity-ticker-color: var(--user-entity-ticker-color, #dc3545);
 --entity-ticker-bg: rgba(220, 53, 69, 0.1);
 --entity-ticker-text: #c82333;
 --entity-ticker-border: rgba(220, 53, 69, 0.3);
 
 /* התראה - Alert */
---entity-alert-color: #ff9c05;
+--entity-alert-color: var(--user-entity-alert-color, #ff9c05);
 --entity-alert-bg: rgba(255, 156, 5, 0.1);
 --entity-alert-text: #e55a00;
 --entity-alert-border: rgba(255, 156, 5, 0.3);
 
 /* הערה - Note */
---entity-note-color: #6f42c1;
+--entity-note-color: var(--user-entity-note-color, #6f42c1);
 --entity-note-bg: rgba(111, 66, 193, 0.1);
 --entity-note-text: #5a32a3;
 --entity-note-border: rgba(111, 66, 193, 0.3);
@@ -176,22 +177,40 @@
 /* ===== צבעי ערכים מספריים ===== */
 
 /* חיובי - Positive */
+--numeric-positive-color: var(--user-numeric-positive-color, #28a745);
 --numeric-positive-light: #d4edda;
---numeric-positive-medium: #28a745;
+--numeric-positive-medium: var(--user-numeric-positive-color, #28a745);
 --numeric-positive-dark: #155724;
 --numeric-positive-border: #c3e6cb;
 
 /* שלילי - Negative */
+--numeric-negative-color: var(--user-numeric-negative-color, #dc3545);
 --numeric-negative-light: #f8d7da;
---numeric-negative-medium: #dc3545;
+--numeric-negative-medium: var(--user-numeric-negative-color, #dc3545);
 --numeric-negative-dark: #721c24;
 --numeric-negative-border: #f5c6cb;
 
 /* אפס - Zero */
+--numeric-zero-color: var(--user-numeric-zero-color, #6c757d);
 --numeric-zero-light: #e2e3e5;
---numeric-zero-medium: #6c757d;
+--numeric-zero-medium: var(--user-numeric-zero-color, #6c757d);
 --numeric-zero-dark: #383d41;
 --numeric-zero-border: #d6d8db;
+
+/* ===== צבעי סטטוס ===== */
+--status-open-color: var(--user-status-open-color, #28a745);
+--status-closed-color: var(--user-status-closed-color, #6c757d);
+--status-cancelled-color: var(--user-status-cancelled-color, #dc3545);
+--status-pending-color: var(--user-status-pending-color, #ffc107);
+--status-active-color: var(--user-status-active-color, #007bff);
+--status-inactive-color: var(--user-status-inactive-color, #6c757d);
+
+/* ===== צבעי סוגי השקעה ===== */
+--type-swing-color: var(--user-type-swing-color, #007bff);
+--type-investment-color: var(--user-type-investment-color, #28a745);
+--type-passive-color: var(--user-type-passive-color, #6f42c1);
+--type-day-trading-color: var(--user-type-day-trading-color, #fd7e14);
+--type-scalping-color: var(--user-type-scalping-color, #dc3545);
 }
 
 /* ===== 01-settings/_spacing.css ===== */
@@ -342,7 +361,6 @@ line-height: 1.5;
 /* HTML root settings */
 html {
 direction: rtl;
-lang: he;
 }
 
 /* Body base styles - מבוסס על apple-theme.css */
@@ -355,6 +373,18 @@ line-height: 1.4;
 -webkit-font-smoothing: antialiased;
 -moz-osx-font-smoothing: grayscale;
 font-family: var(--font-family-primary);
+}
+
+/* Main Content - Same max-width and padding as header-container */
+.main-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 10px 10px;
+}
+
+/* Top Section - Special spacing */
+.top-section {
+    margin: 10px 0; /* 10px top and bottom margin */
 }
 
 /* ===== 04-elements/_headings.css ===== */
@@ -645,6 +675,24 @@ border-radius: calc(var(--apple-radius-small) * 0.75);
 padding: 0.5rem 1rem;
 font-size: 1rem;
 border-radius: calc(var(--apple-radius-small) * 1.25);
+}
+
+.btn-lg.btn-primary {
+  background-color: white !important;
+  color: var(--logo-green) !important;
+  border: 1px solid var(--logo-green) !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 1rem !important;
+  border-radius: calc(var(--apple-radius-small) * 1.25) !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-lg.btn-primary:hover {
+  background-color: var(--logo-green) !important;
+  color: white !important;
+  border-color: var(--logo-green) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(41, 166, 168, 0.3) !important;
 }
 
 /* ===== 05-objects/_layout.css ===== */
@@ -1132,9 +1180,9 @@ font-family: Arial, sans-serif;
 
 /* כפתורים בסיסיים Bootstrap */
 .btn-primary {
-  background-color: #007bff !important;
-  color: white !important;
-  border: 1px solid #007bff !important;
+  background-color: white !important;
+  color: var(--logo-green) !important;
+  border: 1px solid var(--logo-green) !important;
   padding: 0.375rem 0.75rem !important;
   font-size: 0.875rem !important;
   border-radius: 0.25rem !important;
@@ -1142,10 +1190,11 @@ font-family: Arial, sans-serif;
 }
 
 .btn-primary:hover {
-  background-color: #0056b3 !important;
-  border-color: #0056b3 !important;
+  background-color: var(--logo-green) !important;
+  color: white !important;
+  border-color: var(--logo-green) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 2px 4px rgba(41, 166, 168, 0.3) !important;
 }
 
 .btn-warning {
@@ -1205,9 +1254,9 @@ font-family: Arial, sans-serif;
 
 /* כפתורים קטנים */
 .btn-sm.btn-primary {
-  background-color: #007bff !important;
-  color: white !important;
-  border: 1px solid #007bff !important;
+  background-color: white !important;
+  color: var(--logo-green) !important;
+  border: 1px solid var(--logo-green) !important;
   padding: 0.25rem 0.5rem !important;
   font-size: 0.75rem !important;
   border-radius: 0.25rem !important;
@@ -1215,10 +1264,11 @@ font-family: Arial, sans-serif;
 }
 
 .btn-sm.btn-primary:hover {
-  background-color: #0056b3 !important;
-  border-color: #0056b3 !important;
+  background-color: var(--logo-green) !important;
+  color: white !important;
+  border-color: var(--logo-green) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 2px 4px rgba(41, 166, 168, 0.3) !important;
 }
 
 .btn-sm.btn-warning {
@@ -2476,9 +2526,7 @@ min-width: fit-content;
 */
 
 /* סגנונות ניווט כלליים */
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
 /* פריטי תפריט */
 .nav-item {
@@ -2509,7 +2557,6 @@ color: #29a6a8;
 font-weight: 600;
 }
 
-/* TikTrack menu styles moved to header-styles.css */
 
 /* פירורי לחם */
 .breadcrumb {
@@ -2611,7 +2658,6 @@ width: 100%;
 padding: var(--spacing-md);
 }
 
-/* TikTrack menu styles moved to header-styles.css */
 }
 
 /* ===== 06-components/_forms-advanced.css ===== */
@@ -3280,181 +3326,46 @@ background-color: #dc3545;
 background-color: #ffc107;
 }
 
-/* ===== 06-components/_header-system.css ===== */
-/**
- * TikTrack Header System Stylesheet - Clean Version
- * קובץ הסגנונות למערכת ראש הדף החדשה - גרסה נקייה
- * 
- * File: trading-ui/styles-new/06-components/_header-system.css
- * Version: 3.0.0 - Clean
- * Last Updated: September 6, 2025
- * 
- * מבוסס על התפריט הישן שעובד מושלם
- * HTML פשוט, CSS נקי, JavaScript בסיסי
- * 
- * Features:
- * - עיצוב אלמנט unified-header בלבד
- * - סגנונות לוגו וניווט פשוטים
- * - תת-תפריטים עם hover פשוט
- * - התאמה למסכים קטנים
- * 
- * SCOPE RULE: כל selector חייב להתחיל ב-#unified-header
- */
+/* ===== סוף הגדרות התפריט - כל הגדרות התפריט נמצאות ב-header-styles.css ===== */
+/* ===== כל מה שמתחת לקו הזה הוא תוכן העמוד בלבד ===== */
 
-/* ===== סגנונות בסיסיים לכותרת ===== */
-#unified-header {
-background: var(--apple-bg-elevated);
-border-bottom: 1px solid var(--apple-border-light);
-box-shadow: var(--apple-shadow-light);
-position: sticky;
-top: 0;
-z-index: 1000;
-}
 
-#unified-header .header-container {
-    max-width: 1380px;
-    margin: 0 auto;
-    padding: 1rem 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    direction: rtl;
-}
 
-#unified-header .header-top {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-bottom: 1px solid var(--apple-border-light);
-    position: relative;
-    min-height: 70px;
-    direction: rtl;
-    background: var(--apple-bg-elevated);
-}
+/* ===== 06-components/_entity-colors.css ===== */
 
-#unified-header .header-top .logo-section {
-    order: 3;
-    margin-right: auto;
-}
 
-#unified-header .header-top .header-nav {
-    order: 1;
-    margin-left: auto;
-}
 
-/* ===== סגנונות לוגו ===== */
-#unified-header .logo-section {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    direction: ltr;
-}
 
-#unified-header .logo {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    text-decoration: none;
-    color: inherit;
-}
 
-#unified-header .logo:hover {
-    text-decoration: none;
-    color: inherit;
-}
 
-#unified-header .logo-image {
-    width: 125px;
-    height: 37.5px;
-    object-fit: contain;
-    display: block;
-}
 
-#unified-header .logo-text {
-    font-size: 1rem;
-    font-weight: 300;
-    color: #26baac;
-    direction: ltr;
-    text-align: left;
-    align-self: flex-end;
-    margin-bottom: -5px;
-    white-space: nowrap;
-}
 
-/* ===== סגנונות ניווט ===== */
-#unified-header .header-nav {
-    display: flex;
-    align-items: center;
-}
 
-#unified-header .main-nav {
-    display: flex;
-    align-items: center;
-}
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* ===== סגנונות תפריט נפתח ===== */
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* TikTrack menu styles moved to header-styles.css */
 
-/* ===== התאמה למסכים קטנים ===== */
-@media (max-width: 768px) {
-    #unified-header .header-container {
-        padding: 0;
-        height: 44px;
-    }
-
-    #unified-header .logo-text {
-        font-size: 0.9375rem;
-    }
-}
 
 /* ===== 06-components/_entity-colors.css ===== */
 /**
@@ -3777,4 +3688,80 @@ background-color: color-mix(in srgb, var(--type-scalping-color) 10%, transparent
 
 .type-scalping-text {
 color: var(--type-scalping-color);
+}
+
+/* ===== Bootstrap Text Utility Classes ===== */
+.text-primary {
+color: var(--logo-green) !important;
+}
+
+.text-secondary {
+color: var(--logo-orange) !important;
+}
+
+.text-success {
+color: var(--apple-green) !important;
+}
+
+.text-danger {
+color: var(--apple-red) !important;
+}
+
+.text-warning {
+color: var(--apple-yellow) !important;
+}
+
+.text-info {
+color: var(--apple-blue) !important;
+}
+
+.text-muted {
+color: var(--apple-text-tertiary) !important;
+}
+
+/* ===== Bootstrap Badge Classes ===== */
+.badge.bg-primary {
+background-color: var(--logo-green) !important;
+color: white !important;
+}
+
+.badge.bg-secondary {
+background-color: var(--logo-orange) !important;
+color: white !important;
+}
+
+.badge.bg-success {
+background-color: var(--apple-green) !important;
+color: white !important;
+}
+
+.badge.bg-danger {
+background-color: var(--apple-red) !important;
+color: white !important;
+}
+
+.badge.bg-warning {
+background-color: var(--apple-yellow) !important;
+color: var(--apple-text-primary) !important;
+}
+
+.badge.bg-info {
+background-color: var(--apple-blue) !important;
+color: white !important;
+}
+
+/* ===== Button Styles Within Cards ===== */
+.card .btn-primary {
+background-color: white !important;
+  color: var(--logo-green) !important;
+  border: 1px solid var(--logo-green) !important;
+transition: all 0.2s ease !important;
+}
+
+.card .btn-primary:hover {
+  background-color: var(--logo-green) !important;
+  color: white !important;
+  border-color: var(--logo-green) !important;
+transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(41, 166, 168, 0.3) !important;
 }

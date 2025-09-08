@@ -1,6 +1,151 @@
-/* Header Styles - Exception to unified CSS system */
+/* Header Styles - Exception to unified CSS system - v38 - Fixed Filters */
 /* This file contains all styles for the header component */
 /* It's separate from unified.css as per design decision */
+
+/* ===== 06-components/_header-system.css ===== */
+/**
+ * TikTrack Header System Stylesheet - Clean Version
+ * קובץ הסגנונות למערכת ראש הדף החדשה - גרסה נקייה
+ * 
+ * File: trading-ui/styles-new/06-components/_header-system.css
+ * Version: 3.0.0 - Clean
+ * Last Updated: September 6, 2025
+ * 
+ * מבוסס על התפריט הישן שעובד מושלם
+ * HTML פשוט, CSS נקי, JavaScript בסיסי
+ * 
+ * Features:
+ * - עיצוב אלמנט unified-header בלבד
+ * - סגנונות לוגו וניווט פשוטים
+ * - תת-תפריטים עם hover פשוט
+ * - התאמה למסכים קטנים
+ * 
+ * SCOPE RULE: כל selector חייב להתחיל ב-#unified-header
+ */
+
+/* ===== סגנונות בסיסיים לכותרת ===== */
+#unified-header {
+background: var(--apple-bg-elevated);
+border-bottom: 1px solid var(--apple-border-light);
+box-shadow: var(--apple-shadow-light);
+position: sticky;
+top: 0;
+z-index: 1000;
+}
+
+#unified-header .header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    direction: rtl;
+}
+
+/* Filters Container - Same max-width and padding as header-container */
+.filters-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 10px;
+}
+
+/* Header Filters - No side padding, no top margin */
+.header-filters {
+    padding: 1rem 0;
+    background: white;
+    position: relative;
+    z-index: 950;
+    min-height: 60px;
+    display: none;
+    margin-top: 0;
+}
+
+#unified-header .header-top {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid var(--apple-border-light);
+    position: relative;
+    min-height: 70px;
+    direction: rtl;
+    background: var(--apple-bg-elevated);
+}
+
+#unified-header .header-top .logo-section {
+    order: 3;
+    margin-right: auto;
+}
+
+#unified-header .header-top .header-nav {
+    order: 1;
+    margin-left: auto;
+}
+
+/* ===== סגנונות לוגו ===== */
+#unified-header .logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    direction: ltr;
+}
+
+#unified-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    color: inherit;
+}
+
+#unified-header .logo:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+#unified-header .logo-image {
+    width: 125px;
+    height: 37.5px;
+    object-fit: contain;
+    display: block;
+}
+
+#unified-header .logo-text {
+    font-size: 1rem;
+    font-weight: 300;
+    color: #26baac;
+    direction: ltr;
+    text-align: left;
+    align-self: flex-end;
+    margin-bottom: -5px;
+    white-space: nowrap;
+}
+
+/* ===== סגנונות ניווט ===== */
+#unified-header .header-nav {
+    display: flex;
+    align-items: center;
+}
+
+#unified-header .main-nav {
+    display: flex;
+    align-items: center;
+}
+
+/* ===== התאמה למסכים קטנים ===== */
+@media (max-width: 768px) {
+    #unified-header .header-container {
+        padding: 0;
+        height: 44px;
+    }
+
+    #unified-header .logo-text {
+        font-size: 0.9375rem;
+    }
+}
 
 /* Menu - Apple Style with TikTrack Colors */
 
@@ -32,7 +177,7 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1400px;
 }
 
 /* Navigation */
@@ -182,7 +327,7 @@
         .tiktrack-dropdown-item {
             display: block;
             padding: 0.5rem 1rem;
-            color: #ff9e04; /* צבע הלוגו - כתום */
+            color: #29a6a8; /* ירוק לוגו כברירת מחדל */
             text-decoration: none;
             transition: all 0.2s ease;
             font-size: 14px;
@@ -206,7 +351,7 @@
 
 .tiktrack-dropdown-item:hover {
     background: #f5f5f7;
-    color: #e6850e; /* צבע הלוגו כהה יותר ב-hover */
+    color: #ff9e04; /* כתום ב-hover */
 }
 
         /* Submenus */
@@ -314,7 +459,7 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
@@ -488,44 +633,29 @@
     box-shadow: none !important;
 }
 
-/* Level 3 Submenu - רמה 3 של התפריט */
+/* Level 3 Submenu - רמה 3 של התפריט (בסגנון אפל) */
 .level3-submenu {
     position: absolute !important;
     top: 0 !important;
-    right: calc(100% - 10px) !important; /* RTL: הזזה ימינה לחפיפה */
+    right: 100% !important; /* כמו בדוגמה של אפל */
     left: auto !important;
     margin-top: -1px !important;
     margin-right: 0 !important;
     margin-left: 0 !important;
     background: white !important;
     border: 1px solid #e5e5e5 !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
     min-width: 180px !important;
     padding: 0.5rem 0 !important;
     display: none !important;
-    z-index: 1002 !important;
+    z-index: 1001 !important;
     list-style: none !important;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(0);
-    transition: all 0.3s ease;
-    transition-delay: 0.1s;
 }
 
-.level3-submenu:hover {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(0);
-    transition-delay: 0s;
-}
-
+/* הצגת תפריט רמה 3 (בסגנון אפל) */
 .dropdown-submenu:hover .level3-submenu {
     display: block !important;
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(0);
-    transition-delay: 0s;
 }
 
 .separator {
@@ -533,3 +663,4 @@
     background: #e5e5e5;
     margin: 0.5rem 0;
 }
+

@@ -1,5 +1,5 @@
 /**
- * Header System - TikTrack Frontend
+ * Header System - TikTrack Frontend - v30 - Position & Color Fix
  * ==================================
  *
  * Header System JS loading...

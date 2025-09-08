@@ -1,60 +1,97 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
-
-            <!-- ===== CSS Architecture - Unified CSS ===== -->
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>עמוד עיצובים - TikTrack</title>
     
-    <!-- Bootstrap Framework -->
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- TikTrack CSS - Unified CSS (No @import) -->
-    <link rel="stylesheet" href="styles-new/unified.css">
+    <!-- Unified CSS -->
+    <link rel="stylesheet" href="styles-new/unified.css?v=v1.4.0">
     
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v38_fixed">
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Error Handlers -->
-    <script src="scripts/error-handlers.js"></script>
-    
-    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_level3_fix"></head>
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js?v=v34_fixes"></script>
+</head>
 
-  <body>
-    <!-- unified-header ייווצר כאן אוטומטית -->
-    <div id="unified-header"></div>
-    
+<body>
     <div class="background-wrapper">
-      <div class="page-body">
-        <div class="container">
-          <h1>עמוד עיצובים</h1>
-          <p>תוכן העמוד יבוא כאן...</p>
+        <!-- Header System -->
+        <div id="unified-header"></div>
+
+        <!-- Page body -->
+        <div class="page-body">
+            <!-- Main content limited in width -->
+            <div class="main-content">
+                <!-- UI Content Section Top Start-->
+                <div class="top-section">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>🏠 עמוד עיצובים - כותרת סקשן עליון</h2>
+                        <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
+                            <span class="filter-arrow">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- כאן נכנס התוכן של גוף הסקשן -->
+                        <h4>תוכן סקשן עליון</h4>
+                    </div>
+                </div>
+                <!-- UI Content Section Top End -->  
+
+                <!-- UI Content Section 1 Start-->
+                <div class="content-section">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>📊 ביצועים - כותרת סקשן 1</h2>
+                        <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
+                            <span class="filter-arrow">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- כאן נכנס התוכן של גוף הסקשן -->
+                        <h4>תוכן סקשן מספר 1</h4>
+                    </div>
+                </div>
+                <!-- UI Content Section 1 End -->   
+
+                <!-- UI Content Section 2 Start-->
+                <div class="content-section">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>🎨 עיצוב וסגנונות - כותרת סקשן 2</h2>
+                        <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
+                            <span class="filter-arrow">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- כאן נכנס התוכן של גוף הסקשן -->
+                        <h4>תוכן סקשן מספר 2</h4>
+                    </div>
+                </div>
+                <!-- UI Content Section 2 End--> 
+
+                <!-- UI Content Section 3 Start-->
+                <div class="content-section">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>📋 רכיבי ממשק - כותרת סקשן 3</h2>
+                        <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
+                            <span class="filter-arrow">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- כאן נכנס התוכן של גוף הסקשן -->
+                        <h4>תוכן סקשן מספר 3</h4>
+                    </div>
+                </div>
+                <!-- UI Content Section 3 End--> 
+            </div>
         </div>
-      </div>
     </div>
-
-    <!-- Page initialization -->
-    <script>
-      // Page initialization
-      document.addEventListener('DOMContentLoaded', function () {
-        console.log('🔄 Initializing designs page...');
-        if (typeof initializeDesignsPage === 'function') {
-          initializeDesignsPage();
-        }
-        
-        // אתחול מערכת הכותרת החדשה (כוללת תפריט ראשי)
-        console.log("🔄 Initializing unified header system...");
-        if (window.headerSystem) {
-          window.headerSystem.init();
-        }
-      });
-    </script>
-    
-    <!-- Header System -->
-    <script src="scripts/header-system.js?v=20250115_level3_fix"></script>
-  </body>
-
+</body>
 </html>

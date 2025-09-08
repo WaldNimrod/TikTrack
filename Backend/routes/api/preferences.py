@@ -132,3 +132,42 @@ def get_profiles() -> Any:
             "error": str(e),
             "timestamp": "2025-01-07T21:55:00Z"
         }), 500
+
+@preferences_bp.route('/colors', methods=['GET'])
+@rate_limit_api(requests_per_minute=30)
+def get_colors() -> Any:
+    """Get color preferences"""
+    try:
+        # Return default colors for now
+        colors = {
+            "numeric-positive-color": "#28a745",
+            "numeric-negative-color": "#dc3545", 
+            "numeric-zero-color": "#6c757d",
+            "entity-trade-color": "#007bff",
+            "entity-account-color": "#28a745",
+            "entity-ticker-color": "#dc3545",
+            "entity-alert-color": "#ff9c05",
+            "entity-execution-color": "#17a2b8",
+            "entity-cash-flow-color": "#20c997",
+            "entity-trade-plan-color": "#17a2b8",
+            "entity-note-color": "#6f42c1",
+            "status-open-color": "#28a745",
+            "status-closed-color": "#6c757d",
+            "status-cancelled-color": "#dc3545",
+            "status-pending-color": "#ffc107",
+            "type-swing-color": "#007bff",
+            "type-investment-color": "#28a745",
+            "type-passive-color": "#6f42c1",
+            "type-day-trading-color": "#fd7e14",
+            "type-scalping-color": "#dc3545"
+        }
+        
+        return jsonify(colors), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting colors: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": "2025-01-07T21:55:00Z"
+        }), 500

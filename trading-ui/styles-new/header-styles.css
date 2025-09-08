@@ -201,9 +201,23 @@
             left: auto; /* Override Bootstrap default */
             margin-top: -1px;
             margin-right: -1px; /* RTL: margin-right instead of margin-left */
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 180px;
+            padding: 0.5rem 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(10px);
+            transition: all 0.3s ease;
+            z-index: 1002;
+            list-style: none;
         }
         
-        .tiktrack-dropdown-menu .dropdown-submenu:hover .submenu {
+        .tiktrack-dropdown-menu .dropdown-submenu:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
             transform: translateX(0);
         }
 

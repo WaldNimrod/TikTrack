@@ -1240,8 +1240,8 @@
                                             <div class="overview-card-number">₪125,000</div>
                                             <div class="overview-card-label">יתרה כוללת</div>
                                             <div class="overview-card-change positive">+2.5%</div>
-                                        </div>
-                                    </div>
+                    </div>
+                </div>
                                     <div class="overview-card success">
                                         <div class="overview-card-icon">💰</div>
                                         <div class="overview-card-content">
@@ -1645,10 +1645,10 @@
             if (body.style.display === 'none') {
                 body.style.display = 'block';
                 icon.textContent = '▲';
-            } else {
+                } else {
                 body.style.display = 'none';
                 icon.textContent = '▼';
-            }
+                }
         }
 
         function refreshStylesTest() {
@@ -1881,18 +1881,18 @@
             if (typeof window.showLinkedItems === 'function') {
                 window.showLinkedItems(type, id);
             } else {
-                if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', ``הצגת פריטים מקושרים ל-${type} #${id}``); } else { alert(``הצגת פריטים מקושרים ל-${type} #${id}``); };
+                if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `הצגת פריטים מקושרים ל-${type} #${id}`); } else { alert(`הצגת פריטים מקושרים ל-${type} #${id}`); };
             }
         }
 
         function editTrade(id) {
             console.log(`🔄 Editing trade #${id}`);
-            if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', ``עריכת טרייד #${id}``); } else { alert(``עריכת טרייד #${id}``); };
+            if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `עריכת טרייד #${id}`); } else { alert(`עריכת טרייד #${id}`); };
         }
 
         function editAlert(id) {
             console.log(`🔄 Editing alert #${id}`);
-            if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', ``עריכת התראה #${id}``); } else { alert(``עריכת התראה #${id}``); };
+            if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `עריכת התראה #${id}`); } else { alert(`עריכת התראה #${id}`); };
         }
 
         // Initialize page

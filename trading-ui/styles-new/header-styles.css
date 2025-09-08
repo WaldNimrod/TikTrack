@@ -196,10 +196,10 @@
         /* Bootstrap 5 submenu positioning - RTL version */
         .tiktrack-dropdown-menu .dropdown-submenu .dropdown-menu {
             top: 0;
-            right: 100%; /* RTL: right instead of left */
+            right: calc(100% - 10px); /* RTL: הזזה ימינה לחפיפה */
             left: auto; /* Override Bootstrap default */
             margin-top: -1px;
-            margin-right: -1px; /* RTL: margin-right instead of margin-left */
+            margin-right: 0; /* ללא margin נוסף */
         }
         
         .tiktrack-dropdown-menu .dropdown-submenu:hover .submenu {

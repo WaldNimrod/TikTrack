@@ -22,7 +22,7 @@
 
 ## 🎯 תובנות מעשיות מהעבודה על עמודים
 
-> **חשוב**: לפני התחלת העבודה, מומלץ לקרוא את [סעיף 22: תובנות ודיוקים מהעבודה המעשית](#22-תובנות-מהעבודה-על-עמוד-בדיקת-כותרת-טבלאות-עזר-ותבנית-בסיס) שמכיל ניסיון מעשי מהעבודה על 3 עמודים, שגיאות נפוצות ופתרונות, ותהליך אופטימלי שפותח מהניסיון.
+> **חשוב**: לפני התחלת העבודה, מומלץ לקרוא את [סעיף 22: תובנות ודיוקים מהעבודה המעשית](#22-תובנות-מהעבודה-על-עמוד-בדיקת-כותרת-טבלאות-עזר-ותבנית-בסיס) שמכיל ניסיון מעשי מהעבודה על 3 עמודים, שגיאות נפוצות ופתרונות, ותהליך אופטימלי שפותח מהניסיון. כמו כן, מומלץ לקרוא את [סעיף 23: צביעת סטטוסים לפי סולם הצבעים הדינמי](#23-שימוש-במערכת-הצבעים-הדינמית-לצביעת-סטטוסים) לשימוש נכון במערכת הצבעים.
 
 ## שלב 1: יישום נכון של התפריט ואלמנט הראש
 
@@ -1097,21 +1097,260 @@ read_lints trading-ui/db_extradata.html
 מדריך זה מספק תהליך מפורט לעדכון עמוד קיים לתבנית הבסיס החדשה. הקפד על כל הצעדים כדי להבטיח עקביות ואיכות במערכת.
 
 ### נקודות מפתח:
-- **תהליך מובנה**: 21 שלבים מוגדרים בבירור + תובנות מעשיות
+- **תהליך מובנה**: 23 שלבים מוגדרים בבירור + תובנות מעשיות
 - **מזהי טבלאות**: טבלה מלאה עם כל המזהים הנדרשים לכל עמוד
 - **כפתורי פתיחה/סגירה**: מערכת מרוכזת עם הוראות מפורטות לכל מצב
 - **ניקוי סקריפטים**: הוראות מפורטות להעברת סקריפטים אינליין לקבצים חיצוניים
 - **זיהוי CSS אינליין**: כלים לזיהוי והצגת הגדרות CSS אינליין
+- **צביעת סטטוסים**: מערכת צבעים דינמית עם הוראות מפורטות לשימוש
 - **תובנות מעשיות**: שגיאות נפוצות ופתרונות מהעבודה על עמודים אמיתיים
 - **בדיקות חובה**: 5 בדיקות מבנה + בדיקה חוזרת מול תבנית + 7 בדיקות מתקדמות
 - **גיבוי מלא**: גיבוי מקומי + גיט האב + תגים
 - **מעקב מתמיד**: רשימת משימות דו-מימדית לכל העמודים
-- **דוגמאות מעשיות**: 3 עמודים שהושלמו בהצלחה עם תובנות מפורטות (כל 21 הסעיפים)
+- **דוגמאות מעשיות**: 3 עמודים שהושלמו בהצלחה עם תובנות מפורטות (כל 23 הסעיפים)
 - **תהליך אופטימלי**: כל המידע הדרוש לביצוע מושלם של התהליך
 
 ---
 
 **📝 הערה**: מדריך זה מתעדכן עם כל שינוי במבנה העמודים במערכת.
+
+---
+
+## צביעת סטטוסים לפי סולם הצבעים הדינמי
+
+### 23. שימוש במערכת הצבעים הדינמית לצביעת סטטוסים
+
+**תאריך**: 2025-01-15 15:00  
+**מטרה**: שימוש עקבי במערכת הצבעים הדינמית לצביעת סטטוסים בכל העמודים
+
+#### 23.1 מבוא למערכת הצבעים הדינמית
+
+מערכת הצבעים הדינמית של TikTrack מאפשרת התאמה אישית של צבעים לכל משתמש, עם שמירה ב-API ועדכון בזמן אמת. המערכת מבוססת על CSS Custom Properties וממשקת עם מערכת ההעדפות.
+
+**עקרונות המערכת:**
+- **CSS Custom Properties** - כל הצבעים מוגדרים כמשתנים
+- **API Integration** - שמירה וטעינה מ-API
+- **Fallback Values** - ערכי ברירת מחדל לכל צבע
+- **Real-time Updates** - עדכון מיידי של הצבעים
+- **Theme Support** - תמיכה בערכות נושא שונות
+
+#### 23.2 צבעי סטטוס זמינים
+
+**צבעי סטטוס בסיסיים:**
+```css
+/* צבעי סטטוס דינמיים */
+:root {
+  --status-open-color: var(--user-status-open-color, #28a745);
+  --status-closed-color: var(--user-status-closed-color, #6c757d);
+  --status-cancelled-color: var(--user-status-cancelled-color, #dc3545);
+  --status-pending-color: var(--user-status-pending-color, #ffc107);
+  --status-active-color: var(--user-status-active-color, #007bff);
+  --status-inactive-color: var(--user-status-inactive-color, #6c757d);
+}
+```
+
+**סטטוסים זמינים:**
+- `open` - פתוח (ירוק)
+- `closed` - סגור (אפור)
+- `cancelled` - מבוטל (אדום)
+- `pending` - ממתין (צהוב)
+- `active` - פעיל (כחול)
+- `inactive` - לא פעיל (אפור)
+
+#### 23.3 שימוש בצבעי סטטוס ב-HTML
+
+**תגיות סטטוס בסיסיות:**
+```html
+<!-- תגיות סטטוס עם צבעים דינמיים -->
+<span class="status-badge status-open">פתוח</span>
+<span class="status-badge status-closed">סגור</span>
+<span class="status-badge status-cancelled">מבוטל</span>
+<span class="status-badge status-pending">ממתין</span>
+<span class="status-badge status-active">פעיל</span>
+<span class="status-badge status-inactive">לא פעיל</span>
+```
+
+**סטטוסים עם רקע:**
+```html
+<!-- סטטוסים עם רקע צבעוני -->
+<span class="status-open">פתוח</span>
+<span class="status-closed">סגור</span>
+<span class="status-cancelled">מבוטל</span>
+<span class="status-pending">ממתין</span>
+<span class="status-active">פעיל</span>
+<span class="status-inactive">לא פעיל</span>
+```
+
+**סטטוסים עם רקע בלבד:**
+```html
+<!-- רקע צבעוני בלבד -->
+<span class="status-open-bg">פתוח</span>
+<span class="status-closed-bg">סגור</span>
+<span class="status-cancelled-bg">מבוטל</span>
+<span class="status-pending-bg">ממתין</span>
+<span class="status-active-bg">פעיל</span>
+<span class="status-inactive-bg">לא פעיל</span>
+```
+
+**סטטוסים עם טקסט בלבד:**
+```html
+<!-- טקסט צבעוני בלבד -->
+<span class="status-open-text">פתוח</span>
+<span class="status-closed-text">סגור</span>
+<span class="status-cancelled-text">מבוטל</span>
+<span class="status-pending-text">ממתין</span>
+<span class="status-active-text">פעיל</span>
+<span class="status-inactive-text">לא פעיל</span>
+```
+
+#### 23.4 שימוש ב-JavaScript לצבעי סטטוס
+
+**פונקציות זמינות:**
+```javascript
+// קבלת צבע סטטוס
+const openColor = getStatusColor('open', 'medium');
+const closedColor = getStatusColor('closed', 'light');
+
+// קבלת צבע רקע סטטוס
+const openBgColor = getStatusBackgroundColor('open');
+const closedBgColor = getStatusBackgroundColor('closed');
+
+// קבלת צבע טקסט סטטוס
+const openTextColor = getStatusTextColor('open');
+const closedTextColor = getStatusTextColor('closed');
+
+// קבלת צבע גבול סטטוס
+const openBorderColor = getStatusBorderColor('open');
+const closedBorderColor = getStatusBorderColor('closed');
+```
+
+**עדכון דינמי של צבעי סטטוס:**
+```javascript
+// עדכון צבע סטטוס
+function updateStatusColor(statusType, colorValue) {
+  const colorKey = `status-${statusType}-color`;
+  updateColor(colorKey, colorValue);
+  
+  // עדכון UI
+  updateStatusColorDisplay(statusType, colorValue);
+}
+
+// עדכון תצוגת צבע סטטוס
+function updateStatusColorDisplay(statusType, colorValue) {
+  const elements = document.querySelectorAll(`.status-${statusType}`);
+  elements.forEach(element => {
+    element.style.setProperty('--status-color', colorValue);
+  });
+}
+```
+
+#### 23.5 כללים לשימוש נכון
+
+**כללים חשובים:**
+1. **עקביות** - השתמש באותם צבעי סטטוס בכל העמודים
+2. **נגישות** - וודא שיש ניגודיות מספקת בין הטקסט לרקע
+3. **משמעות** - השתמש בצבעים שמתאימים למשמעות הסטטוס
+4. **עדכון** - המערכת מתעדכנת אוטומטית כשהמשתמש משנה העדפות
+
+**דוגמאות לשימוש נכון:**
+```html
+<!-- נכון - שימוש במחלקות סטטוס -->
+<td class="status-cell">
+  <span class="status-badge status-open">פתוח</span>
+</td>
+
+<!-- נכון - שימוש עם רקע -->
+<td class="status-cell status-open-bg">
+  <span class="status-open-text">פתוח</span>
+</td>
+
+<!-- שגוי - שימוש בצבעים קבועים -->
+<td class="status-cell" style="background-color: #28a745;">
+  <span style="color: white;">פתוח</span>
+</td>
+```
+
+#### 23.6 בדיקות ואימות
+
+**בדיקת טעינת צבעים:**
+```javascript
+// בדיקת טעינת צבעים דינמיים
+async function testDynamicColors() {
+  try {
+    const response = await fetch('/api/preferences');
+    const preferences = await response.json();
+    
+    if (preferences.colorScheme && preferences.colorScheme.status) {
+      console.log('✅ צבעי סטטוס נטענו בהצלחה');
+      console.log('צבעי סטטוס:', preferences.colorScheme.status);
+    } else {
+      console.log('⚠️ צבעי סטטוס לא נמצאו, משתמש בברירת מחדל');
+    }
+  } catch (error) {
+    console.error('❌ שגיאה בטעינת צבעי סטטוס:', error);
+  }
+}
+```
+
+**בדיקת עדכון צבעים:**
+```javascript
+// בדיקת עדכון צבעים בזמן אמת
+function testColorUpdate() {
+  const testElement = document.querySelector('.status-open');
+  if (testElement) {
+    const computedStyle = getComputedStyle(testElement);
+    const color = computedStyle.getPropertyValue('--status-open-color');
+    console.log('צבע סטטוס פתוח:', color);
+  }
+}
+```
+
+#### 23.7 אינטגרציה עם מערכת ההעדפות
+
+**טעינת צבעי סטטוס מההעדפות:**
+```javascript
+// טעינת צבעי סטטוס מההעדפות
+function loadStatusColorsFromPreferences(preferences) {
+  if (preferences && preferences.statusColors) {
+    Object.assign(STATUS_COLORS, preferences.statusColors);
+    console.log('✅ צבעי סטטוס נטענו מההעדפות');
+  }
+}
+```
+
+**שמירת צבעי סטטוס להעדפות:**
+```javascript
+// שמירת צבעי סטטוס להעדפות
+async function saveStatusColorsToPreferences(statusColors) {
+  try {
+    const response = await fetch('/api/preferences', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        colorScheme: {
+          status: statusColors
+        }
+      })
+    });
+    
+    if (response.ok) {
+      console.log('✅ צבעי סטטוס נשמרו בהצלחה');
+    }
+  } catch (error) {
+    console.error('❌ שגיאה בשמירת צבעי סטטוס:', error);
+  }
+}
+```
+
+#### 23.8 כללים חשובים
+
+1. **אין צבעים קבועים** - תמיד השתמש במערכת הצבעים הדינמית
+2. **עקביות** - השתמש באותם צבעי סטטוס בכל העמודים
+3. **נגישות** - וודא שיש ניגודיות מספקת
+4. **עדכון אוטומטי** - המערכת מתעדכנת אוטומטית
+5. **תמיכה בערכות נושא** - המערכת תומכת בערכות נושא שונות
 
 ---
 
@@ -1231,7 +1470,19 @@ grep -n "style.*:" trading-ui/page-name.html
 
 ## היסטוריית גרסאות
 
-### גרסה 2.9 (נוכחית)
+### גרסה 3.0 (נוכחית)
+- **תאריך**: 2025-01-15 15:00
+- **שינויים**: 
+  - הוספת סעיף 23: צביעת סטטוסים לפי סולם הצבעים הדינמי
+  - הוספת הוראות מפורטות לשימוש במערכת הצבעים הדינמית
+  - הוספת דוגמאות HTML ו-JavaScript לשימוש בצבעי סטטוס
+  - הוספת כללים לשימוש נכון בצבעי סטטוס
+  - הוספת בדיקות ואימות למערכת הצבעים
+  - הוספת אינטגרציה עם מערכת ההעדפות
+  - הרחבת התהליך ל-23 שלבים מקיפים
+  - עדכון הסיכום עם מערכת הצבעים הדינמית
+
+### גרסה 2.9
 - **תאריך**: 2025-01-15 14:30
 - **שינויים**: 
   - הוספת סעיף 22: תובנות ודיוקים מהעבודה המעשית

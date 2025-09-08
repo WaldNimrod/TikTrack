@@ -1,142 +1,101 @@
 #!/usr/bin/env python3
 """
-CSS Deduplicator - הסרת כפילויות מ-CSS
-מסיר כפילויות ומאחד סגנונות זהים
-
-Usage: python3 css-deduplicator.py
+CSS Deduplicator - מסיר כפילויות וסותרות מ-CSS
 """
 
-import os
 import re
-from pathlib import Path
-from collections import OrderedDict
+import os
+from collections import defaultdict, OrderedDict
 
-class CSSDeduplicator:
-    def __init__(self):
-        self.styles_dir = Path('trading-ui/styles-new')
-        self.unified_file = self.styles_dir / 'unified.css'
-        
-    def parse_css_rules(self, css_content):
-        """נתח כללי CSS"""
-        rules = OrderedDict()
-        
-        # Find all CSS rules
-        pattern = r'([^{}]+)\s*\{([^{}]*)\}'
-        matches = re.findall(pattern, css_content, re.DOTALL)
-        
-        for selector, properties in matches:
-            selector = selector.strip()
-            properties = properties.strip()
+def deduplicate_css(css_file):
+    """מסיר כפילויות וסותרות מקובץ CSS"""
+    
+    if not os.path.exists(css_file):
+        print(f"❌ File not found: {css_file}")
+        return
+    
+    with open(css_file, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    print(f"📄 Processing: {css_file}")
+    print(f"📏 Original size: {len(content)} characters")
+    
+    # 1. מוצא כל ה-CSS rules
+    rules = re.findall(r'([^{}]+)\s*\{([^{}]*)\}', content, re.MULTILINE | re.DOTALL)
+    
+    print(f"🎯 Found {len(rules)} CSS rules")
+    
+    # 2. מקבץ לפי selector
+    selector_rules = defaultdict(list)
+    
+    for selector, properties in rules:
+        selector = selector.strip()
+        if selector and not selector.startswith('/*'):
+            # מנקה את ה-properties
+            clean_props = properties.strip()
+            if clean_props:
+                selector_rules[selector].append(clean_props)
+    
+    print(f"📊 Unique selectors: {len(selector_rules)}")
+    
+    # 3. מוצא כפילויות
+    duplicates = {k: v for k, v in selector_rules.items() if len(v) > 1}
+    print(f"🔄 Found {len(duplicates)} selectors with duplicates")
+    
+    # 4. משלב כפילויות
+    merged_rules = {}
+    for selector, prop_list in selector_rules.items():
+        if len(prop_list) > 1:
+            # משלב את כל ה-properties
+            all_props = []
+            for props in prop_list:
+                # מחלץ properties
+                props_match = re.findall(r'([^:;]+):\s*([^;]+);?', props)
+                for prop, value in props_match:
+                    all_props.append((prop.strip(), value.strip()))
             
-            if selector and properties:
-                # Normalize selector (remove extra spaces)
-                normalized_selector = re.sub(r'\s+', ' ', selector)
-                
-                # Normalize properties (remove extra spaces, sort)
-                normalized_properties = self.normalize_properties(properties)
-                
-                # Use normalized selector as key
-                if normalized_selector not in rules:
-                    rules[normalized_selector] = []
-                
-                rules[normalized_selector].append({
-                    'original_selector': selector,
-                    'properties': normalized_properties,
-                    'full_rule': f"{selector} {{\n{properties}\n}}"
-                })
-        
-        return rules
+            # מסיר כפילויות של properties
+            unique_props = OrderedDict()
+            for prop, value in all_props:
+                if prop not in unique_props:
+                    unique_props[prop] = value
+                else:
+                    # אם יש סתירה, לוקח את האחרון
+                    print(f"⚠️ Conflict in {selector}: {prop} = {unique_props[prop]} vs {value}")
+                    unique_props[prop] = value
+            
+            # בונה את ה-CSS החדש
+            merged_props = []
+            for prop, value in unique_props.items():
+                merged_props.append(f"  {prop}: {value};")
+            
+            merged_rules[selector] = '{\n' + '\n'.join(merged_props) + '\n}'
+        else:
+            # selector יחיד - שומר כמו שהוא
+            merged_rules[selector] = '{\n' + prop_list[0] + '\n}'
     
-    def normalize_properties(self, properties):
-        """נרמל מאפיינים CSS"""
-        # Split by semicolon and clean
-        prop_list = [prop.strip() for prop in properties.split(';') if prop.strip()]
-        
-        # Sort properties for consistency
-        prop_list.sort()
-        
-        return '; '.join(prop_list)
+    # 5. בונה את ה-CSS החדש
+    new_content = "/* TikTrack Unified CSS - Deduplicated */\n"
+    new_content += "/* Generated automatically from ITCSS structure */\n"
+    new_content += "/* אלמנט הראש נשמר בנפרד */\n\n"
     
-    def deduplicate_css(self):
-        """הסר כפילויות מ-CSS"""
-        print("🚀 מתחיל הסרת כפילויות...")
-        
-        if not self.unified_file.exists():
-            print("❌ קובץ unified.css לא נמצא")
-            return
-        
-        # Read CSS content
-        with open(self.unified_file, 'r', encoding='utf-8') as f:
-            css_content = f.read()
-        
-        # Parse rules
-        rules = self.parse_css_rules(css_content)
-        
-        print(f"📊 נמצאו {len(rules)} סלקטורים ייחודיים")
-        
-        # Count duplicates
-        duplicates = 0
-        for selector, rule_list in rules.items():
-            if len(rule_list) > 1:
-                duplicates += len(rule_list) - 1
-        
-        print(f"📊 נמצאו {duplicates} כפילויות")
-        
-        # Create deduplicated CSS
-        deduplicated_content = []
-        deduplicated_content.append("/* TikTrack Unified CSS - Deduplicated */")
-        deduplicated_content.append("/* Generated automatically with duplicate removal */")
-        deduplicated_content.append("")
-        
-        # Add each unique rule
-        for selector, rule_list in rules.items():
-            # Use the first rule (most specific)
-            rule = rule_list[0]
-            deduplicated_content.append(rule['full_rule'])
-            deduplicated_content.append("")
-        
-        # Write deduplicated file
-        deduplicated_file = self.styles_dir / 'unified-deduplicated.css'
-        with open(deduplicated_file, 'w', encoding='utf-8') as f:
-            f.write('\n'.join(deduplicated_content))
-        
-        print(f"✅ קובץ ללא כפילויות נשמר ב: {deduplicated_file}")
-        
-        # Calculate file size
-        file_size = deduplicated_file.stat().st_size
-        print(f"📊 גודל קובץ: {file_size / 1024:.1f} KB")
-        
-        return deduplicated_file
+    # מוסיף את כל ה-rules
+    for selector, rule in merged_rules.items():
+        new_content += f"{selector} {rule}\n\n"
     
-    def replace_unified_css(self, deduplicated_file):
-        """החלף את unified.css בקובץ ללא כפילויות"""
-        # Create backup
-        backup_file = self.styles_dir / 'unified-backup.css'
-        with open(self.unified_file, 'r', encoding='utf-8') as src:
-            with open(backup_file, 'w', encoding='utf-8') as dst:
-                dst.write(src.read())
-        
-        print(f"💾 גיבוי נשמר ב: {backup_file}")
-        
-        # Replace unified.css
-        with open(deduplicated_file, 'r', encoding='utf-8') as src:
-            with open(self.unified_file, 'w', encoding='utf-8') as dst:
-                dst.write(src.read())
-        
-        print("✅ unified.css הוחלף בקובץ ללא כפילויות")
+    # 6. שומר את הקובץ
+    with open(css_file, 'w', encoding='utf-8') as f:
+        f.write(new_content)
     
-    def run(self):
-        """הרץ את תהליך הסרת הכפילויות"""
-        print("🎯 מתחיל תהליך הסרת כפילויות...")
-        
-        # Step 1: Deduplicate CSS
-        deduplicated_file = self.deduplicate_css()
-        
-        # Step 2: Replace unified.css
-        self.replace_unified_css(deduplicated_file)
-        
-        print("🎉 תהליך הסרת הכפילויות הושלם בהצלחה!")
+    print(f"💾 File updated: {css_file}")
+    print(f"📏 New size: {len(new_content)} characters")
+    print(f"📊 Rules before: {len(rules)}")
+    print(f"📊 Rules after: {len(merged_rules)}")
+    print(f"✅ Removed {len(rules) - len(merged_rules)} duplicate rules")
 
 if __name__ == "__main__":
-    deduplicator = CSSDeduplicator()
-    deduplicator.run()
+    css_file = "trading-ui/styles-new/unified.css"
+    print("🧹 CSS Deduplicator - מסיר כפילויות וסותרות")
+    print("=" * 60)
+    deduplicate_css(css_file)
+    print("\n✅ Deduplication complete!")

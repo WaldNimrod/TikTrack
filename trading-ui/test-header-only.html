@@ -28,7 +28,7 @@
     <script src="scripts/color-demo-toggle.js"></script>
 </head>
 
-<body>
+<body class="test-header-only">
     <div class="background-wrapper">
         <!-- Header System -->
         <div id="unified-header"></div>
@@ -103,6 +103,7 @@
                                     </div>
                                     <div class="card-body">
                                         <div id="filterDebugInfo" style="font-family: monospace; font-size: 11px; background: #f8f9fa; padding: 10px; border-radius: 5px; max-height: 200px; overflow-y: auto;">
+                                            <div><strong>Time:</strong> <span id="currentTime">-</span></div>
                                             <div><strong>Status:</strong> <span id="statusDebug">-</span></div>
                                             <div><strong>Type:</strong> <span id="typeDebug">-</span></div>
                                             <div><strong>Account:</strong> <span id="accountDebug">-</span></div>
@@ -114,8 +115,6 @@
                                         <button onclick="testAccountFilter()" class="btn btn-sm btn-primary mt-2">🧪 בדוק פילטר חשבון</button>
                                         <button onclick="testDateFilter()" class="btn btn-sm btn-secondary mt-2">🧪 בדוק פילטר תאריך</button>
                                         <button onclick="testSearchFilter()" class="btn btn-sm btn-dark mt-2">🧪 בדוק חיפוש חופשי</button>
-                                        <button onclick="testStatusColors()" class="btn btn-sm btn-success mt-2">🎨 בדוק צבעי סטטוס</button>
-                                        <button onclick="updateStatusColorDisplay()" class="btn btn-sm btn-info mt-2">🔄 עדכן תצוגת צבעים</button>
                                         <button onclick="showActiveContainer()" class="btn btn-sm btn-warning mt-2">🔍 הצג קונטיינר פעיל</button>
                                     </div>
                                 </div>
@@ -125,139 +124,129 @@
                 </div>
                 <!-- UI Content Section Top End -->  
 
-
                 <!-- UI Content Section 1 Start-->
-                <div class="content-section" id="performance">
+                <div class="content-section" id="tickers">
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-                        <h2>📈 טבלת ביצועים - כותרת סקשן 1</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('performance')" title="הצג/הסתר סקשן">
+                        <h2>📈 טבלת טיקרים - כותרת סקשן 1</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('tickers')" title="הצג/הסתר סקשן">
                             <span class="filter-arrow">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5>טבלת ביצועים</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive" id="tradesContainer">
-                                            <table class="table table-striped" data-table-type="test_trades">
-                                                <thead>
-                                                    <tr>
-                                                        <th>טיקר</th>
-                                                        <th>סטטוס</th>
-                                                        <th>טיפוס</th>
-                                                        <th>חשבון</th>
-                                                        <th>תאריך פתיחה</th>
-                                                        <th>כמות</th>
-                                                        <th>מחיר</th>
-                                                        <th>ערך</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>AAPL</td>
-                                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
-                                                        <td data-investment-type="swing">סווינג</td>
-                                                        <td data-account="Trading Account 1">Trading Account 1</td>
-                                                        <td data-created-at="2025-08-22">2025-08-22</td>
-                                                        <td>100</td>
-                                                        <td>150.50</td>
-                                                        <td>15,050</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>TSLA</td>
-                                                        <td data-status="סגור"><span class="status-badge status-closed">סגור</span></td>
-                                                        <td data-investment-type="investment">השקעה</td>
-                                                        <td data-account="Investment Account">Investment Account</td>
-                                                        <td data-created-at="2025-08-21">2025-08-21</td>
-                                                        <td>50</td>
-                                                        <td>200.00</td>
-                                                        <td>10,000</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>SPY</td>
-                                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
-                                                        <td data-investment-type="passive">פסיבי</td>
-                                                        <td data-account="Trading Account 1">Trading Account 1</td>
-                                                        <td data-created-at="2025-08-20">2025-08-20</td>
-                                                        <td>200</td>
-                                                        <td>450.25</td>
-                                                        <td>90,050</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>BTC</td>
-                                                        <td data-status="מבוטל"><span class="status-badge status-cancelled">מבוטל</span></td>
-                                                        <td data-investment-type="swing">סווינג</td>
-                                                        <td data-account="Retirement Account">Retirement Account</td>
-                                                        <td data-created-at="2025-08-15">2025-08-15</td>
-                                                        <td>0.5</td>
-                                                        <td>45,000</td>
-                                                        <td>22,500</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>MSFT</td>
-                                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
-                                                        <td data-investment-type="investment">השקעה</td>
-                                                        <td data-account="Investment Account">Investment Account</td>
-                                                        <td data-created-at="2025-08-10">2025-08-10</td>
-                                                        <td>75</td>
-                                                        <td>300.75</td>
-                                                        <td>22,556</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>QQQ</td>
-                                                        <td data-status="סגור"><span class="status-badge status-closed">סגור</span></td>
-                                                        <td data-investment-type="passive">פסיבי</td>
-                                                        <td data-account="Trading Account 1">Trading Account 1</td>
-                                                        <td data-created-at="2025-08-18">2025-08-18</td>
-                                                        <td>150</td>
-                                                        <td>380.00</td>
-                                                        <td>57,000</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>NVDA</td>
-                                                        <td data-status="בוטל"><span class="status-badge status-cancelled">בוטל</span></td>
-                                                        <td data-investment-type="swing">סווינג</td>
-                                                        <td data-account="Retirement Account">Retirement Account</td>
-                                                        <td data-created-at="2025-08-16">2025-08-16</td>
-                                                        <td>25</td>
-                                                        <td>450.00</td>
-                                                        <td>11,250</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>GOOGL</td>
-                                                        <td data-status="סגור"><span class="status-badge status-closed">סגור</span></td>
-                                                        <td data-investment-type="day-trading">דיי טריידינג</td>
-                                                        <td data-account="Trading Account 1">Trading Account 1</td>
-                                                        <td data-created-at="2025-08-17">2025-08-17</td>
-                                                        <td>10</td>
-                                                        <td>2800.00</td>
-                                                        <td>28,000</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>META</td>
-                                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
-                                                        <td data-investment-type="passive">פסיבי</td>
-                                                        <td data-account="Investment Account">Investment Account</td>
-                                                        <td data-created-at="2025-08-15">2025-08-15</td>
-                                                        <td>5</td>
-                                                        <td>320.00</td>
-                                                        <td>1,600</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="table-responsive" id="tickersContainer">
+                            <table id="tickersTable" class="table" data-table-type="tickers">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" data-sort="symbol">
+                                            <span>טיקר</span>
+                                            <i class="sort-icon">↕</i>
+                                        </th>
+                                        <th class="sortable" data-sort="status">
+                                            <span>סטטוס</span>
+                                            <i class="sort-icon">↕</i>
+                                        </th>
+                                        <th class="sortable" data-sort="has_trades">
+                                            <span>יש טריידים</span>
+                                            <i class="sort-icon">↕</i>
+                                        </th>
+                                        <th class="sortable" data-sort="current_price">
+                                            <span>מחיר נוכחי</span>
+                                            <i class="sort-icon">↕</i>
+                                        </th>
+                                        <th class="sortable" data-sort="daily_change_percent">
+                                            <span>שינוי %</span>
+                                            <i class="sort-icon">↕</i>
+                                        </th>
+                                        <th class="sortable" data-sort="type">
+                                            <span>סוג</span>
+                                            <i class="sort-icon">↕</i>
+                                        </th>
+                                        <th class="sortable" data-sort="name">
+                                            <span>שם</span>
+                                            <i class="sort-icon">↕</i>
+                                        </th>
+                                        <th class="sortable" data-sort="notes">
+                                            <span>הערות</span>
+                                            <i class="sort-icon">↕</i>
+                                        </th>
+                                        <th class="sortable" data-sort="updated_at">
+                                            <span>עודכן</span>
+                                            <i class="sort-icon">↕</i>
+                                        </th>
+                                        <th class="actions-header">פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>AAPL</td>
+                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
+                                        <td>כן</td>
+                                        <td>$150.50</td>
+                                        <td class="numeric-value-positive">+2.35%</td>
+                                        <td data-investment-type="stock">מניה</td>
+                                        <td>Apple Inc.</td>
+                                        <td>טיקר טכנולוגיה</td>
+                                        <td>2025-01-15 10:30</td>
+                                        <td class="actions-cell">
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="editTicker(1)" title="ערוך">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteTicker(1)" title="מחק">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>MSFT</td>
+                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
+                                        <td>כן</td>
+                                        <td>$420.75</td>
+                                        <td class="numeric-value-positive">+1.85%</td>
+                                        <td data-investment-type="stock">מניה</td>
+                                        <td>Microsoft Corporation</td>
+                                        <td>טיקר טכנולוגיה</td>
+                                        <td>2025-01-15 10:25</td>
+                                        <td class="actions-cell">
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="editTicker(2)" title="ערוך">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteTicker(2)" title="מחק">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>GOOGL</td>
+                                        <td data-status="סגור"><span class="status-badge status-closed">סגור</span></td>
+                                        <td>לא</td>
+                                        <td>$2,850.00</td>
+                                        <td class="numeric-value-negative">-0.75%</td>
+                                        <td data-investment-type="stock">מניה</td>
+                                        <td>Alphabet Inc.</td>
+                                        <td>טיקר טכנולוגיה</td>
+                                        <td>2025-01-15 09:45</td>
+                                        <td class="actions-cell">
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-outline-primary" onclick="editTicker(3)" title="ערוך">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteTicker(3)" title="מחק">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-                <!-- UI Content Section 1 End--> 
+                <!-- UI Content Section 1 End -->   
 
                 <!-- UI Content Section 2 Start-->
                 <div class="content-section" id="debug">
@@ -313,6 +302,7 @@
                     </div>
                 </div>
                 <!-- UI Content Section 2 End--> 
+
             </div>
         </div>
     </div>

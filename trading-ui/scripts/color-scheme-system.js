@@ -282,6 +282,31 @@ function generateAndApplyEntityCSS() {
 }
 
 /**
+ * יצירת CSS דינמי לסטטוסים ויישום על הדף
+ * Generate dynamic CSS for statuses and apply to page
+ */
+function generateAndApplyStatusCSS() {
+  try {
+    // יצירת CSS חדש לסטטוסים
+    const newCSS = generateStatusCSS();
+    
+    // עדכון אלמנט ה-CSS
+    let styleElement = document.getElementById('dynamic-status-colors');
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = 'dynamic-status-colors';
+      document.head.appendChild(styleElement);
+    }
+    
+    styleElement.textContent = newCSS;
+    
+    console.log('✅ CSS דינמי לסטטוסים נוצר והוחל על הדף');
+  } catch (error) {
+    console.error('❌ שגיאה ביצירת CSS דינמי לסטטוסים:', error);
+  }
+}
+
+/**
  * טעינת צבעי סטטוסים מההעדפות
  * Load status colors from preferences
  * 
@@ -752,6 +777,14 @@ function generateStatusCSS() {
   border: 1px solid ${colors.medium};
 }
 
+/* תמיכה בשילוב status-badge + status-${status} */
+.status-badge.status-${status} {
+  background: linear-gradient(135deg, color-mix(in srgb, ${colors.medium} 15%, transparent) 0%, color-mix(in srgb, ${colors.medium} 10%, transparent) 100%) !important;
+  color: ${colors.medium} !important;
+  border: 1px solid color-mix(in srgb, ${colors.medium} 30%, transparent) !important;
+  box-shadow: 0 2px 8px color-mix(in srgb, ${colors.medium} 15%, transparent) !important;
+}
+
 .status-${status}-text {
   color: ${colors.medium};
 }
@@ -769,6 +802,16 @@ function generateStatusCSS() {
 }
     `;
   });
+
+  // תמיכה בסטטוס "מבוטל" (נוסף לטבלה)
+  css += `
+.status-badge.status-cancelled {
+  background: linear-gradient(135deg, color-mix(in srgb, #ff6600 15%, transparent) 0%, color-mix(in srgb, #ff6600 10%, transparent) 100%) !important;
+  color: #ff6600 !important;
+  border: 1px solid color-mix(in srgb, #ff6600 30%, transparent) !important;
+  box-shadow: 0 2px 8px color-mix(in srgb, #ff6600 15%, transparent) !important;
+}
+  `;
 
   // מחלקה לסטטוס לא מוגדר
   css += `
@@ -1848,38 +1891,47 @@ function getSubHeaderOpacityHex() {
 // טעינת הגדרות צבע בטעינת הדף
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🎨 מאתחל מערכת צבעים...');
+  
+  // יצירת CSS דינמי לסטטוסים מיד
+  console.log('🎨 יוצר CSS דינמי לסטטוסים...');
+  generateAndApplyStatusCSS();
+  
+  // נסה לטעון העדפות, אבל אם זה נכשל, המשך עם ברירות מחדל
   loadColorPreferences().then(() => {
-    // אחרי טעינת ההעדפות, עדכן את הכותרות עם הצבעים החדשים
-    const bodyClass = document.body.className;
-    if (bodyClass) {
-      // חילוץ סוג הישות מהקלאס של הגוף
-      const entityType = bodyClass.split(' ').find(cls => 
-        ['tickers-page', 'trades-page', 'accounts-page', 'alerts-page', 'cash-flows-page'].includes(cls)
-      );
+    console.log('✅ העדפות נטענו בהצלחה');
+  }).catch(error => {
+    console.warn('⚠️ לא ניתן לטעון צבעי ישויות מההעדפות, משתמש בברירות מחדל:', error);
+  });
+  
+  // אחרי טעינת ההעדפות, עדכן את הכותרות עם הצבעים החדשים
+  const bodyClass = document.body.className;
+  if (bodyClass) {
+    // חילוץ סוג הישות מהקלאס של הגוף
+    const entityType = bodyClass.split(' ').find(cls => 
+      ['tickers-page', 'trades-page', 'accounts-page', 'alerts-page', 'cash-flows-page', 'test-header-only'].includes(cls)
+    );
+    
+    if (entityType) {
+      let type = entityType.replace('-page', '');
+      // תיקון שמות ישויות לפורמט יחיד
+      if (type === 'tickers') type = 'ticker';
+      else if (type === 'trades') type = 'trade';
+      else if (type === 'accounts') type = 'account';
+      else if (type === 'alerts') type = 'alert';
+      else if (type === 'cash-flows') type = 'cash-flow';
+      else if (type === 'notes') type = 'note';
+      else if (type === 'trade-plans') type = 'trade-plan';
+      else if (type === 'executions') type = 'execution';
+      else if (type === 'test-header-only') type = 'test';
       
-      if (entityType) {
-        let type = entityType.replace('-page', '');
-        // תיקון שמות ישויות לפורמט יחיד
-        if (type === 'tickers') type = 'ticker';
-        else if (type === 'trades') type = 'trade';
-        else if (type === 'accounts') type = 'account';
-        else if (type === 'alerts') type = 'alert';
-        else if (type === 'cash-flows') type = 'cash-flow';
-        else if (type === 'notes') type = 'note';
-        else if (type === 'trade-plans') type = 'trade-plan';
-        else if (type === 'executions') type = 'execution';
-        
-        console.log(`🎨 מעדכן כותרות עבור ${type}...`);
-        if (window.applyEntityColorsToHeaders) {
-          setTimeout(() => {
-            window.applyEntityColorsToHeaders(type);
-          }, 100);
-        }
+      console.log(`🎨 מעדכן כותרות עבור ${type}...`);
+      if (window.applyEntityColorsToHeaders) {
+        setTimeout(() => {
+          window.applyEntityColorsToHeaders(type);
+        }, 100);
       }
     }
-  }).catch(error => {
-    console.warn('⚠️ לא ניתן לטעון צבעי ישויות מההעדפות:', error);
-  });
+  }
 });
 
 // ===== EXPORTS =====
@@ -1903,6 +1955,7 @@ window.createEntityLegend = createEntityLegend;
 window.generateEntityCSS = generateEntityCSS;
 window.generateStatusCSS = generateStatusCSS;
 window.generateInvestmentTypeCSS = generateInvestmentTypeCSS;
+window.generateAndApplyStatusCSS = generateAndApplyStatusCSS;
 
 // Export status color functions
 window.getStatusColor = getStatusColor;

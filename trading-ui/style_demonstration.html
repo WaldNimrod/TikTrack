@@ -47,17 +47,18 @@
 
         <!-- Page body - All content after header -->
         <div class="page-body">
-            <!-- CSS Controls Section -->
-            <div class="top-section" id="cssControlsSection">
-                <!-- CSS Controls header -->
+            <!-- Style Controls Section -->
+            <div class="top-section" id="styleControlsSection">
+                <!-- Style Controls header -->
                 <div class="section-header">
                     <div class="table-title">
                         <img src="images/icons/home.svg" alt="הגדרות"
                             style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
-                        בקרת קבצי CSS
+                        בקרת שכבות סגנונות
                     </div>
+                    <div class="table-count">הדלקה וכיבוי של שכבות CSS</div>
                     <div class="table-actions">
-                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור בקרה">
+                        <button class="filter-toggle-btn" onclick="toggleStyleControlsSection()" title="הצג/הסתר בקרת סגנונות">
                             <span class="filter-icon">▲</span>
                         </button>
                     </div>
@@ -66,95 +67,57 @@
                 <!-- CSS Controls body -->
                 <div class="section-body">
                     <div class="styles-test-container">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>קובץ CSS</th>
-                                    <th>תיאור</th>
-                                    <th>פעולה</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Bootstrap Framework -->
-                                <tr>
-                                    <td><strong>Bootstrap</strong></td>
-                                    <td>מסגרת CSS בסיסית - Grid, Components, Utilities</td>
-                                    <td>
-                                        <input type="checkbox" id="bootstrapToggle" checked
-                                            onchange="toggleBootstrap(this.checked)">
-                                    </td>
-                                </tr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>שכבות בסיסיות</h5>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="toggleBaseStyles" checked onchange="toggleStyleLayer('base')">
+                                    <label class="form-check-label" for="toggleBaseStyles">
+                                        סגנונות בסיסיים
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="toggleLayoutStyles" checked onchange="toggleStyleLayer('layout')">
+                                    <label class="form-check-label" for="toggleLayoutStyles">
+                                        סגנונות פריסה
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="toggleComponentStyles" checked onchange="toggleStyleLayer('components')">
+                                    <label class="form-check-label" for="toggleComponentStyles">
+                                        רכיבים
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>שכבות מתקדמות</h5>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="toggleUtilityStyles" checked onchange="toggleStyleLayer('utilities')">
+                                    <label class="form-check-label" for="toggleUtilityStyles">
+                                        כלי עזר
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="toggleThemeStyles" checked onchange="toggleStyleLayer('themes')">
+                                    <label class="form-check-label" for="toggleThemeStyles">
+                                        ערכות נושא
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="toggleResponsiveStyles" checked onchange="toggleStyleLayer('responsive')">
+                                    <label class="form-check-label" for="toggleResponsiveStyles">
+                                        רספונסיביות
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
 
-                                <!-- Apple Theme -->
-                                <tr>
-                                    <td><strong>Apple Theme</strong></td>
-                                    <td>עיצוב Apple-inspired - צבעים, גרדיאנטים, אנימציות</td>
-                                    <td>
-                                        <input type="checkbox" id="appleThemeToggle" checked
-                                            onchange="toggleCSS('apple-theme.css', this.checked)">
-                                    </td>
-                                </tr>
 
-                                <!-- General Styles -->
-                                <tr>
-                                    <td><strong>General Styles</strong></td>
-                                    <td>סגנונות כלליים - משתנים, Reset, Layout בסיסי</td>
-                                    <td>
-                                        <input type="checkbox" id="generalStylesToggle" checked
-                                            onchange="toggleCSS('styles.css', this.checked)">
-                                    </td>
-                                </tr>
 
-                                <!-- Typography -->
-                                <tr>
-                                    <td><strong>Typography</strong></td>
-                                    <td>סגנונות טקסט - כותרות, פסקאות, יישור</td>
-                                    <td>
-                                        <input type="checkbox" id="typographyToggle" checked
-                                            onchange="toggleCSS('typography.css', this.checked)">
-                                    </td>
-                                </tr>
 
-                                <!-- Table Styles -->
-                                <tr>
-                                    <td><strong>Table Styles</strong></td>
-                                    <td>עיצוב טבלאות - כותרות, תאים, סידור, פילטרים</td>
-                                    <td>
-                                        <input type="checkbox" id="tableStylesToggle" checked
-                                            onchange="toggleCSS('table.css', this.checked)">
-                                    </td>
-                                </tr>
 
-                                <!-- Header System -->
-                                <tr>
-                                    <td><strong>Header System</strong></td>
-                                    <td>מערכת כותרת מאוחדת - תפריט, פילטרים, ניווט</td>
-                                    <td>
-                                        <input type="checkbox" id="headerSystemToggle" checked>
-                                    </td>
-                                </tr>
 
-                                <!-- Database Display -->
-                                <tr>
-                                    <td><strong>Database Display</strong></td>
-                                    <td>עיצוב עמודי בסיס נתונים - טבלאות, תצוגה קומפקטית</td>
-                                    <td>
-                                        <input type="checkbox" id="dbDisplayToggle" checked
-                                            onchange="toggleCSS('db-display.css', this.checked)">
-                                    </td>
-                                </tr>
 
-                                <!-- Styles Test (Page Specific) -->
-                                <tr>
-                                    <td><strong>Styles Test</strong></td>
-                                    <td>סגנונות ייחודיים לעמוד הדגמת סגנונות</td>
-                                    <td>
-                                        <input type="checkbox" id="stylesTestToggle" checked
-                                            onchange="toggleCSS('styles-test.css', this.checked)">
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             </div>
@@ -1161,7 +1124,7 @@
                             style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
                         בדיקת סגנונות - סקשן 9
                     </div>
-                    <div class="table-count">מגוון אלמנטים לבדיקה</div>
+                    <div class="table-count">תגיות וסטטוסים</div>
                     <div class="table-actions">
                         <button class="filter-toggle-btn" onclick="toggleMainSection9()" title="הצג/הסתר אזור בדיקה">
                             <span class="filter-icon">▲</span>
@@ -1172,7 +1135,70 @@
                 <!-- Styles Test body -->
                 <div class="section-body">
                     <div class="styles-test-container">
-                        <!-- תוכן יוכנס כאן בהמשך -->
+                        <h3 class="style-section-title">סגנונות מתקדמים - תגיות וסטטוסים</h3>
+                        <div class="style-examples">
+                            <!-- Status Badges -->
+                            <div class="mb-4">
+                                <h5>תגיות סטטוס</h5>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="status-badge status-open">פתוח</span>
+                                    <span class="status-badge status-closed">סגור</span>
+                                    <span class="status-badge status-cancelled">מבוטל</span>
+                                    <span class="status-badge status-active">פעיל</span>
+                                    <span class="status-badge status-inactive">לא פעיל</span>
+                                    <span class="status-badge status-pending">ממתין</span>
+                                    <span class="status-badge status-completed">הושלם</span>
+                                    <span class="status-badge status-archived">בארכיון</span>
+                                </div>
+                            </div>
+
+                            <!-- Priority Badges -->
+                            <div class="mb-4">
+                                <h5>תגיות עדיפות</h5>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="priority-badge priority-high">גבוהה</span>
+                                    <span class="priority-badge priority-medium">בינונית</span>
+                                    <span class="priority-badge priority-low">נמוכה</span>
+                                </div>
+                            </div>
+
+                            <!-- Numeric Values -->
+                            <div class="mb-4">
+                                <h5>ערכים מספריים</h5>
+                                <div class="d-flex flex-wrap gap-3">
+                                    <span class="numeric-text-positive">+5.6%</span>
+                                    <span class="numeric-text-negative">-2.3%</span>
+                                    <span class="numeric-text-zero">0.0%</span>
+                                    <span class="profit-positive">+₪12,500</span>
+                                    <span class="profit-negative">-₪8,200</span>
+                                </div>
+                            </div>
+
+                            <!-- Trade Types -->
+                            <div class="mb-4">
+                                <h5>סוגי טריידים</h5>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="side-long">Long</span>
+                                    <span class="side-short">Short</span>
+                                    <span class="type-swing">Swing</span>
+                                    <span class="type-investment">Investment</span>
+                                    <span class="type-stock">Stock</span>
+                                    <span class="type-etf">ETF</span>
+                                    <span class="type-crypto">Crypto</span>
+                                </div>
+                            </div>
+
+                            <!-- Triggered Badges -->
+                            <div class="mb-4">
+                                <h5>תגיות התראות</h5>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="triggered-badge triggered-yes">הופעל</span>
+                                    <span class="triggered-badge triggered-no">לא הופעל</span>
+                                    <span class="triggered-badge triggered-new">חדש</span>
+                                    <span class="triggered-badge triggered-unknown">לא ידוע</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1485,36 +1511,63 @@
     </style>
 
     <script>
-        // CSS Control Functions
-        function toggleCSS(filename, enabled) {
-            const linkElement = document.querySelector(`link[href="styles/${filename}"]`);
-            if (linkElement) {
-                linkElement.disabled = !enabled;
-                console.log(`🔄 ${filename} ${enabled ? 'enabled' : 'disabled'}`);
+        // Style Layer Control Functions
+        function toggleStyleLayer(layer) {
+            const styleElement = document.getElementById(`style-layer-${layer}`);
+            if (styleElement) {
+                styleElement.disabled = !styleElement.disabled;
+            } else {
+                // Create a new style element for the layer
+                const newStyle = document.createElement('style');
+                newStyle.id = `style-layer-${layer}`;
+                newStyle.textContent = getLayerStyles(layer);
+                document.head.appendChild(newStyle);
             }
         }
 
-        function toggleBootstrap(enabled) {
-            const linkElement = document.querySelector('link[href*="bootstrap"]');
-            if (linkElement) {
-                linkElement.disabled = !enabled;
-                console.log(`🔄 Bootstrap CSS ${enabled ? 'enabled' : 'disabled'}`);
-            }
+        function getLayerStyles(layer) {
+            const layers = {
+                'base': `
+                    /* Base styles - variables, reset, typography */
+                    :root { --layer-base: active; }
+                `,
+                'layout': `
+                    /* Layout styles - grid, flexbox, positioning */
+                    :root { --layer-layout: active; }
+                `,
+                'components': `
+                    /* Component styles - buttons, cards, modals */
+                    :root { --layer-components: active; }
+                `,
+                'utilities': `
+                    /* Utility styles - spacing, colors, alignment */
+                    :root { --layer-utilities: active; }
+                `,
+                'themes': `
+                    /* Theme styles - colors, gradients, animations */
+                    :root { --layer-themes: active; }
+                `,
+                'responsive': `
+                    /* Responsive styles - media queries, breakpoints */
+                    :root { --layer-responsive: active; }
+                `
+            };
+            return layers[layer] || '';
         }
 
-        function toggleAllCSS() {
-            const checkboxes = document.querySelectorAll('.css-header input[type="checkbox"]');
-            const allEnabled = Array.from(checkboxes).every(cb => cb.checked);
+        function toggleStyleControlsSection() {
+            const section = document.getElementById('styleControlsSection');
+            const toggleBtn = section.querySelector('button[onclick="toggleStyleControlsSection()"]');
+            const icon = toggleBtn.querySelector('.filter-icon');
+            const body = section.querySelector('.section-body');
 
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = !allEnabled;
-                if (checkbox.id === 'bootstrapCSS') {
-                    toggleBootstrap(!allEnabled);
-                } else {
-                    const filename = checkbox.id.replace('CSS', '').replace(/([A-Z])/g, '-$1').toLowerCase() + '.css';
-                    toggleCSS(filename, !allEnabled);
-                }
-            });
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                icon.textContent = '▲';
+            } else {
+                body.style.display = 'none';
+                icon.textContent = '▼';
+            }
         }
 
         function refreshStylesTest() {

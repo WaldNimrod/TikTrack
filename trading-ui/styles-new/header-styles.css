@@ -60,7 +60,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    color: #28a745; /* ירוק - צבע הלוגו */
+    color: #26baac; /* ירוק - צבע הלוגו */
     text-decoration: none;
     border-radius: 8px;
     transition: all 0.2s ease;
@@ -73,7 +73,7 @@
 }
 
 .tiktrack-nav-item.active .tiktrack-nav-link {
-    color: #28a745; /* ירוק - פריט פעיל */
+    color: #26baac; /* ירוק - פריט פעיל */
     font-weight: 600; /* משקל כבד יותר לפריט פעיל */
     text-decoration: underline; /* קו תחתון לפריטים ראשיים */
 }
@@ -183,7 +183,7 @@
         .tiktrack-dropdown-item {
             display: block;
             padding: 0.5rem 1rem;
-            color: #28a745; /* ירוק - צבע הלוגו */
+            color: #26baac; /* ירוק - צבע הלוגו */
             text-decoration: none;
             transition: all 0.2s ease;
             font-size: 14px;
@@ -234,7 +234,7 @@
 /* פריט פעיל בתפריטי משנה - רקע ירוק */
 .tiktrack-dropdown-item.active {
     background: #d4edda; /* רקע ירוק בהיר לפריט פעיל */
-    color: #28a745; /* ירוק לפריט פעיל */
+    color: #26baac; /* ירוק לפריט פעיל */
 }
 
         /* Submenus */
@@ -275,7 +275,7 @@
 
 .cache-clear-btn:hover {
     background: transparent !important;
-    color: #ff9500;
+    color: #ff9e04;
     border: none !important;
     box-shadow: none !important;
 }
@@ -302,7 +302,7 @@
     background: white !important;
     border: none !important;
     border-radius: 50% !important;
-    color: #ff9c05 !important;
+    color: #ff9e04 !important;
     font-size: 0.8rem;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -386,7 +386,7 @@
 }
 
 .filter-toggle:hover {
-    border-color: #ff9500 !important;
+    border-color: #ff9e04 !important;
     color: #ff9500 !important;
     background: white !important;
     box-shadow: none !important;
@@ -431,8 +431,8 @@
 }
 
 .filter-option.selected {
-    background: #e3f2fd !important;
-    color: #1976d2 !important;
+    background: #d4edda !important;
+    color: #26baac !important;
     font-weight: bold !important;
 }
 
@@ -453,7 +453,7 @@
 
 .search-filter-input:focus {
     outline: none !important;
-    border-color: #ff9500 !important;
+    border-color: #ff9e04 !important;
     box-shadow: none !important;
 }
 
@@ -522,7 +522,7 @@
 }
 
 .reset-btn:hover, .clear-btn:hover {
-    border-color: #ff9500 !important;
+    border-color: #ff9e04 !important;
     color: #ff9500 !important;
     background: white !important;
     box-shadow: none !important;

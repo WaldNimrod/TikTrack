@@ -3211,7 +3211,7 @@ function createMenuHTML() {
                                 </ul>
                             </li>
                             <li class="tiktrack-nav-item">
-                                <a href="#" class="cache-clear-btn" title="ניקוי מטמון מלא" onclick="clearDevelopmentCache(event)">🧹 נקה Cache (פיתוח)</a>
+                                <a href="#" class="cache-clear-btn" title="ניקוי מטמון מלא" onclick="clearDevelopmentCache(event)">🧹</a>
                             </li>
                         </ul>
                     </nav>
@@ -5397,7 +5397,7 @@ async function clearDevelopmentCache(event) {
   } finally {
     // החזרת הכפתור למצב רגיל
     if (button) {
-      const originalText = button.dataset.originalText || '<i class="fas fa-trash"></i> נקה Cache (פיתוח)';
+      const originalText = button.dataset.originalText || '🧹';
       button.innerHTML = originalText;
       button.disabled = false;
     }

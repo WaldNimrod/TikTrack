@@ -195,8 +195,8 @@
         
         /* תיקון נוסף לתפריטים בתוך tiktrack-dropdown-menu */
         .tiktrack-dropdown-menu .dropdown-submenu .submenu {
-            right: calc(100% + 2px); /* רווח קטן יותר */
-            transform: translateX(2px); /* פחות הזזה */
+            right: calc(100% - 10px); /* הזזה ימינה לפי עברית */
+            transform: translateX(-10px); /* הזזה ימינה */
         }
         
         .tiktrack-dropdown-menu .dropdown-submenu:hover .submenu {
@@ -221,7 +221,7 @@
         .dropdown-submenu .submenu {
             position: absolute;
             top: 0;
-            right: calc(100% + 5px); /* הזזה שמאלה עם פחות רווח */
+            right: calc(100% - 10px); /* הזזה ימינה לפי עברית */
             background: white;
             border: 1px solid #e5e5e5;
             border-radius: 8px;
@@ -230,7 +230,7 @@
             padding: 0.5rem 0;
             opacity: 0;
             visibility: hidden;
-            transform: translateX(5px); /* פחות הזזה */
+            transform: translateX(-10px); /* הזזה ימינה לפי עברית */
             transition: all 0.3s ease; /* הארכת זמן המעבר */
             z-index: 1002;
             list-style: none;
@@ -253,7 +253,7 @@
         
         /* עיכוב בסגירה */
         .dropdown-submenu:not(:hover) .submenu {
-            transition-delay: 0.2s; /* עיכוב בסגירה */
+            transition-delay: 0.5s; /* עיכוב ארוך יותר בסגירה */
         }
 
 /* Cache clear button */

@@ -240,18 +240,7 @@ function deleteNote(id) {
           );
         } else {
           // Fallback למקרה שמערכת התראות לא זמינה
-          const confirmed = typeof showConfirmationDialog === 'function' ? 
-            await new Promise(resolve => {
-              showConfirmationDialog(
-                'האם אתה בטוח שברצונך למחוק הערה זו?',
-                () => resolve(true),
-                () => resolve(false),
-                'מחיקת הערה',
-                'מחק',
-                'ביטול'
-              );
-            }) : 
-            window.confirm('האם אתה בטוח שברצונך למחוק הערה זו?');
+          const confirmed = window.confirm('האם אתה בטוח שברצונך למחוק הערה זו?');
           if (confirmed) {
             confirmDeleteNote(id);
           }
@@ -377,11 +366,11 @@ window.restoreNotesSectionState = restoreNotesSectionState;
 
 // פונקציה לטעינת נתונים
 async function loadNotesData() {
-  // loadNotesData נקראה
+  console.log('🚀🚀🚀 loadNotesData התחיל 🚀🚀🚀');
 
   try {
     // קריאה לשרת לקבלת נתוני הערות
-    // קריאה לשרת לקבלת נתוני הערות
+    console.log('📡 קריאה לשרת לקבלת נתוני הערות...');
     const response = await fetch('/api/v1/notes/');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -389,7 +378,7 @@ async function loadNotesData() {
 
     const responseData = await response.json();
     const notes = responseData.data || responseData;
-    // נתונים התקבלו מהשרת
+    console.log('✅ נתונים התקבלו מהשרת:', notes ? notes.length : 0, 'הערות');
 
     // בדיקה אם הנתונים ריקים או לא תקינים
     if (!notes || notes.length === 0) {
@@ -482,12 +471,16 @@ async function loadNotesData() {
 
 // פונקציה לעדכון הטבלה
 function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], tickers = []) {
-  // updateNotesTable נקראה עם הערות
+  console.log('🚀🚀🚀 updateNotesTable התחיל עם', notes ? notes.length : 0, 'הערות 🚀🚀🚀');
+  
   const tbody = document.querySelector('#notesTable tbody');
   if (!tbody) {
+    console.error('❌ לא נמצא tbody בטבלה');
     handleElementNotFound('updateNotesTable', 'לא נמצא tbody בטבלה');
     return;
   }
+  
+  console.log('✅ tbody נמצא:', tbody);
 
   if (!notes || notes.length === 0) {
     tbody.innerHTML = `
@@ -689,6 +682,9 @@ function updateNotesTable(notes, accounts = [], trades = [], tradePlans = [], ti
   }).join('');
 
   tbody.innerHTML = rows;
+  console.log('✅ טבלת הערות עודכנה בהצלחה עם', notes.length, 'הערות');
+  console.log('🔍 מספר שורות בטבלה:', tbody.children.length);
+  
   // עדכון table-count ו-info-summary
   updateNotesSummary(notes);
 }
@@ -1510,20 +1506,43 @@ window.populateSelect = populateSelect;
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
+  console.log('🚀🚀🚀 notes.js - DOMContentLoaded התחיל 🚀🚀🚀');
+  
   // בדיקת זמינות מערכות
+  console.log('🔍 בדיקת זמינות מערכות:');
+  console.log('  - showSuccessNotification:', typeof window.showSuccessNotification);
+  console.log('  - loadNotesData:', typeof window.loadNotesData);
+  console.log('  - updateNotesTable:', typeof window.updateNotesTable);
+  
   // בדיקה שהמערכת זמינה
   if (typeof window.showSuccessNotification !== 'function') {
+    console.warn('⚠️ showSuccessNotification לא זמינה - ממתין...');
+    // נסה שוב אחרי 2 שניות
+    setTimeout(() => {
+      console.log('🔄 ניסיון שני לטעינת נתונים...');
+      if (typeof window.showSuccessNotification === 'function') {
+        console.log('✅ showSuccessNotification זמינה עכשיו - מתחיל טעינת נתונים');
+        loadNotesData();
+      } else {
+        console.error('❌ showSuccessNotification עדיין לא זמינה');
+      }
+    }, 2000);
     return;
   }
 
+  console.log('✅ כל המערכות זמינות - מתחיל אתחול');
+
   // שחזור מצב הסגירה
   if (typeof window.restoreAllSectionStates === 'function') {
+    console.log('🔄 שחזור מצב סגירה - מערכת גלובלית');
     window.restoreAllSectionStates();
   } else {
+    console.log('🔄 שחזור מצב סגירה - מערכת מקומית');
     restoreNotesSectionState();
   }
 
   // טעינת נתונים
+  console.log('📡 טעינת נתוני הערות...');
   loadNotesData();
 
   // הוספת ולידציה בזמן אמת
@@ -1532,6 +1551,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // שחזור מצב סידור
   restoreSortState();
 
+  console.log('✅ notes.js - DOMContentLoaded הושלם');
 });
 
 // פונקציה להגדרת אירועי ולידציה

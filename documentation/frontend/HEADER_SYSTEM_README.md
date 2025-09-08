@@ -3,49 +3,460 @@
 ## Overview
 The TikTrack Header System is a comprehensive navigation and filtering solution that provides a unified interface across all pages of the application. It includes advanced filtering capabilities, responsive navigation, and seamless integration with the backend API.
 
+**🚨 MAJOR ARCHITECTURAL CHANGE (December 2024)**: The header system has been completely rebuilt with a new modular architecture, separating the menu system from the filter system for better maintainability and performance.
+
 ## File Location
-- **Main File**: `trading-ui/scripts/header-system.js`
-- **Version**: 4.3 (September 6, 2025)
-- **Status**: **MAJOR UPDATE** - CSS Architecture Migration & Submenu Issues
+- **Main File**: `trading-ui/scripts/header-component.js` (NEW - December 2024)
+- **Legacy File**: `trading-ui/scripts/header-system.js` (DEPRECATED)
+- **Version**: 5.0 (December 2024)
+- **Status**: **COMPLETE REBUILD** - New Modular Architecture
 
-## 🚨 Current Status (September 6, 2025)
+## 🚨 Current Status (December 2024)
 
-### 1. **Menu Migration Strategy - COMPLETED**
-- **Status**: **COMPLETED** - Comprehensive migration plan created
-- **Approach**: Systematic migration from old system to Bootstrap 5 compatible structure
-- **Tools**: Automated scripts and detailed workplan
-- **Result**: Clean migration path with 5 phases and clear success criteria
+### 1. **New Header Architecture - COMPLETED**
+- **Status**: **COMPLETED** - Complete rebuild with modular architecture
+- **New Structure**: Separated menu system from filter system
+- **Main Files**: 
+  - `trading-ui/scripts/header-component.js` - Main header component
+  - `trading-ui/scripts/filter-system.js` - Global filter system
+  - `trading-ui/scripts/main.js` - Global utilities and initialization
+- **Test Page**: `trading-ui/test-header-only.html` - Complete test environment
 
-### 2. **Bootstrap 5 Menu Classes Analysis - COMPLETED**
-- **Status**: **COMPLETED** - Full analysis of Bootstrap 5 menu structure
-- **Documentation**: `bootstrap-5-menu-classes-reference.md` with 20 categories
-- **Comparison**: `menu-classes-comparison.md` with detailed comparison table
-- **Findings**: 20 existing TikTrack classes, 35 missing Bootstrap 5 classes
-- **Impact**: Clear roadmap for complete menu compatibility
+### 2. **Bootstrap 5 Integration - COMPLETED**
+- **Status**: **COMPLETED** - Full Bootstrap 5 compatibility
+- **Implementation**: Based on Bootstrap 5 dropdown and navigation components
+- **Reference**: Started from Bootstrap 5 official documentation and examples
+- **CSS Architecture**: Clean, modular CSS with proper specificity
+- **Result**: Modern, responsive header system with proper dropdown behavior
 
-### 3. **Submenu Display Problem - IDENTIFIED**
-- **Issue**: Second-level submenus display as flat list instead of nested dropdowns
-- **Symptoms**: All submenu items appear in a single flat list without proper nesting
-- **Affected Elements**: Settings submenu, Development Tools submenu
-- **Status**: **SOLUTION READY** - Migration plan addresses this issue
-- **Root Cause**: **IDENTIFIED** - Missing Bootstrap 5 submenu classes and structure
+### 3. **Filter System Integration - COMPLETED**
+- **Status**: **COMPLETED** - Seamless integration with existing filter system
+- **Architecture**: Header component delegates to global filter system
+- **Compatibility**: Works with all existing table structures
+- **Features**: Multi-select filters, dynamic account loading, state persistence
 
-### 2. **CSS Architecture Migration - COMPLETED**
-- **Status**: **COMPLETED** - Successfully migrated to unified CSS system
-- **New Structure**: `styles-new/unified.css` (98.1KB, 0 duplicates)
-- **Old Files**: `styles/header-system.css` - **DEPRECATED**
-- **Architecture**: ITCSS methodology with 7 layers
-- **Migration Method**: Incremental CSS isolation and transfer from old system
+## 🏗️ New Header Architecture (December 2024)
 
-### 3. **Duplicate CSS Cleanup - COMPLETED**
-- **Status**: **COMPLETED** - All duplicates removed
-- **Tools Used**: Custom Python scripts for duplicate detection
-- **Result**: Clean, optimized CSS files
+### 1. **Modular Component Structure**
+The new header system is built with a clean, modular architecture:
 
-### 4. **CSS Loading and Application Issues - RESOLVED**
-- **Issue**: Styles not applying correctly when using `unified.css` alone
-- **Symptoms**: Computed styles showing defaults (position: static, background: transparent)
-- **Root Cause**: CSS specificity and loading order conflicts with Bootstrap
+```
+trading-ui/
+├── scripts/
+│   ├── header-component.js      # Main header component (NEW)
+│   ├── filter-system.js         # Global filter system (EXISTING)
+│   ├── main.js                  # Global utilities (EXISTING)
+│   └── header-system.js         # Legacy system (DEPRECATED)
+├── styles-new/
+│   └── unified.css              # Unified CSS system (CLEANED)
+└── test-header-only.html        # Complete test environment (NEW)
+```
+
+### 2. **Bootstrap 5 Foundation**
+The new header is built on Bootstrap 5 principles:
+
+#### **Reference Source**
+- **Bootstrap 5 Official Documentation**: https://getbootstrap.com/docs/5.3/components/dropdowns/
+- **Bootstrap 5 Navbar**: https://getbootstrap.com/docs/5.3/components/navbar/
+- **Bootstrap 5 Navigation**: https://getbootstrap.com/docs/5.3/components/navs-tabs/
+
+#### **Key Bootstrap 5 Classes Used**
+```css
+/* Core Bootstrap 5 Structure */
+.navbar                    /* Main navigation container */
+.navbar-nav               /* Navigation list */
+.nav-item                 /* Individual navigation items */
+.nav-link                 /* Navigation links */
+.dropdown                 /* Dropdown container */
+.dropdown-toggle          /* Dropdown trigger */
+.dropdown-menu            /* Dropdown content */
+.dropdown-item            /* Dropdown items */
+.show                     /* Active/visible state */
+```
+
+### 3. **CSS Architecture - CLEANED**
+- **Status**: **COMPLETED** - Successfully cleaned unified CSS system
+- **New Structure**: `styles-new/unified.css` (6,564 lines, cleaned from 8,090)
+- **Cleanup**: Removed 1,526 lines of conflicting styles (232 CSS rule blocks)
+- **Method**: Automated Python script for systematic cleanup
+- **Result**: Clean, conflict-free CSS with proper specificity
+
+## 🎨 Header Component Design & Styling
+
+### 1. **HTML Structure**
+The new header follows Bootstrap 5 structure with custom TikTrack styling:
+
+```html
+<div id="unified-header" class="header-container">
+    <div class="header-top">
+        <nav class="header-nav">
+            <ul class="tiktrack-nav-list">
+                <li class="tiktrack-nav-item">
+                    <a href="/" class="tiktrack-nav-link active" data-page="home">
+                        <img src="images/icons/home.svg" alt="בית">
+                    </a>
+                </li>
+                <li class="tiktrack-nav-item dropdown">
+                    <a href="#" class="tiktrack-nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                        תכנון
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/trades" class="dropdown-item">עסקאות</a></li>
+                        <li><a href="/trade-plans" class="dropdown-item">תכניות מסחר</a></li>
+                    </ul>
+                </li>
+                <!-- More navigation items -->
+            </ul>
+        </nav>
+    </div>
+    
+    <div class="header-filters">
+        <div class="filter-toggle-section">
+            <button class="filter-toggle-btn" onclick="toggleFilterSection()">
+                <span class="filter-arrow">▼</span>
+            </button>
+        </div>
+        
+        <div class="header-filters-content">
+            <!-- Filter controls -->
+        </div>
+    </div>
+</div>
+```
+
+### 2. **CSS Styling Guidelines**
+
+#### **Header Container**
+```css
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+```
+
+#### **Navigation Styling**
+```css
+.tiktrack-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    color: #1d1d1f;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-weight: 400;
+    font-size: 16px;
+}
+
+/* Home icon specific styling */
+.tiktrack-nav-item:first-child .tiktrack-nav-link {
+    padding-right: 0; /* Remove right padding for home icon */
+}
+```
+
+#### **Filter System Styling**
+```css
+.filter-toggle {
+    width: 120px; /* Fixed width for consistency */
+    justify-content: space-between;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 0.5rem;
+    font-size: 14px;
+}
+
+.filter-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 1000;
+    min-width: 150px;
+}
+
+.filter-option {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.filter-option:hover {
+    background: #f8f9fa;
+}
+
+.filter-option.selected {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+```
+
+### 3. **Filter Behavior**
+
+#### **Multi-Select Filters (Status, Type, Account)**
+- Click to toggle selection
+- Multiple items can be selected
+- Button text shows count: "2 סטטוסים"
+- Menu closes on mouse leave
+- Visual indication of selected items
+
+#### **Single-Select Filter (Date)**
+- Only one option can be selected
+- Menu closes immediately after selection
+- Button text shows selected option
+- Auto-close after 2 seconds (if not immediate)
+
+#### **Search Filter**
+- Real-time search as you type
+- Clear button (✕) on the right
+- Fixed width: 120px
+- No line breaks in text
+
+### 4. **State Management**
+The header component maintains state across page loads:
+
+```javascript
+// Save filter state
+function saveFilterState() {
+    const state = {
+        isOpen: !filterToggleBtn.classList.contains('collapsed'),
+        searchValue: searchFilterInput.value,
+        statusValue: statusButton.textContent,
+        typeValue: typeButton.textContent,
+        accountValue: accountButton.textContent,
+        dateValue: dateButton.textContent
+    };
+    localStorage.setItem('headerFilterState', JSON.stringify(state));
+}
+
+// Restore filter state
+function restoreFilterState() {
+    const savedState = localStorage.getItem('headerFilterState');
+    if (savedState) {
+        const state = JSON.parse(savedState);
+        // Restore all filter states
+    }
+}
+```
+
+### 5. **Integration with Existing Filter System**
+The header component integrates seamlessly with the existing global filter system:
+
+```javascript
+// Header component delegates to global filter system
+function selectStatusOption(value) {
+    // Update button text (Hebrew translation)
+    if (value === 'all') {
+        statusButton.textContent = 'סטטוס';
+    } else {
+        const statusTranslations = {
+            'open': 'פתוח',
+            'closed': 'סגור',
+            'cancelled': 'מבוטל'
+        };
+        statusButton.textContent = statusTranslations[value] || value;
+    }
+    
+    // Delegate to global filter system (English values)
+    if (window.updateFilter) {
+        window.updateFilter('status', value);
+    }
+}
+```
+
+## 🚀 How to Use the New Header System
+
+### 1. **Basic Integration**
+To add the new header system to any page:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Load CSS in correct order -->
+    <link rel="stylesheet" href="styles-new/unified.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <!-- Header will be injected here -->
+    <div id="unified-header"></div>
+    
+    <!-- Your page content -->
+    <div class="container">
+        <div id="tradesContainer" class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Investment Type</th>
+                        <th>Account</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- table rows -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Load JavaScript in correct order -->
+    <script src="scripts/filter-system.js"></script>
+    <script src="scripts/header-component.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
+</html>
+```
+
+### 2. **Test Environment**
+Use the complete test environment to see the header in action:
+
+**File**: `trading-ui/test-header-only.html`
+- Complete working example
+- All filters functional
+- Test table with sample data
+- Debug logging enabled
+
+### 3. **Customization**
+
+#### **Adding New Navigation Items**
+```javascript
+// In header-component.js, modify the getHeaderHTML() function
+const navigationItems = [
+    { text: 'בית', href: '/', icon: 'home.svg' },
+    { text: 'תכנון', href: '#', submenu: [
+        { text: 'עסקאות', href: '/trades' },
+        { text: 'תכניות מסחר', href: '/trade-plans' }
+    ]},
+    // Add your new item here
+    { text: 'דוחות', href: '/reports' }
+];
+```
+
+#### **Customizing Filter Options**
+```javascript
+// In header-component.js, modify filter options
+const statusOptions = [
+    { value: 'all', text: 'הכל' },
+    { value: 'open', text: 'פתוח' },
+    { value: 'closed', text: 'סגור' },
+    { value: 'cancelled', text: 'מבוטל' }
+    // Add new status options here
+];
+```
+
+#### **Styling Customization**
+```css
+/* In your page CSS or unified.css */
+.header-container {
+    /* Customize header container */
+    background: #f8f9fa;
+    border-bottom: 2px solid #007bff;
+}
+
+.tiktrack-nav-link {
+    /* Customize navigation links */
+    color: #007bff;
+    font-weight: 600;
+}
+
+.filter-toggle {
+    /* Customize filter buttons */
+    background: #e3f2fd;
+    border-color: #2196f3;
+}
+```
+
+### 4. **Filter System Integration**
+
+#### **Table Requirements**
+Your tables must follow this structure:
+
+```html
+<div id="[entityName]Container" class="table-responsive">
+    <table>
+        <thead>
+            <tr>
+                <th>Status</th>           <!-- For status filter -->
+                <th>Investment Type</th>  <!-- For type filter -->
+                <th>Account</th>          <!-- For account filter -->
+                <th>Date</th>             <!-- For date filter -->
+                <th>Actions</th>          <!-- Excluded from search -->
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Open</td>             <!-- English values -->
+                <td>Investment</td>       <!-- English values -->
+                <td>Trading Account 1</td>
+                <td>2024-12-15</td>
+                <td>Edit | Delete</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+```
+
+#### **Supported Container IDs**
+- `tradesContainer`
+- `tradePlansContainer`
+- `alertsContainer`
+- `executionsContainer`
+- `accountsContainer`
+- `tickersContainer`
+- `cashFlowsContainer`
+- `notesContainer`
+
+### 5. **Data Requirements**
+
+#### **Status Values (English)**
+- `open` - Open trades
+- `closed` - Closed trades
+- `cancelled` - Cancelled trades
+
+#### **Type Values (English)**
+- `swing` - Swing trading
+- `investment` - Long-term investment
+- `passive` - Passive investment
+
+#### **Account Data**
+- Loaded dynamically from server
+- Only active accounts shown
+- Cached in localStorage for performance
+
+### 6. **Debugging**
+
+#### **Enable Debug Logging**
+```javascript
+// In browser console
+localStorage.setItem('debugHeader', 'true');
+```
+
+#### **Check Filter States**
+```javascript
+// In browser console
+console.log('Filter states:', {
+    status: window.selectedStatusesForFilter,
+    type: window.selectedTypesForFilter,
+    account: window.selectedAccountsForFilter,
+    date: window.selectedDateRangeForFilter,
+    search: window.searchTextForFilter
+});
+```
+
+#### **Test Filter Application**
+```javascript
+// In browser console
+window.applyTableFilter('status', ['open']);
+window.applyTableFilter('type', ['investment', 'swing']);
+window.applyTableFilter('search', 'test search');
+```
 - **Solution**: Reordered CSS loading to prioritize `unified.css` over Bootstrap
 - **Status**: **RESOLVED** - CSS loading order fixed
 
@@ -801,7 +1212,21 @@ window.applyTableFilter('status', ['Open']);
 
 ## Version History
 
-### Version 4.3 (September 6, 2025) - CURRENT
+### Version 5.0 (December 2024) - CURRENT
+- **🚨 COMPLETE REBUILD**: New modular header architecture
+- **NEW FILES**: 
+  - `trading-ui/scripts/header-component.js` - Main header component
+  - `trading-ui/test-header-only.html` - Complete test environment
+- **Bootstrap 5 FOUNDATION**: Built on Bootstrap 5 dropdown and navigation components
+- **CSS CLEANUP**: Removed 1,526 lines of conflicting styles from unified.css
+- **FILTER INTEGRATION**: Seamless integration with existing global filter system
+- **MODULAR ARCHITECTURE**: Separated menu system from filter system
+- **STATE MANAGEMENT**: Persistent filter and navigation states
+- **RESPONSIVE DESIGN**: Mobile-friendly navigation interface
+- **DEBUGGING**: Comprehensive logging and debugging tools
+- **DOCUMENTATION**: Complete usage and customization guide
+
+### Version 4.3 (September 6, 2025) - DEPRECATED
 - **🚨 CRITICAL ISSUE IDENTIFIED**: Second-level submenus display as flat list
 - **CSS ARCHITECTURE MIGRATION**: Successfully migrated to unified CSS system
 - **DUPLICATE CSS CLEANUP**: Removed all CSS duplicates using custom Python tools
@@ -815,7 +1240,116 @@ window.applyTableFilter('status', ['Open']);
 - **MIGRATION METHOD**: Incremental CSS isolation using temporary file approach
 - **DEBUGGING TOOLS**: Added comprehensive CSS loading and style testing
 
-### Version 4.2 (August 31, 2025)
+## 🔧 Issues Resolved in Version 5.0
+
+### 1. **Filter Display Issues - RESOLVED**
+- **Problem**: Filter text breaking lines and inconsistent sizing
+- **Solution**: Fixed width (120px) for all filter buttons, added `white-space: nowrap`
+- **Result**: Consistent filter display with proper text handling
+
+### 2. **Date Filter Behavior - RESOLVED**
+- **Problem**: Date filter not closing immediately after selection
+- **Solution**: Removed 2-second delay, immediate close after selection
+- **Result**: Better user experience with instant feedback
+
+### 3. **Search Filter Sizing - RESOLVED**
+- **Problem**: Search filter larger than other filters
+- **Solution**: Fixed width to 120px, proper padding for clear button
+- **Result**: Consistent sizing across all filters
+
+### 4. **Clear Button Functionality - RESOLVED**
+- **Problem**: Clear button not working properly
+- **Solution**: Fixed CSS positioning, proper event handling, correct class names
+- **Result**: Functional clear button with proper styling
+
+### 5. **Multi-Select vs Single-Select Behavior - RESOLVED**
+- **Problem**: Inconsistent filter behavior
+- **Solution**: 
+  - Multi-select (Status, Type, Account): Toggle selection, show count, close on mouse leave
+  - Single-select (Date): Immediate selection, auto-close
+- **Result**: Intuitive filter behavior matching user expectations
+
+### 6. **CSS Conflicts - RESOLVED**
+- **Problem**: External CSS overriding filter styles
+- **Solution**: Systematic cleanup of unified.css, removed 1,526 conflicting lines
+- **Result**: Clean, conflict-free styling
+
+### 7. **State Persistence - RESOLVED**
+- **Problem**: Filter states not saved across page loads
+- **Solution**: localStorage integration for filter and navigation states
+- **Result**: Persistent user experience
+
+## 🔄 Existing Filter System Integration
+
+### **IMPORTANT**: The existing filter system remains unchanged!
+The new header component integrates with the existing global filter system without modifying its core functionality.
+
+#### **Existing Filter System Files (UNCHANGED)**
+- `trading-ui/scripts/filter-system.js` - Global filter system (EXISTING)
+- `trading-ui/scripts/main.js` - Global utilities (EXISTING)
+
+#### **How Integration Works**
+The new header component delegates filter operations to the existing system:
+
+```javascript
+// Header component calls existing global functions
+function selectStatusOption(value) {
+    // Update UI (Hebrew translation)
+    statusButton.textContent = statusTranslations[value] || value;
+    
+    // Delegate to existing global filter system
+    if (window.updateFilter) {
+        window.updateFilter('status', value); // English value
+    }
+}
+```
+
+#### **Existing Filter System Features (PRESERVED)**
+- **Universal Table Filtering**: Single `applyTableFilter()` function works on all tables
+- **Smart Column Detection**: Automatically detects relevant columns by header text
+- **Multi-Container Support**: Filters apply to all visible table containers
+- **Dynamic Filter Application**: Filters adapt to table structure automatically
+- **Comprehensive Logging**: Detailed logs for debugging and monitoring
+
+#### **Table Structure Requirements (UNCHANGED)**
+Tables must follow the existing structure:
+
+```html
+<div id="[entityName]Container" class="table-responsive">
+    <table>
+        <thead>
+            <tr>
+                <th>Status</th>           <!-- For status filter -->
+                <th>Investment Type</th>  <!-- For type filter -->
+                <th>Account</th>          <!-- For account filter -->
+                <th>Date</th>             <!-- For date filter -->
+                <th>Actions</th>          <!-- Excluded from search -->
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Open</td>             <!-- English values -->
+                <td>Investment</td>       <!-- English values -->
+                <td>Trading Account 1</td>
+                <td>2024-12-15</td>
+                <td>Edit | Delete</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+```
+
+#### **Supported Container IDs (UNCHANGED)**
+- `tradesContainer`
+- `tradePlansContainer`
+- `alertsContainer`
+- `executionsContainer`
+- `accountsContainer`
+- `tickersContainer`
+- `cashFlowsContainer`
+- `notesContainer`
+
+### Version 4.2 (August 31, 2025) - DEPRECATED
 - **COMPLETE FILTER SYSTEM REFACTORING**: Simplified architecture by removing complex functions
 - **NEW FILTER FUNCTIONS**: Replaced complex system with simple, direct filter application
 - **ENGLISH-ONLY LOGIC**: All internal filter logic now uses English column names

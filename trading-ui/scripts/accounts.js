@@ -333,11 +333,30 @@ function updateAccountsTable(accounts) {
   const tbody = document.querySelector('#accountsTable tbody');
   if (!tbody) {
     console.warn('⚠️ לא נמצא tbody לטבלת חשבונות - ייתכן שהדף לא נטען עדיין');
-    return;
+    console.log('🔍 חיפוש אלטרנטיבי...');
+    const table = document.querySelector('#accountsTable');
+    if (table) {
+      console.log('✅ נמצאה הטבלה:', table);
+      const tbodyAlt = table.querySelector('tbody');
+      if (tbodyAlt) {
+        console.log('✅ נמצא tbody אלטרנטיבי:', tbodyAlt);
+        // המשך עם tbodyAlt
+        tbody = tbodyAlt;
+      } else {
+        console.error('❌ לא נמצא tbody בטבלה');
+        return;
+      }
+    } else {
+      console.error('❌ לא נמצאה הטבלה #accountsTable');
+      return;
+    }
   }
 
   // בניית הטבלה מחדש לפי הכותרות בדיוק
   console.log('📊 עדכון טבלת חשבונות עם', accounts.length, 'חשבונות');
+  console.log('🔍 tbody נמצא:', tbody);
+  console.log('🔍 tbody.innerHTML לפני עדכון:', tbody.innerHTML.length, 'תווים');
+  
   tbody.innerHTML = accounts.map(account => {
     // המרת סטטוס לעברית לפילטר
     const statusForFilter = account.status === 'open' ? 'פתוח' :
@@ -413,6 +432,8 @@ function updateAccountsTable(accounts) {
   }
 
   console.log('✅ טבלת חשבונות עודכנה בהצלחה עם', accounts.length, 'חשבונות');
+  console.log('🔍 tbody.innerHTML אחרי עדכון:', tbody.innerHTML.length, 'תווים');
+  console.log('🔍 מספר שורות בטבלה:', tbody.children.length);
   // END UPDATE ACCOUNTS TABLE
 }
 
@@ -1640,6 +1661,9 @@ if (window.location.pathname.includes('/accounts')) {
  */
 async function loadAccountsDataForAccountsPage() {
   console.log('🚀🚀🚀 loadAccountsDataForAccountsPage התחיל 🚀🚀🚀');
+  console.log('🔍 בדיקת זמינות פונקציות:');
+  console.log('  - apiCall:', typeof window.apiCall);
+  console.log('  - updateAccountsTable:', typeof window.updateAccountsTable);
   try {
     // טעינת נתונים מהשרת
     let accounts;
@@ -1693,7 +1717,23 @@ async function loadAccountsDataForAccountsPage() {
     // עדכון הטבלה עם הנתונים המסוננים
     if (typeof window.updateAccountsTable === 'function') {
       console.log('📊 עדכון טבלה עם', filteredAccounts.length, 'חשבונות');
-      window.updateAccountsTable(filteredAccounts);
+      console.log('🔍 קריאה ל-updateAccountsTable...');
+      console.log('🔍 נתונים לשליחה:', filteredAccounts.slice(0, 2)); // רק 2 ראשונים לדיבוג
+      console.log('🔍 בדיקת tbody לפני עדכון...');
+      const tbodyBefore = document.querySelector('#accountsTable tbody');
+      if (tbodyBefore) {
+        console.log('✅ tbody נמצא לפני עדכון:', tbodyBefore);
+        console.log('🔍 מספר שורות לפני עדכון:', tbodyBefore.children.length);
+      } else {
+        console.error('❌ tbody לא נמצא לפני עדכון');
+      }
+      console.log('🔍 קריאה ל-updateAccountsTable עם', filteredAccounts.length, 'חשבונות...');
+      try {
+        window.updateAccountsTable(filteredAccounts);
+        console.log('✅ updateAccountsTable הושלמה בהצלחה');
+      } catch (error) {
+        console.error('❌ שגיאה ב-updateAccountsTable:', error);
+      }
 
       // בדיקה שהטבלה התעדכנה כראוי
       const tbody = document.querySelector('#accountsTable tbody');
@@ -1701,6 +1741,10 @@ async function loadAccountsDataForAccountsPage() {
         console.warn('⚠️ הטבלה לא התעדכנה כראוי - אין שורות בטבלה');
       } else {
         console.log('✅ הטבלה התעדכנה בהצלחה');
+        console.log('🔍 מספר שורות אחרי עדכון:', tbody ? tbody.children.length : 'לא נמצא');
+        if (tbody && tbody.children.length > 0) {
+          console.log('🔍 תוכן השורה הראשונה:', tbody.children[0].textContent.substring(0, 100));
+        }
       }
       
       // יישום צבעי ישויות על כותרות
@@ -2649,6 +2693,50 @@ function showAccountDetails(accountId) {
 
 // ייצוא הפונקציה לגלובל
 window.showAccountDetails = showAccountDetails;
+
+// הוספת timeout לאתחול - אחרי שהפונקציות מיוצאות
+setTimeout(() => {
+  console.log('⏰ Timeout 2 שניות - מתחיל אתחול');
+  if (window.location.pathname.includes('/accounts')) {
+    console.log('🎯 נמצאים בדף החשבונות - מתחיל טעינת נתונים');
+    console.log('🔍 בדיקת זמינות פונקציות:');
+    console.log('  - loadAccountsDataForAccountsPage:', typeof window.loadAccountsDataForAccountsPage);
+    console.log('  - apiCall:', typeof window.apiCall);
+    console.log('  - updateAccountsTable:', typeof window.updateAccountsTable);
+    
+    if (typeof window.loadAccountsDataForAccountsPage === 'function') {
+      console.log('📡 קורא ל-loadAccountsDataForAccountsPage');
+      window.loadAccountsDataForAccountsPage();
+    } else {
+      console.error('❌ loadAccountsDataForAccountsPage לא נמצאה');
+      console.log('🔍 ניסיון לטעון נתונים ישירות...');
+      
+      // ניסיון לטעון נתונים ישירות
+      if (typeof window.apiCall === 'function') {
+        console.log('📡 משתמש ב-apiCall ישירות');
+        window.apiCall('/api/v1/accounts/', 'GET')
+          .then(data => {
+            console.log('✅ נתונים נטענו ישירות:', data);
+            if (data && data.length > 0) {
+              console.log('📊 עדכון טבלה עם', data.length, 'רשומות');
+              if (typeof window.updateAccountsTable === 'function') {
+                window.updateAccountsTable(data);
+              } else {
+                console.error('❌ updateAccountsTable לא נמצאה');
+              }
+            }
+          })
+          .catch(error => {
+            console.error('❌ שגיאה בטעינת נתונים ישירה:', error);
+          });
+      } else {
+        console.error('❌ apiCall לא נמצאה');
+      }
+    }
+  }
+}, 2000);
+
+console.log('✅ accounts.js נטען בהצלחה');
 
 // סיום הקובץ
 console.log('✅ accounts.js נטען בהצלחה');

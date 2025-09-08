@@ -79,7 +79,7 @@
         <!-- כותרת מעקב טריידים -->
         <div class="section-header entity-trade-main-header">
           <div class="table-title">
-                                    <img src="images/icons/trades.svg" alt="מעקב טריידים" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                                    <img src="images/icons/trades.svg" alt="מעקב טריידים" class="section-icon-large">
             מעקב טריידים
           </div>
           <div class="table-actions">
@@ -92,7 +92,7 @@
         <!-- כרטיסיות התראות -->
         <div class="section-body">
           <!-- Color Scheme Demo for Trades -->
-          <div id="tradesColorDemo" class="mb-3" style="display: none;">
+          <div id="tradesColorDemo" class="mb-3 d-none">
             <div class="d-flex gap-2 mb-2">
               <span class="entity-trade-badge">טרייד פעיל</span>
               <span class="entity-account-badge">Interactive Brokers</span>
@@ -126,21 +126,21 @@
           <!-- כותרת הטריידים שלי -->
           <div class="section-header entity-trade-main-header">
             <div class="table-title">
-                                          <img src="images/icons/trades.svg" alt="הטריידים שלי" style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
+                                          <img src="images/icons/trades.svg" alt="הטריידים שלי" class="section-icon-large">
               הטריידים שלי
             </div>
             <div class="table-count" id="tradesCount">טוען...</div>
             <div class="table-actions">
               <button id="addTradeBtn" class="refresh-btn" onclick="showAddTradeModal()" title="הוסף טרייד חדש">
-                                    <img src="images/icons/trades.svg" alt="הוסף" class="action-icon" style="width: 16px; height: 16px;"> הוסף
+                                    <img src="images/icons/trades.svg" alt="הוסף" class="action-icon"> הוסף
               </button>
               
               <!-- כפתורי עריכה ומחיקה נסתרים (לזיהוי בבדיקות) -->
               <button id="editTradeBtn" class="refresh-btn d-none" onclick="editTradeRecord('')" title="ערוך טרייד נבחר">
-                                    <img src="images/icons/trades.svg" alt="ערוך" class="action-icon" style="width: 16px; height: 16px;"> ערוך
+                                    <img src="images/icons/trades.svg" alt="ערוך" class="action-icon"> ערוך
               </button>
               <button id="deleteTradeBtn" class="refresh-btn d-none" onclick="deleteTradeRecord('')" title="מחק טרייד נבחר">
-                                    <img src="images/icons/trades.svg" alt="מחק" class="action-icon" style="width: 16px; height: 16px;"> מחק
+                                    <img src="images/icons/trades.svg" alt="מחק" class="action-icon"> מחק
               </button>
 
               <div class="action-separator"></div>
@@ -158,85 +158,73 @@
                   <tr>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        data-sort-column="0"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        data-sort-column="0">
                         טיקר <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        data-sort-column="1"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        data-sort-column="1">
                         מחיר נוכחי <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        data-sort-column="2"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        data-sort-column="2">
                         שינוי % <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        data-sort-column="3"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        data-sort-column="3">
                         סטטוס <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        data-sort-column="4"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        data-sort-column="4">
                         סוג <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        data-sort-column="5"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        data-sort-column="5">
                         צד <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        data-sort-column="6"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        data-sort-column="6">
                         תוכנית <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        data-sort-column="7"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        data-sort-column="7">
                         רווח/הפסד <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        data-sort-column="8"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        data-sort-column="8">
                         נוצר ב <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        data-sort-column="9"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        data-sort-column="9">
                         נסגר ב <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        data-sort-column="10"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        data-sort-column="10">
                         חשבון <span class="sort-icon">↕</span>
                       </button>
                     </th>
                     <th>
                       <button class="btn btn-link sortable-header"
-                        data-sort-column="11"
-                        style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">
+                        data-sort-column="11">
                         הערות <span class="sort-icon">↕</span>
                       </button>
                     </th>
@@ -262,60 +250,53 @@
     </div> <!-- סוף page-body -->
 
     <!-- מרווח בתחתית הדף -->
-    <div style="height: 3rem;"></div>
+    <div class="bottom-spacing"></div>
 
     <!-- מודל עריכת טרייד -->
     <div class="modal fade" id="editTradeModal" tabindex="-1" aria-labelledby="editTradeModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
-      <div class="modal-dialog modal-lg" style="max-width: 800px; margin: 1.75rem auto;">
+      <div class="modal-dialog modal-lg modal-large">
         <div class="modal-content">
-          <div class="modal-header" style="background-color: #ff9c05; color: white;">
-            <h5 class="modal-title" id="editTradeModalLabel" style="order: 1;">עריכת טרייד</h5>
-            <div style="order: 2;">
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
+          <div class="modal-header modal-header-orange">
+            <h5 class="modal-title" id="editTradeModalLabel">עריכת טרייד</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
 
           <!-- שורת מידע ואיקונים מתחת לכותרת -->
-          <div class="d-flex justify-content-between align-items-center p-2"
-            style="background-color: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+          <div class="d-flex justify-content-between align-items-center p-2 modal-info-bar">
             <!-- מידע טיקר, מחיר ושינוי יומי -->
             <div class="d-flex gap-4 align-items-center">
               <div class="d-flex align-items-center">
-                <span class="text-muted me-2" style="font-size: 14px;">טיקר:</span>
-                <span id="editTradeTickerDisplay" style="font-weight: bold; cursor: pointer;"
+                <span class="text-muted me-2 small-text">טיקר:</span>
+                <span id="editTradeTickerDisplay" class="bold-text clickable"
                   onclick="viewLinkedItemsForTrade(document.getElementById('editTradeId').value)"
                   title="צפה באלמנטים מקושרים">-</span>
               </div>
               <div class="d-flex align-items-center">
-                <span class="text-muted me-2" style="font-size: 14px;">מחיר:</span>
-                <span id="editTradeCurrentPrice" style="font-weight: bold;">-</span>
+                <span class="text-muted me-2 small-text">מחיר:</span>
+                <span id="editTradeCurrentPrice" class="bold-text">-</span>
               </div>
               <div class="d-flex align-items-center">
-                <span class="text-muted me-2" style="font-size: 14px;">שינוי:</span>
-                <span id="editTradeDailyChange" style="font-weight: bold;">-</span>
+                <span class="text-muted me-2 small-text">שינוי:</span>
+                <span id="editTradeDailyChange" class="bold-text">-</span>
               </div>
             </div>
 
             <!-- כפתורים -->
             <div class="d-flex gap-2">
-              <button type="button" class="btn btn-sm"
-                style="background-color: #ffffff; border: 1px solid #ced4da; color: #6c757d; padding: 6px 10px; border-radius: 4px;"
+              <button type="button" class="btn btn-sm btn-modal-action"
                 onclick="viewLinkedItemsForTrade(document.getElementById('editTradeId').value)"
                 title="צפה באלמנטים מקושרים">
                 🔗
               </button>
-              <button type="button" class="btn btn-sm"
-                style="background-color: #ffffff; border: 1px solid #ced4da; color: #6c757d; padding: 6px 10px; border-radius: 4px;"
+              <button type="button" class="btn btn-sm btn-modal-action"
                 onclick="addEditReminder()" title="תזכיר לי כש...">
                 ⏰
               </button>
-              <button type="button" class="btn btn-sm"
-                style="background-color: #ffffff; border: 1px solid #ced4da; color: #6c757d; padding: 6px 10px; border-radius: 4px;"
+              <button type="button" class="btn btn-sm btn-modal-action"
                 onclick="addEditImportantNote()" title="יש לי עוד משהו חשוב">
                 📝
               </button>
-              <button type="button" class="btn btn-sm"
-                style="background-color: #ffffff; border: 1px solid #ced4da; color: #6c757d; padding: 6px 10px; border-radius: 4px;"
+              <button type="button" class="btn btn-sm btn-modal-action"
                 onclick="addEditBuySell()" title="הוסף קניה/מכירה">
                 💰
               </button>
@@ -362,8 +343,8 @@
               <div class="row">
                 <div class="col-md-12">
                   <div class="mb-3">
-                    <div class="border rounded p-3" style="background-color: #f8f9fa;">
-                      <h6 class="mb-3 text-center" style="color: #dc3545; font-weight: bold;">דוגמה</h6>
+                    <div class="border rounded p-3 bg-light">
+                      <h6 class="mb-3 text-center text-danger fw-bold">דוגמה</h6>
                       <div class="row">
                         <div class="col-md-4">
                           <label class="form-label small text-muted fw-bold">פוזיציה</label>
@@ -502,20 +483,17 @@
 
                     <!-- כפתורי פעולות לעסקאות -->
                     <div class="d-flex gap-2 mt-2">
-                      <button type="button" class="btn btn-sm"
-                        style="background-color: white; color: #28a745; border: 1px solid #6c757d; font-size: 12px;"
+                      <button type="button" class="btn btn-sm btn-action-small"
                         onclick="addEditBuySell()">
-                        <img src="images/icons/trades.svg" alt="הוסף קניה/מכירה" class="btn-icon" style="width: 16px; height: 16px;"> הוסף קניה/מכירה
+                        <img src="images/icons/trades.svg" alt="הוסף קניה/מכירה" class="btn-icon"> הוסף קניה/מכירה
                       </button>
-                      <button type="button" class="btn btn-sm"
-                        style="background-color: white; color: #28a745; border: 1px solid #6c757d; font-size: 12px;"
+                      <button type="button" class="btn btn-sm btn-action-small"
                         onclick="linkExistingExecution()">
-                        <img src="images/icons/trades.svg" alt="שיוך עסקה קיימת" class="btn-icon" style="width: 16px; height: 16px;"> שיוך עסקה קיימת
+                        <img src="images/icons/trades.svg" alt="שיוך עסקה קיימת" class="btn-icon"> שיוך עסקה קיימת
                       </button>
-                      <button type="button" class="btn btn-sm"
-                        style="background-color: white; color: #28a745; border: 1px solid #6c757d; font-size: 12px;"
+                      <button type="button" class="btn btn-sm btn-action-small"
                         onclick="unlinkExecution()">
-                        <img src="images/icons/trades.svg" alt="ביטול שיוך" class="btn-icon" style="width: 16px; height: 16px;"> ביטול שיוך
+                        <img src="images/icons/trades.svg" alt="ביטול שיוך" class="btn-icon"> ביטול שיוך
                       </button>
                     </div>
                   </div>
@@ -525,7 +503,7 @@
               <!-- שדות נסתרים -->
               <input type="hidden" id="editTradeId">
               <input type="hidden" id="editTradeTickerId">
-              <div class="form-control-plaintext" id="editTradeIdDisplay" style="display: none;"></div>
+              <div class="form-control-plaintext d-none" id="editTradeIdDisplay"></div>
             </form>
           </div>
           <div class="modal-footer">
@@ -533,10 +511,10 @@
               <!-- כפתורים בצד שמאל -->
               <div>
                 <button type="button" class="btn btn-info me-2" onclick="addEditImportantNote()">
-                  <img src="images/icons/home.svg" alt="יש לי עוד משהו חשוב" class="btn-icon" style="width: 16px; height: 16px;"> יש לי עוד משהו חשוב
+                  <img src="images/icons/home.svg" alt="יש לי עוד משהו חשוב" class="btn-icon"> יש לי עוד משהו חשוב
                 </button>
                 <button type="button" class="btn btn-warning me-2" onclick="addEditReminder()">
-                  <img src="images/icons/alerts.svg" alt="תזכיר לי כש..." class="btn-icon" style="width: 16px; height: 16px;"> תזכיר לי כש...
+                  <img src="images/icons/alerts.svg" alt="תזכיר לי כש..." class="btn-icon"> תזכיר לי כש...
                 </button>
               </div>
 
@@ -556,7 +534,7 @@
 
     <!-- מודל הוספת טרייד -->
     <div class="modal fade" id="addTradeModal" tabindex="-1" aria-labelledby="addTradeModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">
-      <div class="modal-dialog modal-lg" style="max-width: 800px; margin: 1.75rem auto;">
+      <div class="modal-dialog modal-lg modal-large">
         <div class="modal-content">
           <div class="modal-header modal-header-colored">
             <h5 class="modal-title" id="addTradeModalLabel">הוספת טרייד חדש</h5>
@@ -671,7 +649,7 @@
               </div>
 
               <!-- שדות נסתרים -->
-              <div class="mb-3" style="display: none;">
+              <div class="mb-3 d-none">
                 <label for="addTradeStatus" class="form-label">סטטוס</label>
                 <select class="form-select" id="addTradeStatus" required>
                   <option value="open">פתוח</option>
@@ -686,10 +664,10 @@
               <!-- כפתורים בצד שמאל -->
               <div>
                 <button type="button" class="btn btn-info me-2" onclick="addImportantNote()">
-                  <img src="images/icons/home.svg" alt="יש לי עוד משהו חשוב" class="btn-icon" style="width: 16px; height: 16px;"> יש לי עוד משהו חשוב
+                  <img src="images/icons/home.svg" alt="יש לי עוד משהו חשוב" class="btn-icon"> יש לי עוד משהו חשוב
                 </button>
                 <button type="button" class="btn btn-warning" onclick="addReminder()">
-                  <img src="images/icons/alerts.svg" alt="תזכיר לי כש..." class="btn-icon" style="width: 16px; height: 16px;"> תזכיר לי כש...
+                  <img src="images/icons/alerts.svg" alt="תזכיר לי כש..." class="btn-icon"> תזכיר לי כש...
                 </button>
               </div>
 

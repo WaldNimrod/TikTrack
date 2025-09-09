@@ -6,6 +6,12 @@ if (typeof Chart === 'undefined') {
     console.warn('⚠️ Chart.js library not loaded - charts will not display');
 }
 
+// Chart instances
+let performanceChart = null;
+let allocationChart = null;
+let accountsChart = null;
+let riskChart = null;
+
 // Function to switch between table tabs
 function switchTableTab(tabName) {
     console.log('🔄 Switching to tab:', tabName);
@@ -39,7 +45,182 @@ function updateChartPeriod(period) {
 // Function to refresh charts
 function refreshCharts() {
     console.log('🔄 Refreshing charts...');
-    // Chart refresh logic would go here
+    initializeCharts();
+}
+
+// Function to initialize all charts
+function initializeCharts() {
+    console.log('📊 Initializing charts...');
+    
+    // Initialize Performance Chart
+    const performanceCtx = document.getElementById('performanceChart');
+    if (performanceCtx && typeof Chart !== 'undefined') {
+        if (performanceChart) performanceChart.destroy();
+        
+        performanceChart = new Chart(performanceCtx, {
+            type: 'line',
+            data: {
+                labels: ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'],
+                datasets: [{
+                    label: 'תיק השקעות',
+                    data: [100, 105, 102, 108, 115, 112, 118, 125, 122, 128, 135, 140],
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'מדד תל אביב 35',
+                    data: [100, 103, 101, 106, 110, 108, 112, 116, 114, 118, 122, 125],
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'ביצועי תיק מול מדד תל אביב 35'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'תשואה (%)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Initialize Allocation Chart
+    const allocationCtx = document.getElementById('allocationChart');
+    if (allocationCtx && typeof Chart !== 'undefined') {
+        if (allocationChart) allocationChart.destroy();
+        
+        allocationChart = new Chart(allocationCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['טכנולוגיה', 'פיננסים', 'בריאות', 'אנרגיה', 'תעשייה', 'אחר'],
+                datasets: [{
+                    data: [35, 25, 15, 10, 10, 5],
+                    backgroundColor: [
+                        '#28a745',
+                        '#007bff',
+                        '#dc3545',
+                        '#ffc107',
+                        '#6f42c1',
+                        '#6c757d'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'חלוקת נכסים לפי סקטורים'
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    }
+    
+    // Initialize Accounts Chart
+    const accountsCtx = document.getElementById('accountsChart');
+    if (accountsCtx && typeof Chart !== 'undefined') {
+        if (accountsChart) accountsChart.destroy();
+        
+        accountsChart = new Chart(accountsCtx, {
+            type: 'bar',
+            data: {
+                labels: ['חשבון USD', 'חשבון ILS', 'חשבון EUR', 'חשבון Crypto'],
+                datasets: [{
+                    label: 'תשואה שנתית (%)',
+                    data: [12.5, 8.3, 15.2, 25.8],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.8)',
+                        'rgba(0, 123, 255, 0.8)',
+                        'rgba(255, 193, 7, 0.8)',
+                        'rgba(220, 53, 69, 0.8)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'השוואת ביצועים בין חשבונות'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'תשואה (%)'
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Initialize Risk Chart
+    const riskCtx = document.getElementById('riskChart');
+    if (riskCtx && typeof Chart !== 'undefined') {
+        if (riskChart) riskChart.destroy();
+        
+        riskChart = new Chart(riskCtx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'מניות',
+                    data: [
+                        {x: 5, y: 8}, {x: 7, y: 12}, {x: 3, y: 6}, {x: 9, y: 15},
+                        {x: 4, y: 7}, {x: 6, y: 10}, {x: 8, y: 14}, {x: 2, y: 4},
+                        {x: 10, y: 18}, {x: 1, y: 3}, {x: 11, y: 20}, {x: 12, y: 22}
+                    ],
+                    backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                    borderColor: '#28a745'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'ניתוח סיכון מול תשואה לפי מניות'
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'רמת סיכון (%)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'תשואה צפויה (%)'
+                        }
+                    }
+                }
+            }
+        });
+    }
 }
 
 // Function to refresh overview
@@ -135,6 +316,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load action buttons after a short delay to ensure UI utils are loaded
     setTimeout(loadActionButtons, 500);
     
+    // Initialize charts after a delay to ensure Chart.js is loaded
+    setTimeout(initializeCharts, 1000);
+    
     console.log('✅ Homepage initialized successfully');
 });
 
@@ -142,6 +326,7 @@ document.addEventListener('DOMContentLoaded', function() {
 window.switchTableTab = switchTableTab;
 window.updateChartPeriod = updateChartPeriod;
 window.refreshCharts = refreshCharts;
+window.initializeCharts = initializeCharts;
 window.refreshOverview = refreshOverview;
 window.exportOverview = exportOverview;
 window.quickAction = quickAction;

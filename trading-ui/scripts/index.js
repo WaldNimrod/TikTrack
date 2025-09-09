@@ -78,18 +78,52 @@ function initializeCharts() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                aspectRatio: 2.5, // יחס רוחב:גובה של 2.5:1 (מלבני)
                 plugins: {
                     title: {
                         display: true,
-                        text: 'ביצועי תיק מול מדד תל אביב 35'
+                        text: 'ביצועי תיק מול מדד תל אביב 35',
+                        font: {
+                            size: 14
+                        }
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                size: 12
+                            }
+                        }
                     }
                 },
                 scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'חודש',
+                            font: {
+                                size: 12
+                            }
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
+                        }
+                    },
                     y: {
                         beginAtZero: false,
                         title: {
                             display: true,
-                            text: 'תשואה (%)'
+                            text: 'תשואה (%)',
+                            font: {
+                                size: 12
+                            }
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
                         }
                     }
                 }
@@ -121,13 +155,23 @@ function initializeCharts() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                aspectRatio: 1.2, // יחס רוחב:גובה של 1.2:1 (כמעט מרובע)
                 plugins: {
                     title: {
                         display: true,
-                        text: 'חלוקת נכסים לפי סקטורים'
+                        text: 'חלוקת נכסים לפי סקטורים',
+                        font: {
+                            size: 14
+                        }
                     },
                     legend: {
-                        position: 'bottom'
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                size: 11
+                            },
+                            padding: 15
+                        }
                     }
                 }
             }
@@ -157,18 +201,44 @@ function initializeCharts() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                aspectRatio: 2.2, // יחס רוחב:גובה של 2.2:1 (מלבני)
                 plugins: {
                     title: {
                         display: true,
-                        text: 'השוואת ביצועים בין חשבונות'
+                        text: 'השוואת ביצועים בין חשבונות',
+                        font: {
+                            size: 14
+                        }
                     }
                 },
                 scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'חשבון',
+                            font: {
+                                size: 12
+                            }
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
+                        }
+                    },
                     y: {
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'תשואה (%)'
+                            text: 'תשואה (%)',
+                            font: {
+                                size: 12
+                            }
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
                         }
                     }
                 }
@@ -198,23 +268,46 @@ function initializeCharts() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                aspectRatio: 1.8, // יחס רוחב:גובה של 1.8:1 (מלבני)
                 plugins: {
                     title: {
                         display: true,
-                        text: 'ניתוח סיכון מול תשואה לפי מניות'
+                        text: 'ניתוח סיכון מול תשואה לפי מניות',
+                        font: {
+                            size: 14
+                        }
+                    },
+                    legend: {
+                        display: false
                     }
                 },
                 scales: {
                     x: {
                         title: {
                             display: true,
-                            text: 'רמת סיכון (%)'
+                            text: 'רמת סיכון (%)',
+                            font: {
+                                size: 12
+                            }
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
                         }
                     },
                     y: {
                         title: {
                             display: true,
-                            text: 'תשואה צפויה (%)'
+                            text: 'תשואה צפויה (%)',
+                            font: {
+                                size: 12
+                            }
+                        },
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
                         }
                     }
                 }

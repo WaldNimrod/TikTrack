@@ -59,12 +59,12 @@ margin: 0 auto;
 }
 
 #unified-header .header-top .logo-section {
-    order: 3;
+    order: 1;
     margin-right: auto;
 }
 
 #unified-header .header-top .header-nav {
-    order: 1;
+    order: 2;
     margin-left: auto;
 }
 
@@ -637,9 +637,7 @@ margin: 0 auto;
     direction: ltr;
 }
 
-#unified-header .logo-text {
-    margin-bottom: 10px;
-}
+/* REMOVED DUPLICATE logo-text definition that was overriding align-self: flex-end */
 
 #unified-header .logo-icon {
     max-width: 100%;

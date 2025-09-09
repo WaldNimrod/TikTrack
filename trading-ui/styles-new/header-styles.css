@@ -31,7 +31,6 @@ box-shadow: var(--apple-shadow-light);
 position: sticky;
 top: 0;
 z-index: 1000;
-max-width: 1360px;
 margin: 0 auto;
 }
 
@@ -341,7 +340,6 @@ margin: 0 auto;
     display: flex;
     align-items: center;
     gap: 1rem;
-    max-width: 1400px;
     margin: 0 auto;
 }
 

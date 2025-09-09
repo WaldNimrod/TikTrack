@@ -53,7 +53,6 @@
 
     <!-- Page body - all content after header -->
     <div class="page-body">
-      <!-- UI Content Section 1 Start -->
       <!-- Accounts area - top-Section -->
       <div class="top-section accounts-page">
         <!-- Accounts header -->
@@ -97,11 +96,9 @@
           </div>
         </div>
       </div> <!-- End top-section -->
-      <!-- UI Content Section 1 End -->
 
       <!-- Main content -->
       <div class="main-content">
-        <!-- UI Content Section 2 Start -->
         <!-- My accounts area - content-section -->
         <div class="content-section accounts-page" id="accountsMainSection">
           <!-- My accounts header -->
@@ -191,7 +188,6 @@
             </div>
           </div>
         </div>
-        <!-- UI Content Section 2 End -->
       </div>
     </div> <!-- End page-body -->
 
@@ -222,6 +218,54 @@
     <script src="scripts/central-refresh-system.js"></script>
     <script src="scripts/accounts.js"></script>
 
+    <script>
+      // ===== Sorting system - adapted for accounts =====
+
+      // Global variables for sorting
+      let accountsCurrentSortColumn = null;
+      let accountsCurrentSortDirection = 'asc';
+
+      /**
+       * Function for sorting the table
+       * 
+       * This function uses the global sorting system from main.js
+       * to sort the accounts table by the selected column.
+       * 
+       * @param {number} columnIndex - column index for sorting (0-6)
+       * 
+       * @requires window.sortTableData - global function from main.js
+       * @requires window.filteredAccountsData - filtered data
+       * @requires accountsData - original data
+       * @requires updateAccountsTable - function to update table
+       * 
+       * @since 2.0
+       */
+      function sortTable(columnIndex) {
+        console.log(`🔄 מיון טבלת חשבונות לפי עמודה ${columnIndex}`);
+
+        // Use global function
+        if (typeof window.sortTableData === 'function') {
+          const sortedData = window.sortTableData(
+            columnIndex,
+            window.filteredAccountsData || accountsData,
+            'accounts',
+            updateAccountsTable
+          );
+
+          // Update filtered data
+          window.filteredAccountsData = sortedData;
+        } else {
+          if (typeof handleFunctionNotFound === 'function') {
+            handleFunctionNotFound('sortTableData', 'פונקציית מיון טבלה לא נמצאה');
+          }
+        }
+      }
+
+      // Define function as global
+      window.sortTable = sortTable;
+
+      // All functions moved to accounts.js - using window functions from accounts.js
+    </script>
 
     <!-- Add Account Modal -->
     <div class="modal fade" id="addAccountModal" tabindex="-1" aria-labelledby="addAccountModalLabel" aria-hidden="true" data-bs-backdrop="true" data-bs-keyboard="true">

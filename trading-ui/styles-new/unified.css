@@ -1044,20 +1044,41 @@ button:disabled,
   padding: 1.5rem;
   border-radius: var(--apple-radius-medium);
   border: 1px solid var(--apple-border-light);
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
 }
 .chart-title {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--apple-text-primary);
-  margin-bottom: 1rem;
+  margin: 0;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
+.chart-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.chart-actions .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: 4px;
+}
 .chart-container {
   position: relative;
-  height: 300px;
-  margin-top: 1rem;
+  flex: 1;
+  min-height: 0;
+  margin-top: 0;
 }
 .stat-card {
   background: #ffffff;

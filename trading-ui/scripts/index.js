@@ -60,71 +60,83 @@ function initializeCharts() {
         performanceChart = new Chart(performanceCtx, {
             type: 'line',
             data: {
-                labels: ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'],
+                labels: ['ינ', 'פב', 'מרץ', 'אפר', 'מאי', 'יוני', 'יולי', 'אוג', 'ספט', 'אוק', 'נוב', 'דצמ'],
                 datasets: [{
                     label: 'תיק השקעות',
                     data: [100, 105, 102, 108, 115, 112, 118, 125, 122, 128, 135, 140],
                     borderColor: '#28a745',
                     backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                    tension: 0.4
+                    tension: 0.4,
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
                 }, {
                     label: 'מדד תל אביב 35',
                     data: [100, 103, 101, 106, 110, 108, 112, 116, 114, 118, 122, 125],
                     borderColor: '#007bff',
                     backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                    tension: 0.4
+                    tension: 0.4,
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                aspectRatio: 2.5, // יחס רוחב:גובה של 2.5:1 (מלבני)
+                aspectRatio: 3.5, // יחס רוחב:גובה של 3.5:1 (מלבני מאוד)
                 plugins: {
                     title: {
-                        display: true,
-                        text: 'ביצועי תיק מול מדד תל אביב 35',
-                        font: {
-                            size: 14
-                        }
+                        display: false // הסרת הכותרת מהגרף
                     },
                     legend: {
-                        position: 'bottom',
+                        position: 'top',
+                        align: 'start',
                         labels: {
                             font: {
-                                size: 12
-                            }
+                                size: 11
+                            },
+                            usePointStyle: true,
+                            pointStyle: 'line',
+                            padding: 20
                         }
                     }
                 },
                 scales: {
                     x: {
                         title: {
-                            display: true,
-                            text: 'חודש',
-                            font: {
-                                size: 12
-                            }
+                            display: false // הסרת כותרת ציר X
                         },
                         ticks: {
                             font: {
-                                size: 11
-                            }
+                                size: 10
+                            },
+                            maxTicksLimit: 8
+                        },
+                        grid: {
+                            display: false
                         }
                     },
                     y: {
                         beginAtZero: false,
                         title: {
-                            display: true,
-                            text: 'תשואה (%)',
-                            font: {
-                                size: 12
-                            }
+                            display: false // הסרת כותרת ציר Y
                         },
                         ticks: {
                             font: {
-                                size: 11
+                                size: 10
                             }
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)',
+                            drawBorder: false
                         }
+                    }
+                },
+                elements: {
+                    point: {
+                        hoverBackgroundColor: '#fff',
+                        hoverBorderWidth: 2
                     }
                 }
             }
@@ -137,10 +149,11 @@ function initializeCharts() {
         if (allocationChart) allocationChart.destroy();
         
         allocationChart = new Chart(allocationCtx, {
-            type: 'doughnut',
+            type: 'bar',
             data: {
                 labels: ['טכנולוגיה', 'פיננסים', 'בריאות', 'אנרגיה', 'תעשייה', 'אחר'],
                 datasets: [{
+                    label: 'אחוז מהתיק',
                     data: [35, 25, 15, 10, 10, 5],
                     backgroundColor: [
                         '#28a745',
@@ -149,28 +162,55 @@ function initializeCharts() {
                         '#ffc107',
                         '#6f42c1',
                         '#6c757d'
-                    ]
+                    ],
+                    borderWidth: 0,
+                    borderRadius: 4,
+                    borderSkipped: false
                 }]
             },
             options: {
+                indexAxis: 'y', // עמודות אופקיות
                 responsive: true,
                 maintainAspectRatio: false,
-                aspectRatio: 1.2, // יחס רוחב:גובה של 1.2:1 (כמעט מרובע)
+                aspectRatio: 2.8, // יחס רוחב:גובה של 2.8:1 (מלבני מאוד)
                 plugins: {
                     title: {
-                        display: true,
-                        text: 'חלוקת נכסים לפי סקטורים',
-                        font: {
-                            size: 14
-                        }
+                        display: false // הסרת הכותרת מהגרף
                     },
                     legend: {
-                        position: 'bottom',
-                        labels: {
+                        display: false // הסרת המקרא
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        max: 40,
+                        title: {
+                            display: false
+                        },
+                        ticks: {
                             font: {
-                                size: 11
+                                size: 10
                             },
-                            padding: 15
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        },
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 10
+                            }
+                        },
+                        grid: {
+                            display: false
                         }
                     }
                 }
@@ -186,59 +226,64 @@ function initializeCharts() {
         accountsChart = new Chart(accountsCtx, {
             type: 'bar',
             data: {
-                labels: ['חשבון USD', 'חשבון ILS', 'חשבון EUR', 'חשבון Crypto'],
+                labels: ['USD', 'ILS', 'EUR', 'Crypto'],
                 datasets: [{
                     label: 'תשואה שנתית (%)',
                     data: [12.5, 8.3, 15.2, 25.8],
                     backgroundColor: [
-                        'rgba(40, 167, 69, 0.8)',
-                        'rgba(0, 123, 255, 0.8)',
-                        'rgba(255, 193, 7, 0.8)',
-                        'rgba(220, 53, 69, 0.8)'
-                    ]
+                        '#28a745',
+                        '#007bff',
+                        '#ffc107',
+                        '#dc3545'
+                    ],
+                    borderWidth: 0,
+                    borderRadius: 6,
+                    borderSkipped: false
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                aspectRatio: 2.2, // יחס רוחב:גובה של 2.2:1 (מלבני)
+                aspectRatio: 3.2, // יחס רוחב:גובה של 3.2:1 (מלבני מאוד)
                 plugins: {
                     title: {
-                        display: true,
-                        text: 'השוואת ביצועים בין חשבונות',
-                        font: {
-                            size: 14
-                        }
+                        display: false // הסרת הכותרת מהגרף
+                    },
+                    legend: {
+                        display: false // הסרת המקרא
                     }
                 },
                 scales: {
                     x: {
                         title: {
-                            display: true,
-                            text: 'חשבון',
-                            font: {
-                                size: 12
-                            }
+                            display: false
                         },
                         ticks: {
                             font: {
-                                size: 11
+                                size: 10
                             }
+                        },
+                        grid: {
+                            display: false
                         }
                     },
                     y: {
                         beginAtZero: true,
+                        max: 30,
                         title: {
-                            display: true,
-                            text: 'תשואה (%)',
-                            font: {
-                                size: 12
-                            }
+                            display: false
                         },
                         ticks: {
                             font: {
-                                size: 11
+                                size: 10
+                            },
+                            callback: function(value) {
+                                return value + '%';
                             }
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)',
+                            drawBorder: false
                         }
                     }
                 }
@@ -261,21 +306,22 @@ function initializeCharts() {
                         {x: 4, y: 7}, {x: 6, y: 10}, {x: 8, y: 14}, {x: 2, y: 4},
                         {x: 10, y: 18}, {x: 1, y: 3}, {x: 11, y: 20}, {x: 12, y: 22}
                     ],
-                    backgroundColor: 'rgba(40, 167, 69, 0.6)',
-                    borderColor: '#28a745'
+                    backgroundColor: '#28a745',
+                    borderColor: '#28a745',
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#28a745',
+                    pointHoverBorderWidth: 2
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                aspectRatio: 1.8, // יחס רוחב:גובה של 1.8:1 (מלבני)
+                aspectRatio: 2.5, // יחס רוחב:גובה של 2.5:1 (מלבני)
                 plugins: {
                     title: {
-                        display: true,
-                        text: 'ניתוח סיכון מול תשואה לפי מניות',
-                        font: {
-                            size: 14
-                        }
+                        display: false // הסרת הכותרת מהגרף
                     },
                     legend: {
                         display: false
@@ -283,31 +329,41 @@ function initializeCharts() {
                 },
                 scales: {
                     x: {
+                        beginAtZero: true,
+                        max: 15,
                         title: {
-                            display: true,
-                            text: 'רמת סיכון (%)',
-                            font: {
-                                size: 12
-                            }
+                            display: false
                         },
                         ticks: {
                             font: {
-                                size: 11
+                                size: 10
+                            },
+                            callback: function(value) {
+                                return value + '%';
                             }
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)',
+                            drawBorder: false
                         }
                     },
                     y: {
+                        beginAtZero: true,
+                        max: 25,
                         title: {
-                            display: true,
-                            text: 'תשואה צפויה (%)',
-                            font: {
-                                size: 12
-                            }
+                            display: false
                         },
                         ticks: {
                             font: {
-                                size: 11
+                                size: 10
+                            },
+                            callback: function(value) {
+                                return value + '%';
                             }
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)',
+                            drawBorder: false
                         }
                     }
                 }
@@ -326,6 +382,48 @@ function refreshOverview() {
 function exportOverview() {
     console.log('📤 Exporting overview...');
     // Export logic would go here
+}
+
+// Function to export specific chart
+function exportChart(chartType) {
+    console.log('📤 Exporting chart:', chartType);
+    
+    let chart = null;
+    let filename = '';
+    
+    switch(chartType) {
+        case 'performance':
+            chart = performanceChart;
+            filename = 'performance-chart.png';
+            break;
+        case 'allocation':
+            chart = allocationChart;
+            filename = 'allocation-chart.png';
+            break;
+        case 'accounts':
+            chart = accountsChart;
+            filename = 'accounts-chart.png';
+            break;
+        case 'risk':
+            chart = riskChart;
+            filename = 'risk-chart.png';
+            break;
+        default:
+            console.warn('Unknown chart type:', chartType);
+            return;
+    }
+    
+    if (chart) {
+        // Create download link
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = chart.toBase64Image();
+        link.click();
+        
+        console.log('✅ Chart exported:', filename);
+    } else {
+        console.warn('Chart not found:', chartType);
+    }
 }
 
 // Function for quick actions
@@ -422,4 +520,5 @@ window.refreshCharts = refreshCharts;
 window.initializeCharts = initializeCharts;
 window.refreshOverview = refreshOverview;
 window.exportOverview = exportOverview;
+window.exportChart = exportChart;
 window.quickAction = quickAction;

@@ -45,9 +45,6 @@ margin: 0 auto;
     direction: rtl;
 }
 
-/* REMOVED DUPLICATE - kept the extended .filters-container */
-
-/* REMOVED DUPLICATE - kept the extended .header-filters with .show class */
 
 #unified-header .header-top {
     margin: 0;
@@ -158,21 +155,9 @@ margin: 0 auto;
     }
 }
 
-/* REMOVED DUPLICATE - kept #unified-header */
+/* ===== סגנונות ניווט ===== */
 
-/* REMOVED DUPLICATE - kept #unified-header .header-top */
-
-/* REMOVED DUPLICATE - kept #unified-header .header-container */
-
-/* REMOVED DUPLICATE navigation elements - kept #unified-header versions */
-
-/* REMOVED DUPLICATE navigation hover/active states - kept #unified-header versions */
-
-/* REMOVED DUPLICATE logo-section - kept #unified-header .logo-section */
-
-/* REMOVED DUPLICATE logo elements - kept #unified-header versions */
-
-        /* Dropdown Menus */
+/* ===== סגנונות תפריטים נפתחים ===== */
         .tiktrack-dropdown-menu {
             position: absolute;
             top: 100%;
@@ -257,9 +242,8 @@ margin: 0 auto;
             position: relative;
         }
         
-        /* Bootstrap 5 submenu base positioning - REMOVED - handled by unified.css */
 
-/* Cache clear button */
+/* ===== סגנונות כפתורים ===== */
 .cache-clear-btn {
     display: flex;
     align-items: center;
@@ -328,7 +312,7 @@ margin: 0 auto;
     transform: rotate(180deg) translateY(-5px);
 }
 
-/* Filters Section */
+/* ===== סגנונות פילטרים ===== */
 .header-filters {
     padding: 1rem 2rem;
     background: white;

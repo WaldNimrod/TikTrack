@@ -1587,6 +1587,7 @@ button:disabled,
 }
 
 /* From: _header-system-yesterday.css */
+/* ===== סגנונות בסיסיים לכותרת ===== */
 #unified-header {
     background: var(--apple-bg-elevated);
     border-bottom: 1px solid var(--apple-border-light);
@@ -1594,9 +1595,10 @@ button:disabled,
     position: sticky;
     top: 0;
     z-index: 1000;
+    max-width: 1360px;
+    margin: 0 auto;
 }
 #unified-header .header-container {
-    max-width: 1380px;
     margin: 0 auto;
     padding: 1rem 10px;
     display: flex;
@@ -1604,31 +1606,13 @@ button:disabled,
     align-items: center;
 }
 #unified-header .header-wrapper {
-    max-width: 1200px;
     margin: 0;
     padding: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
 }
-#unified-header .header-top {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    position: relative;
-}
-#unified-header .header-top .logo-section {
-    order: 3;
-    margin-inline-end: auto;
-}
-#unified-header .header-top .header-nav {
-    order: 1;
-    margin-inline-start: auto;
-}
+/* REMOVED DUPLICATE header-top definitions */
 #unified-header .page-title {
     position: absolute;
     left: 50%;
@@ -2002,7 +1986,6 @@ button:disabled,
     font-weight: 600;
 }
 #unified-header .header-filters {
-    max-width: 1380px;
     margin: 0 auto;
     padding: 1rem 10px;
     background: var(--apple-bg-elevated);
@@ -2015,10 +1998,8 @@ button:disabled,
     gap: 1rem;
     flex-wrap: wrap;
     direction: rtl;
-    max-width: 1380px;
     margin: 0 auto;
     padding: 0 10px;
-    width: 100%;
 }
 #unified-header .filter-group {
     position: relative;
@@ -2570,25 +2551,7 @@ button:disabled,
   }
 }
 
-/* From: _header-system.css */
-#unified-header {
-    background: var(--apple-bg-elevated);
-    border-bottom: 1px solid var(--apple-border-light);
-    box-shadow: var(--apple-shadow-light);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-#unified-header .header-container {
-    max-width: 1380px;
-    margin: 0 auto;
-    padding: 1rem 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    direction: rtl;
-}
+/* From: _header-system.css - REMOVED DUPLICATE */
 #unified-header .header-top {
     margin: 0;
     padding: 0;
@@ -3016,28 +2979,8 @@ body {
     transition: transform 0.2s ease;
     color: #ff9c05;
 }
-.header-filters {
-    padding: 1rem 2rem;
-    background: #f5f5f7;
-    border-top: 1px solid #e5e5e5;
-    position: relative;
-    z-index: 1000;
-    min-height: 60px;
-    display: none;
-}
-.header-filters.show {
-    display: block;
-}
-.filters-container {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 1rem;
-    flex-wrap: wrap;
-    direction: rtl;
-    min-height: 40px;
-    padding: 0.5rem 0;
-}
+/* REMOVED DUPLICATE header-filters definitions */
+/* REMOVED DUPLICATE filters-container definition */
 .filter-group {
     position: relative;
 }
@@ -4118,25 +4061,7 @@ table th.actions-cell {
   gap: 0.5rem;
 }
 
-/* From: _header-system-clean.css */
-#unified-header {
-    background: var(--apple-bg-elevated);
-    border-bottom: 1px solid var(--apple-border-light);
-    box-shadow: var(--apple-shadow-light);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-#unified-header .header-container {
-    max-width: 1380px;
-    margin: 0 auto;
-    padding: 1rem 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    direction: rtl;
-}
+/* From: _header-system-clean.css - REMOVED DUPLICATE */
 #unified-header .header-top {
     margin: 0;
     padding: 0;

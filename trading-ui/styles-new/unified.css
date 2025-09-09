@@ -1595,7 +1595,6 @@ button:disabled,
     position: sticky;
     top: 0;
     z-index: 1000;
-    max-width: 1360px;
     margin: 0 auto;
 }
 #unified-header .header-container {

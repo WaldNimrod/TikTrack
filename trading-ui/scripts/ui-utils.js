@@ -1156,7 +1156,7 @@ function generateActionButtons(entityId, entityType, status, detailsFunction, li
   if (showDetails) {
     buttonsHtml += `
       <button class="btn btn-sm btn-outline-success" onclick="${detailsFunction}('${entityType}', ${entityId})" title="פרטים">
-        <i class="bi bi-info-circle"></i>
+        👁️
       </button>`;
   }
 
@@ -1164,7 +1164,7 @@ function generateActionButtons(entityId, entityType, status, detailsFunction, li
   if (showLinked) {
     buttonsHtml += `
       <button class="btn btn-sm btn-outline-success" onclick="${linkedFunction}('${entityType}', ${entityId})" title="אובייקטים מקושרים">
-        <i class="bi bi-link-45deg"></i>
+        🔗
       </button>`;
   }
 
@@ -1172,7 +1172,7 @@ function generateActionButtons(entityId, entityType, status, detailsFunction, li
   if (showEdit) {
     buttonsHtml += `
       <button class="btn btn-sm btn-outline-warning" onclick="${editFunction}('${entityType}', ${entityId})" title="ערוך">
-        <i class="bi bi-pencil"></i>
+        ✏️
       </button>`;
   }
 
@@ -1181,20 +1181,20 @@ function generateActionButtons(entityId, entityType, status, detailsFunction, li
     const isCancelled = status === 'בוטל' || status === 'סגור';
     const buttonClass = isCancelled ? 'btn-outline-success' : 'btn-outline-danger';
     const buttonTitle = isCancelled ? 'שיחזר' : 'בטל';
-    const buttonIcon = isCancelled ? 'bi-arrow-clockwise' : 'bi-x-circle';
+    const buttonIcon = isCancelled ? '↻' : '❌';
     const buttonFunction = isCancelled ? restoreFunction : cancelFunction;
 
     buttonsHtml += `
       <button class="btn btn-sm ${buttonClass}" onclick="${buttonFunction}('${entityType}', ${entityId})" title="${buttonTitle}">
-        <i class="bi ${buttonIcon}"></i>
+        ${buttonIcon}
       </button>`;
   }
 
   // Delete button
   if (showDelete) {
     buttonsHtml += `
-      <button class="btn btn-sm btn-outline-danger" onclick="${deleteFunction}('${entityType}', ${entityId})" title="מחק">
-        <i class="bi bi-trash"></i>
+      <button class="btn btn-sm btn-outline-danger" onclick="${deleteFunction}('${entityType}', ${entityId})" title="מחק" style="font-size: 0.8em;">
+        🗑️
       </button>`;
   }
 
@@ -1255,6 +1255,79 @@ window.restoreSectionStates = window.restoreSectionStates;
 // Export action buttons system
 window.generateActionButtons = generateActionButtons;
 console.log('✅ generateActionButtons function exported to window');
+
+/**
+ * פונקציה לטעינת כפתורי פעולות לכל הטבלה
+ * @param {string} tableId - מזהה הטבלה
+ * @param {string} entityType - סוג הישות (ticker, trade, etc.)
+ * @param {Object} config - הגדרות הכפתורים
+ */
+function loadTableActionButtons(tableId, entityType, config = {}) {
+  const table = document.getElementById(tableId);
+  if (!table) {
+    console.error(`❌ Table ${tableId} not found`);
+    return;
+  }
+
+  const rows = table.querySelectorAll('tbody tr');
+  console.log(`🔧 Loading action buttons for ${rows.length} rows in table ${tableId}`);
+
+  rows.forEach((row, index) => {
+    const actionsCell = row.querySelector('.actions-cell');
+    if (!actionsCell) {
+      console.warn(`⚠️ No actions cell found in row ${index}`);
+      return;
+    }
+
+    // קבלת נתונים מהשורה
+    const entityId = actionsCell.dataset.entityId || (index + 1);
+    const status = actionsCell.dataset.status || 'פתוח';
+    
+    // הגדרות ברירת מחדל
+    const defaultConfig = {
+      showDetails: true,
+      showLinked: true,
+      showEdit: true,
+      showCancel: true,
+      showDelete: true,
+      detailsFunction: `view${entityType.charAt(0).toUpperCase() + entityType.slice(1)}Details`,
+      linkedFunction: `viewLinkedItems`,
+      editFunction: `edit${entityType.charAt(0).toUpperCase() + entityType.slice(1)}`,
+      cancelFunction: `cancel${entityType.charAt(0).toUpperCase() + entityType.slice(1)}`,
+      restoreFunction: `restore${entityType.charAt(0).toUpperCase() + entityType.slice(1)}`,
+      deleteFunction: `delete${entityType.charAt(0).toUpperCase() + entityType.slice(1)}`
+    };
+
+    // מיזוג עם הגדרות מותאמות אישית
+    const finalConfig = { ...defaultConfig, ...config };
+
+    // יצירת הכפתורים
+    const buttonsHtml = generateActionButtons(
+      entityId,
+      entityType,
+      status,
+      finalConfig.detailsFunction,
+      finalConfig.linkedFunction,
+      finalConfig.editFunction,
+      finalConfig.cancelFunction,
+      finalConfig.restoreFunction,
+      finalConfig.deleteFunction,
+      finalConfig.showDetails,
+      finalConfig.showLinked,
+      finalConfig.showEdit,
+      finalConfig.showCancel,
+      finalConfig.showDelete
+    );
+
+    actionsCell.innerHTML = buttonsHtml;
+  });
+
+  console.log(`✅ Action buttons loaded for ${rows.length} rows`);
+}
+
+// Export the new function
+window.loadTableActionButtons = loadTableActionButtons;
+console.log('✅ loadTableActionButtons function exported to window');
 
 // Export demo functions for testing
 window.viewTickerDetails = viewTickerDetails;

@@ -2,10 +2,12 @@
  * Test Header Only Page - JavaScript Functions
  * פונקציות JavaScript ספציפיות לעמוד בדיקת ראש הדף
  * 
- * @version 1.0.0
+ * @version 3.1.0
  * @lastUpdated January 15, 2025
  * @author TikTrack Development Team
  */
+
+console.log('🔧 test-header-only.js loaded successfully!');
 
 
 // ===== DEBUG FUNCTIONS =====
@@ -86,32 +88,37 @@ function updateDebugInfo() {
 function updateCurrentFilterStatus() {
     // פילטר סטטוס
     const statusText = document.getElementById('selectedStatus');
-    if (statusText) {
-        document.getElementById('currentStatusFilter').textContent = statusText.textContent;
+    const currentStatusFilter = document.getElementById('currentStatusFilter');
+    if (statusText && currentStatusFilter) {
+        currentStatusFilter.textContent = statusText.textContent;
     }
 
     // פילטר טיפוס
     const typeText = document.getElementById('selectedType');
-    if (typeText) {
-        document.getElementById('currentTypeFilter').textContent = typeText.textContent;
+    const currentTypeFilter = document.getElementById('currentTypeFilter');
+    if (typeText && currentTypeFilter) {
+        currentTypeFilter.textContent = typeText.textContent;
     }
 
     // פילטר חשבון
     const accountText = document.getElementById('selectedAccount');
-    if (accountText) {
-        document.getElementById('currentAccountFilter').textContent = accountText.textContent;
+    const currentAccountFilter = document.getElementById('currentAccountFilter');
+    if (accountText && currentAccountFilter) {
+        currentAccountFilter.textContent = accountText.textContent;
     }
 
     // פילטר תאריכים
     const dateRangeText = document.getElementById('selectedDateRange');
-    if (dateRangeText) {
-        document.getElementById('currentDateRangeFilter').textContent = dateRangeText.textContent;
+    const currentDateRangeFilter = document.getElementById('currentDateRangeFilter');
+    if (dateRangeText && currentDateRangeFilter) {
+        currentDateRangeFilter.textContent = dateRangeText.textContent;
     }
 
     // פילטר חיפוש
     const searchInput = document.getElementById('searchFilterInput');
-    if (searchInput) {
-        document.getElementById('currentSearchFilter').textContent = searchInput.value || 'אין חיפוש';
+    const currentSearchFilter = document.getElementById('currentSearchFilter');
+    if (searchInput && currentSearchFilter) {
+        currentSearchFilter.textContent = searchInput.value || 'אין חיפוש';
     }
 }
 
@@ -156,15 +163,24 @@ function updateTableStats() {
 function updateQuickStats() {
     // עדכון סטטיסטיקות מהירות
     const currentTime = new Date().toLocaleTimeString();
-    document.getElementById('currentTime').textContent = currentTime;
+    const currentTimeElement = document.getElementById('currentTime');
+    if (currentTimeElement) {
+        currentTimeElement.textContent = currentTime;
+    }
 
     // עדכון מספר טבלאות
     const tables = document.querySelectorAll('table');
-    document.getElementById('tablesCount').textContent = `${tables.length} טבלאות`;
+    const tablesCountElement = document.getElementById('tablesCount');
+    if (tablesCountElement) {
+        tablesCountElement.textContent = `${tables.length} טבלאות`;
+    }
 
     // עדכון מספר סקשנים
     const sections = document.querySelectorAll('.content-section');
-    document.getElementById('sectionsCount').textContent = `${sections.length} סקשנים`;
+    const sectionsCountElement = document.getElementById('sectionsCount');
+    if (sectionsCountElement) {
+        sectionsCountElement.textContent = `${sections.length} סקשנים`;
+    }
 }
 
 /**
@@ -211,67 +227,27 @@ function testSearchFilter() {
  * טעינת כפתורי פעולות לטבלה
  */
 function loadActionButtons() {
-    console.log('🔧 loadActionButtons called');
-    console.log('🔧 generateActionButtons function available:', typeof generateActionButtons);
+    console.log('🔧 loadActionButtons called - START');
+    console.log('🔧 loadTableActionButtons function available:', typeof window.loadTableActionButtons);
     
-    // טעינת כפתורים לשורה 1 (AAPL)
-    const cell1 = document.getElementById('actions-cell-1');
-    console.log('🔧 Cell 1 found:', !!cell1);
-    if (cell1 && typeof generateActionButtons === 'function') {
-        console.log('🔧 Loading buttons for cell 1...');
-        const buttonsHtml = generateActionButtons(1, 'ticker', 'פתוח', 'viewTickerDetails', 'viewLinkedItems', 'editTicker', 'cancelTicker', 'restoreTicker', 'deleteTicker', true, true, true, true, true);
-        cell1.innerHTML = buttonsHtml;
-        console.log('🔧 Cell 1 HTML set:', cell1.innerHTML.length, 'characters');
+    // טעינת כפתורים לכל הטבלה בבת אחת
+    if (typeof window.loadTableActionButtons === 'function') {
+        console.log('🔧 Loading action buttons for entire table...');
+        
+        // הגדרות מותאמות אישית לטבלת הטיקרים
+        const tickerConfig = {
+            showDetails: false,  // הסתרת כפתור פרטים
+            showLinked: true,
+            showEdit: true,
+            showCancel: true,
+            showDelete: true
+            // הפונקציות יוגדרו אוטומטית לפי entityType
+        };
+        
+        window.loadTableActionButtons('tickersTable', 'ticker', tickerConfig);
+        console.log('✅ Action buttons loaded for all rows');
     } else {
-        console.log('❌ Cell 1 not found or function not available');
-    }
-    
-    // טעינת כפתורים לשורה 2 (MSFT)
-    const cell2 = document.getElementById('actions-cell-2');
-    console.log('🔧 Cell 2 found:', !!cell2);
-    if (cell2 && typeof generateActionButtons === 'function') {
-        console.log('🔧 Loading buttons for cell 2...');
-        const buttonsHtml = generateActionButtons(2, 'ticker', 'פתוח', 'viewTickerDetails', 'viewLinkedItems', 'editTicker', 'cancelTicker', 'restoreTicker', 'deleteTicker', true, true, true, true, true);
-        cell2.innerHTML = buttonsHtml;
-        console.log('🔧 Cell 2 HTML set:', cell2.innerHTML.length, 'characters');
-    } else {
-        console.log('❌ Cell 2 not found or function not available');
-    }
-    
-    // טעינת כפתורים לשורה 3 (GOOGL)
-    const cell3 = document.getElementById('actions-cell-3');
-    console.log('🔧 Cell 3 found:', !!cell3);
-    if (cell3 && typeof generateActionButtons === 'function') {
-        console.log('🔧 Loading buttons for cell 3...');
-        const buttonsHtml = generateActionButtons(3, 'ticker', 'סגור', 'viewTickerDetails', 'viewLinkedItems', 'editTicker', 'cancelTicker', 'restoreTicker', 'deleteTicker', true, true, true, true, true);
-        cell3.innerHTML = buttonsHtml;
-        console.log('🔧 Cell 3 HTML set:', cell3.innerHTML.length, 'characters');
-    } else {
-        console.log('❌ Cell 3 not found or function not available');
-    }
-    
-    // טעינת כפתורים לשורה 4 (TSLA)
-    const cell4 = document.getElementById('actions-cell-4');
-    console.log('🔧 Cell 4 found:', !!cell4);
-    if (cell4 && typeof generateActionButtons === 'function') {
-        console.log('🔧 Loading buttons for cell 4...');
-        const buttonsHtml = generateActionButtons(4, 'ticker', 'פתוח', 'viewTickerDetails', 'viewLinkedItems', 'editTicker', 'cancelTicker', 'restoreTicker', 'deleteTicker', true, true, true, true, true);
-        cell4.innerHTML = buttonsHtml;
-        console.log('🔧 Cell 4 HTML set:', cell4.innerHTML.length, 'characters');
-    } else {
-        console.log('❌ Cell 4 not found or function not available');
-    }
-    
-    // טעינת כפתורים לשורה 5 (NVDA)
-    const cell5 = document.getElementById('actions-cell-5');
-    console.log('🔧 Cell 5 found:', !!cell5);
-    if (cell5 && typeof generateActionButtons === 'function') {
-        console.log('🔧 Loading buttons for cell 5...');
-        const buttonsHtml = generateActionButtons(5, 'ticker', 'פתוח', 'viewTickerDetails', 'viewLinkedItems', 'editTicker', 'cancelTicker', 'restoreTicker', 'deleteTicker', true, true, true, true, true);
-        cell5.innerHTML = buttonsHtml;
-        console.log('🔧 Cell 5 HTML set:', cell5.innerHTML.length, 'characters');
-    } else {
-        console.log('❌ Cell 5 not found or function not available');
+        console.log('❌ loadTableActionButtons function not available');
     }
 }
 
@@ -284,7 +260,11 @@ document.addEventListener('DOMContentLoaded', function() {
     updateQuickStats();
     
     // טעינת כפתורי פעולות אחרי שהדף נטען
-    setTimeout(loadActionButtons, 100);
+    console.log('🔧 Setting timeout for loadActionButtons...');
+    setTimeout(function() {
+        console.log('🔧 Timeout triggered, calling loadActionButtons...');
+        loadActionButtons();
+    }, 100);
 });
 
 // ===== TICKER TABLE FUNCTIONS =====

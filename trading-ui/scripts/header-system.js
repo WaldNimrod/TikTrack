@@ -70,8 +70,8 @@ class HeaderSystem {
       console.log('📝 Creating new header element...');
       headerElement = document.createElement('div');
       headerElement.id = 'unified-header';
-    // הכנסת הכותרת לתחילת הדף
-    document.body.insertBefore(headerElement, document.body.firstChild);
+      // הכנסת הכותרת לתחילת הדף
+      document.body.insertBefore(headerElement, document.body.firstChild);
     
     // הוספת כפתור הפילטר מחוץ ל-header
     const filterToggleSection = document.createElement('div');
@@ -697,7 +697,7 @@ class HeaderSystem {
 
                     <li class="tiktrack-nav-item dropdown">
                       <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="development-tools">
-                        <span class="nav-text">🔧 כלי פיתוח</span>
+                        <span class="nav-text">כלי פיתוח</span>
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
@@ -746,7 +746,6 @@ class HeaderSystem {
                       <a href="#" class="tiktrack-nav-link" onclick="clearDevelopmentCache(event)" 
                          title="נקה מטמון פיתוח">
                         <span class="nav-text" style="color: #ff0000; font-size: 1.2rem;">🧹</span>
-                        <span class="nav-text" style="color: #ff0000; font-size: 0.9rem; margin-right: 5px;">נקה Cache (פיתוח)</span>
                       </a>
                     </li>
                   </ul>

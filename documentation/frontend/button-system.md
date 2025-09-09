@@ -2,14 +2,24 @@
 
 ## סקירה כללית
 
-מערכת הכפתורים המרוכזת של TikTrack מספקת פתרון אחיד ויעיל לניהול כל כפתורי הפעולה במערכת. המערכת מרוכזת בקובץ `scripts/button-icons.js` ומבטיחה עקביות, תחזוקה קלה וביצועים טובים.
+מערכת הכפתורים המרוכזת של TikTrack מספקת פתרון אחיד ויעיל לניהול כל כפתורי הפעולה במערכת. המערכת כוללת שתי שכבות:
+
+1. **מערכת בסיסית** - `scripts/button-icons.js` - כפתורים בודדים
+2. **מערכת מתקדמת** - `scripts/ui-utils.js` - כפתורי פעולות לטבלאות דינמיות
+
+המערכת מבטיחה עקביות, תחזוקה קלה וביצועים טובים.
 
 ## ארכיטקטורה
 
-### קובץ מרכזי
+### מערכת בסיסית - כפתורים בודדים
 - **מיקום**: `trading-ui/scripts/button-icons.js`
-- **תפקיד**: ניהול מרכזי של כל כפתורי הפעולה
+- **תפקיד**: ניהול מרכזי של כפתורים בודדים
 - **טעינה**: נטען בכל העמודים לפני הסקריפטים הספציפיים
+
+### מערכת מתקדמת - כפתורי פעולות לטבלאות
+- **מיקום**: `trading-ui/scripts/ui-utils.js`
+- **תפקיד**: ניהול כפתורי פעולות לטבלאות דינמיות
+- **פונקציות**: `generateActionButtons`, `loadTableActionButtons`
 
 ### מערכת איקונים מרכזית
 ```javascript
@@ -91,6 +101,64 @@ ${createLinkButton(`viewLinkedItemsForTrade(${trade.id})`)}
 - `itemId` (number): מזהה הפריט
 - `size` (string, optional): גודל הכפתור
 - `additionalClasses` (string, optional): מחלקות CSS נוספות
+
+## מערכת מתקדמת - כפתורי פעולות לטבלאות
+
+### 1. `generateActionButtons(entityId, entityType, status, ...functions, ...showFlags)`
+**תפקיד**: יצירת כפתורי פעולות מלאים לשורה בודדת
+**פרמטרים**:
+- `entityId` (number): מזהה הישות
+- `entityType` (string): סוג הישות ('ticker', 'trade', etc.)
+- `status` (string): סטטוס הישות ('פתוח', 'סגור', etc.)
+- `detailsFunction` (string): שם פונקציה לפרטים
+- `linkedFunction` (string): שם פונקציה לקישור
+- `editFunction` (string): שם פונקציה לעריכה
+- `cancelFunction` (string): שם פונקציה לביטול
+- `restoreFunction` (string): שם פונקציה לשיחזור
+- `deleteFunction` (string): שם פונקציה למחיקה
+- `showDetails` (boolean): הצג כפתור פרטים
+- `showLinked` (boolean): הצג כפתור קישור
+- `showEdit` (boolean): הצג כפתור עריכה
+- `showCancel` (boolean): הצג כפתור ביטול/שיחזור
+- `showDelete` (boolean): הצג כפתור מחיקה
+
+**דוגמה**:
+```javascript
+const buttonsHtml = generateActionButtons(
+    1, 'ticker', 'פתוח',
+    'viewTickerDetails', 'viewLinkedItems', 'editTicker', 'cancelTicker', 'restoreTicker', 'deleteTicker',
+    true, true, true, true, true
+);
+```
+
+### 2. `loadTableActionButtons(tableId, entityType, config)`
+**תפקיד**: טעינת כפתורי פעולות לכל הטבלה בבת אחת
+**פרמטרים**:
+- `tableId` (string): מזהה הטבלה
+- `entityType` (string): סוג הישות
+- `config` (object): הגדרות הכפתורים
+
+**דוגמה**:
+```javascript
+loadTableActionButtons('tickersTable', 'ticker', {
+    showDetails: true,
+    showLinked: true,
+    showEdit: true,
+    showCancel: true,
+    showDelete: true
+});
+```
+
+**דוגמה עם הגדרות מותאמות**:
+```javascript
+loadTableActionButtons('tradesTable', 'trade', {
+    showDetails: false,  // ללא כפתור פרטים
+    showLinked: true,
+    showEdit: true,
+    showCancel: true,
+    showDelete: true
+});
+```
 
 ## שימוש בעמודים
 

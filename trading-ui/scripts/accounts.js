@@ -2738,6 +2738,51 @@ setTimeout(() => {
 
 console.log('✅ accounts.js נטען בהצלחה');
 
+// ===== Sorting system - adapted for accounts =====
+
+// Global variables for sorting
+let accountsCurrentSortColumn = null;
+let accountsCurrentSortDirection = 'asc';
+
+/**
+ * Function for sorting the table
+ * 
+ * This function uses the global sorting system from main.js
+ * to sort the accounts table by the selected column.
+ * 
+ * @param {number} columnIndex - column index for sorting (0-6)
+ * 
+ * @requires window.sortTableData - global function from main.js
+ * @requires window.filteredAccountsData - filtered data
+ * @requires accountsData - original data
+ * @requires updateAccountsTable - function to update table
+ * 
+ * @since 2.0
+ */
+function sortTable(columnIndex) {
+  console.log(`🔄 מיון טבלת חשבונות לפי עמודה ${columnIndex}`);
+
+  // Use global function
+  if (typeof window.sortTableData === 'function') {
+    const sortedData = window.sortTableData(
+      columnIndex,
+      window.filteredAccountsData || accountsData,
+      'accounts',
+      updateAccountsTable
+    );
+
+    // Update filtered data
+    window.filteredAccountsData = sortedData;
+  } else {
+    if (typeof handleFunctionNotFound === 'function') {
+      handleFunctionNotFound('sortTableData', 'פונקציית מיון טבלה לא נמצאה');
+    }
+  }
+}
+
+// Define function as global
+window.sortTable = sortTable;
+
 // סיום הקובץ
 console.log('✅ accounts.js נטען בהצלחה');
 

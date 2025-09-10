@@ -1678,20 +1678,30 @@ class HeaderSystem {
     allItem.addEventListener('click', e => {
       e.stopPropagation();
       // Use DOMContentLoaded to ensure functions are available
+      console.log('🔧 Setting up account filter click handler for "הכול"');
+      console.log('📊 Current DOM readyState:', document.readyState);
+
       if (document.readyState === 'loading') {
+        console.log('⏳ DOM still loading, waiting for DOMContentLoaded...');
         document.addEventListener('DOMContentLoaded', () => {
+          console.log('✅ DOMContentLoaded fired, checking selectAccountOption...');
           if (typeof selectAccountOption === 'function') {
+            console.log('✅ selectAccountOption available, calling with "הכול"');
             selectAccountOption('הכול');
           } else {
             console.error('❌ selectAccountOption not available after DOM load');
+            console.log('🔍 Available window functions:', Object.keys(window).filter(key => key.includes('select')));
           }
         });
       } else {
         // DOM already loaded
+        console.log('✅ DOM already loaded, checking selectAccountOption...');
         if (typeof selectAccountOption === 'function') {
+          console.log('✅ selectAccountOption available, calling with "הכול"');
           selectAccountOption('הכול');
         } else {
           console.error('❌ selectAccountOption not available');
+          console.log('🔍 Available window functions:', Object.keys(window).filter(key => key.includes('select')));
         }
       }
     });
@@ -1712,9 +1722,11 @@ class HeaderSystem {
       item.addEventListener('click', e => {
         e.stopPropagation();
         // Use DOMContentLoaded to ensure functions are available
+        console.log('🔧 Setting up account filter click handler for:', account.name);
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', () => {
             if (typeof selectAccountOption === 'function') {
+              console.log('✅ selectAccountOption available, calling with:', account.name);
               selectAccountOption(account.name);
             } else {
               console.error('❌ selectAccountOption not available after DOM load');
@@ -1723,6 +1735,7 @@ class HeaderSystem {
         } else {
           // DOM already loaded
           if (typeof selectAccountOption === 'function') {
+            console.log('✅ selectAccountOption available, calling with:', account.name);
             selectAccountOption(account.name);
           } else {
             console.error('❌ selectAccountOption not available');
@@ -1745,23 +1758,30 @@ class HeaderSystem {
         console.log('🔧 Date range filter item clicked:', item.getAttribute('data-value'));
 
         const range = item.getAttribute('data-value');
-          // Use DOMContentLoaded to ensure functions are available
-          if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-              if (typeof selectDateRangeOption === 'function') {
-                selectDateRangeOption(range);
-              } else {
-                console.error('❌ selectDateRangeOption not available after DOM load');
-              }
-            });
-          } else {
-            // DOM already loaded
+        // Use DOMContentLoaded to ensure functions are available
+        if (document.readyState === 'loading') {
+          console.log('⏳ DOM still loading, waiting for DOMContentLoaded (date range)...');
+          document.addEventListener('DOMContentLoaded', () => {
+            console.log('✅ DOMContentLoaded fired for date range, checking selectDateRangeOption...');
             if (typeof selectDateRangeOption === 'function') {
+              console.log('✅ selectDateRangeOption available, calling with:', range);
               selectDateRangeOption(range);
             } else {
-              console.error('❌ selectDateRangeOption not available');
+              console.error('❌ selectDateRangeOption not available after DOM load');
+              console.log('🔍 Available window functions:', Object.keys(window).filter(key => key.includes('select')));
             }
+          });
+        } else {
+          // DOM already loaded
+          console.log('✅ DOM already loaded, checking selectDateRangeOption...');
+          if (typeof selectDateRangeOption === 'function') {
+            console.log('✅ selectDateRangeOption available, calling with:', range);
+            selectDateRangeOption(range);
+          } else {
+            console.error('❌ selectDateRangeOption not available');
+            console.log('🔍 Available window functions:', Object.keys(window).filter(key => key.includes('select')));
           }
+        }
       });
     });
 
@@ -2774,20 +2794,30 @@ class HeaderSystem {
     allOption.addEventListener('click', e => {
       e.stopPropagation();
       // Use DOMContentLoaded to ensure functions are available
+      console.log('🔧 Setting up account filter click handler for "הכול"');
+      console.log('📊 Current DOM readyState:', document.readyState);
+
       if (document.readyState === 'loading') {
+        console.log('⏳ DOM still loading, waiting for DOMContentLoaded...');
         document.addEventListener('DOMContentLoaded', () => {
+          console.log('✅ DOMContentLoaded fired, checking selectAccountOption...');
           if (typeof selectAccountOption === 'function') {
+            console.log('✅ selectAccountOption available, calling with "הכול"');
             selectAccountOption('הכול');
           } else {
             console.error('❌ selectAccountOption not available after DOM load');
+            console.log('🔍 Available window functions:', Object.keys(window).filter(key => key.includes('select')));
           }
         });
       } else {
         // DOM already loaded
+        console.log('✅ DOM already loaded, checking selectAccountOption...');
         if (typeof selectAccountOption === 'function') {
+          console.log('✅ selectAccountOption available, calling with "הכול"');
           selectAccountOption('הכול');
         } else {
           console.error('❌ selectAccountOption not available');
+          console.log('🔍 Available window functions:', Object.keys(window).filter(key => key.includes('select')));
         }
       }
     });
@@ -2805,9 +2835,11 @@ class HeaderSystem {
       option.addEventListener('click', e => {
         e.stopPropagation();
         // Use DOMContentLoaded to ensure functions are available
+        console.log('🔧 Setting up account filter click handler for:', account.name);
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', () => {
             if (typeof selectAccountOption === 'function') {
+              console.log('✅ selectAccountOption available, calling with:', account.name);
               selectAccountOption(account.name);
             } else {
               console.error('❌ selectAccountOption not available after DOM load');
@@ -2816,6 +2848,7 @@ class HeaderSystem {
         } else {
           // DOM already loaded
           if (typeof selectAccountOption === 'function') {
+            console.log('✅ selectAccountOption available, calling with:', account.name);
             selectAccountOption(account.name);
           } else {
             console.error('❌ selectAccountOption not available');

@@ -25,14 +25,13 @@
 
 /* ===== סגנונות בסיסיים לכותרת ===== */
 #unified-header {
-background: var(--apple-bg-elevated);
-border-bottom: 1px solid var(--apple-border-light);
-box-shadow: var(--apple-shadow-light);
-position: sticky;
-top: 0;
-z-index: 1000;
-max-width: 1360px;
-margin: 0 auto;
+    background: var(--apple-bg-elevated);
+    border-bottom: 1px solid var(--apple-border-light);
+    box-shadow: var(--apple-shadow-light);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    margin: 0 auto;
 }
 
 #unified-header .header-container {
@@ -42,6 +41,7 @@ margin: 0 auto;
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    max-width: 1360px;
     direction: rtl;
 }
 

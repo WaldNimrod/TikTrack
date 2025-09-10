@@ -55,7 +55,7 @@
 - [שלב 21: בדיקה חוזרת מול תבנית הבסיס](#שלב-21-בדיקה-חוזרת-מול-תבנית-הבסיס)
 - [שלב 22: גיבוי לגיט האב](#שלב-22-גיבוי-לגיט-האב)
 - [שלב 23: בדיקות נוספות לאימות מבנה תקין](#שלב-23-בדיקות-נוספות-לאימות-מבנה-תקין)
-- [שלב 24: שילוב כפתורי פעולות בעמודת פעולות](#שלב-24-שילוב-כפתורי-פעולות-בעמודת-פעולות)
+- [שלב 24: בדיקת תוכן מחוץ לסקשנים](#שלב-24-בדיקת-תוכן-מחוץ-לסקשנים)
 - [שלב 25: עדכון רשימת המשימות והמדריך](#שלב-25-עדכון-רשימת-המשימות-והמדריך) ⚠️ **שלב אחרון תמיד**
 
 ## 🎯 תובנות מעשיות מהעבודה על עמודים
@@ -1912,9 +1912,6 @@ git push origin "page-name-v2.0"
 # בדוק שהעמוד עובד בכל הדפדפנים
 ```
 
-### שלב 24: שילוב כפתורי פעולות בעמודת פעולות
-
-**⚠️ שלב זה מתבצע רק אחרי שהטבלאות מוכנות ופועלות!**
 
 #### 24.1 מערכת כפתורי פעולות
 
@@ -1968,6 +1965,174 @@ loadTableActionButtons('alerts-table', 'alert', {
     showCancel: true,
     showDelete: true
 });
+```
+
+## שלב 24: בדיקת תוכן מחוץ לסקשנים
+
+### 24.1 זיהוי תוכן מחוץ לסקשנים
+
+**חשוב**: אחרי הזרקת התוכן לסקשנים, יש לבדוק שאין תוכן מחוץ לסקשנים.
+
+#### בדיקה 1: זיהוי תוכן בין ההערות
+```bash
+# בדוק מה יש בין ההערות CONTENT SECTIONS START/END
+grep -A 50 "CONTENT SECTIONS START" trading-ui/page-name.html | grep -B 50 "CONTENT SECTIONS END"
+```
+
+#### בדיקה 2: זיהוי תוכן מחוץ לסקשנים
+```bash
+# בדוק אם יש תוכן בין הסקשנים
+grep -A 10 "UI Content Section.*End" trading-ui/page-name.html | grep -B 10 "UI Content Section.*Start"
+```
+
+### 24.2 תיקון תוכן מחוץ לסקשנים
+
+#### שלב 1: זיהוי הבעיה
+```bash
+# חפש תוכן שלא נמצא בתוך section-body
+grep -n "table\|div\|p\|h[1-6]" trading-ui/page-name.html | grep -v "section-body"
+```
+
+#### שלב 2: העברת תוכן לסקשן מתאים
+```html
+<!-- שגוי - תוכן מחוץ לסקשנים -->
+<div class="main-content">
+  <!-- UI Content Section 1 Start -->
+  <div class="content-section" id="section1">
+    <div class="section-body">
+      <!-- תוכן סקשן 1 -->
+    </div>
+  </div>
+  <!-- UI Content Section 1 End -->
+  
+  <!-- תוכן שלא שייך לשום סקשן - שגוי! -->
+  <div class="table-responsive">
+    <table class="table">
+      <!-- תוכן הטבלה -->
+    </table>
+  </div>
+  
+  <!-- UI Content Section 2 Start -->
+  <div class="content-section" id="section2">
+    <div class="section-body">
+      <!-- תוכן סקשן 2 -->
+    </div>
+  </div>
+  <!-- UI Content Section 2 End -->
+</div>
+```
+
+```html
+<!-- נכון - כל התוכן בתוך סקשנים -->
+<div class="main-content">
+  <!-- UI Content Section 1 Start -->
+  <div class="content-section" id="section1">
+    <div class="section-body">
+      <!-- תוכן סקשן 1 -->
+    </div>
+  </div>
+  <!-- UI Content Section 1 End -->
+  
+  <!-- UI Content Section 2 Start -->
+  <div class="content-section" id="section2">
+    <div class="section-body">
+      <!-- תוכן סקשן 2 -->
+      <div class="table-responsive">
+        <table class="table">
+          <!-- תוכן הטבלה -->
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- UI Content Section 2 End -->
+</div>
+```
+
+### 24.3 כללים לתיקון
+
+#### ✅ **מה מותר מחוץ לסקשנים:**
+- **רווחים**: `<div style="height: 3rem;"></div>`
+- **מערכות**: `<div class="notification-container"></div>`
+- **מודלים**: `<div class="modal">...</div>`
+- **סקריפטים**: `<script src="..."></script>`
+
+#### ❌ **מה אסור מחוץ לסקשנים:**
+- **טבלאות**: `<table class="table">...</table>`
+- **כרטיסים**: `<div class="card">...</div>`
+- **פורמים**: `<form>...</form>`
+- **תוכן עסקי**: כל תוכן שקשור לפונקציונליות העמוד
+
+### 24.4 בדיקה סופית
+
+#### בדיקה 1: אין תוכן מחוץ לסקשנים
+```bash
+# בדוק שאין תוכן בין הסקשנים
+grep -A 5 "UI Content Section.*End" trading-ui/page-name.html | grep -B 5 "UI Content Section.*Start"
+# חייב להיות: רק הערות HTML, ללא תוכן
+```
+
+#### בדיקה 2: כל התוכן בתוך section-body
+```bash
+# בדוק שכל התוכן נמצא בתוך section-body
+grep -n "table\|div\|p\|h[1-6]" trading-ui/page-name.html | grep -v "section-body"
+# חייב להיות: רק אלמנטים טכניים (רווחים, מערכות, סקריפטים)
+```
+
+#### בדיקה 3: מבנה תקין
+```bash
+# בדוק שהמבנה תקין
+grep "UI Content Section.*Start\|UI Content Section.*End" trading-ui/page-name.html
+# חייב להיות: מספר זוגי של הערות (התחלה + סיום לכל סקשן)
+```
+
+### 24.5 דוגמה מעשית: תיקון עמוד התראות
+
+**הבעיה שזוהתה:**
+```html
+<!-- שגוי - תוכן מחוץ לסקשנים -->
+<div class="main-content">
+  <!-- UI Content Section 1 Start -->
+  <div class="content-section" id="section1">
+    <div class="section-body">
+      <!-- קומפוננט התראות פעילות -->
+    </div>
+  </div>
+  <!-- UI Content Section 1 End -->
+  
+  <!-- תוכן שלא שייך לשום סקשן - שגוי! -->
+  <div class="table-responsive">
+    <table class="table" data-table-type="alerts">
+      <!-- טבלת התראות -->
+    </table>
+  </div>
+</div>
+```
+
+**הפתרון:**
+```html
+<!-- נכון - כל התוכן בתוך סקשנים -->
+<div class="main-content">
+  <!-- UI Content Section 1 Start -->
+  <div class="content-section" id="section1">
+    <div class="section-body">
+      <!-- קומפוננט התראות פעילות -->
+    </div>
+  </div>
+  <!-- UI Content Section 1 End -->
+  
+  <!-- UI Content Section 2 Start -->
+  <div class="content-section" id="section2">
+    <div class="section-body">
+      <!-- טבלת התראות -->
+      <div class="table-responsive">
+        <table class="table" data-table-type="alerts">
+          <!-- טבלת התראות -->
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- UI Content Section 2 End -->
+</div>
 ```
 
 ### שלב 25: עדכון רשימת המשימות והמדריך ⚠️ **שלב אחרון תמיד**

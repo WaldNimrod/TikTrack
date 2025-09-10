@@ -47,6 +47,43 @@ let alertsData = [];
 
 // בדיקה שהפונקציות הגלובליות זמינות
 
+// אתחול מערכת ראש הדף החדשה
+document.addEventListener("DOMContentLoaded", () => {
+  console.log('🚀 טעינת דף התראות עם מערכת ראש דף חדשה...');
+
+  // אתחול HeaderSystem
+  if (window.headerSystem && !window.headerSystem.isInitialized) {
+    console.log('✅ אתחול HeaderSystem...');
+    window.headerSystem.init();
+  }
+
+  // וידוא שהמודולים נסגרים בלחיצה על הרקע
+  const modals = document.querySelectorAll('.modal');
+  modals.forEach(modal => {
+    // הוספת data-bs-backdrop אם לא קיים
+    if (!modal.hasAttribute('data-bs-backdrop')) {
+      modal.setAttribute('data-bs-backdrop', 'true');
+    }
+    
+    // הוספת data-bs-keyboard אם לא קיים
+    if (!modal.hasAttribute('data-bs-keyboard')) {
+      modal.setAttribute('data-bs-keyboard', 'true');
+    }
+
+    // הוספת event listener לסגירה בלחיצה על הרקע
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        const modalInstance = bootstrap.Modal.getInstance(modal);
+        if (modalInstance) {
+          modalInstance.hide();
+        }
+      }
+    });
+  });
+
+  console.log('✅ מודולים הוגדרו לסגירה בלחיצה על הרקע');
+});
+
 
 // נתוני דמה
 const demoAlerts = [
@@ -610,7 +647,7 @@ function updateAlertsTable(alerts) {
 
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
-          <td class="actions-cell">
+          <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
             <div class="btn-group btn-group-sm" role="group" style="gap: 2px;">
               <button class="btn btn-info" 
                       onclick="viewLinkedItemsForAlert(${alert.id})" 
@@ -2198,6 +2235,24 @@ if (typeof window.toggleMainSection !== 'function') {
 
       // שמירת המצב ב-localStorage
       localStorage.setItem('alertsSectionCollapsed', !isCollapsed);
+    }
+  };
+}
+
+// פונקציה כללית לסגירה/פתיחה של סקשנים
+if (typeof window.toggleSection !== 'function') {
+  window.toggleSection = function (sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      const body = section.querySelector('.section-body');
+      const icon = section.querySelector('.section-toggle-icon');
+      if (body) {
+        const isHidden = body.style.display === 'none';
+        body.style.display = isHidden ? 'block' : 'none';
+        if (icon) {
+          icon.textContent = isHidden ? '▼' : '▲';
+        }
+      }
     }
   };
 }

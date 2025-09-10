@@ -1677,21 +1677,7 @@ class HeaderSystem {
     // הוספת event listener לאופציית "הכול"
     allItem.addEventListener('click', e => {
       e.stopPropagation();
-
-      // הסרת בחירה מכל הפריטים
-      accountMenu.querySelectorAll('.account-filter-item').forEach(item => {
-        item.classList.remove('selected');
-      });
-
-      // בחירת "הכול"
-      allItem.classList.add('selected');
-
-      // עדכון הפילטר
-      if (window.headerSystem && window.headerSystem.updateAccountFilterDisplayText) {
-        window.headerSystem.updateAccountFilterDisplayText();
-      } else {
-        updateAccountFilterDisplayText();
-      }
+      selectAccountOption('הכול');
     });
 
     accountMenu.appendChild(allItem);
@@ -1709,21 +1695,7 @@ class HeaderSystem {
       // הוספת event listener
       item.addEventListener('click', e => {
         e.stopPropagation();
-
-        // הסרת בחירה מ"הכול"
-        const currentAllItem = accountMenu.querySelector('[data-value="הכול"]');
-        if (currentAllItem) {
-          currentAllItem.classList.remove('selected');
-        }
-
-        item.classList.toggle('selected');
-
-        // עדכון הפילטר
-        if (window.headerSystem && window.headerSystem.updateAccountFilterDisplayText) {
-          window.headerSystem.updateAccountFilterDisplayText();
-        } else {
-          updateAccountFilterDisplayText();
-        }
+        selectAccountOption(account.name);
       });
 
       accountMenu.appendChild(item);
@@ -1737,22 +1709,11 @@ class HeaderSystem {
       item.addEventListener('click', e => {
         e.preventDefault();
         e.stopPropagation();
-        
-        console.log('🔧 Date range filter item clicked:', item.getAttribute('data-range'));
-        
-        const range = item.getAttribute('data-range');
-        const text = item.textContent.trim();
 
-        // עדכון הטקסט המוצג
-        document.getElementById('selectedDateRange').textContent = text;
+        console.log('🔧 Date range filter item clicked:', item.getAttribute('data-value'));
 
-        // עדכון הפילטר במערכת
-        if (window.filterSystem) {
-          window.filterSystem.updateFilter('dateRange', range);
-        }
-
-        // סגירת הדרופדאון
-        this.closeAllDropdowns();
+        const range = item.getAttribute('data-value');
+        selectDateRangeOption(range);
       });
     });
 

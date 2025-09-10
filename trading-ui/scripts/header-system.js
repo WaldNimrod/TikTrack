@@ -632,8 +632,7 @@ class HeaderSystem {
                   <ul class="tiktrack-nav-list">
                     <li class="tiktrack-nav-item">
                       <a href="/" class="tiktrack-nav-link" data-page="home">
-                        <img src="images/icons/home.svg" alt="בית" width="24" height="24" class="nav-icon">
-                        <span class="nav-text">בית</span>
+                        <img src="images/icons/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only">
                       </a>
                     </li>
 

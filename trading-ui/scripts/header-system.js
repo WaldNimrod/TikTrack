@@ -632,7 +632,7 @@ class HeaderSystem {
                   <ul class="tiktrack-nav-list">
                     <li class="tiktrack-nav-item">
                       <a href="/" class="tiktrack-nav-link" data-page="home">
-                        <span class="nav-text">בית</span>
+                        <i class="home-icon">🏠</i>
                       </a>
                     </li>
 

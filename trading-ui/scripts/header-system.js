@@ -1677,21 +1677,23 @@ class HeaderSystem {
     // הוספת event listener לאופציית "הכול"
     allItem.addEventListener('click', e => {
       e.stopPropagation();
-      setTimeout(() => {
+      // Use DOMContentLoaded to ensure functions are available
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          if (typeof selectAccountOption === 'function') {
+            selectAccountOption('הכול');
+          } else {
+            console.error('❌ selectAccountOption not available after DOM load');
+          }
+        });
+      } else {
+        // DOM already loaded
         if (typeof selectAccountOption === 'function') {
           selectAccountOption('הכול');
         } else {
-          console.warn('⚠️ selectAccountOption not available yet');
-          // Try again after another delay
-          setTimeout(() => {
-            if (typeof selectAccountOption === 'function') {
-              selectAccountOption('הכול');
-            } else {
-              console.error('❌ selectAccountOption still not available');
-            }
-          }, 100);
+          console.error('❌ selectAccountOption not available');
         }
-      }, 100);
+      }
     });
 
     accountMenu.appendChild(allItem);
@@ -1709,21 +1711,23 @@ class HeaderSystem {
       // הוספת event listener
       item.addEventListener('click', e => {
         e.stopPropagation();
-        setTimeout(() => {
+        // Use DOMContentLoaded to ensure functions are available
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', () => {
+            if (typeof selectAccountOption === 'function') {
+              selectAccountOption(account.name);
+            } else {
+              console.error('❌ selectAccountOption not available after DOM load');
+            }
+          });
+        } else {
+          // DOM already loaded
           if (typeof selectAccountOption === 'function') {
             selectAccountOption(account.name);
           } else {
-            console.warn('⚠️ selectAccountOption not available yet');
-            // Try again after another delay
-            setTimeout(() => {
-              if (typeof selectAccountOption === 'function') {
-                selectAccountOption(account.name);
-              } else {
-                console.error('❌ selectAccountOption still not available');
-              }
-            }, 100);
+            console.error('❌ selectAccountOption not available');
           }
-        }, 100);
+        }
       });
 
       accountMenu.appendChild(item);
@@ -1731,7 +1735,7 @@ class HeaderSystem {
   }
 
   setupFilterItemEventListeners() {
-    // Event listeners לפריטי פילטר תאריכים - עם setTimeout למניעת בעיות טעינה
+    // Event listeners לפריטי פילטר תאריכים - עם DOMContentLoaded למניעת בעיות טעינה
     const dateItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
     dateItems.forEach(item => {
       item.addEventListener('click', e => {
@@ -1741,21 +1745,23 @@ class HeaderSystem {
         console.log('🔧 Date range filter item clicked:', item.getAttribute('data-value'));
 
         const range = item.getAttribute('data-value');
-          setTimeout(() => {
+          // Use DOMContentLoaded to ensure functions are available
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+              if (typeof selectDateRangeOption === 'function') {
+                selectDateRangeOption(range);
+              } else {
+                console.error('❌ selectDateRangeOption not available after DOM load');
+              }
+            });
+          } else {
+            // DOM already loaded
             if (typeof selectDateRangeOption === 'function') {
               selectDateRangeOption(range);
             } else {
-              console.warn('⚠️ selectDateRangeOption not available yet');
-              // Try again after another delay
-              setTimeout(() => {
-                if (typeof selectDateRangeOption === 'function') {
-                  selectDateRangeOption(range);
-                } else {
-                  console.error('❌ selectDateRangeOption still not available');
-                }
-              }, 100);
+              console.error('❌ selectDateRangeOption not available');
             }
-          }, 100);
+          }
       });
     });
 
@@ -2767,21 +2773,23 @@ class HeaderSystem {
     `;
     allOption.addEventListener('click', e => {
       e.stopPropagation();
-      setTimeout(() => {
+      // Use DOMContentLoaded to ensure functions are available
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          if (typeof selectAccountOption === 'function') {
+            selectAccountOption('הכול');
+          } else {
+            console.error('❌ selectAccountOption not available after DOM load');
+          }
+        });
+      } else {
+        // DOM already loaded
         if (typeof selectAccountOption === 'function') {
           selectAccountOption('הכול');
         } else {
-          console.warn('⚠️ selectAccountOption not available yet');
-          // Try again after another delay
-          setTimeout(() => {
-            if (typeof selectAccountOption === 'function') {
-              selectAccountOption('הכול');
-            } else {
-              console.error('❌ selectAccountOption still not available');
-            }
-          }, 100);
+          console.error('❌ selectAccountOption not available');
         }
-      }, 100);
+      }
     });
     accountMenu.appendChild(allOption);
 
@@ -2796,21 +2804,23 @@ class HeaderSystem {
       `;
       option.addEventListener('click', e => {
         e.stopPropagation();
-        setTimeout(() => {
+        // Use DOMContentLoaded to ensure functions are available
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', () => {
+            if (typeof selectAccountOption === 'function') {
+              selectAccountOption(account.name);
+            } else {
+              console.error('❌ selectAccountOption not available after DOM load');
+            }
+          });
+        } else {
+          // DOM already loaded
           if (typeof selectAccountOption === 'function') {
             selectAccountOption(account.name);
           } else {
-            console.warn('⚠️ selectAccountOption not available yet');
-            // Try again after another delay
-            setTimeout(() => {
-              if (typeof selectAccountOption === 'function') {
-                selectAccountOption(account.name);
-              } else {
-                console.error('❌ selectAccountOption still not available');
-              }
-            }, 100);
+            console.error('❌ selectAccountOption not available');
           }
-        }, 100);
+        }
       });
       accountMenu.appendChild(option);
     });
@@ -4497,23 +4507,25 @@ async function resetFiltersToDefaults() {
     // עדכון טקסט פילטר תאריכים - הפעלת הפונקציה במקום עדכון ישיר
     const selectedDateRangeElement = document.getElementById('selectedDateRange');
     if (selectedDateRangeElement && dateRangeValue !== 'כל זמן') {
-      // נשתמש ב-setTimeout כדי לתת לפונקציות להיטען
-      setTimeout(() => {
+      // Use DOMContentLoaded to ensure functions are available
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          if (typeof selectDateRangeOption === 'function') {
+            selectDateRangeOption(dateRangeValue);
+          } else {
+            console.error('❌ selectDateRangeOption not available after DOM load');
+            selectedDateRangeElement.textContent = dateRangeValue;
+          }
+        });
+      } else {
+        // DOM already loaded
         if (typeof selectDateRangeOption === 'function') {
           selectDateRangeOption(dateRangeValue);
         } else {
-          console.warn('⚠️ selectDateRangeOption not available yet');
-          // Try again after another delay
-          setTimeout(() => {
-            if (typeof selectDateRangeOption === 'function') {
-              selectDateRangeOption(dateRangeValue);
-            } else {
-              console.error('❌ selectDateRangeOption still not available');
-              selectedDateRangeElement.textContent = dateRangeValue;
-            }
-          }, 150);
+          console.error('❌ selectDateRangeOption not available');
+          selectedDateRangeElement.textContent = dateRangeValue;
         }
-      }, 150);
+      }
     } else if (selectedDateRangeElement) {
       selectedDateRangeElement.textContent = 'כל זמן';
     }

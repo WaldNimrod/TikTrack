@@ -38,10 +38,9 @@ margin: 0 auto;
     margin: 0 auto;
     padding: 1rem 10px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     width: 100%;
-    direction: rtl;
 }
 
 
@@ -1023,7 +1022,8 @@ margin: 0 auto;
     padding: 1rem 10px;
     background: var(--apple-bg-elevated);
     border-top: 1px solid var(--apple-border-light);
-    display: block;
+    display: flex;
+    justify-content: center;
 }
 
 #unified-header .filters-container {
@@ -1031,7 +1031,7 @@ margin: 0 auto;
     align-items: center;
     gap: 1rem;
     flex-wrap: wrap;
-    direction: rtl;
+    justify-content: center;
     margin: 0 auto;
     padding: 0 10px;
 }

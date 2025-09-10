@@ -3847,8 +3847,7 @@ function applySearchFilter(searchTerm) {
 // ייצוא פונקציות בחירה לגלובל
 window.selectStatusOption = selectStatusOption;
 window.selectTypeOption = selectTypeOption;
-window.selectAccountOption = selectAccountOption;
-window.selectDateRangeOption = selectDateRangeOption;
+// selectAccountOption and selectDateRangeOption are now exported from filter-system.js
 
 // ייצוא פונקציות פילטר לגלובל
 window.applyStatusFilter = applyStatusFilter;

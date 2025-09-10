@@ -1210,6 +1210,35 @@ function selectAccountOption(account) {
   }
 }
 
+/**
+ * בחירת אפשרות פילטר תאריכים
+ */
+function selectDateRangeOption(dateRange) {
+  console.log('🔧 selectDateRangeOption called with:', dateRange);
+
+  // הסרת בחירה מכל הפריטים
+  const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+  dateRangeItems.forEach(item => item.classList.remove('selected'));
+
+  // בחירת הפריט שנלחץ
+  const clickedItem = Array.from(dateRangeItems).find(item => item.getAttribute('data-value') === dateRange);
+  if (clickedItem) {
+    clickedItem.classList.add('selected');
+  }
+
+  // עדכון טקסט ההצגה
+  updateDateRangeFilterText();
+
+  // הפעלת הפילטר
+  applyDateRangeFilter(dateRange);
+
+  // סגירת התפריט
+  const dateMenu = document.getElementById('dateRangeFilterMenu');
+  if (dateMenu) {
+    dateMenu.classList.remove('show');
+  }
+}
+
 // ===== FILTER TEXT UPDATE FUNCTIONS =====
 
 function updateStatusFilterText() {
@@ -1245,7 +1274,7 @@ function updateTypeFilterText() {
 function updateAccountFilterText() {
   const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
   const accountElement = document.getElementById('selectedAccount');
-  
+
   if (accountElement) {
     if (selectedItems.length === 0 || (selectedItems.length === 1 && selectedItems[0].getAttribute('data-value') === 'הכול')) {
       accountElement.textContent = 'כל החשבונות';
@@ -1253,6 +1282,23 @@ function updateAccountFilterText() {
       accountElement.textContent = selectedItems[0].getAttribute('data-value');
     } else {
       accountElement.textContent = `${selectedItems.length} חשבונות`;
+    }
+  }
+}
+
+function updateDateRangeFilterText() {
+  const selectedItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item.selected');
+  const dateRangeElement = document.getElementById('selectedDateRange');
+
+  if (dateRangeElement) {
+    if (selectedItems.length === 0) {
+      dateRangeElement.textContent = 'כל זמן';
+    } else if (selectedItems.length === 1) {
+      const item = selectedItems[0];
+      const value = item.getAttribute('data-value');
+      dateRangeElement.textContent = value;
+    } else {
+      dateRangeElement.textContent = `${selectedItems.length} טווחי זמן`;
     }
   }
 }
@@ -1300,9 +1346,11 @@ function applyAccountFilter() {
 window.selectStatusOption = selectStatusOption;
 window.selectTypeOption = selectTypeOption;
 window.selectAccountOption = selectAccountOption;
+window.selectDateRangeOption = selectDateRangeOption;
 window.updateStatusFilterText = updateStatusFilterText;
 window.updateTypeFilterText = updateTypeFilterText;
 window.updateAccountFilterText = updateAccountFilterText;
+window.updateDateRangeFilterText = updateDateRangeFilterText;
 window.applyStatusFilter = applyStatusFilter;
 window.applyTypeFilter = applyTypeFilter;
 window.applyAccountFilter = applyAccountFilter;

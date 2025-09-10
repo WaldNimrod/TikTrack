@@ -38,6 +38,1201 @@
  * SCOPE RULE: כל selector חייב להתחיל ב-#unified-header
  */
 
+/* ===== סגנונות אלמנט ראש הדף החדש ===== */
+/* סגנונות אלה מיועדים רק לאלמנט unified-header */
+
+/* סגנונות לוגו - מועברים מ-menu.css */
+#unified-header .logo-section {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    direction: ltr;
+    /* הלוגו צריך להיות LTR */
+}
+
+#unified-header .logo-text {
+    margin-bottom: 10px;
+}
+
+#unified-header .logo-icon {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    margin: 16px 0;
+}
+
+#unified-header .home-icon {
+    color: #09384d;
+    font-size: 48px;
+    font-weight: 500;
+}
+
+/* אנימציות נוספות לפריטי ניווט - מועברים מ-menu.css */
+#unified-header .nav-item {
+    position: relative;
+    overflow: hidden;
+}
+
+#unified-header .nav-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(41, 166, 168, 0.1);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    border-radius: 6px;
+}
+
+#unified-header .nav-item:hover::before {
+    opacity: 1;
+}
+
+#unified-header .nav-item.active::before {
+    opacity: 0;
+    background: transparent;
+}
+
+/* סגנונות בסיסיים לכותרת */
+
+/* ===== תפריטי משנה עם שלוש רמות ===== */
+/* הגדרה זו מועברת למטה עם שאר הגדרות התפריט */
+
+#unified-header .dropdown-submenu .tiktrack-submenu-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+#unified-header .submenu-arrow {
+    font-size: 0.8em;
+    transition: transform 0.2s ease;
+    margin-right: 8px;
+}
+
+#unified-header .dropdown-submenu:hover .submenu-arrow {
+    transform: rotate(90deg);
+}
+
+/* ===== הגדרות חסרות לתפריטי משנה ===== */
+
+/* הגדרות לרמה 2 - submenu */
+#unified-header .submenu .tiktrack-dropdown-item {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    list-style: none;
+}
+
+#unified-header .submenu .tiktrack-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+#unified-header .submenu .tiktrack-dropdown-item:hover {
+    background: rgba(38, 186, 172, 0.1);
+    color: #26baac;
+}
+
+/* הגדרות לרמה 3 - tiktrack-submenu */
+#unified-header .tiktrack-submenu .tiktrack-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+#unified-header .tiktrack-submenu .tiktrack-dropdown-item:hover {
+    background: rgba(38, 186, 172, 0.1);
+    color: #26baac;
+}
+
+/* ===== התאמה למסכים קטנים ===== */
+@media (max-width: 768px) {
+    /* רמה 2 - submenu */
+    #unified-header .dropdown-submenu .submenu {
+        position: static;
+        right: auto;
+        top: auto;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        border: none;
+        border-top: 1px solid var(--apple-border-light);
+        margin-top: 8px;
+        padding-top: 8px;
+        margin-right: 0;
+    }
+    
+    #unified-header .dropdown-submenu:hover .submenu {
+        transform: none;
+    }
+    
+    /* רמה 3 - tiktrack-submenu */
+    #unified-header .tiktrack-submenu {
+        position: static;
+        left: auto;
+        top: auto;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        border: none;
+        border-top: 1px solid var(--apple-border-light);
+        margin-top: 8px;
+        padding-top: 8px;
+        margin-left: 0;
+    }
+    
+    #unified-header .dropdown-submenu:hover .tiktrack-submenu {
+        transform: none;
+    }
+}
+#unified-header {
+    background: var(--apple-bg-elevated);
+    border-bottom: 1px solid var(--apple-border-light);
+    box-shadow: var(--apple-shadow-light);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* הגבלת סגנונות לאלמנט הספציפי */
+#unified-header .header-container {
+    max-width: 1380px;
+    margin: 0 auto;
+    padding: 1rem 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    direction: rtl;
+}
+
+#unified-header .header-wrapper {
+    max-width: 1200px;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+/* REMOVED CONFLICTING header-top styles - kept in header-styles.css */
+
+/* REMOVED DUPLICATE header-top positioning - kept in header-styles.css */
+
+#unified-header .header-top .filter-toggle-section {
+    order: 2;
+}
+
+#unified-header .page-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#unified-header .page-title h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--apple-text-primary);
+    margin: 0;
+}
+
+#unified-header .logo-section {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    direction: ltr;
+    /* הלוגו צריך להיות LTR */
+}
+
+#unified-header .logo-text {
+    margin-bottom: 10px;
+}
+
+#unified-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    direction: ltr;
+}
+
+#unified-header .logo-image {
+    width: 125px;
+    height: 37.5px;
+    object-fit: contain;
+}
+
+#unified-header .logo-text {
+    font-size: 1rem;
+    font-weight: 300;
+    color: #26baac;
+    direction: ltr;
+    text-align: left;
+    align-self: flex-end;
+    margin-bottom: -5px;
+}
+
+/* סגנונות לוגו מורחבים */
+#unified-header .logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    direction: ltr;
+}
+
+#unified-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    color: inherit;
+}
+
+#unified-header .logo:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+#unified-header .logo-image {
+    width: 125px;
+    height: 37.5px;
+    object-fit: contain;
+    display: block;
+}
+
+#unified-header .logo-text {
+    font-size: 1rem;
+    font-weight: 300;
+    color: #26baac;
+    direction: ltr;
+    text-align: left;
+    align-self: flex-end;
+    margin-bottom: -5px;
+    white-space: nowrap;
+}
+
+#unified-header .logo-icon {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    margin: 16px 0;
+}
+
+#unified-header .home-icon {
+    color: #09384d;
+    font-size: 48px;
+    font-weight: 500;
+}
+
+/* Dropdown menu styles */
+#unified-header .dropdown-menu {
+    top: 100%;
+    right: 0;
+    margin: 0;
+    animation: dropdownFadeIn 0.2s ease-out;
+    display: none;
+    direction: ltr;
+    /* הדרופדאון צריך להיות LTR */
+    z-index: 9999;
+    min-width: 200px;
+    padding: 0.5rem 0;
+}
+
+#unified-header .dropdown-menu.show {
+    position: relative !important;
+    z-index: 99999 !important;
+    display: block !important;
+}
+
+#unified-header .dropdown-menu:not(.show) {
+    display: none !important;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        transform: translateX(-2px);
+    }
+}
+
+#unified-header .dropdown-item:first-child {
+    border-radius: 12px 12px 0 0;
+}
+
+#unified-header .dropdown-item:last-child {
+    border-radius: 0 0 12px 12px;
+}
+
+#unified-header .dropdown-arrow {
+    margin-right: 0.5rem;
+    font-size: 0.8rem;
+    transition: transform 0.2s ease;
+}
+
+#unified-header .dropdown-toggle[aria-expanded="true"] .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* סגנונות ניווט */
+#unified-header .header-nav {
+    display: flex;
+    align-items: center;
+}
+
+#unified-header .main-nav {
+    display: flex;
+    align-items: center;
+}
+
+#unified-header .tiktrack-nav-list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 0.5rem;
+}
+
+#unified-header .tiktrack-nav-item {
+    position: relative;
+}
+
+#unified-header .tiktrack-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    color: #333333;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: color 0.2s ease, background-color 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 400;
+    border: none;
+    position: relative;
+    margin: 0;
+}
+
+#unified-header .tiktrack-nav-link:hover {
+    background: transparent;
+    color: #ff9c05;
+    text-decoration: underline;
+    text-decoration-color: #ff9c05;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+}
+
+#unified-header .tiktrack-nav-item.active .tiktrack-nav-link:hover {
+    background: transparent;
+    color: #333333;
+    border: none;
+    text-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* חריגה לדף הבית - אין צל */
+#unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/"]:hover {
+    text-shadow: none;
+}
+
+#unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/index.html"]:hover {
+    text-shadow: none;
+}
+
+#unified-header .tiktrack-nav-item.active .tiktrack-nav-link {
+    background: transparent;
+    color: #333333;
+    font-weight: 600;
+    border: none;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* חריגה לדף הבית - אין צל */
+#unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/"] {
+    text-shadow: none;
+}
+
+#unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/index.html"] {
+    text-shadow: none;
+}
+
+#unified-header .nav-icon {
+    font-size: 1.2rem;
+}
+
+#unified-header .nav-text {
+    font-weight: 400;
+    color: #333333;
+}
+
+#unified-header .tiktrack-nav-item.active .tiktrack-nav-link .nav-text {
+    color: #333333;
+    font-weight: 600;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* חריגה לדף הבית - אין צל */
+#unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/"] .nav-text {
+    text-shadow: none;
+}
+
+#unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/index.html"] .nav-text {
+    text-shadow: none;
+}
+
+#unified-header .tiktrack-nav-link:focus {
+    outline: none;
+    transform: none;
+    margin: 0;
+}
+
+#unified-header .tiktrack-nav-link:active {
+    transform: none;
+    margin: 0;
+}
+
+#unified-header .tiktrack-dropdown-arrow {
+    font-size: 0.8rem;
+    transition: transform 0.2s ease;
+    color: #333333;
+}
+
+#unified-header .tiktrack-nav-item.active .tiktrack-nav-link .tiktrack-dropdown-arrow {
+    color: #333333;
+}
+
+#unified-header .tiktrack-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--apple-bg-elevated);
+    border: 1px solid var(--apple-border-light);
+    border-radius: 12px;
+    box-shadow: var(--apple-shadow-medium);
+    min-width: 200px;
+    padding: 0.5rem 0;
+    display: none;
+    z-index: 1000;
+    list-style: none;
+}
+
+#unified-header .tiktrack-dropdown-menu.show {
+    display: block;
+}
+
+#unified-header .tiktrack-dropdown-item {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: #000000;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-weight: 300;
+    font-size: 0.85rem;
+    list-style: none;
+}
+
+#unified-header .tiktrack-dropdown-item:hover {
+    background: rgba(38, 186, 172, 0.1);
+    color: #26baac;
+}
+
+#unified-header .tiktrack-dropdown-item.active {
+    background: rgba(0, 0, 0, 0.05);
+    color: #333333;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+#unified-header .tiktrack-dropdown-item.active:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: #333333;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== תפריטי משנה - הגדרות בסיסיות ===== */
+#unified-header .dropdown-submenu {
+    position: relative;
+    list-style: none;
+}
+
+#unified-header .dropdown-submenu .submenu {
+    position: absolute;
+    top: 0;
+    right: 100%;
+    background: var(--apple-bg-elevated);
+    border: 1px solid var(--apple-border-light);
+    border-radius: 12px;
+    box-shadow: var(--apple-shadow-medium);
+    min-width: 150px;
+    padding: 0.5rem 0;
+    display: none;
+    z-index: 1001;
+    list-style: none;
+    margin-right: 0.125rem;
+}
+
+#unified-header .dropdown-submenu:hover .submenu {
+    display: block;
+    animation: submenuFadeIn 0.2s ease-out;
+}
+
+@keyframes submenuFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+#unified-header .submenu .tiktrack-dropdown-item {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    list-style: none;
+}
+
+#unified-header .submenu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#unified-header .submenu .tiktrack-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+#unified-header .submenu .tiktrack-dropdown-item:hover {
+    background: rgba(38, 186, 172, 0.1);
+    color: #26baac;
+}
+
+/* ===== תפריטי משנה רמה 3 - tiktrack-submenu ===== */
+#unified-header .tiktrack-submenu {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    background: var(--apple-bg-elevated);
+    border: 1px solid var(--apple-border-light);
+    border-radius: 8px;
+    display: none;
+    box-shadow: var(--apple-shadow-medium);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-10px);
+    z-index: 1003;
+    transition: all 0.2s ease;
+    padding: 8px 0;
+    margin-left: 0.125rem;
+}
+
+#unified-header .dropdown-submenu:hover .tiktrack-submenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    display: block;
+}
+
+#unified-header .tiktrack-submenu .tiktrack-dropdown-item {
+    padding: 8px 16px;
+    white-space: nowrap;
+    border: none;
+    background: transparent;
+    color: var(--apple-text-primary);
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    text-align: right;
+    transition: background-color 0.2s ease;
+    font-size: 0.8rem;
+}
+
+#unified-header .tiktrack-submenu .tiktrack-dropdown-item:hover {
+    background-color: var(--apple-bg-hover);
+    color: var(--apple-text-primary);
+}
+
+/* ===== הגדרות חסרות לתפריטי משנה ===== */
+
+/* הגדרות לרמה 2 - submenu */
+#unified-header .submenu .tiktrack-dropdown-item {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    list-style: none;
+}
+
+#unified-header .submenu .tiktrack-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+#unified-header .submenu .tiktrack-dropdown-item:hover {
+    background: rgba(38, 186, 172, 0.1);
+    color: #26baac;
+}
+
+/* הגדרות לרמה 3 - tiktrack-submenu */
+#unified-header .tiktrack-submenu .tiktrack-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+#unified-header .tiktrack-submenu .tiktrack-dropdown-item:hover {
+    background: rgba(38, 186, 172, 0.1);
+    color: #26baac;
+}
+
+#unified-header .dropdown-divider {
+    margin: 0.5rem 0;
+    border: none;
+    border-top: 1px solid var(--apple-border-light);
+}
+
+/* אפקט נוסף לתפריט הנפתח */
+#unified-header .dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    right: 20px;
+}
+
+/* תמיכה במכשירים ניידים */
+@media (max-width: 768px) {
+    #unified-header .header-container {
+        padding: 0;
+        height: 44px;
+    }
+
+    #unified-header .nav-menu {
+        gap: 0;
+    }
+
+    #unified-header .nav-item {
+        padding: 0.5rem 0.625rem;
+        font-size: 0.8125rem;
+        margin: 0 0.0625rem;
+    }
+
+    #unified-header .logo-text {
+        font-size: 0.9375rem;
+    }
+}
+
+/* אנימציות נוספות */
+#unified-header .nav-item {
+    position: relative;
+    overflow: hidden;
+}
+
+#unified-header .nav-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+#unified-header .nav-item:hover::before {
+    left: 100%;
+}
+
+/* ===== סגנונות פילטרים ===== */
+
+/* אזור פילטרים */
+#unified-header .header-filters {
+    max-width: 1380px;
+    margin: 0 auto;
+    padding: 1rem 10px;
+    background: var(--apple-bg-elevated);
+    border-top: 1px solid var(--apple-border-light);
+    display: block;
+}
+
+#unified-header .filters-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    direction: rtl;
+    max-width: 1380px;
+    margin: 0 auto;
+    padding: 0 10px;
+    width: 100%;
+}
+
+#unified-header .filter-group {
+    position: relative;
+}
+
+#unified-header .filter-dropdown {
+    position: relative;
+}
+
+#unified-header .filter-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--apple-bg-elevated);
+    border: 1px solid var(--apple-border-light);
+    border-radius: 8px;
+    color: var(--apple-text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    min-width: 120px;
+    width: 140px;
+    justify-content: space-between;
+}
+
+#unified-header .filter-toggle:hover {
+    background: var(--apple-bg-secondary);
+    border-color: var(--apple-border-medium);
+}
+
+#unified-header .filter-toggle.active {
+    background: transparent !important;
+    color: #28a745 !important;
+    border-color: #28a745 !important;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
+}
+
+#unified-header .filter-label {
+    font-weight: 500;
+}
+
+#unified-header .selected-value {
+    color: var(--apple-text-secondary);
+    font-size: 0.85rem;
+    min-width: 80px;
+    text-align: right;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#unified-header .dropdown-arrow {
+    font-size: 0.8rem;
+    transition: transform 0.2s ease;
+}
+
+#unified-header .filter-toggle.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* סגנונות בסיס לפילטרים */
+#unified-header .filter-menu {
+    position: absolute !important;
+    top: 100% !important;
+    right: 0 !important;
+    background: white !important;
+    border: 1px solid #e8e8e8 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    min-width: 180px !important;
+    z-index: 10001 !important;
+    display: none;
+    margin-top: 5px;
+    padding: 0.5rem 0;
+}
+
+/* סגנונות לפילטרים פתוחים */
+#unified-header .filter-menu.show {
+    display: block !important;
+}
+
+/* פריטי פילטר סטטוס */
+#statusFilterMenu .status-filter-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0.4rem 1rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    font-size: 0.9rem !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    background: white !important;
+    color: #333 !important;
+}
+
+#statusFilterMenu .status-filter-item:last-child {
+    border-bottom: none !important;
+}
+
+#statusFilterMenu .status-filter-item:hover {
+    background-color: #f8f9fa !important;
+    color: #29a6a8 !important;
+}
+
+#statusFilterMenu .status-filter-item.selected {
+    background-color: rgba(40, 167, 69, 0.08) !important;
+    color: #28a745 !important;
+    border: none !important;
+    font-weight: 500 !important;
+    box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
+}
+
+/* פריטי פילטר טיפוס */
+#typeFilterMenu .type-filter-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0.4rem 1rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    font-size: 0.9rem !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    background: white !important;
+    color: #333 !important;
+}
+
+#typeFilterMenu .type-filter-item:last-child {
+    border-bottom: none !important;
+}
+
+#typeFilterMenu .type-filter-item:hover {
+    background-color: #f8f9fa !important;
+    color: #29a6a8 !important;
+}
+
+#typeFilterMenu .type-filter-item.selected {
+    background-color: rgba(40, 167, 69, 0.08) !important;
+    color: #28a745 !important;
+    border: none !important;
+    font-weight: 500 !important;
+    box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
+}
+
+/* פריטי פילטר חשבונות */
+#accountFilterMenu .account-filter-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0.4rem 1rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    font-size: 0.9rem !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    background: white !important;
+    color: #333 !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Alef', sans-serif !important;
+}
+
+#accountFilterMenu .account-filter-item:last-child {
+    border-bottom: none !important;
+}
+
+#accountFilterMenu .account-filter-item:hover {
+    background-color: #f8f9fa !important;
+    color: #29a6a8 !important;
+}
+
+#accountFilterMenu .account-filter-item.selected {
+    background-color: rgba(40, 167, 69, 0.08) !important;
+    color: #28a745 !important;
+    border: none !important;
+    font-weight: 500 !important;
+    box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
+}
+
+/* הסתרת הנקודה במצב לא נבחר */
+#accountFilterMenu .account-filter-item .check-mark {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+/* הצגת סימן V במצב נבחר */
+#accountFilterMenu .account-filter-item.selected .check-mark::before {
+    content: "✓" !important;
+    color: #28a745 !important;
+    font-weight: bold !important;
+    font-size: 1.2rem !important;
+    text-shadow: 0 0 2px rgba(40, 167, 69, 0.3) !important;
+}
+
+/* פריטי פילטר תאריכים */
+#dateRangeFilterMenu .date-range-filter-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0.4rem 1rem !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    font-size: 0.9rem !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    background: white !important;
+    color: #333 !important;
+}
+
+#dateRangeFilterMenu .date-range-filter-item:last-child {
+    border-bottom: none !important;
+}
+
+#dateRangeFilterMenu .date-range-filter-item:hover {
+    background-color: #f8f9fa !important;
+    color: #29a6a8 !important;
+}
+
+#dateRangeFilterMenu .date-range-filter-item.selected {
+    background-color: rgba(40, 167, 69, 0.08) !important;
+    color: #28a745 !important;
+    font-weight: 500 !important;
+    border: none !important;
+    box-shadow: 0 1px 3px rgba(40, 167, 69, 0.2) !important;
+}
+
+/* הסתרת הנקודה במצב לא נבחר */
+#unified-header .filter-menu .check-mark {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+/* הצגת סימן V במצב נבחר */
+#unified-header .filter-menu .filter-item.selected .check-mark::before {
+    content: "✓" !important;
+    color: #28a745 !important;
+    font-weight: bold !important;
+    font-size: 1.2rem !important;
+    text-shadow: 0 0 2px rgba(40, 167, 69, 0.3) !important;
+}
+
+/* סגנונות חיפוש */
+#unified-header .search-filter {
+    flex: 0 0 200px;
+    position: relative;
+}
+
+#unified-header .search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 200px;
+}
+
+#unified-header .search-filter-input {
+    width: 100%;
+    padding: 0.5rem 1rem 0.5rem 2rem;
+    border: 1px solid var(--apple-border-light);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: var(--apple-bg-elevated);
+    color: var(--apple-text-primary);
+}
+
+#unified-header .search-filter-input:focus {
+    outline: none;
+    border-color: var(--apple-accent);
+    box-shadow: 0 0 0 2px var(--apple-accent-bg);
+}
+
+#unified-header .search-clear-btn {
+    position: absolute;
+    left: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--apple-text-secondary);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+#unified-header .search-clear-btn:hover {
+    background: var(--apple-bg-secondary);
+    color: var(--apple-text-primary);
+}
+
+/* כפתור איפוס - רקע לבן, מסגרת ואיקון ירוק */
+#unified-header .reset-filter {
+    margin-left: auto;
+}
+
+#unified-header .reset-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    width: 30px;
+    height: 30px;
+    background: white;
+    border: 2px solid #26baac;
+    border-radius: 6px;
+    color: #26baac;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+#unified-header .reset-btn:hover {
+    background: #f8f9fa;
+    transform: rotate(180deg);
+    box-shadow: 0 2px 4px rgba(38, 186, 172, 0.3);
+}
+
+#unified-header .reset-icon {
+    font-size: 0.9rem;
+    transition: transform 0.2s ease;
+}
+
+/* כפתורי פעולה - איפוס וניקוי צמודים */
+#unified-header .action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+#unified-header .clear-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    width: 30px;
+    height: 30px;
+    background: white;
+    border: 2px solid #ff9c05;
+    border-radius: 6px;
+    color: #ff9c05;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+#unified-header .clear-btn:hover {
+    background: #fff8f0;
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(255, 156, 5, 0.3);
+}
+
+#unified-header .clear-icon {
+    font-size: 1rem;
+    font-weight: bold;
+    transition: transform 0.2s ease;
+}
+
+/* כפתור הצג/הסתר פילטרים - עגול ללא מסגרת, רקע לבן + צל */
+#unified-header .filter-toggle-section {
+    display: flex;
+    align-items: center;
+}
+
+/* כפתור פילטר ייחודי - עגול כתום ללא מסגרת */
+#unified-header .filter-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    width: 32px;
+    height: 32px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    color: #ff9c05;
+    font-size: 0.8rem;
+    cursor: pointer;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -95px;
+    z-index: 1001;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+#unified-header .filter-toggle-btn.collapsed {
+    bottom: -20px;
+}
+
+#unified-header .filter-toggle-btn:hover {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+#unified-header .filter-toggle-btn:hover .filter-arrow {
+    color: #ff9c05;
+}
+
+#unified-header .filter-toggle-btn.collapsed .filter-arrow {
+    transform: rotate(180deg);
+}
+
+#unified-header .filter-arrow {
+    color: #ff9c05;
+    font-weight: bold;
+}
+
+/* התאמה למסכים קטנים */
+@media (max-width: 768px) {
+    #unified-header .header-filters {
+        padding: 1rem 0;
+    }
+
+    #unified-header .filters-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #unified-header .search-filter {
+        min-width: auto;
+    }
+
+    #unified-header .filter-group {
+        width: 100%;
+    }
+
+    #unified-header .filter-toggle {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    #unified-header .reset-filter {
+        margin-left: 0;
+        align-self: center;
+    }
+}
+
+/* ===== סגנונות כרטיסי התראות - רק בתוך ראש הדף ===== */
+#unified-header .alert-card-price {
+    background-color: rgba(255, 193, 7, 0.3) !important;
+    /* צהוב - התראת מחיר */
+    border-left: 4px solid #ffc107;
+}
+
+#unified-header .alert-card-stop-loss {
+    background-color: rgba(220, 53, 69, 0.3) !important;
+    /* אדום - עצירת הפסד */
+    border-left: 4px solid #dc3545;
+}
+
+#unified-header .alert-card-volume {
+    background-color: rgba(40, 167, 69, 0.3) !important;
+    /* ירוק - התראת נפח */
+    border-left: 4px solid #28a745;
+}
+
+#unified-header .alert-card-custom {
+    background-color: rgba(108, 117, 125, 0.3) !important;
+    /* אפור - התראה מותאמת */
+    border-left: 4px solid #6c757d;
+}
+
+#unified-header .alert-card-default {
+    background-color: rgba(0, 123, 255, 0.3) !important;
+    /* כחול - ברירת מחדל */
+    border-left: 4px solid #007bff;
+}
+
+/* הוספת hover effect לכרטיסים - רק בתוך ראש הדף */
+#unified-header .alert-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;

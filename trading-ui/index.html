@@ -47,75 +47,6 @@
                         </button>
                     </div>
                     <div class="section-body">
-                        <!-- סטטיסטיקות מהירות -->
-                        <div class="hero-stats">
-                            <div class="hero-stat">
-                                <div class="hero-stat-number">₪1,250,000</div>
-                                <div class="hero-stat-label">שווי תיק</div>
-                            </div>
-                            <div class="hero-stat">
-                                <div class="hero-stat-number positive">+5.6%</div>
-                                <div class="hero-stat-label">תשואה</div>
-                            </div>
-                            <div class="hero-stat">
-                                <div class="hero-stat-number">15</div>
-                                <div class="hero-stat-label">טריידים</div>
-                            </div>
-                            <div class="hero-stat">
-                                <div class="hero-stat-number">8</div>
-                                <div class="hero-stat-label">התראות</div>
-                            </div>
-                            <div class="hero-stat">
-                                <div class="hero-stat-number positive">+₪12,500</div>
-                                <div class="hero-stat-label">היום</div>
-                            </div>
-                            <div class="hero-stat">
-                                <div class="hero-stat-number">78.5%</div>
-                                <div class="hero-stat-label">הצלחה</div>
-                            </div>
-                        </div>
-
-                        <!-- באנר מערכת העדפות V2 החדשה -->
-                        <div class="v2-announcement-banner gradient-banner">
-                            <div class="container">
-                                <div class="row align-items-center">
-                                    <div class="col-md-8">
-                                        <div class="d-flex align-items-center">
-                                            <div class="me-3 banner-icon">🚀</div>
-                                            <div>
-                                                <h5 class="mb-1 fw-bold">מערכת העדפות V2 זמינה כעת!</h5>
-                                                <p class="mb-0 banner-text">
-                                                    פרופילים מרובים • יבוא/יצוא • היסטוריית שינויים • עיצוב מתקדם
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 text-end">
-                                        <a href="preferences-v2.html" class="btn btn-light btn-sm me-2 fw-bold">
-                                            <i class="bi bi-stars"></i> נסה עכשיו
-                                        </a>
-                                        <a href="PREFERENCES_V2_IMPLEMENTATION_REPORT.md" target="_blank" 
-                                           class="btn btn-outline-light btn-sm small-text">
-                                            <i class="bi bi-info-circle"></i> מידע נוסף
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- UI Content Section Top End -->  
-
-                <!-- UI Content Section 1 Start-->
-                <div class="content-section" id="section1">
-                    <div class="section-header">
-                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-                        <h2>🏠 ברוכים הבאים ל-TikTrack</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
-                    </div>
-                    <div class="section-body">
                         <!-- באנר עיצובי עליון -->
                         <div class="hero-banner">
                             <div class="hero-bg-illustration">
@@ -189,6 +120,66 @@
                                             <div class="hero-stat-label">התראות</div>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section Top End -->  
+
+                <!-- UI Content Section 1 Start-->
+                <div class="content-section" id="section1">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>📊 סקירה כללית</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="overview-actions mb-3">
+                            <button class="btn btn-sm btn-outline-primary" onclick="refreshOverview()">
+                                <i class="bi bi-arrow-clockwise"></i> רענן
+                            </button>
+                            <button class="btn btn-sm btn-outline-success" onclick="exportOverview()">
+                                <i class="bi bi-download"></i> ייצוא
+                            </button>
+                        </div>
+
+                        <div class="overview-grid">
+                            <div class="overview-card primary">
+                                <div class="overview-card-icon">💰</div>
+                                <div class="overview-card-content">
+                                    <div class="overview-card-number">₪1,250,000</div>
+                                    <div class="overview-card-label">שווי תיק כולל</div>
+                                    <div class="overview-card-change positive">+₪12,500 היום</div>
+                                </div>
+                            </div>
+
+                            <div class="overview-card success">
+                                <div class="overview-card-icon">📈</div>
+                                <div class="overview-card-content">
+                                    <div class="overview-card-number positive">+₪70,000</div>
+                                    <div class="overview-card-label">רווח כולל</div>
+                                    <div class="overview-card-change positive">+5.6% השנה</div>
+                                </div>
+                            </div>
+
+                            <div class="overview-card info">
+                                <div class="overview-card-icon">🎯</div>
+                                <div class="overview-card-content">
+                                    <div class="overview-card-number">15</div>
+                                    <div class="overview-card-label">טריידים פעילים</div>
+                                    <div class="overview-card-change">8 רווחיים</div>
+                                </div>
+                            </div>
+
+                            <div class="overview-card warning">
+                                <div class="overview-card-icon">🔔</div>
+                                <div class="overview-card-content">
+                                    <div class="overview-card-number">8</div>
+                                    <div class="overview-card-label">התראות פעילות</div>
+                                    <div class="overview-card-change">3 דורשות תשומת לב</div>
                                 </div>
                             </div>
                         </div>

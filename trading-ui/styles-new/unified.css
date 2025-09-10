@@ -1084,6 +1084,124 @@ button:disabled,
   margin: 0;
   padding: 0;
 }
+
+/* Hero Banner Styles */
+.hero-banner {
+  position: relative;
+  height: 400px;
+  overflow: hidden;
+  border-radius: var(--apple-radius-medium);
+  background: linear-gradient(135deg, rgba(40,167,69,0.1) 0%, rgba(0,123,255,0.1) 100%);
+}
+
+.hero-bg-illustration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.hero-quick-links {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+  z-index: 3;
+}
+
+.quick-link-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 50%;
+  text-decoration: none;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.quick-link-icon:hover {
+  background: rgba(255,255,255,1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.quick-link-icon.gradient-bg {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+}
+
+.hero-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.hero-text {
+  text-align: center;
+  color: var(--apple-text-primary);
+  max-width: 600px;
+  padding: 20px;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--apple-text-primary);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: var(--apple-text-secondary);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.hero-stat {
+  text-align: center;
+  background: rgba(255,255,255,0.9);
+  padding: 1rem;
+  border-radius: var(--apple-radius-medium);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  min-width: 120px;
+}
+
+.hero-stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--apple-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.hero-stat-number.positive {
+  color: #28a745;
+}
+
+.hero-stat-label {
+  font-size: 0.9rem;
+  color: var(--apple-text-secondary);
+}
 .stat-card {
   background: #ffffff;
   padding: 1.5rem;

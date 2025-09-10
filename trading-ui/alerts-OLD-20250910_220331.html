@@ -52,14 +52,37 @@
 
     <!-- Page body - All content after header -->
     <div class="page-body">
-      <!-- Top Section - Overview and Quick Actions -->
-      <div class="top-section" id="topSection">
+      <!-- Alerts area - top-Section -->
+      <div class="top-section" id="alertsTopSection">
+        <!-- Alerts header -->
         <div class="section-header">
-          <h2>🔔 התראות - סקירה כללית</h2>
-          <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
-          </button>
+          <div class="table-title">
+            <img src="images/icons/alerts.svg" alt="התראות"
+              style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+            התראות
+          </div>
+          <div class="table-actions">
+            <button id="addAlertBtn" class="refresh-btn" onclick="showAddAlertModal()" title="הוסף התראה חדשה">
+              <span class="action-icon">➕</span> הוסף
+            </button>
+            
+            <!-- כפתורי עריכה ומחיקה נסתרים (לזיהוי בבדיקות) -->
+            <button id="editAlertBtn" class="refresh-btn d-none" onclick="editAlert('')" title="ערוך התראה נבחרת">
+              <span class="action-icon">✏️</span> ערוך
+            </button>
+            <button id="deleteAlertBtn" class="refresh-btn d-none" onclick="deleteAlert('')" title="מחק התראה נבחרת">
+              <span class="action-icon">🗑️</span> מחק
+            </button>
+            
+            <div class="action-separator"></div>
+            <div class="action-separator"></div>
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור התראות">
+              <span class="filter-icon">▲</span>
+            </button>
+          </div>
         </div>
+
+        <!-- Alert cards -->
         <div class="section-body">
           <!-- Color Scheme Demo for Alerts -->
           <div id="alertsColorDemo" class="mb-3" style="display: none;">
@@ -85,37 +108,23 @@
             <div>התראות השבוע: <strong id="weekAlerts">0</strong></div>
           </div>
         </div>
-      </div>
+      </div> <!-- End top-section -->
 
-      <!-- Content Section 1 - Alerts Management -->
-      <div class="content-section" id="section1">
-        <div class="section-header">
-          <h2>📋 ניהול התראות</h2>
-          <div class="table-actions">
-            <button id="addAlertBtn" class="refresh-btn" onclick="showAddAlertModal()" title="הוסף התראה חדשה">
-              <span class="action-icon">➕</span> הוסף
-            </button>
-            
-            <!-- כפתורי עריכה ומחיקה נסתרים (לזיהוי בבדיקות) -->
-            <button id="editAlertBtn" class="refresh-btn d-none" onclick="editAlert('')" title="ערוך התראה נבחרת">
-              <span class="action-icon">✏️</span> ערוך
-            </button>
-            <button id="deleteAlertBtn" class="refresh-btn d-none" onclick="deleteAlert('')" title="מחק התראה נבחרת">
-              <span class="action-icon">🗑️</span> מחק
-            </button>
-            
-            <div class="action-separator"></div>
-            <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-              <span class="section-toggle-icon">▼</span>
-            </button>
-          </div>
-        </div>
+      <!-- Main content -->
+      <div class="main-content">
 
-        <div class="section-body">
-          <!-- Quick filters -->
-          <div class="filter-controls mb-3">
-            <div class="d-flex gap-2 align-items-center">
-              <span class="filter-label">פילטרים מהירים:</span>
+        <!-- Alerts area - content-section -->
+        <div class="content-section alerts-page" id="alertsMainSection">
+          <!-- Alerts header -->
+          <div class="section-header">
+            <div class="table-title">
+              <img src="images/icons/alerts.svg" alt="ההתראות שלי"
+                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+              ההתראות שלי
+            </div>
+            <div class="table-count">טוען...</div>
+            <div class="table-actions">
+              <!-- Quick filters -->
               <button class="btn btn-sm active" onclick="filterAlertsByRelatedObjectType('all')" data-type="all" title="הצג הכל" style="background-color: white; color: #28a745; border-color: #28a745;">
                 הכל
               </button>
@@ -131,12 +140,20 @@
               <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('ticker')" data-type="ticker" title="טיקרים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
                 <img src="images/icons/tickers.svg" alt="טיקרים" style="width: 14px; height: 14px;">
               </button>
+              
+              <span style="margin: 0 10px; color: #666;">|</span>
+              
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור התראות">
+                <span class="filter-icon">▲</span>
+              </button>
             </div>
           </div>
 
           <!-- Alerts table -->
-          <div class="table-responsive" id="alertsContainer">
-            <table class="table" id="alertsTable" data-table-type="alerts">
+          <div class="section-body">
+            <div class="table-responsive" id="alertsContainer">
+              <table class="table" id="alertsTable" data-table-type="alerts">
                 <thead>
                   <tr>
                     <th style="width: 10%;">
@@ -202,7 +219,7 @@
             </div>
           </div>
         </div>
-      </div> <!-- End section1 -->
+      </div>
     </div> <!-- End page-body -->
 
     <!-- Bottom page spacing -->
@@ -451,6 +468,45 @@
     <script src="scripts/alert-service.js"></script>
     <script src="scripts/alerts.js"></script>
     <script src="scripts/active-alerts-component.js"></script>
+    <script>
+      // אתחול מערכת ראש הדף החדשה
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log('🚀 טעינת דף התראות עם מערכת ראש דף חדשה...');
+
+        // אתחול HeaderSystem
+        if (window.headerSystem && !window.headerSystem.isInitialized) {
+          console.log('✅ אתחול HeaderSystem...');
+          window.headerSystem.init();
+        }
+
+        // וידוא שהמודולים נסגרים בלחיצה על הרקע
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+          // הוספת data-bs-backdrop אם לא קיים
+          if (!modal.hasAttribute('data-bs-backdrop')) {
+            modal.setAttribute('data-bs-backdrop', 'true');
+          }
+          
+          // הוספת data-bs-keyboard אם לא קיים
+          if (!modal.hasAttribute('data-bs-keyboard')) {
+            modal.setAttribute('data-bs-keyboard', 'true');
+          }
+
+          // הוספת event listener לסגירה בלחיצה על הרקע
+          modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+              const modalInstance = bootstrap.Modal.getInstance(modal);
+              if (modalInstance) {
+                modalInstance.hide();
+              }
+            }
+          });
+        });
+
+        console.log('✅ מודולים הוגדרו לסגירה בלחיצה על הרקע');
+      });
+      
+    </script>
 </body>
 
 </html>

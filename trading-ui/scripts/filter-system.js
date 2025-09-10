@@ -1210,6 +1210,9 @@ function selectAccountOption(account) {
   }
 }
 
+// Export functions early to ensure they're available when header-system.js loads
+window.selectAccountOption = selectAccountOption;
+
 /**
  * בחירת אפשרות פילטר תאריכים
  */
@@ -1238,6 +1241,9 @@ function selectDateRangeOption(dateRange) {
     dateMenu.classList.remove('show');
   }
 }
+
+// Export selectDateRangeOption early as well
+window.selectDateRangeOption = selectDateRangeOption;
 
 // ===== FILTER TEXT UPDATE FUNCTIONS =====
 
@@ -1345,8 +1351,7 @@ function applyAccountFilter() {
 
 window.selectStatusOption = selectStatusOption;
 window.selectTypeOption = selectTypeOption;
-window.selectAccountOption = selectAccountOption;
-window.selectDateRangeOption = selectDateRangeOption;
+// selectAccountOption and selectDateRangeOption are exported early in the file
 window.updateStatusFilterText = updateStatusFilterText;
 window.updateTypeFilterText = updateTypeFilterText;
 window.updateAccountFilterText = updateAccountFilterText;

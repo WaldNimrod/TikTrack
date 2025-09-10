@@ -652,6 +652,13 @@ margin: 0 auto;
     object-fit: contain;
 }
 
+#unified-header .nav-icon {
+    width: 24px;
+    height: 24px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
 #unified-header .home-icon {
     color: #09384d;
     font-size: 96px;

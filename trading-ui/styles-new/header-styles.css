@@ -49,25 +49,22 @@ margin: 0 auto;
     margin: 0 auto;
     padding: 0;
     display: flex;
+    justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid var(--apple-border-light);
     position: relative;
     min-height: 70px;
-    direction: rtl;
+    direction: ltr;
     background: var(--apple-bg-elevated);
     max-width: 1360px;
-    left: 50%;
-    transform: translateX(-50%);
 }
 
 #unified-header .header-top .logo-section {
-    order: 1;
-    margin-right: auto;
+    /* Logo on the left */
 }
 
 #unified-header .header-top .header-nav {
-    order: 2;
-    margin-left: auto;
+    /* Menu on the right */
 }
 
 /* ===== סגנונות לוגו ===== */

@@ -600,21 +600,6 @@ margin: 0 auto;
     margin: 0 auto;
 }
 
-#unified-header .header-container {
-    margin: 0 auto;
-    padding: 1rem 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-#unified-header .header-wrapper {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
 
 #unified-header .page-title {
     position: absolute;
@@ -629,12 +614,6 @@ margin: 0 auto;
     margin: 0;
 }
 
-#unified-header .logo-section {
-    display: flex;
-    align-items: flex-end;
-    gap: 0.5rem;
-    direction: ltr;
-}
 
 /* REMOVED DUPLICATE logo-text definition that was overriding align-self: flex-end */
 
@@ -1109,20 +1088,6 @@ margin: 0 auto;
     display: none !important;
 }
 
-#unified-header .header-top {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-#unified-header .header-top .logo-section {
-        order: 1;
-        margin: 0;
-    }
-
-#unified-header .header-top .header-nav {
-        order: 2;
-        margin: 0;
-    }
 
 #unified-header .tiktrack-dropdown-menu {
     position: absolute;

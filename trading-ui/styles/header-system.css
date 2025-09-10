@@ -225,9 +225,7 @@
 
 /* REMOVED DUPLICATE header-top positioning - kept in header-styles.css */
 
-#unified-header .header-top .filter-toggle-section {
-    order: 2;
-}
+/* REMOVED CONFLICTING filter-toggle-section - kept in header-styles.css */
 
 #unified-header .page-title {
     position: absolute;

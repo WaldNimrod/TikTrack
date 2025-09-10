@@ -45,21 +45,26 @@
 <body class="alerts-page">
     <!-- Unified Header Container -->
     <div id="unified-header"></div>
-  <!-- General background -->
+  <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
   <div class="background-wrapper">
+    <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
 
-    <!-- unified-header ייווצר כאן אוטומטית -->
-
-    <!-- Page body - All content after header -->
+    <!-- ===== TEMPLATE ZONE 3: PAGE BODY (LOCKED) ===== -->
     <div class="page-body">
-      <!-- Top Section - Overview and Quick Actions -->
-      <div class="top-section" id="topSection">
-        <div class="section-header">
-          <h2>🔔 התראות - סקירה כללית</h2>
-          <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
-          </button>
-        </div>
+      <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT (EDITABLE) ===== -->
+      <div class="main-content">
+        <!-- ===== CONTENT SECTIONS START (EDITABLE) ===== -->
+        <!-- Alerts area - top-Section -->
+        <!-- UI Content Section 1 Start -->
+        <div class="content-section" id="section1">
+          <div class="section-header entity-test-sub-header">
+            <h2>🔔 התראות - סקירה כללית</h2>
+            <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+              <span class="section-toggle-icon">▼</span>
+            </button>
+          </div>
+
+        <!-- Alert cards -->
         <div class="section-body">
           <!-- Color Scheme Demo for Alerts -->
           <div id="alertsColorDemo" class="mb-3" style="display: none;">
@@ -85,37 +90,18 @@
             <div>התראות השבוע: <strong id="weekAlerts">0</strong></div>
           </div>
         </div>
-      </div>
+        </div>
+        <!-- UI Content Section 1 End -->
 
-      <!-- Content Section 1 - Alerts Management -->
-      <div class="content-section" id="section1">
-        <div class="section-header">
-          <h2>📋 ניהול התראות</h2>
-          <div class="table-actions">
-            <button id="addAlertBtn" class="refresh-btn" onclick="showAddAlertModal()" title="הוסף התראה חדשה">
-              <span class="action-icon">➕</span> הוסף
-            </button>
-            
-            <!-- כפתורי עריכה ומחיקה נסתרים (לזיהוי בבדיקות) -->
-            <button id="editAlertBtn" class="refresh-btn d-none" onclick="editAlert('')" title="ערוך התראה נבחרת">
-              <span class="action-icon">✏️</span> ערוך
-            </button>
-            <button id="deleteAlertBtn" class="refresh-btn d-none" onclick="deleteAlert('')" title="מחק התראה נבחרת">
-              <span class="action-icon">🗑️</span> מחק
-            </button>
-            
-            <div class="action-separator"></div>
-            <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+        <!-- UI Content Section 2 Start -->
+        <div class="content-section" id="section2">
+          <div class="section-header entity-test-sub-header">
+            <h2>📋 ניהול התראות</h2>
+            <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
               <span class="section-toggle-icon">▼</span>
             </button>
           </div>
-        </div>
-
-        <div class="section-body">
-          <!-- Quick filters -->
-          <div class="filter-controls mb-3">
-            <div class="d-flex gap-2 align-items-center">
-              <span class="filter-label">פילטרים מהירים:</span>
+              <!-- Quick filters -->
               <button class="btn btn-sm active" onclick="filterAlertsByRelatedObjectType('all')" data-type="all" title="הצג הכל" style="background-color: white; color: #28a745; border-color: #28a745;">
                 הכל
               </button>
@@ -131,12 +117,20 @@
               <button class="btn btn-sm btn-outline-primary" onclick="filterAlertsByRelatedObjectType('ticker')" data-type="ticker" title="טיקרים" style="width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
                 <img src="images/icons/tickers.svg" alt="טיקרים" style="width: 14px; height: 14px;">
               </button>
+              
+              <span style="margin: 0 10px; color: #666;">|</span>
+              
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור התראות">
+                <span class="filter-icon">▲</span>
+              </button>
             </div>
           </div>
 
           <!-- Alerts table -->
-          <div class="table-responsive" id="alertsContainer">
-            <table class="table" id="alertsTable" data-table-type="alerts">
+          <div class="section-body">
+            <div class="table-responsive" id="alertsContainer">
+              <table class="table" id="alertsTable" data-table-type="alerts">
                 <thead>
                   <tr>
                     <th style="width: 10%;">
@@ -202,8 +196,13 @@
             </div>
           </div>
         </div>
-      </div> <!-- End section1 -->
-    </div> <!-- End page-body -->
+        </div>
+        <!-- UI Content Section 2 End -->
+      <!-- ===== CONTENT SECTIONS END (EDITABLE) ===== -->
+      </div>
+      <!-- ===== END MAIN CONTENT ===== -->
+    </div>
+    <!-- ===== END PAGE BODY ===== -->
 
     <!-- Bottom page spacing -->
     <div style="height: 3rem;"></div>
@@ -443,7 +442,8 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  </div> <!-- End background-wrapper -->
+  </div>
+  <!-- ===== END BACKGROUND WRAPPER ===== -->
 
     <!-- Modular files -->
     <script src="scripts/main.js"></script>
@@ -451,6 +451,45 @@
     <script src="scripts/alert-service.js"></script>
     <script src="scripts/alerts.js"></script>
     <script src="scripts/active-alerts-component.js"></script>
+    <script>
+      // אתחול מערכת ראש הדף החדשה
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log('🚀 טעינת דף התראות עם מערכת ראש דף חדשה...');
+
+        // אתחול HeaderSystem
+        if (window.headerSystem && !window.headerSystem.isInitialized) {
+          console.log('✅ אתחול HeaderSystem...');
+          window.headerSystem.init();
+        }
+
+        // וידוא שהמודולים נסגרים בלחיצה על הרקע
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+          // הוספת data-bs-backdrop אם לא קיים
+          if (!modal.hasAttribute('data-bs-backdrop')) {
+            modal.setAttribute('data-bs-backdrop', 'true');
+          }
+          
+          // הוספת data-bs-keyboard אם לא קיים
+          if (!modal.hasAttribute('data-bs-keyboard')) {
+            modal.setAttribute('data-bs-keyboard', 'true');
+          }
+
+          // הוספת event listener לסגירה בלחיצה על הרקע
+          modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+              const modalInstance = bootstrap.Modal.getInstance(modal);
+              if (modalInstance) {
+                modalInstance.hide();
+              }
+            }
+          });
+        });
+
+        console.log('✅ מודולים הוגדרו לסגירה בלחיצה על הרקע');
+      });
+      
+    </script>
 </body>
 
 </html>

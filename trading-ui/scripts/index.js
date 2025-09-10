@@ -52,7 +52,7 @@ function refreshCharts() {
 function initializeCharts() {
     console.log('📊 Initializing charts...');
     
-    // Initialize Performance Chart
+    // Initialize Performance Chart - Simple line chart
     const performanceCtx = document.getElementById('performanceChart');
     if (performanceCtx && typeof Chart !== 'undefined') {
         if (performanceChart) performanceChart.destroy();
@@ -60,165 +60,55 @@ function initializeCharts() {
         performanceChart = new Chart(performanceCtx, {
             type: 'line',
             data: {
-                labels: ['ינ', 'פב', 'מרץ', 'אפר', 'מאי', 'יוני', 'יולי', 'אוג', 'ספט', 'אוק', 'נוב', 'דצמ'],
+                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
                 datasets: [{
-                    label: 'תיק השקעות',
-                    data: [100, 105, 102, 108, 115, 112, 118, 125, 122, 128, 135, 140],
+                    label: 'תיק',
+                    data: [100, 115, 125, 140],
                     borderColor: '#28a745',
                     backgroundColor: 'rgba(40, 167, 69, 0.1)',
                     tension: 0.4,
-                    borderWidth: 3,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                }, {
-                    label: 'מדד תל אביב 35',
-                    data: [100, 103, 101, 106, 110, 108, 112, 116, 114, 118, 122, 125],
-                    borderColor: '#007bff',
-                    backgroundColor: 'rgba(0, 123, 255, 0.1)',
-                    tension: 0.4,
-                    borderWidth: 3,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
+                    fill: true
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                aspectRatio: 3.5, // יחס רוחב:גובה של 3.5:1 (מלבני מאוד)
                 plugins: {
-                    title: {
-                        display: false // הסרת הכותרת מהגרף
-                    },
-                    legend: {
-                        position: 'top',
-                        align: 'start',
-                        labels: {
-                            font: {
-                                size: 11
-                            },
-                            usePointStyle: true,
-                            pointStyle: 'line',
-                            padding: 20
-                        }
-                    }
+                    legend: { display: false }
                 },
                 scales: {
-                    x: {
-                        title: {
-                            display: false // הסרת כותרת ציר X
-                        },
-                        ticks: {
-                            font: {
-                                size: 10
-                            },
-                            maxTicksLimit: 8
-                        },
-                        grid: {
-                            display: false
-                        }
-                    },
-                    y: {
-                        beginAtZero: false,
-                        title: {
-                            display: false // הסרת כותרת ציר Y
-                        },
-                        ticks: {
-                            font: {
-                                size: 10
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(0,0,0,0.1)',
-                            drawBorder: false
-                        }
-                    }
-                },
-                elements: {
-                    point: {
-                        hoverBackgroundColor: '#fff',
-                        hoverBorderWidth: 2
-                    }
+                    x: { display: false },
+                    y: { display: false }
                 }
             }
         });
     }
     
-    // Initialize Allocation Chart
+    // Initialize Allocation Chart - Simple doughnut
     const allocationCtx = document.getElementById('allocationChart');
     if (allocationCtx && typeof Chart !== 'undefined') {
         if (allocationChart) allocationChart.destroy();
         
         allocationChart = new Chart(allocationCtx, {
-            type: 'bar',
+            type: 'doughnut',
             data: {
-                labels: ['טכנולוגיה', 'פיננסים', 'בריאות', 'אנרגיה', 'תעשייה', 'אחר'],
+                labels: ['טכנולוגיה', 'פיננסים', 'אחר'],
                 datasets: [{
-                    label: 'אחוז מהתיק',
-                    data: [35, 25, 15, 10, 10, 5],
-                    backgroundColor: [
-                        '#28a745',
-                        '#007bff',
-                        '#dc3545',
-                        '#ffc107',
-                        '#6f42c1',
-                        '#6c757d'
-                    ],
-                    borderWidth: 0,
-                    borderRadius: 4,
-                    borderSkipped: false
+                    data: [50, 30, 20],
+                    backgroundColor: ['#28a745', '#007bff', '#ffc107']
                 }]
             },
             options: {
-                indexAxis: 'y', // עמודות אופקיות
                 responsive: true,
                 maintainAspectRatio: false,
-                aspectRatio: 2.8, // יחס רוחב:גובה של 2.8:1 (מלבני מאוד)
                 plugins: {
-                    title: {
-                        display: false // הסרת הכותרת מהגרף
-                    },
-                    legend: {
-                        display: false // הסרת המקרא
-                    }
-                },
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        max: 40,
-                        title: {
-                            display: false
-                        },
-                        ticks: {
-                            font: {
-                                size: 10
-                            },
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        },
-                        grid: {
-                            display: false
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: false
-                        },
-                        ticks: {
-                            font: {
-                                size: 10
-                            }
-                        },
-                        grid: {
-                            display: false
-                        }
-                    }
+                    legend: { display: false }
                 }
             }
         });
     }
     
-    // Initialize Accounts Chart
+    // Initialize Accounts Chart - Simple bar
     const accountsCtx = document.getElementById('accountsChart');
     if (accountsCtx && typeof Chart !== 'undefined') {
         if (accountsChart) accountsChart.destroy();
@@ -226,72 +116,27 @@ function initializeCharts() {
         accountsChart = new Chart(accountsCtx, {
             type: 'bar',
             data: {
-                labels: ['USD', 'ILS', 'EUR', 'Crypto'],
+                labels: ['USD', 'ILS', 'EUR'],
                 datasets: [{
-                    label: 'תשואה שנתית (%)',
-                    data: [12.5, 8.3, 15.2, 25.8],
-                    backgroundColor: [
-                        '#28a745',
-                        '#007bff',
-                        '#ffc107',
-                        '#dc3545'
-                    ],
-                    borderWidth: 0,
-                    borderRadius: 6,
-                    borderSkipped: false
+                    data: [15, 8, 12],
+                    backgroundColor: ['#28a745', '#007bff', '#ffc107']
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                aspectRatio: 3.2, // יחס רוחב:גובה של 3.2:1 (מלבני מאוד)
                 plugins: {
-                    title: {
-                        display: false // הסרת הכותרת מהגרף
-                    },
-                    legend: {
-                        display: false // הסרת המקרא
-                    }
+                    legend: { display: false }
                 },
                 scales: {
-                    x: {
-                        title: {
-                            display: false
-                        },
-                        ticks: {
-                            font: {
-                                size: 10
-                            }
-                        },
-                        grid: {
-                            display: false
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        max: 30,
-                        title: {
-                            display: false
-                        },
-                        ticks: {
-                            font: {
-                                size: 10
-                            },
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(0,0,0,0.1)',
-                            drawBorder: false
-                        }
-                    }
+                    x: { display: false },
+                    y: { display: false }
                 }
             }
         });
     }
     
-    // Initialize Risk Chart
+    // Initialize Risk Chart - Simple scatter
     const riskCtx = document.getElementById('riskChart');
     if (riskCtx && typeof Chart !== 'undefined') {
         if (riskChart) riskChart.destroy();
@@ -300,72 +145,22 @@ function initializeCharts() {
             type: 'scatter',
             data: {
                 datasets: [{
-                    label: 'מניות',
                     data: [
-                        {x: 5, y: 8}, {x: 7, y: 12}, {x: 3, y: 6}, {x: 9, y: 15},
-                        {x: 4, y: 7}, {x: 6, y: 10}, {x: 8, y: 14}, {x: 2, y: 4},
-                        {x: 10, y: 18}, {x: 1, y: 3}, {x: 11, y: 20}, {x: 12, y: 22}
+                        {x: 5, y: 8}, {x: 7, y: 12}, {x: 3, y: 6}, {x: 9, y: 15}
                     ],
                     backgroundColor: '#28a745',
-                    borderColor: '#28a745',
-                    pointRadius: 6,
-                    pointHoverRadius: 8,
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: '#28a745',
-                    pointHoverBorderWidth: 2
+                    pointRadius: 8
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                aspectRatio: 2.5, // יחס רוחב:גובה של 2.5:1 (מלבני)
                 plugins: {
-                    title: {
-                        display: false // הסרת הכותרת מהגרף
-                    },
-                    legend: {
-                        display: false
-                    }
+                    legend: { display: false }
                 },
                 scales: {
-                    x: {
-                        beginAtZero: true,
-                        max: 15,
-                        title: {
-                            display: false
-                        },
-                        ticks: {
-                            font: {
-                                size: 10
-                            },
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(0,0,0,0.1)',
-                            drawBorder: false
-                        }
-                    },
-                    y: {
-                        beginAtZero: true,
-                        max: 25,
-                        title: {
-                            display: false
-                        },
-                        ticks: {
-                            font: {
-                                size: 10
-                            },
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(0,0,0,0.1)',
-                            drawBorder: false
-                        }
-                    }
+                    x: { display: false },
+                    y: { display: false }
                 }
             }
         });

@@ -1354,4 +1354,5 @@ window.updateDateRangeFilterText = updateDateRangeFilterText;
 window.applyStatusFilter = applyStatusFilter;
 window.applyTypeFilter = applyTypeFilter;
 window.applyAccountFilter = applyAccountFilter;
+window.applyDateRangeFilter = applyDateRangeFilter;
 

@@ -42,9 +42,6 @@ margin: 0 auto;
     align-items: center;
     width: 100%;
     direction: rtl;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
 }
 
 
@@ -652,13 +649,6 @@ margin: 0 auto;
     object-fit: contain;
 }
 
-#unified-header .nav-icon {
-    width: 24px;
-    height: 24px;
-    margin-left: 8px;
-    vertical-align: middle;
-}
-
 #unified-header .home-icon {
     color: #09384d;
     font-size: 96px;
@@ -1034,10 +1024,6 @@ margin: 0 auto;
     background: var(--apple-bg-elevated);
     border-top: 1px solid var(--apple-border-light);
     display: block;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-    width: fit-content;
 }
 
 #unified-header .filters-container {

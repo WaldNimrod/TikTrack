@@ -38,9 +38,13 @@ margin: 0 auto;
     margin: 0 auto;
     padding: 1rem 10px;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     width: 100%;
+    direction: rtl;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 
@@ -1022,8 +1026,11 @@ margin: 0 auto;
     padding: 1rem 10px;
     background: var(--apple-bg-elevated);
     border-top: 1px solid var(--apple-border-light);
-    display: flex;
-    justify-content: center;
+    display: block;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    width: fit-content;
 }
 
 #unified-header .filters-container {
@@ -1031,7 +1038,7 @@ margin: 0 auto;
     align-items: center;
     gap: 1rem;
     flex-wrap: wrap;
-    justify-content: center;
+    direction: rtl;
     margin: 0 auto;
     padding: 0 10px;
 }

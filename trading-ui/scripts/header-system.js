@@ -1677,7 +1677,11 @@ class HeaderSystem {
     // הוספת event listener לאופציית "הכול"
     allItem.addEventListener('click', e => {
       e.stopPropagation();
-      selectAccountOption('הכול');
+      if (typeof selectAccountOption === 'function') {
+        selectAccountOption('הכול');
+      } else {
+        console.warn('⚠️ selectAccountOption not available yet');
+      }
     });
 
     accountMenu.appendChild(allItem);
@@ -1713,7 +1717,11 @@ class HeaderSystem {
         console.log('🔧 Date range filter item clicked:', item.getAttribute('data-value'));
 
         const range = item.getAttribute('data-value');
-        selectDateRangeOption(range);
+        if (typeof selectDateRangeOption === 'function') {
+          selectDateRangeOption(range);
+        } else {
+          console.warn('⚠️ selectDateRangeOption not available yet');
+        }
       });
     });
 
@@ -2725,7 +2733,11 @@ class HeaderSystem {
     `;
     allOption.addEventListener('click', e => {
       e.stopPropagation();
-      selectAccountOption('הכול');
+      if (typeof selectAccountOption === 'function') {
+        selectAccountOption('הכול');
+      } else {
+        console.warn('⚠️ selectAccountOption not available yet');
+      }
     });
     accountMenu.appendChild(allOption);
 
@@ -2740,7 +2752,11 @@ class HeaderSystem {
       `;
       option.addEventListener('click', e => {
         e.stopPropagation();
-        selectAccountOption(account.name);
+        if (typeof selectAccountOption === 'function') {
+          selectAccountOption(account.name);
+        } else {
+          console.warn('⚠️ selectAccountOption not available yet');
+        }
       });
       accountMenu.appendChild(option);
     });
@@ -3806,9 +3822,7 @@ function applySearchFilter(searchTerm) {
 // פונקציה applyDateRangeFilter כבר מוגדרת בשורה 3797
 
 // ייצוא פונקציות בחירה לגלובל
-window.selectStatusOption = selectStatusOption;
-window.selectTypeOption = selectTypeOption;
-// selectAccountOption and selectDateRangeOption are now exported from filter-system.js
+// selectStatusOption, selectTypeOption, selectAccountOption and selectDateRangeOption are now exported from filter-system.js
 
 // ייצוא פונקציות פילטר לגלובל
 window.applyStatusFilter = applyStatusFilter;
@@ -4430,7 +4444,11 @@ async function resetFiltersToDefaults() {
     const selectedDateRangeElement = document.getElementById('selectedDateRange');
     if (selectedDateRangeElement && dateRangeValue !== 'כל זמן') {
       // הפעלת הפונקציה שמטפלת בתרגום התאריכים
-      selectDateRangeOption(dateRangeValue);
+      if (typeof selectDateRangeOption === 'function') {
+        selectDateRangeOption(dateRangeValue);
+      } else {
+        console.warn('⚠️ selectDateRangeOption not available yet');
+      }
     } else if (selectedDateRangeElement) {
       selectedDateRangeElement.textContent = 'כל זמן';
     }

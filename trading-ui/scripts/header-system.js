@@ -1682,8 +1682,16 @@ class HeaderSystem {
           selectAccountOption('הכול');
         } else {
           console.warn('⚠️ selectAccountOption not available yet');
+          // Try again after another delay
+          setTimeout(() => {
+            if (typeof selectAccountOption === 'function') {
+              selectAccountOption('הכול');
+            } else {
+              console.error('❌ selectAccountOption still not available');
+            }
+          }, 100);
         }
-      }, 50);
+      }, 100);
     });
 
     accountMenu.appendChild(allItem);
@@ -1706,8 +1714,16 @@ class HeaderSystem {
             selectAccountOption(account.name);
           } else {
             console.warn('⚠️ selectAccountOption not available yet');
+            // Try again after another delay
+            setTimeout(() => {
+              if (typeof selectAccountOption === 'function') {
+                selectAccountOption(account.name);
+              } else {
+                console.error('❌ selectAccountOption still not available');
+              }
+            }, 100);
           }
-        }, 50);
+        }, 100);
       });
 
       accountMenu.appendChild(item);
@@ -1725,13 +1741,21 @@ class HeaderSystem {
         console.log('🔧 Date range filter item clicked:', item.getAttribute('data-value'));
 
         const range = item.getAttribute('data-value');
-        setTimeout(() => {
-          if (typeof selectDateRangeOption === 'function') {
-            selectDateRangeOption(range);
-          } else {
-            console.warn('⚠️ selectDateRangeOption not available yet');
-          }
-        }, 50);
+          setTimeout(() => {
+            if (typeof selectDateRangeOption === 'function') {
+              selectDateRangeOption(range);
+            } else {
+              console.warn('⚠️ selectDateRangeOption not available yet');
+              // Try again after another delay
+              setTimeout(() => {
+                if (typeof selectDateRangeOption === 'function') {
+                  selectDateRangeOption(range);
+                } else {
+                  console.error('❌ selectDateRangeOption still not available');
+                }
+              }, 100);
+            }
+          }, 100);
       });
     });
 
@@ -2748,8 +2772,16 @@ class HeaderSystem {
           selectAccountOption('הכול');
         } else {
           console.warn('⚠️ selectAccountOption not available yet');
+          // Try again after another delay
+          setTimeout(() => {
+            if (typeof selectAccountOption === 'function') {
+              selectAccountOption('הכול');
+            } else {
+              console.error('❌ selectAccountOption still not available');
+            }
+          }, 100);
         }
-      }, 50);
+      }, 100);
     });
     accountMenu.appendChild(allOption);
 
@@ -2769,8 +2801,16 @@ class HeaderSystem {
             selectAccountOption(account.name);
           } else {
             console.warn('⚠️ selectAccountOption not available yet');
+            // Try again after another delay
+            setTimeout(() => {
+              if (typeof selectAccountOption === 'function') {
+                selectAccountOption(account.name);
+              } else {
+                console.error('❌ selectAccountOption still not available');
+              }
+            }, 100);
           }
-        }, 50);
+        }, 100);
       });
       accountMenu.appendChild(option);
     });
@@ -4457,15 +4497,23 @@ async function resetFiltersToDefaults() {
     // עדכון טקסט פילטר תאריכים - הפעלת הפונקציה במקום עדכון ישיר
     const selectedDateRangeElement = document.getElementById('selectedDateRange');
     if (selectedDateRangeElement && dateRangeValue !== 'כל זמן') {
-      // נשתמש ב-setTimeout קטן כדי לתת לפונקציות להיטען
+      // נשתמש ב-setTimeout כדי לתת לפונקציות להיטען
       setTimeout(() => {
         if (typeof selectDateRangeOption === 'function') {
           selectDateRangeOption(dateRangeValue);
         } else {
           console.warn('⚠️ selectDateRangeOption not available yet');
-          selectedDateRangeElement.textContent = dateRangeValue;
+          // Try again after another delay
+          setTimeout(() => {
+            if (typeof selectDateRangeOption === 'function') {
+              selectDateRangeOption(dateRangeValue);
+            } else {
+              console.error('❌ selectDateRangeOption still not available');
+              selectedDateRangeElement.textContent = dateRangeValue;
+            }
+          }, 150);
         }
-      }, 100);
+      }, 150);
     } else if (selectedDateRangeElement) {
       selectedDateRangeElement.textContent = 'כל זמן';
     }

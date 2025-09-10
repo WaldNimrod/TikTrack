@@ -221,18 +221,7 @@
     width: 100%;
 }
 
-#unified-header .header-top {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-bottom: 1px solid var(--apple-border-light);
-    position: relative;
-    min-height: 70px;
-    direction: rtl;
-    background: var(--apple-bg-elevated);
-}
+/* REMOVED CONFLICTING header-top styles - kept in header-styles.css */
 
 /* REMOVED DUPLICATE header-top positioning - kept in header-styles.css */
 

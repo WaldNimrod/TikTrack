@@ -31,6 +31,7 @@ box-shadow: var(--apple-shadow-light);
 position: sticky;
 top: 0;
 z-index: 1000;
+max-width: 1360px;
 margin: 0 auto;
 }
 
@@ -44,29 +45,44 @@ margin: 0 auto;
     direction: rtl;
 }
 
+/* Filters Container - Same max-width and padding as header-container */
+.filters-container {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0 10px;
+}
+
+/* Header Filters - No side padding, no top margin */
+.header-filters {
+    padding: 1rem 0;
+    background: white;
+    position: relative;
+    z-index: 950;
+    min-height: 60px;
+    display: none;
+    margin-top: 0;
+}
 
 #unified-header .header-top {
-    margin: 0 auto;
+    margin: 0;
     padding: 0;
     display: flex;
+    justify-content: center;
     align-items: center;
     border-bottom: 1px solid var(--apple-border-light);
     position: relative;
     min-height: 70px;
     direction: rtl;
     background: var(--apple-bg-elevated);
-    max-width: 1360px;
-    left: 50%;
-    transform: translateX(-50%);
 }
 
 #unified-header .header-top .logo-section {
-    order: 1;
+    order: 3;
     margin-right: auto;
 }
 
 #unified-header .header-top .header-nav {
-    order: 2;
+    order: 1;
     margin-left: auto;
 }
 
@@ -156,9 +172,128 @@ margin: 0 auto;
     }
 }
 
-/* ===== סגנונות ניווט ===== */
+/* Menu - Apple Style with TikTrack Colors */
 
-/* ===== סגנונות תפריטים נפתחים ===== */
+/* Main Header */
+.unified-header {
+    background: #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Header Top */
+.header-top {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem 0 1rem 0;
+    position: relative;
+    min-height: 70px;
+    direction: rtl;
+    width: 100%;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+}
+
+/* REMOVED conflicting .header-container definition - kept #unified-header .header-container */
+
+/* Navigation */
+.header-nav {
+    padding: 0;
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.tiktrack-nav-list {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tiktrack-nav-item {
+    position: relative;
+}
+
+.tiktrack-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    color: #ff9e04; /* צבע הלוגו - כתום */
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    font-weight: 400;
+    font-size: 16px;
+}
+
+.tiktrack-nav-link:hover {
+    color: #e6850e; /* צבע הלוגו כהה יותר ב-hover */
+}
+
+.tiktrack-nav-item.active .tiktrack-nav-link {
+    color: #cc7a00; /* צבע הלוגו כהה מאוד לפריט פעיל */
+    font-weight: 600; /* משקל כבד יותר לפריט פעיל */
+}
+
+.tiktrack-nav-item:first-child {
+    margin-right: 0;
+}
+
+.tiktrack-nav-item:first-child .tiktrack-nav-link {
+    padding-right: 0;
+}
+
+.tiktrack-nav-item:nth-child(2) {
+    margin-right: 0.5rem;
+}
+
+/* Logo Section */
+.logo-section {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    direction: ltr;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-decoration: none;
+    color: inherit;
+    direction: ltr;
+}
+
+.logo:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.logo-image {
+    width: 125px;
+    height: 37.5px;
+    object-fit: contain;
+    display: block;
+}
+
+.logo-text {
+    font-size: 1rem;
+    font-weight: 300;
+    color: #26baac;
+    direction: ltr;
+    text-align: left;
+    align-self: flex-end;
+    margin-bottom: -5px;
+    white-space: nowrap;
+}
+
+        /* Dropdown Menus */
         .tiktrack-dropdown-menu {
             position: absolute;
             top: 100%;
@@ -243,8 +378,9 @@ margin: 0 auto;
             position: relative;
         }
         
+        /* Bootstrap 5 submenu base positioning - REMOVED - handled by unified.css */
 
-/* ===== סגנונות כפתורים ===== */
+/* Cache clear button */
 .cache-clear-btn {
     display: flex;
     align-items: center;
@@ -313,7 +449,7 @@ margin: 0 auto;
     transform: rotate(180deg) translateY(-5px);
 }
 
-/* ===== סגנונות פילטרים ===== */
+/* Filters Section */
 .header-filters {
     padding: 1rem 2rem;
     background: white;
@@ -342,6 +478,7 @@ margin: 0 auto;
     display: flex;
     align-items: center;
     gap: 1rem;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
@@ -590,769 +727,5 @@ margin: 0 auto;
     height: 1px;
     background: #e5e5e5;
     margin: 0.5rem 0;
-}
-
-/* ===== סגנונות #unified-header ייחודיים ===== */
-#unified-header {
-    background: var(--apple-bg-elevated);
-    border-bottom: 1px solid var(--apple-border-light);
-    box-shadow: var(--apple-shadow-light);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    margin: 0 auto;
-}
-
-#unified-header .header-container {
-    margin: 0 auto;
-    padding: 1rem 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-#unified-header .header-wrapper {
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-#unified-header .page-title {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-#unified-header .page-title h1 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--apple-text-primary);
-    margin: 0;
-}
-
-#unified-header .logo-section {
-    display: flex;
-    align-items: flex-end;
-    gap: 0.5rem;
-    direction: ltr;
-}
-
-/* REMOVED DUPLICATE logo-text definition that was overriding align-self: flex-end */
-
-#unified-header .logo-icon {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-}
-
-#unified-header .home-icon {
-    color: #09384d;
-    font-size: 96px;
-    font-weight: 500;
-}
-
-#unified-header .logo {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    text-decoration: none;
-    color: inherit;
-}
-
-#unified-header .logo:hover {
-    text-decoration: none;
-    color: inherit;
-}
-
-#unified-header .logo-image {
-    width: 125px;
-    height: 37.5px;
-    object-fit: contain;
-    display: block;
-}
-
-#unified-header .header-nav {
-    display: flex;
-    align-items: center;
-}
-
-#unified-header .nav-item {
-    position: relative;
-    overflow: hidden;
-}
-
-#unified-header .nav-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(41, 166, 168, 0.1);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    border-radius: 6px;
-}
-
-#unified-header .nav-item:hover::before {
-    opacity: 1;
-}
-
-#unified-header .nav-item.active::before {
-    opacity: 0;
-    background: transparent;
-}
-
-#unified-header .main-nav {
-    display: flex;
-    align-items: center;
-}
-
-#unified-header .tiktrack-nav-list {
-    display: flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    gap: 0.5rem;
-}
-
-#unified-header .tiktrack-nav-item {
-    position: relative;
-}
-
-#unified-header .tiktrack-nav-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    color: #333333;
-    text-decoration: none;
-    border-radius: var(--apple-radius-small);
-    transition: all 0.2s ease;
-    font-weight: 400;
-}
-
-#unified-header .tiktrack-nav-link:hover {
-    background: transparent;
-    color: #ff9c05;
-    text-decoration: underline;
-    text-decoration-color: #ff9c05;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 4px;
-}
-
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link:hover {
-    background: transparent;
-    color: #333333;
-    border: none;
-    text-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-}
-
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/"]:hover {
-    text-shadow: none;
-}
-
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/index.html"]:hover {
-    text-shadow: none;
-}
-
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link {
-    background: transparent;
-    color: #333333;
-    font-weight: 600;
-    border: none;
-    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/"] {
-    text-shadow: none;
-}
-
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/index.html"] {
-    text-shadow: none;
-}
-
-#unified-header .nav-icon {
-    font-size: 1.2rem;
-}
-
-#unified-header .nav-text {
-    font-weight: 400;
-    color: #333333;
-}
-
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link .nav-text {
-    color: #333333;
-    font-weight: 600;
-    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/"] .nav-text {
-    text-shadow: none;
-}
-
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link[href="/index.html"] .nav-text {
-    text-shadow: none;
-}
-
-#unified-header .tiktrack-nav-link:focus {
-    outline: none;
-    transform: none;
-    margin: 0;
-}
-
-#unified-header .tiktrack-nav-link:active {
-    transform: none;
-    margin: 0;
-}
-
-#unified-header .tiktrack-dropdown-arrow {
-    font-size: 0.8rem;
-    transition: transform 0.2s ease;
-    color: #333333;
-}
-
-#unified-header .tiktrack-nav-item.active .tiktrack-nav-link .tiktrack-dropdown-arrow {
-    color: #333333;
-}
-
-#unified-header .dropdown-menu {
-    top: 100%;
-    right: 0;
-    margin: 0;
-    animation: dropdownFadeIn 0.2s ease-out;
-    display: none;
-    position: absolute;
-    background: var(--apple-bg-elevated);
-    border: 1px solid var(--apple-border-light);
-    border-radius: var(--apple-radius-medium);
-    box-shadow: var(--apple-shadow-medium);
-    min-width: 200px;
-    z-index: 1001;
-}
-
-#unified-header .dropdown-menu.show {
-    position: relative !important;
-    z-index: 99999 !important;
-    display: block !important;
-}
-
-#unified-header .dropdown-menu:not(.show) {
-    display: none !important;
-}
-
-#unified-header .dropdown-item {
-    padding: 8px 16px;
-    white-space: nowrap;
-    border: none;
-    background: transparent;
-    color: var(--apple-text-primary);
-    text-decoration: none;
-    display: block;
-    width: 100%;
-    text-align: right;
-    transition: background-color 0.2s ease;
-}
-
-#unified-header .dropdown-item:hover {
-    background-color: var(--apple-bg-secondary);
-    color: var(--apple-text-primary);
-}
-
-#unified-header .dropdown-item:first-child {
-    border-radius: 12px 12px 0 0;
-}
-
-#unified-header .dropdown-item:last-child {
-    border-radius: 0 0 12px 12px;
-}
-
-#unified-header .dropdown-arrow {
-    margin-inline-end: 0.5rem;
-    font-size: 0.8rem;
-    transition: transform 0.2s ease;
-}
-
-#unified-header .dropdown-toggle {
-    background: transparent;
-    border: none;
-    color: var(--apple-text-primary);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: var(--apple-radius-small);
-    transition: all 0.2s ease;
-}
-
-#unified-header .dropdown-toggle:hover {
-    background: var(--apple-bg-secondary);
-    color: #ff9c05;
-}
-
-#unified-header .dropdown-toggle[aria-expanded="true"] .dropdown-arrow {
-    transform: rotate(180deg);
-}
-
-#unified-header .dropdown-submenu {
-    position: relative;
-}
-
-#unified-header .dropdown-submenu .tiktrack-submenu-toggle {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-#unified-header .submenu-arrow {
-    font-size: 0.8em;
-    transition: transform 0.2s ease;
-    margin-inline-end: 8px;
-}
-
-#unified-header .dropdown-submenu:hover .submenu-arrow {
-    transform: rotate(90deg);
-}
-
-#unified-header .tiktrack-submenu {
-    position: absolute;
-    left: 100%;
-    top: 0;
-    background: var(--apple-bg-elevated);
-    border: 1px solid var(--apple-border-light);
-    border-radius: var(--apple-radius-medium);
-    box-shadow: var(--apple-shadow-medium);
-    min-width: 180px;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(-10px);
-    transition: all 0.2s ease;
-    z-index: 1002;
-}
-
-#unified-header .dropdown-submenu:hover .tiktrack-submenu,
-#unified-header .tiktrack-submenu.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateX(0);
-}
-
-#unified-header .tiktrack-submenu .tiktrack-dropdown-item {
-    padding: 8px 16px;
-    white-space: nowrap;
-    border: none;
-    background: transparent;
-    color: var(--apple-text-primary);
-    text-decoration: none;
-    display: block;
-    width: 100%;
-    text-align: right;
-    transition: background-color 0.2s ease;
-}
-
-#unified-header .tiktrack-submenu .tiktrack-dropdown-item:hover {
-    background-color: var(--apple-bg-secondary);
-    color: var(--apple-text-primary);
-}
-
-#unified-header .dropdown-submenu:hover .tiktrack-submenu {
-        transform: none;
-    }
-
-#unified-header .filter-toggle-btn {
-    background: transparent;
-    border: 1px solid var(--apple-border);
-    border-radius: var(--apple-radius-small);
-    padding: 0.5rem 1rem;
-    color: var(--apple-text-primary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-#unified-header .filter-toggle-btn:hover {
-    background: var(--apple-bg-secondary);
-    border-color: #ff9c05;
-    color: #ff9c05;
-}
-
-#unified-header .filter-toggle-btn.active {
-    background: #ff9c05;
-    border-color: #ff9c05;
-    color: white;
-}
-
-#unified-header .notification-icon {
-    position: relative;
-    color: var(--apple-text-primary);
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: color 0.2s ease;
-}
-
-#unified-header .notification-icon:hover {
-    color: #ff9c05;
-}
-
-#unified-header .notification-badge {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background: #ff3b30;
-    color: white;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    font-size: 0.7rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-}
-
-#unified-header .header-filters {
-    margin: 0 auto;
-    padding: 1rem 10px;
-    background: var(--apple-bg-elevated);
-    border-top: 1px solid var(--apple-border-light);
-    display: block;
-}
-
-#unified-header .filters-container {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-    direction: rtl;
-    margin: 0 auto;
-    padding: 0 10px;
-}
-
-#unified-header .filter-group {
-    position: relative;
-}
-
-#unified-header .filter-dropdown {
-    position: relative;
-}
-
-#unified-header .filter-toggle {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: var(--apple-bg-elevated);
-    border: 1px solid var(--apple-border-light);
-    border-radius: 8px;
-    color: var(--apple-text-primary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 0.9rem;
-    min-width: 120px;
-    width: 140px;
-    justify-content: space-between;
-}
-
-#unified-header .filter-toggle:hover {
-    background: var(--apple-bg-secondary);
-    border-color: var(--apple-border);
-}
-
-#unified-header .filter-toggle.active {
-    background: transparent !important;
-    color: #28a745 !important;
-    border-color: #28a745 !important;
-    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3) !important;
-}
-
-#unified-header .filter-label {
-    font-weight: 500;
-}
-
-#unified-header .selected-value {
-    color: var(--apple-text-secondary);
-    font-size: 0.85rem;
-    min-width: 80px;
-    text-align: right;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-#unified-header .filter-menu {
-    position: absolute !important;
-    top: 100% !important;
-    right: 0 !important;
-    background: white !important;
-    border: 1px solid #e8e8e8 !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    min-width: 180px !important;
-    z-index: 10001 !important;
-    display: none;
-    margin-top: 5px;
-    padding: 0.5rem 0;
-}
-
-#unified-header .filter-menu.show {
-    position: absolute !important;
-    z-index: 99999 !important;
-    display: block !important;
-}
-
-#unified-header .filter-menu:not(.show) {
-    display: none !important;
-}
-
-/* ===== סגנונות תפריטי משנה חסרים ===== */
-
-/* תפריטי משנה בסיסיים */
-.tiktrack-dropdown-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: white;
-    border: 1px solid #e5e5e5;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    min-width: 200px;
-    padding: 0.5rem 0;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.3s ease;
-    z-index: 1001;
-    list-style: none;
-}
-
-.tiktrack-nav-item:hover .tiktrack-dropdown-menu {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
-/* פריטי תפריט עם ריווח ופונטים */
-.tiktrack-dropdown-item {
-    display: block;
-    padding: 0.5rem 1rem;
-    color: #29a6a8;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    font-size: 14px;
-    font-weight: 400;
-}
-
-.tiktrack-dropdown-item:hover {
-    background: #f5f5f7;
-    color: #ff9e04;
-}
-
-.tiktrack-dropdown-item.active {
-    background: rgba(0, 0, 0, 0.05);
-    color: #333333;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* תפריטי משנה עם ריווח מיוחד */
-.dropdown-submenu > .tiktrack-dropdown-item {
-    padding-right: 0.5rem;
-}
-
-/* תפריט רמה 3 */
-.level3-submenu {
-    position: absolute !important;
-    top: 0 !important;
-    right: 100% !important;
-    left: auto !important;
-    margin-top: -1px !important;
-    margin-right: 0 !important;
-    margin-left: 0 !important;
-    background: white !important;
-    border: 1px solid #e5e5e5 !important;
-    border-radius: 12px !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
-    min-width: 180px !important;
-    padding: 0.5rem 0 !important;
-    display: none !important;
-    z-index: 1001 !important;
-    list-style: none !important;
-}
-
-.dropdown-submenu:hover .level3-submenu {
-    display: block !important;
-}
-
-/* מפרידים */
-.separator {
-    height: 1px;
-    background: #e5e5e5;
-    margin: 0.5rem 0;
-}
-
-/* תפריטי פילטר עם ריווח ופונטים */
-.filter-option {
-    padding: 0.45rem 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    color: #1d1d1f;
-    font-size: 0.9em;
-    font-weight: 400;
-}
-
-.filter-option:hover {
-    background: #f5f5f7;
-    color: #ff9e04;
-}
-
-.filter-option.selected {
-    background: #e3f2fd !important;
-    color: #1976d2 !important;
-    font-weight: 600 !important;
-}
-
-/* תפריטי פילטר עם רקעים */
-.filter-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    min-width: 150px;
-    padding: 0.5rem 0;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-10px);
-    transition: all 0.2s ease;
-    z-index: 1003;
-    display: block !important;
-}
-
-.filter-group:hover .filter-menu,
-.filter-menu.show {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translateY(0) !important;
-    display: block !important;
-}
-
-#unified-header .header-top {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-#unified-header .header-top .logo-section {
-        order: 1;
-        margin: 0;
-    }
-
-#unified-header .header-top .header-nav {
-        order: 2;
-        margin: 0;
-    }
-
-#unified-header .tiktrack-dropdown-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: var(--apple-bg-elevated);
-    border: 1px solid var(--apple-border-light);
-    border-radius: 12px;
-    box-shadow: var(--apple-shadow-medium);
-    min-width: 200px;
-    padding: 0.5rem 0;
-    display: none;
-    z-index: 1000;
-    list-style: none;
-}
-
-#unified-header .tiktrack-dropdown-menu.show {
-    display: block;
-}
-
-#unified-header .tiktrack-dropdown-item {
-    display: block;
-    padding: 0.5rem 1rem;
-    color: #000000;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    font-weight: 300;
-    font-size: 0.85rem;
-    list-style: none;
-}
-
-#unified-header .tiktrack-dropdown-item:hover {
-    background: rgba(38, 186, 172, 0.1);
-    color: #26baac;
-}
-
-#unified-header .tiktrack-dropdown-item.active {
-    background: rgba(0, 0, 0, 0.05);
-    color: #333333;
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-#unified-header .tiktrack-dropdown-item.active:hover {
-    background: rgba(0, 0, 0, 0.08);
-    color: #333333;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-}
-
-#unified-header .dropdown-submenu .submenu {
-    position: absolute;
-    top: 0;
-    right: 100%;
-    background: var(--apple-bg-elevated);
-    border: 1px solid var(--apple-border-light);
-    border-radius: 12px;
-    box-shadow: var(--apple-shadow-medium);
-    min-width: 200px;
-    padding: 0.5rem 0;
-    display: none;
-    z-index: 1001;
-    list-style: none;
-}
-
-#unified-header .dropdown-submenu:hover .submenu {
-    display: block;
-}
-
-#unified-header .submenu .tiktrack-dropdown-item {
-    padding: 0.4rem 1rem;
-    font-size: 0.8rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    list-style: none;
-}
-
-#unified-header .submenu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-#unified-header .submenu .tiktrack-dropdown-item:last-child {
-    border-bottom: none;
-}
-
-#unified-header .submenu .tiktrack-dropdown-item:hover {
-    background: rgba(38, 186, 172, 0.1);
-    color: #26baac;
-}
-
-#unified-header .dropdown-divider {
-    margin: 0.5rem 0;
-    border: none;
-    border-top: 1px solid var(--apple-border-light);
 }
 

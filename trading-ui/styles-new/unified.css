@@ -15,19 +15,19 @@
   --status-active-color: var(--user-status-active-color, #007bff);
   --status-inactive-color: var(--user-status-inactive-color, #6c757d);
   
-  /* צבעי ישויות דינמיים */
-  --entity-trade-color: var(--user-entity-trade-color, #007bff);
-  --entity-trade-plan-color: var(--user-entity-trade-plan-color, #ffffff);
-  --entity-execution-color: var(--user-entity-execution-color, #17a2b8);
-  --entity-account-color: var(--user-entity-account-color, #1b0b75);
-  --entity-cash-flow-color: var(--user-entity-cash-flow-color, #20c997);
-  --entity-ticker-color: var(--user-entity-ticker-color, #019193);
-  --entity-alert-color: var(--user-entity-alert-color, #ff9c05);
-  --entity-note-color: var(--user-entity-note-color, #6f42c1);
-  --entity-constraint-color: var(--user-entity-constraint-color, #6c757d);
-  --entity-design-color: var(--user-entity-design-color, #495057);
-  --entity-research-color: var(--user-entity-research-color, #343a40);
-  --entity-preference-color: var(--user-entity-preference-color, #adb5bd);
+  /* צבעי ישויות דינמיים - צבעים מובחנים ונראים */
+  --entity-trade-color: var(--user-entity-trade-color, #007bff);        /* כחול */
+  --entity-trade-plan-color: var(--user-entity-trade-plan-color, #6f42c1); /* סגול */
+  --entity-execution-color: var(--user-entity-execution-color, #17a2b8);   /* טורקיז */
+  --entity-account-color: var(--user-entity-account-color, #28a745);       /* ירוק */
+  --entity-cash-flow-color: var(--user-entity-cash-flow-color, #20c997);   /* ירוק בהיר */
+  --entity-ticker-color: var(--user-entity-ticker-color, #dc3545);         /* אדום */
+  --entity-alert-color: var(--user-entity-alert-color, #ff9c05);           /* כתום */
+  --entity-note-color: var(--user-entity-note-color, #6c757d);             /* אפור */
+  --entity-constraint-color: var(--user-entity-constraint-color, #495057); /* אפור כהה */
+  --entity-design-color: var(--user-entity-design-color, #343a40);         /* אפור מאוד כהה */
+  --entity-research-color: var(--user-entity-research-color, #17a2b8);     /* טורקיז */
+  --entity-preference-color: var(--user-entity-preference-color, #adb5bd); /* אפור בהיר */
 }
 
 /* From: _typography.css */
@@ -548,6 +548,7 @@ button:disabled,
   background: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
+  gap: 1rem;
 }
 .section-header:not([class*="entity-"]) {
   background: #ffffff;
@@ -2102,6 +2103,44 @@ select option {
   .info-summary div {
     justify-content: flex-start;
     text-align: right;
+  }
+}
+
+/* ===== INFO SUMMARY IN SECTION HEADER ===== */
+/* סגנונות מיוחדים ל-info-summary כשהוא נמצא ב-section-header */
+.section-header .info-summary {
+  margin: 0 1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(248, 249, 250, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  flex: 1;
+  max-width: 600px;
+}
+
+.section-header .info-summary div {
+  font-size: 13px;
+  padding: 0 0.25rem;
+}
+
+.section-header .info-summary strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Responsive design for info-summary in section header */
+@media (max-width: 768px) {
+  .section-header .info-summary {
+    margin: 0.5rem 0;
+    max-width: 100%;
+  }
+  
+  .section-header .info-summary div {
+    font-size: 12px;
+  }
+  
+  .section-header .info-summary strong {
+    font-size: 13px;
   }
 }
 

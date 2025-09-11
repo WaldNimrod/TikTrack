@@ -84,12 +84,21 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log('✅ מודולים הוגדרו לסגירה בלחיצה על הרקע');
 
   // וידוא שצבעי ישויות מוגדרים
+  console.log('🔍 בודק אם loadColorPreferences קיים:', !!window.loadColorPreferences);
   if (window.loadColorPreferences) {
+    console.log('🎨 קורא ל-loadColorPreferences...');
     window.loadColorPreferences().then(() => {
       console.log('✅ צבעי ישויות נטענו לעמוד התראות');
+      // בדיקת הצבעים שנטענו
+      const tradeColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-color');
+      const tickerColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-ticker-color');
+      console.log('🎨 צבע טרייד:', tradeColor);
+      console.log('🎨 צבע טיקר:', tickerColor);
     }).catch(error => {
       console.warn('⚠️ שגיאה בטעינת צבעי ישויות:', error);
     });
+  } else {
+    console.warn('⚠️ loadColorPreferences לא קיים!');
   }
 });
 

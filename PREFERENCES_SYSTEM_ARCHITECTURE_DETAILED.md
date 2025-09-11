@@ -78,8 +78,8 @@ class UserPreferencesNew(BaseModel):
 ## 🏗️ **ארכיטקטורה**
 
 ### **Backend Components:**
-1. **Models**: `UserPreferencesV2`, `PreferenceProfile`, `PreferenceHistory`
-2. **Services**: `PreferencesServiceV2`, `MigrationService`  
+1. **Models**: `UserPreferences`, `PreferenceProfile`, `PreferenceHistory`
+2. **Services**: `PreferencesService`, `MigrationService`  
 3. **API**: `/api/v2/preferences/*`
 4. **Validators**: תבניות בדיקה מתקדמות
 
@@ -147,7 +147,7 @@ class UserPreferencesNew(BaseModel):
 ## 🔄 **תהליך המיגרציה**
 
 ### **שלב 1: יצירת מבנה חדש**
-1. מודל `UserPreferencesV2` 
+1. מודל `UserPreferences` 
 2. שירותי מיגרציה
 3. API endpoints חדשים
 
@@ -182,7 +182,7 @@ def migrate_existing_preferences():
 
 ### **Priority 1 - Core**
 - [x] ניתוח מערכת קיימת
-- [ ] מודל UserPreferencesV2
+- [ ] מודל UserPreferences
 - [ ] API endpoints בסיסיים
 - [ ] מיגרציה
 

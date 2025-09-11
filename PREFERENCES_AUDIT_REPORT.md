@@ -26,7 +26,7 @@
 
 ### **🎯 מטרת הבדיקה**
 בדיקה מקיפה של השינויים העמוקים שבוצעו במערכת ההעדפות, כולל:
-- שינוי השם מ-V2 לשמות ברירת המחדל
+- שינוי השם לשמות ברירת המחדל
 - בדיקת שלמות הקבצים והפונקציונליות
 - אימות מיגרציה ונתונים
 - בדיקת אינטגרציה עם מערכת קיימת
@@ -52,7 +52,7 @@
   - Responsive design מלא
 
 - **JavaScript מתקדם**: `trading-ui/scripts/preferences-v2.js` (1,007 שורות)
-  - מנוע V2 מלא עם ניהול state מתקדם
+  - מנוע מלא עם ניהול state מתקדם
   - תמיכה בפרופילים מרובים
   - יבוא/יצוא הגדרות
   - בדיקות תקינות
@@ -78,10 +78,10 @@
 
 #### **4. תיעוד מקיף**
 - **דוקומנטציה ראשית**: `PREFERENCES_SYSTEM_ARCHITECTURE_NEW.md`
-- **ארכיטקטורת ברירות מחדל**: `PREFERENCES_V2_DEFAULTS_ARCHITECTURE.md`
-- **דוח יישום**: `PREFERENCES_V2_IMPLEMENTATION_REPORT.md`
-- **השוואה V1 vs V2**: `PREFERENCES_V1_VS_V2_COMPARISON.md`
-- **דוח השלמה**: `PREFERENCES_V2_FINAL_COMPLETION_REPORT.md`
+- **ארכיטקטורת ברירות מחדל**: `PREFERENCES_DEFAULTS_ARCHITECTURE.md`
+- **דוח יישום**: `PREFERENCES_IMPLEMENTATION_REPORT.md`
+- **השוואה מערכת ישנה vs נוכחית**: `PREFERENCES_LEGACY_VS_CURRENT_COMPARISON.md`
+- **דוח השלמה**: `PREFERENCES_FINAL_COMPLETION_REPORT.md`
 
 ### **❌ מה שחסר או לא עובד**
 
@@ -100,21 +100,21 @@
 
 ## 📊 **תוצאות בדיקות מפורטות**
 
-### **בדיקת מערכת V2**
+### **בדיקת מערכת העדפות**
 ```
-📋 PREFERENCES V2 SYSTEM TEST REPORT
+📋 PREFERENCES SYSTEM TEST REPORT
 ====================================
 🕐 Test Date: 2025-09-06 13:30:24
 
 🧪 Running: API Endpoints
-🔍 Testing V2 API endpoints availability...
+🔍 Testing API endpoints availability...
   ✅ /api/v2/preferences/: HTTP 403
   ✅ /api/v2/preferences/profiles: HTTP 403
   ✅ /api/v2/preferences/compatibility/v1: HTTP 403
 
 🧪 Running: Data Integrity
-🔍 Testing V2 data integrity...
-✅ All V2 tables exist
+🔍 Testing data integrity...
+✅ All tables exist
 ✅ Profile: ברירת מחדל
 ✅ Currency: USD
 ✅ Migrated: True
@@ -124,7 +124,7 @@
 
 🧪 Running: Migration Completeness
 🔍 Testing migration completeness...
-❌ Currency: USD (DEPRECATED - USE V2) ≠ USD
+❌ Currency: USD (DEPRECATED) ≠ USD
 ✅ Stop Loss: 5.0 ➜ 5.0
 ✅ Status Filter: open ➜ open
 
@@ -142,14 +142,14 @@
 ### **פירוט תוצאות בדיקות**
 
 #### **✅ Data Integrity - PASS**
-- כל הטבלאות V2 קיימות במסד הנתונים
+- כל הטבלאות קיימות במסד הנתונים
 - פרופיל ברירת מחדל נוצר בהצלחה
 - נתונים מועברים ונשמרים נכון
 - JSON fields תקינים (color_scheme, opacity_settings, refresh_overrides)
 
 #### **❌ API Endpoints - FAIL**
 - כל ה-endpoints מחזירים HTTP 403
-- השרת לא מכיר ב-API V2
+- השרת לא מכיר ב-API החדש
 - Blueprint לא רשום ב-`app.py`
 
 #### **❌ Migration Completeness - FAIL**
@@ -162,15 +162,14 @@
 
 ### **📁 קבצי דוקומנטציה ראשיים**
 1. **[PREFERENCES_SYSTEM_ARCHITECTURE_NEW.md](PREFERENCES_SYSTEM_ARCHITECTURE_NEW.md)** - אפיון המערכת החדשה
-2. **[PREFERENCES_V2_DEFAULTS_ARCHITECTURE.md](PREFERENCES_V2_DEFAULTS_ARCHITECTURE.md)** - ארכיטקטורת ברירות מחדל דינמיות
-3. **[PREFERENCES_V2_IMPLEMENTATION_REPORT.md](PREFERENCES_V2_IMPLEMENTATION_REPORT.md)** - דוח יישום מפורט
-4. **[PREFERENCES_V1_VS_V2_COMPARISON.md](PREFERENCES_V1_VS_V2_COMPARISON.md)** - השוואה מפורטת V1 vs V2
-5. **[PREFERENCES_V2_FINAL_COMPLETION_REPORT.md](PREFERENCES_V2_FINAL_COMPLETION_REPORT.md)** - דוח השלמה סופי
+2. **[PREFERENCES_DEFAULTS_ARCHITECTURE.md](PREFERENCES_DEFAULTS_ARCHITECTURE.md)** - ארכיטקטורת ברירות מחדל דינמיות
+3. **[PREFERENCES_IMPLEMENTATION_REPORT.md](PREFERENCES_IMPLEMENTATION_REPORT.md)** - דוח יישום מפורט
+4. **[PREFERENCES_LEGACY_VS_CURRENT_COMPARISON.md](PREFERENCES_LEGACY_VS_CURRENT_COMPARISON.md)** - השוואה מפורטת מערכת ישנה vs נוכחית
+5. **[PREFERENCES_FINAL_COMPLETION_REPORT.md](PREFERENCES_FINAL_COMPLETION_REPORT.md)** - דוח השלמה סופי
 
 ### **📁 קבצי קוד Frontend**
 1. **[trading-ui/preferences-v2.html](trading-ui/preferences-v2.html)** - ממשק משתמש מתקדם
-2. **[trading-ui/scripts/preferences-v2.js](trading-ui/scripts/preferences-v2.js)** - מנוע JavaScript V2
-3. **[trading-ui/scripts/preferences-v2-compatibility.js](trading-ui/scripts/preferences-v2-compatibility.js)** - שכבת תאימות
+2. **[trading-ui/scripts/preferences.js](trading-ui/scripts/preferences.js)** - מנוע JavaScript
 
 ### **📁 קבצי Backend (חסרים)**
 1. **`Backend/models/user_preferences_v2.py`** - מודל SQLAlchemy (לא קיים)
@@ -191,7 +190,7 @@
 ## 🚨 **בעיות קריטיות שזוהו**
 
 ### **1. Backend API חסר לחלוטין**
-- **בעיה**: כל קבצי Backend V2 חסרים
+- **בעיה**: כל קבצי Backend חסרים
 - **השפעה**: המערכת לא פונקציונלית
 - **פתרון**: יצירת 3 קבצי Backend + עדכון app.py
 
@@ -291,4 +290,4 @@
 
 ---
 
-*דוח זה מסכם בדיקה מקיפה של מערכת העדפות V2 ומספק תכנית פעולה מפורטת להשלמת המערכת.*
+*דוח זה מסכם בדיקה מקיפה של מערכת העדפות ומספק תכנית פעולה מפורטת להשלמת המערכת.*

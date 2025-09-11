@@ -636,17 +636,15 @@ function updateAlertsTable(alerts) {
       return `
         <tr data-status="${alert.status || ''}" data-date="${alert.created_at || ''}">
           <td class="ticker-cell">
-            <div style="display: flex; align-items: center; gap: 5px;">
+            <div class="ticker-cell-content">
               <span class="ticker-symbol-link" 
                     onclick="showEntityDetails('alert', ${alert.id}); return false;" 
-                    title="פרטי התראה"
-                    style="cursor: pointer; font-weight: 500;">
+                    title="פרטי התראה">
                 ${symbolDisplay}
               </span>
-              <span class="ticker-symbol-link" 
+              <span class="ticker-link-icon" 
                     onclick="if (${alert.related_id || 'false'}) { showEntityDetails('ticker', ${alert.related_id}); } else { if (window.showErrorNotification) { window.showErrorNotification('שגיאה', 'מזהה טיקר לא זמין'); } else if (typeof showNotification === 'function') { showNotification('מזהה טיקר לא זמין', 'error'); } else { alert('מזהה טיקר לא זמין'); } } return false;" 
-                    title="פרטי טיקר"
-                    style="cursor: pointer; opacity: 0.6; transition: opacity 0.2s ease-in-out;">
+                    title="פרטי טיקר">
                 🔗
               </span>
             </div>
@@ -663,12 +661,11 @@ function updateAlertsTable(alerts) {
     return alert.condition || '-';
   })()}</span></td>
           <td class="status-cell" data-status="${alert.status || ''}">
-          <span class="status-badge ${statusClass}" style="color: ${statusColor}; background-color: ${statusBgColor}; border: 1px solid ${statusColor};">${statusDisplay}</span>
+          <span class="status-badge ${statusClass}">${statusDisplay}</span>
         </td>
-          <td><span class="triggered-badge ${triggeredClass}" style="background-color: ${triggeredBgColor}; border: 1px solid ${triggeredBorderColor}; color: ${triggeredColor}; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem;">${triggeredDisplay}</span></td>
-          <td style="padding: 0;">
+          <td><span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span></td>
+          <td class="related-cell">
             <div class="related-object-cell ${relatedClass}" 
-             style="justify-content: flex-start; text-align: right; min-width: 150px; cursor: pointer; background-color: ${relatedBgColor || 'rgba(108, 117, 125, 0.1)'}; color: ${relatedColor || '#6c757d'}; padding: 0.25rem 0.5rem; border-radius: 0.25rem; border: 1px solid ${relatedColor || '#6c757d'};" 
              title="קישור לדף אובייקט - בפיתוח">
               ${relatedDisplay}
             </div>
@@ -677,7 +674,7 @@ function updateAlertsTable(alerts) {
           <td><span class="message-text">${alert.message || '-'}</span></td>
           <td data-date="${alert.created_at}"><span class="date-text">${createdAt}</span></td>
           <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
-            <div class="btn-group btn-group-sm" role="group" style="gap: 2px;">
+            <div class="btn-group btn-group-sm actions-btn-group" role="group">
               <button class="btn btn-info" 
                       onclick="viewLinkedItemsForAlert(${alert.id})" 
                       title="צפה באלמנטים מקושרים">🔗</button>

@@ -1682,49 +1682,49 @@ button:disabled,
 /* Specific entity colors - all use same pattern: light background + colored text/border */
 .related-trade {
   color: var(--entity-trade-color);
-  background-color: color-mix(in srgb, var(--entity-trade-color) 10%, transparent);
+  background-color: rgba(0, 123, 255, 0.1);
   border-color: var(--entity-trade-color);
 }
 
 .related-trade-plan {
   color: var(--entity-trade-plan-color);
-  background-color: color-mix(in srgb, var(--entity-trade-plan-color) 10%, transparent);
+  background-color: rgba(111, 66, 193, 0.1);
   border-color: var(--entity-trade-plan-color);
 }
 
 .related-execution {
   color: var(--entity-execution-color);
-  background-color: color-mix(in srgb, var(--entity-execution-color) 10%, transparent);
+  background-color: rgba(23, 162, 184, 0.1);
   border-color: var(--entity-execution-color);
 }
 
 .related-account {
   color: var(--entity-account-color);
-  background-color: color-mix(in srgb, var(--entity-account-color) 10%, transparent);
+  background-color: rgba(40, 167, 69, 0.1);
   border-color: var(--entity-account-color);
 }
 
 .related-cash-flow {
   color: var(--entity-cash-flow-color);
-  background-color: color-mix(in srgb, var(--entity-cash-flow-color) 10%, transparent);
+  background-color: rgba(32, 201, 151, 0.1);
   border-color: var(--entity-cash-flow-color);
 }
 
 .related-ticker {
   color: var(--entity-ticker-color);
-  background-color: color-mix(in srgb, var(--entity-ticker-color) 10%, transparent);
+  background-color: rgba(220, 53, 69, 0.1);
   border-color: var(--entity-ticker-color);
 }
 
 .related-alert {
   color: var(--entity-alert-color);
-  background-color: color-mix(in srgb, var(--entity-alert-color) 10%, transparent);
+  background-color: rgba(255, 156, 5, 0.1);
   border-color: var(--entity-alert-color);
 }
 
 .related-note {
   color: var(--entity-note-color);
-  background-color: color-mix(in srgb, var(--entity-note-color) 10%, transparent);
+  background-color: rgba(108, 117, 125, 0.1);
   border-color: var(--entity-note-color);
 }
 
@@ -2104,6 +2104,24 @@ select option {
     justify-content: flex-start;
     text-align: right;
   }
+}
+
+/* ===== BUTTON ROWS - GENERAL STYLES ===== */
+/* סגנונות כלליים לכל שורות הכפתורים באתר */
+.button-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.button-row .btn {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.button-row .btn + .btn {
+  margin-left: 0;
 }
 
 /* ===== FILTER BUTTONS IN SECTION HEADER ===== */

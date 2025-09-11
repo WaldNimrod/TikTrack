@@ -17,7 +17,7 @@
   
   /* צבעי ישויות דינמיים */
   --entity-trade-color: var(--user-entity-trade-color, #007bff);
-  --entity-trade-plan-color: var(--user-entity-trade-plan-color, #0056b3);
+  --entity-trade-plan-color: var(--user-entity-trade-plan-color, #ffffff);
   --entity-execution-color: var(--user-entity-execution-color, #17a2b8);
   --entity-account-color: var(--user-entity-account-color, #1b0b75);
   --entity-cash-flow-color: var(--user-entity-cash-flow-color, #20c997);
@@ -2044,3 +2044,46 @@ select option {
 @import '06-components/_bootstrap-overrides.css';
 @import '06-components/_header-system.css';
 @import '06-components/_entity-colors.css';
+
+/* ===== INFO SUMMARY COMPONENT ===== */
+/* סגנונות למידע סיכום */
+.info-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  background: var(--apple-bg-secondary);
+  border-radius: var(--apple-radius-medium);
+  border: 1px solid var(--apple-border-light);
+  width: 100%;
+}
+
+.info-summary div {
+  font-size: 14px;
+  color: var(--apple-text-secondary);
+  text-align: center;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.info-summary strong {
+  color: var(--apple-text-primary);
+  font-weight: 600;
+}
+
+/* Responsive design for info-summary */
+@media (max-width: 768px) {
+  .info-summary {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .info-summary div {
+    justify-content: flex-start;
+    text-align: right;
+  }
+}

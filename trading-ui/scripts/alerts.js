@@ -82,6 +82,15 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   console.log('✅ מודולים הוגדרו לסגירה בלחיצה על הרקע');
+
+  // וידוא שצבעי ישויות מוגדרים
+  if (window.loadColorPreferences) {
+    window.loadColorPreferences().then(() => {
+      console.log('✅ צבעי ישויות נטענו לעמוד התראות');
+    }).catch(error => {
+      console.warn('⚠️ שגיאה בטעינת צבעי ישויות:', error);
+    });
+  }
 });
 
 

@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- TikTrack CSS - Unified CSS (No @import) -->
-    <link rel="stylesheet" href="styles-new/unified.css?v=v1.5.5_preferences_fixed">
+    <link rel="stylesheet" href="styles-new/unified.css?v=v1.5.3_fix_colors">
     
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -20,7 +20,7 @@
     <script src="scripts/error-handlers.js"></script>
     
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v43_preferences_fixed"></head>
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v41_alerts_colors"></head>
 
 <body class="preferences-page">
     <!-- Unified Header Container -->
@@ -38,8 +38,15 @@
                 <!-- ===== CONTENT SECTIONS START (EDITABLE) ===== -->
       
       <!-- כותרת ראשית -->
-      <div class="top-section preferences-page">
-      <div class="preferences-header slide-in">
+      <div class="top-section" id="topSection">
+        <div class="section-header">
+          <h2>⚙️ הגדרות מערכת</h2>
+          <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
+        </div>
+        <div class="section-body">
+          <div class="preferences-header slide-in">
         <div class="d-flex justify-content-between align-items-center">
           <div>
             <h1><i class="bi bi-gear-fill"></i> הגדרות מערכת</h1>
@@ -53,6 +60,7 @@
               <i class="bi bi-upload"></i> יבא הגדרות
             </button>
           </div>
+        </div>
         </div>
       </div>
       
@@ -140,12 +148,14 @@
       </div>
       
       <!-- ===== הגדרות בסיסיות ===== -->
-      <div class="content-section preferences-page" id="generalSection">
-        <div class="section-header" onclick="toggleSection('general')">
-          <h3><span class="section-icon">⚙️</span> הגדרות בסיסיות</h3>
-          <span class="section-toggle" id="general-toggle">▼</span>
+      <div class="content-section" id="section1">
+        <div class="section-header">
+          <h2>⚙️ הגדרות בסיסיות</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
         </div>
-        <div class="section-body" id="general-body">
+        <div class="section-body">
           <div class="settings-grid">
             
             <!-- מטבעות -->
@@ -296,12 +306,14 @@
       </div>
       
       <!-- ===== פילטרים ברירת מחדל ===== -->
-      <div class="content-section preferences-page" id="filtersSection">
-        <div class="section-header" onclick="toggleSection('filters')">
-          <h3><span class="section-icon">🔍</span> פילטרים ברירת מחדל</h3>
-          <span class="section-toggle" id="filters-toggle">▼</span>
+      <div class="content-section" id="section2">
+        <div class="section-header">
+          <h2>🔍 פילטרים ברירת מחדל</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
         </div>
-        <div class="section-body" id="filters-body">
+        <div class="section-body">
           <div class="settings-grid">
             
             <!-- פילטרים בסיסיים -->
@@ -433,12 +445,14 @@
       </div>
       
       <!-- ===== מערכת צבעים מתקדמת ===== -->
-      <div class="content-section preferences-page" id="colorsSection">
-        <div class="section-header" onclick="toggleSection('colors')">
-          <h3><span class="section-icon">🎨</span> מערכת צבעים מתקדמת</h3>
-          <span class="section-toggle" id="colors-toggle">▼</span>
+      <div class="content-section" id="section3">
+        <div class="section-header">
+          <h2>🎨 מערכת צבעים מתקדמת</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
         </div>
-        <div class="section-body" id="colors-body">
+        <div class="section-body">
           
           <!-- Theme selector -->
           <div class="setting-item">
@@ -640,12 +654,14 @@
       </div>
       
       <!-- ===== ממשק משתמש ===== -->
-      <div class="content-section preferences-page" id="uiSection">
-        <div class="section-header" onclick="toggleSection('ui')">
-          <h3><span class="section-icon">🖥️</span> ממשק משתמש</h3>
-          <span class="section-toggle" id="ui-toggle">▼</span>
+      <div class="content-section" id="section4">
+        <div class="section-header">
+          <h2>🖥️ ממשק משתמש</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
         </div>
-        <div class="section-body" id="ui-body">
+        <div class="section-body">
           <div class="settings-grid">
             
             <!-- תצוגה כללית -->
@@ -709,12 +725,14 @@
       </div>
       
       <!-- ===== הגדרות מערכת ושרת ===== -->
-      <div class="content-section preferences-page" id="systemSection">
-        <div class="section-header" onclick="toggleSection('system')">
-          <h3><span class="section-icon">⚙️</span> הגדרות מערכת ושרת</h3>
-          <span class="section-toggle" id="system-toggle">▼</span>
+      <div class="content-section" id="section5">
+        <div class="section-header">
+          <h2>⚙️ הגדרות מערכת ושרת</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
         </div>
-        <div class="section-body" id="system-body">
+        <div class="section-body">
           <div class="settings-grid">
             
             <!-- מערכת קונסול -->
@@ -813,12 +831,14 @@
       </div>
       
       <!-- ===== נתונים חיצוניים ===== -->
-      <div class="content-section preferences-page" id="externalSection">
-        <div class="section-header" onclick="toggleSection('external')">
-          <h3><span class="section-icon">🌐</span> נתונים חיצוניים</h3>
-          <span class="section-toggle" id="external-toggle">▼</span>
+      <div class="content-section" id="section6">
+        <div class="section-header">
+          <h2>🌐 נתונים חיצוניים</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
         </div>
-        <div class="section-body" id="external-body">
+        <div class="section-body">
           <div class="settings-grid">
             
             <!-- ספקי נתונים -->
@@ -898,12 +918,14 @@
       </div>
       
       <!-- ===== הגדרות מתקדמות ===== -->
-      <div class="content-section preferences-page" id="advancedSection">
-        <div class="section-header" onclick="toggleSection('advanced')">
-          <h3><span class="section-icon">🔧</span> הגדרות מתקדמות</h3>
-          <span class="section-toggle" id="advanced-toggle">▼</span>
+      <div class="content-section" id="section7">
+        <div class="section-header">
+          <h2>🔧 הגדרות מתקדמות</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section7')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
         </div>
-        <div class="section-body" id="advanced-body">
+        <div class="section-body">
           <div class="settings-grid">
             
             <!-- הגדרות שקיפות -->

@@ -2131,7 +2131,7 @@ select option {
   align-items: center;
   gap: 0.5rem;
   flex: 1;
-  justify-content: center;
+  justify-content: flex-start;
   margin: 0 1rem;
 }
 

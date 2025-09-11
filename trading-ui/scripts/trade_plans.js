@@ -2285,15 +2285,15 @@ function getTypeClass(type) {
 
 /**
  * טעינת העדפות המשתמש
- * ✨ עודכן לתמיכה במערכת העדפות V2!
+ * ✨ עודכן לתמיכה במערכת העדפות !
  */
 async function loadUserPreferences() {
   try {
-    console.log('📋 Loading user preferences for trade_plans (V2/V1)...');
+    console.log('📋 Loading user preferences for trade_plans (/V1)...');
     
-    // נסה ראשית מערכת V2 גלובלית
+    // נסה ראשית מערכת  גלובלית
     if (typeof window.getCurrentPreference === 'function') {
-      console.log('✅ Using global preferences system (V2/V1)');
+      console.log('✅ Using global preferences system (/V1)');
       return {
         timezone: await window.getCurrentPreference('timezone') || 'Asia/Jerusalem',
         primaryCurrency: await window.getCurrentPreference('primaryCurrency') || 'USD',
@@ -2302,13 +2302,12 @@ async function loadUserPreferences() {
       };
     }
     
-    // Fallback ל-API V2
-    try {
+    // Fallback ל-API     try {
       const v2Response = await fetch('/api/v2/preferences/');
       if (v2Response.ok) {
         const v2Data = await v2Response.json();
         if (v2Data.success && v2Data.data.preferences) {
-          console.log('✅ Using V2 API preferences');
+          console.log('✅ Using  API preferences');
           const prefs = v2Data.data.preferences;
           return {
             timezone: prefs.general?.timezone || 'Asia/Jerusalem',
@@ -2319,7 +2318,7 @@ async function loadUserPreferences() {
         }
       }
     } catch (v2Error) {
-      console.log('🔄 V2 API not available, trying V1...');
+      console.log('🔄  API not available, trying V1...');
     }
     
     // Fallback ל-V1 API
@@ -2358,7 +2357,7 @@ async function loadUserPreferences() {
 
 /**
  * יצירת תאריך עם timezone נכון
- * ✨ עודכן לתמיכה במערכת העדפות V2!
+ * ✨ עודכן לתמיכה במערכת העדפות !
  */
 async function createDateWithTimezone(year, month, day) {
   const preferences = await loadUserPreferences();

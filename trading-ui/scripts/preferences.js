@@ -1,8 +1,8 @@
 /**
- * Preferences System V2 - Advanced Client
- * =======================================
+ * Preferences System - Advanced Client
+ * ====================================
  * 
- * מערכת העדפות מתקדמת V2 עם פרופילים מרובים,
+ * מערכת העדפות מתקדמת עם פרופילים מרובים,
  * יבוא/יצוא, ובדיקות תקינות מתקדמות.
  * 
  * Author: TikTrack Development Team
@@ -10,7 +10,7 @@
  * Date: January 2025
  */
 
-class PreferencesV2 {
+class Preferences {
   constructor() {
     this.currentProfile = null;
     this.profiles = [];
@@ -23,7 +23,7 @@ class PreferencesV2 {
   
   async init() {
     try {
-      console.log('🚀 Initializing Preferences V2 system...');
+      console.log('🚀 Initializing Preferences  system...');
       
       // טען פרופילים
       await this.loadProfiles();
@@ -31,8 +31,7 @@ class PreferencesV2 {
       // טען הגדרות לפרופיל הנוכחי
       await this.loadPreferences();
       
-      // בדוק תאימות עם V1
-      await this.checkV1Compatibility();
+      // בדוק תאימות עם       await this.checkCompatibility();
       
       // עדכן ממשק
       this.updateUI();
@@ -40,11 +39,11 @@ class PreferencesV2 {
       // הגדר event listeners
       this.setupEventListeners();
       
-      console.log('✅ Preferences V2 system initialized');
+      console.log('✅ Preferences  system initialized');
       
     } catch (error) {
-      console.error('❌ Error initializing Preferences V2:', error);
-      this.showError('שגיאה באתחול מערכת העדפות V2');
+      console.error('❌ Error initializing Preferences :', error);
+      this.showError('שגיאה באתחול מערכת העדפות ');
     }
   }
   
@@ -111,12 +110,12 @@ class PreferencesV2 {
     }
   }
   
-  async checkV1Compatibility() {
+  async checkCompatibility() {
     try {
-      // Skip V1 compatibility check - using V1 API directly
+      // Skip  compatibility check - using  API directly
       return;
     } catch (error) {
-      console.warn('⚠️ Could not check V1 compatibility:', error);
+      console.warn('⚠️ Could not check  compatibility:', error);
     }
   }
   
@@ -452,9 +451,9 @@ class PreferencesV2 {
   
   async runMigration() {
     try {
-      this.showInfo('מבצע מיגרציה מV1 לV2...');
+      this.showInfo('מבצע העברה מ ל...');
       
-      const response = await fetch('/api/v2/preferences/migrate', {
+      const response = await fetch('/api/v2/preferences/transfer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -465,10 +464,10 @@ class PreferencesV2 {
       const data = await response.json();
       
       if (data.success) {
-        this.showSuccess('מיגרציה הושלמה בהצלחה!');
+        this.showSuccess('העברה הושלמה בהצלחה!');
         
-        // הסתר התראת מיגרציה
-        document.getElementById('migrationAlert').classList.add('d-none');
+        // הסתר התראת העברה
+        document.getElementById('transferAlert').classList.add('d-none');
         
         // רענן נתונים
         await this.loadProfiles();
@@ -476,12 +475,12 @@ class PreferencesV2 {
         this.updateUI();
         
       } else {
-        throw new Error(data.error || 'שגיאה במיגרציה');
+        throw new Error(data.error || 'שגיאה בהעברה');
       }
       
     } catch (error) {
-      console.error('❌ Error running migration:', error);
-      this.showError('שגיאה במיגרציה: ' + error.message);
+      console.error('❌ Error running transfer:', error);
+      this.showError('שגיאה בהעברה: ' + error.message);
     }
   }
   
@@ -701,7 +700,7 @@ class PreferencesV2 {
   }
   
   showMigrationAlert() {
-    const alert = document.getElementById('migrationAlert');
+    const alert = document.getElementById('transferAlert');
     if (alert) {
       alert.classList.remove('d-none');
     }
@@ -714,7 +713,7 @@ class PreferencesV2 {
       'delete': '🗑️ מחיקה',
       'import': '📤 ייבוא',
       'export': '📥 יצוא',
-      'migrate_from_v1': '🔄 מיגרציה מV1'
+      'transfer_from_v1': '🔄 העברה מ'
     };
     return labels[changeType] || changeType;
   }
@@ -847,7 +846,7 @@ class PreferencesV2 {
   // פונקציות התראות
   showSuccess(message) {
     if (typeof window.showSuccessNotification === 'function') {
-      window.showSuccessNotification('הגדרות V2', message);
+      window.showSuccessNotification('הגדרות ', message);
     } else {
       console.log('✅', message);
     }
@@ -855,7 +854,7 @@ class PreferencesV2 {
   
   showError(message) {
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('הגדרות V2', message);
+      window.showErrorNotification('הגדרות ', message);
     } else {
       console.error('❌', message);
     }
@@ -863,7 +862,7 @@ class PreferencesV2 {
   
   showInfo(message) {
     if (typeof window.showInfoNotification === 'function') {
-      window.showInfoNotification('הגדרות V2', message);
+      window.showInfoNotification('הגדרות ', message);
     } else {
       console.log('ℹ️', message);
     }
@@ -871,7 +870,7 @@ class PreferencesV2 {
   
   showWarning(message) {
     if (typeof window.showWarningNotification === 'function') {
-      window.showWarningNotification('הגדרות V2', message);
+      window.showWarningNotification('הגדרות ', message);
     } else {
       console.warn('⚠️', message);
     }
@@ -914,66 +913,64 @@ function openEntityColorPicker(entity) {
     }
     
     // עדכן בהעדפות
-    if (window.preferencesV2) {
-      window.preferencesV2.updateEntityColor(entity, color);
+    if (window.preferences) {
+      window.preferences.updateEntityColor(entity, color);
     }
   }
 }
 
 // פונקציות שיוצאו לגלובל
 /**
- * טעינת העדפות V2
- * טוען את כל ההעדפות מהשרת
+ * טעינת העדפות  * טוען את כל ההעדפות מהשרת
  */
-function loadPreferencesV2() {
+function loadPreferences() {
   try {
-    console.log('📊 טוען העדפות V2...');
+    console.log('📊 טוען העדפות ...');
     
     // הצגת אינדיקטור טעינה
     if (typeof window.showNotification === 'function') {
-      window.showNotification('טוען העדפות V2...', 'info');
+      window.showNotification('טוען העדפות ...', 'info');
     }
     
     // טעינת העדפות
-    if (window.preferencesV2Instance) {
-      window.preferencesV2Instance.loadPreferences();
+    if (window.preferencesInstance) {
+      window.preferencesInstance.loadPreferences();
     } else {
       // יצירת instance חדש
-      window.preferencesV2Instance = new PreferencesV2();
+      window.preferencesInstance = new Preferences();
     }
     
     // הודעת הצלחה
     if (typeof window.showSuccessNotification === 'function') {
-      window.showSuccessNotification('העדפות V2 נטענו בהצלחה');
+      window.showSuccessNotification('העדפות  נטענו בהצלחה');
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('העדפות V2 נטענו בהצלחה', 'success');
+      window.showNotification('העדפות  נטענו בהצלחה', 'success');
     }
     
   } catch (error) {
-    console.error('שגיאה בטעינת העדפות V2:', error);
+    console.error('שגיאה בטעינת העדפות :', error);
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בטעינת העדפות V2', error.message);
+      window.showErrorNotification('שגיאה בטעינת העדפות ', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בטעינת העדפות V2', 'error');
+      window.showNotification('שגיאה בטעינת העדפות ', 'error');
     }
   }
 }
 
 /**
- * עדכון העדפה V2
- * מעדכן העדפה ספציפית
+ * עדכון העדפה  * מעדכן העדפה ספציפית
  * @param {string} key - מפתח ההעדפה
  * @param {any} value - ערך ההעדפה
  */
-function updatePreferenceV2(key, value) {
+function updatePreference(key, value) {
   try {
-    console.log('📝 מעדכן העדפה V2:', key, value);
+    console.log('📝 מעדכן העדפה :', key, value);
     
     // עדכון ההעדפה
-    if (window.preferencesV2Instance) {
-      window.preferencesV2Instance.updatePreference(key, value);
+    if (window.preferencesInstance) {
+      window.preferencesInstance.updatePreference(key, value);
     } else {
-      throw new Error('Preferences V2 instance not initialized');
+      throw new Error('Preferences  instance not initialized');
     }
     
     // הודעת הצלחה
@@ -984,33 +981,32 @@ function updatePreferenceV2(key, value) {
     }
     
   } catch (error) {
-    console.error('שגיאה בעדכון העדפה V2:', error);
+    console.error('שגיאה בעדכון העדפה :', error);
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בעדכון העדפה V2', error.message);
+      window.showErrorNotification('שגיאה בעדכון העדפה ', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בעדכון העדפה V2', 'error');
+      window.showNotification('שגיאה בעדכון העדפה ', 'error');
     }
   }
 }
 
 /**
- * מחיקת העדפה V2
- * מוחק העדפה ספציפית
+ * מחיקת העדפה  * מוחק העדפה ספציפית
  * @param {string} key - מפתח ההעדפה
  */
-function deletePreferenceV2(key) {
+function deletePreference(key) {
   try {
-    console.log('🗑️ מוחק העדפה V2:', key);
+    console.log('🗑️ מוחק העדפה :', key);
     
     // הצגת חלון אישור
     const confirmMessage = `האם אתה בטוח שברצונך למחוק את ההעדפה "${key}"?`;
     
     if (confirm(confirmMessage)) {
       // מחיקת ההעדפה
-      if (window.preferencesV2Instance) {
-        window.preferencesV2Instance.deletePreference(key);
+      if (window.preferencesInstance) {
+        window.preferencesInstance.deletePreference(key);
       } else {
-        throw new Error('Preferences V2 instance not initialized');
+        throw new Error('Preferences  instance not initialized');
       }
       
       // הודעת הצלחה
@@ -1022,24 +1018,23 @@ function deletePreferenceV2(key) {
     }
     
   } catch (error) {
-    console.error('שגיאה במחיקת העדפה V2:', error);
+    console.error('שגיאה במחיקת העדפה :', error);
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה במחיקת העדפה V2', error.message);
+      window.showErrorNotification('שגיאה במחיקת העדפה ', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה במחיקת העדפה V2', 'error');
+      window.showNotification('שגיאה במחיקת העדפה ', 'error');
     }
   }
 }
 
 /**
- * יצירת פרופיל חדש V2
- * יוצר פרופיל העדפות חדש
+ * יצירת פרופיל חדש  * יוצר פרופיל העדפות חדש
  * @param {string} name - שם הפרופיל
  * @param {string} description - תיאור הפרופיל
  */
-function createProfileV2(name, description = '') {
+function createProfile(name, description = '') {
   try {
-    console.log('➕ יוצר פרופיל V2 חדש:', name);
+    console.log('➕ יוצר פרופיל  חדש:', name);
     
     // ולידציה בסיסית
     if (!name || name.trim() === '') {
@@ -1047,10 +1042,10 @@ function createProfileV2(name, description = '') {
     }
     
     // יצירת הפרופיל
-    if (window.preferencesV2Instance) {
-      window.preferencesV2Instance.createProfile(name, description);
+    if (window.preferencesInstance) {
+      window.preferencesInstance.createProfile(name, description);
     } else {
-      throw new Error('Preferences V2 instance not initialized');
+      throw new Error('Preferences  instance not initialized');
     }
     
     // הודעת הצלחה
@@ -1061,33 +1056,32 @@ function createProfileV2(name, description = '') {
     }
     
   } catch (error) {
-    console.error('שגיאה ביצירת פרופיל V2:', error);
+    console.error('שגיאה ביצירת פרופיל :', error);
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה ביצירת פרופיל V2', error.message);
+      window.showErrorNotification('שגיאה ביצירת פרופיל ', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה ביצירת פרופיל V2', 'error');
+      window.showNotification('שגיאה ביצירת פרופיל ', 'error');
     }
   }
 }
 
 /**
- * מחיקת פרופיל V2
- * מוחק פרופיל העדפות
+ * מחיקת פרופיל  * מוחק פרופיל העדפות
  * @param {number} profileId - מזהה הפרופיל
  */
-function deleteProfileV2(profileId) {
+function deleteProfile(profileId) {
   try {
-    console.log('🗑️ מוחק פרופיל V2:', profileId);
+    console.log('🗑️ מוחק פרופיל :', profileId);
     
     // הצגת חלון אישור
     const confirmMessage = `האם אתה בטוח שברצונך למחוק את הפרופיל?\n\nפעולה זו אינה ניתנת לביטול.`;
     
     if (confirm(confirmMessage)) {
       // מחיקת הפרופיל
-      if (window.preferencesV2Instance) {
-        window.preferencesV2Instance.deleteProfile(profileId);
+      if (window.preferencesInstance) {
+        window.preferencesInstance.deleteProfile(profileId);
       } else {
-        throw new Error('Preferences V2 instance not initialized');
+        throw new Error('Preferences  instance not initialized');
       }
       
       // הודעת הצלחה
@@ -1099,81 +1093,81 @@ function deleteProfileV2(profileId) {
     }
     
   } catch (error) {
-    console.error('שגיאה במחיקת פרופיל V2:', error);
+    console.error('שגיאה במחיקת פרופיל :', error);
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה במחיקת פרופיל V2', error.message);
+      window.showErrorNotification('שגיאה במחיקת פרופיל ', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה במחיקת פרופיל V2', 'error');
+      window.showNotification('שגיאה במחיקת פרופיל ', 'error');
     }
   }
 }
 
 function saveAllPreferences() {
-  if (window.preferencesV2) {
-    window.preferencesV2.saveAllPreferences();
+  if (window.preferences) {
+    window.preferences.saveAllPreferences();
   }
 }
 
 function createNewProfile() {
-  if (window.preferencesV2) {
-    window.preferencesV2.createNewProfile();
+  if (window.preferences) {
+    window.preferences.createNewProfile();
   }
 }
 
 function submitCreateProfile() {
-  if (window.preferencesV2) {
-    window.preferencesV2.submitCreateProfile();
+  if (window.preferences) {
+    window.preferences.submitCreateProfile();
   }
 }
 
 function runMigration() {
-  if (window.preferencesV2) {
-    window.preferencesV2.runMigration();
+  if (window.preferences) {
+    window.preferences.runMigration();
   }
 }
 
 function exportPreferences() {
-  if (window.preferencesV2) {
-    window.preferencesV2.exportPreferences();
+  if (window.preferences) {
+    window.preferences.exportPreferences();
   }
 }
 
 function importPreferences() {
-  if (window.preferencesV2) {
-    window.preferencesV2.importPreferences();
+  if (window.preferences) {
+    window.preferences.importPreferences();
   }
 }
 
 function handleFileImport(event) {
-  if (window.preferencesV2) {
-    window.preferencesV2.handleFileImport(event);
+  if (window.preferences) {
+    window.preferences.handleFileImport(event);
   }
 }
 
 function validateSettings() {
-  if (window.preferencesV2) {
-    window.preferencesV2.validateSettings();
+  if (window.preferences) {
+    window.preferences.validateSettings();
   }
 }
 
 function viewHistory() {
-  if (window.preferencesV2) {
-    window.preferencesV2.viewHistory();
+  if (window.preferences) {
+    window.preferences.viewHistory();
   }
 }
 
 function resetToDefaults() {
-  if (window.preferencesV2 && confirm('האם אתה בטוח שברצונך לאפס את כל ההגדרות לברירת מחדל?')) {
+  if (window.preferences && confirm('האם אתה בטוח שברצונך לאפס את כל ההגדרות לברירת מחדל?')) {
     // יישום איפוס
-    window.preferencesV2.preferences = window.preferencesV2.getDefaultPreferences();
-    window.preferencesV2.updateUI();
-    window.preferencesV2.markDirty();
+    window.preferences.preferences = window.preferences.getDefaultPreferences();
+    window.preferences.updateUI();
+    window.preferences.markDirty();
   }
 }
 
 async function saveCurrentAsDefaults() {
-  if (window.preferencesV2) {
-    await window.preferencesV2.saveCurrentAsDefaults();
+  if (window.preferences) {
+    await window.preferences.saveCurrentAsDefaults();
   }
 }
 
@@ -1187,6 +1181,6 @@ function previewSettings() {
 
 // אתחול כשהדף נטען
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🎯 DOM loaded, initializing Preferences V2...');
-  window.preferencesV2 = new PreferencesV2();
+  console.log('🎯 DOM loaded, initializing Preferences ...');
+  window.preferences = new Preferences();
 });

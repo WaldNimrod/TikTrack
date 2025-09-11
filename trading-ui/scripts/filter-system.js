@@ -4,13 +4,13 @@
  * ========================================
  *
  * מערכת פילטרים מאוחדת שמתאימה את עצמה לכל טבלה
- * 🚀 תומך במערכת העדפות V2 החדשה!
+ * 🚀 תומך במערכת העדפות החדשה!
  *
  * Dependencies:
  * - table-mappings.js (for column mappings)
  * - main.js (global utilities)
  * - translation-utils.js (translation functions)
- * - preferences-v2-compatibility.js (V2 support)
+ * - preferences.js (preferences support)
  *
  * Table Mapping:
  * - Uses table types from table-mappings.js
@@ -849,13 +849,13 @@ FilterSystem.prototype.resetToUserDefaults = async function() {
 // פונקציה לקבלת העדפת משתמש
 FilterSystem.prototype.getUserPreference = async function(preferenceKey) {
   try {
-    // ✨ עדכון לתמיכה במערכת V2!
-    console.log(`🔍 FilterSystem.getUserPreference(${preferenceKey}) - checking V2 first...`);
+    // ✨ עדכון לתמיכה במערכת העדפות!
+    console.log(`🔍 FilterSystem.getUserPreference(${preferenceKey}) - checking preferences first...`);
     
-    // עדיפות ראשונה - מערכת V2 אם זמינה
+    // עדיפות ראשונה - מערכת העדפות אם זמינה
     if (typeof window.getCurrentPreference === 'function') {
       const value = await window.getCurrentPreference(preferenceKey);
-      console.log(`✅ V2 preference ${preferenceKey}: ${value}`);
+      console.log(`✅ preference ${preferenceKey}: ${value}`);
       return value;
     }
     

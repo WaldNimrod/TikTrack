@@ -2042,12 +2042,11 @@ window.reactivateTicker = reactivateTicker;
  */
 async function loadColorsAndApplyToHeaders() {
   try {
-    // ✨ עדכון לתמיכה במערכת העדפות V2
-    // נסה לטעון העדפות V2 ראשית, ואז V1 כ-fallback
+    // ✨ עדכון לתמיכה במערכת העדפות     // נסה לטעון העדפות  ראשית, ואז V1 כ-fallback
     if (!window.currentPreferences) {
-      if (window.preferencesV2 && window.preferencesV2.loadPreferences) {
-        await window.preferencesV2.loadPreferences();
-        console.log('✅ Loaded V2 preferences for tickers');
+      if (window.preferences && window.preferences.loadPreferences) {
+        await window.preferences.loadPreferences();
+        console.log('✅ Loaded  preferences for tickers');
       } else if (window.loadPreferences) {
         await window.loadPreferences();
         console.log('🔄 Loaded V1 preferences for tickers (fallback)');

@@ -680,7 +680,7 @@ class HeaderSystem {
                           <a class="tiktrack-dropdown-item" href="#">⚙️ הגדרות מערכת</a>
                           <ul class="level3-submenu">
                             <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/test-preferences-v2-integration.html">בדיקת אינטגרציה V2</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/test-preferences-integration.html">בדיקת אינטגרציה</a></li>
                           </ul>
                         </li>
                         
@@ -4416,7 +4416,7 @@ async function resetFiltersToDefaults() {
   console.log('🔄 Resetting filters to user defaults...');
   
   try {
-    // שימוש במערכת העדפות V2 החדשה
+    // שימוש במערכת העדפות החדשה
     if (window.filterSystem && typeof window.filterSystem.resetToUserDefaults === 'function') {
       await window.filterSystem.resetToUserDefaults();
       return;
@@ -4667,19 +4667,19 @@ function clearFiltersManually() {
 
 /**
  * קבלת הגדרה נוכחית מהשרת
- * ✨ עודכן לתמיכה במערכת העדפות V2!
+ * ✨ עודכן לתמיכה במערכת העדפות!
  */
 async function getCurrentPreference(key) {
   try {
-    console.log(`🔍 header-system getCurrentPreference(${key}) - checking V2 first...`);
+    console.log(`🔍 header-system getCurrentPreference(${key}) - checking preferences first...`);
     
-    // עדיפות ראשונה - מערכת V2
+    // עדיפות ראשונה - מערכת העדפות
     try {
       const response = await fetch('/api/v2/preferences/');
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.data.preferences) {
-          // מיפוי מפתחות V1 ל-V2
+          // מיפוי מפתחות ישנים לחדשים
           const keyMappings = {
             'defaultStatusFilter': 'defaultFilters.status',
             'defaultTypeFilter': 'defaultFilters.type',
@@ -4694,19 +4694,19 @@ async function getCurrentPreference(key) {
           if (v2Path) {
             const value = v2Path.split('.').reduce((obj, k) => obj?.[k], data.data.preferences);
             if (value !== undefined) {
-              console.log(`✅ Found V2 preference ${key}: ${value}`);
+              console.log(`✅ Found preference ${key}: ${value}`);
               return value;
             }
           }
         }
       }
     } catch (v2Error) {
-      console.log(`🔄 V2 not available, trying V1: ${v2Error.message}`);
+      console.log(`🔄 Preferences not available, trying fallback: ${v2Error.message}`);
     }
     
-    // נסה גם עם preferences-v2-compatibility.js
-    if (window.preferencesV2 && window.preferencesV2.preferences) {
-      const v2Preferences = window.preferencesV2.preferences;
+    // נסה גם עם preferences compatibility
+    if (window.preferences && window.preferences.preferences) {
+      const preferences = window.preferences.preferences;
       const keyMappings = {
         'defaultStatusFilter': 'defaultFilters.status',
         'defaultTypeFilter': 'defaultFilters.type',
@@ -4719,7 +4719,7 @@ async function getCurrentPreference(key) {
       if (v2Path) {
         const value = v2Path.split('.').reduce((obj, k) => obj?.[k], v2Preferences);
         if (value !== undefined) {
-          console.log(`✅ Found V2 compatibility preference ${key}: ${value}`);
+          console.log(`✅ Found compatibility preference ${key}: ${value}`);
           return value;
         }
       }

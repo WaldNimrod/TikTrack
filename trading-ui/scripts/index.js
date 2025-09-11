@@ -242,7 +242,7 @@ function quickAction(action) {
             console.log('📋 Reports - feature to be added');
             break;
         case 'preferences-v2':
-            console.log('🚀 Opening Preferences V2 advanced system');
+            console.log('🚀 Opening Preferences advanced system');
             window.location.href = 'preferences-v2.html';
             break;
         case 'settings':

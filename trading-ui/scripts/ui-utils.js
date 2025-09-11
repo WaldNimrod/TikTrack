@@ -4,10 +4,11 @@
  * פונקציות UI משותפות באמת - רק מה שמשמש הרבה עמודים
  *
  * File: trading-ui/scripts/ui-utils.js
- * Version: 1.1
- * Last Updated: August 26, 2025
+ * Version: 1.2
+ * Last Updated: January 15, 2025
  *
  * Added: Price calculation functions for trade plans, trades, and tickers
+ * Added: Section toggle functions for opening/closing sections
  */
 
 // ===== PRICE CALCULATION FUNCTIONS =====
@@ -1347,4 +1348,142 @@ document.addEventListener('DOMContentLoaded', () => {
       window.restoreSectionStates();
     }
   }, 100);
+});
+
+// ===== SECTION TOGGLE FUNCTIONS =====
+// These functions handle opening/closing sections across all pages
+
+/**
+ * Toggle top section visibility
+ * Used for the main top section of each page
+ */
+function toggleTopSection() {
+  console.log('🔧 ui-utils.js toggleTopSection called');
+  
+  const topSection = document.querySelector('.top-section');
+  if (!topSection) {
+    console.warn('⚠️ Top section not found');
+    return;
+  }
+  
+  const sectionBody = topSection.querySelector('.section-body');
+  const toggleIcon = topSection.querySelector('.section-toggle-icon');
+  
+  if (!sectionBody || !toggleIcon) {
+    console.warn('⚠️ Section body or toggle icon not found');
+    return;
+  }
+  
+  // Toggle visibility
+  const isVisible = sectionBody.style.display !== 'none';
+  sectionBody.style.display = isVisible ? 'none' : 'block';
+  
+  // Update icon
+  toggleIcon.textContent = isVisible ? '▶' : '▼';
+  
+  // Save state to localStorage
+  localStorage.setItem('topSectionCollapsed', isVisible.toString());
+  
+  console.log(`✅ Top section ${isVisible ? 'collapsed' : 'expanded'}`);
+}
+
+/**
+ * Toggle section visibility by ID
+ * Used for content sections with specific IDs
+ * @param {string} sectionId - The ID of the section to toggle
+ */
+function toggleSection(sectionId) {
+  console.log(`🔧 ui-utils.js toggleSection called with: ${sectionId}`);
+  
+  const section = document.getElementById(sectionId);
+  if (!section) {
+    console.warn(`⚠️ Section with ID '${sectionId}' not found`);
+    return;
+  }
+  
+  const sectionBody = section.querySelector('.section-body');
+  const toggleIcon = section.querySelector('.section-toggle-icon');
+  
+  if (!sectionBody || !toggleIcon) {
+    console.warn('⚠️ Section body or toggle icon not found');
+    return;
+  }
+  
+  // Toggle visibility
+  const isVisible = sectionBody.style.display !== 'none';
+  sectionBody.style.display = isVisible ? 'none' : 'block';
+  
+  // Update icon
+  toggleIcon.textContent = isVisible ? '▶' : '▼';
+  
+  // Save state to localStorage
+  localStorage.setItem(`${sectionId}Collapsed`, isVisible.toString());
+  
+  console.log(`✅ Section '${sectionId}' ${isVisible ? 'collapsed' : 'expanded'}`);
+}
+
+/**
+ * Toggle all sections visibility
+ * Used for expanding/collapsing all sections at once
+ */
+function toggleAllSections() {
+  console.log('🔧 ui-utils.js toggleAllSections called');
+  
+  const sections = document.querySelectorAll('.content-section, .top-section');
+  const allCollapsed = Array.from(sections).every(section => {
+    const sectionBody = section.querySelector('.section-body');
+    return sectionBody && sectionBody.style.display === 'none';
+  });
+  
+  sections.forEach(section => {
+    const sectionBody = section.querySelector('.section-body');
+    const toggleIcon = section.querySelector('.section-toggle-icon');
+    
+    if (sectionBody && toggleIcon) {
+      sectionBody.style.display = allCollapsed ? 'block' : 'none';
+      toggleIcon.textContent = allCollapsed ? '▼' : '▶';
+      
+      // Save state to localStorage
+      const sectionId = section.id || 'topSection';
+      localStorage.setItem(`${sectionId}Collapsed`, (!allCollapsed).toString());
+    }
+  });
+  
+  console.log(`✅ All sections ${allCollapsed ? 'expanded' : 'collapsed'}`);
+}
+
+/**
+ * Load section states from localStorage
+ * Called on page load to restore previous section states
+ */
+function loadSectionStates() {
+  console.log('🔧 ui-utils.js loadSectionStates called');
+  
+  const sections = document.querySelectorAll('.content-section, .top-section');
+  
+  sections.forEach(section => {
+    const sectionId = section.id || 'topSection';
+    const isCollapsed = localStorage.getItem(`${sectionId}Collapsed`) === 'true';
+    
+    const sectionBody = section.querySelector('.section-body');
+    const toggleIcon = section.querySelector('.section-toggle-icon');
+    
+    if (sectionBody && toggleIcon && isCollapsed) {
+      sectionBody.style.display = 'none';
+      toggleIcon.textContent = '▶';
+    }
+  });
+  
+  console.log('✅ Section states loaded from localStorage');
+}
+
+// Export functions to global scope
+window.toggleTopSection = toggleTopSection;
+window.toggleSection = toggleSection;
+window.toggleAllSections = toggleAllSections;
+window.loadSectionStates = loadSectionStates;
+
+// Load section states when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+  loadSectionStates();
 });

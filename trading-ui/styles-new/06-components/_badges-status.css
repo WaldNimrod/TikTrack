@@ -269,61 +269,8 @@
   text-align: right;
 }
 
-.related-account {
-  background-color: #e3f2fd;
-  color: #1565c0;
-  border: 1px solid #bbdefb;
-}
-
-.related-trade {
-  background-color: #e8f5e8;
-  color: #2e7d32;
-  border: 1px solid #c8e6c9;
-}
-
-.related-plan {
-  background-color: #fff3e0;
-  color: #ef6c00;
-  border: 1px solid #ffcc02;
-}
-
-.related-ticker {
-  background-color: #fce4ec;
-  color: #c2185b;
-  border: 1px solid #f8bbd9;
-}
-
-.related-other {
-  background-color: #f5f5f5;
-  color: #616161;
-  border: 1px solid #e0e0e0;
-}
-
-/* Hover effects */
-.related-account:hover {
-  background-color: #bbdefb;
-  color: #0d47a1;
-}
-
-.related-trade:hover {
-  background-color: #c8e6c9;
-  color: #1b5e20;
-}
-
-.related-plan:hover {
-  background-color: #ffcc02;
-  color: #e65100;
-}
-
-.related-ticker:hover {
-  background-color: #f8bbd9;
-  color: #880e4f;
-}
-
-.related-other:hover {
-  background-color: #e0e0e0;
-  color: #424242;
-}
+/* Related entity styles - now handled by dynamic color system */
+/* Static colors removed to allow dynamic entity colors from preferences */
 
 /* ===== סטטוס דוט ===== */
 .status-dot {

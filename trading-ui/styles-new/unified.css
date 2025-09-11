@@ -2087,3 +2087,10 @@ select option {
     text-align: right;
   }
 }
+
+/* ===== PAGE-SPECIFIC STYLES ===== */
+/* עמוד התראות - כתום */
+.alerts-page .section-header,
+.alerts-page .top-section .section-header {
+  border-bottom: 2px solid var(--entity-alert-color, #ff9c05);
+}

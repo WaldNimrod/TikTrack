@@ -90,29 +90,8 @@
 }
 
 /* ===== ערכים מספריים ===== */
-.numeric-text-positive {
-  color: var(--numeric-positive-medium, #28a745) !important;
-  font-weight: 600;
-}
-
-.numeric-text-negative {
-  color: var(--numeric-negative-medium, #dc3545) !important;
-  font-weight: 600;
-}
-
-.numeric-text-zero {
-  color: var(--numeric-zero-medium, #6c757d) !important;
-}
-
-.profit-positive {
-  color: var(--numeric-positive-medium, #28a745) !important;
-  font-weight: 600;
-}
-
-.profit-negative {
-  color: var(--numeric-negative-medium, #dc3545) !important;
-  font-weight: 600;
-}
+/* Numeric text styles - now handled by dynamic color system */
+/* Static colors removed to allow dynamic numeric colors from preferences */
 
 /* ===== שדות צד (Long/Short) ===== */
 .side-long {
@@ -131,21 +110,8 @@
   transform: translateY(-1px) !important;
 }
 
-.side-short {
-  color: #dc3545 !important;
-  font-weight: 600 !important;
-  font-size: 0.9rem !important;
-  padding: 0.25rem 0.5rem !important;
-  border-radius: 6px !important;
-  background: rgba(220, 53, 69, 0.1) !important;
-  display: inline-block !important;
-  transition: all 0.3s ease !important;
-}
-
-.side-short:hover {
-  background: rgba(220, 53, 69, 0.15) !important;
-  transform: translateY(-1px) !important;
-}
+/* Side short styles - now handled by dynamic color system */
+/* Static colors removed to allow dynamic side colors from preferences */
 
 /* ===== שדות סוג (Type) ===== */
 .type-swing {
@@ -159,16 +125,8 @@
   transition: all 0.3s ease !important;
 }
 
-.type-investment {
-  color: #28a745 !important;
-  font-weight: 600 !important;
-  font-size: 0.9rem !important;
-  padding: 0.25rem 0.5rem !important;
-  border-radius: 6px !important;
-  background: rgba(40, 167, 69, 0.1) !important;
-  display: inline-block !important;
-  transition: all 0.3s ease !important;
-}
+/* Type investment styles - now handled by dynamic color system */
+/* Static colors removed to allow dynamic type colors from preferences */
 
 .type-stock {
   color: #007bff !important;
@@ -181,16 +139,8 @@
   transition: all 0.3s ease !important;
 }
 
-.type-etf {
-  color: #28a745 !important;
-  font-weight: 600 !important;
-  font-size: 0.9rem !important;
-  padding: 0.25rem 0.5rem !important;
-  border-radius: 6px !important;
-  background: rgba(40, 167, 69, 0.1) !important;
-  display: inline-block !important;
-  transition: all 0.3s ease !important;
-}
+/* Type ETF styles - now handled by dynamic color system */
+/* Static colors removed to allow dynamic type colors from preferences */
 
 .type-crypto {
   color: #6f42c1 !important;
@@ -281,14 +231,5 @@
   margin-inline-start: 6px;
 }
 
-.status-dot.online {
-  background-color: #28a745;
-}
-
-.status-dot.offline {
-  background-color: #dc3545;
-}
-
-.status-dot.pending {
-  background-color: #ffc107;
-}
+/* Status dots - now handled by dynamic color system */
+/* Static colors removed to allow dynamic status colors from preferences */

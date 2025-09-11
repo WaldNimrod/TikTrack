@@ -82,6 +82,14 @@
           <!-- Active alerts web component -->
           <active-alerts></active-alerts>
 
+          <!-- Data summary -->
+          <div class="info-summary" id="summaryStats">
+            <div>סה"כ התראות: <strong id="totalAlerts">12</strong></div>
+            <div>התראות פעילות: <strong id="activeAlerts">8</strong></div>
+            <div>התראות חדשות: <strong id="newAlerts">0</strong></div>
+            <div>התראות היום: <strong id="todayAlerts">0</strong></div>
+            <div>התראות השבוע: <strong id="weekAlerts">0</strong></div>
+          </div>
         </div>
       </div>
       <!-- Top Section End -->
@@ -90,20 +98,7 @@
       <div class="content-section" id="section1">
         <div class="section-header entity-test-sub-header">
           <h2>📋 ניהול התראות</h2>
-          <div class="info-summary" id="summaryStats">
-            <div>סה"כ התראות: <strong id="totalAlerts">12</strong></div>
-            <div>התראות פעילות: <strong id="activeAlerts">8</strong></div>
-            <div>התראות חדשות: <strong id="newAlerts">0</strong></div>
-            <div>התראות היום: <strong id="todayAlerts">0</strong></div>
-            <div>התראות השבוע: <strong id="weekAlerts">0</strong></div>
-          </div>
-          <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
-          </button>
-        </div>
-        <div class="section-body">
-          <!-- Quick filters -->
-          <div class="mb-3">
+          <div class="filter-buttons-container">
             <button class="btn btn-sm active" onclick="filterAlertsByRelatedObjectType('all')" data-type="all" title="הצג הכל" style="background-color: white; color: #28a745; border-color: #28a745;">
               הכל
             </button>
@@ -121,12 +116,12 @@
             </button>
             
             <span style="margin: 0 10px; color: #666;">|</span>
-            
-            <div class="action-separator"></div>
-            <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור התראות">
-              <span class="filter-icon">▲</span>
-            </button>
           </div>
+          <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
+        </div>
+        <div class="section-body">
 
           <!-- Alerts table -->
           <div class="table-responsive" id="alertsContainer">

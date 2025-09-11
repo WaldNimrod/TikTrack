@@ -3164,14 +3164,7 @@ window.addEventListener('load', () => {
   document.body.removeChild(testElement);
   document.body.removeChild(testVar);
   
-  if (typeof HeaderSystem === 'function') {
-    console.log('✅ HeaderSystem class found, creating instance...');
-    window.headerSystem = new HeaderSystem();
-    window.headerSystem.init();
-    console.log('✅ Header system initialized successfully');
-  } else {
-    console.error('❌ HeaderSystem class not found');
-  }
+  // Header system initialization moved to main DOMContentLoaded
 });
 
 // ===== פונקציות יצירת תפריט דינמי - הוסרו (כפילות מיותרת) =====
@@ -5045,6 +5038,20 @@ async function clearDevelopmentCache(event) {
 
 // ייצוא פונקציות פיתוח
 window.clearDevelopmentCache = clearDevelopmentCache;
+
+// אתחול מערכת ראש הדף
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 DOM loaded, initializing Header System...');
+  
+  if (typeof HeaderSystem === 'function') {
+    console.log('✅ HeaderSystem class found, creating instance...');
+    window.headerSystem = new HeaderSystem();
+    window.headerSystem.init();
+    console.log('✅ Header system initialized successfully');
+  } else {
+    console.error('❌ HeaderSystem class not found');
+  }
+});
 
 // Header System JS loaded completely
 

@@ -83,23 +83,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   console.log('✅ מודולים הוגדרו לסגירה בלחיצה על הרקע');
 
-  // וידוא שצבעי ישויות מוגדרים
-  console.log('🔍 בודק אם loadColorPreferences קיים:', !!window.loadColorPreferences);
-  if (window.loadColorPreferences) {
-    console.log('🎨 קורא ל-loadColorPreferences...');
-    window.loadColorPreferences().then(() => {
-      console.log('✅ צבעי ישויות נטענו לעמוד התראות');
-      // בדיקת הצבעים שנטענו
-      const tradeColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-color');
-      const tickerColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-ticker-color');
-      console.log('🎨 צבע טרייד:', tradeColor);
-      console.log('🎨 צבע טיקר:', tickerColor);
-    }).catch(error => {
-      console.warn('⚠️ שגיאה בטעינת צבעי ישויות:', error);
-    });
-  } else {
-    console.warn('⚠️ loadColorPreferences לא קיים!');
-  }
+  // בדיקת הצבעים הסטטיים
+  console.log('🎨 בודק צבעים סטטיים...');
+  const tradeColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-color');
+  const tickerColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-ticker-color');
+  const tradePlanColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-plan-color');
+  const accountColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-account-color');
+  console.log('🎨 צבע טרייד:', tradeColor);
+  console.log('🎨 צבע טיקר:', tickerColor);
+  console.log('🎨 צבע תוכנית:', tradePlanColor);
+  console.log('🎨 צבע חשבון:', accountColor);
 });
 
 

@@ -400,7 +400,7 @@ function convertSharesToAmount(shares, price) {
 
 /**
  * Get user preference
- * ✨ עודכן לתמיכה במערכת העדפות V2!
+ * ✨ עודכן לתמיכה במערכת העדפות!
  * @param {string} key - Preference key
  * @param {*} defaultValue - Default value
  * @returns {*} User preference value
@@ -413,7 +413,7 @@ async function getUserPreference(key, defaultValue = null) {
     if (typeof window.getCurrentPreference === 'function') {
       const value = await window.getCurrentPreference(key);
       if (value !== null && value !== undefined) {
-        console.log(`✅ Got V2/V1 preference ${key}: ${value}`);
+        console.log(`✅ Got preference ${key}: ${value}`);
         return value;
       }
     }

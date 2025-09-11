@@ -1599,35 +1599,35 @@ function updateCSSVariablesFromPreferences(preferences) {
 
 /**
  * טעינת הגדרות צבע מהעדפות
- * ✨ עודכן לתמיכה במערכת העדפות V2!
+ * ✨ עודכן לתמיכה במערכת העדפות!
  * Load color settings from preferences
  */
 async function loadColorPreferences() {
   try {
-    console.log('🎨 טוען הגדרות צבע מהעדפות (V2/V1)...');
+    console.log('🎨 טוען הגדרות צבע מהעדפות...');
 
-    // נסה ראשית מערכת V2
+    // נסה ראשית מערכת העדפות
     try {
       const v2Response = await fetch('/api/v2/preferences/');
       if (v2Response.ok) {
         const v2Data = await v2Response.json();
         if (v2Data.success && v2Data.data.preferences) {
           const prefs = v2Data.data.preferences;
-          console.log('🚀 Using V2 color preferences');
+          console.log('🚀 Using preferences color settings');
           
-          // עדכון מערכת הצבעים מV2
+          // עדכון מערכת הצבעים מהעדפות
           if (prefs.colorScheme) {
             if (prefs.colorScheme.numericValues) {
               Object.assign(NUMERIC_VALUE_COLORS, prefs.colorScheme.numericValues);
-              console.log('✅ V2 numeric colors loaded');
+              console.log('✅ numeric colors loaded');
             }
             if (prefs.colorScheme.entities) {
               Object.assign(ENTITY_COLORS, prefs.colorScheme.entities);
-              console.log('✅ V2 entity colors loaded');
+              console.log('✅ entity colors loaded');
             }
             if (prefs.colorScheme.status) {
               Object.assign(STATUS_COLORS, prefs.colorScheme.status);
-              console.log('✅ V2 status colors loaded');
+              console.log('✅ status colors loaded');
             }
           }
           
@@ -1649,17 +1649,17 @@ async function loadColorPreferences() {
             }
           }
           
-          console.log('🎨 ✅ הגדרות צבע V2 נטענו בהצלחה');
+          console.log('🎨 ✅ הגדרות צבע נטענו בהצלחה');
           return true;
         }
       }
     } catch (v2Error) {
-      // V2 preferences not available (likely database tables not created yet)
-      console.log('🔄 V2 colors not available, falling back to V1');
+      // preferences not available (likely database tables not created yet)
+      console.log('🔄 preferences colors not available, falling back to defaults');
     }
 
-    // Fallback ל-V1
-    console.log('🔄 Using V1 color preferences (fallback)');
+    // Fallback ל-legacy
+    console.log('🔄 Using legacy color preferences (fallback)');
     const response = await fetch('/api/v1/preferences/');
     if (response.ok) {
       const data = await response.json();

@@ -159,16 +159,16 @@ async function showAddExecutionModal() {
   document.getElementById('addExecutionDate').value = todayString;
 
   // הגדרת עמלה ברירת מחדל לפי העדפות
-  // ✨ עודכן לתמיכה במערכת העדפות V2!
+  // ✨ עודכן לתמיכה במערכת העדפות!
   try {
     let defaultCommission = 1.0; // ברירת מחדל משופרת
     
-    // נסה לקבל מהמערכת החדשה V2/V1
+    // נסה לקבל מהמערכת החדשה
     if (typeof window.getCurrentPreference === 'function') {
       const commissionFromPrefs = await window.getCurrentPreference('defaultCommission');
       if (commissionFromPrefs !== null && commissionFromPrefs !== undefined) {
         defaultCommission = commissionFromPrefs;
-        console.log(`✅ Using commission from V2/V1 preferences: ${defaultCommission}`);
+        console.log(`✅ Using commission from preferences: ${defaultCommission}`);
       }
     } 
     // Fallback לV1 userPreferences

@@ -7,11 +7,27 @@
 /* From: _colors-dynamic.css */
 :root {
   /* צבעי סטטוס דינמיים */
-  /* Status colors - now handled by dynamic color system */
-  /* Static CSS variables removed to allow dynamic status colors from preferences */
+  /* צבעי סטטוס דינמיים */
+  --status-open-color: var(--user-status-open-color, #28a745);
+  --status-closed-color: var(--user-status-closed-color, #6c757d);
+  --status-cancelled-color: var(--user-status-cancelled-color, #dc3545);
+  --status-pending-color: var(--user-status-pending-color, #ffc107);
+  --status-active-color: var(--user-status-active-color, #007bff);
+  --status-inactive-color: var(--user-status-inactive-color, #6c757d);
   
-  /* Entity colors - now handled by dynamic color system */
-  /* Static CSS variables removed to allow dynamic entity colors from preferences */
+  /* צבעי ישויות דינמיים */
+  --entity-trade-color: var(--user-entity-trade-color, #007bff);
+  --entity-trade-plan-color: var(--user-entity-trade-plan-color, #0056b3);
+  --entity-execution-color: var(--user-entity-execution-color, #17a2b8);
+  --entity-account-color: var(--user-entity-account-color, #1b0b75);
+  --entity-cash-flow-color: var(--user-entity-cash-flow-color, #20c997);
+  --entity-ticker-color: var(--user-entity-ticker-color, #019193);
+  --entity-alert-color: var(--user-entity-alert-color, #ff9c05);
+  --entity-note-color: var(--user-entity-note-color, #6f42c1);
+  --entity-constraint-color: var(--user-entity-constraint-color, #6c757d);
+  --entity-design-color: var(--user-entity-design-color, #495057);
+  --entity-research-color: var(--user-entity-research-color, #343a40);
+  --entity-preference-color: var(--user-entity-preference-color, #adb5bd);
 }
 
 /* From: _typography.css */
@@ -94,14 +110,36 @@
 
 /* From: _colors-semantic.css */
 :root {
-  /* Semantic colors - now handled by dynamic color system */
-  /* Static CSS variables removed to allow dynamic semantic colors from preferences */
+  /* צבעים סמנטיים דינמיים */
+  --color-success: var(--user-color-success, #28a745);
+  --color-success-light: var(--user-color-success-light, #d4edda);
+  --color-success-dark: var(--user-color-success-dark, #155724);
+  --color-success-border: var(--user-color-success-border, #c3e6cb);
+  --color-danger: var(--user-color-danger, #dc3545);
+  --color-danger-light: var(--user-color-danger-light, #f8d7da);
+  --color-danger-dark: var(--user-color-danger-dark, #721c24);
+  --color-danger-border: var(--user-color-danger-border, #f5c6cb);
+  --color-warning: var(--user-color-warning, #ffc107);
+  --color-warning-light: var(--user-color-warning-light, #fff3cd);
+  --color-warning-dark: var(--user-color-warning-dark, #856404);
+  --color-warning-border: var(--user-color-warning-border, #ffeaa7);
   --color-info: #007bff;
   --color-info-light: #d1ecf1;
   --color-info-dark: #0c5460;
   --color-info-border: #bee5eb;
-  /* Numeric value colors - now handled by dynamic color system */
-  /* Static CSS variables removed to allow dynamic numeric colors from preferences */
+  /* צבעי ערכים מספריים דינמיים */
+  --numeric-positive-light: var(--user-numeric-positive-light, #d4edda);
+  --numeric-positive-medium: var(--user-numeric-positive-medium, #28a745);
+  --numeric-positive-dark: var(--user-numeric-positive-dark, #155724);
+  --numeric-positive-border: var(--user-numeric-positive-border, #c3e6cb);
+  --numeric-negative-light: var(--user-numeric-negative-light, #f8d7da);
+  --numeric-negative-medium: var(--user-numeric-negative-medium, #dc3545);
+  --numeric-negative-dark: var(--user-numeric-negative-dark, #721c24);
+  --numeric-negative-border: var(--user-numeric-negative-border, #f5c6cb);
+  --numeric-zero-light: var(--user-numeric-zero-light, #e2e3e5);
+  --numeric-zero-medium: var(--user-numeric-zero-medium, #6c757d);
+  --numeric-zero-dark: var(--user-numeric-zero-dark, #383d41);
+  --numeric-zero-border: var(--user-numeric-zero-border, #d6d8db);
 }
 
 /* From: _rtl-logical.css */
@@ -1456,8 +1494,25 @@ button:disabled,
   color: #388e3c !important;
   box-shadow: 0 2px 6px rgba(76, 175, 80, 0.1) !important;
 }
-/* Numeric text styles - now handled by dynamic color system */
-/* Static colors removed to allow dynamic numeric colors from preferences */
+.numeric-text-positive {
+  color: var(--numeric-positive-medium) !important;
+  font-weight: 600;
+}
+.numeric-text-negative {
+  color: var(--numeric-negative-medium) !important;
+  font-weight: 600;
+}
+.numeric-text-zero {
+  color: var(--numeric-zero-medium) !important;
+}
+.profit-positive {
+  color: var(--numeric-positive-medium) !important;
+  font-weight: 600;
+}
+.profit-negative {
+  color: var(--numeric-negative-medium) !important;
+  font-weight: 600;
+}
 .side-long {
   color: #6f42c1 !important;
   font-weight: 600 !important;
@@ -1472,8 +1527,20 @@ button:disabled,
   background: rgba(111, 66, 193, 0.15) !important;
   transform: translateY(-1px) !important;
 }
-/* Side short styles - now handled by dynamic color system */
-/* Static colors removed to allow dynamic side colors from preferences */
+.side-short {
+  color: var(--color-danger) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+.side-short:hover {
+  background: color-mix(in srgb, var(--color-danger) 15%, transparent) !important;
+  transform: translateY(-1px) !important;
+}
 .type-swing {
   color: #17a2b8 !important;
   font-weight: 600 !important;
@@ -1484,8 +1551,16 @@ button:disabled,
   display: inline-block !important;
   transition: all 0.3s ease !important;
 }
-/* Type investment styles - now handled by dynamic color system */
-/* Static colors removed to allow dynamic type colors from preferences */
+.type-investment {
+  color: var(--color-success) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: color-mix(in srgb, var(--color-success) 10%, transparent) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
 .type-stock {
   color: #007bff !important;
   font-weight: 600 !important;
@@ -1496,8 +1571,16 @@ button:disabled,
   display: inline-block !important;
   transition: all 0.3s ease !important;
 }
-/* Type ETF styles - now handled by dynamic color system */
-/* Static colors removed to allow dynamic type colors from preferences */
+.type-etf {
+  color: var(--color-success) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: color-mix(in srgb, var(--color-success) 10%, transparent) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
 .type-crypto {
   color: #6f42c1 !important;
   font-weight: 600 !important;
@@ -1573,8 +1656,15 @@ button:disabled,
   border-radius: 50%;
   margin-inline-start: 6px;
 }
-/* Status dots - now handled by dynamic color system */
-/* Static colors removed to allow dynamic status colors from preferences */
+.status-dot.online {
+  background-color: var(--status-open-color);
+}
+.status-dot.offline {
+  background-color: var(--status-closed-color);
+}
+.status-dot.pending {
+  background-color: var(--status-pending-color);
+}
 
 /* From: _forms-advanced.css */
 .form-check,

@@ -90,8 +90,29 @@
 }
 
 /* ===== ערכים מספריים ===== */
-/* Numeric text styles - now handled by dynamic color system */
-/* Static colors removed to allow dynamic numeric colors from preferences */
+.numeric-text-positive {
+  color: var(--numeric-positive-medium) !important;
+  font-weight: 600;
+}
+
+.numeric-text-negative {
+  color: var(--numeric-negative-medium) !important;
+  font-weight: 600;
+}
+
+.numeric-text-zero {
+  color: var(--numeric-zero-medium) !important;
+}
+
+.profit-positive {
+  color: var(--numeric-positive-medium) !important;
+  font-weight: 600;
+}
+
+.profit-negative {
+  color: var(--numeric-negative-medium) !important;
+  font-weight: 600;
+}
 
 /* ===== שדות צד (Long/Short) ===== */
 .side-long {
@@ -110,8 +131,21 @@
   transform: translateY(-1px) !important;
 }
 
-/* Side short styles - now handled by dynamic color system */
-/* Static colors removed to allow dynamic side colors from preferences */
+.side-short {
+  color: var(--color-danger) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.side-short:hover {
+  background: color-mix(in srgb, var(--color-danger) 15%, transparent) !important;
+  transform: translateY(-1px) !important;
+}
 
 /* ===== שדות סוג (Type) ===== */
 .type-swing {
@@ -125,8 +159,21 @@
   transition: all 0.3s ease !important;
 }
 
-/* Type investment styles - now handled by dynamic color system */
-/* Static colors removed to allow dynamic type colors from preferences */
+.type-investment {
+  color: var(--color-success) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: color-mix(in srgb, var(--color-success) 10%, transparent) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.type-investment:hover {
+  background: color-mix(in srgb, var(--color-success) 15%, transparent) !important;
+  transform: translateY(-1px) !important;
+}
 
 .type-stock {
   color: #007bff !important;
@@ -139,8 +186,21 @@
   transition: all 0.3s ease !important;
 }
 
-/* Type ETF styles - now handled by dynamic color system */
-/* Static colors removed to allow dynamic type colors from preferences */
+.type-etf {
+  color: var(--color-success) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: color-mix(in srgb, var(--color-success) 10%, transparent) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.type-etf:hover {
+  background: color-mix(in srgb, var(--color-success) 15%, transparent) !important;
+  transform: translateY(-1px) !important;
+}
 
 .type-crypto {
   color: #6f42c1 !important;
@@ -231,5 +291,14 @@
   margin-inline-start: 6px;
 }
 
-/* Status dots - now handled by dynamic color system */
-/* Static colors removed to allow dynamic status colors from preferences */
+.status-dot.online {
+  background-color: var(--status-open-color);
+}
+
+.status-dot.offline {
+  background-color: var(--status-closed-color);
+}
+
+.status-dot.pending {
+  background-color: var(--status-pending-color);
+}

@@ -1662,6 +1662,23 @@ button:disabled,
   border: 1px solid;
 }
 
+/* Related entity styles - unified appearance */
+.related-trade,
+.related-trade-plan,
+.related-execution,
+.related-account,
+.related-cash-flow,
+.related-ticker,
+.related-alert,
+.related-note,
+.related-other {
+  /* Default styles for all related entities */
+  background-color: rgba(108, 117, 125, 0.1);
+  color: #6c757d;
+  border-color: #6c757d;
+}
+
+/* Specific entity colors - all use same pattern: light background + colored text/border */
 .related-trade {
   color: var(--entity-trade-color);
   background-color: color-mix(in srgb, var(--entity-trade-color) 10%, transparent);
@@ -2093,4 +2110,14 @@ select option {
 .alerts-page .section-header,
 .alerts-page .top-section .section-header {
   border-bottom: 2px solid var(--entity-alert-color, #ff9c05);
+}
+
+/* ===== TRADING COLORS ===== */
+/* צבעי קניה ומכירה */
+.buy-color {
+  color: #28a745 !important;
+}
+
+.sell-color {
+  color: #dc3545 !important;
 }

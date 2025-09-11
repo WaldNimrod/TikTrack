@@ -1,41 +1,24 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
             <!-- ===== CSS Architecture - Unified CSS ===== -->
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Bootstrap Framework -->
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- TikTrack CSS - Unified CSS (No @import) -->
-    <link rel="stylesheet" href="styles-new/unified.css?v=v1.5.3_fix_colors">
+    <!-- Unified CSS -->
+    <link rel="stylesheet" href="styles-new/unified.css?v=v1.4.0">
     
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Error Handlers -->
-    <script src="scripts/error-handlers.js"></script>
-    
-    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v41_alerts_colors"></head>
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v38_fixed">
 
-<body class="preferences-page">
-    <!-- Unified Header Container -->
-    <div id="unified-header"></div>
-    
-    <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
+<body>
     <div class="background-wrapper">
-        <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
-        <!-- Header already loaded above -->
-        
-        <!-- ===== TEMPLATE ZONE 3: PAGE BODY (LOCKED) ===== -->
+        <!-- Header System -->
+        <div id="unified-header"></div>
+
+        <!-- Page body -->
         <div class="page-body">
-            <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT (EDITABLE) ===== -->
+            <!-- Main content limited in width -->
             <div class="main-content">
-                <!-- ===== CONTENT SECTIONS START (EDITABLE) ===== -->
       
       <!-- כותרת ראשית -->
       <div class="top-section" id="topSection">
@@ -1064,33 +1047,24 @@
         </div>
       </div>
     </div>
-                <!-- ===== CONTENT SECTIONS END (EDITABLE) ===== -->
             </div>
-            <!-- ===== END MAIN CONTENT ===== -->
         </div>
-        <!-- ===== END PAGE BODY ===== -->
     </div>
-    <!-- ===== END BACKGROUND WRAPPER ===== -->
   
   <!-- Hidden file input for import -->
   <input type="file" id="importFileInput" class="d-none" accept=".json" onchange="handleFileImport(event)">
   
-  <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  
-  <!-- Header System -->
-  <script src="scripts/header-system.js?v=v44_preferences_fixed"></script>
-  
-  <!-- Core scripts -->
-  <script src="scripts/notification-system.js"></script>
-  <script src="scripts/main.js"></script>
-  
-  <!-- Color system script -->
-  <script src="scripts/color-scheme-system.js"></script>
-  
-  <!-- Preferences script -->
-  <script src="scripts/central-refresh-system.js"></script>
-  <script src="scripts/preferences.js"></script>
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js?v=v34_fixes"></script>
+    
+    <!-- Dynamic Color System Scripts -->
+    <script src="scripts/color-scheme-system.js"></script>
+    
+    <!-- Preferences System Scripts -->
+    <script src="scripts/preferences.js"></script>
+    
+    <!-- Color Demo Toggle Script -->
+    <script src="scripts/color-demo-toggle.js"></script>
   
 </body>
 </html>

@@ -586,22 +586,42 @@ function updateAlertsTable(alerts) {
       }
 
 
-      // המרת מצב הפעלה לעברית להצגה
+      // המרת מצב הפעלה לעברית להצגה עם צבעים דינמיים
       // לפי הדוקומנטציה: false=לא הופעל, new=הופעל לא נקרא, true=נקרא/בוטל
       let triggeredDisplay;
       let triggeredClass = '';
+      let triggeredColor = '#6c757d';
+      let triggeredBgColor = 'rgba(108, 117, 125, 0.1)';
+      let triggeredBorderColor = '#6c757d';
+      
       if (alert.is_triggered === 'true' || alert.is_triggered === true) {
         triggeredDisplay = 'כן';
         triggeredClass = 'triggered-yes';
+        // צבע חיובי - הופעל בהצלחה
+        triggeredColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'medium') : '#28a745';
+        triggeredBgColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'light') : 'rgba(40, 167, 69, 0.1)';
+        triggeredBorderColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'border') : 'rgba(40, 167, 69, 0.3)';
       } else if (alert.is_triggered === 'false' || alert.is_triggered === false) {
         triggeredDisplay = 'לא';
         triggeredClass = 'triggered-no';
+        // צבע שלילי - לא הופעל
+        triggeredColor = window.getNumericValueColor ? window.getNumericValueColor(-1, 'medium') : '#dc3545';
+        triggeredBgColor = window.getNumericValueColor ? window.getNumericValueColor(-1, 'light') : 'rgba(220, 53, 69, 0.1)';
+        triggeredBorderColor = window.getNumericValueColor ? window.getNumericValueColor(-1, 'border') : 'rgba(220, 53, 69, 0.3)';
       } else if (alert.is_triggered === 'new') {
         triggeredDisplay = 'חדש';
         triggeredClass = 'triggered-new';
+        // צבע חיובי - הופעל חדש
+        triggeredColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'medium') : '#28a745';
+        triggeredBgColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'light') : 'rgba(40, 167, 69, 0.1)';
+        triggeredBorderColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'border') : 'rgba(40, 167, 69, 0.3)';
       } else {
         triggeredDisplay = 'לא מוגדר';
         triggeredClass = 'triggered-unknown';
+        // צבע נייטרלי
+        triggeredColor = '#6c757d';
+        triggeredBgColor = 'rgba(108, 117, 125, 0.1)';
+        triggeredBorderColor = '#6c757d';
       }
 
       return `
@@ -636,10 +656,10 @@ function updateAlertsTable(alerts) {
           <td class="status-cell" data-status="${alert.status || ''}">
           <span class="status-badge ${statusClass}" style="color: ${statusColor}; background-color: ${statusBgColor}; border: 1px solid ${statusColor};">${statusDisplay}</span>
         </td>
-          <td><span class="triggered-badge ${triggeredClass}" style="background-color: white; border: 1px solid #6c757d; color: #6c757d; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem;">${triggeredDisplay}</span></td>
+          <td><span class="triggered-badge ${triggeredClass}" style="background-color: ${triggeredBgColor}; border: 1px solid ${triggeredBorderColor}; color: ${triggeredColor}; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-size: 0.875rem;">${triggeredDisplay}</span></td>
           <td style="padding: 0;">
             <div class="related-object-cell ${relatedClass}" 
-             style="justify-content: flex-start; text-align: right; min-width: 150px; cursor: pointer; background-color: ${relatedBgColor || 'rgba(108, 117, 125, 0.1)'}; color: black; padding: 0.25rem 0.5rem; border-radius: 0.25rem; border: 1px solid ${relatedColor || '#6c757d'};" 
+             style="justify-content: flex-start; text-align: right; min-width: 150px; cursor: pointer; background-color: ${relatedBgColor || 'rgba(108, 117, 125, 0.1)'}; color: ${relatedColor || '#6c757d'}; padding: 0.25rem 0.5rem; border-radius: 0.25rem; border: 1px solid ${relatedColor || '#6c757d'};" 
              title="קישור לדף אובייקט - בפיתוח">
               ${relatedDisplay}
             </div>

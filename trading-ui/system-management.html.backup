@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מנהל מערכת - TikTrack</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Unified CSS -->
+    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=v1.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=v1.0.0">
+    
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v39_system_management">
+    
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js?v=v35_system_management"></script>
+    
+    <!-- Dynamic Color System Scripts -->
+    <script src="scripts/color-scheme-system.js"></script>
+    
+    <!-- Preferences System Scripts -->
+    <script src="scripts/preferences.js"></script>
+    
+    <!-- Color Demo Toggle Script -->
+    <script src="scripts/color-demo-toggle.js"></script>
+</head>
+
+<body>
+    <div class="background-wrapper">
+        <!-- Header System -->
+        <div id="unified-header"></div>
+
+        <!-- Page body -->
+        <div class="page-body">
+            <!-- Main content limited in width -->
+            <div class="main-content">
+                <!-- UI Content Section Top Start-->
+                <div class="top-section">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>🔧 מנהל מערכת</h2>
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- קומפוננט התראות פעילות -->
+                        <active-alerts></active-alerts>
+
+                        <!-- סיכום סטטוס מהיר -->
+                        <div class="info-summary" id="summaryStats">
+                            <div>סטטוס שרת: <strong id="serverHealthStats">בדיקה...</strong></div>
+                            <div>בסיס נתונים: <strong id="databaseHealthStats">בדיקה...</strong></div>
+                            <div>מטמון: <strong id="cacheHealthStats">בדיקה...</strong></div>
+                            <div>סטטוס: <strong id="overallStatus">בדיקה...</strong></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section Top End -->  
+
+                <!-- UI Content Section 1 Start-->
+                <div class="content-section" id="section1">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>🏥 בריאות מערכת</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>🏥 בריאות מערכת</h3>
+                                <div class="system-score-small">
+                                    <span class="score-label">ציון כללי:</span>
+                                    <span class="system-score excellent">טוען...</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="health-grid">
+                                    <div class="status-card">
+                                        <div class="card-header">
+                                            <h3>שרת</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="health-status active">פעיל</div>
+                                            <div class="health-details">זמן פעילות: 24 שעות</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-card">
+                                        <div class="card-header">
+                                            <h3>בסיס נתונים</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="health-status active">מחובר</div>
+                                            <div class="health-details">גודל: 15.2 MB</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-card">
+                                        <div class="card-header">
+                                            <h3>מטמון</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="health-status active">בריא</div>
+                                            <div class="health-details">אחוז פגיעות: 87%</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-card">
+                                        <div class="card-header">
+                                            <h3>רשת</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="health-status active">יציב</div>
+                                            <div class="health-details">עיכוב: 12ms</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 1 End -->   
+
+                <!-- UI Content Section 2 Start-->
+                <div class="content-section" id="section2">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>📈 ביצועי מערכת</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>📈 ביצועי מערכת</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="performance-grid">
+                                    <div class="status-card">
+                                        <div class="card-header">
+                                            <h3>מעבד (CPU)</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="performance-indicator" data-type="cpu">
+                                                <div class="progress-bar">0%</div>
+                                            </div>
+                                            <div class="performance-value cpu-usage">0%</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-card">
+                                        <div class="card-header">
+                                            <h3>זיכרון (RAM)</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="performance-indicator" data-type="memory">
+                                                <div class="progress-bar">0%</div>
+                                            </div>
+                                            <div class="performance-value memory-usage">0%</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-card">
+                                        <div class="card-header">
+                                            <h3>דיסק</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="performance-indicator" data-type="disk">
+                                                <div class="progress-bar">0%</div>
+                                            </div>
+                                            <div class="performance-value disk-usage">0%</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-card">
+                                        <div class="card-header">
+                                            <h3>מטמון</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="performance-indicator" data-type="cache">
+                                                <div class="progress-bar">0%</div>
+                                            </div>
+                                            <div class="performance-value cache-usage">0%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 2 End--> 
+
+                <!-- UI Content Section 3 Start-->
+                <div class="content-section" id="section3">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>🌐 נתונים חיצוניים</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>🌐 נתונים חיצוניים</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="external-data-grid">
+                                    <div class="status-card">
+                                        <div class="card-header">
+                                            <h3>Yahoo Finance</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="data-status active">פעיל</div>
+                                            <div class="data-details">
+                                                <div class="data-item">
+                                                    <span class="data-label">עדכון אחרון:</span>
+                                                    <span class="data-value" id="external-last-update">טוען...</span>
+                                                </div>
+                                                <div class="data-item">
+                                                    <span class="data-label">רמת דיוק:</span>
+                                                    <span class="data-value" id="external-accuracy">טוען...</span>
+                                                </div>
+                                                <div class="data-item">
+                                                    <span class="data-label">טריות נתונים:</span>
+                                                    <span class="data-value" id="external-freshness">טוען...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="status-card">
+                                        <div class="card-header">
+                                            <h3>סטטיסטיקות כלליות</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="data-status active">בריא</div>
+                                            <div class="data-details">
+                                                <div class="data-item">
+                                                    <span class="data-label">ספקים פעילים:</span>
+                                                    <span class="data-value" id="external-providers">טוען...</span>
+                                                </div>
+                                                <div class="data-item">
+                                                    <span class="data-label">אחוז הצלחה:</span>
+                                                    <span class="data-value" id="external-success-rate">טוען...</span>
+                                                </div>
+                                                <div class="data-item">
+                                                    <span class="data-label">סטטוס כללי:</span>
+                                                    <span class="data-value" id="external-overall-status">טוען...</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 3 End--> 
+
+                <!-- UI Content Section 4 Start-->
+                <div class="content-section" id="section4">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>🚨 התראות מערכת</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>🚨 התראות מערכת</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="alerts-section">
+                                    <div class="alerts-summary">
+                                        <div class="alert-summary-item">
+                                            <span class="alert-count error" id="error-count">0</span>
+                                            <span class="alert-label">שגיאות</span>
+                                        </div>
+                                        <div class="alert-summary-item">
+                                            <span class="alert-count warning" id="warning-count">0</span>
+                                            <span class="alert-label">אזהרות</span>
+                                        </div>
+                                        <div class="alert-summary-item">
+                                            <span class="alert-count info" id="info-count">0</span>
+                                            <span class="alert-label">מידע</span>
+                                        </div>
+                                    </div>
+                                    <div class="alerts-list" id="alerts-list">
+                                        <div class="alert-item">
+                                            <div class="alert-timestamp">טוען...</div>
+                                            <div class="alert-level">INFO</div>
+                                            <div class="alert-message">טוען התראות...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 4 End--> 
+
+                <!-- UI Content Section 5 Start-->
+                <div class="content-section" id="section5">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>🔒 אבטחה</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>🔒 אבטחה</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="security-grid">
+                                    <div class="status-card">
+                                        <div class="card-header">
+                                            <h3>ניטור איומים</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="security-status safe">מערכת מאובטחת</div>
+                                            <div class="security-details">סריקה אחרונה: לפני 5 דקות</div>
+                                        </div>
+                                    </div>
+                                    <div class="status-card">
+                                        <div class="card-header">
+                                            <h3>בקרת גישה</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="security-status safe">פעיל</div>
+                                            <div class="security-details">משתמשים מחוברים: 1</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 5 End--> 
+
+                <!-- UI Content Section 6 Start-->
+                <div class="content-section" id="section6">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>📋 לוגים וניטור</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>📋 לוגים וניטור</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="logs-section">
+                                    <div class="log-filters">
+                                        <select id="log-level-filter">
+                                            <option value="all">כל הרמות</option>
+                                            <option value="info">מידע</option>
+                                            <option value="warning">אזהרה</option>
+                                            <option value="error">שגיאה</option>
+                                        </select>
+                                        <input type="text" id="log-search" placeholder="חיפוש בלוגים...">
+                                        <button class="refresh-btn" title="רענן נתונים">🔄 רענן</button>
+                                    </div>
+                                    <div class="log-content" id="log-content">
+                                        <div class="log-entry log-info">
+                                            <div class="log-timestamp">טוען...</div>
+                                            <div class="log-level">INFO</div>
+                                            <div class="log-message">טוען נתוני מערכת...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 6 End--> 
+
+                <!-- UI Content Section 7 Start-->
+                <div class="content-section" id="section7">
+                    <div class="section-header entity-test-sub-header">
+                        <h2>💾 גיבויים ושחזור</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section7')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>💾 גיבויים ושחזור</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="backup-grid">
+                                    <div class="status-card">
+                                        <div class="card-header">
+                                            <h3>גיבויים אוטומטיים</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>גיבוי יומי בשעה 02:00</p>
+                                            <button class="btn btn-primary">הפעל גיבוי עכשיו</button>
+                                        </div>
+                                    </div>
+                                    <div class="status-card">
+                                        <div class="card-header">
+                                            <h3>שחזור מערכת</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>שחזור מגיבוי אחרון</p>
+                                            <button class="btn btn-warning">שחזר מערכת</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 7 End--> 
+            </div>
+        </div>
+    </div>
+
+    <!-- Core System Scripts -->
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/table-mappings.js"></script>
+    <script src="scripts/date-utils.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/linked-items.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/main.js"></script>
+    
+    <!-- Page-specific scripts -->
+    <script src="scripts/system-management.js"></script>
+</body>
+</html>

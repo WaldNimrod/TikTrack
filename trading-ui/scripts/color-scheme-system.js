@@ -1608,11 +1608,11 @@ async function loadColorPreferences() {
 
     // נסה ראשית מערכת העדפות
     try {
-      const v2Response = await fetch('/api/v2/preferences/');
-      if (v2Response.ok) {
-        const v2Data = await v2Response.json();
-        if (v2Data.success && v2Data.data.preferences) {
-          const prefs = v2Data.data.preferences;
+      const newResponse = await fetch('/api/v1/preferences/user');
+      if (newResponse.ok) {
+        const newData = await newResponse.json();
+        if (newData.success && newData.data.preferences) {
+          const prefs = newData.data.preferences;
           console.log('🚀 Using preferences color settings');
           
           // עדכון מערכת הצבעים מהעדפות
@@ -1653,14 +1653,14 @@ async function loadColorPreferences() {
           return true;
         }
       }
-    } catch (v2Error) {
+    } catch (newError) {
       // preferences not available (likely database tables not created yet)
       console.log('🔄 preferences colors not available, falling back to defaults');
     }
 
     // Fallback ל-legacy
     console.log('🔄 Using legacy color preferences (fallback)');
-    const response = await fetch('/api/v1/preferences/');
+    const response = await fetch('/api/v1/preferences/user');
     if (response.ok) {
       const data = await response.json();
       const preferences = data.data || data;

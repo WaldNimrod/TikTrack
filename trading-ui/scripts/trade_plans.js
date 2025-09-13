@@ -2303,12 +2303,12 @@ async function loadUserPreferences() {
     }
     
     // Fallback ל-API     try {
-      const v2Response = await fetch('/api/v2/preferences/');
-      if (v2Response.ok) {
-        const v2Data = await v2Response.json();
-        if (v2Data.success && v2Data.data.preferences) {
-          console.log('✅ Using  API preferences');
-          const prefs = v2Data.data.preferences;
+      const newResponse = await fetch('/api/v1/preferences/user');
+      if (newResponse.ok) {
+        const newData = await newResponse.json();
+        if (newData.success && newData.data.preferences) {
+          console.log('✅ Using new API preferences');
+          const prefs = newData.data.preferences;
           return {
             timezone: prefs.general?.timezone || 'Asia/Jerusalem',
             primaryCurrency: prefs.general?.primaryCurrency || 'USD',
@@ -2317,13 +2317,13 @@ async function loadUserPreferences() {
           };
         }
       }
-    } catch (v2Error) {
-      console.log('🔄  API not available, trying V1...');
+    } catch (newError) {
+      console.log('🔄 New API not available, trying V1...');
     }
     
     // Fallback ל-V1 API
     try {
-      const v1Response = await fetch('/api/v1/preferences/');
+      const v1Response = await fetch('/api/v1/preferences/user');
       if (v1Response.ok) {
         const preferences = await v1Response.json();
         console.log('✅ Using V1 API preferences');
@@ -2334,7 +2334,7 @@ async function loadUserPreferences() {
     }
     
     // Fallback אחרון - קובץ JSON מקומי (legacy)
-    const response = await fetch('/api/v2/preferences/');
+    const response = await fetch('/api/v1/preferences/user');
     if (response.ok) {
       const preferences = await response.json();
       console.log('🔄 Using local JSON preferences (legacy)');

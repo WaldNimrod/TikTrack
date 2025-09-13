@@ -1,0 +1,84 @@
+/**
+ * כותרות - Headings
+ * 
+ * קובץ זה מכיל את הסגנונות של כל הכותרות במערכת
+ * מבוסס על הסגנונות הקיימים מהמערכת הישנה
+ * 
+ * @version 1.1.0
+ * @lastUpdated January 6, 2025
+ */
+
+/* כל הכותרות */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--apple-text-primary);
+  margin-bottom: var(--spacing-md);
+  text-align: right;
+  direction: rtl;
+}
+
+/* גדלי כותרות */
+h1 {
+  font-size: var(--font-size-xxxl);  /* 32px */
+  font-weight: var(--font-weight-bold);
+}
+
+h2 {
+  font-size: var(--font-size-xxl);   /* 24px */
+  font-weight: var(--font-weight-semibold);
+}
+
+h3 {
+  font-size: var(--font-size-xl);    /* 20px */
+  font-weight: var(--font-weight-semibold);
+}
+
+h4 {
+  font-size: var(--font-size-lg);    /* 18px */
+  font-weight: var(--font-weight-medium);
+}
+
+h5 {
+  font-size: var(--font-size-base);  /* 16px */
+  font-weight: var(--font-weight-medium);
+}
+
+h6 {
+  font-size: var(--font-size-sm);    /* 14px */
+  font-weight: var(--font-weight-medium);
+}
+
+/* ===== סגנונות כותרות ספציפיים מהמערכת הישנה ===== */
+
+/* כותרת סקשן */
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--apple-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* כותרת עם איקון */
+.section-title img,
+.table-title img {
+  width: 20px;
+  height: 20px;
+  margin-inline-start: 8px;
+  vertical-align: middle;
+}
+
+/* כותרת עם ספירה */
+.section-count {
+  background: #29a6a8;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-inline-start: 0.5rem;
+}

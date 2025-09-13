@@ -1,5 +1,4 @@
 // Index page specific JavaScript
-console.log('🏠 index.js loaded successfully!');
 
 // Chart.js library needed for charts
 if (typeof Chart === 'undefined') {
@@ -14,7 +13,6 @@ let riskChart = null;
 
 // Function to switch between table tabs
 function switchTableTab(tabName) {
-    console.log('🔄 Switching to tab:', tabName);
     
     // Hide all table contents
     document.querySelectorAll('.table-content').forEach(table => {
@@ -38,19 +36,16 @@ function switchTableTab(tabName) {
 
 // Function to update chart period
 function updateChartPeriod(period) {
-    console.log('📊 Updating chart period to:', period);
     // Chart update logic would go here
 }
 
 // Function to refresh charts
 function refreshCharts() {
-    console.log('🔄 Refreshing charts...');
     initializeCharts();
 }
 
 // Function to initialize all charts
 function initializeCharts() {
-    console.log('📊 Initializing charts...');
     
     // Initialize Performance Chart - Simple line chart
     const performanceCtx = document.getElementById('performanceChart');
@@ -169,19 +164,16 @@ function initializeCharts() {
 
 // Function to refresh overview
 function refreshOverview() {
-    console.log('🔄 Refreshing overview...');
     // Overview refresh logic would go here
 }
 
 // Function to export overview
 function exportOverview() {
-    console.log('📤 Exporting overview...');
     // Export logic would go here
 }
 
 // Function to export specific chart
 function exportChart(chartType) {
-    console.log('📤 Exporting chart:', chartType);
     
     let chart = null;
     let filename = '';
@@ -204,7 +196,6 @@ function exportChart(chartType) {
             filename = 'risk-chart.png';
             break;
         default:
-            console.warn('Unknown chart type:', chartType);
             return;
     }
     
@@ -215,15 +206,12 @@ function exportChart(chartType) {
         link.href = chart.toBase64Image();
         link.click();
         
-        console.log('✅ Chart exported:', filename);
     } else {
-        console.warn('Chart not found:', chartType);
     }
 }
 
 // Function for quick actions
 function quickAction(action) {
-    console.log('⚡ Quick action:', action);
     
     switch (action) {
         case 'new-trade':
@@ -236,30 +224,24 @@ function quickAction(action) {
             window.location.href = 'accounts.html';
             break;
         case 'export-data':
-            console.log('📊 Export data - feature to be added');
             break;
         case 'reports':
-            console.log('📋 Reports - feature to be added');
             break;
-        case 'preferences-v2':
-            console.log('🚀 Opening Preferences advanced system');
-            window.location.href = 'preferences-v2.html';
+        case 'preferences-new':
+            window.location.href = 'preferences-new.html';
             break;
         case 'settings':
-            console.log('🔄 Opening Preferences V1 traditional system');
-            window.location.href = 'preferences-v2.html';
+            window.location.href = 'preferences.html';
             break;
         case 'documentation':
             window.open('../JAVASCRIPT_SCRIPTS_ARCHITECTURE.md', '_blank');
             break;
         default:
-            console.log('❓ Unknown action:', action);
     }
 }
 
 // Load action buttons for tables
 function loadActionButtons() {
-    console.log('🔧 Loading action buttons for homepage tables...');
     
     if (typeof window.loadTableActionButtons === 'function') {
         // Load buttons for trades table
@@ -289,15 +271,13 @@ function loadActionButtons() {
             showDelete: false
         });
         
-        console.log('✅ Action buttons loaded for all tables');
     } else {
-        console.log('❌ loadTableActionButtons function not available');
     }
 }
 
 // Initialize page after DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🏠 Homepage DOM loaded - initializing...');
+    
     
     // Load action buttons after a short delay to ensure UI utils are loaded
     setTimeout(loadActionButtons, 500);
@@ -305,7 +285,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize charts after a delay to ensure Chart.js is loaded
     setTimeout(initializeCharts, 1000);
     
-    console.log('✅ Homepage initialized successfully');
 });
 
 // Export functions to global scope

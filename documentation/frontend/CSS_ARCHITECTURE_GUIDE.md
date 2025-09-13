@@ -32,11 +32,12 @@
 
 ## 🚨 בעיות קריטיות שזוהו (6 בספטמבר 2025)
 
-### 1. **בעיית יישום סגנונות - קריטית**
+### 1. **בעיית יישום סגנונות - נפתרה**
 - **בעיה**: סגנונות לא נטענים נכון במערכת החדשה
 - **תסמינים**: סגנונות מחושבים מציגים ערכי ברירת מחדל (position: static, background: transparent)
-- **סיבה**: סדר טעינת CSS ו-Bootstrap override
-- **סטטוס**: **נפתר** - תוקן סדר טעינת CSS
+- **סיבה**: סדר טעינת CSS שגוי - קבצי ה-CSS שלנו היו נטענים לפני Bootstrap
+- **פתרון**: תוקן סדר הטעינה - Bootstrap לפני קבצי ה-ITCSS שלנו כדי שהם יוכלו לדרוס אותו
+- **סטטוס**: **נפתר** - תוקן סדר טעינת CSS בכל הקבצים
 
 ### 2. **בעיית תזמון JavaScript - נפתרה**
 - **בעיה**: מערכת header מתחילה לפני שכל משאבי CSS נטענו
@@ -118,7 +119,11 @@
 ```
 trading-ui/
 ├── styles-new/                    # מערכת CSS חדשה
-│   ├── unified.css               # קובץ CSS מאוחד (98.1KB) - ייצור
+│   ├── 01-settings/              # משתנים וגדרות CSS
+│   ├── 03-generic/               # איפוסים וסגנונות בסיסיים
+│   ├── 04-elements/              # סגנונות HTML בסיסיים
+│   ├── 05-objects/               # מבני פריסה
+│   └── 06-components/            # רכיבי UI
 │   ├── 01-settings/              # משתנים וגדרות
 │   ├── 02-tools/                 # פונקציות ומיקסינים
 │   ├── 03-generic/               # איפוס ונורמליזציה
@@ -130,7 +135,7 @@ trading-ui/
 │   ├── 09-utilities/             # מחלקות עזר
 │   └── main.css                  # קובץ ראשי
 ├── styles/                       # מערכת CSS ישנה (deprecated)
-│   ├── header-system.css         # DEPRECATED - השתמש ב-unified.css
+│   ├── header-styles.css         # סגנונות תפריט (נפרד מ-ITCSS)
 │   ├── header-system-temp.css    # זמני - לבדיקות ומיגרציה
 │   ├── apple-theme.css           # עדיין בשימוש
 │   └── styles.css                # עדיין בשימוש
@@ -138,7 +143,11 @@ trading-ui/
 ```
 
 ### קבצי ייצור עיקריים
-- **`styles-new/unified.css`** - קובץ CSS מאוחד לכל המערכת
+- **`styles-new/01-settings/`** - משתנים וגדרות CSS
+- **`styles-new/03-generic/`** - איפוסים וסגנונות בסיסיים
+- **`styles-new/04-elements/`** - סגנונות HTML בסיסיים
+- **`styles-new/05-objects/`** - מבני פריסה
+- **`styles-new/06-components/`** - רכיבי UI
 - **`styles-new/main.css`** - קובץ ראשי לארכיטקטורה החדשה
 - **`styles/header-system-temp.css`** - קובץ זמני לבדיקות ומיגרציה
 
@@ -226,7 +235,7 @@ trading-ui/
 #### 2. **איזול סגנונות קריטיים**
 - **חלקים 1-4**: הוכחו כלא קריטיים לתפריט
 - **חלק 5**: זוהה כקריטי - מכיל סגנונות תפריט חיוניים
-- **חלקים 6-10**: הועתקו במלואם ל-`unified.css`
+- **חלקים 6-10**: הועתקו במלואם לקבצי ITCSS המתאימים
 
 #### 3. **סגנונות קריטיים שזוהו**
 ```css
@@ -253,7 +262,7 @@ trading-ui/
 
 #### 1. **סדר טעינת CSS**
 - **בעיה**: Bootstrap CSS דורס סגנונות מותאמים אישית
-- **פתרון**: טעינת `unified.css` לפני `bootstrap.min.css`
+- **פתרון**: טעינת קבצי ITCSS אחרי `bootstrap.min.css`
 - **תוצאה**: סגנונות מותאמים אישית מקבלים עדיפות
 
 #### 2. **תזמון JavaScript**
@@ -270,9 +279,9 @@ trading-ui/
 
 #### 1. **בדיקת טעינת CSS**
 ```javascript
-// בדיקה אם unified.css נטען
-const unifiedCssFound = Array.from(document.styleSheets).some(sheet => 
-    sheet.href && sheet.href.includes('unified.css')
+// בדיקה אם קבצי ITCSS נטענו
+const itcssCssLoaded = Array.from(document.styleSheets).some(sheet => 
+    sheet.href && sheet.href.includes('01-settings/_variables.css')
 );
 ```
 
@@ -1429,7 +1438,7 @@ A: שימוש ב-CSS Stats, בדיקת גודל קבצים, בדיקת זמן ט
 #### בעיה: סגנונות לא נטענים במערכת החדשה
 **תסמינים:** סגנונות מחושבים מציגים ערכי ברירת מחדל
 **פתרון:** 
-1. בדיקת סדר טעינת CSS - `unified.css` לפני `bootstrap.min.css`
+1. בדיקת סדר טעינת CSS - קבצי ITCSS אחרי `bootstrap.min.css`
 2. בדיקת תזמון JavaScript - `window.onload` במקום `DOMContentLoaded`
 3. בדיקת סגנונות מחושבים עם `getComputedStyle()`
 
@@ -1495,7 +1504,7 @@ A: שימוש ב-CSS Stats, בדיקת גודל קבצים, בדיקת זמן ט
 - **ארכיטקטורת תפריטים** - בעיה ארכיטקטורית, לא בעיית CSS
 
 #### 🔄 בתהליך
-- **אימות כל העמודים** - מעבר ל-`unified.css`
+- **אימות כל העמודים** - מעבר לקבצי ITCSS נפרדים
 - **הסרת קבצים ישנים** - `styles/header-system.css`
 
 ### לקחים מהמיגרציה
@@ -1525,7 +1534,7 @@ A: שימוש ב-CSS Stats, בדיקת גודל קבצים, בדיקת זמן ט
 
 #### 2. **חשיבות סדר טעינת CSS**
 - **בעיה**: Bootstrap CSS דורס סגנונות מותאמים אישית
-- **פתרון**: טעינת `unified.css` לפני `bootstrap.min.css`
+- **פתרון**: טעינת קבצי ITCSS אחרי `bootstrap.min.css`
 - **דרישה**: האפיון חייב לכלול הנחיות ברורות על loading order
 
 #### 3. **תזמון JavaScript קריטי**
@@ -1547,10 +1556,10 @@ A: שימוש ב-CSS Stats, בדיקת גודל קבצים, בדיקת זמן ט
 - **קובץ רלוונטי**: `trading-ui/scripts/header-system.js`
 
 #### 2. **בעיית הפילטר (Filter System)**
-- **תסמינים**: פילטרים לא עובדים עם `unified.css` בלבד
+- **תסמינים**: פילטרים לא עובדים עם קבצי ITCSS בלבד
 - **סיבה**: סגנונות פילטר לא הועברו נכון למערכת החדשה
-- **דרישה**: העברת כל סגנונות הפילטר ל-`unified.css`
-- **קובץ רלוונטי**: `trading-ui/styles-new/unified.css`
+- **דרישה**: העברת כל סגנונות הפילטר לקבצי ITCSS המתאימים
+- **קבצים רלוונטיים**: `trading-ui/styles-new/06-components/` (רכיבי UI)
 
 #### 3. **שמירת הגדרות עיצוב קיימות**
 - **דרישה**: כל הגדרות העיצוב שהיו פעילות באתר חייבות להישמר
@@ -1608,19 +1617,19 @@ A: שימוש ב-CSS Stats, בדיקת גודל קבצים, בדיקת זמן ט
 
 3. **יישום פתרון**:
    - עדכון HTML structure ב-`header-system.js`
-   - עדכון CSS classes ב-`unified.css`
+   - עדכון CSS classes בקבצי ITCSS המתאימים
    - בדיקה ותיקון
 
 #### שלב 3: השלמת מיגרציית הפילטר (עדיפות בינונית)
 **זמן משוער**: 1-2 ימים
 
 1. **זיהוי סגנונות פילטר חסרים**:
-   - השוואה בין `header-system-temp.css` ל-`unified.css`
+   - השוואה בין `header-system-temp.css` לקבצי ITCSS
    - זיהוי סגנונות פילטר שלא הועברו
    - בדיקת פונקציונליות
 
 2. **העברת סגנונות חסרים**:
-   - העתקת סגנונות פילטר ל-`unified.css`
+   - העתקת סגנונות פילטר לקבצי ITCSS המתאימים
    - בדיקת פונקציונליות
    - תיקון בעיות
 
@@ -1643,7 +1652,7 @@ A: שימוש ב-CSS Stats, בדיקת גודל קבצים, בדיקת זמן ט
    - `trading-ui/notes.html`
 
 2. **בדיקת כל עמוד**:
-   - בדיקת טעינת `unified.css`
+   - בדיקת טעינת קבצי ITCSS
    - בדיקת פונקציונליות תפריט
    - בדיקת פונקציונליות פילטר
    - בדיקת עיצוב כללי
@@ -1677,7 +1686,7 @@ A: שימוש ב-CSS Stats, בדיקת גודל קבצים, בדיקת זמן ט
 ```javascript
 // בדיקת טעינת CSS
 function checkCSSLoading() {
-  const requiredCSS = ['unified.css', 'bootstrap.min.css'];
+  const requiredCSS = ['01-settings/_variables.css', '06-components/_notifications.css', 'bootstrap.min.css'];
   const loadedCSS = Array.from(document.styleSheets).map(sheet => 
     sheet.href ? sheet.href.split('/').pop() : null
   );
@@ -1747,7 +1756,7 @@ function checkCSSVariables(requiredVariables) {
 ### 🔗 קישורים לקבצים רלוונטיים
 
 #### קבצי קוד עיקריים:
-- **`trading-ui/styles-new/unified.css`** - קובץ CSS מאוחד
+- **`trading-ui/styles-new/`** - תיקיית קבצי ITCSS
 - **`trading-ui/scripts/header-system.js`** - מערכת התפריט
 - **`trading-ui/test-header-clean.html`** - סביבת בדיקה
 - **`trading-ui/styles/header-system-temp.css`** - קובץ זמני לבדיקות

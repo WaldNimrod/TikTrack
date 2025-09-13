@@ -852,6 +852,14 @@ function openColorPicker(type) {
   const colorInput = document.getElementById(type + 'Color');
   if (colorInput) {
     colorInput.click();
+    
+    // הוסף event listener לעדכון התצוגה המקדימה
+    colorInput.addEventListener('change', function() {
+      const preview = document.querySelector(`.color-preview[onclick*="${type}"]`);
+      if (preview) {
+        preview.style.backgroundColor = this.value;
+      }
+    });
   }
 }
 

@@ -62,12 +62,10 @@ class HeaderSystem {
   }
 
   static createHeader() {
-    console.log('🔄 Creating header...');
     
     // מציאת אלמנט קיים או יצירת חדש
     let headerElement = document.getElementById('unified-header');
     if (!headerElement) {
-      console.log('📝 Creating new header element...');
       headerElement = document.createElement('div');
       headerElement.id = 'unified-header';
       // הכנסת הכותרת לתחילת הדף
@@ -84,14 +82,11 @@ class HeaderSystem {
     `;
     document.body.appendChild(filterToggleSection);
     } else {
-      console.log('✅ Found existing header element');
     }
 
     // הוספת התוכן לאלמנט
     const headerHTML = HeaderSystem.getHeaderHTML();
-    console.log('📝 Setting header HTML content...');
     headerElement.innerHTML = headerHTML;
-    console.log('✅ Header created successfully');
   }
 
 
@@ -367,6 +362,14 @@ class HeaderSystem {
            .tiktrack-dropdown-item:hover {
              background: #F2F2F7;
              color: #3C3C43;
+           }
+
+           /* Separator styling */
+           .separator {
+             height: 1px;
+             background: #E5E5EA;
+             margin: 0.25rem 0;
+             list-style: none;
            }
 
            /* Section headers styling */
@@ -662,36 +665,17 @@ class HeaderSystem {
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
-                        <!-- 📊 ניהול נתונים -->
-                        <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">📊 ניהול נתונים</a>
-                          <ul class="level3-submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/alerts">התראות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/executions">עסקעות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/accounts">חשבונות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
-                          </ul>
-                        </li>
-                        
-                        <!-- ⚙️ הגדרות מערכת -->
-                        <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">⚙️ הגדרות מערכת</a>
-                          <ul class="level3-submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/test-preferences-integration.html">בדיקת אינטגרציה</a></li>
-                          </ul>
-                        </li>
-                        
-                        <!-- 🔧 כלי פיתוח -->
-                        <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">🔧 כלי פיתוח</a>
-                          <ul class="level3-submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
-                          </ul>
-                        </li>
+                        <li><a class="tiktrack-dropdown-item" href="/alerts">התראות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/accounts">חשבונות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/executions">עסקאות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
                       </ul>
                     </li>
 
@@ -1057,7 +1041,6 @@ class HeaderSystem {
           e.preventDefault();
           e.stopPropagation();
 
-          console.log('🔄 Reset filters button clicked');
           if (window.resetFiltersToDefaults) {
             window.resetFiltersToDefaults().catch(error => {
               console.error('❌ Error resetting filters to defaults:', error);
@@ -1074,7 +1057,6 @@ class HeaderSystem {
           e.preventDefault();
           e.stopPropagation();
 
-          console.log('🧹 Clear filters button clicked');
           if (window.clearAllFilters) {
             window.clearAllFilters();
           } else {
@@ -1678,30 +1660,21 @@ class HeaderSystem {
     allItem.addEventListener('click', e => {
       e.stopPropagation();
       // Use DOMContentLoaded to ensure functions are available
-      console.log('🔧 Setting up account filter click handler for "הכול"');
-      console.log('📊 Current DOM readyState:', document.readyState);
 
       if (document.readyState === 'loading') {
-        console.log('⏳ DOM still loading, waiting for DOMContentLoaded...');
         document.addEventListener('DOMContentLoaded', () => {
-          console.log('✅ DOMContentLoaded fired, checking selectAccountOption...');
           if (typeof selectAccountOption === 'function') {
-            console.log('✅ selectAccountOption available, calling with "הכול"');
             selectAccountOption('הכול');
           } else {
             console.error('❌ selectAccountOption not available after DOM load');
-            console.log('🔍 Available window functions:', Object.keys(window).filter(key => key.includes('select')));
           }
         });
       } else {
         // DOM already loaded
-        console.log('✅ DOM already loaded, checking selectAccountOption...');
         if (typeof selectAccountOption === 'function') {
-          console.log('✅ selectAccountOption available, calling with "הכול"');
           selectAccountOption('הכול');
         } else {
           console.error('❌ selectAccountOption not available');
-          console.log('🔍 Available window functions:', Object.keys(window).filter(key => key.includes('select')));
         }
       }
     });
@@ -1722,11 +1695,9 @@ class HeaderSystem {
       item.addEventListener('click', e => {
         e.stopPropagation();
         // Use DOMContentLoaded to ensure functions are available
-        console.log('🔧 Setting up account filter click handler for:', account.name);
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', () => {
             if (typeof selectAccountOption === 'function') {
-              console.log('✅ selectAccountOption available, calling with:', account.name);
               selectAccountOption(account.name);
             } else {
               console.error('❌ selectAccountOption not available after DOM load');
@@ -1735,7 +1706,6 @@ class HeaderSystem {
         } else {
           // DOM already loaded
           if (typeof selectAccountOption === 'function') {
-            console.log('✅ selectAccountOption available, calling with:', account.name);
             selectAccountOption(account.name);
           } else {
             console.error('❌ selectAccountOption not available');
@@ -1755,31 +1725,23 @@ class HeaderSystem {
         e.preventDefault();
         e.stopPropagation();
 
-        console.log('🔧 Date range filter item clicked:', item.getAttribute('data-value'));
 
         const range = item.getAttribute('data-value');
         // Use DOMContentLoaded to ensure functions are available
         if (document.readyState === 'loading') {
-          console.log('⏳ DOM still loading, waiting for DOMContentLoaded (date range)...');
           document.addEventListener('DOMContentLoaded', () => {
-            console.log('✅ DOMContentLoaded fired for date range, checking selectDateRangeOption...');
             if (typeof selectDateRangeOption === 'function') {
-              console.log('✅ selectDateRangeOption available, calling with:', range);
               selectDateRangeOption(range);
             } else {
               console.error('❌ selectDateRangeOption not available after DOM load');
-              console.log('🔍 Available window functions:', Object.keys(window).filter(key => key.includes('select')));
             }
           });
         } else {
           // DOM already loaded
-          console.log('✅ DOM already loaded, checking selectDateRangeOption...');
           if (typeof selectDateRangeOption === 'function') {
-            console.log('✅ selectDateRangeOption available, calling with:', range);
             selectDateRangeOption(range);
           } else {
             console.error('❌ selectDateRangeOption not available');
-            console.log('🔍 Available window functions:', Object.keys(window).filter(key => key.includes('select')));
           }
         }
       });
@@ -1792,7 +1754,6 @@ class HeaderSystem {
         e.preventDefault();
         e.stopPropagation();
         
-        console.log('🔧 Status filter item clicked:', item.getAttribute('data-value'));
 
         // toggle selection - מולטיסלקט
         item.classList.toggle('selected');
@@ -1801,7 +1762,6 @@ class HeaderSystem {
         const selectedStatuses = Array.from(document.querySelectorAll('#statusFilterMenu .status-filter-item.selected'))
           .map(selectedItem => selectedItem.getAttribute('data-value'));
 
-        console.log('📋 Selected statuses:', selectedStatuses);
 
         // update display text
         const statusElement = document.getElementById('selectedStatus');
@@ -1830,7 +1790,6 @@ class HeaderSystem {
         e.preventDefault();
         e.stopPropagation();
         
-        console.log('🔧 Type filter item clicked:', item.getAttribute('data-value'));
 
         // toggle selection
         item.classList.toggle('selected');
@@ -1869,7 +1828,6 @@ class HeaderSystem {
         e.preventDefault();
         e.stopPropagation();
         
-        console.log('🔧 Account filter item clicked:', item.getAttribute('data-value'));
 
         // toggle selection
         item.classList.toggle('selected');
@@ -2194,35 +2152,26 @@ class HeaderSystem {
 
   // פונקציה לפתיחה/סגירה של סקשנים
   toggleSection(sectionId) {
-    console.log(`🔍 HeaderSystem.toggleSection called with sectionId: ${sectionId}`);
     
     const section = document.querySelector(`[data-section="${sectionId}"]`);
-    console.log(`🔍 Found section:`, section);
     
     const sectionBody = section ? section.querySelector('.section-body') : null;
-    console.log(`🔍 Found sectionBody:`, sectionBody);
     
     const toggleBtn = section ? section.querySelector(
       `button[onclick*="toggleSection('${sectionId}')"], button[onclick*="toggleSection(${sectionId})"]`) : null;
-    console.log(`🔍 Found toggleBtn:`, toggleBtn);
     
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-    console.log(`🔍 Found icon:`, icon);
 
     if (sectionBody && toggleBtn) {
-      console.log(`🔍 Both sectionBody and toggleBtn found, proceeding with toggle`);
       const isCollapsed = sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none';
-      console.log(`🔍 isCollapsed:`, isCollapsed);
 
       if (isCollapsed) {
-        console.log(`🔍 Opening section`);
         sectionBody.classList.remove('collapsed');
         sectionBody.style.display = 'block';
         if (icon) {
           icon.textContent = '▲';
         }
       } else {
-        console.log(`🔍 Closing section`);
         sectionBody.classList.add('collapsed');
         sectionBody.style.display = 'none';
         if (icon) {
@@ -2232,57 +2181,31 @@ class HeaderSystem {
 
       // Save state to localStorage
       localStorage.setItem(`${sectionId}SectionCollapsed`, !isCollapsed);
-      console.log(`🔍 Saved state to localStorage: ${sectionId}SectionCollapsed = ${!isCollapsed}`);
     } else {
-      console.log(`🔍 Missing elements - sectionBody: ${!!sectionBody}, toggleBtn: ${!!toggleBtn}`);
-      console.log(`🔍 For filters, we need to handle this differently`);
       
       // טיפול מיוחד לפילטרים
       if (sectionId === 'filters' && section) {
-        console.log(`🔍 Handling filters section specially`);
         const filtersElement = section; // הפילטרים הם ה-section עצמו
         const toggleBtn = document.getElementById('filterToggleBtn');
         const arrow = toggleBtn ? toggleBtn.querySelector('.filter-arrow') : null;
         
-        console.log(`🔍 filtersElement:`, filtersElement);
-        console.log(`🔍 toggleBtn:`, toggleBtn);
-        console.log(`🔍 arrow:`, arrow);
         
         if (filtersElement && toggleBtn && arrow) {
           const isCollapsed = filtersElement.style.display === 'none';
-          console.log(`🔍 filters isCollapsed:`, isCollapsed);
           
           if (isCollapsed) {
-            console.log(`🔍 Opening filters`);
             filtersElement.style.display = 'block';
             arrow.textContent = '▼';
             toggleBtn.classList.remove('collapsed');
-            console.log(`🔍 Button classes after opening:`, toggleBtn.className);
-            console.log(`🔍 Button position after opening:`, toggleBtn.getBoundingClientRect());
-            console.log(`🔍 Button computed styles:`, {
-              transform: window.getComputedStyle(toggleBtn).transform,
-              top: window.getComputedStyle(toggleBtn).top,
-              position: window.getComputedStyle(toggleBtn).position
-            });
           } else {
-            console.log(`🔍 Closing filters`);
             filtersElement.style.display = 'none';
             arrow.textContent = '▶';
             toggleBtn.classList.add('collapsed');
-            console.log(`🔍 Button classes after closing:`, toggleBtn.className);
-            console.log(`🔍 Button position after closing:`, toggleBtn.getBoundingClientRect());
-            console.log(`🔍 Button computed styles:`, {
-              transform: window.getComputedStyle(toggleBtn).transform,
-              top: window.getComputedStyle(toggleBtn).top,
-              position: window.getComputedStyle(toggleBtn).position
-            });
           }
           
           // Save state to localStorage
           localStorage.setItem(`${sectionId}SectionCollapsed`, !isCollapsed);
-          console.log(`🔍 Saved filters state to localStorage: ${sectionId}SectionCollapsed = ${!isCollapsed}`);
         } else {
-          console.log(`🔍 Missing filter elements - filtersElement: ${!!filtersElement}, toggleBtn: ${!!toggleBtn}, arrow: ${!!arrow}`);
         }
       }
     }
@@ -2290,11 +2213,9 @@ class HeaderSystem {
 
   // פונקציה לשחזור מצב סקשנים
   restoreSectionStates() {
-    console.log(`🔍 HeaderSystem.restoreSectionStates called`);
     
     // Restoring section states from localStorage
     const sections = document.querySelectorAll('.content-section');
-    console.log(`🔍 Found ${sections.length} content sections`);
 
     sections.forEach(section => {
       const sectionId = section.getAttribute('data-section');
@@ -2306,7 +2227,6 @@ class HeaderSystem {
       if (sectionId && sectionBody) {
         const storageKey = `${sectionId}SectionCollapsed`;
         const isCollapsed = localStorage.getItem(storageKey) === 'true';
-        console.log(`🔍 Section ${sectionId}: isCollapsed = ${isCollapsed}`);
 
         if (isCollapsed) {
           sectionBody.classList.add('collapsed');
@@ -2329,10 +2249,8 @@ class HeaderSystem {
     // שחזור מצב הפילטרים
     const filtersSection = document.querySelector('[data-section="filters"]');
     if (filtersSection) {
-      console.log(`🔍 Restoring filters state`);
       const storageKey = 'filtersSectionCollapsed';
       const isCollapsed = localStorage.getItem(storageKey) === 'true';
-      console.log(`🔍 Filters isCollapsed: ${isCollapsed}`);
       
       const toggleBtn = document.getElementById('filterToggleBtn');
       const arrow = toggleBtn ? toggleBtn.querySelector('.filter-arrow') : null;
@@ -2344,7 +2262,6 @@ class HeaderSystem {
         }
         if (toggleBtn) {
           toggleBtn.classList.add('collapsed');
-          console.log(`🔍 Restored button as collapsed:`, toggleBtn.className);
         }
       } else {
         filtersSection.style.display = 'block';
@@ -2353,7 +2270,6 @@ class HeaderSystem {
         }
         if (toggleBtn) {
           toggleBtn.classList.remove('collapsed');
-          console.log(`🔍 Restored button as open:`, toggleBtn.className);
         }
       }
     }
@@ -2361,7 +2277,6 @@ class HeaderSystem {
 
   // פונקציה לאיפוס כל הפילטרים למצב ברירת מחדל מהעדפות
   static async resetAllFilters() {
-    console.log('🔄 Resetting filters to user defaults...');
     
     try {
       // שימוש ב-FilterSystem החדש
@@ -2794,30 +2709,21 @@ class HeaderSystem {
     allOption.addEventListener('click', e => {
       e.stopPropagation();
       // Use DOMContentLoaded to ensure functions are available
-      console.log('🔧 Setting up account filter click handler for "הכול"');
-      console.log('📊 Current DOM readyState:', document.readyState);
 
       if (document.readyState === 'loading') {
-        console.log('⏳ DOM still loading, waiting for DOMContentLoaded...');
         document.addEventListener('DOMContentLoaded', () => {
-          console.log('✅ DOMContentLoaded fired, checking selectAccountOption...');
           if (typeof selectAccountOption === 'function') {
-            console.log('✅ selectAccountOption available, calling with "הכול"');
             selectAccountOption('הכול');
           } else {
             console.error('❌ selectAccountOption not available after DOM load');
-            console.log('🔍 Available window functions:', Object.keys(window).filter(key => key.includes('select')));
           }
         });
       } else {
         // DOM already loaded
-        console.log('✅ DOM already loaded, checking selectAccountOption...');
         if (typeof selectAccountOption === 'function') {
-          console.log('✅ selectAccountOption available, calling with "הכול"');
           selectAccountOption('הכול');
         } else {
           console.error('❌ selectAccountOption not available');
-          console.log('🔍 Available window functions:', Object.keys(window).filter(key => key.includes('select')));
         }
       }
     });
@@ -2835,11 +2741,9 @@ class HeaderSystem {
       option.addEventListener('click', e => {
         e.stopPropagation();
         // Use DOMContentLoaded to ensure functions are available
-        console.log('🔧 Setting up account filter click handler for:', account.name);
         if (document.readyState === 'loading') {
           document.addEventListener('DOMContentLoaded', () => {
             if (typeof selectAccountOption === 'function') {
-              console.log('✅ selectAccountOption available, calling with:', account.name);
               selectAccountOption(account.name);
             } else {
               console.error('❌ selectAccountOption not available after DOM load');
@@ -2848,7 +2752,6 @@ class HeaderSystem {
         } else {
           // DOM already loaded
           if (typeof selectAccountOption === 'function') {
-            console.log('✅ selectAccountOption available, calling with:', account.name);
             selectAccountOption(account.name);
           } else {
             console.error('❌ selectAccountOption not available');
@@ -3111,21 +3014,18 @@ window.HeaderSystem = HeaderSystem;
 
 // אתחול אוטומטי - מחכה לטעינת כל המשאבים כולל CSS
 window.addEventListener('load', () => {
-  console.log('🔄 All Resources Loaded (including CSS) - Header System Starting...');
   
   // בדיקת זמינות סגנונות
-  console.log('🔍 Checking if unified.css is loaded...');
   const stylesheets = document.styleSheets;
-  let unifiedCssFound = false;
+  let headerCssFound = false;
   for (let i = 0; i < stylesheets.length; i++) {
-    if (stylesheets[i].href && stylesheets[i].href.includes('unified.css')) {
-      unifiedCssFound = true;
-      console.log('✅ unified.css found in stylesheets');
+    if (stylesheets[i].href && stylesheets[i].href.includes('header-styles.css')) {
+      headerCssFound = true;
       break;
     }
   }
-  if (!unifiedCssFound) {
-    console.error('❌ unified.css not found in stylesheets');
+  if (!headerCssFound) {
+    console.error('❌ header-styles.css not found in stylesheets');
   }
   
   // בדיקה ישירה של הסגנונות
@@ -3137,15 +3037,8 @@ window.addEventListener('load', () => {
   
   const dropdownElement = testElement.querySelector('.tiktrack-dropdown-menu');
   const computedStyle = window.getComputedStyle(dropdownElement);
-  console.log('🔍 CSS Test - tiktrack-dropdown-menu styles:');
-  console.log('  - position:', computedStyle.position);
-  console.log('  - display:', computedStyle.display);
-  console.log('  - background:', computedStyle.background);
-  console.log('  - border:', computedStyle.border);
-  console.log('  - z-index:', computedStyle.zIndex);
   
   // בדיקה אם הסגנונות נטענים בכלל (ללא קריאת rules בגלל CORS)
-  console.log('🔍 CSS rules check skipped due to CORS security');
   
   // בדיקה אם המשתנים CSS עובדים
   const testVar = document.createElement('div');
@@ -3156,10 +3049,6 @@ window.addEventListener('load', () => {
   document.body.appendChild(testVar);
   
   const varStyle = window.getComputedStyle(testVar);
-  console.log('🔍 CSS Variables Test:');
-  console.log('  - background:', varStyle.background);
-  console.log('  - border:', varStyle.border);
-  console.log('  - box-shadow:', varStyle.boxShadow);
   
   document.body.removeChild(testElement);
   document.body.removeChild(testVar);
@@ -3835,13 +3724,10 @@ function showAllRecordsInTable(containerId) {
  * הפעלת פילטר סטטוס (לשמירה על תאימות לאחור)
  */
 function applyStatusFilter() {
-  console.log('🔍 applyStatusFilter called');
   
   const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
-  console.log('🔍 Found selected items in applyStatusFilter:', selectedItems.length);
   
   const selectedStatuses = Array.from(selectedItems).map(item => item.getAttribute('data-value'));
-  console.log('🔍 Selected statuses array:', selectedStatuses);
   
   applyFilter('status', selectedStatuses);
 }
@@ -4250,7 +4136,6 @@ window.filterAlertsByType = filterAlertsByType;
  * עדכון טקסט פילטר סטטוס
  */
 function updateStatusFilterText() {
-  console.log('🔍 updateStatusFilterText called');
   
   const selectedStatusElement = document.getElementById('selectedStatus');
   if (!selectedStatusElement) {
@@ -4259,17 +4144,14 @@ function updateStatusFilterText() {
   }
   
   const selectedItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
-  console.log('🔍 Found selected items:', selectedItems.length);
 
   if (selectedItems.length === 0) {
-    console.log('🔍 No items selected, setting text to: כל סטטוס');
     selectedStatusElement.textContent = 'כל סטטוס';
   } else {
     // עבור בחירה יחידה - תמיד נציג את הפריט הנבחר הראשון
     const item = selectedItems[0];
     const value = item.getAttribute('data-value');
     const displayText = value === 'הכול' ? 'כל סטטוס' : value;
-    console.log('🔍 Selected item value:', value, 'Display text:', displayText);
     selectedStatusElement.textContent = displayText;
   }
 }
@@ -4675,7 +4557,7 @@ async function getCurrentPreference(key) {
     
     // עדיפות ראשונה - מערכת העדפות
     try {
-      const response = await fetch('/api/v2/preferences/');
+      const response = await fetch('/api/v1/preferences/user');
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.data.preferences) {
@@ -4690,9 +4572,9 @@ async function getCurrentPreference(key) {
             'timezone': 'general.timezone'
           };
           
-          const v2Path = keyMappings[key];
-          if (v2Path) {
-            const value = v2Path.split('.').reduce((obj, k) => obj?.[k], data.data.preferences);
+          const newPath = keyMappings[key];
+          if (newPath) {
+            const value = newPath.split('.').reduce((obj, k) => obj?.[k], data.data.preferences);
             if (value !== undefined) {
               console.log(`✅ Found preference ${key}: ${value}`);
               return value;
@@ -4700,8 +4582,8 @@ async function getCurrentPreference(key) {
           }
         }
       }
-    } catch (v2Error) {
-      console.log(`🔄 Preferences not available, trying fallback: ${v2Error.message}`);
+    } catch (newError) {
+      console.log(`🔄 Preferences not available, trying fallback: ${newError.message}`);
     }
     
     // נסה גם עם preferences compatibility
@@ -4715,9 +4597,9 @@ async function getCurrentPreference(key) {
         'defaultSearchFilter': 'defaultFilters.search'
       };
       
-      const v2Path = keyMappings[key];
-      if (v2Path) {
-        const value = v2Path.split('.').reduce((obj, k) => obj?.[k], v2Preferences);
+      const newPath = keyMappings[key];
+      if (newPath) {
+        const value = newPath.split('.').reduce((obj, k) => obj?.[k], newPreferences);
         if (value !== undefined) {
           console.log(`✅ Found compatibility preference ${key}: ${value}`);
           return value;
@@ -4726,7 +4608,7 @@ async function getCurrentPreference(key) {
     }
     
     // Fallback ל-V1 API
-    const response = await fetch('/api/v1/preferences/');
+    const response = await fetch('/api/v1/preferences/user');
     if (response.ok) {
       const preferences = await response.json();
       console.log(`✅ Found V1 preference ${key}: ${preferences[key]}`);
@@ -4818,7 +4700,6 @@ async function clearDevelopmentCache(event) {
   let button = null;
 
   try {
-    console.log('🔄 מתחיל ניקוי Cache מקיף...');
 
     // מציאת הכפתור - קודם מנסה event.target, אחרת מחפש ב-DOM
     if (event && event.target) {
@@ -4837,13 +4718,6 @@ async function clearDevelopmentCache(event) {
                );
     }
 
-    // לוג לבדיקה
-    console.log('🔍 חיפוש כפתור:', {
-      eventTarget: event?.target,
-      foundButton: button,
-      buttonText: button?.textContent,
-      buttonHTML: button?.innerHTML,
-    });
 
     // הצגת הודעת טעינה
     if (button) {
@@ -4854,7 +4728,6 @@ async function clearDevelopmentCache(event) {
     }
 
     // ===== שלב 1: ניקוי Cache של הדפדפן =====
-    console.log('🧹 מנקה Cache של הדפדפן...');
 
     // ניקוי localStorage (רק פריטים שקשורים למערכת)
     try {
@@ -4868,7 +4741,6 @@ async function clearDevelopmentCache(event) {
           clearedLocalStorage++;
         }
       });
-      console.log(`✅ localStorage נוקה: ${clearedLocalStorage} פריטים נמחקו`);
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות localStorage:', e);
     }
@@ -4877,7 +4749,6 @@ async function clearDevelopmentCache(event) {
     try {
       const sessionKeys = Object.keys(sessionStorage);
       sessionStorage.clear();
-      console.log(`✅ sessionStorage נוקה: ${sessionKeys.length} פריטים נמחקו`);
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות sessionStorage:', e);
     }
@@ -4889,7 +4760,6 @@ async function clearDevelopmentCache(event) {
         for (const db of databases) {
           if (db.name && !db.name.includes('system')) {
             await indexedDB.deleteDatabase(db.name);
-            console.log(`🗑️ IndexedDB נמחק: ${db.name}`);
           }
         }
       }
@@ -4898,7 +4768,6 @@ async function clearDevelopmentCache(event) {
     }
 
     // ===== שלב 2: ניקוי Cache של השרת =====
-    console.log('🔄 מנקה Cache של השרת...');
     const response = await fetch('/api/v1/cache/clear', {
       method: 'POST',
       headers: {
@@ -4908,19 +4777,16 @@ async function clearDevelopmentCache(event) {
 
     if (response.ok) {
       const result = await response.json();
-      console.log('✅ Cache של השרת נוקה בהצלחה:', result);
     } else {
       console.warn('⚠️ לא ניתן לנקות Cache של השרת:', response.status);
     }
 
     // ===== שלב 3: ניקוי Service Workers =====
-    console.log('🧹 מנקה Service Workers...');
     try {
       if ('serviceWorker' in navigator) {
         const registrations = await navigator.serviceWorker.getRegistrations();
         for (const registration of registrations) {
           await registration.unregister();
-          console.log('🗑️ Service Worker נמחק');
         }
       }
     } catch (e) {
@@ -4928,14 +4794,12 @@ async function clearDevelopmentCache(event) {
     }
 
     // ===== שלב 4: ניקוי Cache API =====
-    console.log('🧹 מנקה Cache API...');
     try {
       if ('caches' in window) {
         const cacheNames = await caches.keys();
         await Promise.all(
           cacheNames.map(cacheName => caches.delete(cacheName)),
         );
-        console.log(`✅ Cache API נוקה: ${cacheNames.length} caches נמחקו`);
       }
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות Cache API:', e);
@@ -4945,7 +4809,6 @@ async function clearDevelopmentCache(event) {
     try {
       if ('applicationCache' in window) {
         window.applicationCache.update();
-        console.log('✅ Application Cache עודכן');
       }
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות Application Cache:', e);
@@ -4956,7 +4819,6 @@ async function clearDevelopmentCache(event) {
       // ניקוי cache של fetch requests
       if (window.fetch && window.fetch.cache) {
         window.fetch.cache.clear();
-        console.log('✅ Fetch cache נוקה');
       }
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות Fetch cache:', e);
@@ -4971,47 +4833,25 @@ async function clearDevelopmentCache(event) {
           img.src = img.src + '?t=' + Date.now();
         }
       });
-      console.log(`✅ ${images.length} תמונות נוקו מ-cache`);
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות תמונות:', e);
     }
 
     // ===== הצגת הודעת הצלחה =====
-    console.log('🎉 כל סוגי ה-Cache נוקו בהצלחה!');
-
-    // לוג לבדיקת מערכת ההתראות
-    console.log('🔍 בדיקת מערכת התראות:', {
-      showSuccessNotification: typeof window.showSuccessNotification,
-      showNotification: typeof window.showNotification,
-      notificationSystem: typeof window.notificationSystem,
-    });
-
     if (typeof window.showSuccessNotification === 'function') {
-      console.log('✅ קורא ל-showSuccessNotification');
       window.showSuccessNotification('הצלחה', 'Cache נוקה בהצלחה - כולל דפדפן ושרת');
     } else if (typeof window.showNotification === 'function') {
-      console.log('✅ קורא ל-showNotification');
       window.showNotification('Cache נוקה בהצלחה - כולל דפדפן ושרת', 'success');
-    } else {
-      console.log('❌ מערכת התראות לא זמינה - רק console.log');
-      console.log('✅ Cache נוקה בהצלחה - כולל דפדפן ושרת');
     }
 
     // ===== רענון הדף =====
-    console.log('🔄 הדף ירענן בעוד 3 שניות...');
-
     if (typeof window.showInfoNotification === 'function') {
-      console.log('✅ קורא ל-showInfoNotification - רענון בעוד 3 שניות');
       window.showInfoNotification('מידע', 'הדף ירענן בעוד 3 שניות...');
-    } else {
-      console.log('❌ showInfoNotification לא זמין');
     }
 
     setTimeout(() => {
-      console.log('🔄 רענון בעוד שנייה...');
       setTimeout(() => {
         // forced reload - bypass all cache
-        console.log('🔄 מבצע רענון כפוי של הדף...');
         window.location.reload(true);
       }, 1000);
     }, 2000);
@@ -5020,11 +4860,7 @@ async function clearDevelopmentCache(event) {
     console.error('❌ שגיאה כללית בניקוי Cache:', error);
 
     if (typeof window.showErrorNotification === 'function') {
-      console.log('✅ קורא ל-showErrorNotification');
       window.showErrorNotification('שגיאה', 'שגיאה כללית בניקוי Cache: ' + error.message);
-    } else {
-      console.log('❌ showErrorNotification לא זמין - רק console.error');
-      console.error('❌ שגיאה כללית בניקוי Cache');
     }
   } finally {
     // החזרת הכפתור למצב רגיל
@@ -5041,13 +4877,9 @@ window.clearDevelopmentCache = clearDevelopmentCache;
 
 // אתחול מערכת ראש הדף
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🚀 DOM loaded, initializing Header System...');
-  
   if (typeof HeaderSystem === 'function') {
-    console.log('✅ HeaderSystem class found, creating instance...');
     window.headerSystem = new HeaderSystem();
     window.headerSystem.init();
-    console.log('✅ Header system initialized successfully');
   } else {
     console.error('❌ HeaderSystem class not found');
   }

@@ -1,0 +1,304 @@
+/**
+ * תגיות סטטוס - Status Badges
+ * 
+ * קובץ זה מכיל את הסגנונות של כל התגיות והבאדג'ים במערכת
+ * מבוסס על הסגנונות הקיימים ב-table.css ו-numeric-value-colors.css
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* ===== תגיות סטטוס בסיסיות ===== */
+.status-badge {
+  padding: 0.5rem 1rem !important;
+  border-radius: 20px !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  font-family: var(--font-family-primary) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.status-badge::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent) !important;
+  transition: left 0.5s ease !important;
+}
+
+.status-badge:hover::before {
+  left: 100% !important;
+}
+
+/* סטטוסים בסיסיים - מוגדרים ב-unified.css */
+
+/* ===== תגיות חשיבות ===== */
+.priority-badge {
+  padding: 0.5rem 1rem !important;
+  border-radius: 20px !important;
+  font-size: 0.85rem !important;
+  font-weight: 700 !important;
+  font-family: var(--font-family-primary) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  display: inline-block !important;
+}
+
+.priority-badge::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent) !important;
+  transition: left 0.5s ease !important;
+}
+
+.priority-badge:hover::before {
+  left: 100% !important;
+}
+
+.priority-badge.priority-high {
+  background: linear-gradient(135deg, rgba(244, 67, 54, 0.2) 0%, rgba(229, 57, 53, 0.2) 100%) !important;
+  color: #d32f2f !important;
+  box-shadow: 0 2px 6px rgba(244, 67, 54, 0.1) !important;
+}
+
+.priority-badge.priority-medium {
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(255, 143, 0, 0.2) 100%) !important;
+  color: #f57c00 !important;
+  box-shadow: 0 2px 6px rgba(255, 152, 0, 0.1) !important;
+}
+
+.priority-badge.priority-low {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(67, 160, 71, 0.2) 100%) !important;
+  color: #388e3c !important;
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.1) !important;
+}
+
+/* ===== ערכים מספריים ===== */
+.numeric-text-positive {
+  color: var(--numeric-positive-medium) !important;
+  font-weight: 600;
+}
+
+.numeric-text-negative {
+  color: var(--numeric-negative-medium) !important;
+  font-weight: 600;
+}
+
+.numeric-text-zero {
+  color: var(--numeric-zero-medium) !important;
+}
+
+.profit-positive {
+  color: var(--numeric-positive-medium) !important;
+  font-weight: 600;
+}
+
+.profit-negative {
+  color: var(--numeric-negative-medium) !important;
+  font-weight: 600;
+}
+
+/* ===== שדות צד (Long/Short) ===== */
+.side-long {
+  color: #6f42c1 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: rgba(111, 66, 193, 0.1) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.side-long:hover {
+  background: rgba(111, 66, 193, 0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
+.side-short {
+  color: var(--color-danger) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.side-short:hover {
+  background: color-mix(in srgb, var(--color-danger) 15%, transparent) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ===== שדות סוג (Type) ===== */
+.type-swing {
+  color: #17a2b8 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: rgba(23, 162, 184, 0.1) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.type-investment {
+  color: var(--color-success) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: color-mix(in srgb, var(--color-success) 10%, transparent) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.type-investment:hover {
+  background: color-mix(in srgb, var(--color-success) 15%, transparent) !important;
+  transform: translateY(-1px) !important;
+}
+
+.type-stock {
+  color: #007bff !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: rgba(0, 123, 255, 0.1) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.type-etf {
+  color: var(--color-success) !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: color-mix(in srgb, var(--color-success) 10%, transparent) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+.type-etf:hover {
+  background: color-mix(in srgb, var(--color-success) 15%, transparent) !important;
+  transform: translateY(-1px) !important;
+}
+
+.type-crypto {
+  color: #6f42c1 !important;
+  font-weight: 600 !important;
+  font-size: 0.9rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 6px !important;
+  background: rgba(111, 66, 193, 0.1) !important;
+  display: inline-block !important;
+  transition: all 0.3s ease !important;
+}
+
+/* ===== תגיות התראות ===== */
+.triggered-badge {
+  font-weight: 500;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+  min-width: 30px;
+  display: inline-block;
+}
+
+.triggered-badge.triggered-yes {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.triggered-badge.triggered-no {
+  background-color: #f5f5f5;
+  color: #616161;
+  border: 1px solid #e0e0e0;
+}
+
+.triggered-badge.triggered-new {
+  background-color: #fff3e0;
+  color: #ef6c00;
+  border: 1px solid #ffcc02;
+}
+
+.triggered-badge.triggered-unknown {
+  background-color: #f5f5f5;
+  color: #616161;
+  border: 1px solid #e0e0e0;
+}
+
+/* ===== אייקון טריידים פעילים ===== */
+.active-trades-icon {
+  display: inline-block;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 20px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== אובייקטים מקושרים ===== */
+.related-object-cell {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  min-height: 40px;
+  box-sizing: border-box;
+  direction: rtl;
+  text-align: right;
+}
+
+/* Related entity styles - now handled by dynamic color system */
+/* Static colors removed to allow dynamic entity colors from preferences */
+
+/* ===== סטטוס דוט ===== */
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-inline-start: 6px;
+}
+
+.status-dot.online {
+  background-color: var(--status-open-color);
+}
+
+.status-dot.offline {
+  background-color: var(--status-closed-color);
+}
+
+.status-dot.pending {
+  background-color: var(--status-pending-color);
+}

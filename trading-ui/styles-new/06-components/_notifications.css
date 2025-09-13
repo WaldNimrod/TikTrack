@@ -13,9 +13,10 @@
   position: fixed;
   top: 20px;
   inset-inline-end: 20px;
-  z-index: 1000000002 !important;
+  right: 20px; /* fallback for older browsers */
+  z-index: 1000000002;
   max-width: 400px;
-  width: 100%;
+  width: auto;
   pointer-events: none;
 }
 
@@ -35,6 +36,9 @@
   align-items: center;
   gap: 12px;
   direction: rtl;
+  position: relative;
+  width: auto;
+  max-width: 380px;
 }
 
 .notification.show {

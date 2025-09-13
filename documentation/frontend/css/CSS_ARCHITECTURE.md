@@ -25,26 +25,125 @@ The TikTrack CSS architecture provides a comprehensive styling system with page-
 
 ## File Structure ✅ **RECENTLY ENHANCED**
 
-### Core Files
+### Core Files ✅ **UPDATED - September 2025**
 ```
-trading-ui/styles/
-├── styles.css              # Global styles and page themes ✅ RECENTLY ENHANCED
-├── header-system.css       # Header and navigation styles
-├── table.css              # Table-specific styles
-├── db-display.css         # Database display styles
-├── apple-theme.css        # Apple-inspired theme
-├── warning-system.css     # Warning modal styles ✅ RECENTLY ENHANCED
-└── [page-specific].css    # Page-specific stylesheets
+trading-ui/styles-new/
+├── header-styles.css       # Header and navigation styles
+├── 01-settings/            # CSS variables and settings
+│   ├── _variables.css      # CSS custom properties
+│   ├── _colors-dynamic.css # Dynamic color system
+│   ├── _colors-semantic.css # Semantic color definitions
+│   ├── _spacing.css        # Spacing system
+│   ├── _typography.css     # Typography system
+│   └── _rtl-logical.css    # RTL logical properties
+├── 02-tools/               # Mixins and functions (empty - not used)
+├── 03-generic/             # Reset and base styles
+│   ├── _reset.css          # CSS reset
+│   └── _base.css           # Base element styles
+├── 04-elements/            # Basic HTML elements
+│   ├── _headings.css       # Heading styles
+│   ├── _links.css          # Link styles
+│   ├── _forms-base.css     # Basic form elements
+│   └── _buttons-base.css   # Basic button styles
+├── 05-objects/             # Layout objects
+│   ├── _layout.css         # Layout containers
+│   └── _grid.css           # Grid system
+├── 06-components/          # UI components
+│   ├── _buttons-advanced.css # Advanced button styles
+│   ├── _tables.css         # Table styles
+│   ├── _cards.css          # Card components
+│   ├── _modals.css         # Modal components
+│   ├── _notifications.css  # Notification system
+│   ├── _navigation.css     # Navigation components
+│   ├── _forms-advanced.css # Advanced form components
+│   ├── _badges-status.css  # Status badges
+│   └── _entity-colors.css  # Entity-specific colors
+└── [page-specific].css     # Page-specific stylesheets
 ```
 
-### Loading Order
-1. **apple-theme.css** - Base theme and variables (weakest)
-2. **styles.css** - Global styles and page themes
-3. **header-system.css** - Header and navigation
-4. **table.css** - Table-specific styles
-5. **warning-system.css** - Warning modal styles
-6. **db-display.css** - Database display styles
-7. **Page-specific CSS** - Page-specific styles (strongest)
+**Note**: The old `styles/` directory structure has been replaced with the new `styles-new/` ITCSS-based architecture. Each CSS file is loaded individually via `<link>` tags instead of `@import`.
+
+### Loading Order ✅ **UPDATED - September 2025**
+1. **bootstrap.min.css** - Bootstrap framework
+2. **CSS Files (Individual)** - Individual CSS files from ITCSS structure - **MUST LOAD AFTER BOOTSTRAP TO OVERRIDE IT**
+3. **header-styles.css** - Header and navigation styles (after Bootstrap)
+4. **Page-specific CSS** - Page-specific styles (strongest)
+
+**⚠️ IMPORTANT**: The order is critical for proper style application. TikTrack's custom styles must override Bootstrap's default styles, so all custom CSS files must load AFTER Bootstrap to ensure our customizations take precedence.
+
+**🔄 MAJOR ARCHITECTURE CHANGE - September 2025**:
+- **OLD**: Used `unified.css` with `@import` statements
+- **NEW**: Individual `<link>` tags for each CSS file
+- **REASON**: `@import` doesn't work reliably in browsers
+- **BENEFIT**: Better performance, parallel loading, individual caching
+- **STATUS**: ✅ **COMPLETED** - All pages updated, `unified.css` moved to backup
+
+## ITCSS Implementation ✅ **COMPLETED - September 2025**
+
+### Architecture Overview
+TikTrack now uses a complete ITCSS (Inverted Triangle CSS) architecture:
+
+```
+trading-ui/styles-new/
+├── 01-settings/     # CSS variables and configuration
+├── 02-tools/        # Mixins and functions (empty - not used)
+├── 03-generic/      # Reset and base styles
+├── 04-elements/     # Basic HTML elements
+├── 05-objects/      # Layout objects
+├── 06-components/   # UI components
+└── header-styles.css # Header system (exception)
+```
+
+### Benefits Achieved
+- ✅ **Modular Architecture**: Each layer has a specific purpose
+- ✅ **Predictable Cascade**: Styles load in logical order
+- ✅ **Better Performance**: Individual file caching
+- ✅ **Easier Maintenance**: Clear separation of concerns
+- ✅ **Scalable**: Easy to add new components
+
+### File Count
+- **Total CSS Files**: 26 individual files
+- **Settings**: 6 files (variables, colors, spacing, typography)
+- **Generic**: 2 files (reset, base)
+- **Elements**: 4 files (headings, links, forms, buttons)
+- **Objects**: 2 files (layout, grid)
+- **Components**: 12 files (buttons, tables, cards, modals, etc.)
+
+## Migration from unified.css ✅ **COMPLETED - September 2025**
+
+### What Was Changed
+- **All HTML pages** updated from `unified.css` to individual `<link>` tags
+- **unified.css** moved to backup directory: `backups/css-archive-20250913/`
+- **Comments updated** to reflect new architecture
+- **CSS management page** updated to show ITCSS files
+
+### Pages Updated (17 total)
+- ✅ index.html
+- ✅ alerts.html
+- ✅ accounts.html
+- ✅ executions.html
+- ✅ trades.html
+- ✅ preferences.html
+- ✅ cash_flows.html
+- ✅ tickers.html
+- ✅ trade_plans.html
+- ✅ notes.html
+- ✅ constraints.html
+- ✅ research.html
+- ✅ db_display.html
+- ✅ db_extradata.html
+- ✅ system-management.html
+- ✅ css-management.html
+- ✅ designs.html
+- ✅ numeric-value-colors-demo.html
+- ✅ test-header-only.html
+- ✅ style_demonstration.html
+
+### Verification
+- ✅ All CSS files accessible via HTTP
+- ✅ No broken links
+- ✅ All pages load correctly
+- ✅ Header system preserved (separate file)
 
 ## Global Styles ✅ **RECENTLY ENHANCED**
 

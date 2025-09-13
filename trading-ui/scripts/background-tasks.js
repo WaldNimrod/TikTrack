@@ -557,7 +557,7 @@ const eventHandlers = {
      * Initialize event handlers
      */
   init() {
-    console.log('🔧 EventHandlers init - fixing button connections v20250903-2050');
+    console.log('🔧 EventHandlers init - fixing button connections 20250903-2050');
 
     // Check if buttons exist
     const startBtn = document.getElementById('start-scheduler');

@@ -340,13 +340,13 @@ class RealLinterSystem {
             '.css': [
                 'styles/styles.css',
                 'styles/apple-theme.css',
-                'styles-new/unified.css',
+                'styles-new/header-styles.css',
                 'styles/notification-system.css'
             ],
             '.html': [
                 'index.html',
                 'linter-realtime-monitor.html',
-                'preferences-v2.html',
+                'preferences-new.html',
                 'db_display.html'
             ]
         };

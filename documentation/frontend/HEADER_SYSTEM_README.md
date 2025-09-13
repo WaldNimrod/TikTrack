@@ -54,7 +54,11 @@ trading-ui/
 │   ├── filter-system.js         # Global filter system (EXISTING)
 │   └── main.js                  # Global utilities (EXISTING)
 ├── styles-new/
-│   └── unified.css              # Unified CSS system (EXISTING)
+│   ├── 01-settings/             # CSS variables and settings
+│   ├── 03-generic/              # Reset and base styles
+│   ├── 04-elements/             # Basic HTML elements
+│   ├── 05-objects/              # Layout objects
+│   └── 06-components/           # UI components
 └── test-header-only.html        # Test environment (REFERENCE)
 ```
 
@@ -65,13 +69,13 @@ The header system consists of two main parts:
 - **Purpose**: Navigation between pages
 - **Features**: Logo, main navigation, dropdown menus
 - **Function**: `HeaderSystem.getHeaderHTML()` - generates complete header HTML
-- **CSS**: Menu-specific styles in unified.css
+- **CSS**: Menu-specific styles in ITCSS component files
 
 #### **Part 2: Filter System**
 - **Purpose**: Data filtering across tables
 - **Features**: Status, Type, Account, Date, Search filters
 - **Function**: Integrated in `HeaderSystem.getHeaderHTML()` - generates filters HTML
-- **CSS**: Filter-specific styles in unified.css
+- **CSS**: Filter-specific styles in ITCSS component files
 
 #### **Unified Container**
 - **Purpose**: Wraps both parts in single container
@@ -133,7 +137,7 @@ The header system consists of two main parts:
 ## ⚠️ **חשוב מאוד: חריג מהמערכת - סגנונות התפריט**
 
 ### **החלטה עיצובית חשובה:**
-**התפריט הוא החריג היחיד במערכת** - כל הסגנונות שלו מוגדרים **inline/embedded** בתוך העמודים, **לא** דרך הקובץ המאוחד `unified.css`.
+**התפריט הוא החריג היחיד במערכת** - כל הסגנונות שלו מוגדרים **inline/embedded** בתוך העמודים, **לא** דרך קבצי ITCSS הרגילים.
 
 ### **למה זה חריג:**
 - התפריט הוא רכיב מורכב עם הרבה סגנונות ספציפיים
@@ -166,7 +170,7 @@ headerSystem.init();
 ### **Integration Points**
 - **Existing Pages**: All pages already have `<div id="unified-header"></div>`
 - **Existing Scripts**: All pages already load `header-system.js`
-- **Existing CSS**: All styles already exist in `unified.css`
+- **Existing CSS**: All styles already exist in ITCSS component files
 - **Existing Filters**: Filter system already integrated
 
 ### **Event Listeners**
@@ -178,7 +182,7 @@ headerSystem.init();
 ### **Compatibility**
 - **Backward Compatible**: Works with existing page structure
 - **Filter Integration**: Uses existing filter system
-- **CSS Integration**: Uses existing unified.css
+- **CSS Integration**: Uses existing ITCSS architecture
 - **No Breaking Changes**: All existing functionality preserved
 
 ### 2. **Bootstrap 5 Foundation**
@@ -205,7 +209,7 @@ The new header is built on Bootstrap 5 principles:
 
 ### 3. **CSS Architecture - CLEANED**
 - **Status**: **COMPLETED** - Successfully cleaned unified CSS system
-- **New Structure**: `styles-new/unified.css` (6,564 lines, cleaned from 8,090)
+- **New Structure**: `styles-new/` ITCSS architecture (26 individual files)
 - **Cleanup**: Removed 1,526 lines of conflicting styles (232 CSS rule blocks)
 - **Method**: Automated Python script for systematic cleanup
 - **Result**: Clean, conflict-free CSS with proper specificity
@@ -409,7 +413,9 @@ To add the new header system to any page:
 <html>
 <head>
     <!-- Load CSS in correct order -->
-    <link rel="stylesheet" href="styles-new/unified.css">
+    <!-- ITCSS Individual Files -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body>
@@ -482,7 +488,7 @@ const statusOptions = [
 
 #### **Styling Customization**
 ```css
-/* In your page CSS or unified.css */
+/* In your page CSS or ITCSS component files */
 .header-container {
     /* Customize header container */
     background: #f8f9fa;
@@ -586,7 +592,7 @@ window.applyTableFilter('status', ['open']);
 window.applyTableFilter('type', ['investment', 'swing']);
 window.applyTableFilter('search', 'test search');
 ```
-- **Solution**: Reordered CSS loading to prioritize `unified.css` over Bootstrap
+- **Solution**: Reordered CSS loading to prioritize ITCSS files over Bootstrap
 - **Status**: **RESOLVED** - CSS loading order fixed
 
 ### 5. **JavaScript Timing Issues - RESOLVED**
@@ -700,7 +706,7 @@ window.applyTableFilter('search', 'test search');
 
 #### 1. **CSS Architecture Issues**
 - **Problem**: CSS loading order conflicts with Bootstrap
-- **Solution**: Load `unified.css` before `bootstrap.min.css`
+- **Solution**: Load ITCSS files after `bootstrap.min.css`
 - **Impact**: Proper style application and override capability
 
 #### 2. **JavaScript Timing Issues**
@@ -798,7 +804,7 @@ The migration from old CSS system to unified CSS was completed using an incremen
 #### 2. **Incremental CSS Isolation**
 - **Parts 1-4**: Commented out - confirmed non-critical for menu functionality
 - **Part 5**: Identified as critical - contains essential menu styles
-- **Parts 6-10**: Copied in full to `unified.css` - contains complete menu system
+- **Parts 6-10**: Copied in full to ITCSS component files - contains complete menu system
 
 #### 3. **Critical Styles Identified**
 The following CSS classes were identified as essential for menu functionality:
@@ -813,7 +819,7 @@ The following CSS classes were identified as essential for menu functionality:
 
 #### 4. **CSS Loading Order Resolution**
 - **Problem**: Bootstrap CSS was overriding custom styles
-- **Solution**: Reordered CSS links to load `unified.css` before `bootstrap.min.css`
+- **Solution**: Reordered CSS links to load ITCSS files after `bootstrap.min.css`
 - **Result**: Custom styles now have proper precedence
 
 #### 5. **JavaScript Timing Fix**
@@ -827,7 +833,7 @@ The following CSS classes were identified as essential for menu functionality:
 - **Result**: CSS variables are properly defined and working
 
 ### Debugging Tools Implemented
-1. **CSS Loading Detection**: JavaScript checks if `unified.css` is loaded
+1. **CSS Loading Detection**: JavaScript checks if ITCSS files are loaded
 2. **Computed Style Testing**: Tests actual computed styles of menu elements
 3. **CSS Variable Testing**: Validates CSS variable resolution
 4. **Comprehensive Logging**: Detailed console output for troubleshooting
@@ -836,7 +842,7 @@ The following CSS classes were identified as essential for menu functionality:
 - **Primary Test File**: `trading-ui/test-header-clean.html`
 - **Reference File**: `trading-ui/test-header-old-system.html`
 - **Temporary CSS**: `trading-ui/styles/header-system-temp.css` (for testing)
-- **Final CSS**: `trading-ui/styles-new/unified.css` (production)
+- **Final CSS**: `trading-ui/styles-new/` ITCSS architecture (production)
 
 ## System Components
 
@@ -874,11 +880,15 @@ trading-ui/
 │   ├── header-system.js          # Main header system (UPDATED - window.onload timing)
 │   └── console-cleanup.js        # Console management
 ├── styles-new/                   # NEW CSS Architecture
-│   ├── unified.css              # Single unified CSS file (98.1KB) - PRODUCTION
+│   ├── 01-settings/             # CSS variables and settings - PRODUCTION
+│   ├── 03-generic/              # Reset and base styles - PRODUCTION
+│   ├── 04-elements/             # Basic HTML elements - PRODUCTION
+│   ├── 05-objects/              # Layout objects - PRODUCTION
+│   └── 06-components/           # UI components - PRODUCTION
 │   └── 06-components/
 │       └── _header-system.css   # Header-specific styles
 ├── styles/                       # DEPRECATED - Legacy CSS
-│   ├── header-system.css         # DEPRECATED - Use styles-new/unified.css
+│   ├── header-system.css         # DEPRECATED - Use styles-new/ ITCSS files
 │   ├── header-system-temp.css    # TEMPORARY - For testing and migration
 │   ├── apple-theme.css           # Base theme (still used)
 │   └── styles.css                # General styles (still used)
@@ -895,11 +905,11 @@ trading-ui/
 - **Purpose**: Primary test environment for header functionality
 - **Status**: Header creates successfully, but submenus display as flat list
 - **Debug**: Contains extensive logging for troubleshooting
-- **CSS Loading**: Uses `unified.css` with proper loading order
+- **CSS Loading**: Uses ITCSS files with proper loading order
 
 ### 2. **Key Files to Examine**
 1. **`trading-ui/scripts/header-system.js`** - Main JavaScript logic (UPDATED with window.onload)
-2. **`trading-ui/styles-new/unified.css`** - Unified CSS file (contains all menu styles)
+2. **`trading-ui/styles-new/`** - ITCSS architecture (contains all menu styles)
 3. **`trading-ui/test-header-clean.html`** - Primary test environment
 4. **`trading-ui/test-header-old-system.html`** - Reference working system
 
@@ -911,7 +921,7 @@ trading-ui/
 
 ### 4. **Current Status Summary**
 - ✅ **CSS Migration**: Completed successfully
-- ✅ **CSS Loading Order**: Fixed (unified.css before bootstrap.min.css)
+- ✅ **CSS Loading Order**: Fixed (ITCSS files after bootstrap.min.css)
 - ✅ **JavaScript Timing**: Fixed (window.onload instead of DOMContentLoaded)
 - ✅ **CSS Variables**: Validated and working
 - ❌ **Submenu Display**: Still showing as flat list (architectural issue)
@@ -1347,7 +1357,7 @@ window.applyTableFilter('status', ['Open']);
   - `trading-ui/scripts/header-component.js` - Main header component
   - `trading-ui/test-header-only.html` - Complete test environment
 - **Bootstrap 5 FOUNDATION**: Built on Bootstrap 5 dropdown and navigation components
-- **CSS CLEANUP**: Removed 1,526 lines of conflicting styles from unified.css
+- **CSS CLEANUP**: Removed 1,526 lines of conflicting styles from legacy CSS
 - **FILTER INTEGRATION**: Seamless integration with existing global filter system
 - **MODULAR ARCHITECTURE**: Separated menu system from filter system
 - **STATE MANAGEMENT**: Persistent filter and navigation states
@@ -1359,11 +1369,11 @@ window.applyTableFilter('status', ['Open']);
 - **🚨 CRITICAL ISSUE IDENTIFIED**: Second-level submenus display as flat list
 - **CSS ARCHITECTURE MIGRATION**: Successfully migrated to unified CSS system
 - **DUPLICATE CSS CLEANUP**: Removed all CSS duplicates using custom Python tools
-- **UNIFIED CSS FILE**: Created `styles-new/unified.css` (98.1KB, 0 duplicates)
+- **ITCSS ARCHITECTURE**: Created `styles-new/` ITCSS structure (26 files, 0 duplicates)
 - **DEPRECATED OLD CSS**: `styles/header-system.css` marked as deprecated
 - **RESEARCH DIRECTION**: Identified need for Bootstrap 5 submenu CSS research
 - **TEST ENVIRONMENT**: `test-header-clean.html` ready for submenu debugging
-- **CSS LOADING ORDER**: Fixed - unified.css now loads before bootstrap.min.css
+- **CSS LOADING ORDER**: Fixed - ITCSS files now load after bootstrap.min.css
 - **JAVASCRIPT TIMING**: Fixed - changed from DOMContentLoaded to window.onload
 - **CSS VARIABLES**: Validated and working correctly
 - **MIGRATION METHOD**: Incremental CSS isolation using temporary file approach
@@ -1400,7 +1410,7 @@ window.applyTableFilter('status', ['Open']);
 
 ### 6. **CSS Conflicts - RESOLVED**
 - **Problem**: External CSS overriding filter styles
-- **Solution**: Systematic cleanup of unified.css, removed 1,526 conflicting lines
+- **Solution**: Systematic cleanup and migration to ITCSS, removed 1,526 conflicting lines
 - **Result**: Clean, conflict-free styling
 
 ### 7. **State Persistence - RESOLVED**
@@ -1536,21 +1546,21 @@ For issues or questions:
 - **Root Cause**: **IDENTIFIED** - This is an architectural issue, not a CSS loading problem
 - **Files to Fix**: 
   - `trading-ui/scripts/header-system.js` (HTML structure)
-  - `trading-ui/styles-new/unified.css` (CSS styling)
+  - `trading-ui/styles-new/` (ITCSS CSS architecture)
 - **Research Needed**: Bootstrap 5 official submenu documentation
 - **Test Environment**: `trading-ui/test-header-clean.html`
 
 ### 2. **CSS Architecture Validation - COMPLETED**
 - **Status**: Migration completed successfully
-- **CSS Loading Order**: Fixed (unified.css before bootstrap.min.css)
+- **CSS Loading Order**: Fixed (ITCSS files after bootstrap.min.css)
 - **JavaScript Timing**: Fixed (window.onload instead of DOMContentLoaded)
 - **CSS Variables**: Validated and working
-- **Next**: Validate all pages use `styles-new/unified.css`
+- **Next**: Validate all pages use `styles-new/` ITCSS architecture
 - **Remove**: Deprecated `styles/header-system.css` references
 
 ### 3. **Migration Process Documentation - COMPLETED**
 - **Method**: Incremental CSS isolation using temporary file approach
-- **Critical Styles**: Identified and transferred to unified.css
+- **Critical Styles**: Identified and transferred to ITCSS component files
 - **Debugging Tools**: Implemented comprehensive CSS testing
 - **Status**: Fully documented for future reference
 

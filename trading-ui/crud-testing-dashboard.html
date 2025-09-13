@@ -20,82 +20,990 @@
     <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_level3_fix">
     
     <!-- Error Handlers -->
-    <script src="scripts/error-handlers.js"></script></head>
+    <script src="scripts/error-handlers.js"></script>
+    
+    <!-- CRUD Testing Dashboard Styles -->
+    <style>
+        .page-test-card {
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .page-header {
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #29a6a8 0%, #1f8a8c 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .page-header.high {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        }
+        .page-header.critical {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+        .page-title {
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        .priority-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 8px;
+        }
+        .status-not-tested { background: #6c757d; }
+        .status-tested { background: #ffc107; }
+        .status-complete { background: #28a745; }
+        .status-partial { background: #fd7e14; }
+        .page-body {
+            padding: 20px;
+        }
+        .test-section {
+            margin-bottom: 25px;
+        }
+        .test-section h4 {
+            color: #495057;
+            border-bottom: 2px solid #29a6a8;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+        .checklist li {
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+        }
+        .checklist input[type="checkbox"] {
+            margin-left: 10px;
+            accent-color: #29a6a8;
+        }
+        .button-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin: 4px 0;
+        }
+        .button-item.create {
+            border-color: #28a745;
+            background: rgba(40, 167, 69, 0.05);
+        }
+        .button-item.update {
+            border-color: #17a2b8;
+            background: rgba(23, 162, 184, 0.05);
+        }
+        .button-item.delete {
+            border-color: #dc3545;
+            background: rgba(220, 53, 69, 0.05);
+        }
+        .button-item.other {
+            border-color: #6c757d;
+            background: rgba(108, 117, 125, 0.05);
+        }
+        .test-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .buttons-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        /* Summary Stats Styles */
+        .summary-stats {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 20px;
+            border: 2px solid #29a6a8;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            margin: 20px 0;
+        }
+        .summary-item {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .summary-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #29a6a8;
+            margin-bottom: 5px;
+        }
+        .summary-label {
+            font-size: 0.9em;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        /* Bootstrap Tab Fixes */
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+        .tab-pane.fade {
+            opacity: 0;
+            transition: opacity 0.15s linear;
+        }
+        .tab-pane.fade.active {
+            opacity: 1;
+        }
+    </style>
+</head>
 <body>
-    <!-- Unified Header Container -->
-    <div id="unified-header"></div>    <div class="background-wrapper">
+    <div class="background-wrapper">
+        <!-- Header System -->
+        <div id="unified-header"></div>
+
+        <!-- Page body -->
         <div class="page-body">
-            <!-- Header placeholder -->
-            <div id="unified-header"></div>
-            
-            <div class="testing-dashboard">
-                <div class="container-with-border">
-                    <h1>🧪 דשבורד בדיקות CRUD - TikTrack</h1>
-                    <p><strong>נוצר:</strong> 06/09/2025 04:05</p>
-                    
-                    <div class="summary-stats" id="summaryStats">
-                        <div class="summary-item">
-                            <div class="summary-number" id="totalPages">12</div>
-                            <div class="summary-label">עמודים לבדיקה</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-number" id="testedPages">0</div>
-                            <div class="summary-label">עמודים נבדקו</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-number" id="passedPages">0</div>
-                            <div class="summary-label">עמודים תקינים</div>
-                        </div>
-                        <div class="summary-item">
-                            <div class="summary-number" id="progressPercent">0%</div>
-                            <div class="summary-label">התקדמות</div>
-                        </div>
+            <!-- Main content limited in width -->
+            <div class="main-content">
+                <!-- UI Content Section Top Start-->
+                <div class="top-section">
+                    <div class="section-header">
+                        <h1>🧪 דשבורד בדיקות CRUD</h1>
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
                     </div>
-                    
-                    <!-- טאבים לפי ישויות -->
-                    <ul class="nav nav-tabs" id="entityTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="main-tab" data-bs-toggle="tab" data-bs-target="#main" type="button" role="tab">
-                                🏠 ראשי
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="trades-tab" data-bs-toggle="tab" data-bs-target="#trades" type="button" role="tab">
-                                📈 טריידים
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="accounts-tab" data-bs-toggle="tab" data-bs-target="#accounts" type="button" role="tab">
-                                🏦 חשבונות
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="alerts-tab" data-bs-toggle="tab" data-bs-target="#alerts" type="button" role="tab">
-                                🔔 התראות
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="tickers-tab" data-bs-toggle="tab" data-bs-target="#tickers" type="button" role="tab">
-                                📊 טיקרים
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="executions-tab" data-bs-toggle="tab" data-bs-target="#executions" type="button" role="tab">
-                                ⚡ ביצועים
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="other-tab" data-bs-toggle="tab" data-bs-target="#other" type="button" role="tab">
-                                📝 אחר
-                            </button>
-                        </li>
-                    </ul>
-                    
-                    <!-- תוכן הטאבים -->
-                    <div class="tab-content" id="entityTabContent">
-                        <!-- הטאבים יוכנסו כאן -->
+                    <div class="section-body">
+                        <p><strong>נוצר:</strong> 06/09/2025 04:05</p>
+                        
+                        <div class="summary-stats" id="summaryStats">
+                            <div class="summary-item">
+                                <div class="summary-number" id="totalPages">12</div>
+                                <div class="summary-label">עמודים לבדיקה</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-number" id="testedPages">0</div>
+                                <div class="summary-label">עמודים נבדקו</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-number" id="passedPages">0</div>
+                                <div class="summary-label">עמודים תקינים</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-number" id="progressPercent">0%</div>
+                                <div class="summary-label">התקדמות</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <!-- UI Content Section Top End -->  
+
+                <!-- UI Content Section 1 Start-->
+                <div class="content-section" id="section1">
+                    <div class="section-header">
+                        <h2>📋 טאבי ישויות</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- טאבים לפי ישויות -->
+                        <ul class="nav nav-tabs" id="entityTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="main-tab" data-bs-toggle="tab" data-bs-target="#main" type="button" role="tab">
+                                    🏠 ראשי
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="trades-tab" data-bs-toggle="tab" data-bs-target="#trades" type="button" role="tab">
+                                    📈 טריידים
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="accounts-tab" data-bs-toggle="tab" data-bs-target="#accounts" type="button" role="tab">
+                                    🏦 חשבונות
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="alerts-tab" data-bs-toggle="tab" data-bs-target="#alerts" type="button" role="tab">
+                                    🔔 התראות
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tickers-tab" data-bs-toggle="tab" data-bs-target="#tickers" type="button" role="tab">
+                                    📊 טיקרים
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="executions-tab" data-bs-toggle="tab" data-bs-target="#executions" type="button" role="tab">
+                                    ⚡ ביצועים
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="other-tab" data-bs-toggle="tab" data-bs-target="#other" type="button" role="tab">
+                                    📝 אחר
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- UI Content Section 1 End -->   
+
+                <!-- UI Content Section 2 Start-->
+                <div class="content-section" id="section2">
+                    <div class="section-header">
+                        <h2>📊 תוכן הטאבים</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- תוכן הטאבים -->
+                        <div class="tab-content" id="entityTabContent">
+                            <!-- טאב ראשי -->
+                            <div class="tab-pane fade show active" id="main" role="tabpanel">
+                                <div class="page-test-card" id="pageCardIndex">
+                <div class="page-header high">
+                    <div class="page-title">
+                        👀 דף הבית
+                    </div>
+                    <div>
+                        <span class="priority-badge">high</span>
+                        <span class="status-indicator status-not-tested" id="statusIndex"></span>
+                    </div>
+                </div>
+                
+                <div class="page-body">
+                    <div class="test-actions">
+                        <a href="/" target="_blank" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt"></i> פתח עמוד
+                        </a>
+                        <button class="btn btn-success" onclick="markPageComplete('index')">
+                            <i class="fas fa-check"></i> סיימתי בדיקה
+                        </button>
+                        <button class="btn btn-warning" onclick="markPagePartial('index')">
+                            <i class="fas fa-exclamation"></i> יש בעיות
+                        </button>
+                    </div>
+                    
+                    <div class="test-section">
+                        <h4>🔍 בדיקות בסיסיות</h4>
+                        <ul class="checklist">
+                            <li>
+                                <input type="checkbox" id="index_load">
+                                <label for="index_load">עמוד נטען ללא שגיאות</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="index_css">
+                                <label for="index_css">עיצוב CSS נראה תקין</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="index_js">
+                                <label for="index_js">אין שגיאות JavaScript בקונסול</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="index_rtl">
+                                <label for="index_rtl">RTL ועברית נכונים</label>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="test-section">
+                        <h4>🎛️ כפתורים לבדיקה</h4>
+                        <div class="buttons-list">
+
+                            <div class="button-item other">
+                                <input type="checkbox" id="index_btn_0">
+                                <label for="index_btn_0"><strong>קישורי ניווט</strong> - עובד כהלכה</label>
+                            </div>
+
+                            <div class="button-item other">
+                                <input type="checkbox" id="index_btn_1">
+                                <label for="index_btn_1"><strong>כפתורי פעולות מהירות</strong> - עובד כהלכה</label>
+                            </div>
+
+                            <div class="button-item other">
+                                <input type="checkbox" id="index_btn_2">
+                                <label for="index_btn_2"><strong>לינקים לעמודים</strong> - עובד כהלכה</label>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    
+                    <div class="test-section">
+                        <h4>📝 הערות ובעיות</h4>
+                        <textarea class="form-control" id="index_notes" rows="3" 
+                                  placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                    </div>
+                </div>
+                                </div>
+                            </div>
+                            <!-- סיום טאב ראשי -->
+
+                            <!-- טאב טריידים -->
+                            <div class="tab-pane fade" id="trades" role="tabpanel">
+                                <div class="page-test-card" id="pageCardTrades">
+                <div class="page-header critical">
+                    <div class="page-title">
+                        🔧 טריידים
+                    </div>
+                    <div>
+                        <span class="priority-badge">critical</span>
+                        <span class="status-indicator status-not-tested" id="statusTrades"></span>
+                    </div>
+                </div>
+                
+                <div class="page-body">
+                    <div class="test-actions">
+                        <a href="/trades" target="_blank" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt"></i> פתח עמוד
+                        </a>
+                        <button class="btn btn-success" onclick="markPageComplete('trades')">
+                            <i class="fas fa-check"></i> סיימתי בדיקה
+                        </button>
+                        <button class="btn btn-warning" onclick="markPagePartial('trades')">
+                            <i class="fas fa-exclamation"></i> יש בעיות
+                        </button>
+                    </div>
+                    
+                    <div class="test-section">
+                        <h4>🔍 בדיקות בסיסיות</h4>
+                        <ul class="checklist">
+                            <li>
+                                <input type="checkbox" id="trades_load">
+                                <label for="trades_load">עמוד נטען ללא שגיאות</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="trades_css">
+                                <label for="trades_css">עיצוב CSS נראה תקין</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="trades_js">
+                                <label for="trades_js">אין שגיאות JavaScript בקונסול</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="trades_rtl">
+                                <label for="trades_rtl">RTL ועברית נכונים</label>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="test-section">
+                        <h4>🎛️ כפתורים לבדיקה</h4>
+                        <div class="buttons-list">
+
+                            <div class="button-item create">
+                                <input type="checkbox" id="trades_btn_0">
+                                <label for="trades_btn_0"><strong>הוסף טרייד חדש</strong> - עובד כהלכה</label>
+                            </div>
+
+                            <div class="button-item update">
+                                <input type="checkbox" id="trades_btn_1">
+                                <label for="trades_btn_1"><strong>ערוך (בעמודת פעולות)</strong> - עובד כהלכה</label>
+                            </div>
+
+                            <div class="button-item delete">
+                                <input type="checkbox" id="trades_btn_2">
+                                <label for="trades_btn_2"><strong>מחק (בעמודת פעולות)</strong> - עובד כהלכה</label>
+                            </div>
+
+                            <div class="button-item other">
+                                <input type="checkbox" id="trades_btn_3">
+                                <label for="trades_btn_3"><strong>סגור טרייד</strong> - עובד כהלכה</label>
+                            </div>
+
+                            <div class="button-item other">
+                                <input type="checkbox" id="trades_btn_4">
+                                <label for="trades_btn_4"><strong>בטל טרייד</strong> - עובד כהלכה</label>
+                            </div>
+
+                            <div class="button-item other">
+                                <input type="checkbox" id="trades_btn_5">
+                                <label for="trades_btn_5"><strong>רענן נתונים</strong> - עובד כהלכה</label>
+                            </div>
+
+                            <div class="button-item other">
+                                <input type="checkbox" id="trades_btn_6">
+                                <label for="trades_btn_6"><strong>מיון עמודות</strong> - עובד כהלכה</label>
+                            </div>
+
+                            <div class="button-item other">
+                                <input type="checkbox" id="trades_btn_7">
+                                <label for="trades_btn_7"><strong>פילטרים</strong> - עובד כהלכה</label>
+                            </div>
+
+                        </div>
+                    </div>
+                    
+                    <div class="test-section">
+                        <h4>🔧 בדיקות CRUD מפורטות</h4>
+                        <ul class="checklist">
+                            <li>
+                                <input type="checkbox" id="trades_create">
+                                <label for="trades_create"><strong>Create:</strong> יצירה חדשה עובדת (מודל נפתח, שמירה מצליחה)</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="trades_read">
+                                <label for="trades_read"><strong>Read:</strong> קריאת נתונים עובדת (טבלה נטענת, נתונים מוצגים)</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="trades_update">
+                                <label for="trades_update"><strong>Update:</strong> עדכון עובד (מודל נפתח, שמירה מצליחה)</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="trades_delete">
+                                <label for="trades_delete"><strong>Delete:</strong> מחיקה עובדת (אישור, מחיקה מהטבלה)</label>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="test-section">
+                        <h4>📊 בדיקות נוספות</h4>
+                        <ul class="checklist">
+                            <li>
+                                <input type="checkbox" id="trades_sorting">
+                                <label for="trades_sorting">מיון עמודות עובד</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="trades_filtering">
+                                <label for="trades_filtering">פילטרים עובדים</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="trades_pagination">
+                                <label for="trades_pagination">עמודים עובדים (אם יש)</label>
+                            </li>
+                            <li>
+                                <input type="checkbox" id="trades_validation">
+                                <label for="trades_validation">ולידציה של שדות עובדת</label>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="test-section">
+                        <h4>📝 הערות ובעיות</h4>
+                        <textarea class="form-control" id="trades_notes" rows="3" 
+                                  placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                    </div>
+                </div>
+                                </div>
+                            </div>
+                            <!-- סיום טאב טריידים -->
+
+                            <!-- טאב חשבונות -->
+                            <div class="tab-pane fade" id="accounts" role="tabpanel">
+                                <div class="page-test-card" id="pageCardAccounts">
+                                    <div class="page-header critical">
+                                        <div class="page-title">
+                                            🏦 חשבונות
+                                        </div>
+                                        <div>
+                                            <span class="priority-badge">critical</span>
+                                            <span class="status-indicator status-not-tested" id="statusAccounts"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="page-body">
+                                        <div class="test-actions">
+                                            <a href="/accounts" target="_blank" class="btn btn-primary">
+                                                <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                            </a>
+                                            <button class="btn btn-success" onclick="markPageComplete('accounts')">
+                                                <i class="fas fa-check"></i> סיימתי בדיקה
+                                            </button>
+                                            <button class="btn btn-warning" onclick="markPagePartial('accounts')">
+                                                <i class="fas fa-exclamation"></i> יש בעיות
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔍 בדיקות בסיסיות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="accounts_load">
+                                                    <label for="accounts_load">עמוד נטען ללא שגיאות</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="accounts_css">
+                                                    <label for="accounts_css">עיצוב CSS נראה תקין</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="accounts_js">
+                                                    <label for="accounts_js">אין שגיאות JavaScript בקונסול</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="accounts_rtl">
+                                                    <label for="accounts_rtl">RTL ועברית נכונים</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🎛️ כפתורים לבדיקה</h4>
+                                            <div class="buttons-list">
+                                                <div class="button-item create">
+                                                    <input type="checkbox" id="accounts_btn_0">
+                                                    <label for="accounts_btn_0"><strong>הוסף חשבון חדש</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item update">
+                                                    <input type="checkbox" id="accounts_btn_1">
+                                                    <label for="accounts_btn_1"><strong>ערוך חשבון</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item delete">
+                                                    <input type="checkbox" id="accounts_btn_2">
+                                                    <label for="accounts_btn_2"><strong>מחק חשבון</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="accounts_btn_3">
+                                                    <label for="accounts_btn_3"><strong>רענן נתונים</strong> - עובד כהלכה</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔧 בדיקות CRUD מפורטות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="accounts_create">
+                                                    <label for="accounts_create"><strong>Create:</strong> יצירת חשבון חדש עובדת (מודל נפתח, שמירה מצליחה)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="accounts_read">
+                                                    <label for="accounts_read"><strong>Read:</strong> קריאת נתונים עובדת (טבלה נטענת, נתונים מוצגים)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="accounts_update">
+                                                    <label for="accounts_update"><strong>Update:</strong> עדכון חשבון עובד (מודל נפתח, שמירה מצליחה)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="accounts_delete">
+                                                    <label for="accounts_delete"><strong>Delete:</strong> מחיקת חשבון עובדת (אישור, מחיקה מהטבלה)</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>📝 הערות ובעיות</h4>
+                                            <textarea class="form-control" id="accounts_notes" rows="3" 
+                                                      placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- טאב התראות -->
+                            <div class="tab-pane fade" id="alerts" role="tabpanel">
+                                <div class="page-test-card" id="pageCardAlerts">
+                                    <div class="page-header critical">
+                                        <div class="page-title">
+                                            🔔 התראות
+                                        </div>
+                                        <div>
+                                            <span class="priority-badge">critical</span>
+                                            <span class="status-indicator status-not-tested" id="statusAlerts"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="page-body">
+                                        <div class="test-actions">
+                                            <a href="/alerts" target="_blank" class="btn btn-primary">
+                                                <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                            </a>
+                                            <button class="btn btn-success" onclick="markPageComplete('alerts')">
+                                                <i class="fas fa-check"></i> סיימתי בדיקה
+                                            </button>
+                                            <button class="btn btn-warning" onclick="markPagePartial('alerts')">
+                                                <i class="fas fa-exclamation"></i> יש בעיות
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔍 בדיקות בסיסיות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="alerts_load">
+                                                    <label for="alerts_load">עמוד נטען ללא שגיאות</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="alerts_css">
+                                                    <label for="alerts_css">עיצוב CSS נראה תקין</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="alerts_js">
+                                                    <label for="alerts_js">אין שגיאות JavaScript בקונסול</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="alerts_rtl">
+                                                    <label for="alerts_rtl">RTL ועברית נכונים</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🎛️ כפתורים לבדיקה</h4>
+                                            <div class="buttons-list">
+                                                <div class="button-item create">
+                                                    <input type="checkbox" id="alerts_btn_0">
+                                                    <label for="alerts_btn_0"><strong>הוסף התראה חדשה</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item update">
+                                                    <input type="checkbox" id="alerts_btn_1">
+                                                    <label for="alerts_btn_1"><strong>ערוך התראה</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item delete">
+                                                    <input type="checkbox" id="alerts_btn_2">
+                                                    <label for="alerts_btn_2"><strong>מחק התראה</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="alerts_btn_3">
+                                                    <label for="alerts_btn_3"><strong>סמן כנקרא</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="alerts_btn_4">
+                                                    <label for="alerts_btn_4"><strong>רענן התראות</strong> - עובד כהלכה</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔧 בדיקות CRUD מפורטות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="alerts_create">
+                                                    <label for="alerts_create"><strong>Create:</strong> יצירת התראה חדשה עובדת (מודל נפתח, שמירה מצליחה)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="alerts_read">
+                                                    <label for="alerts_read"><strong>Read:</strong> קריאת התראות עובדת (טבלה נטענת, נתונים מוצגים)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="alerts_update">
+                                                    <label for="alerts_update"><strong>Update:</strong> עדכון התראה עובד (מודל נפתח, שמירה מצליחה)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="alerts_delete">
+                                                    <label for="alerts_delete"><strong>Delete:</strong> מחיקת התראה עובדת (אישור, מחיקה מהטבלה)</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>📝 הערות ובעיות</h4>
+                                            <textarea class="form-control" id="alerts_notes" rows="3" 
+                                                      placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- טאב טיקרים -->
+                            <div class="tab-pane fade" id="tickers" role="tabpanel">
+                                <div class="page-test-card" id="pageCardTickers">
+                                    <div class="page-header high">
+                                        <div class="page-title">
+                                            📊 טיקרים
+                                        </div>
+                                        <div>
+                                            <span class="priority-badge">high</span>
+                                            <span class="status-indicator status-not-tested" id="statusTickers"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="page-body">
+                                        <div class="test-actions">
+                                            <a href="/tickers" target="_blank" class="btn btn-primary">
+                                                <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                            </a>
+                                            <button class="btn btn-success" onclick="markPageComplete('tickers')">
+                                                <i class="fas fa-check"></i> סיימתי בדיקה
+                                            </button>
+                                            <button class="btn btn-warning" onclick="markPagePartial('tickers')">
+                                                <i class="fas fa-exclamation"></i> יש בעיות
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔍 בדיקות בסיסיות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="tickers_load">
+                                                    <label for="tickers_load">עמוד נטען ללא שגיאות</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="tickers_css">
+                                                    <label for="tickers_css">עיצוב CSS נראה תקין</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="tickers_js">
+                                                    <label for="tickers_js">אין שגיאות JavaScript בקונסול</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="tickers_rtl">
+                                                    <label for="tickers_rtl">RTL ועברית נכונים</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🎛️ כפתורים לבדיקה</h4>
+                                            <div class="buttons-list">
+                                                <div class="button-item create">
+                                                    <input type="checkbox" id="tickers_btn_0">
+                                                    <label for="tickers_btn_0"><strong>הוסף טיקר חדש</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item update">
+                                                    <input type="checkbox" id="tickers_btn_1">
+                                                    <label for="tickers_btn_1"><strong>ערוך טיקר</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item delete">
+                                                    <input type="checkbox" id="tickers_btn_2">
+                                                    <label for="tickers_btn_2"><strong>מחק טיקר</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="tickers_btn_3">
+                                                    <label for="tickers_btn_3"><strong>רענן נתונים</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="tickers_btn_4">
+                                                    <label for="tickers_btn_4"><strong>ייבא מ-Yahoo Finance</strong> - עובד כהלכה</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔧 בדיקות CRUD מפורטות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="tickers_create">
+                                                    <label for="tickers_create"><strong>Create:</strong> יצירת טיקר חדש עובדת (מודל נפתח, שמירה מצליחה)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="tickers_read">
+                                                    <label for="tickers_read"><strong>Read:</strong> קריאת נתוני טיקרים עובדת (טבלה נטענת, נתונים מוצגים)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="tickers_update">
+                                                    <label for="tickers_update"><strong>Update:</strong> עדכון טיקר עובד (מודל נפתח, שמירה מצליחה)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="tickers_delete">
+                                                    <label for="tickers_delete"><strong>Delete:</strong> מחיקת טיקר עובדת (אישור, מחיקה מהטבלה)</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>📝 הערות ובעיות</h4>
+                                            <textarea class="form-control" id="tickers_notes" rows="3" 
+                                                      placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- טאב ביצועים -->
+                            <div class="tab-pane fade" id="executions" role="tabpanel">
+                                <div class="page-test-card" id="pageCardExecutions">
+                                    <div class="page-header high">
+                                        <div class="page-title">
+                                            ⚡ ביצועים
+                                        </div>
+                                        <div>
+                                            <span class="priority-badge">high</span>
+                                            <span class="status-indicator status-not-tested" id="statusExecutions"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="page-body">
+                                        <div class="test-actions">
+                                            <a href="/executions" target="_blank" class="btn btn-primary">
+                                                <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                            </a>
+                                            <button class="btn btn-success" onclick="markPageComplete('executions')">
+                                                <i class="fas fa-check"></i> סיימתי בדיקה
+                                            </button>
+                                            <button class="btn btn-warning" onclick="markPagePartial('executions')">
+                                                <i class="fas fa-exclamation"></i> יש בעיות
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔍 בדיקות בסיסיות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="executions_load">
+                                                    <label for="executions_load">עמוד נטען ללא שגיאות</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="executions_css">
+                                                    <label for="executions_css">עיצוב CSS נראה תקין</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="executions_js">
+                                                    <label for="executions_js">אין שגיאות JavaScript בקונסול</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="executions_rtl">
+                                                    <label for="executions_rtl">RTL ועברית נכונים</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🎛️ כפתורים לבדיקה</h4>
+                                            <div class="buttons-list">
+                                                <div class="button-item create">
+                                                    <input type="checkbox" id="executions_btn_0">
+                                                    <label for="executions_btn_0"><strong>הוסף ביצוע חדש</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item update">
+                                                    <input type="checkbox" id="executions_btn_1">
+                                                    <label for="executions_btn_1"><strong>ערוך ביצוע</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item delete">
+                                                    <input type="checkbox" id="executions_btn_2">
+                                                    <label for="executions_btn_2"><strong>מחק ביצוע</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="executions_btn_3">
+                                                    <label for="executions_btn_3"><strong>רענן נתונים</strong> - עובד כהלכה</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔧 בדיקות CRUD מפורטות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="executions_create">
+                                                    <label for="executions_create"><strong>Create:</strong> יצירת ביצוע חדש עובדת (מודל נפתח, שמירה מצליחה)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="executions_read">
+                                                    <label for="executions_read"><strong>Read:</strong> קריאת ביצועים עובדת (טבלה נטענת, נתונים מוצגים)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="executions_update">
+                                                    <label for="executions_update"><strong>Update:</strong> עדכון ביצוע עובד (מודל נפתח, שמירה מצליחה)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="executions_delete">
+                                                    <label for="executions_delete"><strong>Delete:</strong> מחיקת ביצוע עובדת (אישור, מחיקה מהטבלה)</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>📝 הערות ובעיות</h4>
+                                            <textarea class="form-control" id="executions_notes" rows="3" 
+                                                      placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- טאב אחר -->
+                            <div class="tab-pane fade" id="other" role="tabpanel">
+                                <div class="page-test-card" id="pageCardOther">
+                                    <div class="page-header high">
+                                        <div class="page-title">
+                                            📝 ישויות נוספות
+                                        </div>
+                                        <div>
+                                            <span class="priority-badge">high</span>
+                                            <span class="status-indicator status-not-tested" id="statusOther"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="page-body">
+                                        <div class="test-section">
+                                            <h4>🔍 ישויות נוספות לבדיקה</h4>
+                                            <div class="buttons-list">
+                                                <div class="button-item other">
+                                                    <a href="/cash_flows" target="_blank" class="btn btn-outline-primary">
+                                                        💰 תזרים מזומנים
+                                                    </a>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <a href="/trade_plans" target="_blank" class="btn btn-outline-primary">
+                                                        📋 תוכניות מסחר
+                                                    </a>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <a href="/constraints" target="_blank" class="btn btn-outline-primary">
+                                                        ⚠️ אילוצים
+                                                    </a>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <a href="/notes" target="_blank" class="btn btn-outline-primary">
+                                                        📝 הערות
+                                                    </a>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <a href="/research" target="_blank" class="btn btn-outline-primary">
+                                                        🔬 מחקר
+                                                    </a>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <a href="/preferences" target="_blank" class="btn btn-outline-primary">
+                                                        ⚙️ העדפות
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🎛️ בדיקות כלליות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="other_navigation">
+                                                    <label for="other_navigation">ניווט בין עמודים עובד</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="other_links">
+                                                    <label for="other_links">קישורים פנימיים עובדים</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="other_forms">
+                                                    <label for="other_forms">טפסים נטענים ללא שגיאות</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="other_tables">
+                                                    <label for="other_tables">טבלאות מציגות נתונים</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>📝 הערות ובעיות</h4>
+                                            <textarea class="form-control" id="other_notes" rows="3" 
+                                                      placeholder="תעד כאן בעיות, שגיאות או הערות על העמודים הנוספים..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 2 End--> 
             </div>
         </div>
     </div>
@@ -112,6 +1020,76 @@
     
     <script>
         // פונקציות JavaScript יוכנסו כאן
+        
+        // Tab functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tabs
+            const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            
+            // Hide all tab panes except the active one
+            tabPanes.forEach(pane => {
+                if (!pane.classList.contains('active')) {
+                    pane.style.display = 'none';
+                }
+            });
+            
+            // Add click event listeners to tab buttons
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all buttons and panes
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabPanes.forEach(pane => {
+                        pane.classList.remove('active', 'show');
+                        pane.style.display = 'none';
+                    });
+                    
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Show corresponding tab pane
+                    const targetId = this.getAttribute('data-bs-target');
+                    const targetPane = document.querySelector(targetId);
+                    if (targetPane) {
+                        targetPane.classList.add('active', 'show');
+                        targetPane.style.display = 'block';
+                    }
+                });
+            });
+        });
+        
+        // Page status management functions
+        function markPageComplete(pageId) {
+            const statusElement = document.getElementById('status' + pageId.charAt(0).toUpperCase() + pageId.slice(1));
+            if (statusElement) {
+                statusElement.className = 'status-indicator status-complete';
+                statusElement.title = 'נבדק בהצלחה';
+            }
+            updateSummaryStats();
+        }
+        
+        function markPagePartial(pageId) {
+            const statusElement = document.getElementById('status' + pageId.charAt(0).toUpperCase() + pageId.slice(1));
+            if (statusElement) {
+                statusElement.className = 'status-indicator status-partial';
+                statusElement.title = 'נבדק עם בעיות';
+            }
+            updateSummaryStats();
+        }
+        
+        function updateSummaryStats() {
+            const totalPages = 6; // ראשי, טריידים, חשבונות, התראות, טיקרים, ביצועים
+            const completePages = document.querySelectorAll('.status-indicator.status-complete').length;
+            const partialPages = document.querySelectorAll('.status-indicator.status-partial').length;
+            const testedPages = completePages + partialPages;
+            const progressPercent = Math.round((testedPages / totalPages) * 100);
+            
+            document.getElementById('testedPages').textContent = testedPages;
+            document.getElementById('passedPages').textContent = completePages;
+            document.getElementById('progressPercent').textContent = progressPercent + '%';
+        }
     </script>
 </body>
 </html>

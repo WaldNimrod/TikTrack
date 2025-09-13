@@ -1341,21 +1341,20 @@ function applyAccountFilter() {
   }
 }
 
+function applyDateRangeFilter(dateRange) {
+  if (window.filterSystem && typeof window.filterSystem.applyFilters === 'function') {
+    window.filterSystem.currentFilters.dateRange = dateRange;
+    window.filterSystem.applyFilters();
+  }
+}
+
 // ===== EXPORT FUNCTIONS TO WINDOW =====
-console.log('🔧 Exporting filter functions to window...');
 
 window.selectStatusOption = selectStatusOption;
 window.selectTypeOption = selectTypeOption;
 window.selectAccountOption = selectAccountOption;
 window.selectDateRangeOption = selectDateRangeOption;
 
-console.log('✅ Filter functions exported successfully');
-console.log('🔍 Available functions:', {
-  selectAccountOption: typeof window.selectAccountOption,
-  selectDateRangeOption: typeof window.selectDateRangeOption,
-  selectStatusOption: typeof window.selectStatusOption,
-  selectTypeOption: typeof window.selectTypeOption
-});
 window.updateStatusFilterText = updateStatusFilterText;
 window.updateTypeFilterText = updateTypeFilterText;
 window.updateAccountFilterText = updateAccountFilterText;

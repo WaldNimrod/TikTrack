@@ -1,0 +1,476 @@
+/**
+ * כפתורים מתקדמים - Advanced Buttons
+ * 
+ * קובץ זה מכיל את הסגנונות המתקדמים של כפתורים ספציפיים
+ * מבוסס על הסגנונות הקיימים ב-styles.css
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* כפתור מודגש בצבע כתום - לשימוש בכל המערכת */
+.btn-emphasized,
+.btn-primary-emphasized,
+button.btn-emphasized,
+button.btn-primary-emphasized {
+  background-color: white !important;
+  color: #ff9c05 !important;
+  border: 2px solid #ff9c05 !important;
+  border-radius: 6px !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-emphasized:hover,
+.btn-primary-emphasized:hover {
+  background-color: #ff9c05 !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(255, 156, 5, 0.3) !important;
+}
+
+/* כפתורי שמירה עם צבע הלוגו */
+.btn-success[onclick*="save"],
+.btn-success[onclick*="Save"],
+button[onclick*="saveTradeRecord"],
+button[onclick*="saveNewTradeRecord"],
+.btn-success {
+  background-color: white !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem 0.6rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-success:hover {
+  background-color: #29a6a8 !important;
+  color: white !important;
+  border-color: #29a6a8 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(41, 166, 168, 0.3) !important;
+}
+
+/* כפתורי מחיקה */
+.btn-danger {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+  color: #dc3545 !important;
+  border-color: #dc3545 !important;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+  color: white !important;
+  border-color: #dc3545 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 16px rgba(220, 53, 69, 0.3) !important;
+}
+
+/* כפתורי outline */
+.btn-outline-success {
+  border-color: #28a745;
+  color: #28a745;
+  background: white;
+  border-width: 2px;
+  padding: 0.5rem 1rem;
+}
+
+.btn-outline-success:hover {
+  background: #28a745;
+  color: white;
+  border-color: #28a745;
+}
+
+.btn-outline-primary {
+  border-color: var(--logo-orange);
+  color: var(--logo-orange);
+  background: white;
+  border-width: 2px;
+  padding: 0.5rem 1rem;
+}
+
+.btn-outline-primary:hover {
+  background: var(--logo-orange);
+  color: white;
+  border-color: var(--logo-orange);
+}
+
+.btn-outline-danger {
+  border: 2px solid #dc3545 !important;
+  background-color: white !important;
+  color: #dc3545 !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545 !important;
+  color: white !important;
+  border-color: #dc3545 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
+}
+
+/* כפתור ביטול לא פעיל */
+.btn-cancel-disabled {
+  border: 1px solid #6c757d !important;
+  background-color: #f8f9fa !important;
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+  opacity: 0.65 !important;
+  transition: none !important;
+}
+
+.btn-cancel-disabled:hover {
+  border: 1px solid #6c757d !important;
+  background-color: #f8f9fa !important;
+  color: #6c757d !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* כפתור סגירה עם X */
+.btn .cancel-icon {
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 1;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  text-align: center;
+  vertical-align: middle;
+  color: inherit;
+  font-family: Arial, sans-serif;
+}
+
+/* כפתורים בסיסיים Bootstrap */
+.btn-primary {
+  background-color: #007bff !important;
+  color: white !important;
+  border: 1px solid #007bff !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3 !important;
+  border-color: #0056b3 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+}
+
+.btn-warning {
+  background-color: white !important;
+  color: #ff9c05 !important;
+  border: 1px solid #ff9c05 !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-warning:hover {
+  background-color: #ff9c05 !important;
+  color: white !important;
+  border-color: #ff9c05 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3) !important;
+}
+
+.btn-info {
+  background-color: #17a2b8 !important;
+  color: white !important;
+  border: 1px solid #17a2b8 !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-info:hover {
+  background-color: #138496 !important;
+  border-color: #138496 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(23, 162, 184, 0.3) !important;
+}
+
+/* כפתורי secondary */
+.btn-secondary {
+  background: #ffffff !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem 0.6rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-secondary:hover {
+  background: #ffffff !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* כפתורים קטנים */
+.btn-sm.btn-primary {
+  background-color: #007bff !important;
+  color: white !important;
+  border: 1px solid #007bff !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-sm.btn-primary:hover {
+  background-color: #0056b3 !important;
+  border-color: #0056b3 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+}
+
+.btn-sm.btn-warning {
+  background-color: white !important;
+  color: #ff9c05 !important;
+  border: 1px solid #ff9c05 !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-sm.btn-warning:hover {
+  background-color: #ff9c05 !important;
+  color: white !important;
+  border-color: #ff9c05 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3) !important;
+}
+
+.btn-sm.btn-danger {
+  background-color: white !important;
+  color: #dc3545 !important;
+  border: 1px solid #dc3545 !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-sm.btn-danger:hover {
+  background-color: #dc3545 !important;
+  color: white !important;
+  border-color: #dc3545 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
+}
+
+.btn-sm.btn-secondary {
+  background: #ffffff !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-sm.btn-secondary:hover {
+  background: #ffffff !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* כפתורי הוספה מיוחדים */
+.add-btn {
+  background: transparent !important;
+  color: #000000 !important;
+  border: 2px solid #29a6a8 !important;
+  box-shadow: none !important;
+  padding: 6px 13px !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.add-btn:hover {
+  background-color: #29a6a8 !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(41, 166, 168, 0.3) !important;
+}
+
+/* כפתורי restore/reactivate */
+.restore-button,
+button[onclick*="restore"],
+button[onclick*="reactivate"],
+button[title*="החזר"],
+button[title*="הפעל מחדש"] {
+  border: 1px solid #28a745 !important;
+  background-color: transparent !important;
+  color: #28a745 !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.restore-button:hover,
+button[onclick*="restore"]:hover,
+button[onclick*="reactivate"]:hover,
+button[title*="החזר"]:hover,
+button[title*="הפעל מחדש"]:hover {
+  background-color: #28a745 !important;
+  color: #ffffff !important;
+  border-color: #28a745 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3) !important;
+}
+
+/* כפתורי outline נוספים */
+.btn-success-outline {
+  border: 2px solid #28a745 !important;
+  background-color: white !important;
+  color: #28a745 !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-success-outline:hover {
+  background-color: #28a745 !important;
+  color: white !important;
+  border-color: #28a745 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3) !important;
+}
+
+.btn-danger-outline {
+  border: 2px solid #dc3545 !important;
+  background-color: white !important;
+  color: #dc3545 !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-danger-outline:hover {
+  background-color: #dc3545 !important;
+  color: white !important;
+  border-color: #dc3545 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
+}
+
+/* כפתורי secondary במודלים */
+.modal-footer .btn-secondary {
+  background: white !important;
+  border: 2px solid #ff9c05 !important;
+  color: #ff9c05 !important;
+  padding: 9px 18px !important;
+  font-size: 0.825rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.modal-footer .btn-secondary:hover {
+  background: #ff9c05 !important;
+  border-color: #ff9c05 !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15) !important;
+}
+
+.modal .btn-secondary,
+.modal .btn-warning {
+  background: white !important;
+  border: 2px solid #ff9c05 !important;
+  color: #ff9c05 !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  border-radius: 0.25rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.modal .btn-secondary:hover,
+.modal .btn-warning:hover {
+  background: #ff9c05 !important;
+  border-color: #ff9c05 !important;
+  color: white !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3) !important;
+}
+
+/* כפתורי secondary מותאמים אישית */
+.btn-secondary-custom,
+button.btn-secondary-custom {
+  background-color: white !important;
+  color: #29a6a8 !important;
+  border: 2px solid #29a6a8 !important;
+  border-radius: 4px !important;
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-secondary-custom:hover,
+button.btn-secondary-custom:hover {
+  background-color: #f8f9fa !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(41, 166, 168, 0.2) !important;
+}
+
+/* כפתורי פעולות בטבלאות */
+.actions-cell .btn-sm.btn-secondary {
+  background: #ffffff !important;
+  color: #29a6a8 !important;
+  border: 1px solid #29a6a8 !important;
+  border-radius: 8px !important;
+  padding: 0.3rem !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+}
+
+.actions-cell .btn-sm.btn-secondary:hover {
+  background: #ffffff !important;
+  color: #1f8a8c !important;
+  border-color: #1f8a8c !important;
+  transform: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* כפתורים עם רוחב מינימלי */
+.btn-info, .btn-success, .btn-warning, .btn-danger, .btn-primary, .btn-secondary {
+  min-width: 30px !important;
+}

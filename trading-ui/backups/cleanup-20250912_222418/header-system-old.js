@@ -4541,7 +4541,7 @@ function clearFiltersManually() {
  */
 async function getCurrentPreference(key) {
   try {
-    const response = await fetch('/api/v1/preferences/');
+    const response = await fetch('/api/v1/preferences/user');
     if (response.ok) {
       const preferences = await response.json();
       return preferences.user[key] || preferences.defaults[key];

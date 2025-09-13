@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // בדוק אם יש מערכת מובנית לניקוי console
     if (window.manualClearConsole) {
-      console.log('🔗 מערכת מובנית לניקוי console זמינה (preferences-v2.js)');
+      console.log('🔗 מערכת מובנית לניקוי console זמינה (preferences-new.js)');
     } else {
       console.log('ℹ️ מערכת מובנית לניקוי console לא זמינה - ניקוי ידני בלבד');
     }

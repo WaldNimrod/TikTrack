@@ -7,7 +7,7 @@
  *
  * This file has undergone significant refactoring to improve code organization:
  *
- * ORIGINAL STATE (v2.2):
+ * ORIGINAL STATE (2.2):
  * - 2153 lines of mixed functionality
  * - Duplicate functions across multiple files
  * - Difficult to maintain and debug

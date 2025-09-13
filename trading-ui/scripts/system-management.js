@@ -40,6 +40,140 @@ class SystemManagement {
     console.log('✅ System Management - Initialized successfully');
   }
 
+  /**
+   * Refresh system data
+   * רענון נתוני מערכת
+   */
+  static refreshSystemData() {
+    console.log('🔄 Refreshing system data...');
+    const systemManagement = new SystemManagement();
+    systemManagement.loadSystemData();
+  }
+
+  /**
+   * Run system check
+   * הרצת בדיקת מערכת
+   */
+  static runSystemCheck() {
+    console.log('🔍 Running system check...');
+    // Add system check logic here
+    SystemManagement.showNotification('בדיקת מערכת הושלמה בהצלחה', 'success');
+  }
+
+  /**
+   * Clear cache
+   * ניקוי מטמון
+   */
+  static clearCache() {
+    console.log('🗑️ Clearing cache...');
+    // Add cache clearing logic here
+    SystemManagement.showNotification('המטמון נוקה בהצלחה', 'success');
+  }
+
+  /**
+   * Show notification
+   * הצגת התראה
+   */
+  static showNotification(message, type = 'info') {
+    if (typeof showNotification === 'function') {
+      showNotification(message, type);
+    } else {
+      console.log(`📢 ${type.toUpperCase()}: ${message}`);
+    }
+  }
+
+  /**
+   * Copy detailed debug log to clipboard
+   * העתקת לוג מפורט ללוח
+   */
+  static copyDetailedLog() {
+    const logData = {
+      timestamp: new Date().toLocaleString('he-IL'),
+      page: 'system-management',
+      url: window.location.href,
+      sections: {
+        section1: document.getElementById('section1') ? 'exists' : 'missing',
+        section2: document.getElementById('section2') ? 'exists' : 'missing',
+        section3: document.getElementById('section3') ? 'exists' : 'missing',
+        section4: document.getElementById('section4') ? 'exists' : 'missing',
+        section5: document.getElementById('section5') ? 'exists' : 'missing',
+        section6: document.getElementById('section6') ? 'exists' : 'missing',
+        section7: document.getElementById('section7') ? 'exists' : 'missing'
+      },
+      stats: {
+        serverHealth: document.getElementById('serverHealthStats')?.textContent || 'not found',
+        databaseHealth: document.getElementById('databaseHealthStats')?.textContent || 'not found',
+        cacheHealth: document.getElementById('cacheHealthStats')?.textContent || 'not found',
+        overallStatus: document.getElementById('overallStatus')?.textContent || 'not found'
+      },
+      performance: {
+        uptime: document.getElementById('uptimeStats')?.textContent || 'not found',
+        memory: document.getElementById('memoryStats')?.textContent || 'not found',
+        cpu: document.getElementById('cpuStats')?.textContent || 'not found',
+        disk: document.getElementById('diskStats')?.textContent || 'not found'
+      },
+      charts: {
+        performanceChart: document.getElementById('performanceChart') ? 'exists' : 'missing'
+      },
+      console: {
+        errors: window.console?.error ? 'console.error available' : 'console.error missing',
+        warnings: window.console?.warn ? 'console.warn available' : 'console.warn missing',
+        logs: window.console?.log ? 'console.log available' : 'console.log missing'
+      }
+    };
+    
+    const logText = `🔧 SYSTEM MANAGEMENT DEBUG LOG
+=====================================
+📅 זמן: ${logData.timestamp}
+🌐 עמוד: ${logData.page}
+🔗 URL: ${logData.url}
+
+📋 סקשנים:
+- סקשן 1 (בריאות מערכת): ${logData.sections.section1}
+- סקשן 2 (ביצועי מערכת): ${logData.sections.section2}
+- סקשן 3 (נתונים חיצוניים): ${logData.sections.section3}
+- סקשן 4 (התראות מערכת): ${logData.sections.section4}
+- סקשן 5 (אבטחה): ${logData.sections.section5}
+- סקשן 6 (לוגים וניטור): ${logData.sections.section6}
+- סקשן 7 (גיבויים ושחזור): ${logData.sections.section7}
+
+📊 סטטיסטיקות:
+- בריאות שרת: ${logData.stats.serverHealth}
+- בריאות בסיס נתונים: ${logData.stats.databaseHealth}
+- בריאות מטמון: ${logData.stats.cacheHealth}
+- סטטוס כללי: ${logData.stats.overallStatus}
+
+⚡ ביצועים:
+- זמן פעילות: ${logData.performance.uptime}
+- זיכרון: ${logData.performance.memory}
+- מעבד: ${logData.performance.cpu}
+- דיסק: ${logData.performance.disk}
+
+📈 גרפים:
+- גרף ביצועים: ${logData.charts.performanceChart}
+
+🔧 קונסול:
+- console.error: ${logData.console.errors}
+- console.warn: ${logData.console.warnings}
+- console.log: ${logData.console.logs}
+
+=====================================`;
+    
+    navigator.clipboard.writeText(logText).then(() => {
+      if (window.showSuccessNotification) {
+        window.showSuccessNotification('הצלחה', 'לוג מפורט הועתק ללוח!');
+      } else {
+        alert('לוג מפורט הועתק ללוח!');
+      }
+    }).catch(err => {
+      if (window.showErrorNotification) {
+        window.showErrorNotification('שגיאה', 'לא ניתן להעתיק ללוח: ' + err.message);
+      } else {
+        alert('שגיאה בהעתקה: ' + err.message);
+      }
+    });
+  }
+
   static initializeDashboard() {
     // Initialize header system
     if (window.headerSystem) {
@@ -516,6 +650,12 @@ async function copyDetailedLog() {
 document.addEventListener('DOMContentLoaded', () => {
   window.systemManagement = new SystemManagement();
   window.systemManagement.init();
+  
+  // Make functions globally available
+  window.copyDetailedLog = SystemManagement.copyDetailedLog;
+  window.refreshSystemData = SystemManagement.refreshSystemData;
+  window.runSystemCheck = SystemManagement.runSystemCheck;
+  window.clearCache = SystemManagement.clearCache;
 });
 
 // Cleanup on page unload

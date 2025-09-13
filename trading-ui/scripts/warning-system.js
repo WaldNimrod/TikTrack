@@ -207,39 +207,12 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
     // המודל הוצג בהצלחה
   } catch (error) {
     // fallback ל-confirm רגיל
-    if (typeof window.showConfirmationDialog === 'function') {
-      window.showConfirmationDialog(
-        'אישור',
-        message,
-        onConfirm,
-      );
-    } else {
-      if (typeof window.showConfirmationDialog === 'function') {
-        window.showConfirmationDialog(
-          'אישור',
-          message,
-          onConfirm,
-          onCancel,
-        );
-      } else {
-        const confirmed = typeof showConfirmationDialog === 'function' ? 
-          await new Promise(resolve => {
-            showConfirmationDialog(
-              message,
-              () => resolve(true),
-              () => resolve(false),
-              'אישור',
-              'אישור',
-              'ביטול'
-            );
-          }) : 
-          window.confirm(message);
-        if (confirmed && onConfirm) {
-          onConfirm();
-        } else if (!confirmed && onCancel) {
-          onCancel();
-        }
-      }
+    console.error('Bootstrap Modal Error:', error);
+    const confirmed = window.confirm(message);
+    if (confirmed && onConfirm) {
+      onConfirm();
+    } else if (!confirmed && onCancel) {
+      onCancel();
     }
   }
 }

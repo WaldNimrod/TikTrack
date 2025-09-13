@@ -1,14 +1,67 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
-            <!-- ===== CSS Architecture - Unified CSS ===== -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>עמוד העדפות - TikTrack</title>
+    
+    <!-- 
+    CSS Loading Order - ראו: documentation/frontend/css/CSS_ARCHITECTURE.md
+    Bootstrap חייב להיטען לפני CSS שלנו כדי ש-CSS שלנו יוכל לדרוס אותו
+    -->
+    
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- Unified CSS -->
-    <link rel="stylesheet" href="styles-new/unified.css?v=v1.4.0">
+    <!-- Unified CSS - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=v1.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=v1.0.0">
     
     <!-- Header Styles -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=v38_fixed">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js?v=v34_fixes"></script>
+    
+    <!-- Dynamic Color System Scripts -->
+    <script src="scripts/color-scheme-system.js"></script>
+    
+    <!-- Preferences System Scripts -->
+    <script src="scripts/preferences.js?v=v1.0.1_color_fixes"></script>
+    
+    <!-- Color Demo Toggle Script -->
+    <script src="scripts/color-demo-toggle.js"></script>
+    
+    <!-- UI Utils Script -->
+    <script src="scripts/ui-utils.js"></script>
+</head>
 
 <body>
     <div class="background-wrapper">
@@ -30,12 +83,12 @@
         </div>
         <div class="section-body">
           <div class="preferences-header slide-in">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="preferences-header-row">
           <div>
             <h1><i class="bi bi-gear-fill"></i> הגדרות מערכת</h1>
             <p>מערכת הגדרות מתקדמת עם כל השדות הנדרשים - בסיסיות, עיצובים, מערכת, נתונים חיצוניים ומתקדמות</p>
           </div>
-          <div class="d-flex gap-3">
+          <div class="preferences-buttons-row">
             <button class="btn btn-outline-success" onclick="exportPreferences()">
               <i class="bi bi-download"></i> יצא הגדרות
             </button>
@@ -49,7 +102,7 @@
       
       <!-- בחירת פרופיל -->
       <div class="profile-selector slide-in">
-        <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="preferences-section-header">
           <h4><i class="bi bi-person-circle"></i> פרופילי הגדרות</h4>
           <button class="btn btn-outline-primary btn-sm" onclick="createNewProfile()">
             <i class="bi bi-plus-circle"></i> פרופיל חדש
@@ -60,7 +113,7 @@
           <!-- פרופילים יטענו דינמית -->
         </div>
         
-        <div class="d-flex gap-3 mt-3 button-row">
+        <div class="preferences-buttons-row mt-3">
           <button class="btn btn-outline-danger btn-sm" onclick="deleteCurrentProfile()" id="deleteProfileBtn">
             <i class="bi bi-trash"></i> מחק פרופיל
           </button>
@@ -75,7 +128,7 @@
       
       <!-- התראת מערכת חדשה -->
       <div class="alert alert-info-modern">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="preferences-header-row">
           <div>
             <h5><i class="bi bi-stars"></i> ברוכים הבאים למערכת ההעדפות!</h5>
             <p class="mb-0">מערכת מתקדמת עם פרופילים מרובים, יבוא/יצוא, היסטוריית שינויים ועוד תכונות חדשות</p>
@@ -91,7 +144,7 @@
       
       <!-- התראת מיגרציה -->
       <div class="alert alert-info-modern d-none" id="migrationAlert">
-        <div class="d-flex justify-content-between align-items-center">
+        <div class="preferences-header-row">
           <div>
             <h5><i class="bi bi-info-circle"></i> מיגרציה מV1</h5>
             <p class="mb-0">זוהו הגדרות ישנות. ברצונך לעדכן למערכת החדשה?</p>
@@ -103,30 +156,22 @@
       </div>
       
       <!-- סטטיסטיקות מערכת -->
-      <div class="row mb-4">
-        <div class="col-md-3 mb-3">
-          <div class="stats-card">
-            <h4 id="totalProfiles">0</h4>
-            <p>פרופילים</p>
-          </div>
+      <div class="preferences-grid mb-4">
+        <div class="stats-card">
+          <h4 id="totalProfiles">0</h4>
+          <p>פרופילים</p>
         </div>
-        <div class="col-md-3 mb-3">
-          <div class="stats-card">
-            <h4 id="settingsCount">0</h4>
-            <p>הגדרות</p>
-          </div>
+        <div class="stats-card">
+          <h4 id="settingsCount">0</h4>
+          <p>הגדרות</p>
         </div>
-        <div class="col-md-3 mb-3">
-          <div class="stats-card">
-            <h4 id="lastUpdate">-</h4>
-            <p>עדכון אחרון</p>
-          </div>
+        <div class="stats-card">
+          <h4 id="lastUpdate">-</h4>
+          <p>עדכון אחרון</p>
         </div>
-        <div class="col-md-3 mb-3">
-          <div class="stats-card">
-            <h4 id="validationStatus">✅</h4>
-            <p>תקינות</p>
-          </div>
+        <div class="stats-card">
+          <h4 id="validationStatus">✅</h4>
+          <p>תקינות</p>
         </div>
       </div>
       
@@ -444,7 +489,7 @@
               <p>בחר ערכת נושא עיקרית למערכת</p>
             </div>
             <div class="setting-control">
-              <div class="d-flex gap-3">
+              <div class="preferences-buttons-row">
                 <div class="form-check">
                   <input class="form-check-input" type="radio" name="theme" value="light" id="themeLight" checked>
                   <label class="form-check-label" for="themeLight">🌞 בהיר</label>
@@ -471,7 +516,7 @@
               <div class="row g-2">
                 <div class="col-4 text-center">
                   <label class="form-label small">רווחים</label>
-                  <div class="color-picker-group justify-content-center">
+                  <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-success"
                          onclick="openColorPicker('positive')"></div>
                     <input type="color" id="positiveColor" class="d-none" value="#28a745">
@@ -479,7 +524,7 @@
                 </div>
                 <div class="col-4 text-center">
                   <label class="form-label small">הפסדים</label>
-                  <div class="color-picker-group justify-content-center">
+                  <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-danger"
                          onclick="openColorPicker('negative')"></div>
                     <input type="color" id="negativeColor" class="d-none" value="#dc3545">
@@ -487,7 +532,7 @@
                 </div>
                 <div class="col-4 text-center">
                   <label class="form-label small">אפס</label>
-                  <div class="color-picker-group justify-content-center">
+                  <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-secondary"
                          onclick="openColorPicker('zero')"></div>
                     <input type="color" id="zeroColor" class="d-none" value="#6c757d">
@@ -498,7 +543,7 @@
           </div>
           
           <!-- צבעי ישויות -->
-          <div class="setting-item">
+          <div class="setting-item full-width">
             <div class="setting-label">
               <h5>🏷️ צבעי ישויות</h5>
               <p>צבעי טריידים, חשבונות, טיקרים והתראות</p>
@@ -507,60 +552,68 @@
               <div class="row g-2">
                 <div class="col-3 text-center">
                   <label class="form-label small">טריידים</label>
-                  <div class="color-picker-group justify-content-center">
+                  <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-primary"
-                         onclick="openEntityColorPicker('trade')"></div>
+                         onclick="openColorPicker('trade')"></div>
+                    <input type="color" id="tradeColor" class="d-none" value="#007bff">
                   </div>
                 </div>
                 <div class="col-3 text-center">
                   <label class="form-label small">חשבונות</label>
-                  <div class="color-picker-group justify-content-center">
+                  <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-purple"
-                         onclick="openEntityColorPicker('account')"></div>
+                         onclick="openColorPicker('account')"></div>
+                    <input type="color" id="accountColor" class="d-none" value="#6f42c1">
                   </div>
                 </div>
                 <div class="col-3 text-center">
                   <label class="form-label small">טיקרים</label>
-                  <div class="color-picker-group justify-content-center">
+                  <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-teal"
-                         onclick="openEntityColorPicker('ticker')"></div>
+                         onclick="openColorPicker('ticker')"></div>
+                    <input type="color" id="tickerColor" class="d-none" value="#20c997">
                   </div>
                 </div>
                 <div class="col-3 text-center">
                   <label class="form-label small">התראות</label>
-                  <div class="color-picker-group justify-content-center">
+                  <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-warning"
-                         onclick="openEntityColorPicker('alert')"></div>
+                         onclick="openColorPicker('alert')"></div>
+                    <input type="color" id="alertColor" class="d-none" value="#ffc107">
                   </div>
                 </div>
               </div>
               <div class="row g-2 mt-2">
                 <div class="col-3 text-center">
                   <label class="form-label small">עסקאות</label>
-                  <div class="color-picker-group justify-content-center">
+                  <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-indigo"
-                         onclick="openEntityColorPicker('execution')"></div>
+                         onclick="openColorPicker('execution')"></div>
+                    <input type="color" id="executionColor" class="d-none" value="#6610f2">
                   </div>
                 </div>
                 <div class="col-3 text-center">
                   <label class="form-label small">תזרים מזומנים</label>
-                  <div class="color-picker-group justify-content-center">
+                  <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-info"
-                         onclick="openEntityColorPicker('cashflow')"></div>
+                         onclick="openColorPicker('cashflow')"></div>
+                    <input type="color" id="cashflowColor" class="d-none" value="#17a2b8">
                   </div>
                 </div>
                 <div class="col-3 text-center">
                   <label class="form-label small">תכנוני השקעה</label>
-                  <div class="color-picker-group justify-content-center">
+                  <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-orange"
-                         onclick="openEntityColorPicker('tradeplan')"></div>
+                         onclick="openColorPicker('tradeplan')"></div>
+                    <input type="color" id="tradeplanColor" class="d-none" value="#fd7e14">
                   </div>
                 </div>
                 <div class="col-3 text-center">
                   <label class="form-label small">הערות</label>
-                  <div class="color-picker-group justify-content-center">
+                  <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-secondary"
-                         onclick="openEntityColorPicker('note')"></div>
+                         onclick="openColorPicker('note')"></div>
+                    <input type="color" id="noteColor" class="d-none" value="#6c757d">
                   </div>
                 </div>
               </div>
@@ -568,7 +621,7 @@
           </div>
           
           <!-- צבעי סטטוסים -->
-          <div class="setting-item">
+          <div class="setting-item full-width">
             <div class="setting-label">
               <h5>📊 צבעי סטטוסים</h5>
               <p>צבעי סטטוסי טריידים (פתוח, סגור, מבוטל)</p>
@@ -577,23 +630,26 @@
               <div class="row g-2">
                 <div class="col-4 text-center">
                   <label class="form-label small">פתוח</label>
-                  <div class="color-picker-group justify-content-center">
+                  <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-success"
-                         onclick="openStatusColorPicker('open')"></div>
+                         onclick="openColorPicker('statusOpen')"></div>
+                    <input type="color" id="statusOpenColor" class="d-none" value="#28a745">
                   </div>
                 </div>
                 <div class="col-4 text-center">
                   <label class="form-label small">סגור</label>
-                  <div class="color-picker-group justify-content-center">
+                  <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-secondary"
-                         onclick="openStatusColorPicker('closed')"></div>
+                         onclick="openColorPicker('statusClosed')"></div>
+                    <input type="color" id="statusClosedColor" class="d-none" value="#6c757d">
                   </div>
                 </div>
                 <div class="col-4 text-center">
                   <label class="form-label small">מבוטל</label>
-                  <div class="color-picker-group justify-content-center">
+                  <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-danger"
-                         onclick="openStatusColorPicker('cancelled')"></div>
+                         onclick="openColorPicker('statusCancelled')"></div>
+                    <input type="color" id="statusCancelledColor" class="d-none" value="#dc3545">
                   </div>
                 </div>
               </div>
@@ -601,7 +657,7 @@
           </div>
           
           <!-- צבעי סוגי השקעה -->
-          <div class="setting-item">
+          <div class="setting-item full-width">
             <div class="setting-label">
               <h5>💼 צבעי סוגי השקעה</h5>
               <p>צבעי סוגי השקעה (סווינג, השקעה, פאסיבי)</p>
@@ -610,23 +666,26 @@
               <div class="row g-2">
                 <div class="col-4 text-center">
                   <label class="form-label small">סווינג</label>
-                  <div class="color-picker-group justify-content-center">
+                  <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-primary"
-                         onclick="openInvestmentColorPicker('swing')"></div>
+                         onclick="openColorPicker('investmentSwing')"></div>
+                    <input type="color" id="investmentSwingColor" class="d-none" value="#007bff">
                   </div>
                 </div>
                 <div class="col-4 text-center">
                   <label class="form-label small">השקעה</label>
-                  <div class="color-picker-group justify-content-center">
+                  <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-success"
-                         onclick="openInvestmentColorPicker('investment')"></div>
+                         onclick="openColorPicker('investmentInvestment')"></div>
+                    <input type="color" id="investmentInvestmentColor" class="d-none" value="#28a745">
                   </div>
                 </div>
                 <div class="col-4 text-center">
                   <label class="form-label small">פאסיבי</label>
-                  <div class="color-picker-group justify-content-center">
+                  <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-warning"
-                         onclick="openInvestmentColorPicker('passive')"></div>
+                         onclick="openColorPicker('investmentPassive')"></div>
+                    <input type="color" id="investmentPassiveColor" class="d-none" value="#ffc107">
                   </div>
                 </div>
               </div>
@@ -1053,18 +1112,6 @@
   
   <!-- Hidden file input for import -->
   <input type="file" id="importFileInput" class="d-none" accept=".json" onchange="handleFileImport(event)">
-  
-    <!-- Header System Script -->
-    <script src="scripts/header-system.js?v=v34_fixes"></script>
-    
-    <!-- Dynamic Color System Scripts -->
-    <script src="scripts/color-scheme-system.js"></script>
-    
-    <!-- Preferences System Scripts -->
-    <script src="scripts/preferences.js"></script>
-    
-    <!-- Color Demo Toggle Script -->
-    <script src="scripts/color-demo-toggle.js"></script>
   
 </body>
 </html>

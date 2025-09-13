@@ -40,6 +40,15 @@
   text-align: right;
 }
 
+/* Main content container */
+.main-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* Container with border */
 .container-with-border {
   background: var(--apple-bg-elevated);

@@ -670,7 +670,6 @@ async function enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction
       await new Promise(resolve => setTimeout(resolve, delay));
     }
     
-    console.log(`🔄 רענון נתונים אחרי ${operationName}`);
     
     // טעינת נתונים חדשים
     if (typeof loadDataFunction === 'function') {
@@ -682,7 +681,6 @@ async function enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction
       await updateActiveFieldsFunction();
     }
     
-    console.log(`✅ רענון הטבלה הושלם אחרי ${operationName}`);
     
     return true;
   } catch (error) {
@@ -848,7 +846,6 @@ async function autoRefreshCurrentPage(operationName = 'פעולה') {
  * Handles opening/closing of top sections across all pages
  */
 window.toggleTopSection = function () {
-  console.log('🔧 ui-utils.js toggleTopSection called');
   const currentPath = window.location.pathname;
 
   // Special handling for notes page
@@ -877,21 +874,6 @@ window.toggleTopSection = function () {
   const toggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
   const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
   
-  console.log('🔍 toggleTopSection elements found:', {
-    section: !!section,
-    toggleBtn: !!toggleBtn,
-    icon: !!icon,
-    currentPath: currentPath
-  });
-  
-  if (section) {
-    console.log('📊 Section state:', {
-      display: section.style.display,
-      hasCollapsed: section.classList.contains('collapsed'),
-      isHidden: section.style.display === 'none'
-    });
-  }
-
   if (section) {
     const isCollapsed = section.classList.contains('collapsed') || section.style.display === 'none';
 
@@ -947,7 +929,6 @@ window.toggleTopSection = function () {
  * Handles opening/closing of main content sections across all pages
  */
 window.toggleMainSection = function () {
-  console.log('🔧 ui-utils.js toggleMainSection called');
   const currentPath = window.location.pathname;
 
   // Special handling for notes page
@@ -1003,28 +984,11 @@ window.toggleMainSection = function () {
  * @param {string} sectionId - The ID of the section to toggle
  */
 window.toggleSection = function (sectionId) {
-  console.log('🔧 ui-utils.js toggleSection called with:', sectionId);
   
   const section = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId}"]`);
   const sectionBody = section ? section.querySelector('.section-body') : null;
   const toggleBtn = section ? section.querySelector('button[onclick*="toggleSection"]') : null;
   const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
-  
-  console.log('🔍 toggleSection elements found:', {
-    sectionId: sectionId,
-    section: !!section,
-    sectionBody: !!sectionBody,
-    toggleBtn: !!toggleBtn,
-    icon: !!icon
-  });
-  
-  if (sectionBody) {
-    console.log('📊 Section body state:', {
-      display: sectionBody.style.display,
-      hasCollapsed: sectionBody.classList.contains('collapsed'),
-      isHidden: sectionBody.style.display === 'none'
-    });
-  }
   
   if (sectionBody) {
     const isCollapsed = sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none';
@@ -1045,7 +1009,6 @@ window.toggleSection = function (sectionId) {
     // Save state
     localStorage.setItem(`${sectionId}SectionHidden`, sectionBody.style.display === 'none');
     
-    console.log(`✅ Section ${sectionId} toggled:`, sectionBody.style.display === 'none' ? 'collapsed' : 'expanded');
   } else {
     console.warn(`❌ Section ${sectionId} not found`);
   }
@@ -1088,7 +1051,6 @@ window.toggleAllSections = function () {
     }
   });
 
-  console.log(`✅ All sections ${allCollapsed ? 'opened' : 'closed'}`);
 };
 
 /**
@@ -1126,7 +1088,6 @@ window.restoreSectionStates = function () {
     }
   });
 
-  console.log('✅ Section states restored from localStorage');
 };
 
 // ===== ACTION BUTTONS SYSTEM =====
@@ -1150,7 +1111,6 @@ window.restoreSectionStates = function () {
  * @returns {string} HTML string for action buttons
  */
 function generateActionButtons(entityId, entityType, status, detailsFunction, linkedFunction, editFunction, cancelFunction, restoreFunction, deleteFunction, showDetails = true, showLinked = true, showEdit = true, showCancel = true, showDelete = true) {
-  console.log('🔧 generateActionButtons called with:', {entityId, entityType, status, detailsFunction, linkedFunction, editFunction, cancelFunction, restoreFunction, deleteFunction, showDetails, showLinked, showEdit, showCancel, showDelete});
   let buttonsHtml = '<div class="btn-group">';
 
   // Details button
@@ -1200,7 +1160,6 @@ function generateActionButtons(entityId, entityType, status, detailsFunction, li
   }
 
   buttonsHtml += '</div>';
-  console.log('🔧 generateActionButtons returning HTML:', buttonsHtml);
   return buttonsHtml;
 }
 
@@ -1255,7 +1214,6 @@ window.restoreSectionStates = window.restoreSectionStates;
 
 // Export action buttons system
 window.generateActionButtons = generateActionButtons;
-console.log('✅ generateActionButtons function exported to window');
 
 /**
  * פונקציה לטעינת כפתורי פעולות לכל הטבלה
@@ -1271,7 +1229,6 @@ function loadTableActionButtons(tableId, entityType, config = {}) {
   }
 
   const rows = table.querySelectorAll('tbody tr');
-  console.log(`🔧 Loading action buttons for ${rows.length} rows in table ${tableId}`);
 
   rows.forEach((row, index) => {
     const actionsCell = row.querySelector('.actions-cell');
@@ -1323,12 +1280,10 @@ function loadTableActionButtons(tableId, entityType, config = {}) {
     actionsCell.innerHTML = buttonsHtml;
   });
 
-  console.log(`✅ Action buttons loaded for ${rows.length} rows`);
 }
 
 // Export the new function
 window.loadTableActionButtons = loadTableActionButtons;
-console.log('✅ loadTableActionButtons function exported to window');
 
 // Export demo functions for testing
 window.viewTickerDetails = viewTickerDetails;
@@ -1358,7 +1313,6 @@ document.addEventListener('DOMContentLoaded', () => {
  * Used for the main top section of each page
  */
 function toggleTopSection() {
-  console.log('🔧 ui-utils.js toggleTopSection called');
   
   const topSection = document.querySelector('.top-section');
   if (!topSection) {
@@ -1393,7 +1347,6 @@ function toggleTopSection() {
  * @param {string} sectionId - The ID of the section to toggle
  */
 function toggleSection(sectionId) {
-  console.log(`🔧 ui-utils.js toggleSection called with: ${sectionId}`);
   
   const section = document.getElementById(sectionId);
   if (!section) {
@@ -1449,7 +1402,6 @@ function toggleAllSections() {
     }
   });
   
-  console.log(`✅ All sections ${allCollapsed ? 'expanded' : 'collapsed'}`);
 }
 
 /**
@@ -1457,7 +1409,6 @@ function toggleAllSections() {
  * Called on page load to restore previous section states
  */
 function loadSectionStates() {
-  console.log('🔧 ui-utils.js loadSectionStates called');
   
   const sections = document.querySelectorAll('.content-section, .top-section');
   
@@ -1474,7 +1425,6 @@ function loadSectionStates() {
     }
   });
   
-  console.log('✅ Section states loaded from localStorage');
 }
 
 // Export functions to global scope

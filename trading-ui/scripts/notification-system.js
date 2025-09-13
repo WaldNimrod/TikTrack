@@ -110,46 +110,82 @@ function getNotificationIcon(type) {
  * @param {number} duration - Optional duration in milliseconds (default: 5000)
  */
 function showNotification(message, type = 'info', title = 'מערכת', duration = 5000) {
+  console.log('🔔 showNotification נקרא:', { message, type, title, duration });
+  
   // אם מרכז ההתראות זמין, הוסף את ההתראה אליו
   if (window.notificationsCenter && typeof window.notificationsCenter.addNotification === 'function') {
+    console.log('✅ מוסיף התראה למרכז התראות');
     window.notificationsCenter.addNotification(type, title, message);
   }
 
-  // הצגת התראה מיידית בממשק (אם לא במרכז ההתראות)
-  if (!window.location.pathname.includes('notifications-center')) {
-    const container = createNotificationContainer();
-    
-    const notification = document.createElement('div');
-    notification.className = `notification ${type} show`;
-    
-    notification.innerHTML = `
-      <div class="notification-icon">
-        <i class="fas ${getNotificationIcon(type)}"></i>
-      </div>
-      <div class="notification-content">
-        <div class="notification-title">${title}</div>
-        <div class="notification-message">${message}</div>
-      </div>
-      <button type="button" class="notification-close" onclick="this.parentElement.remove()">
-        <i class="fas fa-times"></i>
-      </button>
-    `;
+  // הצגת התראה מיידית בממשק (תמיד)
+  console.log('🔧 יוצר קונטיינר התראות...');
+  const container = createNotificationContainer();
+  console.log('✅ קונטיינר נוצר:', container);
+  
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  
+  notification.innerHTML = `
+    <div class="notification-icon">
+      <i class="fas ${getNotificationIcon(type)}"></i>
+    </div>
+    <div class="notification-content">
+      <div class="notification-title">${title}</div>
+      <div class="notification-message">${message}</div>
+    </div>
+    <button type="button" class="notification-close" onclick="this.parentElement.remove()">
+      <i class="fas fa-times"></i>
+    </button>
+  `;
 
-    container.appendChild(notification);
+  console.log('🔧 מוסיף התראה לקונטיינר...');
+  container.appendChild(notification);
+  console.log('✅ התראה נוספה לקונטיינר');
 
-    // הסרה אוטומטית
-    setTimeout(() => {
-      hideNotification(notification);
-    }, duration);
-  }
+  // הוספת קלאס show אחרי שהאלמנט נוסף ל-DOM
+  setTimeout(() => {
+    console.log('🔧 מוסיף קלאס show...');
+    notification.classList.add('show');
+    console.log('✅ קלאס show נוסף');
+    
+    // בדיקת סגנונות מחושבים להתראה
+    const computedStyle = window.getComputedStyle(notification);
+    console.log('🔍 סגנונות מחושבים להתראה:');
+    console.log('  background:', computedStyle.background);
+    console.log('  border:', computedStyle.border);
+    console.log('  border-radius:', computedStyle.borderRadius);
+    console.log('  transform:', computedStyle.transform);
+    console.log('  opacity:', computedStyle.opacity);
+    console.log('  display:', computedStyle.display);
+    console.log('  position:', computedStyle.position);
+    
+    // בדיקת סגנונות notification
+    const styleSheets = Array.from(document.styleSheets);
+    const notificationStyles = Array.from(styleSheets).map(sheet => {
+      try {
+        const rules = Array.from(sheet.cssRules || sheet.rules || []);
+        return rules.filter(rule => 
+          rule.selectorText && rule.selectorText.includes('notification')
+        );
+      } catch (e) {
+        return [];
+      }
+    }).flat();
+    console.log('🔍 סגנונות notification נמצאו:', notificationStyles.length);
+    notificationStyles.forEach(rule => {
+      console.log('    כלל:', rule.selectorText);
+    });
+  }, 10);
+
+  // הסרה אוטומטית
+  setTimeout(() => {
+    console.log('🔧 מסיר התראה אוטומטית...');
+    hideNotification(notification);
+  }, duration);
 }
 
-// ייצוא הפונקציה הגלובלית
-window.showNotification = showNotification;
-window.showSuccessNotification = (message, title = 'הצלחה') => showNotification(message, 'success', title);
-window.showErrorNotification = (message, title = 'שגיאה') => showNotification(message, 'error', title);
-window.showWarningNotification = (message, title = 'אזהרה') => showNotification(message, 'warning', title);
-window.showInfoNotification = (message, title = 'מידע') => showNotification(message, 'info', title);
+// ייצוא הפונקציה הגלובלית - יועבר למטה
 
 // ===== LINKED ITEMS SYSTEM FUNCTIONS =====
 // These functions handle linked items display and management
@@ -180,15 +216,58 @@ async function loadLinkedItemsData(itemType, itemId) {
  * @returns {HTMLElement} Notification container element
  */
 function createNotificationContainer() {
+  console.log('🔧 createNotificationContainer נקרא');
   let container = document.getElementById('notification-container');
+  console.log('🔍 קונטיינר קיים?', !!container);
 
   if (!container) {
+    console.log('🔧 יוצר קונטיינר חדש...');
     container = document.createElement('div');
     container.id = 'notification-container';
     container.className = 'notification-container';
     document.body.appendChild(container);
+    console.log('✅ קונטיינר נוצר ונוסף ל-DOM');
+    
+    // בדיקת סגנונות מחושבים
+    const computedStyle = window.getComputedStyle(container);
+    console.log('🔍 סגנונות מחושבים לקונטיינר:');
+    console.log('  position:', computedStyle.position);
+    console.log('  top:', computedStyle.top);
+    console.log('  right:', computedStyle.right);
+    console.log('  z-index:', computedStyle.zIndex);
+    console.log('  max-width:', computedStyle.maxWidth);
+    
+    // בדיקת טעינת CSS
+    console.log('🔍 בדיקת טעינת CSS:');
+    const styleSheets = Array.from(document.styleSheets);
+    const headerCss = styleSheets.find(sheet => 
+      sheet.href && sheet.href.includes('header-styles.css')
+    );
+    console.log('  header-styles.css נטען?', !!headerCss);
+    if (headerCss) {
+      console.log('  header-styles.css URL:', headerCss.href);
+    }
+    
+    // בדיקת סגנונות notification-container
+    const notificationStyles = Array.from(styleSheets).map(sheet => {
+      try {
+        const rules = Array.from(sheet.cssRules || sheet.rules || []);
+        return rules.filter(rule => 
+          rule.selectorText && rule.selectorText.includes('notification-container')
+        );
+      } catch (e) {
+        return [];
+      }
+    }).flat();
+    console.log('  סגנונות notification-container נמצאו:', notificationStyles.length);
+    notificationStyles.forEach(rule => {
+      console.log('    כלל:', rule.selectorText);
+    });
+  } else {
+    console.log('✅ קונטיינר קיים');
   }
 
+  console.log('🔍 קונטיינר סופי:', container);
   return container;
 }
 
@@ -212,23 +291,7 @@ function hideNotification(notification) {
   }
 }
 
-/**
- * Get notification icon by type
- * NOTIFICATION SYSTEM - Returns appropriate icon for notification type
- *
- * @param {string} type - Notification type
- * @returns {string} Icon HTML
- */
-function getNotificationIcon(type) {
-  const icons = {
-    success: '✅',
-    error: '❌',
-    warning: '⚠️',
-    info: 'ℹ️',
-  };
-
-  return icons[type] || icons.info;
-}
+// This function is already defined above - removing duplicate
 
 // ===== SPECIFIC NOTIFICATION FUNCTIONS =====
 // These are convenience functions for different notification types

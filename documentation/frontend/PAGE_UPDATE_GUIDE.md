@@ -1,10 +1,12 @@
-# מדריך בניית עמוד - גרסה 2
+# Page Building Guide - Version 2.2
 
-> 📋 **מדריך מפורט**: בניית עמוד חדש או עדכון עמוד קיים לתבנית הבסיס החדשה עם מבנה סקשנים נכון
+> 📋 **Comprehensive Guide**: Building a new page or updating an existing page to the new base template with proper section structure
 
-## סקירה כללית
+## Overview
 
-מדריך זה מתאר את התהליך המלא לבניית עמוד חדש או עדכון עמוד קיים לתבנית הבסיס החדשה עם מבנה סקשנים נכון, תפריט מאוחד, וסגנונות מופרדים.
+This guide describes the complete process for building a new page or updating an existing page to the new base template with proper section structure, unified menu, and separated styles.
+
+> ⚠️ **Important Warning!** Before starting work, it is **mandatory** to read the documentation of the systems relevant to the user interface. Without understanding these systems, the work may fail or create problems in the system.
 
 ## קבצים קשורים
 
@@ -15,54 +17,70 @@
 
 ## 📚 קריאת דוקומנטציה מומלצת
 
-לפני התחלת העבודה, מומלץ לקרוא את הדוקומנטציה הבאה:
-- **מבנה עמוד**: `documentation/frontend/PAGE_STRUCTURE_TEMPLATE.md`
-- **מערכת צבעים**: `documentation/frontend/DYNAMIC_COLORS_GUIDE.md`
-- **מערכת העדפות**: `documentation/features/preferences/README.md`
+> ⚠️ **חשוב מאוד!** לפני התחלת העבודה, **חובה** לקרוא את הדוקומנטציה הבאה:
+
+### 🔴 מערכות חובה - קריאה מוקדמת
+- **מערכת העדפות**: `documentation/features/preferences/README.md` - **חובה!** להבין את מערכת ההעדפות הגרסה הנכונה
+- **מערכת צבעים דינאמיים**: `documentation/frontend/DYNAMIC_COLORS_GUIDE.md` - **חובה!** להבין את מערכת הצבעים הדינאמית
+- **מערכת פתיחה/סגירה**: `documentation/frontend/SECTION_TOGGLE_SYSTEM.md` - **חובה!** להבין את מערכת פתיחה וסגירה של סקשנים
+- **מערכת התראות**: `documentation/frontend/NOTIFICATION_SYSTEM.md` - **חובה!** להבין את מערכת ההתראות וההודעות
+
+### 📖 מערכות נוספות - מומלץ
+- **מבנה עמוד**: `documentation/frontend/PAGE_STRUCTURE_TEMPLATE.md` - מבנה העמוד הסטנדרטי
+- **מערכת טבלאות**: `documentation/frontend/TABLE_SYSTEM.md` - מערכת הטבלאות
+- **מערכת פילטרים**: `documentation/frontend/FILTER_SYSTEM.md` - מערכת הפילטרים
 
 ## 📋 אינדקס שלבים
 
-### שלבים בסיסיים (1-5)
+### שלבים בסיסיים (1-6)
 - [שלב 1: יישום נכון של התפריט ואלמנט הראש](#שלב-1-יישום-נכון-של-התפריט-ואלמנט-הראש)
 - [שלב 2: הבנת התבנית הנעולה](#שלב-2-הבנת-התבנית-הנעולה)
 - [שלב 3: ניהול סקשנים בתבנית הנעולה](#שלב-3-ניהול-סקשנים-בתבנית-הנעולה)
 - [שלב 4: הזרקת תוכן לסקשנים](#שלב-4-הזרקת-תוכן-לסקשנים)
 - [שלב 5: בדיקות התבנית הנעולה](#שלב-5-בדיקות-התבנית-הנעולה)
-
-### שלבים פונקציונליים (6-10)
 - [שלב 6: הפעלת כפתורי הפתיחה/סגירה](#שלב-6-הפעלת-כפתורי-הפתיחהסגירה)
+
+### שלבים פונקציונליים (7-11)
 - [שלב 7: יצירת תבנית בסיס](#שלב-7-יצירת-תבנית-בסיס)
 - [שלב 8: העברת תוכן קיים](#שלב-8-העברת-תוכן-קיים)
 - [שלב 9: עדכון איקונים](#שלב-9-עדכון-איקונים)
 - [שלב 10: עדכון גרסאות cache busting](#שלב-10-עדכון-גרסאות-cache-busting)
-
-### שלבים טכניים (11-15)
 - [שלב 11: בדיקה ואימות](#שלב-11-בדיקה-ואימות)
+
+### שלבים טכניים (12-16)
 - [שלב 12: עדכון דוקומנטציה](#שלב-12-עדכון-דוקומנטציה)
 - [שלב 13: הוספת מזהי טבלאות](#שלב-13-הוספת-מזהי-טבלאות)
 - [שלב 14: בדיקה ותיקון כפתורי פתיחה וסגירה](#שלב-14-בדיקה-ותיקון-כפתורי-פתיחה-וסגירה)
 - [שלב 15: הפעלת מערכת הצבעים הדינמית](#שלב-15-הפעלת-מערכת-הצבעים-הדינמית)
 - [שלב 15.5: צביעת עמודת מחיר לפי השינוי](#שלב-155-צביעת-עמודת-מחיר-לפי-השינוי)
-
-### שלבים מתקדמים (16-20)
 - [שלב 16: יישום כפתורי כן/לא (Yes/No Buttons)](#שלב-16-יישום-כפתורי-כןלא-yesno-buttons)
+
+### שלבים מתקדמים (17-21)
 - [שלב 17: הגדרת רוחב עמודות טבלה דינמי](#שלב-17-הגדרת-רוחב-עמודות-טבלה-דינמי)
 - [שלב 18: חיבור מערכת הצבעים הדינמית ומערכת ההעדפות](#שלב-18-חיבור-מערכת-הצבעים-הדינמית-ומערכת-ההעדפות)
 - [שלב 19: ניקוי סקריפטים אינליין ו-CSS אינליין](#שלב-19-ניקוי-סקריפטים-אינליין-ו-css-אינליין)
 - [שלב 20: בדיקות חובה אחרי עדכון עמוד](#שלב-20-בדיקות-חובה-אחרי-עדכון-עמוד)
+- [שלב 21: גיבוי לגיט האב](#שלב-21-גיבוי-לגיט-האב)
 
-### שלבים סופיים (21-25)
+### שלבים סופיים (21-26)
 - [שלב 21: בדיקה חוזרת מול תבנית הבסיס](#שלב-21-בדיקה-חוזרת-מול-תבנית-הבסיס)
 - [שלב 22: גיבוי לגיט האב](#שלב-22-גיבוי-לגיט-האב)
 - [שלב 23: בדיקות נוספות לאימות מבנה תקין](#שלב-23-בדיקות-נוספות-לאימות-מבנה-תקין)
 - [שלב 24: בדיקת תוכן מחוץ לסקשנים](#שלב-24-בדיקת-תוכן-מחוץ-לסקשנים)
-- [שלב 25: עדכון רשימת המשימות והמדריך](#שלב-25-עדכון-רשימת-המשימות-והמדריך) ⚠️ **שלב אחרון תמיד**
+- [שלב 25: ניקוי קבצים זמניים וקבצי עבודה](#שלב-25-ניקוי-קבצים-זמניים-וקבצי-עבודה)
+- [שלב 26: עדכון רשימת המשימות והמדריך](#שלב-26-עדכון-רשימת-המשימות-והמדריך) ⚠️ **שלב אחרון תמיד**
 
 ## 🎯 תובנות מעשיות מהעבודה על עמודים
 
 > **חשוב**: לפני התחלת העבודה, מומלץ לקרוא את [סעיף 22: תובנות ודיוקים מהעבודה המעשית](#22-תובנות-מהעבודה-על-עמוד-בדיקת-כותרת-טבלאות-עזר-ותבנית-בסיס) שמכיל ניסיון מעשי מהעבודה על 5 עמודים, שגיאות נפוצות ופתרונות, ותהליך אופטימלי שפותח מהניסיון. כמו כן, מומלץ לקרוא את [סעיף 22.5: תובנות מהעבודה על עמוד הבית](#225-תובנות-מהעבודה-על-עמוד-הבית-דף-ראשי) שמכיל תובנות מהעבודה על עמוד מורכב עם 5 סקשנים, גרפים, וסקריפטים מורכבים. בנוסף, מומלץ לקרוא את [סעיף 22.7: תובנות מהעבודה על עמוד ההעדפות](#227-תובנות-מהעבודה-על-עמוד-ההעדפות) שמכיל תובנות מהעבודה על עמוד מורכב עם מערכת צבעים דינמית ומערכת העדפות מתקדמת.
 
 ## שלב 1: יישום נכון של התפריט ואלמנט הראש
+
+> ⚠️ **חשוב!** לפני התחלת שלב זה, **חובה** לקרוא את הדוקומנטציה של המערכות החובה:
+> - **מערכת העדפות**: `documentation/features/preferences/README.md`
+> - **מערכת צבעים דינאמיים**: `documentation/frontend/DYNAMIC_COLORS_GUIDE.md`
+> - **מערכת פתיחה/סגירה**: `documentation/frontend/SECTION_TOGGLE_SYSTEM.md`
+> - **מערכת התראות**: `documentation/frontend/NOTIFICATION_SYSTEM.md`
 
 ### 1.1 הוספת אלמנט התפריט
 ```html
@@ -71,24 +89,185 @@
 ```
 
 ### 1.2 הוספת קבצי הסגנונות
+
+> ⚠️ **חשוב מאוד!** סדר טעינת CSS קריטי למערכת. TikTrack's custom styles חייבים לדרוס את Bootstrap, לכן **חובה** לטעון את קבצי ה-CSS שלנו אחרי `bootstrap.min.css`.
+
 ```html
+<!-- 
+CSS Loading Order - ראו: documentation/frontend/css/CSS_ARCHITECTURE.md
+Bootstrap חייב להיטען לפני CSS שלנו כדי ש-CSS שלנו יוכל לדרוס אותו
+-->
+
 <!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<!-- Unified CSS -->
-<link rel="stylesheet" href="styles-new/unified.css?v=v1.4.0">
+<!-- Unified CSS - אחרי Bootstrap כדי לדרוס אותו -->
+<!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
+<!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+<link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/03-generic/_base.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/04-elements/_links.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_tables.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_cards.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_modals.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=v1.0.1">
+<link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=v1.0.0">
 
 <!-- Header Styles -->
 <link rel="stylesheet" href="styles-new/header-styles.css?v=v38_fixed">
 ```
 
-### 1.3 הוספת סקריפט התפריט
+**עקרונות חשובים:**
+- **קבצי ה-CSS שלנו תמיד אחרי Bootstrap** - מאפשר דריסת סגנונות Bootstrap על ידי TikTrack
+- **`header-styles.css` אחרי Bootstrap** - סגנונות תפריט ספציפיים
+- **cache busting** - עדכון גרסאות למניעת cache ישן
+- **אין קבצי CSS ישנים** - כל הקבצים הישנים הועברו לגיבוי
+
+**קבצי CSS פעילים בלבד:**
+- `styles-new/01-settings/` - משתנים וגדרות CSS
+- `styles-new/03-generic/` - איפוסים וסגנונות בסיסיים
+- `styles-new/04-elements/` - סגנונות HTML בסיסיים
+- `styles-new/05-objects/` - מבני פריסה
+- `styles-new/06-components/` - רכיבי UI
+- `styles-new/header-styles.css` - סגנונות תפריט
+- `bootstrap.min.css` - Bootstrap framework
+
+### 1.3 ניקוי קבצי CSS ישנים
+
+> ⚠️ **חובה!** לפני בניית עמוד חדש, יש לנקות קבצי CSS ישנים כדי למנוע כפילויות ובעיות דריסה.
+
+**קבצי CSS ישנים שצריך להעביר לגיבוי:**
+```bash
+# יצירת תיקיית גיבוי
+mkdir -p trading-ui/styles/backup-$(date +%Y%m%d)
+
+# העברת קבצי CSS ישנים לגיבוי
+mv trading-ui/styles/notification-system.css trading-ui/styles/backup-$(date +%Y%m%d)/
+mv trading-ui/styles/notifications-center.css trading-ui/styles/backup-$(date +%Y%m%d)/
+mv trading-ui/styles/header-system.css trading-ui/styles/backup-$(date +%Y%m%d)/
+```
+
+**קבצי CSS שצריך להעביר לגיבוי:**
+- `notification-system.css` - הועבר ל-ITCSS individual files
+- `notifications-center.css` - הועבר ל-ITCSS individual files
+- `header-system.css` - הועבר ל-`header-styles.css`
+- כל קובץ CSS עם `-temp`, `-old`, `-backup` בשם
+
+**יתרונות הניקוי:**
+- **אין כפילויות** - כל סגנון מוגדר פעם אחת
+- **אין דריסות** - סגנונות לא מתנגשים
+- **ביצועים טובים יותר** - פחות קבצים לטעינה
+- **תחזוקה קלה יותר** - מערכת מרכזית אחת
+
+### 1.4 בדיקת מערכת הסגנונות
+
+> ⚠️ **חובה!** אחרי הוספת קבצי הסגנונות, יש לבדוק שהמערכת עובדת נכון.
+
+**בדיקות חובה:**
+```bash
+# 1. בדיקה שהקבצים נטענים
+curl -s http://localhost:8080/styles-new/01-settings/_variables.css | head -5
+curl -s http://localhost:8080/styles-new/header-styles.css | head -5
+
+# 2. בדיקה שהסגנונות נטענים בקבצי ITCSS
+curl -s http://localhost:8080/styles-new/06-components/_notifications.css | grep -c "\.notification"
+
+# 3. בדיקה שאין כפילויות
+grep -r "\.notification" trading-ui/styles/ | wc -l
+# חייב להיות: 0 (כל הקבצים הישנים הועברו לגיבוי)
+```
+
+**בדיקות JavaScript:**
+```javascript
+// בדיקה אם קבצי ITCSS נטענו
+const itcssCssLoaded = Array.from(document.styleSheets).some(sheet => 
+    sheet.href && sheet.href.includes('01-settings/_variables.css')
+);
+console.log('ITCSS CSS loaded:', itcssCssLoaded);
+
+// בדיקת סגנונות מחושבים
+const testElement = document.createElement('div');
+testElement.className = 'notification';
+const computedStyle = window.getComputedStyle(testElement);
+console.log('Notification styles:', {
+    position: computedStyle.position,
+    background: computedStyle.background,
+    display: computedStyle.display
+});
+```
+
+**תסמינים של בעיות:**
+- **התראות לא מוצגות** - בעיית סדר טעינת CSS
+- **סגנונות לא נטענים** - בעיית @import או קבצים חסרים
+- **עיצוב לא נכון** - סדר טעינת CSS שגוי - קבצי ה-CSS שלנו לא דורסים את Bootstrap
+- **כפילויות** - קבצי CSS ישנים עדיין פעילים
+
+**פתרונות:**
+1. **תיקון סדר טעינה** - קבצי ה-CSS שלנו אחרי `bootstrap.min.css` כדי לדרוס אותו
+2. **ניקוי קבצים ישנים** - העברה לגיבוי
+3. **בדיקת @import** - וידוא שהקבצים נטענים
+4. **cache busting** - עדכון גרסאות
+
+### 1.4.1 הסרת סגנונות אינליין
+
+> ⚠️ **חובה!** יש להסיר כל סגנונות אינליין (`style="..."`) מכל העמודים, למעט מערכת ראש הדף.
+
+**חיפוש סגנונות אינליין:**
+```bash
+# חיפוש סגנונות אינליין בכל העמודים
+grep -r "style=" trading-ui/*.html | wc -l
+
+# חיפוש סגנונות אינליין בעמוד ספציפי
+grep -n "style=" trading-ui/page-name.html
+```
+
+**דוגמאות לסגנונות אינליין שצריך להסיר:**
+```html
+<!-- ❌ אסור - סגנון אינליין -->
+<button style="width: 32px; height: 32px; padding: 0;">
+<div style="display: none;">
+<img style="width: 14px; height: 14px;">
+
+<!-- ✅ נכון - שימוש בכיתות CSS -->
+<button class="btn-icon-small">
+<div class="d-none">
+<img class="icon-small">
+```
+
+**כללים חשובים:**
+- **אין סגנונות אינליין** - כל הסגנונות חייבים להיות בקבצי CSS חיצוניים
+- **מערכת ראש הדף יוצאת דופן** - מותר לה להשתמש בסגנונות אינליין
+- **כיתות CSS גלובליות** - השתמש בכיתות קיימות מ-Bootstrap או מקבצי ה-ITCSS שלנו
+- **סגנונות ספציפיים** - הוסף לקבצי CSS החיצוניים
+
+**תהליך הסרה:**
+1. **זיהוי** - מצא את כל הסגנונות האינליין
+2. **החלפה** - החלף בכיתות CSS קיימות
+3. **הוספה** - הוסף סגנונות חדשים לקבצי CSS החיצוניים
+4. **בדיקה** - וודא שהעיצוב נשמר
+
+### 1.5 הוספת סקריפט התפריט
 ```html
 <!-- Header System Script -->
 <script src="scripts/header-system.js?v=v34_fixes"></script>
 ```
 
-### 1.4 מבנה HTML בסיסי עם תבנית נעולה
+### 1.6 מבנה HTML בסיסי עם תבנית נעולה
 ```html
 <body>
     <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
@@ -148,7 +327,7 @@
 <!-- UI Content Section X Start-->
 <div class="content-section" id="sectionId">
     <div class="section-header entity-test-sub-header">
-        <h2>📊 כותרת הסקשן - כותרת סקשן X</h2>
+        <h2>📊 כותרת הסקשן</h2>
         <button class="filter-toggle-btn" onclick="toggleSection('sectionId')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
         </button>
@@ -178,7 +357,7 @@ grep -n "CONTENT SECTIONS START\|CONTENT SECTIONS END" trading-ui/page-name.html
 <!-- UI Content Section X Start-->
 <div class="content-section" id="newSectionId">
     <div class="section-header entity-test-sub-header">
-        <h2>📊 כותרת חדשה - כותרת סקשן X</h2>
+        <h2>📊 כותרת חדשה</h2>
         <button class="filter-toggle-btn" onclick="toggleSection('newSectionId')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
         </button>
@@ -239,7 +418,7 @@ grep "UI Content Section.*Start" trading-ui/page-name.html | sort
 # עדכן את כל ההערות והכותרות בהתאם לסדר החדש
 # UI Content Section 1 Start/End
 # UI Content Section 2 Start/End
-# כותרת סקשן 1, כותרת סקשן 2
+# כותרות סקשנים (ללא "כותרת סקשן X")
 ```
 
 ### 3.4 שינוי שם סקשן
@@ -247,7 +426,7 @@ grep "UI Content Section.*Start" trading-ui/page-name.html | sort
 #### שלב 1: עדכון הכותרת
 ```html
 <!-- עדכן רק את הכותרת -->
-<h2>📊 שם חדש - כותרת סקשן X</h2>
+<h2>📊 שם חדש</h2>
 ```
 
 #### שלב 2: שמירת ה-ID
@@ -307,7 +486,7 @@ grep -n "h1\|h2\|h3\|class.*card-header" trading-ui/page-name.html
 <!-- UI Content Section Top Start-->
 <div class="top-section">
     <div class="section-header">
-        <h1>🔧 שם העמוד - כותרת סקשן עליון</h1>
+        <h1>🔧 שם העמוד</h1>
         <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
         </button>
@@ -349,7 +528,7 @@ grep -n "h1\|h2\|h3\|class.*card-header" trading-ui/page-name.html
 <!-- UI Content Section X Start-->
 <div class="content-section" id="sectionX">
     <div class="section-header entity-test-sub-header">
-        <h2>📊 כותרת הסקשן - כותרת סקשן X</h2>
+        <h2>📊 כותרת הסקשן</h2>
         <button class="filter-toggle-btn" onclick="toggleSection('sectionX')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
         </button>
@@ -380,7 +559,7 @@ grep -n "h1\|h2\|h3\|class.*card-header" trading-ui/page-name.html
 - **העתק רק תוכן פנימי**: אל תעתיק `<div class="row">` או קונטיינרים חיצוניים
 - **שמור על מבנה התבנית**: השתמש במבנה הסקשנים הקיים
 - **עדכן כותרות סקשנים**: החלף כותרות דוגמה בכותרות אמיתיות
-- **הוסף איקונים מתאימים**: לכל כותרת סקשן
+- **הוסף איקונים מתאימים**: לכל כותרת סקשן (ללא "כותרת סקשן X")
 
 #### ❌ **אסור לעשות:**
 - **אל תעתיק קונטיינרים חיצוניים**: רק התוכן הפנימי
@@ -455,7 +634,7 @@ read_lints trading-ui/page-name.html
 #### בדיקה 9: רוחב מקסימלי
 ```bash
 # בדוק שהרוחב המקסימלי מוגדר נכון
-grep "max-width.*1360px" trading-ui/styles-new/unified.css
+grep "max-width.*1360px" trading-ui/styles-new/05-objects/_layout.css
 grep "max-width.*1360px" trading-ui/styles-new/header-styles.css
 # חייב להיות: הגדרות ל-main-content ו-unified-header
 ```
@@ -556,7 +735,7 @@ cp trading-ui/designs.html trading-ui/[page-name]-template.html
 ```html
 <div class="top-section">
     <div class="section-header">
-        <h1>[שם העמוד] - כותרת סקשן עליון</h1>
+        <h1>[שם העמוד]</h1>
         <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
         </button>
@@ -590,9 +769,11 @@ cp trading-ui/designs.html trading-ui/[page-name]-template.html
 ```
 
 ### 8.3 עדכון כותרות סקשנים
-- סקשן 1: `[כותרת הסקשן] - כותרת סקשן 1`
-- סקשן 2: `[כותרת הסקשן] - כותרת סקשן 2`
-- סקשן 3: `[כותרת הסקשן] - כותרת סקשן 3`
+- סקשן 1: `[כותרת הסקשן]` (ללא "כותרת סקשן 1")
+- סקשן 2: `[כותרת הסקשן]` (ללא "כותרת סקשן 2")
+- סקשן 3: `[כותרת הסקשן]` (ללא "כותרת סקשן 3")
+
+> ⚠️ **חשוב!** הסר את הטקסט "כותרת סקשן X" מכל הכותרות - השאר רק את הכותרת האמיתית
 
 ## שלב 9: עדכון איקונים
 
@@ -603,10 +784,10 @@ cp trading-ui/designs.html trading-ui/[page-name]-template.html
 
 ### 9.2 דוגמאות איקונים
 ```html
-<h1>🔧 בדיקת ראש הדף - כותרת סקשן עליון</h1>
-<h2>📊 ביצועים - כותרת סקשן 1</h2>
-<h2>🎨 עיצוב וסגנונות - כותרת סקשן 2</h2>
-<h2>📋 רכיבי ממשק - כותרת סקשן 3</h2>
+<h1>🔧 בדיקת ראש הדף</h1>
+<h2>📊 ביצועים</h2>
+<h2>🎨 עיצוב וסגנונות</h2>
+<h2>📋 רכיבי ממשק</h2>
 ```
 
 ## שלב 10: עדכון גרסאות cache busting
@@ -614,7 +795,31 @@ cp trading-ui/designs.html trading-ui/[page-name]-template.html
 ### 10.1 עדכון גרסאות CSS
 ```html
 <!-- Unified CSS -->
-<link rel="stylesheet" href="styles-new/unified.css?v=v1.4.0">
+<!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
+<!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+<link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/03-generic/_base.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/04-elements/_links.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_tables.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_cards.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_modals.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=v1.0.1">
+<link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=v1.0.0">
 
 <!-- Header Styles -->
 <link rel="stylesheet" href="styles-new/header-styles.css?v=v38_fixed">
@@ -674,9 +879,9 @@ cp trading-ui/designs.html trading-ui/header-test-template.html
 <title>בדיקת ראש הדף - TikTrack</title>
 ```
 
-### צעד 3: עדכון כותרת סקשן עליון
+### צעד 3: עדכון כותרת סקשן עליון (הסר "כותרת סקשן עליון")
 ```html
-<h1>🔧 בדיקת ראש הדף - כותרת סקשן עליון</h1>
+<h1>🔧 בדיקת ראש הדף</h1>
 ```
 
 ### צעד 4: חישוב מספר הסקשנים הדרושים
@@ -701,7 +906,7 @@ grep "UI Content Section.*Start" trading-ui/test-header-only.html
 # <!-- UI Content Section 4 Start-->
 # <div class="content-section">
 #     <div class="section-header">
-#         <h2>📋 רכיבי ממשק - כותרת סקשן 4</h2>
+#         <h2>📋 רכיבי ממשק</h2>
 #         <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
 #             <span class="section-toggle-icon">▼</span>
 #         </button>
@@ -714,7 +919,7 @@ grep "UI Content Section.*Start" trading-ui/test-header-only.html
 # <!-- UI Content Section 5 Start-->
 # <div class="content-section">
 #     <div class="section-header">
-#         <h2>🔧 כלי פיתוח - כותרת סקשן 5</h2>
+#         <h2>🔧 כלי פיתוח</h2>
 #         <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
 #             <span class="section-toggle-icon">▼</span>
 #         </button>
@@ -801,7 +1006,7 @@ grep -A 10 "תוכן סקשן מספר" trading-ui/header-test-template.html
 # <!-- UI Content Section 2 Start-->
 # <div class="content-section">
 #     <div class="section-header">
-#         <h2>🎨 עיצוב וסגנונות - כותרת סקשן 2</h2>
+#         <h2>🎨 עיצוב וסגנונות</h2>
 #         <button class="filter-toggle-btn" title="הצג/הסתר סקשן">
 #             <span class="section-toggle-icon">▼</span>
 #         </button>
@@ -866,9 +1071,8 @@ grep "מצב המערכות\|טבלת ביצועים\|מידע דיבאג" tradi
 
 4. **עדכון כותרות הסקשנים:**
    ```bash
-   # עדכון כותרות:
-   # "כותרת סקשן 2" → "כותרת סקשן 1"
-   # "כותרת סקשן 3" → "כותרת סקשן 2"
+   # הסר את הטקסט "כותרת סקשן X" מכל הכותרות
+   # השאר רק את הכותרת האמיתית
    ```
 
 **תהליך כללי לתיקון כפילות:**
@@ -1853,7 +2057,7 @@ grep -A 10 -B 5 "main-content" trading-ui/page-name.html
 grep "unified-header" trading-ui/page-name.html
 
 # 4. בדוק שהסגנונות נטענים נכון
-grep "unified.css\|header-styles.css" trading-ui/page-name.html
+grep "01-settings/_variables.css\|header-styles.css" trading-ui/page-name.html
 ```
 
 ### צעד 22: גיבוי לגיט האב
@@ -2135,11 +2339,84 @@ grep "UI Content Section.*Start\|UI Content Section.*End" trading-ui/page-name.h
 </div>
 ```
 
-### שלב 25: עדכון רשימת המשימות והמדריך ⚠️ **שלב אחרון תמיד**
+### שלב 25: ניקוי קבצים זמניים וקבצי עבודה
+
+#### 25.1 זיהוי קבצים זמניים וקבצי עבודה
+
+**קבצים שצריכים לעבור לגיבוי:**
+- כל הקבצים עם `-BACKUP-`, `-OLD-`, `.backup` בשם
+- כל הקבצים עם `template` בשם
+- כל הקבצים עם `test-` בשם (שאינם מקושרים מהתפריט)
+- כל הקבצים עם `example`, `demo` בשם (שאינם מקושרים מהתפריט)
+- קבצי JavaScript גיבויים (`.js.backup`, `-clean.js`, `-old.js`, `-yesterday.js`)
+- קבצי CSS גיבויים (`.css.backup`, `-temp.css`)
+- קבצי תמונות כפילויות (`logoV2.svg`)
+- תיקיות עבודה זמניות (`dist/`, `external_data_integration_client/`)
+
+#### 25.2 יצירת תיקיית גיבוי
+
+```bash
+# יצירת תיקיית גיבוי עם תאריך ושעה
+BACKUP_DIR="trading-ui/backups/cleanup-$(date +%Y%m%d_%H%M%S)"
+mkdir -p "$BACKUP_DIR"
+```
+
+#### 25.3 העברת קבצים לגיבוי
+
+```bash
+# העברת קבצי HTML גיבויים
+mv trading-ui/*-BACKUP-*.html trading-ui/*-OLD-*.html trading-ui/*template*.html "$BACKUP_DIR/"
+
+# העברת קבצי JavaScript גיבויים
+mv trading-ui/scripts/*.backup trading-ui/scripts/*-clean.js trading-ui/scripts/*-old.js trading-ui/scripts/*-yesterday.js "$BACKUP_DIR/"
+
+# העברת קבצי CSS גיבויים
+mv trading-ui/styles/*.backup trading-ui/styles/*-temp.css trading-ui/styles-new/*.backup "$BACKUP_DIR/"
+
+# העברת קבצי תמונות כפילויות
+mv trading-ui/images/logoV2.svg "$BACKUP_DIR/"
+
+# העברת תיקיות עבודה זמניות
+mv trading-ui/dist trading-ui/external_data_integration_client "$BACKUP_DIR/"
+```
+
+#### 25.4 בדיקת קבצים שצריכים להישאר
+
+**קבצים שצריכים להישאר (מקושרים מהתפריט):**
+- עמודים ראשיים: `index.html`, `trade_plans.html`, `trades.html`, `research.html`
+- עמודי הגדרות: `alerts.html`, `notes.html`, `accounts.html`, `tickers.html`, `executions.html`, `cash_flows.html`, `preferences.html`
+- עמודי בסיס נתונים: `db_display.html`, `db_extradata.html`
+- כלי פיתוח: `system-management.html`, `server-monitor.html`, `notifications-center.html`, `constraints.html`, `css-management.html`, `numeric-value-colors-demo.html`, `style_demonstration.html`, `color-scheme-examples.html`, `designs.html`, `external-data-dashboard.html`, `linter-realtime-monitor.html`, `crud-testing-dashboard.html`, `cache-test.html`, `js-map.html`, `page-scripts-matrix.html`, `test-header-only.html`
+
+#### 25.5 בדיקת ניקוי מוצלח
+
+```bash
+# בדוק שאין עוד קבצים זמניים
+find trading-ui -name "*.backup" -o -name "*BACKUP*" -o -name "*OLD*" -o -name "*template*" | grep -v backups
+
+# בדוק שהקבצים הפעילים עדיין קיימים
+ls -la trading-ui/*.html | grep -E "(index|trade_plans|trades|research|alerts|notes|accounts|tickers|executions|cash_flows|preferences|db_display|db_extradata|system-management|server-monitor|notifications-center|constraints|css-management|numeric-value-colors-demo|style_demonstration|color-scheme-examples|designs|external-data-dashboard|linter-realtime-monitor|crud-testing-dashboard|cache-test|js-map|page-scripts-matrix|test-header-only)"
+```
+
+#### 25.6 כללים חשובים
+
+**כללים לניקוי:**
+1. **בדוק תמיד** - וודא שהקבצים לא מקושרים מהתפריט לפני מחיקה
+2. **גיבוי לפני מחיקה** - תמיד העבר לגיבוי לפני מחיקה
+3. **שמור על קבצים פעילים** - רק קבצים זמניים וקבצי עבודה
+4. **תעד את התהליך** - רשום מה הועבר לגיבוי
+
+**מה אסור למחוק:**
+- קבצים מקושרים מהתפריט הראשי
+- קבצי CSS ו-JavaScript פעילים
+- תמונות ואיקונים פעילים
+- תיקיות עם תוכן פעיל
+
+### שלב 26: עדכון רשימת המשימות והמדריך ⚠️ **שלב אחרון תמיד**
 
 **⚠️ חשוב: שלב זה חייב להיות השלב האחרון תמיד, גם כשמוסיפים שלבים חדשים למדריך!**
 
-#### 25.1 עדכון הטבלה הדו-מימדית
+#### 26.1 עדכון הטבלה הדו-מימדית
 
 ```bash
 # 1. עדכן את הטבלה במדריך
@@ -2152,7 +2429,7 @@ grep "UI Content Section.*Start\|UI Content Section.*End" trading-ui/page-name.h
 # | **עמוד ראשי** | `/` | ✅ הושלם | 2025-01-15 | 5 סקשנים: סטטיסטיקות מהירות, סקירה כללית, גרפים, טבלאות, פעולות, סטטיסטיקות מתקדמות |
 ```
 
-#### 25.2 הוספת תובנות למדריך
+#### 26.2 הוספת תובנות למדריך
 
 **אם העמוד היה מורכב או מיוחד, הוסף תובנות:**
 
@@ -2181,7 +2458,7 @@ grep "UI Content Section.*Start\|UI Content Section.*End" trading-ui/page-name.h
 - [המלצות לשיפור המדריך]
 ```
 
-#### 25.3 עדכון מספר העמודים המושלמים
+#### 26.3 עדכון מספר העמודים המושלמים
 
 ```bash
 # עדכן את ההערה המספרת כמה עמודים הושלמו
@@ -2198,7 +2475,7 @@ grep "UI Content Section.*Start\|UI Content Section.*End" trading-ui/page-name.h
 - **מחיקת סקשנים ריקים**: תמיד מחק סקשנים שלא קיבלו תוכן בסוף התהליך
 - **עדכון הערות**: עדכן את מספרי הסקשנים בהערות `<!-- UI Content Section X Start/End -->`
 - **תיקון מספור**: אחרי מחיקת סקשנים, תקן את מספור הסקשנים הנותרים (1, 2, 3...)
-- **עדכון כותרות**: עדכן את כותרות הסקשנים בהתאם למספור החדש
+- **עדכון כותרות**: עדכן את כותרות הסקשנים בהתאם למספור החדש (הסר "כותרת סקשן X")
 
 ### חלוקת תוכן נכונה
 - **העתק רק תוכן פנימי**: אל תעתיק `<div class="row">` או קונטיינרים חיצוניים
@@ -2255,8 +2532,8 @@ grep "UI Content Section.*Start\|UI Content Section.*End" trading-ui/page-name.h
 
 ### הפרדת סגנונות
 - כל הגדרות התפריט ב-`header-styles.css`
-- כל הגדרות התוכן ב-`unified.css`
-- אין הגדרות תפריט ב-`unified.css`
+- כל הגדרות התוכן בקבצי ITCSS
+- אין הגדרות תפריט בקבצי ITCSS
 
 ### מבנה סקשנים
 - `top-section`: סקשן עליון עם רווח 10px
@@ -2281,6 +2558,7 @@ grep "UI Content Section.*Start\|UI Content Section.*End" trading-ui/page-name.h
 | **חשבונות** | `/accounts` | ✅ הושלם | 2025-01-15 | 2 סקשנים: סיכום חשבונות, טבלת חשבונות מפורטת - **כל 25 הסעיפים הושלמו** |
 | **התראות** | `/alerts` | ✅ הושלם | 2025-01-15 | 2 סקשנים: סקירה כללית עם קומפוננט התראות פעילות, ניהול התראות עם טבלה ופילטרים - **כל 25 הסעיפים הושלמו** |
 | **העדפות** | `/preferences` | ✅ הושלם | 2025-01-15 | 7 סקשנים: הגדרות בסיסיות, פילטרים ברירת מחדל, מערכת צבעים מתקדמת, ממשק משתמש, הגדרות מערכת ושרת, נתונים חיצוניים, הגדרות מתקדמות - **כל 25 הסעיפים הושלמו** |
+| **מרכז התראות** | `/notifications-center` | ✅ הושלם | 2025-01-15 | 3 סקשנים + סקשן עליון: קומפוננט התראות פעילות, סטטיסטיקות מפורטות, הגדרות התראות, היסטוריית התראות - **כל 25 הסעיפים הושלמו** |
 
 ### עמודים שטרם עודכנו ⏳
 
@@ -2302,9 +2580,9 @@ grep "UI Content Section.*Start\|UI Content Section.*End" trading-ui/page-name.h
 
 #### שלב 2: העברת תוכן
 - [ ] עדכון כותרת העמוד
-- [ ] עדכון כותרת סקשן עליון
+- [ ] עדכון כותרת סקשן עליון (הסר "כותרת סקשן עליון")
 - [ ] העברת תוכן לסקשנים
-- [ ] עדכון כותרות סקשנים
+- [ ] עדכון כותרות סקשנים (הסר "כותרת סקשן X")
 - [ ] הוספת איקונים מתאימים
 
 #### שלב 3: עדכון טכני
@@ -2382,6 +2660,7 @@ read_lints trading-ui/db_extradata.html
 - **מעקב מתמיד**: רשימת משימות דו-מימדית לכל העמודים
 - **דוגמאות מעשיות**: 7 עמודים שהושלמו בהצלחה עם תובנות מפורטות
 - **תהליך אופטימלי**: כל המידע הדרוש לביצוע מושלם של התהליך
+- **ניקוי קבצים זמניים**: תהליך מובנה לניקוי קבצי עבודה וגיבויים
 
 ### יתרונות התבנית הנעולה:
 - 🛡️ **הגנה מלאה** על המבנה הבסיסי
@@ -2392,7 +2671,7 @@ read_lints trading-ui/db_extradata.html
 
 ---
 
-**📝 הערה**: מדריך זה מתעדכן עם כל שינוי במבנה העמודים במערכת. נכון להיום, 7 עמודים הושלמו בהצלחה עם כל 25 השלבים.
+**📝 הערה**: מדריך זה מתעדכן עם כל שינוי במבנה העמודים במערכת. נכון להיום, 7 עמודים הושלמו בהצלחה עם כל 26 השלבים.
 
 ---
 
@@ -2993,6 +3272,152 @@ async function saveStatusColorsToPreferences(statusColors) {
 
 ---
 
+## 22.8 תובנות מהעבודה על עמוד מרכז התראות
+
+### 22.8.1 אתגרים מיוחדים של עמוד מרכז התראות
+
+**עמוד עם מבנה כפול מורכב:**
+- עמוד מרכז התראות היה עם מבנה כפול של `unified-header` (שורות 26 ו-29)
+- מבנה HTML לא תואם לתבנית הנעולה
+- חסרות הערות TEMPLATE ZONE
+- מבנה סקשנים לא נכון
+
+**הצלחות מיוחדות:**
+1. **תיקון מבנה מושלם** - הסרת כפילויות ותיקון מבנה TEMPLATE ZONE
+2. **אינטגרציה מלאה** - חיבור עם Web Components קיימים
+3. **מבנה סקשנים מאורגן** - 3 סקשנים + סקשן עליון עם תוכן הגיוני
+4. **בדיקת CRUD מלאה** - כל הפונקציות עובדות ומחוברות
+
+### 22.8.2 תובנות על טיפול בעמוד עם מבנה כפול מורכב
+
+**מבנה קיים בעייתי:**
+```html
+<!-- שגוי - unified-header כפול -->
+<div id="unified-header"></div>
+<!-- ... תוכן אחר ... -->
+<div id="unified-header"></div>
+```
+
+**פתרון אופטימלי:**
+```html
+<!-- נכון - unified-header אחד בלבד -->
+<div id="unified-header"></div>
+<!-- ... תוכן אחר ... -->
+```
+
+**עקרון חשוב:**
+- **בדיקת כפילויות** - תמיד לבדוק שאין אלמנטים כפולים
+- **מבנה נקי** - כל אלמנט פעם אחת בלבד
+- **תיקון מיידי** - לתקן כפילויות מיד כשמזהה אותן
+- **שימוש בתבנית בסיס** - `designs.html` כבר כוללת את המבנה הנכון
+
+### 22.8.3 תובנות על אינטגרציה עם Web Components
+
+**Web Component שמור:**
+- `<active-alerts></active-alerts>` נשמר ופועל
+- לא נפגע בתהליך המיגרציה
+- ממשיך לעבוד עם המערכת הקיימת
+
+**עקרון חשוב:**
+- **קומפוננטים קיימים לא נפגעים** - רק מבנה הסקשנים משתנה
+- **הפונקציונליות נשמרת במלואה** - Web Components ממשיכים לעבוד
+- **אינטגרציה חלקה** - הקומפוננטים עובדים במבנה החדש
+
+### 22.8.4 תובנות על ניהול סקשנים עם תוכן מורכב
+
+**מבנה סקשנים מאורגן:**
+1. **סקשן עליון** - קומפוננט התראות פעילות + סטטיסטיקות מהירות
+2. **סקשן 1** - סטטיסטיקות מפורטות + סטטוס חיבור
+3. **סקשן 2** - הגדרות התראות עם checkboxes
+4. **סקשן 3** - היסטוריית התראות עם פילטרים
+
+**עקרון ארגון:**
+- מהכללי לפרטי
+- מהסקירה לניהול
+- מהמידע לפעולה
+
+### 22.8.5 תובנות על בדיקת CRUD מלאה למערכת התראות
+
+**פונקציות שנבדקו:**
+- `copyDetailedLog()` - העתקת לוג מפורט
+- `copyNotificationsToClipboard()` - העתקת התראות ללוח
+- `saveNotificationSettings()` - שמירת הגדרות התראות
+- `resetNotificationSettings()` - איפוס הגדרות התראות
+- `clearHistory()` - ניקוי היסטוריית התראות
+
+**עקרונות חשובים:**
+- **בדיקת זמינות פונקציות** - כל הפונקציות חייבות להיות ב-window scope
+- **אינטגרציה עם מערכת קיימת** - לא לשבור פונקציונליות קיימת
+- **בדיקת כל הקבצים** - HTML, CSS, JS חייבים להיטען
+
+### 22.8.6 תובנות על שימוש במערכת התראות מתקדמת
+
+**סקריפטים נדרשים:**
+- `notification-system.js` - מערכת התראות בסיסית
+- `realtime-notifications-client.js` - התראות בזמן אמת
+- `notifications-center.js` - ניהול מרכז התראות
+
+**עקרונות חשובים:**
+- **אינטגרציה עם WebSocket** - התראות בזמן אמת
+- **ניהול היסטוריה** - שמירה וטעינה של היסטוריית התראות
+- **הגדרות אישיות** - שמירה וטעינה של הגדרות משתמש
+
+### 22.8.7 תובנות על מבנה TEMPLATE ZONE
+
+**מה שלמדנו:**
+1. **תבנית בסיס מושלמת** - `designs.html` כבר כוללת את כל הסקריפטים הנדרשים
+2. **אין צורך בהוספות** - כל הסקריפטים כבר קיימים בתבנית
+3. **מבנה מאוזן** - כל div נפתח ונגמר במקום הנכון
+4. **הערות נעילות** - המבנה מוגן מפני שינויים
+
+**עקרונות חשובים:**
+- **סמוך על התבנית** - התבנית הבסיס כבר מושלמת
+- **אל תוסיף מיותר** - רק מה שחסר באמת
+- **שמור על המבנה** - אל תשנה את המבנה הבסיסי
+
+### 22.8.8 מבנה הסקשנים הסופי
+
+**4 סקשנים מאורגנים:**
+1. **סקשן עליון** - קומפוננט התראות פעילות + סטטיסטיקות מהירות
+2. **סקשן 1** - סטטיסטיקות מפורטות + סטטוס חיבור
+3. **סקשן 2** - הגדרות התראות עם checkboxes
+4. **סקשן 3** - היסטוריית התראות עם פילטרים
+
+**עקרון ארגון:**
+- מהכללי לפרטי
+- מהסקירה לניהול
+- מהמידע לפעולה
+
+### 22.8.9 שיפורים למדריך
+
+**מה שלמדנו:**
+1. **מבנה כפול מורכב** - המדריך מתמודד מעולה גם עם מבנה מורכב
+2. **Web Components** - קומפוננטים נשמרים ופועלים במבנה החדש
+3. **בדיקת CRUD מלאה** - חשוב לבדוק כל הפונקציות
+4. **מערכת התראות מתקדמת** - אינטגרציה מלאה עובדת מעולה
+5. **תבנית בסיס מושלמת** - התבנית כבר כוללת הכל
+
+**המלצות לעתיד:**
+- עמודים עם מבנה כפול כדאי לבדוק ולתקן מיד
+- Web Components קיימים לא נפגעים במבנה החדש
+- בדיקת CRUD מלאה חשובה מאוד לעמודים מורכבים
+- מערכת התראות מתקדמת עובדת מעולה במבנה החדש
+- לסמוך על התבנית הבסיס - היא כבר מושלמת
+- אין כפילויות - כל אלמנט פעם אחת בלבד
+- שמירה על קומפוננטים - Web Components נשמרים ופועלים
+- אינטגרציה עם מערכות קיימות - לא לשבור פונקציונליות קיימת
+- סמוך על התבנית - התבנית הבסיס כבר מושלמת
+
+### 22.8.10 כללים חשובים שנתגלו
+
+1. **אין כפילויות** - כל אלמנט פעם אחת בלבד
+2. **שמירה על קומפוננטים** - Web Components נשמרים ופועלים
+3. **בדיקת CRUD מלאה** - כל הפונקציות חייבות להיות זמינות
+4. **אינטגרציה עם מערכות קיימות** - לא לשבור פונקציונליות קיימת
+5. **סמוך על התבנית** - התבנית הבסיס כבר מושלמת
+
+---
+
 ## תובנות ודיוקים מהעבודה המעשית
 
 ### 22. תובנות מהעבודה על עמוד בדיקת כותרת, טבלאות עזר ותבנית בסיס
@@ -3109,7 +3534,82 @@ grep -n "style.*:" trading-ui/page-name.html
 
 ## היסטוריית גרסאות
 
-### גרסה 3.1 (נוכחית)
+### גרסה 2.2 (נוכחית)
+- **תאריך**: 2025-09-12 23:35
+- **שינויים**: 
+  - **ניקוי קבצי CSS ישנים**: העברת 19 קבצי CSS ישנים לגיבוי
+  - **תיקון מספור הסעיפים**: עדכון מספור נכון של כל הסעיפים במדריך
+  - **הוספת סעיף 1.4.1**: הסרת סגנונות אינליין עם הוראות מפורטות
+  - **עדכון אינדקס השלבים**: תיקון מספור השלבים (1-6, 7-11, 12-16, 17-21)
+  - **הוספת כללים חשובים**: מערכת ראש הדף יוצאת דופן לסגנונות אינליין
+  - **הוספת תהליך הסרה**: 4 שלבים להסרת סגנונות אינליין
+  - **בדיקת מערכת**: וידוא שהתראות עובדות אחרי הניקוי
+
+### גרסה 2.1 (קודמת)
+- **תאריך**: 2025-09-12 23:00
+- **שינויים**: 
+  - **תיקון קריטי**: עדכון סדר טעינת CSS - קבצי ITCSS אחרי `bootstrap.min.css` כדי לדרוס אותו
+  - **הוספת סעיף 1.2.1**: ניקוי קבצי CSS ישנים והעברה לגיבוי
+  - **הוספת סעיף 1.2.2**: בדיקת מערכת הסגנונות עם כלי debugging
+  - **הוספת עקרונות חשובים**: הבטחת דריסת Bootstrap על ידי TikTrack styles
+  - **הוספת פתרונות לבעיות נפוצות**: התראות לא מוצגות, סגנונות לא נטענים
+  - **הוספת כלי בדיקה**: JavaScript ו-bash לבדיקת מערכת הסגנונות
+
+### גרסה 3.6 (נוכחית) - ITCSS Migration
+- **תאריך**: 2025-09-13 23:40
+- **שינויים**:
+  - **מעבר מ-unified.css ל-ITCSS**: החלפת קובץ מאוחד בקבצים נפרדים
+  - **עדכון כל התבניות**: החלפת `<link>` tags ל-ITCSS individual files
+  - **מחיקת כלים מיותרים**: הסרת `build-unified-css.py`
+  - **עדכון דוקומנטציה**: כל ההתייחסויות עודכנו ל-ITCSS
+  - **שיפור ביצועים**: טעינה מקבילה של קבצי CSS
+
+### גרסה 3.5 (קודמת)
+- **תאריך**: 2025-01-12 23:15
+- **שינויים**:
+  - **תיקון קריטי**: עדכון סדר טעינת CSS בכל הקבצים - Bootstrap לפני קבצי ITCSS
+  - **עדכון דוקומנטציה**: תיקון כל ההפניות לסדר הטעינה הנכון
+  - **הוספת הערות**: הפניה לדוקומנטציה המרכזית בכל עמוד
+  - **תיקון עקרונות**: הבטחת דריסת Bootstrap על ידי TikTrack styles
+
+### גרסה 3.4 (קודמת)
+- **תאריך**: 2025-01-12 22:30
+- **שינויים**: 
+  - הוספת שלב 25: ניקוי קבצים זמניים וקבצי עבודה
+  - הוספת הוראות מפורטות לזיהוי קבצים זמניים
+  - הוספת תהליך יצירת תיקיית גיבוי עם תאריך ושעה
+  - הוספת הוראות להעברת קבצים לגיבוי (HTML, JavaScript, CSS, תמונות, תיקיות)
+  - הוספת בדיקת קבצים שצריכים להישאר (מקושרים מהתפריט)
+  - הוספת בדיקת ניקוי מוצלח
+  - הוספת כללים חשובים לניקוי
+  - עדכון מספור השלבים (25-26)
+  - הרחבת התהליך ל-26 שלבים מקיפים
+  - עדכון הסיכום עם ניקוי קבצים זמניים
+
+### גרסה 3.3
+- **תאריך**: 2025-01-15 18:30
+- **שינויים**: 
+  - הוספת אזהרה חשובה בתחילת המדריך על קריאת דוקומנטציה חובה
+  - הוספת סעיף "מערכות חובה - קריאה מוקדמת" עם 4 מערכות חובה
+  - הוספת אזהרה בשלב 1 על קריאת דוקומנטציה לפני התחלת העבודה
+  - הדגשת חשיבות קריאת דוקומנטציה למערכות הרלוונטיות לממשק המשתמש
+  - הוספת קישורים למערכות: העדפות, צבעים דינאמיים, פתיחה/סגירה, התראות
+
+### גרסה 3.2
+- **תאריך**: 2025-01-15 18:00
+- **שינויים**: 
+  - הוספת סעיף 22.8: תובנות מהעבודה על עמוד מרכז התראות
+  - הוספת תובנות על טיפול בעמוד עם מבנה כפול מורכב
+  - הוספת תובנות על אינטגרציה עם Web Components
+  - הוספת תובנות על ניהול סקשנים עם תוכן מורכב
+  - הוספת תובנות על בדיקת CRUD מלאה למערכת התראות
+  - הוספת תובנות על שימוש במערכת התראות מתקדמת
+  - הוספת תובנות על מבנה TEMPLATE ZONE
+  - הוספת כללים חשובים שנתגלו מהעבודה על עמוד מרכז התראות
+  - עדכון רשימת העמודים המושלמים (8 עמודים הושלמו)
+  - עדכון ההמלצות לעתיד עם תובנות חדשות
+
+### גרסה 3.1
 - **תאריך**: 2025-01-15 16:00
 - **שינויים**: 
   - הוספת סעיף 22.7: תובנות מהעבודה על עמוד ההעדפות

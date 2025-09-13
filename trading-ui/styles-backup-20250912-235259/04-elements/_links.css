@@ -1,0 +1,46 @@
+/**
+ * קישורים - Links
+ * 
+ * קובץ זה מכיל את הסגנונות של כל הקישורים במערכת
+ * מבוסס על הסגנונות הקיימים ב-styles.css
+ * 
+ * @version 1.0.0
+ * @lastUpdated January 5, 2025
+ */
+
+/* כל הקישורים - מבוסס על הסגנונות הקיימים */
+a,
+.clickable-link,
+strong[onclick] {
+  color: #29a6a8;  /* צבע טורקיז מקורי */
+  text-decoration: none;
+  transition: color 0.2s ease;
+  font-family: var(--font-family-primary);
+  cursor: pointer;
+}
+
+/* Hover state */
+a:hover,
+.clickable-link:hover,
+strong[onclick]:hover {
+  color: #1f8a8c;  /* צבע טורקיז כהה יותר */
+  text-decoration: none;
+}
+
+/* Focus state */
+a:focus,
+.clickable-link:focus {
+  outline: 2px solid rgba(41, 166, 168, 0.5);
+  outline-offset: 2px;
+}
+
+/* Visited state */
+a:visited {
+  color: #29a6a8;  /* שומר על אותו צבע */
+}
+
+/* Active state */
+a:active,
+.clickable-link:active {
+  color: #1f8a8c;
+}

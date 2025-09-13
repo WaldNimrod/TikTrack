@@ -23,6 +23,7 @@
 class NotificationsCenter {
   constructor() {
     this.history = [];
+    this.notifications = []; // הוספתי את זה
     this.settings = NotificationsCenter.loadSettings();
     this.stats = {
       success: 0,
@@ -236,44 +237,38 @@ class NotificationsCenter {
 
   updateConnectionStatus(status = 'connecting') {
     // בדיקה אם האלמנטים קיימים (רק בעמוד מרכז ההתראות)
-    const connectionStatusElement = document.getElementById('connectionStatus');
-    if (!connectionStatusElement) {
-      return; // לא בעמוד מרכז ההתראות
-    }
-
-    const statusDot = connectionStatusElement.querySelector('.status-dot');
-    const statusText = connectionStatusElement.querySelector('.status-text');
+    const overallStatusElement = document.getElementById('overallStatus');
     const websocketStatus = document.getElementById('websocketStatus');
     const connectionTimeElement = document.getElementById('connectionTime');
     const messagesSentElement = document.getElementById('messagesSent');
 
     // בדיקה שכל האלמנטים קיימים
-    if (!statusDot || !statusText || !websocketStatus || !connectionTimeElement || !messagesSentElement) {
+    if (!overallStatusElement || !websocketStatus || !connectionTimeElement || !messagesSentElement) {
       return;
     }
 
-    // הסרת כל הקלאסים הקיימים
-    statusDot.className = 'status-dot';
-
     switch (status) {
     case 'connected':
-      statusDot.classList.add('connected');
-      statusText.textContent = 'מחובר';
-      websocketStatus.textContent = 'פעיל';
+      websocketStatus.textContent = 'מחובר';
+      websocketStatus.className = 'text-success';
+      overallStatusElement.textContent = 'מחובר';
+      overallStatusElement.className = 'text-success';
       break;
     case 'disconnected':
-      statusDot.classList.add('disconnected');
-      statusText.textContent = 'מנותק';
-      websocketStatus.textContent = 'לא פעיל';
+      websocketStatus.textContent = 'מנותק';
+      websocketStatus.className = 'text-danger';
       connectionTimeElement.textContent = '-';
       messagesSentElement.textContent = '0';
+      overallStatusElement.textContent = 'מנותק';
+      overallStatusElement.className = 'text-danger';
       break;
     case 'connecting':
-      statusDot.classList.add('connecting');
-      statusText.textContent = 'מתחבר...';
       websocketStatus.textContent = 'מתחבר...';
+      websocketStatus.className = 'text-warning';
       connectionTimeElement.textContent = '-';
       messagesSentElement.textContent = '0';
+      overallStatusElement.textContent = 'מתחבר...';
+      overallStatusElement.className = 'text-warning';
       break;
     }
 
@@ -612,7 +607,7 @@ class NotificationsCenter {
 
   // פונקציות ציבוריות
 
-  clearHistory() {
+  async clearHistory() {
     // Function to execute history clearing
     const executeClearHistory = () => {
       this.history = [];
@@ -635,8 +630,9 @@ class NotificationsCenter {
         () => console.log('❌ ניקוי היסטוריה - משתמש ביטל')
       );
     } else {
-      const confirmed = typeof showConfirmationDialog === 'function' ? 
-        await new Promise(resolve => {
+      let confirmed = false;
+      if (typeof showConfirmationDialog === 'function') {
+        confirmed = await new Promise(resolve => {
           showConfirmationDialog(
             'האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?',
             () => resolve(true),
@@ -645,8 +641,11 @@ class NotificationsCenter {
             'נקה',
             'ביטול'
           );
-        }) : 
-        window.confirm('האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?');
+        });
+      } else {
+        confirmed = window.confirm('האם אתה בטוח שברצונך לנקות את כל היסטוריית ההתראות?');
+      }
+      
       if (confirmed) {
         executeClearHistory();
       } else {
@@ -867,15 +866,25 @@ function copyDetailedLog() {
 
 // פונקציה להעתקת התראות ללוח
 function copyNotificationsToClipboard() {
+  console.log('🔍 copyNotificationsToClipboard נקרא!');
   try {
     if (!window.notificationsCenter) {
-      // console.warn('מרכז התראות לא זמין');
+      console.warn('❌ מרכז התראות לא זמין');
+      if (window.showErrorNotification) {
+        window.showErrorNotification('שגיאה', 'מרכז התראות לא זמין');
+      }
       return;
     }
 
-    const notifications = window.notificationsCenter.notifications;
-    const history = window.notificationsCenter.history;
-    const stats = window.notificationsCenter.stats;
+    const notifications = window.notificationsCenter.notifications || [];
+    const history = window.notificationsCenter.history || [];
+    const stats = window.notificationsCenter.stats || { success: 0, error: 0, warning: 0, info: 0 };
+    
+    console.log('📊 נתונים שנמצאו:', {
+      notifications: notifications.length,
+      history: history.length,
+      stats: stats
+    });
 
     let log = '=== לוג התראות TikTrack ===\n\n';
     log += '📊 סטטיסטיקות:\n';
@@ -906,26 +915,73 @@ function copyNotificationsToClipboard() {
 
     log += '🔗 חיבור WebSocket:\n';
     log += `סטטוס: ${window.realtimeNotificationsClient?.socket?.connected ? 'מחובר' : 'לא מחובר'}\n`;
+    log += `סטטוס WebSocket: ${document.getElementById('websocketStatus')?.textContent || 'לא ידוע'}\n`;
     log += `זמן חיבור: ${document.getElementById('connectionTime')?.textContent || 'לא ידוע'}\n`;
+    log += `הודעות נשלחו: ${document.getElementById('messagesSent')?.textContent || '0'}\n`;
+    log += `סטטוס מערכת: ${document.getElementById('overallStatus')?.textContent || 'לא ידוע'}\n`;
+    
+    log += '\n📊 מידע טכני:\n';
+    log += `זמן יצירת הלוג: ${new Date().toLocaleString('he-IL')}\n`;
+    log += `גרסת דפדפן: ${navigator.userAgent.split(' ').slice(-2).join(' ')}\n`;
+    log += `רזולוציה מסך: ${window.screen.width}x${window.screen.height}\n`;
+    log += `גודל חלון: ${window.innerWidth}x${window.innerHeight}\n`;
+    log += `זמן אמת: ${new Date().toISOString()}\n`;
+    
     log += '\n=== סוף לוג ===';
+    
+    console.log('📋 לוג שנוצר:', log.substring(0, 200) + '...');
 
     // העתקה ללוח
+    console.log('🔄 מנסה להעתיק ללוח...');
     navigator.clipboard.writeText(log).then(() => {
-      // console.log('✅ לוג התראות הועתק ללוח בהצלחה');
+      console.log('✅ לוג התראות הועתק ללוח בהצלחה');
+      if (window.showSuccessNotification) {
+        window.showSuccessNotification('הצלחה', 'לוג התראות הועתק ללוח בהצלחה');
+      }
     }).catch(err => {
-      // console.error('❌ שגיאה בהעתקה ללוח:', err);
-      // גיבוי - הצגה בחלון
-      // העתקה ללוח
-      navigator.clipboard.writeText(log).then(() => {
-        window.showSuccessNotification('לוג התראות הועתק ללוח בהצלחה');
-      }).catch(() => {
+      console.error('❌ שגיאה בהעתקה ללוח:', err);
+      if (window.showErrorNotification) {
+        window.showErrorNotification('שגיאה', 'שגיאה בהעתקה ללוח: ' + err.message);
+      }
       // Fallback - הצגת הלוג בחלון נפרד
-        const newWindow = window.open('', '_blank');
-        newWindow.document.write(`<pre>${log}</pre>`);
-      });
+      const newWindow = window.open('', '_blank');
+      newWindow.document.write(`
+        <html>
+          <head>
+            <title>לוג מפורט - מרכז התראות</title>
+            <style>
+              body { 
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                direction: rtl; 
+                text-align: right; 
+                margin: 20px; 
+                background: #f8f9fa; 
+              }
+              pre { 
+                background: #ffffff; 
+                border: 1px solid #dee2e6; 
+                border-radius: 8px; 
+                padding: 20px; 
+                white-space: pre-wrap; 
+                font-family: 'Courier New', monospace; 
+                font-size: 14px; 
+                line-height: 1.6; 
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+              }
+            </style>
+          </head>
+          <body>
+            <h2>📋 לוג מפורט - מרכז התראות TikTrack</h2>
+            <pre>${log}</pre>
+          </body>
+        </html>
+      `);
     });
   } catch (error) {
-    // console.error('❌ שגיאה ביצירת לוג התראות:', error);
+    console.error('❌ שגיאה ביצירת לוג התראות:', error);
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', 'שגיאה ביצירת לוג התראות: ' + error.message);
+    }
   }
 }
 
@@ -958,7 +1014,7 @@ function saveNotificationSettings() {
   }
 }
 
-function resetNotificationSettings() {
+async function resetNotificationSettings() {
   // Function to execute settings reset
   const executeReset = () => {
     if (window.notificationsCenter) {
@@ -978,8 +1034,9 @@ function resetNotificationSettings() {
       () => console.log('❌ איפוס הגדרות - משתמש ביטל')
     );
   } else {
-    const confirmed = typeof showConfirmationDialog === 'function' ? 
-      await new Promise(resolve => {
+    let confirmed = false;
+    if (typeof showConfirmationDialog === 'function') {
+      confirmed = await new Promise(resolve => {
         showConfirmationDialog(
           'האם אתה בטוח שברצונך לאפס את כל ההגדרות?',
           () => resolve(true),
@@ -988,8 +1045,11 @@ function resetNotificationSettings() {
           'אפס',
           'ביטול'
         );
-      }) : 
-      window.confirm('האם אתה בטוח שברצונך לאפס את כל ההגדרות?');
+      });
+    } else {
+      confirmed = window.confirm('האם אתה בטוח שברצונך לאפס את כל ההגדרות?');
+    }
+    
     if (confirmed) {
       executeReset();
     } else {
@@ -999,6 +1059,7 @@ function resetNotificationSettings() {
 }
 
 
+// פונקציות גלובליות - קוראות לפונקציות של המחלקה
 function clearHistory() {
   if (window.notificationsCenter) {
     window.notificationsCenter.clearHistory();
@@ -1017,6 +1078,192 @@ function filterHistory() {
   }
 }
 
+// פונקציות בדיקת התראות
+function testSuccessNotification() {
+  console.log('🔍 testSuccessNotification נקרא!');
+  console.log('🔍 window.showSuccessNotification זמין?', typeof window.showSuccessNotification);
+  
+  if (window.showSuccessNotification) {
+    console.log('✅ קורא ל-showSuccessNotification...');
+    window.showSuccessNotification('בדיקת הצלחה', 'זוהי הודעת הצלחה לבדיקה - הכל עובד תקין!');
+    console.log('✅ showSuccessNotification נקרא בהצלחה');
+  } else {
+    console.error('❌ showSuccessNotification לא זמין');
+    // נסיון ישיר ליצירת התראה
+    console.log('🔧 מנסה ליצור התראה ישירה...');
+    const container = document.createElement('div');
+    container.id = 'notification-container';
+    container.className = 'notification-container';
+    document.body.appendChild(container);
+    
+    const notification = document.createElement('div');
+    notification.className = 'notification success';
+    notification.innerHTML = `
+      <div class="notification-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="notification-content">
+        <div class="notification-title">בדיקת הצלחה</div>
+        <div class="notification-message">זוהי הודעת הצלחה לבדיקה - הכל עובד תקין!</div>
+      </div>
+      <button type="button" class="notification-close" onclick="this.parentElement.remove()">
+        <i class="fas fa-times"></i>
+      </button>
+    `;
+    
+    container.appendChild(notification);
+    setTimeout(() => {
+      notification.classList.add('show');
+    }, 10);
+    
+    console.log('✅ התראה נוצרה ישירות');
+  }
+}
+
+function testErrorNotification() {
+  console.log('🔍 testErrorNotification נקרא!');
+  console.log('🔍 window.showErrorNotification זמין?', typeof window.showErrorNotification);
+  
+  if (window.showErrorNotification) {
+    console.log('✅ קורא ל-showErrorNotification...');
+    window.showErrorNotification('בדיקת שגיאה', 'זוהי הודעת שגיאה לבדיקה - הכל עובד תקין!');
+    console.log('✅ showErrorNotification נקרא בהצלחה');
+  } else {
+    console.error('❌ showErrorNotification לא זמין');
+    // נסיון ישיר ליצירת התראה
+    console.log('🔧 מנסה ליצור התראה ישירה...');
+    const container = document.createElement('div');
+    container.id = 'notification-container';
+    container.className = 'notification-container';
+    document.body.appendChild(container);
+    
+    const notification = document.createElement('div');
+    notification.className = 'notification error';
+    notification.innerHTML = `
+      <div class="notification-icon">
+        <i class="fas fa-exclamation-circle"></i>
+      </div>
+      <div class="notification-content">
+        <div class="notification-title">בדיקת שגיאה</div>
+        <div class="notification-message">זוהי הודעת שגיאה לבדיקה - הכל עובד תקין!</div>
+      </div>
+      <button type="button" class="notification-close" onclick="this.parentElement.remove()">
+        <i class="fas fa-times"></i>
+      </button>
+    `;
+    
+    container.appendChild(notification);
+    setTimeout(() => {
+      notification.classList.add('show');
+    }, 10);
+    
+    console.log('✅ התראה נוצרה ישירות');
+  }
+}
+
+function testWarningNotification() {
+  console.log('🔍 testWarningNotification נקרא!');
+  console.log('🔍 window.showWarningNotification זמין?', typeof window.showWarningNotification);
+  
+  if (window.showWarningNotification) {
+    console.log('✅ קורא ל-showWarningNotification...');
+    window.showWarningNotification('בדיקת אזהרה', 'זוהי הודעת אזהרה לבדיקה - הכל עובד תקין!');
+    console.log('✅ showWarningNotification נקרא בהצלחה');
+  } else {
+    console.error('❌ showWarningNotification לא זמין');
+    // נסיון ישיר ליצירת התראה
+    console.log('🔧 מנסה ליצור התראה ישירה...');
+    const container = document.createElement('div');
+    container.id = 'notification-container';
+    container.className = 'notification-container';
+    document.body.appendChild(container);
+    
+    const notification = document.createElement('div');
+    notification.className = 'notification warning';
+    notification.innerHTML = `
+      <div class="notification-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div class="notification-content">
+        <div class="notification-title">בדיקת אזהרה</div>
+        <div class="notification-message">זוהי הודעת אזהרה לבדיקה - הכל עובד תקין!</div>
+      </div>
+      <button type="button" class="notification-close" onclick="this.parentElement.remove()">
+        <i class="fas fa-times"></i>
+      </button>
+    `;
+    
+    container.appendChild(notification);
+    setTimeout(() => {
+      notification.classList.add('show');
+    }, 10);
+    
+    console.log('✅ התראה נוצרה ישירות');
+  }
+}
+
+function testInfoNotification() {
+  console.log('🔍 testInfoNotification נקרא!');
+  console.log('🔍 window.showInfoNotification זמין?', typeof window.showInfoNotification);
+  
+  if (window.showInfoNotification) {
+    console.log('✅ קורא ל-showInfoNotification...');
+    window.showInfoNotification('בדיקת מידע', 'זוהי הודעת מידע לבדיקה - הכל עובד תקין!');
+    console.log('✅ showInfoNotification נקרא בהצלחה');
+  } else {
+    console.error('❌ showInfoNotification לא זמין');
+    // נסיון ישיר ליצירת התראה
+    console.log('🔧 מנסה ליצור התראה ישירה...');
+    const container = document.createElement('div');
+    container.id = 'notification-container';
+    container.className = 'notification-container';
+    document.body.appendChild(container);
+    
+    const notification = document.createElement('div');
+    notification.className = 'notification info';
+    notification.innerHTML = `
+      <div class="notification-icon">
+        <i class="fas fa-info-circle"></i>
+      </div>
+      <div class="notification-content">
+        <div class="notification-title">בדיקת מידע</div>
+        <div class="notification-message">זוהי הודעת מידע לבדיקה - הכל עובד תקין!</div>
+      </div>
+      <button type="button" class="notification-close" onclick="this.parentElement.remove()">
+        <i class="fas fa-times"></i>
+      </button>
+    `;
+    
+    container.appendChild(notification);
+    setTimeout(() => {
+      notification.classList.add('show');
+    }, 10);
+    
+    console.log('✅ התראה נוצרה ישירות');
+  }
+}
+
+// ייצוא פונקציות ל-window scope
+window.copyNotificationsToClipboard = copyNotificationsToClipboard;
+window.clearHistory = clearHistory;
+window.refreshNotifications = refreshNotifications;
+window.filterHistory = filterHistory;
+window.saveNotificationSettings = saveNotificationSettings;
+window.resetNotificationSettings = resetNotificationSettings;
+window.testSuccessNotification = testSuccessNotification;
+window.testErrorNotification = testErrorNotification;
+window.testWarningNotification = testWarningNotification;
+window.testInfoNotification = testInfoNotification;
+
+// ייצוא פונקציה להוספת התראות
+window.addNotification = function(type, title, message, time = 'now') {
+  if (window.notificationsCenter && typeof window.notificationsCenter.addNotification === 'function') {
+    window.notificationsCenter.addNotification(type, title, message, time);
+  } else {
+    console.warn('❌ מרכז התראות לא זמין להוספת התראה');
+  }
+};
+
 
 // אתחול
 document.addEventListener('DOMContentLoaded', () => {
@@ -1030,6 +1277,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // יצירת מופע מרכז התראות
   window.notificationsCenter = new NotificationsCenter();
+
+  // בדיקת זמינות פונקציות
+  console.log('🔍 בדיקת זמינות פונקציות:');
+  console.log('🔍 testSuccessNotification:', typeof testSuccessNotification);
+  console.log('🔍 testErrorNotification:', typeof testErrorNotification);
+  console.log('🔍 testWarningNotification:', typeof testWarningNotification);
+  console.log('🔍 testInfoNotification:', typeof testInfoNotification);
+  console.log('🔍 window.testSuccessNotification:', typeof window.testSuccessNotification);
+  console.log('🔍 window.testErrorNotification:', typeof window.testErrorNotification);
+  console.log('🔍 window.testWarningNotification:', typeof window.testWarningNotification);
+  console.log('🔍 window.testInfoNotification:', typeof window.testInfoNotification);
 
   console.log('✅ דף מרכז התראות נטען בהצלחה (v1.0.9 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed + Settings Fix + AutoRefresh Fix)');
 });

@@ -10,15 +10,7 @@
 
 /* ===== סגנונות בסיסיים של Bootstrap ===== */
 
-/* כרטיסים בסגנון אפל - לא כולל כרטיסי עיצובים */
-.card:not(.design-card) {
-  background: var(--apple-bg-elevated);
-  border-radius: var(--apple-radius-large);
-  border: 1px solid var(--apple-border-light);
-  box-shadow: var(--apple-shadow-light);
-  padding: var(--apple-spacing-lg);
-  margin-bottom: var(--apple-spacing-md);
-}
+/* כרטיסים בסגנון אפל - הועבר ל-_cards.css */
 
 /* טופס בסגנון אפל */
 .form-group {
@@ -56,14 +48,7 @@
 
 /* ===== סגנונות מודלים ===== */
 
-/* מודל בסגנון אפל - הגדרה כללית לכל האתר */
-.modal {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  z-index: 999999999 !important;
-  direction: rtl;
-}
+/* מודל בסגנון אפל - הועבר ל-_modals.css */
 
 /* הגדרות z-index גבוהות לכל המודלים באתר */
 .modal-dialog {

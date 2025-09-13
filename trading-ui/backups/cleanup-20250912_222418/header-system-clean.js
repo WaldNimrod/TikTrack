@@ -84,7 +84,6 @@ class HeaderSystemClean {
                         <a class="tiktrack-dropdown-item" href="#">⚙️ הגדרות מערכת</a>
                         <ul class="submenu">
                           <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
-                          <li><a class="tiktrack-dropdown-item" href="/test-preferences-v2-integration.html">בדיקת אינטגרציה V2</a></li>
                         </ul>
                       </li>
                       

@@ -12,7 +12,7 @@ def create_crud_testing_dashboard():
     print("📊 יוצר דשבורד בדיקות CRUD...")
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    dashboard_file = f"/workspace/trading-ui/crud-testing-dashboard.html"
+    dashboard_file = f"trading-ui/crud-testing-dashboard.html"
     
     # רשימת עמודים לבדיקה
     pages = [

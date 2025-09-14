@@ -1336,16 +1336,20 @@ class ServerMonitor {
         () => console.log('❌ clearLogs - משתמש ביטל')
       );
     } else {
-      const confirmed = typeof showConfirmationDialog === 'function' ? 
-        await new Promise(resolve => {
+      let confirmed = false;
+      if (typeof showConfirmationDialog === 'function') {
+        confirmed = await new Promise(resolve => {
           showConfirmationDialog(
             'ניקוי לוגים',
             'האם אתה בטוח שברצונך לנקות את כל הלוגים?',
             () => resolve(true),
             () => resolve(false)
           );
-        }) : 
-        window.confirm('האם אתה בטוח שברצונך לנקות את כל הלוגים?');
+        });
+      } else {
+        confirmed = window.confirm('האם אתה בטוח שברצונך לנקות את כל הלוגים?');
+      }
+      
       if (confirmed) {
         executeClearLogs();
       } else {
@@ -1691,10 +1695,32 @@ document.addEventListener('DOMContentLoaded', () => {
 window.serverMonitor = new ServerMonitor();
 
 // הוספת פונקציות גלובליות
-window.copyDetailedLog = () => window.serverMonitor.copyDetailedLog();
+window.copyDetailedLog = () => {
+  if (window.serverMonitor) {
+    return window.serverMonitor.copyDetailedLog();
+  } else {
+    console.error('❌ serverMonitor instance לא קיים');
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה: serverMonitor לא אותחל');
+    }
+  }
+};
 
 // הוספת פונקציות חסרות
-ServerMonitor.optimizeDatabase = () => window.serverMonitor.optimizeDatabase();
-ServerMonitor.exportLogs = () => window.serverMonitor.exportLogs();
+ServerMonitor.optimizeDatabase = () => {
+  if (window.serverMonitor) {
+    return window.serverMonitor.optimizeDatabase();
+  } else {
+    console.error('❌ serverMonitor instance לא קיים');
+  }
+};
+
+ServerMonitor.exportLogs = () => {
+  if (window.serverMonitor) {
+    return window.serverMonitor.exportLogs();
+  } else {
+    console.error('❌ serverMonitor instance לא קיים');
+  }
+};
 
 console.log('✅ ServerMonitor instance נוצר:', window.serverMonitor);

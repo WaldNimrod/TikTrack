@@ -362,6 +362,158 @@ def clear_cache() -> Any:
             "timestamp": datetime.now().isoformat()
         }), 500
 
+@app.route("/api/cache/status", methods=["GET"])
+@rate_limit_api(requests_per_minute=60)
+def cache_status() -> Any:
+    """Get cache status with detailed information"""
+    try:
+        stats = advanced_cache_service.get_stats()
+        return jsonify({
+            "status": "success",
+            "data": {
+                "hitRate": stats.get("hit_rate", 0) * 100,
+                "hitRateChange": stats.get("hit_rate_change", 0),
+                "size": stats.get("total_size_bytes", 0),
+                "sizeChange": stats.get("size_change_bytes", 0),
+                "avgResponseTime": stats.get("avg_response_time_ms", 0),
+                "responseTimeChange": stats.get("response_time_change_ms", 0),
+                "totalRequests": stats.get("total_requests", 0),
+                "requestsChange": stats.get("requests_change", 0),
+                "ttl": {
+                    "general": DEFAULT_CACHE_TTL,
+                    "external": DEFAULT_CACHE_TTL * 2,
+                    "static": DEFAULT_CACHE_TTL * 4
+                },
+                "active": CACHE_ENABLED,
+                "optimized": stats.get("optimized", False),
+                "memoryAvailable": stats.get("memory_available_mb", 1000)
+            },
+            "timestamp": datetime.now().isoformat()
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@app.route("/api/cache/entries", methods=["GET"])
+@rate_limit_api(requests_per_minute=60)
+def cache_entries() -> Any:
+    """Get all cache entries"""
+    try:
+        entries = advanced_cache_service.get_all_entries()
+        return jsonify({
+            "status": "success",
+            "data": entries,
+            "timestamp": datetime.now().isoformat()
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@app.route("/api/cache/clear-expired", methods=["POST"])
+@rate_limit_api(requests_per_minute=30)
+def clear_expired_cache() -> Any:
+    """Clear expired cache entries"""
+    try:
+        cleared_count = advanced_cache_service.clear_expired()
+        return jsonify({
+            "status": "success",
+            "data": {
+                "clearedCount": cleared_count
+            },
+            "message": f"Cleared {cleared_count} expired cache entries",
+            "timestamp": datetime.now().isoformat()
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@app.route("/api/cache/preload", methods=["POST"])
+@rate_limit_api(requests_per_minute=10)
+def preload_cache() -> Any:
+    """Preload cache with common data"""
+    try:
+        preloaded_count = advanced_cache_service.preload_common_data()
+        return jsonify({
+            "status": "success",
+            "data": {
+                "preloadedCount": preloaded_count
+            },
+            "message": f"Preloaded {preloaded_count} cache entries",
+            "timestamp": datetime.now().isoformat()
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@app.route("/api/cache/optimize", methods=["POST"])
+@rate_limit_api(requests_per_minute=5)
+def optimize_cache() -> Any:
+    """Optimize cache performance"""
+    try:
+        result = advanced_cache_service.optimize()
+        return jsonify({
+            "status": "success",
+            "data": {
+                "optimizedSize": result.get("optimized_size_bytes", 0)
+            },
+            "message": "Cache optimized successfully",
+            "timestamp": datetime.now().isoformat()
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@app.route("/api/cache/analytics", methods=["GET"])
+@rate_limit_api(requests_per_minute=30)
+def cache_analytics() -> Any:
+    """Get cache analytics and performance data"""
+    try:
+        analytics = advanced_cache_service.get_analytics()
+        return jsonify({
+            "status": "success",
+            "data": analytics,
+            "timestamp": datetime.now().isoformat()
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@app.route("/api/cache/dependencies", methods=["GET"])
+@rate_limit_api(requests_per_minute=30)
+def cache_dependencies() -> Any:
+    """Get cache dependencies information"""
+    try:
+        dependencies = advanced_cache_service.get_dependencies()
+        return jsonify({
+            "status": "success",
+            "data": dependencies,
+            "timestamp": datetime.now().isoformat()
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
 @app.route("/api/rate-limits/stats", methods=["GET"])
 @rate_limit_api(requests_per_minute=30)
 def rate_limit_stats() -> Any:

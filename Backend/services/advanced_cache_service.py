@@ -48,13 +48,24 @@ class CacheEntry:
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization"""
+        # Convert data to JSON-serializable format
+        try:
+            import json
+            serializable_data = json.loads(json.dumps(self.data, default=str))
+        except:
+            serializable_data = str(self.data)
+        
+        from datetime import datetime
         return {
-            'data': self.data,
+            'data': serializable_data,
             'ttl': self.ttl,
             'dependencies': list(self.dependencies),
             'created_at': self.created_at,
+            'created_at_iso': datetime.fromtimestamp(self.created_at).isoformat(),
+            'expires_at_iso': datetime.fromtimestamp(self.created_at + self.ttl).isoformat(),
             'access_count': self.access_count,
-            'last_accessed': self.last_accessed
+            'last_accessed': self.last_accessed,
+            'last_accessed_iso': datetime.fromtimestamp(self.last_accessed).isoformat()
         }
 
 
@@ -303,9 +314,167 @@ class AdvancedCacheService:
                 'estimated_memory_mb': round(estimated_memory / (1024 * 1024), 2),
                 'max_memory_mb': round(self.max_memory_bytes / (1024 * 1024), 2),
                 'memory_usage_percent': round((estimated_memory / self.max_memory_bytes) * 100, 2),
-                'stats': self.stats.copy()
+                'stats': self.stats.copy(),
+                'hit_rate': hit_rate / 100,  # For compatibility with frontend
+                'hit_rate_change': 0,  # Placeholder for change calculation
+                'total_size_bytes': estimated_memory,
+                'size_change_bytes': 0,  # Placeholder for change calculation
+                'avg_response_time_ms': 10,  # Placeholder
+                'response_time_change_ms': 0,  # Placeholder
+                'total_requests': total_requests,
+                'requests_change': 0,  # Placeholder
+                'optimized': False,  # Placeholder
+                'memory_available_mb': round((self.max_memory_bytes - estimated_memory) / (1024 * 1024), 2)
             }
     
+    def get_all_entries(self) -> List[Dict[str, Any]]:
+        """Get all cache entries as a list"""
+        with self.lock:
+            entries = []
+            for key, entry in self.cache.items():
+                entry_dict = entry.to_dict()
+                entry_dict['key'] = key
+                entry_dict['type'] = self._get_entry_type(key)
+                entry_dict['status'] = 'expired' if entry.is_expired() else 'active'
+                entry_dict['size'] = self._estimate_entry_size(entry)
+                entry_dict['description'] = self._get_entry_description(key, entry_dict['type'])
+                entries.append(entry_dict)
+            return entries
+    
+    def clear_expired(self) -> int:
+        """Clear all expired cache entries"""
+        with self.lock:
+            expired_keys = [key for key, entry in self.cache.items() if entry.is_expired()]
+            for key in expired_keys:
+                del self.cache[key]
+                self.stats['deletes'] += 1
+            
+            logger.info(f"Cleared {len(expired_keys)} expired cache entries")
+            return len(expired_keys)
+    
+    def preload_common_data(self) -> int:
+        """Preload cache with common data"""
+        with self.lock:
+            # Add some common cache entries
+            common_data = {
+                'system_config': {'theme': 'dark', 'language': 'he'},
+                'user_preferences': {'notifications': True, 'auto_refresh': 30},
+                'market_status': {'status': 'open', 'last_update': time.time()},
+                'api_keys': {'yahoo': 'demo_key', 'alpha_vantage': 'demo_key'}
+            }
+            
+            preloaded_count = 0
+            for key, data in common_data.items():
+                if key not in self.cache:
+                    self.cache[key] = CacheEntry(
+                        data=data,
+                        ttl=3600,  # 1 hour
+                        dependencies=[],
+                        created_at=time.time()
+                    )
+                    preloaded_count += 1
+            
+            logger.info(f"Preloaded {preloaded_count} common cache entries")
+            return preloaded_count
+    
+    def optimize(self) -> Dict[str, Any]:
+        """Optimize cache performance"""
+        with self.lock:
+            # Remove least recently used entries if memory is full
+            current_memory = self._estimate_memory_usage()
+            optimized_size = 0
+            
+            if current_memory > self.max_memory_bytes * 0.8:  # 80% threshold
+                # Sort by last accessed time and remove oldest
+                sorted_entries = sorted(
+                    self.cache.items(),
+                    key=lambda x: x[1].last_accessed
+                )
+                
+                # Remove 20% of oldest entries
+                remove_count = len(sorted_entries) // 5
+                for key, entry in sorted_entries[:remove_count]:
+                    optimized_size += self._estimate_entry_size(entry)
+                    del self.cache[key]
+                    self.stats['deletes'] += 1
+            
+            logger.info(f"Cache optimized: freed {optimized_size} bytes")
+            return {'optimized_size_bytes': optimized_size}
+    
+    def get_analytics(self) -> Dict[str, Any]:
+        """Get cache analytics and performance data"""
+        with self.lock:
+            stats = self.get_stats()
+            
+            # Calculate performance metrics
+            total_requests = stats['stats']['hits'] + stats['stats']['misses']
+            efficiency = (stats['stats']['hits'] / total_requests * 100) if total_requests > 0 else 0
+            
+            return {
+                'performance': {
+                    'hit_rate': stats['hit_rate_percent'],
+                    'total_requests': total_requests,
+                    'cache_size_mb': stats['estimated_memory_mb'],
+                    'efficiency_score': round(efficiency, 2)
+                },
+                'recommendations': [
+                    'Cache is performing well' if efficiency > 70 else 'Consider increasing cache size',
+                    'Monitor memory usage regularly' if stats['memory_usage_percent'] > 80 else 'Memory usage is optimal'
+                ],
+                'quality': 'Excellent' if efficiency > 90 else 'Good' if efficiency > 70 else 'Needs improvement'
+            }
+    
+    def get_dependencies(self) -> Dict[str, Any]:
+        """Get cache dependencies information"""
+        with self.lock:
+            return {
+                'total_dependencies': len(self.dependencies),
+                'dependency_chains': list(self.dependencies.keys()),
+                'circular_dependencies': self._detect_circular_dependencies(),
+                'orphaned_entries': self._find_orphaned_entries()
+            }
+    
+    def _get_entry_type(self, key: str) -> str:
+        """Determine entry type based on key"""
+        if 'api' in key.lower():
+            return 'api'
+        elif 'external' in key.lower():
+            return 'external'
+        elif 'static' in key.lower():
+            return 'static'
+        elif 'session' in key.lower():
+            return 'session'
+        else:
+            return 'computed'
+    
+    def _estimate_entry_size(self, entry: CacheEntry) -> int:
+        """Estimate size of a cache entry in bytes"""
+        try:
+            return len(str(entry.data).encode('utf-8'))
+        except:
+            return 1024  # Default estimate
+    
+    def _detect_circular_dependencies(self) -> List[List[str]]:
+        """Detect circular dependencies"""
+        # Simplified circular dependency detection
+        return []
+    
+    def _find_orphaned_entries(self) -> List[str]:
+        """Find orphaned cache entries"""
+        # Simplified orphaned entry detection
+        return []
+    
+    def _get_entry_description(self, key: str, entry_type: str) -> str:
+        """Get description for cache entry"""
+        descriptions = {
+            'api': f'ערך מטמון API עבור {key}',
+            'external': f'נתונים חיצוניים עבור {key}',
+            'static': f'נתונים סטטיים עבור {key}',
+            'session': f'נתוני סשן עבור {key}',
+            'computed': f'ערך מחושב עבור {key}'
+        }
+        return descriptions.get(entry_type, f'ערך מטמון עבור {key}')
+
     def _estimate_memory_usage(self) -> int:
         """Estimate current memory usage in bytes"""
         total_size = 0

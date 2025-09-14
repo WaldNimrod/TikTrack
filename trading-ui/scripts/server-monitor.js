@@ -566,6 +566,9 @@ class ServerMonitor {
       serverStatus.className = `status-value ${status}`;
     }
 
+    // עדכון info-summary
+    this.updateSummaryStats(status, data);
+
     // עדכון פרטי שרת
     if (data && data.components) {
       // סטטוס בסיס נתונים
@@ -1336,12 +1339,10 @@ class ServerMonitor {
       const confirmed = typeof showConfirmationDialog === 'function' ? 
         await new Promise(resolve => {
           showConfirmationDialog(
+            'ניקוי לוגים',
             'האם אתה בטוח שברצונך לנקות את כל הלוגים?',
             () => resolve(true),
-            () => resolve(false),
-            'ניקוי לוגים',
-            'נקה',
-            'ביטול'
+            () => resolve(false)
           );
         }) : 
         window.confirm('האם אתה בטוח שברצונך לנקות את כל הלוגים?');
@@ -1503,6 +1504,37 @@ class ServerMonitor {
     }
   }
 
+  updateSummaryStats(status, data) {
+    // עדכון info-summary
+    const serverStatusStats = document.getElementById('serverStatusStats');
+    const databaseStatusStats = document.getElementById('databaseStatusStats');
+    const cacheStatusStats = document.getElementById('cacheStatusStats');
+    const overallStatus = document.getElementById('overallStatus');
+
+    if (serverStatusStats) {
+      serverStatusStats.textContent = status === 'online' ? 'מחובר' : 'מנותק';
+    }
+
+    if (data && data.components) {
+      if (databaseStatusStats) {
+        const dbStatus = data.components.database?.status === 'healthy' ? 'פעיל' : 'לא פעיל';
+        databaseStatusStats.textContent = dbStatus;
+      }
+
+      if (cacheStatusStats) {
+        const cacheStatus = data.components.cache?.status === 'healthy' ? 'פעיל' : 'לא פעיל';
+        cacheStatusStats.textContent = cacheStatus;
+      }
+    } else {
+      if (databaseStatusStats) databaseStatusStats.textContent = 'לא ידוע';
+      if (cacheStatusStats) cacheStatusStats.textContent = 'לא ידוע';
+    }
+
+    if (overallStatus) {
+      overallStatus.textContent = status === 'online' ? 'פעיל' : 'לא פעיל';
+    }
+  }
+
   updateStatusUI() {
     // עדכון כפתורים לפי סטטוס
     const isOnline = document.getElementById('serverStatus')?.textContent === 'מחובר';
@@ -1654,3 +1686,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   console.log('✅ דף ניטור שרת נטען בהצלחה');
 });
+
+// יצירת instance גלובלי
+window.serverMonitor = new ServerMonitor();
+
+// הוספת פונקציות גלובליות
+window.copyDetailedLog = () => window.serverMonitor.copyDetailedLog();
+
+// הוספת פונקציות חסרות
+ServerMonitor.optimizeDatabase = () => window.serverMonitor.optimizeDatabase();
+ServerMonitor.exportLogs = () => window.serverMonitor.exportLogs();

@@ -1,14 +1,63 @@
 <!DOCTYPE html>
+<!--
+  ========================================
+  דף בדיקת מטמון - Cache Test Page
+  ========================================
+  
+  דף זה מאפשר בדיקה מקיפה של מערכת המטמון
+  כולל ניהול TTL, ניקוי מטמון, ובדיקת ביצועים
+  
+  תכונות:
+  - בדיקת סטטוס מטמון בזמן אמת
+  - ניהול TTL ו-Cache Invalidation
+  - בדיקת ביצועים ומטריקות
+  - ניקוי מטמון סלקטיבי
+  - מעקב אחר Dependencies
+  
+  מחבר: TikTrack Development Team
+  תאריך עדכון אחרון: January 2025
+  ========================================
+-->
 <html lang="he" dir="rtl">
-            <!-- ===== CSS Architecture - Unified CSS ===== -->
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת מטמון - TikTrack</title>
     
-    <!-- Bootstrap Framework -->
+    <!-- 
+    CSS Loading Order - ראו: documentation/frontend/css/CSS_ARCHITECTURE.md
+    Bootstrap חייב להיטען לפני CSS שלנו כדי ש-CSS שלנו יוכל לדרוס אותו
+    -->
+    
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- TikTrack CSS - Unified CSS (No @import) -->
-    <link rel="stylesheet" href="styles-new/unified.css">
+    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=v1.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=v1.0.0">
     
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -18,340 +67,392 @@
     
     <!-- Error Handlers -->
     <script src="scripts/error-handlers.js"></script>
-    
-    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_level3_fix"></head>
+
+    <!-- Filter System Script -->
+    <script src="scripts/filter-system.js"></script>
+
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v38_fixed">
+</head>
+
 <body class="cache-test-page">
-    <!-- Unified Header Container -->
-    <div id="unified-header"></div>
     <div class="background-wrapper">
-        <!-- unified-header יווצר כאן אוטומטית -->
+        <!-- Header System -->
         <div id="unified-header"></div>
-        
-        <!-- Page body - All content after header -->
+
+        <!-- Page body -->
         <div class="page-body">
-            <!-- Page area - top-Section -->
-            <div class="top-section">
-                <!-- Main header -->
-                <div class="section-header">
-                    <div class="table-title">
-                        <img src="images/icons/development.svg?v=20250905" alt="מוניטורינג Cache"
-                            style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
-                        מוניטורינג Cache מתקדם
-                    </div>
-                    <div class="table-actions">
-                        <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
-                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור Cache">
-                            <span class="filter-icon">▲</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Alert cards -->
-                <div class="section-body">
-                    <active-alerts></active-alerts>
-
-                    <!-- Page summary -->
-                    <div class="info-summary" id="summaryStats">
-                        <div>מצב מערכת: <strong id="systemStatusStats">בדיקה...</strong></div>
-                        <div>Hit Rate: <strong id="hitRateStats">בדיקה...</strong></div>
-                        <div>זיכרון: <strong id="memoryUsageStats">בדיקה...</strong></div>
-                        <div>סטטוס: <strong id="overallStatus">בדיקה...</strong></div>
-                    </div>
-                </div>
-            </div> <!-- End top-section -->
-
-            <!-- Main content -->
-            <div class="main-content" data-section="cache-test">
-                <div class="container">
-
-        <!-- Cache Status Dashboard -->
-        <section class="cache-dashboard">
-            <div class="dashboard-grid">
-                <div class="status-card">
-                    <div class="card-header">
-                        <i class="fas fa-heartbeat"></i>
-                        <h3>מצב המערכת</h3>
-                    </div>
-                    <div class="card-content">
-                        <div id="system-status" class="status-indicator">
-                            <i class="fas fa-spinner fa-spin"></i> בודק...
-                        </div>
-                    </div>
-                </div>
-
-                <div class="status-card">
-                    <div class="card-header">
-                        <i class="fas fa-chart-line"></i>
-                        <h3>ביצועים</h3>
-                    </div>
-                    <div class="card-content">
-                        <div id="performance-stats" class="stats-display">
-                            <i class="fas fa-spinner fa-spin"></i> טוען...
-                        </div>
-                    </div>
-                </div>
-
-                <div class="status-card">
-                    <div class="card-header">
-                        <i class="fas fa-database"></i>
-                        <h3>זיכרון</h3>
-                    </div>
-                    <div class="card-content">
-                        <div id="memory-usage" class="memory-display">
-                            <i class="fas fa-spinner fa-spin"></i> טוען...
-                        </div>
-                    </div>
-                </div>
-
-                <div class="status-card">
-                    <div class="card-header">
-                        <i class="fas fa-bullseye"></i>
-                        <h3>Hit Rate</h3>
-                    </div>
-                    <div class="card-content">
-                        <div id="hit-rate" class="hit-rate-display">
-                            <i class="fas fa-spinner fa-spin"></i> טוען...
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Dependencies System Monitoring -->
-        <section class="dependencies-monitoring">
-            <h2><i class="fas fa-project-diagram"></i> מעקב Dependencies</h2>
-            
-            <div class="dependencies-grid">
-                <div class="dependency-card">
-                    <div class="card-header">
-                        <i class="fas fa-link"></i>
-                        <h3>Dependencies Matrix</h3>
-                    </div>
-                    <div class="card-content">
-                        <div id="dependencies-matrix" class="dependencies-display">
-                            <div class="dependency-item">
-                                <span class="dep-name">tickers</span>
-                                <span class="dep-arrow">→</span>
-                                <span class="dep-targets">dashboard</span>
-                            </div>
-                            <div class="dependency-item">
-                                <span class="dep-name">trades</span>
-                                <span class="dep-arrow">→</span>
-                                <span class="dep-targets">tickers, dashboard</span>
-                            </div>
-                            <div class="dependency-item">
-                                <span class="dep-name">executions</span>
-                                <span class="dep-arrow">→</span>
-                                <span class="dep-targets">trades, dashboard</span>
-                            </div>
-                            <div class="dependency-item">
-                                <span class="dep-name">preferences</span>
-                                <span class="dep-arrow">→</span>
-                                <span class="dep-targets">-</span>
-                            </div>
-                            <div class="dependency-item">
-                                <span class="dep-name">currencies</span>
-                                <span class="dep-arrow">→</span>
-                                <span class="dep-targets">-</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="dependency-card">
-                    <div class="card-header">
-                        <i class="fas fa-clock"></i>
-                        <h3>TTL Strategy</h3>
-                    </div>
-                    <div class="card-content">
-                        <div id="ttl-strategy" class="ttl-display">
-                            <div class="ttl-item critical">
-                                <span class="ttl-type">🔥 קריטי</span>
-                                <span class="ttl-value">30s</span>
-                                <span class="ttl-entities">tickers, trades, executions</span>
-                            </div>
-                            <div class="ttl-item normal">
-                                <span class="ttl-type">⚡ רגיל</span>
-                                <span class="ttl-value">5min</span>
-                                <span class="ttl-entities">preferences</span>
-                            </div>
-                            <div class="ttl-item static">
-                                <span class="ttl-type">🏗️ סטטי</span>
-                                <span class="ttl-value">1h</span>
-                                <span class="ttl-entities">currencies</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="dependency-card">
-                    <div class="card-header">
-                        <i class="fas fa-bolt"></i>
-                        <h3>Invalidation Testing</h3>
-                    </div>
-                    <div class="card-content">
-                        <div class="invalidation-controls">
-                            <select id="dependency-select" class="form-control">
-                                <option value="tickers">tickers</option>
-                                <option value="trades">trades</option>
-                                <option value="executions">executions</option>
-                                <option value="preferences">preferences</option>
-                                <option value="currencies">currencies</option>
-                                <option value="dashboard">dashboard</option>
-                            </select>
-                            <button id="invalidate-dependency-btn" class="btn btn-warning">
-                                <i class="fas fa-trash"></i> Invalidate Dependency
+            <!-- Main content limited in width -->
+            <div class="main-content">
+                <!-- Top Section - Cache Status Overview -->
+                <div class="top-section">
+                    <div class="section-header">
+                        <h1 class="table-title">🧪 בדיקת מטמון</h1>
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-sm btn-outline-primary" onclick="refreshCacheStatus()">
+                                <i class="fas fa-sync-alt"></i> רענן סטטוס
+                            </button>
+                            <button class="btn btn-sm btn-outline-success" onclick="copyDetailedLog()">
+                                <i class="fas fa-copy"></i> העתק לוג מפורט
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="toggleAllSections()">
+                                <i class="fas fa-expand-arrows-alt"></i> הצג/הסתר הכל
                             </button>
                         </div>
-                        <div id="invalidation-results" class="results-display">
-                            תוצאות invalidation יופיעו כאן...
+                    </div>
+                    <div class="section-body">
+                        <!-- Cache Status Cards -->
+                        <div class="overview-grid">
+                            <div class="overview-card primary">
+                                <div class="overview-card-icon">⚡</div>
+                                <div class="overview-card-content">
+                                    <div class="overview-card-number" id="cacheHitRate">--</div>
+                                    <div class="overview-card-label">שיעור פגיעות במטמון</div>
+                                    <div class="overview-card-change" id="cacheHitRateChange">טוען...</div>
+                                </div>
+                            </div>
+
+                            <div class="overview-card success">
+                                <div class="overview-card-icon">💾</div>
+                                <div class="overview-card-content">
+                                    <div class="overview-card-number" id="cacheSize">--</div>
+                                    <div class="overview-card-label">גודל מטמון</div>
+                                    <div class="overview-card-change" id="cacheSizeChange">טוען...</div>
+                                </div>
+                            </div>
+
+                            <div class="overview-card info">
+                                <div class="overview-card-icon">🕒</div>
+                                <div class="overview-card-content">
+                                    <div class="overview-card-number" id="avgResponseTime">--</div>
+                                    <div class="overview-card-label">זמן תגובה ממוצע</div>
+                                    <div class="overview-card-change" id="avgResponseTimeChange">טוען...</div>
+                                </div>
+                            </div>
+
+                            <div class="overview-card warning">
+                                <div class="overview-card-icon">🔄</div>
+                                <div class="overview-card-content">
+                                    <div class="overview-card-number" id="totalRequests">--</div>
+                                    <div class="overview-card-label">סך בקשות</div>
+                                    <div class="overview-card-change" id="totalRequestsChange">טוען...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 1 - Cache Management -->
+                <div class="content-section" id="section1">
+                    <div class="section-header">
+                        <h2>⚙️ ניהול מטמון</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="button-row mb-3">
+                            <button class="btn btn-sm btn-outline-primary" onclick="clearAllCache()">
+                                <i class="fas fa-trash-alt"></i> נקה כל המטמון
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="clearExpiredCache()">
+                                <i class="fas fa-clock"></i> נקה מטמון פג תוקף
+                            </button>
+                            <button class="btn btn-sm btn-outline-info" onclick="preloadCache()">
+                                <i class="fas fa-download"></i> טען מטמון מראש
+                            </button>
+                            <button class="btn btn-sm btn-outline-success" onclick="optimizeCache()">
+                                <i class="fas fa-magic"></i> אופטמז מטמון
+                            </button>
+                        </div>
+
+                        <!-- Cache Control Panel -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="stat-card">
+                                    <div class="stat-header">
+                                        <h3 class="stat-title">הגדרות TTL</h3>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-row">
+                                            <span>API כללי</span>
+                                            <span class="badge bg-primary" id="generalTTL">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>נתונים חיצוניים</span>
+                                            <span class="badge bg-info" id="externalTTL">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>נתונים סטטיים</span>
+                                            <span class="badge bg-success" id="staticTTL">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="stat-card">
+                                    <div class="stat-header">
+                                        <h3 class="stat-title">סטטוס מטמון</h3>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-row">
+                                            <span>מטמון פעיל</span>
+                                            <span class="badge bg-success" id="cacheActive">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>מטמון אופטימלי</span>
+                                            <span class="badge bg-info" id="cacheOptimized">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>זיכרון זמין</span>
+                                            <span class="badge bg-warning" id="memoryAvailable">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2 - Cache Analytics -->
+                <div class="content-section" id="section2">
+                    <div class="section-header">
+                        <h2>📊 ניתוח מטמון</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="button-row mb-3">
+                            <select class="form-select d-inline-block w-auto" id="timeRange" onchange="updateAnalytics()">
+                                <option value="1h">שעה אחרונה</option>
+                                <option value="24h" selected>24 שעות</option>
+                                <option value="7d">7 ימים</option>
+                                <option value="30d">30 ימים</option>
+                            </select>
+                            <button class="btn btn-sm btn-outline-primary" onclick="generateAnalyticsReport()">
+                                <i class="fas fa-chart-line"></i> דוח ניתוח
+                            </button>
+                        </div>
+
+                        <!-- Analytics Cards -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="compact-stat-card">
+                                    <div class="compact-stat-number positive" id="hitCount">--</div>
+                                    <div class="compact-stat-label">פגיעות במטמון</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="compact-stat-card">
+                                    <div class="compact-stat-number negative" id="missCount">--</div>
+                                    <div class="compact-stat-label">חטיפות מטמון</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="compact-stat-card">
+                                    <div class="compact-stat-number" id="evictionCount">--</div>
+                                    <div class="compact-stat-label">הסרות מטמון</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="compact-stat-card">
+                                    <div class="compact-stat-number" id="invalidationCount">--</div>
+                                    <div class="compact-stat-label">ביטולי מטמון</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Performance Chart -->
+                        <div class="chart-card mt-4">
+                            <div class="chart-title">
+                                <i class="fas fa-chart-area"></i>
+                                ביצועי מטמון לאורך זמן
+                            </div>
+                            <div class="chart-container" id="performanceChart">
+                                <canvas id="cachePerformanceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3 - Cache Entries -->
+                <div class="content-section" id="section3">
+                    <div class="section-header">
+                        <h2>🗂️ רשימת ערכי מטמון</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="button-row mb-3">
+                            <div class="input-group" style="max-width: 300px;">
+                                <input type="text" class="form-control" id="cacheSearch" placeholder="חיפוש במטמון..." onkeyup="searchCacheEntries()">
+                                <button class="btn btn-outline-secondary" type="button" onclick="searchCacheEntries()">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <select class="form-select d-inline-block w-auto" id="cacheFilter" onchange="filterCacheEntries()">
+                                <option value="all">כל הערכים</option>
+                                <option value="expired">פג תוקף</option>
+                                <option value="active">פעיל</option>
+                                <option value="external">נתונים חיצוניים</option>
+                                <option value="internal">נתונים פנימיים</option>
+                            </select>
+                        </div>
+
+                        <!-- Cache Entries Table -->
+                        <div class="table-container">
+                            <div class="table-responsive">
+                                <table class="data-table" id="cacheTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="sortable-header-btn" onclick="sortTable('cacheTable', 0)">
+                                                מפתח מטמון
+                                                <span class="sort-icon">↕</span>
+                                            </th>
+                                            <th class="sortable-header-btn" onclick="sortTable('cacheTable', 1)">
+                                                סוג נתונים
+                                                <span class="sort-icon">↕</span>
+                                            </th>
+                                            <th class="sortable-header-btn" onclick="sortTable('cacheTable', 2)">
+                                                זמן יצירה
+                                                <span class="sort-icon">↕</span>
+                                            </th>
+                                            <th class="sortable-header-btn" onclick="sortTable('cacheTable', 3)">
+                                                TTL
+                                                <span class="sort-icon">↕</span>
+                                            </th>
+                                            <th class="sortable-header-btn" onclick="sortTable('cacheTable', 4)">
+                                                גודל
+                                                <span class="sort-icon">↕</span>
+                                            </th>
+                                            <th class="sortable-header-btn" onclick="sortTable('cacheTable', 5)">
+                                                סטטוס
+                                                <span class="sort-icon">↕</span>
+                                            </th>
+                                            <th class="actions-cell">פעולות</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cacheTableBody">
+                                        <!-- Cache entries will be populated here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4 - Cache Dependencies -->
+                <div class="content-section" id="section4">
+                    <div class="section-header">
+                        <h2>🔗 תלויות מטמון</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="button-row mb-3">
+                            <button class="btn btn-sm btn-outline-primary" onclick="refreshDependencies()">
+                                <i class="fas fa-sync-alt"></i> רענן תלויות
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="validateDependencies()">
+                                <i class="fas fa-check-circle"></i> בדוק תקינות
+                            </button>
+                            <button class="btn btn-sm btn-outline-info" onclick="optimizeDependencies()">
+                                <i class="fas fa-project-diagram"></i> אופטמז תלויות
+                            </button>
+                        </div>
+
+                        <!-- Dependencies Overview -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="stat-card">
+                                    <div class="stat-header">
+                                        <h3 class="stat-title">סטטיסטיקות תלויות</h3>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-row">
+                                            <span>סך תלויות</span>
+                                            <span class="badge bg-primary" id="totalDependencies">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>תלויות פעילות</span>
+                                            <span class="badge bg-success" id="activeDependencies">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>תלויות שבורות</span>
+                                            <span class="badge bg-danger" id="brokenDependencies">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="stat-card">
+                                    <div class="stat-header">
+                                        <h3 class="stat-title">ביטולי מטמון</h3>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-row">
+                                            <span>ביטולים היום</span>
+                                            <span class="badge bg-warning" id="invalidationsToday">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>ביטולים השבוע</span>
+                                            <span class="badge bg-info" id="invalidationsWeek">--</span>
+                                        </div>
+                                        <div class="stat-row">
+                                            <span>יעילות ביטולים</span>
+                                            <span class="badge bg-success" id="invalidationEfficiency">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Dependencies Tree -->
+                        <div class="chart-card mt-4">
+                            <div class="chart-title">
+                                <i class="fas fa-sitemap"></i>
+                                עץ תלויות מטמון
+                            </div>
+                            <div class="chart-container" id="dependenciesTree">
+                                <div id="dependenciesVisualization">
+                                    <!-- Dependencies tree will be rendered here -->
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </div>
 
-        <!-- Cache Operations -->
-        <section class="cache-operations">
-            <h2><i class="fas fa-tools"></i> פעולות Cache</h2>
-            
-            <div class="operations-grid">
-                <div class="operation-card">
-                    <h3>ניקוי Cache</h3>
-                    <p>מחיקת כל רשומות ה-Cache</p>
-                    <button id="clear-cache-btn" class="btn btn-danger">
-                        <i class="fas fa-trash"></i> נקה Cache
-                    </button>
-                </div>
-
-                <div class="operation-card">
-                    <h3>בדיקת בריאות</h3>
-                    <p>בדיקת מצב המערכת</p>
-                    <button id="health-check-btn" class="btn btn-info">
-                        <i class="fas fa-stethoscope"></i> בדיקת בריאות
-                    </button>
-                </div>
-
-                <div class="operation-card">
-                    <h3>סטטיסטיקות</h3>
-                    <p>קבלת נתונים מפורטים</p>
-                    <button id="stats-btn" class="btn btn-success">
-                        <i class="fas fa-chart-bar"></i> סטטיסטיקות
-                    </button>
-                </div>
-
-                <div class="operation-card">
-                    <h3>רענון נתונים</h3>
-                    <p>עדכון כל הנתונים</p>
-                    <button id="refresh-btn" class="btn btn-primary">
-                        <i class="fas fa-sync-alt"></i> רענן
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Cache Testing -->
-        <section class="cache-testing">
-            <h2><i class="fas fa-vial"></i> בדיקות Cache</h2>
-            
-            <div class="test-controls">
-                <div class="test-input-group">
-                    <label for="test-key">מפתח בדיקה:</label>
-                    <input type="text" id="test-key" placeholder="הכנס מפתח לבדיקה" value="test_key_123">
-                </div>
-                
-                <div class="test-input-group">
-                    <label for="test-value">ערך בדיקה:</label>
-                    <input type="text" id="test-value" placeholder="הכנס ערך לבדיקה" value="test_value_456">
-                </div>
-                
-                <div class="test-input-group">
-                    <label for="test-ttl">TTL (שניות):</label>
-                    <input type="number" id="test-ttl" placeholder="300" value="300" min="1" max="3600">
-                </div>
-            </div>
-
-            <div class="test-actions">
-                <button id="set-cache-btn" class="btn btn-success">
-                    <i class="fas fa-save"></i> שמור ב-Cache
-                </button>
-                <button id="get-cache-btn" class="btn btn-info">
-                    <i class="fas fa-search"></i> קבל מ-Cache
-                </button>
-                <button id="delete-cache-btn" class="btn btn-warning">
-                    <i class="fas fa-trash"></i> מחק מ-Cache
-                </button>
-            </div>
-
-            <div class="test-results">
-                <h3>תוצאות הבדיקה:</h3>
-                <div id="test-output" class="test-output">
-                    <p class="placeholder">התוצאות יופיעו כאן...</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Performance Monitoring -->
-        <section class="performance-monitoring">
-            <h2><i class="fas fa-tachometer-alt"></i> ניטור ביצועים</h2>
-            
-            <div class="performance-grid">
-                <div class="performance-card">
-                    <h3>זמני תגובה</h3>
-                    <div id="response-times" class="performance-data">
-                        <i class="fas fa-spinner fa-spin"></i> טוען...
-                    </div>
-                </div>
-
-                <div class="performance-card">
-                    <h3>סטטיסטיקות Cache</h3>
-                    <div id="cache-stats" class="performance-data">
-                        <i class="fas fa-spinner fa-spin"></i> טוען...
-                    </div>
-                </div>
-
-                <div class="performance-card">
-                    <h3>ניתוח ביצועים</h3>
-                    <div id="performance-analysis" class="performance-data">
-                        <i class="fas fa-spinner fa-spin"></i> טוען...
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Logs and Debugging -->
-        <section class="logs-debugging">
-            <h2><i class="fas fa-bug"></i> לוגים ודיבוג</h2>
-            
-            <div class="logs-controls">
-                <button id="clear-logs-btn" class="btn btn-secondary">
-                    <i class="fas fa-eraser"></i> נקה לוגים
-                </button>
-                <button id="export-logs-btn" class="btn btn-outline">
-                    <i class="fas fa-download"></i> ייצא לוגים
-                </button>
-            </div>
-
-            <div class="logs-display">
-                <div id="logs-content" class="logs-content">
-                    <p class="placeholder">הלוגים יופיעו כאן...</p>
-                </div>
-            </div>
-        </section>
-                </div>
-            </div> <!-- End main-content -->
-        </div> <!-- End page-body -->
-    </div> <!-- End background-wrapper -->
-
-    <!-- Scripts -->
-    <script src="scripts/console-cleanup.js"></script>
-    <script src="scripts/page-utils.js"></script>
-    <script src="scripts/header-system.js?v=20250115_level3_fix"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js?v=v34_fixes"></script>
+    
+    <!-- Notification System -->
     <script src="scripts/notification-system.js"></script>
+    
+    <!-- Main Utilities -->
     <script src="scripts/main.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    
+    <!-- Cache Test Script -->
     <script src="scripts/cache-test.js"></script>
+
+    <!-- Initialize on page load -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCacheTest();
+        });
+    </script>
 </body>
 </html>

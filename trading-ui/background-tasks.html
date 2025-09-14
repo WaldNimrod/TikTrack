@@ -28,6 +28,7 @@
     <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=v1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=v1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_info-summary.css?v=v1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=v1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=v1.0.1">
     <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=v1.0.0">
@@ -45,8 +46,7 @@
     <script src="scripts/color-scheme-system.js"></script>
     
     <!-- Preferences System Scripts -->
-    <script src="scripts/preferences-v2.js"></script>
-    <script src="scripts/preferences-v2-compatibility.js"></script>
+    <script src="scripts/preferences.js"></script>
     
     <!-- Color Demo Toggle Script -->
     <script src="scripts/color-demo-toggle.js"></script>
@@ -67,13 +67,16 @@
                 <div class="top-section">
                     <div class="section-header">
                         <h1>🔧 ניהול משימות רקע</h1>
-                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <div class="header-actions">
+                            <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                                <i class="fas fa-copy"></i> העתק לוג מפורט
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
-                        <h2>מצב המערכות</h2>
-                        
                         <!-- Active alerts -->
                         <active-alerts></active-alerts>
 
@@ -85,12 +88,6 @@
                             <div>סטטוס: <strong id="overallStatus">בדיקה...</strong></div>
                         </div>
 
-                        <!-- Action buttons -->
-                        <div class="table-actions">
-                            <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
-                                <i class="fas fa-copy"></i> העתק לוג מפורט
-                            </button>
-                        </div>
                     </div>
                 </div>
 
@@ -153,18 +150,18 @@
                             </div>
                         </div>
 
-                        <!-- Control Buttons -->
-                        <div class="btn-group mb-3">
-                            <button id="start-scheduler" class="btn btn-success btn-sm" onclick="startScheduler()">
-                                <i class="fas fa-play me-1"></i> הפעל Scheduler
-                            </button>
-                            <button id="stop-scheduler" class="btn btn-danger btn-sm" onclick="stopScheduler()">
-                                <i class="fas fa-stop me-1"></i> עצור Scheduler
-                            </button>
-                            <button id="refresh-status" class="btn btn-primary btn-sm" onclick="refreshStatus()">
-                                <i class="fas fa-sync-alt me-1"></i> רענן
-                            </button>
-                        </div>
+                <!-- Control Buttons -->
+                <div class="control-buttons mb-3">
+                    <button id="start-scheduler" class="btn btn-success btn-sm" onclick="startScheduler()">
+                        <i class="fas fa-play me-1"></i> הפעל Scheduler
+                    </button>
+                    <button id="stop-scheduler" class="btn btn-danger btn-sm" onclick="stopScheduler()">
+                        <i class="fas fa-stop me-1"></i> עצור Scheduler
+                    </button>
+                    <button id="refresh-status" class="btn btn-primary btn-sm" onclick="refreshStatus()">
+                        <i class="fas fa-sync-alt me-1"></i> רענן
+                    </button>
+                </div>
                     </div>
                 </div>
 
@@ -335,9 +332,14 @@
                     </td>
                     <td>${(task.success_rate || 0).toFixed(1)}%</td>
                     <td>
-                        <button class="btn btn-sm btn-primary" onclick="executeTask('${name}')">
-                            <i class="fas fa-play"></i> הפעל
-                        </button>
+                        <div class="task-controls">
+                            <button class="btn btn-sm btn-primary" onclick="executeTask('${name}')">
+                                <i class="fas fa-play"></i> הפעל
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="stopTask('${name}')">
+                                <i class="fas fa-stop"></i> עצור
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
@@ -422,6 +424,19 @@
             }
         }
 
+        async function stopTask(taskName) {
+            try {
+                log(`🛑 עוצר משימה: ${taskName}`);
+                await apiCall(`/api/v1/background-tasks/tasks/${taskName}/stop`, 'POST');
+                log(`✅ משימה ${taskName} נעצרה בהצלחה`);
+                window.showNotification && window.showNotification(`משימה ${taskName} נעצרה בהצלחה`, 'success');
+                setTimeout(refreshStatus, 2000);
+            } catch (error) {
+                log(`❌ שגיאה בעצירת משימה ${taskName}: ${error.message}`);
+                window.showNotification && window.showNotification(`שגיאה בעצירת משימה: ${error.message}`, 'error');
+            }
+        }
+
         // Copy detailed log functionality
         function generateDetailedLog() {
             const timestamp = new Date().toLocaleString('he-IL');
@@ -468,6 +483,68 @@
                 console.error('Failed to copy log:', error);
                 window.showNotification && window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
                 console.log(generateDetailedLog());
+            }
+        }
+
+        // Toggle all sections function
+        function toggleAllSections() {
+            const sections = document.querySelectorAll('.content-section');
+            const topSection = document.querySelector('.top-section .section-body');
+            const toggleIcon = document.querySelector('.header-actions .section-toggle-icon');
+            
+            // Check if any section is open
+            let anyOpen = false;
+            sections.forEach(section => {
+                const body = section.querySelector('.section-body');
+                if (body && body.style.display !== 'none') {
+                    anyOpen = true;
+                }
+            });
+            
+            // Also check top section
+            if (topSection && topSection.style.display !== 'none') {
+                anyOpen = true;
+            }
+            
+            // Toggle all sections
+            const shouldShow = !anyOpen;
+            
+            sections.forEach(section => {
+                const body = section.querySelector('.section-body');
+                const icon = section.querySelector('.section-toggle-icon');
+                if (body) {
+                    body.style.display = shouldShow ? 'block' : 'none';
+                }
+                if (icon) {
+                    icon.textContent = shouldShow ? '▼' : '▶';
+                }
+            });
+            
+            // Toggle top section
+            if (topSection) {
+                topSection.style.display = shouldShow ? 'block' : 'none';
+            }
+            
+            // Update main toggle icon
+            if (toggleIcon) {
+                toggleIcon.textContent = shouldShow ? '▼' : '▶';
+            }
+        }
+
+        // Individual section toggle
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+            
+            const body = section.querySelector('.section-body');
+            const icon = section.querySelector('.section-toggle-icon');
+            
+            if (body) {
+                const isHidden = body.style.display === 'none';
+                body.style.display = isHidden ? 'block' : 'none';
+                if (icon) {
+                    icon.textContent = isHidden ? '▼' : '▶';
+                }
             }
         }
 

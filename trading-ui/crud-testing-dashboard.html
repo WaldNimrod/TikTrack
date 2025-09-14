@@ -219,12 +219,85 @@
                 <!-- UI Content Section 1 Start-->
                 <div class="content-section" id="section1">
                     <div class="section-header">
-                        <h2>📋 טאבי ישויות</h2>
+                        <h2>🧪 כלי בדיקות CRUD</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
+                        <!-- הסבר על הכלים -->
+                        <div class="alert alert-info mb-4">
+                            <h5><i class="fas fa-info-circle"></i> איך להשתמש בכלי הבדיקות</h5>
+                            <p><strong>שלב 1:</strong> לחץ על הטאב של הישות שברצונך לבדוק</p>
+                            <p><strong>שלב 2:</strong> לחץ על כפתור "פתח עמוד" כדי לפתוח את העמוד הנבדק</p>
+                            <p><strong>שלב 3:</strong> השתמש בכלי הבדיקה האוטומטיים או בדוק ידנית</p>
+                            <p><strong>שלב 4:</strong> סמן את הבדיקות שביצעת וסיים עם "סיימתי בדיקה" או "יש בעיות"</p>
+                        </div>
+
+                        <!-- כלי בדיקה כלליים -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6><i class="fas fa-tools"></i> כלי בדיקה אוטומטיים</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-primary btn-sm mb-2" onclick="runAllBasicTests()">
+                                            <i class="fas fa-play"></i> בדיקות בסיסיות לכל העמודים
+                                        </button>
+                                        <br>
+                                        <button class="btn btn-success btn-sm mb-2" onclick="runAllCRUDTests()">
+                                            <i class="fas fa-database"></i> בדיקות CRUD לכל הישויות
+                                        </button>
+                                        <br>
+                                        <button class="btn btn-warning btn-sm" onclick="checkAllConnections()">
+                                            <i class="fas fa-network-wired"></i> בדיקת חיבורים לשרת
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6><i class="fas fa-chart-line"></i> דוחות וסטטיסטיקות</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <button class="btn btn-info btn-sm mb-2" onclick="generateTestReport()">
+                                            <i class="fas fa-file-alt"></i> יצירת דוח בדיקה
+                                        </button>
+                                        <br>
+                                        <button class="btn btn-secondary btn-sm mb-2" onclick="exportTestResults()">
+                                            <i class="fas fa-download"></i> ייצוא תוצאות
+                                        </button>
+                                        <br>
+                                        <button class="btn btn-dark btn-sm" onclick="resetAllTests()">
+                                            <i class="fas fa-undo"></i> איפוס כל הבדיקות
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- תצוגת תוצאות בדיקות -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6><i class="fas fa-chart-bar"></i> תוצאות בדיקות</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="testResultsContainer" style="display: none;">
+                                            <h6>תוצאות בדיקה אחרונה:</h6>
+                                            <div id="testResultsContent"></div>
+                                        </div>
+                                        <div id="noResultsMessage" class="text-muted">
+                                            <i class="fas fa-info-circle"></i> עדיין לא בוצעו בדיקות. לחץ על אחד מכפתורי הבדיקה למעלה.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- טאבים לפי ישויות -->
                         <ul class="nav nav-tabs" id="entityTabs" role="tablist">
                             <li class="nav-item" role="presentation">
@@ -258,24 +331,37 @@
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="other-tab" data-bs-toggle="tab" data-bs-target="#other" type="button" role="tab">
-                                    📝 אחר
+                                <button class="nav-link" id="cash_flows-tab" data-bs-toggle="tab" data-bs-target="#cash_flows" type="button" role="tab">
+                                    💰 תזרים מזומנים
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="trade_plans-tab" data-bs-toggle="tab" data-bs-target="#trade_plans" type="button" role="tab">
+                                    📋 תוכניות מסחר
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="constraints-tab" data-bs-toggle="tab" data-bs-target="#constraints" type="button" role="tab">
+                                    ⚠️ אילוצים
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab">
+                                    📝 הערות
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="research-tab" data-bs-toggle="tab" data-bs-target="#research" type="button" role="tab">
+                                    🔬 מחקר
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="preferences-tab" data-bs-toggle="tab" data-bs-target="#preferences" type="button" role="tab">
+                                    ⚙️ העדפות
                                 </button>
                             </li>
                         </ul>
-                    </div>
-                </div>
-                <!-- UI Content Section 1 End -->   
 
-                <!-- UI Content Section 2 Start-->
-                <div class="content-section" id="section2">
-                    <div class="section-header">
-                        <h2>📊 תוכן הטאבים</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
-                    </div>
-                    <div class="section-body">
                         <!-- תוכן הטאבים -->
                         <div class="tab-content" id="entityTabContent">
                             <!-- טאב ראשי -->
@@ -292,17 +378,20 @@
                 </div>
                 
                 <div class="page-body">
-                    <div class="test-actions">
-                        <a href="/" target="_blank" class="btn btn-primary">
-                            <i class="fas fa-external-link-alt"></i> פתח עמוד
-                        </a>
-                        <button class="btn btn-success" onclick="markPageComplete('index')">
-                            <i class="fas fa-check"></i> סיימתי בדיקה
-                        </button>
-                        <button class="btn btn-warning" onclick="markPagePartial('index')">
-                            <i class="fas fa-exclamation"></i> יש בעיות
-                        </button>
-                    </div>
+                                        <div class="test-actions">
+                                            <a href="/" target="_blank" class="btn btn-primary">
+                                                <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                            </a>
+                                            <button class="btn btn-info btn-sm" onclick="runBasicTest('index', '/')">
+                                                <i class="fas fa-play"></i> בדיקה בסיסית
+                                            </button>
+                                            <button class="btn btn-success" onclick="markPageComplete('index')">
+                                                <i class="fas fa-check"></i> סיימתי בדיקה
+                                            </button>
+                                            <button class="btn btn-warning" onclick="markPagePartial('index')">
+                                                <i class="fas fa-exclamation"></i> יש בעיות
+                                            </button>
+                                        </div>
                     
                     <div class="test-section">
                         <h4>🔍 בדיקות בסיסיות</h4>
@@ -373,17 +462,23 @@
                 </div>
                 
                 <div class="page-body">
-                    <div class="test-actions">
-                        <a href="/trades" target="_blank" class="btn btn-primary">
-                            <i class="fas fa-external-link-alt"></i> פתח עמוד
-                        </a>
-                        <button class="btn btn-success" onclick="markPageComplete('trades')">
-                            <i class="fas fa-check"></i> סיימתי בדיקה
-                        </button>
-                        <button class="btn btn-warning" onclick="markPagePartial('trades')">
-                            <i class="fas fa-exclamation"></i> יש בעיות
-                        </button>
-                    </div>
+                                        <div class="test-actions">
+                                            <a href="/trades" target="_blank" class="btn btn-primary">
+                                                <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                            </a>
+                                            <button class="btn btn-info btn-sm" onclick="runBasicTest('trades', '/trades')">
+                                                <i class="fas fa-play"></i> בדיקה בסיסית
+                                            </button>
+                                            <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('trades', '/api/v1/trades/')">
+                                                <i class="fas fa-database"></i> בדיקת CRUD
+                                            </button>
+                                            <button class="btn btn-success" onclick="markPageComplete('trades')">
+                                                <i class="fas fa-check"></i> סיימתי בדיקה
+                                            </button>
+                                            <button class="btn btn-warning" onclick="markPagePartial('trades')">
+                                                <i class="fas fa-exclamation"></i> יש בעיות
+                                            </button>
+                                        </div>
                     
                     <div class="test-section">
                         <h4>🔍 בדיקות בסיסיות</h4>
@@ -526,6 +621,12 @@
                                             <a href="/accounts" target="_blank" class="btn btn-primary">
                                                 <i class="fas fa-external-link-alt"></i> פתח עמוד
                                             </a>
+                                            <button class="btn btn-info btn-sm" onclick="runBasicTest('accounts', '/accounts')">
+                                                <i class="fas fa-play"></i> בדיקה בסיסית
+                                            </button>
+                                            <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('accounts', '/api/v1/accounts/')">
+                                                <i class="fas fa-database"></i> בדיקת CRUD
+                                            </button>
                                             <button class="btn btn-success" onclick="markPageComplete('accounts')">
                                                 <i class="fas fa-check"></i> סיימתי בדיקה
                                             </button>
@@ -627,6 +728,12 @@
                                             <a href="/alerts" target="_blank" class="btn btn-primary">
                                                 <i class="fas fa-external-link-alt"></i> פתח עמוד
                                             </a>
+                                            <button class="btn btn-info btn-sm" onclick="runBasicTest('alerts', '/alerts')">
+                                                <i class="fas fa-play"></i> בדיקה בסיסית
+                                            </button>
+                                            <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('alerts', '/api/v1/alerts/')">
+                                                <i class="fas fa-database"></i> בדיקת CRUD
+                                            </button>
                                             <button class="btn btn-success" onclick="markPageComplete('alerts')">
                                                 <i class="fas fa-check"></i> סיימתי בדיקה
                                             </button>
@@ -732,6 +839,12 @@
                                             <a href="/tickers" target="_blank" class="btn btn-primary">
                                                 <i class="fas fa-external-link-alt"></i> פתח עמוד
                                             </a>
+                                            <button class="btn btn-info btn-sm" onclick="runBasicTest('tickers', '/tickers')">
+                                                <i class="fas fa-play"></i> בדיקה בסיסית
+                                            </button>
+                                            <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('tickers', '/api/v1/tickers/')">
+                                                <i class="fas fa-database"></i> בדיקת CRUD
+                                            </button>
                                             <button class="btn btn-success" onclick="markPageComplete('tickers')">
                                                 <i class="fas fa-check"></i> סיימתי בדיקה
                                             </button>
@@ -837,6 +950,12 @@
                                             <a href="/executions" target="_blank" class="btn btn-primary">
                                                 <i class="fas fa-external-link-alt"></i> פתח עמוד
                                             </a>
+                                            <button class="btn btn-info btn-sm" onclick="runBasicTest('executions', '/executions')">
+                                                <i class="fas fa-play"></i> בדיקה בסיסית
+                                            </button>
+                                            <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('executions', '/api/v1/executions/')">
+                                                <i class="fas fa-database"></i> בדיקת CRUD
+                                            </button>
                                             <button class="btn btn-success" onclick="markPageComplete('executions')">
                                                 <i class="fas fa-check"></i> סיימתי בדיקה
                                             </button>
@@ -920,82 +1039,652 @@
                                 </div>
                             </div>
 
-                            <!-- טאב אחר -->
-                            <div class="tab-pane fade" id="other" role="tabpanel">
-                                <div class="page-test-card" id="pageCardOther">
+                            <!-- טאב תזרים מזומנים -->
+                            <div class="tab-pane fade" id="cash_flows" role="tabpanel">
+                                <div class="page-test-card" id="pageCardCashFlows">
                                     <div class="page-header high">
                                         <div class="page-title">
-                                            📝 ישויות נוספות
+                                            💰 תזרים מזומנים
                                         </div>
                                         <div>
                                             <span class="priority-badge">high</span>
-                                            <span class="status-indicator status-not-tested" id="statusOther"></span>
+                                            <span class="status-indicator status-not-tested" id="statusCashFlows"></span>
                                         </div>
                                     </div>
                                     
                                     <div class="page-body">
+                                        <div class="test-actions">
+                                            <a href="/cash_flows" target="_blank" class="btn btn-primary">
+                                                <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                            </a>
+                                            <button class="btn btn-info btn-sm" onclick="runBasicTest('cash_flows', '/cash_flows')">
+                                                <i class="fas fa-play"></i> בדיקה בסיסית
+                                            </button>
+                                            <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('cash_flows', '/api/v1/cash_flows/')">
+                                                <i class="fas fa-database"></i> בדיקת CRUD
+                                            </button>
+                                            <button class="btn btn-success" onclick="markPageComplete('cash_flows')">
+                                                <i class="fas fa-check"></i> סיימתי בדיקה
+                                            </button>
+                                            <button class="btn btn-warning" onclick="markPagePartial('cash_flows')">
+                                                <i class="fas fa-exclamation"></i> יש בעיות
+                                            </button>
+                                        </div>
+                                        
                                         <div class="test-section">
-                                            <h4>🔍 ישויות נוספות לבדיקה</h4>
+                                            <h4>🔍 בדיקות בסיסיות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="cash_flows_load">
+                                                    <label for="cash_flows_load">עמוד נטען ללא שגיאות</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="cash_flows_css">
+                                                    <label for="cash_flows_css">עיצוב CSS נראה תקין</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="cash_flows_js">
+                                                    <label for="cash_flows_js">אין שגיאות JavaScript בקונסול</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="cash_flows_rtl">
+                                                    <label for="cash_flows_rtl">RTL ועברית נכונים</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🎛️ כפתורים לבדיקה</h4>
                                             <div class="buttons-list">
-                                                <div class="button-item other">
-                                                    <a href="/cash_flows" target="_blank" class="btn btn-outline-primary">
-                                                        💰 תזרים מזומנים
-                                                    </a>
+                                                <div class="button-item create">
+                                                    <input type="checkbox" id="cash_flows_btn_0">
+                                                    <label for="cash_flows_btn_0"><strong>הוסף תזרים חדש</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item update">
+                                                    <input type="checkbox" id="cash_flows_btn_1">
+                                                    <label for="cash_flows_btn_1"><strong>ערוך תזרים</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item delete">
+                                                    <input type="checkbox" id="cash_flows_btn_2">
+                                                    <label for="cash_flows_btn_2"><strong>מחק תזרים</strong> - עובד כהלכה</label>
                                                 </div>
                                                 <div class="button-item other">
-                                                    <a href="/trade_plans" target="_blank" class="btn btn-outline-primary">
-                                                        📋 תוכניות מסחר
-                                                    </a>
-                                                </div>
-                                                <div class="button-item other">
-                                                    <a href="/constraints" target="_blank" class="btn btn-outline-primary">
-                                                        ⚠️ אילוצים
-                                                    </a>
-                                                </div>
-                                                <div class="button-item other">
-                                                    <a href="/notes" target="_blank" class="btn btn-outline-primary">
-                                                        📝 הערות
-                                                    </a>
-                                                </div>
-                                                <div class="button-item other">
-                                                    <a href="/research" target="_blank" class="btn btn-outline-primary">
-                                                        🔬 מחקר
-                                                    </a>
-                                                </div>
-                                                <div class="button-item other">
-                                                    <a href="/preferences" target="_blank" class="btn btn-outline-primary">
-                                                        ⚙️ העדפות
-                                                    </a>
+                                                    <input type="checkbox" id="cash_flows_btn_3">
+                                                    <label for="cash_flows_btn_3"><strong>רענן נתונים</strong> - עובד כהלכה</label>
                                                 </div>
                                             </div>
                                         </div>
                                         
                                         <div class="test-section">
-                                            <h4>🎛️ בדיקות כלליות</h4>
+                                            <h4>🔧 בדיקות CRUD מפורטות</h4>
                                             <ul class="checklist">
                                                 <li>
-                                                    <input type="checkbox" id="other_navigation">
-                                                    <label for="other_navigation">ניווט בין עמודים עובד</label>
+                                                    <input type="checkbox" id="cash_flows_create">
+                                                    <label for="cash_flows_create"><strong>Create:</strong> יצירת תזרים חדש עובדת (מודל נפתח, שמירה מצליחה)</label>
                                                 </li>
                                                 <li>
-                                                    <input type="checkbox" id="other_links">
-                                                    <label for="other_links">קישורים פנימיים עובדים</label>
+                                                    <input type="checkbox" id="cash_flows_read">
+                                                    <label for="cash_flows_read"><strong>Read:</strong> קריאת נתוני תזרים עובדת (טבלה נטענת, נתונים מוצגים)</label>
                                                 </li>
                                                 <li>
-                                                    <input type="checkbox" id="other_forms">
-                                                    <label for="other_forms">טפסים נטענים ללא שגיאות</label>
+                                                    <input type="checkbox" id="cash_flows_update">
+                                                    <label for="cash_flows_update"><strong>Update:</strong> עדכון תזרים עובד (מודל נפתח, שמירה מצליחה)</label>
                                                 </li>
                                                 <li>
-                                                    <input type="checkbox" id="other_tables">
-                                                    <label for="other_tables">טבלאות מציגות נתונים</label>
+                                                    <input type="checkbox" id="cash_flows_delete">
+                                                    <label for="cash_flows_delete"><strong>Delete:</strong> מחיקת תזרים עובדת (אישור, מחיקה מהטבלה)</label>
                                                 </li>
                                             </ul>
                                         </div>
                                         
                                         <div class="test-section">
                                             <h4>📝 הערות ובעיות</h4>
-                                            <textarea class="form-control" id="other_notes" rows="3" 
-                                                      placeholder="תעד כאן בעיות, שגיאות או הערות על העמודים הנוספים..."></textarea>
+                                            <textarea class="form-control" id="cash_flows_notes" rows="3" 
+                                                      placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- טאב תוכניות מסחר -->
+                            <div class="tab-pane fade" id="trade_plans" role="tabpanel">
+                                <div class="page-test-card" id="pageCardTradePlans">
+                                    <div class="page-header critical">
+                                        <div class="page-title">
+                                            📋 תוכניות מסחר
+                                        </div>
+                                        <div>
+                                            <span class="priority-badge">critical</span>
+                                            <span class="status-indicator status-not-tested" id="statusTradePlans"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="page-body">
+                                        <div class="test-actions">
+                                            <a href="/trade_plans" target="_blank" class="btn btn-primary">
+                                                <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                            </a>
+                                            <button class="btn btn-info btn-sm" onclick="runBasicTest('trade_plans', '/trade_plans')">
+                                                <i class="fas fa-play"></i> בדיקה בסיסית
+                                            </button>
+                                            <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('trade_plans', '/api/v1/trade_plans/')">
+                                                <i class="fas fa-database"></i> בדיקת CRUD
+                                            </button>
+                                            <button class="btn btn-success" onclick="markPageComplete('trade_plans')">
+                                                <i class="fas fa-check"></i> סיימתי בדיקה
+                                            </button>
+                                            <button class="btn btn-warning" onclick="markPagePartial('trade_plans')">
+                                                <i class="fas fa-exclamation"></i> יש בעיות
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔍 בדיקות בסיסיות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="trade_plans_load">
+                                                    <label for="trade_plans_load">עמוד נטען ללא שגיאות</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="trade_plans_css">
+                                                    <label for="trade_plans_css">עיצוב CSS נראה תקין</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="trade_plans_js">
+                                                    <label for="trade_plans_js">אין שגיאות JavaScript בקונסול</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="trade_plans_rtl">
+                                                    <label for="trade_plans_rtl">RTL ועברית נכונים</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🎛️ כפתורים לבדיקה</h4>
+                                            <div class="buttons-list">
+                                                <div class="button-item create">
+                                                    <input type="checkbox" id="trade_plans_btn_0">
+                                                    <label for="trade_plans_btn_0"><strong>הוסף תוכנית חדשה</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item update">
+                                                    <input type="checkbox" id="trade_plans_btn_1">
+                                                    <label for="trade_plans_btn_1"><strong>ערוך תוכנית</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item delete">
+                                                    <input type="checkbox" id="trade_plans_btn_2">
+                                                    <label for="trade_plans_btn_2"><strong>מחק תוכנית</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="trade_plans_btn_3">
+                                                    <label for="trade_plans_btn_3"><strong>רענן נתונים</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="trade_plans_btn_4">
+                                                    <label for="trade_plans_btn_4"><strong>הוסף תנאי</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="trade_plans_btn_5">
+                                                    <label for="trade_plans_btn_5"><strong>הוסף סיבה</strong> - עובד כהלכה</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔧 בדיקות CRUD מפורטות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="trade_plans_create">
+                                                    <label for="trade_plans_create"><strong>Create:</strong> יצירת תוכנית חדשה עובדת (מודל נפתח, שמירה מצליחה)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="trade_plans_read">
+                                                    <label for="trade_plans_read"><strong>Read:</strong> קריאת תוכניות עובדת (טבלה נטענת, נתונים מוצגים)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="trade_plans_update">
+                                                    <label for="trade_plans_update"><strong>Update:</strong> עדכון תוכנית עובד (מודל נפתח, שמירה מצליחה)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="trade_plans_delete">
+                                                    <label for="trade_plans_delete"><strong>Delete:</strong> מחיקת תוכנית עובדת (אישור, מחיקה מהטבלה)</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>📝 הערות ובעיות</h4>
+                                            <textarea class="form-control" id="trade_plans_notes" rows="3" 
+                                                      placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- טאב אילוצים -->
+                            <div class="tab-pane fade" id="constraints" role="tabpanel">
+                                <div class="page-test-card" id="pageCardConstraints">
+                                    <div class="page-header high">
+                                        <div class="page-title">
+                                            ⚠️ אילוצים
+                                        </div>
+                                        <div>
+                                            <span class="priority-badge">high</span>
+                                            <span class="status-indicator status-not-tested" id="statusConstraints"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="page-body">
+                                        <div class="test-actions">
+                                            <a href="/constraints" target="_blank" class="btn btn-primary">
+                                                <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                            </a>
+                                            <button class="btn btn-info btn-sm" onclick="runBasicTest('constraints', '/constraints')">
+                                                <i class="fas fa-play"></i> בדיקה בסיסית
+                                            </button>
+                                            <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('constraints', '/api/v1/constraints/')">
+                                                <i class="fas fa-database"></i> בדיקת CRUD
+                                            </button>
+                                            <button class="btn btn-success" onclick="markPageComplete('constraints')">
+                                                <i class="fas fa-check"></i> סיימתי בדיקה
+                                            </button>
+                                            <button class="btn btn-warning" onclick="markPagePartial('constraints')">
+                                                <i class="fas fa-exclamation"></i> יש בעיות
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔍 בדיקות בסיסיות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="constraints_load">
+                                                    <label for="constraints_load">עמוד נטען ללא שגיאות</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="constraints_css">
+                                                    <label for="constraints_css">עיצוב CSS נראה תקין</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="constraints_js">
+                                                    <label for="constraints_js">אין שגיאות JavaScript בקונסול</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="constraints_rtl">
+                                                    <label for="constraints_rtl">RTL ועברית נכונים</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🎛️ כפתורים לבדיקה</h4>
+                                            <div class="buttons-list">
+                                                <div class="button-item create">
+                                                    <input type="checkbox" id="constraints_btn_0">
+                                                    <label for="constraints_btn_0"><strong>הוסף אילוץ חדש</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item update">
+                                                    <input type="checkbox" id="constraints_btn_1">
+                                                    <label for="constraints_btn_1"><strong>ערוך אילוץ</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item delete">
+                                                    <input type="checkbox" id="constraints_btn_2">
+                                                    <label for="constraints_btn_2"><strong>מחק אילוץ</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="constraints_btn_3">
+                                                    <label for="constraints_btn_3"><strong>רענן נתונים</strong> - עובד כהלכה</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔧 בדיקות CRUD מפורטות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="constraints_create">
+                                                    <label for="constraints_create"><strong>Create:</strong> יצירת אילוץ חדש עובדת (מודל נפתח, שמירה מצליחה)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="constraints_read">
+                                                    <label for="constraints_read"><strong>Read:</strong> קריאת אילוצים עובדת (טבלה נטענת, נתונים מוצגים)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="constraints_update">
+                                                    <label for="constraints_update"><strong>Update:</strong> עדכון אילוץ עובד (מודל נפתח, שמירה מצליחה)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="constraints_delete">
+                                                    <label for="constraints_delete"><strong>Delete:</strong> מחיקת אילוץ עובדת (אישור, מחיקה מהטבלה)</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>📝 הערות ובעיות</h4>
+                                            <textarea class="form-control" id="constraints_notes" rows="3" 
+                                                      placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- טאב הערות -->
+                            <div class="tab-pane fade" id="notes" role="tabpanel">
+                                <div class="page-test-card" id="pageCardNotes">
+                                    <div class="page-header high">
+                                        <div class="page-title">
+                                            📝 הערות
+                                        </div>
+                                        <div>
+                                            <span class="priority-badge">high</span>
+                                            <span class="status-indicator status-not-tested" id="statusNotes"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="page-body">
+                                        <div class="test-actions">
+                                            <a href="/notes" target="_blank" class="btn btn-primary">
+                                                <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                            </a>
+                                            <button class="btn btn-info btn-sm" onclick="runBasicTest('notes', '/notes')">
+                                                <i class="fas fa-play"></i> בדיקה בסיסית
+                                            </button>
+                                            <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('notes', '/api/v1/notes/')">
+                                                <i class="fas fa-database"></i> בדיקת CRUD
+                                            </button>
+                                            <button class="btn btn-success" onclick="markPageComplete('notes')">
+                                                <i class="fas fa-check"></i> סיימתי בדיקה
+                                            </button>
+                                            <button class="btn btn-warning" onclick="markPagePartial('notes')">
+                                                <i class="fas fa-exclamation"></i> יש בעיות
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔍 בדיקות בסיסיות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="notes_load">
+                                                    <label for="notes_load">עמוד נטען ללא שגיאות</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="notes_css">
+                                                    <label for="notes_css">עיצוב CSS נראה תקין</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="notes_js">
+                                                    <label for="notes_js">אין שגיאות JavaScript בקונסול</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="notes_rtl">
+                                                    <label for="notes_rtl">RTL ועברית נכונים</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🎛️ כפתורים לבדיקה</h4>
+                                            <div class="buttons-list">
+                                                <div class="button-item create">
+                                                    <input type="checkbox" id="notes_btn_0">
+                                                    <label for="notes_btn_0"><strong>הוסף הערה חדשה</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item update">
+                                                    <input type="checkbox" id="notes_btn_1">
+                                                    <label for="notes_btn_1"><strong>ערוך הערה</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item delete">
+                                                    <input type="checkbox" id="notes_btn_2">
+                                                    <label for="notes_btn_2"><strong>מחק הערה</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="notes_btn_3">
+                                                    <label for="notes_btn_3"><strong>רענן נתונים</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="notes_btn_4">
+                                                    <label for="notes_btn_4"><strong>עורך טקסט</strong> - עובד כהלכה</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔧 בדיקות CRUD מפורטות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="notes_create">
+                                                    <label for="notes_create"><strong>Create:</strong> יצירת הערה חדשה עובדת (מודל נפתח, שמירה מצליחה)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="notes_read">
+                                                    <label for="notes_read"><strong>Read:</strong> קריאת הערות עובדת (טבלה נטענת, נתונים מוצגים)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="notes_update">
+                                                    <label for="notes_update"><strong>Update:</strong> עדכון הערה עובד (מודל נפתח, שמירה מצליחה)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="notes_delete">
+                                                    <label for="notes_delete"><strong>Delete:</strong> מחיקת הערה עובדת (אישור, מחיקה מהטבלה)</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>📝 הערות ובעיות</h4>
+                                            <textarea class="form-control" id="notes_notes" rows="3" 
+                                                      placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- טאב מחקר -->
+                            <div class="tab-pane fade" id="research" role="tabpanel">
+                                <div class="page-test-card" id="pageCardResearch">
+                                    <div class="page-header high">
+                                        <div class="page-title">
+                                            🔬 מחקר
+                                        </div>
+                                        <div>
+                                            <span class="priority-badge">high</span>
+                                            <span class="status-indicator status-not-tested" id="statusResearch"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="page-body">
+                                        <div class="test-actions">
+                                            <a href="/research" target="_blank" class="btn btn-primary">
+                                                <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                            </a>
+                                            <button class="btn btn-info btn-sm" onclick="runBasicTest('research', '/research')">
+                                                <i class="fas fa-play"></i> בדיקה בסיסית
+                                            </button>
+                                            <button class="btn btn-success" onclick="markPageComplete('research')">
+                                                <i class="fas fa-check"></i> סיימתי בדיקה
+                                            </button>
+                                            <button class="btn btn-warning" onclick="markPagePartial('research')">
+                                                <i class="fas fa-exclamation"></i> יש בעיות
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔍 בדיקות בסיסיות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="research_load">
+                                                    <label for="research_load">עמוד נטען ללא שגיאות</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="research_css">
+                                                    <label for="research_css">עיצוב CSS נראה תקין</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="research_js">
+                                                    <label for="research_js">אין שגיאות JavaScript בקונסול</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="research_rtl">
+                                                    <label for="research_rtl">RTL ועברית נכונים</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🎛️ כפתורים לבדיקה</h4>
+                                            <div class="buttons-list">
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="research_btn_0">
+                                                    <label for="research_btn_0"><strong>רענן נתונים</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="research_btn_1">
+                                                    <label for="research_btn_1"><strong>חפש מחקרים</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="research_btn_2">
+                                                    <label for="research_btn_2"><strong>ייצא נתונים</strong> - עובד כהלכה</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔧 בדיקות מפורטות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="research_data">
+                                                    <label for="research_data"><strong>נתונים:</strong> טעינת נתוני מחקר עובדת</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="research_display">
+                                                    <label for="research_display"><strong>תצוגה:</strong> הצגת נתוני מחקר עובדת</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="research_filters">
+                                                    <label for="research_filters"><strong>פילטרים:</strong> פילטרי מחקר עובדים</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="research_export">
+                                                    <label for="research_export"><strong>ייצוא:</strong> ייצוא נתוני מחקר עובד</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>📝 הערות ובעיות</h4>
+                                            <textarea class="form-control" id="research_notes" rows="3" 
+                                                      placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- טאב העדפות -->
+                            <div class="tab-pane fade" id="preferences" role="tabpanel">
+                                <div class="page-test-card" id="pageCardPreferences">
+                                    <div class="page-header high">
+                                        <div class="page-title">
+                                            ⚙️ העדפות
+                                        </div>
+                                        <div>
+                                            <span class="priority-badge">high</span>
+                                            <span class="status-indicator status-not-tested" id="statusPreferences"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="page-body">
+                                        <div class="test-actions">
+                                            <a href="/preferences" target="_blank" class="btn btn-primary">
+                                                <i class="fas fa-external-link-alt"></i> פתח עמוד
+                                            </a>
+                                            <button class="btn btn-info btn-sm" onclick="runBasicTest('preferences', '/preferences')">
+                                                <i class="fas fa-play"></i> בדיקה בסיסית
+                                            </button>
+                                            <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('preferences', '/api/v1/preferences/user')">
+                                                <i class="fas fa-database"></i> בדיקת CRUD
+                                            </button>
+                                            <button class="btn btn-success" onclick="markPageComplete('preferences')">
+                                                <i class="fas fa-check"></i> סיימתי בדיקה
+                                            </button>
+                                            <button class="btn btn-warning" onclick="markPagePartial('preferences')">
+                                                <i class="fas fa-exclamation"></i> יש בעיות
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔍 בדיקות בסיסיות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="preferences_load">
+                                                    <label for="preferences_load">עמוד נטען ללא שגיאות</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="preferences_css">
+                                                    <label for="preferences_css">עיצוב CSS נראה תקין</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="preferences_js">
+                                                    <label for="preferences_js">אין שגיאות JavaScript בקונסול</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="preferences_rtl">
+                                                    <label for="preferences_rtl">RTL ועברית נכונים</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🎛️ כפתורים לבדיקה</h4>
+                                            <div class="buttons-list">
+                                                <div class="button-item create">
+                                                    <input type="checkbox" id="preferences_btn_0">
+                                                    <label for="preferences_btn_0"><strong>צור פרופיל חדש</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item update">
+                                                    <input type="checkbox" id="preferences_btn_1">
+                                                    <label for="preferences_btn_1"><strong>עדכן העדפה</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item delete">
+                                                    <input type="checkbox" id="preferences_btn_2">
+                                                    <label for="preferences_btn_2"><strong>מחק פרופיל</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="preferences_btn_3">
+                                                    <label for="preferences_btn_3"><strong>שמור העדפות</strong> - עובד כהלכה</label>
+                                                </div>
+                                                <div class="button-item other">
+                                                    <input type="checkbox" id="preferences_btn_4">
+                                                    <label for="preferences_btn_4"><strong>איפוס ברירת מחדל</strong> - עובד כהלכה</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>🔧 בדיקות CRUD מפורטות</h4>
+                                            <ul class="checklist">
+                                                <li>
+                                                    <input type="checkbox" id="preferences_create">
+                                                    <label for="preferences_create"><strong>Create:</strong> יצירת פרופיל חדש עובדת (מודל נפתח, שמירה מצליחה)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="preferences_read">
+                                                    <label for="preferences_read"><strong>Read:</strong> קריאת העדפות עובדת (נתונים נטענים, מוצגים)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="preferences_update">
+                                                    <label for="preferences_update"><strong>Update:</strong> עדכון העדפות עובד (שמירה מצליחה)</label>
+                                                </li>
+                                                <li>
+                                                    <input type="checkbox" id="preferences_delete">
+                                                    <label for="preferences_delete"><strong>Delete:</strong> מחיקת פרופיל עובדת (אישור, מחיקה)</label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                        <div class="test-section">
+                                            <h4>📝 הערות ובעיות</h4>
+                                            <textarea class="form-control" id="preferences_notes" rows="3" 
+                                                      placeholder="תעד כאן בעיות, שגיאות או הערות על העמוד..."></textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -1003,7 +1692,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- UI Content Section 2 End--> 
+                <!-- UI Content Section 1 End--> 
             </div>
         </div>
     </div>
@@ -1011,18 +1700,26 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
-    <script src="/static/js/console-cleanup.js"></script>
-    <script src="/static/js/translation-utils.js"></script>
-    <script src="/static/js/notification-system.js"></script>
-    <script src="/static/js/ui-utils.js"></script>
-    <script src="/static/js/main.js"></script>
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/main.js"></script>
     <script src="scripts/header-system.js?v=20250115_level3_fix"></script>
     
     <script>
         // פונקציות JavaScript יוכנסו כאן
         
-        // Tab functionality
+        // פונקציה חסרה לתיקון שגיאת getCurrentPageName
+        function getCurrentPageName() {
+            return 'crud-testing-dashboard';
+        }
+        
+        // Tab functionality and auto-save
         document.addEventListener('DOMContentLoaded', function() {
+            // טעינת מצב שמור
+            loadTestState();
+            
             // Initialize tabs
             const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
             const tabPanes = document.querySelectorAll('.tab-pane');
@@ -1058,6 +1755,26 @@
                     }
                 });
             });
+            
+            // שמירה אוטומטית של צ'קבוקסים
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    saveTestState();
+                });
+            });
+            
+            // שמירה אוטומטית של הערות
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                textarea.addEventListener('input', function() {
+                    // שמירה עם debounce
+                    clearTimeout(textarea.saveTimeout);
+                    textarea.saveTimeout = setTimeout(() => {
+                        saveTestState();
+                    }, 1000);
+                });
+            });
         });
         
         // Page status management functions
@@ -1068,8 +1785,9 @@
                 statusElement.title = 'נבדק בהצלחה';
             }
             updateSummaryStats();
+            saveTestState();
         }
-        
+
         function markPagePartial(pageId) {
             const statusElement = document.getElementById('status' + pageId.charAt(0).toUpperCase() + pageId.slice(1));
             if (statusElement) {
@@ -1077,10 +1795,11 @@
                 statusElement.title = 'נבדק עם בעיות';
             }
             updateSummaryStats();
+            saveTestState();
         }
         
         function updateSummaryStats() {
-            const totalPages = 6; // ראשי, טריידים, חשבונות, התראות, טיקרים, ביצועים
+            const totalPages = 12; // ראשי, טריידים, חשבונות, התראות, טיקרים, ביצועים, תזרים מזומנים, תוכניות מסחר, אילוצים, הערות, מחקר, העדפות
             const completePages = document.querySelectorAll('.status-indicator.status-complete').length;
             const partialPages = document.querySelectorAll('.status-indicator.status-partial').length;
             const testedPages = completePages + partialPages;
@@ -1089,6 +1808,612 @@
             document.getElementById('testedPages').textContent = testedPages;
             document.getElementById('passedPages').textContent = completePages;
             document.getElementById('progressPercent').textContent = progressPercent + '%';
+        }
+
+        // ===== מערכת שמירת מצב =====
+        
+        /**
+         * שמירת מצב הבדיקות ב-localStorage
+         */
+        function saveTestState() {
+            const testState = {
+                timestamp: new Date().toISOString(),
+                checkboxes: {},
+                statusIndicators: {},
+                notes: {},
+                summary: {
+                    totalPages: 12,
+                    testedPages: document.querySelectorAll('.status-indicator.status-complete, .status-indicator.status-partial').length,
+                    completePages: document.querySelectorAll('.status-indicator.status-complete').length,
+                    partialPages: document.querySelectorAll('.status-indicator.status-partial').length
+                }
+            };
+            
+            // שמירת מצב הצ'קבוקסים
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                testState.checkboxes[checkbox.id] = checkbox.checked;
+            });
+            
+            // שמירת מצב אינדיקטורי הסטטוס
+            const statusIndicators = document.querySelectorAll('.status-indicator');
+            statusIndicators.forEach(indicator => {
+                testState.statusIndicators[indicator.id] = indicator.className;
+            });
+            
+            // שמירת הערות
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                testState.notes[textarea.id] = textarea.value;
+            });
+            
+            localStorage.setItem('crudTestState', JSON.stringify(testState));
+            console.log('💾 מצב הבדיקות נשמר');
+        }
+        
+        /**
+         * טעינת מצב הבדיקות מ-localStorage
+         */
+        function loadTestState() {
+            const savedState = localStorage.getItem('crudTestState');
+            if (!savedState) {
+                console.log('💾 אין מצב שמור - מתחיל מחדש');
+                return;
+            }
+            
+            try {
+                const testState = JSON.parse(savedState);
+                console.log('💾 טוען מצב שמור מ:', testState.timestamp);
+                
+                // טעינת מצב הצ'קבוקסים
+                Object.entries(testState.checkboxes).forEach(([id, checked]) => {
+                    const checkbox = document.getElementById(id);
+                    if (checkbox) {
+                        checkbox.checked = checked;
+                    }
+                });
+                
+                // טעינת מצב אינדיקטורי הסטטוס
+                Object.entries(testState.statusIndicators).forEach(([id, className]) => {
+                    const indicator = document.getElementById(id);
+                    if (indicator) {
+                        indicator.className = className;
+                    }
+                });
+                
+                // טעינת הערות
+                Object.entries(testState.notes).forEach(([id, value]) => {
+                    const textarea = document.getElementById(id);
+                    if (textarea) {
+                        textarea.value = value;
+                    }
+                });
+                
+                // עדכון הסטטיסטיקות
+                updateSummaryStats();
+                
+                console.log('✅ מצב הבדיקות נטען בהצלחה');
+                
+            } catch (error) {
+                console.error('❌ שגיאה בטעינת מצב הבדיקות:', error);
+            }
+        }
+        
+        /**
+         * הצגת תוצאות בדיקה
+         */
+        function displayTestResults(testType, results) {
+            const container = document.getElementById('testResultsContainer');
+            const content = document.getElementById('testResultsContent');
+            const noResults = document.getElementById('noResultsMessage');
+            
+            if (!container || !content || !noResults) return;
+            
+            const successCount = results.filter(r => r.status === 'success' || r.readStatus === 'success').length;
+            const totalCount = results.length;
+            const successRate = Math.round((successCount / totalCount) * 100);
+            
+            let html = `
+                <div class="alert alert-${successRate > 80 ? 'success' : 'warning'} mb-3">
+                    <h6><i class="fas fa-chart-pie"></i> ${testType}</h6>
+                    <p class="mb-0">
+                        <strong>הצלחות:</strong> ${successCount}/${totalCount} (${successRate}%)<br>
+                        <strong>זמן:</strong> ${new Date().toLocaleString('he-IL')}
+                    </p>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>ישות/עמוד</th>
+                                <th>סטטוס</th>
+                                <th>פרטים</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            results.forEach(result => {
+                const status = result.status || result.readStatus;
+                const icon = status === 'success' ? '✅' : '❌';
+                const title = result.title || result.name || result.page;
+                const details = [];
+                
+                if (result.statusCode) details.push(`קוד: ${result.statusCode}`);
+                if (result.responseTime) details.push(`זמן: ${result.responseTime}ms`);
+                if (result.recordCount !== undefined) details.push(`רשומות: ${result.recordCount}`);
+                if (result.error) details.push(`שגיאה: ${result.error}`);
+                
+                // אם אין פרטים, הוסף הודעה ברורה
+                if (details.length === 0 && status !== 'success') {
+                    details.push('שגיאה לא ידועה');
+                }
+                
+                html += `
+                    <tr class="${status === 'success' ? 'table-success' : 'table-danger'}">
+                        <td>${title}</td>
+                        <td>${icon} ${status === 'success' ? 'עובד' : 'שגיאה'}</td>
+                        <td>${details.join(', ') || 'אין פרטים'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            content.innerHTML = html;
+            container.style.display = 'block';
+            noResults.style.display = 'none';
+            
+            // שמירת המצב
+            saveTestState();
+        }
+
+        // ===== כלי בדיקה אוטומטיים =====
+        
+        /**
+         * בדיקה בסיסית לעמוד בודד
+         */
+        async function runBasicTest(pageId, url) {
+            console.log(`🧪 בודק ${pageId}...`);
+            
+            // הצגת הודעת התחלה
+            if (typeof window.showNotification === 'function') {
+                window.showNotification(`🔍 בודק ${pageId}...`, 'info');
+            }
+            
+            try {
+                const startTime = Date.now();
+                const response = await fetch(url);
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+                const isOk = response.ok;
+                
+                // עדכון הצ'קבוקסים
+                const loadCheckbox = document.getElementById(`${pageId}_load`);
+                if (loadCheckbox) {
+                    loadCheckbox.checked = isOk;
+                }
+                
+                // יצירת תוצאה לתצוגה
+                const result = {
+                    page: pageId,
+                    title: pageId,
+                    url: url,
+                    status: isOk ? 'success' : 'error',
+                    statusCode: response.status,
+                    responseTime: responseTime
+                };
+                
+                // הצגת תוצאות
+                displayTestResults(`בדיקה בסיסית - ${pageId}`, [result]);
+                
+                // שמירת המצב
+                saveTestState();
+                
+            } catch (error) {
+                console.error(`❌ שגיאה בבדיקת ${pageId}:`, error);
+                
+                // יצירת תוצאה עם שגיאה
+                const result = {
+                    page: pageId,
+                    title: pageId,
+                    url: url,
+                    status: 'error',
+                    error: error.message
+                };
+                
+                // הצגת תוצאות
+                displayTestResults(`בדיקה בסיסית - ${pageId}`, [result]);
+            }
+        }
+
+        /**
+         * בדיקת CRUD לישות בודדת
+         */
+        async function runCRUDTest(entityId, endpoint) {
+            console.log(`🧪 בודק CRUD עבור ${entityId}...`);
+            
+            // הצגת הודעת התחלה
+            if (typeof window.showNotification === 'function') {
+                window.showNotification(`🔍 בודק CRUD עבור ${entityId}...`, 'info');
+            }
+            
+            try {
+                const startTime = Date.now();
+                const response = await fetch(endpoint);
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+                const isOk = response.ok;
+                const data = isOk ? await response.json() : null;
+                
+                // עדכון הצ'קבוקסים
+                const readCheckbox = document.getElementById(`${entityId}_read`);
+                if (readCheckbox) {
+                    readCheckbox.checked = isOk;
+                }
+                
+                // יצירת תוצאה לתצוגה
+                const result = {
+                    entity: entityId,
+                    title: entityId,
+                    endpoint: endpoint,
+                    readStatus: isOk ? 'success' : 'error',
+                    statusCode: response.status,
+                    responseTime: responseTime,
+                    recordCount: data?.data?.length || 0
+                };
+                
+                // הצגת תוצאות
+                displayTestResults(`בדיקת CRUD - ${entityId}`, [result]);
+                
+                // שמירת המצב
+                saveTestState();
+                
+            } catch (error) {
+                console.error(`❌ שגיאה בבדיקת CRUD עבור ${entityId}:`, error);
+                
+                // יצירת תוצאה עם שגיאה
+                const result = {
+                    entity: entityId,
+                    title: entityId,
+                    endpoint: endpoint,
+                    readStatus: 'error',
+                    error: error.message
+                };
+                
+                // הצגת תוצאות
+                displayTestResults(`בדיקת CRUD - ${entityId}`, [result]);
+            }
+        }
+        
+        /**
+         * הרצת בדיקות בסיסיות לכל העמודים
+         */
+        async function runAllBasicTests() {
+            console.log('🧪 מתחיל בדיקות בסיסיות לכל העמודים...');
+            
+            // הצגת הודעת התחלה
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('🔍 מתחיל בדיקות בסיסיות לכל העמודים...', 'info');
+            }
+            
+            const pages = [
+                { name: 'index', url: '/', title: 'דף הבית' },
+                { name: 'trades', url: '/trades', title: 'טריידים' },
+                { name: 'accounts', url: '/accounts', title: 'חשבונות' },
+                { name: 'alerts', url: '/alerts', title: 'התראות' },
+                { name: 'tickers', url: '/tickers', title: 'טיקרים' },
+                { name: 'executions', url: '/executions', title: 'ביצועים' },
+                { name: 'cash_flows', url: '/cash_flows', title: 'תזרים מזומנים' },
+                { name: 'trade_plans', url: '/trade_plans', title: 'תוכניות מסחר' },
+                { name: 'constraints', url: '/constraints', title: 'אילוצים' },
+                { name: 'notes', url: '/notes', title: 'הערות' },
+                { name: 'research', url: '/research', title: 'מחקר' },
+                { name: 'preferences', url: '/preferences', title: 'העדפות' }
+            ];
+
+            let results = [];
+            
+            for (const page of pages) {
+                console.log(`🔍 בודק ${page.title}...`);
+                
+                try {
+                    const response = await fetch(page.url);
+                    const isOk = response.ok;
+                    const loadTime = Date.now();
+                    
+                    results.push({
+                        page: page.name,
+                        title: page.title,
+                        url: page.url,
+                        status: isOk ? 'success' : 'error',
+                        statusCode: response.status,
+                        loadTime: loadTime
+                    });
+                    
+                    // עדכון הצ'קבוקסים
+                    const loadCheckbox = document.getElementById(`${page.name}_load`);
+                    if (loadCheckbox) {
+                        loadCheckbox.checked = isOk;
+                    }
+                    
+                    console.log(`✅ ${page.title}: ${isOk ? 'עובד' : 'שגיאה'}`);
+                    
+                } catch (error) {
+                    console.error(`❌ שגיאה בבדיקת ${page.title}:`, error);
+                    results.push({
+                        page: page.name,
+                        title: page.title,
+                        url: page.url,
+                        status: 'error',
+                        error: error.message
+                    });
+                }
+                
+                // המתנה קצרה בין בדיקות
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            // הצגת תוצאות
+            displayTestResults('בדיקות בסיסיות', results);
+        }
+
+        /**
+         * הרצת בדיקות CRUD לכל הישויות
+         */
+        async function runAllCRUDTests() {
+            console.log('🧪 מתחיל בדיקות CRUD לכל הישויות...');
+            
+            // הצגת הודעת התחלה
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('🔍 מתחיל בדיקות CRUD לכל הישויות...', 'info');
+            }
+            
+            const entities = [
+                { name: 'trades', endpoint: '/api/v1/trades/', title: 'טריידים' },
+                { name: 'accounts', endpoint: '/api/v1/accounts/', title: 'חשבונות' },
+                { name: 'alerts', endpoint: '/api/v1/alerts/', title: 'התראות' },
+                { name: 'tickers', endpoint: '/api/v1/tickers/', title: 'טיקרים' },
+                { name: 'executions', endpoint: '/api/v1/executions/', title: 'ביצועים' },
+                { name: 'cash_flows', endpoint: '/api/v1/cash_flows/', title: 'תזרים מזומנים' },
+                { name: 'trade_plans', endpoint: '/api/v1/trade_plans/', title: 'תוכניות מסחר' },
+                { name: 'constraints', endpoint: '/api/v1/constraints/', title: 'אילוצים' },
+                { name: 'notes', endpoint: '/api/v1/notes/', title: 'הערות' },
+                { name: 'preferences', endpoint: '/api/v1/preferences/user', title: 'העדפות' }
+            ];
+
+            let results = [];
+            
+            for (const entity of entities) {
+                console.log(`🔍 בודק CRUD עבור ${entity.title}...`);
+                
+                try {
+                    // בדיקת READ
+                    const response = await fetch(entity.endpoint);
+                    const isOk = response.ok;
+                    const data = isOk ? await response.json() : null;
+                    
+                    results.push({
+                        entity: entity.name,
+                        title: entity.title,
+                        endpoint: entity.endpoint,
+                        readStatus: isOk ? 'success' : 'error',
+                        statusCode: response.status,
+                        recordCount: data?.data?.length || 0
+                    });
+                    
+                    // עדכון הצ'קבוקסים
+                    const readCheckbox = document.getElementById(`${entity.name}_read`);
+                    if (readCheckbox) {
+                        readCheckbox.checked = isOk;
+                    }
+                    
+                    console.log(`✅ ${entity.title} CRUD: ${isOk ? 'עובד' : 'שגיאה'}`);
+                    
+                } catch (error) {
+                    console.error(`❌ שגיאה בבדיקת CRUD עבור ${entity.title}:`, error);
+                    results.push({
+                        entity: entity.name,
+                        title: entity.title,
+                        endpoint: entity.endpoint,
+                        readStatus: 'error',
+                        error: error.message
+                    });
+                }
+                
+                // המתנה קצרה בין בדיקות
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+            
+            // הצגת תוצאות
+            displayTestResults('בדיקות CRUD', results);
+        }
+
+        /**
+         * בדיקת חיבורים לשרת
+         */
+        async function checkAllConnections() {
+            console.log('🧪 בודק חיבורים לשרת...');
+            
+            // הצגת הודעת התחלה
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('🔍 מתחיל בדיקת חיבורים לשרת...', 'info');
+            }
+            
+            const endpoints = [
+                { name: 'health', url: '/api/health', title: 'בריאות השרת' },
+                { name: 'trades', url: '/api/v1/trades/', title: 'API טריידים' },
+                { name: 'accounts', url: '/api/v1/accounts/', title: 'API חשבונות' },
+                { name: 'alerts', url: '/api/v1/alerts/', title: 'API התראות' },
+                { name: 'tickers', url: '/api/v1/tickers/', title: 'API טיקרים' },
+                { name: 'executions', url: '/api/v1/executions/', title: 'API ביצועים' },
+                { name: 'cash_flows', url: '/api/v1/cash_flows/', title: 'API תזרים מזומנים' },
+                { name: 'trade_plans', url: '/api/v1/trade_plans/', title: 'API תוכניות מסחר' },
+                { name: 'constraints', url: '/api/v1/constraints/', title: 'API אילוצים' },
+                { name: 'notes', url: '/api/v1/notes/', title: 'API הערות' },
+                { name: 'preferences', url: '/api/v1/preferences/', title: 'API העדפות' }
+            ];
+
+            let results = [];
+            
+            for (const endpoint of endpoints) {
+                console.log(`🔍 בודק ${endpoint.title}...`);
+                
+                try {
+                    const startTime = Date.now();
+                    const response = await fetch(endpoint.url);
+                    const endTime = Date.now();
+                    const responseTime = endTime - startTime;
+                    
+                    results.push({
+                        name: endpoint.name,
+                        title: endpoint.title,
+                        url: endpoint.url,
+                        status: response.ok ? 'success' : 'error',
+                        statusCode: response.status,
+                        responseTime: responseTime
+                    });
+                    
+                    console.log(`✅ ${endpoint.title}: ${response.ok ? 'עובד' : 'שגיאה'} (${responseTime}ms)`);
+                    
+                } catch (error) {
+                    console.error(`❌ שגיאה בבדיקת ${endpoint.title}:`, error);
+                    results.push({
+                        name: endpoint.name,
+                        title: endpoint.title,
+                        url: endpoint.url,
+                        status: 'error',
+                        error: error.message
+                    });
+                }
+                
+                // המתנה קצרה בין בדיקות
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+            
+            // הצגת תוצאות
+            displayTestResults('בדיקת חיבורים', results);
+        }
+
+
+        /**
+         * יצירת דוח בדיקה
+         */
+        function generateTestReport() {
+            const report = {
+                timestamp: new Date().toISOString(),
+                summary: {
+                    totalPages: 12,
+                    testedPages: document.querySelectorAll('.status-indicator.status-complete, .status-indicator.status-partial').length,
+                    completePages: document.querySelectorAll('.status-indicator.status-complete').length,
+                    partialPages: document.querySelectorAll('.status-indicator.status-partial').length
+                },
+                pages: []
+            };
+            
+            // איסוף נתונים על כל עמוד
+            const pageCards = document.querySelectorAll('.page-test-card');
+            pageCards.forEach(card => {
+                const pageId = card.id.replace('pageCard', '').toLowerCase();
+                const statusElement = document.getElementById(`status${pageId.charAt(0).toUpperCase() + pageId.slice(1)}`);
+                const status = statusElement ? statusElement.className : 'unknown';
+                
+                const pageData = {
+                    id: pageId,
+                    status: status,
+                    tests: {}
+                };
+                
+                // איסוף תוצאות בדיקות
+                const checkboxes = card.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    const testId = checkbox.id;
+                    const testName = checkbox.nextElementSibling?.textContent || testId;
+                    pageData.tests[testId] = {
+                        name: testName,
+                        checked: checkbox.checked
+                    };
+                });
+                
+                // איסוף הערות
+                const notesTextarea = card.querySelector('textarea');
+                if (notesTextarea) {
+                    pageData.notes = notesTextarea.value;
+                }
+                
+                report.pages.push(pageData);
+            });
+            
+            // הצגת הדוח
+            const reportText = JSON.stringify(report, null, 2);
+            console.log('📊 דוח בדיקה:', report);
+            
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('דוח בדיקה נוצר בהצלחה! ראה בקונסול לפרטים.', 'success');
+            } else {
+                alert('דוח בדיקה נוצר בהצלחה! ראה בקונסול לפרטים.');
+            }
+            
+            return report;
+        }
+
+        /**
+         * ייצוא תוצאות בדיקה
+         */
+        function exportTestResults() {
+            const report = generateTestReport();
+            const dataStr = JSON.stringify(report, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `crud-test-results-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('תוצאות הבדיקה יוצאו בהצלחה!', 'success');
+            } else {
+                alert('תוצאות הבדיקה יוצאו בהצלחה!');
+            }
+        }
+
+        /**
+         * איפוס כל הבדיקות
+         */
+        function resetAllTests() {
+            if (confirm('האם אתה בטוח שברצונך לאפס את כל הבדיקות?')) {
+                // איפוס כל הצ'קבוקסים
+                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                // איפוס כל שדות ההערות
+                const textareas = document.querySelectorAll('textarea');
+                textareas.forEach(textarea => {
+                    textarea.value = '';
+                });
+                
+                // איפוס כל אינדיקטורי הסטטוס
+                const statusIndicators = document.querySelectorAll('.status-indicator');
+                statusIndicators.forEach(indicator => {
+                    indicator.className = 'status-indicator status-not-tested';
+                    indicator.title = 'לא נבדק';
+                });
+                
+                // עדכון הסטטיסטיקות
+                updateSummaryStats();
+                
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification('כל הבדיקות אופסו בהצלחה!', 'success');
+                } else {
+                    alert('כל הבדיקות אופסו בהצלחה!');
+                }
+            }
         }
     </script>
 </body>

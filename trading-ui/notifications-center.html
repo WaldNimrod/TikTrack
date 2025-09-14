@@ -190,51 +190,59 @@
                                 <h3><i class="fas fa-cog"></i> הגדרות התראות</h3>
                             </div>
                             <div class="card-body">
-                                <div class="settings-grid">
-                                    <div class="setting-item">
-                                        <label class="setting-label">
-                                            <input type="checkbox" id="enableRealtime" checked>
-                                            <span class="checkmark"></span>
-                                            התראות בזמן אמת
-                                        </label>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="settings-column">
+                                            <div class="setting-item">
+                                                <label class="setting-label">
+                                                    <input type="checkbox" id="enableRealtime" checked>
+                                                    <span class="checkmark"></span>
+                                                    התראות בזמן אמת
+                                                </label>
+                                            </div>
+                                            <div class="setting-item">
+                                                <label class="setting-label">
+                                                    <input type="checkbox" id="enableSounds" checked disabled>
+                                                    <span class="checkmark"></span>
+                                                    צלילי התראה (מבוטל זמנית)
+                                                </label>
+                                            </div>
+                                            <div class="setting-item">
+                                                <label class="setting-label">
+                                                    <input type="checkbox" id="enableBackgroundTasks" checked>
+                                                    <span class="checkmark"></span>
+                                                    משימות ברקע
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="setting-item">
-                                        <label class="setting-label">
-                                            <input type="checkbox" id="enableSounds" checked>
-                                            <span class="checkmark"></span>
-                                            צלילי התראה
-                                        </label>
-                                    </div>
-                                    <div class="setting-item">
-                                        <label class="setting-label">
-                                            <input type="checkbox" id="enableBackgroundTasks" checked>
-                                            <span class="checkmark"></span>
-                                            משימות ברקע
-                                        </label>
-                                    </div>
-                                    <div class="setting-item">
-                                        <label class="setting-label">
-                                            <input type="checkbox" id="enableDataUpdates" checked>
-                                            <span class="checkmark"></span>
-                                            עדכוני נתונים
-                                        </label>
-                                    </div>
-                                    <div class="setting-item">
-                                        <label class="setting-label">
-                                            <input type="checkbox" id="enableExternalData" checked>
-                                            <span class="checkmark"></span>
-                                            נתונים חיצוניים
-                                        </label>
-                                    </div>
-                                    <div class="setting-item">
-                                        <label class="setting-label">
-                                            <input type="checkbox" id="enableSystemEvents" checked>
-                                            <span class="checkmark"></span>
-                                            אירועי מערכת
-                                        </label>
+                                    <div class="col-md-6">
+                                        <div class="settings-column">
+                                            <div class="setting-item">
+                                                <label class="setting-label">
+                                                    <input type="checkbox" id="enableDataUpdates" checked>
+                                                    <span class="checkmark"></span>
+                                                    עדכוני נתונים
+                                                </label>
+                                            </div>
+                                            <div class="setting-item">
+                                                <label class="setting-label">
+                                                    <input type="checkbox" id="enableExternalData" checked>
+                                                    <span class="checkmark"></span>
+                                                    נתונים חיצוניים
+                                                </label>
+                                            </div>
+                                            <div class="setting-item">
+                                                <label class="setting-label">
+                                                    <input type="checkbox" id="enableSystemEvents" checked>
+                                                    <span class="checkmark"></span>
+                                                    אירועי מערכת
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="settings-actions">
+                                <div class="settings-actions actions-default">
                                     <button class="btn btn-primary" onclick="saveNotificationSettings()">
                                         <i class="fas fa-save"></i> שמור הגדרות
                                     </button>
@@ -253,16 +261,20 @@
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>📜 היסטוריית התראות</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <div class="section-header-actions">
+                            <button class="btn btn-sm btn-outline-danger" onclick="clearHistory()">
+                                <i class="fas fa-trash"></i> נקה היסטוריה
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
                         <!-- היסטוריית התראות -->
                         <div class="history-card">
                             <div class="card-header">
-                                <h3><i class="fas fa-history"></i> היסטוריית התראות</h3>
-                                <div class="card-actions">
+                                <div class="history-controls">
                                     <select id="historyFilter" class="form-select form-select-sm" onchange="filterHistory()">
                                         <option value="">כל ההתראות</option>
                                         <option value="success">הצלחה</option>
@@ -276,9 +288,6 @@
                                         <option value="7d">שבוע אחרון</option>
                                         <option value="30d">חודש אחרון</option>
                                     </select>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="clearHistory()">
-                                        <i class="fas fa-trash"></i> נקה היסטוריה
-                                    </button>
                                 </div>
                             </div>
                             <div class="card-body">

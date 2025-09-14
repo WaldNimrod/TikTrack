@@ -1000,11 +1000,7 @@ window.backupData = function() {
   }
 };
 
-window.clearCache = function() {
-  if (window.externalDataDashboard) {
-    window.externalDataDashboard.clearCache();
-  }
-};
+// Removed duplicate clearCache function - using global clearAllCache instead
 
 window.optimizeCache = function() {
   if (window.externalDataDashboard) {

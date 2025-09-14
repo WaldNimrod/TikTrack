@@ -476,7 +476,7 @@ class RealtimeNotificationsClient {
 
   showConnectionStatus(status) {
     const statusMessages = {
-      'connected': '🔗 מחובר לשרת בזמן אמת',
+      'connected': '', // הסרת הודעת חיבור
       'disconnected': '🔌 מנותק מהשרת',
       'error': '❌ שגיאת חיבור',
       'reconnected': '🔄 התחבר מחדש',

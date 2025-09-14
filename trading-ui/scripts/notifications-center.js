@@ -379,7 +379,7 @@ class NotificationsCenter {
     const enableSystemEvents = document.getElementById('enableSystemEvents');
 
     if (enableRealtime) {enableRealtime.checked = this.settings.enableRealtime;}
-    if (enableSounds) {enableSounds.checked = this.settings.enableSounds;}
+    if (enableSounds && !enableSounds.disabled) {enableSounds.checked = this.settings.enableSounds;}
     if (enableBackgroundTasks) {enableBackgroundTasks.checked = this.settings.enableBackgroundTasks;}
     if (enableDataUpdates) {enableDataUpdates.checked = this.settings.enableDataUpdates;}
     if (enableExternalData) {enableExternalData.checked = this.settings.enableExternalData;}
@@ -396,9 +396,13 @@ class NotificationsCenter {
                     <i class="${iconClass}"></i>
                 </div>
                 <div class="notification-content">
-                    <div class="notification-title">${notification.title}</div>
-                    <div class="notification-message">${notification.message}</div>
-                    <div class="notification-time">${timeAgo}</div>
+                    <div class="notification-line">
+                        <span class="notification-title">${notification.title}</span>
+                        <span class="notification-separator"> --> </span>
+                        <span class="notification-message">${notification.message}</span>
+                        <span class="notification-separator"> --> </span>
+                        <span class="notification-time">${timeAgo}</span>
+                    </div>
                 </div>
             </div>
         `;
@@ -463,7 +467,7 @@ class NotificationsCenter {
   static loadSettings() {
     const defaultSettings = {
       enableRealtime: true,
-      enableSounds: true,
+      enableSounds: false, // מבוטל זמנית
       enableBackgroundTasks: true,
       enableDataUpdates: true,
       enableExternalData: true,
@@ -549,7 +553,7 @@ class NotificationsCenter {
       console.log('🔧 תיקון הגדרות מבוטלות...');
       this.settings = {
         enableRealtime: true,
-        enableSounds: true,
+        enableSounds: false, // מבוטל זמנית
         enableBackgroundTasks: true,
         enableDataUpdates: true,
         enableExternalData: true,
@@ -1001,7 +1005,7 @@ function saveNotificationSettings() {
 
   const settings = {
     enableRealtime: enableRealtime.checked,
-    enableSounds: enableSounds.checked,
+    enableSounds: enableSounds.disabled ? false : enableSounds.checked, // מבוטל זמנית
     enableBackgroundTasks: enableBackgroundTasks.checked,
     enableDataUpdates: enableDataUpdates.checked,
     enableExternalData: enableExternalData.checked,

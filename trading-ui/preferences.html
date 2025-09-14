@@ -14,34 +14,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Unified CSS - אחרי Bootstrap כדי לדרוס אותו -->
-    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
-    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
-    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=v1.0.1">
-    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles/unified.css?v=v1.0.0">
     
     <!-- Header Styles -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v38_fixed">
+    <link rel="stylesheet" href="styles/header-styles.css?v=v1.0.0">
     
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -55,6 +31,56 @@
     
     <!-- Preferences System Scripts -->
     <script src="scripts/preferences.js?v=v1.0.1_color_fixes"></script>
+    
+    <!-- Exit Warning Script -->
+    <script>
+      // הודעת אזהרה לפני יציאה מהעמוד
+      let hasUnsavedChanges = false;
+      
+      // בדיקה אם יש שינויים לא שמורים
+      function checkForUnsavedChanges() {
+        // כאן נוכל להוסיף לוגיקה לבדיקת שינויים
+        return hasUnsavedChanges;
+      }
+      
+      // הוספת event listener ליציאה מהעמוד
+      window.addEventListener('beforeunload', function(e) {
+        if (checkForUnsavedChanges()) {
+          e.preventDefault();
+          e.returnValue = 'יש לך שינויים לא שמורים. האם אתה בטוח שברצונך לעזוב?';
+          return e.returnValue;
+        }
+      });
+      
+      // סימון שיש שינויים לא שמורים
+      function markAsDirty() {
+        hasUnsavedChanges = true;
+        const saveButton = document.getElementById('saveButton');
+        if (saveButton) {
+          saveButton.classList.add('btn-warning');
+          saveButton.innerHTML = '<i class="bi bi-save"></i> שמור שינויים *';
+        }
+      }
+      
+      // סימון שהכל נקי
+      function markAsClean() {
+        hasUnsavedChanges = false;
+        const saveButton = document.getElementById('saveButton');
+        if (saveButton) {
+          saveButton.classList.remove('btn-warning');
+          saveButton.innerHTML = '<i class="bi bi-save"></i> שמור הגדרות';
+        }
+      }
+      
+      // הוספת event listeners לכל השדות
+      document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+          input.addEventListener('change', markAsDirty);
+          input.addEventListener('input', markAsDirty);
+        });
+      });
+    </script>
     
     <!-- Color Demo Toggle Script -->
     <script src="scripts/color-demo-toggle.js"></script>
@@ -76,27 +102,13 @@
       <!-- כותרת ראשית -->
       <div class="top-section" id="topSection">
         <div class="section-header">
-          <h2>⚙️ הגדרות מערכת</h2>
+          <h1>⚙️ הגדרות מערכת</h1>
           <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
+            <span class="filter-arrow">▼</span>
           </button>
         </div>
         <div class="section-body">
-          <div class="preferences-header slide-in">
-        <div class="preferences-header-row">
-          <div>
-            <h1><i class="bi bi-gear-fill"></i> הגדרות מערכת</h1>
-            <p>מערכת הגדרות מתקדמת עם כל השדות הנדרשים - בסיסיות, עיצובים, מערכת, נתונים חיצוניים ומתקדמות</p>
-          </div>
-          <div class="preferences-buttons-row">
-            <button class="btn btn-outline-success" onclick="exportPreferences()">
-              <i class="bi bi-download"></i> יצא הגדרות
-            </button>
-            <button class="btn btn-outline-primary" onclick="importPreferences()">
-              <i class="bi bi-upload"></i> יבא הגדרות
-            </button>
-          </div>
-        </div>
+          <p>מערכת הגדרות מתקדמת עם כל השדות הנדרשים - בסיסיות, עיצובים, מערכת, נתונים חיצוניים ומתקדמות</p>
         </div>
       </div>
       
@@ -126,21 +138,6 @@
         </div>
       </div>
       
-      <!-- התראת מערכת חדשה -->
-      <div class="alert alert-info-modern">
-        <div class="preferences-header-row">
-          <div>
-            <h5><i class="bi bi-stars"></i> ברוכים הבאים למערכת ההעדפות!</h5>
-            <p class="mb-0">מערכת מתקדמת עם פרופילים מרובים, יבוא/יצוא, היסטוריית שינויים ועוד תכונות חדשות</p>
-          </div>
-          <div class="text-end">
-            <small class="text-muted">גרסה 2.0</small><br>
-            <a href="preferences.html" class="btn btn-outline-secondary btn-sm">
-              <i class="bi bi-arrow-left"></i> חזור ל-V1
-            </a>
-          </div>
-        </div>
-      </div>
       
       <!-- התראת מיגרציה -->
       <div class="alert alert-info-modern d-none" id="migrationAlert">
@@ -175,12 +172,31 @@
         </div>
       </div>
       
+      <!-- כפתורי פעולה ראשיים -->
+      <div class="preferences-buttons-row mb-4">
+        <button class="btn btn-success" onclick="saveAllPreferences()" id="saveButton">
+          <i class="bi bi-save"></i> שמור הגדרות
+        </button>
+        <button class="btn btn-outline-success" onclick="exportPreferences()">
+          <i class="bi bi-download"></i> יצא הגדרות
+        </button>
+        <button class="btn btn-outline-primary" onclick="importPreferences()">
+          <i class="bi bi-upload"></i> יבא הגדרות
+        </button>
+        <button class="btn btn-outline-warning" onclick="resetToDefaults()">
+          <i class="bi bi-arrow-clockwise"></i> אפס לברירות מחדל
+        </button>
+        <button class="btn btn-outline-secondary" onclick="toggleAllPreferenceSections()">
+          <i class="bi bi-arrows-expand"></i> פתח/סגור הכל
+        </button>
+      </div>
+      
       <!-- ===== הגדרות בסיסיות ===== -->
       <div class="content-section" id="section1">
         <div class="section-header">
           <h2>⚙️ הגדרות בסיסיות</h2>
           <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
+            <span class="filter-arrow">▼</span>
           </button>
         </div>
         <div class="section-body">
@@ -192,7 +208,8 @@
                 <h5>💰 מטבעות</h5>
                 <p>מטבע ראשי ומשני לתצוגת נתונים</p>
               </div>
-              <div class="setting-control">
+            </div>
+            <div class="setting-control">
                 <div class="row g-2">
                   <div class="col-6">
                     <label class="form-label small">ראשי</label>
@@ -221,7 +238,8 @@
                 <h5>🌍 אזור זמן ושפה</h5>
                 <p>הגדרות אזור זמן ושפה</p>
               </div>
-              <div class="setting-control">
+            </div>
+            <div class="setting-control">
                 <div class="row g-2">
                   <div class="col-6">
                     <label class="form-label small">אזור זמן</label>
@@ -242,6 +260,41 @@
                 </div>
               </div>
             </div>
+            
+            <!-- הגדרות חשבון -->
+            <div class="setting-item">
+              <div class="setting-label">
+                <h5>🏦 הגדרות חשבון</h5>
+                <p>פילטר חשבון ברירת מחדל</p>
+              </div>
+              <div class="setting-control">
+                <div class="row g-2">
+                  <div class="col-12">
+                    <label class="form-label small">חשבון ברירת מחדל</label>
+                    <select id="defaultAccountFilter" class="form-select form-control-modern">
+                      <option value="all">כל החשבונות</option>
+                      <option value="main">חשבון ראשי</option>
+                      <option value="secondary">חשבון משני</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+      
+      <!-- ===== הגדרות מסחר ===== -->
+      <div class="content-section" id="section1_5">
+        <div class="section-header">
+          <h2>📈 הגדרות מסחר</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section1_5')" title="הצג/הסתר סקשן">
+            <span class="filter-arrow">▼</span>
+          </button>
+        </div>
+        <div class="section-body">
+          <div class="settings-grid">
             
             <!-- הגדרות מסחר -->
             <div class="setting-item">
@@ -309,26 +362,6 @@
               </div>
             </div>
             
-            <!-- הגדרות חשבון -->
-            <div class="setting-item">
-              <div class="setting-label">
-                <h5>🏦 הגדרות חשבון</h5>
-                <p>פילטר חשבון ברירת מחדל</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                  <div class="col-12">
-                    <label class="form-label small">חשבון ברירת מחדל</label>
-                    <select id="defaultAccountFilter" class="form-select form-control-modern">
-                      <option value="all">כל החשבונות</option>
-                      <option value="main">חשבון ראשי</option>
-                      <option value="secondary">חשבון משני</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
           </div>
         </div>
       </div>
@@ -338,7 +371,7 @@
         <div class="section-header">
           <h2>🔍 פילטרים ברירת מחדל</h2>
           <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
+            <span class="filter-arrow">▼</span>
           </button>
         </div>
         <div class="section-body">
@@ -477,7 +510,7 @@
         <div class="section-header">
           <h2>🎨 מערכת צבעים מתקדמת</h2>
           <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
+            <span class="filter-arrow">▼</span>
           </button>
         </div>
         <div class="section-body">
@@ -519,7 +552,7 @@
                   <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-success"
                          onclick="openColorPicker('positive')"></div>
-                    <input type="color" id="positiveColor" class="d-none" value="#28a745">
+                    <input type="color" id="positiveColor" class="form-control color-picker" value="#28a745">
                   </div>
                 </div>
                 <div class="col-4 text-center">
@@ -527,7 +560,7 @@
                   <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-danger"
                          onclick="openColorPicker('negative')"></div>
-                    <input type="color" id="negativeColor" class="d-none" value="#dc3545">
+                    <input type="color" id="negativeColor" class="form-control color-picker" value="#dc3545">
                   </div>
                 </div>
                 <div class="col-4 text-center">
@@ -535,7 +568,7 @@
                   <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-secondary"
                          onclick="openColorPicker('zero')"></div>
-                    <input type="color" id="zeroColor" class="d-none" value="#6c757d">
+                    <input type="color" id="zeroColor" class="form-control color-picker" value="#6c757d">
                   </div>
                 </div>
               </div>
@@ -555,7 +588,7 @@
                   <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-primary"
                          onclick="openColorPicker('trade')"></div>
-                    <input type="color" id="tradeColor" class="d-none" value="#007bff">
+                    <input type="color" id="tradeColor" class="form-control color-picker" value="#007bff">
                   </div>
                 </div>
                 <div class="col-3 text-center">
@@ -563,7 +596,7 @@
                   <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-purple"
                          onclick="openColorPicker('account')"></div>
-                    <input type="color" id="accountColor" class="d-none" value="#6f42c1">
+                    <input type="color" id="accountColor" class="form-control color-picker" value="#6f42c1">
                   </div>
                 </div>
                 <div class="col-3 text-center">
@@ -571,7 +604,7 @@
                   <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-teal"
                          onclick="openColorPicker('ticker')"></div>
-                    <input type="color" id="tickerColor" class="d-none" value="#20c997">
+                    <input type="color" id="tickerColor" class="form-control color-picker" value="#20c997">
                   </div>
                 </div>
                 <div class="col-3 text-center">
@@ -579,7 +612,7 @@
                   <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-warning"
                          onclick="openColorPicker('alert')"></div>
-                    <input type="color" id="alertColor" class="d-none" value="#ffc107">
+                    <input type="color" id="alertColor" class="form-control color-picker" value="#ffc107">
                   </div>
                 </div>
               </div>
@@ -589,7 +622,7 @@
                   <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-indigo"
                          onclick="openColorPicker('execution')"></div>
-                    <input type="color" id="executionColor" class="d-none" value="#6610f2">
+                    <input type="color" id="executionColor" class="form-control color-picker" value="#6610f2">
                   </div>
                 </div>
                 <div class="col-3 text-center">
@@ -597,7 +630,7 @@
                   <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-info"
                          onclick="openColorPicker('cashflow')"></div>
-                    <input type="color" id="cashflowColor" class="d-none" value="#17a2b8">
+                    <input type="color" id="cashflowColor" class="form-control color-picker" value="#17a2b8">
                   </div>
                 </div>
                 <div class="col-3 text-center">
@@ -605,7 +638,7 @@
                   <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-orange"
                          onclick="openColorPicker('tradeplan')"></div>
-                    <input type="color" id="tradeplanColor" class="d-none" value="#fd7e14">
+                    <input type="color" id="tradeplanColor" class="form-control color-picker" value="#fd7e14">
                   </div>
                 </div>
                 <div class="col-3 text-center">
@@ -613,7 +646,7 @@
                   <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-secondary"
                          onclick="openColorPicker('note')"></div>
-                    <input type="color" id="noteColor" class="d-none" value="#6c757d">
+                    <input type="color" id="noteColor" class="form-control color-picker" value="#6c757d">
                   </div>
                 </div>
               </div>
@@ -633,7 +666,7 @@
                   <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-success"
                          onclick="openColorPicker('statusOpen')"></div>
-                    <input type="color" id="statusOpenColor" class="d-none" value="#28a745">
+                    <input type="color" id="statusOpenColor" class="form-control color-picker" value="#28a745">
                   </div>
                 </div>
                 <div class="col-4 text-center">
@@ -641,7 +674,7 @@
                   <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-secondary"
                          onclick="openColorPicker('statusClosed')"></div>
-                    <input type="color" id="statusClosedColor" class="d-none" value="#6c757d">
+                    <input type="color" id="statusClosedColor" class="form-control color-picker" value="#6c757d">
                   </div>
                 </div>
                 <div class="col-4 text-center">
@@ -649,7 +682,7 @@
                   <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-danger"
                          onclick="openColorPicker('statusCancelled')"></div>
-                    <input type="color" id="statusCancelledColor" class="d-none" value="#dc3545">
+                    <input type="color" id="statusCancelledColor" class="form-control color-picker" value="#dc3545">
                   </div>
                 </div>
               </div>
@@ -669,7 +702,7 @@
                   <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-primary"
                          onclick="openColorPicker('investmentSwing')"></div>
-                    <input type="color" id="investmentSwingColor" class="d-none" value="#007bff">
+                    <input type="color" id="investmentSwingColor" class="form-control color-picker" value="#007bff">
                   </div>
                 </div>
                 <div class="col-4 text-center">
@@ -677,7 +710,7 @@
                   <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-success"
                          onclick="openColorPicker('investmentInvestment')"></div>
-                    <input type="color" id="investmentInvestmentColor" class="d-none" value="#28a745">
+                    <input type="color" id="investmentInvestmentColor" class="form-control color-picker" value="#28a745">
                   </div>
                 </div>
                 <div class="col-4 text-center">
@@ -685,7 +718,7 @@
                   <div class="preferences-color-picker-group justify-content-center">
                     <div class="color-preview bg-warning"
                          onclick="openColorPicker('investmentPassive')"></div>
-                    <input type="color" id="investmentPassiveColor" class="d-none" value="#ffc107">
+                    <input type="color" id="investmentPassiveColor" class="form-control color-picker" value="#ffc107">
                   </div>
                 </div>
               </div>
@@ -700,7 +733,7 @@
         <div class="section-header">
           <h2>🖥️ ממשק משתמש</h2>
           <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
+            <span class="filter-arrow">▼</span>
           </button>
         </div>
         <div class="section-body">
@@ -771,7 +804,7 @@
         <div class="section-header">
           <h2>⚙️ הגדרות מערכת ושרת</h2>
           <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
+            <span class="filter-arrow">▼</span>
           </button>
         </div>
         <div class="section-body">
@@ -877,7 +910,7 @@
         <div class="section-header">
           <h2>🌐 נתונים חיצוניים</h2>
           <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
+            <span class="filter-arrow">▼</span>
           </button>
         </div>
         <div class="section-body">
@@ -964,7 +997,7 @@
         <div class="section-header">
           <h2>🔧 הגדרות מתקדמות</h2>
           <button class="filter-toggle-btn" onclick="toggleSection('section7')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
+            <span class="filter-arrow">▼</span>
           </button>
         </div>
         <div class="section-body">
@@ -1110,8 +1143,11 @@
         </div>
     </div>
   
-  <!-- Hidden file input for import -->
-  <input type="file" id="importFileInput" class="d-none" accept=".json" onchange="handleFileImport(event)">
-  
+      <!-- Hidden file input for import -->
+      <input type="file" id="importFileInput" class="d-none" accept=".json" onchange="handleFileImport(event)">
+      
+            </div> <!-- main-content -->
+        </div> <!-- page-body -->
+    </div> <!-- background-wrapper -->
 </body>
 </html>

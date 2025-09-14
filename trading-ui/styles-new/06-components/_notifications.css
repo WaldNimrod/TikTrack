@@ -241,3 +241,101 @@
   direction: ltr;
   min-width: fit-content;
 }
+
+/* כפתורי הגדרות - ברירת מחדל */
+.settings-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  justify-content: flex-start; /* משמאל */
+}
+
+.settings-actions .btn {
+  margin: 0;
+}
+
+/* הגדרות עמודות */
+.settings-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.setting-item {
+  margin-bottom: 0.5rem;
+}
+
+/* כפתורי היסטוריה */
+.history-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.history-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-start; /* משמאל */
+}
+
+.history-actions .btn {
+  margin: 0;
+}
+
+/* כפתורים בכותרת סקשן */
+.section-header-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.section-header-actions .btn {
+  margin: 0;
+}
+
+/* היסטוריית התראות - שורה אחת */
+.notification-line {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notification-separator {
+  color: var(--apple-text-tertiary);
+  font-weight: 500;
+}
+
+.notification-title {
+  font-weight: 600;
+  color: var(--apple-text-primary);
+}
+
+.notification-message {
+  color: var(--apple-text-secondary);
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-time {
+  color: var(--apple-text-tertiary);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+/* הגדרות מבוטלות */
+.setting-label input:disabled + .checkmark {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.setting-label input:disabled {
+  cursor: not-allowed;
+}
+
+.setting-label:has(input:disabled) {
+  opacity: 0.6;
+  color: var(--apple-text-tertiary);
+}

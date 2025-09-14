@@ -9,6 +9,10 @@
  * Last Updated: January 2025
  */
 
+// מערכת מעקב אחר כפילויות שכבר אוחדו
+let mergedDuplicates = new Set();
+let removedDuplicates = new Set();
+
 // ===== CSS MANAGEMENT FUNCTIONS =====
 
 /**
@@ -40,9 +44,6 @@ async function refreshCssStats() {
         if (totalSizeElement) totalSizeElement.textContent = totalSize;
         if (totalRulesElement) totalRulesElement.textContent = totalRules.toString();
         
-        if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification('הצלחה', 'נתוני CSS עודכנו בהצלחה');
-        }
     } catch (error) {
         console.error('❌ שגיאה ברענון נתוני CSS:', error);
         if (typeof window.showErrorNotification === 'function') {
@@ -65,7 +66,7 @@ async function validateCss() {
         const validationResults = await validateCssAPI();
         
         if (validationResults.errors.length === 0) {
-        if (typeof window.showSuccessNotification === 'function') {
+    if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('בדיקת תקינות', 'CSS תקין - לא נמצאו שגיאות');
             }
         } else {
@@ -231,7 +232,7 @@ async function fetchCssFileContent(filename) {
     --apple-spacing-md: 1rem;
     --apple-spacing-lg: 1.5rem;
 }`;
-        } else {
+    } else {
             content = `/* ${filename} - TikTrack */
 /* קובץ CSS זה מכיל סגנונות עבור ${filename} */
 .example-class {
@@ -284,8 +285,16 @@ function showCssViewerModal(filename, content) {
     
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     
-    const modal = new bootstrap.Modal(document.getElementById('cssViewerModal'));
-    modal.show();
+    // בדיקה אם Bootstrap זמין
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const modal = new bootstrap.Modal(document.getElementById('cssViewerModal'));
+        modal.show();
+    } else {
+        console.error('Bootstrap Modal לא זמין');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
+        }
+    }
 }
 
 /**
@@ -330,8 +339,16 @@ function showDeleteConfirmationModal(filename) {
     
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     
-    const modal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
-    modal.show();
+    // בדיקה אם Bootstrap זמין
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const modal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
+        modal.show();
+    } else {
+        console.error('Bootstrap Modal לא זמין');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
+        }
+    }
 }
 
 /**
@@ -343,8 +360,10 @@ async function confirmDeleteCssFile(filename) {
         const response = { ok: true };
         
         if (response.ok) {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmationModal'));
-            modal.hide();
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmationModal'));
+                if (modal) modal.hide();
+            }
             
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('מחיקה', `קובץ ${filename} נמחק בהצלחה`);
@@ -393,7 +412,7 @@ async function searchCssRules() {
         
         if (allResults.length > 0) {
             displaySearchResults(allResults, searchTerm);
-        } else {
+    } else {
     if (typeof window.showInfoNotification === 'function') {
                 window.showInfoNotification('חיפוש', 'לא נמצאו תוצאות');
             }
@@ -553,17 +572,170 @@ function clearCssSearch() {
 async function removeUnusedCss() {
     console.log('🧹 מתחיל הסרת CSS לא בשימוש...');
     
+    // הצגת חלון גיבוי
+    showBackupDialog(async () => {
+        await performRemoveUnusedCss();
+    });
+}
+
+/**
+ * ביצוע הסרת CSS לא בשימוש עם בחירה
+ */
+async function performRemoveUnusedCss() {
     try {
     if (typeof window.showInfoNotification === 'function') {
-            window.showInfoNotification('ניקוי', 'מתחיל הסרת CSS לא בשימוש...');
+            window.showInfoNotification('ניקוי', 'מתחיל סריקת CSS לא בשימוש...');
         }
         
         const cleanupResults = await removeUnusedCssAPI();
         
-        console.log(`📊 ניקוי הושלם: ${cleanupResults.removedRules} כללים הוסרו`);
+        // הצגת מודל בחירה
+        showUnusedCssRemovalModal(cleanupResults);
         
-        if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification('ניקוי הושלם', `${cleanupResults.removedRules} כללים לא בשימוש הוסרו`);
+    } catch (error) {
+        console.error('❌ שגיאה בהסרת CSS לא בשימוש:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בהסרת CSS לא בשימוש: ' + error.message);
+        }
+    }
+}
+
+/**
+ * הצגת מודל בחירת הסרת CSS לא בשימוש
+ */
+function showUnusedCssRemovalModal(cleanupResults) {
+    const modalHTML = `
+        <div class="modal fade" id="unusedCssRemovalModal" tabindex="-1">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">🧹 הסרת CSS לא בשימוש</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <strong>📊 סיכום:</strong> נמצאו ${cleanupResults.removedRules} כללים לא בשימוש מתוך ${cleanupResults.totalRules} כללים
+                        </div>
+                        
+                        <p>בחר איזה כללים להסיר:</p>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="selectAllUnused" onchange="toggleAllUnusedCss(this)">
+                                <label class="form-check-label" for="selectAllUnused">
+                                    <strong>בחר הכל</strong>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                            <table class="table table-sm">
+                                <thead class="sticky-top bg-light">
+                                    <tr>
+                                        <th>בחירה</th>
+                                        <th>קובץ</th>
+                                        <th>כללים להסרה</th>
+                                        <th>דוגמה</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${cleanupResults.files.map(file => `
+                                        <tr>
+                                            <td>
+                                                <div class="form-check">
+                                                    <input class="form-check-input unused-css-checkbox" type="checkbox" value="${file.name}" id="unused_${file.name.replace(/[^a-zA-Z0-9]/g, '_')}" checked>
+                                                </div>
+                                            </td>
+                                            <td><code>${file.name}</code></td>
+                                            <td><span class="badge bg-warning">${file.removed} כללים</span></td>
+                                            <td><small class="text-muted">.unused-class, .old-style</small></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <strong>⚠️ שימו לב:</strong> פעולה זו תמחק את הכללים הנבחרים לצמיתות. וודאו שיש לכם גיבוי.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-danger" onclick="executeUnusedCssRemoval()">
+                            <i class="fas fa-trash"></i> הסר נבחרים
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const existingModal = document.getElementById('unusedCssRemovalModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // בדיקה אם Bootstrap זמין
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const modal = new bootstrap.Modal(document.getElementById('unusedCssRemovalModal'));
+        modal.show();
+    } else {
+        console.error('Bootstrap Modal לא זמין');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
+        }
+    }
+}
+
+/**
+ * בחירת/ביטול כל הכללים הלא בשימוש
+ */
+function toggleAllUnusedCss(selectAllCheckbox) {
+    const checkboxes = document.querySelectorAll('.unused-css-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+    });
+}
+
+/**
+ * ביצוע הסרת CSS לא בשימוש
+ */
+async function executeUnusedCssRemoval() {
+    const selectedFiles = Array.from(document.querySelectorAll('.unused-css-checkbox:checked'))
+        .map(checkbox => checkbox.value);
+    
+    if (selectedFiles.length === 0) {
+        if (typeof window.showWarningNotification === 'function') {
+            window.showWarningNotification('אזהרה', 'אנא בחר לפחות קובץ אחד להסרה');
+        }
+        return;
+    }
+    
+    try {
+        // סימולציה של הסרת CSS לא בשימוש
+        const totalRemoved = selectedFiles.length * 8; // דמה
+        const response = { ok: true, removedRules: totalRemoved, files: selectedFiles };
+        
+        if (response.ok) {
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('unusedCssRemovalModal'));
+                if (modal) modal.hide();
+            }
+            
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('הסרה הושלמה', `${response.removedRules} כללים הוסרו מ-${response.files.length} קבצים`);
+            }
+            
+            // רענון הנתונים
+            setTimeout(() => {
+                if (typeof window.refreshCssStats === 'function') {
+                    window.refreshCssStats();
+                }
+            }, 1000);
+        } else {
+            throw new Error('שגיאה בהסרת CSS לא בשימוש');
         }
         
     } catch (error) {
@@ -583,11 +755,13 @@ async function removeUnusedCssAPI() {
         const removalData = {
             totalRules: 856,
             usedRules: 742,
-            removedRules: 114,
+            removedRules: 23, // תואם לנתון בסטטיסטיקות
             files: [
-                { name: '_buttons-advanced.css', removed: 12 },
-                { name: '_tables.css', removed: 8 },
-                { name: '_cards.css', removed: 6 }
+                { name: '_buttons-advanced.css', removed: 8 },
+                { name: '_tables.css', removed: 6 },
+                { name: '_cards.css', removed: 4 },
+                { name: '_forms-advanced.css', removed: 3 },
+                { name: '_navigation.css', removed: 2 }
             ]
         };
         
@@ -621,8 +795,8 @@ async function minifyCss() {
         const minifyResults = await minifyCssAPI();
         
         console.log(`📊 דחיסה הושלמה: ${minifyResults.originalSize} → ${minifyResults.minifiedSize} (${minifyResults.savings}% חיסכון)`);
-        
-        if (typeof window.showSuccessNotification === 'function') {
+
+    if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification('דחיסה הושלמה', `חיסכון של ${minifyResults.savings}% בגודל`);
         }
         
@@ -701,31 +875,75 @@ async function detectCssDuplicates() {
  */
 async function detectCssDuplicatesAPI() {
     try {
-        // סימולציה של זיהוי כפילויות
+        // כל הכפילויות הזמינות
+        const allDuplicates = [
+            {
+                selector: '.btn-primary',
+                files: ['_buttons-base.css', '_buttons-advanced.css'],
+                lines: [15, 23],
+                conflict: true
+            },
+            {
+                selector: '--primary-color',
+                files: ['_variables.css', '_colors-semantic.css'],
+                lines: [12, 8],
+                conflict: true
+            },
+            {
+                selector: '.card-header',
+                files: ['_cards.css', '_modals.css'],
+                lines: [8, 12],
+                conflict: true
+            },
+            {
+                selector: '--text-primary',
+                files: ['_variables.css', '_colors-semantic.css'],
+                lines: [15, 6],
+                conflict: true
+            }
+        ];
+        
+        // סינון כפילויות שכבר אוחדו או הוסרו
+        const activeDuplicates = allDuplicates.filter(dup => {
+            // בדיקה אם הכפילות אוחדה
+            if (mergedDuplicates.has(dup.selector)) {
+                return false;
+            }
+            
+            // בדיקה אם הכפילות נמחקה מכל הקבצים או מקובץ ספציפי
+            const deletedFromAll = removedDuplicates.has(dup.selector);
+            const deletedFromSpecific = Array.from(removedDuplicates).some(item => {
+                const [deletedSelector, deletedFile] = item.split('||');
+                return deletedSelector === dup.selector && dup.files.includes(deletedFile);
+            });
+            
+            // אם נמחקה מכל הקבצים או מכל הקבצים (כולם נמחקו)
+            if (deletedFromAll) {
+                return false;
+            }
+            
+            // אם נמחקה מכל הקבצים הספציפיים
+            if (deletedFromSpecific) {
+                // בדיקה אם נשארו קבצים שלא נמחקו מהם
+                const remainingFiles = dup.files.filter(file => {
+                    const deleteInfo = `${dup.selector}||${file}`;
+                    return !removedDuplicates.has(deleteInfo);
+                });
+                return remainingFiles.length > 0;
+            }
+            
+            return true;
+        });
+        
         const duplicatesData = {
             totalFiles: 24,
-            duplicates: [
-                {
-                    selector: '.btn-primary',
-                    files: ['_buttons-base.css', '_buttons-advanced.css'],
-                    lines: [15, 23],
-                    conflict: true
-                },
-                {
-                    selector: '--primary-color',
-                    files: ['_variables.css', '_colors-semantic.css'],
-                    lines: [12, 8],
-                    conflict: true
-                }
-            ],
-            conflicts: [
-                {
-                    selector: '.btn-primary',
-                    files: ['_buttons-base.css', '_buttons-advanced.css'],
-                    conflict: 'background-color',
-                    values: ['#007bff', '#0056b3']
-                }
-            ]
+            duplicates: activeDuplicates,
+            conflicts: activeDuplicates.filter(dup => dup.conflict).map(dup => ({
+                selector: dup.selector,
+                files: dup.files,
+                conflict: 'background-color',
+                values: ['#007bff', '#0056b3']
+            }))
         };
         
         return duplicatesData;
@@ -764,6 +982,9 @@ function displayDuplicateResults(results) {
             html += `
                 <div class="alert alert-warning">
                     <strong>⚠️ נמצאו ${results.duplicates.length} כפילויות:</strong>
+                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="resetAllDuplicates()">
+                        <i class="fas fa-refresh"></i> איפוס
+                    </button>
                 </div>
                 <div class="table-responsive">
                     <table class="table table-sm">
@@ -783,9 +1004,14 @@ function displayDuplicateResults(results) {
                         <td><code>${duplicate.selector}</code></td>
                         <td>${duplicate.files.join(', ')}</td>
                         <td>
-                            <button class="btn btn-sm btn-outline-danger" onclick="cleanupCssDuplicates('${duplicate.selector}')">
-                                נקה
+                            <div class="d-flex gap-1">
+                                <button class="btn btn-sm btn-outline-primary" onclick="showSpecificDuplicateCleanupModal('${duplicate.selector}', {files: [${duplicate.files.map(f => `'${f}'`).join(', ')}]})">
+                                    <i class="fas fa-merge"></i> איחוד
+                                </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeSpecificDuplicate('${duplicate.selector}')">
+                                <i class="fas fa-trash"></i> מחק
                             </button>
+                            </div>
                         </td>
                     </tr>
                 `;
@@ -796,7 +1022,7 @@ function displayDuplicateResults(results) {
                     </table>
                 </div>
             `;
-        } else {
+    } else {
             html += `
                 <div class="alert alert-success">
                     <strong>✅ לא נמצאו כפילויות!</strong>
@@ -837,25 +1063,161 @@ function createDuplicateResultsContainer() {
 }
 
 /**
+ * הצגת חלון גיבוי לפני פעולות
+ */
+function showBackupDialog(actionCallback) {
+    const modalHTML = `
+        <div class="modal fade" id="backupDialogModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">💾 גיבוי לפני פעולה</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-warning">
+                            <strong>⚠️ פעולה משמעותית:</strong> הפעולה הבאה תשנה את קבצי הסגנונות שלכם.
+                        </div>
+                        <p>האם ברצונכם לבצע גיבוי של כל קבצי הסגנונות לפני ביצוע הפעולה?</p>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="createBackup" checked>
+                            <label class="form-check-label" for="createBackup">
+                                <strong>צור גיבוי אוטומטי</strong>
+                            </label>
+                        </div>
+                        <small class="text-muted">הגיבוי יכלול את כל קבצי ה-CSS הנוכחיים עם חותמת זמן</small>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-primary" onclick="proceedWithBackup()">
+                            <i class="fas fa-play"></i> המשך
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const existingModal = document.getElementById('backupDialogModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // שמירת callback לפעולה
+    window.backupActionCallback = actionCallback;
+    
+    // בדיקה אם Bootstrap זמין
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const modal = new bootstrap.Modal(document.getElementById('backupDialogModal'));
+        modal.show();
+    } else {
+        console.error('Bootstrap Modal לא זמין');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
+        }
+    }
+}
+
+/**
+ * המשך עם גיבוי
+ */
+async function proceedWithBackup() {
+    const createBackup = document.getElementById('createBackup').checked;
+    
+    try {
+        if (createBackup) {
+            if (typeof window.showInfoNotification === 'function') {
+                window.showInfoNotification('גיבוי', 'יוצר גיבוי של קבצי הסגנונות...');
+            }
+            
+            // ביצוע גיבוי
+            const backupResult = await createCssBackup();
+            
+            if (backupResult.success) {
+    if (typeof window.showSuccessNotification === 'function') {
+                    window.showSuccessNotification('גיבוי הושלם', `גיבוי נוצר: ${backupResult.backupFile}`);
+                }
+    } else {
+                if (typeof window.showWarningNotification === 'function') {
+                    window.showWarningNotification('אזהרה', 'לא ניתן ליצור גיבוי, ממשיך ללא גיבוי');
+                }
+            }
+        }
+        
+        // סגירת המודל
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('backupDialogModal'));
+            if (modal) modal.hide();
+        }
+        
+        // ביצוע הפעולה המקורית
+        if (window.backupActionCallback) {
+            await window.backupActionCallback();
+        }
+        
+    } catch (error) {
+        console.error('❌ שגיאה בגיבוי:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בגיבוי: ' + error.message);
+        }
+    }
+}
+
+/**
+ * יצירת גיבוי של קבצי CSS
+ */
+async function createCssBackup() {
+    try {
+        // סימולציה של יצירת גיבוי
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const backupFile = `backup-css-${timestamp}.zip`;
+        
+        // סימולציה של יצירת גיבוי
+        const response = { 
+            success: true, 
+            backupFile: backupFile,
+            filesBackedUp: 24,
+            totalSize: '2.4 MB'
+        };
+        
+        console.log(`💾 גיבוי נוצר: ${backupFile}`);
+        
+        return response;
+        
+    } catch (error) {
+        console.error('❌ שגיאה ביצירת גיבוי:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
  * ניקוי כפילויות CSS
  */
 async function cleanupCssDuplicates(selector = null) {
     console.log('🧹 מתחיל ניקוי כפילויות...');
     
+    // הצגת חלון גיבוי
+    showBackupDialog(async () => {
+        await performCleanupDuplicates(selector);
+    });
+}
+
+/**
+ * ביצוע ניקוי כפילויות עם בחירת קובץ איחוד
+ */
+async function performCleanupDuplicates(selector = null) {
     try {
-        // סימולציה של ניקוי כפילויות
-        const response = { ok: true };
+        // קבלת נתוני כפילויות
+        const duplicates = await detectCssDuplicatesAPI();
         
-        if (response.ok) {
-            if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('ניקוי הושלם', 'כפילויות נוקו בהצלחה');
-            }
-            
-            setTimeout(() => {
-                detectCssDuplicates();
-            }, 1000);
-    } else {
-            throw new Error('שגיאה בניקוי כפילויות');
+        if (selector) {
+            // ניקוי ספציפי לסלקטור
+            await cleanupSpecificDuplicate(selector, duplicates);
+        } else {
+            // ניקוי כללי - הצגת בחירת קובץ איחוד
+            showDuplicateCleanupModal(duplicates);
         }
         
     } catch (error) {
@@ -864,6 +1226,370 @@ async function cleanupCssDuplicates(selector = null) {
             window.showErrorNotification('שגיאה', 'שגיאה בניקוי כפילויות: ' + error.message);
         }
     }
+}
+
+/**
+ * הצגת מודל בחירת קובץ איחוד לכפילויות
+ */
+function showDuplicateCleanupModal(duplicates) {
+    const modalHTML = `
+        <div class="modal fade" id="duplicateCleanupModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">🧹 ניקוי כפילויות CSS</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>בחר לאיזה קובץ לאחד את הכפילויות:</p>
+                        <div class="mb-3">
+                            <label for="mergeTargetFile" class="form-label">קובץ יעד לאיחוד:</label>
+                            <select class="form-select" id="mergeTargetFile">
+                                <option value="">בחר קובץ...</option>
+                                <option value="_buttons-base.css">_buttons-base.css</option>
+                                <option value="_buttons-advanced.css">_buttons-advanced.css</option>
+                                <option value="_variables.css">_variables.css</option>
+                                <option value="_colors-semantic.css">_colors-semantic.css</option>
+                            </select>
+                        </div>
+                        <div class="alert alert-info">
+                            <strong>כפילויות שיועברו:</strong>
+                            <ul class="mb-0">
+                                ${duplicates.duplicates.map(d => `<li><code>${d.selector}</code> מ-${d.files.join(', ')}</li>`).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-primary" onclick="executeDuplicateCleanup()">
+                            <i class="fas fa-merge"></i> בצע איחוד
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const existingModal = document.getElementById('duplicateCleanupModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // בדיקה אם Bootstrap זמין
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const modal = new bootstrap.Modal(document.getElementById('duplicateCleanupModal'));
+        modal.show();
+    } else {
+        console.error('Bootstrap Modal לא זמין');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
+        }
+    }
+}
+
+/**
+ * ביצוע איחוד כפילויות
+ */
+async function executeDuplicateCleanup() {
+    const targetFile = document.getElementById('mergeTargetFile').value;
+    
+    if (!targetFile) {
+        if (typeof window.showWarningNotification === 'function') {
+            window.showWarningNotification('אזהרה', 'אנא בחר קובץ יעד לאיחוד');
+        }
+        return;
+    }
+    
+    try {
+        // קבלת נתוני כפילויות נוכחיים
+        const duplicates = await detectCssDuplicatesAPI();
+        
+        // סימולציה של איחוד כפילויות
+        const response = { ok: true, mergedRules: duplicates.duplicates.length };
+        
+        if (response.ok) {
+            // הוספת כל הכפילויות לרשימת הכפילויות שאוחדו
+            duplicates.duplicates.forEach(dup => {
+                mergedDuplicates.add(dup.selector);
+            });
+            
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('duplicateCleanupModal'));
+                if (modal) modal.hide();
+            }
+            
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('איחוד הושלם', `${response.mergedRules} כפילויות אוחדו לקובץ ${targetFile}`);
+            }
+            
+            setTimeout(() => {
+                detectCssDuplicates();
+            }, 1000);
+        } else {
+            throw new Error('שגיאה באיחוד כפילויות');
+        }
+        
+    } catch (error) {
+        console.error('❌ שגיאה באיחוד כפילויות:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה באיחוד כפילויות: ' + error.message);
+        }
+    }
+}
+
+/**
+ * ניקוי כפילות ספציפית
+ */
+async function cleanupSpecificDuplicate(selector, duplicates) {
+    const duplicate = duplicates.duplicates.find(d => d.selector === selector);
+    if (!duplicate) {
+        if (typeof window.showWarningNotification === 'function') {
+            window.showWarningNotification('אזהרה', 'כפילות לא נמצאה');
+        }
+        return;
+    }
+    
+    // הצגת בחירת קובץ איחוד לכפילות ספציפית
+    showSpecificDuplicateCleanupModal(selector, duplicate);
+}
+
+/**
+ * הצגת מודל בחירת קובץ איחוד לכפילות ספציפית
+ */
+function showSpecificDuplicateCleanupModal(selector, duplicate) {
+    const modalHTML = `
+        <div class="modal fade" id="specificDuplicateCleanupModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">🧹 ניקוי כפילות ספציפית</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <strong>סלקטור:</strong> <code>${selector}</code>
+                        </div>
+                        <p>נמצא בקבצים: <strong>${duplicate.files.join(', ')}</strong></p>
+                        <div class="mb-3">
+                            <label for="specificMergeTargetFile" class="form-label">קובץ יעד לאיחוד:</label>
+                            <select class="form-select" id="specificMergeTargetFile">
+                                <option value="">בחר קובץ...</option>
+                                ${duplicate.files.map(file => `<option value="${file}">${file}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="alert alert-warning">
+                            <strong>⚠️ שימו לב:</strong> הכפילות תועבר לקובץ הנבחר ותימחק מהקבצים האחרים.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-primary" onclick="executeSpecificDuplicateCleanup('${selector}')">
+                            <i class="fas fa-merge"></i> בצע איחוד
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const existingModal = document.getElementById('specificDuplicateCleanupModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // בדיקה אם Bootstrap זמין
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const modal = new bootstrap.Modal(document.getElementById('specificDuplicateCleanupModal'));
+        modal.show();
+    } else {
+        console.error('Bootstrap Modal לא זמין');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
+        }
+    }
+}
+
+/**
+ * ביצוע איחוד כפילות ספציפית
+ */
+async function executeSpecificDuplicateCleanup(selector) {
+    const targetFile = document.getElementById('specificMergeTargetFile').value;
+    
+    if (!targetFile) {
+        if (typeof window.showWarningNotification === 'function') {
+            window.showWarningNotification('אזהרה', 'אנא בחר קובץ יעד לאיחוד');
+        }
+        return;
+    }
+    
+    try {
+        // סימולציה של איחוד כפילות ספציפית
+        const response = { ok: true, mergedRule: selector };
+        
+        if (response.ok) {
+            // הוספת הכפילות לרשימת הכפילויות שאוחדו
+            mergedDuplicates.add(selector);
+            
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('specificDuplicateCleanupModal'));
+                if (modal) modal.hide();
+            }
+            
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('איחוד הושלם', `הכפילות ${selector} אוחדה לקובץ ${targetFile}`);
+            }
+            
+            setTimeout(() => {
+                detectCssDuplicates();
+            }, 1000);
+        } else {
+            throw new Error('שגיאה באיחוד כפילות ספציפית');
+        }
+        
+    } catch (error) {
+        console.error('❌ שגיאה באיחוד כפילות ספציפית:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה באיחוד כפילות ספציפית: ' + error.message);
+        }
+    }
+}
+
+/**
+ * מחיקת כפילות ספציפית
+ */
+async function removeSpecificDuplicate(selector) {
+    // קבלת נתוני הכפילות
+    const duplicates = await detectCssDuplicatesAPI();
+    const duplicate = duplicates.duplicates.find(dup => dup.selector === selector);
+    
+    if (!duplicate) {
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'כפילות לא נמצאה');
+        }
+        return;
+    }
+    
+    // הצגת מודל בחירת קובץ למחיקה
+    showDeleteFileSelectionModal(selector, duplicate);
+}
+
+/**
+ * הצגת מודל בחירת קובץ למחיקה
+ */
+function showDeleteFileSelectionModal(selector, duplicate) {
+    const modalHTML = `
+        <div class="modal fade" id="deleteFileSelectionModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">🗑️ מחיקת כפילות</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-info">
+                            <strong>סלקטור:</strong> <code>${selector}</code>
+                        </div>
+                        <p>הכפילות נמצאת בקבצים: <strong>${duplicate.files.join(', ')}</strong></p>
+                        <div class="mb-3">
+                            <label for="deleteFromFile" class="form-label">מאיזה קובץ למחוק את הכפילות:</label>
+                            <select class="form-select" id="deleteFromFile">
+                                <option value="">בחר קובץ...</option>
+                                ${duplicate.files.map(file => `<option value="${file}">${file}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="alert alert-warning">
+                            <strong>⚠️ שימו לב:</strong> הכפילות תימחק מהקובץ הנבחר בלבד. בקבצים האחרים היא תישאר.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        <button type="button" class="btn btn-danger" onclick="executeDeleteFromFile('${selector}')">
+                            <i class="fas fa-trash"></i> מחק מהקובץ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const existingModal = document.getElementById('deleteFileSelectionModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const modal = new bootstrap.Modal(document.getElementById('deleteFileSelectionModal'));
+        modal.show();
+    } else {
+        console.error('Bootstrap Modal לא זמין');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
+        }
+    }
+}
+
+/**
+ * ביצוע מחיקה מקובץ ספציפי
+ */
+async function executeDeleteFromFile(selector) {
+    const targetFile = document.getElementById('deleteFromFile').value;
+    
+    if (!targetFile) {
+        if (typeof window.showWarningNotification === 'function') {
+            window.showWarningNotification('אזהרה', 'אנא בחר קובץ למחיקה');
+        }
+        return;
+    }
+    
+    // הצגת חלון גיבוי
+    showBackupDialog(async () => {
+        try {
+            // הוספת הכפילות לרשימת הכפילויות שהוסרו (עם פרטי הקובץ)
+            const deleteInfo = `${selector}||${targetFile}`;
+            removedDuplicates.add(deleteInfo);
+            
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteFileSelectionModal'));
+                if (modal) modal.hide();
+            }
+            
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('מחיקה הושלמה', `הכפילות ${selector} נמחקה מהקובץ ${targetFile}`);
+            }
+            
+            setTimeout(() => {
+                detectCssDuplicates();
+            }, 1000);
+            
+        } catch (error) {
+            console.error('❌ שגיאה במחיקת כפילות:', error);
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', 'שגיאה במחיקת כפילות: ' + error.message);
+            }
+        }
+    });
+}
+
+/**
+ * איפוס כל הכפילויות (לצורך בדיקה)
+ */
+function resetAllDuplicates() {
+    mergedDuplicates.clear();
+    removedDuplicates.clear();
+    
+    if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('איפוס הושלם', 'כל הכפילויות אופסו - ניתן לבדוק שוב');
+    }
+    
+    setTimeout(() => {
+        detectCssDuplicates();
+    }, 1000);
 }
 
 /**
@@ -1093,8 +1819,16 @@ function showAddCssFileModal() {
     
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     
-    const modal = new bootstrap.Modal(document.getElementById('addCssFileModal'));
-    modal.show();
+    // בדיקה אם Bootstrap זמין
+    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const modal = new bootstrap.Modal(document.getElementById('addCssFileModal'));
+        modal.show();
+    } else {
+        console.error('Bootstrap Modal לא זמין');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
+        }
+    }
 }
 
 /**
@@ -1118,8 +1852,10 @@ async function createNewCssFileFromModal() {
         const response = { ok: true };
         
         if (response.ok) {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addCssFileModal'));
-            modal.hide();
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addCssFileModal'));
+                if (modal) modal.hide();
+            }
 
     if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `קובץ ${fullFileName} נוצר בהצלחה`);
@@ -1222,9 +1958,6 @@ async function loadCssFilesList() {
         
         displayCssFilesTable(cssFiles);
         
-        if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification('הצלחה', `נטענו ${cssFiles.length} קבצי CSS בהצלחה`);
-        }
         
     } catch (error) {
         console.error('❌ שגיאה בטעינת רשימת קבצי CSS:', error);
@@ -1315,6 +2048,18 @@ window.createNewCssFile = createNewCssFile;
 window.createCssFileFromTemplate = createCssFileFromTemplate;
 window.openCssEditor = openCssEditor;
 window.toggleSection = toggleSection;
+window.showBackupDialog = showBackupDialog;
+window.proceedWithBackup = proceedWithBackup;
+window.createCssBackup = createCssBackup;
+window.executeDuplicateCleanup = executeDuplicateCleanup;
+window.executeUnusedCssRemoval = executeUnusedCssRemoval;
+window.toggleAllUnusedCss = toggleAllUnusedCss;
+window.showSpecificDuplicateCleanupModal = showSpecificDuplicateCleanupModal;
+window.executeSpecificDuplicateCleanup = executeSpecificDuplicateCleanup;
+window.removeSpecificDuplicate = removeSpecificDuplicate;
+window.resetAllDuplicates = resetAllDuplicates;
+window.showDeleteFileSelectionModal = showDeleteFileSelectionModal;
+window.executeDeleteFromFile = executeDeleteFromFile;
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
@@ -1325,3 +2070,4 @@ document.addEventListener('DOMContentLoaded', function() {
 window.addEventListener('error', (e) => {
     console.error('❌ שגיאה כללית:', e.error);
 });
+

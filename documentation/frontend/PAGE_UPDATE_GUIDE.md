@@ -15,6 +15,42 @@ This guide describes the complete process for building a new page or updating an
 - **גרסה 1**: `documentation/frontend/PAGE_UPDATE_GUIDE_v1.md` - מדריך עדכון עמוד קיים לתבנית בסיס נכונה
 - **גרסה 2**: `documentation/frontend/PAGE_UPDATE_GUIDE.md` (נוכחי) - מדריך בניית עמוד מקיף
 
+## 📊 טבלת סטטוס עמודים במערכת
+
+> **עדכון אחרון**: 15 בינואר 2025
+
+### עמודים תחת תפריט "כלי פיתוח -> פעולות מערכת"
+
+| עמוד | כתובת | סקשנים | סטטוס עדכון | כפתור כל הסקשנים | הערות |
+|------|--------|---------|--------------|-------------------|-------|
+| **🔧 ניהול מערכת** | `/system-management` | 8 | ✅ עדכון מלא | ✅ יושם | 7 סקשני תוכן + 1 עליון |
+| **🎨 ניהול CSS** | `/css-management` | 5 | ✅ עדכון מלא | ✅ יושם | 4 סקשני תוכן + 1 עליון |
+| **🧪 דשבורד בדיקות CRUD** | `/crud-testing-dashboard` | 2 | ✅ עדכון מלא | ❌ לא נדרש | 1 סקשן תוכן + 1 עליון |
+| **מרכז התראות** | `/notifications-center` | 3 | ✅ עדכון מלא | ❌ לא נדרש | 2 סקשני תוכן + 1 עליון |
+| **⚙️ משימות רקע** | `/background-tasks` | 6 | ✅ עדכון מלא | ✅ יושם | 5 סקשני תוכן + 1 עליון |
+| **🖥️ ניטור שרת** | `/server-monitor` | 2 | ✅ עדכון מלא | ❌ לא נדרש | 1 סקשן תוכן + 1 עליון |
+| **🔍 ניטור Linter** | `/linter-realtime-monitor` | 6 | ✅ עדכון מלא | ✅ יושם | 5 סקשני תוכן + 1 עליון |
+
+### עמודים תחת תפריטים אחרים
+
+| עמוד | כתובת | סקשנים | סטטוס עדכון | כפתור כל הסקשנים | הערות |
+|------|--------|---------|--------------|-------------------|-------|
+| **🏠 עמוד הבית** | `/index` | 7 | ✅ עדכון מלא | ✅ יושם | 6 סקשני תוכן + 1 עליון |
+| **⚙️ העדפות** | `/preferences` | 8 | ✅ עדכון מלא | ✅ יושם | 7 סקשני תוכן + 1 עליון |
+| **👥 חשבונות** | `/accounts` | 3 | ✅ עדכון מלא | ❌ לא נדרש | 2 סקשני תוכן + 1 עליון |
+| **🚨 התראות** | `/alerts` | 2 | ✅ עדכון מלא | ❌ לא נדרש | 1 סקשן תוכן + 1 עליון |
+| **📋 בדיקת כותרת** | `/test-header-only` | 4 | ✅ עדכון מלא | ✅ יושם | 3 סקשני תוכן + 1 עליון |
+| **🗃️ טבלאות עזר** | `/db_extradata` | 4 | ✅ עדכון מלא | ✅ יושם | 3 סקשני תוכן + 1 עליון |
+| **🎨 עיצובים** | `/designs` | 4 | ✅ עדכון מלא | ✅ יושם | 3 סקשני תוכן + 1 עליון |
+
+### סיכום סטטוס
+
+- **✅ עדכון מלא**: 14 עמודים
+- **🔄 עדכון חלקי**: 0 עמודים  
+- **❌ ללא עדכון**: 0 עמודים
+- **🔘 כפתור כל הסקשנים יושם**: 8 עמודים (יותר מ-3 סקשנים)
+- **⚪ כפתור כל הסקשנים לא נדרש**: 6 עמודים (3 סקשנים או פחות)
+
 ## 📚 קריאת דוקומנטציה מומלצת
 
 > ⚠️ **חשוב מאוד!** לפני התחלת העבודה, **חובה** לקרוא את הדוקומנטציה הבאה:
@@ -1192,7 +1228,22 @@ grep "onclick.*toggle" trading-ui/page-name.html
 אם חסרים כפתורים, יש להוסיף אותם לפי התבנית:
 
 **כפתור סקשן עליון:**
+
+> ⚠️ **כלל חדש - כפתור סקשן עליון לפתיחת כל הסקשנים:**
+> 
+> אם לעמוד יש **יותר מ-3 סקשנים סה"כ** (כולל הסקשן העליון), הכפתור של הסקשן העליון צריך לפתוח ולסגור את **כל הסקשנים** בעמוד, לא רק את הסקשן העליון.
+> 
+> **עמודים עם יותר מ-3 סקשנים:** system-management (8), css-management (5), background-tasks (6), linter-realtime-monitor (6), index (7), preferences (8)
+> 
+> **עמודים עם 3 סקשנים או פחות:** crud-testing-dashboard (2), notifications-center (3), server-monitor (2), accounts (3), alerts (2)
+
 ```html
+<!-- לעמודים עם יותר מ-3 סקשנים - כפתור לפתיחת כל הסקשנים -->
+<button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+    <span class="section-toggle-icon">▼</span>
+</button>
+
+<!-- לעמודים עם 3 סקשנים או פחות - כפתור רגיל -->
 <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
     <span class="section-toggle-icon">▼</span>
 </button>
@@ -1274,6 +1325,7 @@ grep "scripts/" trading-ui/designs.html
 grep "color-scheme-system.js" trading-ui/designs.html
 grep "preferences-v2.js" trading-ui/designs.html
 grep "ui-utils.js" trading-ui/designs.html
+grep "central-refresh-system.js" trading-ui/designs.html
 grep "main.js" trading-ui/designs.html
 ```
 
@@ -1286,8 +1338,30 @@ grep "main.js" trading-ui/designs.html
 - מערכת נתונים (`data-utils.js`)
 - מערכת קישורים (`linked-items.js`)
 - מערכת עמודים (`page-utils.js`)
+- מערכת ניקוי מטמון (`central-refresh-system.js`)
 
-#### 15.3 יישום צבעי סטטוס
+#### 15.3 פונקציות ניקוי מטמון
+
+**פונקציות גלובליות זמינות לניקוי מטמון:**
+
+```javascript
+// ניקוי מטמון מלא - מומלץ לשימוש
+window.clearAllCache();
+
+// ניקוי מטמון לפני פעולת CRUD
+window.clearCacheBeforeCRUD(pageType, operation);
+
+// ניקוי מטמון וריענון מלא
+window.clearCacheAndRefresh(pageType);
+```
+
+**חשוב**: 
+- השתמש ב-`window.clearAllCache()` לניקוי מטמון כללי
+- הפונקציה מציגה התראה אוטומטית: "המטמון נוקה בהצלחה"
+- אין צורך ליצור פונקציות מקומיות לניקוי מטמון
+- המערכת הגלובלית מטפלת בכל סוגי המטמון
+
+#### 15.4 יישום צבעי סטטוס
 
 **כיתות CSS זמינות לסטטוסים:**
 
@@ -1842,6 +1916,7 @@ grep "scripts/" trading-ui/designs.html
 grep "color-scheme-system.js" trading-ui/designs.html
 grep "preferences-v2.js" trading-ui/designs.html
 grep "ui-utils.js" trading-ui/designs.html
+grep "central-refresh-system.js" trading-ui/designs.html
 grep "main.js" trading-ui/designs.html
 ```
 

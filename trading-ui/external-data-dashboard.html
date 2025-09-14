@@ -668,8 +668,44 @@
         
         function copyDetailedLog() {
             console.log('📋 העתקת לוג מפורט...');
-            // TODO: Implement detailed log copying
-            showNotification('לוג מפורט הועתק ללוח', 'success');
+            
+            // Collect all log entries
+            const logEntries = document.querySelectorAll('.log-entry');
+            let detailedLog = '=== לוג מפורט של דשבורד נתונים חיצוניים ===\n';
+            detailedLog += `זמן יצירה: ${new Date().toLocaleString('he-IL')}\n\n`;
+            
+            if (logEntries.length === 0) {
+                detailedLog += 'אין רשומות לוג זמינות\n';
+            } else {
+                logEntries.forEach((entry, index) => {
+                    const processName = entry.querySelector('strong');
+                    const timestamp = entry.querySelector('.text-muted');
+                    const badge = entry.querySelector('.badge');
+                    const details = entry.querySelector('.text-muted.small.mt-1');
+                    
+                    if (processName && timestamp && badge) {
+                        detailedLog += `--- רשומה ${index + 1} ---\n`;
+                        detailedLog += `תהליך: ${processName.textContent}\n`;
+                        detailedLog += `זמן: ${timestamp.textContent}\n`;
+                        detailedLog += `סטטוס: ${badge.textContent}\n`;
+                        if (details) {
+                            detailedLog += `פרטים: ${details.textContent}\n`;
+                        }
+                        detailedLog += '\n';
+                    }
+                });
+            }
+            
+            detailedLog += '=== סוף הלוג ===';
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(detailedLog).then(() => {
+                showNotification('לוג מפורט הועתק ללוח בהצלחה', 'success');
+                console.log('📋 לוג מפורט הועתק:', detailedLog);
+            }).catch(err => {
+                console.error('שגיאה בהעתקת הלוג:', err);
+                showNotification('שגיאה בהעתקת הלוג', 'error');
+            });
         }
         
         function analyzeData() {
@@ -694,8 +730,33 @@
             // Use the global notification system
             if (typeof showSystemNotification === 'function') {
                 showSystemNotification(message, type);
+            } else if (typeof showNotification === 'function' && showNotification !== arguments.callee) {
+                showNotification(message, type);
             } else {
+                // Fallback to console and alert
                 console.log(`📢 ${type.toUpperCase()}: ${message}`);
+                
+                // Create a simple notification element
+                const notification = document.createElement('div');
+                notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
+                notification.style.position = 'fixed';
+                notification.style.top = '20px';
+                notification.style.right = '20px';
+                notification.style.zIndex = '9999';
+                notification.style.minWidth = '300px';
+                notification.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 5000);
             }
         }
     </script>

@@ -17,7 +17,7 @@ This guide describes the complete process for building a new page or updating an
 
 ## 📊 טבלת סטטוס עמודים במערכת
 
-> **עדכון אחרון**: 15 בינואר 2025
+> **עדכון אחרון**: 14 בספטמבר 2025
 
 ### עמודים תחת תפריט "כלי פיתוח -> פעולות מערכת"
 

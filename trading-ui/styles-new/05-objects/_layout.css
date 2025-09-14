@@ -105,7 +105,6 @@
 
 /* אזור עליון */
 .top-section {
-  background: var(--apple-bg-elevated, #ffffff);
   margin: 0;
   border-radius: 0;
   box-shadow: none;

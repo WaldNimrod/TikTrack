@@ -1,186 +1,466 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
-            <!-- ===== CSS Architecture - Unified CSS ===== -->
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דשבורד נתונים חיצוניים - TikTrack</title>
     
-    <!-- Bootstrap Framework -->
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- TikTrack CSS - Unified CSS (No @import) -->
-    <link rel="stylesheet" href="styles-new/unified.css">
+    <!-- Unified CSS - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=external-data-dashboard-v1.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=external-data-dashboard-v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_info-summary.css?v=external-data-dashboard-v1.0.0">
     
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=external-data-dashboard-v1.0.0">
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js?v=external-data-dashboard-v1.0.0"></script>
     
-    <!-- Error Handlers -->
-    <script src="scripts/error-handlers.js"></script>
+    <!-- Dynamic Color System Scripts -->
+    <script src="scripts/color-scheme-system.js"></script>
     
-    <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_level3_fix"></head>
-<body class="external-data-dashboard-page">
-    <!-- Unified Header Container -->
-    <div id="unified-header"></div>
-    <!-- General background -->
+    <!-- Preferences System Scripts -->
+    <script src="scripts/preferences.js"></script>
+</head>
+
+<body>
     <div class="background-wrapper">
-        
-        <!-- unified-header ייווצר כאן אוטומטית -->
+        <!-- Header System -->
         <div id="unified-header"></div>
-        
-        <!-- Page body - All content after header -->
+
+        <!-- Page body -->
         <div class="page-body">
-            <!-- Dashboard area - top-Section -->
-            <div class="top-section">
-                <!-- Main header -->
-                <div class="section-header">
-                    <div class="table-title">
-                        <img src="images/icons/development.svg?v=20250905" alt="דשבורד נתונים חיצוניים"
-                            style="width: 40px; height: 40px; margin-left: 8px; vertical-align: middle;">
-                        דשבורד נתונים חיצוניים
-                    </div>
-                    <div class="table-actions">
-                        <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
-                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור דשבורד">
-                            <span class="filter-icon">▲</span>
+            <!-- Main content limited in width -->
+            <div class="main-content">
+                <!-- UI Content Section Top Start-->
+                <div class="top-section">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>🔌 דשבורד נתונים חיצוניים</h2>
+                        <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                            <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
-                </div>
-
-                <!-- Alert cards -->
-                <div class="section-body">
-                    <active-alerts></active-alerts>
-
-                    <!-- Dashboard summary -->
-                    <div class="info-summary" id="summaryStats">
-                        <div>ספקי נתונים: <strong id="providersStats">0</strong></div>
-                        <div>ציטוטים במטמון: <strong id="cacheStats">0</strong></div>
-                        <div>אחוז פגיעות: <strong id="hitRateStats">0%</strong></div>
-                        <div>סטטוס כללי: <strong id="overallStatus">בדיקה...</strong></div>
+                    <div class="section-body">
+                        <!-- כאן נכנס התוכן של גוף הסקשן -->
+                        <div class="info-summary" id="summaryStats">
+                            <div>ספקי נתונים: <strong id="providersStats">0</strong></div>
+                            <div>ציטוטים במטמון: <strong id="cacheStats">0</strong></div>
+                            <div>אחוז פגיעות: <strong id="hitRateStats">0%</strong></div>
+                            <div>סטטוס כללי: <strong id="overallStatus">בדיקה...</strong></div>
+                        </div>
                     </div>
                 </div>
-            </div> <!-- End top-section -->
+                <!-- UI Content Section Top End -->  
 
-            <!-- Main content -->
-            <div class="main-content" data-section="external-data">
-                <div class="dashboard-container">
-
-        <!-- System Status -->
-        <div class="status-grid">
-            <div class="status-card">
-                <h3>🔌 Yahoo Finance</h3>
-                <div id="yahoo-status" class="status-indicator">בדיקה...</div>
-                <div id="yahoo-details" class="status-details"></div>
-            </div>
-
-            <div class="status-card">
-                <h3>💾 מטמון</h3>
-                <div id="cache-status-indicator" class="status-indicator">בדיקה...</div>
-                <div id="cache-details" class="status-details"></div>
-            </div>
-
-            <div class="status-card">
-                <h3>🗄️ בסיס נתונים</h3>
-                <div id="db-status" class="status-indicator">בדיקה...</div>
-                <div id="db-details" class="status-details"></div>
-            </div>
-
-            <div class="status-card">
-                <h3>🔌 API</h3>
-                <div id="api-status-indicator" class="status-indicator">בדיקה...</div>
-                <div id="api-details" class="status-details"></div>
-            </div>
-        </div>
-
-        <!-- Providers Section -->
-        <div class="section">
-            <h2>🏢 ספקי נתונים</h2>
-            <div class="action-buttons">
-                <button class="btn btn-primary" onclick="refreshProviders()">🔄 רענן ספקים</button>
-                <button class="btn btn-warning" onclick="testAllProviders()">🧪 בדוק כל הספקים</button>
-            </div>
-            <div id="providers-grid" class="providers-grid">
-                <!-- Providers will be loaded here -->
-            </div>
-        </div>
-
-        <!-- Cache Statistics -->
-        <div class="section">
-            <h2>📊 סטטיסטיקות מטמון</h2>
-            <div class="action-buttons">
-                <button class="btn btn-success" onclick="optimizeCache()">⚡ אופטמז מטמון</button>
-                <button class="btn btn-danger" onclick="clearCache()">🗑️ נקה מטמון</button>
-            </div>
-            <div id="cache-stats" class="cache-stats-grid">
-                <!-- Cache stats will be loaded here -->
-            </div>
-        </div>
-
-        <!-- Group Refresh History -->
-        <div class="section">
-            <h2>📊 היסטוריית עדכונים קבוצתיים</h2>
-            <div class="group-refresh-filters">
-                <select id="group-category-filter">
-                    <option value="">כל הקטגוריות</option>
-                    <option value="active_trades">טיקרים עם טרייד פעיל</option>
-                    <option value="no_active_trades">טיקרים ללא טרייד פעיל</option>
-                    <option value="closed">טיקרים סגורים/מבוטלים</option>
-                </select>
-                <select id="group-status-filter">
-                    <option value="">כל הסטטוסים</option>
-                    <option value="completed">הושלם</option>
-                    <option value="failed">נכשל</option>
-                    <option value="started">התחיל</option>
-                </select>
-                <input type="number" id="group-limit" placeholder="מספר רשומות" value="20" min="1" max="100">
-                <button class="btn btn-primary" onclick="refreshGroupHistory()">🔄 רענן היסטוריה</button>
-                <button class="btn btn-success" onclick="exportGroupHistory()">📥 ייצא היסטוריה</button>
-            </div>
-            <div id="group-refresh-content" class="group-refresh-content">
-                <!-- Group refresh history will be loaded here -->
-            </div>
-        </div>
-
-        <!-- System Logs -->
-        <div class="section">
-            <h2>📋 לוגים מערכתיים</h2>
-            <div class="log-filters">
-                <select id="log-level-filter">
-                    <option value="all">כל הרמות</option>
-                    <option value="info">מידע</option>
-                    <option value="warning">אזהרה</option>
-                    <option value="error">שגיאה</option>
-                </select>
-                <input type="text" id="log-search" placeholder="חיפוש בלוגים...">
-                <button class="btn btn-primary" onclick="refreshLogs()">🔄 רענן לוגים</button>
-                <button class="btn btn-danger" onclick="clearLogs()">🗑️ נקה לוגים</button>
-                <button class="btn btn-secondary" onclick="copyDetailedLog()">📋 העתק לוג מפורט</button>
-            </div>
-            <div id="log-content" class="log-content">
-                <!-- Logs will be loaded here -->
-            </div>
-        </div>
-
-        <!-- Data Management -->
-        <div class="section">
-            <h2>📊 ניהול נתונים</h2>
-            <div class="action-buttons">
-                <button class="btn btn-primary" onclick="analyzeData()">📊 נתח נתונים</button>
-                <button class="btn btn-success" onclick="exportData()">📤 ייצא נתונים</button>
-                <button class="btn btn-warning" onclick="backupData()">💾 גבה נתונים</button>
-            </div>
+                <!-- UI Content Section 1 Start-->
+                <div class="content-section" id="section1">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>🔌 סטטוס מערכת</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- כאן נכנס התוכן של גוף הסקשן -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title">🔌 Yahoo Finance</h5>
+                                        <div id="yahoo-status" class="status-indicator">בדיקה...</div>
+                                        <div id="yahoo-details" class="status-details mt-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title">💾 מטמון</h5>
+                                        <div id="cache-status-indicator" class="status-indicator">בדיקה...</div>
+                                        <div id="cache-details" class="status-details mt-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title">🗄️ בסיס נתונים</h5>
+                                        <div id="db-status" class="status-indicator">בדיקה...</div>
+                                        <div id="db-details" class="status-details mt-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title">🔌 API</h5>
+                                        <div id="api-status-indicator" class="status-indicator">בדיקה...</div>
+                                        <div id="api-details" class="status-details mt-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div> <!-- End main-content -->
-        </div> <!-- End page-body -->
-    </div> <!-- End background-wrapper -->
+                <!-- UI Content Section 1 End -->   
 
-    <!-- Scripts -->
-    <script src="scripts/header-system.js?v=20250115_level3_fix"></script>
+                <!-- UI Content Section 2 Start-->
+                <div class="content-section" id="section2">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>📊 ניהול נתונים</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- כאן נכנס התוכן של גוף הסקשן -->
+                        <div class="control-buttons mb-3">
+                            <button class="btn btn-primary btn-sm" onclick="analyzeData()">
+                                <i class="fas fa-chart-bar"></i> נתח נתונים
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="exportData()">
+                                <i class="fas fa-file-export"></i> ייצא נתונים
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="backupData()">
+                                <i class="fas fa-save"></i> גבה נתונים
+                            </button>
+                        </div>
+                        <div class="alert alert-info">
+                            <strong>📊 ניהול נתונים:</strong> כלים לניתוח, ייצוא וגיבוי של נתוני המערכת.
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 2 End -->
+
+                <!-- UI Content Section 3 Start-->
+                <div class="content-section" id="section3">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>🏢 ספקי נתונים</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- כאן נכנס התוכן של גוף הסקשן -->
+                        <div class="control-buttons mb-3">
+                            <button class="btn btn-primary btn-sm" onclick="refreshProviders()">
+                                <i class="fas fa-sync-alt"></i> רענן ספקים
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="testAllProviders()">
+                                <i class="fas fa-vial"></i> בדוק כל הספקים
+                            </button>
+                        </div>
+                        <div class="row" id="providers-grid">
+                            <!-- Providers will be loaded here as cards -->
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">🔌 Yahoo Finance</h6>
+                                        <span class="badge bg-success">פעיל</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">ספק נתונים פיננסיים עיקרי</p>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="testProvider('yahoo')">
+                                                <i class="fas fa-play"></i> בדוק
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="configureProvider('yahoo')">
+                                                <i class="fas fa-cog"></i> הגדר
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">📊 Alpha Vantage</h6>
+                                        <span class="badge bg-warning">חלקי</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">ספק נתונים חלופי</p>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="testProvider('alpha')">
+                                                <i class="fas fa-play"></i> בדוק
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="configureProvider('alpha')">
+                                                <i class="fas fa-cog"></i> הגדר
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 2 End -->
+
+                <!-- UI Content Section 3 Start-->
+                <div class="content-section" id="section3">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>📊 סטטיסטיקות מטמון</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- כאן נכנס התוכן של גוף הסקשן -->
+                        <div class="control-buttons mb-3">
+                            <button class="btn btn-success btn-sm" onclick="optimizeCache()">
+                                <i class="fas fa-bolt"></i> אופטמז מטמון
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="clearCache()">
+                                <i class="fas fa-trash"></i> נקה מטמון
+                            </button>
+                        </div>
+                        <div class="row" id="cache-stats">
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary">📊 סה"כ רשומות</h5>
+                                        <h3 class="text-primary" id="totalCacheRecords">0</h3>
+                                        <small class="text-muted">רשומות במטמון</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-success">⚡ אחוז פגיעות</h5>
+                                        <h3 class="text-success" id="cacheHitRate">0%</h3>
+                                        <small class="text-muted">הצלחות במטמון</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-warning">⏰ זמן ממוצע</h5>
+                                        <h3 class="text-warning" id="avgCacheTime">0ms</h3>
+                                        <small class="text-muted">זמן גישה ממוצע</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-info">💾 גודל מטמון</h5>
+                                        <h3 class="text-info" id="cacheSize">0 MB</h3>
+                                        <small class="text-muted">גודל זיכרון</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 3 End -->
+
+                <!-- UI Content Section 4 Start-->
+                <div class="content-section" id="section4">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>📊 היסטוריית עדכונים קבוצתיים</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-primary btn-sm" onclick="refreshGroupHistory()">
+                                <i class="fas fa-sync-alt"></i> רענן היסטוריה
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="exportGroupHistory()">
+                                <i class="fas fa-download"></i> ייצא היסטוריה
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <!-- כאן נכנס התוכן של גוף הסקשן -->
+                        <div class="group-refresh-filters mb-3">
+                            <select id="group-category-filter" class="form-select form-select-sm me-2">
+                                <option value="">כל הקטגוריות</option>
+                                <option value="active_trades">טיקרים עם טרייד פעיל</option>
+                                <option value="no_active_trades">טיקרים ללא טרייד פעיל</option>
+                                <option value="closed">טיקרים סגורים/מבוטלים</option>
+                            </select>
+                            <select id="group-status-filter" class="form-select form-select-sm me-2">
+                                <option value="">כל הסטטוסים</option>
+                                <option value="completed">הושלם</option>
+                                <option value="failed">נכשל</option>
+                                <option value="started">התחיל</option>
+                            </select>
+                            <input type="number" id="group-limit" class="form-control form-control-sm me-2" placeholder="מספר רשומות" value="20" min="1" max="100">
+                        </div>
+                        <div id="group-refresh-content" class="group-refresh-content">
+                            <!-- Group refresh history will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 4 End -->
+
+                <!-- UI Content Section 5 Start-->
+                <div class="content-section" id="section5">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>📋 לוגים מערכתיים</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- כאן נכנס התוכן של גוף הסקשן -->
+                        <div class="log-filters mb-3">
+                            <select id="log-level-filter" class="form-select form-select-sm me-2">
+                                <option value="all">כל הרמות</option>
+                                <option value="info">מידע</option>
+                                <option value="warning">אזהרה</option>
+                                <option value="error">שגיאה</option>
+                            </select>
+                            <input type="text" id="log-search" class="form-control form-control-sm me-2" placeholder="חיפוש בלוגים...">
+                            <button class="btn btn-primary btn-sm me-2" onclick="refreshLogs()">
+                                <i class="fas fa-sync-alt"></i> רענן לוגים
+                            </button>
+                            <button class="btn btn-danger btn-sm me-2" onclick="clearLogs()">
+                                <i class="fas fa-trash"></i> נקה לוגים
+                            </button>
+                            <button class="btn btn-secondary btn-sm me-2" onclick="copyDetailedLog()">
+                                <i class="fas fa-copy"></i> העתק לוג מפורט
+                            </button>
+                        </div>
+                        <div id="log-content" class="log-content">
+                            <!-- Logs will be loaded here -->
+                            <div class="log-entry mb-2 p-2 border-start border-3 border-success">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong class="text-success">🔄 רענון נתונים</strong>
+                                        <span class="text-muted ms-2">14:30:25</span>
+                                    </div>
+                                    <span class="badge bg-success">הצלחה</span>
+                                </div>
+                                <div class="text-muted small mt-1">
+                                    עדכון נתונים עבור AAPL, MSFT, GOOGL - 15 רשומות עודכנו בהצלחה
+                                </div>
+                            </div>
+                            <div class="log-entry mb-2 p-2 border-start border-3 border-warning">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong class="text-warning">⚠️ אזהרת מטמון</strong>
+                                        <span class="text-muted ms-2">14:28:10</span>
+                                    </div>
+                                    <span class="badge bg-warning">אזהרה</span>
+                                </div>
+                                <div class="text-muted small mt-1">
+                                    מטמון קרוב לגודל מקסימלי - 95% תפוסה
+                                </div>
+                            </div>
+                            <div class="log-entry mb-2 p-2 border-start border-3 border-danger">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong class="text-danger">❌ שגיאת חיבור</strong>
+                                        <span class="text-muted ms-2">14:25:45</span>
+                                    </div>
+                                    <span class="badge bg-danger">שגיאה</span>
+                                </div>
+                                <div class="text-muted small mt-1">
+                                    חיבור ל-Yahoo Finance נכשל - timeout אחרי 30 שניות
+                                </div>
+                            </div>
+                            <div class="log-entry mb-2 p-2 border-start border-3 border-info">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong class="text-info">ℹ️ מידע מערכת</strong>
+                                        <span class="text-muted ms-2">14:20:15</span>
+                                    </div>
+                                    <span class="badge bg-info">מידע</span>
+                                </div>
+                                <div class="text-muted small mt-1">
+                                    מערכת ניטור נתונים פועלת תקין - 100% זמינות
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 5 End -->
+
+                <!-- UI Content Section 6 Start-->
+                <div class="content-section" id="section6">
+                    <div class="section-header">
+                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
+                        <h2>📊 ניהול נתונים</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <!-- כאן נכנס התוכן של גוף הסקשן -->
+                        <div class="action-buttons mb-3">
+                            <button class="btn btn-primary btn-sm" onclick="analyzeData()">
+                                <i class="fas fa-chart-bar"></i> נתח נתונים
+                            </button>
+                            <button class="btn btn-success btn-sm" onclick="exportData()">
+                                <i class="fas fa-file-export"></i> ייצא נתונים
+                            </button>
+                            <button class="btn btn-warning btn-sm" onclick="backupData()">
+                                <i class="fas fa-save"></i> גבה נתונים
+                            </button>
+                        </div>
+                        <div class="alert alert-info">
+                            <strong>📊 ניהול נתונים:</strong> כלים לניתוח, ייצוא וגיבוי של נתוני המערכת.
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 6 End -->
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Core System Scripts -->
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/table-mappings.js"></script>
+    <script src="scripts/date-utils.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/linked-items.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/central-refresh-system.js"></script>
+    <script src="scripts/main.js"></script>
+    
+    <!-- Notification system -->
     <script src="scripts/notification-system.js"></script>
+    
+    <!-- Page-specific scripts -->
     <script src="scripts/external-data-dashboard.js"></script>
 </body>
 </html>

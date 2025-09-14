@@ -8,6 +8,22 @@
  * @lastUpdated January 5, 2025
  */
 
+/* הגדרה כללית לכפתורים - ברירת מחדל */
+.btn-group-default,
+.actions-default,
+.controls-default {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  justify-content: flex-start; /* משמאל */
+}
+
+.btn-group-default .btn,
+.actions-default .btn,
+.controls-default .btn {
+  margin: 0;
+}
+
 /* כפתור מודגש בצבע כתום - לשימוש בכל המערכת */
 .btn-emphasized,
 .btn-primary-emphasized,

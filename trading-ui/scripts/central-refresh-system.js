@@ -579,6 +579,11 @@ window.clearAllCache = () => {
   }
   
   console.log('✅ All global cache cleared');
+  
+  // הצגת התראה למשתמש
+  if (typeof showNotification === 'function') {
+    showNotification('המטמון נוקה בהצלחה', 'success');
+  }
 };
 
 // פונקציה לניקוי מטמון וריענון מלא

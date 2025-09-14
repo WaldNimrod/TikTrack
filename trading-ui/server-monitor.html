@@ -89,8 +89,41 @@
                     <!-- UI Content Section 1 Start-->
                     <div class="content-section" id="section1">
                         <div class="section-header">
-                            <h2>📊 סטטוס שרת</h2>
+                            <h2>⚡ פעולות מהירות</h2>
                             <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                        <div class="section-body">
+                            <div class="quick-actions actions-default">
+                                <button class="btn btn-primary" onclick="serverMonitor.checkServerHealth()">
+                                    <i class="fas fa-heartbeat"></i> בדיקת בריאות שרת
+                                </button>
+                                <button class="btn btn-success" onclick="serverMonitor.restartServer()">
+                                    <i class="fas fa-redo"></i> הפעלת שרת מחדש
+                                </button>
+                                <button class="btn btn-warning" onclick="serverMonitor.clearCache()">
+                                    <i class="fas fa-broom"></i> ניקוי Cache
+                                </button>
+                                <button class="btn btn-info" onclick="serverMonitor.optimizeDatabase()">
+                                    <i class="fas fa-database"></i> אופטימיזציית DB
+                                </button>
+                                <button class="btn btn-danger" onclick="serverMonitor.emergencyStop()">
+                                    <i class="fas fa-stop-circle"></i> עצירת חירום
+                                </button>
+                                <button class="btn btn-secondary" onclick="serverMonitor.exportLogs()">
+                                    <i class="fas fa-download"></i> ייצוא לוגים
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- UI Content Section 1 End-->
+
+                    <!-- UI Content Section 2 Start-->
+                    <div class="content-section" id="section2">
+                        <div class="section-header">
+                            <h2>📊 סטטוס שרת</h2>
+                            <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -154,39 +187,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- UI Content Section 1 End-->
-
-                    <!-- UI Content Section 2 Start-->
-                    <div class="content-section" id="section2">
-                        <div class="section-header">
-                            <h2>⚡ פעולות מהירות</h2>
-                            <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                        <div class="section-body">
-                            <div class="quick-actions actions-default">
-                                <button class="btn btn-primary" onclick="serverMonitor.checkServerHealth()">
-                                    <i class="fas fa-heartbeat"></i> בדיקת בריאות שרת
-                                </button>
-                                <button class="btn btn-success" onclick="serverMonitor.restartServer()">
-                                    <i class="fas fa-redo"></i> הפעלת שרת מחדש
-                                </button>
-                                <button class="btn btn-warning" onclick="serverMonitor.clearCache()">
-                                    <i class="fas fa-broom"></i> ניקוי Cache
-                                </button>
-                                <button class="btn btn-info" onclick="ServerMonitor.optimizeDatabase()">
-                                    <i class="fas fa-database"></i> אופטימיזציית DB
-                                </button>
-                                <button class="btn btn-danger" onclick="serverMonitor.emergencyStop()">
-                                    <i class="fas fa-stop-circle"></i> עצירת חירום
-                                </button>
-                                <button class="btn btn-secondary" onclick="ServerMonitor.exportLogs()">
-                                    <i class="fas fa-download"></i> ייצוא לוגים
-                                </button>
                             </div>
                         </div>
                     </div>

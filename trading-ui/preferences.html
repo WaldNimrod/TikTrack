@@ -13,102 +13,137 @@
     <div class="background-wrapper">
         <!-- Unified Header -->
         <div id="unified-header"></div>
-        
+
         <div class="page-body">
             <div class="main-content">
                 <!-- Top Section -->
                 <div class="top-section">
-                    <div class="section-header">
+        <div class="section-header">
                         <h1>⚙️ הגדרות מערכת</h1>
                         <p>ניהול הגדרות המערכת והעדפות המשתמש</p>
-                    </div>
-                </div>
-
+        </div>
+      </div>
+      
                 <!-- Content Sections -->
-                <div class="content-section" id="section1">
-                    <div class="section-header">
+      <div class="content-section" id="section1">
+        <div class="section-header">
                         <h2>🏦 הגדרות בסיסיות</h2>
                         <p>הגדרות כלליות למערכת</p>
+        </div>
+        <div class="section-body">
+            <!-- מטבעות -->
+            <div class="setting-item">
+              <div class="setting-label">
+                <h5>💰 מטבעות</h5>
+                <p>מטבע ראשי ומשני לתצוגת נתונים</p>
+              </div>
+              <div class="setting-control">
+                <div class="row g-2">
+                  <div class="col-6">
+                                        <label class="form-label small">מטבע ראשי</label>
+                    <select id="primaryCurrency" class="form-select form-control-modern">
+                                            <option value="USD">USD</option>
+                                            <option value="EUR">EUR</option>
+                                            <option value="GBP">GBP</option>
+                                            <option value="ILS">ILS</option>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                                    <label class="form-label small">מטבע משני <span class="text-muted">(עתידי)</span></label>
+                    <select id="secondaryCurrency" class="form-select form-control-modern" disabled>
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="GBP">GBP</option>
+                                        <option value="ILS">ILS</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+                        <!-- אזור זמן ושפה -->
+            <div class="setting-item">
+              <div class="setting-label">
+                <h5>🌍 אזור זמן ושפה</h5>
+                                <p>הגדרות אזור זמן ושפת הממשק</p>
+              </div>
+              <div class="setting-control">
+                <div class="row g-2">
+                  <div class="col-6">
+                    <label class="form-label small">אזור זמן</label>
+                    <select id="timezone" class="form-select form-control-modern">
+                      <option value="Asia/Jerusalem">ישראל</option>
+                      <option value="America/New_York">ניו יורק</option>
+                                            <option value="Europe/London">לונדון</option>
+                                            <option value="Asia/Tokyo">טוקיו</option>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                                        <label class="form-label small">שפת הממשק <span class="text-muted">(עתידי)</span></label>
+                    <select id="language" class="form-select form-control-modern" disabled>
+                      <option value="he">עברית</option>
+                      <option value="en">English</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            
+                        <!-- הגדרות ניהול סיכונים -->
+            <div class="setting-item">
+              <div class="setting-label">
+                                <h5>⚠️ הגדרות ניהול סיכונים</h5>
+                <p>הגדרות ניהול סיכונים מתקדמות</p>
+              </div>
+              <div class="setting-control">
+                <div class="row g-2">
+                                    <div class="col-4">
+                                        <label class="form-label small">סיכון מקסימלי לחשבון (%) <span class="text-muted">(עתידי)</span></label>
+                                        <input type="number" id="maxAccountRisk" class="form-control form-control-modern" step="0.1" min="0" max="100" disabled>
+                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label small">סיכון מקסימלי לטרייד (%) <span class="text-muted">(עתידי)</span></label>
+                                        <input type="number" id="maxTradeRisk" class="form-control form-control-modern" step="0.1" min="0" max="100" disabled>
+                  </div>
+                                    <div class="col-4">
+                                        <label class="form-label small">גודל פוזיציה מקסימלי (%) <span class="text-muted">(עתידי)</span></label>
+                                        <input type="number" id="maxPositionSize" class="form-control form-control-modern" step="0.1" min="0" max="100" disabled>
+                    </div>
+                                </div>
+                            </div>
+                  </div>
+                </div>
+              </div>
+                </div>
+
+                <!-- הגדרות מסחר -->
+                <div class="content-section" id="section1_5">
+                    <div class="section-header">
+                        <h2>📈 הגדרות מסחר</h2>
+                        <p>הגדרות ברירת מחדל למסחר</p>
                     </div>
                     <div class="section-body">
-                        <!-- מטבעות -->
-                        <div class="setting-item">
-                            <div class="setting-label">
-                                <h5>💰 מטבעות</h5>
-                                <p>מטבע ראשי ומשני לתצוגת נתונים</p>
-                            </div>
-                        </div>
-                        <div class="setting-control">
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <label class="form-label small">מטבע ראשי</label>
-                                    <select id="primaryCurrency" class="form-select form-control-modern">
-                                        <option value="USD">USD</option>
-                                        <option value="EUR">EUR</option>
-                                        <option value="GBP">GBP</option>
-                                        <option value="ILS">ILS</option>
-                                    </select>
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label small">מטבע משני</label>
-                                    <select id="secondaryCurrency" class="form-select form-control-modern">
-                                        <option value="USD">USD</option>
-                                        <option value="EUR">EUR</option>
-                                        <option value="GBP">GBP</option>
-                                        <option value="ILS">ILS</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- אזור זמן ושפה -->
-                        <div class="setting-item">
-                            <div class="setting-label">
-                                <h5>🌍 אזור זמן ושפה</h5>
-                                <p>הגדרות אזור זמן ושפת הממשק</p>
-                            </div>
-                        </div>
-                        <div class="setting-control">
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <label class="form-label small">אזור זמן</label>
-                                    <select id="timezone" class="form-select form-control-modern">
-                                        <option value="Asia/Jerusalem">ישראל</option>
-                                        <option value="America/New_York">ניו יורק</option>
-                                        <option value="Europe/London">לונדון</option>
-                                        <option value="Asia/Tokyo">טוקיו</option>
-                                    </select>
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label small">שפת הממשק</label>
-                                    <select id="language" class="form-select form-control-modern">
-                                        <option value="he">עברית</option>
-                                        <option value="en">English</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- הגדרות מסחר -->
                         <div class="setting-item">
                             <div class="setting-label">
-                                <h5>📈 הגדרות מסחר</h5>
+                                <h5>💰 הגדרות מסחר בסיסיות</h5>
                                 <p>הגדרות ברירת מחדל למסחר</p>
                             </div>
-                        </div>
-                        <div class="setting-control">
-                            <div class="row g-2">
-                                <div class="col-4">
-                                    <label class="form-label small">סטופ לוס ברירת מחדל (%)</label>
-                                    <input type="number" id="defaultStopLoss" class="form-control form-control-modern" step="0.1" min="0" max="100">
-                                </div>
-                                <div class="col-4">
-                                    <label class="form-label small">יעד ברירת מחדל (%)</label>
-                                    <input type="number" id="defaultTargetPrice" class="form-control form-control-modern" step="0.1" min="0" max="1000">
-                                </div>
-                                <div class="col-4">
-                                    <label class="form-label small">עמלה ברירת מחדל ($)</label>
-                                    <input type="number" id="defaultCommission" class="form-control form-control-modern" step="0.01" min="0">
+                            <div class="setting-control">
+                                <div class="row g-2">
+                                    <div class="col-4">
+                                        <label class="form-label small">סטופ לוס ברירת מחדל (%)</label>
+                                        <input type="number" id="defaultStopLoss" class="form-control form-control-modern" step="0.1" min="0" max="100">
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label small">יעד ברירת מחדל (%)</label>
+                                        <input type="number" id="defaultTargetPrice" class="form-control form-control-modern" step="0.1" min="0" max="1000">
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="form-label small">עמלה ברירת מחדל ($)</label>
+                                        <input type="number" id="defaultCommission" class="form-control form-control-modern" step="0.01" min="0">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -120,265 +155,242 @@
                     <div class="section-header">
                         <h2>🔍 פילטרים ברירת מחדל</h2>
                         <p>הגדרות פילטרים ברירת מחדל לכל הדפים</p>
-                    </div>
+              </div>
                     <div class="section-body">
-                        <!-- הגדרות חשבון -->
-                        <div class="setting-item">
-                            <div class="setting-label">
-                                <h5>🏦 הגדרות חשבון</h5>
-                                <p>פילטר חשבון ברירת מחדל</p>
+            <!-- הגדרות חשבון -->
+            <div class="setting-item">
+              <div class="setting-label">
+                <h5>🏦 הגדרות חשבון</h5>
+                <p>פילטר חשבון ברירת מחדל</p>
                             </div>
-                        </div>
-                        <div class="setting-control">
-                            <div class="row g-2">
-                                <div class="col-12">
-                                    <label class="form-label small">חשבון ברירת מחדל</label>
-                                    <select id="defaultAccountFilter" class="form-select form-control-modern">
-                                        <option value="all">כל החשבונות</option>
-                                        <option value="main">חשבון ראשי</option>
-                                        <option value="secondary">חשבון משני</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- פילטרים בסיסיים -->
-                        <div class="setting-item">
-                            <div class="setting-label">
-                                <h5>📊 פילטרים בסיסיים</h5>
+              </div>
+              <div class="setting-control">
+                <div class="row g-2">
+                  <div class="col-12">
+                    <label class="form-label small">חשבון ברירת מחדל</label>
+                    <select id="defaultAccountFilter" class="form-select form-control-modern">
+                      <option value="all">כל החשבונות</option>
+                      <option value="main">חשבון ראשי</option>
+                      <option value="secondary">חשבון משני</option>
+                    </select>
+                </div>
+              </div>
+            </div>
+            
+            <!-- פילטרים בסיסיים -->
+            <div class="setting-item">
+              <div class="setting-label">
+                <h5>📊 פילטרים בסיסיים</h5>
                                 <p>פילטרים ברירת מחדל לטבלאות</p>
                             </div>
-                        </div>
-                        <div class="setting-control">
-                            <div class="row g-2">
+              </div>
+              <div class="setting-control">
+                <div class="row g-2">
                                 <div class="col-4">
-                                    <label class="form-label small">סטטוס</label>
-                                    <select id="defaultStatusFilter" class="form-select form-control-modern">
-                                        <option value="open">פתוח</option>
-                                        <option value="closed">סגור</option>
-                                        <option value="cancelled">מבוטל</option>
-                                        <option value="all">הכול</option>
-                                    </select>
-                                </div>
+                    <label class="form-label small">סטטוס</label>
+                    <select id="defaultStatusFilter" class="form-select form-control-modern">
+                      <option value="open">פתוח</option>
+                      <option value="closed">סגור</option>
+                      <option value="cancelled">מבוטל</option>
+                      <option value="all">הכול</option>
+                    </select>
+                  </div>
                                 <div class="col-4">
-                                    <label class="form-label small">סוג השקעה</label>
-                                    <select id="defaultTypeFilter" class="form-select form-control-modern">
-                                        <option value="swing">סווינג</option>
-                                        <option value="investment">השקעה</option>
-                                        <option value="passive">פאסיבי</option>
-                                        <option value="all">הכול</option>
-                                    </select>
-                                </div>
+                    <label class="form-label small">סוג השקעה</label>
+                    <select id="defaultTypeFilter" class="form-select form-control-modern">
+                      <option value="swing">סווינג</option>
+                      <option value="investment">השקעה</option>
+                      <option value="passive">פאסיבי</option>
+                      <option value="all">הכול</option>
+                    </select>
+                  </div>
                                 <div class="col-4">
                                     <label class="form-label small">טווח תאריכים</label>
-                                    <select id="defaultDateRangeFilter" class="form-select form-control-modern">
-                                        <option value="today">היום</option>
-                                        <option value="this_week">השבוע</option>
-                                        <option value="last_month">חודש אחרון</option>
-                                        <option value="ytd">YTD</option>
-                                        <option value="all">כל זמן</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                <select id="defaultDateRangeFilter" class="form-select form-control-modern">
+                  <option value="today">היום</option>
+                  <option value="this_week">השבוע</option>
+                  <option value="last_month">חודש אחרון</option>
+                  <option value="ytd">YTD</option>
+                  <option value="all">כל זמן</option>
+                </select>
+              </div>
+            </div>
+              </div>
+              </div>
+            </div>
+            
                 <!-- הגדרות ממשק משתמש -->
-                <div class="content-section" id="section3">
-                    <div class="section-header">
-                        <h2>🎨 הגדרות ממשק משתמש</h2>
+      <div class="content-section" id="section3">
+        <div class="section-header">
+                        <h2>🎨 הגדרות ממשק משתמש <span class="text-muted">(עתידיות)</span></h2>
                         <p>הגדרות עיצוב וחוויית משתמש</p>
-                    </div>
-                    <div class="section-body">
+        </div>
+        <div class="section-body">
                         <!-- מערכת צבעים -->
-                        <div class="setting-item">
-                            <div class="setting-label">
+          <div class="setting-item">
+            <div class="setting-label">
                                 <h5>🌈 מערכת צבעים</h5>
                                 <p>צבעי המערכת והנושא</p>
-                            </div>
-                        </div>
-                        <div class="setting-control">
-                            <div class="row g-2">
-                                <div class="col-3">
-                                    <label class="form-label small">צבע ראשי</label>
-                                    <input type="color" id="primaryColor" class="form-control color-picker" value="#007bff">
-                                </div>
-                                <div class="col-3">
-                                    <label class="form-label small">צבע משני</label>
-                                    <input type="color" id="secondaryColor" class="form-control color-picker" value="#6c757d">
-                                </div>
-                                <div class="col-3">
-                                    <label class="form-label small">צבע הצלחה</label>
-                                    <input type="color" id="successColor" class="form-control color-picker" value="#28a745">
-                                </div>
-                                <div class="col-3">
-                                    <label class="form-label small">צבע אזהרה</label>
-                                    <input type="color" id="warningColor" class="form-control color-picker" value="#ffc107">
-                                </div>
-                            </div>
-                        </div>
-
+            </div>
+            <div class="setting-control">
+              <div class="row g-2">
+                                    <div class="col-3">
+                                        <label class="form-label small">צבע ראשי</label>
+                                        <input type="color" id="primaryColor" class="form-control color-picker" value="#007bff" disabled>
+                  </div>
+                                    <div class="col-3">
+                                        <label class="form-label small">צבע משני</label>
+                                        <input type="color" id="secondaryColor" class="form-control color-picker" value="#6c757d" disabled>
+                </div>
+                                    <div class="col-3">
+                                        <label class="form-label small">צבע הצלחה</label>
+                                        <input type="color" id="successColor" class="form-control color-picker" value="#28a745" disabled>
+                  </div>
+                                    <div class="col-3">
+                                        <label class="form-label small">צבע אזהרה</label>
+                                        <input type="color" id="warningColor" class="form-control color-picker" value="#ffc107" disabled>
+                </div>
+              </div>
+            </div>
+          </div>
+          
                         <!-- הגדרות תצוגה -->
-                        <div class="setting-item">
-                            <div class="setting-label">
+            <div class="setting-item">
+              <div class="setting-label">
                                 <h5>👁️ הגדרות תצוגה</h5>
                                 <p>הגדרות תצוגת הנתונים</p>
-                            </div>
-                        </div>
-                        <div class="setting-control">
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <label class="form-label small">מספר שורות בטבלה</label>
-                                    <select id="tableRowsPerPage" class="form-select form-control-modern">
-                                        <option value="10">10</option>
-                                        <option value="25">25</option>
-                                        <option value="50">50</option>
-                                        <option value="100">100</option>
-                                    </select>
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label small">עיצוב ברירת מחדל</label>
-                                    <select id="defaultTheme" class="form-select form-control-modern">
-                                        <option value="light">בהיר</option>
-                                        <option value="dark">כהה</option>
-                                        <option value="auto">אוטומטי</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+              </div>
+              <div class="setting-control">
+                <div class="row g-2">
+                  <div class="col-6">
+                                        <label class="form-label small">מספר שורות בטבלה</label>
+                                        <select id="tableRowsPerPage" class="form-select form-control-modern" disabled>
+                      <option value="10">10</option>
+                                            <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                                        <label class="form-label small">עיצוב ברירת מחדל</label>
+                                        <select id="defaultTheme" class="form-select form-control-modern" disabled>
+                                            <option value="light">בהיר</option>
+                                            <option value="dark">כהה</option>
+                                            <option value="auto">אוטומטי</option>
+                                        </select>
+                  </div>
                 </div>
-
+              </div>
+          </div>
+        </div>
+      </div>
+      
                 <!-- הגדרות מערכת ושרת -->
                 <div class="content-section" id="section4">
-                    <div class="section-header">
-                        <h2>⚙️ הגדרות מערכת ושרת</h2>
+        <div class="section-header">
+          <h2>⚙️ הגדרות מערכת ושרת</h2>
                         <p>הגדרות טכניות של המערכת</p>
-                    </div>
-                    <div class="section-body">
+        </div>
+        <div class="section-body">
                         <!-- הגדרות שרת -->
-                        <div class="setting-item">
-                            <div class="setting-label">
+            <div class="setting-item">
+              <div class="setting-label">
                                 <h5>🖥️ הגדרות שרת</h5>
                                 <p>הגדרות חיבור לשרת</p>
-                            </div>
-                        </div>
-                        <div class="setting-control">
-                            <div class="row g-2">
-                                <div class="col-6">
+              </div>
+              </div>
+              <div class="setting-control">
+                <div class="row g-2">
+                  <div class="col-6">
                                     <label class="form-label small">כתובת שרת</label>
                                     <input type="text" id="serverUrl" class="form-control form-control-modern" value="http://localhost:8080">
-                                </div>
-                                <div class="col-6">
+                  </div>
+                  <div class="col-6">
                                     <label class="form-label small">פורט</label>
                                     <input type="number" id="serverPort" class="form-control form-control-modern" value="8080">
-                                </div>
-                            </div>
-                        </div>
-
+                </div>
+              </div>
+            </div>
+            
                         <!-- הגדרות ביצועים -->
-                        <div class="setting-item">
-                            <div class="setting-label">
+            <div class="setting-item">
+              <div class="setting-label">
                                 <h5>⚡ הגדרות ביצועים</h5>
                                 <p>הגדרות ביצועים וזיכרון</p>
-                            </div>
-                        </div>
-                        <div class="setting-control">
-                            <div class="row g-2">
-                                <div class="col-4">
+              </div>
+              </div>
+              <div class="setting-control">
+                <div class="row g-2">
+                  <div class="col-4">
                                     <label class="form-label small">מרווח רענון (דקות)</label>
                                     <input type="number" id="refreshInterval" class="form-control form-control-modern" min="1" max="60">
-                                </div>
-                                <div class="col-4">
+                  </div>
+                  <div class="col-4">
                                     <label class="form-label small">זמן Cache (דקות)</label>
                                     <input type="number" id="cacheTTL" class="form-control form-control-modern" min="1" max="1440">
-                                </div>
-                                <div class="col-4">
+                  </div>
+                  <div class="col-4">
                                     <label class="form-label small">גודל זיכרון מקסימלי (MB)</label>
                                     <input type="number" id="maxMemorySize" class="form-control form-control-modern" min="100" max="2048">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                  </div>
+                  </div>
                 </div>
-
+              </div>
+            </div>
+            
                 <!-- הגדרות מתקדמות -->
                 <div class="content-section" id="section5">
-                    <div class="section-header">
-                        <h2>🔧 הגדרות מתקדמות</h2>
+        <div class="section-header">
+          <h2>🔧 הגדרות מתקדמות</h2>
                         <p>הגדרות מתקדמות למפתחים</p>
-                    </div>
-                    <div class="section-body">
+        </div>
+        <div class="section-body">
                         <!-- הגדרות קונסול -->
-                        <div class="setting-item">
-                            <div class="setting-label">
+            <div class="setting-item">
+              <div class="setting-label">
                                 <h5>🖥️ הגדרות קונסול</h5>
                                 <p>הגדרות מערכת הקונסול</p>
-                            </div>
-                        </div>
-                        <div class="setting-control">
-                            <div class="row g-2">
-                                <div class="col-6">
+              </div>
+              </div>
+              <div class="setting-control">
+                <div class="row g-2">
+                  <div class="col-6">
                                     <label class="form-label small">רמת לוג</label>
                                     <select id="logLevel" class="form-select form-control-modern">
                                         <option value="debug">Debug</option>
                                         <option value="info">Info</option>
                                         <option value="warning">Warning</option>
                                         <option value="error">Error</option>
-                                    </select>
-                                </div>
-                                <div class="col-6">
+                    </select>
+                  </div>
+                  <div class="col-6">
                                     <label class="form-label small">גודל קובץ לוג מקסימלי (MB)</label>
                                     <input type="number" id="maxLogFileSize" class="form-control form-control-modern" min="1" max="100">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- הגדרות ניהול סיכונים -->
-                        <div class="setting-item">
-                            <div class="setting-label">
-                                <h5>⚠️ הגדרות ניהול סיכונים</h5>
-                                <p>הגדרות ניהול סיכונים מתקדמות</p>
-                            </div>
-                        </div>
-                        <div class="setting-control">
-                            <div class="row g-2">
-                                <div class="col-4">
-                                    <label class="form-label small">סיכון מקסימלי לחשבון (%)</label>
-                                    <input type="number" id="maxAccountRisk" class="form-control form-control-modern" step="0.1" min="0" max="100">
-                                </div>
-                                <div class="col-4">
-                                    <label class="form-label small">סיכון מקסימלי לטרייד (%)</label>
-                                    <input type="number" id="maxTradeRisk" class="form-control form-control-modern" step="0.1" min="0" max="100">
-                                </div>
-                                <div class="col-4">
-                                    <label class="form-label small">גודל פוזיציה מקסימלי (%)</label>
-                                    <input type="number" id="maxPositionSize" class="form-control form-control-modern" step="0.1" min="0" max="100">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-
-                <!-- כפתורי פעולה -->
+              </div>
+            </div>
+            
+        </div>
+      </div>
+      
+      <!-- כפתורי פעולה -->
                 <div class="content-section" id="actions">
-                    <div class="section-header">
+        <div class="section-header">
                         <h2>🎯 פעולות</h2>
                         <p>שמירה ואיפוס הגדרות</p>
-                    </div>
-                    <div class="section-body">
-                        <div class="d-flex gap-3">
-                            <button class="btn btn-success" id="saveButton" onclick="saveAllPreferences()">
-                                <i class="bi bi-save"></i> שמור הגדרות
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
+        <div class="section-body">
+        <div class="d-flex gap-3">
+                            <button class="btn btn-success" id="saveButton" onclick="saveAllPreferences()">
+            <i class="bi bi-save"></i> שמור הגדרות
+          </button>
+        </div>
+      </div>
+                  </div>
     </div>
-
+    </div>
+  </div>
+  
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/header-system.js?v=v1.0.0"></script>
@@ -438,7 +450,7 @@
                     }
                 }
                 
-                // Load UI preferences
+                // Load UI preferences (disabled but visible)
                 const uiResponse = await fetch('/api/v1/preferences/ui');
                 const uiData = await uiResponse.json();
                 
@@ -463,7 +475,7 @@
                     document.getElementById('maxMemorySize').value = systemPrefs.maxMemorySize || 512;
                 }
                 
-                // Load advanced preferences
+                // Load advanced preferences (only active ones)
                 const advancedResponse = await fetch('/api/v1/preferences/advanced');
                 const advancedData = await advancedResponse.json();
                 
@@ -471,6 +483,7 @@
                     const advancedPrefs = advancedData.data.advanced_preferences;
                     document.getElementById('logLevel').value = advancedPrefs.logLevel || 'info';
                     document.getElementById('maxLogFileSize').value = advancedPrefs.maxLogFileSize || 10;
+                    // Risk management settings moved to basic settings but are disabled
                     document.getElementById('maxAccountRisk').value = advancedPrefs.maxAccountRisk || 2.0;
                     document.getElementById('maxTradeRisk').value = advancedPrefs.maxTradeRisk || 1.0;
                     document.getElementById('maxPositionSize').value = advancedPrefs.maxPositionSize || 5.0;
@@ -506,6 +519,7 @@
                     }
                 };
                 
+                // UI preferences are disabled - not saving (but keeping for future use)
                 const uiData = {
                     primaryColor: document.getElementById('primaryColor').value,
                     secondaryColor: document.getElementById('secondaryColor').value,
@@ -524,6 +538,7 @@
                 const advancedData = {
                     logLevel: document.getElementById('logLevel').value,
                     maxLogFileSize: parseInt(document.getElementById('maxLogFileSize').value),
+                    // Risk management settings are disabled but kept for future use
                     maxAccountRisk: parseFloat(document.getElementById('maxAccountRisk').value),
                     maxTradeRisk: parseFloat(document.getElementById('maxTradeRisk').value),
                     maxPositionSize: parseFloat(document.getElementById('maxPositionSize').value)
@@ -536,6 +551,7 @@
                     body: JSON.stringify(generalData)
                 });
                 
+                // UI preferences are disabled but still saving for future use
                 await fetch('/api/v1/preferences/ui', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -569,8 +585,8 @@
             // Load preferences
             loadPreferences();
             
-            // Add event listeners to all inputs
-            const inputs = document.querySelectorAll('input, select, textarea');
+            // Add event listeners to all inputs (except disabled ones)
+            const inputs = document.querySelectorAll('input:not([disabled]), select:not([disabled]), textarea:not([disabled])');
             inputs.forEach(input => {
                 input.addEventListener('change', markChanges);
                 input.addEventListener('input', markChanges);

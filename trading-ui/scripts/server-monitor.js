@@ -1687,7 +1687,7 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('✅ דף ניטור שרת נטען בהצלחה');
 });
 
-// יצירת instance גלובלי
+// יצירת instance גלובלי מיד
 window.serverMonitor = new ServerMonitor();
 
 // הוספת פונקציות גלובליות
@@ -1696,3 +1696,5 @@ window.copyDetailedLog = () => window.serverMonitor.copyDetailedLog();
 // הוספת פונקציות חסרות
 ServerMonitor.optimizeDatabase = () => window.serverMonitor.optimizeDatabase();
 ServerMonitor.exportLogs = () => window.serverMonitor.exportLogs();
+
+console.log('✅ ServerMonitor instance נוצר:', window.serverMonitor);

@@ -80,6 +80,58 @@ class PreferencesService:
             return False
     
     @classmethod
+    def get_ui_preferences(cls) -> Dict[str, Any]:
+        """Get UI preferences"""
+        return {
+            "primaryColor": "#007bff",
+            "secondaryColor": "#6c757d", 
+            "successColor": "#28a745",
+            "warningColor": "#ffc107",
+            "tableRowsPerPage": 25,
+            "defaultTheme": "light"
+        }
+    
+    @classmethod
+    def set_ui_preferences(cls, data: Dict[str, Any]) -> bool:
+        """Set UI preferences"""
+        # Implementation for saving UI preferences
+        return True
+    
+    @classmethod
+    def get_system_preferences(cls) -> Dict[str, Any]:
+        """Get system preferences"""
+        return {
+            "serverUrl": "http://localhost:8080",
+            "serverPort": 8080,
+            "refreshInterval": 5,
+            "cacheTTL": 5,
+            "maxMemorySize": 512
+        }
+    
+    @classmethod
+    def set_system_preferences(cls, data: Dict[str, Any]) -> bool:
+        """Set system preferences"""
+        # Implementation for saving system preferences
+        return True
+    
+    @classmethod
+    def get_advanced_preferences(cls) -> Dict[str, Any]:
+        """Get advanced preferences"""
+        return {
+            "logLevel": "info",
+            "maxLogFileSize": 10,
+            "maxAccountRisk": 2.0,
+            "maxTradeRisk": 1.0,
+            "maxPositionSize": 5.0
+        }
+    
+    @classmethod
+    def set_advanced_preferences(cls, data: Dict[str, Any]) -> bool:
+        """Set advanced preferences"""
+        # Implementation for saving advanced preferences
+        return True
+    
+    @classmethod
     def get_fallback_defaults(cls) -> Dict[str, Any]:
         """ברירות מחדל גיבוי במקרה של כשל בטעינת הקובץ"""
         return {

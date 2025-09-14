@@ -106,6 +106,93 @@ def save_user_preferences() -> Any:
             "timestamp": "2025-01-07T21:55:00Z"
         }), 500
 
+@preferences_bp.route('/ui', methods=['GET', 'POST'])
+@rate_limit_api(requests_per_minute=30)
+def ui_preferences() -> Any:
+    """Get/Set UI preferences"""
+    try:
+        if request.method == 'GET':
+            ui_prefs = PreferencesService.get_ui_preferences()
+            return jsonify({
+                "success": True,
+                "data": {"ui_preferences": ui_prefs},
+                "timestamp": "2025-01-07T21:55:00Z"
+            }), 200
+        else:
+            data = request.get_json()
+            result = PreferencesService.set_ui_preferences(data)
+            return jsonify({
+                "success": True,
+                "data": {"updated": result},
+                "timestamp": "2025-01-07T21:55:00Z"
+            }), 200
+            
+    except Exception as e:
+        logger.error(f"Error with UI preferences: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": "2025-01-07T21:55:00Z"
+        }), 500
+
+@preferences_bp.route('/system', methods=['GET', 'POST'])
+@rate_limit_api(requests_per_minute=30)
+def system_preferences() -> Any:
+    """Get/Set system preferences"""
+    try:
+        if request.method == 'GET':
+            system_prefs = PreferencesService.get_system_preferences()
+            return jsonify({
+                "success": True,
+                "data": {"system_preferences": system_prefs},
+                "timestamp": "2025-01-07T21:55:00Z"
+            }), 200
+        else:
+            data = request.get_json()
+            result = PreferencesService.set_system_preferences(data)
+            return jsonify({
+                "success": True,
+                "data": {"updated": result},
+                "timestamp": "2025-01-07T21:55:00Z"
+            }), 200
+            
+    except Exception as e:
+        logger.error(f"Error with system preferences: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": "2025-01-07T21:55:00Z"
+        }), 500
+
+@preferences_bp.route('/advanced', methods=['GET', 'POST'])
+@rate_limit_api(requests_per_minute=30)
+def advanced_preferences() -> Any:
+    """Get/Set advanced preferences"""
+    try:
+        if request.method == 'GET':
+            advanced_prefs = PreferencesService.get_advanced_preferences()
+            return jsonify({
+                "success": True,
+                "data": {"advanced_preferences": advanced_prefs},
+                "timestamp": "2025-01-07T21:55:00Z"
+            }), 200
+        else:
+            data = request.get_json()
+            result = PreferencesService.set_advanced_preferences(data)
+            return jsonify({
+                "success": True,
+                "data": {"updated": result},
+                "timestamp": "2025-01-07T21:55:00Z"
+            }), 200
+            
+    except Exception as e:
+        logger.error(f"Error with advanced preferences: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": "2025-01-07T21:55:00Z"
+        }), 500
+
 @preferences_bp.route('/profiles', methods=['GET'])
 @rate_limit_api(requests_per_minute=30)
 def get_profiles() -> Any:

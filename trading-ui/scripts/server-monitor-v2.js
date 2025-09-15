@@ -13,9 +13,34 @@ class ServerMonitor {
       refreshInterval: 5000,
       maxLogs: 100
     };
-    
+
+    // Rate limiting protection
+    this.lastActionTime = {
+      checkHealth: 0,
+      restart: 0,
+      clearCache: 0,
+      optimize: 0,
+      emergencyStop: 0
+    };
+    this.actionCooldown = 2000; // 2 seconds cooldown
+
     console.log('🚀 ServerMonitor initialized');
     this.init();
+  }
+
+  // בדיקת rate limiting
+  canPerformAction(actionName) {
+    const now = Date.now();
+    const timeSinceLastAction = now - this.lastActionTime[actionName];
+
+    if (timeSinceLastAction < this.actionCooldown) {
+      const remainingTime = Math.ceil((this.actionCooldown - timeSinceLastAction) / 1000);
+      console.warn(`⏳ ${actionName} ב-cooldown. נסה שוב בעוד ${remainingTime} שניות`);
+      return false;
+    }
+
+    this.lastActionTime[actionName] = now;
+    return true;
   }
 
   // אתחול המערכת
@@ -25,6 +50,7 @@ class ServerMonitor {
     this.setupEventListeners();
     this.startMonitoring();
     this.loadSystemInfo();
+    this.loadHealthData();
   }
 
   // טעינת הגדרות
@@ -81,18 +107,20 @@ class ServerMonitor {
   // התחלת ניטור
   startMonitoring() {
     if (this.isMonitoring) return;
-    
+
     console.log('🔄 ServerMonitor - מתחיל ניטור');
     this.isMonitoring = true;
     this.updateStatus('מתחיל ניטור...');
-    
+
     // בדיקה ראשונית
     this.checkServerStatus();
-    
+    this.loadHealthData();
+
     // הגדרת רענון אוטומטי
     if (this.settings.autoRefresh) {
       this.monitoringInterval = setInterval(() => {
         this.checkServerStatus();
+        this.loadHealthData();
       }, this.settings.refreshInterval);
     }
   }
@@ -121,7 +149,8 @@ class ServerMonitor {
       
       if (response.ok) {
         this.updateServerStatus('online', data);
-        this.addLog('success', 'שרת פעיל', `זמן תגובה: ${data.response_time}ms`);
+        const responseTime = data.response_time_ms || 'לא זמין';
+        this.addLog('success', 'שרת פעיל', `זמן תגובה: ${responseTime}ms`);
       } else {
         this.updateServerStatus('offline', data);
         this.addLog('error', 'שרת לא זמין', data.message || 'שגיאה לא ידועה');
@@ -352,10 +381,14 @@ class ServerMonitor {
 
   // אופטימיזציה של בסיס הנתונים
   async optimizeDatabase() {
+    if (!this.canPerformAction('optimize')) {
+      return;
+    }
+
     try {
       console.log('🔧 ServerMonitor - מבצע אופטימיזציה של בסיס הנתונים');
-      
-      const response = await fetch('/api/optimize-database', {
+
+      const response = await fetch('/api/database/optimize', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -421,7 +454,7 @@ class ServerMonitor {
   async loadSystemInfo() {
     try {
       console.log('🔧 ServerMonitor - טוען מידע מערכת');
-      
+
       const response = await fetch('/api/system-info');
       if (response.ok) {
         const data = await response.json();
@@ -429,6 +462,240 @@ class ServerMonitor {
       }
     } catch (error) {
       console.error('❌ שגיאה בטעינת מידע מערכת:', error);
+    }
+  }
+
+  // טעינת נתוני בריאות שרת
+  async loadHealthData() {
+    try {
+      console.log('🔍 ServerMonitor - טוען נתוני בריאות');
+
+      const response = await fetch('/api/health');
+      if (response.ok) {
+        const data = await response.json();
+        this.updateHealthData(data);
+      }
+    } catch (error) {
+      console.error('❌ שגיאה בטעינת נתוני בריאות:', error);
+    }
+  }
+
+  // עדכון נתוני בריאות בממשק
+  updateHealthData(data) {
+    if (!data || !data.components) return;
+
+    // עדכון סטטוס שרת
+    const serverStatusEl = document.getElementById('serverStatus');
+    if (serverStatusEl) {
+      serverStatusEl.textContent = data.status === 'healthy' ? 'פעיל' : 'לא פעיל';
+      serverStatusEl.className = `status-value ${data.status === 'healthy' ? 'success' : 'error'}`;
+    }
+
+    // עדכון זמן פעילות (אם זמין)
+    const uptimeEl = document.getElementById('uptime');
+    if (uptimeEl && data.components.system?.details?.uptime) {
+      uptimeEl.textContent = data.components.system.details.uptime;
+    }
+
+    // עדכון סטטוס בסיס נתונים
+    const databaseStatusEl = document.getElementById('databaseStatus');
+    if (databaseStatusEl && data.components.database) {
+      const dbStatus = data.components.database.status === 'healthy' ? 'פעיל' : 'לא פעיל';
+      databaseStatusEl.textContent = dbStatus;
+      databaseStatusEl.className = `status-value ${data.components.database.status === 'healthy' ? 'success' : 'error'}`;
+    }
+
+    // עדכון גודל בסיס נתונים
+    const dbSizeEl = document.getElementById('dbSize');
+    if (dbSizeEl && data.components.database?.details?.database_size_mb) {
+      dbSizeEl.textContent = `${data.components.database.details.database_size_mb} MB`;
+    }
+
+    // עדכון מספר טיקרים
+    const tickerCountEl = document.getElementById('tickerCount');
+    if (tickerCountEl && data.components.database?.details?.ticker_count) {
+      tickerCountEl.textContent = data.components.database.details.ticker_count;
+    }
+
+    // עדכון סטטוס מטמון
+    const cacheStatusEl = document.getElementById('cacheStatus');
+    if (cacheStatusEl && data.components.cache) {
+      const cacheStatus = data.components.cache.status === 'healthy' ? 'פעיל' : 'לא פעיל';
+      cacheStatusEl.textContent = cacheStatus;
+      cacheStatusEl.className = `status-value ${data.components.cache.status === 'healthy' ? 'success' : 'error'}`;
+    }
+
+    // עדכון ערכי מטמון
+    const cacheEntriesEl = document.getElementById('cacheEntries');
+    if (cacheEntriesEl && data.components.cache?.details?.total_entries) {
+      cacheEntriesEl.textContent = data.components.cache.details.total_entries;
+    }
+
+    // עדכון זיכרון מטמון
+    const cacheMemoryEl = document.getElementById('cacheMemory');
+    if (cacheMemoryEl && data.components.system?.details?.memory_usage_bytes) {
+      const memoryMB = Math.round(data.components.system.details.memory_usage_bytes / (1024 * 1024));
+      cacheMemoryEl.textContent = `${memoryMB} MB`;
+    }
+
+    // עדכון סטטוס מערכת
+    const systemStatusEl = document.getElementById('systemStatus');
+    if (systemStatusEl && data.components.system) {
+      const sysStatus = data.components.system.status === 'healthy' ? 'תקין' : 'לא תקין';
+      systemStatusEl.textContent = sysStatus;
+      systemStatusEl.className = `status-value ${data.components.system.status === 'healthy' ? 'success' : 'error'}`;
+    }
+
+    // עדכון שימוש CPU
+    const cpuUsageEl = document.getElementById('cpuUsage');
+    if (cpuUsageEl && data.components.system?.details?.cpu_percent) {
+      cpuUsageEl.textContent = `${data.components.system.details.cpu_percent}%`;
+    }
+
+    // עדכון שימוש זיכרון
+    const memoryUsageEl = document.getElementById('memoryUsage');
+    if (memoryUsageEl && data.components.system?.details?.memory_percent) {
+      memoryUsageEl.textContent = `${data.components.system.details.memory_percent}%`;
+    }
+
+    console.log('✅ נתוני בריאות עודכנו בהצלחה');
+  }
+
+  // בדיקת בריאות שרת
+  async checkServerHealth() {
+    if (!this.canPerformAction('checkHealth')) {
+      return;
+    }
+
+    try {
+      console.log('🔍 ServerMonitor - בודק בריאות שרת');
+
+      const response = await fetch('/api/health');
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ בריאות שרת:', data);
+        this.addLog('success', 'בדיקת בריאות', `סטטוס: ${data.status}`);
+        if (window.showSuccessNotification) {
+          window.showSuccessNotification('ניטור שרת', 'בדיקת בריאות הושלמה בהצלחה');
+        }
+      } else {
+        throw new Error('שגיאה בבדיקת בריאות');
+      }
+    } catch (error) {
+      console.error('❌ שגיאה בבדיקת בריאות שרת:', error);
+      this.addLog('error', 'שגיאת בריאות', error.message);
+      if (window.showErrorNotification) {
+        window.showErrorNotification('שגיאה', 'שגיאה בבדיקת בריאות שרת');
+      }
+    }
+  }
+
+  // הפעלה מחדש של שרת
+  async restartServer() {
+    if (!this.canPerformAction('restart')) {
+      return;
+    }
+
+    try {
+      console.log('🔄 ServerMonitor - מפעיל שרת מחדש');
+
+      const response = await fetch('/api/server/restart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ שרת הופעל מחדש:', result);
+        this.addLog('success', 'הפעלה מחדש', 'השרת הופעל מחדש בהצלחה');
+        if (window.showSuccessNotification) {
+          window.showSuccessNotification('ניטור שרת', 'השרת הופעל מחדש בהצלחה');
+        }
+      } else {
+        throw new Error('שגיאה בהפעלה מחדש');
+      }
+    } catch (error) {
+      console.error('❌ שגיאה בהפעלה מחדש:', error);
+      this.addLog('error', 'שגיאת הפעלה', error.message);
+      if (window.showErrorNotification) {
+        window.showErrorNotification('שגיאה', 'שגיאה בהפעלה מחדש של השרת');
+      }
+    }
+  }
+
+  // ניקוי מטמון
+  async clearCache() {
+    if (!this.canPerformAction('clearCache')) {
+      return;
+    }
+
+    try {
+      console.log('🧹 ServerMonitor - מנקה מטמון');
+
+      const response = await fetch('/api/cache/clear', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ מטמון נוקה:', result);
+        this.addLog('success', 'ניקוי מטמון', 'המטמון נוקה בהצלחה');
+        if (window.showSuccessNotification) {
+          window.showSuccessNotification('ניטור שרת', 'המטמון נוקה בהצלחה');
+        }
+      } else {
+        throw new Error('שגיאה בניקוי מטמון');
+      }
+    } catch (error) {
+      console.error('❌ שגיאה בניקוי מטמון:', error);
+      this.addLog('error', 'שגיאת ניקוי', error.message);
+      if (window.showErrorNotification) {
+        window.showErrorNotification('שגיאה', 'שגיאה בניקוי מטמון');
+      }
+    }
+  }
+
+  // עצירת חירום
+  async emergencyStop() {
+    if (!this.canPerformAction('emergencyStop')) {
+      return;
+    }
+
+    try {
+      console.log('🛑 ServerMonitor - מבצע עצירת חירום');
+
+      if (!confirm('האם אתה בטוח שברצונך לבצע עצירת חירום? זה יעצור את השרת מיידית!')) {
+        return;
+      }
+
+      const response = await fetch('/api/server/stop', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ עצירת חירום הושלמה:', result);
+        this.addLog('warning', 'עצירת חירום', 'השרת נעצר בהצלחה');
+        if (window.showWarningNotification) {
+          window.showWarningNotification('ניטור שרת', 'עצירת חירום הושלמה');
+        }
+      } else {
+        throw new Error('שגיאה בעצירת חירום');
+      }
+    } catch (error) {
+      console.error('❌ שגיאה בעצירת חירום:', error);
+      this.addLog('error', 'שגיאת עצירה', error.message);
+      if (window.showErrorNotification) {
+        window.showErrorNotification('שגיאה', 'שגיאה בעצירת חירום');
+      }
     }
   }
 

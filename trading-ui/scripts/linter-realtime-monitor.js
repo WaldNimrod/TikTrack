@@ -863,8 +863,26 @@ function copyDetailedLog() {
 function toggleSection(sectionId) {
     if (typeof window.toggleSectionGlobal === 'function') {
         window.toggleSectionGlobal(sectionId);
+    } else if (typeof window.toggleSection === 'function') {
+        window.toggleSection(sectionId);
     } else {
-        console.warn('פונקציית toggleSectionGlobal לא נמצאה ב-main.js');
+        console.warn('פונקציית toggleSection לא נמצאה');
+    }
+}
+
+function toggleAllSections() {
+    const sections = ['statisticsSection', 'chartSection', 'controlsSection', 'logsSection'];
+
+    if (typeof window.toggleAllSectionsGlobal === 'function') {
+        window.toggleAllSectionsGlobal(sections);
+    } else if (typeof window.toggleAllSections === 'function') {
+        window.toggleAllSections(sections);
+    } else {
+        console.warn('פונקציית toggleAllSections לא נמצאה');
+        // Fallback: toggle each section individually
+        sections.forEach(sectionId => {
+            toggleSection(sectionId);
+        });
     }
 }
 
@@ -1128,6 +1146,7 @@ function ignoreAllIssues() {
 }
 
 window.toggleSection = toggleSection;
+window.toggleAllSections = toggleAllSections;
 window.resetSettings = resetSettings;
 window.copyDetailedLog = copyDetailedLog;
 window.fixAllIssues = fixAllIssues;

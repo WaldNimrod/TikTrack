@@ -1431,6 +1431,8 @@ function loadSectionStates() {
 window.toggleTopSection = toggleTopSection;
 window.toggleSection = toggleSection;
 window.toggleAllSections = toggleAllSections;
+window.toggleSectionGlobal = toggleSection;
+window.toggleAllSectionsGlobal = toggleAllSections;
 window.loadSectionStates = loadSectionStates;
 
 // Load section states when DOM is ready

@@ -231,7 +231,17 @@ class HealthService:
             # Process information
             process = psutil.Process()
             process_memory = process.memory_info()
-            
+
+            # Calculate uptime
+            uptime_seconds = time.time() - process.create_time()
+            uptime_hours = int(uptime_seconds // 3600)
+            uptime_minutes = int((uptime_seconds % 3600) // 60)
+
+            if uptime_hours > 0:
+                uptime = f"{uptime_hours} שעות, {uptime_minutes} דקות"
+            else:
+                uptime = f"{uptime_minutes} דקות"
+
             # Determine resource status
             resource_status = 'good'
             if cpu_percent > 90 or memory.percent > 90 or disk.percent > 95:
@@ -258,9 +268,11 @@ class HealthService:
                     'cpu_percent': round(cpu_percent, 1),
                     'memory_percent': round(memory.percent, 1),
                     'memory_available_gb': round(memory.available / (1024**3), 2),
+                    'memory_usage_bytes': int(memory.used),  # Add for cache display
                     'disk_percent': round(disk.percent, 1),
                     'disk_free_gb': round(disk.free / (1024**3), 2),
                     'process_memory_mb': round(process_memory.rss / (1024**2), 2),
+                    'uptime': uptime,
                     'response_time_ms': round((time.time() - start_time) * 1000, 2)
                 }
             })

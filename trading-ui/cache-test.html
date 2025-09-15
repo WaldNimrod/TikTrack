@@ -65,6 +65,68 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
+    <style>
+        /* Dependency Tree Styles */
+        .dependency-tree {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        
+        .tree-container {
+            font-family: 'Courier New', monospace;
+        }
+        
+        .tree-node {
+            margin: 8px 0;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #007bff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .tree-node.root {
+            border-left-color: #28a745;
+            font-weight: bold;
+            background: #e8f5e8;
+        }
+        
+        .tree-node.leaf {
+            border-left-color: #6c757d;
+            background: #f8f9fa;
+            font-size: 0.9em;
+        }
+        
+        .tree-children {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+        
+        .tree-node i {
+            margin-right: 8px;
+            color: #007bff;
+        }
+        
+        .tree-node.root i {
+            color: #28a745;
+        }
+        
+        .tree-node.leaf i {
+            color: #6c757d;
+        }
+        
+        /* Performance Chart Styles */
+        .performance-chart {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            height: 300px;
+        }
+    </style>
+    
     <!-- Error Handlers -->
     <script src="scripts/error-handlers.js"></script>
 
@@ -234,6 +296,14 @@
                                 <i class="fas fa-chart-line"></i> דוח ניתוח
                             </button>
                         </div>
+                        
+                        <!-- Analytics Content -->
+                        <div id="analyticsContent">
+                            <div class="text-center text-muted">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                טוען נתוני ניתוח...
+                            </div>
+                        </div>
 
                         <!-- Analytics Cards -->
                         <div class="row">
@@ -270,7 +340,7 @@
                                 ביצועי מטמון לאורך זמן
                             </div>
                             <div class="chart-container" id="performanceChart">
-                                <canvas id="cachePerformanceChart"></canvas>
+                                <canvas id="analyticsChart" width="800" height="400"></canvas>
                             </div>
                         </div>
                     </div>
@@ -362,6 +432,14 @@
                             <button class="btn btn-sm btn-outline-info" onclick="optimizeDependencies()">
                                 <i class="fas fa-project-diagram"></i> אופטמז תלויות
                             </button>
+                        </div>
+                        
+                        <!-- Dependencies Content -->
+                        <div id="dependenciesContent">
+                            <div class="text-center text-muted">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                טוען נתוני תלויות...
+                            </div>
                         </div>
 
                         <!-- Dependencies Overview -->

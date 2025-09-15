@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ניטור שרת - TikTrack</title>
     
+    <!-- 
+    ===== IMPORTANT DEVELOPMENT RULES =====
+    
+    CSS RULES:
+    - Only external CSS files are used, following the system's CSS architecture
+    - NO inline styles or styles within the page are allowed in this system
+    - All styling must be defined in external stylesheets according to ITCSS methodology
+    
+    JAVASCRIPT RULES:
+    - All functions are located in external files
+    - NO functions are allowed within the page
+    - All system functions use shared global functions located in dedicated files
+    - Page-specific functions should be centralized only in the page's dedicated script file
+    
+    ======================================
+    -->
+    
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
@@ -73,12 +90,20 @@
                 <div class="section-body">
                     <active-alerts></active-alerts>
 
+                    <!-- Monitoring Status -->
+                    <div class="monitoring-status" id="monitoringStatus">
+                        <div class="status-indicator">
+                            <span class="status-text" id="statusText">מאתחל...</span>
+                            <span class="last-check" id="lastCheck">-</span>
+                        </div>
+                    </div>
+
                     <!-- Page summary -->
                     <div class="info-summary" id="summaryStats">
                         <div>סטטוס שרת: <strong id="serverStatusStats">בדיקה...</strong></div>
                         <div>בסיס נתונים: <strong id="databaseStatusStats">בדיקה...</strong></div>
                         <div>Cache: <strong id="cacheStatusStats">בדיקה...</strong></div>
-                        <div>סטטוס: <strong id="overallStatus">בדיקה...</strong></div>
+                        <div>סטטוס כללי: <strong id="overallStatus">בדיקה...</strong></div>
                     </div>
                 </div>
             </div> <!-- End top-section -->
@@ -95,6 +120,25 @@
                             </button>
                         </div>
                         <div class="section-body">
+                                    <!-- Monitoring Controls -->
+                            <div class="monitoring-controls">
+                                <div class="control-group">
+                                    <label for="autoRefresh">
+                                        <input type="checkbox" id="autoRefresh" checked>
+                                        רענון אוטומטי
+                                    </label>
+                                </div>
+                                <div class="control-group">
+                                    <label for="refreshInterval">מרווח רענון (שניות):</label>
+                                    <select id="refreshInterval">
+                                        <option value="5000">5</option>
+                                        <option value="10000" selected>10</option>
+                                        <option value="30000">30</option>
+                                        <option value="60000">60</option>
+                                    </select>
+                                </div>
+                            </div>
+
                             <div class="quick-actions actions-default">
                                 <button class="btn btn-primary" onclick="serverMonitor.checkServerHealth()">
                                     <i class="fas fa-heartbeat"></i> בדיקת בריאות שרת
@@ -188,9 +232,50 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5><i class="fas fa-info-circle"></i> מידע מערכת</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="systemInfo" class="system-info">
+                                                <div class="info-item">
+                                                    <span class="info-label">גרסת Python:</span>
+                                                    <span class="info-value">-</span>
+                                                </div>
+                                                <div class="info-item">
+                                                    <span class="info-label">גרסת Flask:</span>
+                                                    <span class="info-value">-</span>
+                                                </div>
+                                                <div class="info-item">
+                                                    <span class="info-label">זמן פעולה:</span>
+                                                    <span class="info-value">-</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <!-- UI Content Section 2 End-->
+
+                    <!-- UI Content Section 3 Start-->
+                    <div class="content-section" id="section3">
+                        <div class="section-header">
+                            <h2>📋 לוגי ניטור</h2>
+                            <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                        <div class="section-body">
+                            <div class="logs-container" id="logsContainer">
+                                <!-- Logs will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- UI Content Section 3 End-->
                 </div>
             </div> <!-- End main-content -->
         </div> <!-- End page-body -->
@@ -209,6 +294,6 @@
     <script src="scripts/central-refresh-system.js"></script>
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/main.js"></script>
-    <script src="scripts/server-monitor-v2.js?v=v2.0.0"></script>
+    <script src="scripts/server-monitor-v2.js?v=v2.0.1"></script>
 </body>
 </html>

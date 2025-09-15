@@ -54,6 +54,7 @@ from datetime import datetime
 from typing import Dict, Any, Optional, List
 import time
 import sys # Added for sys.exit
+import psutil
 
 # Import configuration settings for cache modes
 from config.settings import DEVELOPMENT_MODE, CACHE_DISABLED, DEFAULT_CACHE_TTL, CACHE_ENABLED
@@ -303,10 +304,10 @@ def detailed_health_check() -> Any:
         cache_health = health_service.check_cache_health()
         system_health = health_service.check_system_health()
         api_health = health_service.check_api_endpoints()
-        
+
         # Get health trends
         trends = health_service.get_health_trends(hours=24)
-        
+
         detailed_report = {
             "timestamp": datetime.now().isoformat(),
             "components": {
@@ -318,8 +319,45 @@ def detailed_health_check() -> Any:
             "trends": trends,
             "rate_limits": rate_limiter.get_rate_limit_stats()
         }
-        
+
         return jsonify(detailed_report), 200
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "timestamp": datetime.now().isoformat(),
+            "error": str(e)
+        }), 500
+
+@app.route("/api/system-info", methods=["GET"])
+@rate_limit_api(requests_per_minute=60)
+def system_info() -> Any:
+    """System information endpoint for server monitor"""
+    try:
+        import time
+        import flask
+
+        # Get system uptime (simplified - actual process start time)
+        uptime_seconds = time.time() - psutil.Process().create_time()
+        uptime_days = int(uptime_seconds // 86400)
+        uptime_hours = int((uptime_seconds % 86400) // 3600)
+        uptime_minutes = int((uptime_seconds % 3600) // 60)
+
+        # Format uptime string
+        if uptime_days > 0:
+            uptime = f"{uptime_days} ימים, {uptime_hours} שעות, {uptime_minutes} דקות"
+        elif uptime_hours > 0:
+            uptime = f"{uptime_hours} שעות, {uptime_minutes} דקות"
+        else:
+            uptime = f"{uptime_minutes} דקות"
+
+        system_info_data = {
+            "python_version": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+            "flask_version": flask.__version__,
+            "uptime": uptime,
+            "timestamp": datetime.now().isoformat()
+        }
+
+        return jsonify(system_info_data), 200
     except Exception as e:
         return jsonify({
             "status": "error",
@@ -635,6 +673,45 @@ def get_task_status() -> Any:
         return jsonify({
             "status": "success",
             "data": status,
+            "timestamp": datetime.now().isoformat()
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+# Server Management Endpoints
+@app.route("/api/server/restart", methods=["POST"])
+@rate_limit_api(requests_per_minute=5)
+def restart_server() -> Any:
+    """Restart the server"""
+    try:
+        # This is a placeholder - in production, this would trigger actual server restart
+        return jsonify({
+            "status": "success",
+            "message": "Server restart initiated",
+            "note": "This is a placeholder endpoint. Actual restart should be handled by the deployment system.",
+            "timestamp": datetime.now().isoformat()
+        }), 200
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@app.route("/api/server/stop", methods=["POST"])
+@rate_limit_api(requests_per_minute=5)
+def stop_server() -> Any:
+    """Stop the server (emergency stop)"""
+    try:
+        # This is a placeholder - in production, this would trigger actual server stop
+        return jsonify({
+            "status": "success",
+            "message": "Server stop initiated",
+            "note": "This is a placeholder endpoint. Actual stop should be handled by the deployment system.",
             "timestamp": datetime.now().isoformat()
         }), 200
     except Exception as e:

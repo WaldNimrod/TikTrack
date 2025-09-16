@@ -2435,7 +2435,7 @@ class HeaderSystem {
   loadUserPreferences() {
     try {
       // ניסיון לטעון מ-localStorage תחילה (מהיר)
-      const localPreferences = localStorage.getItem('tiktrack_preferences');
+      const localPreferences = localStorage.getItem('tikTrack_preferences');
       if (localPreferences) {
         const parsed = JSON.parse(localPreferences);
         if (parsed.user) {
@@ -2455,7 +2455,7 @@ class HeaderSystem {
       }
 
       // אם אין ב-localStorage, ננסה לטעון מהשרת
-      const userPreferences = localStorage.getItem('userPreferences');
+      const userPreferences = localStorage.getItem('tikTrack_preferences');
       if (userPreferences) {
         return JSON.parse(userPreferences);
       }

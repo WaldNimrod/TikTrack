@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
-
-            <!-- ===== CSS Architecture - Unified CSS ===== -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מוניטור אילוצים - TikTrack</title>
+    
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
@@ -34,6 +37,7 @@
     <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=v1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=v1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_constraints.css?v=v1.0.0">
     
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -41,525 +45,216 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- Error Handlers -->
-    <script src="scripts/error-handlers.js"></script>
-    
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=v33_green_orange"></head>
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v33_green_orange">
+</head>
 
 <body>
-  <!-- unified-header ייווצר כאן אוטומטית -->
-  <div id="unified-header"></div>
-  <div class="background-wrapper">
-    <div class="page-body">
-      <!-- Constraints Monitor - top-Section -->
-      <div class="top-section">
-        <div class="section-header">
-          <div class="table-title">
-            <img src="images/icons/development.svg?v=20250905" alt="מוניטור אילוצים" class="section-icon"> מוניטור אילוצים
-          </div>
-          <div class="table-actions">
-            <button class="filter-toggle-btn" onclick="window.toggleTopSection()" title="הצג/הסתר אזור סטטיסטיקה">
-              <span class="filter-icon">▲</span>
-            </button>
-          </div>
+    <div class="background-wrapper">
+        <!-- Unified Header -->
+        <div id="unified-header"></div>
+        
+        <div class="page-body">
+            <div class="main-content">
+                <!-- Top Section -->
+                <div class="top-section">
+                    <div class="section-header">
+                        <h1>🔒 מוניטור אילוצים</h1>
+                        <p>ניהול וניטור אילוצי בסיס הנתונים</p>
+                    </div>
+                    <div class="section-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h3 class="card-title text-primary" id="total-constraints">-</h3>
+                                        <p class="card-text">סה"כ אילוצים</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h3 class="card-title text-success" id="total-tables">-</h3>
+                                        <p class="card-text">טבלאות עם אילוצים</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h3 class="card-title text-warning" id="constraint-types">-</h3>
+                                        <p class="card-text">סוגי אילוצים</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h3 class="card-title text-info" id="active-constraints">-</h3>
+                                        <p class="card-text">אילוצים פעילים</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Section 1: Overview Layer -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 id="overview-title">📊 סקירה כללית</h2>
+                        <p>תצוגה כללית של כל האילוצים במערכת</p>
+                    </div>
+                    <div class="section-body">
+                        <div id="overview-content">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">טוען...</span>
+                                </div>
+                                <p class="mt-2">טוען סקירה כללית...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Section 2: All Constraints Table -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2>📋 כל האילוצים</h2>
+                        <p>טבלה מפורטת של כל האילוצים במערכת</p>
+                    </div>
+                    <div class="section-body">
+                        <div class="d-flex gap-2 mb-3">
+                            <button class="btn btn-primary" onclick="window.refreshConstraints()">
+                                <i class="fas fa-sync-alt"></i> רענן נתונים
+                            </button>
+                            <button class="btn btn-success" onclick="window.validateAllConstraints()">
+                                <i class="fas fa-check-double"></i> בדוק כל האילוצים
+                            </button>
+                        </div>
+                        
+                        <!-- Filter Controls -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="table-filter" class="form-label">טבלה:</label>
+                                    <select id="table-filter" class="form-select" onchange="window.filterByTable(this.value)">
+                                        <option value="">כל הטבלאות</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="type-filter" class="form-label">סוג אילוץ:</label>
+                                    <select id="type-filter" class="form-select" onchange="window.filterByType(this.value)">
+                                        <option value="">כל סוגי האילוצים</option>
+                                        <option value="PRIMARY_KEY">PRIMARY KEY</option>
+                                        <option value="FOREIGN_KEY">FOREIGN KEY</option>
+                                        <option value="UNIQUE">UNIQUE</option>
+                                        <option value="NOT_NULL">NOT NULL</option>
+                                        <option value="CHECK">CHECK</option>
+                                        <option value="RANGE">RANGE</option>
+                                        <option value="ENUM">ENUM</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="search-input" class="form-label">חיפוש:</label>
+                                    <input type="text" id="search-input" class="form-control" placeholder="חיפוש אילוצים..." onkeyup="window.filterConstraints(this.value)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Constraints Table -->
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover" id="constraints-table" data-table-type="constraints">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th class="sortable" data-sort="constraint_name">
+                                            <i class="fas fa-sort"></i> שם אילוץ
+                                        </th>
+                                        <th class="sortable" data-sort="table_name">
+                                            <i class="fas fa-sort"></i> טבלה
+                                        </th>
+                                        <th class="sortable" data-sort="column_name">
+                                            <i class="fas fa-sort"></i> עמודה
+                                        </th>
+                                        <th class="sortable" data-sort="constraint_type">
+                                            <i class="fas fa-sort"></i> סוג
+                                        </th>
+                                        <th class="sortable" data-sort="constraint_definition">
+                                            <i class="fas fa-sort"></i> הגדרה
+                                        </th>
+                                        <th class="sortable" data-sort="is_active">
+                                            <i class="fas fa-sort"></i> פעיל
+                                        </th>
+                                        <th>פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="constraints-table-body">
+                                    <tr>
+                                        <td colspan="7" class="text-center">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">טוען...</span>
+                                            </div>
+                                            <p class="mt-2">טוען אילוצים...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Section 3: By Table Layer -->
+                <div class="content-section d-none" id="by-table-section">
+                    <div class="section-header">
+                        <h2>📋 אילוצים לפי טבלאות</h2>
+                        <p>תצוגה מפורטת של אילוצים לפי טבלאות</p>
+                    </div>
+                    <div class="section-body">
+                        <div id="by-table-content">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">טוען...</span>
+                                </div>
+                                <p class="mt-2">טוען אילוצים לפי טבלאות...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Section 4: By Type Layer -->
+                <div class="content-section d-none" id="by-type-section">
+                    <div class="section-header">
+                        <h2>🏷️ אילוצים לפי סוג</h2>
+                        <p>תצוגה מפורטת של אילוצים לפי סוג</p>
+                    </div>
+                    <div class="section-body">
+                        <div id="by-type-content">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">טוען...</span>
+                                </div>
+                                <p class="mt-2">טוען אילוצים לפי סוג...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages Container -->
+                <div id="messages" class="mt-3"></div>
+            </div>
         </div>
-
-        <div class="section-body">
-          <div class="stats-cards">
-            <div class="stat-card">
-              <div class="stat-number" id="total-constraints">-</div>
-              <div class="stat-label">סה"כ אילוצים</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-number" id="total-tables">-</div>
-              <div class="stat-label">טבלאות עם אילוצים</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-number" id="constraint-types">-</div>
-              <div class="stat-label">סוגי אילוצים</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-number" id="active-constraints">-</div>
-              <div class="stat-label">אילוצים פעילים</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Main content -->
-      <div class="main-content">
-        <div class="content-section constraints-monitor-page">
-          <div class="section-header">
-            <div class="table-title">
-              <img src="images/icons/development.svg?v=20250905" alt="מוניטור אילוצים בשכבות" class="section-icon"> מוניטור אילוצים בשכבות<br><span class="subtitle-text">Constraints Monitor by Layers</span>
-            </div>
-            <div class="d-flex gap-2 align-items-center">
-              <div class="search-input-wrapper">
-                <input type="text" class="search-filter-input" placeholder="חיפוש אילוצים..."
-                  onkeyup="window.filterConstraints(this.value)">
-              </div>
-              <button class="refresh-btn" onclick="window.refreshConstraints()" title="רענן נתונים">
-                <span class="action-icon">🔄</span> רענן
-              </button>
-              <button class="filter-toggle-btn" onclick="window.toggleMainSection()"
-                title="הצג/הסתר אזור מוניטור אילוצים">
-                <span class="filter-icon">▲</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="section-body">
-            <div class="constraints-monitor-container">
-              <div id="messages"></div>
-
-              <!-- Filter Controls -->
-              <div class="filter-controls">
-                <select id="table-filter" onchange="window.filterByTable(this.value)">
-                  <option value="">כל הטבלאות</option>
-                </select>
-                <select id="type-filter" onchange="window.filterByType(this.value)">
-                  <option value="">כל סוגי האילוצים</option>
-                  <option value="ENUM">ENUM</option>
-                  <option value="NOT_NULL">NOT NULL</option>
-                  <option value="FOREIGN_KEY">FOREIGN KEY</option>
-                  <option value="UNIQUE">UNIQUE</option>
-                  <option value="RANGE">RANGE</option>
-                </select>
-                <div class="layer-toggle active" onclick="window.toggleLayer('overview')">סקירה כללית</div>
-                <div class="layer-toggle" onclick="window.toggleLayer('by-table')">לפי טבלאות</div>
-                <div class="layer-toggle" onclick="window.toggleLayer('by-type')">לפי סוג</div>
-              </div>
-
-              <!-- Overview Layer -->
-              <div id="overview-layer" class="layer-section">
-                <div class="layer-header">
-                  <div class="layer-title">
-                    <i class="fas fa-chart-pie"></i>
-                    סקירה כללית
-                  </div>
-                  <div class="layer-stats">
-                    <div class="stat-item">
-                      <i class="fas fa-database"></i>
-                      <span id="overview-tables-count">-</span> טבלאות
-                    </div>
-                    <div class="stat-item">
-                      <i class="fas fa-shield-alt"></i>
-                      <span id="overview-constraints-count">-</span> אילוצים
-                    </div>
-                  </div>
-                </div>
-                <div id="overview-content">
-                  <div class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin"></i> טוען סקירה כללית...
-                  </div>
-                </div>
-              </div>
-
-              <!-- By Table Layer -->
-              <div id="by-table-layer" class="layer-section d-none">
-                <div class="layer-header">
-                  <div class="layer-title">
-                    <i class="fas fa-table"></i>
-                    אילוצים לפי טבלאות
-                  </div>
-                  <div class="layer-stats">
-                    <div class="stat-item">
-                      <i class="fas fa-list"></i>
-                      <span id="table-layer-count">-</span> טבלאות
-                    </div>
-                  </div>
-                </div>
-                <div id="by-table-content">
-                  <div class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin"></i> טוען אילוצים לפי טבלאות...
-                  </div>
-                </div>
-              </div>
-
-              <!-- By Type Layer -->
-              <div id="by-type-layer" class="layer-section d-none">
-                <div class="layer-header">
-                  <div class="layer-title">
-                    <i class="fas fa-tags"></i>
-                    אילוצים לפי סוג
-                  </div>
-                  <div class="layer-stats">
-                    <div class="stat-item">
-                      <i class="fas fa-layer-group"></i>
-                      <span id="type-layer-count">-</span> סוגים
-                    </div>
-                  </div>
-                </div>
-                <div id="by-type-content">
-                  <div class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin"></i> טוען אילוצים לפי סוג...
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-    <div class="bottom-spacing"></div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="scripts/translation-utils.js"></script>
-  <script src="scripts/linked-items.js"></script>
-  <script src="scripts/main.js"></script>
-  <script src="scripts/header-system.js?v=20250115_level3_fix"></script>
-  <script src="scripts/notification-system.js"></script>
-  <script src="scripts/validation-utils.js"></script>
-  <script src="scripts/error-handlers.js"></script>
-
-  <script>
-    // Constraints Monitor JavaScript
-    class ConstraintsMonitor {
-      constructor() {
-        this.apiBase = 'http://localhost:8080/api/v1/constraints';
-        this.constraints = [];
-        this.tables = [];
-        this.currentLayer = 'overview';
-        this.filters = {
-          table: '',
-          type: '',
-          search: ''
-        };
-        
-        this.init();
-      }
-
-      async init() {
-        try {
-          await this.loadData();
-          this.setupEventListeners();
-          this.renderCurrentLayer();
-        } catch (error) {
-          this.showMessage('שגיאה בטעינת נתוני האילוצים', 'error');
-          console.error('Error initializing constraints monitor:', error);
-        }
-      }
-
-      async loadData() {
-        try {
-          // Load constraints
-          const constraintsResponse = await fetch(`${this.apiBase}/`);
-          const constraintsData = await constraintsResponse.json();
-          
-          if (constraintsData.status === 'success') {
-            this.constraints = constraintsData.data;
-          }
-
-          // Load tables
-          const tablesResponse = await fetch(`${this.apiBase}/tables`);
-          const tablesData = await tablesResponse.json();
-          
-          if (tablesData.status === 'success') {
-            this.tables = tablesData.data;
-          }
-
-          this.updateStats();
-          this.populateFilters();
-        } catch (error) {
-          console.error('Error loading data:', error);
-          throw error;
-        }
-      }
-
-      updateStats() {
-        const totalConstraints = this.constraints.length;
-        const totalTables = this.tables.length;
-        const constraintTypes = [...new Set(this.constraints.map(c => c.constraint_type))].length;
-        const activeConstraints = this.constraints.filter(c => c.is_active).length;
-
-        document.getElementById('total-constraints').textContent = totalConstraints;
-        document.getElementById('total-tables').textContent = totalTables;
-        document.getElementById('constraint-types').textContent = constraintTypes;
-        document.getElementById('active-constraints').textContent = activeConstraints;
-      }
-
-      populateFilters() {
-        const tableFilter = document.getElementById('table-filter');
-        tableFilter.innerHTML = '<option value="">כל הטבלאות</option>';
-        
-        this.tables.forEach(table => {
-          const option = document.createElement('option');
-          option.value = table;
-          option.textContent = table;
-          tableFilter.appendChild(option);
-        });
-      }
-
-      getBadgeClass(constraintType) {
-        const classes = {
-          'ENUM': 'badge-enum',
-          'NOT_NULL': 'badge-not-null',
-          'FOREIGN_KEY': 'badge-foreign-key',
-          'UNIQUE': 'badge-unique',
-          'RANGE': 'badge-range'
-        };
-        return classes[constraintType] || 'badge-enum';
-      }
-
-      renderOverviewLayer() {
-        const content = document.getElementById('overview-content');
-        
-        // Group constraints by table
-        const constraintsByTable = {};
-        this.constraints.forEach(constraint => {
-          if (!constraintsByTable[constraint.table_name]) {
-            constraintsByTable[constraint.table_name] = [];
-          }
-          constraintsByTable[constraint.table_name].push(constraint);
-        });
-
-        let html = '<div class="constraint-grid">';
-        
-        Object.entries(constraintsByTable).forEach(([tableName, constraints]) => {
-          html += `
-            <div class="constraint-card">
-              <div class="constraint-header">
-                <div class="constraint-name">${tableName}</div>
-                <div class="table-constraint-count">${constraints.length}</div>
-              </div>
-              <div class="constraint-details">
-                <div>סה"כ אילוצים: <strong>${constraints.length}</strong></div>
-                <div>סוגי אילוצים: <strong>${[...new Set(constraints.map(c => c.constraint_type))].length}</strong></div>
-                <div>אילוצים פעילים: <strong>${constraints.filter(c => c.is_active).length}</strong></div>
-              </div>
-            </div>
-          `;
-        });
-        
-        html += '</div>';
-        content.innerHTML = html;
-      }
-
-      renderByTableLayer() {
-        const content = document.getElementById('by-table-content');
-        
-        // Group constraints by table
-        const constraintsByTable = {};
-        this.constraints.forEach(constraint => {
-          if (!constraintsByTable[constraint.table_name]) {
-            constraintsByTable[constraint.table_name] = [];
-          }
-          constraintsByTable[constraint.table_name].push(constraint);
-        });
-
-        let html = '';
-        
-        Object.entries(constraintsByTable).forEach(([tableName, constraints]) => {
-          html += `
-            <div class="table-constraints-section">
-              <div class="table-header">
-                <span>${tableName}</span>
-                <span class="table-constraint-count">${constraints.length} אילוצים</span>
-              </div>
-              <div class="constraint-grid">
-          `;
-          
-          constraints.forEach(constraint => {
-            html += `
-              <div class="constraint-card">
-                <div class="constraint-header">
-                  <div class="constraint-name">${constraint.constraint_name}</div>
-                  <div class="constraint-type-badge ${this.getBadgeClass(constraint.constraint_type)}">
-                    ${constraint.constraint_type}
-                  </div>
-                </div>
-                <div class="constraint-details">
-                  <div class="constraint-table">טבלה: ${constraint.table_name}</div>
-                  <div class="constraint-column">עמודה: ${constraint.column_name}</div>
-                  <div class="constraint-definition">${constraint.constraint_definition}</div>
-                </div>
-              </div>
-            `;
-          });
-          
-          html += `
-              </div>
-            </div>
-          `;
-        });
-        
-        content.innerHTML = html;
-      }
-
-      renderByTypeLayer() {
-        const content = document.getElementById('by-type-content');
-        
-        // Group constraints by type
-        const constraintsByType = {};
-        this.constraints.forEach(constraint => {
-          if (!constraintsByType[constraint.constraint_type]) {
-            constraintsByType[constraint.constraint_type] = [];
-          }
-          constraintsByType[constraint.constraint_type].push(constraint);
-        });
-
-        let html = '';
-        
-        Object.entries(constraintsByType).forEach(([type, constraints]) => {
-          html += `
-            <div class="table-constraints-section">
-              <div class="table-header">
-                <span>${type} - ${constraints.length} אילוצים</span>
-                <span class="table-constraint-count">${constraints.length}</span>
-              </div>
-              <div class="constraint-grid">
-          `;
-          
-          constraints.forEach(constraint => {
-            html += `
-              <div class="constraint-card">
-                <div class="constraint-header">
-                  <div class="constraint-name">${constraint.constraint_name}</div>
-                  <div class="constraint-type-badge ${this.getBadgeClass(constraint.constraint_type)}">
-                    ${constraint.constraint_type}
-                  </div>
-                </div>
-                <div class="constraint-details">
-                  <div class="constraint-table">טבלה: ${constraint.table_name}</div>
-                  <div class="constraint-column">עמודה: ${constraint.column_name}</div>
-                  <div class="constraint-definition">${constraint.constraint_definition}</div>
-                </div>
-              </div>
-            `;
-          });
-          
-          html += `
-              </div>
-            </div>
-          `;
-        });
-        
-        content.innerHTML = html;
-      }
-
-      renderCurrentLayer() {
-        switch (this.currentLayer) {
-          case 'overview':
-            this.renderOverviewLayer();
-            break;
-          case 'by-table':
-            this.renderByTableLayer();
-            break;
-          case 'by-type':
-            this.renderByTypeLayer();
-            break;
-        }
-      }
-
-      setupEventListeners() {
-        // Add any additional event listeners here
-      }
-
-      showMessage(message, type = 'info') {
-        const messagesContainer = document.getElementById('messages');
-        const messageClass = type === 'error' ? 'error-message' : 'success-message';
-        
-        messagesContainer.innerHTML = `
-          <div class="${messageClass}">
-            ${message}
-          </div>
-        `;
-        
-        // Auto-hide after 5 seconds
-        setTimeout(() => {
-          messagesContainer.innerHTML = '';
-        }, 5000);
-      }
-    }
-
-    // Global functions
-    let constraintsMonitor;
-
-    window.toggleLayer = function(layer) {
-      // Update active layer toggle
-      document.querySelectorAll('.layer-toggle').forEach(toggle => {
-        toggle.classList.remove('active');
-      });
-      event.target.classList.add('active');
-      
-      // Hide all layers
-      document.querySelectorAll('.layer-section').forEach(section => {
-        section.style.display = 'none';
-      });
-      
-      // Show selected layer
-      document.getElementById(`${layer}-layer`).style.display = 'block';
-      
-      // Update current layer and render
-      constraintsMonitor.currentLayer = layer;
-      constraintsMonitor.renderCurrentLayer();
-    };
-
-    window.filterByTable = function(table) {
-      constraintsMonitor.filters.table = table;
-      constraintsMonitor.renderCurrentLayer();
-    };
-
-    window.filterByType = function(type) {
-      constraintsMonitor.filters.type = type;
-      constraintsMonitor.renderCurrentLayer();
-    };
-
-    window.filterConstraints = function(searchText) {
-      constraintsMonitor.filters.search = searchText;
-      constraintsMonitor.renderCurrentLayer();
-    };
-
-    window.refreshConstraints = function() {
-      constraintsMonitor.loadData().then(() => {
-        constraintsMonitor.renderCurrentLayer();
-        constraintsMonitor.showMessage('נתונים רועננו בהצלחה', 'success');
-      });
-    };
-
-    window.toggleTopSection = function() {
-      const topSection = document.querySelector('.top-section');
-      const sectionBody = topSection.querySelector('.section-body');
-      const filterIcon = topSection.querySelector('.filter-icon');
-
-      if (sectionBody.style.display === 'none') {
-        sectionBody.style.display = 'block';
-        filterIcon.textContent = '▲';
-      } else {
-        sectionBody.style.display = 'none';
-        filterIcon.textContent = '▼';
-      }
-    };
-
-    window.toggleMainSection = function() {
-      const mainSection = document.querySelector('.content-section');
-      const sectionBody = mainSection.querySelector('.section-body');
-      const filterIcon = mainSection.querySelector('.filter-icon');
-
-      if (sectionBody.style.display === 'none') {
-        sectionBody.style.display = 'block';
-        filterIcon.textContent = '▲';
-      } else {
-        sectionBody.style.display = 'none';
-        filterIcon.textContent = '▼';
-      }
-    };
-
-    // Initialize when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('מוניטור אילוצים נטען');
-      constraintsMonitor = new ConstraintsMonitor();
-    });
-  </script>
-
-  <script src="scripts/console-cleanup.js"></script>
-  <script src="scripts/header-system.js?v=20250115_level3_fix"></script>
-  <script src="scripts/notification-system.js"></script>
-  <script src="scripts/main.js"></script>
-  <script src="scripts/active-alerts-component.js"></script>
-
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts/header-system.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/constraints.js"></script>
 </body>
-
 </html>

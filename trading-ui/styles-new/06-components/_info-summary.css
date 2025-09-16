@@ -492,3 +492,58 @@
     color: var(--color-text-muted, #868e96);
     font-style: italic;
 }
+
+/* Toggle Button Styles */
+.filter-toggle-btn {
+    background: none;
+    border: none;
+    color: var(--color-text-secondary, #6c757d);
+    font-size: var(--typography-font-size-lg, 18px);
+    cursor: pointer;
+    padding: var(--spacing-xs, 8px);
+    border-radius: var(--spacing-border-radius-sm, 6px);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+.filter-toggle-btn:hover {
+    background: var(--color-bg-secondary, #f8f9fa);
+    color: var(--color-text-primary, #212529);
+}
+
+.filter-icon {
+    font-size: var(--typography-font-size-lg, 18px);
+    font-weight: bold;
+    transition: transform 0.3s ease;
+    display: inline-block;
+    line-height: 1;
+}
+
+.filter-toggle-btn.collapsed .filter-icon {
+    transform: rotate(180deg);
+}
+
+/* RTL Support for Toggle Buttons */
+[dir="rtl"] .filter-icon {
+    transform: scaleX(-1);
+}
+
+[dir="rtl"] .filter-toggle-btn.collapsed .filter-icon {
+    transform: scaleX(-1) rotate(180deg);
+}
+
+/* Dark theme support for toggle buttons */
+@media (prefers-color-scheme: dark) {
+    .filter-toggle-btn {
+        color: var(--color-text-secondary-dark, #a0aec0);
+    }
+
+    .filter-toggle-btn:hover {
+        background: var(--color-bg-secondary-dark, #2d3748);
+        color: var(--color-text-primary-dark, #ffffff);
+    }
+}

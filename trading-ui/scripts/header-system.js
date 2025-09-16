@@ -3824,17 +3824,17 @@ window.isDateInRange = isDateInRange;
 function getFilterConfig(filterType) {
   const configs = {
     'status': {
-      columnName: 'Status',
-      containerIdKeywords: ['status', 'Status'],
+      columnName: 'סטטוס',
+      containerIdKeywords: ['status', 'Status', 'סטטוס'],
       knownContainers: ['tradesContainer', 'tradePlansContainer', 'trade_plansContainer', 'alertsContainer', 'executionsContainer', 'accountsContainer', 'tickersContainer', 'cashFlowsContainer', 'notesContainer'],
-      cellValues: ['Open', 'Closed', 'Cancelled'],
+      cellValues: ['פתוח', 'סגור', 'מבוטל'],
       dataField: 'status',
     },
     'type': {
-      columnName: 'Investment Type',
-      containerIdKeywords: ['type', 'Type', 'investment'],
+      columnName: 'סוג השקעה',
+      containerIdKeywords: ['type', 'Type', 'investment', 'סוג', 'השקעה'],
       knownContainers: ['tradesContainer', 'tradePlansContainer', 'trade_plansContainer'],
-      cellValues: ['Investment', 'Swing', 'Passive'],
+      cellValues: ['השקעה', 'סאוינג', 'פסיבי'],
       dataField: 'investment-type',
     },
     'account': {
@@ -3845,8 +3845,8 @@ function getFilterConfig(filterType) {
       dataField: 'account',
     },
     'date': {
-      columnName: 'Date',
-      containerIdKeywords: ['date', 'Date'],
+      columnName: 'תאריך',
+      containerIdKeywords: ['date', 'Date', 'תאריך'],
       knownContainers: ['tradesContainer', 'alertsContainer', 'executionsContainer', 'cashFlowsContainer', 'notesContainer'],
       cellValues: [], // Dates are dynamic
       dataField: 'date',
@@ -3997,12 +3997,12 @@ function checkRowFilterWithConfig(row, filterConfig, selectedValues) {
   let originalValue = cell.getAttribute(`data-${dataField}`);
 
   // For date filter, also check data-date attribute
-  if (filterConfig.columnName === 'Date' && !originalValue) {
+  if (filterConfig.columnName === 'תאריך' && !originalValue) {
     originalValue = cell.getAttribute('data-date');
   }
 
   // Apply filter logic
-  if (filterConfig.columnName === 'Date') {
+  if (filterConfig.columnName === 'תאריך') {
     // For date filter, check both cell value and original value
     if (originalValue) {
       return checkDateFilter(originalValue, selectedValues[0]) || checkDateFilter(cellValue, selectedValues[0]);
@@ -4032,10 +4032,10 @@ function getColumnIndexByConfig(row, filterConfig) {
 
   // Define Hebrew translations for column names
   const hebrewTranslations = {
-    'Status': ['סטטוס', 'Status'],
-    'Investment Type': ['סוג השקעה', 'סוג', 'Investment Type'],
+    'סטטוס': ['סטטוס', 'Status'],
+    'סוג השקעה': ['סוג השקעה', 'סוג', 'Investment Type'],
     'Account': ['חשבון', 'Account'],
-    'Date': ['תאריך', 'Date', 'נוצר ב', 'נסגר ב', 'תאריך ביצוע', 'תאריך הפעלה', 'נוצר ב', 'תאריך'],
+    'תאריך': ['תאריך', 'Date', 'נוצר ב', 'נסגר ב', 'תאריך ביצוע', 'תאריך הפעלה', 'נוצר ב', 'תאריך'],
   };
 
   for (let i = 0; i < headers.length; i++) {

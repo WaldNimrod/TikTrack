@@ -11,6 +11,10 @@
     
     <!-- Custom CSS - ITCSS Architecture - אחרי Bootstrap כדי לדרוס אותו -->
     <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=v1.0.0">
     <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=v1.0.0">
     <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=v1.0.0">
     <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=v1.0.0">
@@ -31,66 +35,19 @@
     <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=v1.0.0">
     
     <!-- Header Styles -->
-    <link rel="stylesheet" href="styles/header-styles.css?v=v1.0.0">
-    
-    <style>
-        .color-preview {
-            width: 50px;
-            height: 30px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            cursor: pointer;
-            display: inline-block;
-        }
-        
-        .control-narrow {
-            width: 100px;
-        }
-        
-        .section-divider {
-            border-top: 1px solid #dee2e6;
-            margin: 2rem 0 1rem 0;
-        }
-        
-        .profile-buttons {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        
-        .profile-buttons .btn {
-            flex: 1;
-            min-width: 120px;
-        }
-        
-        .toggle-all-btn {
-            background: var(--primary-color, #29a6a8);
-            color: white;
-            border: none;
-            padding: 0.25rem 0.75rem;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .main-save-btn {
-            background: var(--primary-color, #29a6a8);
-            color: white;
-            border: none;
-            padding: 0.75rem 2rem;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-        }
-    </style>
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v38_fixed">
 </head>
 <body>
-        <!-- Header System -->
+    <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
+    <div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
         <div id="unified-header"></div>
 
-    <!-- Main Content -->
-            <div class="main-content">
+        <!-- ===== TEMPLATE ZONE 3: PAGE BODY (LOCKED) ===== -->
         <div class="page-body">
+            <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT (EDITABLE) ===== -->
+            <div class="main-content">
+                <!-- ===== CONTENT SECTIONS START (EDITABLE) ===== -->
             <div class="container-fluid">
                 
                 <!-- Header Section -->
@@ -102,13 +59,19 @@
                                 <p>ניהול הגדרות המערכת והעדפות המשתמש</p>
           </div>
                             <div class="d-flex gap-2">
+                                <button class="btn btn-success" onclick="window.saveAllPreferences()" id="saveAllBtn">
+                                    <i class="bi bi-save"></i> שמור הכל
+                                </button>
+                                <button class="btn btn-warning" onclick="window.resetToDefaults()" id="resetBtn">
+                                    <i class="bi bi-arrow-clockwise"></i> איפוס
+                                </button>
                                 <button class="toggle-all-btn" onclick="window.toggleAllSections()" id="toggleAllBtn">
                                     <i class="bi bi-arrows-expand"></i> פתח הכל
-            </button>
+                                </button>
                                 <div class="auto-save-indicator">
                                     <i class="bi bi-check-circle text-success"></i> שמירה אוטומטית
-          </div>
-        </div>
+                                </div>
+                            </div>
         </div>
       </div>
         </div>
@@ -722,6 +685,25 @@
             </div>
         </div>
     </div>
+    
+    <!-- Bottom Save Buttons -->
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-center gap-3 p-3 bg-light rounded">
+                    <button class="btn btn-success btn-lg" onclick="window.saveAllPreferences()" id="saveAllBtnBottom">
+                        <i class="bi bi-save"></i> שמור הכל
+                    </button>
+                    <button class="btn btn-warning btn-lg" onclick="window.resetToDefaults()" id="resetBtnBottom">
+                        <i class="bi bi-arrow-clockwise"></i> איפוס לברירות מחדל
+                    </button>
+                    <button class="btn btn-info btn-lg" onclick="window.exportPreferences()" id="exportBtn">
+                        <i class="bi bi-download"></i> ייצא הגדרות
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
   
     <!-- Notification system -->
     <div class="notification-container" id="notificationContainer"></div>
@@ -755,5 +737,12 @@
             }
         });
     </script>
+                <!-- ===== CONTENT SECTIONS END (EDITABLE) ===== -->
+            </div>
+            <!-- ===== END MAIN CONTENT ===== -->
+        </div>
+        <!-- ===== END PAGE BODY ===== -->
+    </div>
+    <!-- ===== END BACKGROUND WRAPPER ===== -->
 </body>
 </html>

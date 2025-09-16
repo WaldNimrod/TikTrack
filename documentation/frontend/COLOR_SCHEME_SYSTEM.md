@@ -431,7 +431,7 @@ updateEntityColors({
 
 ### דף דוגמאות מקיף
 - **דף דוגמאות**: `trading-ui/color-scheme-examples.html`
-- **דף בדיקות מספרים**: `trading-ui/numeric-value-colors-demo.html`
+- **דף בדיקות מספרים**: `trading-ui/dynamic-colors-display.html`
 
 ### עמודים עם מערכת צבעים מלאה
 - **התראות**: `trading-ui/alerts.html` (כתום #ff9c05)

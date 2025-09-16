@@ -90,7 +90,7 @@
                 <div class="top-section">
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-                        <h1>🔧 בדיקת ראש הדף - כותרת סקשן עליון</h1>
+                        <h1>🔧 בדיקת ראש הדף</h1>
                         <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
@@ -157,7 +157,7 @@
                                         <h5>🔍 מצב פילטרים (Debug)</h5>
                                     </div>
                                     <div class="card-body">
-                                        <div id="filterDebugInfo" style="font-family: monospace; font-size: 11px; background: #f8f9fa; padding: 10px; border-radius: 5px; max-height: 200px; overflow-y: auto;">
+                                        <div id="filterDebugInfo" class="debug-info">
                                             <div><strong>Time:</strong> <span id="currentTime">-</span></div>
                                             <div><strong>Status:</strong> <span id="statusDebug">-</span></div>
                                             <div><strong>Type:</strong> <span id="typeDebug">-</span></div>
@@ -183,14 +183,14 @@
                 <div class="content-section" id="section1">
                     <div class="section-header entity-test-sub-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-                        <h2>📊 סקשן 1 - כותרת סקשן 1</h2>
+                        <h2>📊 טבלת ביצועים</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
-                        <div class="table-responsive" id="tickersContainer" style="overflow-x: auto;">
-                            <table id="tickersTable" class="table" data-table-type="tickers" style="width: 100%; table-layout: auto; min-width: 800px;">
+                        <div class="table-responsive" id="tickersContainer">
+                            <table id="tickersTable" class="table" data-table-type="tickers">
                                 <colgroup>
                                     <!-- עמודות דינמיות - ללא רוחב קבוע -->
                                 </colgroup>
@@ -358,7 +358,7 @@
                 <div class="content-section" id="section2">
                     <div class="section-header entity-test-sub-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-                        <h2>🔍 סקשן 2 - כותרת סקשן 2</h2>
+                        <h2>🔍 מידע דיבאג</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
@@ -402,7 +402,7 @@
                 <div class="content-section" id="section3">
                     <div class="section-header entity-test-sub-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-                        <h2>⚙️ סקשן 3 - כותרת סקשן 3</h2>
+                        <h2>⚙️ כלי פיתוח</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>

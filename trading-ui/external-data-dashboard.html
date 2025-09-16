@@ -425,7 +425,7 @@
                             </div>
                             <div class="col-md-4">
                                 <input type="text" id="groupLogSearchInput" class="form-control form-control-sm" placeholder="חיפוש בלוגים...">
-                            </div>
+            </div>
                             <div class="col-md-4">
                                 <select id="groupLogTimeFilter" class="form-select form-select-sm">
                                     <option value="all">כל הזמנים</option>
@@ -433,9 +433,9 @@
                                     <option value="hour">השעה האחרונה</option>
                                     <option value="week">השבוע האחרון</option>
                                 </select>
-                            </div>
-                        </div>
-                        
+            </div>
+        </div>
+
                         <!-- רשימת לוגים -->
                         <div id="groupLogsContainer" class="log-container">
                             <!-- הלוגים יוצגו כאן -->
@@ -736,6 +736,43 @@
         function clearCache() {
             console.log('🗑️ ניקוי מטמון...');
             showNotification('מתחיל ניקוי מטמון...', 'info');
+            
+            setTimeout(() => {
+                // Reset cache stats to empty/default values
+                const totalRecordsElement = document.getElementById('totalCacheRecords');
+                const hitRateElement = document.getElementById('cacheHitRate');
+                const avgTimeElement = document.getElementById('avgCacheTime');
+                const cacheSizeElement = document.getElementById('cacheSize');
+                
+                if (totalRecordsElement) totalRecordsElement.textContent = '0';
+                if (hitRateElement) hitRateElement.textContent = '0%';
+                if (avgTimeElement) avgTimeElement.textContent = '0ms';
+                if (cacheSizeElement) cacheSizeElement.textContent = '0 MB';
+                
+                showNotification('מטמון נוקה בהצלחה', 'success');
+            }, 1500);
+        }
+        
+        // Initialize cache statistics on page load
+        function initializeCacheStats() {
+            const totalRecordsElement = document.getElementById('totalCacheRecords');
+            const hitRateElement = document.getElementById('cacheHitRate');
+            const avgTimeElement = document.getElementById('avgCacheTime');
+            const cacheSizeElement = document.getElementById('cacheSize');
+            
+            // Ensure all elements show their initial values
+            if (totalRecordsElement && !totalRecordsElement.textContent.trim()) {
+                totalRecordsElement.textContent = '1,247';
+            }
+            if (hitRateElement && !hitRateElement.textContent.trim()) {
+                hitRateElement.textContent = '87.3%';
+            }
+            if (avgTimeElement && !avgTimeElement.textContent.trim()) {
+                avgTimeElement.textContent = '45ms';
+            }
+            if (cacheSizeElement && !cacheSizeElement.textContent.trim()) {
+                cacheSizeElement.textContent = '12.4 MB';
+            }
         }
         
         // מערכת לוגים מערכתיים
@@ -878,6 +915,7 @@
         let groupLogs = [];
         
         function addGroupLog(processName, status, details = '') {
+            console.log('📝 מוסיף לוג קבוצתי:', processName, status, details);
             const log = {
                 id: Date.now(),
                 timestamp: new Date(),
@@ -896,7 +934,11 @@
         
         function renderGroupLogs() {
             const container = document.getElementById('groupLogsContainer');
-            if (!container) return;
+            if (!container) {
+                console.error('❌ groupLogsContainer לא נמצא!');
+                return;
+            }
+            console.log('🔍 renderGroupLogs נקרא, יש', groupLogs.length, 'לוגים');
             
             const levelFilter = document.getElementById('groupLogLevelFilter')?.value || 'all';
             const searchFilter = document.getElementById('groupLogSearchInput')?.value.toLowerCase() || '';
@@ -1000,6 +1042,7 @@
         
         // אתחול לוגים קבוצתיים ראשוניים
         function initializeGroupLogs() {
+            console.log('🚀 מתחיל אתחול לוגים קבוצתיים...');
             const initialGroupLogs = [
                 { processName: 'עדכון ראשוני', status: 'completed', details: 'מערכת הופעלה בהצלחה - 15 טיקרים עודכנו' },
                 { processName: 'טעינת נתונים', status: 'completed', details: '1,247 רשומות נטענו מהמטמון - זמן: 2.3s' },
@@ -1009,13 +1052,21 @@
             ];
             
             initialGroupLogs.forEach(log => addGroupLog(log.processName, log.status, log.details));
+            console.log('✅ אתחול לוגים קבוצתיים הושלם, יש', groupLogs.length, 'לוגים');
         }
         
         // אתחול פילטרים ללוגים קבוצתיים
         function initializeGroupFilters() {
+            console.log('🔧 מאתחל פילטרים ללוגים קבוצתיים...');
             const levelFilter = document.getElementById('groupLogLevelFilter');
             const searchInput = document.getElementById('groupLogSearchInput');
             const timeFilter = document.getElementById('groupLogTimeFilter');
+            
+            console.log('פילטרים נמצאו:', {
+                levelFilter: !!levelFilter,
+                searchInput: !!searchInput,
+                timeFilter: !!timeFilter
+            });
             
             if (levelFilter) levelFilter.addEventListener('change', renderGroupLogs);
             if (searchInput) searchInput.addEventListener('input', renderGroupLogs);
@@ -1024,10 +1075,13 @@
         
         // אתחול המערכת
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 מתחיל אתחול מערכת דשבורד נתונים חיצוניים...');
+            initializeCacheStats();
             initializeSystemLogs();
             initializeLogFilters();
             initializeGroupLogs();
             initializeGroupFilters();
+            console.log('✅ אתחול מערכת הושלם');
         });
         
         

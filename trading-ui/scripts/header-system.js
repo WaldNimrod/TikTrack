@@ -714,7 +714,7 @@ class HeaderSystem {
                           <a class="tiktrack-dropdown-item" href="#">🎨 ממשק משתמש</a>
                           <ul class="level3-submenu">
                             <li><a class="tiktrack-dropdown-item" href="/style_demonstration">הדגמת סגנונות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/numeric-value-colors-demo">הדגמת צבעים לערכים מספריים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/dynamic-colors-display">תצוגת מערכת צבעים דינמית</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/designs">עיצובים</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">מיפוי סקריפטים</a></li>

@@ -33,12 +33,14 @@ window.autoSavePreference = async function(key, value) {
     currentPrefs[key] = value;
     localStorage.setItem('tikTrack_preferences', JSON.stringify(currentPrefs));
     
-    // Show success notification
-    if (typeof window.showSuccessNotification === 'function') {
-      window.showSuccessNotification('נשמר', `${key} נשמר בהצלחה`);
-    }
+    // לא מציגים הודעה על כל שמירה - זה מטריד את המשתמש
+    // רק בלוג לקונסול
+    console.log(`✅ ${key} saved to localStorage`);
     
-    // Try to save to server (optional)
+    // Mark as unsaved (needs database save)
+    window.markAsUnsaved();
+    
+    // Try to save to server (mandatory)
     try {
       const response = await fetch('/api/v1/preferences/user', {
         method: 'POST',
@@ -49,12 +51,19 @@ window.autoSavePreference = async function(key, value) {
       });
       
       if (response.ok) {
-        console.log(`✅ ${key} saved to server`);
+        const result = await response.json();
+        console.log(`✅ ${key} saved to database:`, result);
       } else {
-        console.log(`⚠️ ${key} saved locally only`);
+        console.error(`❌ Failed to save ${key} to database:`, response.status);
+        if (typeof window.showErrorNotification === 'function') {
+          window.showErrorNotification('שגיאה', `שגיאה בשמירת ${key} לבסיס הנתונים`);
+        }
       }
     } catch (apiError) {
-      console.log(`⚠️ ${key} saved locally only (server error)`);
+      console.error(`❌ Server error saving ${key}:`, apiError);
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה', `שגיאת שרת בשמירת ${key}`);
+      }
     }
     
   } catch (error) {
@@ -86,9 +95,7 @@ window.loadPreferences = function() {
       });
       
       console.log('✅ Preferences loaded successfully');
-      if (typeof window.showInfoNotification === 'function') {
-        window.showInfoNotification('נטען', 'הגדרות נטענו מהזיכרון המקומי');
-      }
+      // לא מציגים הודעה - זה מטריד את המשתמש
       return true;
     }
   } catch (error) {
@@ -179,6 +186,142 @@ window.openColorPicker = function(colorId) {
   }
 };
 
+// Save all preferences to database
+window.saveAllPreferences = async function() {
+  try {
+    console.log('💾 Saving all preferences to database...');
+    
+    // Get all current preferences from localStorage
+    const currentPrefs = JSON.parse(localStorage.getItem('tikTrack_preferences') || '{}');
+    
+    if (Object.keys(currentPrefs).length === 0) {
+      if (typeof window.showWarningNotification === 'function') {
+        window.showWarningNotification('אזהרה', 'אין הגדרות לשמירה');
+      }
+      return;
+    }
+    
+    // Save to server
+    const response = await fetch('/api/v1/preferences/user', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(currentPrefs)
+    });
+    
+    if (response.ok) {
+      const result = await response.json();
+      console.log('✅ All preferences saved to database:', result);
+      
+      // Mark as saved
+      window.markAsSaved();
+      
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('נשמר', 'כל ההגדרות נשמרו בהצלחה לבסיס הנתונים');
+      }
+    } else {
+      console.error('❌ Failed to save preferences to database:', response.status);
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה', 'שגיאה בשמירת ההגדרות לבסיס הנתונים');
+      }
+    }
+  } catch (error) {
+    console.error('❌ Error saving all preferences:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה בשמירת ההגדרות');
+    }
+  }
+};
+
+// Reset to defaults
+window.resetToDefaults = function() {
+  if (confirm('האם אתה בטוח שברצונך לאפס את כל ההגדרות לברירות המחדל?')) {
+    console.log('🔄 Resetting to defaults...');
+    
+    // Clear localStorage
+    localStorage.removeItem('tikTrack_preferences');
+    
+    // Set defaults
+    window.setDefaults();
+    
+    if (typeof window.showInfoNotification === 'function') {
+      window.showInfoNotification('אופס', 'ההגדרות אופסו לברירות המחדל');
+    }
+  }
+};
+
+// Export preferences
+window.exportPreferences = function() {
+  try {
+    const currentPrefs = JSON.parse(localStorage.getItem('tikTrack_preferences') || '{}');
+    
+    if (Object.keys(currentPrefs).length === 0) {
+      if (typeof window.showWarningNotification === 'function') {
+        window.showWarningNotification('אזהרה', 'אין הגדרות לייצוא');
+      }
+      return;
+    }
+    
+    // Create download
+    const dataStr = JSON.stringify(currentPrefs, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(dataBlob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `tiktrack-preferences-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    
+    URL.revokeObjectURL(url);
+    
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification('ייצא', 'ההגדרות יוצאו בהצלחה');
+    }
+  } catch (error) {
+    console.error('❌ Error exporting preferences:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה בייצוא ההגדרות');
+    }
+  }
+};
+
+// Track unsaved changes
+let hasUnsavedChanges = false;
+
+// Add beforeunload event listener
+window.addEventListener('beforeunload', function(e) {
+  if (hasUnsavedChanges) {
+    e.preventDefault();
+    e.returnValue = 'יש לך שינויים לא נשמרים. האם אתה בטוח שברצונך לעזוב?';
+    return e.returnValue;
+  }
+});
+
+// Mark as unsaved when changes are made
+window.markAsUnsaved = function() {
+  hasUnsavedChanges = true;
+  // Update save button appearance
+  const saveButtons = document.querySelectorAll('#saveAllBtn, #saveAllBtnBottom');
+  saveButtons.forEach(btn => {
+    btn.classList.add('btn-warning');
+    btn.classList.remove('btn-success');
+    btn.innerHTML = '<i class="bi bi-exclamation-triangle"></i> שמור שינויים';
+  });
+};
+
+// Mark as saved when saved
+window.markAsSaved = function() {
+  hasUnsavedChanges = false;
+  // Update save button appearance
+  const saveButtons = document.querySelectorAll('#saveAllBtn, #saveAllBtnBottom');
+  saveButtons.forEach(btn => {
+    btn.classList.add('btn-success');
+    btn.classList.remove('btn-warning');
+    btn.innerHTML = '<i class="bi bi-save"></i> שמור הכל';
+  });
+};
+
 // Initialize preferences page
 window.initializePreferencesPage = function() {
   console.log('🚀 Initializing preferences page');
@@ -192,6 +335,9 @@ window.initializePreferencesPage = function() {
   
   // Setup auto-save
   window.setupAutoSave();
+  
+  // Mark as saved initially
+  window.markAsSaved();
   
   console.log('✅ Preferences page initialized');
 };

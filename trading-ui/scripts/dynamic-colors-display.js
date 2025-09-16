@@ -1,10 +1,10 @@
 /**
- * Numeric Value Colors Demo Page Script
+ * Dynamic Colors Display Page Script
  * Handles content injection into locked template sections
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== Numeric Value Colors Demo Page Loaded ===');
+    console.log('=== Dynamic Colors Display Page Loaded ===');
 
     // Initialize color scheme system
     if (window.generateNumericValueCSS) {
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /**
- * Inject content into Section 1 (Numeric Values)
+ * Inject content into Section 1 (Dynamic Colors - Numeric Values)
  */
 function injectSection1Content() {
     const sectionContent = `

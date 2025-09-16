@@ -116,7 +116,7 @@ if (typeof window.showSuccessNotification === 'function') {
 - `/notifications-center` - מרכז התראות
 - `/background-tasks` - משימות ברקע
 - `/style_demonstration` - הדגמת סגנונות
-- `/numeric-value-colors-demo` - הדגמת צבעים
+- `/dynamic-colors-display` - תצוגת צבעים דינמית
 - `/test-header-only` - בדיקת כותרת
 - `/designs` - עיצובים
 - `/page-scripts-matrix` - מיפוי סקריפטים

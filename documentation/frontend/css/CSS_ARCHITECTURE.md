@@ -135,7 +135,7 @@ trading-ui/styles-new/
 - ✅ system-management.html
 - ✅ css-management.html
 - ✅ designs.html
-- ✅ numeric-value-colors-demo.html
+- ✅ dynamic-colors-display.html
 - ✅ test-header-only.html
 - ✅ style_demonstration.html
 

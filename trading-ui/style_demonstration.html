@@ -81,15 +81,11 @@
 </head>
 
 <body>
-    <!-- General background -->
-    <div class="background-wrapper">
         <!-- Unified Header Container -->
         <div id="unified-header"></div>
 
-        <!-- Page body - All content after header -->
-        <div class="page-body">
-            <!-- Main content wrapper -->
-            <div class="main-content">
+    <!-- Main content wrapper -->
+    <div class="main-content">
             <!-- Style Controls Section -->
             <div class="top-section" id="styleControlsSection">
                 <!-- Style Controls header -->
@@ -402,7 +398,7 @@
                         </div>
                         <div class="table-count">טבלאות לדוגמה</div>
                         <div class="table-actions">
-                            <button class="filter-toggle-btn" onclick="toggleMainSection7()"
+                            <button class="filter-toggle-btn" onclick="toggleSection('stylesTestSection1')"
                                 title="הצג/הסתר אזור בדיקה">
                                 <span class="filter-icon">▲</span>
                             </button>
@@ -733,31 +729,7 @@
                     </div>
                 </div>
 
-                <!-- Styles Test Section 2 -->
-                <div class="content-section" id="stylesTestSection2">
-                    <!-- Styles Test header -->
-                    <div class="section-header">
-                        <div class="table-title">
-                            <img src="images/icons/home.svg" alt="סגנונות"
-                                class="section-icon">
-                            עצירת סגנונות
-                        </div>
-                        <div class="table-count">ניהול קבצי CSS</div>
-                        <div class="table-actions">
-                            <button class="filter-toggle-btn" onclick="toggleMainSection2()"
-                                title="הצג/הסתר אזור בדיקה">
-                                <span class="filter-icon">▲</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Styles Test body -->
-                    <div class="section-body">
-                        <div class="styles-test-container">
-                            <!-- תוכן יוכנס כאן בהמשך -->
-                        </div>
-                    </div>
-                </div>
+                <!-- REMOVED: Styles Test Section 2 - "עצירת סגנונות" - מיותר -->
 
                 <!-- Typography Section -->
                 <div class="content-section" id="typographySection">
@@ -770,7 +742,7 @@
                         </div>
                         <div class="table-count">כותרות וטקסט</div>
                         <div class="table-actions">
-                            <button class="filter-toggle-btn" onclick="toggleTypographySection()"
+                            <button class="filter-toggle-btn" onclick="toggleSection("typographySection")"
                                 title="הצג/הסתר סקשן טיפוגרפיה">
                                 <span class="filter-icon">▲</span>
                             </button>
@@ -799,8 +771,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
             </div>
 
             <!-- Styles Test Section 3 -->
@@ -814,7 +784,7 @@
                     </div>
                     <div class="table-count">כפתורים שונים</div>
                     <div class="table-actions">
-                        <button class="filter-toggle-btn" onclick="toggleMainSection3()" title="הצג/הסתר אזור בדיקה">
+                        <button class="filter-toggle-btn" onclick="toggleSection("stylesTestSection3")" title="הצג/הסתר אזור בדיקה">
                             <span class="filter-icon">▲</span>
                         </button>
                     </div>
@@ -875,7 +845,7 @@
                     </div>
                     <div class="table-count">טפסים וטבלאות</div>
                     <div class="table-actions">
-                        <button class="filter-toggle-btn" onclick="toggleMainSection4()" title="הצג/הסתר אזור בדיקה">
+                        <button class="filter-toggle-btn" onclick="toggleSection("stylesTestSection4")" title="הצג/הסתר אזור בדיקה">
                             <span class="filter-icon">▲</span>
                         </button>
                     </div>
@@ -1001,7 +971,7 @@
                     </div>
                     <div class="table-count">אלמנטים נוספים</div>
                     <div class="table-actions">
-                        <button class="filter-toggle-btn" onclick="toggleMainSection5()" title="הצג/הסתר אזור בדיקה">
+                        <button class="filter-toggle-btn" onclick="toggleSection("stylesTestSection5")" title="הצג/הסתר אזור בדיקה">
                             <span class="filter-icon">▲</span>
                         </button>
                     </div>
@@ -1105,7 +1075,7 @@
                     </div>
                     <div class="table-count">התראות וכרטיסיות</div>
                     <div class="table-actions">
-                        <button class="filter-toggle-btn" onclick="toggleMainSection6()" title="הצג/הסתר אזור בדיקה">
+                        <button class="filter-toggle-btn" onclick="toggleSection("stylesTestSection6")" title="הצג/הסתר אזור בדיקה">
                             <span class="filter-icon">▲</span>
                         </button>
                     </div>
@@ -1192,7 +1162,7 @@
                     </div>
                     <div class="table-count">בקרת קבצי CSS</div>
                     <div class="table-actions">
-                        <button class="filter-toggle-btn" onclick="toggleMainSection8()" title="הצג/הסתר אזור בדיקה">
+                        <button class="filter-toggle-btn" onclick="toggleSection("stylesTestSection8")" title="הצג/הסתר אזור בדיקה">
                             <span class="filter-icon">▲</span>
                         </button>
                     </div>
@@ -1392,7 +1362,7 @@
                     </div>
                     <div class="table-count">תגיות וסטטוסים</div>
                     <div class="table-actions">
-                        <button class="filter-toggle-btn" onclick="toggleMainSection9()" title="הצג/הסתר אזור בדיקה">
+                        <button class="filter-toggle-btn" onclick="toggleSection("stylesTestSection9")" title="הצג/הסתר אזור בדיקה">
                             <span class="filter-icon">▲</span>
                         </button>
                     </div>
@@ -1480,7 +1450,7 @@
                     </div>
                     <div class="table-count">אלמנטים מתקדמים</div>
                     <div class="table-actions">
-                        <button class="filter-toggle-btn" onclick="toggleMainSection10()" title="הצג/הסתר אזור בדיקה">
+                        <button class="filter-toggle-btn" onclick="toggleSection("stylesTestSection10")" title="הצג/הסתר אזור בדיקה">
                             <span class="filter-icon">▲</span>
                         </button>
                     </div>
@@ -1609,7 +1579,7 @@
                     </div>
                     <div class="table-count">מערכת צבעים מהעדפות</div>
                     <div class="table-actions">
-                        <button class="filter-toggle-btn" onclick="toggleDynamicColorsSection()" title="הצג/הסתר צבעים דינמיים">
+                        <button class="filter-toggle-btn" onclick="toggleSection("dynamicColorsSection")" title="הצג/הסתר צבעים דינמיים">
                             <span class="filter-icon">▲</span>
                         </button>
                     </div>
@@ -1748,9 +1718,7 @@
 
 
     
-            </div> <!-- End main-content -->
-        </div> <!-- End page-body -->
-    </div> <!-- End background-wrapper -->
+    </div> <!-- End main-content -->
 
     <!-- Global UI Utilities -->
     <script src="scripts/ui-utils.js?v=v1.0.0"></script>

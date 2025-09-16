@@ -213,11 +213,8 @@ function updateChart() {
         qualityChart.data.datasets[1].data = newData.errors;
         qualityChart.data.datasets[2].data = newData.warnings;
         qualityChart.update();
-        addLogEntry('INFO', 'גרף עודכן עם נתונים חדשים');
-        // Use direct call to avoid recursion
-        if (typeof window.showInfoNotification === 'function') {
-            window.showInfoNotification('גרף עודכן', 'הגרף עודכן עם הנתונים העדכניים');
-        }
+        // Only log to console, no notifications to avoid spam
+        console.log('📊 Chart updated with new data');
     }
 }
 
@@ -612,11 +609,25 @@ function startAutoRefresh() {
     if (autoRefreshInterval) {
         clearInterval(autoRefreshInterval);
     }
+
+    // Get refresh interval from settings (in minutes, convert to milliseconds)
+    const intervalMinutes = parseInt(document.getElementById('refreshInterval')?.value) || 2;
+    const intervalMs = intervalMinutes * 60 * 1000;
+
+    // Update the display
+    const currentIntervalDisplay = document.getElementById('currentInterval');
+    if (currentIntervalDisplay) {
+        currentIntervalDisplay.textContent = intervalMinutes;
+    }
+
     autoRefreshInterval = setInterval(() => {
         if (isAutoRefreshActive) {
-            loadInitialData();
+            // Only update statistics and logs, not chart every time
+            updateStatisticsDisplay();
+            loadLogs();
+            console.log('🔄 Auto refresh: updated stats and logs');
         }
-    }, 30000);
+    }, intervalMs);
 }
 
 // Initialize control buttons
@@ -854,6 +865,64 @@ function copyDetailedLog() {
 
     addLogEntry('INFO', 'לוג אבחון הועתק');
 }
+
+// Monitoring control functions
+window.startMonitoring = () => {
+    console.log('▶️ Starting monitoring...');
+    isAutoRefreshActive = true;
+    startAutoRefresh();
+
+    // Update button states
+    const startBtn = document.getElementById('startMonitoringBtn');
+    const stopBtn = document.getElementById('stopMonitoringBtn');
+
+    if (startBtn) startBtn.disabled = true;
+    if (stopBtn) stopBtn.disabled = false;
+
+    // Show notification
+    if (typeof window.showSuccessNotification === 'function') {
+        const interval = document.getElementById('refreshInterval')?.value || 2;
+        window.showSuccessNotification('ניטור התחיל', `הניטור יתעדכן כל ${interval} דקות`);
+    }
+};
+
+window.stopMonitoring = () => {
+    console.log('⏹️ Stopping monitoring...');
+    isAutoRefreshActive = false;
+
+    if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+    }
+
+    // Update button states
+    const startBtn = document.getElementById('startMonitoringBtn');
+    const stopBtn = document.getElementById('stopMonitoringBtn');
+
+    if (startBtn) startBtn.disabled = false;
+    if (stopBtn) stopBtn.disabled = true;
+
+    // Show notification
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('ניטור נעצר', 'הניטור האוטומטי הופסק');
+    }
+};
+
+// Handle refresh interval changes
+document.addEventListener('DOMContentLoaded', function() {
+    const refreshIntervalInput = document.getElementById('refreshInterval');
+    if (refreshIntervalInput) {
+        refreshIntervalInput.addEventListener('change', function() {
+            if (isAutoRefreshActive) {
+                // Restart with new interval
+                startAutoRefresh();
+                if (typeof window.showInfoNotification === 'function') {
+                    window.showInfoNotification('קצב ניטור עודכן', `הניטור יתעדכן כל ${this.value} דקות`);
+                }
+            }
+        });
+    }
+});
 
 // Global functions
 window.copyDetailedLog = copyDetailedLog;

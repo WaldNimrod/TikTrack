@@ -56,7 +56,6 @@
                         <div class="page-header d-flex justify-content-between align-items-center">
           <div>
                                 <h1>⚙️ העדפות</h1>
-                                <p>ניהול הגדרות המערכת והעדפות המשתמש</p>
           </div>
                             <div class="d-flex gap-2">
                                 <button class="btn btn-success" onclick="window.saveAllPreferences()" id="saveAllBtn">
@@ -65,12 +64,9 @@
                                 <button class="btn btn-warning" onclick="window.resetToDefaults()" id="resetBtn">
                                     <i class="bi bi-arrow-clockwise"></i> איפוס
                                 </button>
-                                <button class="toggle-all-btn" onclick="window.toggleAllSections()" id="toggleAllBtn">
-                                    <i class="bi bi-arrows-expand"></i> פתח הכל
+                                <button class="btn btn-outline-secondary" onclick="window.toggleAllSections()" id="toggleAllBtn">
+                                    <i class="bi bi-arrows-expand"></i> פתח/סגור הכל
                                 </button>
-                                <div class="auto-save-indicator">
-                                    <i class="bi bi-check-circle text-success"></i> שמירה אוטומטית
-                                </div>
                             </div>
         </div>
       </div>
@@ -80,11 +76,10 @@
                 <div class="content-section" id="section1">
                     <div class="section-header">
                         <h2>👤 ניהול פרופילים</h2>
-                        <p>ניהול פרופילי הגדרות שונים</p>
                         <button class="filter-toggle-btn" onclick="window.toggleSection('section1')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
-          </button>
-        </div>
+                        </button>
+                    </div>
                     <div class="section-body">
                         <div class="row">
                             <div class="col-md-6">
@@ -133,7 +128,6 @@
                 <div class="content-section" id="section2">
         <div class="section-header">
                         <h2>🏦 הגדרות בסיסיות</h2>
-                        <p>הגדרות כלליות למערכת</p>
                         <button class="filter-toggle-btn" onclick="window.toggleSection('section2')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
@@ -188,7 +182,6 @@
                 <div class="content-section" id="section3">
                     <div class="section-header">
                         <h2>📈 הגדרות מסחר</h2>
-                        <p>הגדרות ברירת מחדל למסחר</p>
                         <button class="filter-toggle-btn" onclick="window.toggleSection('section3')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
@@ -239,7 +232,6 @@
                 <div class="content-section" id="section4">
         <div class="section-header">
           <h2>🔍 פילטרים ברירת מחדל</h2>
-                        <p>פילטרים שיוחלו באופן אוטומטי</p>
                         <button class="filter-toggle-btn" onclick="window.toggleSection('section4')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
@@ -301,7 +293,6 @@
                 <div class="content-section" id="section5">
         <div class="section-header">
                         <h2>🎨 צבעים</h2>
-                        <p>הגדרות צבעים למערכת וממשק המשתמש</p>
                         <button class="filter-toggle-btn" onclick="window.toggleSection('section5')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
@@ -618,7 +609,6 @@
       <div class="content-section" id="section6">
         <div class="section-header">
                         <h2>⚙️ הגדרות מערכת ושרת</h2>
-                        <p>הגדרות טכניות ומערכת</p>
                         <button class="filter-toggle-btn" onclick="window.toggleSection('section6')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>

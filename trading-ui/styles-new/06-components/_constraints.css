@@ -1,0 +1,430 @@
+/**
+ * Constraints Monitor Styles
+ * סגנונות למוניטור אילוצים
+ * 
+ * @author TikTrack Development Team
+ * @version 1.0.0
+ * @since 2025-01-15
+ */
+
+/* ===== CONSTRAINTS MONITOR LAYOUT ===== */
+.constraints-monitor-container {
+    padding: 1rem 0;
+}
+
+/* ===== FILTER CONTROLS ===== */
+.filter-controls {
+    background: var(--bs-light);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--bs-border-color);
+}
+
+.filter-controls .form-select,
+.filter-controls .form-control {
+    border-radius: 0.375rem;
+    border: 1px solid var(--bs-border-color);
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.filter-controls .form-select:focus,
+.filter-controls .form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* ===== LAYER TOGGLES ===== */
+.layer-toggle {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    background: var(--bs-light);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.375rem;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.layer-toggle:hover {
+    background: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary);
+}
+
+.layer-toggle.active {
+    background: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary);
+}
+
+/* ===== CONSTRAINT CARDS ===== */
+.constraint-card {
+    background: white;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.15s ease-in-out;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.constraint-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.constraint-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--bs-border-color);
+}
+
+.constraint-name {
+    font-weight: 600;
+    color: var(--bs-dark);
+    font-size: 1rem;
+}
+
+.constraint-type-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+}
+
+.table-constraint-count {
+    background: var(--bs-primary);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* ===== CONSTRAINT DETAILS ===== */
+.constraint-details {
+    font-size: 0.875rem;
+    color: var(--bs-secondary);
+}
+
+.constraint-details div {
+    margin-bottom: 0.25rem;
+}
+
+.constraint-details strong {
+    color: var(--bs-dark);
+    font-weight: 600;
+}
+
+/* ===== BADGE STYLES ===== */
+.badge-enum {
+    background-color: var(--bs-primary) !important;
+    color: white !important;
+}
+
+.badge-not-null {
+    background-color: var(--bs-warning) !important;
+    color: var(--bs-dark) !important;
+}
+
+.badge-foreign-key {
+    background-color: var(--bs-info) !important;
+    color: white !important;
+}
+
+.badge-unique {
+    background-color: var(--bs-success) !important;
+    color: white !important;
+}
+
+.badge-range {
+    background-color: var(--bs-secondary) !important;
+    color: white !important;
+}
+
+/* ===== TABLE CONSTRAINTS SECTIONS ===== */
+.table-constraints-section {
+    margin-bottom: 2rem;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--bs-light);
+    border-radius: 0.5rem 0.5rem 0 0;
+    border: 1px solid var(--bs-border-color);
+    border-bottom: none;
+    font-weight: 600;
+    color: var(--bs-dark);
+}
+
+.table-header span:first-child {
+    font-size: 1.1rem;
+}
+
+/* ===== CONSTRAINT GRID ===== */
+.constraint-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    background: white;
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0 0 0.5rem 0.5rem;
+}
+
+/* ===== CONSTRAINTS TABLE ===== */
+#constraints-table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+#constraints-table th:nth-child(1),
+#constraints-table td:nth-child(1) {
+    width: 18%; /* שם אילוץ */
+}
+
+#constraints-table th:nth-child(2),
+#constraints-table td:nth-child(2) {
+    width: 13%; /* טבלה */
+}
+
+#constraints-table th:nth-child(3),
+#constraints-table td:nth-child(3) {
+    width: 13%; /* עמודה */
+}
+
+#constraints-table th:nth-child(4),
+#constraints-table td:nth-child(4) {
+    width: 10%; /* סוג */
+}
+
+#constraints-table th:nth-child(5),
+#constraints-table td:nth-child(5) {
+    width: 22%; /* הגדרה */
+}
+
+#constraints-table th:nth-child(6),
+#constraints-table td:nth-child(6) {
+    width: 6%; /* פעיל */
+}
+
+#constraints-table th:nth-child(7),
+#constraints-table td:nth-child(7) {
+    width: 18%; /* פעולות */
+}
+
+/* ===== TABLE CELL CONTENT ===== */
+#constraints-table td {
+    vertical-align: middle;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+#constraints-table td:nth-child(5) {
+    font-size: 0.85rem;
+    line-height: 1.3;
+}
+
+#constraints-table .btn-group {
+    display: flex;
+    gap: 2px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#constraints-table .btn-group .btn {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.7rem;
+    min-width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== LOADING SPINNER ===== */
+.loading-spinner {
+    text-align: center;
+    padding: 2rem;
+    color: var(--bs-secondary);
+}
+
+.loading-spinner i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--bs-primary);
+}
+
+/* ===== MESSAGES ===== */
+.error-message {
+    background: var(--bs-danger);
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.success-message {
+    background: var(--bs-success);
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 1400px) {
+    #constraints-table {
+        min-width: 1200px;
+    }
+    
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+@media (max-width: 768px) {
+    .constraint-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-controls {
+        padding: 0.75rem;
+    }
+    
+    .layer-toggle {
+        display: block;
+        margin: 0.25rem 0;
+        text-align: center;
+    }
+    
+    .constraint-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .table-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    #constraints-table {
+        min-width: 1000px;
+    }
+    
+    #constraints-table .btn-group {
+        flex-direction: column;
+        gap: 1px;
+    }
+    
+    #constraints-table .btn-group .btn {
+        min-width: 24px;
+        height: 24px;
+        font-size: 0.6rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .constraint-card {
+        padding: 0.75rem;
+    }
+    
+    .constraint-name {
+        font-size: 0.9rem;
+    }
+    
+    .constraint-details {
+        font-size: 0.8rem;
+    }
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+@media (prefers-color-scheme: dark) {
+    .constraint-card {
+        background: var(--bs-dark);
+        border-color: var(--bs-border-color);
+        color: var(--bs-light);
+    }
+    
+    .constraint-name {
+        color: var(--bs-light);
+    }
+    
+    .constraint-details strong {
+        color: var(--bs-light);
+    }
+    
+    .filter-controls {
+        background: var(--bs-dark);
+        border-color: var(--bs-border-color);
+    }
+    
+    .table-header {
+        background: var(--bs-dark);
+        border-color: var(--bs-border-color);
+        color: var(--bs-light);
+    }
+    
+    .constraint-grid {
+        background: var(--bs-dark);
+        border-color: var(--bs-border-color);
+    }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.constraint-card {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* ===== ACCESSIBILITY ===== */
+.constraint-card:focus-within {
+    outline: 2px solid var(--bs-primary);
+    outline-offset: 2px;
+}
+
+.layer-toggle:focus {
+    outline: 2px solid var(--bs-primary);
+    outline-offset: 2px;
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+    .filter-controls,
+    .layer-toggle,
+    .btn {
+        display: none !important;
+    }
+    
+    .constraint-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+    
+    .constraint-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -19,6 +19,19 @@
   ========================================
 -->
 <html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת סגנונות - TikTrack</title>
+    
+    <!--
+    ========================================
+    כללי פיתוח - Development Rules
+    ========================================
+    CSS: רק קבצים חיצוניים משותפים, לפי ארכיטקטורת CSS. ללא inline או סגנונות ספציפיים לעמוד.
+    JS: כל הפונקציות בקבצים חיצוניים. ללא פונקציות בתוך העמוד. כל מערכות האתר משתמשות בפונקציות גלובליות משותפות. פונקציות ספציפיות לעמוד צריכות להיות מרוכזות בקובץ הסקריפט המיועד לעמוד.
+    ========================================
+    -->
 
             <!-- ===== CSS Architecture - Unified CSS ===== -->
     <!-- Google Fonts -->
@@ -64,7 +77,8 @@
     <script src="scripts/error-handlers.js"></script>
     
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_dropdown_fix"></head>
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_dropdown_fix">
+</head>
 
 <body class="styles-test-page">
     <!-- General background -->
@@ -72,22 +86,21 @@
         <!-- Unified Header Container -->
         <div id="unified-header"></div>
 
-        <!-- unified-header ייווצר כאן אוטומטית -->
-
         <!-- Page body - All content after header -->
         <div class="page-body">
+            <!-- Main content wrapper -->
+            <div class="main-content">
             <!-- Style Controls Section -->
             <div class="top-section" id="styleControlsSection">
                 <!-- Style Controls header -->
                 <div class="section-header">
                     <div class="table-title">
-                        <img src="images/icons/home.svg" alt="הגדרות"
-                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                        <img src="images/icons/home.svg" alt="הגדרות" class="section-icon">
                         בקרת שכבות סגנונות
                     </div>
                     <div class="table-count">הדלקה וכיבוי של שכבות CSS</div>
                     <div class="table-actions">
-                        <button class="filter-toggle-btn" onclick="toggleStyleControlsSection()" title="הצג/הסתר בקרת סגנונות">
+                        <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
                             <span class="filter-icon">▲</span>
                         </button>
                     </div>
@@ -96,53 +109,278 @@
                 <!-- CSS Controls body -->
                 <div class="section-body">
                     <div class="styles-test-container">
+                        <!-- בקרת שכבות שלמות -->
+                        <div class="row mb-4">
+                            <div class="col-12">
                         <div class="row">
-                            <div class="col-md-6">
-                                <h5>שכבות בסיסיות</h5>
+                                    <div class="col-md-4 mb-2">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-center">01-Settings</h6>
+                                                <button class="btn btn-primary btn-sm w-100 mb-3" onclick="toggleLayer('01-settings')">
+                                                    <i class="fas fa-cog"></i> הגדרות
+                                                </button>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="toggleBaseStyles" checked onchange="toggleStyleLayer('base')">
-                                    <label class="form-check-label" for="toggleBaseStyles">
-                                        סגנונות בסיסיים
+                                                    <input class="form-check-input" type="checkbox" id="toggleVariables" checked onchange="toggleStyleFile('01-settings/_variables.css')">
+                                                    <label class="form-check-label" for="toggleVariables">
+                                                        משתנים (Variables)
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="toggleLayoutStyles" checked onchange="toggleStyleLayer('layout')">
-                                    <label class="form-check-label" for="toggleLayoutStyles">
-                                        סגנונות פריסה
+                                                    <input class="form-check-input" type="checkbox" id="toggleColorsDynamic" checked onchange="toggleStyleFile('01-settings/_colors-dynamic.css')">
+                                                    <label class="form-check-label" for="toggleColorsDynamic">
+                                                        צבעים דינמיים
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="toggleComponentStyles" checked onchange="toggleStyleLayer('components')">
-                                    <label class="form-check-label" for="toggleComponentStyles">
-                                        רכיבים
+                                                    <input class="form-check-input" type="checkbox" id="toggleColorsSemantic" checked onchange="toggleStyleFile('01-settings/_colors-semantic.css')">
+                                                    <label class="form-check-label" for="toggleColorsSemantic">
+                                                        צבעים סמנטיים
                                     </label>
                                 </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="toggleSpacing" checked onchange="toggleStyleFile('01-settings/_spacing.css')">
+                                                    <label class="form-check-label" for="toggleSpacing">
+                                                        רווחים (Spacing)
+                                                    </label>
                             </div>
-                            <div class="col-md-6">
-                                <h5>שכבות מתקדמות</h5>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="toggleUtilityStyles" checked onchange="toggleStyleLayer('utilities')">
-                                    <label class="form-check-label" for="toggleUtilityStyles">
-                                        כלי עזר
+                                                    <input class="form-check-input" type="checkbox" id="toggleTypography" checked onchange="toggleStyleFile('01-settings/_typography.css')">
+                                                    <label class="form-check-label" for="toggleTypography">
+                                                        טיפוגרפיה
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="toggleThemeStyles" checked onchange="toggleStyleLayer('themes')">
-                                    <label class="form-check-label" for="toggleThemeStyles">
-                                        ערכות נושא
+                                                    <input class="form-check-input" type="checkbox" id="toggleRtlLogical" checked onchange="toggleStyleFile('01-settings/_rtl-logical.css')">
+                                                    <label class="form-check-label" for="toggleRtlLogical">
+                                                        RTL לוגי
                                     </label>
                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-center">02-Tools</h6>
+                                                <button class="btn btn-secondary btn-sm mb-3" onclick="toggleLayer('02-tools')">
+                                                    <i class="fas fa-tools"></i> כלים
+                                                </button>
+                                                <div class="alert alert-info alert-sm mb-0">
+                                                    <small>שכבה זו ריקה - אין קבצים להפעיל/לכבות</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-center">03-Generic</h6>
+                                                <button class="btn btn-info btn-sm w-100 mb-3" onclick="toggleLayer('03-generic')">
+                                                    <i class="fas fa-layer-group"></i> בסיסי
+                                                </button>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="toggleResponsiveStyles" checked onchange="toggleStyleLayer('responsive')">
-                                    <label class="form-check-label" for="toggleResponsiveStyles">
-                                        רספונסיביות
+                                                    <input class="form-check-input" type="checkbox" id="toggleReset" checked onchange="toggleStyleFile('03-generic/_reset.css')">
+                                                    <label class="form-check-label" for="toggleReset">
+                                                        Reset
                                     </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="toggleBase" checked onchange="toggleStyleFile('03-generic/_base.css')">
+                                                    <label class="form-check-label" for="toggleBase">
+                                                        Base
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-center">04-Elements</h6>
+                                                <button class="btn btn-warning btn-sm w-100 mb-3" onclick="toggleLayer('04-elements')">
+                                                    <i class="fas fa-tags"></i> אלמנטים
+                                                </button>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="toggleHeadings" checked onchange="toggleStyleFile('04-elements/_headings.css')">
+                                                    <label class="form-check-label" for="toggleHeadings">
+                                                        כותרות
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="toggleLinks" checked onchange="toggleStyleFile('04-elements/_links.css')">
+                                                    <label class="form-check-label" for="toggleLinks">
+                                                        קישורים
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="toggleFormsBase" checked onchange="toggleStyleFile('04-elements/_forms-base.css')">
+                                                    <label class="form-check-label" for="toggleFormsBase">
+                                                        טפסים בסיסיים
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="toggleButtonsBase" checked onchange="toggleStyleFile('04-elements/_buttons-base.css')">
+                                                    <label class="form-check-label" for="toggleButtonsBase">
+                                                        כפתורים בסיסיים
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-center">05-Objects</h6>
+                                                <button class="btn btn-success btn-sm w-100 mb-3" onclick="toggleLayer('05-objects')">
+                                                    <i class="fas fa-th"></i> אובייקטים
+                                                </button>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="toggleLayout" checked onchange="toggleStyleFile('05-objects/_layout.css')">
+                                                    <label class="form-check-label" for="toggleLayout">
+                                                        פריסה
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="toggleGrid" checked onchange="toggleStyleFile('05-objects/_grid.css')">
+                                                    <label class="form-check-label" for="toggleGrid">
+                                                        רשת
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 mb-2">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-center">06-Components</h6>
+                                                <button class="btn btn-danger btn-sm w-100 mb-3" onclick="toggleLayer('06-components')">
+                                                    <i class="fas fa-puzzle-piece"></i> רכיבים
+                                                </button>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="toggleButtonsAdvanced" checked onchange="toggleStyleFile('06-components/_buttons-advanced.css')">
+                                                    <label class="form-check-label" for="toggleButtonsAdvanced">
+                                                        כפתורים מתקדמים
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="toggleTables" checked onchange="toggleStyleFile('06-components/_tables.css')">
+                                                    <label class="form-check-label" for="toggleTables">
+                                                        טבלאות
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="toggleCards" checked onchange="toggleStyleFile('06-components/_cards.css')">
+                                                    <label class="form-check-label" for="toggleCards">
+                                                        כרטיסים
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="toggleModals" checked onchange="toggleStyleFile('06-components/_modals.css')">
+                                                    <label class="form-check-label" for="toggleModals">
+                                                        חלונות מודל
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="toggleNotifications" checked onchange="toggleStyleFile('06-components/_notifications.css')">
+                                                    <label class="form-check-label" for="toggleNotifications">
+                                                        התראות
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="toggleNavigation" checked onchange="toggleStyleFile('06-components/_navigation.css')">
+                                                    <label class="form-check-label" for="toggleNavigation">
+                                                        ניווט
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="toggleFormsAdvanced" checked onchange="toggleStyleFile('06-components/_forms-advanced.css')">
+                                                    <label class="form-check-label" for="toggleFormsAdvanced">
+                                                        טפסים מתקדמים
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="toggleBadgesStatus" checked onchange="toggleStyleFile('06-components/_badges-status.css')">
+                                                    <label class="form-check-label" for="toggleBadgesStatus">
+                                                        תגי סטטוס
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="toggleEntityColors" checked onchange="toggleStyleFile('06-components/_entity-colors.css')">
+                                                    <label class="form-check-label" for="toggleEntityColors">
+                                                        צבעי ישויות
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- קבצים מיוחדים -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h5>קבצים מיוחדים</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="toggleHeaderStyles" checked onchange="toggleStyleFile('header-styles.css')">
+                                            <label class="form-check-label" for="toggleHeaderStyles">
+                                                סגנונות כותרת
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="toggleBootstrap" checked onchange="toggleStyleFile('bootstrap')">
+                                            <label class="form-check-label" for="toggleBootstrap">
+                                                Bootstrap Framework
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-
+                        <!-- בקרות נוספות -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <button class="btn btn-primary btn-sm" onclick="enableAllStyles()">
+                                        <i class="fas fa-check"></i> הפעל הכל
+                                    </button>
+                                    <button class="btn btn-secondary btn-sm" onclick="disableAllStyles()">
+                                        <i class="fas fa-times"></i> כבה הכל
+                                    </button>
+                                    <button class="btn btn-info btn-sm" onclick="resetToDefaults()">
+                                        <i class="fas fa-undo"></i> איפוס לברירת מחדל
+                                    </button>
+                                    <button class="btn btn-warning btn-sm" onclick="showStyleInfo()">
+                                        <i class="fas fa-info"></i> מידע על ITCSS
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- הסבר על ITCSS -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <h6><i class="fas fa-info-circle"></i> ארכיטקטורת ITCSS (Inverted Triangle CSS)</h6>
+                                    <p class="mb-2">המערכת שלנו משתמשת בארכיטקטורת ITCSS המאורגנת ב-6 שכבות:</p>
+                                    <ul class="mb-2">
+                                        <li><strong>01-settings:</strong> משתנים, צבעים, רווחים, טיפוגרפיה</li>
+                                        <li><strong>02-tools:</strong> פונקציות ו-mixins (ריק)</li>
+                                        <li><strong>03-generic:</strong> Reset ו-base styles</li>
+                                        <li><strong>04-elements:</strong> אלמנטים בסיסיים (כותרות, קישורים, טפסים, כפתורים)</li>
+                                        <li><strong>05-objects:</strong> אובייקטי פריסה (layout, grid)</li>
+                                        <li><strong>06-components:</strong> רכיבי UI (כפתורים מתקדמים, טבלאות, כרטיסים, מודלים)</li>
+                                    </ul>
+                                    <p class="mb-0"><strong>סדר טעינה:</strong> Bootstrap → ITCSS files → Header styles</p>
+                                </div>
+                            </div>
+                        </div>
 
 
 
@@ -151,16 +389,15 @@
                 </div>
             </div>
 
-            <!-- Main content -->
-            <div class="main-content">
+            <!-- Content sections -->
 
-                <!-- Styles Test Section 7 - Trades and Alerts Tables -->
-                <div class="content-section styles-test-page" id="stylesTestSection7">
+                <!-- Styles Test Section 1 - Trades and Alerts Tables -->
+                <div class="content-section styles-test-page" id="stylesTestSection1">
                     <!-- Styles Test header -->
                     <div class="section-header">
                         <div class="table-title">
                             <img src="images/icons/home.svg" alt="סגנונות"
-                                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                                class="section-icon">
                             טבלאות טריידים והתראות
                         </div>
                         <div class="table-count">טבלאות לדוגמה</div>
@@ -186,49 +423,49 @@
                                                     <th>
                                                         <button class="btn btn-link sortable-header"
                                                             onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }"
-                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            class="style-toggle-btn">
                                                             חשבון <span class="sort-icon">↕</span>
                                                         </button>
                                                     </th>
                                                     <th>
                                                         <button class="btn btn-link sortable-header"
                                                             onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }"
-                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            class="style-toggle-btn">
                                                             טיקר <span class="sort-icon">↕</span>
                                                         </button>
                                                     </th>
                                                     <th>
                                                         <button class="btn btn-link sortable-header"
                                                             onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }"
-                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            class="style-toggle-btn">
                                                             סוג <span class="sort-icon">↕</span>
                                                         </button>
                                                     </th>
                                                     <th>
                                                         <button class="btn btn-link sortable-header"
                                                             onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }"
-                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            class="style-toggle-btn">
                                                             כמות <span class="sort-icon">↕</span>
                                                         </button>
                                                     </th>
                                                     <th>
                                                         <button class="btn btn-link sortable-header"
                                                             onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }"
-                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            class="style-toggle-btn">
                                                             מחיר <span class="sort-icon">↕</span>
                                                         </button>
                                                     </th>
                                                     <th>
                                                         <button class="btn btn-link sortable-header"
                                                             onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }"
-                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            class="style-toggle-btn">
                                                             סטטוס <span class="sort-icon">↕</span>
                                                         </button>
                                                     </th>
                                                     <th>
                                                         <button class="btn btn-link sortable-header"
                                                             onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); }"
-                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            class="style-toggle-btn">
                                                             תאריך <span class="sort-icon">↕</span>
                                                         </button>
                                                     </th>
@@ -355,49 +592,49 @@
                                                     <th>
                                                         <button class="btn btn-link sortable-header"
                                                             onclick="if (typeof window.sortTable === 'function') { window.sortTable(0); }"
-                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            class="style-toggle-btn">
                                                             טיקר <span class="sort-icon">↕</span>
                                                         </button>
                                                     </th>
                                                     <th>
                                                         <button class="btn btn-link sortable-header"
                                                             onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }"
-                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            class="style-toggle-btn">
                                                             תנאי <span class="sort-icon">↕</span>
                                                         </button>
                                                     </th>
                                                     <th>
                                                         <button class="btn btn-link sortable-header"
                                                             onclick="if (typeof window.sortTable === 'function') { window.sortTable(2); }"
-                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            class="style-toggle-btn">
                                                             סטטוס <span class="sort-icon">↕</span>
                                                         </button>
                                                     </th>
                                                     <th>
                                                         <button class="btn btn-link sortable-header"
                                                             onclick="if (typeof window.sortTable === 'function') { window.sortTable(3); }"
-                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            class="style-toggle-btn">
                                                             הופעל <span class="sort-icon">↕</span>
                                                         </button>
                                                     </th>
                                                     <th>
                                                         <button class="btn btn-link sortable-header"
                                                             onclick="if (typeof window.sortTable === 'function') { window.sortTable(4); }"
-                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            class="style-toggle-btn">
                                                             קשור ל: <span class="sort-icon">↕</span>
                                                         </button>
                                                     </th>
                                                     <th>
                                                         <button class="btn btn-link sortable-header"
                                                             onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }"
-                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            class="style-toggle-btn">
                                                             הודעה <span class="sort-icon">↕</span>
                                                         </button>
                                                     </th>
                                                     <th>
                                                         <button class="btn btn-link sortable-header"
                                                             onclick="if (typeof window.sortTable === 'function') { window.sortTable(6); }"
-                                                            style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none; white-space: nowrap;">
+                                                            class="style-toggle-btn">
                                                             נוצר ב: <span class="sort-icon">↕</span>
                                                         </button>
                                                     </th>
@@ -502,7 +739,7 @@
                     <div class="section-header">
                         <div class="table-title">
                             <img src="images/icons/home.svg" alt="סגנונות"
-                                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                                class="section-icon">
                             עצירת סגנונות
                         </div>
                         <div class="table-count">ניהול קבצי CSS</div>
@@ -528,7 +765,7 @@
                     <div class="section-header">
                         <div class="table-title">
                             <img src="images/icons/home.svg" alt="טיפוגרפיה"
-                                style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                                class="section-icon">
                             טיפוגרפיה - Typography
                         </div>
                         <div class="table-count">כותרות וטקסט</div>
@@ -572,7 +809,7 @@
                 <div class="section-header">
                     <div class="table-title">
                         <img src="images/icons/home.svg" alt="סגנונות"
-                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                            class="section-icon">
                         כפתורים
                     </div>
                     <div class="table-count">כפתורים שונים</div>
@@ -633,7 +870,7 @@
                 <div class="section-header">
                     <div class="table-title">
                         <img src="images/icons/home.svg" alt="סגנונות"
-                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                            class="section-icon">
                         טבלאות וטפסים
                     </div>
                     <div class="table-count">טפסים וטבלאות</div>
@@ -759,7 +996,7 @@
                 <div class="section-header">
                     <div class="table-title">
                         <img src="images/icons/home.svg" alt="סגנונות"
-                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                            class="section-icon">
                         תגיות, פסי התקדמות וספינרים
                     </div>
                     <div class="table-count">אלמנטים נוספים</div>
@@ -798,19 +1035,19 @@
                             <h3 class="style-section-title">פסי התקדמות - Progress</h3>
                             <div class="style-examples">
                                 <div class="progress mb-3">
-                                    <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25"
+                                    <div class="progress-bar progress-25" aria-valuenow="25"
                                         aria-valuemin="0" aria-valuemax="100">25%</div>
                                 </div>
                                 <div class="progress mb-3">
-                                    <div class="progress-bar bg-success" role="progressbar" style="width: 50%"
+                                    <div class="progress-bar bg-success progress-50"
                                         aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
                                 </div>
                                 <div class="progress mb-3">
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 75%"
+                                    <div class="progress-bar bg-warning progress-75"
                                         aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75%</div>
                                 </div>
                                 <div class="progress">
-                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 100%"
+                                    <div class="progress-bar bg-danger progress-100"
                                         aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">100%</div>
                                 </div>
                             </div>
@@ -863,7 +1100,7 @@
                 <div class="section-header">
                     <div class="table-title">
                         <img src="images/icons/home.svg" alt="סגנונות"
-                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                            class="section-icon">
                         התראות וכרטיסיות
                     </div>
                     <div class="table-count">התראות וכרטיסיות</div>
@@ -950,7 +1187,7 @@
                 <div class="section-header">
                     <div class="table-title">
                         <img src="images/icons/home.svg" alt="הגדרות"
-                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                            class="section-icon">
                         מפת שיוכים - עמודים לקבצים
                     </div>
                     <div class="table-count">בקרת קבצי CSS</div>
@@ -1150,7 +1387,7 @@
                 <div class="section-header">
                     <div class="table-title">
                         <img src="images/icons/home.svg" alt="סגנונות"
-                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                            class="section-icon">
                         בדיקת סגנונות - סקשן 9
                     </div>
                     <div class="table-count">תגיות וסטטוסים</div>
@@ -1238,7 +1475,7 @@
                 <div class="section-header">
                     <div class="table-title">
                         <img src="images/icons/home.svg" alt="סגנונות"
-                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                            class="section-icon">
                         בדיקת סגנונות - סקשן 10
                     </div>
                     <div class="table-count">אלמנטים מתקדמים</div>
@@ -1367,7 +1604,7 @@
                 <div class="section-header">
                     <div class="table-title">
                         <img src="images/icons/home.svg" alt="סגנונות"
-                            style="width: 20px; height: 20px; margin-left: 8px; vertical-align: middle;">
+                            class="section-icon">
                         צבעים דינמיים
                     </div>
                     <div class="table-count">מערכת צבעים מהעדפות</div>
@@ -1389,15 +1626,15 @@
                                 <h5>צבעי ערכים מספריים</h5>
                                 <div class="d-flex flex-wrap gap-3">
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--numeric-positive-color, #28a745);"></div>
+                                        <div class="color-preview color-preview-positive"></div>
                                         <span class="numeric-text-positive">רווחים (+5.6%)</span>
                                     </div>
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--numeric-negative-color, #dc3545);"></div>
+                                        <div class="color-preview color-preview-negative"></div>
                                         <span class="numeric-text-negative">הפסדים (-2.3%)</span>
                                     </div>
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--numeric-zero-color, #6c757d);"></div>
+                                        <div class="color-preview color-preview-zero"></div>
                                         <span class="numeric-text-zero">אפס (0.0%)</span>
                                     </div>
                                 </div>
@@ -1408,35 +1645,35 @@
                                 <h5>צבעי ישויות</h5>
                                 <div class="d-flex flex-wrap gap-3">
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--entity-trade-color, #007bff);"></div>
+                                        <div class="color-preview color-preview-trade"></div>
                                         <span class="entity-link">טריידים</span>
                                     </div>
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--entity-account-color, #28a745);"></div>
+                                        <div class="color-preview color-preview-account"></div>
                                         <span class="entity-link">חשבונות</span>
                                     </div>
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--entity-ticker-color, #dc3545);"></div>
+                                        <div class="color-preview color-preview-ticker"></div>
                                         <span class="entity-link">טיקרים</span>
                                     </div>
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--entity-alert-color, #ff9c05);"></div>
+                                        <div class="color-preview color-preview-alert"></div>
                                         <span class="entity-link">התראות</span>
                                     </div>
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--entity-execution-color, #17a2b8);"></div>
+                                        <div class="color-preview color-preview-execution"></div>
                                         <span class="entity-link">עסקאות</span>
                                     </div>
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--entity-cash-flow-color, #20c997);"></div>
+                                        <div class="color-preview color-preview-cash-flow"></div>
                                         <span class="entity-link">תזרים מזומנים</span>
                                     </div>
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--entity-trade-plan-color, #17a2b8);"></div>
+                                        <div class="color-preview color-preview-trade-plan"></div>
                                         <span class="entity-link">תכנוני השקעה</span>
                                     </div>
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--entity-note-color, #6f42c1);"></div>
+                                        <div class="color-preview color-preview-note"></div>
                                         <span class="entity-link">הערות</span>
                                     </div>
                                 </div>
@@ -1447,19 +1684,19 @@
                                 <h5>צבעי סטטוס</h5>
                                 <div class="d-flex flex-wrap gap-3">
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--status-open-color, #28a745);"></div>
+                                        <div class="color-preview color-preview-status-open"></div>
                                         <span class="status-badge status-open">פתוח</span>
                                     </div>
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--status-closed-color, #6c757d);"></div>
+                                        <div class="color-preview color-preview-status-closed"></div>
                                         <span class="status-badge status-closed">סגור</span>
                                     </div>
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--status-cancelled-color, #dc3545);"></div>
+                                        <div class="color-preview color-preview-status-cancelled"></div>
                                         <span class="status-badge status-cancelled">מבוטל</span>
                                     </div>
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--status-pending-color, #ffc107);"></div>
+                                        <div class="color-preview color-preview-status-pending"></div>
                                         <span class="status-badge status-pending">ממתין</span>
                                     </div>
                                 </div>
@@ -1470,23 +1707,23 @@
                                 <h5>צבעי סוגי השקעה</h5>
                                 <div class="d-flex flex-wrap gap-3">
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--type-swing-color, #007bff);"></div>
+                                        <div class="color-preview color-preview-type-swing"></div>
                                         <span class="type-swing">סווינג</span>
                                     </div>
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--type-investment-color, #28a745);"></div>
+                                        <div class="color-preview color-preview-type-investment"></div>
                                         <span class="type-investment">השקעה</span>
                                     </div>
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--type-passive-color, #6f42c1);"></div>
+                                        <div class="color-preview color-preview-type-passive"></div>
                                         <span class="type-passive">פאסיבי</span>
                                     </div>
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--type-day-trading-color, #fd7e14);"></div>
+                                        <div class="color-preview color-preview-type-day-trading"></div>
                                         <span class="type-day-trading">דיי טריידינג</span>
                                     </div>
                                     <div class="color-demo-item">
-                                        <div class="color-preview" style="background-color: var(--type-scalping-color, #dc3545);"></div>
+                                        <div class="color-preview color-preview-type-scalping"></div>
                                         <span class="type-scalping">סקלפינג</span>
                                     </div>
                                 </div>
@@ -1786,420 +2023,19 @@
         }
     </style>
 
-    <script>
-        // Style Layer Control Functions
-        function toggleStyleLayer(layer) {
-            const styleElement = document.getElementById(`style-layer-${layer}`);
-            if (styleElement) {
-                styleElement.disabled = !styleElement.disabled;
-            } else {
-                // Create a new style element for the layer
-                const newStyle = document.createElement('style');
-                newStyle.id = `style-layer-${layer}`;
-                newStyle.textContent = getLayerStyles(layer);
-                document.head.appendChild(newStyle);
-            }
-        }
+    
+            </div> <!-- End main-content -->
+        </div> <!-- End page-body -->
+    </div> <!-- End background-wrapper -->
 
-        function getLayerStyles(layer) {
-            const layers = {
-                'base': `
-                    /* Base styles - variables, reset, typography */
-                    :root { --layer-base: active; }
-                `,
-                'layout': `
-                    /* Layout styles - grid, flexbox, positioning */
-                    :root { --layer-layout: active; }
-                `,
-                'components': `
-                    /* Component styles - buttons, cards, modals */
-                    :root { --layer-components: active; }
-                `,
-                'utilities': `
-                    /* Utility styles - spacing, colors, alignment */
-                    :root { --layer-utilities: active; }
-                `,
-                'themes': `
-                    /* Theme styles - colors, gradients, animations */
-                    :root { --layer-themes: active; }
-                `,
-                'responsive': `
-                    /* Responsive styles - media queries, breakpoints */
-                    :root { --layer-responsive: active; }
-                `
-            };
-            return layers[layer] || '';
-        }
-
-        function toggleStyleControlsSection() {
-            const section = document.getElementById('styleControlsSection');
-            const toggleBtn = section.querySelector('button[onclick="toggleStyleControlsSection()"]');
-            const icon = toggleBtn.querySelector('.filter-icon');
-            const body = section.querySelector('.section-body');
-
-            if (body.style.display === 'none') {
-                body.style.display = 'block';
-                icon.textContent = '▲';
-                } else {
-                body.style.display = 'none';
-                icon.textContent = '▼';
-                }
-        }
-
-        function refreshStylesTest() {
-            console.log('🔄 Refreshing styles page');
-            location.reload();
-        }
-
-        function refreshStylesTest2() {
-            console.log('🔄 Refreshing styles section 2');
-            location.reload();
-        }
-
-        function refreshStylesTest3() {
-            console.log('🔄 Refreshing styles section 3');
-            location.reload();
-        }
-
-        function refreshStylesTest4() {
-            console.log('🔄 Refreshing styles section 4');
-            location.reload();
-        }
-
-        function refreshStylesTest5() {
-            console.log('🔄 Refreshing styles section 5');
-            location.reload();
-        }
-
-        function refreshStylesTest6() {
-            console.log('🔄 Refreshing styles section 6');
-            location.reload();
-        }
-
-        function refreshStylesTest7() {
-            console.log('🔄 Refreshing styles section 7');
-            location.reload();
-        }
-
-        function refreshStylesTest8() {
-            console.log('🔄 Refreshing styles section 8');
-            location.reload();
-        }
-
-        function refreshStylesTest9() {
-            console.log('🔄 Refreshing styles section 9');
-            location.reload();
-        }
-
-        function refreshStylesTest10() {
-            console.log('🔄 Refreshing styles section 10');
-            location.reload();
-        }
-
-        function toggleMainSection2() {
-            const section = document.getElementById('stylesTestSection2');
-            const toggleBtn = section.querySelector('button[onclick="toggleMainSection2()"]');
-            const icon = toggleBtn.querySelector('.filter-icon');
-            const body = section.querySelector('.section-body');
-
-            if (body.style.display === 'none') {
-                body.style.display = 'block';
-                icon.textContent = '▲';
-            } else {
-                body.style.display = 'none';
-                icon.textContent = '▼';
-            }
-        }
-
-        function toggleMainSection3() {
-            const section = document.getElementById('stylesTestSection3');
-            const toggleBtn = section.querySelector('button[onclick="toggleMainSection3()"]');
-            const icon = toggleBtn.querySelector('.filter-icon');
-            const body = section.querySelector('.section-body');
-
-            if (body.style.display === 'none') {
-                body.style.display = 'block';
-                icon.textContent = '▲';
-            } else {
-                body.style.display = 'none';
-                icon.textContent = '▼';
-            }
-        }
-
-        function toggleMainSection4() {
-            const section = document.getElementById('stylesTestSection4');
-            const toggleBtn = section.querySelector('button[onclick="toggleMainSection4()"]');
-            const icon = toggleBtn.querySelector('.filter-icon');
-            const body = section.querySelector('.section-body');
-
-            if (body.style.display === 'none') {
-                body.style.display = 'block';
-                icon.textContent = '▲';
-            } else {
-                body.style.display = 'none';
-                icon.textContent = '▼';
-            }
-        }
-
-        function toggleMainSection5() {
-            const section = document.getElementById('stylesTestSection5');
-            const toggleBtn = section.querySelector('button[onclick="toggleMainSection5()"]');
-            const icon = toggleBtn.querySelector('.filter-icon');
-            const body = section.querySelector('.section-body');
-
-            if (body.style.display === 'none') {
-                body.style.display = 'block';
-                icon.textContent = '▲';
-            } else {
-                body.style.display = 'none';
-                icon.textContent = '▼';
-            }
-        }
-
-        function toggleMainSection6() {
-            const section = document.getElementById('stylesTestSection6');
-            const toggleBtn = section.querySelector('button[onclick="toggleMainSection6()"]');
-            const icon = toggleBtn.querySelector('.filter-icon');
-            const body = section.querySelector('.section-body');
-
-            if (body.style.display === 'none') {
-                body.style.display = 'block';
-                icon.textContent = '▲';
-            } else {
-                body.style.display = 'none';
-                icon.textContent = '▼';
-            }
-        }
-
-        function toggleMainSection7() {
-            const section = document.getElementById('stylesTestSection7');
-            const toggleBtn = section.querySelector('button[onclick="toggleMainSection7()"]');
-            const icon = toggleBtn.querySelector('.filter-icon');
-            const body = section.querySelector('.section-body');
-
-            if (body.style.display === 'none') {
-                body.style.display = 'block';
-                icon.textContent = '▲';
-            } else {
-                body.style.display = 'none';
-                icon.textContent = '▼';
-            }
-        }
-
-        function toggleMainSection8() {
-            const section = document.getElementById('stylesTestSection8');
-            const toggleBtn = section.querySelector('button[onclick="toggleMainSection8()"]');
-            const icon = toggleBtn.querySelector('.filter-icon');
-            const body = section.querySelector('.section-body');
-
-            if (body.style.display === 'none') {
-                body.style.display = 'block';
-                icon.textContent = '▲';
-            } else {
-                body.style.display = 'none';
-                icon.textContent = '▼';
-            }
-        }
-
-        function toggleMainSection9() {
-            const section = document.getElementById('stylesTestSection9');
-            const toggleBtn = section.querySelector('button[onclick="toggleMainSection9()"]');
-            const icon = toggleBtn.querySelector('.filter-icon');
-            const body = section.querySelector('.section-body');
-
-            if (body.style.display === 'none') {
-                body.style.display = 'block';
-                icon.textContent = '▲';
-            } else {
-                body.style.display = 'none';
-                icon.textContent = '▼';
-            }
-        }
-
-        function toggleMainSection10() {
-            const section = document.getElementById('stylesTestSection10');
-            const toggleBtn = section.querySelector('button[onclick="toggleMainSection10()"]');
-            const icon = toggleBtn.querySelector('.filter-icon');
-            const body = section.querySelector('.section-body');
-
-            if (body.style.display === 'none') {
-                body.style.display = 'block';
-                icon.textContent = '▲';
-            } else {
-                body.style.display = 'none';
-                icon.textContent = '▼';
-            }
-        }
-
-        function toggleDynamicColorsSection() {
-            const section = document.getElementById('dynamicColorsSection');
-            const toggleBtn = section.querySelector('button[onclick="toggleDynamicColorsSection()"]');
-            const icon = toggleBtn.querySelector('.filter-icon');
-            const body = section.querySelector('.section-body');
-
-            if (body.style.display === 'none') {
-                body.style.display = 'block';
-                icon.textContent = '▲';
-            } else {
-                body.style.display = 'none';
-                icon.textContent = '▼';
-            }
-        }
-
-        // Dynamic Colors Functions
-        async function loadDynamicColors() {
-            try {
-                const response = await fetch('/api/v1/preferences/colors');
-                if (!response.ok) {
-                    throw new Error('Failed to load colors from preferences');
-                }
-                
-                const colors = await response.json();
-                
-                // Update CSS Variables
-                Object.entries(colors).forEach(([key, value]) => {
-                    if (value) {
-                        document.documentElement.style.setProperty(`--user-${key}`, value);
-                    }
-                });
-                
-                // Show success notification
-                if (typeof showSuccessNotification === 'function') {
-                    showSuccessNotification('צבעים נטענו בהצלחה מהעדפות');
-                } else {
-                    alert('צבעים נטענו בהצלחה מהעדפות');
-                }
-                
-                console.log('Dynamic colors loaded successfully:', colors);
-            } catch (error) {
-                console.error('Failed to load dynamic colors:', error);
-                if (typeof showErrorNotification === 'function') {
-                    showErrorNotification('שגיאה בטעינת צבעים מהעדפות');
-                } else {
-                    alert('שגיאה בטעינת צבעים מהעדפות');
-                }
-            }
-        }
-
-        async function resetDynamicColors() {
-            try {
-                // Reset to default values by removing custom CSS variables
-                const colorKeys = [
-                    'numeric-positive-color', 'numeric-negative-color', 'numeric-zero-color',
-                    'entity-trade-color', 'entity-account-color', 'entity-ticker-color',
-                    'entity-alert-color', 'entity-execution-color', 'entity-cash-flow-color',
-                    'entity-trade-plan-color', 'entity-note-color',
-                    'status-open-color', 'status-closed-color', 'status-cancelled-color',
-                    'status-pending-color',
-                    'type-swing-color', 'type-investment-color', 'type-passive-color',
-                    'type-day-trading-color', 'type-scalping-color'
-                ];
-                
-                colorKeys.forEach(key => {
-                    document.documentElement.style.removeProperty(`--${key}`);
-                });
-                
-                // Show success notification
-                if (typeof showSuccessNotification === 'function') {
-                    showSuccessNotification('צבעים אופסו לברירות מחדל');
-                } else {
-                    alert('צבעים אופסו לברירות מחדל');
-                }
-                
-                console.log('Dynamic colors reset successfully');
-            } catch (error) {
-                console.error('Failed to reset dynamic colors:', error);
-                if (typeof showErrorNotification === 'function') {
-                    showErrorNotification('שגיאה באיפוס צבעים');
-                } else {
-                    alert('שגיאה באיפוס צבעים');
-                }
-            }
-        }
-
-        function openPreferencesPage() {
-            window.open('/preferences.html', '_blank');
-        }
-
-        // Load dynamic colors on page load
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                await loadDynamicColors();
-                console.log('Dynamic colors loaded on page load');
-            } catch (error) {
-                console.error('Failed to load dynamic colors on page load:', error);
-            }
-        });
-
-        function refreshTradesTable() {
-            console.log('🔄 Refreshing trades table');
-            // כאן אפשר להוסיף לוגיקה לרענון הטבלה
-        }
-
-        function refreshAlertsTable() {
-            console.log('🔄 Refreshing alerts table');
-            // כאן אפשר להוסיף לוגיקה לרענון הטבלה
-        }
-
-        function toggleTradesTableSection() {
-            const section = document.getElementById('tradesTableTestSection');
-            const toggleBtn = section.querySelector('button[onclick="toggleTradesTableSection()"]');
-            const icon = toggleBtn.querySelector('.filter-icon');
-            const body = section.querySelector('.section-body');
-
-            if (body.style.display === 'none') {
-                body.style.display = 'block';
-                icon.textContent = '▲';
-            } else {
-                body.style.display = 'none';
-                icon.textContent = '▼';
-            }
-        }
-
-        function toggleAlertsTableSection() {
-            const section = document.getElementById('alertsTableTestSection');
-            const toggleBtn = section.querySelector('button[onclick="toggleAlertsTableSection()"]');
-            const icon = toggleBtn.querySelector('.filter-icon');
-            const body = section.querySelector('.section-body');
-
-            if (body.style.display === 'none') {
-                body.style.display = 'block';
-                icon.textContent = '▲';
-            } else {
-                body.style.display = 'none';
-                icon.textContent = '▼';
-            }
-        }
-
-        function showLinkedItems(type, id) {
-            console.log(`🔄 Showing linked items for ${type} #${id}`);
-            if (typeof window.showLinkedItems === 'function') {
-                window.showLinkedItems(type, id);
-            } else {
-                if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `הצגת פריטים מקושרים ל-${type} #${id}`); } else { alert(`הצגת פריטים מקושרים ל-${type} #${id}`); };
-            }
-        }
-
-        function editTrade(id) {
-            console.log(`🔄 Editing trade #${id}`);
-            if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `עריכת טרייד #${id}`); } else { alert(`עריכת טרייד #${id}`); };
-        }
-
-        function editAlert(id) {
-            console.log(`🔄 Editing alert #${id}`);
-            if (typeof window.showInfoNotification === 'function') { window.showInfoNotification('מידע', `עריכת התראה #${id}`); } else { alert(`עריכת התראה #${id}`); };
-        }
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function () {
-            console.log('🔄 Styles page loaded');
-
-            // Restore section states
-            if (typeof window.restoreAllSectionStates === 'function') {
-                window.restoreAllSectionStates();
-            }
-        });
-    </script>
+    <!-- Global UI Utilities -->
+    <script src="scripts/ui-utils.js?v=v1.0.0"></script>
+    
+    <!-- Notification System -->
+    <script src="scripts/notification-system.js?v=v1.0.0"></script>
+    
+    <!-- Style Demonstration Scripts -->
+    <script src="scripts/style-demonstration.js?v=v1.0.0"></script>
     
     <!-- Header System -->
     <script src="scripts/header-system.js?v=20250115_level3_fix"></script>

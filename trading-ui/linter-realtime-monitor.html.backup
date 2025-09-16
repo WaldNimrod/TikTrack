@@ -91,13 +91,9 @@
             ניטור Linter בזמן אמת
           </div>
           <div class="table-actions">
-              <button class="btn btn-outline-primary btn-sm" onclick="window.copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
-                <i class="fas fa-copy"></i> העתק לוג מפורט
-              </button>
-              <div class="action-separator"></div>
-              <button class="btn btn-outline-success btn-sm" onclick="window.startFileScan()" title="סרוק קבצי JavaScript לאיתור בעיות">
-                <i class="fas fa-search"></i> סרוק קבצים
-              </button>
+            <button class="btn btn-outline-primary btn-sm" onclick="window.copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+              <i class="fas fa-copy"></i> העתק לוג מפורט
+            </button>
             <button class="btn btn-outline-secondary btn-sm" onclick="window.toggleAutoRefresh()" title="הפעל/בטל רענון אוטומטי" id="autoRefreshBtn">
               <i class="fas fa-sync-alt"></i> רענון אוטומטי
             </button>
@@ -139,7 +135,7 @@
       <!-- Main content -->
       <div class="main-content" data-section="linter-monitor" data-table-type="linter-realtime-monitor">
 
-        <!-- Chart Section -->
+        <!-- Quality Chart Section -->
         <div class="content-section" id="chartSection" data-table-type="linter-realtime-monitor">
           <!-- Chart header -->
           <div class="section-header">
@@ -157,6 +153,57 @@
               </button>
             </div>
           </div>
+                <div class="stat-content">
+                  <div class="stat-value" id="warningCount">0</div>
+                  <div class="stat-label">אזהרות</div>
+                  <div class="stat-change neutral" id="warningChange">+0</div>
+                </div>
+              </div>
+
+              <div class="stat-item success">
+                <div class="stat-icon">
+                  <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-value" id="successCount">0</div>
+                  <div class="stat-label">הצלחות</div>
+                  <div class="stat-change neutral" id="successChange">+0</div>
+                </div>
+              </div>
+
+              <div class="stat-item info">
+                <div class="stat-icon">
+                  <i class="fas fa-file-code"></i>
+                </div>
+                <div class="stat-content">
+                  <div class="stat-value" id="filesScanned">0</div>
+                  <div class="stat-label">קבצים נסרקו</div>
+                  <div class="stat-change neutral" id="filesChange">+0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> <!-- End statistics section -->
+
+        <!-- Chart Section -->
+        <div class="content-section" id="chartSection" data-table-type="linter-realtime-monitor">
+          <!-- Chart header -->
+          <div class="section-header">
+            <div class="table-title">
+              <img src="images/icons/development.svg" alt="גרפים" class="section-icon">
+              גרפי ניטור Linter
+            </div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="window.updateChart && window.updateChart()" title="רענן גרף">
+                <i class="fas fa-chart-line"></i> רענן גרף
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="window.toggleSection('chartSection')" title="הצג/הסתר אזור גרפים">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
           <!-- Chart body -->
           <div class="section-body">
             <div class="chart-container" style="width: 100%; height: 500px; margin: 0 auto;">
@@ -164,6 +211,81 @@
             </div>
           </div>
         </div> <!-- End chart section -->
+
+        <!-- Controls Section -->
+        <div class="content-section" id="controlsSection" data-table-type="linter-realtime-monitor">
+          <!-- Controls header -->
+          <div class="section-header">
+            <div class="table-title">
+              <img src="images/icons/development.svg" alt="הגדרות" class="section-icon">
+              הגדרות ניטור
+            </div>
+            <div class="table-actions">
+              <button class="refresh-btn" onclick="window.resetSettings && window.resetSettings()" title="איפוס הגדרות">
+                <i class="fas fa-undo"></i> איפוס
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="window.toggleSection('controlsSection')" title="הצג/הסתר אזור הגדרות">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Controls body -->
+          <div class="section-body">
+            <div class="controls-grid">
+              <div class="control-group">
+                <label class="control-label">תדירות סריקה (שניות)</label>
+                <input type="number" class="control-input" id="scanInterval" value="5" min="1" max="60">
+              </div>
+              <div class="control-group">
+                <label class="control-label">רמת לוג</label>
+                <select class="control-select" id="logLevel">
+                  <option value="error">שגיאות בלבד</option>
+                  <option value="warning" selected>אזהרות ושגיאות</option>
+                  <option value="info">כל ההודעות</option>
+                </select>
+              </div>
+              <div class="control-group">
+                <label class="control-label">תיקיות לסריקה</label>
+                <input type="text" class="control-input" id="scanPaths" value="trading-ui/">
+              </div>
+            </div>
+            <div class="controls-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button class="btn btn-primary" id="startMonitoring" onclick="window.startMonitoring && window.startMonitoring()">
+                <i class="bi bi-play-fill"></i> התחל ניטור
+              </button>
+              <button class="btn btn-secondary" id="stopMonitoring" disabled onclick="window.stopMonitoring && window.stopMonitoring()">
+                <i class="bi bi-stop-fill"></i> עצור ניטור
+              </button>
+              <button class="btn btn-success" id="clearLogs" onclick="window.clearLogs && window.clearLogs()">
+                <i class="bi bi-trash"></i> נקה לוגים
+              </button>
+              <button class="btn btn-danger" id="exportLogs" onclick="window.exportLogs && window.exportLogs()">
+                <i class="bi bi-download"></i> ייצא לוגים
+              </button>
+            </div>
+            
+            <!-- Fix Actions -->
+            <div class="fix-actions">
+              <h5>פעולות תיקון</h5>
+              <div class="fix-buttons" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-success" onclick="window.fixAllIssues()" title="תקן את כל הבעיות הניתנות לתיקון">
+                  <i class="fas fa-magic"></i> תיקון אוטומטי לכל הבעיות
+                </button>
+                <button class="btn btn-warning" onclick="window.fixAllErrors()" title="תקן רק שגיאות">
+                  <i class="fas fa-exclamation-triangle"></i> תיקון שגיאות בלבד
+                </button>
+                <button class="btn btn-info" onclick="window.fixAllWarnings()" title="תקן רק אזהרות">
+                  <i class="fas fa-exclamation-circle"></i> תיקון אזהרות בלבד
+                </button>
+                <button class="btn btn-secondary" onclick="window.ignoreAllIssues()" title="התעלם מכל הבעיות">
+                  <i class="fas fa-eye-slash"></i> התעלם מהכל
+                </button>
+              </div>
+            </div>
+          </div>
+        </div> <!-- End controls section -->
 
         <!-- Logs Section -->
         <div class="content-section" id="logsSection" data-table-type="linter-realtime-monitor">
@@ -214,110 +336,35 @@
                   <span class="log-timestamp">[${new Date().toLocaleTimeString('he-IL')}]</span>
                   <span class="log-level info">[INFO]</span>
                 </div>
-                <div class="log-message">מערכת הניטור מוכנה</div>
+                <div class="log-message">מערכת ניטור Linter אותחלה</div>
               </div>
             </div>
           </div>
         </div> <!-- End logs section -->
 
-        <!-- Controls Section -->
-        <div class="content-section" id="controlsSection" data-table-type="linter-realtime-monitor">
-          <!-- Controls header -->
-          <div class="section-header">
-            <div class="table-title">
-              <img src="images/icons/development.svg" alt="הגדרות" class="section-icon">
-              הגדרות ניטור
-            </div>
-            <div class="table-actions">
-              <button class="refresh-btn" onclick="window.resetSettings && window.resetSettings()" title="איפוס הגדרות">
-                <i class="fas fa-undo"></i> איפוס
-              </button>
-              <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="window.toggleSection('controlsSection')" title="הצג/הסתר אזור הגדרות">
-                <span class="filter-icon">▲</span>
-              </button>
-            </div>
-          </div>
+      </div> <!-- End main-content -->
+    </div> <!-- End page-body -->
+  </div> <!-- End background-wrapper -->
 
-          <!-- Controls body -->
-          <div class="section-body">
-            <div class="control-group" style="margin-bottom: 20px;">
-              <label class="control-label">הגדרות ניטור:</label>
-              <div class="control-row" style="display: flex; gap: 15px; margin-top: 10px;">
-                <div class="control-input-group">
-                  <label style="display: block; font-size: 12px; color: #666; margin-bottom: 5px;">תיקיות לסריקה</label>
-                  <input type="text" class="control-input" id="scanPaths" value="trading-ui/" style="width: 200px;">
-                </div>
-                <div class="control-input-group">
-                  <label style="display: block; font-size: 12px; color: #666; margin-bottom: 5px;">מרווח סריקה (שניות)</label>
-                  <input type="number" class="control-input" id="scanInterval" value="30" min="5" max="300" style="width: 120px;">
-                </div>
-                <div class="control-input-group">
-                  <label style="display: block; font-size: 12px; color: #666; margin-bottom: 5px;">רמת לוג</label>
-                  <select class="control-input" id="logLevel" style="width: 120px;">
-                    <option value="info">מידע</option>
-                    <option value="warning">אזהרות</option>
-                    <option value="error">שגיאות בלבד</option>
-                  </select>
-                </div>
-              </div>
-            </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-            <div class="controls-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
-              <button class="btn btn-primary" id="startMonitoring" onclick="window.startMonitoring && window.startMonitoring()">
-                <i class="bi bi-play-fill"></i> התחל ניטור
-              </button>
-              <button class="btn btn-secondary" id="stopMonitoring" disabled onclick="window.stopMonitoring && window.stopMonitoring()">
-                <i class="bi bi-stop-fill"></i> עצור ניטור
-              </button>
-              <button class="btn btn-success" id="clearLogs" onclick="window.clearLogs && window.clearLogs()">
-                <i class="bi bi-trash"></i> נקה לוגים
-              </button>
-              <button class="btn btn-danger" id="exportLogs" onclick="window.exportLogs && window.exportLogs()">
-                <i class="bi bi-download"></i> ייצא לוגים
-              </button>
-            </div>
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
 
-            <!-- Fix Actions -->
-            <div class="fix-actions" style="margin-top: 20px;">
-              <h5 style="margin-bottom: 10px;">פעולות תיקון אוטומטי:</h5>
-              <div class="fix-buttons" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="btn btn-success" onclick="window.fixAllIssues()" title="תקן את כל הבעיות הניתנות לתיקון">
-                  <i class="fas fa-magic"></i> תיקון אוטומטי לכל הבעיות
-                </button>
-                <button class="btn btn-warning" onclick="window.fixAllErrors()" title="תקן רק שגיאות">
-                  <i class="fas fa-exclamation-triangle"></i> תיקון שגיאות בלבד
-                </button>
-                <button class="btn btn-info" onclick="window.fixAllWarnings()" title="תקן רק אזהרות">
-                  <i class="fas fa-exclamation-circle"></i> תיקון אזהרות בלבד
-                </button>
-                <button class="btn btn-secondary" onclick="window.ignoreAllIssues()" title="התעלם מכל הבעיות">
-                  <i class="fas fa-eye-slash"></i> התעלם מהכל
-                </button>
-              </div>
-            </div>
-          </div>
-        </div> <!-- End controls section -->
-      </div> <!-- End main content -->
-    </div> <!-- End page body -->
-  </div> <!-- End background wrapper -->
-
-  <!-- Scripts -->
-  <!-- Chart.js for graphs -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
-
-  <script src="scripts/header-system.js?v=v34_fixes"></script>
-  <script src="scripts/color-scheme-system.js"></script>
-  <script src="scripts/preferences.js"></script>
-  <script src="scripts/ui-utils.js"></script>
-  <script src="scripts/tables.js"></script>
-  <script src="scripts/translation-utils.js"></script>
-  <script src="scripts/data-utils.js"></script>
-  <script src="scripts/linked-items.js"></script>
-  <script src="scripts/page-utils.js"></script>
-  <script src="scripts/central-refresh-system.js"></script>
-  <script src="scripts/notification-system.js"></script>
-  <script src="scripts/main.js"></script>
-    <script src="scripts/linter-realtime-monitor.js?v=20250917_clean"></script>
+    <!-- Scripts -->
+    <script src="scripts/header-system.js?v=v34_fixes"></script>
+    <script src="scripts/color-scheme-system.js"></script>
+    <script src="scripts/preferences.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/linked-items.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/central-refresh-system.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/linter-realtime-monitor.js?v=20250916_final"></script>
 </body>
 </html>

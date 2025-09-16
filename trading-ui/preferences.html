@@ -3,36 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>הגדרות מערכת - TikTrack</title>
+    <title>העדפות - TikTrack</title>
     
+    <!-- Bootstrap CSS - חייב להיות קודם כדי שה-ITCSS יוכל לדרוס אותו -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="styles/unified.css?v=v1.0.0" rel="stylesheet">
-    <link href="styles/header-styles.css?v=v1.0.0" rel="stylesheet">
-    <link href="styles-new/06-components/_notifications.css?v=v1.0.0" rel="stylesheet">
+    
+    <!-- Custom CSS - ITCSS Architecture - אחרי Bootstrap כדי לדרוס אותו -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=v1.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=v1.0.0">
+    
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles/header-styles.css?v=v1.0.0">
+    
     <style>
-        .color-picker {
-            width: 50%;
-            height: 10px;
+        .color-preview {
+            width: 50px;
+            height: 30px;
             border: 1px solid #ddd;
-            border-radius: 2px;
+            border-radius: 4px;
             cursor: pointer;
-            padding: 0;
+            display: inline-block;
         }
         
-        .setting-item {
+        .control-narrow {
+            width: 100px;
+        }
+        
+        .section-divider {
+            border-top: 1px solid #dee2e6;
+            margin: 2rem 0 1rem 0;
+        }
+        
+        .profile-buttons {
             display: flex;
-            flex-direction: column;
-            margin-bottom: 1.5rem;
+            gap: 0.5rem;
+            flex-wrap: wrap;
         }
         
-        .setting-label {
-            width: 100%;
-            margin-bottom: 0.5rem;
+        .profile-buttons .btn {
+            flex: 1;
+            min-width: 120px;
         }
         
-        .setting-control {
-            width: 100%;
+        .toggle-all-btn {
+            background: var(--primary-color, #29a6a8);
+            color: white;
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .main-save-btn {
+            background: var(--primary-color, #29a6a8);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -44,186 +92,130 @@
             <div class="main-content">
         <div class="page-body">
             <div class="container-fluid">
-                <div class="row">
+                
+                <!-- Header Section -->
+                <div class="row mb-4">
                     <div class="col-12">
-                        <div class="page-header">
-                            <div class="d-flex justify-content-between align-items-center">
+                        <div class="page-header d-flex justify-content-between align-items-center">
           <div>
-                                    <h1>⚙️ הגדרות מערכת</h1>
-                                    <p>ניהול הגדרות המערכת והעדפות המשתמש</p>
+                                <h1>⚙️ העדפות</h1>
+                                <p>ניהול הגדרות המערכת והעדפות המשתמש</p>
           </div>
-                                <button class="btn btn-primary btn-lg" onclick="saveAllPreferences()" id="saveButton">
-                                    <i class="bi bi-save"></i> שמור הגדרות
+                            <div class="d-flex gap-2">
+                                <button class="toggle-all-btn" onclick="window.toggleAllSections()" id="toggleAllBtn">
+                                    <i class="bi bi-arrows-expand"></i> פתח הכל
             </button>
+                                <div class="auto-save-indicator">
+                                    <i class="bi bi-check-circle text-success"></i> שמירה אוטומטית
           </div>
         </div>
         </div>
       </div>
+        </div>
+        
+                <!-- Section 1: Profile Management -->
+                <div class="content-section" id="section1">
+                    <div class="section-header">
+                        <h2>👤 ניהול פרופילים</h2>
+                        <p>ניהול פרופילי הגדרות שונים</p>
+                        <button class="filter-toggle-btn" onclick="window.toggleSection('section1')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+          </button>
+        </div>
+                    <div class="section-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">פרופיל נוכחי</label>
+                                    <select id="profileSelect" class="form-select">
+                                        <option value="1">ברירת מחדל</option>
+                                    </select>
+      </div>
+          </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">שם פרופיל חדש</label>
+                                    <input type="text" id="newProfileName" class="form-control" placeholder="הכנס שם פרופיל">
+          </div>
+        </div>
+      </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="profile-buttons">
+                                    <button class="btn btn-primary" onclick="window.loadProfile()">
+                                        <i class="bi bi-download"></i> טען
+                                    </button>
+                                    <button class="btn btn-success" onclick="window.createProfile()">
+                                        <i class="bi bi-plus-circle"></i> צור
+                                    </button>
+                                    <button class="btn btn-warning" onclick="window.saveCurrentProfile()">
+                                        <i class="bi bi-save"></i> שמור נוכחי
+                                    </button>
+                                    <button class="btn btn-info" onclick="window.duplicateProfile()">
+                                        <i class="bi bi-copy"></i> שכפל
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="window.exportProfile()">
+                                        <i class="bi bi-upload"></i> ייצא
+                                    </button>
+                                    <button class="btn btn-danger" onclick="window.deleteProfile()">
+                                        <i class="bi bi-trash"></i> מחק
+          </button>
+        </div>
+      </div>
+        </div>
+        </div>
+      </div>
       
-                <!-- Section 1: Basic Settings -->
-      <div class="content-section" id="section1">
+                <!-- Section 2: Basic Settings -->
+                <div class="content-section" id="section2">
         <div class="section-header">
                         <h2>🏦 הגדרות בסיסיות</h2>
                         <p>הגדרות כלליות למערכת</p>
-          <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="window.toggleSection('section2')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
         </div>
         <div class="section-body">
                         <div class="row">
                             <div class="col-md-6">
-            <!-- מטבעות -->
-            <div class="setting-item">
-              <div class="setting-label">
-                <h5>💰 מטבעות</h5>
-                <p>מטבע ראשי ומשני לתצוגת נתונים</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                                            <div class="col-12">
-                                                <label class="form-label small">מטבע ראשי</label>
-                    <select id="primaryCurrency" class="form-select form-control-modern">
-                                                    <option value="USD">USD</option>
-                                                    <option value="EUR">EUR</option>
-                                                    <option value="GBP">GBP</option>
-                                                    <option value="ILS">ILS</option>
+                                <div class="mb-3">
+                                    <label class="form-label">מטבע ראשי</label>
+                                    <select id="primaryCurrency" class="form-select control-narrow" onchange="validateCurrency(this)">
+                                        <option value="USD">USD - דולר ארה"ב</option>
+                      <option value="EUR">EUR - יורו</option>
+                                        <option value="GBP">GBP - לירה שטרלינג</option>
+                                        <option value="ILS">ILS - שקל חדש</option>
                     </select>
+                                    <small class="text-muted">כרגע נתמך רק דולר ארה"ב</small>
                   </div>
-                                            <div class="col-12">
-                                                <label class="form-label small">מטבע משני <span class="text-muted">(עתידי)</span></label>
-                    <select id="secondaryCurrency" class="form-select form-control-modern" disabled>
-                                                    <option value="USD">USD</option>
-                                                    <option value="EUR">EUR</option>
-                                                    <option value="GBP">GBP</option>
-                                                    <option value="ILS">ILS</option>
+                                <div class="mb-3">
+                                    <label class="form-label">מטבע משני <span class="text-muted">(עתידי)</span></label>
+                                    <select id="secondaryCurrency" class="form-select control-narrow" disabled>
+                                        <option value="USD">USD - דולר ארה"ב</option>
+                      <option value="EUR">EUR - יורו</option>
+                                        <option value="GBP">GBP - לירה שטרלינג</option>
+                                        <option value="ILS">ILS - שקל חדש</option>
                     </select>
                   </div>
                 </div>
-              </div>
-            </div>
-                            </div>
                             <div class="col-md-6">
-                                <!-- אזור זמן ושפה -->
-            <div class="setting-item">
-              <div class="setting-label">
-                <h5>🌍 אזור זמן ושפה</h5>
-                                        <p>הגדרות אזור זמן ושפת הממשק</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                                            <div class="col-12">
-                    <label class="form-label small">אזור זמן</label>
-                    <select id="timezone" class="form-select form-control-modern">
-                      <option value="Asia/Jerusalem">ישראל</option>
-                      <option value="America/New_York">ניו יורק</option>
-                                                    <option value="Europe/London">לונדון</option>
-                                                    <option value="Asia/Tokyo">טוקיו</option>
+                                <div class="mb-3">
+                                    <label class="form-label">אזור זמן</label>
+                                    <select id="timezone" class="form-select">
+                                        <option value="Asia/Jerusalem">Asia/Jerusalem</option>
+                                        <option value="America/New_York">America/New_York</option>
+                                        <option value="Europe/London">Europe/London</option>
+                                        <option value="Asia/Tokyo">Asia/Tokyo</option>
                     </select>
                   </div>
-                                            <div class="col-12">
-                                                <label class="form-label small">שפת הממשק <span class="text-muted">(עתידי)</span></label>
-                    <select id="language" class="form-select form-control-modern" disabled>
+                                <div class="mb-3">
+                                    <label class="form-label">שפה <span class="text-muted">(עתידי)</span></label>
+                                    <select id="language" class="form-select control-narrow" disabled>
                       <option value="he">עברית</option>
                       <option value="en">English</option>
+                                        <option value="ar">العربية</option>
                     </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-                <!-- Section 2: Profile Management -->
-                <div class="content-section" id="section2">
-                    <div class="section-header">
-                        <h2>👤 ניהול פרופילים</h2>
-                        <p>ניהול פרופילי הגדרות מרובים</p>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
                     </div>
-                    <div class="section-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <!-- רשימת פרופילים -->
-            <div class="setting-item">
-              <div class="setting-label">
-                                        <h5>📋 פרופילים קיימים</h5>
-                                        <p>ניהול פרופילי הגדרות</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                                            <div class="col-12">
-                                                <select id="profileSelect" class="form-select form-control-modern">
-                                                    <option value="default">פרופיל ברירת מחדל</option>
-                                                </select>
-                    </div>
-                                            <div class="col-12">
-                                                <button class="btn btn-outline-primary" onclick="loadProfile()">
-                                                    <i class="bi bi-arrow-clockwise"></i> טען פרופיל
-                                                </button>
-                  </div>
-                    </div>
-                  </div>
-                    </div>
-                  </div>
-                            <div class="col-md-6">
-                                <!-- יצירת פרופיל חדש -->
-                                <div class="setting-item">
-                                    <div class="setting-label">
-                                        <h5>➕ יצירת פרופיל חדש</h5>
-                                        <p>יצירת פרופיל הגדרות חדש</p>
-                </div>
-                                    <div class="setting-control">
-                                        <div class="row g-2">
-                                            <div class="col-12">
-                                                <input type="text" id="newProfileName" class="form-control form-control-modern" placeholder="שם הפרופיל החדש">
-              </div>
-                                            <div class="col-12">
-                                                <button class="btn btn-success" onclick="createProfile()">
-                                                    <i class="bi bi-plus"></i> צור פרופיל
-                                                </button>
-            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <!-- פעולות פרופיל -->
-            <div class="setting-item">
-              <div class="setting-label">
-                                        <h5>🔧 פעולות פרופיל</h5>
-                                        <p>שמירה, מחיקה וייצוא פרופילים</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                                            <div class="col-3">
-                                                <button class="btn btn-primary" onclick="saveCurrentProfile()">
-                                                    <i class="bi bi-save"></i> שמור פרופיל
-                                                </button>
-                    </div>
-                                            <div class="col-3">
-                                                <button class="btn btn-warning" onclick="duplicateProfile()">
-                                                    <i class="bi bi-files"></i> שכפל פרופיל
-                                                </button>
-                  </div>
-                                            <div class="col-3">
-                                                <button class="btn btn-info" onclick="exportProfile()">
-                                                    <i class="bi bi-download"></i> ייצא פרופיל
-                                                </button>
-                    </div>
-                                            <div class="col-3">
-                                                <button class="btn btn-danger" onclick="deleteProfile()">
-                                                    <i class="bi bi-trash"></i> מחק פרופיל
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                   </div>
                 </div>
               </div>
@@ -234,1177 +226,533 @@
                     <div class="section-header">
                         <h2>📈 הגדרות מסחר</h2>
                         <p>הגדרות ברירת מחדל למסחר</p>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="window.toggleSection('section3')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
-                    </div>
+              </div>
                     <div class="section-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <!-- הגדרות מסחר בסיסיות -->
-            <div class="setting-item">
-              <div class="setting-label">
-                                        <h5>💰 הגדרות מסחר בסיסיות</h5>
-                                        <p>הגדרות ברירת מחדל למסחר</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                  <div class="col-12">
-                                                <label class="form-label small">סטופ לוס ברירת מחדל (%)</label>
-                                                <input type="number" id="defaultStopLoss" class="form-control form-control-modern" step="0.1" min="0" max="100">
+                                <h5>הגדרות בסיסיות</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">Stop Loss ברירת מחדל (%)</label>
+                                    <input type="number" id="defaultStopLoss" class="form-control control-narrow" 
+                                           step="0.1" min="0" max="100" value="5.0">
+                    </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Target Price ברירת מחדל (%)</label>
+                                    <input type="number" id="defaultTargetPrice" class="form-control control-narrow" 
+                                           step="0.1" min="0" max="1000" value="10.0">
                   </div>
-                                            <div class="col-12">
-                                                <label class="form-label small">יעד ברירת מחדל (%)</label>
-                                                <input type="number" id="defaultTargetPrice" class="form-control form-control-modern" step="0.1" min="0" max="1000">
+                                <div class="mb-3">
+                                    <label class="form-label">עמלה ברירת מחדל ($)</label>
+                                    <input type="number" id="defaultCommission" class="form-control control-narrow" 
+                                           step="0.01" min="0" value="1.0">
+                    </div>
+                  </div>
+                            <div class="col-md-6">
+                                <h5>ניהול סיכונים <span class="text-muted">(עתידי)</span></h5>
+                                <div class="mb-3">
+                                    <label class="form-label">סיכון מקסימלי לחשבון (%)</label>
+                                    <input type="number" id="maxAccountRisk" class="form-control control-narrow" 
+                                           step="0.1" min="0" max="100" value="10.0" disabled>
                 </div>
-                                            <div class="col-12">
-                                                <label class="form-label small">עמלה ברירת מחדל ($)</label>
-                                                <input type="number" id="defaultCommission" class="form-control form-control-modern" step="0.01" min="0">
+                                <div class="mb-3">
+                                    <label class="form-label">סיכון מקסימלי לטריד (%)</label>
+                                    <input type="number" id="maxTradeRisk" class="form-control control-narrow" 
+                                           step="0.1" min="0" max="100" value="2.0" disabled>
+              </div>
+                                <div class="mb-3">
+                                    <label class="form-label">גודל פוזיציה מקסימלי (%)</label>
+                                    <input type="number" id="maxPositionSize" class="form-control control-narrow" 
+                                           step="0.1" min="0" max="100" value="25.0" disabled>
+            </div>
+                  </div>
+                </div>
               </div>
             </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <!-- הגדרות ניהול סיכונים -->
-                                <div class="setting-item">
-                                    <div class="setting-label">
-                                        <h5>⚠️ הגדרות ניהול סיכונים</h5>
-                                        <p>הגדרות ניהול סיכונים מתקדמות</p>
-                                    </div>
-                                    <div class="setting-control">
-                                        <div class="row g-2">
-                                            <div class="col-12">
-                                                <label class="form-label small">סיכון מקסימלי לחשבון (%) <span class="text-muted">(עתידי)</span></label>
-                                                <input type="number" id="maxAccountRisk" class="form-control form-control-modern" step="0.1" min="0" max="100" disabled>
-                                            </div>
-                                            <div class="col-12">
-                                                <label class="form-label small">סיכון מקסימלי לטרייד (%) <span class="text-muted">(עתידי)</span></label>
-                                                <input type="number" id="maxTradeRisk" class="form-control form-control-modern" step="0.1" min="0" max="100" disabled>
-                                            </div>
-                                            <div class="col-12">
-                                                <label class="form-label small">גודל פוזיציה מקסימלי (%) <span class="text-muted">(עתידי)</span></label>
-                                                <input type="number" id="maxPositionSize" class="form-control form-control-modern" step="0.1" min="0" max="100" disabled>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-          </div>
-        </div>
-      </div>
-      
+            
                 <!-- Section 4: Default Filters -->
                 <div class="content-section" id="section4">
         <div class="section-header">
           <h2>🔍 פילטרים ברירת מחדל</h2>
-                        <p>הגדרות פילטרים ברירת מחדל לכל הדפים</p>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                        <p>פילטרים שיוחלו באופן אוטומטי</p>
+                        <button class="filter-toggle-btn" onclick="window.toggleSection('section4')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
         </div>
         <div class="section-body">
                         <div class="row">
                             <div class="col-md-6">
-            <!-- פילטרים בסיסיים -->
-            <div class="setting-item">
-              <div class="setting-label">
-                <h5>📊 פילטרים בסיסיים</h5>
-                                        <p>פילטרים ברירת מחדל לטבלאות</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                                            <div class="col-12">
-                    <label class="form-label small">סטטוס</label>
-                    <select id="defaultStatusFilter" class="form-select form-control-modern">
-                      <option value="open">פתוח</option>
+                                <h5>פילטרים בסיסיים</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">סטטוס ברירת מחדל</label>
+                                    <select id="defaultStatusFilter" class="form-select control-narrow">
+                                        <option value="all">הכל</option>
+                                        <option value="open" selected>פתוח</option>
                       <option value="closed">סגור</option>
                       <option value="cancelled">מבוטל</option>
-                      <option value="all">הכול</option>
                     </select>
                   </div>
-                                            <div class="col-12">
-                    <label class="form-label small">סוג השקעה</label>
-                    <select id="defaultTypeFilter" class="form-select form-control-modern">
-                      <option value="swing">סווינג</option>
+                                <div class="mb-3">
+                                    <label class="form-label">סוג ברירת מחדל</label>
+                                    <select id="defaultTypeFilter" class="form-select control-narrow">
+                                        <option value="all">הכל</option>
+                                        <option value="swing" selected>Swing</option>
                       <option value="investment">השקעה</option>
-                      <option value="passive">פאסיבי</option>
-                      <option value="all">הכול</option>
+                                        <option value="passive">פסיבי</option>
                     </select>
                   </div>
-                                            <div class="col-12">
-                                                <label class="form-label small">טווח תאריכים</label>
-                <select id="defaultDateRangeFilter" class="form-select form-control-modern">
-                                                    <option value="all">כל זמן</option>
+                                <div class="mb-3">
+                                    <label class="form-label">טווח תאריכים</label>
+                                    <select id="defaultDateRangeFilter" class="form-select">
                   <option value="today">היום</option>
-                                                    <option value="yesterday">אתמול</option>
-                  <option value="this_week">השבוע</option>
-                                                    <option value="last_week">שבוע קודם</option>
-                                                    <option value="this_month">החודש</option>
-                                                    <option value="last_month">חודש קודם</option>
-                                                    <option value="this_year">השנה</option>
-                                                    <option value="last_year">השנה הקודמת</option>
+                                        <option value="this_week" selected>השבוע</option>
+                                        <option value="this_month">החודש</option>
+                                        <option value="this_year">השנה</option>
+                                        <option value="all">הכל</option>
+                                        <option value="custom">מותאם אישית</option>
                 </select>
               </div>
-                                            <div class="col-12">
-                                                <label class="form-label small">טקסט חיפוש ברירת מחדל</label>
-                                                <input type="text" id="defaultSearchFilter" class="form-control form-control-modern" placeholder="טקסט חיפוש ברירת מחדל">
             </div>
-              </div>
-                  </div>
-                  </div>
-                </div>
                             <div class="col-md-6">
-                                <!-- הגדרות חשבון -->
-            <div class="setting-item">
-              <div class="setting-label">
-                                        <h5>🏦 הגדרות חשבון</h5>
-                                        <p>פילטר חשבון ברירת מחדל</p>
+                                <h5>פילטרים נוספים</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">חיפוש ברירת מחדל</label>
+                                    <input type="text" id="defaultSearchFilter" class="form-control" 
+                                           placeholder="טקסט חיפוש ברירת מחדל">
               </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                  <div class="col-12">
-                                                <label class="form-label small">חשבון ברירת מחדל</label>
-                                                <select id="defaultAccountFilter" class="form-select form-control-modern">
-                                                    <option value="all">כל החשבונות</option>
-                                                    <option value="main">חשבון ראשי</option>
-                                                    <option value="secondary">חשבון משני</option>
-                                                </select>
-                    </div>
+                                <div class="mb-3">
+                                    <label class="form-label">חשבון ברירת מחדל</label>
+                                    <select id="defaultAccountFilter" class="form-select">
+                                        <option value="all">כל החשבונות</option>
+                                        <option value="main">חשבון ראשי</option>
+                    </select>
+                  </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-      
-                <!-- Section 5: User Interface -->
+            
+                <!-- Section 5: Colors -->
                 <div class="content-section" id="section5">
         <div class="section-header">
-                        <h2>🎨 הגדרות ממשק משתמש</h2>
-                        <p>הגדרות עיצוב וחוויית משתמש</p>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
+                        <h2>🎨 צבעים</h2>
+                        <p>הגדרות צבעים למערכת וממשק המשתמש</p>
+                        <button class="filter-toggle-btn" onclick="window.toggleSection('section5')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
         </div>
         <div class="section-body">
-                        <!-- צבעים בסיסיים -->
-          <div class="setting-item">
-            <div class="setting-label">
-                                <h5>🎨 צבעים בסיסיים</h5>
-                                <p>צבעי המערכת הבסיסיים</p>
+                        <!-- Basic System Colors -->
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>צבעי מערכת בסיסיים</h5>
             </div>
-            <div class="setting-control">
-              <div class="row g-2">
-                                    <div class="col-6">
-                                        <label class="form-label small">צבע ראשי</label>
-                                        <input type="color" id="primaryColor" class="form-control color-picker" value="#29a6a8" data-color-key="primary-color">
+                </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3 d-flex align-items-center gap-2">
+                                    <label class="form-label mb-0 w-25">צבע ראשי:</label>
+                                    <div class="color-preview bg-primary" onclick="window.openColorPicker('primaryColor')"></div>
+                                    <input type="color" id="primaryColor" value="#29a6a8" class="d-none">
+                </div>
+                                <div class="mb-3 d-flex align-items-center gap-2">
+                                    <label class="form-label mb-0 w-25">צבע משני:</label>
+                                    <div class="color-preview bg-warning" onclick="window.openColorPicker('secondaryColor')"></div>
+                                    <input type="color" id="secondaryColor" value="#ff9c05" class="d-none">
+                </div>
+                                <div class="mb-3 d-flex align-items-center gap-2">
+                                    <label class="form-label mb-0 w-25">הצלחה:</label>
+                                    <div class="color-preview bg-success" onclick="window.openColorPicker('successColor')"></div>
+                                    <input type="color" id="successColor" value="#28a745" class="d-none">
+              </div>
+            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 d-flex align-items-center gap-2">
+                                    <label class="form-label mb-0 w-25">אזהרה:</label>
+                                    <div class="color-preview bg-warning" onclick="window.openColorPicker('warningColor')"></div>
+                                    <input type="color" id="warningColor" value="#ffc107" class="d-none">
+          </div>
+                                <div class="mb-3 d-flex align-items-center gap-2">
+                                    <label class="form-label mb-0 w-25">סכנה:</label>
+                                    <div class="color-preview bg-danger" onclick="window.openColorPicker('dangerColor')"></div>
+                                    <input type="color" id="dangerColor" value="#dc3545" class="d-none">
+            </div>
+                                <div class="mb-3 d-flex align-items-center gap-2">
+                                    <label class="form-label mb-0 w-25">מידע:</label>
+                                    <div class="color-preview bg-info" onclick="window.openColorPicker('infoColor')"></div>
+                                    <input type="color" id="infoColor" value="#007bff" class="d-none">
+              </div>
+            </div>
+          </div>
+          
+                        <div class="section-divider"></div>
+                        
+                        <!-- Entity Colors -->
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>צבעי ישויות</h5>
+                                <small class="text-muted">כל ישות כוללת 3 וריאנטים: רגיל, בהיר (רקע), כהה (טקסט)</small>
+            </div>
                   </div>
-                                    <div class="col-6">
-                                        <label class="form-label small">צבע משני</label>
-                                        <input type="color" id="secondaryColor" class="form-control color-picker" value="#ff9c05" data-color-key="secondary-color">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- Trades -->
+                                <div class="mb-3">
+                                    <label class="form-label">טריידים:</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <div class="color-preview bg-primary" onclick="window.openColorPicker('entityTradeColor')"></div>
+                                        <div class="color-preview bg-light" onclick="window.openColorPicker('entityTradeColorLight')"></div>
+                                        <div class="color-preview bg-dark" onclick="window.openColorPicker('entityTradeColorDark')"></div>
+                                        <input type="color" id="entityTradeColor" value="#007bff" class="d-none">
+                                        <input type="color" id="entityTradeColorLight" value="#e3f2fd" class="d-none">
+                                        <input type="color" id="entityTradeColorDark" value="#0056b3" class="d-none">
                 </div>
                   </div>
-                                <div class="row g-2 mt-2">
-                                    <div class="col-3">
-                                        <label class="form-label small">הצלחה</label>
-                                        <input type="color" id="successColor" class="form-control color-picker" value="#28a745" data-color-key="success-color">
+                                <!-- Accounts -->
+                                <div class="mb-3">
+                                    <label class="form-label">חשבונות:</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <div class="color-preview" onclick="window.openColorPicker('entityAccountColor')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('entityAccountColorLight')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('entityAccountColorDark')"></div>
+                                        <input type="color" id="entityAccountColor" value="#28a745">
+                                        <input type="color" id="entityAccountColorLight" value="#d4edda">
+                                        <input type="color" id="entityAccountColorDark" value="#155724">
                 </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">אזהרה</label>
-                                        <input type="color" id="warningColor" class="form-control color-picker" value="#ffc107" data-color-key="warning-color">
                   </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">סכנה</label>
-                                        <input type="color" id="dangerColor" class="form-control color-picker" value="#dc3545" data-color-key="danger-color">
-                                    </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">מידע</label>
-                                        <input type="color" id="infoColor" class="form-control color-picker" value="#007bff" data-color-key="info-color">
+                                <!-- Tickers -->
+                                <div class="mb-3">
+                                    <label class="form-label">טיקרים:</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <div class="color-preview" onclick="window.openColorPicker('entityTickerColor')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('entityTickerColorLight')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('entityTickerColorDark')"></div>
+                                        <input type="color" id="entityTickerColor" value="#dc3545">
+                                        <input type="color" id="entityTickerColorLight" value="#f8d7da">
+                                        <input type="color" id="entityTickerColorDark" value="#721c24">
+                </div>
+                  </div>
+                                <!-- Alerts -->
+                                <div class="mb-3">
+                                    <label class="form-label">התראות:</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <div class="color-preview" onclick="window.openColorPicker('entityAlertColor')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('entityAlertColorLight')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('entityAlertColorDark')"></div>
+                                        <input type="color" id="entityAlertColor" value="#ff9c05">
+                                        <input type="color" id="entityAlertColorLight" value="#fff3cd">
+                                        <input type="color" id="entityAlertColorDark" value="#856404">
+                </div>
+              </div>
+                  </div>
+                            <div class="col-md-6">
+                                <!-- Cash Flow -->
+                                <div class="mb-3">
+                                    <label class="form-label">תזרים מזומנים:</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <div class="color-preview" onclick="window.openColorPicker('entityCashFlowColor')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('entityCashFlowColorLight')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('entityCashFlowColorDark')"></div>
+                                        <input type="color" id="entityCashFlowColor" value="#20c997">
+                                        <input type="color" id="entityCashFlowColorLight" value="#d1ecf1">
+                                        <input type="color" id="entityCashFlowColorDark" value="#0c5460">
+                </div>
+                  </div>
+                                <!-- Notes -->
+                                <div class="mb-3">
+                                    <label class="form-label">הערות:</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <div class="color-preview" onclick="window.openColorPicker('entityNoteColor')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('entityNoteColorLight')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('entityNoteColorDark')"></div>
+                                        <input type="color" id="entityNoteColor" value="#6f42c1">
+                                        <input type="color" id="entityNoteColorLight" value="#e2e3f1">
+                                        <input type="color" id="entityNoteColorDark" value="#383d41">
+                </div>
+                  </div>
+                                <!-- Trade Plans -->
+                                <div class="mb-3">
+                                    <label class="form-label">תכניות מסחר:</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <div class="color-preview" onclick="window.openColorPicker('entityTradePlanColor')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('entityTradePlanColorLight')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('entityTradePlanColorDark')"></div>
+                                        <input type="color" id="entityTradePlanColor" value="#17a2b8">
+                                        <input type="color" id="entityTradePlanColorLight" value="#d1ecf1">
+                                        <input type="color" id="entityTradePlanColorDark" value="#0c5460">
+                </div>
+                  </div>
+                                <!-- Executions -->
+                                <div class="mb-3">
+                                    <label class="form-label">ביצועים:</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <div class="color-preview" onclick="window.openColorPicker('entityExecutionColor')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('entityExecutionColorLight')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('entityExecutionColorDark')"></div>
+                                        <input type="color" id="entityExecutionColor" value="#fd7e14">
+                                        <input type="color" id="entityExecutionColorLight" value="#ffeaa7">
+                                        <input type="color" id="entityExecutionColorDark" value="#e17055">
                 </div>
               </div>
             </div>
           </div>
           
-          <!-- צבעי ישויות -->
-                        <div class="setting-item">
-            <div class="setting-label">
-                                <h5>📊 צבעי ישויות</h5>
-                                <p>צבעים לכל סוג ישות במערכת</p>
+                        <div class="section-divider"></div>
+                        
+                        <!-- Status Colors -->
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>צבעי סטטוסים</h5>
             </div>
-            <div class="setting-control">
-              <div class="row g-2">
-                                    <!-- טריידים -->
-                                    <div class="col-3">
-                  <label class="form-label small">טריידים</label>
-                                        <input type="color" id="entityTradeColor" class="form-control color-picker" value="#007bff" data-color-key="entity-trade-color">
                   </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">בהיר (רקע)</label>
-                                        <input type="color" id="entityTradeColorLight" class="form-control color-picker" value="#e3f2fd" data-color-key="entity-trade-color-light">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">פתוח:</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <div class="color-preview" onclick="window.openColorPicker('statusOpenColor')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('statusOpenColorLight')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('statusOpenColorDark')"></div>
+                                        <input type="color" id="statusOpenColor" value="#28a745">
+                                        <input type="color" id="statusOpenColorLight" value="#d4edda">
+                                        <input type="color" id="statusOpenColorDark" value="#155724">
                 </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">כהה (טקסט)</label>
-                                        <input type="color" id="entityTradeColorDark" class="form-control color-picker" value="#0056b3" data-color-key="entity-trade-color-dark">
                   </div>
                 </div>
-                                <div class="row g-2 mt-2">
-                                    <!-- חשבונות -->
-                                    <div class="col-3">
-                                        <label class="form-label small">חשבונות</label>
-                                        <input type="color" id="entityAccountColor" class="form-control color-picker" value="#28a745" data-color-key="entity-account-color">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">סגור:</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <div class="color-preview" onclick="window.openColorPicker('statusClosedColor')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('statusClosedColorLight')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('statusClosedColorDark')"></div>
+                                        <input type="color" id="statusClosedColor" value="#6c757d">
+                                        <input type="color" id="statusClosedColorLight" value="#f8f9fa">
+                                        <input type="color" id="statusClosedColorDark" value="#495057">
                   </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">בהיר (רקע)</label>
-                                        <input type="color" id="entityAccountColorLight" class="form-control color-picker" value="#d4edda" data-color-key="entity-account-color-light">
-                </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">כהה (טקסט)</label>
-                                        <input type="color" id="entityAccountColorDark" class="form-control color-picker" value="#155724" data-color-key="entity-account-color-dark">
                 </div>
               </div>
-              <div class="row g-2 mt-2">
-                                    <!-- טיקרים -->
-                                    <div class="col-3">
-                                        <label class="form-label small">טיקרים</label>
-                                        <input type="color" id="entityTickerColor" class="form-control color-picker" value="#dc3545" data-color-key="entity-ticker-color">
-                  </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">בהיר (רקע)</label>
-                                        <input type="color" id="entityTickerColorLight" class="form-control color-picker" value="#f8d7da" data-color-key="entity-ticker-color-light">
-                </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">כהה (טקסט)</label>
-                                        <input type="color" id="entityTickerColorDark" class="form-control color-picker" value="#721c24" data-color-key="entity-ticker-color-dark">
-                  </div>
-                </div>
-                                <div class="row g-2 mt-2">
-                                    <!-- התראות -->
-                                    <div class="col-3">
-                                        <label class="form-label small">התראות</label>
-                                        <input type="color" id="entityAlertColor" class="form-control color-picker" value="#ff9c05" data-color-key="entity-alert-color">
-                  </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">בהיר (רקע)</label>
-                                        <input type="color" id="entityAlertColorLight" class="form-control color-picker" value="#fff3cd" data-color-key="entity-alert-color-light">
-                </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">כהה (טקסט)</label>
-                                        <input type="color" id="entityAlertColorDark" class="form-control color-picker" value="#856404" data-color-key="entity-alert-color-dark">
-                  </div>
-                </div>
-                                <div class="row g-2 mt-2">
-                                    <!-- תזרים מזומנים -->
-                                    <div class="col-3">
-                                        <label class="form-label small">תזרים מזומנים</label>
-                                        <input type="color" id="entityCashFlowColor" class="form-control color-picker" value="#20c997" data-color-key="entity-cash-flow-color">
-              </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">בהיר (רקע)</label>
-                                        <input type="color" id="entityCashFlowColorLight" class="form-control color-picker" value="#d1ecf1" data-color-key="entity-cash-flow-color-light">
-            </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">כהה (טקסט)</label>
-                                        <input type="color" id="entityCashFlowColorDark" class="form-control color-picker" value="#0c5460" data-color-key="entity-cash-flow-color-dark">
-          </div>
-            </div>
-                                <div class="row g-2 mt-2">
-                                    <!-- הערות -->
-                                    <div class="col-3">
-                                        <label class="form-label small">הערות</label>
-                                        <input type="color" id="entityNoteColor" class="form-control color-picker" value="#6f42c1" data-color-key="entity-note-color">
-                  </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">בהיר (רקע)</label>
-                                        <input type="color" id="entityNoteColorLight" class="form-control color-picker" value="#e2e3f1" data-color-key="entity-note-color-light">
-                </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">כהה (טקסט)</label>
-                                        <input type="color" id="entityNoteColorDark" class="form-control color-picker" value="#383d41" data-color-key="entity-note-color-dark">
-                  </div>
-                </div>
-                                <div class="row g-2 mt-2">
-                                    <!-- תוכניות מסחר -->
-                                    <div class="col-3">
-                                        <label class="form-label small">תוכניות מסחר</label>
-                                        <input type="color" id="entityTradePlanColor" class="form-control color-picker" value="#17a2b8" data-color-key="entity-trade-plan-color">
-                  </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">בהיר (רקע)</label>
-                                        <input type="color" id="entityTradePlanColorLight" class="form-control color-picker" value="#d1ecf1" data-color-key="entity-trade-plan-color-light">
-                </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">כהה (טקסט)</label>
-                                        <input type="color" id="entityTradePlanColorDark" class="form-control color-picker" value="#0c5460" data-color-key="entity-trade-plan-color-dark">
-              </div>
-            </div>
-                                <div class="row g-2 mt-2">
-                                    <!-- ביצועים -->
-                                    <div class="col-3">
-                                        <label class="form-label small">ביצועים</label>
-                                        <input type="color" id="entityExecutionColor" class="form-control color-picker" value="#fd7e14" data-color-key="entity-execution-color">
-          </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">בהיר (רקע)</label>
-                                        <input type="color" id="entityExecutionColorLight" class="form-control color-picker" value="#ffeaa7" data-color-key="entity-execution-color-light">
-            </div>
-                                    <div class="col-3">
-                                        <label class="form-label small">כהה (טקסט)</label>
-                                        <input type="color" id="entityExecutionColorDark" class="form-control color-picker" value="#e17055" data-color-key="entity-execution-color-dark">
-                </div>
-              </div>
-            </div>
-          </div>
-          
-                        <!-- צבעי סטטוס -->
-            <div class="setting-item">
-              <div class="setting-label">
-                                <h5>📈 צבעי סטטוס</h5>
-                                <p>צבעים לכל סטטוס במערכת</p>
-              </div>
-              <div class="setting-control">
-                                <div class="row g-2">
-                                    <!-- פתוח -->
-                                    <div class="col-4">
-                                        <label class="form-label small">פתוח</label>
-                                        <input type="color" id="statusOpenColor" class="form-control color-picker" value="#28a745" data-color-key="status-open-color">
-                  </div>
-                                    <div class="col-4">
-                                        <label class="form-label small">בהיר (רקע)</label>
-                                        <input type="color" id="statusOpenColorLight" class="form-control color-picker" value="#d4edda" data-color-key="status-open-color-light">
-                  </div>
-                                    <div class="col-4">
-                                        <label class="form-label small">כהה (טקסט)</label>
-                                        <input type="color" id="statusOpenColorDark" class="form-control color-picker" value="#155724" data-color-key="status-open-color-dark">
-                </div>
-              </div>
-                                <div class="row g-2 mt-2">
-                                    <!-- סגור -->
-                                    <div class="col-4">
-                                        <label class="form-label small">סגור</label>
-                                        <input type="color" id="statusClosedColor" class="form-control color-picker" value="#6c757d" data-color-key="status-closed-color">
-            </div>
-                                    <div class="col-4">
-                                        <label class="form-label small">בהיר (רקע)</label>
-                                        <input type="color" id="statusClosedColorLight" class="form-control color-picker" value="#f8f9fa" data-color-key="status-closed-color-light">
-              </div>
-                                    <div class="col-4">
-                                        <label class="form-label small">כהה (טקסט)</label>
-                                        <input type="color" id="statusClosedColorDark" class="form-control color-picker" value="#495057" data-color-key="status-closed-color-dark">
-                  </div>
-                  </div>
-                                <div class="row g-2 mt-2">
-                                    <!-- מבוטל -->
-                                    <div class="col-4">
-                                        <label class="form-label small">מבוטל</label>
-                                        <input type="color" id="statusCancelledColor" class="form-control color-picker" value="#dc3545" data-color-key="status-cancelled-color">
-                </div>
-                                    <div class="col-4">
-                                        <label class="form-label small">בהיר (רקע)</label>
-                                        <input type="color" id="statusCancelledColorLight" class="form-control color-picker" value="#f8d7da" data-color-key="status-cancelled-color-light">
-              </div>
-                                    <div class="col-4">
-                                        <label class="form-label small">כהה (טקסט)</label>
-                                        <input type="color" id="statusCancelledColorDark" class="form-control color-picker" value="#721c24" data-color-key="status-cancelled-color-dark">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">מבוטל:</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <div class="color-preview" onclick="window.openColorPicker('statusCancelledColor')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('statusCancelledColorLight')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('statusCancelledColorDark')"></div>
+                                        <input type="color" id="statusCancelledColor" value="#dc3545">
+                                        <input type="color" id="statusCancelledColorLight" value="#f8d7da">
+                                        <input type="color" id="statusCancelledColorDark" value="#721c24">
             </div>
           </div>
         </div>
       </div>
       
-                        <!-- צבעי סוגי השקעה -->
-            <div class="setting-item">
-              <div class="setting-label">
-                                <h5>💼 צבעי סוגי השקעה</h5>
-                                <p>צבעים לכל סוג השקעה</p>
+                        <div class="section-divider"></div>
+                        
+                        <!-- Investment Type Colors -->
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>צבעי סוגי השקעה</h5>
               </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                                    <!-- Swing -->
-                                    <div class="col-4">
-                                        <label class="form-label small">Swing</label>
-                                        <input type="color" id="typeSwingColor" class="form-control color-picker" value="#007bff" data-color-key="type-swing-color">
-                    </div>
-                                    <div class="col-4">
-                                        <label class="form-label small">בהיר (רקע)</label>
-                                        <input type="color" id="typeSwingColorLight" class="form-control color-picker" value="#e3f2fd" data-color-key="type-swing-color-light">
                   </div>
-                                    <div class="col-4">
-                                        <label class="form-label small">כהה (טקסט)</label>
-                                        <input type="color" id="typeSwingColorDark" class="form-control color-picker" value="#0056b3" data-color-key="type-swing-color-dark">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">Swing:</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <div class="color-preview" onclick="window.openColorPicker('typeSwingColor')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('typeSwingColorLight')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('typeSwingColorDark')"></div>
+                                        <input type="color" id="typeSwingColor" value="#007bff">
+                                        <input type="color" id="typeSwingColorLight" value="#e3f2fd">
+                                        <input type="color" id="typeSwingColorDark" value="#0056b3">
                   </div>
                 </div>
-                <div class="row g-2 mt-2">
-                                    <!-- השקעה -->
-                                    <div class="col-4">
-                                        <label class="form-label small">השקעה</label>
-                                        <input type="color" id="typeInvestmentColor" class="form-control color-picker" value="#28a745" data-color-key="type-investment-color">
-                    </div>
-                                    <div class="col-4">
-                                        <label class="form-label small">בהיר (רקע)</label>
-                                        <input type="color" id="typeInvestmentColorLight" class="form-control color-picker" value="#d4edda" data-color-key="type-investment-color-light">
-                  </div>
-                                    <div class="col-4">
-                                        <label class="form-label small">כהה (טקסט)</label>
-                                        <input type="color" id="typeInvestmentColorDark" class="form-control color-picker" value="#155724" data-color-key="type-investment-color-dark">
-                  </div>
-                </div>
-                                <div class="row g-2 mt-2">
-                                    <!-- פסיבי -->
-                                    <div class="col-4">
-                                        <label class="form-label small">פסיבי</label>
-                                        <input type="color" id="typePassiveColor" class="form-control color-picker" value="#6f42c1" data-color-key="type-passive-color">
               </div>
-                                    <div class="col-4">
-                                        <label class="form-label small">בהיר (רקע)</label>
-                                        <input type="color" id="typePassiveColorLight" class="form-control color-picker" value="#e2e3f1" data-color-key="type-passive-color-light">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">השקעה:</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <div class="color-preview" onclick="window.openColorPicker('typeInvestmentColor')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('typeInvestmentColorLight')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('typeInvestmentColorDark')"></div>
+                                        <input type="color" id="typeInvestmentColor" value="#28a745">
+                                        <input type="color" id="typeInvestmentColorLight" value="#d4edda">
+                                        <input type="color" id="typeInvestmentColorDark" value="#155724">
             </div>
-                                    <div class="col-4">
-                                        <label class="form-label small">כהה (טקסט)</label>
-                                        <input type="color" id="typePassiveColorDark" class="form-control color-picker" value="#383d41" data-color-key="type-passive-color-dark">
               </div>
+                  </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">פסיבי:</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <div class="color-preview" onclick="window.openColorPicker('typePassiveColor')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('typePassiveColorLight')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('typePassiveColorDark')"></div>
+                                        <input type="color" id="typePassiveColor" value="#6f42c1">
+                                        <input type="color" id="typePassiveColorLight" value="#e2e3f1">
+                                        <input type="color" id="typePassiveColorDark" value="#383d41">
+                  </div>
                 </div>
               </div>
             </div>
             
-                        <!-- צבעי ערכים -->
-            <div class="setting-item">
-              <div class="setting-label">
-                                <h5>💰 צבעי ערכים</h5>
-                                <p>צבעים לערכים חיוביים, שליליים וניטרליים</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                                    <!-- ערך חיובי -->
-                  <div class="col-4">
-                                        <label class="form-label small">ערך חיובי</label>
-                                        <input type="color" id="valuePositiveColor" class="form-control color-picker" value="#28a745" data-color-key="value-positive-color">
-                  </div>
-                  <div class="col-4">
-                                        <label class="form-label small">בהיר (רקע)</label>
-                                        <input type="color" id="valuePositiveColorLight" class="form-control color-picker" value="#d4edda" data-color-key="value-positive-color-light">
-                  </div>
-                  <div class="col-4">
-                                        <label class="form-label small">כהה (טקסט)</label>
-                                        <input type="color" id="valuePositiveColorDark" class="form-control color-picker" value="#155724" data-color-key="value-positive-color-dark">
-                  </div>
-                </div>
-                                <div class="row g-2 mt-2">
-                                    <!-- ערך שלילי -->
-                                    <div class="col-4">
-                                        <label class="form-label small">ערך שלילי</label>
-                                        <input type="color" id="valueNegativeColor" class="form-control color-picker" value="#dc3545" data-color-key="value-negative-color">
-              </div>
-                                    <div class="col-4">
-                                        <label class="form-label small">בהיר (רקע)</label>
-                                        <input type="color" id="valueNegativeColorLight" class="form-control color-picker" value="#f8d7da" data-color-key="value-negative-color-light">
-            </div>
-                                    <div class="col-4">
-                                        <label class="form-label small">כהה (טקסט)</label>
-                                        <input type="color" id="valueNegativeColorDark" class="form-control color-picker" value="#721c24" data-color-key="value-negative-color-dark">
-          </div>
+                        <div class="section-divider"></div>
+                        
+                        <!-- Value Colors -->
+                        <div class="row">
+                            <div class="col-12">
+                                <h5>צבעי ערכים</h5>
         </div>
-                                <div class="row g-2 mt-2">
-                                    <!-- ערך ניטרלי -->
-                  <div class="col-4">
-                                        <label class="form-label small">ערך ניטרלי</label>
-                                        <input type="color" id="valueNeutralColor" class="form-control color-picker" value="#6c757d" data-color-key="value-neutral-color">
+              </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">חיובי:</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <div class="color-preview" onclick="window.openColorPicker('valuePositiveColor')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('valuePositiveColorLight')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('valuePositiveColorDark')"></div>
+                                        <input type="color" id="valuePositiveColor" value="#28a745">
+                                        <input type="color" id="valuePositiveColorLight" value="#d4edda">
+                                        <input type="color" id="valuePositiveColorDark" value="#155724">
+                    </div>
                   </div>
-                  <div class="col-4">
-                                        <label class="form-label small">בהיר (רקע)</label>
-                                        <input type="color" id="valueNeutralColorLight" class="form-control color-picker" value="#f8f9fa" data-color-key="value-neutral-color-light">
                   </div>
-                  <div class="col-4">
-                                        <label class="form-label small">כהה (טקסט)</label>
-                                        <input type="color" id="valueNeutralColorDark" class="form-control color-picker" value="#495057" data-color-key="value-neutral-color-dark">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">שלילי:</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <div class="color-preview" onclick="window.openColorPicker('valueNegativeColor')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('valueNegativeColorLight')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('valueNegativeColorDark')"></div>
+                                        <input type="color" id="valueNegativeColor" value="#dc3545">
+                                        <input type="color" id="valueNegativeColorLight" value="#f8d7da">
+                                        <input type="color" id="valueNegativeColorDark" value="#721c24">
+                </div>
+                    </div>
+                  </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">ניטרלי:</label>
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <div class="color-preview" onclick="window.openColorPicker('valueNeutralColor')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('valueNeutralColorLight')"></div>
+                                        <div class="color-preview" onclick="window.openColorPicker('valueNeutralColorDark')"></div>
+                                        <input type="color" id="valueNeutralColor" value="#6c757d">
+                                        <input type="color" id="valueNeutralColorLight" value="#f8f9fa">
+                                        <input type="color" id="valueNeutralColorDark" value="#495057">
                   </div>
                 </div>
               </div>
             </div>
-            
-                        <!-- הגדרות תצוגה -->
-            <div class="setting-item">
-              <div class="setting-label">
-                                <h5>👁️ הגדרות תצוגה</h5>
-                                <p>הגדרות תצוגת הנתונים</p>
-              </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                                    <div class="col-6">
-                                        <label class="form-label small">מספר שורות בטבלה <span class="text-muted">(עתידי)</span></label>
-                                        <select id="tableRowsPerPage" class="form-select form-control-modern" disabled>
-                                            <option value="10">10</option>
-                                            <option value="25">25</option>
-                                            <option value="50">50</option>
-                                            <option value="100">100</option>
-                                        </select>
-                    </div>
-                                    <div class="col-6">
-                                        <label class="form-label small">עיצוב ברירת מחדל <span class="text-muted">(עתידי)</span></label>
-                                        <select id="defaultTheme" class="form-select form-control-modern" disabled>
-                                            <option value="light">בהיר</option>
-                                            <option value="dark">כהה</option>
-                                            <option value="auto">אוטומטי</option>
-                                        </select>
-                  </div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
             
-                <!-- Section 6: System and Server -->
-                <div class="content-section" id="section6">
+                <!-- Section 6: System Settings -->
+      <div class="content-section" id="section6">
         <div class="section-header">
                         <h2>⚙️ הגדרות מערכת ושרת</h2>
-                        <p>הגדרות טכניות של המערכת</p>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
+                        <p>הגדרות טכניות ומערכת</p>
+                        <button class="filter-toggle-btn" onclick="window.toggleSection('section6')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
         </div>
         <div class="section-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <!-- הגדרות שרת -->
-            <div class="setting-item">
-              <div class="setting-label">
-                                        <h5>🖥️ הגדרות שרת</h5>
-                                        <p>הגדרות חיבור לשרת</p>
+                                <h5>הגדרות שרת</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">כתובת שרת</label>
+                                    <input type="text" id="serverUrl" class="form-control" value="http://localhost:8080">
               </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                                            <div class="col-12">
-                                                <label class="form-label small">כתובת שרת</label>
-                                                <input type="text" id="serverUrl" class="form-control form-control-modern" value="http://localhost:8080">
-                  </div>
-                                            <div class="col-12">
-                                                <label class="form-label small">פורט</label>
-                                                <input type="number" id="serverPort" class="form-control form-control-modern" value="8080">
-                  </div>
-                </div>
-              </div>
+                                <div class="mb-3">
+                                    <label class="form-label">פורט</label>
+                                    <input type="number" id="serverPort" class="form-control control-narrow" value="8080" min="1" max="65535">
             </div>
             
-                                <!-- הגדרות ביצועים -->
-            <div class="setting-item">
-              <div class="setting-label">
-                                        <h5>⚡ הגדרות ביצועים</h5>
-                                        <p>הגדרות ביצועים וזיכרון</p>
+                                <h5 class="mt-4">הגדרות ביצועים</h5>
+                                <div class="mb-3">
+                                    <label class="form-label">מרווח רענון (דקות)</label>
+                                    <input type="number" id="refreshInterval" class="form-control control-narrow" value="5" min="1" max="60">
               </div>
-              <div class="setting-control">
-                <div class="row g-2">
-                                            <div class="col-12">
-                                                <label class="form-label small">מרווח רענון (דקות)</label>
-                                                <input type="number" id="refreshInterval" class="form-control form-control-modern" min="1" max="60">
+                                <div class="mb-3">
+                                    <label class="form-label">זמן Cache (דקות)</label>
+                                    <input type="number" id="cacheTTL" class="form-control control-narrow" value="10" min="1" max="1440">
+                    </div>
+                                <div class="mb-3">
+                                    <label class="form-label">גודל זיכרון מקסימלי (MB)</label>
+                                    <input type="number" id="maxMemorySize" class="form-control control-narrow" value="512" min="100" max="2048">
                   </div>
-                                            <div class="col-12">
-                                                <label class="form-label small">זמן Cache (דקות)</label>
-                                                <input type="number" id="cacheTTL" class="form-control form-control-modern" min="1" max="1440">
-                  </div>
-                                            <div class="col-12">
-                                                <label class="form-label small">גודל זיכרון מקסימלי (MB)</label>
-                                                <input type="number" id="maxMemorySize" class="form-control form-control-modern" min="100" max="2048">
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+                    </div>
                             <div class="col-md-6">
-                                <!-- הגדרות קונסולה ולוג -->
-                                <div class="setting-item">
-                                    <div class="setting-label">
-                                        <h5>🖥️ הגדרות קונסולה ולוג</h5>
-                                        <p>הגדרות ניקוי וניהול קונסולה ולוגים</p>
-      </div>
-                                    <div class="setting-control">
-                                        <div class="row g-2">
-                                            <div class="col-12">
-                                                <label class="form-label small">זמן ניקוי קונסולה (דקות)</label>
-                                                <input type="number" id="consoleCleanupInterval" class="form-control form-control-modern" min="5" max="1440">
-        </div>
-                                            <div class="col-12">
-                                                <label class="form-label small">ניקוי ידני של קונסולה</label>
+                                <h5>הגדרות קונסולה ולוג</h5>
+          <div class="mb-3">
+                                    <label class="form-label">זמן ניקוי קונסולה (דקות)</label>
+                                    <input type="number" id="consoleCleanupInterval" class="form-control control-narrow" value="30" min="5" max="1440">
+          </div>
+          <div class="mb-3">
           <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="manualConsoleCleanup">
-                                                    <label class="form-check-label small" for="manualConsoleCleanup">
-                                                        אפשר ניקוי ידני
+                                        <input class="form-check-input" type="checkbox" id="manualConsoleCleanup">
+                                        <label class="form-check-label" for="manualConsoleCleanup">
+                                            ניקוי ידני של קונסולה
             </label>
           </div>
         </div>
-                                            <div class="col-12">
-                                                <label class="form-label small">רמת לוג</label>
-                                                <select id="logLevel" class="form-select form-control-modern">
-                                                    <option value="debug">Debug</option>
-                                                    <option value="info">Info</option>
-                                                    <option value="warning">Warning</option>
-                                                    <option value="error">Error</option>
-                                                </select>
+                                <div class="mb-3">
+                                    <label class="form-label">רמת לוג</label>
+                                    <select id="logLevel" class="form-select control-narrow">
+                                        <option value="debug" selected>Debug</option>
+                                        <option value="info">Info</option>
+                                        <option value="warning">Warning</option>
+                                        <option value="error">Error</option>
+                                    </select>
         </div>
-                                            <div class="col-12">
-                                                <label class="form-label small">גודל קובץ לוג מקסימלי (MB)</label>
-                                                <input type="number" id="maxLogFileSize" class="form-control form-control-modern" min="1" max="100">
+                                <div class="mb-3">
+                                    <label class="form-label">גודל קובץ לוג מקסימלי (MB)</label>
+                                    <input type="number" id="maxLogFileSize" class="form-control control-narrow" value="10" min="1" max="100">
       </div>
     </div>
   </div>
         </div>
               </div>
-            </div>
-          </div>
-        </div>
-                
-                <!-- Save Button at Bottom -->
-                <div class="row mt-4">
-                    <div class="col-12 d-flex justify-content-start">
-                        <button class="btn btn-primary btn-lg" onclick="saveAllPreferences()" id="saveButtonBottom">
-                            <i class="bi bi-save"></i> שמור הגדרות
-                        </button>
-      </div>
-    </div>
+            
             </div>
         </div>
     </div>
   
+    <!-- Notification system -->
+    <div class="notification-container" id="notificationContainer"></div>
+
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/header-system.js?v=v1.0.0"></script>
-    <script src="scripts/notification-system.js?v=v1.0.0"></script>
+    <script src="scripts/console-cleanup.js?v=v1.0.0"></script>
+    <script src="scripts/translation-utils.js?v=v1.0.0"></script>
+    <script src="scripts/data-utils.js?v=v1.0.0"></script>
     <script src="scripts/ui-utils.js?v=v1.0.0"></script>
+    <script src="scripts/table-mappings.js?v=v1.0.0"></script>
+    <script src="scripts/date-utils.js?v=v1.0.0"></script>
     <script src="scripts/tables.js?v=v1.0.0"></script>
+    <script src="scripts/linked-items.js?v=v1.0.0"></script>
+    <script src="scripts/page-utils.js?v=v1.0.0"></script>
     <script src="scripts/main.js?v=v1.0.0"></script>
+    <script src="scripts/notification-system.js?v=v1.0.0"></script>
+    <script src="scripts/preferences.js?v=v1.0.0"></script>
     
     <script>
-        // Check if notification system is loaded
-        console.log('Notification system loaded:', typeof window.showNotification === 'function');
-        if (typeof window.showNotification !== 'function') {
-            console.error('Notification system not loaded!');
-        }
-    </script>
-    
-    <script>
-        // Track unsaved changes
-        let hasUnsavedChanges = false;
-        
-        // Update save button appearance
-        function updateSaveButton() {
-            const saveButton = document.getElementById('saveButton');
-            const saveButtonBottom = document.getElementById('saveButtonBottom');
-            
-            console.log('Updating save buttons, hasUnsavedChanges:', hasUnsavedChanges);
-            console.log('Save button found:', !!saveButton);
-            console.log('Save button bottom found:', !!saveButtonBottom);
-            
-            if (hasUnsavedChanges) {
-                if (saveButton) {
-                    saveButton.className = 'btn btn-warning btn-lg';
-                    saveButton.innerHTML = '<i class="bi bi-save"></i> שמור הגדרות *';
-                }
-                if (saveButtonBottom) {
-                    saveButtonBottom.className = 'btn btn-warning btn-lg';
-                    saveButtonBottom.innerHTML = '<i class="bi bi-save"></i> שמור הגדרות *';
-                }
-            } else {
-                if (saveButton) {
-                    saveButton.className = 'btn btn-success btn-lg';
-                    saveButton.innerHTML = '<i class="bi bi-save"></i> שמור הגדרות';
-                }
-                if (saveButtonBottom) {
-                    saveButtonBottom.className = 'btn btn-success btn-lg';
-                    saveButtonBottom.innerHTML = '<i class="bi bi-save"></i> שמור הגדרות';
-                }
-            }
-        }
-        
-        // Mark changes
-        function markChanges() {
-            console.log('Marking changes...');
-            hasUnsavedChanges = true;
-            updateSaveButton();
-        }
-        
-        // Load open accounts for filter
-        async function loadOpenAccounts() {
-            try {
-                const response = await fetch('/api/v1/accounts?status=open');
-                const data = await response.json();
-                
-                if (data.success && data.data.accounts) {
-                    const accountSelect = document.getElementById('defaultAccountFilter');
-                    accountSelect.innerHTML = '<option value="all">כל החשבונות</option>';
-                    
-                    data.data.accounts.forEach(account => {
-                        const option = document.createElement('option');
-                        option.value = account.id;
-                        option.textContent = `${account.name} (${account.broker})`;
-                        accountSelect.appendChild(option);
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading open accounts:', error);
-            }
-        }
-        
-        // Load all preferences
-        async function loadAllPreferences() {
-            try {
-                console.log('=== LOADING PREFERENCES ===');
-                await loadOpenAccounts();
-                
-                const generalResponse = await fetch('/api/v1/preferences/user');
-                const generalData = await generalResponse.json();
-                
-                if (generalData.success && generalData.data.preferences) {
-                    const prefs = generalData.data.preferences;
-                    
-                    if (prefs.general) {
-                        document.getElementById('primaryCurrency').value = prefs.general.primaryCurrency || 'USD';
-                        document.getElementById('timezone').value = prefs.general.timezone || 'Asia/Jerusalem';
-                        document.getElementById('defaultStopLoss').value = prefs.general.defaultStopLoss || 5.0;
-                        document.getElementById('defaultTargetPrice').value = prefs.general.defaultTargetPrice || 10.0;
-                        document.getElementById('defaultCommission').value = prefs.general.defaultCommission || 1.0;
-                    }
-                    
-                    if (prefs.defaultFilters) {
-                        document.getElementById('defaultStatusFilter').value = prefs.defaultFilters.status || 'open';
-                        document.getElementById('defaultTypeFilter').value = prefs.defaultFilters.type || 'swing';
-                        document.getElementById('defaultDateRangeFilter').value = prefs.defaultFilters.dateRange || 'this_week';
-                        document.getElementById('defaultAccountFilter').value = prefs.defaultFilters.account || 'all';
-                        document.getElementById('defaultSearchFilter').value = prefs.defaultFilters.search || '';
-                    }
-                    
-                    if (prefs.externalData) {
-                        document.getElementById('refreshInterval').value = prefs.externalData.refresh?.interval || 5;
-                        document.getElementById('cacheTTL').value = prefs.externalData.refresh?.cacheTTL || 5;
-                    }
-                    
-                    if (prefs.system) {
-                        document.getElementById('serverUrl').value = prefs.system.serverUrl || 'http://localhost:8080';
-                        document.getElementById('serverPort').value = prefs.system.serverPort || 8080;
-                        document.getElementById('maxMemorySize').value = prefs.system.maxMemorySize || 512;
-                        document.getElementById('consoleCleanupInterval').value = prefs.system.consoleCleanupInterval || 30;
-                        document.getElementById('manualConsoleCleanup').checked = prefs.system.manualConsoleCleanup || false;
-                    }
-                    
-                    if (prefs.advanced) {
-                        document.getElementById('logLevel').value = prefs.advanced.logLevel || 'info';
-                        document.getElementById('maxLogFileSize').value = prefs.advanced.maxLogFileSize || 10;
-                    }
-                }
-                
-                const uiResponse = await fetch('/api/v1/preferences/ui');
-                const uiData = await uiResponse.json();
-                
-                if (uiData.success && uiData.data.ui_preferences) {
-                    const uiPrefs = uiData.data.ui_preferences;
-                    
-                    // Basic colors
-                    document.getElementById('primaryColor').value = uiPrefs.primaryColor || '#29a6a8';
-                    document.getElementById('secondaryColor').value = uiPrefs.secondaryColor || '#ff9c05';
-                    document.getElementById('successColor').value = uiPrefs.successColor || '#28a745';
-                    document.getElementById('warningColor').value = uiPrefs.warningColor || '#ffc107';
-                    document.getElementById('dangerColor').value = uiPrefs.dangerColor || '#dc3545';
-                    document.getElementById('infoColor').value = uiPrefs.infoColor || '#007bff';
-                    
-                    // Entity colors with variants
-                    document.getElementById('entityTradeColor').value = uiPrefs.entityTradeColor || '#007bff';
-                    document.getElementById('entityTradeColorLight').value = uiPrefs.entityTradeColorLight || '#e3f2fd';
-                    document.getElementById('entityTradeColorDark').value = uiPrefs.entityTradeColorDark || '#0056b3';
-                    
-                    document.getElementById('entityAccountColor').value = uiPrefs.entityAccountColor || '#28a745';
-                    document.getElementById('entityAccountColorLight').value = uiPrefs.entityAccountColorLight || '#d4edda';
-                    document.getElementById('entityAccountColorDark').value = uiPrefs.entityAccountColorDark || '#155724';
-                    
-                    document.getElementById('entityTickerColor').value = uiPrefs.entityTickerColor || '#dc3545';
-                    document.getElementById('entityTickerColorLight').value = uiPrefs.entityTickerColorLight || '#f8d7da';
-                    document.getElementById('entityTickerColorDark').value = uiPrefs.entityTickerColorDark || '#721c24';
-                    
-                    document.getElementById('entityAlertColor').value = uiPrefs.entityAlertColor || '#ff9c05';
-                    document.getElementById('entityAlertColorLight').value = uiPrefs.entityAlertColorLight || '#fff3cd';
-                    document.getElementById('entityAlertColorDark').value = uiPrefs.entityAlertColorDark || '#856404';
-                    
-                    document.getElementById('entityCashFlowColor').value = uiPrefs.entityCashFlowColor || '#20c997';
-                    document.getElementById('entityCashFlowColorLight').value = uiPrefs.entityCashFlowColorLight || '#d1ecf1';
-                    document.getElementById('entityCashFlowColorDark').value = uiPrefs.entityCashFlowColorDark || '#0c5460';
-                    
-                    document.getElementById('entityNoteColor').value = uiPrefs.entityNoteColor || '#6f42c1';
-                    document.getElementById('entityNoteColorLight').value = uiPrefs.entityNoteColorLight || '#e2e3f1';
-                    document.getElementById('entityNoteColorDark').value = uiPrefs.entityNoteColorDark || '#383d41';
-                    
-                    document.getElementById('entityTradePlanColor').value = uiPrefs.entityTradePlanColor || '#17a2b8';
-                    document.getElementById('entityTradePlanColorLight').value = uiPrefs.entityTradePlanColorLight || '#d1ecf1';
-                    document.getElementById('entityTradePlanColorDark').value = uiPrefs.entityTradePlanColorDark || '#0c5460';
-                    
-                    document.getElementById('entityExecutionColor').value = uiPrefs.entityExecutionColor || '#fd7e14';
-                    document.getElementById('entityExecutionColorLight').value = uiPrefs.entityExecutionColorLight || '#ffeaa7';
-                    document.getElementById('entityExecutionColorDark').value = uiPrefs.entityExecutionColorDark || '#e17055';
-                    
-                    // Status colors with variants (only 3 statuses)
-                    document.getElementById('statusOpenColor').value = uiPrefs.statusOpenColor || '#28a745';
-                    document.getElementById('statusOpenColorLight').value = uiPrefs.statusOpenColorLight || '#d4edda';
-                    document.getElementById('statusOpenColorDark').value = uiPrefs.statusOpenColorDark || '#155724';
-                    
-                    document.getElementById('statusClosedColor').value = uiPrefs.statusClosedColor || '#6c757d';
-                    document.getElementById('statusClosedColorLight').value = uiPrefs.statusClosedColorLight || '#f8f9fa';
-                    document.getElementById('statusClosedColorDark').value = uiPrefs.statusClosedColorDark || '#495057';
-                    
-                    document.getElementById('statusCancelledColor').value = uiPrefs.statusCancelledColor || '#dc3545';
-                    document.getElementById('statusCancelledColorLight').value = uiPrefs.statusCancelledColorLight || '#f8d7da';
-                    document.getElementById('statusCancelledColorDark').value = uiPrefs.statusCancelledColorDark || '#721c24';
-                    
-                    // Investment type colors with variants (only 3 types)
-                    document.getElementById('typeSwingColor').value = uiPrefs.typeSwingColor || '#007bff';
-                    document.getElementById('typeSwingColorLight').value = uiPrefs.typeSwingColorLight || '#e3f2fd';
-                    document.getElementById('typeSwingColorDark').value = uiPrefs.typeSwingColorDark || '#0056b3';
-                    
-                    document.getElementById('typeInvestmentColor').value = uiPrefs.typeInvestmentColor || '#28a745';
-                    document.getElementById('typeInvestmentColorLight').value = uiPrefs.typeInvestmentColorLight || '#d4edda';
-                    document.getElementById('typeInvestmentColorDark').value = uiPrefs.typeInvestmentColorDark || '#155724';
-                    
-                    document.getElementById('typePassiveColor').value = uiPrefs.typePassiveColor || '#6f42c1';
-                    document.getElementById('typePassiveColorLight').value = uiPrefs.typePassiveColorLight || '#e2e3f1';
-                    document.getElementById('typePassiveColorDark').value = uiPrefs.typePassiveColorDark || '#383d41';
-                    
-                    // Value colors with variants
-                    document.getElementById('valuePositiveColor').value = uiPrefs.valuePositiveColor || '#28a745';
-                    document.getElementById('valuePositiveColorLight').value = uiPrefs.valuePositiveColorLight || '#d4edda';
-                    document.getElementById('valuePositiveColorDark').value = uiPrefs.valuePositiveColorDark || '#155724';
-                    
-                    document.getElementById('valueNegativeColor').value = uiPrefs.valueNegativeColor || '#dc3545';
-                    document.getElementById('valueNegativeColorLight').value = uiPrefs.valueNegativeColorLight || '#f8d7da';
-                    document.getElementById('valueNegativeColorDark').value = uiPrefs.valueNegativeColorDark || '#721c24';
-                    
-                    document.getElementById('valueNeutralColor').value = uiPrefs.valueNeutralColor || '#6c757d';
-                    document.getElementById('valueNeutralColorLight').value = uiPrefs.valueNeutralColorLight || '#f8f9fa';
-                    document.getElementById('valueNeutralColorDark').value = uiPrefs.valueNeutralColorDark || '#495057';
-                    
-                    // Display settings
-                    document.getElementById('tableRowsPerPage').value = uiPrefs.tableRowsPerPage || 25;
-                    document.getElementById('defaultTheme').value = uiPrefs.defaultTheme || 'light';
-                }
-                
-            } catch (error) {
-                console.error('Error loading preferences:', error);
-                window.showNotification('שגיאה בטעינת ההגדרות: ' + error.message, 'error');
-            }
-        }
-        
-        // Save all preferences
-        async function saveAllPreferences() {
-            try {
-                console.log('=== SAVE PREFERENCES CALLED ===');
-                console.log('Starting to save preferences...');
-                
-                // Disable save button to prevent multiple clicks
-                const saveButton = document.getElementById('saveButton');
-                const saveButtonBottom = document.getElementById('saveButtonBottom');
-                if (saveButton) saveButton.disabled = true;
-                if (saveButtonBottom) saveButtonBottom.disabled = true;
-                const generalData = {
-                    primaryCurrency: document.getElementById('primaryCurrency').value,
-                    timezone: document.getElementById('timezone').value,
-                    defaultStopLoss: parseFloat(document.getElementById('defaultStopLoss').value),
-                    defaultTargetPrice: parseFloat(document.getElementById('defaultTargetPrice').value),
-                    defaultCommission: parseFloat(document.getElementById('defaultCommission').value),
-                    defaultFilters: {
-                        status: document.getElementById('defaultStatusFilter').value,
-                        type: document.getElementById('defaultTypeFilter').value,
-                        dateRange: document.getElementById('defaultDateRangeFilter').value,
-                        account: document.getElementById('defaultAccountFilter').value,
-                        search: document.getElementById('defaultSearchFilter').value
-                    },
-                    externalData: {
-                        refresh: {
-                            interval: parseInt(document.getElementById('refreshInterval').value),
-                            cacheTTL: parseInt(document.getElementById('cacheTTL').value)
-                        }
-                    },
-                    system: {
-                        serverUrl: document.getElementById('serverUrl').value,
-                        serverPort: parseInt(document.getElementById('serverPort').value),
-                        maxMemorySize: parseInt(document.getElementById('maxMemorySize').value),
-                        consoleCleanupInterval: parseInt(document.getElementById('consoleCleanupInterval').value),
-                        manualConsoleCleanup: document.getElementById('manualConsoleCleanup').checked
-                    },
-                    advanced: {
-                        logLevel: document.getElementById('logLevel').value,
-                        maxLogFileSize: parseInt(document.getElementById('maxLogFileSize').value)
-                    }
-                };
-                
-                const uiData = {
-                    primaryColor: document.getElementById('primaryColor').value,
-                    secondaryColor: document.getElementById('secondaryColor').value,
-                    successColor: document.getElementById('successColor').value,
-                    warningColor: document.getElementById('warningColor').value,
-                    dangerColor: document.getElementById('dangerColor').value,
-                    infoColor: document.getElementById('infoColor').value,
-                    
-                    entityTradeColor: document.getElementById('entityTradeColor').value,
-                    entityTradeColorLight: document.getElementById('entityTradeColorLight').value,
-                    entityTradeColorDark: document.getElementById('entityTradeColorDark').value,
-                    
-                    entityAccountColor: document.getElementById('entityAccountColor').value,
-                    entityAccountColorLight: document.getElementById('entityAccountColorLight').value,
-                    entityAccountColorDark: document.getElementById('entityAccountColorDark').value,
-                    
-                    entityTickerColor: document.getElementById('entityTickerColor').value,
-                    entityTickerColorLight: document.getElementById('entityTickerColorLight').value,
-                    entityTickerColorDark: document.getElementById('entityTickerColorDark').value,
-                    
-                    entityAlertColor: document.getElementById('entityAlertColor').value,
-                    entityAlertColorLight: document.getElementById('entityAlertColorLight').value,
-                    entityAlertColorDark: document.getElementById('entityAlertColorDark').value,
-                    
-                    entityCashFlowColor: document.getElementById('entityCashFlowColor').value,
-                    entityCashFlowColorLight: document.getElementById('entityCashFlowColorLight').value,
-                    entityCashFlowColorDark: document.getElementById('entityCashFlowColorDark').value,
-                    
-                    entityNoteColor: document.getElementById('entityNoteColor').value,
-                    entityNoteColorLight: document.getElementById('entityNoteColorLight').value,
-                    entityNoteColorDark: document.getElementById('entityNoteColorDark').value,
-                    
-                    entityTradePlanColor: document.getElementById('entityTradePlanColor').value,
-                    entityTradePlanColorLight: document.getElementById('entityTradePlanColorLight').value,
-                    entityTradePlanColorDark: document.getElementById('entityTradePlanColorDark').value,
-                    
-                    entityExecutionColor: document.getElementById('entityExecutionColor').value,
-                    entityExecutionColorLight: document.getElementById('entityExecutionColorLight').value,
-                    entityExecutionColorDark: document.getElementById('entityExecutionColorDark').value,
-                    
-                    statusOpenColor: document.getElementById('statusOpenColor').value,
-                    statusOpenColorLight: document.getElementById('statusOpenColorLight').value,
-                    statusOpenColorDark: document.getElementById('statusOpenColorDark').value,
-                    
-                    statusClosedColor: document.getElementById('statusClosedColor').value,
-                    statusClosedColorLight: document.getElementById('statusClosedColorLight').value,
-                    statusClosedColorDark: document.getElementById('statusClosedColorDark').value,
-                    
-                    statusCancelledColor: document.getElementById('statusCancelledColor').value,
-                    statusCancelledColorLight: document.getElementById('statusCancelledColorLight').value,
-                    statusCancelledColorDark: document.getElementById('statusCancelledColorDark').value,
-                    
-                    typeSwingColor: document.getElementById('typeSwingColor').value,
-                    typeSwingColorLight: document.getElementById('typeSwingColorLight').value,
-                    typeSwingColorDark: document.getElementById('typeSwingColorDark').value,
-                    
-                    typeInvestmentColor: document.getElementById('typeInvestmentColor').value,
-                    typeInvestmentColorLight: document.getElementById('typeInvestmentColorLight').value,
-                    typeInvestmentColorDark: document.getElementById('typeInvestmentColorDark').value,
-                    
-                    typePassiveColor: document.getElementById('typePassiveColor').value,
-                    typePassiveColorLight: document.getElementById('typePassiveColorLight').value,
-                    typePassiveColorDark: document.getElementById('typePassiveColorDark').value,
-                    
-                    valuePositiveColor: document.getElementById('valuePositiveColor').value,
-                    valuePositiveColorLight: document.getElementById('valuePositiveColorLight').value,
-                    valuePositiveColorDark: document.getElementById('valuePositiveColorDark').value,
-                    
-                    valueNegativeColor: document.getElementById('valueNegativeColor').value,
-                    valueNegativeColorLight: document.getElementById('valueNegativeColorLight').value,
-                    valueNegativeColorDark: document.getElementById('valueNegativeColorDark').value,
-                    
-                    valueNeutralColor: document.getElementById('valueNeutralColor').value,
-                    valueNeutralColorLight: document.getElementById('valueNeutralColorLight').value,
-                    valueNeutralColorDark: document.getElementById('valueNeutralColorDark').value,
-                    
-                    tableRowsPerPage: parseInt(document.getElementById('tableRowsPerPage').value),
-                    defaultTheme: document.getElementById('defaultTheme').value
-                };
-                
-                const systemData = {
-                    serverUrl: document.getElementById('serverUrl').value,
-                    serverPort: parseInt(document.getElementById('serverPort').value),
-                    maxMemorySize: parseInt(document.getElementById('maxMemorySize').value)
-                };
-                
-                const advancedData = {
-                    logLevel: document.getElementById('logLevel').value,
-                    maxLogFileSize: parseInt(document.getElementById('maxLogFileSize').value)
-                };
-                
-                console.log('Saving general data...', generalData);
-                const userResponse = await fetch('/api/v1/preferences/user', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(generalData)
-                });
-                console.log('User response:', userResponse.status);
-                
-                // If rate limited, wait longer and try again
-                if (userResponse.status === 429) {
-                    console.log('Rate limited, waiting 2 seconds...');
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                    // Retry the request
-                    const retryResponse = await fetch('/api/v1/preferences/user', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(generalData)
-                    });
-                    console.log('Retry response:', retryResponse.status);
-                }
-                
-                // Add delay to prevent rate limiting
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                console.log('Saving UI data...', uiData);
-                const uiResponse = await fetch('/api/v1/preferences/ui', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(uiData)
-                });
-                console.log('UI response:', uiResponse.status);
-                
-                // Add delay to prevent rate limiting
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                console.log('Saving system data...', systemData);
-                const systemResponse = await fetch('/api/v1/preferences/system', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(systemData)
-                });
-                console.log('System response:', systemResponse.status);
-                
-                // Add delay to prevent rate limiting
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                console.log('Saving advanced data...', advancedData);
-                const advancedResponse = await fetch('/api/v1/preferences/advanced', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(advancedData)
-                });
-                console.log('Advanced response:', advancedResponse.status);
-                
-                // Check if all responses are successful
-                if (userResponse.ok && uiResponse.ok && systemResponse.ok && advancedResponse.ok) {
-                    hasUnsavedChanges = false;
-                    updateSaveButton();
-                    console.log('All preferences saved successfully!');
-                    console.log('showNotification function exists:', typeof window.showNotification === 'function');
-                    if (typeof window.showNotification === 'function') {
-                        console.log('Calling showNotification...');
-                        window.showNotification('הגדרות נשמרו בהצלחה!', 'success');
-                        console.log('showNotification called');
-                    } else {
-                        console.error('showNotification not available, using alert');
-                        alert('הגדרות נשמרו בהצלחה!');
-                    }
-                    
-                    // Don't reload - keep current values since they were just saved
-                    console.log('Save completed - keeping current values');
-                } else {
-                    console.error('Some API calls failed:', {
-                        user: userResponse.status,
-                        ui: uiResponse.status,
-                        system: systemResponse.status,
-                        advanced: advancedResponse.status
-                    });
-                    
-                    // Check if it's a rate limiting issue
-                    if (userResponse.status === 429 || uiResponse.status === 429 || 
-                        systemResponse.status === 429 || advancedResponse.status === 429) {
-                        window.showNotification('יותר מדי בקשות - נסה שוב בעוד רגע', 'warning');
-                    } else {
-                        window.showNotification('שגיאה בשמירת חלק מההגדרות', 'error');
-                    }
-                }
-                
-            } catch (error) {
-                console.error('Error saving preferences:', error);
-                window.showNotification('שגיאה בשמירת ההגדרות: ' + error.message, 'error');
-            } finally {
-                // Re-enable save buttons
-                const saveButton = document.getElementById('saveButton');
-                const saveButtonBottom = document.getElementById('saveButtonBottom');
-                if (saveButton) saveButton.disabled = false;
-                if (saveButtonBottom) saveButtonBottom.disabled = false;
-            }
-        }
-        
-        // Initialize page
+        // All functions moved to global system - no local functions
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Page loaded, initializing...');
-            console.log('showNotification function exists at start:', typeof window.showNotification === 'function');
-            loadAllPreferences();
+            console.log('🚀 Preferences page loaded');
             
-            const inputs = document.querySelectorAll('input:not([disabled]), select:not([disabled]), textarea:not([disabled])');
-            console.log('Found', inputs.length, 'inputs to add event listeners to');
-            inputs.forEach(input => {
-                input.addEventListener('change', markChanges);
-                input.addEventListener('input', markChanges);
-            });
-            
-            const colorPickers = document.querySelectorAll('input[type="color"]');
-            colorPickers.forEach(picker => {
-                picker.addEventListener('change', function(e) {
-                    const colorKey = e.target.dataset.colorKey;
-                    const colorValue = e.target.value;
-                    
-                    if (colorKey) {
-                        document.documentElement.style.setProperty(`--user-${colorKey}`, colorValue);
-                        markChanges();
-                    }
-                });
-            });
-            
-            window.loadProfile = function() {
-                const profileSelect = document.getElementById('profileSelect');
-                const selectedProfile = profileSelect.value;
-                console.log('Loading profile:', selectedProfile);
-                window.showNotification('פרופיל נטען בהצלחה', 'success');
-            };
-            
-            window.createProfile = function() {
-                const newProfileName = document.getElementById('newProfileName').value;
-                if (!newProfileName.trim()) {
-                    window.showNotification('אנא הזן שם פרופיל', 'error');
-                    return;
-                }
-                console.log('Creating profile:', newProfileName);
-                window.showNotification('פרופיל נוצר בהצלחה', 'success');
-                document.getElementById('newProfileName').value = '';
-            };
-            
-            window.saveCurrentProfile = function() {
-                const profileSelect = document.getElementById('profileSelect');
-                const selectedProfile = profileSelect.value;
-                console.log('Saving current settings to profile:', selectedProfile);
-                window.showNotification('פרופיל נשמר בהצלחה', 'success');
-            };
-            
-            window.duplicateProfile = function() {
-                const profileSelect = document.getElementById('profileSelect');
-                const selectedProfile = profileSelect.value;
-                console.log('Duplicating profile:', selectedProfile);
-                window.showNotification('פרופיל שוכפל בהצלחה', 'success');
-            };
-            
-            window.exportProfile = function() {
-                const profileSelect = document.getElementById('profileSelect');
-                const selectedProfile = profileSelect.value;
-                console.log('Exporting profile:', selectedProfile);
-                window.showNotification('פרופיל יוצא בהצלחה', 'success');
-            };
-            
-            window.deleteProfile = function() {
-                const profileSelect = document.getElementById('profileSelect');
-                const selectedProfile = profileSelect.value;
-                if (selectedProfile === 'default') {
-                    window.showNotification('לא ניתן למחוק פרופיל ברירת מחדל', 'error');
-                    return;
-                }
-                console.log('Deleting profile:', selectedProfile);
-                window.showNotification('פרופיל נמחק בהצלחה', 'success');
-            };
-            
-            window.addEventListener('beforeunload', function(e) {
-                if (hasUnsavedChanges) {
-                    e.preventDefault();
-                    e.returnValue = '';
-                }
-            });
-            
-            console.log('=== INITIALIZATION COMPLETE ===');
-            console.log('showNotification function exists at end:', typeof window.showNotification === 'function');
+            // Initialize using global functions
+            if (typeof window.initializePreferencesPage === 'function') {
+                window.initializePreferencesPage();
+            } else {
+                console.warn('Global preferences functions not available');
+            }
         });
     </script>
 </body>

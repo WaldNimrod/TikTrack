@@ -419,7 +419,7 @@ async function getUserPreference(key, defaultValue = null) {
     }
     
     // Fallback ל-localStorage מקומי
-    const preferences = JSON.parse(localStorage.getItem('userPreferences') || '{}');
+    const preferences = JSON.parse(localStorage.getItem('tikTrack_preferences') || '{}');
     const localValue = preferences[key] !== undefined ? preferences[key] : defaultValue;
     console.log(`🔄 Using localStorage preference ${key}: ${localValue}`);
     return localValue;

@@ -247,7 +247,7 @@
                                         <th>
                                             <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTable === 'function') { window.sortTable(8); }">
-                                                עודכן <span class="sort-icon">↕</span>
+                                                Date <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th class="actions-cell">פעולות</th>
@@ -267,7 +267,7 @@
                                         <td data-investment-type="Investment">Investment</td>
                                         <td>Apple Inc.</td>
                                         <td>טיקר טכנולוגיה</td>
-                                        <td>2025-01-15 10:30</td>
+                                        <td>2025-01-15</td>
                     <td class="actions-cell" id="actions-cell-1">
                         <!-- Actions will be populated by JavaScript -->
                     </td>
@@ -282,10 +282,10 @@
                     </td>
                     <td><span class="numeric-text-positive">$420.75</span></td>
                     <td><span class="numeric-text-positive">+1.85%</span></td>
-                    <td data-investment-type="stock">מניה</td>
+                    <td data-investment-type="Investment">Investment</td>
                     <td>Microsoft Corporation</td>
                     <td>טיקר טכנולוגיה</td>
-                    <td>2025-01-15 10:25</td>
+                                        <td>2025-01-14</td>
                     <td class="actions-cell" id="actions-cell-2">
                         <!-- Actions will be populated by JavaScript -->
                     </td>
@@ -303,7 +303,7 @@
                                         <td data-investment-type="Investment">Investment</td>
                                         <td>Alphabet Inc.</td>
                                         <td>טיקר טכנולוגיה</td>
-                                        <td>2025-01-15 09:45</td>
+                                        <td>2025-01-13</td>
                     <td class="actions-cell" id="actions-cell-3">
                         <!-- Actions will be populated by JavaScript -->
                     </td>
@@ -321,7 +321,7 @@
                                         <td data-investment-type="Swing">Swing</td>
                                         <td>Tesla Inc.</td>
                                         <td>טיקר רכב חשמלי</td>
-                                        <td>2025-01-15 11:15</td>
+                                        <td>2025-01-12</td>
                                         <td class="actions-cell" id="actions-cell-4">
                                             <!-- Actions will be populated by JavaScript -->
                                         </td>
@@ -339,7 +339,7 @@
                                         <td data-investment-type="Passive">Passive</td>
                                         <td>NVIDIA Corporation</td>
                                         <td>טיקר AI וצ'יפים</td>
-                                        <td>2025-01-15 11:00</td>
+                                        <td>2025-01-11</td>
                                         <td class="actions-cell" id="actions-cell-5">
                                             <!-- Actions will be populated by JavaScript -->
                                         </td>
@@ -357,7 +357,7 @@
                                         <td data-investment-type="Investment">Investment</td>
                                         <td>Amazon.com Inc.</td>
                                         <td>טיקר מסחר אלקטרוני</td>
-                                        <td>2025-01-15 08:30</td>
+                                        <td>2025-01-10</td>
                                         <td class="actions-cell" id="actions-cell-6">
                                             <!-- Actions will be populated by JavaScript -->
                                         </td>
@@ -379,10 +379,15 @@
                         </button>
                     </div>
                     <div class="section-body">
-                        <div class="alert alert-warning">
-                            <h5>🔍 סקשן 2 - בדיקת כפתורי פתיחה/סגירה</h5>
-                            <p>זהו סקשן תוכן רגיל עם ID: <code>section2</code></p>
-                            <p>לחץ על כפתור הפתיחה/סגירה כדי לבדוק שהמערכת הגלובלית עובדת.</p>
+                        <div class="alert alert-info">
+                            <h5>🔍 מידע דיבאג - מצב המערכות</h5>
+                            <p>מידע על מצב המערכות והפילטרים:</p>
+                            <div id="systemStatusInfo">
+                                <p><strong>מערכת הכותרת:</strong> <span id="headerSystemStatus">טוען...</span></p>
+                                <p><strong>מערכת הפילטרים:</strong> <span id="filterSystemStatus">טוען...</span></p>
+                                <p><strong>מערכת התרגום:</strong> <span id="translationSystemStatus">טוען...</span></p>
+                                <p><strong>מספר שורות בטבלה:</strong> <span id="tableRowCount">טוען...</span></p>
+                            </div>
                         </div>
                         
                         <div class="card">
@@ -423,11 +428,18 @@
                         </button>
                     </div>
                     <div class="section-body">
-                        <div class="alert alert-danger">
-                            <h5>⚙️ סקשן 3 - בדיקת כפתורי פתיחה/סגירה</h5>
-                            <p>זהו סקשן תוכן רגיל עם ID: <code>section3</code></p>
-                            <p>לחץ על כפתור הפתיחה/סגירה כדי לבדוק שהמערכת הגלובלית עובדת.</p>
-                                        </div>
+                        <div class="alert alert-success">
+                            <h5>⚙️ כלי פיתוח - מצב פילטרים (Debug)</h5>
+                            <p>מידע מפורט על מצב הפילטרים:</p>
+                            <div id="filterDebugInfo" class="debug-info">
+                                <p><strong>פילטר סטטוס:</strong> <span id="statusFilterInfo">לא נבחר</span></p>
+                                <p><strong>פילטר סוג השקעה:</strong> <span id="typeFilterInfo">לא נבחר</span></p>
+                                <p><strong>פילטר חשבון:</strong> <span id="accountFilterInfo">לא נבחר</span></p>
+                                <p><strong>פילטר תאריך:</strong> <span id="dateFilterInfo">לא נבחר</span></p>
+                                <p><strong>פילטר חיפוש:</strong> <span id="searchFilterInfo">ריק</span></p>
+                                <p><strong>שורות מוצגות:</strong> <span id="visibleRowsInfo">כל השורות</span></p>
+                            </div>
+                        </div>
 
                         <div class="card">
                             <div class="card-body">
@@ -489,5 +501,66 @@
     
     <!-- Page-specific script -->
     <script src="scripts/test-header-only.js?v=3.1.0"></script>
+    
+    <!-- Debug Information Script -->
+    <script>
+        // Debug Information Updates
+        function updateSystemStatus() {
+            // Check header system
+            const headerElement = document.getElementById('unified-header');
+            const headerStatus = headerElement ? 'פעיל' : 'לא פעיל';
+            document.getElementById('headerSystemStatus').textContent = headerStatus;
+            
+            // Check filter system
+            const filterSystemStatus = window.applyTableFilter ? 'פעיל' : 'לא פעיל';
+            document.getElementById('filterSystemStatus').textContent = filterSystemStatus;
+            
+            // Check translation system
+            const translationSystemStatus = window.translateText ? 'פעיל' : 'לא פעיל';
+            document.getElementById('translationSystemStatus').textContent = translationSystemStatus;
+            
+            // Count table rows
+            const tableRows = document.querySelectorAll('#tickersTable tbody tr');
+            document.getElementById('tableRowCount').textContent = tableRows.length;
+        }
+        
+        function updateFilterDebugInfo() {
+            // Get filter states
+            const statusFilter = window.selectedStatusesForFilter || [];
+            const typeFilter = window.selectedTypesForFilter || [];
+            const accountFilter = window.selectedAccountsForFilter || [];
+            const dateFilter = window.selectedDateRangeForFilter || 'All Time';
+            const searchFilter = window.searchTextForFilter || '';
+            
+            // Update display
+            document.getElementById('statusFilterInfo').textContent = 
+                statusFilter.length > 0 ? statusFilter.join(', ') : 'לא נבחר';
+            document.getElementById('typeFilterInfo').textContent = 
+                typeFilter.length > 0 ? typeFilter.join(', ') : 'לא נבחר';
+            document.getElementById('accountFilterInfo').textContent = 
+                accountFilter.length > 0 ? accountFilter.join(', ') : 'לא נבחר';
+            document.getElementById('dateFilterInfo').textContent = dateFilter;
+            document.getElementById('searchFilterInfo').textContent = searchFilter || 'ריק';
+            
+            // Count visible rows
+            const visibleRows = document.querySelectorAll('#tickersTable tbody tr:not([style*="display: none"])');
+            document.getElementById('visibleRowsInfo').textContent = 
+                `${visibleRows.length} מתוך ${document.querySelectorAll('#tickersTable tbody tr').length}`;
+        }
+        
+        // Update debug info every 2 seconds
+        setInterval(() => {
+            updateSystemStatus();
+            updateFilterDebugInfo();
+        }, 2000);
+        
+        // Initial update
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                updateSystemStatus();
+                updateFilterDebugInfo();
+            }, 1000);
+        });
+    </script>
 </body>
 </html>

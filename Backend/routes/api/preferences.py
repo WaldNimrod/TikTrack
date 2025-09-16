@@ -89,14 +89,41 @@ def save_user_preferences() -> Any:
                 "timestamp": "2025-01-07T21:55:00Z"
             }), 400
         
-        # For now, just return success
-        logger.info(f"Received preferences data: {list(data.keys())}")
-        
-        return jsonify({
-            "success": True,
-            "message": "Preferences saved successfully",
-            "timestamp": "2025-01-07T21:55:00Z"
-        }), 200
+        # Save to database using PreferencesService
+        db = SessionLocal()
+        try:
+            # Get current user (for now, use default user ID 1)
+            user_id = 1
+            
+            # Save preferences using the service
+            result = PreferencesService.save_user_preferences(
+                db=db,
+                user_id=user_id,
+                preferences_data=data,
+                profile_name="ברירת מחדל"
+            )
+            
+            if result:
+                logger.info(f"✅ Preferences saved successfully for user {user_id}: {list(data.keys())}")
+                return jsonify({
+                    "success": True,
+                    "message": "Preferences saved successfully to database",
+                    "data": {
+                        "saved_keys": list(data.keys()),
+                        "user_id": user_id
+                    },
+                    "timestamp": "2025-01-07T21:55:00Z"
+                }), 200
+            else:
+                logger.error(f"❌ Failed to save preferences for user {user_id}")
+                return jsonify({
+                    "success": False,
+                    "error": "Failed to save preferences to database",
+                    "timestamp": "2025-01-07T21:55:00Z"
+                }), 500
+                
+        finally:
+            db.close()
         
     except Exception as e:
         logger.error(f"Error saving user preferences: {e}")

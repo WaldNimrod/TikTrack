@@ -24,6 +24,39 @@
   margin: 0;
 }
 
+/* סגנון כללי לכפתורים - תמיד בשורה עם רווח */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-inline-end: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* כפתורים בשורה - ללא מעבר שורה */
+.btn-inline {
+  display: inline-flex;
+  margin-inline-end: 0.5rem;
+  margin-bottom: 0;
+}
+
+/* קבוצת כפתורים - תמיד בשורה */
+.btn-group,
+.profile-buttons,
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btn-group .btn,
+.profile-buttons .btn,
+.button-row .btn {
+  margin: 0;
+  flex-shrink: 0;
+}
+
 /* כפתור מודגש בצבע כתום - לשימוש בכל המערכת */
 .btn-emphasized,
 .btn-primary-emphasized,

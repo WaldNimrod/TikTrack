@@ -231,7 +231,7 @@
   - 0 קישורים
 
 #### 18. **Numeric-Value-Colors-Demo** - 10%
-- **קובץ:** `trading-ui/numeric-value-colors-demo.html`
+- **קובץ:** `trading-ui/dynamic-colors-display.html`
 - **בעיות:**
   - 0 כפתורים
   - 0 פונקציות onclick

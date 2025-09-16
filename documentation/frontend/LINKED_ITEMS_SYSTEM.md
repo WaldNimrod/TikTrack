@@ -552,7 +552,7 @@ window.updateNumericValueColors({
 - **HTML V2**: `trading-ui/preferences-v2.html` (סקשן צבעים מתקדם)
 - **HTML V2**: `trading-ui/preferences-v2.html` (מערכת צבעים מתקדמת) ✨ **NEW**
 - **JavaScript V2**: `trading-ui/scripts/preferences-v2.js` (ניהול צבעים מתקדם) ✨ **NEW**
-- **דוגמה**: `trading-ui/numeric-value-colors-demo.html`
+- **דוגמה**: `trading-ui/dynamic-colors-display.html`
 
 ### יתרונות המערכת החדשה
 

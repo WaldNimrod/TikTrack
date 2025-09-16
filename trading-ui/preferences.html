@@ -853,7 +853,7 @@
                 
                 <!-- Save Button at Bottom -->
                 <div class="row mt-4">
-                    <div class="col-12">
+                    <div class="col-12 d-flex justify-content-start">
                         <button class="btn btn-primary btn-lg" onclick="saveAllPreferences()" id="saveButtonBottom">
                             <i class="bi bi-save"></i> שמור הגדרות
                         </button>
@@ -1095,6 +1095,12 @@
             try {
                 console.log('=== SAVE PREFERENCES CALLED ===');
                 console.log('Starting to save preferences...');
+                
+                // Disable save button to prevent multiple clicks
+                const saveButton = document.getElementById('saveButton');
+                const saveButtonBottom = document.getElementById('saveButtonBottom');
+                if (saveButton) saveButton.disabled = true;
+                if (saveButtonBottom) saveButtonBottom.disabled = true;
                 const generalData = {
                     primaryCurrency: document.getElementById('primaryCurrency').value,
                     timezone: document.getElementById('timezone').value,
@@ -1226,6 +1232,9 @@
                 });
                 console.log('User response:', userResponse.status);
                 
+                // Add delay to prevent rate limiting
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
                 console.log('Saving UI data...', uiData);
                 const uiResponse = await fetch('/api/v1/preferences/ui', {
                     method: 'POST',
@@ -1234,6 +1243,9 @@
                 });
                 console.log('UI response:', uiResponse.status);
                 
+                // Add delay to prevent rate limiting
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
                 console.log('Saving system data...', systemData);
                 const systemResponse = await fetch('/api/v1/preferences/system', {
                     method: 'POST',
@@ -1241,6 +1253,9 @@
                     body: JSON.stringify(systemData)
                 });
                 console.log('System response:', systemResponse.status);
+                
+                // Add delay to prevent rate limiting
+                await new Promise(resolve => setTimeout(resolve, 100));
                 
                 console.log('Saving advanced data...', advancedData);
                 const advancedResponse = await fetch('/api/v1/preferences/advanced', {
@@ -1255,8 +1270,8 @@
                     hasUnsavedChanges = false;
                     updateSaveButton();
                     console.log('All preferences saved successfully!');
-                console.log('showNotification function exists:', typeof window.showNotification === 'function');
-                window.showNotification('הגדרות נשמרו בהצלחה!', 'success');
+                    console.log('showNotification function exists:', typeof window.showNotification === 'function');
+                    window.showNotification('הגדרות נשמרו בהצלחה!', 'success');
                 } else {
                     console.error('Some API calls failed:', {
                         user: userResponse.status,
@@ -1264,12 +1279,25 @@
                         system: systemResponse.status,
                         advanced: advancedResponse.status
                     });
-                window.showNotification('שגיאה בשמירת חלק מההגדרות', 'error');
+                    
+                    // Check if it's a rate limiting issue
+                    if (userResponse.status === 429 || uiResponse.status === 429 || 
+                        systemResponse.status === 429 || advancedResponse.status === 429) {
+                        window.showNotification('יותר מדי בקשות - נסה שוב בעוד רגע', 'warning');
+                    } else {
+                        window.showNotification('שגיאה בשמירת חלק מההגדרות', 'error');
+                    }
                 }
                 
             } catch (error) {
                 console.error('Error saving preferences:', error);
                 window.showNotification('שגיאה בשמירת ההגדרות: ' + error.message, 'error');
+            } finally {
+                // Re-enable save buttons
+                const saveButton = document.getElementById('saveButton');
+                const saveButtonBottom = document.getElementById('saveButtonBottom');
+                if (saveButton) saveButton.disabled = false;
+                if (saveButtonBottom) saveButtonBottom.disabled = false;
             }
         }
         

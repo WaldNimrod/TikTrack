@@ -1390,7 +1390,7 @@ function toggleAllSections() {
   
   sections.forEach(section => {
     const sectionBody = section.querySelector('.section-body');
-    const toggleIcon = section.querySelector('.section-toggle-icon');
+    const toggleIcon = section.querySelector('.section-toggle-icon, .filter-icon');
     
     if (sectionBody && toggleIcon) {
       sectionBody.style.display = allCollapsed ? 'block' : 'none';

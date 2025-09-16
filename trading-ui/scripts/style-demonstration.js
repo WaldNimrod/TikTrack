@@ -83,9 +83,8 @@ function updateColorSystem() {
     const primaryColor = getComputedStyle(root).getPropertyValue('--primary-color') || '#007bff';
     const secondaryColor = getComputedStyle(root).getPropertyValue('--secondary-color') || '#6c757d';
     
-    // Update all color variations
-    root.style.setProperty('--primary-color', primaryColor);
-    root.style.setProperty('--secondary-color', secondaryColor);
+    // REMOVED: root.style.setProperty() calls - these create inline styles which violate project rules
+    // The CSS custom properties should be defined in external CSS files only
     
     // Trigger color update event
     document.dispatchEvent(new CustomEvent('colorSystemUpdated', {
@@ -97,13 +96,11 @@ function updateColorSystem() {
 function testStyleFile(filePath) {
     console.log(`Testing style file: ${filePath}`);
     
-    // Add test class to body
-    document.body.classList.add(`test-${filePath.replace(/[^a-zA-Z0-9]/g, '-')}`);
+    // REMOVED: Adding test classes to body - this can interfere with page styling
+    // Test classes should be defined in external CSS files only
     
-    // Remove after 2 seconds
-    setTimeout(() => {
-        document.body.classList.remove(`test-${filePath.replace(/[^a-zA-Z0-9]/g, '-')}`);
-    }, 2000);
+    // Just log the test instead of modifying DOM
+    console.log(`Style file test completed: ${filePath}`);
 }
 
 // Layer Control Functions
@@ -212,8 +209,8 @@ Loading order: Bootstrap → ITCSS files → Header styles
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Style Demonstration Page Loaded');
     
-    // Initialize color system
-    updateColorSystem();
+    // REMOVED: updateColorSystem() call - this was causing inline styles to be applied
+    // The color system should be handled by external CSS files only
     
     // Add event listeners for style file controls
     const styleCheckboxes = document.querySelectorAll('input[type="checkbox"][onchange*="toggleStyleFile"]');
@@ -236,19 +233,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Test the toggle functions
     console.log('Testing toggle functions...');
     
-    // Test toggleStyleFile with a real file
-    setTimeout(() => {
-        console.log('Testing toggleStyleFile with _variables.css...');
-        const testLink = document.querySelector('link[href*="_variables.css"]');
-        if (testLink) {
-            console.log('Found _variables.css link:', testLink.href);
-            console.log('Current disabled state:', testLink.disabled);
-            
-            // Test the toggle function
-            console.log('Testing toggle function...');
-            toggleStyleFile('01-settings/_variables.css');
-        } else {
-            console.log('_variables.css link not found');
-        }
-    }, 1000);
+    // REMOVED: setTimeout test - this was causing style changes after page load
+    // The toggle functions should only be called by user interaction, not automatically
 });

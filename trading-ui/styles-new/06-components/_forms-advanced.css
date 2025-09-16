@@ -231,6 +231,22 @@ select option {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
+/* מסגרת לבנה לכל קונטרולי הצבעים */
+input[type="color"] {
+  border: 2px solid white !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  width: 50px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+}
+
+input[type="color"]:hover {
+  border-color: #007bff !important;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2) !important;
+}
+
 /* מחלקת הסתרה */
 .d-none {
   display: none !important;

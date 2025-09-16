@@ -1228,8 +1228,21 @@
                 });
                 console.log('User response:', userResponse.status);
                 
+                // If rate limited, wait longer and try again
+                if (userResponse.status === 429) {
+                    console.log('Rate limited, waiting 2 seconds...');
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    // Retry the request
+                    const retryResponse = await fetch('/api/v1/preferences/user', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(generalData)
+                    });
+                    console.log('Retry response:', retryResponse.status);
+                }
+                
                 // Add delay to prevent rate limiting
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 500));
                 
                 console.log('Saving UI data...', uiData);
                 const uiResponse = await fetch('/api/v1/preferences/ui', {
@@ -1240,7 +1253,7 @@
                 console.log('UI response:', uiResponse.status);
                 
                 // Add delay to prevent rate limiting
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 500));
                 
                 console.log('Saving system data...', systemData);
                 const systemResponse = await fetch('/api/v1/preferences/system', {
@@ -1251,7 +1264,7 @@
                 console.log('System response:', systemResponse.status);
                 
                 // Add delay to prevent rate limiting
-                await new Promise(resolve => setTimeout(resolve, 100));
+                await new Promise(resolve => setTimeout(resolve, 500));
                 
                 console.log('Saving advanced data...', advancedData);
                 const advancedResponse = await fetch('/api/v1/preferences/advanced', {
@@ -1276,9 +1289,8 @@
                         alert('הגדרות נשמרו בהצלחה!');
                     }
                     
-                    // Reload preferences to show updated values
-                    console.log('Reloading preferences after save...');
-                    await loadAllPreferences();
+                    // Don't reload - keep current values since they were just saved
+                    console.log('Save completed - keeping current values');
                 } else {
                     console.error('Some API calls failed:', {
                         user: userResponse.status,

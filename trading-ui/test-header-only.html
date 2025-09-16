@@ -205,7 +205,7 @@
                                         <th>
                                             <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTable === 'function') { window.sortTable(1); }">
-                                                סטטוס <span class="sort-icon">↕</span>
+                                                Status <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th>
@@ -229,7 +229,7 @@
                                         <th>
                                             <button class="btn btn-link sortable-header"
                                                 onclick="if (typeof window.sortTable === 'function') { window.sortTable(5); }">
-                                                סוג <span class="sort-icon">↕</span>
+                                                Investment Type <span class="sort-icon">↕</span>
                                             </button>
                                         </th>
                                         <th>
@@ -256,7 +256,7 @@
                                                 <tbody>
                                                     <tr>
                                                         <td>AAPL</td>
-                                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
+                                                        <td data-status="Open"><span class="status-badge status-open">Open</span></td>
                     <td title="יש טריידים פעילים" class="text-center">
                         <span class="btn btn-sm btn-success btn-yes-no">
                             ✓
@@ -264,7 +264,7 @@
                     </td>
                     <td><span class="numeric-text-positive">$150.50</span></td>
                     <td><span class="numeric-text-positive">+2.35%</span></td>
-                                        <td data-investment-type="stock">מניה</td>
+                                        <td data-investment-type="Investment">Investment</td>
                                         <td>Apple Inc.</td>
                                         <td>טיקר טכנולוגיה</td>
                                         <td>2025-01-15 10:30</td>
@@ -274,7 +274,7 @@
                                                     </tr>
                                                     <tr>
                                                         <td>MSFT</td>
-                                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
+                                                        <td data-status="Open"><span class="status-badge status-open">Open</span></td>
                     <td title="יש טריידים פעילים" class="text-center">
                         <span class="btn btn-sm btn-success btn-yes-no">
                             ✓
@@ -292,7 +292,7 @@
                                                     </tr>
                                                     <tr>
                                                         <td>GOOGL</td>
-                                                        <td data-status="סגור"><span class="status-badge status-closed">סגור</span></td>
+                                                        <td data-status="Closed"><span class="status-badge status-closed">Closed</span></td>
                     <td title="אין טריידים פעילים" class="text-center">
                         <span class="btn btn-sm btn-danger btn-yes-no">
                             ✗
@@ -300,7 +300,7 @@
                     </td>
                                         <td><span class="numeric-text-negative">$2,850.00</span></td>
                                         <td><span class="numeric-text-negative">-0.75%</span></td>
-                                        <td data-investment-type="stock">מניה</td>
+                                        <td data-investment-type="Investment">Investment</td>
                                         <td>Alphabet Inc.</td>
                                         <td>טיקר טכנולוגיה</td>
                                         <td>2025-01-15 09:45</td>
@@ -310,7 +310,7 @@
                                     </tr>
                                     <tr>
                                         <td>TSLA</td>
-                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
+                                        <td data-status="Open"><span class="status-badge status-open">Open</span></td>
                                         <td>
                                             <button class="btn-yes-no btn-yes" title="יש טריידים">
                                                 ✓
@@ -318,7 +318,7 @@
                                         </td>
                                         <td>$245.30</td>
                                         <td><span class="numeric-text-positive">+3.20%</span></td>
-                                        <td data-investment-type="stock">מניה</td>
+                                        <td data-investment-type="Swing">Swing</td>
                                         <td>Tesla Inc.</td>
                                         <td>טיקר רכב חשמלי</td>
                                         <td>2025-01-15 11:15</td>
@@ -328,7 +328,7 @@
                                                     </tr>
                                                     <tr>
                                         <td>NVDA</td>
-                                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
+                                                        <td data-status="Open"><span class="status-badge status-open">Open</span></td>
                                         <td>
                                             <button class="btn-yes-no btn-yes" title="יש טריידים">
                                                 ✓
@@ -336,11 +336,29 @@
                                         </td>
                                         <td>$875.40</td>
                                         <td><span class="numeric-text-positive">+4.15%</span></td>
-                                        <td data-investment-type="stock">מניה</td>
+                                        <td data-investment-type="Passive">Passive</td>
                                         <td>NVIDIA Corporation</td>
                                         <td>טיקר AI וצ'יפים</td>
                                         <td>2025-01-15 11:00</td>
                                         <td class="actions-cell" id="actions-cell-5">
+                                            <!-- Actions will be populated by JavaScript -->
+                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                        <td>AMZN</td>
+                                        <td data-status="Cancelled"><span class="status-badge status-cancelled">Cancelled</span></td>
+                                        <td>
+                                            <button class="btn-yes-no btn-no" title="אין טריידים">
+                                                ✗
+                                            </button>
+                                        </td>
+                                        <td>$3,250.80</td>
+                                        <td><span class="numeric-text-negative">-1.25%</span></td>
+                                        <td data-investment-type="Investment">Investment</td>
+                                        <td>Amazon.com Inc.</td>
+                                        <td>טיקר מסחר אלקטרוני</td>
+                                        <td>2025-01-15 08:30</td>
+                                        <td class="actions-cell" id="actions-cell-6">
                                             <!-- Actions will be populated by JavaScript -->
                                         </td>
                                                     </tr>

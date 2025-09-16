@@ -40,31 +40,8 @@ window.autoSavePreference = async function(key, value) {
     // Mark as unsaved (needs database save)
     window.markAsUnsaved();
     
-    // Try to save to server (mandatory)
-    try {
-      const response = await fetch('/api/v1/preferences/user', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ [key]: value })
-      });
-      
-      if (response.ok) {
-        const result = await response.json();
-        console.log(`✅ ${key} saved to database:`, result);
-      } else {
-        console.error(`❌ Failed to save ${key} to database:`, response.status);
-        if (typeof window.showErrorNotification === 'function') {
-          window.showErrorNotification('שגיאה', `שגיאה בשמירת ${key} לבסיס הנתונים`);
-        }
-      }
-    } catch (apiError) {
-      console.error(`❌ Server error saving ${key}:`, apiError);
-      if (typeof window.showErrorNotification === 'function') {
-        window.showErrorNotification('שגיאה', `שגיאת שרת בשמירת ${key}`);
-      }
-    }
+    // Don't save to server on every change - only on manual save
+    // This prevents rate limiting issues
     
   } catch (error) {
     console.error(`❌ Error saving ${key}:`, error);

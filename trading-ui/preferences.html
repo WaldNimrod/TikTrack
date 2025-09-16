@@ -104,7 +104,7 @@
       </div>
                         <div class="row">
                             <div class="col-12">
-                                <div class="profile-buttons">
+                                <div class="profile-buttons d-flex flex-wrap gap-2">
                                     <button class="btn btn-primary" onclick="window.loadProfile()">
                                         <i class="bi bi-download"></i> טען
                                     </button>
@@ -317,35 +317,35 @@
                             <div class="col-md-6">
                                 <div class="mb-3 d-flex align-items-center gap-2">
                                     <label class="form-label mb-0 w-25">צבע ראשי:</label>
-                                    <div class="color-preview bg-primary" onclick="window.openColorPicker('primaryColor')"></div>
-                                    <input type="color" id="primaryColor" value="#29a6a8" class="d-none">
+                                    
+                                    <input type="color" id="primaryColor" value="#29a6a8" class="form-control form-control-color">
                 </div>
                                 <div class="mb-3 d-flex align-items-center gap-2">
                                     <label class="form-label mb-0 w-25">צבע משני:</label>
-                                    <div class="color-preview bg-warning" onclick="window.openColorPicker('secondaryColor')"></div>
-                                    <input type="color" id="secondaryColor" value="#ff9c05" class="d-none">
+                                    
+                                    <input type="color" id="secondaryColor" value="#ff9c05" class="form-control form-control-color">
                 </div>
                                 <div class="mb-3 d-flex align-items-center gap-2">
                                     <label class="form-label mb-0 w-25">הצלחה:</label>
-                                    <div class="color-preview bg-success" onclick="window.openColorPicker('successColor')"></div>
-                                    <input type="color" id="successColor" value="#28a745" class="d-none">
+                                    
+                                    <input type="color" id="successColor" value="#28a745" class="form-control form-control-color">
               </div>
             </div>
                             <div class="col-md-6">
                                 <div class="mb-3 d-flex align-items-center gap-2">
                                     <label class="form-label mb-0 w-25">אזהרה:</label>
-                                    <div class="color-preview bg-warning" onclick="window.openColorPicker('warningColor')"></div>
-                                    <input type="color" id="warningColor" value="#ffc107" class="d-none">
+                                    
+                                    <input type="color" id="warningColor" value="#ffc107" class="form-control form-control-color">
           </div>
                                 <div class="mb-3 d-flex align-items-center gap-2">
                                     <label class="form-label mb-0 w-25">סכנה:</label>
-                                    <div class="color-preview bg-danger" onclick="window.openColorPicker('dangerColor')"></div>
-                                    <input type="color" id="dangerColor" value="#dc3545" class="d-none">
+                                    
+                                    <input type="color" id="dangerColor" value="#dc3545" class="form-control form-control-color">
             </div>
                                 <div class="mb-3 d-flex align-items-center gap-2">
                                     <label class="form-label mb-0 w-25">מידע:</label>
-                                    <div class="color-preview bg-info" onclick="window.openColorPicker('infoColor')"></div>
-                                    <input type="color" id="infoColor" value="#007bff" class="d-none">
+                                    
+                                    <input type="color" id="infoColor" value="#007bff" class="form-control form-control-color">
               </div>
             </div>
           </div>
@@ -365,21 +365,21 @@
                                 <div class="mb-3">
                                     <label class="form-label">טריידים:</label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <div class="color-preview bg-primary" onclick="window.openColorPicker('entityTradeColor')"></div>
-                                        <div class="color-preview bg-light" onclick="window.openColorPicker('entityTradeColorLight')"></div>
-                                        <div class="color-preview bg-dark" onclick="window.openColorPicker('entityTradeColorDark')"></div>
-                                        <input type="color" id="entityTradeColor" value="#007bff" class="d-none">
-                                        <input type="color" id="entityTradeColorLight" value="#e3f2fd" class="d-none">
-                                        <input type="color" id="entityTradeColorDark" value="#0056b3" class="d-none">
-                </div>
+                                        <label class="form-label mb-0">רגיל:</label>
+                                        <input type="color" id="entityTradeColor" value="#007bff" class="form-control form-control-color">
+                                        <label class="form-label mb-0">בהיר:</label>
+                                        <input type="color" id="entityTradeColorLight" value="#e3f2fd" class="form-control form-control-color">
+                                        <label class="form-label mb-0">כהה:</label>
+                                        <input type="color" id="entityTradeColorDark" value="#0056b3" class="form-control form-control-color">
+                                    </div>
                   </div>
                                 <!-- Accounts -->
                                 <div class="mb-3">
                                     <label class="form-label">חשבונות:</label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <div class="color-preview" onclick="window.openColorPicker('entityAccountColor')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('entityAccountColorLight')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('entityAccountColorDark')"></div>
+                                        
+                                        
+                                        
                                         <input type="color" id="entityAccountColor" value="#28a745">
                                         <input type="color" id="entityAccountColorLight" value="#d4edda">
                                         <input type="color" id="entityAccountColorDark" value="#155724">
@@ -389,9 +389,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">טיקרים:</label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <div class="color-preview" onclick="window.openColorPicker('entityTickerColor')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('entityTickerColorLight')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('entityTickerColorDark')"></div>
+                                        
+                                        
+                                        
                                         <input type="color" id="entityTickerColor" value="#dc3545">
                                         <input type="color" id="entityTickerColorLight" value="#f8d7da">
                                         <input type="color" id="entityTickerColorDark" value="#721c24">
@@ -401,9 +401,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">התראות:</label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <div class="color-preview" onclick="window.openColorPicker('entityAlertColor')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('entityAlertColorLight')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('entityAlertColorDark')"></div>
+                                        
+                                        
+                                        
                                         <input type="color" id="entityAlertColor" value="#ff9c05">
                                         <input type="color" id="entityAlertColorLight" value="#fff3cd">
                                         <input type="color" id="entityAlertColorDark" value="#856404">
@@ -415,9 +415,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">תזרים מזומנים:</label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <div class="color-preview" onclick="window.openColorPicker('entityCashFlowColor')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('entityCashFlowColorLight')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('entityCashFlowColorDark')"></div>
+                                        
+                                        
+                                        
                                         <input type="color" id="entityCashFlowColor" value="#20c997">
                                         <input type="color" id="entityCashFlowColorLight" value="#d1ecf1">
                                         <input type="color" id="entityCashFlowColorDark" value="#0c5460">
@@ -427,9 +427,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">הערות:</label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <div class="color-preview" onclick="window.openColorPicker('entityNoteColor')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('entityNoteColorLight')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('entityNoteColorDark')"></div>
+                                        
+                                        
+                                        
                                         <input type="color" id="entityNoteColor" value="#6f42c1">
                                         <input type="color" id="entityNoteColorLight" value="#e2e3f1">
                                         <input type="color" id="entityNoteColorDark" value="#383d41">
@@ -439,9 +439,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">תכניות מסחר:</label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <div class="color-preview" onclick="window.openColorPicker('entityTradePlanColor')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('entityTradePlanColorLight')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('entityTradePlanColorDark')"></div>
+                                        
+                                        
+                                        
                                         <input type="color" id="entityTradePlanColor" value="#17a2b8">
                                         <input type="color" id="entityTradePlanColorLight" value="#d1ecf1">
                                         <input type="color" id="entityTradePlanColorDark" value="#0c5460">
@@ -451,9 +451,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">ביצועים:</label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <div class="color-preview" onclick="window.openColorPicker('entityExecutionColor')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('entityExecutionColorLight')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('entityExecutionColorDark')"></div>
+                                        
+                                        
+                                        
                                         <input type="color" id="entityExecutionColor" value="#fd7e14">
                                         <input type="color" id="entityExecutionColorLight" value="#ffeaa7">
                                         <input type="color" id="entityExecutionColorDark" value="#e17055">
@@ -475,9 +475,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">פתוח:</label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <div class="color-preview" onclick="window.openColorPicker('statusOpenColor')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('statusOpenColorLight')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('statusOpenColorDark')"></div>
+                                        
+                                        
+                                        
                                         <input type="color" id="statusOpenColor" value="#28a745">
                                         <input type="color" id="statusOpenColorLight" value="#d4edda">
                                         <input type="color" id="statusOpenColorDark" value="#155724">
@@ -488,9 +488,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">סגור:</label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <div class="color-preview" onclick="window.openColorPicker('statusClosedColor')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('statusClosedColorLight')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('statusClosedColorDark')"></div>
+                                        
+                                        
+                                        
                                         <input type="color" id="statusClosedColor" value="#6c757d">
                                         <input type="color" id="statusClosedColorLight" value="#f8f9fa">
                                         <input type="color" id="statusClosedColorDark" value="#495057">
@@ -501,9 +501,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">מבוטל:</label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <div class="color-preview" onclick="window.openColorPicker('statusCancelledColor')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('statusCancelledColorLight')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('statusCancelledColorDark')"></div>
+                                        
+                                        
+                                        
                                         <input type="color" id="statusCancelledColor" value="#dc3545">
                                         <input type="color" id="statusCancelledColorLight" value="#f8d7da">
                                         <input type="color" id="statusCancelledColorDark" value="#721c24">
@@ -525,9 +525,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">Swing:</label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <div class="color-preview" onclick="window.openColorPicker('typeSwingColor')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('typeSwingColorLight')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('typeSwingColorDark')"></div>
+                                        
+                                        
+                                        
                                         <input type="color" id="typeSwingColor" value="#007bff">
                                         <input type="color" id="typeSwingColorLight" value="#e3f2fd">
                                         <input type="color" id="typeSwingColorDark" value="#0056b3">
@@ -538,9 +538,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">השקעה:</label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <div class="color-preview" onclick="window.openColorPicker('typeInvestmentColor')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('typeInvestmentColorLight')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('typeInvestmentColorDark')"></div>
+                                        
+                                        
+                                        
                                         <input type="color" id="typeInvestmentColor" value="#28a745">
                                         <input type="color" id="typeInvestmentColorLight" value="#d4edda">
                                         <input type="color" id="typeInvestmentColorDark" value="#155724">
@@ -551,9 +551,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">פסיבי:</label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <div class="color-preview" onclick="window.openColorPicker('typePassiveColor')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('typePassiveColorLight')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('typePassiveColorDark')"></div>
+                                        
+                                        
+                                        
                                         <input type="color" id="typePassiveColor" value="#6f42c1">
                                         <input type="color" id="typePassiveColorLight" value="#e2e3f1">
                                         <input type="color" id="typePassiveColorDark" value="#383d41">
@@ -575,9 +575,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">חיובי:</label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <div class="color-preview" onclick="window.openColorPicker('valuePositiveColor')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('valuePositiveColorLight')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('valuePositiveColorDark')"></div>
+                                        
+                                        
+                                        
                                         <input type="color" id="valuePositiveColor" value="#28a745">
                                         <input type="color" id="valuePositiveColorLight" value="#d4edda">
                                         <input type="color" id="valuePositiveColorDark" value="#155724">
@@ -588,9 +588,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">שלילי:</label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <div class="color-preview" onclick="window.openColorPicker('valueNegativeColor')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('valueNegativeColorLight')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('valueNegativeColorDark')"></div>
+                                        
+                                        
+                                        
                                         <input type="color" id="valueNegativeColor" value="#dc3545">
                                         <input type="color" id="valueNegativeColorLight" value="#f8d7da">
                                         <input type="color" id="valueNegativeColorDark" value="#721c24">
@@ -601,9 +601,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">ניטרלי:</label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <div class="color-preview" onclick="window.openColorPicker('valueNeutralColor')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('valueNeutralColorLight')"></div>
-                                        <div class="color-preview" onclick="window.openColorPicker('valueNeutralColorDark')"></div>
+                                        
+                                        
+                                        
                                         <input type="color" id="valueNeutralColor" value="#6c757d">
                                         <input type="color" id="valueNeutralColorLight" value="#f8f9fa">
                                         <input type="color" id="valueNeutralColorDark" value="#495057">

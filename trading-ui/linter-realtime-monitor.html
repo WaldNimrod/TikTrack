@@ -95,12 +95,9 @@
                 <i class="fas fa-copy"></i> העתק לוג מפורט
               </button>
               <div class="action-separator"></div>
-              <button class="btn btn-outline-success btn-sm" onclick="window.startFileScan()" title="סרוק קבצי JavaScript לאיתור בעיות">
+              <button class="btn btn-success btn-sm" onclick="window.startFileScan()" title="סרוק קבצי JavaScript לאיתור בעיות">
                 <i class="fas fa-search"></i> סרוק קבצים
               </button>
-            <button class="btn btn-outline-secondary btn-sm" onclick="window.toggleAutoRefresh()" title="הפעל/בטל רענון אוטומטי" id="autoRefreshBtn">
-              <i class="fas fa-sync-alt"></i> רענון אוטומטי
-            </button>
             <button class="filter-toggle-btn" onclick="window.toggleAllSections()" title="הצג/הסתר כל הסקשנים">
               <span class="filter-icon">▲</span>
             </button>
@@ -131,6 +128,25 @@
             <div class="status-item">
               <span class="label">אזהרות:</span>
               <span class="value"><strong id="totalWarningsStats">0</strong></span>
+            </div>
+          </div>
+
+          <!-- Linter Settings - Moved above logs -->
+          <div class="settings-section" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
+            <h5 style="margin-bottom: 15px; color: #495057;"><i class="fas fa-cogs"></i> הגדרות ניטור Linter</h5>
+            <div class="control-row" style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+              <div class="control-input-group">
+                <label style="display: block; font-size: 12px; color: #666; margin-bottom: 5px;">תיקיות לסריקה</label>
+                <input type="text" class="control-input" id="scanPaths" value="trading-ui/scripts/" style="width: 200px; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px;">
+              </div>
+              <div class="control-input-group">
+                <label style="display: block; font-size: 12px; color: #666; margin-bottom: 5px;">רמת לוג</label>
+                <select class="control-input" id="logLevel" style="width: 120px; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px;">
+                  <option value="info">מידע</option>
+                  <option value="warning">אזהרות</option>
+                  <option value="error">שגיאות בלבד</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -220,84 +236,39 @@
           </div>
         </div> <!-- End logs section -->
 
-        <!-- Controls Section -->
-        <div class="content-section" id="controlsSection" data-table-type="linter-realtime-monitor">
-          <!-- Controls header -->
+        <!-- Fix Actions Section -->
+        <div class="content-section" id="fixActionsSection" data-table-type="linter-realtime-monitor">
+          <!-- Fix Actions header -->
           <div class="section-header">
             <div class="table-title">
-              <img src="images/icons/development.svg" alt="הגדרות" class="section-icon">
-              הגדרות ניטור
+              <img src="images/icons/development.svg" alt="תיקונים" class="section-icon">
+              פעולות תיקון אוטומטי
             </div>
             <div class="table-actions">
-              <button class="refresh-btn" onclick="window.resetSettings && window.resetSettings()" title="איפוס הגדרות">
-                <i class="fas fa-undo"></i> איפוס
-              </button>
-              <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="window.toggleSection('controlsSection')" title="הצג/הסתר אזור הגדרות">
+              <button class="filter-toggle-btn" onclick="window.toggleSection('fixActionsSection')" title="הצג/הסתר אזור תיקונים">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
           </div>
 
-          <!-- Controls body -->
+          <!-- Fix Actions body -->
           <div class="section-body">
-            <div class="control-group" style="margin-bottom: 20px;">
-              <label class="control-label">הגדרות ניטור:</label>
-              <div class="control-row" style="display: flex; gap: 15px; margin-top: 10px;">
-                <div class="control-input-group">
-                  <label style="display: block; font-size: 12px; color: #666; margin-bottom: 5px;">תיקיות לסריקה</label>
-                  <input type="text" class="control-input" id="scanPaths" value="trading-ui/" style="width: 200px;">
-                </div>
-                <div class="control-input-group">
-                  <label style="display: block; font-size: 12px; color: #666; margin-bottom: 5px;">מרווח סריקה (שניות)</label>
-                  <input type="number" class="control-input" id="scanInterval" value="30" min="5" max="300" style="width: 120px;">
-                </div>
-                <div class="control-input-group">
-                  <label style="display: block; font-size: 12px; color: #666; margin-bottom: 5px;">רמת לוג</label>
-                  <select class="control-input" id="logLevel" style="width: 120px;">
-                    <option value="info">מידע</option>
-                    <option value="warning">אזהרות</option>
-                    <option value="error">שגיאות בלבד</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="controls-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
-              <button class="btn btn-primary" id="startMonitoring" onclick="window.startMonitoring && window.startMonitoring()">
-                <i class="bi bi-play-fill"></i> התחל ניטור
+            <div class="fix-buttons" style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button class="btn btn-success" onclick="window.fixAllIssues()" title="תקן את כל הבעיות הניתנות לתיקון">
+                <i class="fas fa-magic"></i> תיקון אוטומטי לכל הבעיות
               </button>
-              <button class="btn btn-secondary" id="stopMonitoring" disabled onclick="window.stopMonitoring && window.stopMonitoring()">
-                <i class="bi bi-stop-fill"></i> עצור ניטור
+              <button class="btn btn-warning" onclick="window.fixAllErrors()" title="תקן רק שגיאות">
+                <i class="fas fa-exclamation-triangle"></i> תיקון שגיאות בלבד
               </button>
-              <button class="btn btn-success" id="clearLogs" onclick="window.clearLogs && window.clearLogs()">
-                <i class="bi bi-trash"></i> נקה לוגים
+              <button class="btn btn-info" onclick="window.fixAllWarnings()" title="תקן רק אזהרות">
+                <i class="fas fa-exclamation-circle"></i> תיקון אזהרות בלבד
               </button>
-              <button class="btn btn-danger" id="exportLogs" onclick="window.exportLogs && window.exportLogs()">
-                <i class="bi bi-download"></i> ייצא לוגים
+              <button class="btn btn-secondary" onclick="window.ignoreAllIssues()" title="התעלם מכל הבעיות">
+                <i class="fas fa-eye-slash"></i> התעלם מהכל
               </button>
-            </div>
-
-            <!-- Fix Actions -->
-            <div class="fix-actions" style="margin-top: 20px;">
-              <h5 style="margin-bottom: 10px;">פעולות תיקון אוטומטי:</h5>
-              <div class="fix-buttons" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="btn btn-success" onclick="window.fixAllIssues()" title="תקן את כל הבעיות הניתנות לתיקון">
-                  <i class="fas fa-magic"></i> תיקון אוטומטי לכל הבעיות
-                </button>
-                <button class="btn btn-warning" onclick="window.fixAllErrors()" title="תקן רק שגיאות">
-                  <i class="fas fa-exclamation-triangle"></i> תיקון שגיאות בלבד
-                </button>
-                <button class="btn btn-info" onclick="window.fixAllWarnings()" title="תקן רק אזהרות">
-                  <i class="fas fa-exclamation-circle"></i> תיקון אזהרות בלבד
-                </button>
-                <button class="btn btn-secondary" onclick="window.ignoreAllIssues()" title="התעלם מכל הבעיות">
-                  <i class="fas fa-eye-slash"></i> התעלם מהכל
-                </button>
-              </div>
             </div>
           </div>
-        </div> <!-- End controls section -->
+        </div> <!-- End fix actions section -->
       </div> <!-- End main content -->
     </div> <!-- End page body -->
   </div> <!-- End background wrapper -->

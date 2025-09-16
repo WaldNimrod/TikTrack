@@ -77,7 +77,7 @@ def get_user_preferences() -> Any:
         }), 500
 
 @preferences_bp.route('/user', methods=['POST'])
-@rate_limit_api(requests_per_minute=10)
+@rate_limit_api(requests_per_minute=60)
 def save_user_preferences() -> Any:
     """Save user preferences"""
     try:

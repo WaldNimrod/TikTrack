@@ -60,7 +60,6 @@ class PreferenceProfile(BaseModel):
             'isActive': self.is_active,
             'description': self.description,
             'createdAt': self.created_at.isoformat() if self.created_at else None,
-            'updatedAt': self.updated_at.isoformat() if self.updated_at else None,
             'lastUsedAt': self.last_used_at.isoformat() if self.last_used_at else None,
             'usageCount': self.usage_count
         }

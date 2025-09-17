@@ -7,6 +7,7 @@ let autoRefreshInterval;
 let isAutoRefreshActive = true;
 let systemLog = [];
 let logCounter = 0;
+let isChartUpdating = false; // Prevent concurrent chart updates
 
 // Track fixed issues to persist across scans
 let fixedIssues = {
@@ -215,7 +216,13 @@ function generateHistoricalData() {
     
     // Update chart with new data
 function updateChart() {
-    if (qualityChart) {
+    if (isChartUpdating) {
+        console.log('📊 Chart update skipped - already updating');
+        return;
+    }
+
+    if (qualityChart && qualityChart.data && qualityChart.options) {
+        isChartUpdating = true;
         const newData = generateHistoricalData();
 
         // Update data
@@ -224,19 +231,44 @@ function updateChart() {
         qualityChart.data.datasets[1].data = newData.errors;
         qualityChart.data.datasets[2].data = newData.warnings;
 
-        // Update y1 axis max value based on current data
+        // Calculate max issues for y1 axis
+        const allErrors = newData.errors.length > 0 ? newData.errors : [0];
+        const allWarnings = newData.warnings.length > 0 ? newData.warnings : [0];
+
         const maxIssues = Math.max(
-            ...newData.errors,
-            ...newData.warnings
+            ...allErrors,
+            ...allWarnings,
+            10 // minimum
         );
-        qualityChart.options.scales.y1.max = Math.max(50, maxIssues + 5);
 
-        // Ensure y1 axis stays on the right
+        // Update y1 axis with proper scaling
+        qualityChart.options.scales.y1.max = Math.max(50, maxIssues + 10);
+        qualityChart.options.scales.y1.min = 0;
+
+        // Ensure y1 axis stays on the right and has proper settings
         qualityChart.options.scales.y1.position = 'right';
+        qualityChart.options.scales.y1.display = true;
+        qualityChart.options.scales.y1.grid = {
+            drawOnChartArea: false
+        };
+        qualityChart.options.scales.y1.ticks = {
+            precision: 0,
+            beginAtZero: true
+        };
 
-        qualityChart.update();
-        console.log('📊 Chart updated with new data - max issues:', maxIssues);
+        // Force chart to recalculate and redraw
+        qualityChart.update('none'); // 'none' prevents animations that might cause issues
+
+        console.log('📊 Chart updated successfully:', {
+            qualityPoints: newData.quality.length,
+            errorPoints: newData.errors.length,
+            warningPoints: newData.warnings.length,
+            maxIssues: maxIssues,
+            y1Max: qualityChart.options.scales.y1.max
+        });
     }
+
+    isChartUpdating = false;
 }
 
 // Load initial data
@@ -663,8 +695,10 @@ function finishScan() {
         window.showSuccessNotification('סריקה הושלמה', `נסרקו ${scanningResults.totalFiles} קבצים, נמצאו ${scanningResults.errors.length} שגיאות ו-${scanningResults.warnings.length} אזהרות`);
     }
 
-    // Update chart with new data
-    updateChart();
+    // Update chart with new data after a short delay to ensure all data is ready
+    setTimeout(() => {
+        updateChart();
+    }, 500);
 }
 
 // Start auto refresh

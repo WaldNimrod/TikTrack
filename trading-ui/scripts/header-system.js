@@ -3253,7 +3253,7 @@ const FILTER_COLUMNS = {
 };
 
 // Tables that support type filter
-const TYPE_FILTER_TABLES = ['tradesContainer', 'tradePlansContainer', 'trade_plansContainer'];
+const TYPE_FILTER_TABLES = ['tradesContainer', 'tradePlansContainer', 'trade_plansContainer', 'tickersContainer'];
 
 /**
  * Simple filter application function
@@ -3858,7 +3858,7 @@ function getFilterConfig(filterType) {
     'type': {
       columnName: 'סוג השקעה',
       containerIdKeywords: ['type', 'Type', 'investment', 'סוג', 'השקעה'],
-      knownContainers: ['tradesContainer', 'tradePlansContainer', 'trade_plansContainer'],
+      knownContainers: ['tradesContainer', 'tradePlansContainer', 'trade_plansContainer', 'tickersContainer'],
       cellValues: ['investment', 'swing', 'passive'],
       dataField: 'investment-type',
     },

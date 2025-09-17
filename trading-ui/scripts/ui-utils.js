@@ -1019,7 +1019,7 @@ window.toggleSection = function (sectionId) {
  * Handles opening/closing of all content sections at once
  */
 window.toggleAllSections = function () {
-  const sections = document.querySelectorAll('.content-section');
+  const sections = document.querySelectorAll('.content-section, .top-section');
   const allCollapsed = Array.from(sections).every(section => {
     const sectionBody = section.querySelector('.section-body');
     return sectionBody && (sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none');
@@ -1367,10 +1367,9 @@ function loadSectionStates() {
 
 // Export functions to global scope
 window.toggleTopSection = toggleTopSection;
-window.toggleSection = toggleSection;
-window.toggleAllSections = toggleAllSections;
-window.toggleSectionGlobal = toggleSection;
-window.toggleAllSectionsGlobal = toggleAllSections;
+// toggleSection and toggleAllSections are already exported above as window.toggleSection and window.toggleAllSections
+window.toggleSectionGlobal = window.toggleSection;
+window.toggleAllSectionsGlobal = window.toggleAllSections;
 window.loadSectionStates = loadSectionStates;
 
 // Load section states when DOM is ready

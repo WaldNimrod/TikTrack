@@ -393,89 +393,159 @@ function startFileScan() {
     setTimeout(() => scanJavaScriptFiles(), 1000);
 }
 
-// Scan JavaScript files for issues
+// Scan files for issues based on selected file types
 function scanJavaScriptFiles() {
     // Show scan start notification
     if (typeof window.showInfoNotification === 'function') {
-        window.showInfoNotification('סריקה התחילה', 'סורק את כל קבצי ה-JavaScript בפרויקט...');
+        window.showInfoNotification('סריקה התחילה', 'סורק את הקבצים שנבחרו בפרויקט...');
     }
 
-    // Use static list of all JavaScript files instead of API call
-    const jsFiles = [
-        'linter-realtime-monitor.js',
-        'header-system.js',
-        'color-scheme-system.js',
-        'preferences.js',
-        'ui-utils.js',
-        'tables.js',
-        'translation-utils.js',
-        'data-utils.js',
-        'linked-items.js',
-        'page-utils.js',
-        'central-refresh-system.js',
-        'notification-system.js',
-        'main.js',
-        'alerts.js',
-        'cash_flows.js',
-        'trades.js',
-        'accounts.js',
-        'currencies.js',
-        'entity-details-system.js',
-        'entity-details-modal.js',
-        'entity-details-api.js',
-        'entity-details-renderer.js',
-        'auth.js',
-        'trade_plans.js',
-        'executions.js',
-        'database.js',
-        'external-data-service.js',
-        'yahoo-finance-service.js',
-        'ticker-service.js',
-        'notes.js',
-        'crud-utils.js',
-        'validation-utils.js',
-        'date-utils.js',
-        'filter-system.js',
-        'menu.js',
-        'simple-filter.js',
-        'research.js',
-        'style-demonstration.js',
-        'test-script.js',
-        'console-cleanup.js',
-        'account-service.js',
-        'active-alerts-component.js',
-        'real-linter-system.js',
-        'related-object-filters.js',
-        'tickers.js',
-        'error-handlers.js',
-        'color-demo-toggle.js',
-        'css-management.js',
-        'dynamic-colors-display.js',
-        'constraint-manager.js',
-        'constrains.js',
-        'trade-plan-service.js',
-        'system-management.js',
-        'cache-test.js',
-        'server-monitor-v2.js',
-        'button-icons.js',
-        'test-debug.js',
-        'background-tasks.js',
-        'notifications-center.js',
-        'table-mappings.js',
-        'query-optimization-test.js',
-        'condition-translator.js',
-        'db_display.js',
-        'external-data-dashboard.js',
-        'js-map.js',
-        'realtime-notifications-client.js'
-    ];
+    // Get file type selections
+    const scanJs = document.getElementById('scanJs')?.checked || false;
+    const scanHtml = document.getElementById('scanHtml')?.checked || false;
 
-    scanningResults.totalFiles = jsFiles.length;
+    if (!scanJs && !scanHtml) {
+        if (typeof window.showWarningNotification === 'function') {
+            window.showWarningNotification('אין בחירה', 'אנא בחר לפחות סוג קובץ אחד לסריקה');
+        }
+        return;
+    }
+
+    // Collect all files based on selection
+    let allFiles = [];
+
+    if (scanJs) {
+        const jsFiles = [
+            'linter-realtime-monitor.js',
+            'header-system.js',
+            'color-scheme-system.js',
+            'preferences.js',
+            'ui-utils.js',
+            'tables.js',
+            'translation-utils.js',
+            'data-utils.js',
+            'linked-items.js',
+            'page-utils.js',
+            'central-refresh-system.js',
+            'notification-system.js',
+            'main.js',
+            'alerts.js',
+            'cash_flows.js',
+            'trades.js',
+            'accounts.js',
+            'currencies.js',
+            'entity-details-system.js',
+            'entity-details-modal.js',
+            'entity-details-api.js',
+            'entity-details-renderer.js',
+            'auth.js',
+            'trade_plans.js',
+            'executions.js',
+            'database.js',
+            'external-data-service.js',
+            'yahoo-finance-service.js',
+            'ticker-service.js',
+            'notes.js',
+            'crud-utils.js',
+            'validation-utils.js',
+            'date-utils.js',
+            'filter-system.js',
+            'menu.js',
+            'simple-filter.js',
+            'research.js',
+            'style-demonstration.js',
+            'test-script.js',
+            'console-cleanup.js',
+            'account-service.js',
+            'active-alerts-component.js',
+            'real-linter-system.js',
+            'related-object-filters.js',
+            'tickers.js',
+            'error-handlers.js',
+            'color-demo-toggle.js',
+            'css-management.js',
+            'dynamic-colors-display.js',
+            'constraint-manager.js',
+            'constrains.js',
+            'trade-plan-service.js',
+            'system-management.js',
+            'cache-test.js',
+            'server-monitor-v2.js',
+            'button-icons.js',
+            'test-debug.js',
+            'background-tasks.js',
+            'notifications-center.js',
+            'table-mappings.js',
+            'query-optimization-test.js',
+            'condition-translator.js',
+            'db_display.js',
+            'external-data-dashboard.js',
+            'js-map.js',
+            'realtime-notifications-client.js'
+        ];
+        allFiles = allFiles.concat(jsFiles);
+    }
+
+    if (scanHtml) {
+        const htmlFiles = [
+            'designs.html',
+            'test-header-yesterday.html',
+            'preferences.html',
+            'index.html',
+            'constraints.html',
+            'accounts.html',
+            'linter-realtime-monitor.html',
+            'css-management.html',
+            'style_demonstration.html',
+            'preferences-management-temp.html',
+            'cache-test.html',
+            'background-tasks-old.html',
+            'notifications-center.html',
+            'research.html',
+            'simple-clean-menu.html',
+            'test-header-only-restored.html',
+            'crud-testing-dashboard-backup.html',
+            'preferences-backup.html',
+            'db_display.html',
+            'menu.html',
+            'notes.html',
+            'tickers.html',
+            'external-data-dashboard.html',
+            'trade_plans.html',
+            'db_extradata.html',
+            'server-monitor.html',
+            'preferences-new.html',
+            'system-management-fixed.html',
+            'preferences-temp-guide.html',
+            'test-header-clean.html',
+            'apple-style-menu-example.html',
+            'test-header-menus-pushed.html',
+            'system-management.html',
+            'background-tasks-fixed.html',
+            'color-scheme-examples.html',
+            'cash_flows.html',
+            'dynamic-colors-display.html',
+            'background-tasks.html',
+            'test-header-only-new.html',
+            'preferences-temp.html',
+            'alerts.html',
+            'page-scripts-matrix.html',
+            'js-map.html',
+            'test-header-old-system.html',
+            'executions.html',
+            'test-header-only.html',
+            'trades.html',
+            'crud-testing-dashboard.html'
+        ];
+        allFiles = allFiles.concat(htmlFiles);
+    }
+
+    scanningResults.totalFiles = allFiles.length;
     scanningResults.scannedFiles = 0;
 
-    console.log('🔍 Starting scan of', jsFiles.length, 'JavaScript files');
+    console.log('🔍 Starting scan of', allFiles.length, 'files (JS:', scanJs, 'HTML:', scanHtml, ')');
 
-    jsFiles.forEach((fileName, index) => {
+    allFiles.forEach((fileName, index) => {
         setTimeout(() => {
             scanSingleFile(fileName);
             scanningResults.scannedFiles++;
@@ -495,10 +565,13 @@ function scanJavaScriptFiles() {
     });
 }
 
-// Scan a single JavaScript file
+// Scan a single file (JS or HTML)
 function scanSingleFile(fileName) {
+    const isHtmlFile = fileName.endsWith('.html');
+    const filePath = isHtmlFile ? `/${fileName}` : `/scripts/${fileName}`;
+
     // Try to get actual file content
-    fetch(`/scripts/${fileName}`)
+    fetch(filePath)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
@@ -506,7 +579,11 @@ function scanSingleFile(fileName) {
             return response.text();
         })
         .then(content => {
-            analyzeFileContent(fileName, content);
+            if (isHtmlFile) {
+                analyzeHtmlContent(fileName, content);
+            } else {
+                analyzeFileContent(fileName, content);
+            }
         })
         .catch(() => {
             // Fallback to simulated analysis
@@ -632,6 +709,135 @@ function analyzeFileContent(fileName, content) {
     });
 }
 
+// Analyze HTML file content for issues
+function analyzeHtmlContent(fileName, content) {
+    const issues = [];
+    let issuesFound = 0;
+
+    // Check for missing alt attributes on images
+    const imgRegex = /<img[^>]*>/gi;
+    const imgMatches = content.match(imgRegex) || [];
+
+    imgMatches.forEach(imgTag => {
+        if (!imgTag.includes('alt=')) {
+            issues.push({
+                type: 'warning',
+                message: 'Image missing alt attribute (accessibility issue)',
+                line: getLineNumber(content, imgTag),
+                fix: 'Add alt attribute: alt="image description"'
+            });
+            issuesFound++;
+        }
+    });
+
+    // Check for missing title attributes on links
+    const linkRegex = /<a[^>]*href=[^>]*>/gi;
+    const linkMatches = content.match(linkRegex) || [];
+
+    linkMatches.forEach(linkTag => {
+        if (!linkTag.includes('title=') && !linkTag.includes('aria-label=')) {
+            issues.push({
+                type: 'info',
+                message: 'Link missing title or aria-label (accessibility)',
+                line: getLineNumber(content, linkTag),
+                fix: 'Add title or aria-label for better accessibility'
+            });
+            issuesFound++;
+        }
+    });
+
+    // Check for inline styles (warning)
+    const inlineStyleRegex = /style=["'][^"']*["']/gi;
+    const inlineStyles = content.match(inlineStyleRegex) || [];
+
+    if (inlineStyles.length > 0) {
+        issues.push({
+            type: 'warning',
+            message: `Found ${inlineStyles.length} inline style attributes`,
+            line: getLineNumber(content, inlineStyles[0]),
+            fix: 'Move styles to external CSS file'
+        });
+        issuesFound++;
+    }
+
+    // Check for missing doctype
+    if (!content.trim().toLowerCase().startsWith('<!doctype')) {
+        issues.push({
+            type: 'warning',
+            message: 'Missing DOCTYPE declaration',
+            line: 1,
+            fix: 'Add <!DOCTYPE html> at the beginning'
+        });
+        issuesFound++;
+    }
+
+    // Check for missing meta charset
+    if (!content.includes('<meta charset=') && !content.includes('<meta charset=')) {
+        issues.push({
+            type: 'warning',
+            message: 'Missing meta charset declaration',
+            line: 1,
+            fix: 'Add <meta charset="UTF-8"> in head section'
+        });
+        issuesFound++;
+    }
+
+    // Check for missing lang attribute
+    if (!content.includes('<html lang=')) {
+        issues.push({
+            type: 'info',
+            message: 'Missing lang attribute on html element',
+            line: 1,
+            fix: 'Add lang attribute: <html lang="he">'
+        });
+        issuesFound++;
+    }
+
+    // Add found issues to results
+    issues.forEach(issue => {
+        const issueEntry = {
+            type: issue.type,
+            message: issue.message,
+            file: fileName,
+            line: issue.line,
+            fix: issue.fix,
+            timestamp: new Date().toISOString(),
+            id: Date.now() + Math.random()
+        };
+
+        if (issue.type === 'error') {
+            scanningResults.errors.push(issueEntry);
+        } else if (issue.type === 'warning') {
+            scanningResults.warnings.push(issueEntry);
+        } else {
+            scanningResults.warnings.push(issueEntry); // info as warning
+        }
+
+        addLogEntry(issue.type.toUpperCase(), `${fileName}:${issue.line} - ${issue.message}`, {
+            file: fileName,
+            line: issue.line,
+            suggestion: issue.fix
+        });
+    });
+
+    // Report scan completion
+    addLogEntry('INFO', `קובץ ${fileName} נסרק - נמצאו ${issuesFound} בעיות HTML`, {
+        file: fileName,
+        issuesFound: issuesFound
+    });
+}
+
+// Helper function to get line number from content
+function getLineNumber(content, searchString) {
+    const lines = content.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes(searchString.substring(0, 50))) {
+            return i + 1;
+        }
+    }
+    return 1;
+}
+
 // Fallback simulation for files that can't be loaded
 function simulateFileAnalysis(fileName) {
     // Only add warning about file access
@@ -652,6 +858,64 @@ function simulateFileAnalysis(fileName) {
         suggestion: 'Check file permissions and path'
     });
 }
+
+// Copy unresolved issues log for manual fixing
+window.copyUnresolvedIssuesLog = () => {
+    console.log('📋 Copying unresolved issues log...');
+
+    const unresolvedErrors = scanningResults.errors || [];
+    const unresolvedWarnings = scanningResults.warnings || [];
+
+    if (unresolvedErrors.length === 0 && unresolvedWarnings.length === 0) {
+        if (typeof window.showInfoNotification === 'function') {
+            window.showInfoNotification('אין בעיות', 'לא נמצאו בעיות לא פתורות');
+        }
+        return;
+    }
+
+    // Create comprehensive log
+    const logData = {
+        timestamp: new Date().toISOString(),
+        summary: {
+            totalUnresolvedErrors: unresolvedErrors.length,
+            totalUnresolvedWarnings: unresolvedWarnings.length,
+            totalIssues: unresolvedErrors.length + unresolvedWarnings.length
+        },
+        unresolvedErrors: unresolvedErrors.map(error => ({
+            file: error.file,
+            line: error.line,
+            message: error.message,
+            suggestedFix: error.fix,
+            timestamp: error.timestamp
+        })),
+        unresolvedWarnings: unresolvedWarnings.map(warning => ({
+            file: warning.file,
+            line: warning.line,
+            message: warning.message,
+            suggestedFix: warning.fix,
+            timestamp: warning.timestamp
+        })),
+        instructions: "הבעיות הבאות לא ניתן היה לתקן אוטומטית. אנא טפל בהן ידנית או בקש עזרה מהמפתחים."
+    };
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(JSON.stringify(logData, null, 2))
+        .then(() => {
+            console.log('✅ Unresolved issues log copied to clipboard');
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification(
+                    'לוג הועתק',
+                    `הועתק לוג של ${logData.summary.totalIssues} בעיות לא פתורות`
+                );
+            }
+        })
+        .catch(() => {
+            console.error('❌ Failed to copy unresolved issues log');
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', 'לא הצלחנו להעתיק את הלוג');
+            }
+        });
+};
 
 // Finish the scan and update statistics
 function finishScan() {

@@ -12,7 +12,7 @@
 // Notification function - uses global notification system
 // This function is a wrapper that calls the global showNotification function
 function showNotification(message, type = 'info', title = 'מערכת', duration = 5000) {
-    // Check if global notification system is available
+    // Check if global notification system is available and it's not this function
     if (typeof window.showNotification === 'function' && window.showNotification !== showNotification) {
         // Call the global notification system
         window.showNotification(message, type, title, duration);
@@ -27,12 +27,18 @@ function showNotification(message, type = 'info', title = 'מערכת', duration
 const removedLinks = new Map();
 
 function toggleStyleFile(filePath) {
-    console.log(`Trying to toggle: ${filePath}`);
+    console.log(`🔄 [TOGGLE START] Trying to toggle: ${filePath}`);
+    console.log(`📊 [TOGGLE INFO] Current removedLinks count: ${removedLinks.size}`);
+    console.log(`📊 [TOGGLE INFO] Removed links:`, Array.from(removedLinks.keys()));
     
     // Check if link was previously removed
     if (removedLinks.has(filePath)) {
+        console.log(`✅ [RESTORE] Link was previously removed, restoring: ${filePath}`);
+        
         // Restore the link
         const linkData = removedLinks.get(filePath);
+        console.log(`📋 [RESTORE] Link data:`, linkData);
+        
         const newLink = document.createElement('link');
         newLink.rel = 'stylesheet';
         newLink.href = linkData.href;
@@ -42,12 +48,19 @@ function toggleStyleFile(filePath) {
         const lastLink = document.querySelector('link[rel="stylesheet"]:last-of-type');
         if (lastLink) {
             lastLink.parentNode.insertBefore(newLink, lastLink.nextSibling);
+            console.log(`📍 [RESTORE] Inserted after: ${lastLink.href}`);
         } else {
             document.head.appendChild(newLink);
+            console.log(`📍 [RESTORE] Appended to head`);
         }
         
         removedLinks.delete(filePath);
-        console.log(`${filePath} restored to DOM`);
+        
+        // Force browser to recalculate styles
+        document.documentElement.offsetHeight;
+        
+        console.log(`✅ [RESTORE COMPLETE] ${filePath} restored to DOM`);
+        console.log(`📊 [RESTORE INFO] Remaining removed links: ${removedLinks.size}`);
         showNotification(`${filePath} מופעל`, 'info');
         return;
     }
@@ -56,28 +69,57 @@ function toggleStyleFile(filePath) {
     const allLinks = document.querySelectorAll('link[rel="stylesheet"]');
     let existingLink = null;
     
+    console.log(`🔍 [SEARCH] Looking for CSS file: ${filePath}`);
+    console.log(`📊 [SEARCH] Total CSS links found: ${allLinks.length}`);
+    
     // Try different matching strategies
-    for (let link of allLinks) {
+    for (let i = 0; i < allLinks.length; i++) {
+        const link = allLinks[i];
         const href = link.href;
-        console.log(`Checking link: ${href}`);
+        console.log(`🔍 [SEARCH ${i+1}/${allLinks.length}] Checking link: ${href}`);
         
         // Check if this link matches our file path
-        if (href.includes(filePath) || 
-            href.includes(filePath.replace('styles-new/', '')) ||
-            href.includes(filePath.replace('01-settings/', '')) ||
-            href.includes(filePath.replace('03-generic/', '')) ||
-            href.includes(filePath.replace('04-elements/', '')) ||
-            href.includes(filePath.replace('05-objects/', '')) ||
-            href.includes(filePath.replace('06-components/', '')) ||
-            href.includes('styles-new/' + filePath) ||
-            (filePath === 'bootstrap.min.css' && href.includes('bootstrap.min.css')) ||
-            (filePath === 'bootstrap.min.css' && href.includes('bootstrap@5.3.0/dist/css/bootstrap.min.css'))) {
+        let matches = false;
+        
+        if (filePath === 'bootstrap.min.css') {
+            // Special handling for Bootstrap
+            matches = href.includes('bootstrap.min.css') && !href.includes('bootstrap-icons');
+            console.log(`🎯 [BOOTSTRAP CHECK] ${href} -> ${matches}`);
+        } else {
+            // Regular file matching
+            const match1 = href.includes(filePath);
+            const match2 = href.includes(filePath.replace('styles-new/', ''));
+            const match3 = href.includes(filePath.replace('01-settings/', ''));
+            const match4 = href.includes(filePath.replace('03-generic/', ''));
+            const match5 = href.includes(filePath.replace('04-elements/', ''));
+            const match6 = href.includes(filePath.replace('05-objects/', ''));
+            const match7 = href.includes(filePath.replace('06-components/', ''));
+            const match8 = href.includes('styles-new/' + filePath);
+            
+            matches = match1 || match2 || match3 || match4 || match5 || match6 || match7 || match8;
+            
+            console.log(`🎯 [MATCH CHECK] ${href}:`);
+            console.log(`   - Direct match: ${match1}`);
+            console.log(`   - Without styles-new/: ${match2}`);
+            console.log(`   - Without 01-settings/: ${match3}`);
+            console.log(`   - Without 03-generic/: ${match4}`);
+            console.log(`   - Without 04-elements/: ${match5}`);
+            console.log(`   - Without 05-objects/: ${match6}`);
+            console.log(`   - Without 06-components/: ${match7}`);
+            console.log(`   - With styles-new/ prefix: ${match8}`);
+            console.log(`   - FINAL RESULT: ${matches}`);
+        }
+        
+        if (matches) {
+            console.log(`✅ [MATCH FOUND] Found matching link: ${href}`);
             existingLink = link;
             break;
         }
     }
     
     if (existingLink) {
+        console.log(`🗑️ [REMOVE] Found link to remove: ${existingLink.href}`);
+        
         // Store link data before removing
         const linkData = {
             href: existingLink.href,
@@ -85,18 +127,31 @@ function toggleStyleFile(filePath) {
             disabled: existingLink.disabled
         };
         
+        console.log(`💾 [REMOVE] Storing link data:`, linkData);
+        
         // Remove the link from DOM
         existingLink.remove();
         removedLinks.set(filePath, linkData);
         
-        console.log(`${filePath} disabled - link removed from DOM`);
+        console.log(`🗑️ [REMOVE] Link removed from DOM`);
+        console.log(`📊 [REMOVE] Added to removedLinks: ${filePath}`);
+        console.log(`📊 [REMOVE] Total removed links now: ${removedLinks.size}`);
+        
+        // Force browser to recalculate styles
+        document.documentElement.offsetHeight;
+        
+        console.log(`✅ [REMOVE COMPLETE] ${filePath} disabled - link removed from DOM`);
         showNotification(`${filePath} כובה`, 'info');
     } else {
-        console.warn(`CSS file not found: ${filePath}`);
-        console.log('Available CSS links:');
-        allLinks.forEach(link => console.log(`- ${link.href}`));
+        console.warn(`❌ [NOT FOUND] CSS file not found: ${filePath}`);
+        console.log(`📋 [NOT FOUND] Available CSS links:`);
+        allLinks.forEach((link, index) => {
+            console.log(`   ${index + 1}. ${link.href}`);
+        });
         showNotification(`קובץ CSS לא נמצא: ${filePath}`, 'error');
     }
+    
+    console.log(`🏁 [TOGGLE END] Finished processing: ${filePath}`);
 }
 
 // Legacy function for backward compatibility

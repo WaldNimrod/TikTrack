@@ -133,7 +133,7 @@
             <div class="control-row" style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
               <div class="control-input-group">
                 <label style="display: block; font-size: 12px; color: #666; margin-bottom: 5px;">תיקיות לסריקה</label>
-                <input type="text" class="control-input" id="scanPaths" value="trading-ui/scripts/" style="width: 200px; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px;">
+                <input type="text" class="control-input" id="scanPaths" value="trading-ui/" style="width: 200px; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px;">
               </div>
               <div class="control-input-group">
                 <label style="display: block; font-size: 12px; color: #666; margin-bottom: 5px;">רמת לוג</label>
@@ -146,6 +146,21 @@
               <div class="control-input-group">
                 <label style="display: block; font-size: 12px; color: #666; margin-bottom: 5px;">קצב ניטור (דקות)</label>
                 <input type="number" class="control-input" id="refreshInterval" value="2" min="1" max="30" style="width: 100px; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px;">
+              </div>
+            </div>
+
+            <!-- File type selection -->
+            <div class="control-row" style="margin-bottom: 15px;">
+              <label style="display: block; font-size: 14px; color: #495057; margin-bottom: 10px; font-weight: 500;">סוגי קבצים לסריקה:</label>
+              <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                  <input type="checkbox" id="scanJs" checked style="margin: 0;">
+                  <span>JavaScript (.js)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                  <input type="checkbox" id="scanHtml" style="margin: 0;">
+                  <span>HTML (.html)</span>
+                </label>
               </div>
             </div>
 
@@ -218,10 +233,10 @@
           <div class="section-body">
             <!-- Scan button moved here -->
             <div class="scan-section" style="margin-bottom: 20px; text-align: center;">
-              <button class="btn btn-success btn-lg" onclick="window.startFileScan()" title="סרוק קבצי JavaScript לאיתור בעיות">
-                <i class="fas fa-search fa-lg"></i> סרוק קבצי JavaScript
+              <button class="btn btn-success btn-lg" onclick="window.startFileScan()" title="סרוק קבצי JavaScript ו-HTML לאיתור בעיות">
+                <i class="fas fa-search fa-lg"></i> סרוק קבצים
               </button>
-              <p style="margin: 10px 0; color: #666; font-size: 14px;">סורק את כל קבצי ה-JavaScript בפרויקט לאיתור בעיות קוד</p>
+              <p style="margin: 10px 0; color: #666; font-size: 14px;">סורק את הקבצים שנבחרו (JavaScript ו/או HTML) לאיתור בעיות קוד ונגישות</p>
             </div>
 
             <div class="fix-buttons" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
@@ -237,6 +252,14 @@
               <button class="btn btn-secondary" onclick="window.ignoreAllIssues()" title="התעלם מכל הבעיות">
                 <i class="fas fa-eye-slash"></i> התעלם מהכל
               </button>
+            </div>
+
+            <!-- Export unresolved issues -->
+            <div class="export-section" style="margin-top: 20px; text-align: center;">
+              <button class="btn btn-outline-info" onclick="window.copyUnresolvedIssuesLog()" title="העתק רשימה של הבעיות שלא נפתרו לתיקון ידני">
+                <i class="fas fa-clipboard-list"></i> העתק לוג שגיאות ואזהרות
+              </button>
+              <p style="margin: 8px 0; color: #6c757d; font-size: 13px;">מעתיק רשימה של הבעיות שלא ניתן היה לתקן אוטומטית</p>
             </div>
           </div>
         </div> <!-- End fix actions section -->

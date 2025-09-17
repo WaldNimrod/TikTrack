@@ -122,48 +122,19 @@
                             </div>
                         </div>
                         
-                        <!-- דוגמאות צבעי סטטוס -->
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <h6>תגיות סטטוס עם רקע:</h6>
-                                <div class="d-flex flex-wrap gap-2">
-                                    <span class="status-badge status-open">פתוח</span>
-                                    <span class="status-badge status-closed">סגור</span>
-                                    <span class="status-badge status-cancelled">בוטל</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>טקסט צבעוני בלבד:</h6>
-                                <div class="d-flex flex-wrap gap-2">
-                                    <span class="status-open-text">פתוח</span>
-                                    <span class="status-closed-text">סגור</span>
-                                    <span class="status-cancelled-text">בוטל</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-12">
-                                <h6>רקע צבעוני בלבד:</h6>
-                                <div class="d-flex flex-wrap gap-2">
-                                    <span class="status-open-bg p-2 rounded">פתוח</span>
-                                    <span class="status-closed-bg p-2 rounded">סגור</span>
-                                    <span class="status-cancelled-bg p-2 rounded">בוטל</span>
-                                </div>
-                            </div>
-                        </div>
                         
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5>מצב המערכות</h5>
+                                        <h5>🔍 מידע דיבאג - מצב המערכות</h5>
                                     </div>
                                     <div class="card-body">
-                                        <div id="systemStatus">
-                                            <p><strong>HeaderSystem:</strong> <span id="headerStatus">בודק...</span></p>
-                                            <p><strong>FilterSystem:</strong> <span id="filterStatus">בודק...</span></p>
-                                            <p><strong>Header Element:</strong> <span id="headerElementStatus">בודק...</span></p>
+                                        <div id="systemStatusInfo">
+                                            <p><strong>מערכת הכותרת:</strong> <span id="headerSystemStatus">טוען...</span></p>
+                                            <p><strong>מערכת הפילטרים:</strong> <span id="filterSystemStatus">טוען...</span></p>
+                                            <p><strong>מערכת התרגום:</strong> <span id="translationSystemStatus">טוען...</span></p>
+                                            <p><strong>מספר שורות בטבלה:</strong> <span id="tableRowCount">טוען...</span></p>
                                         </div>
                                     </div>
                                 </div>
@@ -176,19 +147,13 @@
                                     </div>
                                     <div class="card-body">
                                         <div id="filterDebugInfo" class="debug-info">
-                                            <div><strong>Time:</strong> <span id="currentTime">-</span></div>
-                                            <div><strong>Status:</strong> <span id="statusDebug">-</span></div>
-                                            <div><strong>Type:</strong> <span id="typeDebug">-</span></div>
-                                            <div><strong>Account:</strong> <span id="accountDebug">-</span></div>
-                                            <div><strong>Date:</strong> <span id="dateDebug">-</span></div>
+                                            <p><strong>פילטר סטטוס:</strong> <span id="statusFilterInfo">לא נבחר</span></p>
+                                            <p><strong>פילטר סוג השקעה:</strong> <span id="typeFilterInfo">לא נבחר</span></p>
+                                            <p><strong>פילטר חשבון:</strong> <span id="accountFilterInfo">לא נבחר</span></p>
+                                            <p><strong>פילטר תאריך:</strong> <span id="dateFilterInfo">לא נבחר</span></p>
+                                            <p><strong>פילטר חיפוש:</strong> <span id="searchFilterInfo">ריק</span></p>
+                                            <p><strong>שורות מוצגות:</strong> <span id="visibleRowsInfo">כל השורות</span></p>
                                         </div>
-                                        <button onclick="updateDebugInfo()" class="btn btn-sm btn-primary mt-2">🔄 עדכן</button>
-                                        <button onclick="testStatusFilter()" class="btn btn-sm btn-info mt-2">🧪 בדוק פילטר סטטוס</button>
-                                        <button onclick="testTypeFilter()" class="btn btn-sm btn-success mt-2">🧪 בדוק פילטר סוג</button>
-                                        <button onclick="testAccountFilter()" class="btn btn-sm btn-primary mt-2">🧪 בדוק פילטר חשבון</button>
-                                        <button onclick="testDateFilter()" class="btn btn-sm btn-secondary mt-2">🧪 בדוק פילטר תאריך</button>
-                                        <button onclick="testSearchFilter()" class="btn btn-sm btn-dark mt-2">🧪 בדוק חיפוש חופשי</button>
-                                        <button onclick="showActiveContainer()" class="btn btn-sm btn-warning mt-2">🔍 הצג קונטיינר פעיל</button>
                                     </div>
                                 </div>
                             </div>
@@ -515,74 +480,13 @@
     <!-- Page-specific script -->
     <script src="scripts/test-header-only.js?v=3.1.0"></script>
     
-    <!-- Debug Information Script -->
+    <!-- Initialize Debug System -->
     <script>
-        // Debug Information Updates
-        function updateSystemStatus() {
-            // Check header system
-            const headerElement = document.getElementById('unified-header');
-            const headerStatus = headerElement ? 'פעיל' : 'לא פעיל';
-            document.getElementById('headerSystemStatus').textContent = headerStatus;
-            
-            // Check filter system
-            const filterSystemStatus = window.applyFilter ? 'פעיל' : 'לא פעיל';
-            document.getElementById('filterSystemStatus').textContent = filterSystemStatus;
-            
-            // Check translation system
-            const translationSystemStatus = window.translateTradePlanType ? 'פעיל' : 'לא פעיל';
-            document.getElementById('translationSystemStatus').textContent = translationSystemStatus;
-            
-            // Count table rows
-            const tableRows = document.querySelectorAll('#tickersContainer tbody tr');
-            document.getElementById('tableRowCount').textContent = tableRows.length;
-        }
-        
-        function updateFilterDebugInfo() {
-            // Get filter states from actual DOM elements
-            const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
-            const statusFilter = Array.from(statusItems).map(item => item.getAttribute('data-value'));
-            
-            const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
-            const typeFilter = Array.from(typeItems).map(item => item.getAttribute('data-value'));
-            
-            const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
-            const accountFilter = Array.from(accountItems).map(item => item.getAttribute('data-value'));
-            
-            const dateItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item.selected');
-            const dateFilter = dateItems.length > 0 ? dateItems[0].getAttribute('data-value') : 'כל זמן';
-            
-            const searchInput = document.getElementById('searchFilterInput');
-            const searchFilter = searchInput ? searchInput.value : '';
-            
-            // Update display
-            document.getElementById('statusFilterInfo').textContent = 
-                statusFilter.length > 0 ? statusFilter.join(', ') : 'לא נבחר';
-            document.getElementById('typeFilterInfo').textContent = 
-                typeFilter.length > 0 ? typeFilter.join(', ') : 'לא נבחר';
-            document.getElementById('accountFilterInfo').textContent = 
-                accountFilter.length > 0 ? accountFilter.join(', ') : 'לא נבחר';
-            document.getElementById('dateFilterInfo').textContent = dateFilter;
-            document.getElementById('searchFilterInfo').textContent = searchFilter || 'ריק';
-            
-            // Count visible rows
-            const visibleRows = document.querySelectorAll('#tickersContainer tbody tr:not([style*="display: none"])');
-            const totalRows = document.querySelectorAll('#tickersContainer tbody tr');
-            document.getElementById('visibleRowsInfo').textContent = 
-                `${visibleRows.length} מתוך ${totalRows.length}`;
-        }
-        
-        // Update debug info every 2 seconds
-        setInterval(() => {
-            updateSystemStatus();
-            updateFilterDebugInfo();
-        }, 2000);
-        
-        // Initial update
+        // Initialize debug system from header system
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                updateSystemStatus();
-                updateFilterDebugInfo();
-            }, 1000);
+            if (window.initializeDebugSystem) {
+                window.initializeDebugSystem();
+            }
         });
     </script>
 </body>

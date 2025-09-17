@@ -1754,19 +1754,35 @@ class HeaderSystem {
         e.preventDefault();
         e.stopPropagation();
         
+        const clickedValue = item.getAttribute('data-value');
+        const isCurrentlySelected = item.classList.contains('selected');
 
-        // toggle selection - מולטיסלקט
-        item.classList.toggle('selected');
+        // Logic: "הכול" cannot be selected with other options
+        if (clickedValue === 'הכול') {
+          // If clicking "הכול", deselect all others and select only "הכול"
+          statusItems.forEach(otherItem => {
+            otherItem.classList.remove('selected');
+          });
+          item.classList.add('selected');
+        } else {
+          // If clicking any other option, deselect "הכול" first
+          const allItem = document.querySelector('#statusFilterMenu .status-filter-item[data-value="הכול"]');
+          if (allItem) {
+            allItem.classList.remove('selected');
+          }
+          
+          // Toggle the clicked item
+          item.classList.toggle('selected');
+        }
 
         // collect all selected statuses
         const selectedStatuses = Array.from(document.querySelectorAll('#statusFilterMenu .status-filter-item.selected'))
           .map(selectedItem => selectedItem.getAttribute('data-value'));
 
-
         // update display text
         const statusElement = document.getElementById('selectedStatus');
-        if (selectedStatuses.length === 0) {
-          statusElement.textContent = 'כל סטטוס';  // ✅ יחיד
+        if (selectedStatuses.length === 0 || (selectedStatuses.length === 1 && selectedStatuses[0] === 'הכול')) {
+          statusElement.textContent = 'כל סטטוס';
         } else if (selectedStatuses.length === 1) {
           statusElement.textContent = selectedStatuses[0];
         } else {
@@ -1785,9 +1801,26 @@ class HeaderSystem {
         e.preventDefault();
         e.stopPropagation();
         
+        const clickedValue = item.getAttribute('data-value');
+        const isCurrentlySelected = item.classList.contains('selected');
 
-        // toggle selection
-        item.classList.toggle('selected');
+        // Logic: "הכול" cannot be selected with other options
+        if (clickedValue === 'הכול') {
+          // If clicking "הכול", deselect all others and select only "הכול"
+          typeItems.forEach(otherItem => {
+            otherItem.classList.remove('selected');
+          });
+          item.classList.add('selected');
+        } else {
+          // If clicking any other option, deselect "הכול" first
+          const allItem = document.querySelector('#typeFilterMenu .type-filter-item[data-value="הכול"]');
+          if (allItem) {
+            allItem.classList.remove('selected');
+          }
+          
+          // Toggle the clicked item
+          item.classList.toggle('selected');
+        }
 
         // collect all selected types
         const selectedTypes = Array.from(document.querySelectorAll('#typeFilterMenu .type-filter-item.selected'))
@@ -1795,8 +1828,8 @@ class HeaderSystem {
 
         // update display text
         const typeElement = document.getElementById('selectedType');
-        if (selectedTypes.length === 0) {
-          typeElement.textContent = 'כל סוג השקעה';  // ✅ יחיד
+        if (selectedTypes.length === 0 || (selectedTypes.length === 1 && selectedTypes[0] === 'הכול')) {
+          typeElement.textContent = 'כל סוג השקעה';
         } else if (selectedTypes.length === 1) {
           typeElement.textContent = selectedTypes[0];
         } else {
@@ -1818,9 +1851,26 @@ class HeaderSystem {
         e.preventDefault();
         e.stopPropagation();
         
+        const clickedValue = item.getAttribute('data-value');
+        const isCurrentlySelected = item.classList.contains('selected');
 
-        // toggle selection
-        item.classList.toggle('selected');
+        // Logic: "הכול" cannot be selected with other options
+        if (clickedValue === 'הכול') {
+          // If clicking "הכול", deselect all others and select only "הכול"
+          accountItems.forEach(otherItem => {
+            otherItem.classList.remove('selected');
+          });
+          item.classList.add('selected');
+        } else {
+          // If clicking any other option, deselect "הכול" first
+          const allItem = document.querySelector('#accountFilterMenu .account-filter-item[data-value="הכול"]');
+          if (allItem) {
+            allItem.classList.remove('selected');
+          }
+          
+          // Toggle the clicked item
+          item.classList.toggle('selected');
+        }
 
         // collect all selected accounts
         const selectedAccounts = Array.from(document.querySelectorAll('#accountFilterMenu .account-filter-item.selected'))
@@ -1828,7 +1878,7 @@ class HeaderSystem {
 
         // update display text
         const accountElement = document.getElementById('selectedAccount');
-        if (selectedAccounts.length === 0) {
+        if (selectedAccounts.length === 0 || (selectedAccounts.length === 1 && selectedAccounts[0] === 'הכול')) {
           accountElement.textContent = 'כל החשבונות';
         } else if (selectedAccounts.length === 1) {
           accountElement.textContent = selectedAccounts[0];
@@ -4869,6 +4919,124 @@ document.addEventListener('DOMContentLoaded', function() {
     console.error('❌ HeaderSystem class not found');
   }
 });
+
+// Debug Information Functions
+/**
+ * Update system status information
+ */
+function updateSystemStatus() {
+  // Check header system
+  const headerElement = document.getElementById('unified-header');
+  const headerStatus = headerElement ? 'פעיל' : 'לא פעיל';
+  const headerSystemStatusElement = document.getElementById('headerSystemStatus');
+  if (headerSystemStatusElement) {
+    headerSystemStatusElement.textContent = headerStatus;
+  }
+  
+  // Check filter system
+  const filterSystemStatus = window.applyFilter ? 'פעיל' : 'לא פעיל';
+  const filterSystemStatusElement = document.getElementById('filterSystemStatus');
+  if (filterSystemStatusElement) {
+    filterSystemStatusElement.textContent = filterSystemStatus;
+  }
+  
+  // Check translation system
+  const translationSystemStatus = window.translateTradePlanType ? 'פעיל' : 'לא פעיל';
+  const translationSystemStatusElement = document.getElementById('translationSystemStatus');
+  if (translationSystemStatusElement) {
+    translationSystemStatusElement.textContent = translationSystemStatus;
+  }
+  
+  // Count table rows
+  const tableRows = document.querySelectorAll('#tickersContainer tbody tr');
+  const tableRowCountElement = document.getElementById('tableRowCount');
+  if (tableRowCountElement) {
+    tableRowCountElement.textContent = tableRows.length;
+  }
+}
+
+/**
+ * Update filter debug information
+ */
+function updateFilterDebugInfo() {
+  // Get filter states from actual DOM elements
+  const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
+  const statusFilter = Array.from(statusItems).map(item => item.getAttribute('data-value'));
+  
+  const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
+  const typeFilter = Array.from(typeItems).map(item => item.getAttribute('data-value'));
+  
+  const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
+  const accountFilter = Array.from(accountItems).map(item => item.getAttribute('data-value'));
+  
+  const dateItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item.selected');
+  const dateFilter = dateItems.length > 0 ? dateItems[0].getAttribute('data-value') : 'כל זמן';
+  
+  const searchInput = document.getElementById('searchFilterInput');
+  const searchFilter = searchInput ? searchInput.value : '';
+  
+  // Update display
+  const statusFilterInfoElement = document.getElementById('statusFilterInfo');
+  if (statusFilterInfoElement) {
+    statusFilterInfoElement.textContent = 
+      statusFilter.length > 0 ? statusFilter.join(', ') : 'לא נבחר';
+  }
+  
+  const typeFilterInfoElement = document.getElementById('typeFilterInfo');
+  if (typeFilterInfoElement) {
+    typeFilterInfoElement.textContent = 
+      typeFilter.length > 0 ? typeFilter.join(', ') : 'לא נבחר';
+  }
+  
+  const accountFilterInfoElement = document.getElementById('accountFilterInfo');
+  if (accountFilterInfoElement) {
+    accountFilterInfoElement.textContent = 
+      accountFilter.length > 0 ? accountFilter.join(', ') : 'לא נבחר';
+  }
+  
+  const dateFilterInfoElement = document.getElementById('dateFilterInfo');
+  if (dateFilterInfoElement) {
+    dateFilterInfoElement.textContent = dateFilter;
+  }
+  
+  const searchFilterInfoElement = document.getElementById('searchFilterInfo');
+  if (searchFilterInfoElement) {
+    searchFilterInfoElement.textContent = searchFilter || 'ריק';
+  }
+  
+  // Count visible rows
+  const visibleRows = document.querySelectorAll('#tickersContainer tbody tr:not([style*="display: none"])');
+  const totalRows = document.querySelectorAll('#tickersContainer tbody tr');
+  const visibleRowsInfoElement = document.getElementById('visibleRowsInfo');
+  if (visibleRowsInfoElement) {
+    visibleRowsInfoElement.textContent = 
+      `${visibleRows.length} מתוך ${totalRows.length}`;
+  }
+}
+
+/**
+ * Initialize debug system
+ */
+function initializeDebugSystem() {
+  // Update debug info every 2 seconds
+  setInterval(() => {
+    updateSystemStatus();
+    updateFilterDebugInfo();
+  }, 2000);
+  
+  // Initial update
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      updateSystemStatus();
+      updateFilterDebugInfo();
+    }, 1000);
+  });
+}
+
+// Export debug functions to global scope
+window.updateSystemStatus = updateSystemStatus;
+window.updateFilterDebugInfo = updateFilterDebugInfo;
+window.initializeDebugSystem = initializeDebugSystem;
 
 // Header System JS loaded completely
 

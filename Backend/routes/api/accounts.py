@@ -32,6 +32,29 @@ def get_accounts():
     finally:
         db.close()
 
+@accounts_bp.route('/open', methods=['GET'])
+@cache_for(ttl=60)  # Cache for 1 minute
+def get_open_accounts():
+    """Get all open accounts"""
+    try:
+        db: Session = next(get_db())
+        accounts = AccountService.get_open_accounts(db)
+        return jsonify({
+            "status": "success",
+            "data": [account.to_dict() for account in accounts],
+            "message": "Open accounts retrieved successfully",
+            "version": "v1"
+        })
+    except Exception as e:
+        logger.error(f"Error getting open accounts: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": "Failed to retrieve open accounts"},
+            "version": "v1"
+        }), 500
+    finally:
+        db.close()
+
 @accounts_bp.route('/<int:account_id>', methods=['GET'])
 @cache_for(ttl=120)  # Cache for 2 minutes - individual accounts
 def get_account(account_id: int):

@@ -18,6 +18,11 @@ class AccountService:
         return db.query(Account).filter(Account.id == account_id).first()
     
     @staticmethod
+    def get_open_accounts(db: Session) -> List[Account]:
+        """Get all open accounts"""
+        return db.query(Account).filter(Account.status == 'open').all()
+    
+    @staticmethod
     def create(db: Session, data: Dict[str, Any]) -> Account:
         """Create new account"""
         # Validate that all fields exist in the Account model

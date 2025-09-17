@@ -23,8 +23,34 @@ function showNotification(message, type = 'info', title = 'מערכת', duration
 }
 
 // Style File Control Functions
+// Store removed links for restoration
+const removedLinks = new Map();
+
 function toggleStyleFile(filePath) {
     console.log(`Trying to toggle: ${filePath}`);
+    
+    // Check if link was previously removed
+    if (removedLinks.has(filePath)) {
+        // Restore the link
+        const linkData = removedLinks.get(filePath);
+        const newLink = document.createElement('link');
+        newLink.rel = 'stylesheet';
+        newLink.href = linkData.href;
+        newLink.disabled = false;
+        
+        // Insert after the last stylesheet link
+        const lastLink = document.querySelector('link[rel="stylesheet"]:last-of-type');
+        if (lastLink) {
+            lastLink.parentNode.insertBefore(newLink, lastLink.nextSibling);
+        } else {
+            document.head.appendChild(newLink);
+        }
+        
+        removedLinks.delete(filePath);
+        console.log(`${filePath} restored to DOM`);
+        showNotification(`${filePath} מופעל`, 'info');
+        return;
+    }
     
     // Find the existing link element for this CSS file
     const allLinks = document.querySelectorAll('link[rel="stylesheet"]');
@@ -42,24 +68,29 @@ function toggleStyleFile(filePath) {
             href.includes(filePath.replace('03-generic/', '')) ||
             href.includes(filePath.replace('04-elements/', '')) ||
             href.includes(filePath.replace('05-objects/', '')) ||
-            href.includes(filePath.replace('06-components/', ''))) {
+            href.includes(filePath.replace('06-components/', '')) ||
+            href.includes('styles-new/' + filePath) ||
+            (filePath === 'bootstrap.min.css' && href.includes('bootstrap.min.css')) ||
+            (filePath === 'bootstrap.min.css' && href.includes('bootstrap@5.3.0/dist/css/bootstrap.min.css'))) {
             existingLink = link;
             break;
         }
     }
     
     if (existingLink) {
-        // Toggle the disabled state
-        existingLink.disabled = !existingLink.disabled;
-        console.log(`${filePath} ${existingLink.disabled ? 'disabled' : 'enabled'}`);
-        console.log(`Link href: ${existingLink.href}`);
-        console.log(`Link disabled: ${existingLink.disabled}`);
+        // Store link data before removing
+        const linkData = {
+            href: existingLink.href,
+            rel: existingLink.rel,
+            disabled: existingLink.disabled
+        };
         
-        // Force reflow to ensure changes take effect
-        existingLink.offsetHeight;
+        // Remove the link from DOM
+        existingLink.remove();
+        removedLinks.set(filePath, linkData);
         
-        // Show visual feedback
-        showNotification(`${filePath} ${existingLink.disabled ? 'כובה' : 'מופעל'}`, 'info');
+        console.log(`${filePath} disabled - link removed from DOM`);
+        showNotification(`${filePath} כובה`, 'info');
     } else {
         console.warn(`CSS file not found: ${filePath}`);
         console.log('Available CSS links:');

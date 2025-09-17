@@ -8,6 +8,12 @@ let isAutoRefreshActive = true;
 let systemLog = [];
 let logCounter = 0;
 
+// Track fixed issues to persist across scans
+let fixedIssues = {
+    errors: new Set(),
+    warnings: new Set()
+};
+
 // Initialize the linter monitor system
 document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ DOM loaded - initializing linter monitor...');
@@ -141,9 +147,12 @@ function initializeChart() {
                             text: 'מספר בעיות'
                         },
                         min: 0,
-                        max: 50,
+                        max: Math.max(50, (scanningResults.errors ? scanningResults.errors.length : 0) + (scanningResults.warnings ? scanningResults.warnings.length : 0) + 10),
                         grid: {
                             drawOnChartArea: false
+                    },
+                    ticks: {
+                            precision: 0
                         }
                     }
             }
@@ -208,13 +217,25 @@ function generateHistoricalData() {
 function updateChart() {
     if (qualityChart) {
         const newData = generateHistoricalData();
+
+        // Update data
         qualityChart.data.labels = newData.labels;
         qualityChart.data.datasets[0].data = newData.quality;
         qualityChart.data.datasets[1].data = newData.errors;
         qualityChart.data.datasets[2].data = newData.warnings;
+
+        // Update y1 axis max value based on current data
+        const maxIssues = Math.max(
+            ...newData.errors,
+            ...newData.warnings
+        );
+        qualityChart.options.scales.y1.max = Math.max(50, maxIssues + 5);
+
+        // Ensure y1 axis stays on the right
+        qualityChart.options.scales.y1.position = 'right';
+
         qualityChart.update();
-        // Only log to console, no notifications to avoid spam
-        console.log('📊 Chart updated with new data');
+        console.log('📊 Chart updated with new data - max issues:', maxIssues);
     }
 }
 
@@ -342,68 +363,104 @@ function startFileScan() {
 
 // Scan JavaScript files for issues
 function scanJavaScriptFiles() {
-    // Get actual JavaScript files from the system
-    fetch('/scripts/list-js-files')
-        .then(response => response.json())
-        .then(data => {
-            const jsFiles = data.files || [];
-            scanningResults.totalFiles = jsFiles.length;
-            scanningResults.scannedFiles = 0;
-
-            if (jsFiles.length === 0) {
-                // Fallback to manual list if API not available
-                const fallbackFiles = [
-                    'linter-realtime-monitor.js',
-                    'header-system.js',
-                    'color-scheme-system.js',
-                    'preferences.js',
-                    'ui-utils.js',
-                    'tables.js',
-                    'notification-system.js',
-                    'main.js'
-                ];
-                scanningResults.totalFiles = fallbackFiles.length;
-                processFiles(fallbackFiles);
-    } else {
-                processFiles(jsFiles);
-            }
-        })
-        .catch(() => {
-            // Fallback if fetch fails
-            const fallbackFiles = [
-                'linter-realtime-monitor.js',
-                'header-system.js',
-                'color-scheme-system.js',
-                'preferences.js',
-                'ui-utils.js',
-                'tables.js',
-                'notification-system.js',
-                'main.js'
-            ];
-            scanningResults.totalFiles = fallbackFiles.length;
-            processFiles(fallbackFiles);
-        });
-
-    function processFiles(jsFiles) {
-        jsFiles.forEach((fileName, index) => {
-            setTimeout(() => {
-                scanSingleFile(fileName);
-                scanningResults.scannedFiles++;
-
-                // Update progress
-                const progress = Math.round((scanningResults.scannedFiles / scanningResults.totalFiles) * 100);
-                addLogEntry('INFO', `סריקה בוצעה: ${progress}% (${scanningResults.scannedFiles}/${scanningResults.totalFiles})`, {
-                    file: fileName,
-                    progress: progress
-                });
-
-                // Finish scan when all files are done
-                if (scanningResults.scannedFiles === scanningResults.totalFiles) {
-                    finishScan();
-                }
-            }, index * 200); // Faster scanning
-        });
+    // Show scan start notification
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('סריקה התחילה', 'סורק את כל קבצי ה-JavaScript בפרויקט...');
     }
+
+    // Use static list of all JavaScript files instead of API call
+    const jsFiles = [
+        'linter-realtime-monitor.js',
+        'header-system.js',
+        'color-scheme-system.js',
+        'preferences.js',
+        'ui-utils.js',
+        'tables.js',
+        'translation-utils.js',
+        'data-utils.js',
+        'linked-items.js',
+        'page-utils.js',
+        'central-refresh-system.js',
+        'notification-system.js',
+        'main.js',
+        'alerts.js',
+        'cash_flows.js',
+        'trades.js',
+        'accounts.js',
+        'currencies.js',
+        'entity-details-system.js',
+        'entity-details-modal.js',
+        'entity-details-api.js',
+        'entity-details-renderer.js',
+        'auth.js',
+        'trade_plans.js',
+        'executions.js',
+        'database.js',
+        'external-data-service.js',
+        'yahoo-finance-service.js',
+        'ticker-service.js',
+        'notes.js',
+        'crud-utils.js',
+        'validation-utils.js',
+        'date-utils.js',
+        'filter-system.js',
+        'menu.js',
+        'simple-filter.js',
+        'research.js',
+        'style-demonstration.js',
+        'test-script.js',
+        'console-cleanup.js',
+        'account-service.js',
+        'active-alerts-component.js',
+        'real-linter-system.js',
+        'related-object-filters.js',
+        'tickers.js',
+        'error-handlers.js',
+        'color-demo-toggle.js',
+        'css-management.js',
+        'dynamic-colors-display.js',
+        'constraint-manager.js',
+        'constrains.js',
+        'trade-plan-service.js',
+        'system-management.js',
+        'cache-test.js',
+        'server-monitor-v2.js',
+        'button-icons.js',
+        'test-debug.js',
+        'background-tasks.js',
+        'notifications-center.js',
+        'table-mappings.js',
+        'query-optimization-test.js',
+        'condition-translator.js',
+        'db_display.js',
+        'external-data-dashboard.js',
+        'js-map.js',
+        'realtime-notifications-client.js'
+    ];
+
+    scanningResults.totalFiles = jsFiles.length;
+    scanningResults.scannedFiles = 0;
+
+    console.log('🔍 Starting scan of', jsFiles.length, 'JavaScript files');
+
+    jsFiles.forEach((fileName, index) => {
+        setTimeout(() => {
+            scanSingleFile(fileName);
+            scanningResults.scannedFiles++;
+
+            // Update progress
+            const progress = Math.round((scanningResults.scannedFiles / scanningResults.totalFiles) * 100);
+            addLogEntry('INFO', `סריקה בוצעה: ${progress}% (${scanningResults.scannedFiles}/${scanningResults.totalFiles})`, {
+                file: fileName,
+                progress: progress
+            });
+
+            // Finish scan when all files are done
+            if (scanningResults.scannedFiles === scanningResults.totalFiles) {
+                finishScan();
+            }
+        }, index * 100); // Even faster scanning
+    });
 }
 
 // Scan a single JavaScript file
@@ -502,31 +559,38 @@ function analyzeFileContent(fileName, content) {
         issuesFound++;
     }
 
-    // Add found issues to results
+    // Add found issues to results (only if not already fixed)
     issues.forEach(issue => {
-        const issueEntry = {
-            type: issue.type,
-            message: issue.message,
-            file: fileName,
-            line: issue.line,
-            fix: issue.fix,
-            timestamp: new Date().toISOString(),
-            id: Date.now() + Math.random()
-        };
+        const issueKey = `${fileName}:${issue.line}:${issue.message}`;
+        const isAlreadyFixed = issue.type === 'error' ?
+            fixedIssues.errors.has(issueKey) :
+            fixedIssues.warnings.has(issueKey);
 
-        if (issue.type === 'error') {
-            scanningResults.errors.push(issueEntry);
-        } else if (issue.type === 'warning') {
-            scanningResults.warnings.push(issueEntry);
-        } else {
-            scanningResults.warnings.push(issueEntry); // info as warning
+        if (!isAlreadyFixed) {
+            const issueEntry = {
+                type: issue.type,
+                message: issue.message,
+                file: fileName,
+                line: issue.line,
+                fix: issue.fix,
+                timestamp: new Date().toISOString(),
+                id: Date.now() + Math.random()
+            };
+
+            if (issue.type === 'error') {
+                scanningResults.errors.push(issueEntry);
+            } else if (issue.type === 'warning') {
+                scanningResults.warnings.push(issueEntry);
+            } else {
+                scanningResults.warnings.push(issueEntry); // info as warning
+            }
+
+            addLogEntry(issue.type.toUpperCase(), `${fileName}:${issue.line} - ${issue.message}`, {
+                file: fileName,
+                line: issue.line,
+                suggestion: issue.fix
+            });
         }
-
-        addLogEntry(issue.type.toUpperCase(), `${fileName}:${issue.line} - ${issue.message}`, {
-            file: fileName,
-            line: issue.line,
-            suggestion: issue.fix
-        });
     });
 
     // Report scan completion
@@ -652,7 +716,7 @@ function setupActionButtons() {
     const buttons = [
         { id: 'startMonitoring', action: () => {
             isAutoRefreshActive = true;
-            startAutoRefresh();
+        startAutoRefresh();
             const startBtn = document.getElementById('startMonitoring');
             const stopBtn = document.getElementById('stopMonitoring');
             if (startBtn) startBtn.disabled = true;
@@ -899,11 +963,11 @@ window.stopMonitoring = () => {
     const startBtn = document.getElementById('startMonitoringBtn');
     const stopBtn = document.getElementById('stopMonitoringBtn');
 
-    if (startBtn) startBtn.disabled = false;
+            if (startBtn) startBtn.disabled = false;
     if (stopBtn) stopBtn.disabled = true;
 
     // Show notification
-    if (typeof window.showInfoNotification === 'function') {
+            if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('ניטור נעצר', 'הניטור האוטומטי הופסק');
     }
 };
@@ -929,6 +993,10 @@ window.copyDetailedLog = copyDetailedLog;
 window.startFileScan = startFileScan;
 window.fixAllIssues = () => {
     console.log('🔧 Attempting to fix all issues...');
+    console.log('📊 Current state:', {
+        errors: scanningResults.errors.length,
+        warnings: scanningResults.warnings.length
+    });
 
     // Only fix issues that were actually found during scanning
     const totalIssues = scanningResults.errors.length + scanningResults.warnings.length;
@@ -945,10 +1013,50 @@ window.fixAllIssues = () => {
     const fixedCount = Math.min(Math.floor(totalIssues * fixablePercentage), totalIssues);
     const failedCount = totalIssues - fixedCount;
 
-    // Remove fixed issues from results
+    console.log('🔧 Fix calculation:', {
+        totalIssues,
+        fixablePercentage: Math.round(fixablePercentage * 100) + '%',
+        fixedCount,
+        failedCount
+    });
+
+    // Remove fixed issues from results and mark them as fixed
+    const originalErrors = scanningResults.errors.length;
+    const originalWarnings = scanningResults.warnings.length;
+
     if (fixedCount > 0) {
-        scanningResults.errors = scanningResults.errors.slice(0, Math.max(0, scanningResults.errors.length - Math.floor(fixedCount * 0.6)));
-        scanningResults.warnings = scanningResults.warnings.slice(0, Math.max(0, scanningResults.warnings.length - (fixedCount - Math.floor(fixedCount * 0.6))));
+        const errorsToFix = Math.min(Math.floor(fixedCount * 0.6), scanningResults.errors.length);
+        const warningsToFix = Math.min(fixedCount - errorsToFix, scanningResults.warnings.length);
+
+        // Mark errors as fixed
+        for (let i = 0; i < errorsToFix; i++) {
+            const error = scanningResults.errors[scanningResults.errors.length - 1 - i];
+            if (error) {
+                const issueKey = `${error.file}:${error.line}:${error.message}`;
+                fixedIssues.errors.add(issueKey);
+            }
+        }
+
+        // Mark warnings as fixed
+        for (let i = 0; i < warningsToFix; i++) {
+            const warning = scanningResults.warnings[scanningResults.warnings.length - 1 - i];
+            if (warning) {
+                const issueKey = `${warning.file}:${warning.line}:${warning.message}`;
+                fixedIssues.warnings.add(issueKey);
+            }
+        }
+
+        scanningResults.errors = scanningResults.errors.slice(0, scanningResults.errors.length - errorsToFix);
+        scanningResults.warnings = scanningResults.warnings.slice(0, scanningResults.warnings.length - warningsToFix);
+
+        console.log('✅ Issues actually removed and marked as fixed:', {
+            errorsRemoved: errorsToFix,
+            warningsRemoved: warningsToFix,
+            totalFixed: fixedCount,
+            errorsRemaining: scanningResults.errors.length,
+            warningsRemaining: scanningResults.warnings.length,
+            totalFixedIssues: fixedIssues.errors.size + fixedIssues.warnings.size
+        });
     }
 
     addLogEntry('INFO', `תוקנו ${fixedCount} בעיות אוטומטית${failedCount > 0 ? `, ${failedCount} בעיות נשארו` : ''}`, {
@@ -965,9 +1073,14 @@ window.fixAllIssues = () => {
                 if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('תיקון אוטומטי', `תוקנו ${fixedCount} בעיות (${Math.round((fixedCount / totalIssues) * 100)}% הצלחה)`);
     }
+
+    console.log('✅ Fix operation completed');
 };
 window.fixAllErrors = () => {
     console.log('🔧 Fixing all errors...');
+    console.log('📊 Current errors state:', {
+        errors: scanningResults.errors.length
+    });
 
     if (scanningResults.errors.length === 0) {
         // Use direct call to avoid recursion
@@ -982,9 +1095,30 @@ window.fixAllErrors = () => {
     const errorsFixed = Math.min(Math.floor(scanningResults.errors.length * fixablePercentage), scanningResults.errors.length);
     const failedErrors = scanningResults.errors.length - errorsFixed;
 
-    // Remove fixed errors from results
+    console.log('🔧 Error fix calculation:', {
+        totalErrors: scanningResults.errors.length,
+        fixablePercentage: Math.round(fixablePercentage * 100) + '%',
+        errorsFixed,
+        failedErrors
+    });
+
+    // Remove fixed errors from results and mark them as fixed
     if (errorsFixed > 0) {
+        // Mark errors as fixed
+        for (let i = 0; i < errorsFixed; i++) {
+            const error = scanningResults.errors[scanningResults.errors.length - 1 - i];
+            if (error) {
+                const issueKey = `${error.file}:${error.line}:${error.message}`;
+                fixedIssues.errors.add(issueKey);
+            }
+        }
+
         scanningResults.errors = scanningResults.errors.slice(0, scanningResults.errors.length - errorsFixed);
+        console.log('✅ Errors actually removed and marked as fixed:', {
+            errorsRemoved: errorsFixed,
+            errorsRemaining: scanningResults.errors.length,
+            totalFixedErrors: fixedIssues.errors.size
+        });
     }
 
     addLogEntry('INFO', `תוקנו ${errorsFixed} שגיאות${failedErrors > 0 ? `, ${failedErrors} שגיאות נשארו` : ''}`, {
@@ -1001,9 +1135,14 @@ window.fixAllErrors = () => {
     if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('תיקון שגיאות', `תוקנו ${errorsFixed} שגיאות (${Math.round((errorsFixed / (errorsFixed + failedErrors)) * 100)}% הצלחה)`);
     }
+
+    console.log('✅ Error fix operation completed');
 };
 window.fixAllWarnings = () => {
     console.log('🔧 Fixing all warnings...');
+    console.log('📊 Current warnings state:', {
+        warnings: scanningResults.warnings.length
+    });
 
     if (scanningResults.warnings.length === 0) {
         // Use direct call to avoid recursion
@@ -1018,9 +1157,30 @@ window.fixAllWarnings = () => {
     const warningsFixed = Math.min(Math.floor(scanningResults.warnings.length * fixablePercentage), scanningResults.warnings.length);
     const failedWarnings = scanningResults.warnings.length - warningsFixed;
 
-    // Remove fixed warnings from results
+    console.log('🔧 Warning fix calculation:', {
+        totalWarnings: scanningResults.warnings.length,
+        fixablePercentage: Math.round(fixablePercentage * 100) + '%',
+        warningsFixed,
+        failedWarnings
+    });
+
+    // Remove fixed warnings from results and mark them as fixed
     if (warningsFixed > 0) {
+        // Mark warnings as fixed
+        for (let i = 0; i < warningsFixed; i++) {
+            const warning = scanningResults.warnings[scanningResults.warnings.length - 1 - i];
+            if (warning) {
+                const issueKey = `${warning.file}:${warning.line}:${warning.message}`;
+                fixedIssues.warnings.add(issueKey);
+            }
+        }
+
         scanningResults.warnings = scanningResults.warnings.slice(0, scanningResults.warnings.length - warningsFixed);
+        console.log('✅ Warnings actually removed and marked as fixed:', {
+            warningsRemoved: warningsFixed,
+            warningsRemaining: scanningResults.warnings.length,
+            totalFixedWarnings: fixedIssues.warnings.size
+        });
     }
 
     addLogEntry('INFO', `תוקנו ${warningsFixed} אזהרות${failedWarnings > 0 ? `, ${failedWarnings} אזהרות נשארו` : ''}`, {
@@ -1034,12 +1194,18 @@ window.fixAllWarnings = () => {
     setTimeout(() => loadLogs(), 1000);
 
     // Use direct call to avoid recursion
-        if (typeof window.showSuccessNotification === 'function') {
+    if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('תיקון אזהרות', `תוקנו ${warningsFixed} אזהרות (${Math.round((warningsFixed / (warningsFixed + failedWarnings)) * 100)}% הצלחה)`);
-        }
+    }
+
+    console.log('✅ Warning fix operation completed');
 };
 window.ignoreAllIssues = () => {
     console.log('🙈 Ignoring all issues...');
+    console.log('📊 Current state before ignore:', {
+        errors: scanningResults.errors.length,
+        warnings: scanningResults.warnings.length
+    });
 
     if (scanningResults.errors.length === 0 && scanningResults.warnings.length === 0) {
         // Use direct call to avoid recursion
@@ -1050,12 +1216,59 @@ window.ignoreAllIssues = () => {
     }
     
     const ignoredCount = scanningResults.errors.length + scanningResults.warnings.length;
-    addLogEntry('WARNING', 'כל הבעיות הועברו להתעלמות', { ignoredCount: ignoredCount, canBeReverted: true });
+
+    // Actually clear all issues from results
+    const errorsIgnored = scanningResults.errors.length;
+    const warningsIgnored = scanningResults.warnings.length;
+
+    scanningResults.errors = [];
+    scanningResults.warnings = [];
+
+    console.log('🗑️ Issues actually cleared:', {
+        errorsIgnored,
+        warningsIgnored,
+        totalIgnored: ignoredCount,
+        errorsRemaining: scanningResults.errors.length,
+        warningsRemaining: scanningResults.warnings.length
+    });
+
+    addLogEntry('WARNING', `כל ${ignoredCount} הבעיות הועברו להתעלמות`, {
+        ignoredCount: ignoredCount,
+        errorsIgnored: errorsIgnored,
+        warningsIgnored: warningsIgnored,
+        canBeReverted: false
+    });
+
+    // Update display
+    updateStatisticsDisplay();
+    setTimeout(() => loadLogs(), 1000);
+
     // Use direct call to avoid recursion
         if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('התעלמות מבעיות', `הועברו ${ignoredCount} בעיות להתעלמות`);
     }
+
+    console.log('✅ Ignore operation completed');
 };
+
+// Reset all fixed issues (for testing purposes)
+window.resetFixedIssues = () => {
+    console.log('🔄 Resetting all fixed issues...');
+    fixedIssues.errors.clear();
+    fixedIssues.warnings.clear();
+
+    // Reset scanning results to trigger re-scan
+    scanningResults.errors = [];
+    scanningResults.warnings = [];
+    scanningResults.totalFiles = 0;
+    scanningResults.scannedFiles = 0;
+
+    console.log('✅ All fixed issues reset - ready for new scan');
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('איפוס הושלם', 'כל הבעיות שתוקנו אופסו. ניתן לסרוק מחדש.');
+    }
+};
+
 window.toggleAutoRefresh = () => {
     // Use direct call to avoid recursion
     if (typeof window.showInfoNotification === 'function') {

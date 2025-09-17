@@ -49,24 +49,43 @@ def get_defaults() -> Any:
 @preferences_bp.route('/user', methods=['GET'])
 @rate_limit_api(requests_per_minute=30)
 def get_user_preferences() -> Any:
-    """Get user preferences (fallback implementation)"""
+    """Get user preferences from database"""
     try:
-        # For now, return fallback defaults
-        defaults = PreferencesService.get_fallback_defaults()
-        
-        return jsonify({
-            "success": True,
-            "data": {
-                "preferences": defaults,
-                "profiles": [{
-                    "id": 1,
-                    "name": "ברירת מחדל",
-                    "isDefault": True,
-                    "description": "פרופיל ברירת מחדל"
-                }]
-            },
-            "timestamp": "2025-01-07T21:55:00Z"
-        }), 200
+        db = SessionLocal()
+        try:
+            # Get current user (for now, use default user ID 1)
+            user_id = 1
+            
+            # Get preferences from database
+            preferences = PreferencesService.get_preferences(db, user_id)
+            if preferences:
+                # Return actual preferences from database
+                preferences_data = preferences.to_dict()
+                logger.info(f"✅ Retrieved preferences from database for user {user_id}")
+            else:
+                # No preferences found, return fallback defaults
+                preferences_data = PreferencesService.get_fallback_defaults()
+                logger.info(f"⚠️ No preferences found for user {user_id}, returning fallback defaults")
+            
+            # Get profiles
+            profiles = PreferencesService.get_profiles(db, user_id)
+            
+            return jsonify({
+                "success": True,
+                "data": {
+                    "preferences": preferences_data,
+                    "profiles": [profile.to_dict() for profile in profiles] if profiles else [{
+                        "id": 1,
+                        "name": "ברירת מחדל",
+                        "isDefault": True,
+                        "description": "פרופיל ברירת מחדל"
+                    }]
+                },
+                "timestamp": "2025-01-07T21:55:00Z"
+            }), 200
+            
+        finally:
+            db.close()
         
     except Exception as e:
         logger.error(f"Error getting user preferences: {e}")

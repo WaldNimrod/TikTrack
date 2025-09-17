@@ -177,6 +177,21 @@ class PreferencesService:
             return []
     
     @classmethod
+    def get_profiles(cls, db: Session, user_id: int) -> List[PreferenceProfile]:
+        """קבל כל הפרופילים של המשתמש"""
+        try:
+            profiles = db.query(PreferenceProfile).filter(
+                PreferenceProfile.user_id == user_id,
+                PreferenceProfile.is_active == True
+            ).order_by(PreferenceProfile.is_default.desc()).all()
+            
+            return profiles
+            
+        except Exception as e:
+            logger.error(f"Error getting profiles for user {user_id}: {e}")
+            return []
+    
+    @classmethod
     def get_default_profile(cls, db: Session, user_id: int) -> Optional[PreferenceProfile]:
         """קבל את הפרופיל ברירת המחדל של המשתמש"""
         try:
@@ -724,6 +739,53 @@ class PreferencesService:
             logger.error(f"Error cleaning up old history: {e}")
             db.rollback()
             return 0
+    
+    @classmethod
+    def save_user_preferences(cls, db: Session, user_id: int, preferences_data: Dict[str, Any], 
+                             profile_name: str = "ברירת מחדל") -> bool:
+        """שמור העדפות משתמש"""
+        try:
+            # קבל או צור פרופיל ברירת מחדל
+            profile = cls.get_default_profile(db, user_id)
+            if not profile:
+                profile = cls.create_profile(db, user_id, profile_name, is_default=True)
+            
+            # קבל העדפות קיימות או צור חדשות
+            preferences = cls.get_preferences(db, user_id, profile.id)
+            if not preferences:
+                # צור העדפות חדשות
+                preferences = UserPreferences(
+                    user_id=user_id,
+                    profile_id=profile.id,
+                    version='2.0'
+                )
+                db.add(preferences)
+            
+            # עדכן הנתונים
+            preferences.from_dict(preferences_data)
+            
+            # בדוק תקינות
+            errors = preferences.validate()
+            if errors:
+                logger.warning(f"Validation errors for user {user_id}: {errors}")
+                preferences.validation_errors_json = json.dumps(errors)
+            else:
+                preferences.validation_errors_json = None
+            
+            preferences.last_validation = datetime.utcnow()
+            
+            db.commit()
+            
+            # רשום להיסטוריה
+            cls._record_change(db, user_id, profile.id, 'save', {}, preferences_data, user_id)
+            
+            logger.info(f"✅ Saved preferences for user {user_id}: {list(preferences_data.keys())}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error saving preferences for user {user_id}: {e}")
+            db.rollback()
+            return False
     
     @classmethod
     def get_system_statistics(cls, db: Session) -> Dict[str, Any]:

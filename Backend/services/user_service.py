@@ -118,7 +118,7 @@ class UserService:
             
             # Try to get preferences from the new user_preferences table
             try:
-                from models.user_preferences import UserPreferences
+                from models.preferences import UserPreferences
                 user_prefs = db.query(UserPreferences).filter(UserPreferences.user_id == user_id).first()
                 if user_prefs:
                     # Convert database preferences to dictionary format
@@ -155,7 +155,7 @@ class UserService:
             
             # Try to get preferences from the new user_preferences table
             try:
-                from models.user_preferences import UserPreferences
+                from models.preferences import UserPreferences
                 user_prefs = db.query(UserPreferences).filter(UserPreferences.user_id == user_id).first()
                 if user_prefs:
                     # Get current preferences and merge with new ones

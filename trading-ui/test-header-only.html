@@ -172,10 +172,19 @@
                         </button>
                     </div>
                     <div class="section-body">
-                        <div class="table-responsive" id="tickersContainer">
-                            <table id="tickersTable" class="table" data-table-type="tickers">
+                        <div class="table-responsive" id="tickersContainer" style="overflow-x: auto;">
+                            <table id="tickersTable" class="table" data-table-type="tickers" style="min-width: 1200px; width: 100%;">
                                 <colgroup>
-                                    <!-- עמודות דינמיות - ללא רוחב קבוע -->
+                                    <col style="width: 8%;">  <!-- סמל -->
+                                    <col style="width: 8%;">  <!-- סטטוס -->
+                                    <col style="width: 8%;">  <!-- יש טריידים -->
+                                    <col style="width: 10%;"> <!-- מחיר נוכחי -->
+                                    <col style="width: 8%;">  <!-- שינוי % -->
+                                    <col style="width: 10%;"> <!-- סוג השקעה -->
+                                    <col style="width: 15%;"> <!-- שם -->
+                                    <col style="width: 15%;"> <!-- הערות -->
+                                    <col style="width: 10%;"> <!-- תאריך -->
+                                    <col style="width: 8%;">  <!-- פעולות -->
                                 </colgroup>
                                                 <thead>
                                                     <tr>
@@ -480,6 +489,26 @@
     <!-- Page-specific script -->
     <script src="scripts/test-header-only.js?v=3.1.0"></script>
     
+    <!-- Table Responsive CSS -->
+    <style>
+        @media (max-width: 1399px) {
+            #tickersContainer {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            #tickersTable {
+                min-width: 1200px;
+            }
+        }
+        
+        @media (min-width: 1400px) {
+            #tickersContainer {
+                overflow-x: visible;
+            }
+        }
+    </style>
+
     <!-- Initialize Debug System -->
     <script>
         // Initialize debug system from header system

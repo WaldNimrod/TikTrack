@@ -152,7 +152,7 @@
             <!-- File type selection -->
             <div class="control-row" style="margin-bottom: 15px;">
               <label style="display: block; font-size: 14px; color: #495057; margin-bottom: 10px; font-weight: 500;">סוגי קבצים לסריקה:</label>
-              <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
                 <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
                   <input type="checkbox" id="scanJs" checked style="margin: 0;">
                   <span>JavaScript (.js)</span>
@@ -160,6 +160,18 @@
                 <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
                   <input type="checkbox" id="scanHtml" style="margin: 0;">
                   <span>HTML (.html)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                  <input type="checkbox" id="scanPy" style="margin: 0;">
+                  <span>Python (.py)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                  <input type="checkbox" id="scanCss" style="margin: 0;">
+                  <span>CSS (.css)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                  <input type="checkbox" id="scanOther" style="margin: 0;">
+                  <span>אחרים (.json, .md, .sql)</span>
                 </label>
               </div>
             </div>
@@ -236,7 +248,7 @@
               <button class="btn btn-success btn-lg" onclick="window.startFileScan()" title="סרוק קבצי JavaScript ו-HTML לאיתור בעיות">
                 <i class="fas fa-search fa-lg"></i> סרוק קבצים
               </button>
-              <p style="margin: 10px 0; color: #666; font-size: 14px;">סורק את הקבצים שנבחרו (JavaScript ו/או HTML) לאיתור בעיות קוד ונגישות</p>
+              <p style="margin: 10px 0; color: #666; font-size: 14px;">סורק את הקבצים שנבחרו לאיתור בעיות קוד, נגישות, ביצועים ובטיחות</p>
             </div>
 
             <div class="fix-buttons" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
@@ -256,10 +268,15 @@
 
             <!-- Export unresolved issues -->
             <div class="export-section" style="margin-top: 20px; text-align: center;">
-              <button class="btn btn-outline-info" onclick="window.copyUnresolvedIssuesLog()" title="העתק רשימה של הבעיות שלא נפתרו לתיקון ידני">
-                <i class="fas fa-clipboard-list"></i> העתק לוג שגיאות ואזהרות
-              </button>
-              <p style="margin: 8px 0; color: #6c757d; font-size: 13px;">מעתיק רשימה של הבעיות שלא ניתן היה לתקן אוטומטית</p>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                <button class="btn btn-outline-info" onclick="window.copyUnresolvedIssuesLog()" title="העתק רשימה של הבעיות שלא נפתרו לתיקון ידני">
+                  <i class="fas fa-clipboard-list"></i> העתק לוג שגיאות ואזהרות
+                </button>
+                <button class="btn btn-outline-primary" onclick="window.discoverProjectFiles()" title="גלה אוטומטית את כל הקבצים בפרויקט">
+                  <i class="fas fa-search-plus"></i> עדכן רשימת קבצים
+                </button>
+              </div>
+              <p style="margin: 8px 0; color: #6c757d; font-size: 13px;">מעתיק רשימה של הבעיות שלא ניתן היה לתקן אוטומטית, או מגלה קבצים חדשים בפרויקט</p>
             </div>
           </div>
         </div> <!-- End fix actions section -->

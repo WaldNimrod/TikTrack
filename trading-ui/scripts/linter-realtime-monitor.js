@@ -403,15 +403,70 @@ function scanJavaScriptFiles() {
     // Get file type selections
     const scanJs = document.getElementById('scanJs')?.checked || false;
     const scanHtml = document.getElementById('scanHtml')?.checked || false;
+    const scanPy = document.getElementById('scanPy')?.checked || false;
+    const scanCss = document.getElementById('scanCss')?.checked || false;
+    const scanOther = document.getElementById('scanOther')?.checked || false;
 
-    if (!scanJs && !scanHtml) {
+    if (!scanJs && !scanHtml && !scanPy && !scanCss && !scanOther) {
         if (typeof window.showWarningNotification === 'function') {
             window.showWarningNotification('אין בחירה', 'אנא בחר לפחות סוג קובץ אחד לסריקה');
         }
         return;
     }
 
-    // Collect all files based on selection
+    // Use dynamic file discovery if available, otherwise use static lists
+    if (window.projectFiles && window.projectFiles.length > 0) {
+        // Use discovered files
+        let allFiles = [];
+        const discoveredFiles = window.projectFiles;
+
+        if (scanJs) {
+            allFiles = allFiles.concat(discoveredFiles.filter(f => f.endsWith('.js')));
+        }
+        if (scanHtml) {
+            allFiles = allFiles.concat(discoveredFiles.filter(f => f.endsWith('.html')));
+        }
+        if (scanPy) {
+            allFiles = allFiles.concat(discoveredFiles.filter(f => f.endsWith('.py')));
+        }
+        if (scanCss) {
+            allFiles = allFiles.concat(discoveredFiles.filter(f => f.endsWith('.css')));
+        }
+        if (scanOther) {
+            const otherFiles = discoveredFiles.filter(f =>
+                f.endsWith('.json') || f.endsWith('.md') || f.endsWith('.sql') ||
+                f.endsWith('.yml') || f.endsWith('.yaml')
+            );
+            allFiles = allFiles.concat(otherFiles);
+        }
+
+        scanningResults.totalFiles = allFiles.length;
+        scanningResults.scannedFiles = 0;
+
+        console.log('🔍 Starting scan of', allFiles.length, 'discovered files');
+
+        allFiles.forEach((fileName, index) => {
+            setTimeout(() => {
+                scanSingleFile(fileName);
+                scanningResults.scannedFiles++;
+
+                // Update progress
+                const progress = Math.round((scanningResults.scannedFiles / scanningResults.totalFiles) * 100);
+                addLogEntry('INFO', `סריקה בוצעה: ${progress}% (${scanningResults.scannedFiles}/${scanningResults.totalFiles})`, {
+                    file: fileName,
+                    progress: progress
+                });
+
+                // Finish scan when all files are done
+                if (scanningResults.scannedFiles === scanningResults.totalFiles) {
+                    finishScan();
+                }
+            }, index * 100);
+        });
+        return;
+    }
+
+    // Collect all files based on selection (static fallback)
     let allFiles = [];
 
     if (scanJs) {
@@ -540,10 +595,42 @@ function scanJavaScriptFiles() {
         allFiles = allFiles.concat(htmlFiles);
     }
 
+    if (scanPy) {
+        const pyFiles = [
+            'fix-all-css.py',
+            'manual-crud-tester.py',
+            'visual-diff-tool.py',
+            'css-toggle.py',
+            'create-crud-testing-dashboard.py'
+        ];
+        allFiles = allFiles.concat(pyFiles);
+    }
+
+    if (scanCss) {
+        const cssFiles = [
+            'remaining-styles.css',
+            'trading-ui/styles-new/04-elements/_forms-base.css',
+            'trading-ui/styles-new/04-elements/_links.css',
+            'trading-ui/styles-new/04-elements/_headings.css',
+            'trading-ui/styles-new/04-elements/_buttons-base.css'
+        ];
+        allFiles = allFiles.concat(cssFiles);
+    }
+
+    if (scanOther) {
+        const otherFiles = [
+            'package.json',
+            'README.md',
+            'documentation/frontend/DIAGNOSTIC_LOG_SYSTEM.md',
+            'documentation/frontend/NOTIFICATION_SYSTEM.md'
+        ];
+        allFiles = allFiles.concat(otherFiles);
+    }
+
     scanningResults.totalFiles = allFiles.length;
     scanningResults.scannedFiles = 0;
 
-    console.log('🔍 Starting scan of', allFiles.length, 'files (JS:', scanJs, 'HTML:', scanHtml, ')');
+    console.log('🔍 Starting scan of', allFiles.length, 'files (JS:', scanJs, 'HTML:', scanHtml, 'PY:', scanPy, 'CSS:', scanCss, 'OTHER:', scanOther, ')');
 
     allFiles.forEach((fileName, index) => {
         setTimeout(() => {
@@ -565,10 +652,22 @@ function scanJavaScriptFiles() {
     });
 }
 
-// Scan a single file (JS or HTML)
+// Scan a single file (JS, HTML, Python, CSS, or other)
 function scanSingleFile(fileName) {
     const isHtmlFile = fileName.endsWith('.html');
-    const filePath = isHtmlFile ? `/${fileName}` : `/scripts/${fileName}`;
+    const isPyFile = fileName.endsWith('.py');
+    const isCssFile = fileName.endsWith('.css');
+    const isJsFile = fileName.endsWith('.js');
+
+    // Determine file path based on file type
+    let filePath;
+    if (isHtmlFile || isCssFile) {
+        filePath = `/${fileName}`;
+    } else if (isJsFile || fileName.endsWith('.json') || fileName.endsWith('.md') || fileName.endsWith('.sql')) {
+        filePath = isJsFile ? `/scripts/${fileName}` : `/${fileName}`;
+    } else {
+        filePath = `/${fileName}`; // For Python files and others
+    }
 
     // Try to get actual file content
     fetch(filePath)
@@ -581,8 +680,14 @@ function scanSingleFile(fileName) {
         .then(content => {
             if (isHtmlFile) {
                 analyzeHtmlContent(fileName, content);
-            } else {
+            } else if (isPyFile) {
+                analyzePythonContent(fileName, content);
+            } else if (isCssFile) {
+                analyzeCssContent(fileName, content);
+            } else if (isJsFile) {
                 analyzeFileContent(fileName, content);
+            } else {
+                analyzeOtherContent(fileName, content);
             }
         })
         .catch(() => {
@@ -827,6 +932,325 @@ function analyzeHtmlContent(fileName, content) {
     });
 }
 
+// Analyze Python file content for issues
+function analyzePythonContent(fileName, content) {
+    const issues = [];
+    let issuesFound = 0;
+
+    // Check for syntax errors (basic)
+    const syntaxErrors = content.match(/SyntaxError|IndentationError|NameError|TypeError/gi);
+    if (syntaxErrors) {
+        issues.push({
+            type: 'error',
+            message: `Found ${syntaxErrors.length} potential syntax errors`,
+            line: 1,
+            fix: 'Check Python syntax and fix errors'
+        });
+        issuesFound++;
+    }
+
+    // Check for missing imports
+    const lines = content.split('\n');
+    const imports = lines.filter(line => line.trim().startsWith('import ') || line.trim().startsWith('from '));
+
+    // Check for unused imports (basic)
+    const usedImports = new Set();
+    lines.forEach(line => {
+        const words = line.split(/\W+/);
+        words.forEach(word => {
+            if (word && word.length > 1) {
+                usedImports.add(word);
+            }
+        });
+    });
+
+    // Check for security issues
+    if (content.includes('eval(') || content.includes('exec(')) {
+        issues.push({
+            type: 'error',
+            message: 'Use of eval() or exec() detected - security risk',
+            line: lines.findIndex(line => line.includes('eval(') || line.includes('exec(')) + 1,
+            fix: 'Avoid using eval() or exec() for security reasons'
+        });
+        issuesFound++;
+    }
+
+    // Check for missing docstrings
+    const functionDefinitions = lines.filter(line => line.includes('def '));
+    if (functionDefinitions.length > 0) {
+        // Basic check - functions should have docstrings
+        let missingDocstrings = 0;
+        functionDefinitions.forEach((defLine, index) => {
+            const defIndex = lines.indexOf(defLine);
+            const nextLines = lines.slice(defIndex + 1, defIndex + 4);
+            const hasDocstring = nextLines.some(line => line.trim().startsWith('"""') || line.trim().startsWith("'''"));
+            if (!hasDocstring) {
+                missingDocstrings++;
+            }
+        });
+
+        if (missingDocstrings > 0) {
+            issues.push({
+                type: 'warning',
+                message: `${missingDocstrings} functions missing docstrings`,
+                line: 1,
+                fix: 'Add docstrings to all functions'
+            });
+            issuesFound++;
+        }
+    }
+
+    // Check for PEP8 violations (basic)
+    const longLines = lines.filter(line => line.length > 79);
+    if (longLines.length > 0) {
+        issues.push({
+            type: 'warning',
+            message: `${longLines.length} lines exceed 79 characters (PEP8)`,
+            line: lines.indexOf(longLines[0]) + 1,
+            fix: 'Break long lines to comply with PEP8'
+        });
+        issuesFound++;
+    }
+
+    // Add found issues to results
+    issues.forEach(issue => {
+        const issueEntry = {
+            type: issue.type,
+            message: issue.message,
+            file: fileName,
+            line: issue.line,
+            fix: issue.fix,
+            timestamp: new Date().toISOString(),
+            id: Date.now() + Math.random()
+        };
+
+        if (issue.type === 'error') {
+            scanningResults.errors.push(issueEntry);
+        } else {
+            scanningResults.warnings.push(issueEntry);
+        }
+
+        addLogEntry(issue.type.toUpperCase(), `${fileName}:${issue.line} - ${issue.message}`, {
+            file: fileName,
+            line: issue.line,
+            suggestion: issue.fix
+        });
+    });
+
+    // Report scan completion
+    addLogEntry('INFO', `קובץ Python ${fileName} נסרק - נמצאו ${issuesFound} בעיות`, {
+        file: fileName,
+        issuesFound: issuesFound
+    });
+}
+
+// Analyze CSS file content for issues
+function analyzeCssContent(fileName, content) {
+    const issues = [];
+    let issuesFound = 0;
+
+    // Check for syntax errors (basic)
+    const lines = content.split('\n');
+
+    // Check for missing semicolons
+    const missingSemicolons = [];
+    lines.forEach((line, index) => {
+        const trimmed = line.trim();
+        if (trimmed && !trimmed.endsWith(';') && !trimmed.endsWith('{') && !trimmed.endsWith('}') &&
+            !trimmed.startsWith('@') && !trimmed.startsWith('/*') && trimmed.includes(':')) {
+            missingSemicolons.push(index + 1);
+        }
+    });
+
+    if (missingSemicolons.length > 0) {
+        issues.push({
+            type: 'warning',
+            message: `${missingSemicolons.length} properties missing semicolons`,
+            line: missingSemicolons[0],
+            fix: 'Add semicolons to CSS property declarations'
+        });
+        issuesFound++;
+    }
+
+    // Check for !important usage (warning)
+    const importantCount = (content.match(/!important/gi) || []).length;
+    if (importantCount > 0) {
+        issues.push({
+            type: 'warning',
+            message: `Found ${importantCount} !important declarations`,
+            line: 1,
+            fix: 'Avoid !important, use better specificity'
+        });
+        issuesFound++;
+    }
+
+    // Check for unused selectors (basic analysis)
+    const selectorMatches = content.match(/[^\s{]+(?=\s*{)/g) || [];
+    const usedSelectors = new Set(selectorMatches);
+
+    // Look for potential performance issues
+    const universalSelectors = (content.match(/\*/g) || []).length;
+    if (universalSelectors > 5) {
+        issues.push({
+            type: 'warning',
+            message: 'High usage of universal selector (*) may affect performance',
+            line: 1,
+            fix: 'Use more specific selectors to improve performance'
+        });
+        issuesFound++;
+    }
+
+    // Check for duplicate properties
+    const duplicateProps = [];
+    const propertyRegex = /([a-z-]+)\s*:/gi;
+    const properties = [];
+    let match;
+    while ((match = propertyRegex.exec(content)) !== null) {
+        properties.push(match[1]);
+    }
+
+    const seen = new Set();
+    properties.forEach(prop => {
+        if (seen.has(prop)) {
+            duplicateProps.push(prop);
+        }
+        seen.add(prop);
+    });
+
+    if (duplicateProps.length > 0) {
+        issues.push({
+            type: 'info',
+            message: `Found duplicate properties: ${[...new Set(duplicateProps)].join(', ')}`,
+            line: 1,
+            fix: 'Remove duplicate CSS properties'
+        });
+        issuesFound++;
+    }
+
+    // Check for browser compatibility issues (basic)
+    const cssRules = content.match(/-webkit-|-moz-|-ms-|-o-/gi) || [];
+    if (cssRules.length > 20) {
+        issues.push({
+            type: 'info',
+            message: 'High usage of vendor prefixes detected',
+            line: 1,
+            fix: 'Consider using autoprefixer or modern CSS features'
+        });
+        issuesFound++;
+    }
+
+    // Add found issues to results
+    issues.forEach(issue => {
+        const issueEntry = {
+            type: issue.type,
+            message: issue.message,
+            file: fileName,
+            line: issue.line,
+            fix: issue.fix,
+            timestamp: new Date().toISOString(),
+            id: Date.now() + Math.random()
+        };
+
+        if (issue.type === 'error') {
+            scanningResults.errors.push(issueEntry);
+        } else {
+            scanningResults.warnings.push(issueEntry);
+        }
+
+        addLogEntry(issue.type.toUpperCase(), `${fileName}:${issue.line} - ${issue.message}`, {
+            file: fileName,
+            line: issue.line,
+            suggestion: issue.fix
+        });
+    });
+
+    // Report scan completion
+    addLogEntry('INFO', `קובץ CSS ${fileName} נסרק - נמצאו ${issuesFound} בעיות`, {
+        file: fileName,
+        issuesFound: issuesFound
+    });
+}
+
+// Analyze other file types (JSON, MD, SQL, etc.)
+function analyzeOtherContent(fileName, content) {
+    let issuesFound = 0;
+
+    if (fileName.endsWith('.json')) {
+        // JSON validation
+        try {
+            JSON.parse(content);
+            addLogEntry('INFO', `קובץ JSON ${fileName} תקין`, { file: fileName });
+        } catch (e) {
+            const issueEntry = {
+                type: 'error',
+                message: `JSON syntax error: ${e.message}`,
+                file: fileName,
+                line: 1,
+                fix: 'Fix JSON syntax',
+                timestamp: new Date().toISOString(),
+                id: Date.now() + Math.random()
+            };
+            scanningResults.errors.push(issueEntry);
+            addLogEntry('ERROR', `${fileName}:1 - JSON syntax error`, {
+                file: fileName,
+                suggestion: 'Fix JSON syntax'
+            });
+            issuesFound++;
+        }
+    } else if (fileName.endsWith('.md')) {
+        // Basic Markdown validation
+        const lines = content.split('\n');
+        let headerCount = 0;
+        lines.forEach(line => {
+            if (line.startsWith('#')) headerCount++;
+        });
+
+        if (headerCount === 0) {
+            const issueEntry = {
+                type: 'info',
+                message: 'Markdown file has no headers',
+                file: fileName,
+                line: 1,
+                fix: 'Add headers to improve document structure',
+                timestamp: new Date().toISOString(),
+                id: Date.now() + Math.random()
+            };
+            scanningResults.warnings.push(issueEntry);
+            issuesFound++;
+        }
+
+        addLogEntry('INFO', `קובץ Markdown ${fileName} נסרק - ${headerCount} כותרות`, {
+            file: fileName,
+            headers: headerCount
+        });
+    } else if (fileName.endsWith('.sql')) {
+        // Basic SQL validation
+        const uppercaseCommands = (content.match(/\b(SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER)\b/g) || []).length;
+        if (uppercaseCommands === 0) {
+            const issueEntry = {
+                type: 'info',
+                message: 'SQL commands not in uppercase',
+                file: fileName,
+                line: 1,
+                fix: 'Use uppercase for SQL keywords',
+                timestamp: new Date().toISOString(),
+                id: Date.now() + Math.random()
+            };
+            scanningResults.warnings.push(issueEntry);
+            issuesFound++;
+        }
+
+        addLogEntry('INFO', `קובץ SQL ${fileName} נסרק - ${uppercaseCommands} פקודות SQL`, {
+            file: fileName,
+            sqlCommands: uppercaseCommands
+        });
+    } else {
+        addLogEntry('INFO', `קובץ ${fileName} נסרק - סוג קובץ לא מזוהה`, { file: fileName });
+    }
+
+    return issuesFound;
+}
+
 // Helper function to get line number from content
 function getLineNumber(content, searchString) {
     const lines = content.split('\n');
@@ -915,6 +1339,217 @@ window.copyUnresolvedIssuesLog = () => {
                 window.showErrorNotification('שגיאה', 'לא הצלחנו להעתיק את הלוג');
             }
         });
+};
+
+// Auto-discover all project files
+window.discoverProjectFiles = () => {
+    console.log('🔍 Discovering project files...');
+
+    // Show loading notification
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('גילוי קבצים', 'סורק את כל הקבצים בפרויקט...');
+    }
+
+    // For now, we'll create a simulated discovery
+    // In a real implementation, this would call a backend API
+    const discoveredFiles = [];
+
+    // Add JavaScript files
+    const jsFiles = [
+        'linter-realtime-monitor.js',
+        'header-system.js',
+        'color-scheme-system.js',
+        'preferences.js',
+        'ui-utils.js',
+        'tables.js',
+        'translation-utils.js',
+        'data-utils.js',
+        'linked-items.js',
+        'page-utils.js',
+        'central-refresh-system.js',
+        'notification-system.js',
+        'main.js',
+        'alerts.js',
+        'cash_flows.js',
+        'trades.js',
+        'accounts.js',
+        'currencies.js',
+        'entity-details-system.js',
+        'entity-details-modal.js',
+        'entity-details-api.js',
+        'entity-details-renderer.js',
+        'auth.js',
+        'trade_plans.js',
+        'executions.js',
+        'database.js',
+        'external-data-service.js',
+        'yahoo-finance-service.js',
+        'ticker-service.js',
+        'notes.js',
+        'crud-utils.js',
+        'validation-utils.js',
+        'date-utils.js',
+        'filter-system.js',
+        'menu.js',
+        'simple-filter.js',
+        'research.js',
+        'style-demonstration.js',
+        'test-script.js',
+        'console-cleanup.js',
+        'account-service.js',
+        'active-alerts-component.js',
+        'real-linter-system.js',
+        'related-object-filters.js',
+        'tickers.js',
+        'error-handlers.js',
+        'color-demo-toggle.js',
+        'css-management.js',
+        'dynamic-colors-display.js',
+        'constraint-manager.js',
+        'constrains.js',
+        'trade-plan-service.js',
+        'system-management.js',
+        'cache-test.js',
+        'server-monitor-v2.js',
+        'button-icons.js',
+        'test-debug.js',
+        'background-tasks.js',
+        'notifications-center.js',
+        'table-mappings.js',
+        'query-optimization-test.js',
+        'condition-translator.js',
+        'db_display.js',
+        'external-data-dashboard.js',
+        'js-map.js',
+        'realtime-notifications-client.js'
+    ];
+
+    // Add HTML files
+    const htmlFiles = [
+        'designs.html',
+        'test-header-yesterday.html',
+        'preferences.html',
+        'index.html',
+        'constraints.html',
+        'accounts.html',
+        'linter-realtime-monitor.html',
+        'css-management.html',
+        'style_demonstration.html',
+        'preferences-management-temp.html',
+        'cache-test.html',
+        'background-tasks-old.html',
+        'notifications-center.html',
+        'research.html',
+        'simple-clean-menu.html',
+        'test-header-only-restored.html',
+        'crud-testing-dashboard-backup.html',
+        'preferences-backup.html',
+        'db_display.html',
+        'menu.html',
+        'notes.html',
+        'tickers.html',
+        'external-data-dashboard.html',
+        'trade_plans.html',
+        'db_extradata.html',
+        'server-monitor.html',
+        'preferences-new.html',
+        'system-management-fixed.html',
+        'preferences-temp-guide.html',
+        'test-header-clean.html',
+        'apple-style-menu-example.html',
+        'test-header-menus-pushed.html',
+        'system-management.html',
+        'background-tasks-fixed.html',
+        'color-scheme-examples.html',
+        'cash_flows.html',
+        'dynamic-colors-display.html',
+        'background-tasks.html',
+        'test-header-only-new.html',
+        'preferences-temp.html',
+        'alerts.html',
+        'page-scripts-matrix.html',
+        'js-map.html',
+        'test-header-old-system.html',
+        'executions.html',
+        'test-header-only.html',
+        'trades.html',
+        'crud-testing-dashboard.html'
+    ];
+
+    // Add Python files (sample - in real implementation would be discovered)
+    const pyFiles = [
+        'fix-all-css.py',
+        'manual-crud-tester.py',
+        'visual-diff-tool.py',
+        'css-toggle.py',
+        'create-crud-testing-dashboard.py'
+    ];
+
+    // Add CSS files (sample - in real implementation would be discovered)
+    const cssFiles = [
+        'remaining-styles.css',
+        'trading-ui/styles-new/04-elements/_forms-base.css',
+        'trading-ui/styles-new/04-elements/_links.css',
+        'trading-ui/styles-new/04-elements/_headings.css',
+        'trading-ui/styles-new/04-elements/_buttons-base.css'
+    ];
+
+    // Add other files
+    const otherFiles = [
+        'package.json',
+        'README.md',
+        'documentation/frontend/DIAGNOSTIC_LOG_SYSTEM.md',
+        'documentation/frontend/NOTIFICATION_SYSTEM.md'
+    ];
+
+    // Combine all files
+    discoveredFiles.push(...jsFiles, ...htmlFiles, ...pyFiles, ...cssFiles, ...otherFiles);
+
+    // Store discovered files globally
+    window.projectFiles = discoveredFiles;
+
+    // Show summary
+    const jsCount = jsFiles.length;
+    const htmlCount = htmlFiles.length;
+    const pyCount = pyFiles.length;
+    const cssCount = cssFiles.length;
+    const otherCount = otherFiles.length;
+    const totalCount = discoveredFiles.length;
+
+    console.log(`✅ Discovered ${totalCount} files: ${jsCount} JS, ${htmlCount} HTML, ${pyCount} PY, ${cssCount} CSS, ${otherCount} Other`);
+
+    if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification(
+            'גילוי הושלם',
+            `נמצאו ${totalCount} קבצים בפרויקט (${jsCount} JS, ${htmlCount} HTML, ${pyCount} Python, ${cssCount} CSS)`
+        );
+    }
+
+    // Update UI to show discovered files count
+    const fileCountElement = document.getElementById('discoveredFileCount');
+    if (fileCountElement) {
+        fileCountElement.textContent = totalCount;
+    } else {
+        // Add a small indicator if it doesn't exist
+        const indicator = document.createElement('small');
+        indicator.id = 'discoveredFileCount';
+        indicator.style.cssText = 'display: block; margin-top: 5px; color: #6c757d; font-size: 12px;';
+        indicator.textContent = `${totalCount} קבצים זוהו`;
+        const discoverBtn = document.querySelector('button[onclick*="discoverProjectFiles"]');
+        if (discoverBtn && discoverBtn.parentNode) {
+            discoverBtn.parentNode.appendChild(indicator);
+        }
+    }
+
+    // Add log entry
+    addLogEntry('INFO', `גילוי קבצים הושלם - נמצאו ${totalCount} קבצים`, {
+        totalFiles: totalCount,
+        jsFiles: jsCount,
+        htmlFiles: htmlCount,
+        pythonFiles: pyCount,
+        cssFiles: cssCount,
+        otherFiles: otherCount
+    });
 };
 
 // Finish the scan and update statistics

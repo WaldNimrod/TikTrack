@@ -152,14 +152,15 @@ function enableAllStyles() {
     checkboxes.forEach(checkbox => {
         if (!checkbox.checked) {
             checkbox.checked = true;
-            checkbox.dispatchEvent(new Event('change'));
         }
     });
     
-    // Remove Bootstrap override when all styles are enabled
-    removeBootstrapOverride();
+    // Clear all disabled styles
+    disabledStyles.clear();
+    toggleStylesState(true);
     
-    console.log('All styles enabled');
+    console.log('🟢 [CASCADE BULK] All styles enabled via cascade control');
+    showNotification('כל הסגנונות הופעלו', 'success');
 }
 
 function disableAllStyles() {
@@ -167,32 +168,33 @@ function disableAllStyles() {
     checkboxes.forEach(checkbox => {
         if (checkbox.checked) {
             checkbox.checked = false;
-            checkbox.dispatchEvent(new Event('change'));
+            // Add to disabled styles set
+            const filePath = checkbox.getAttribute('onchange').match(/toggleStyleFile\('([^']+)'\)/)?.[1];
+            if (filePath) {
+                disabledStyles.add(filePath);
+            }
         }
     });
     
-    // Add Bootstrap override when all styles are disabled
-    addBootstrapOverride();
+    // Disable all styles
+    toggleStylesState(false);
     
-    console.log('All styles disabled');
+    console.log('🔴 [CASCADE BULK] All styles disabled via cascade control');
+    showNotification('כל הסגנונות כובו', 'info');
 }
 
 function resetToDefaults() {
-    // Reset to default state (all enabled except Bootstrap)
     const checkboxes = document.querySelectorAll('input[type="checkbox"][onchange*="toggleStyleFile"]');
     checkboxes.forEach(checkbox => {
-        if (checkbox.id === 'toggleBootstrap') {
-            checkbox.checked = true; // Bootstrap should be enabled by default
-        } else {
-            checkbox.checked = true; // All other styles enabled
-        }
-        checkbox.dispatchEvent(new Event('change'));
+        checkbox.checked = true; // All styles enabled by default
     });
     
-    // Remove Bootstrap override when resetting to defaults (Bootstrap enabled)
-    removeBootstrapOverride();
+    // Clear all disabled styles and enable all
+    disabledStyles.clear();
+    toggleStylesState(true);
     
-    console.log('Reset to default state');
+    console.log('🔄 [CASCADE RESET] Reset to default state - all styles enabled');
+    showNotification('איפוס לברירת מחדל', 'success');
 }
 
 function showStyleInfo() {

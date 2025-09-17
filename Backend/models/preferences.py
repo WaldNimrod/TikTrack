@@ -1,8 +1,8 @@
 """
-User Preferences Model - TikTrack New Architecture
-=====================================================
+Preferences Model - TikTrack New Architecture
+==============================================
 
-מודל מתקדם למערכת הגדרות משתמש עם תמיכה בפרופילים מרובים,
+מודל מתקדם למערכת העדפות עם תמיכה בפרופילים מרובים,
 יבוא/יצוא הגדרות, ומבנה נתונים משופר.
 
 Author: TikTrack Development Team
@@ -69,7 +69,7 @@ class PreferenceProfile(BaseModel):
 
 
 class UserPreferences(BaseModel):
-    """מודל הגדרות משתמש מתקדם"""
+    """מודל העדפות מתקדם"""
     __tablename__ = 'user_preferences'
     
     # יחסים בסיסיים

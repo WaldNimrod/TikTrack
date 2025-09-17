@@ -216,6 +216,9 @@ document.addEventListener('DOMContentLoaded', function() {
     log('עמוד בדיקת ראש הדף נטען');
     updateQuickStats();
     
+    // טעינת נתונים אמיתיים מבסיס הנתונים
+    loadRealData();
+    
     // טעינת כפתורי פעולות אחרי שהדף נטען
     console.log('🔧 Setting timeout for loadActionButtons...');
     setTimeout(function() {
@@ -223,6 +226,41 @@ document.addEventListener('DOMContentLoaded', function() {
         loadActionButtons();
     }, 100);
 });
+
+// ===== DATA LOADING FUNCTIONS =====
+
+/**
+ * טעינת נתונים אמיתיים מבסיס הנתונים
+ */
+async function loadRealData() {
+    console.log('🔄 טעינת נתונים אמיתיים מבסיס הנתונים...');
+    
+    try {
+        // טעינת נתוני טיקרים
+        if (typeof window.loadTickersData === 'function') {
+            console.log('🔄 טוען נתוני טיקרים...');
+            await window.loadTickersData();
+            console.log('✅ נתוני טיקרים נטענו');
+        } else {
+            console.warn('⚠️ פונקציית loadTickersData לא זמינה');
+        }
+        
+        // טעינת נתוני תכנוני טריידים
+        if (typeof window.loadTradePlansData === 'function') {
+            console.log('🔄 טוען נתוני תכנוני טריידים...');
+            await window.loadTradePlansData();
+            console.log('✅ נתוני תכנוני טריידים נטענו');
+        } else {
+            console.warn('⚠️ פונקציית loadTradePlansData לא זמינה');
+        }
+        
+        log('נתונים אמיתיים נטענו מבסיס הנתונים');
+        
+    } catch (error) {
+        console.error('❌ שגיאה בטעינת נתונים:', error);
+        log('שגיאה בטעינת נתונים: ' + error.message);
+    }
+}
 
 // ===== TICKER TABLE FUNCTIONS =====
 
@@ -273,5 +311,6 @@ window.testSearchFilter = testSearchFilter;
 window.filterTickersByType = filterTickersByType;
 window.toggleTickersSection = toggleTickersSection;
 window.loadActionButtons = loadActionButtons;
+window.loadRealData = loadRealData;
 window.toggleTopSection = toggleTopSection;
 window.toggleSection = toggleSection;

@@ -3220,10 +3220,10 @@ const SUPPORTED_CONTAINERS = [
 
 // Filter column mappings
 const FILTER_COLUMNS = {
-  'status': 'Status',
-  'type': 'Investment Type',
+  'status': 'סטטוס',
+  'type': 'סוג השקעה',
   'account': 'Account',
-  'date': 'Date',
+  'date': 'תאריך',
   'search': null, // Special case - searches all columns
 };
 

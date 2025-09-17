@@ -1774,12 +1774,7 @@ class HeaderSystem {
         }
 
         // עדכון הפילטר במערכת
-        if (window.filterSystem && typeof window.filterSystem.applyFilters === 'function') {
-          window.filterSystem.currentFilters.status = selectedStatuses;
-          window.filterSystem.applyFilters();
-        } else {
-          console.warn('⚠️ FilterSystem not available or applyFilters not a function');
-        }
+        applyFilter('status', selectedStatuses);
       });
     });
 
@@ -1809,12 +1804,7 @@ class HeaderSystem {
         }
 
         // עדכון הפילטר במערכת
-        if (window.filterSystem && typeof window.filterSystem.applyFilters === 'function') {
-          window.filterSystem.currentFilters.type = selectedTypes;
-          window.filterSystem.applyFilters();
-        } else {
-          console.warn('⚠️ FilterSystem not available or applyFilters not a function');
-        }
+        applyFilter('type', selectedTypes);
 
         // לא סוגרים את הדרופדאון - מאפשרים בחירה מרובה
         // this.closeAllDropdowns();
@@ -1847,12 +1837,7 @@ class HeaderSystem {
         }
 
         // עדכון הפילטר במערכת
-        if (window.filterSystem && typeof window.filterSystem.applyFilters === 'function') {
-          window.filterSystem.currentFilters.account = selectedAccounts;
-          window.filterSystem.applyFilters();
-        } else {
-          console.warn('⚠️ FilterSystem not available or applyFilters not a function');
-        }
+        applyFilter('account', selectedAccounts);
 
         // לא סוגרים את הדרופדאון - מאפשרים בחירה מרובה
         // this.closeAllDropdowns();

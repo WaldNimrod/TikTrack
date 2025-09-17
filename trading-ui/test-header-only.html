@@ -96,12 +96,30 @@
                         </button>
                     </div>
                     <div class="section-body">
-                        <h2>מצב המערכות והפילטרים</h2>
+                        <h2>🔍 מידע דיבאג - מצב המערכות והפילטרים</h2>
                         
                         <div class="alert alert-info">
-                            <h5>🔧 סקשן עליון - בדיקת כפתורי פתיחה/סגירה</h5>
-                            <p>זהו הסקשן העליון שמכיל מידע על מצב המערכות והפילטרים.</p>
-                            <p>לחץ על כפתור הפתיחה/סגירה כדי לבדוק שהמערכת הגלובלית עובדת.</p>
+                            <h5>🔍 מידע דיבאג - מצב המערכות</h5>
+                            <p>מידע על מצב המערכות והפילטרים:</p>
+                            <div id="systemStatusInfo">
+                                <p><strong>מערכת הכותרת:</strong> <span id="headerSystemStatus">טוען...</span></p>
+                                <p><strong>מערכת הפילטרים:</strong> <span id="filterSystemStatus">טוען...</span></p>
+                                <p><strong>מערכת התרגום:</strong> <span id="translationSystemStatus">טוען...</span></p>
+                                <p><strong>מספר שורות בטבלה:</strong> <span id="tableRowCount">טוען...</span></p>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-success">
+                            <h5>🔍 מצב פילטרים (Debug)</h5>
+                            <p>מידע מפורט על מצב הפילטרים:</p>
+                            <div id="filterDebugInfo" class="debug-info">
+                                <p><strong>פילטר סטטוס:</strong> <span id="statusFilterInfo">לא נבחר</span></p>
+                                <p><strong>פילטר סוג השקעה:</strong> <span id="typeFilterInfo">לא נבחר</span></p>
+                                <p><strong>פילטר חשבון:</strong> <span id="accountFilterInfo">לא נבחר</span></p>
+                                <p><strong>פילטר תאריך:</strong> <span id="dateFilterInfo">לא נבחר</span></p>
+                                <p><strong>פילטר חיפוש:</strong> <span id="searchFilterInfo">ריק</span></p>
+                                <p><strong>שורות מוצגות:</strong> <span id="visibleRowsInfo">כל השורות</span></p>
+                            </div>
                         </div>
                         
                         <!-- דוגמאות צבעי סטטוס -->
@@ -310,7 +328,7 @@
                                     </tr>
                                     <tr>
                                         <td>TSLA</td>
-                                        <td data-status="Open"><span class="status-badge status-open">Open</span></td>
+                                        <td data-status="פתוח"><span class="status-badge status-open">פתוח</span></td>
                                         <td>
                                             <button class="btn-yes-no btn-yes" title="יש טריידים">
                                                 ✓
@@ -380,14 +398,9 @@
                     </div>
                     <div class="section-body">
                         <div class="alert alert-info">
-                            <h5>🔍 מידע דיבאג - מצב המערכות</h5>
-                            <p>מידע על מצב המערכות והפילטרים:</p>
-                            <div id="systemStatusInfo">
-                                <p><strong>מערכת הכותרת:</strong> <span id="headerSystemStatus">טוען...</span></p>
-                                <p><strong>מערכת הפילטרים:</strong> <span id="filterSystemStatus">טוען...</span></p>
-                                <p><strong>מערכת התרגום:</strong> <span id="translationSystemStatus">טוען...</span></p>
-                                <p><strong>מספר שורות בטבלה:</strong> <span id="tableRowCount">טוען...</span></p>
-                            </div>
+                            <h5>🔧 סקשן שני - בדיקת כפתורי פתיחה/סגירה</h5>
+                            <p>זהו הסקשן השני שמכיל תוכן דמה לבדיקת המערכת.</p>
+                            <p>לחץ על כפתור הפתיחה/סגירה כדי לבדוק שהמערכת הגלובלית עובדת.</p>
                         </div>
                         
                         <div class="card">
@@ -512,25 +525,34 @@
             document.getElementById('headerSystemStatus').textContent = headerStatus;
             
             // Check filter system
-            const filterSystemStatus = window.applyTableFilter ? 'פעיל' : 'לא פעיל';
+            const filterSystemStatus = window.applyFilter ? 'פעיל' : 'לא פעיל';
             document.getElementById('filterSystemStatus').textContent = filterSystemStatus;
             
             // Check translation system
-            const translationSystemStatus = window.translateText ? 'פעיל' : 'לא פעיל';
+            const translationSystemStatus = window.translateTradePlanType ? 'פעיל' : 'לא פעיל';
             document.getElementById('translationSystemStatus').textContent = translationSystemStatus;
             
             // Count table rows
-            const tableRows = document.querySelectorAll('#tickersTable tbody tr');
+            const tableRows = document.querySelectorAll('#tickersContainer tbody tr');
             document.getElementById('tableRowCount').textContent = tableRows.length;
         }
         
         function updateFilterDebugInfo() {
-            // Get filter states
-            const statusFilter = window.selectedStatusesForFilter || [];
-            const typeFilter = window.selectedTypesForFilter || [];
-            const accountFilter = window.selectedAccountsForFilter || [];
-            const dateFilter = window.selectedDateRangeForFilter || 'All Time';
-            const searchFilter = window.searchTextForFilter || '';
+            // Get filter states from actual DOM elements
+            const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
+            const statusFilter = Array.from(statusItems).map(item => item.getAttribute('data-value'));
+            
+            const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
+            const typeFilter = Array.from(typeItems).map(item => item.getAttribute('data-value'));
+            
+            const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
+            const accountFilter = Array.from(accountItems).map(item => item.getAttribute('data-value'));
+            
+            const dateItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item.selected');
+            const dateFilter = dateItems.length > 0 ? dateItems[0].getAttribute('data-value') : 'כל זמן';
+            
+            const searchInput = document.getElementById('searchFilterInput');
+            const searchFilter = searchInput ? searchInput.value : '';
             
             // Update display
             document.getElementById('statusFilterInfo').textContent = 
@@ -543,9 +565,10 @@
             document.getElementById('searchFilterInfo').textContent = searchFilter || 'ריק';
             
             // Count visible rows
-            const visibleRows = document.querySelectorAll('#tickersTable tbody tr:not([style*="display: none"])');
+            const visibleRows = document.querySelectorAll('#tickersContainer tbody tr:not([style*="display: none"])');
+            const totalRows = document.querySelectorAll('#tickersContainer tbody tr');
             document.getElementById('visibleRowsInfo').textContent = 
-                `${visibleRows.length} מתוך ${document.querySelectorAll('#tickersTable tbody tr').length}`;
+                `${visibleRows.length} מתוך ${totalRows.length}`;
         }
         
         // Update debug info every 2 seconds

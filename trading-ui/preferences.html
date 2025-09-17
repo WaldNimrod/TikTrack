@@ -60,26 +60,26 @@
                             <div class="d-flex gap-2">
                                 <button class="btn btn-success" onclick="window.saveAllPreferences()" id="saveAllBtn">
                                     <i class="bi bi-save"></i> שמור הכל
-                                </button>
+            </button>
                                 <button class="btn btn-warning" onclick="window.resetToDefaults()" id="resetBtn">
                                     <i class="bi bi-arrow-clockwise"></i> איפוס
                                 </button>
                                 <button class="btn btn-outline-secondary" onclick="window.toggleAllSections()" id="toggleAllBtn">
                                     <i class="bi bi-arrows-expand"></i> פתח/סגור הכל
-                                </button>
-                            </div>
+            </button>
+          </div>
+        </div>
         </div>
       </div>
-        </div>
-        
+      
                 <!-- Section 1: Profile Management -->
                 <div class="content-section" id="section1">
                     <div class="section-header">
                         <h2>👤 ניהול פרופילים</h2>
                         <button class="filter-toggle-btn" onclick="window.toggleSection('section1')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
-                        </button>
-                    </div>
+          </button>
+        </div>
                     <div class="section-body">
                         <div class="row">
                             <div class="col-md-6">
@@ -88,15 +88,15 @@
                                     <select id="profileSelect" class="form-select">
                                         <option value="1">ברירת מחדל</option>
                                     </select>
-      </div>
-          </div>
+        </div>
+        </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">שם פרופיל חדש</label>
                                     <input type="text" id="newProfileName" class="form-control" placeholder="הכנס שם פרופיל">
-          </div>
-        </div>
       </div>
+          </div>
+          </div>
                         <div class="row">
                             <div class="col-12">
                                 <div class="profile-buttons d-flex flex-wrap gap-2">
@@ -296,50 +296,50 @@
                         <button class="filter-toggle-btn" onclick="window.toggleSection('section5')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
-        </div>
+              </div>
         <div class="section-body">
                         <!-- Basic System Colors -->
                         <div class="row">
-                            <div class="col-12">
+                  <div class="col-12">
                                 <h5>צבעי מערכת בסיסיים</h5>
-            </div>
-                </div>
+                    </div>
+                  </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3 d-flex align-items-center gap-2">
                                     <label class="form-label mb-0 w-25">צבע ראשי:</label>
                                     
-                                    <input type="color" id="primaryColor" value="#29a6a8" class="form-control form-control-color">
+                                    <input type="color" id="primaryColor" value="#29a6a8" class="form-control form-control-color color-picker" data-color-key="primary-color">
                 </div>
                                 <div class="mb-3 d-flex align-items-center gap-2">
                                     <label class="form-label mb-0 w-25">צבע משני:</label>
                                     
-                                    <input type="color" id="secondaryColor" value="#ff9c05" class="form-control form-control-color">
-                </div>
+                                    <input type="color" id="secondaryColor" value="#ff9c05" class="form-control form-control-color color-picker" data-color-key="secondary-color">
+              </div>
                                 <div class="mb-3 d-flex align-items-center gap-2">
                                     <label class="form-label mb-0 w-25">הצלחה:</label>
-                                    
-                                    <input type="color" id="successColor" value="#28a745" class="form-control form-control-color">
-              </div>
-            </div>
+            
+                                    <input type="color" id="successColor" value="#28a745" class="form-control form-control-color color-picker" data-color-key="success-color">
+          </div>
+        </div>
                             <div class="col-md-6">
                                 <div class="mb-3 d-flex align-items-center gap-2">
                                     <label class="form-label mb-0 w-25">אזהרה:</label>
                                     
-                                    <input type="color" id="warningColor" value="#ffc107" class="form-control form-control-color">
-          </div>
+                                    <input type="color" id="warningColor" value="#ffc107" class="form-control form-control-color color-picker" data-color-key="warning-color">
+      </div>
                                 <div class="mb-3 d-flex align-items-center gap-2">
                                     <label class="form-label mb-0 w-25">סכנה:</label>
                                     
-                                    <input type="color" id="dangerColor" value="#dc3545" class="form-control form-control-color">
-            </div>
+                                    <input type="color" id="dangerColor" value="#dc3545" class="form-control form-control-color color-picker" data-color-key="danger-color">
+        </div>
                                 <div class="mb-3 d-flex align-items-center gap-2">
                                     <label class="form-label mb-0 w-25">מידע:</label>
                                     
-                                    <input type="color" id="infoColor" value="#007bff" class="form-control form-control-color">
-              </div>
+                                    <input type="color" id="infoColor" value="#007bff" class="form-control form-control-color color-picker" data-color-key="info-color">
             </div>
-          </div>
+                </div>
+                </div>
           
                         <div class="section-divider"></div>
                         
@@ -348,8 +348,8 @@
                             <div class="col-12">
                                 <h5>צבעי ישויות</h5>
                                 <small class="text-muted">כל ישות כוללת 3 וריאנטים: רגיל, בהיר (רקע), כהה (טקסט)</small>
-            </div>
-                  </div>
+                </div>
+              </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <!-- Trades -->
@@ -357,13 +357,13 @@
                                     <label class="form-label">טריידים:</label>
                                     <div class="d-flex gap-2 align-items-center">
                                         <label class="form-label mb-0">רגיל:</label>
-                                        <input type="color" id="entityTradeColor" value="#007bff" class="form-control form-control-color">
+                                        <input type="color" id="entityTradeColor" value="#007bff" class="form-control form-control-color color-picker" data-color-key="entity-trade-color">
                                         <label class="form-label mb-0">בהיר:</label>
-                                        <input type="color" id="entityTradeColorLight" value="#e3f2fd" class="form-control form-control-color">
+                                        <input type="color" id="entityTradeColorLight" value="#e3f2fd" class="form-control form-control-color color-picker" data-color-key="entity-trade-color-light">
                                         <label class="form-label mb-0">כהה:</label>
-                                        <input type="color" id="entityTradeColorDark" value="#0056b3" class="form-control form-control-color">
-                                    </div>
-                  </div>
+                                        <input type="color" id="entityTradeColorDark" value="#0056b3" class="form-control form-control-color color-picker" data-color-key="entity-trade-color-dark">
+            </div>
+          </div>
                                 <!-- Accounts -->
                                 <div class="mb-3">
                                     <label class="form-label">חשבונות:</label>
@@ -371,10 +371,10 @@
                                         
                                         
                                         
-                                        <input type="color" id="entityAccountColor" value="#28a745">
-                                        <input type="color" id="entityAccountColorLight" value="#d4edda">
-                                        <input type="color" id="entityAccountColorDark" value="#155724">
-                </div>
+                                        <input type="color" id="entityAccountColor" value="#28a745" class="form-control form-control-color color-picker" data-color-key="entity-account-color">
+                                        <input type="color" id="entityAccountColorLight" value="#d4edda" class="form-control form-control-color color-picker" data-color-key="entity-account-color-light">
+                                        <input type="color" id="entityAccountColorDark" value="#155724" class="form-control form-control-color color-picker" data-color-key="entity-account-color-dark">
+            </div>
                   </div>
                                 <!-- Tickers -->
                                 <div class="mb-3">
@@ -383,9 +383,9 @@
                                         
                                         
                                         
-                                        <input type="color" id="entityTickerColor" value="#dc3545">
-                                        <input type="color" id="entityTickerColorLight" value="#f8d7da">
-                                        <input type="color" id="entityTickerColorDark" value="#721c24">
+                                        <input type="color" id="entityTickerColor" value="#dc3545" class="form-control form-control-color color-picker" data-color-key="entity-ticker-color">
+                                        <input type="color" id="entityTickerColorLight" value="#f8d7da" class="form-control form-control-color color-picker" data-color-key="entity-ticker-color-light">
+                                        <input type="color" id="entityTickerColorDark" value="#721c24" class="form-control form-control-color color-picker" data-color-key="entity-ticker-color-dark">
                 </div>
                   </div>
                                 <!-- Alerts -->
@@ -395,12 +395,12 @@
                                         
                                         
                                         
-                                        <input type="color" id="entityAlertColor" value="#ff9c05">
-                                        <input type="color" id="entityAlertColorLight" value="#fff3cd">
-                                        <input type="color" id="entityAlertColorDark" value="#856404">
+                                        <input type="color" id="entityAlertColor" value="#ff9c05" class="form-control form-control-color color-picker" data-color-key="entity-alert-color">
+                                        <input type="color" id="entityAlertColorLight" value="#fff3cd" class="form-control form-control-color color-picker" data-color-key="entity-alert-color-light">
+                                        <input type="color" id="entityAlertColorDark" value="#856404" class="form-control form-control-color color-picker" data-color-key="entity-alert-color-dark">
                 </div>
-              </div>
                   </div>
+                </div>
                             <div class="col-md-6">
                                 <!-- Cash Flow -->
                                 <div class="mb-3">
@@ -409,11 +409,11 @@
                                         
                                         
                                         
-                                        <input type="color" id="entityCashFlowColor" value="#20c997">
-                                        <input type="color" id="entityCashFlowColorLight" value="#d1ecf1">
-                                        <input type="color" id="entityCashFlowColorDark" value="#0c5460">
-                </div>
-                  </div>
+                                        <input type="color" id="entityCashFlowColor" value="#20c997" class="form-control form-control-color color-picker" data-color-key="entity-cash-flow-color">
+                                        <input type="color" id="entityCashFlowColorLight" value="#d1ecf1" class="form-control form-control-color color-picker" data-color-key="entity-cash-flow-color-light">
+                                        <input type="color" id="entityCashFlowColorDark" value="#0c5460" class="form-control form-control-color color-picker" data-color-key="entity-cash-flow-color-dark">
+              </div>
+            </div>
                                 <!-- Notes -->
                                 <div class="mb-3">
                                     <label class="form-label">הערות:</label>
@@ -421,10 +421,10 @@
                                         
                                         
                                         
-                                        <input type="color" id="entityNoteColor" value="#6f42c1">
-                                        <input type="color" id="entityNoteColorLight" value="#e2e3f1">
-                                        <input type="color" id="entityNoteColorDark" value="#383d41">
-                </div>
+                                        <input type="color" id="entityNoteColor" value="#6f42c1" class="form-control form-control-color color-picker" data-color-key="entity-note-color">
+                                        <input type="color" id="entityNoteColorLight" value="#e2e3f1" class="form-control form-control-color color-picker" data-color-key="entity-note-color-light">
+                                        <input type="color" id="entityNoteColorDark" value="#383d41" class="form-control form-control-color color-picker" data-color-key="entity-note-color-dark">
+            </div>
                   </div>
                                 <!-- Trade Plans -->
                                 <div class="mb-3">
@@ -433,9 +433,9 @@
                                         
                                         
                                         
-                                        <input type="color" id="entityTradePlanColor" value="#17a2b8">
-                                        <input type="color" id="entityTradePlanColorLight" value="#d1ecf1">
-                                        <input type="color" id="entityTradePlanColorDark" value="#0c5460">
+                                        <input type="color" id="entityTradePlanColor" value="#17a2b8" class="form-control form-control-color color-picker" data-color-key="entity-trade-plan-color">
+                                        <input type="color" id="entityTradePlanColorLight" value="#d1ecf1" class="form-control form-control-color color-picker" data-color-key="entity-trade-plan-color-light">
+                                        <input type="color" id="entityTradePlanColorDark" value="#0c5460" class="form-control form-control-color color-picker" data-color-key="entity-trade-plan-color-dark">
                 </div>
                   </div>
                                 <!-- Executions -->
@@ -445,13 +445,13 @@
                                         
                                         
                                         
-                                        <input type="color" id="entityExecutionColor" value="#fd7e14">
-                                        <input type="color" id="entityExecutionColorLight" value="#ffeaa7">
-                                        <input type="color" id="entityExecutionColorDark" value="#e17055">
+                                        <input type="color" id="entityExecutionColor" value="#fd7e14" class="form-control form-control-color color-picker" data-color-key="entity-execution-color">
+                                        <input type="color" id="entityExecutionColorLight" value="#ffeaa7" class="form-control form-control-color color-picker" data-color-key="entity-execution-color-light">
+                                        <input type="color" id="entityExecutionColorDark" value="#e17055" class="form-control form-control-color color-picker" data-color-key="entity-execution-color-dark">
                 </div>
-              </div>
-            </div>
-          </div>
+                  </div>
+                </div>
+                  </div>
           
                         <div class="section-divider"></div>
                         
@@ -459,8 +459,8 @@
                         <div class="row">
                             <div class="col-12">
                                 <h5>צבעי סטטוסים</h5>
-            </div>
-                  </div>
+                </div>
+              </div>
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="mb-3">
@@ -469,12 +469,12 @@
                                         
                                         
                                         
-                                        <input type="color" id="statusOpenColor" value="#28a745">
-                                        <input type="color" id="statusOpenColorLight" value="#d4edda">
-                                        <input type="color" id="statusOpenColorDark" value="#155724">
-                </div>
+                                        <input type="color" id="statusOpenColor" value="#28a745" class="form-control form-control-color color-picker" data-color-key="status-open-color">
+                                        <input type="color" id="statusOpenColorLight" value="#d4edda" class="form-control form-control-color color-picker" data-color-key="status-open-color-light">
+                                        <input type="color" id="statusOpenColorDark" value="#155724" class="form-control form-control-color color-picker" data-color-key="status-open-color-dark">
                   </div>
                 </div>
+                  </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label class="form-label">סגור:</label>
@@ -482,12 +482,12 @@
                                         
                                         
                                         
-                                        <input type="color" id="statusClosedColor" value="#6c757d">
-                                        <input type="color" id="statusClosedColorLight" value="#f8f9fa">
-                                        <input type="color" id="statusClosedColorDark" value="#495057">
+                                        <input type="color" id="statusClosedColor" value="#6c757d" class="form-control form-control-color color-picker" data-color-key="status-closed-color">
+                                        <input type="color" id="statusClosedColorLight" value="#f8f9fa" class="form-control form-control-color color-picker" data-color-key="status-closed-color-light">
+                                        <input type="color" id="statusClosedColorDark" value="#495057" class="form-control form-control-color color-picker" data-color-key="status-closed-color-dark">
+                </div>
                   </div>
                 </div>
-              </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label class="form-label">מבוטל:</label>
@@ -495,21 +495,21 @@
                                         
                                         
                                         
-                                        <input type="color" id="statusCancelledColor" value="#dc3545">
-                                        <input type="color" id="statusCancelledColorLight" value="#f8d7da">
-                                        <input type="color" id="statusCancelledColorDark" value="#721c24">
+                                        <input type="color" id="statusCancelledColor" value="#dc3545" class="form-control form-control-color color-picker" data-color-key="status-cancelled-color">
+                                        <input type="color" id="statusCancelledColorLight" value="#f8d7da" class="form-control form-control-color color-picker" data-color-key="status-cancelled-color-light">
+                                        <input type="color" id="statusCancelledColorDark" value="#721c24" class="form-control form-control-color color-picker" data-color-key="status-cancelled-color-dark">
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-      
+          
                         <div class="section-divider"></div>
                         
                         <!-- Investment Type Colors -->
                         <div class="row">
                             <div class="col-12">
                                 <h5>צבעי סוגי השקעה</h5>
-              </div>
+            </div>
                   </div>
                         <div class="row">
                             <div class="col-md-4">
@@ -519,12 +519,12 @@
                                         
                                         
                                         
-                                        <input type="color" id="typeSwingColor" value="#007bff">
-                                        <input type="color" id="typeSwingColorLight" value="#e3f2fd">
-                                        <input type="color" id="typeSwingColorDark" value="#0056b3">
+                                        <input type="color" id="typeSwingColor" value="#007bff" class="form-control form-control-color color-picker" data-color-key="type-swing-color">
+                                        <input type="color" id="typeSwingColorLight" value="#e3f2fd" class="form-control form-control-color color-picker" data-color-key="type-swing-color-light">
+                                        <input type="color" id="typeSwingColorDark" value="#0056b3" class="form-control form-control-color color-picker" data-color-key="type-swing-color-dark">
+            </div>
                   </div>
                 </div>
-              </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label class="form-label">השקעה:</label>
@@ -532,11 +532,11 @@
                                         
                                         
                                         
-                                        <input type="color" id="typeInvestmentColor" value="#28a745">
-                                        <input type="color" id="typeInvestmentColorLight" value="#d4edda">
-                                        <input type="color" id="typeInvestmentColorDark" value="#155724">
-            </div>
+                                        <input type="color" id="typeInvestmentColor" value="#28a745" class="form-control form-control-color color-picker" data-color-key="type-investment-color">
+                                        <input type="color" id="typeInvestmentColorLight" value="#d4edda" class="form-control form-control-color color-picker" data-color-key="type-investment-color-light">
+                                        <input type="color" id="typeInvestmentColorDark" value="#155724" class="form-control form-control-color color-picker" data-color-key="type-investment-color-dark">
               </div>
+                  </div>
                   </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
@@ -545,10 +545,10 @@
                                         
                                         
                                         
-                                        <input type="color" id="typePassiveColor" value="#6f42c1">
-                                        <input type="color" id="typePassiveColorLight" value="#e2e3f1">
-                                        <input type="color" id="typePassiveColorDark" value="#383d41">
-                  </div>
+                                        <input type="color" id="typePassiveColor" value="#6f42c1" class="form-control form-control-color color-picker" data-color-key="type-passive-color">
+                                        <input type="color" id="typePassiveColorLight" value="#e2e3f1" class="form-control form-control-color color-picker" data-color-key="type-passive-color-light">
+                                        <input type="color" id="typePassiveColorDark" value="#383d41" class="form-control form-control-color color-picker" data-color-key="type-passive-color-dark">
+              </div>
                 </div>
               </div>
             </div>
@@ -559,8 +559,8 @@
                         <div class="row">
                             <div class="col-12">
                                 <h5>צבעי ערכים</h5>
+          </div>
         </div>
-              </div>
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="mb-3">
@@ -569,11 +569,11 @@
                                         
                                         
                                         
-                                        <input type="color" id="valuePositiveColor" value="#28a745">
-                                        <input type="color" id="valuePositiveColorLight" value="#d4edda">
-                                        <input type="color" id="valuePositiveColorDark" value="#155724">
+                                        <input type="color" id="valuePositiveColor" value="#28a745" class="form-control form-control-color color-picker" data-color-key="value-positive-color">
+                                        <input type="color" id="valuePositiveColorLight" value="#d4edda" class="form-control form-control-color color-picker" data-color-key="value-positive-color-light">
+                                        <input type="color" id="valuePositiveColorDark" value="#155724" class="form-control form-control-color color-picker" data-color-key="value-positive-color-dark">
+              </div>
                     </div>
-                  </div>
                   </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
@@ -582,10 +582,10 @@
                                         
                                         
                                         
-                                        <input type="color" id="valueNegativeColor" value="#dc3545">
-                                        <input type="color" id="valueNegativeColorLight" value="#f8d7da">
-                                        <input type="color" id="valueNegativeColorDark" value="#721c24">
-                </div>
+                                        <input type="color" id="valueNegativeColor" value="#dc3545" class="form-control form-control-color color-picker" data-color-key="value-negative-color">
+                                        <input type="color" id="valueNegativeColorLight" value="#f8d7da" class="form-control form-control-color color-picker" data-color-key="value-negative-color-light">
+                                        <input type="color" id="valueNegativeColorDark" value="#721c24" class="form-control form-control-color color-picker" data-color-key="value-negative-color-dark">
+              </div>
                     </div>
                   </div>
                             <div class="col-md-4">
@@ -595,13 +595,13 @@
                                         
                                         
                                         
-                                        <input type="color" id="valueNeutralColor" value="#6c757d">
-                                        <input type="color" id="valueNeutralColorLight" value="#f8f9fa">
-                                        <input type="color" id="valueNeutralColorDark" value="#495057">
+                                        <input type="color" id="valueNeutralColor" value="#6c757d" class="form-control form-control-color color-picker" data-color-key="value-neutral-color">
+                                        <input type="color" id="valueNeutralColorLight" value="#f8f9fa" class="form-control form-control-color color-picker" data-color-key="value-neutral-color-light">
+                                        <input type="color" id="valueNeutralColorDark" value="#495057" class="form-control form-control-color color-picker" data-color-key="value-neutral-color-dark">
+              </div>
+                  </div>
                   </div>
                 </div>
-              </div>
-            </div>
               </div>
             </div>
             
@@ -645,15 +645,15 @@
           <div class="mb-3">
                                     <label class="form-label">זמן ניקוי קונסולה (דקות)</label>
                                     <input type="number" id="consoleCleanupInterval" class="form-control control-narrow" value="30" min="5" max="1440">
-          </div>
+                  </div>
           <div class="mb-3">
           <div class="form-check">
                                         <input class="form-check-input" type="checkbox" id="manualConsoleCleanup">
                                         <label class="form-check-label" for="manualConsoleCleanup">
                                             ניקוי ידני של קונסולה
             </label>
-          </div>
-        </div>
+                  </div>
+                </div>
                                 <div class="mb-3">
                                     <label class="form-label">רמת לוג</label>
                                     <select id="logLevel" class="form-select control-narrow">
@@ -662,20 +662,20 @@
                                         <option value="warning">Warning</option>
                                         <option value="error">Error</option>
                                     </select>
-        </div>
+              </div>
                                 <div class="mb-3">
                                     <label class="form-label">גודל קובץ לוג מקסימלי (MB)</label>
                                     <input type="number" id="maxLogFileSize" class="form-control control-narrow" value="10" min="1" max="100">
-      </div>
-    </div>
-  </div>
-        </div>
-              </div>
-            
             </div>
+          </div>
         </div>
-    </div>
-    
+      </div>
+        </div>
+            
+              </div>
+              </div>
+            </div>
+            
     <!-- Bottom Save Buttons -->
     <div class="container-fluid mt-4">
         <div class="row">
@@ -683,17 +683,17 @@
                 <div class="d-flex justify-content-center gap-3 p-3 bg-light rounded">
                     <button class="btn btn-success btn-lg" onclick="window.saveAllPreferences()" id="saveAllBtnBottom">
                         <i class="bi bi-save"></i> שמור הכל
-                    </button>
+          </button>
                     <button class="btn btn-warning btn-lg" onclick="window.resetToDefaults()" id="resetBtnBottom">
                         <i class="bi bi-arrow-clockwise"></i> איפוס לברירות מחדל
-                    </button>
+          </button>
                     <button class="btn btn-info btn-lg" onclick="window.exportPreferences()" id="exportBtn">
                         <i class="bi bi-download"></i> ייצא הגדרות
-                    </button>
-                </div>
-            </div>
+          </button>
         </div>
     </div>
+    </div>
+  </div>
   
     <!-- Notification system -->
     <div class="notification-container" id="notificationContainer"></div>
@@ -728,11 +728,11 @@
         });
     </script>
                 <!-- ===== CONTENT SECTIONS END (EDITABLE) ===== -->
-            </div>
-            <!-- ===== END MAIN CONTENT ===== -->
         </div>
+            <!-- ===== END MAIN CONTENT ===== -->
+              </div>
         <!-- ===== END PAGE BODY ===== -->
-    </div>
+            </div>
     <!-- ===== END BACKGROUND WRAPPER ===== -->
 </body>
 </html>

@@ -51,6 +51,20 @@ class PreferenceProfile(BaseModel):
     created_by_user = relationship("User", foreign_keys=[created_by])
     preferences = relationship("UserPreferences", back_populates="profile", cascade="all, delete-orphan")
     
+    def to_dict(self) -> Dict[str, Any]:
+        """המר פרופיל למילון"""
+        return {
+            'id': self.id,
+            'name': self.profile_name,
+            'isDefault': self.is_default,
+            'isActive': self.is_active,
+            'description': self.description,
+            'createdAt': self.created_at.isoformat() if self.created_at else None,
+            'updatedAt': self.updated_at.isoformat() if self.updated_at else None,
+            'lastUsedAt': self.last_used_at.isoformat() if self.last_used_at else None,
+            'usageCount': self.usage_count
+        }
+    
     def __repr__(self):
         return f"<PreferenceProfile(user_id={self.user_id}, name='{self.profile_name}')>"
 
@@ -98,6 +112,73 @@ class UserPreferences(BaseModel):
     default_max_amount = Column(Float)
     
     # ===== הגדרות ממשק משתמש =====
+    
+    # צבעים בסיסיים
+    primary_color = Column(String(7), default='#007bff')
+    secondary_color = Column(String(7), default='#6c757d')
+    success_color = Column(String(7), default='#28a745')
+    warning_color = Column(String(7), default='#ffc107')
+    danger_color = Column(String(7), default='#dc3545')
+    info_color = Column(String(7), default='#007bff')
+    
+    # צבעי ישויות
+    entity_trade_color = Column(String(7), default='#007bff')
+    entity_trade_color_light = Column(String(7), default='#e3f2fd')
+    entity_trade_color_dark = Column(String(7), default='#0056b3')
+    entity_account_color = Column(String(7), default='#28a745')
+    entity_account_color_light = Column(String(7), default='#d4edda')
+    entity_account_color_dark = Column(String(7), default='#155724')
+    entity_ticker_color = Column(String(7), default='#dc3545')
+    entity_ticker_color_light = Column(String(7), default='#f8d7da')
+    entity_ticker_color_dark = Column(String(7), default='#721c24')
+    entity_alert_color = Column(String(7), default='#ff9c05')
+    entity_alert_color_light = Column(String(7), default='#fff3cd')
+    entity_alert_color_dark = Column(String(7), default='#856404')
+    entity_cash_flow_color = Column(String(7), default='#20c997')
+    entity_cash_flow_color_light = Column(String(7), default='#d1ecf1')
+    entity_cash_flow_color_dark = Column(String(7), default='#0c5460')
+    entity_note_color = Column(String(7), default='#6f42c1')
+    entity_note_color_light = Column(String(7), default='#e2e3f1')
+    entity_note_color_dark = Column(String(7), default='#383d41')
+    entity_trade_plan_color = Column(String(7), default='#17a2b8')
+    entity_trade_plan_color_light = Column(String(7), default='#d1ecf1')
+    entity_trade_plan_color_dark = Column(String(7), default='#0c5460')
+    entity_execution_color = Column(String(7), default='#fd7e14')
+    entity_execution_color_light = Column(String(7), default='#ffeaa7')
+    entity_execution_color_dark = Column(String(7), default='#e17055')
+    
+    # צבעי סטטוסים
+    status_open_color = Column(String(7), default='#28a745')
+    status_open_color_light = Column(String(7), default='#d4edda')
+    status_open_color_dark = Column(String(7), default='#155724')
+    status_closed_color = Column(String(7), default='#6c757d')
+    status_closed_color_light = Column(String(7), default='#f8f9fa')
+    status_closed_color_dark = Column(String(7), default='#495057')
+    status_cancelled_color = Column(String(7), default='#dc3545')
+    status_cancelled_color_light = Column(String(7), default='#f8d7da')
+    status_cancelled_color_dark = Column(String(7), default='#721c24')
+    
+    # צבעי סוגי השקעה
+    type_swing_color = Column(String(7), default='#007bff')
+    type_swing_color_light = Column(String(7), default='#e3f2fd')
+    type_swing_color_dark = Column(String(7), default='#0056b3')
+    type_investment_color = Column(String(7), default='#28a745')
+    type_investment_color_light = Column(String(7), default='#d4edda')
+    type_investment_color_dark = Column(String(7), default='#155724')
+    type_passive_color = Column(String(7), default='#6f42c1')
+    type_passive_color_light = Column(String(7), default='#e2e3f1')
+    type_passive_color_dark = Column(String(7), default='#383d41')
+    
+    # צבעי ערכים
+    value_positive_color = Column(String(7), default='#28a745')
+    value_positive_color_light = Column(String(7), default='#d4edda')
+    value_positive_color_dark = Column(String(7), default='#155724')
+    value_negative_color = Column(String(7), default='#dc3545')
+    value_negative_color_light = Column(String(7), default='#f8d7da')
+    value_negative_color_dark = Column(String(7), default='#721c24')
+    value_neutral_color = Column(String(7), default='#6c757d')
+    value_neutral_color_light = Column(String(7), default='#f8f9fa')
+    value_neutral_color_dark = Column(String(7), default='#495057')
     
     # תצוגה כללית
     theme = Column(String(20), default='light')  # light, dark, auto
@@ -262,6 +343,67 @@ class UserPreferences(BaseModel):
             'maxAmount': self.default_max_amount
         }
         
+        # צבעים
+        result['colors'] = {
+            'primaryColor': self.primary_color,
+            'secondaryColor': self.secondary_color,
+            'successColor': self.success_color,
+            'warningColor': self.warning_color,
+            'dangerColor': self.danger_color,
+            'infoColor': self.info_color,
+            'entityTradeColor': self.entity_trade_color,
+            'entityTradeColorLight': self.entity_trade_color_light,
+            'entityTradeColorDark': self.entity_trade_color_dark,
+            'entityAccountColor': self.entity_account_color,
+            'entityAccountColorLight': self.entity_account_color_light,
+            'entityAccountColorDark': self.entity_account_color_dark,
+            'entityTickerColor': self.entity_ticker_color,
+            'entityTickerColorLight': self.entity_ticker_color_light,
+            'entityTickerColorDark': self.entity_ticker_color_dark,
+            'entityAlertColor': self.entity_alert_color,
+            'entityAlertColorLight': self.entity_alert_color_light,
+            'entityAlertColorDark': self.entity_alert_color_dark,
+            'entityCashFlowColor': self.entity_cash_flow_color,
+            'entityCashFlowColorLight': self.entity_cash_flow_color_light,
+            'entityCashFlowColorDark': self.entity_cash_flow_color_dark,
+            'entityNoteColor': self.entity_note_color,
+            'entityNoteColorLight': self.entity_note_color_light,
+            'entityNoteColorDark': self.entity_note_color_dark,
+            'entityTradePlanColor': self.entity_trade_plan_color,
+            'entityTradePlanColorLight': self.entity_trade_plan_color_light,
+            'entityTradePlanColorDark': self.entity_trade_plan_color_dark,
+            'entityExecutionColor': self.entity_execution_color,
+            'entityExecutionColorLight': self.entity_execution_color_light,
+            'entityExecutionColorDark': self.entity_execution_color_dark,
+            'statusOpenColor': self.status_open_color,
+            'statusOpenColorLight': self.status_open_color_light,
+            'statusOpenColorDark': self.status_open_color_dark,
+            'statusClosedColor': self.status_closed_color,
+            'statusClosedColorLight': self.status_closed_color_light,
+            'statusClosedColorDark': self.status_closed_color_dark,
+            'statusCancelledColor': self.status_cancelled_color,
+            'statusCancelledColorLight': self.status_cancelled_color_light,
+            'statusCancelledColorDark': self.status_cancelled_color_dark,
+            'typeSwingColor': self.type_swing_color,
+            'typeSwingColorLight': self.type_swing_color_light,
+            'typeSwingColorDark': self.type_swing_color_dark,
+            'typeInvestmentColor': self.type_investment_color,
+            'typeInvestmentColorLight': self.type_investment_color_light,
+            'typeInvestmentColorDark': self.type_investment_color_dark,
+            'typePassiveColor': self.type_passive_color,
+            'typePassiveColorLight': self.type_passive_color_light,
+            'typePassiveColorDark': self.type_passive_color_dark,
+            'valuePositiveColor': self.value_positive_color,
+            'valuePositiveColorLight': self.value_positive_color_light,
+            'valuePositiveColorDark': self.value_positive_color_dark,
+            'valueNegativeColor': self.value_negative_color,
+            'valueNegativeColorLight': self.value_negative_color_light,
+            'valueNegativeColorDark': self.value_negative_color_dark,
+            'valueNeutralColor': self.value_neutral_color,
+            'valueNeutralColorLight': self.value_neutral_color_light,
+            'valueNeutralColorDark': self.value_neutral_color_dark
+        }
+        
         # הגדרות ממשק משתמש
         result['ui'] = {
             'theme': self.theme,
@@ -397,8 +539,11 @@ class UserPreferences(BaseModel):
     def from_dict(self, data: Dict[str, Any]) -> None:
         """עדכן את ההגדרות ממילון"""
         
-        # הגדרות כלליות
+        # תמיכה בנתונים שטוחים (flat) ומקוננים (nested)
+        
+        # הגדרות כלליות - תמיכה בשני פורמטים
         if 'general' in data:
+            # פורמט מקונן
             general = data['general']
             if 'primaryCurrency' in general:
                 self.primary_currency = general['primaryCurrency']
@@ -421,9 +566,26 @@ class UserPreferences(BaseModel):
                     self.trading_hours_start = trading_hours['start']
                 if 'end' in trading_hours:
                     self.trading_hours_end = trading_hours['end']
+        else:
+            # פורמט שטוח - תמיכה ישירה
+            if 'primaryCurrency' in data:
+                self.primary_currency = data['primaryCurrency']
+            if 'secondaryCurrency' in data:
+                self.secondary_currency = data['secondaryCurrency']
+            if 'timezone' in data:
+                self.timezone = data['timezone']
+            if 'language' in data:
+                self.language = data['language']
+            if 'defaultStopLoss' in data:
+                self.default_stop_loss = data['defaultStopLoss']
+            if 'defaultTargetPrice' in data:
+                self.default_target_price = data['defaultTargetPrice']
+            if 'defaultCommission' in data:
+                self.default_commission = data['defaultCommission']
         
-        # פילטרים
+        # פילטרים - תמיכה בשני פורמטים
         if 'defaultFilters' in data:
+            # פורמט מקונן
             filters = data['defaultFilters']
             if 'status' in filters:
                 self.default_status_filter = filters['status']
@@ -435,6 +597,159 @@ class UserPreferences(BaseModel):
                 self.default_date_range_filter = filters['dateRange']
             if 'search' in filters:
                 self.default_search_filter = filters['search']
+        else:
+            # פורמט שטוח
+            if 'defaultStatusFilter' in data:
+                self.default_status_filter = data['defaultStatusFilter']
+            if 'defaultTypeFilter' in data:
+                self.default_type_filter = data['defaultTypeFilter']
+            if 'defaultAccountFilter' in data:
+                self.default_account_filter = data['defaultAccountFilter']
+            if 'defaultDateRangeFilter' in data:
+                self.default_date_range_filter = data['defaultDateRangeFilter']
+            if 'defaultSearchFilter' in data:
+                self.default_search_filter = data['defaultSearchFilter']
+        
+        # צבעים - תמיכה בשני פורמטים
+        if 'colors' in data:
+            # פורמט מקונן
+            colors = data['colors']
+            if 'primaryColor' in colors:
+                self.primary_color = colors['primaryColor']
+            if 'secondaryColor' in colors:
+                self.secondary_color = colors['secondaryColor']
+            if 'successColor' in colors:
+                self.success_color = colors['successColor']
+            if 'warningColor' in colors:
+                self.warning_color = colors['warningColor']
+            if 'dangerColor' in colors:
+                self.danger_color = colors['dangerColor']
+            if 'infoColor' in colors:
+                self.info_color = colors['infoColor']
+        else:
+            # פורמט שטוח - צבעים ישירים
+            if 'primaryColor' in data:
+                self.primary_color = data['primaryColor']
+            if 'secondaryColor' in data:
+                self.secondary_color = data['secondaryColor']
+            if 'successColor' in data:
+                self.success_color = data['successColor']
+            if 'warningColor' in data:
+                self.warning_color = data['warningColor']
+            if 'dangerColor' in data:
+                self.danger_color = data['dangerColor']
+            if 'infoColor' in data:
+                self.info_color = data['infoColor']
+            
+            # צבעי ישויות
+            if 'entityTradeColor' in data:
+                self.entity_trade_color = data['entityTradeColor']
+            if 'entityTradeColorLight' in data:
+                self.entity_trade_color_light = data['entityTradeColorLight']
+            if 'entityTradeColorDark' in data:
+                self.entity_trade_color_dark = data['entityTradeColorDark']
+            if 'entityAccountColor' in data:
+                self.entity_account_color = data['entityAccountColor']
+            if 'entityAccountColorLight' in data:
+                self.entity_account_color_light = data['entityAccountColorLight']
+            if 'entityAccountColorDark' in data:
+                self.entity_account_color_dark = data['entityAccountColorDark']
+            if 'entityTickerColor' in data:
+                self.entity_ticker_color = data['entityTickerColor']
+            if 'entityTickerColorLight' in data:
+                self.entity_ticker_color_light = data['entityTickerColorLight']
+            if 'entityTickerColorDark' in data:
+                self.entity_ticker_color_dark = data['entityTickerColorDark']
+            if 'entityAlertColor' in data:
+                self.entity_alert_color = data['entityAlertColor']
+            if 'entityAlertColorLight' in data:
+                self.entity_alert_color_light = data['entityAlertColorLight']
+            if 'entityAlertColorDark' in data:
+                self.entity_alert_color_dark = data['entityAlertColorDark']
+            if 'entityCashFlowColor' in data:
+                self.entity_cash_flow_color = data['entityCashFlowColor']
+            if 'entityCashFlowColorLight' in data:
+                self.entity_cash_flow_color_light = data['entityCashFlowColorLight']
+            if 'entityCashFlowColorDark' in data:
+                self.entity_cash_flow_color_dark = data['entityCashFlowColorDark']
+            if 'entityNoteColor' in data:
+                self.entity_note_color = data['entityNoteColor']
+            if 'entityNoteColorLight' in data:
+                self.entity_note_color_light = data['entityNoteColorLight']
+            if 'entityNoteColorDark' in data:
+                self.entity_note_color_dark = data['entityNoteColorDark']
+            if 'entityTradePlanColor' in data:
+                self.entity_trade_plan_color = data['entityTradePlanColor']
+            if 'entityTradePlanColorLight' in data:
+                self.entity_trade_plan_color_light = data['entityTradePlanColorLight']
+            if 'entityTradePlanColorDark' in data:
+                self.entity_trade_plan_color_dark = data['entityTradePlanColorDark']
+            if 'entityExecutionColor' in data:
+                self.entity_execution_color = data['entityExecutionColor']
+            if 'entityExecutionColorLight' in data:
+                self.entity_execution_color_light = data['entityExecutionColorLight']
+            if 'entityExecutionColorDark' in data:
+                self.entity_execution_color_dark = data['entityExecutionColorDark']
+            
+            # צבעי סטטוסים
+            if 'statusOpenColor' in data:
+                self.status_open_color = data['statusOpenColor']
+            if 'statusOpenColorLight' in data:
+                self.status_open_color_light = data['statusOpenColorLight']
+            if 'statusOpenColorDark' in data:
+                self.status_open_color_dark = data['statusOpenColorDark']
+            if 'statusClosedColor' in data:
+                self.status_closed_color = data['statusClosedColor']
+            if 'statusClosedColorLight' in data:
+                self.status_closed_color_light = data['statusClosedColorLight']
+            if 'statusClosedColorDark' in data:
+                self.status_closed_color_dark = data['statusClosedColorDark']
+            if 'statusCancelledColor' in data:
+                self.status_cancelled_color = data['statusCancelledColor']
+            if 'statusCancelledColorLight' in data:
+                self.status_cancelled_color_light = data['statusCancelledColorLight']
+            if 'statusCancelledColorDark' in data:
+                self.status_cancelled_color_dark = data['statusCancelledColorDark']
+            
+            # צבעי סוגי השקעה
+            if 'typeSwingColor' in data:
+                self.type_swing_color = data['typeSwingColor']
+            if 'typeSwingColorLight' in data:
+                self.type_swing_color_light = data['typeSwingColorLight']
+            if 'typeSwingColorDark' in data:
+                self.type_swing_color_dark = data['typeSwingColorDark']
+            if 'typeInvestmentColor' in data:
+                self.type_investment_color = data['typeInvestmentColor']
+            if 'typeInvestmentColorLight' in data:
+                self.type_investment_color_light = data['typeInvestmentColorLight']
+            if 'typeInvestmentColorDark' in data:
+                self.type_investment_color_dark = data['typeInvestmentColorDark']
+            if 'typePassiveColor' in data:
+                self.type_passive_color = data['typePassiveColor']
+            if 'typePassiveColorLight' in data:
+                self.type_passive_color_light = data['typePassiveColorLight']
+            if 'typePassiveColorDark' in data:
+                self.type_passive_color_dark = data['typePassiveColorDark']
+            
+            # צבעי ערכים
+            if 'valuePositiveColor' in data:
+                self.value_positive_color = data['valuePositiveColor']
+            if 'valuePositiveColorLight' in data:
+                self.value_positive_color_light = data['valuePositiveColorLight']
+            if 'valuePositiveColorDark' in data:
+                self.value_positive_color_dark = data['valuePositiveColorDark']
+            if 'valueNegativeColor' in data:
+                self.value_negative_color = data['valueNegativeColor']
+            if 'valueNegativeColorLight' in data:
+                self.value_negative_color_light = data['valueNegativeColorLight']
+            if 'valueNegativeColorDark' in data:
+                self.value_negative_color_dark = data['valueNegativeColorDark']
+            if 'valueNeutralColor' in data:
+                self.value_neutral_color = data['valueNeutralColor']
+            if 'valueNeutralColorLight' in data:
+                self.value_neutral_color_light = data['valueNeutralColorLight']
+            if 'valueNeutralColorDark' in data:
+                self.value_neutral_color_dark = data['valueNeutralColorDark']
         
         # ממשק משתמש
         if 'ui' in data:

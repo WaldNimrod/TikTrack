@@ -14,7 +14,7 @@ window.validateCurrency = function(select) {
   if (select.value !== 'USD') {
     if (typeof window.showWarningNotification === 'function') {
       window.showWarningNotification('אזהרה', 'כרגע נתמך רק דולר ארה"ב');
-    } else {
+      } else {
       alert('כרגע נתמך רק דולר ארה"ב');
     }
     select.value = 'USD';
@@ -42,8 +42,8 @@ window.autoSavePreference = async function(key, value) {
     
     // Don't save to server on every change - only on manual save
     // This prevents rate limiting issues
-    
-  } catch (error) {
+      
+    } catch (error) {
     console.error(`❌ Error saving ${key}:`, error);
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', `שגיאה בשמירת ${key}`);
@@ -51,13 +51,58 @@ window.autoSavePreference = async function(key, value) {
   }
 };
 
-// Load preferences from localStorage
-window.loadPreferences = function() {
+// Load preferences from server and localStorage
+window.loadPreferences = async function() {
+  try {
+    console.log('📂 Loading preferences from server...');
+    
+    // First try to load from server
+    const response = await fetch('/api/v1/preferences/user');
+    if (response.ok) {
+      const result = await response.json();
+      const serverPrefs = result.data?.preferences || {};
+      
+      console.log('✅ Loaded preferences from server:', serverPrefs);
+      
+      // Merge server preferences with localStorage (localStorage takes priority)
+      const localPrefs = JSON.parse(localStorage.getItem('tikTrack_preferences') || '{}');
+      const mergedPrefs = { ...serverPrefs, ...localPrefs };
+      
+      // Save merged preferences to localStorage
+      localStorage.setItem('tikTrack_preferences', JSON.stringify(mergedPrefs));
+      
+      // Apply preferences to form elements
+      Object.keys(mergedPrefs).forEach(key => {
+        const element = document.getElementById(key);
+      if (element) {
+          if (element.type === 'checkbox') {
+            element.checked = mergedPrefs[key];
+          } else {
+            element.value = mergedPrefs[key];
+        }
+      }
+    });
+    
+      console.log('✅ Preferences loaded and merged successfully');
+      return true;
+    } else {
+      console.log('⚠️ Server preferences not available, loading from localStorage...');
+      return window.loadPreferencesFromLocalStorage();
+    }
+    } catch (error) {
+    console.error('❌ Error loading preferences from server:', error);
+    console.log('📂 Falling back to localStorage...');
+    return window.loadPreferencesFromLocalStorage();
+  }
+};
+
+// Load preferences from localStorage only
+window.loadPreferencesFromLocalStorage = function() {
   try {
     const saved = localStorage.getItem('tikTrack_preferences');
     if (saved) {
       const preferences = JSON.parse(saved);
-      console.log('Loading preferences:', preferences);
+      console.log('Loading preferences from localStorage:', preferences);
       
       // Load all form fields
       Object.keys(preferences).forEach(key => {
@@ -71,12 +116,11 @@ window.loadPreferences = function() {
         }
       });
       
-      console.log('✅ Preferences loaded successfully');
-      // לא מציגים הודעה - זה מטריד את המשתמש
+      console.log('✅ Preferences loaded from localStorage successfully');
       return true;
     }
-  } catch (error) {
-    console.error('❌ Error loading preferences:', error);
+    } catch (error) {
+    console.error('❌ Error loading preferences from localStorage:', error);
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בטעינת ההגדרות');
     }
@@ -155,7 +199,7 @@ window.openColorPicker = function(colorId) {
   const colorInput = document.getElementById(colorId);
   if (colorInput) {
     colorInput.click();
-  } else {
+      } else {
     console.error(`Color input with id '${colorId}' not found`);
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', `לא נמצא שדה צבע עם מזהה: ${colorId}`);
@@ -199,7 +243,7 @@ window.saveAllPreferences = async function() {
       }
     } else {
       console.error('❌ Failed to save preferences to database:', response.status);
-      if (typeof window.showErrorNotification === 'function') {
+    if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification('שגיאה', 'שגיאה בשמירת ההגדרות לבסיס הנתונים');
       }
     }
@@ -299,22 +343,133 @@ window.markAsSaved = function() {
   });
 };
 
-// Initialize preferences page
-window.initializePreferencesPage = function() {
-  console.log('🚀 Initializing preferences page');
-  
-  // Load saved preferences or set defaults
-  const loaded = window.loadPreferences();
-  if (!loaded) {
-    console.log('📝 Setting default values');
-    window.setDefaults();
+// Load open accounts from database
+window.loadOpenAccounts = async function() {
+  try {
+    console.log('🏦 Loading open accounts from database...');
+    
+    const response = await fetch('/api/v1/accounts/open');
+    if (response.ok) {
+      const result = await response.json();
+      const accounts = result.data || [];
+      
+      console.log(`✅ Loaded ${accounts.length} open accounts:`, accounts);
+      
+      // Update the accounts dropdown
+      const accountSelect = document.getElementById('defaultAccountFilter');
+      if (accountSelect) {
+        // Clear existing options except the first one
+        accountSelect.innerHTML = '<option value="">כל החשבונות</option>';
+        
+        // Add open accounts
+        accounts.forEach(account => {
+          const option = document.createElement('option');
+          option.value = account.id;
+          option.textContent = account.name;
+          accountSelect.appendChild(option);
+        });
+        
+        console.log(`✅ Updated accounts dropdown with ${accounts.length} accounts`);
+      }
+      
+      return accounts;
+    } else {
+      console.error('❌ Failed to load open accounts:', response.status);
+      return [];
+    }
+  } catch (error) {
+    console.error('❌ Error loading open accounts:', error);
+    return [];
   }
-  
-  // Setup auto-save
-  window.setupAutoSave();
-  
-  // Mark as saved initially
-  window.markAsSaved();
-  
-  console.log('✅ Preferences page initialized');
 };
+
+        // Initialize preferences page
+        window.initializePreferencesPage = async function() {
+          console.log('🚀 Initializing preferences page');
+          
+          // Load saved preferences or set defaults
+          const loaded = await window.loadPreferences();
+          if (!loaded) {
+            console.log('📝 Setting default values');
+            window.setDefaults();
+          }
+          
+          // Setup auto-save
+          window.setupAutoSave();
+          
+          // Load open accounts
+          window.loadOpenAccounts();
+          
+          // Setup color picker event handlers
+          window.setupColorPickers();
+          
+          // Mark as saved initially
+          window.markAsSaved();
+          
+          console.log('✅ Preferences page initialized');
+        };
+
+        // Setup color picker event handlers - Chrome-style color picker for all browsers
+        window.setupColorPickers = function() {
+          console.log('🎨 Setting up Chrome-style color pickers for all browsers');
+          
+          const colorPickers = document.querySelectorAll('input[type="color"]');
+          
+          colorPickers.forEach(picker => {
+            // Force Chrome-style color picker appearance
+            picker.style.webkitAppearance = 'none';
+            picker.style.mozAppearance = 'none';
+            picker.style.appearance = 'none';
+            picker.style.background = 'none';
+            picker.style.border = '2px solid white';
+            picker.style.borderRadius = '6px';
+            picker.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+            picker.style.width = '50px';
+            picker.style.height = '40px';
+            picker.style.padding = '0';
+            picker.style.cursor = 'pointer';
+            
+            // Add hover effect
+            picker.addEventListener('mouseenter', function() {
+              this.style.borderColor = '#007bff';
+              this.style.boxShadow = '0 4px 8px rgba(0, 123, 255, 0.2)';
+            });
+            
+            picker.addEventListener('mouseleave', function() {
+              this.style.borderColor = 'white';
+              this.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+            });
+            
+            // Add change event listener
+            picker.addEventListener('change', function(e) {
+              const colorKey = e.target.dataset.colorKey;
+              const colorValue = e.target.value;
+              
+              if (colorKey) {
+                // Update CSS variable immediately
+                document.documentElement.style.setProperty(`--user-${colorKey}`, colorValue);
+                
+                // Auto-save the preference
+                window.autoSavePreference(colorKey, colorValue);
+                
+                console.log(`🎨 Color updated: ${colorKey} = ${colorValue}`);
+              }
+            });
+          });
+          
+          console.log(`✅ Setup ${colorPickers.length} Chrome-style color pickers`);
+        };
+
+// Export functions to global scope
+window.validateCurrency = validateCurrency;
+window.autoSavePreference = autoSavePreference;
+window.loadPreferences = loadPreferences;
+window.loadPreferencesFromLocalStorage = loadPreferencesFromLocalStorage;
+window.setDefaults = setDefaults;
+window.setupAutoSave = setupAutoSave;
+window.initializePreferencesPage = initializePreferencesPage;
+window.saveAllPreferences = saveAllPreferences;
+window.resetToDefaults = resetToDefaults;
+window.exportPreferences = exportPreferences;
+window.loadOpenAccounts = loadOpenAccounts;
+window.setupColorPickers = setupColorPickers;

@@ -1341,68 +1341,6 @@ function toggleTopSection() {
   console.log(`✅ Top section ${isVisible ? 'collapsed' : 'expanded'}`);
 }
 
-/**
- * Toggle section visibility by ID
- * Used for content sections with specific IDs
- * @param {string} sectionId - The ID of the section to toggle
- */
-function toggleSection(sectionId) {
-  
-  const section = document.getElementById(sectionId);
-  if (!section) {
-    console.warn(`⚠️ Section with ID '${sectionId}' not found`);
-    return;
-  }
-  
-  const sectionBody = section.querySelector('.section-body');
-  const toggleIcon = section.querySelector('.section-toggle-icon');
-  
-  if (!sectionBody || !toggleIcon) {
-    console.warn('⚠️ Section body or toggle icon not found');
-    return;
-  }
-  
-  // Toggle visibility
-  const isVisible = sectionBody.style.display !== 'none';
-  sectionBody.style.display = isVisible ? 'none' : 'block';
-  
-  // Update icon
-  toggleIcon.textContent = isVisible ? '▶' : '▼';
-  
-  // Save state to localStorage
-  localStorage.setItem(`${sectionId}Collapsed`, isVisible.toString());
-  
-  console.log(`✅ Section '${sectionId}' ${isVisible ? 'collapsed' : 'expanded'}`);
-}
-
-/**
- * Toggle all sections visibility
- * Used for expanding/collapsing all sections at once
- */
-function toggleAllSections() {
-  console.log('🔧 ui-utils.js toggleAllSections called');
-  
-  const sections = document.querySelectorAll('.content-section, .top-section');
-  const allCollapsed = Array.from(sections).every(section => {
-    const sectionBody = section.querySelector('.section-body');
-    return sectionBody && sectionBody.style.display === 'none';
-  });
-  
-  sections.forEach(section => {
-    const sectionBody = section.querySelector('.section-body');
-    const toggleIcon = section.querySelector('.section-toggle-icon, .filter-icon');
-    
-    if (sectionBody && toggleIcon) {
-      sectionBody.style.display = allCollapsed ? 'block' : 'none';
-      toggleIcon.textContent = allCollapsed ? '▼' : '▶';
-      
-      // Save state to localStorage
-      const sectionId = section.id || 'topSection';
-      localStorage.setItem(`${sectionId}Collapsed`, (!allCollapsed).toString());
-    }
-  });
-  
-}
 
 /**
  * Load section states from localStorage

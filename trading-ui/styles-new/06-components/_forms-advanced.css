@@ -247,6 +247,61 @@ input[type="color"]:hover {
   box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2) !important;
 }
 
+/* קונטרול בחירת צבעים מהגיבוי המקומי */
+.color-picker {
+  width: 50%;
+  height: 10px;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Chrome-style color picker for all browsers */
+input[type="color"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: none;
+  border: 2px solid white !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  width: 50px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease;
+}
+
+/* Chrome-style color swatch */
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 4px;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
+/* Firefox Chrome-style */
+input[type="color"]::-moz-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+
+/* Hover effect */
+input[type="color"]:hover {
+  border-color: #007bff !important;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2) !important;
+}
+
+/* Focus effect */
+input[type="color"]:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
 /* מחלקת הסתרה */
 .d-none {
   display: none !important;

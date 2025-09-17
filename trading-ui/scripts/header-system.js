@@ -3834,7 +3834,7 @@ function getFilterConfig(filterType) {
       columnName: 'סוג השקעה',
       containerIdKeywords: ['type', 'Type', 'investment', 'סוג', 'השקעה'],
       knownContainers: ['tradesContainer', 'tradePlansContainer', 'trade_plansContainer'],
-      cellValues: ['השקעה', 'סאוינג', 'פסיבי'],
+      cellValues: ['investment', 'swing', 'passive'],
       dataField: 'investment-type',
     },
     'account': {

@@ -716,12 +716,12 @@
     
     <script>
         // All functions moved to global system - no local functions
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             console.log('🚀 Preferences page loaded');
             
             // Initialize using global functions
             if (typeof window.initializePreferencesPage === 'function') {
-                window.initializePreferencesPage();
+                await window.initializePreferencesPage();
             } else {
                 console.warn('Global preferences functions not available');
             }

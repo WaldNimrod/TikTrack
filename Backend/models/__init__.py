@@ -10,7 +10,7 @@ from .note_relation_type import NoteRelationType
 from .execution import Execution
 from .currency import Currency
 from .user import User
-from .user_preferences import UserPreferences, PreferenceProfile
+from .preferences import UserPreferences, PreferenceProfile
 from .external_data import ExternalDataProvider, MarketDataQuote, DataRefreshLog, IntradayDataSlot
 
 __all__ = [

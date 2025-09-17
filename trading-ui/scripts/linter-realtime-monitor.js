@@ -231,15 +231,11 @@ function updateChart() {
         qualityChart.data.datasets[1].data = newData.errors;
         qualityChart.data.datasets[2].data = newData.warnings;
 
-        // Calculate max issues for y1 axis
-        const allErrors = newData.errors.length > 0 ? newData.errors : [0];
-        const allWarnings = newData.warnings.length > 0 ? newData.warnings : [0];
+        // Calculate max issues for y1 axis - use actual values, not array lengths
+        const maxErrors = newData.errors.length > 0 ? Math.max(...newData.errors) : 0;
+        const maxWarnings = newData.warnings.length > 0 ? Math.max(...newData.warnings) : 0;
 
-        const maxIssues = Math.max(
-            ...allErrors,
-            ...allWarnings,
-            10 // minimum
-        );
+        const maxIssues = Math.max(maxErrors, maxWarnings, 10); // minimum of 10
 
         // Update y1 axis with proper scaling
         qualityChart.options.scales.y1.max = Math.max(50, maxIssues + 10);
@@ -400,18 +396,35 @@ function scanJavaScriptFiles() {
         window.showInfoNotification('סריקה התחילה', 'סורק את הקבצים שנבחרו בפרויקט...');
     }
 
-    // Get file type selections
-    const scanJs = document.getElementById('scanJs')?.checked || false;
-    const scanHtml = document.getElementById('scanHtml')?.checked || false;
-    const scanPy = document.getElementById('scanPy')?.checked || false;
-    const scanCss = document.getElementById('scanCss')?.checked || false;
-    const scanOther = document.getElementById('scanOther')?.checked || false;
+    // Get file type selections - default to all if none selected (for auto-scan)
+    let scanJs = document.getElementById('scanJs')?.checked || false;
+    let scanHtml = document.getElementById('scanHtml')?.checked || false;
+    let scanPy = document.getElementById('scanPy')?.checked || false;
+    let scanCss = document.getElementById('scanCss')?.checked || false;
+    let scanOther = document.getElementById('scanOther')?.checked || false;
 
-    if (!scanJs && !scanHtml && !scanPy && !scanCss && !scanOther) {
-        if (typeof window.showWarningNotification === 'function') {
-            window.showWarningNotification('אין בחירה', 'אנא בחר לפחות סוג קובץ אחד לסריקה');
-        }
-        return;
+    // If no file types are selected, select all (for auto-scan compatibility)
+    const noSelection = !scanJs && !scanHtml && !scanPy && !scanCss && !scanOther;
+    if (noSelection) {
+        scanJs = true;
+        scanHtml = true;
+        scanPy = true;
+        scanCss = true;
+        scanOther = true;
+        console.log('🔍 Auto-scan: No file types selected, scanning all types');
+
+        // Update checkboxes to show what's being scanned
+        const jsCheckbox = document.getElementById('scanJs');
+        const htmlCheckbox = document.getElementById('scanHtml');
+        const pyCheckbox = document.getElementById('scanPy');
+        const cssCheckbox = document.getElementById('scanCss');
+        const otherCheckbox = document.getElementById('scanOther');
+
+        if (jsCheckbox) jsCheckbox.checked = true;
+        if (htmlCheckbox) htmlCheckbox.checked = true;
+        if (pyCheckbox) pyCheckbox.checked = true;
+        if (cssCheckbox) cssCheckbox.checked = true;
+        if (otherCheckbox) otherCheckbox.checked = true;
     }
 
     // Use dynamic file discovery if available, otherwise use static lists
@@ -1482,7 +1495,11 @@ window.discoverProjectFiles = () => {
         'manual-crud-tester.py',
         'visual-diff-tool.py',
         'css-toggle.py',
-        'create-crud-testing-dashboard.py'
+        'create-crud-testing-dashboard.py',
+        'Backend/models/preferences.py',
+        'Backend/services/preferences_service.py',
+        'Backend/services/user_service.py',
+        'Backend/routes/api/quotes_v1.py'
     ];
 
     // Add CSS files (sample - in real implementation would be discovered)
@@ -1499,7 +1516,8 @@ window.discoverProjectFiles = () => {
         'package.json',
         'README.md',
         'documentation/frontend/DIAGNOSTIC_LOG_SYSTEM.md',
-        'documentation/frontend/NOTIFICATION_SYSTEM.md'
+        'documentation/frontend/NOTIFICATION_SYSTEM.md',
+        'Backend/models/user_preferences.py'
     ];
 
     // Combine all files

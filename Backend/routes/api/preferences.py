@@ -266,6 +266,63 @@ def get_profiles() -> Any:
             "timestamp": "2025-01-07T21:55:00Z"
         }), 500
 
+@preferences_bp.route('/profiles/create', methods=['POST'])
+@rate_limit_api(requests_per_minute=10)
+def create_profile() -> Any:
+    """Create a new profile"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                "success": False,
+                "error": "No data provided",
+                "timestamp": "2025-01-07T21:55:00Z"
+            }), 400
+        
+        # Validate required fields
+        profile_name = data.get('name', '').strip()
+        if not profile_name:
+            return jsonify({
+                "success": False,
+                "error": "Profile name is required",
+                "timestamp": "2025-01-07T21:55:00Z"
+            }), 400
+        
+        # Get user ID (for now, use 1 as default)
+        user_id = 1
+        
+        # Create new profile
+        db = SessionLocal()
+        new_profile = PreferencesService.create_profile(
+            db=db,
+            user_id=user_id,
+            profile_name=profile_name,
+            description=data.get('description', ''),
+            is_default=False
+        )
+        
+        if new_profile:
+            return jsonify({
+                "success": True,
+                "message": "Profile created successfully",
+                "data": new_profile.to_dict(),
+                "timestamp": "2025-01-07T21:55:00Z"
+            }), 201
+        else:
+            return jsonify({
+                "success": False,
+                "error": "Failed to create profile",
+                "timestamp": "2025-01-07T21:55:00Z"
+            }), 500
+        
+    except Exception as e:
+        logger.error(f"Error creating profile: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": "2025-01-07T21:55:00Z"
+        }), 500
+
 @preferences_bp.route('/colors', methods=['GET'])
 @rate_limit_api(requests_per_minute=30)
 def get_colors() -> Any:

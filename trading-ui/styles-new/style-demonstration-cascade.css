@@ -1,0 +1,173 @@
+/**
+ * Style Demonstration Cascade Control
+ * 
+ * This file contains CSS rules that use cascade control to enable/disable styles
+ * for the style demonstration page only.
+ * 
+ * @author TikTrack Development Team
+ * @version 1.0.0
+ * @date 2025
+ */
+
+/* ===== Bootstrap Text Utilities - Enabled State ===== */
+.styles-enabled .text-primary { color: #007bff !important; }
+.styles-enabled .text-secondary { color: #6c757d !important; }
+.styles-enabled .text-success { color: #28a745 !important; }
+.styles-enabled .text-danger { color: #dc3545 !important; }
+.styles-enabled .text-warning { color: #ffc107 !important; }
+.styles-enabled .text-info { color: #17a2b8 !important; }
+.styles-enabled .text-muted { color: #6c757d !important; }
+.styles-enabled .text-white { color: #ffffff !important; }
+.styles-enabled .text-dark { color: #343a40 !important; }
+.styles-enabled .text-light { color: #f8f9fa !important; }
+
+/* ===== Bootstrap Text Utilities - Disabled State ===== */
+.styles-disabled .text-primary { color: inherit !important; }
+.styles-disabled .text-secondary { color: inherit !important; }
+.styles-disabled .text-success { color: inherit !important; }
+.styles-disabled .text-danger { color: inherit !important; }
+.styles-disabled .text-warning { color: inherit !important; }
+.styles-disabled .text-info { color: inherit !important; }
+.styles-disabled .text-muted { color: inherit !important; }
+.styles-disabled .text-white { color: inherit !important; }
+.styles-disabled .text-dark { color: inherit !important; }
+.styles-disabled .text-light { color: inherit !important; }
+
+/* ===== Bootstrap Background Utilities - Enabled State ===== */
+.styles-enabled .bg-primary { background-color: #007bff !important; }
+.styles-enabled .bg-secondary { background-color: #6c757d !important; }
+.styles-enabled .bg-success { background-color: #28a745 !important; }
+.styles-enabled .bg-danger { background-color: #dc3545 !important; }
+.styles-enabled .bg-warning { background-color: #ffc107 !important; }
+.styles-enabled .bg-info { background-color: #17a2b8 !important; }
+.styles-enabled .bg-light { background-color: #f8f9fa !important; }
+.styles-enabled .bg-dark { background-color: #343a40 !important; }
+
+/* ===== Bootstrap Background Utilities - Disabled State ===== */
+.styles-disabled .bg-primary { background-color: transparent !important; }
+.styles-disabled .bg-secondary { background-color: transparent !important; }
+.styles-disabled .bg-success { background-color: transparent !important; }
+.styles-disabled .bg-danger { background-color: transparent !important; }
+.styles-disabled .bg-warning { background-color: transparent !important; }
+.styles-disabled .bg-info { background-color: transparent !important; }
+.styles-disabled .bg-light { background-color: transparent !important; }
+.styles-disabled .bg-dark { background-color: transparent !important; }
+
+/* ===== Bootstrap Button Utilities - Enabled State ===== */
+.styles-enabled .btn-primary { 
+    background-color: #007bff !important; 
+    border-color: #007bff !important; 
+    color: #ffffff !important;
+}
+.styles-enabled .btn-secondary { 
+    background-color: #6c757d !important; 
+    border-color: #6c757d !important; 
+    color: #ffffff !important;
+}
+.styles-enabled .btn-success { 
+    background-color: #28a745 !important; 
+    border-color: #28a745 !important; 
+    color: #ffffff !important;
+}
+.styles-enabled .btn-danger { 
+    background-color: #dc3545 !important; 
+    border-color: #dc3545 !important; 
+    color: #ffffff !important;
+}
+.styles-enabled .btn-warning { 
+    background-color: #ffc107 !important; 
+    border-color: #ffc107 !important; 
+    color: #212529 !important;
+}
+.styles-enabled .btn-info { 
+    background-color: #17a2b8 !important; 
+    border-color: #17a2b8 !important; 
+    color: #ffffff !important;
+}
+
+/* ===== Bootstrap Button Utilities - Disabled State ===== */
+.styles-disabled .btn-primary,
+.styles-disabled .btn-secondary,
+.styles-disabled .btn-success,
+.styles-disabled .btn-danger,
+.styles-disabled .btn-warning,
+.styles-disabled .btn-info { 
+    background-color: transparent !important; 
+    border-color: currentColor !important; 
+    color: inherit !important;
+}
+
+/* ===== Bootstrap Spinner Utilities - Enabled State ===== */
+.styles-enabled .spinner-border { 
+    border: 0.25em solid currentColor !important;
+    border-right-color: transparent !important;
+}
+
+/* ===== Bootstrap Spinner Utilities - Disabled State ===== */
+.styles-disabled .spinner-border { 
+    border: 0.25em solid transparent !important;
+    border-right-color: transparent !important;
+}
+
+/* ===== Bootstrap Alert Utilities - Enabled State ===== */
+.styles-enabled .alert-primary { 
+    background-color: #cce5ff !important; 
+    border-color: #b3d9ff !important; 
+    color: #004085 !important;
+}
+.styles-enabled .alert-secondary { 
+    background-color: #e2e3e5 !important; 
+    border-color: #d3d6db !important; 
+    color: #383d41 !important;
+}
+.styles-enabled .alert-success { 
+    background-color: #d4edda !important; 
+    border-color: #c3e6cb !important; 
+    color: #155724 !important;
+}
+.styles-enabled .alert-danger { 
+    background-color: #f8d7da !important; 
+    border-color: #f5c6cb !important; 
+    color: #721c24 !important;
+}
+.styles-enabled .alert-warning { 
+    background-color: #fff3cd !important; 
+    border-color: #ffeaa7 !important; 
+    color: #856404 !important;
+}
+.styles-enabled .alert-info { 
+    background-color: #d1ecf1 !important; 
+    border-color: #bee5eb !important; 
+    color: #0c5460 !important;
+}
+
+/* ===== Bootstrap Alert Utilities - Disabled State ===== */
+.styles-disabled .alert-primary,
+.styles-disabled .alert-secondary,
+.styles-disabled .alert-success,
+.styles-disabled .alert-danger,
+.styles-disabled .alert-warning,
+.styles-disabled .alert-info { 
+    background-color: transparent !important; 
+    border-color: currentColor !important; 
+    color: inherit !important;
+}
+
+/* ===== Bootstrap Badge Utilities - Enabled State ===== */
+.styles-enabled .badge-primary { background-color: #007bff !important; }
+.styles-enabled .badge-secondary { background-color: #6c757d !important; }
+.styles-enabled .badge-success { background-color: #28a745 !important; }
+.styles-enabled .badge-danger { background-color: #dc3545 !important; }
+.styles-enabled .badge-warning { background-color: #ffc107 !important; color: #212529 !important; }
+.styles-enabled .badge-info { background-color: #17a2b8 !important; }
+
+/* ===== Bootstrap Badge Utilities - Disabled State ===== */
+.styles-disabled .badge-primary,
+.styles-disabled .badge-secondary,
+.styles-disabled .badge-success,
+.styles-disabled .badge-danger,
+.styles-disabled .badge-warning,
+.styles-disabled .badge-info { 
+    background-color: transparent !important; 
+    color: inherit !important;
+}

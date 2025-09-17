@@ -71,29 +71,128 @@ window.loadPreferences = async function() {
       // Save merged preferences to localStorage
       localStorage.setItem('tikTrack_preferences', JSON.stringify(mergedPrefs));
       
-      // Apply preferences to form elements
-      Object.keys(mergedPrefs).forEach(key => {
-        const element = document.getElementById(key);
-      if (element) {
-          if (element.type === 'checkbox') {
-            element.checked = mergedPrefs[key];
-          } else {
-            element.value = mergedPrefs[key];
-        }
-      }
-    });
+      // Apply preferences to form elements - handle nested structure
+      applyPreferencesToForm(mergedPrefs);
     
       console.log('✅ Preferences loaded and merged successfully');
-      return true;
-    } else {
+        return true;
+      } else {
       console.log('⚠️ Server preferences not available, loading from localStorage...');
       return window.loadPreferencesFromLocalStorage();
-    }
+      }
     } catch (error) {
     console.error('❌ Error loading preferences from server:', error);
     console.log('📂 Falling back to localStorage...');
     return window.loadPreferencesFromLocalStorage();
   }
+};
+
+// Apply preferences to form elements - handles nested structure
+function applyPreferencesToForm(preferences) {
+  // Map of nested keys to form element IDs
+  const keyMapping = {
+    // General settings
+    'general.defaultStopLoss': 'defaultStopLoss',
+    'general.defaultTargetPrice': 'defaultTargetPrice',
+    'general.defaultCommission': 'defaultCommission',
+    'general.primaryCurrency': 'primaryCurrency',
+    'general.timezone': 'timezone',
+    'general.riskPercentage': 'riskPercentage',
+    
+    // Colors - direct mapping
+    'colors.primaryColor': 'primaryColor',
+    'colors.secondaryColor': 'secondaryColor',
+    'colors.successColor': 'successColor',
+    'colors.warningColor': 'warningColor',
+    'colors.dangerColor': 'dangerColor',
+    'colors.infoColor': 'infoColor',
+    
+    // Entity colors
+    'colors.entityTradeColor': 'entityTradeColor',
+    'colors.entityTradeColorLight': 'entityTradeColorLight',
+    'colors.entityTradeColorDark': 'entityTradeColorDark',
+    'colors.entityAccountColor': 'entityAccountColor',
+    'colors.entityAccountColorLight': 'entityAccountColorLight',
+    'colors.entityAccountColorDark': 'entityAccountColorDark',
+    'colors.entityTickerColor': 'entityTickerColor',
+    'colors.entityTickerColorLight': 'entityTickerColorLight',
+    'colors.entityTickerColorDark': 'entityTickerColorDark',
+    'colors.entityAlertColor': 'entityAlertColor',
+    'colors.entityAlertColorLight': 'entityAlertColorLight',
+    'colors.entityAlertColorDark': 'entityAlertColorDark',
+    'colors.entityCashFlowColor': 'entityCashFlowColor',
+    'colors.entityCashFlowColorLight': 'entityCashFlowColorLight',
+    'colors.entityCashFlowColorDark': 'entityCashFlowColorDark',
+    'colors.entityNoteColor': 'entityNoteColor',
+    'colors.entityNoteColorLight': 'entityNoteColorLight',
+    'colors.entityNoteColorDark': 'entityNoteColorDark',
+    'colors.entityTradePlanColor': 'entityTradePlanColor',
+    'colors.entityTradePlanColorLight': 'entityTradePlanColorLight',
+    'colors.entityTradePlanColorDark': 'entityTradePlanColorDark',
+    'colors.entityExecutionColor': 'entityExecutionColor',
+    'colors.entityExecutionColorLight': 'entityExecutionColorLight',
+    'colors.entityExecutionColorDark': 'entityExecutionColorDark',
+    
+    // Status colors
+    'colors.statusOpenColor': 'statusOpenColor',
+    'colors.statusOpenColorLight': 'statusOpenColorLight',
+    'colors.statusOpenColorDark': 'statusOpenColorDark',
+    'colors.statusClosedColor': 'statusClosedColor',
+    'colors.statusClosedColorLight': 'statusClosedColorLight',
+    'colors.statusClosedColorDark': 'statusClosedColorDark',
+    'colors.statusCancelledColor': 'statusCancelledColor',
+    'colors.statusCancelledColorLight': 'statusCancelledColorLight',
+    'colors.statusCancelledColorDark': 'statusCancelledColorDark',
+    
+    // Type colors
+    'colors.typeSwingColor': 'typeSwingColor',
+    'colors.typeSwingColorLight': 'typeSwingColorLight',
+    'colors.typeSwingColorDark': 'typeSwingColorDark',
+    'colors.typeInvestmentColor': 'typeInvestmentColor',
+    'colors.typeInvestmentColorLight': 'typeInvestmentColorLight',
+    'colors.typeInvestmentColorDark': 'typeInvestmentColorDark',
+    'colors.typePassiveColor': 'typePassiveColor',
+    'colors.typePassiveColorLight': 'typePassiveColorLight',
+    'colors.typePassiveColorDark': 'typePassiveColorDark',
+    
+    // Value colors
+    'colors.valuePositiveColor': 'valuePositiveColor',
+    'colors.valuePositiveColorLight': 'valuePositiveColorLight',
+    'colors.valuePositiveColorDark': 'valuePositiveColorDark',
+    'colors.valueNegativeColor': 'valueNegativeColor',
+    'colors.valueNegativeColorLight': 'valueNegativeColorLight',
+    'colors.valueNegativeColorDark': 'valueNegativeColorDark',
+    'colors.valueNeutralColor': 'valueNeutralColor',
+    'colors.valueNeutralColorLight': 'valueNeutralColorLight',
+    'colors.valueNeutralColorDark': 'valueNeutralColorDark'
+  };
+  
+  // Apply each mapped preference
+  Object.keys(keyMapping).forEach(nestedKey => {
+    const elementId = keyMapping[nestedKey];
+      const element = document.getElementById(elementId);
+    
+      if (element) {
+      // Get value from nested structure
+      const value = window.getNestedValue(preferences, nestedKey);
+      
+      if (value !== undefined && value !== null) {
+          if (element.type === 'checkbox') {
+          element.checked = value;
+          } else {
+            element.value = value;
+          }
+        console.log(`✅ Applied ${nestedKey} = ${value} to ${elementId}`);
+        }
+      }
+    });
+};
+
+// Helper function to get nested values
+function getNestedValue(obj, path) {
+  return path.split('.').reduce((current, key) => {
+    return current && current[key] !== undefined ? current[key] : undefined;
+  }, obj);
 };
 
 // Load preferences from localStorage only
@@ -104,17 +203,8 @@ window.loadPreferencesFromLocalStorage = function() {
       const preferences = JSON.parse(saved);
       console.log('Loading preferences from localStorage:', preferences);
       
-      // Load all form fields
-      Object.keys(preferences).forEach(key => {
-        const element = document.getElementById(key);
-        if (element) {
-          if (element.type === 'checkbox') {
-            element.checked = preferences[key];
-          } else {
-            element.value = preferences[key];
-          }
-        }
-      });
+      // Apply preferences to form elements - handle nested structure
+      applyPreferencesToForm(preferences);
       
       console.log('✅ Preferences loaded from localStorage successfully');
       return true;
@@ -182,16 +272,16 @@ window.setupAutoSave = function() {
       const key = this.id;
       const value = this.type === 'checkbox' ? this.checked : this.value;
       window.autoSavePreference(key, value);
+      });
     });
-  });
-  
+    
   // Special handler for color inputs
   const colorInputs = document.querySelectorAll('input[type="color"]');
   colorInputs.forEach(input => {
     input.addEventListener('change', function() {
       window.autoSavePreference(this.id, this.value);
+      });
     });
-  });
 };
 
 // ===== Color Picker Function =====
@@ -223,31 +313,31 @@ window.saveAllPreferences = async function() {
     }
     
     // Save to server
-    const response = await fetch('/api/v1/preferences/user', {
-      method: 'POST',
-      headers: {
+      const response = await fetch('/api/v1/preferences/user', {
+        method: 'POST',
+        headers: {
         'Content-Type': 'application/json',
-      },
+        },
       body: JSON.stringify(currentPrefs)
-    });
-    
+      });
+      
     if (response.ok) {
       const result = await response.json();
       console.log('✅ All preferences saved to database:', result);
       
       // Mark as saved
       window.markAsSaved();
-      
+        
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('נשמר', 'כל ההגדרות נשמרו בהצלחה לבסיס הנתונים');
-      }
-    } else {
+        }
+      } else {
       console.error('❌ Failed to save preferences to database:', response.status);
     if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification('שגיאה', 'שגיאה בשמירת ההגדרות לבסיס הנתונים');
       }
     }
-  } catch (error) {
+    } catch (error) {
     console.error('❌ Error saving all preferences:', error);
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בשמירת ההגדרות');
@@ -289,18 +379,18 @@ window.exportPreferences = function() {
     const dataBlob = new Blob([dataStr], {type: 'application/json'});
     const url = URL.createObjectURL(dataBlob);
     
-    const link = document.createElement('a');
-    link.href = url;
+      const link = document.createElement('a');
+      link.href = url;
     link.download = `tiktrack-preferences-${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-    
-    URL.revokeObjectURL(url);
-    
+      link.click();
+      
+      URL.revokeObjectURL(url);
+      
     if (typeof window.showSuccessNotification === 'function') {
       window.showSuccessNotification('ייצא', 'ההגדרות יוצאו בהצלחה');
     }
-  } catch (error) {
-    console.error('❌ Error exporting preferences:', error);
+    } catch (error) {
+      console.error('❌ Error exporting preferences:', error);
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'שגיאה בייצוא ההגדרות');
     }
@@ -349,7 +439,7 @@ window.loadOpenAccounts = async function() {
     console.log('🏦 Loading open accounts from database...');
     
     const response = await fetch('/api/v1/accounts/open');
-    if (response.ok) {
+      if (response.ok) {
       const result = await response.json();
       const accounts = result.data || [];
       
@@ -373,11 +463,11 @@ window.loadOpenAccounts = async function() {
       }
       
       return accounts;
-    } else {
+      } else {
       console.error('❌ Failed to load open accounts:', response.status);
       return [];
-    }
-  } catch (error) {
+      }
+    } catch (error) {
     console.error('❌ Error loading open accounts:', error);
     return [];
   }
@@ -399,6 +489,9 @@ window.loadOpenAccounts = async function() {
           
           // Load open accounts
           window.loadOpenAccounts();
+          
+          // Load profiles
+          window.loadProfiles();
           
           // Setup color picker event handlers
           window.setupColorPickers();
@@ -460,11 +553,142 @@ window.loadOpenAccounts = async function() {
           console.log(`✅ Setup ${colorPickers.length} Chrome-style color pickers`);
         };
 
+// Profile Management Functions
+window.createProfile = async function() {
+  const profileName = document.getElementById('newProfileName').value.trim();
+  if (!profileName) {
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'אנא הכנס שם פרופיל');
+    } else {
+      alert('אנא הכנס שם פרופיל');
+    }
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/v1/preferences/profiles/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: profileName,
+        description: `פרופיל ${profileName}`
+      })
+    });
+    
+    const result = await response.json();
+    if (result.success) {
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('הצלחה', 'פרופיל נוצר בהצלחה');
+      }
+      // Refresh profile list
+      window.loadProfiles();
+      document.getElementById('newProfileName').value = '';
+    } else {
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה', result.error || 'שגיאה ביצירת פרופיל');
+      }
+    }
+  } catch (error) {
+    console.error('Error creating profile:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה ביצירת פרופיל');
+    }
+  }
+};
+
+window.loadProfiles = async function() {
+  try {
+    const response = await fetch('/api/v1/preferences/profiles');
+    const result = await response.json();
+    
+    if (result.success) {
+      const profileSelect = document.getElementById('profileSelect');
+      profileSelect.innerHTML = '';
+      
+      result.data.forEach(profile => {
+        const option = document.createElement('option');
+        option.value = profile.id;
+        option.textContent = profile.name;
+        if (profile.isDefault) {
+          option.textContent += ' (ברירת מחדל)';
+        }
+        profileSelect.appendChild(option);
+      });
+    }
+  } catch (error) {
+    console.error('Error loading profiles:', error);
+  }
+};
+
+window.loadProfile = async function() {
+  const profileId = document.getElementById('profileSelect').value;
+  if (!profileId) return;
+  
+  try {
+    // Load preferences for the selected profile
+    const response = await fetch(`/api/v1/preferences/user?profile_id=${profileId}`);
+    const result = await response.json();
+    
+    if (result.success) {
+      // Apply preferences to form
+      applyPreferencesToForm(result.data.preferences);
+      
+      if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification('הצלחה', 'פרופיל נטען בהצלחה');
+      }
+    }
+  } catch (error) {
+    console.error('Error loading profile:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה בטעינת פרופיל');
+    }
+  }
+};
+
+window.saveCurrentProfile = async function() {
+  const profileId = document.getElementById('profileSelect').value;
+  if (!profileId) return;
+  
+  try {
+    // Save current form data to the selected profile
+    await window.saveAllPreferences();
+    
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification('הצלחה', 'פרופיל נשמר בהצלחה');
+    }
+  } catch (error) {
+    console.error('Error saving profile:', error);
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', 'שגיאה בשמירת פרופיל');
+    }
+  }
+};
+
+window.duplicateProfile = function() {
+  if (typeof window.showInfoNotification === 'function') {
+    window.showInfoNotification('מידע', 'פונקציית שכפול פרופיל תיושם בקרוב');
+  }
+};
+
+window.exportProfile = function() {
+  if (typeof window.showInfoNotification === 'function') {
+    window.showInfoNotification('מידע', 'פונקציית ייצוא פרופיל תיושם בקרוב');
+  }
+};
+
+window.deleteProfile = function() {
+  if (typeof window.showInfoNotification === 'function') {
+    window.showInfoNotification('מידע', 'פונקציית מחיקת פרופיל תיושם בקרוב');
+  }
+};
+
 // Export functions to global scope
 window.validateCurrency = validateCurrency;
 window.autoSavePreference = autoSavePreference;
 window.loadPreferences = loadPreferences;
 window.loadPreferencesFromLocalStorage = loadPreferencesFromLocalStorage;
+window.applyPreferencesToForm = applyPreferencesToForm;
+window.getNestedValue = getNestedValue;
 window.setDefaults = setDefaults;
 window.setupAutoSave = setupAutoSave;
 window.initializePreferencesPage = initializePreferencesPage;

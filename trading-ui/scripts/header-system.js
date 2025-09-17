@@ -1072,12 +1072,7 @@ class HeaderSystem {
           const searchInput = document.getElementById('searchFilterInput');
           if (searchInput) {
             searchInput.value = '';
-            // הפעלת פילטר חיפוש ריק
-            if (window.filterSystem) {
-              window.filterSystem.applySearchFilter('');
-            } else {
-              window.applySearchFilter('');
-            }
+            applyFilter('search', '');
           }
           return;
         }
@@ -1088,12 +1083,7 @@ class HeaderSystem {
     document.addEventListener('input', e => {
       if (e.target.id === 'searchFilterInput') {
         const searchTerm = e.target.value;
-
-        if (window.filterSystem) {
-          window.filterSystem.applySearchFilter(searchTerm);
-        } else {
-          window.applySearchFilter(searchTerm);
-        }
+        applyFilter('search', searchTerm);
       }
     });
 

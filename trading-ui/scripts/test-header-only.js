@@ -12,23 +12,7 @@ console.log('🔧 test-header-only.js loaded successfully!');
 
 // ===== DEBUG FUNCTIONS =====
 
-/**
- * פונקציה לעדכון מידע דיבאג פילטרים
- */
-function updateFilterDebugInfo() {
-    // עדכון מידע דיבאג - קורא ישירות מה-DOM
-    const statusText = document.getElementById('selectedStatus');
-    const typeText = document.getElementById('selectedType');
-    const accountText = document.getElementById('selectedAccount');
-    const dateRangeText = document.getElementById('selectedDateRange');
-    const searchInput = document.getElementById('searchFilterInput');
-
-    // עדכון מידע דיבאג
-    document.getElementById('statusDebug').textContent = statusText ? statusText.textContent : 'כל הסטטוסים';
-    document.getElementById('typeDebug').textContent = typeText ? typeText.textContent : 'כל הסוגים';
-    document.getElementById('accountDebug').textContent = accountText ? accountText.textContent : 'כל החשבונות';
-    document.getElementById('dateDebug').textContent = dateRangeText ? dateRangeText.textContent : 'כל התאריכים';
-}
+// Debug functions moved to header-system.js
 
 /**
  * פונקציות בדיקה
@@ -54,33 +38,7 @@ function updateStatus(elementId, status, isSuccess = true) {
 /**
  * פונקציית debug למצב פילטרים
  */
-function updateDebugInfo() {
-    // עדכון מצב מערכות
-    if (typeof window.filterSystem !== 'undefined') {
-        updateStatus('filterSystemStatus', '✅ זמין');
-    } else {
-        updateStatus('filterSystemStatus', '❌ לא זמין', false);
-    }
-
-    // עדכון מצב אזור פילטרים
-    const filtersSection = document.getElementById('headerFilters');
-    if (filtersSection) {
-        const isVisible = filtersSection.style.display !== 'none';
-        updateStatus('filtersSectionStatus', isVisible ? '✅ פתוח' : '❌ סגור', isVisible);
-    }
-
-    // עדכון מצב פילטרים נוכחי
-    updateCurrentFilterStatus();
-
-    // עדכון טווח תאריכים
-    updateDateRangeInfo();
-
-    // עדכון סטטיסטיקות טבלאות
-    updateTableStats();
-
-    // עדכון מידע דיבאג פילטרים
-    updateFilterDebugInfo();
-}
+// updateDebugInfo function moved to header-system.js
 
 /**
  * פונקציה לעדכון מצב פילטרים נוכחי
@@ -256,7 +214,6 @@ function loadActionButtons() {
  */
 document.addEventListener('DOMContentLoaded', function() {
     log('עמוד בדיקת ראש הדף נטען');
-    updateDebugInfo();
     updateQuickStats();
     
     // טעינת כפתורי פעולות אחרי שהדף נטען
@@ -299,10 +256,8 @@ function toggleTickersSection() {
 // ===== EXPORTS =====
 
 // Export functions to global scope
-window.updateFilterDebugInfo = updateFilterDebugInfo;
 window.log = log;
 window.updateStatus = updateStatus;
-window.updateDebugInfo = updateDebugInfo;
 window.updateCurrentFilterStatus = updateCurrentFilterStatus;
 window.updateDateRangeInfo = updateDateRangeInfo;
 window.updateTableStats = updateTableStats;

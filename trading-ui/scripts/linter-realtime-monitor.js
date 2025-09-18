@@ -283,7 +283,189 @@ function loadLogs() {
         if (logsCount) {
             logsCount.textContent = allEntries.length;
         }
+
+        // Update file type statistics
+        updateFileTypeStatistics(scanningResults.errors.concat(scanningResults.warnings));
     }
+}
+
+// Get all log entries from the DOM
+function getAllLogEntries() {
+    const logContainer = document.getElementById('logsContainer');
+    if (!logContainer) return [];
+
+    const logEntries = [];
+    const logEntryElements = logContainer.querySelectorAll('.log-entry');
+
+    logEntryElements.forEach(entryEl => {
+        const timestampEl = entryEl.querySelector('.log-timestamp');
+        const levelEl = entryEl.querySelector('.log-level');
+        const messageEl = entryEl.querySelector('.log-message');
+
+        if (timestampEl && levelEl && messageEl) {
+            const timestamp = timestampEl.textContent.replace(/[[\]]/g, '');
+            const level = levelEl.textContent.toLowerCase().includes('error') ? 'ERROR' :
+                         levelEl.textContent.toLowerCase().includes('warning') ? 'WARNING' : 'INFO';
+            const message = messageEl.textContent.trim();
+
+            // Extract details from message (file:line format)
+            const fileMatch = message.match(/(\w+\.\w+):(\d+)/);
+            const file = fileMatch ? fileMatch[1] : '';
+            const line = fileMatch ? parseInt(fileMatch[2]) : 1;
+
+            logEntries.push({
+                timestamp: timestamp,
+                level: level,
+                message: message,
+                details: {
+                    file: file,
+                    line: line
+                }
+            });
+        }
+    });
+
+    return logEntries;
+}
+
+// Update file type statistics counters
+function updateFileTypeStatistics(issues) {
+    // Initialize counters
+    const stats = {
+        js: { files: new Set(), errors: 0, warnings: 0 },
+        html: { files: new Set(), errors: 0, warnings: 0 },
+        py: { files: new Set(), errors: 0, warnings: 0 },
+        css: { files: new Set(), errors: 0, warnings: 0 },
+        other: { files: new Set(), errors: 0, warnings: 0 }
+    };
+
+    // Process issues (errors and warnings)
+    issues.forEach(issue => {
+        if (issue.file) {
+            const fileName = issue.file;
+            const fileType = getFileType(fileName);
+
+            if (stats[fileType]) {
+                stats[fileType].files.add(fileName);
+
+                // Determine if it's an error or warning
+                if (issue.type === 'error' || issue.level === 'ERROR') {
+                    stats[fileType].errors++;
+                } else if (issue.type === 'warning' || issue.level === 'WARNING') {
+                    stats[fileType].warnings++;
+                }
+            }
+        }
+    });
+
+    // Update UI counters
+    Object.keys(stats).forEach(fileType => {
+        const fileCount = stats[fileType].files.size;
+        const errors = stats[fileType].errors;
+        const warnings = stats[fileType].warnings;
+
+        // Update counters in file type selection
+        const filesCountEl = document.getElementById(`${fileType}FilesCount`);
+        const errorsCountEl = document.getElementById(`${fileType}ErrorsCount`);
+        const warningsCountEl = document.getElementById(`${fileType}WarningsCount`);
+
+        if (filesCountEl) filesCountEl.textContent = fileCount;
+        if (errorsCountEl) errorsCountEl.textContent = errors;
+        if (warningsCountEl) warningsCountEl.textContent = warnings;
+    });
+
+    // Update problem files table
+    updateProblemFilesTable(stats);
+}
+
+// Get file type from filename
+function getFileType(fileName) {
+    if (fileName.endsWith('.js')) return 'js';
+    if (fileName.endsWith('.html')) return 'html';
+    if (fileName.endsWith('.py')) return 'py';
+    if (fileName.endsWith('.css')) return 'css';
+    return 'other';
+}
+
+// Update problem files table
+function updateProblemFilesTable(stats) {
+    const tableBody = document.getElementById('problemFilesTableBody');
+    if (!tableBody) return;
+
+    // Clear existing content
+    tableBody.innerHTML = '';
+
+    // Collect all files with issues from the original issues data
+    const problemFiles = [];
+    const fileIssues = {};
+
+    // Group issues by file
+    const allIssues = scanningResults.errors.concat(scanningResults.warnings);
+    allIssues.forEach(issue => {
+        if (issue.file) {
+            if (!fileIssues[issue.file]) {
+                fileIssues[issue.file] = {
+                    name: issue.file,
+                    type: getFileType(issue.file).toUpperCase(),
+                    errors: 0,
+                    warnings: 0,
+                    total: 0
+                };
+            }
+
+            if (issue.type === 'error' || issue.level === 'ERROR') {
+                fileIssues[issue.file].errors++;
+            } else {
+                fileIssues[issue.file].warnings++;
+            }
+            fileIssues[issue.file].total++;
+        }
+    });
+
+    // Convert to array and add severity
+    Object.values(fileIssues).forEach(file => {
+        if (file.total > 0) {
+            problemFiles.push({
+                ...file,
+                severity: file.errors > 0 ? 'גבוהה' : 'בינונית'
+            });
+        }
+    });
+
+    // Sort by total issues (most problematic first)
+    problemFiles.sort((a, b) => b.total - a.total);
+
+    if (problemFiles.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center text-success py-4">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <br>לא נמצאו קבצים בעייתיים - כל הכבוד!
+                </td>
+            </tr>
+                `;
+        return;
+    }
+
+    // Add rows to table
+    problemFiles.forEach(file => {
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+            <td><code>${file.name}</code></td>
+            <td><span class="badge bg-secondary">${file.type}</span></td>
+            <td><span class="badge bg-danger">${file.errors}</span></td>
+            <td><span class="badge bg-warning">${file.warnings}</span></td>
+            <td><strong>${file.total}</strong></td>
+            <td>
+                <span class="badge ${file.severity === 'גבוהה' ? 'bg-danger' : 'bg-warning'}">
+                    ${file.severity}
+                </span>
+            </td>
+        `;
+
+        tableBody.appendChild(row);
+    });
 }
 
 // File scanning functions
@@ -368,11 +550,42 @@ function scanJavaScriptFiles() {
         let allFiles = [];
         const discoveredFiles = window.projectFiles;
 
-        if (scanJs) {
-            allFiles = allFiles.concat(discoveredFiles.filter(f => f.endsWith('.js')));
-        }
+    if (scanJs) {
+        // Include JS files but exclude obvious backups
+        const jsFiles = discoveredFiles.filter(f =>
+            f.endsWith('.js') &&
+            !f.includes('backup') &&
+            !f.includes('.backup') &&
+            !f.includes('-backup')
+        );
+        allFiles = allFiles.concat(jsFiles);
+
+        // Also add static JS files for comprehensive scanning
+        const staticJsFiles = [
+            'main.js',
+            'preferences.js',
+            'ui-utils.js',
+            'entity-details-system.js',
+            'color-scheme-system.js',
+            'notification-system.js'
+        ];
+        allFiles = allFiles.concat(staticJsFiles);
+    }
         if (scanHtml) {
-            allFiles = allFiles.concat(discoveredFiles.filter(f => f.endsWith('.html')));
+            // Include HTML files but exclude obvious test and backup files
+            const htmlFiles = discoveredFiles.filter(f =>
+                f.endsWith('.html') &&
+                !f.includes('backup') &&
+                !f.includes('.backup') &&
+                !f.includes('-backup') &&
+                !f.includes('test-') &&
+                !f.includes('temp') &&
+                !f.includes('old') &&
+                !f.includes('example') &&
+                !f.includes('demo') &&
+                !f.includes('cascade')
+            );
+            allFiles = allFiles.concat(htmlFiles);
         }
         if (scanPy) {
             allFiles = allFiles.concat(discoveredFiles.filter(f => f.endsWith('.py')));
@@ -381,9 +594,22 @@ function scanJavaScriptFiles() {
             allFiles = allFiles.concat(discoveredFiles.filter(f => f.endsWith('.css')));
         }
         if (scanOther) {
+            // Filter out backup files, documentation, and other non-code files
             const otherFiles = discoveredFiles.filter(f =>
-                f.endsWith('.json') || f.endsWith('.md') || f.endsWith('.sql') ||
-                f.endsWith('.yml') || f.endsWith('.yaml')
+                (f.endsWith('.json') || f.endsWith('.md') || f.endsWith('.sql') ||
+                 f.endsWith('.yml') || f.endsWith('.yaml')) &&
+                !f.includes('backup') &&
+                !f.includes('documentation') &&
+                !f.includes('README') &&
+                !f.includes('package.json') &&
+                !f.startsWith('crud-testing-dashboard') &&
+                !f.startsWith('fix-all-css') &&
+                !f.startsWith('manual-crud-tester') &&
+                !f.startsWith('visual-diff-tool') &&
+                !f.startsWith('css-toggle') &&
+                !f.startsWith('create-crud-testing-dashboard') &&
+                !f.startsWith('remaining-styles') &&
+                !f.startsWith('_')
             );
             allFiles = allFiles.concat(otherFiles);
         }
@@ -505,25 +731,12 @@ function scanJavaScriptFiles() {
     }
 
     if (scanHtml) {
+        // Include more HTML files for comprehensive scanning
         const htmlFiles = [
-            'designs.html',
-            'test-header-yesterday.html',
-            'preferences.html',
             'index.html',
-            'constraints.html',
             'accounts.html',
             'linter-realtime-monitor.html',
-            'css-management.html',
-            'style_demonstration.html',
-            'preferences-management-temp.html',
-            'cache-test.html',
-            'background-tasks-old.html',
-            'notifications-center.html',
-            'research.html',
-            'simple-clean-menu.html',
-            'test-header-only-restored.html',
-            'crud-testing-dashboard-backup.html',
-            'preferences-backup.html',
+            'preferences.html',
             'db_display.html',
             'menu.html',
             'notes.html',
@@ -532,62 +745,43 @@ function scanJavaScriptFiles() {
             'trade_plans.html',
             'db_extradata.html',
             'server-monitor.html',
-            'preferences-new.html',
-            'system-management-fixed.html',
-            'preferences-temp-guide.html',
-            'test-header-clean.html',
-            'apple-style-menu-example.html',
-            'test-header-menus-pushed.html',
-            'system-management.html',
-            'background-tasks-fixed.html',
-            'color-scheme-examples.html',
             'cash_flows.html',
-            'dynamic-colors-display.html',
-            'background-tasks.html',
-            'test-header-only-new.html',
-            'preferences-temp.html',
             'alerts.html',
-            'page-scripts-matrix.html',
-            'js-map.html',
-            'test-header-old-system.html',
             'executions.html',
-            'test-header-only.html',
             'trades.html',
-            'crud-testing-dashboard.html'
+            'system-management.html',
+            'background-tasks.html',
+            'crud-testing-dashboard.html',
+            'css-management.html',
+            'constraints.html',
+            'research.html',
+            'simple-clean-menu.html',
+            'notifications-center.html'
         ];
         allFiles = allFiles.concat(htmlFiles);
     }
 
     if (scanPy) {
-        const pyFiles = [
-            'fix-all-css.py',
-            'manual-crud-tester.py',
-            'visual-diff-tool.py',
-            'css-toggle.py',
-            'create-crud-testing-dashboard.py'
-        ];
-        allFiles = allFiles.concat(pyFiles);
+        // Skip Python files that are not relevant for linting
+        console.log('⏭️ Skipping Python files - not accessible from web interface');
+        // const pyFiles = []; // Empty for now
     }
 
     if (scanCss) {
+        // Include accessible CSS files that actually exist
         const cssFiles = [
-            'remaining-styles.css',
-            'trading-ui/styles-new/04-elements/_forms-base.css',
-            'trading-ui/styles-new/04-elements/_links.css',
-            'trading-ui/styles-new/04-elements/_headings.css',
-            'trading-ui/styles-new/04-elements/_buttons-base.css'
+            'styles-new/header-styles.css',
+            'styles-new/style-demonstration-cascade.css',
+            'styles/header-styles.css',
+            'dist/main.css'
         ];
         allFiles = allFiles.concat(cssFiles);
     }
 
     if (scanOther) {
-        const otherFiles = [
-            'package.json',
-            'README.md',
-            'documentation/frontend/LINTER_REALTIME_MONITOR.md',
-            'documentation/frontend/NOTIFICATION_SYSTEM.md'
-        ];
-        allFiles = allFiles.concat(otherFiles);
+        // Skip documentation and config files that may not be accessible
+        console.log('⏭️ Skipping other files (documentation, config) - may not be accessible');
+        // const otherFiles = []; // Empty for now
     }
 
     scanningResults.totalFiles = allFiles.length;
@@ -628,8 +822,48 @@ function scanSingleFile(fileName) {
         filePath = `/${fileName}`;
     } else if (isJsFile || fileName.endsWith('.json') || fileName.endsWith('.md') || fileName.endsWith('.sql')) {
         filePath = isJsFile ? `/scripts/${fileName}` : `/${fileName}`;
-    } else {
+                } else {
         filePath = `/${fileName}`; // For Python files and others
+    }
+
+    // Skip files that are known not to be accessible or relevant
+    const skipFiles = [
+        'crud-testing-dashboard-backup.html',
+        'preferences-backup.html',
+        'fix-all-css.py',
+        'manual-crud-tester.py',
+        'visual-diff-tool.py',
+        'css-toggle.py',
+        'create-crud-testing-dashboard.py',
+        'remaining-styles.css',
+        '_forms-base.css',
+        '_links.css',
+        '_headings.css',
+        '_buttons-base.css',
+        'package.json',
+        'README.md',
+        'LINTER_REALTIME_MONITOR.md',
+        'NOTIFICATION_SYSTEM.md',
+        // Skip specific CSS files that are not web-accessible
+        'unified.css',
+        'styles-new/unified.css',
+        // Skip all files in subdirectories that are not web-accessible
+        'styles-new/01-settings/',
+        'styles-new/02-tools/',
+        'styles-new/03-generic/',
+        'styles-new/04-elements/',
+        'styles-new/05-objects/',
+        'styles-new/06-components/',
+        'styles-new/07-trumps/',
+        'styles/backup-20250912/',
+        'backups/',
+        'styles-backup'
+    ];
+
+    if (skipFiles.some(skipFile => fileName.includes(skipFile))) {
+        console.log(`⏭️ Skipping file: ${fileName} (known non-accessible)`);
+        scanningResults.scannedFiles++;
+        return;
     }
 
     // Try to get actual file content
@@ -653,9 +887,14 @@ function scanSingleFile(fileName) {
                 analyzeOtherContent(fileName, content);
             }
         })
-        .catch(() => {
-            // Fallback to simulated analysis
-            simulateFileAnalysis(fileName);
+        .catch(error => {
+            // For 404 errors, just skip without warning
+            if (error.message.includes('404') || error.message.includes('NOT FOUND')) {
+                console.log(`📁 File not found: ${fileName} - skipping`);
+            } else {
+                // For other errors, use fallback
+                simulateFileAnalysis(fileName);
+            }
         });
 }
 
@@ -1254,7 +1493,7 @@ window.copyUnresolvedIssuesLog = () => {
     const unresolvedWarnings = scanningResults.warnings || [];
 
     if (unresolvedErrors.length === 0 && unresolvedWarnings.length === 0) {
-        if (typeof window.showInfoNotification === 'function') {
+    if (typeof window.showInfoNotification === 'function') {
             window.showInfoNotification('אין בעיות', 'לא נמצאו בעיות לא פתורות');
         }
         return;
@@ -1561,6 +1800,9 @@ async function finishScan() {
     if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('סריקה הושלמה', `נסרקו ${scanningResults.totalFiles} קבצים, נמצאו ${scanningResults.errors.length} שגיאות ו-${scanningResults.warnings.length} אזהרות`);
     }
+
+    // Update file type statistics after scan completion
+    updateFileTypeStatistics(scanningResults.errors.concat(scanningResults.warnings));
 
     // ===== INTEGRATION WITH DATA COLLECTOR =====
     // Collect scan data and save to IndexedDB

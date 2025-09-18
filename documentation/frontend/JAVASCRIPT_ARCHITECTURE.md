@@ -4,6 +4,397 @@
 
 This document describes the comprehensive JavaScript architecture implemented in TikTrack, featuring a modular system with 40+ organized script files and clear separation of concerns.
 
+## 🗂️ Global Functions Index
+
+### 📊 Core System Functions (`main.js`)
+| Function | Description |
+|----------|-------------|
+| `window.initializeApplication()` | Initialize the entire application |
+| `window.checkDependencies()` | Check if all required modules are available |
+| `window.initializeCoreSystems()` | Initialize header and notification systems |
+| `window.initializeCurrentPage()` | Initialize current page functionality |
+| `window.initializeDynamicColorScheme()` | Initialize dynamic color scheme system |
+| `window.isModuleAvailable(moduleName, functionName)` | Check if a module/function is available |
+| `window.getSystemInfo()` | Get system information and status |
+| `window.closeModalGlobal(modalId)` | Close modal globally |
+| `window.filterDataByFilters(data, pageName)` | Filter data by page-specific filters |
+| `window.updateSortIcons(tableType, activeColumnIndex, direction)` | Update sort icons in tables |
+| `window.restoreAllSectionStates()` | Restore all section states from localStorage |
+
+### 🎨 UI Utilities (`ui-utils.js`)
+| Function | Description |
+|----------|-------------|
+| `window.showModal(modalId)` | Show modal dialog |
+| `window.calculateStopPrice(entryPrice, percentage)` | Calculate stop loss price |
+| `window.calculateTargetPrice(entryPrice, percentage)` | Calculate target price |
+| `window.calculatePercentageFromPrice(entryPrice, targetPrice)` | Calculate percentage from prices |
+| `window.updatePricesFromPercentages()` | Update prices based on percentages |
+| `window.updatePercentagesFromPrices()` | Update percentages based on prices |
+| `window.formatPercentage(value)` | Format percentage display |
+| `window.formatPrice(value)` | Format price display |
+| `window.cancelItem(itemId, itemType)` | Cancel an item (ticker, trade, etc.) |
+| `window.performItemCancellation(itemId, itemType)` | Perform item cancellation |
+| `window.toggleTopSection()` | Toggle top page sections |
+| `window.toggleMainSection()` | Toggle main page sections |
+| `window.toggleSection(sectionId)` | Toggle specific section |
+| `window.toggleAllSections()` | Toggle all sections at once |
+| `window.restoreSectionStates()` | Restore section states |
+| `window.enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction, operationName, delay)` | Enhanced table refresh with DOM reflow |
+| `window.handleApiResponseWithRefresh(response, options)` | Handle API responses with automatic table refresh |
+| `window.getPageDataFunctions(pageName)` | Get page-specific data functions |
+| `window.autoRefreshCurrentPage(operationName)` | Auto-refresh current page |
+| `window.showSecondConfirmationModal(itemId, itemType, action)` | Show second confirmation modal |
+| `window.generateActionButtons(item, tableType)` | Generate action buttons for table items |
+| `window.loadTableActionButtons()` | Load action buttons for tables |
+| `window.viewTickerDetails(tickerId)` | View ticker details |
+| `window.viewLinkedItems(itemId, itemType)` | View linked items |
+| `window.editTicker(tickerId)` | Edit ticker |
+| `window.cancelTicker(tickerId)` | Cancel ticker |
+| `window.restoreTicker(tickerId)` | Restore ticker |
+| `window.deleteTicker(tickerId)` | Delete ticker |
+| `window.loadSectionStates()` | Load section states from localStorage |
+
+### 📊 Data Utilities (`data-utils.js`)
+| Function | Description |
+|----------|-------------|
+| `window.isNumeric(value)` | Check if value is numeric |
+| `window.loadCurrenciesFromServer()` | Load currencies from server |
+| `window.getCurrencyDisplay(currencyId)` | Get currency display name |
+| `window.generateCurrencyOptions(selectedId)` | Generate currency options for selects |
+| `window.apiCall(url, options)` | Make API calls with error handling |
+| `window.calculateDefaultPrices(entryPrice, stopLossPercent, targetPercent)` | Calculate default prices |
+| `window.convertAmountToShares(amount, price)` | Convert amount to shares |
+| `window.convertSharesToAmount(shares, price)` | Convert shares to amount |
+| `window.getUserPreference(preferenceName)` | Get user preference |
+| `window.loadDataFromAPI(endpoint, options)` | Load data from API |
+| `window.validateDataStructure(data, type)` | Validate data structure |
+| `window.filterDataBySearch(data, searchTerm)` | Filter data by search term |
+| `window.validateRequired(value, fieldName)` | Validate required field |
+| `window.validateNumber(value, fieldName, min, max)` | Validate number field |
+| `window.validateDate(value, fieldName)` | Validate date field |
+
+### ✅ Validation Utilities (`validation-utils.js`)
+| Function | Description |
+|----------|-------------|
+| `window.isValidDate(dateString)` | Validate date string |
+| `window.isValidEmail(email)` | Validate email address |
+| `window.isValidPhone(phone)` | Validate phone number |
+| `window.showFieldError(fieldId, message)` | Show field error message |
+| `window.showFieldSuccess(fieldId, message)` | Show field success message |
+| `window.clearFieldError(fieldId)` | Clear field error |
+| `window.clearFieldValidation(fieldId)` | Clear field validation |
+| `window.clearValidationErrors()` | Clear all validation errors |
+| `window.validateForm(formId, rules)` | Validate entire form |
+| `window.validateField(fieldId, rules)` | Validate single field |
+| `window.validateTextField(fieldId, rules)` | Validate text field |
+| `window.validateNumberField(fieldId, rules)` | Validate number field |
+| `window.validateEmailField(fieldId, rules)` | Validate email field |
+| `window.validateDateField(fieldId, rules)` | Validate date field |
+| `window.validateSelectField(fieldId, rules)` | Validate select field |
+| `window.setupFieldValidation(fieldId, rules)` | Setup field validation |
+| `window.validateCurrencySymbol(value)` | Validate currency symbol |
+| `window.validateCurrencyRate(value)` | Validate currency rate |
+| `window.validateTickerSymbol(value)` | Validate ticker symbol |
+| `window.initializeValidation()` | Initialize validation system |
+| `window.clearValidation()` | Clear validation system |
+
+### 🔔 Notification System (`notification-system.js`)
+| Function | Description |
+|----------|-------------|
+| `window.createAlert(alertData)` | Create new alert |
+| `window.updateAlert(alertId, alertData)` | Update existing alert |
+| `window.markAlertAsTriggered(alertId)` | Mark alert as triggered |
+| `window.markAlertAsRead(alertId)` | Mark alert as read |
+| `window.showNotification(message, type, title)` | Show notification |
+| `window.showSuccessNotification(title, message)` | Show success notification |
+| `window.showErrorNotification(title, message)` | Show error notification |
+| `window.showWarningNotification(title, message)` | Show warning notification |
+| `window.showInfoNotification(title, message)` | Show info notification |
+| `window.loadLinkedItemsData(itemId, itemType)` | Load linked items data |
+
+### 📋 Table System (`tables.js`)
+| Function | Description |
+|----------|-------------|
+| `window.sortTableData(columnIndex, data, tableType, updateFunction)` | Sort table data |
+| `window.saveSortState(tableType, columnIndex, direction)` | Save sort state |
+| `window.getSortState(tableType)` | Get sort state |
+| `window.setSortState(tableType, columnIndex, direction)` | Set sort state |
+| `window.sortAnyTable(tableType, columnIndex, data, updateFunction)` | Sort any table |
+| `window.sortTable(tableType, columnIndex, dataArray, updateFunction)` | Legacy sort table |
+| `window.restoreAnyTableSort(tableType, data, updateFunction)` | Restore table sort |
+| `window.applyDefaultSort(tableType, data, updateFunction)` | Apply default sort |
+| `window.closeModal(modalId)` | Close modal |
+| `window.getDefaultColumnDefs(tableType)` | Get default column definitions |
+
+### ⚙️ Preferences System (`preferences.js`)
+| Function | Description |
+|----------|-------------|
+| `window.getPreference(preferenceName)` | Get single preference |
+| `window.getGroupPreferences(groupName)` | Get group preferences |
+| `window.getPreferencesByNames(preferenceNames)` | Get multiple preferences |
+| `window.getAllUserPreferences()` | Get all user preferences |
+| `window.savePreference(preferenceName, value)` | Save single preference |
+| `window.savePreferences(preferences)` | Save multiple preferences |
+| `window.getUserProfiles()` | Get user profiles |
+| `window.checkPreferencesServiceHealth()` | Check preferences service health |
+| `window.getPreferenceInfo(preferenceName)` | Get preference information |
+| `window.loadPreferences()` | Load all preferences |
+| `window.saveAllPreferences()` | Save all preferences |
+| `window.resetToDefaults()` | Reset preferences to defaults |
+| `window.initializePreferences()` | Initialize preferences system |
+
+### 🎯 Preferences Page (`preferences-page.js`)
+| Function | Description |
+|----------|-------------|
+| `window.loadAccountsForPreferences()` | Load accounts for preferences page |
+| `window.loadColorsForPreferences()` | Load colors for preferences page |
+| `window.validateCurrency(selectElement)` | Validate currency selection |
+| `window.initializePreferencesPage()` | Initialize preferences page |
+
+### 📊 Entity Service Functions
+
+#### Accounts (`accounts.js`)
+| Function | Description |
+|----------|-------------|
+| `window.loadAccountsFromServer()` | Load accounts from server |
+| `window.loadAllAccountsFromServer()` | Load all accounts from server |
+| `window.loadDefaultAccounts()` | Load default accounts |
+| `window.loadAccountsData()` | Load accounts data |
+| `window.updateAccountsTable(accounts)` | Update accounts table |
+| `window.loadAccounts()` | Load accounts |
+| `window.loadAccountsDataFromAPI()` | Load accounts data from API |
+| `window.addAccountToAPI(accountData)` | Add account to API |
+| `window.updateAccountInAPI(accountId, accountData)` | Update account in API |
+| `window.deleteAccountFromAPI(accountId)` | Delete account from API |
+| `window.checkLinkedItemsBeforeDelete(accountId)` | Check linked items before delete |
+| `window.loadAccountsDataForAccountsPage()` | Load accounts data for accounts page |
+
+#### Tickers (`tickers.js`)
+| Function | Description |
+|----------|-------------|
+| `window.loadTickersData()` | Load tickers data |
+| `window.updateTickersTable(tickers)` | Update tickers table |
+| `window.loadTickers()` | Load tickers |
+| `window.loadCurrenciesData()` | Load currencies data |
+| `window.getCurrencySymbol(currencyId)` | Get currency symbol |
+| `window.getTickerTypeStyle(type)` | Get ticker type style |
+| `window.getTickerStatusStyle(status)` | Get ticker status style |
+| `window.getTickerStatusLabel(status)` | Get ticker status label |
+| `window.generateTickerCurrencyOptions(ticker)` | Generate ticker currency options |
+| `window.updateCurrencyOptions(ticker)` | Update currency options |
+| `window.deleteTickerFromAPI(tickerId)` | Delete ticker from API |
+| `window.addTickerToAPI(tickerData)` | Add ticker to API |
+| `window.updateTickerInAPI(tickerId, tickerData)` | Update ticker in API |
+| `window.restoreTickerFromAPI(tickerId)` | Restore ticker from API |
+| `window.cancelTickerFromAPI(tickerId)` | Cancel ticker from API |
+| `window.updateTickersSummaryStats()` | Update tickers summary stats |
+
+#### Trades (`trades.js`)
+| Function | Description |
+|----------|-------------|
+| `window.loadTradesData()` | Load trades data |
+| `window.updateTradesTable(trades)` | Update trades table |
+| `window.loadTrades()` | Load trades |
+| `window.addTradeToAPI(tradeData)` | Add trade to API |
+| `window.updateTradeInAPI(tradeId, tradeData)` | Update trade in API |
+| `window.deleteTradeFromAPI(tradeId)` | Delete trade from API |
+| `window.restoreTradeFromAPI(tradeId)` | Restore trade from API |
+| `window.cancelTradeFromAPI(tradeId)` | Cancel trade from API |
+
+#### Trade Plans (`trade_plans.js`)
+| Function | Description |
+|----------|-------------|
+| `window.loadTradePlansData()` | Load trade plans data |
+| `window.updateTradePlansTable(tradePlans)` | Update trade plans table |
+| `window.loadTradePlans()` | Load trade plans |
+| `window.addTradePlanToAPI(tradePlanData)` | Add trade plan to API |
+| `window.updateTradePlanInAPI(tradePlanId, tradePlanData)` | Update trade plan in API |
+| `window.deleteTradePlanFromAPI(tradePlanId)` | Delete trade plan from API |
+| `window.restoreTradePlanFromAPI(tradePlanId)` | Restore trade plan from API |
+| `window.cancelTradePlanFromAPI(tradePlanId)` | Cancel trade plan from API |
+
+#### Executions (`executions.js`)
+| Function | Description |
+|----------|-------------|
+| `window.loadExecutionsData()` | Load executions data |
+| `window.updateExecutionsTable(executions)` | Update executions table |
+| `window.loadExecutions()` | Load executions |
+| `window.addExecutionToAPI(executionData)` | Add execution to API |
+| `window.updateExecutionInAPI(executionId, executionData)` | Update execution in API |
+| `window.deleteExecutionFromAPI(executionId)` | Delete execution from API |
+| `window.validateExecutionTradeId(input)` | Validate execution trade ID |
+| `window.validateExecutionQuantity(input)` | Validate execution quantity |
+| `window.validateExecutionPrice(input)` | Validate execution price |
+| `window.validateExecutionCommission(input)` | Validate execution commission |
+| `window.validateExecutionType(input)` | Validate execution type |
+| `window.validateExecutionSource(input)` | Validate execution source |
+| `window.validateExecutionNotes(input)` | Validate execution notes |
+| `window.validateExecutionExternalId(input)` | Validate execution external ID |
+| `window.validateExecutionDate(input)` | Validate execution date |
+
+#### Alerts (`alerts.js`)
+| Function | Description |
+|----------|-------------|
+| `window.loadAlertsData()` | Load alerts data |
+| `window.updateAlertsTable(alerts)` | Update alerts table |
+| `window.loadAlerts()` | Load alerts |
+| `window.addAlertToAPI(alertData)` | Add alert to API |
+| `window.updateAlertInAPI(alertId, alertData)` | Update alert in API |
+| `window.deleteAlertFromAPI(alertId)` | Delete alert from API |
+| `window.restoreAlertFromAPI(alertId)` | Restore alert from API |
+| `window.cancelAlertFromAPI(alertId)` | Cancel alert from API |
+| `window.validateAlertStatusCombination(status, isTriggered)` | Validate alert status combination |
+
+#### Cash Flows (`cash_flows.js`)
+| Function | Description |
+|----------|-------------|
+| `window.loadCashFlowsData()` | Load cash flows data |
+| `window.updateCashFlowsTable(cashFlows)` | Update cash flows table |
+| `window.loadCashFlows()` | Load cash flows |
+| `window.addCashFlowToAPI(cashFlowData)` | Add cash flow to API |
+| `window.updateCashFlowInAPI(cashFlowId, cashFlowData)` | Update cash flow in API |
+| `window.deleteCashFlowFromAPI(cashFlowId)` | Delete cash flow from API |
+| `window.restoreCashFlowFromAPI(cashFlowId)` | Restore cash flow from API |
+| `window.cancelCashFlowFromAPI(cashFlowId)` | Cancel cash flow from API |
+
+#### Notes (`notes.js`)
+| Function | Description |
+|----------|-------------|
+| `window.loadNotesData()` | Load notes data |
+| `window.updateNotesTable(notes)` | Update notes table |
+| `window.loadNotes()` | Load notes |
+| `window.addNoteToAPI(noteData)` | Add note to API |
+| `window.updateNoteInAPI(noteId, noteData)` | Update note in API |
+| `window.deleteNoteFromAPI(noteId)` | Delete note from API |
+| `window.restoreNoteFromAPI(noteId)` | Restore note from API |
+| `window.cancelNoteFromAPI(noteId)` | Cancel note from API |
+
+### 🔧 System Functions
+
+#### Filter System (`filter-system.js`)
+| Function | Description |
+|----------|-------------|
+| `window.resetFiltersManually()` | Reset filters manually |
+| `window.clearAllFilters()` | Clear all filters |
+| `window.loadAccountsForFilter()` | Load accounts for filter |
+| `window.updateAccountFilterOptions()` | Update account filter options |
+| `window.useAccountFilterFallback()` | Use account filter fallback |
+| `window.getAccountIdByName(accountName)` | Get account ID by name |
+
+#### Header System (`header-system.js`)
+| Function | Description |
+|----------|-------------|
+| `window.HeaderSystem` | Header system class |
+| `window.resetFiltersManually()` | Reset filters manually |
+| `window.clearAllFilters()` | Clear all filters |
+| `window.loadAccountsForFilter()` | Load accounts for filter |
+| `window.updateAccountFilterOptions()` | Update account filter options |
+| `window.useAccountFilterFallback()` | Use account filter fallback |
+| `window.getAccountIdByName(accountName)` | Get account ID by name |
+
+#### Menu System (`menu.js`)
+| Function | Description |
+|----------|-------------|
+| `window.resetFiltersManually()` | Reset filters manually |
+| `window.clearFiltersManually()` | Clear filters manually |
+| `window.loadAccountsForFilter()` | Load accounts for filter |
+| `window.updateAccountFilterOptions()` | Update account filter options |
+| `window.useAccountFilterFallback()` | Use account filter fallback |
+| `window.getAccountIdByName(accountName)` | Get account ID by name |
+
+### 🛠️ Utility Functions
+
+#### Translation (`translation-utils.js`)
+| Function | Description |
+|----------|-------------|
+| `window.translateField(value, fieldName)` | Translate field value |
+| `window.translateStatus(status)` | Translate status |
+| `window.translateType(type)` | Translate type |
+| `window.formatCurrency(amount)` | Format currency |
+| `window.formatNumber(number)` | Format number |
+| `window.formatDate(date)` | Format date |
+| `window.formatTime(time)` | Format time |
+
+#### Date Utilities (`date-utils.js`)
+| Function | Description |
+|----------|-------------|
+| `window.formatDate(date)` | Format date |
+| `window.formatDateTime(dateTime)` | Format date and time |
+| `window.parseDate(dateString)` | Parse date string |
+| `window.isValidDate(date)` | Check if date is valid |
+| `window.addDays(date, days)` | Add days to date |
+| `window.subtractDays(date, days)` | Subtract days from date |
+| `window.getDateRange(startDate, endDate)` | Get date range |
+
+#### Page Utilities (`page-utils.js`)
+| Function | Description |
+|----------|-------------|
+| `window.getCurrentPageName()` | Get current page name |
+| `window.getPageTitle()` | Get page title |
+| `window.getPageType()` | Get page type |
+| `window.isPageLoaded()` | Check if page is loaded |
+| `window.getPageData()` | Get page data |
+
+#### Linked Items (`linked-items.js`)
+| Function | Description |
+|----------|-------------|
+| `window.showLinkedItemsModal(itemId, itemType)` | Show linked items modal |
+| `window.loadLinkedItemsData(itemId, itemType)` | Load linked items data |
+| `window.updateLinkedItemsDisplay(itemId, itemType)` | Update linked items display |
+| `window.getLinkedItemsCount(itemId, itemType)` | Get linked items count |
+
+#### Warning System (`warning-system.js`)
+| Function | Description |
+|----------|-------------|
+| `window.showWarningModal(title, message, callback)` | Show warning modal |
+| `window.showConfirmationModal(title, message, callback)` | Show confirmation modal |
+| `window.showInfoModal(title, message)` | Show info modal |
+| `window.showErrorModal(title, message)` | Show error modal |
+
+#### CRUD Utilities (`crud-utils.js`)
+| Function | Description |
+|----------|-------------|
+| `window.createItem(itemType, itemData)` | Create new item |
+| `window.updateItem(itemType, itemId, itemData)` | Update item |
+| `window.deleteItem(itemType, itemId)` | Delete item |
+| `window.restoreItem(itemType, itemId)` | Restore item |
+| `window.cancelItem(itemType, itemId)` | Cancel item |
+| `window.validateItemData(itemType, itemData)` | Validate item data |
+
+### 📊 Monitoring & Development
+
+#### Linter Monitor (`linter-realtime-monitor.js`)
+| Function | Description |
+|----------|-------------|
+| `window.copyUnresolvedIssuesLog()` | Copy unresolved issues log |
+| `window.discoverProjectFiles()` | Discover project files |
+| `window.startMonitoring()` | Start monitoring |
+| `window.stopMonitoring()` | Stop monitoring |
+| `window.copyDetailedLog()` | Copy detailed log |
+| `window.startFileScan()` | Start file scan |
+| `window.fixAllIssues()` | Fix all issues |
+| `window.fixAllErrors()` | Fix all errors |
+| `window.fixAllWarnings()` | Fix all warnings |
+| `window.ignoreAllIssues()` | Ignore all issues |
+| `window.resetFixedIssues()` | Reset fixed issues |
+| `window.toggleAutoRefresh()` | Toggle auto refresh |
+| `window.toggleSection(id)` | Toggle section |
+| `window.toggleAllSections()` | Toggle all sections |
+| `window.refreshChartData()` | Refresh chart data |
+| `window.clearChartHistory()` | Clear chart history |
+| `window.exportChartData()` | Export chart data |
+| `window.applyChartSettings()` | Apply chart settings |
+| `window.addLogEntry(entry)` | Add log entry |
+| `window.initializeSession()` | Initialize session |
+| `window.getSelectedFileTypes()` | Get selected file types |
+| `window.calculateTotalSize()` | Calculate total size |
+
+---
+
+**Total Global Functions: 200+**  
+**Last Updated: September 18, 2025**  
+**Maintained By: TikTrack Development Team**
+
 ## 🚨 **עדכון דחוף - 4 בספטמבר 2025**
 **בעיה קריטית זוהתה במערכת הנתונים החיצוניים** - הנתונים נאספים מ-Yahoo Finance API אבל לא נשמרים בבסיס הנתונים. המערכת 90% מושלמת עם בעיה אחת קריטית שצריכה פתרון.
 

@@ -4,12 +4,12 @@
    ======================================================== */
 
 /* ===== ULTRA-NARROW MATRIX TABLE ===== */
-/* Minimal width columns for technical table */
+/* Override ITCSS table padding that prevents narrow columns */
 #page-scripts-matrix-table th {
+    padding: 0 !important; /* ZERO padding to allow ultra-narrow columns */
     min-width: 25px;
     max-width: 35px;
     width: 30px;
-    padding: 2px 1px;
     font-size: 0.6rem;
     /* 90-degree rotation for ultra-compact headers */
     transform: rotate(-90deg);
@@ -19,10 +19,10 @@
 }
 
 #page-scripts-matrix-table td {
+    padding: 0 !important; /* ZERO padding for ultra-narrow cells */
     min-width: 25px;
     max-width: 35px;
     width: 30px;
-    padding: 2px 1px;
     font-size: 0.6rem;
     text-align: center;
 }
@@ -177,11 +177,11 @@
 @media (max-width: 768px) {
     #page-scripts-matrix-table th,
     #page-scripts-matrix-table td {
+        padding: 0 !important; /* Keep zero padding on mobile too */
         min-width: 20px;
         max-width: 25px;
         width: 22px;
         font-size: 0.55rem;
-        padding: 1px;
     }
 
     #page-scripts-matrix-table th:first-child,

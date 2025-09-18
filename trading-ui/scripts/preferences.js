@@ -418,10 +418,7 @@ window.loadPreferences = async function() {
             window.applyPreferencesToForm(preferences);
         }
         
-        // Show success notification
-        if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification('נטען', 'ההעדפות נטענו בהצלחה מהמערכת החדשה');
-        }
+        // Preferences loaded successfully
         
         return true;
     } catch (error) {
@@ -449,10 +446,7 @@ window.saveAllPreferences = async function() {
             const formData = window.collectFormData();
             await window.savePreferences(formData);
             
-            // Show success notification
-            if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('נשמר', 'ההעדפות נשמרו בהצלחה במערכת החדשה');
-            }
+            // Preferences saved successfully
             
             return true;
         } else {
@@ -498,6 +492,71 @@ window.initializePreferences = async function() {
     }
 };
 
+// ===== RESET TO DEFAULTS =====
+
+/**
+ * איפוס כל ההעדפות לברירות מחדל
+ * Reset all preferences to default values
+ * 
+ * @returns {Promise<boolean>} - האם האיפוס הצליח
+ */
+window.resetToDefaults = async function() {
+    try {
+        console.log('🔄 Resetting all preferences to defaults...');
+        
+        // קבלת כל ההעדפות הנוכחיות
+        const currentPreferences = await window.getAllUserPreferences();
+        if (!currentPreferences.success) {
+            throw new Error('Failed to get current preferences');
+        }
+        
+        // קבלת ברירות מחדל מהמערכת
+        const response = await fetch('/api/v1/preferences/admin/types');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        const preferenceTypes = data.data.preference_types || [];
+        
+        // יצירת אובייקט עם ברירות מחדל
+        const defaultPreferences = {};
+        preferenceTypes.forEach(pref => {
+            if (pref.default_value !== null) {
+                defaultPreferences[pref.preference_name] = pref.default_value;
+            }
+        });
+        
+        // שמירת ברירות המחדל
+        const saveResult = await window.savePreferences(defaultPreferences);
+        if (saveResult.success) {
+            console.log('✅ All preferences reset to defaults successfully');
+            
+            // Page will reload to show changes
+            
+            // רענון הדף
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+            
+            return true;
+        } else {
+            throw new Error('Failed to save default preferences');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error resetting preferences to defaults:', error);
+        
+        if (typeof showNotification === 'function') {
+            showNotification('שגיאה באיפוס ההעדפות: ' + error.message, 'error');
+        } else {
+            alert('שגיאה באיפוס ההעדפות: ' + error.message);
+        }
+        
+        return false;
+    }
+};
+
 // ===== AUTO-INITIALIZATION =====
 
 // אתחול אוטומטי כשהדף נטען
@@ -531,6 +590,7 @@ if (typeof module !== 'undefined' && module.exports) {
         getPreferenceInfo: window.getPreferenceInfo,
         loadPreferences: window.loadPreferences,
         saveAllPreferences: window.saveAllPreferences,
+        resetToDefaults: window.resetToDefaults,
         initializePreferences: window.initializePreferences
     };
 }

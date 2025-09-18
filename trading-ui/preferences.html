@@ -52,54 +52,94 @@
                 <div class="page-header-section">
                     <h1 class="page-title">העדפות - TikTrack</h1>
                     <p class="page-subtitle text-muted">ניהול העדפות מערכת ואפליקציה</p>
-                </div>
-
+      </div>
+      
                 <!-- 🔓 TEMPLATE ZONE 4 - Page Content (MODIFY ONLY CONTENT INSIDE) -->
                 <!-- ======================================================== -->
                 <!-- ===== CONTENT SECTIONS START (EDITABLE) ===== -->
                 
-                <!-- Action Buttons Section -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="d-flex justify-content-end gap-2">
-                            <button class="btn btn-success" onclick="window.saveAllPreferences()" id="saveAllBtn">
-                                <i class="bi bi-save"></i> שמור הכל
+                <!-- UI Content Section Top Start-->
+                <div class="top-section">
+                    <div class="section-header">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h2><i class="bi bi-info-circle"></i> מידע כללי על ההעדפות</h2>
+        </div>
+                            <div class="col-md-4">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button class="btn btn-success" onclick="window.saveAllPreferences()" id="saveAllBtn">
+                                        <i class="bi bi-save"></i> שמור הכל
           </button>
-                            <button class="btn btn-warning" onclick="window.resetToDefaults()" id="resetBtn">
-                                <i class="bi bi-arrow-clockwise"></i> איפוס
-            </button>
-                            <button class="btn btn-outline-secondary" onclick="window.toggleAllSections()" id="toggleAllBtn">
-                                <i class="bi bi-arrows-expand"></i> פתח/סגור הכל
-            </button>
+                                    <button class="btn btn-warning" onclick="window.resetToDefaults()" id="resetBtn">
+                                        <i class="bi bi-arrow-clockwise"></i> איפוס
+          </button>
+                                    <button class="btn btn-outline-secondary" onclick="window.toggleAllSections()" id="toggleAllBtn">
+                                        <i class="bi bi-arrows-expand"></i> פתח/סגור הכל
+          </button>
+        </div>
+      </div>
+          </div>
+          </div>
+                    <div class="section-body" id="infoSummary">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <strong>פרופיל פעיל:</strong>
+                                    <span id="activeProfileInfo">ברירת מחדל</span>
+        </div>
+                                <div class="info-item">
+                                    <strong>מספר העדפות:</strong>
+                                    <span id="preferencesCount">טוען...</span>
+      </div>
+                                <div class="info-item">
+                                    <strong>סטטוס מערכת:</strong>
+                                    <span id="systemStatus" class="text-success">פעיל</span>
+          </div>
+        </div>
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <strong>עדכון אחרון:</strong>
+                                    <span id="lastUpdate">טוען...</span>
+      </div>
+                                <div class="info-item">
+                                    <strong>גרסת מערכת:</strong>
+                                    <span id="systemVersion">3.0</span>
+        </div>
+                                <div class="info-item">
+                                    <strong>מטבע ראשי:</strong>
+                                    <span id="primaryCurrencyInfo">USD</span>
+        </div>
         </div>
         </div>
       </div>
+                </div>
+                <!-- UI Content Section Top End -->
       
-                <!-- Section 1: Profile Management -->
-                <div class="content-section" id="section1">
-                    <div class="section-header">
+                <!-- UI Content Section 1 Start-->
+      <div class="content-section" id="section1">
+        <div class="section-header">
                         <h2>👤 ניהול פרופילים</h2>
                         <button class="filter-toggle-btn" onclick="window.toggleSection('section1')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
+            <span class="section-toggle-icon">▼</span>
           </button>
         </div>
-                    <div class="section-body">
+        <div class="section-body">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">פרופיל נוכחי</label>
                                     <select id="profileSelect" class="form-select">
                                         <option>ברירת מחדל</option>
-                                    </select>
-        </div>
-        </div>
+                    </select>
+                  </div>
+                  </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">שם פרופיל חדש</label>
                                     <input type="text" id="newProfileName" class="form-control" placeholder="הכנס שם פרופיל">
-      </div>
-          </div>
-          </div>
+                </div>
+              </div>
+            </div>
                         <div class="row">
                             <div class="col-12">
                                 <div class="profile-buttons d-flex flex-wrap gap-2">
@@ -121,21 +161,22 @@
                                     <button class="btn btn-danger" onclick="window.deleteProfile()">
                                         <i class="bi bi-trash"></i> מחק
           </button>
-        </div>
-      </div>
-        </div>
-        </div>
-      </div>
-      
-                <!-- Section 2: Basic Settings -->
+              </div>
+                  </div>
+                  </div>
+                </div>
+              </div>
+                <!-- UI Content Section 1 End -->
+            
+                <!-- UI Content Section 2 Start-->
                 <div class="content-section" id="section2">
-        <div class="section-header">
+                    <div class="section-header">
                         <h2>🏦 הגדרות בסיסיות</h2>
                         <button class="filter-toggle-btn" onclick="window.toggleSection('section2')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
-          </button>
-        </div>
-        <div class="section-body">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+              </div>
+                    <div class="section-body">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -147,7 +188,7 @@
                                         <option>ILS - שקל חדש</option>
                     </select>
                                     <small class="text-muted">כרגע נתמך רק דולר ארה"ב</small>
-                  </div>
+                    </div>
                                 <div class="mb-3">
                                     <label class="form-label">מטבע משני <span class="text-muted">(עתידי)</span></label>
                                     <select id="secondaryCurrency" class="form-select control-narrow" disabled>
@@ -157,7 +198,7 @@
                                         <option>ILS - שקל חדש</option>
                     </select>
                   </div>
-                </div>
+                    </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">אזור זמן</label>
@@ -180,8 +221,9 @@
                 </div>
               </div>
             </div>
+                <!-- UI Content Section 2 End -->
             
-                <!-- Section 3: Trading Settings -->
+                <!-- UI Content Section 3 Start-->
                 <div class="content-section" id="section3">
                     <div class="section-header">
                         <h2>📈 הגדרות מסחר</h2>
@@ -226,12 +268,13 @@
                                     <input type="number" id="maxPositionSize" class="form-control control-narrow" 
                                            step="0.1" min="0" max="100" disabled>
             </div>
+              </div>
                   </div>
                 </div>
               </div>
-            </div>
+                <!-- UI Content Section 3 End -->
             
-                <!-- Section 4: Default Filters -->
+                <!-- UI Content Section 4 Start-->
                 <div class="content-section" id="section4">
         <div class="section-header">
           <h2>🔍 פילטרים ברירת מחדל</h2>
@@ -298,8 +341,9 @@
                 </div>
               </div>
             </div>
+                <!-- UI Content Section 4 End -->
             
-                <!-- Section 5: Colors -->
+                <!-- UI Content Section 5 Start-->
                 <div class="content-section" id="section5">
         <div class="section-header">
                         <h2>🎨 צבעים</h2>
@@ -613,10 +657,10 @@
               </div>
             </div>
               </div>
-            </div>
+                    </div>
+                <!-- UI Content Section 5 End -->
             
-            
-                <!-- Section 6: Admin Interface -->
+                <!-- UI Content Section 6 Start-->
       <div class="content-section" id="section6">
         <div class="section-header">
                         <h2>🔧 ממשק ניהול</h2>
@@ -630,6 +674,7 @@
               </div>
                   </div>
                   </div>
+                <!-- UI Content Section 6 End -->
             
                 </div>
               </div>
@@ -683,149 +728,25 @@
     <script src="scripts/main.js"></script>
     <script src="scripts/preferences.js"></script>
     <script src="scripts/preferences-admin.js"></script>
+    <script src="scripts/preferences-page.js"></script>
 
     <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
     <!-- ======================================================== -->
     <!-- Page-specific JavaScript for preferences -->
+
     <script>
         // Page initialization - September 2025
         document.addEventListener('DOMContentLoaded', function() {
             console.log('⚙️ Preferences page loaded successfully');
 
-            // Initialize sections with toggle functionality
-            initializeSections();
-
             // Initialize page-specific functionality
-            if (typeof initializePreferencesPage === 'function') {
-                initializePreferencesPage();
-            }
-
-            // Initialize admin interface
-            if (typeof window.createPreferencesAdminInterface === 'function') {
-                const adminContainer = document.getElementById('adminInterfaceContainer');
-                if (adminContainer) {
-                    window.createPreferencesAdminInterface();
-                }
+            if (typeof window.initializePreferencesPage === 'function') {
+                window.initializePreferencesPage();
             } else {
-                console.warn('Admin interface functions not available');
-            }
-
-            // Load accounts from database
-            loadAccountsForPreferences();
-            
-            // Load colors from database
-            loadColorsForPreferences();
-
-            // Set page-specific preferences
-            if (typeof setPagePreferences === 'function') {
-                setPagePreferences('preferences', {
-                    sections: ['preferences-sections'],
-                    defaultExpanded: ['preferences-sections']
-                });
+                console.warn('⚠️ initializePreferencesPage function not available');
             }
         });
 
-        // Section toggle functionality
-        function initializeSections() {
-            const toggleButtons = document.querySelectorAll('.section-toggle');
-
-            toggleButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const targetId = this.getAttribute('data-target');
-                    const targetElement = document.getElementById(targetId);
-                    const icon = this.querySelector('i');
-
-                    if (targetElement && icon) {
-                        if (targetElement.style.display === 'none') {
-                            targetElement.style.display = 'block';
-                            icon.className = 'fas fa-chevron-down';
-                        } else {
-                            targetElement.style.display = 'none';
-                            icon.className = 'fas fa-chevron-right';
-                        }
-                    }
-                });
-            });
-        }
-
-        // Load accounts from database for preferences
-        async function loadAccountsForPreferences() {
-            try {
-                const response = await fetch('/api/v1/accounts/');
-                if (response.ok) {
-                    const data = await response.json();
-                    const accounts = data.data || [];
-                    
-                    const accountSelect = document.getElementById('defaultAccountFilter');
-                    if (accountSelect) {
-                        // Clear existing options except the first one
-                        accountSelect.innerHTML = '<option>כל החשבונות</option>';
-                        
-                        // Add active accounts
-                        accounts.forEach(account => {
-                            if (account.is_active) {
-                                const option = document.createElement('option');
-                                option.value = account.id;
-                                option.textContent = account.name;
-                                accountSelect.appendChild(option);
-                            }
-                        });
-                        
-                        console.log('✅ Loaded accounts for preferences:', accounts.length);
-                    }
-                } else {
-                    console.error('❌ Failed to load accounts:', response.status);
-                }
-            } catch (error) {
-                console.error('❌ Error loading accounts:', error);
-            }
-        }
-
-        // Load colors from database for preferences
-        async function loadColorsForPreferences() {
-            try {
-                const response = await fetch('/api/v1/preferences/user');
-                if (response.ok) {
-                    const data = await response.json();
-                    const preferences = data.data.preferences || {};
-                    
-                    // Load colors into color pickers - load all color pickers on the page
-                    let loadedCount = 0;
-                    const allColorPickers = document.querySelectorAll('input[type="color"]');
-                    allColorPickers.forEach(picker => {
-                        const id = picker.id;
-                        if (preferences[id]) {
-                            picker.value = preferences[id];
-                            loadedCount++;
-                        }
-                    });
-                    
-                    console.log(`✅ Loaded ${loadedCount} colors for preferences`);
-                } else {
-                    console.error('❌ Failed to load preferences:', response.status);
-                }
-            } catch (error) {
-                console.error('❌ Error loading colors:', error);
-            }
-        }
-
-        // Validate currency change
-        function validateCurrency(selectElement) {
-            const selectedValue = selectElement.value;
-            
-            // Check if not USD
-            if (!selectedValue.includes('USD')) {
-                // Show notification
-                if (typeof showNotification === 'function') {
-                    showNotification('המערכת תומכת כרגע רק בדולר אמריקאי (USD)', 'warning');
-                } else {
-                    alert('המערכת תומכת כרגע רק בדולר אמריקאי (USD)');
-                }
-                
-                // Reset to USD
-                selectElement.value = 'USD - דולר ארה"ב';
-            }
-        }
     </script>
 </body>
 </html>

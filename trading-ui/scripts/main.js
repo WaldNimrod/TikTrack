@@ -287,7 +287,8 @@ function initializeCurrentPage() {
     body: JSON.stringify({ message: '🔄 Initializing current page: ' + currentPage })
   }).catch(() => {}); // Ignore errors
 
-  alert('🔄 Initializing current page: ' + currentPage);
+  // Page initialization completed
+  console.log('🔄 Initializing current page:', currentPage);
 
   // Call page-specific initialization if available
   const initFunctionName = `initialize${currentPage.charAt(0).toUpperCase() + currentPage.slice(1)}Page`;

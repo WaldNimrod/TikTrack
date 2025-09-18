@@ -1,13 +1,69 @@
-// Linter Realtime Monitor - Clean Implementation
-console.log('🚀 טעינת עמוד ניטור Linter בזמן אמת... v2.0');
+// ====================================================================================================
+// LINTER REALTIME MONITOR - CHART HISTORY STORAGE SYSTEM v3.0
+// ====================================================================================================
+//
+// 📋 ארכיטקטורה חדשה - אחסון היסטוריה אמיתי עם נתונים מדויקים
+//
+// 🎯 מטרה: יצירת גרף שמציג נתונים אמיתיים לאורך זמן עם אחסון עמיד בפני ניקוי מטמון
+//
+// 📊 רכיבי המערכת:
+//   1. IndexedDB - אחסון עיקרי (שורד ניקוי מטמון, 100MB+)
+//   2. שחזור לוגים - גיבוי אוטומטי מקומי
+//   3. Chart.js - תצוגה ויזואלית עם אנימציות
+//   4. איסוף נתונים - רק על שינוי אמיתי (לא כל דקה)
+//
+// 🔧 מצב נוכחי: מוכן ליישום מלא
+//   ✅ מבנה מחלקות בסיסי נוצר
+//   ✅ קוד גרף ישן הוסר
+//   ⏳ ממתין ליישום מלא של IndexedDB
+//   ⏳ ממתין ליישום מלא של שחזור לוגים
+//
+// 📝 דוקומנטציה:
+//   - ראה: documentation/frontend/DIAGNOSTIC_LOG_SYSTEM.md
+//   - ראה: documentation/frontend/LINTER_CHART_SYSTEM.md (יבוא ליצירה)
+//
+// 🚀 הוראות למפתח עתידי:
+//
+//   שלב 1: יישום IndexedDB Adapter
+//   - צור טבלה 'chart_history' עם שדות: timestamp, metrics, sessionId
+//   - הטמע שמירה וקריאה אסינכרונית
+//   - הוסף ניקוי אוטומטי אחרי 24 שעות
+//
+//   שלב 2: יישום Log Recovery
+//   - סרוק קובץ לוגים למציאת מדדים היסטוריים
+//   - חלץ נתונים מתבניות כמו "נמצאו X שגיאות"
+//   - בנה היסטוריה מתוך הלוגים אם IndexedDB ריק
+//
+//   שלב 3: יישום Chart Renderer
+//   - צור גרף עם ציר כפול (איכות + שגיאות)
+//   - הטמע עדכון רק על שינוי אמיתי
+//   - הוסף אנימציות חלקות ו-tooltip מפורט
+//
+//   שלב 4: יישום Data Collection
+//   - אסוף נתונים רק מסריקה או תיקון
+//   - חשב מדדי איכות: 100 - (שגיאות * 5) - (אזהרות * 2)
+//   - שמור עם timestamp מדויק
+//
+//   שלב 5: בדיקות ואופטימיזציה
+//   - בדוק שורדות ניקוי מטמון
+//   - בדוק ביצועים עם נתונים רבים
+//   - הוסף logging מפורט לכל פעולה
+//
+// 🔍 נקודות חשובות:
+//   - אל תעדכן גרף כל דקה - רק על שינוי אמיתי
+//   - השתמש ב-IndexedDB ולא localStorage (שורד ניקוי מטמון)
+//   - שמור רק 24 שעות אחרונות כדי למנוע גידול בלתי מוגבל
+//   - הוסף שחזור מהלוגים כגיבוי למקרי חירום
+//
+// ====================================================================================================
+
+console.log('🚀 טעינת עמוד ניטור Linter בזמן אמת... v3.0');
 
 // Global variables
-let qualityChart;
 let autoRefreshInterval;
 let isAutoRefreshActive = true;
 let systemLog = [];
 let logCounter = 0;
-let isChartUpdating = false; // Prevent concurrent chart updates
 
 // Track fixed issues to persist across scans
 let fixedIssues = {
@@ -20,7 +76,6 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ DOM loaded - initializing linter monitor...');
 
     // Initialize components
-    initializeChart();
     loadInitialData();
     startAutoRefresh();
     initializeControlButtons();
@@ -37,274 +92,80 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize Chart.js chart
 function initializeChart() {
-    console.log('📊 Initializing chart...');
+    console.log('📊 Chart functionality removed - will be reimplemented with real data tracking');
+    // Chart initialization code removed - will be rebuilt with proper architecture
+}
 
-    const canvas = document.getElementById('linterChart');
-    if (!canvas) {
-        // Use direct call to avoid recursion
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה בגרף', 'אלמנט Canvas לא נמצא');
-        } else {
-            console.error('❌ Canvas not found');
-        }
-        return;
+// Chart data generation removed - will be reimplemented with real historical tracking
+// Chart update functionality removed - will be reimplemented with real data tracking
+
+// ===== CHART HISTORY STORAGE SYSTEM =====
+// This will replace the old chart system with robust data persistence
+
+/**
+ * Chart History Storage Architecture
+ * Supports multiple storage backends for maximum reliability
+ */
+class ChartHistoryManager {
+    constructor() {
+        this.storage = {
+            local: new LocalStorageAdapter(),
+            indexed: new IndexedDBAdapter(),
+            server: new ServerStorageAdapter(),
+            file: new FileBackupAdapter()
+        };
+        this.config = {
+            maxHistoryHours: 24,
+            autoCleanup: true,
+            autoBackup: true,
+            compression: true
+        };
     }
-    
-    if (typeof Chart !== 'undefined') {
-    const ctx = canvas.getContext('2d');
-        canvas.width = 800;
-        canvas.height = 400;
 
-        // Generate historical data for the last 24 hours
-        const historicalData = generateHistoricalData();
+    // Main methods to be implemented
+    async saveDataPoint(data) {
+        // Save to all available storage backends
+    }
 
-    qualityChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-                labels: historicalData.labels,
-            datasets: [{
-                label: 'איכות קוד (%)',
-                    data: historicalData.quality,
-                borderColor: '#29a6a8',
-                backgroundColor: 'rgba(41, 166, 168, 0.1)',
-                    borderWidth: 2,
-                fill: true,
-                    tension: 0.4
-                }, {
-                    label: 'שגיאות',
-                    data: historicalData.errors,
-                    borderColor: '#dc3545',
-                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
-                    borderWidth: 2,
-                    fill: false,
-                    yAxisID: 'y1',
-                    tension: 0.4
-                }, {
-                    label: 'אזהרות',
-                    data: historicalData.warnings,
-                    borderColor: '#ffc107',
-                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                    borderWidth: 2,
-                    fill: false,
-                    yAxisID: 'y1',
-                    tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false
-                },
-                plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                label += context.parsed.y;
-                                if (context.datasetIndex > 0) {
-                                    label += ' בעיות';
-                                } else {
-                                    label += '%';
-                                }
-                                return label;
-                            }
-                        }
-                    },
-                    legend: {
-                        display: true,
-                        position: 'top'
-                }
-            },
-            scales: {
-                x: {
-                    display: true,
-                    title: {
-                        display: true,
-                        text: 'זמן'
-                    }
-                },
-                y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                    title: {
-                        display: true,
-                            text: 'איכות קוד (%)'
-                        },
-                        min: 0,
-                        max: 100
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        title: {
-                            display: true,
-                            text: 'מספר בעיות'
-                        },
-                        min: 0,
-                        max: Math.max(50, (scanningResults.errors ? scanningResults.errors.length : 0) + (scanningResults.warnings ? scanningResults.warnings.length : 0) + 10),
-                        grid: {
-                            drawOnChartArea: false
-                    },
-                    ticks: {
-                            precision: 0
-                        }
-                    }
-            }
-        }
-    });
-        console.log('✅ Chart initialized!');
-    } else {
-        // Use direct call to avoid recursion
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה בספריית גרפים', 'Chart.js לא נטען');
-        } else {
-            console.error('❌ Chart.js not loaded');
-        }
+    async loadHistory() {
+        // Load from most recent available source
+    }
+
+    async exportHistory() {
+        // Export history to file
+    }
+
+    async importHistory(data) {
+        // Import history from file
+    }
+
+    async clearHistory() {
+        // Clear all stored history
     }
 }
 
-// Generate historical data for chart based on real scanning data
-function generateHistoricalData() {
-    const labels = [];
-    const quality = [];
-    const errors = [];
-    const warnings = [];
-
-        const now = new Date();
-
-    // Use real data from scanning results if available
-    const realErrors = scanningResults.errors ? scanningResults.errors.length : 0;
-    const realWarnings = scanningResults.warnings ? scanningResults.warnings.length : 0;
-    const realFiles = scanningResults.totalFiles || 75;
-
-    console.log('📊 Using real scanning data for chart:', {
-        realErrors,
-        realWarnings,
-        realFiles,
-        hasScanningResults: scanningResults.totalFiles > 0,
-        currentTime: new Date().toISOString()
-    });
-
-    for (let i = 23; i >= 0; i--) {
-        const time = new Date(now.getTime() - i * 60 * 60 * 1000);
-        labels.push(time.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' }));
-
-        // Base data on real scanning results with some historical variation
-        let baseErrors, baseWarnings;
-
-        if (i === 0) {
-            // Current data - use real results
-            baseErrors = realErrors;
-            baseWarnings = realWarnings;
-        } else {
-            // Historical data - simulate improvement over time
-            const improvement = (24 - i) / 24; // Improvement factor (0 to 1)
-            baseErrors = Math.max(0, Math.round(realErrors * (1 + improvement) + (Math.random() - 0.5) * 3));
-            baseWarnings = Math.max(0, Math.round(realWarnings * (1 + improvement * 0.8) + (Math.random() - 0.5) * 5));
-        }
-
-        errors.push(baseErrors);
-        warnings.push(baseWarnings);
-
-        // Calculate quality based on errors and warnings
-        const totalIssues = baseErrors + baseWarnings;
-        const qualityScore = Math.max(0, Math.min(100, 100 - (totalIssues * 2) - (baseErrors * 5)));
-        quality.push(Math.round(qualityScore));
-    }
-
-    return { labels, quality, errors, warnings };
+// Storage adapters (to be implemented)
+class LocalStorageAdapter {
+    save(data) { /* Implementation */ }
+    load() { /* Implementation */ }
 }
-    
-    // Update chart with new data
-function updateChart() {
-    if (isChartUpdating) {
-        console.log('📊 Chart update skipped - already updating');
-        return;
-    }
 
-    if (qualityChart && qualityChart.data && qualityChart.options) {
-        isChartUpdating = true;
-        const newData = generateHistoricalData();
-
-        // Update data
-        qualityChart.data.labels = newData.labels;
-        qualityChart.data.datasets[0].data = newData.quality;
-        qualityChart.data.datasets[1].data = newData.errors;
-        qualityChart.data.datasets[2].data = newData.warnings;
-
-        // Calculate max issues for y1 axis - use actual values from historical data
-        // Filter out any non-numeric values and handle empty arrays safely
-        const validErrors = newData.errors.filter(n => typeof n === 'number' && !isNaN(n) && isFinite(n));
-        const validWarnings = newData.warnings.filter(n => typeof n === 'number' && !isNaN(n) && isFinite(n));
-
-        const maxErrors = validErrors.length > 0 ? Math.max(...validErrors) : 0;
-        const maxWarnings = validWarnings.length > 0 ? Math.max(...validWarnings) : 0;
-
-        const maxIssues = Math.max(maxErrors, maxWarnings, 10); // minimum of 10
-
-        console.log('📊 Axis calculation debug:', {
-            errorsArray: newData.errors.slice(-3),
-            warningsArray: newData.warnings.slice(-3),
-            validErrors,
-            validWarnings,
-            maxErrors,
-            maxWarnings,
-            maxIssues,
-            y1MaxCalculated: Math.max(50, maxIssues + 10)
-        });
-
-        // Update y1 axis with proper scaling
-        qualityChart.options.scales.y1.max = Math.max(50, maxIssues + 10);
-        qualityChart.options.scales.y1.min = 0;
-
-        // Ensure y1 axis stays on the right and has proper settings
-        qualityChart.options.scales.y1.position = 'right';
-        qualityChart.options.scales.y1.display = true;
-        qualityChart.options.scales.y1.grid = {
-            drawOnChartArea: false
-        };
-        qualityChart.options.scales.y1.ticks = {
-            precision: 0,
-            beginAtZero: true
-        };
-
-        // Ensure left axis (y) is for code quality
-        qualityChart.options.scales.y.position = 'left';
-        qualityChart.options.scales.y.display = true;
-        qualityChart.options.scales.y.title = {
-            display: true,
-            text: 'איכות קוד (%)'
-        };
-
-        // Force chart to recalculate and redraw
-        qualityChart.update('none'); // 'none' prevents animations that might cause issues
-
-        console.log('📊 Chart updated successfully:', {
-            qualityPoints: newData.quality.length,
-            errorPoints: newData.errors.length,
-            warningPoints: newData.warnings.length,
-            maxErrors: maxErrors,
-            maxWarnings: maxWarnings,
-            maxIssues: maxIssues,
-            y1Max: qualityChart.options.scales.y1.max,
-            y1Position: qualityChart.options.scales.y1.position,
-            dataSample: {
-                quality: newData.quality.slice(-3),
-                errors: newData.errors.slice(-3),
-                warnings: newData.warnings.slice(-3)
-            }
-        });
-    }
-
-    isChartUpdating = false;
+class IndexedDBAdapter {
+    save(data) { /* Implementation */ }
+    load() { /* Implementation */ }
 }
+
+class ServerStorageAdapter {
+    save(data) { /* Implementation */ }
+    load() { /* Implementation */ }
+}
+
+class FileBackupAdapter {
+    save(data) { /* Implementation */ }
+    load() { /* Implementation */ }
+}
+
+// ===== END CHART HISTORY STORAGE SYSTEM =====
 
 // Load initial data
 function loadInitialData() {
@@ -1673,10 +1534,7 @@ function finishScan() {
         window.showSuccessNotification('סריקה הושלמה', `נסרקו ${scanningResults.totalFiles} קבצים, נמצאו ${scanningResults.errors.length} שגיאות ו-${scanningResults.warnings.length} אזהרות`);
     }
 
-    // Update chart with new data after a short delay to ensure all data is ready
-    setTimeout(() => {
-        updateChart();
-    }, 500);
+    // Chart update removed - will be reimplemented with real historical data tracking
 }
 
 // Start auto refresh

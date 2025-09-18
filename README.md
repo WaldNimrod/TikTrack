@@ -81,13 +81,13 @@
 
 > 📋 **דוקומנטציה מערכת נתונים חיצוניים**: [EXTERNAL_DATA_INTEGRATION_MODULE_DOCUMENTATION.md](EXTERNAL_DATA_INTEGRATION_MODULE_DOCUMENTATION.md)
 
-> 🚀 **מערכת העדפות V2**: [PREFERENCES_V2_IMPLEMENTATION_REPORT.md](PREFERENCES_V2_IMPLEMENTATION_REPORT.md)
+> 🚀 **מערכת העדפות**: [PREFERENCES_IMPLEMENTATION_REPORT.md](PREFERENCES_IMPLEMENTATION_REPORT.md)
 
-> 📊 **השוואת V1 vs V2**: [PREFERENCES_V1_VS_V2_COMPARISON.md](PREFERENCES_V1_VS_V2_COMPARISON.md)
+> 📊 **השוואת מערכות**: [PREFERENCES_COMPARISON.md](PREFERENCES_COMPARISON.md)
 
 ## 🎉 **סיכום השינויים האחרונים (5 בינואר 2025)**
 
-### **🚀 מערכת העדפות V2 - הושלמה בהצלחה! 🎯**
+### **🚀 מערכת העדפות - הושלמה בהצלחה! 🎯**
 - **מערכת הגדרות מתקדמת**: פרופילים מרובים, יבוא/יצוא, היסטוריית שינויים
 - **50+ הגדרות חדשות**: הרחבה משמעותית מעבר ל-35 הגדרות הקיימות
 - **מיגרציה מוצלחת 100%**: כל הנתונים הקיימים הועברו ללא איבוד
@@ -113,7 +113,7 @@
 
 ### **קבצים שנוצרו/עודכנו:**
 
-#### **🚀 מערכת העדפות V2 (5 בינואר 2025) - 13 קבצים חדשים:**
+#### **🚀 מערכת העדפות (5 בינואר 2025) - 13 קבצים חדשים:**
 - **Backend חדש:**
   - `Backend/models/user_preferences_v2.py` - מודל מתקדם 573 שורות
   - `Backend/services/preferences_service_v2.py` - שירות מתקדם 633 שורות 
@@ -127,9 +127,9 @@
   - `trading-ui/scripts/preferences-v2-compatibility.js` - שכבת תאימות
   - `test-preferences-v2-integration.html` - עמוד בדיקות
 - **תיעוד מקיף:**
-  - `PREFERENCES_V2_IMPLEMENTATION_REPORT.md` - דוח יישום
-  - `PREFERENCES_V1_VS_V2_COMPARISON.md` - השוואה מפורטת
-  - `PREFERENCES_V2_FINAL_COMPLETION_REPORT.md` - דוח השלמה
+  - `PREFERENCES_IMPLEMENTATION_REPORT.md` - דוח יישום
+  - `PREFERENCES_COMPARISON.md` - השוואה מפורטת
+  - `PREFERENCES_FINAL_COMPLETION_REPORT.md` - דוח השלמה
 
 #### **מערכות קודמות:**
 - **חדש:** `Backend/routes/api/server_management.py`

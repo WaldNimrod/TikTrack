@@ -202,7 +202,7 @@ def create_crud_testing_dashboard():
         },
         {
             'id': 'preferences',
-            'name': 'העדפות V1',
+            'name': 'העדפות',
             'url': '/preferences',
             'priority': 'high',
             'crud_level': 'settings',
@@ -221,7 +221,7 @@ def create_crud_testing_dashboard():
         },
         {
             'id': 'preferences-v2',
-            'name': 'העדפות V2',
+            'name': 'העדפות מתקדמות',
             'url': '/preferences-v2',
             'priority': 'high',
             'crud_level': 'settings',
@@ -236,7 +236,7 @@ def create_crud_testing_dashboard():
                 'ייצא העדפות',
                 'ייבא העדפות', 
                 'שמור כפרופיל חדש',
-                'מיגרציה מ-V1'
+                'מיגרציה'
             ]
         },
         {

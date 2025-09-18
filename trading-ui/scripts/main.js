@@ -6,6 +6,7 @@
  */
 
 console.log('🎯 main.js loaded and executing');
+console.log('📄 Current URL:', window.location.href);
 
 // Immediate test
 fetch('/api/debug/log', {
@@ -277,6 +278,7 @@ function setupGlobalModalConfigurations() {
  * Determines current page and calls appropriate initialization
  */
 function initializeCurrentPage() {
+  console.log('🎯 initializeCurrentPage called!');
   const currentPage = getCurrentPageName();
   console.log('🔄 Initializing current page:', currentPage);
 
@@ -288,7 +290,6 @@ function initializeCurrentPage() {
   }).catch(() => {}); // Ignore errors
 
   // Page initialization completed
-  console.log('🔄 Initializing current page:', currentPage);
 
   // Call page-specific initialization if available
   const initFunctionName = `initialize${currentPage.charAt(0).toUpperCase() + currentPage.slice(1)}Page`;

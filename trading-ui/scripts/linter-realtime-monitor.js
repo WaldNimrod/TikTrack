@@ -89,11 +89,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize session
     initializeSession();
 
-    // Start initial file scan after a short delay
-    setTimeout(() => {
-        console.log('🚀 Starting initial file scan...');
-        startFileScan();
-    }, 2000);
+    // NOTE: Auto-scan removed - scanning now only on user request
+    // The monitoring system will work independently
+    console.log('📊 System initialized - monitoring active, scanning on user request only');
 });
 
 // Initialize Chart.js chart

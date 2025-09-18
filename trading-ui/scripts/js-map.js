@@ -81,10 +81,21 @@ class JsMapSystem {
      */
     async loadPageMapping() {
         console.log('🔄 Starting loadPageMapping...');
-        // Always use local scan for consistent static data
-        console.log('🔄 Using local static page mapping...');
-        this.pageMapping = this.scanPageMappingLocally();
-        console.log('🔄 loadPageMapping completed. Page mapping:', this.pageMapping);
+        try {
+            console.log('🌐 Fetching page mapping from API...');
+            const response = await fetch('/api/js-map/page-mapping');
+            if (response.ok) {
+                this.pageMapping = await response.json();
+                console.log('✅ Page mapping loaded from API:', Object.keys(this.pageMapping));
+            } else {
+                console.warn('⚠️ API failed, using local scan');
+                this.pageMapping = this.scanPageMappingLocally();
+            }
+        } catch (error) {
+            console.warn('⚠️ Fetch failed, using local scan:', error);
+            this.pageMapping = this.scanPageMappingLocally();
+        }
+        console.log('🔄 loadPageMapping completed. Page mapping keys:', Object.keys(this.pageMapping));
     }
 
     /**
@@ -636,25 +647,9 @@ function openFunctionDetails(file, functionName) {
 
 // Initialize JS Map page
 function initializeJsMapPage() {
-    console.log('🚀 Initializing JS Map page - FUNCTION CALLED!');
-    alert('🚀 JS Map page initialization started!');
-
-    console.log('📍 Current page name from getCurrentPageName:', typeof getCurrentPageName === 'function' ? getCurrentPageName() : 'function not available');
-
-    // Add visual indicator that JS is working
-    const testDiv = document.createElement('div');
-    testDiv.innerHTML = '<p style="color: green; font-weight: bold;">✅ JavaScript is working!</p>';
-    testDiv.style.position = 'fixed';
-    testDiv.style.top = '10px';
-    testDiv.style.right = '10px';
-    testDiv.style.background = 'white';
-    testDiv.style.padding = '10px';
-    testDiv.style.border = '1px solid green';
-    testDiv.style.zIndex = '9999';
-    document.body.appendChild(testDiv);
+    console.log('🚀 Initializing JS Map page');
 
     // Load initial data
-    console.log('🔄 Calling loadJsMapData...');
     loadJsMapData();
 }
 

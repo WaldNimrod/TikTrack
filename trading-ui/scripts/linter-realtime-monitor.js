@@ -134,11 +134,26 @@ async function loadInitialData() {
         // Initialize Chart Renderer
         if (typeof window.ChartRenderer !== 'undefined') {
             const container = document.getElementById('chartContainer');
+            console.log('🎨 מצאתי container:', container);
             if (container) {
+                console.log('🎨 יוצר ChartRenderer...');
                 window.currentChartRenderer = new window.ChartRenderer('chartContainer');
+                console.log('🎨 קורא ל-initialize...');
+
+                // הצגת הודעת טעינה
+                const statusDiv = document.getElementById('chartStatus');
+                if (statusDiv) {
+                    statusDiv.style.display = 'block';
+                    statusDiv.textContent = 'טוען גרף...';
+                }
+
                 await window.currentChartRenderer.initialize();
                 console.log('✅ Chart Renderer initialized');
+            } else {
+                console.error('❌ לא מצאתי chartContainer');
             }
+        } else {
+            console.error('❌ ChartRenderer לא זמין');
         }
 
         // Load historical data from IndexedDB

@@ -190,7 +190,7 @@ class ChartRenderer {
      */
     async initialize(initialData = []) {
         try {
-            console.log('📊 מאתחל Chart Renderer...');
+            console.log('📊 מאתחל Chart Renderer...', this.containerId, 'with data:', initialData);
 
             const container = document.getElementById(this.containerId);
             if (!container) {
@@ -225,7 +225,16 @@ class ChartRenderer {
 
             const ctx = canvas.getContext('2d');
 
-            // יצירת הגרף
+            // בדיקת מימדי קנבס
+            console.log('📐 מימדי קנבס:', canvas.width, 'x', canvas.height);
+            console.log('📊 יוצר גרף עם נתונים:', chartData);
+
+            // הסתרת הודעת טעינה
+            const statusDiv = document.getElementById('chartStatus');
+            if (statusDiv) {
+                statusDiv.style.display = 'none';
+            }
+
             this.chart = new Chart(ctx, {
                 type: 'line',
                 data: chartData,
@@ -249,6 +258,34 @@ class ChartRenderer {
     prepareChartData(rawData) {
         if (!Array.isArray(rawData)) {
             rawData = [];
+        }
+
+        // אם אין נתונים, יצירת נתונים לדוגמה
+        if (rawData.length === 0) {
+            console.log('📊 יוצר נתונים לדוגמה לגרף...');
+            const now = new Date();
+            rawData = [
+                {
+                    timestamp: new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString(),
+                    metrics: { qualityScore: 85, errors: 12, warnings: 8 }
+                },
+                {
+                    timestamp: new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString(),
+                    metrics: { qualityScore: 78, errors: 18, warnings: 15 }
+                },
+                {
+                    timestamp: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
+                    metrics: { qualityScore: 92, errors: 5, warnings: 3 }
+                },
+                {
+                    timestamp: new Date(now.getTime() - 1 * 60 * 60 * 1000).toISOString(),
+                    metrics: { qualityScore: 88, errors: 8, warnings: 6 }
+                },
+                {
+                    timestamp: now.toISOString(),
+                    metrics: { qualityScore: 95, errors: 2, warnings: 1 }
+                }
+            ];
         }
 
         // מיון לפי timestamp

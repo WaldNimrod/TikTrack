@@ -104,7 +104,7 @@ def get_user_preference() -> Any:
         # קבלת ההעדפה
         preference_value = preferences_service.get_preference(
             user_id=user_id,
-            preference_identifier=preference_name,
+            preference_name=preference_name,
             profile_id=profile_id,
             use_cache=use_cache
         )

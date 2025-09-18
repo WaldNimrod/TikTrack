@@ -628,19 +628,17 @@
             openFunctionModal(functionName, annotations, code);
         }
 
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function () {
-            console.log('🚀 JS Map page initialized');
-
-            // Initialize header system
-            if (window.headerSystem) {
-                window.headerSystem.init();
-            }
+        // Initialize JS Map page
+        function initializeJsMapPage() {
+            console.log('🚀 Initializing JS Map page...');
 
             // Load initial data
             console.log('🔄 Calling loadJsMapData...');
             loadJsMapData();
-        });
+        }
+
+        // Export initialization function
+        window.initializeJsMapPage = initializeJsMapPage;
 
         // Global functions for modal
         function openFunctionModal(functionName, annotations, code) {

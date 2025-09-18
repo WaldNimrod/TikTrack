@@ -415,11 +415,214 @@ window.copyDetailedLog = function() {
 - [מדריך CSS Architecture](../frontend/CSS_ARCHITECTURE.md)
 - [טמפלייט מבנה עמוד](../frontend/PAGE_STRUCTURE_TEMPLATE.md)
 
+## 📊 מערכת הגרף ההיסטורי - Chart History System
+
+### 🎯 ארכיטקטורה חדשה - נתונים אמיתיים לאורך זמן
+
+#### מטרת המערכת
+מערכת הגרף ההיסטורי החדשה נועדה לפתור את הבעיות של הגרף הקודם:
+- **נתונים מדומים** → **נתונים אמיתיים** מהסריקות והתיקונים
+- **איבוד נתונים** בניקוי מטמון → **אחסון עמיד** ב-IndexedDB
+- **עדכונים מיותרים** → **עדכונים רק על שינוי אמיתי**
+
+#### רכיבי המערכת
+
+##### 1. IndexedDB Storage (אחסון עיקרי)
+```javascript
+// מבנה הנתונים ב-IndexedDB
+interface ChartDataPoint {
+  timestamp: string;        // ISO timestamp מדויק
+  metrics: {
+    totalFiles: number;
+    errors: number;
+    warnings: number;
+    scanDuration: number;
+    qualityScore: number;   // חישוב: 100 - (שגיאות * 5) - (אזהרות * 2)
+  };
+  sessionId: string;
+  version: string;
+}
+```
+
+**יתרונות:**
+- ✅ שורד ניקוי מטמון מלא
+- ✅ קיבולת גדולה (100MB+)
+- ✅ עובד בדפדפן פרטי
+- ✅ לא מוגבל בזמן (שונה מ-sessionStorage)
+
+##### 2. Log Recovery System (שחזור מגיבויים)
+```javascript
+// שחזור נתונים מהלוגים
+const recoveryPatterns = {
+  scanComplete: /נמצאו (\d+) שגיאות ו-(\d+) אזהרות/,
+  fixComplete: /תוקנו (\d+) שגיאות/,
+  fileCount: /נסרקו (\d+) קבצים/
+};
+```
+
+**מקרים שבהם זה עובד:**
+- ניקוי מטמון מלא
+- דפדפן פרטי חדש
+- IndexedDB פגום
+- התחלה חוזרת של המערכת
+
+##### 3. Smart Data Collection (איסוף חכם)
+```javascript
+// רק על שינויים אמיתיים - לא כל דקה
+const triggers = {
+  scanComplete: true,     // סיום סריקה
+  fixApplied: true,       // תיקון שגיאות
+  manualRefresh: true,    // רענון ידני
+  pageLoad: false,        // לא בכל טעינת עמוד
+  autoRefresh: false      // לא בכל רענון אוטומטי
+};
+```
+
+##### 4. Chart Renderer (מעבד הגרף)
+```javascript
+// ציר כפול עם מדדים מדויקים
+const chartConfig = {
+  y1: { // ציר ימין - בעיות
+    errors: 'שגיאות',
+    warnings: 'אזהרות'
+  },
+  y: {  // ציר שמאל - איכות
+    quality: 'איכות קוד (%)'
+  },
+  timeRange: '24h',       // 24 שעות אחרונות
+  updateMode: 'real'      // רק נתונים אמיתיים
+};
+```
+
+### 🔄 זרימת העבודה
+
+#### 1. טעינת העמוד
+```javascript
+// 1. נסה לטעון מ-IndexedDB
+const history = await loadFromIndexedDB();
+
+// 2. אם ריק - שחזר מהלוגים
+if (!history.length) {
+  history = await recoverFromLogs();
+}
+
+// 3. צור גרף מהנתונים
+renderChart(history);
+```
+
+#### 2. סריקה חדשה
+```javascript
+// 1. בצע סריקה
+const results = await scanFiles();
+
+// 2. חשב מדדים
+const metrics = calculateMetrics(results);
+
+// 3. שמור ל-IndexedDB
+await saveToIndexedDB(metrics);
+
+// 4. עדכן גרף
+updateChart(metrics);
+```
+
+#### 3. ניקוי מטמון
+```javascript
+// 1. משתמש מנקה מטמון
+browser.clearCache();
+
+// 2. העמוד נטען מחדש - IndexedDB ריק
+pageLoad() {
+  // 3. שחזור אוטומטי מהלוגים
+  const recovered = await recoverFromLogs();
+
+  // 4. שמירה חוזרת ל-IndexedDB
+  await saveToIndexedDB(recovered);
+
+  // 5. הצגת גרף מהנתונים המשוחזרים
+  renderChart(recovered);
+}
+```
+
+### 📈 מדדים שיוצגו
+
+| מדד | חישוב | ציר | תיאור |
+|-----|-------|-----|-------|
+| **איכות קוד** | `100 - (שגיאות × 5) - (אזהרות × 2)` | שמאל | ציון כללי של איכות הקוד |
+| **שגיאות** | מספר שגיאות שנמצאו | ימין | בעיות קריטיות שצריך לתקן |
+| **אזהרות** | מספר אזהרות שנמצאו | ימין | בעיות מומלצות לתיקון |
+| **זמן סריקה** | משך זמן הסריקה | ימין | ביצועי המערכת |
+
+### 🛠️ ממשק משתמש
+
+#### כפתורי בקרה
+- **רענן גרף** - טעינה מחדש של נתונים
+- **נקה היסטוריה** - מחיקת כל הנתונים
+- **ייצא נתונים** - הורדת קובץ JSON
+- **יבא נתונים** - טעינת נתונים מקובץ
+
+#### הגדרות
+- **טווח זמן**: 1h, 6h, 24h, 7d
+- **סוגי מדדים**: איכות, שגיאות, אזהרות, ביצועים
+- **אנימציות**: מופעל/כבוי
+- **עדכונים**: ידני/אוטומטי
+
+### 🔧 יישום טכני
+
+#### מבנה הקוד
+```javascript
+// קבצים עיקריים
+src/
+├── chart/
+│   ├── ChartHistoryManager.js    // ניהול ראשי
+│   ├── IndexedDBAdapter.js       // אחסון IndexedDB
+│   ├── LogRecovery.js            // שחזור לוגים
+│   ├── ChartRenderer.js          // עיבוד גרף
+│   └── DataCollector.js          // איסוף נתונים
+├── utils/
+│   ├── metrics.js                // חישובי מדדים
+│   └── storage.js                // עזרים אחסון
+└── config/
+    └── chart-config.js           // הגדרות
+```
+
+#### ממשקי API
+```javascript
+// ממשקים עיקריים
+interface ChartHistoryManager {
+  saveData(data: ChartDataPoint): Promise<void>;
+  loadHistory(hours: number): Promise<ChartDataPoint[]>;
+  clearHistory(): Promise<void>;
+  exportData(): Promise<string>;
+}
+
+interface IndexedDBAdapter {
+  save(data: ChartDataPoint): Promise<void>;
+  load(limit: number): Promise<ChartDataPoint[]>;
+  clear(): Promise<void>;
+  cleanup(): Promise<void>; // ניקוי נתונים ישנים
+}
+```
+
+### 🧪 בדיקות ואימות
+
+#### בדיקות חובה
+- [ ] שורדות ניקוי מטמון מלא
+- [ ] עבודה בדפדפן פרטי
+- [ ] שחזור נתונים מהלוגים
+- [ ] ביצועים עם 1000+ נקודות נתונים
+- [ ] סנכרון בין סשנים שונים
+
+#### בדיקות מתקדמות
+- [ ] זיכרון - לא יותר מ-50MB
+- [ ] ביצועים - טעינה תוך 2 שניות
+- [ ] אמינות - 99.9% הצלחה בשמירה
+- [ ] תאימות - כל הדפדפנים המודרניים
+
 ## 📝 הערות לפיתוח עתידי
 
 ### שיפורים מתוכננים
-- **אינטגרציה עם שרת** לשליחת לוגים אוטומטית
-- **ויזואליזציה גרפית** של נתוני האבחון
+- **אינטגרציה עם שרת** לשליחת לוגים אוטומטית (אופציונלי)
+- **ויזואליזציה גרפית** של נתוני האבחון ✅ (מיושם)
 - **השוואת snapshots** לאיתור שינויים
 - **אוטומציה של תיקונים** לבעיות נפוצות
 

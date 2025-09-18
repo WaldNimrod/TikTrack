@@ -216,10 +216,16 @@ window.getAllUserPreferences = async function(userId = 1, profileId = null) {
             const preferences = result.data?.preferences || {};
             
             console.log(`✅ Retrieved all preferences:`, preferences);
-            
+
             // עדכון מטמון
             window.preferencesCache.set(preferences);
-            
+
+            // עדכון CSS Variables מצבעים דינמיים
+            if (window.colorSchemeSystem && window.colorSchemeSystem.updateCSSVariablesFromPreferences) {
+                console.log('🎨 Updating CSS variables from preferences...');
+                window.colorSchemeSystem.updateCSSVariablesFromPreferences(preferences);
+            }
+
             return preferences;
         } else {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);

@@ -27,6 +27,7 @@ class QuoteData:
     symbol: str
     price: float
     change_pct: Optional[float] = None
+    change_pct_day: Optional[float] = None  # Added missing attribute
     change_amount: Optional[float] = None
     volume: Optional[int] = None
     currency: str = 'USD'
@@ -610,7 +611,7 @@ class YahooFinanceAdapter:
                 provider_id=self.provider_id,
                 asof_utc=quote.asof_utc or datetime.now(timezone.utc),
                 price=quote.price,
-                change_pct_day=quote.change_pct,
+                change_pct_day=quote.change_pct_day or quote.change_pct,
                 change_amount_day=quote.change_amount,
                 volume=quote.volume,
                 currency=quote.currency,

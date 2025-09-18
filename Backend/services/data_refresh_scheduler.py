@@ -359,7 +359,7 @@ class DataRefreshScheduler:
                 asof_utc=quote_data.asof_utc,
                 source=quote_data.source,
                 volume=quote_data.volume,
-                change_pct_day=quote_data.change_pct_day
+                change_pct_day=quote_data.change_pct_day or quote_data.change_pct
             )
             
             # Add to session and commit

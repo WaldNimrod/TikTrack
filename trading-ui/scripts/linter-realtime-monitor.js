@@ -508,6 +508,8 @@ function scanJavaScriptFiles() {
     let scanCss = document.getElementById('scanCss')?.checked || false;
     let scanOther = document.getElementById('scanOther')?.checked || false;
 
+    console.log('🔍 Scan settings:', { scanJs, scanHtml, scanPy, scanCss, scanOther });
+
     // Show scan start notification
     const selectedTypes = [];
     if (scanJs) selectedTypes.push('JavaScript');
@@ -547,6 +549,7 @@ function scanJavaScriptFiles() {
     // Use dynamic file discovery if available, otherwise use static lists
     if (window.projectFiles && window.projectFiles.length > 0) {
         // Use discovered files
+        console.log('📁 Found', window.projectFiles.length, 'discovered files');
         let allFiles = [];
         const discoveredFiles = window.projectFiles;
 
@@ -558,6 +561,7 @@ function scanJavaScriptFiles() {
             !f.includes('.backup') &&
             !f.includes('-backup')
         );
+        console.log('📄 JS files found:', jsFiles.length, 'dynamic + 6 static');
         allFiles = allFiles.concat(jsFiles);
 
         // Also add static JS files for comprehensive scanning
@@ -585,13 +589,18 @@ function scanJavaScriptFiles() {
                 !f.includes('demo') &&
                 !f.includes('cascade')
             );
+            console.log('📄 HTML files found:', htmlFiles.length);
             allFiles = allFiles.concat(htmlFiles);
         }
         if (scanPy) {
-            allFiles = allFiles.concat(discoveredFiles.filter(f => f.endsWith('.py')));
+            const pyFiles = discoveredFiles.filter(f => f.endsWith('.py'));
+            console.log('🐍 Python files found:', pyFiles.length);
+            allFiles = allFiles.concat(pyFiles);
         }
         if (scanCss) {
-            allFiles = allFiles.concat(discoveredFiles.filter(f => f.endsWith('.css')));
+            const cssFiles = discoveredFiles.filter(f => f.endsWith('.css'));
+            console.log('🎨 CSS files found:', cssFiles.length);
+            allFiles = allFiles.concat(cssFiles);
         }
         if (scanOther) {
             // Filter out backup files, documentation, and other non-code files
@@ -611,6 +620,7 @@ function scanJavaScriptFiles() {
                 !f.startsWith('remaining-styles') &&
                 !f.startsWith('_')
             );
+            console.log('📋 Other files found:', otherFiles.length);
             allFiles = allFiles.concat(otherFiles);
         }
 
@@ -618,6 +628,18 @@ function scanJavaScriptFiles() {
         scanningResults.scannedFiles = 0;
 
         console.log('🔍 Starting scan of', allFiles.length, 'discovered files');
+        console.log('📊 File breakdown:', {
+            total: allFiles.length,
+            unique: new Set(allFiles).size,
+            js: scanJs ? discoveredFiles.filter(f => f.endsWith('.js')).length : 0,
+            html: scanHtml ? discoveredFiles.filter(f => f.endsWith('.html')).length : 0,
+            py: scanPy ? discoveredFiles.filter(f => f.endsWith('.py')).length : 0,
+            css: scanCss ? discoveredFiles.filter(f => f.endsWith('.css')).length : 0,
+            other: scanOther ? discoveredFiles.filter(f =>
+                (f.endsWith('.json') || f.endsWith('.md') || f.endsWith('.sql') ||
+                 f.endsWith('.yml') || f.endsWith('.yaml'))
+            ).length : 0
+        });
         console.log('📊 File type breakdown:', {
             totalDiscovered: window.projectFiles.length,
             jsSelected: scanJs,

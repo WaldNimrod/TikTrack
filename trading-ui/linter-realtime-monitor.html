@@ -247,62 +247,62 @@
                   <i class="fas fa-tools"></i> פעולות מתקדמות:
                 </h5>
 
-                <!-- Fix Options Row -->
-                <div style="margin-bottom: 15px;">
-                  <label style="display: block; font-size: 14px; color: #495057; margin-bottom: 8px; font-weight: 500;">
-                    אפשרויות תיקון:
-                  </label>
-                  <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="btn btn-warning" onclick="window.fixAllErrors()">
-                      <i class="fas fa-exclamation-triangle"></i> תיקון שגיאות
-                    </button>
-                    <button class="btn btn-info" onclick="window.fixAllWarnings()">
-                      <i class="fas fa-exclamation-circle"></i> תיקון אזהרות
-                    </button>
-                    <button class="btn btn-secondary" onclick="window.ignoreAllIssues()">
-                      <i class="fas fa-eye-slash"></i> התעלם מהכל
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Monitoring Controls Row -->
-                <div style="margin-bottom: 15px;">
-                  <label style="display: block; font-size: 14px; color: #495057; margin-bottom: 8px; font-weight: 500;">
-                    בקרת ניטור:
-                  </label>
-                  <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-                    <button class="btn btn-success" id="startMonitoringBtn" onclick="if(typeof window.startMonitoring === 'function') window.startMonitoring(); else console.error('startMonitoring not defined')">
-                      <i class="fas fa-play"></i> התחל ניטור
-                    </button>
-                    <button class="btn btn-secondary" id="stopMonitoringBtn" disabled onclick="if(typeof window.stopMonitoring === 'function') window.stopMonitoring(); else console.error('stopMonitoring not defined')">
-                      <i class="fas fa-stop"></i> עצור ניטור
-                    </button>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                      <label style="font-size: 14px; color: #666;">קצב:</label>
-                      <input type="number" class="form-control" id="refreshInterval" value="2" min="1" max="30" style="width: 80px; font-size: 14px;">
-                      <span style="font-size: 14px; color: #666;">דקות</span>
+                <!-- All Advanced Actions in one column -->
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                  <!-- Fix Options -->
+                  <div>
+                    <label style="display: block; font-size: 14px; color: #495057; margin-bottom: 6px; font-weight: 500;">
+                      <i class="fas fa-wrench"></i> אפשרויות תיקון:
+                    </label>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                      <button class="btn btn-warning btn-sm" onclick="window.fixAllErrors()">
+                        <i class="fas fa-exclamation-triangle"></i> שגיאות
+                      </button>
+                      <button class="btn btn-info btn-sm" onclick="window.fixAllWarnings()">
+                        <i class="fas fa-exclamation-circle"></i> אזהרות
+                      </button>
+                      <button class="btn btn-secondary btn-sm" onclick="window.ignoreAllIssues()">
+                        <i class="fas fa-eye-slash"></i> התעלם
+                      </button>
                     </div>
-                    <span style="color: #666; font-size: 14px;">
-                      <i class="fas fa-info-circle"></i> מתעדכן כל <span id="currentInterval">2</span> דקות
-                    </span>
                   </div>
-                </div>
 
-                <!-- Utility Actions Row -->
-                <div>
-                  <label style="display: block; font-size: 14px; color: #495057; margin-bottom: 8px; font-weight: 500;">
-                    כלים עזר:
-                  </label>
-                  <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="btn btn-outline-primary" onclick="window.discoverProjectFiles()">
-                      <i class="fas fa-search-plus"></i> עדכן רשימת קבצים
-                    </button>
-                    <button class="btn btn-outline-warning" onclick="window.resetFixedIssues()">
-                      <i class="fas fa-undo"></i> איפוס תיקונים
-                    </button>
-                    <button class="btn btn-outline-secondary" onclick="if(typeof window.copyDetailedLog === 'function') window.copyDetailedLog(); else console.error('copyDetailedLog not defined')">
-                      <i class="fas fa-copy"></i> לוג מפורט
-                    </button>
+                  <!-- Monitoring Controls -->
+                  <div>
+                    <label style="display: block; font-size: 14px; color: #495057; margin-bottom: 6px; font-weight: 500;">
+                      <i class="fas fa-clock"></i> בקרת ניטור:
+                    </label>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+                      <button class="btn btn-success btn-sm" id="startMonitoringBtn" onclick="if(typeof window.startMonitoring === 'function') window.startMonitoring(); else console.error('startMonitoring not defined')">
+                        <i class="fas fa-play"></i> התחל
+                      </button>
+                      <button class="btn btn-secondary btn-sm" id="stopMonitoringBtn" disabled onclick="if(typeof window.stopMonitoring === 'function') window.stopMonitoring(); else console.error('stopMonitoring not defined')">
+                        <i class="fas fa-stop"></i> עצור
+                      </button>
+                      <div style="display: flex; align-items: center; gap: 4px;">
+                        <label style="font-size: 12px; color: #666;">כל</label>
+                        <input type="number" class="form-control form-control-sm" id="refreshInterval" value="2" min="1" max="30" style="width: 60px; font-size: 12px;">
+                        <span style="font-size: 12px; color: #666;">דקות</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Utility Actions -->
+                  <div>
+                    <label style="display: block; font-size: 14px; color: #495057; margin-bottom: 6px; font-weight: 500;">
+                      <i class="fas fa-cog"></i> כלים עזר:
+                    </label>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                      <button class="btn btn-outline-primary btn-sm" onclick="window.discoverProjectFiles()">
+                        <i class="fas fa-search-plus"></i> עדכן קבצים
+                      </button>
+                      <button class="btn btn-outline-warning btn-sm" onclick="window.resetFixedIssues()">
+                        <i class="fas fa-undo"></i> איפוס
+                      </button>
+                      <button class="btn btn-outline-secondary btn-sm" onclick="if(typeof window.copyDetailedLog === 'function') window.copyDetailedLog(); else console.error('copyDetailedLog not defined')">
+                        <i class="fas fa-copy"></i> לוג
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

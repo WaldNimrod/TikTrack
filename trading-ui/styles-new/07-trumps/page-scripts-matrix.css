@@ -20,9 +20,6 @@
 
 #page-scripts-matrix-table td {
     padding: 0 !important; /* ZERO padding for ultra-narrow cells */
-    min-width: 25px;
-    max-width: 35px;
-    width: 30px;
     font-size: 0.6rem;
     text-align: center;
 }
@@ -178,9 +175,6 @@
     #page-scripts-matrix-table th,
     #page-scripts-matrix-table td {
         padding: 0 !important; /* Keep zero padding on mobile too */
-        min-width: 20px;
-        max-width: 25px;
-        width: 22px;
         font-size: 0.55rem;
     }
 

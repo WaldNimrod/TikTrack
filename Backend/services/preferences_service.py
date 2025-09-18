@@ -54,7 +54,7 @@ class PreferencesService:
     - אופטימיזציה מקסימלית
     """
     
-    def __init__(self, db_path: str = 'db/simpleTrade_new.db'):
+    def __init__(self, db_path: str = 'Backend/db/simpleTrade_new.db'):
         """אתחול השירות"""
         self.db_path = db_path
         self.cache = {}  # מטמון פנימי

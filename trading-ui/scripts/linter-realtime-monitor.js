@@ -75,6 +75,12 @@ let fixedIssues = {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ DOM loaded - initializing linter monitor...');
 
+    // Initialize DataCollector instance if available
+    if (typeof window.DataCollector !== 'undefined') {
+        window.dataCollectorInstance = new window.DataCollector();
+        console.log('📊 DataCollector instance created');
+    }
+
     // Initialize components
     loadInitialData();
     startAutoRefresh();
@@ -1544,10 +1550,10 @@ async function finishScan() {
     // ===== INTEGRATION WITH DATA COLLECTOR =====
     // Collect scan data and save to IndexedDB
     try {
-        if (typeof window.DataCollector !== 'undefined') {
+        if (typeof window.dataCollectorInstance !== 'undefined' && typeof window.dataCollectorInstance.collectFromScan === 'function') {
             console.log('📊 אוסף נתונים מסריקה עם Data Collector...');
 
-            const scanMetrics = window.DataCollector.collectFromScan({
+            const scanMetrics = window.dataCollectorInstance.collectFromScan({
                 totalFiles: scanningResults.totalFiles,
                 errors: scanningResults.errors.length,
                 warnings: scanningResults.warnings.length,

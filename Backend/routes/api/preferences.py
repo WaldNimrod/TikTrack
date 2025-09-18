@@ -11,7 +11,7 @@ Date: January 2025
 """
 
 from flask import Blueprint, request, jsonify
-from services.preferences_service_v3 import preferences_service
+from services.preferences_service import preferences_service
 from typing import Any, Dict, List
 import logging
 import json
@@ -20,13 +20,13 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 
 # Create blueprint
-preferences_v3_bp = Blueprint('preferences_v3', __name__, url_prefix='/api/v1/preferences-v3')
+preferences_bp = Blueprint('preferences', __name__, url_prefix='/api/v1/preferences')
 
 # ============================================================================
 # User Preferences Endpoints
 # ============================================================================
 
-@preferences_v3_bp.route('/user', methods=['GET'])
+@preferences_bp.route('/user', methods=['GET'])
 def get_user_preferences() -> Any:
     """
     קבלת העדפות משתמש
@@ -66,7 +66,7 @@ def get_user_preferences() -> Any:
             "timestamp": datetime.now().isoformat()
         }), 500
 
-@preferences_v3_bp.route('/user', methods=['POST'])
+@preferences_bp.route('/user', methods=['POST'])
 def save_user_preferences() -> Any:
     """
     שמירת העדפות משתמש
@@ -127,7 +127,7 @@ def save_user_preferences() -> Any:
             "timestamp": datetime.now().isoformat()
         }), 500
 
-@preferences_v3_bp.route('/user/single', methods=['GET'])
+@preferences_bp.route('/user/single', methods=['GET'])
 def get_single_preference() -> Any:
     """
     קבלת העדפה בודדת
@@ -177,7 +177,7 @@ def get_single_preference() -> Any:
             "timestamp": datetime.now().isoformat()
         }), 500
 
-@preferences_v3_bp.route('/user/single', methods=['POST'])
+@preferences_bp.route('/user/single', methods=['POST'])
 def save_single_preference() -> Any:
     """
     שמירת העדפה בודדת
@@ -242,7 +242,7 @@ def save_single_preference() -> Any:
             "timestamp": datetime.now().isoformat()
         }), 500
 
-@preferences_v3_bp.route('/user/group', methods=['GET'])
+@preferences_bp.route('/user/group', methods=['GET'])
 def get_group_preferences() -> Any:
     """
     קבלת העדפות קבוצה
@@ -293,7 +293,7 @@ def get_group_preferences() -> Any:
             "timestamp": datetime.now().isoformat()
         }), 500
 
-@preferences_v3_bp.route('/user/multiple', methods=['POST'])
+@preferences_bp.route('/user/multiple', methods=['POST'])
 def get_multiple_preferences() -> Any:
     """
     קבלת העדפות מרובות
@@ -356,7 +356,7 @@ def get_multiple_preferences() -> Any:
 # Profile Management Endpoints
 # ============================================================================
 
-@preferences_v3_bp.route('/profiles', methods=['GET'])
+@preferences_bp.route('/profiles', methods=['GET'])
 def get_user_profiles() -> Any:
     """
     קבלת פרופילים של משתמש
@@ -389,7 +389,7 @@ def get_user_profiles() -> Any:
 # Admin Endpoints
 # ============================================================================
 
-@preferences_v3_bp.route('/admin/types', methods=['GET'])
+@preferences_bp.route('/admin/types', methods=['GET'])
 def get_preference_types() -> Any:
     """
     קבלת סוגי העדפות (Admin)
@@ -413,7 +413,7 @@ def get_preference_types() -> Any:
             "timestamp": datetime.now().isoformat()
         }), 500
 
-@preferences_v3_bp.route('/admin/groups', methods=['GET'])
+@preferences_bp.route('/admin/groups', methods=['GET'])
 def get_preference_groups() -> Any:
     """
     קבלת קבוצות העדפות (Admin)
@@ -437,7 +437,7 @@ def get_preference_groups() -> Any:
             "timestamp": datetime.now().isoformat()
         }), 500
 
-@preferences_v3_bp.route('/admin/search', methods=['POST'])
+@preferences_bp.route('/admin/search', methods=['POST'])
 def search_preferences() -> Any:
     """
     חיפוש העדפות (Admin)
@@ -473,7 +473,7 @@ def search_preferences() -> Any:
 # Utility Endpoints
 # ============================================================================
 
-@preferences_v3_bp.route('/info/<preference_name>', methods=['GET'])
+@preferences_bp.route('/info/<preference_name>', methods=['GET'])
 def get_preference_info(preference_name: str) -> Any:
     """
     קבלת מידע על העדפה
@@ -499,7 +499,7 @@ def get_preference_info(preference_name: str) -> Any:
             "timestamp": datetime.now().isoformat()
         }), 500
 
-@preferences_v3_bp.route('/health', methods=['GET'])
+@preferences_bp.route('/health', methods=['GET'])
 def health_check() -> Any:
     """
     בדיקת תקינות השירות

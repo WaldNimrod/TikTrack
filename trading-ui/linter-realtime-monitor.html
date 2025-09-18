@@ -125,6 +125,10 @@
               <span class="label">אזהרות:</span>
               <span class="value"><strong id="totalWarningsStats">0</strong></span>
             </div>
+            <div class="status-item">
+              <span class="label">סריקה אחרונה:</span>
+              <span class="value"><strong id="lastScanDate">טרם בוצעה</strong></span>
+            </div>
           </div>
 
             <!-- Unified Control Panel - כל הכלים במקום אחד -->
@@ -217,60 +221,70 @@
               </div>
             </div>
 
-            <!-- Actions Layout - Left column for primary, right column for advanced -->
+            <!-- Actions Layout - Left column for all actions, right column for monitoring -->
             <div style="display: flex; gap: 30px; padding: 20px;">
 
-              <!-- Left Column - Primary Actions -->
+              <!-- Left Column - All Actions (Primary + Advanced) -->
               <div style="flex: 1;">
-                <h5 style="margin-bottom: 15px; color: #495057; font-size: 16px; font-weight: 500;">
-                  <i class="fas fa-play-circle"></i> פעולות עיקריות:
-                </h5>
-                <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 15px;">
-                  <button class="btn btn-success" onclick="window.startFileScan()">
-                    <i class="fas fa-search"></i> סרוק קבצים
-                  </button>
-                  <button class="btn btn-primary" onclick="window.fixAllIssues()">
-                    <i class="fas fa-magic"></i> תיקון אוטומטי
-                  </button>
-                  <button class="btn btn-info" onclick="window.copyUnresolvedIssuesLog()">
-                    <i class="fas fa-clipboard-list"></i> העתק בעיות
-                  </button>
+                <!-- Primary Actions -->
+                <div style="margin-bottom: 20px;">
+                  <h5 style="margin-bottom: 15px; color: #495057; font-size: 16px; font-weight: 500;">
+                    <i class="fas fa-play-circle"></i> פעולות עיקריות:
+                  </h5>
+                  <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 15px;">
+                    <button class="btn btn-success" onclick="window.startFileScan()">
+                      <i class="fas fa-search"></i> סרוק קבצים
+                    </button>
+                    <button class="btn btn-primary" onclick="window.fixAllIssues()">
+                      <i class="fas fa-magic"></i> תיקון אוטומטי
+                    </button>
+                    <button class="btn btn-info" onclick="window.copyUnresolvedIssuesLog()">
+                      <i class="fas fa-clipboard-list"></i> העתק בעיות
+                    </button>
+                  </div>
+                  <p style="margin: 0; color: #666; font-size: 13px;">
+                    סורק ומתקן אוטומטית
+                  </p>
                 </div>
-                <p style="margin: 0; color: #666; font-size: 13px;">
-                  סורק ומתקן אוטומטית
-                </p>
-              </div>
 
-              <!-- Right Column - Advanced Actions -->
-              <div style="flex: 1;">
-                <h5 style="margin-bottom: 15px; color: #495057; font-size: 16px; font-weight: 500;">
-                  <i class="fas fa-tools"></i> פעולות מתקדמות:
-                </h5>
-
-                <!-- All Advanced Actions in one column -->
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                  <!-- Fix Options -->
-                  <div>
-                    <label style="display: block; font-size: 14px; color: #495057; margin-bottom: 6px; font-weight: 500;">
-                      <i class="fas fa-wrench"></i> אפשרויות תיקון:
-                    </label>
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                      <button class="btn btn-warning btn-sm" onclick="window.fixAllErrors()">
-                        <i class="fas fa-exclamation-triangle"></i> שגיאות
-                      </button>
-                      <button class="btn btn-info btn-sm" onclick="window.fixAllWarnings()">
-                        <i class="fas fa-exclamation-circle"></i> אזהרות
-                      </button>
-                      <button class="btn btn-secondary btn-sm" onclick="window.ignoreAllIssues()">
-                        <i class="fas fa-eye-slash"></i> התעלם
-                      </button>
+                <!-- Advanced Actions -->
+                <div>
+                  <h5 style="margin-bottom: 15px; color: #495057; font-size: 16px; font-weight: 500;">
+                    <i class="fas fa-tools"></i> פעולות מתקדמות:
+                  </h5>
+                  <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <!-- Fix Options -->
+                    <div>
+                      <label style="display: block; font-size: 14px; color: #495057; margin-bottom: 6px; font-weight: 500;">
+                        <i class="fas fa-wrench"></i> אפשרויות תיקון:
+                      </label>
+                      <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                        <button class="btn btn-warning btn-sm" onclick="window.fixAllErrors()">
+                          <i class="fas fa-exclamation-triangle"></i> שגיאות
+                        </button>
+                        <button class="btn btn-info btn-sm" onclick="window.fixAllWarnings()">
+                          <i class="fas fa-exclamation-circle"></i> אזהרות
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="window.ignoreAllIssues()">
+                          <i class="fas fa-eye-slash"></i> התעלם
+                        </button>
+                      </div>
                     </div>
                   </div>
+                </div>
+              </div>
 
+              <!-- Right Column - Monitoring and Utilities -->
+              <div style="flex: 1;">
+                <h5 style="margin-bottom: 15px; color: #495057; font-size: 16px; font-weight: 500;">
+                  <i class="fas fa-clock"></i> בקרה וניטור:
+                </h5>
+
+                <div style="display: flex; flex-direction: column; gap: 12px;">
                   <!-- Monitoring Controls -->
                   <div>
                     <label style="display: block; font-size: 14px; color: #495057; margin-bottom: 6px; font-weight: 500;">
-                      <i class="fas fa-clock"></i> בקרת ניטור:
+                      <i class="fas fa-play"></i> בקרת ניטור:
                     </label>
                     <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
                       <button class="btn btn-success btn-sm" id="startMonitoringBtn" onclick="if(typeof window.startMonitoring === 'function') window.startMonitoring(); else console.error('startMonitoring not defined')">

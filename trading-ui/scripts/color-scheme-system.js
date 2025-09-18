@@ -2057,6 +2057,7 @@ window.colorSchemeSystem = {
   loadInvestmentTypeColorsFromPreferences,
   loadAllColorsFromPreferences,
   generateAndApplyEntityCSS,
+  updateCSSVariablesFromPreferences,
   hexToRgb,
   darkenColor,
 

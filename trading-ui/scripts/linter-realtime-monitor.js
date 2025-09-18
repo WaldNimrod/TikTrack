@@ -205,10 +205,31 @@ async function loadInitialData() {
 }
 
 // Update statistics display with real data
-function updateStatisticsDisplay() {
-    const totalFiles = scanningResults.totalFiles || 0;
-    const totalErrors = scanningResults.errors ? scanningResults.errors.length : 0;
-    const totalWarnings = scanningResults.warnings ? scanningResults.warnings.length : 0;
+async function updateStatisticsDisplay() {
+    // First try to load last scan results from IndexedDB
+    let totalFiles = scanningResults.totalFiles || 0;
+    let totalErrors = scanningResults.errors ? scanningResults.errors.length : 0;
+    let totalWarnings = scanningResults.warnings ? scanningResults.warnings.length : 0;
+    let lastScanDate = null;
+
+    try {
+        if (typeof window.IndexedDBAdapter !== 'undefined') {
+            const adapter = new window.IndexedDBAdapter();
+            await adapter.initialize();
+            const history = await adapter.loadLastNPoints(1);
+            if (history && history.length > 0) {
+                const lastData = history[0];
+                if (lastData.metrics) {
+                    totalFiles = lastData.metrics.totalFiles || totalFiles;
+                    totalErrors = lastData.metrics.errors || totalErrors;
+                    totalWarnings = lastData.metrics.warnings || totalWarnings;
+                    lastScanDate = new Date(lastData.timestamp).toLocaleString('he-IL');
+                }
+            }
+        }
+    } catch (error) {
+        console.log('Could not load previous scan data:', error);
+    }
 
     // Determine overall status based on issues
     let overallStatus = 'מצוין';
@@ -233,6 +254,14 @@ function updateStatisticsDisplay() {
             element.textContent = stats[id];
         }
     });
+
+    // Update last scan date if available
+    if (lastScanDate) {
+        const lastScanElement = document.getElementById('lastScanDate');
+        if (lastScanElement) {
+            lastScanElement.textContent = `סריקה אחרונה: ${lastScanDate}`;
+        }
+    }
 }
 
 // Load logs
@@ -556,6 +585,7 @@ function scanJavaScriptFiles() {
     if (window.projectFiles && window.projectFiles.length > 0) {
         // Use discovered files
         console.log('📁 Found', window.projectFiles.length, 'discovered files');
+        console.log('📁 Discovered files sample:', window.projectFiles.slice(0, 10));
         let allFiles = [];
         const discoveredFiles = window.projectFiles;
 
@@ -2541,13 +2571,23 @@ function calculateTotalSize() {
 }
 
 // Update chart indicators with latest data
-function updateChartIndicators(latestDataPoint) {
+async function updateChartIndicators(latestDataPoint) {
     try {
-        // Update total data points
+        // Update total data points from IndexedDB
         const totalDataPointsEl = document.getElementById('totalDataPoints');
-        if (totalDataPointsEl && latestDataPoint) {
-            // This would need to be calculated from IndexedDB
-            totalDataPointsEl.textContent = 'עדכון...';
+        if (totalDataPointsEl) {
+            try {
+                if (typeof window.IndexedDBAdapter !== 'undefined') {
+                    const adapter = new window.IndexedDBAdapter();
+                    await adapter.initialize();
+                    const allData = await adapter.loadAll();
+                    totalDataPointsEl.textContent = allData.length.toString();
+            } else {
+                    totalDataPointsEl.textContent = latestDataPoint ? '1' : '0';
+                }
+            } catch (error) {
+                totalDataPointsEl.textContent = latestDataPoint ? '1' : '0';
+            }
         }
 
         // Update last update time
@@ -2555,6 +2595,25 @@ function updateChartIndicators(latestDataPoint) {
         if (lastUpdateEl && latestDataPoint) {
             const timeStr = new Date(latestDataPoint.timestamp).toLocaleTimeString('he-IL');
             lastUpdateEl.textContent = timeStr;
+        } else if (lastUpdateEl) {
+            lastUpdateEl.textContent = 'אין נתונים';
+        }
+
+        // Update storage size
+        const storageSizeEl = document.getElementById('storageSize');
+        if (storageSizeEl) {
+            try {
+                if (typeof window.IndexedDBAdapter !== 'undefined') {
+                    const adapter = new window.IndexedDBAdapter();
+                    await adapter.initialize();
+                    const size = await adapter.getStorageSize();
+                    storageSizeEl.textContent = `${(size / 1024 / 1024).toFixed(1)} MB`;
+                } else {
+                    storageSizeEl.textContent = '0.0 MB';
+            }
+        } catch (error) {
+                storageSizeEl.textContent = '0.0 MB';
+            }
         }
 
         // Update average quality
@@ -2562,6 +2621,8 @@ function updateChartIndicators(latestDataPoint) {
         if (avgQualityEl && latestDataPoint) {
             const quality = latestDataPoint.metrics?.qualityScore || 0;
             avgQualityEl.textContent = `${quality.toFixed(1)}%`;
+        } else if (avgQualityEl) {
+            avgQualityEl.textContent = '0.0%';
         }
 
         // Update total errors
@@ -2569,20 +2630,34 @@ function updateChartIndicators(latestDataPoint) {
         if (totalErrorsEl && latestDataPoint) {
             const errors = latestDataPoint.metrics?.errors || 0;
             const warnings = latestDataPoint.metrics?.warnings || 0;
-            totalErrorsEl.textContent = errors + warnings;
+            totalErrorsEl.textContent = (errors + warnings).toString();
+        } else if (totalErrorsEl) {
+            totalErrorsEl.textContent = '0';
         }
 
         // Update data completeness
         const completenessEl = document.getElementById('dataCompleteness');
         const completenessBarEl = document.getElementById('dataCompletenessBar');
         if (completenessEl && completenessBarEl) {
-            // Simple completeness based on having data
-            const completeness = latestDataPoint ? 100 : 0;
-            completenessEl.textContent = `${completeness}%`;
-            completenessBarEl.style.width = `${completeness}%`;
+            try {
+                if (typeof window.IndexedDBAdapter !== 'undefined') {
+                    const adapter = new window.IndexedDBAdapter();
+                    await adapter.initialize();
+                    const allData = await adapter.loadAll();
+                    const completeness = allData.length > 0 ? 100 : 0;
+                    completenessEl.textContent = `${completeness}%`;
+                    completenessBarEl.style.width = `${completeness}%`;
+                } else {
+                    completenessEl.textContent = '0%';
+                    completenessBarEl.style.width = '0%';
+                }
+            } catch (error) {
+                completenessEl.textContent = '0%';
+                completenessBarEl.style.width = '0%';
+            }
         }
 
-        } catch (error) {
+    } catch (error) {
         console.error('❌ שגיאה בעדכון אינדיקטורים:', error);
     }
 }
@@ -2596,9 +2671,9 @@ window.refreshChartData = async function() {
 
         if (typeof window.IndexedDBAdapter === 'undefined') {
             console.warn('⚠️ IndexedDBAdapter לא זמין');
-            return;
-        }
-
+        return;
+    }
+    
         const adapter = new window.IndexedDBAdapter();
         await adapter.initialize();
 
@@ -2652,7 +2727,7 @@ window.clearChartHistory = async function() {
         document.getElementById('totalErrors').textContent = '0';
         document.getElementById('dataCompleteness').textContent = '0%';
         document.getElementById('dataCompletenessBar').style.width = '0%';
-
+        
         if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification('היסטוריה נמחקה', 'כל נתוני הגרף נמחקו בהצלחה');
         }
@@ -2708,7 +2783,7 @@ window.exportChartData = async function() {
             }
         } else {
             console.log('ℹ️ אין נתונים לייצא');
-            if (typeof window.showInfoNotification === 'function') {
+        if (typeof window.showInfoNotification === 'function') {
                 window.showInfoNotification('אין נתונים', 'לא נמצאו נתונים לייצא');
             }
         }

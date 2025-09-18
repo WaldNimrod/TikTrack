@@ -2,6 +2,39 @@
 
 > 📋 **מסמך זה מגדיר את המבנה הסטנדרטי לכל עמוד במערכת TikTrack**
 
+## טעינת CSS - ITCSS Architecture
+
+### סדר טעינת CSS נכון (חובה!)
+
+```html
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>שם העמוד - TikTrack</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS - חייב להיות קודם -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- TikTrack ITCSS Main CSS - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- CSS Architecture: ראו documentation/frontend/CSS_ARCHITECTURE_GUIDE.md -->
+    <link rel="stylesheet" href="styles-new/main.css?v=v1.0.0">
+
+    <!-- Header Styles - נפרד מ-ITCSS -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_level3_fix">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+```
+
 ## מבנה עמוד סטנדרטי
 
 ### מבנה HTML בסיסי

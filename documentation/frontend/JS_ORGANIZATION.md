@@ -27,7 +27,7 @@ trading-ui/scripts/
 ├── constraints.js            # Constraints management
 ├── designs.js                # Designs page functionality
 ├── research.js               # Research page functionality
-├── preferences-v2.js         # Preferences management V2
+├── preferences.js            # Preferences management
 
 ```
 

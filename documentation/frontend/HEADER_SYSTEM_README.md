@@ -895,7 +895,7 @@ trading-ui/
 ├── test-header-clean.html        # Primary test environment
 ├── test-header-old-system.html   # Reference working system
 └── config/
-    └── preferences-v2.json       # Default preferences V2
+    └── preferences.json          # Default preferences
 ```
 
 ## 🎯 Next Steps for Submenu Fix

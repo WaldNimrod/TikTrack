@@ -41,13 +41,14 @@ class IndexedDBTester {
      * הרצת כל הבדיקות
      */
     async runAllTests() {
-        console.log('🧪 מתחיל בדיקה מקיפה של IndexedDB...');
+        console.log('🧪 מתחיל בדיקה מקיפה של IndexedDB + Log Recovery + Chart Renderer (שלב 2.5.1-2.5.3)...');
 
         try {
             // אתחול Adapter
             this.adapter = new IndexedDBAdapter();
 
-            // בדיקות בסיסיות
+            // בדיקות בסיסיות - שלב 2.5.1
+            console.log('📊 שלב 2.5.1: בדיקת תשתית IndexedDB');
             await this.testInitialization();
             await this.testSchemaCreation();
             await this.testDataValidation();
@@ -56,6 +57,14 @@ class IndexedDBTester {
             await this.testCleanupOperations();
             await this.testPerformance();
             await this.testErrorHandling();
+
+            // בדיקות Log Recovery - שלב 2.5.2
+            console.log('🔄 שלב 2.5.2: בדיקת Log Recovery System');
+            await this.testLogRecovery();
+
+            // בדיקות Chart Renderer - שלב 2.5.3
+            console.log('📊 שלב 2.5.3: בדיקת Chart Renderer');
+            await this.testChartRenderer();
 
             // סיכום
             this.printSummary();
@@ -363,6 +372,209 @@ class IndexedDBTester {
     }
 
     /**
+     * בדיקת Log Recovery System
+     */
+    async testLogRecovery() {
+        console.log('🔄 בודק Log Recovery System...');
+
+        try {
+            const logRecovery = new LogRecovery();
+
+            // הכנת נתוני לוג לבדיקה
+            const testLogs = [
+                {
+                    timestamp: new Date(Date.now() - 60000).toISOString(),
+                    level: 'info',
+                    message: 'סריקה התחילה - session_test123'
+                },
+                {
+                    timestamp: new Date(Date.now() - 55000).toISOString(),
+                    level: 'info',
+                    message: 'נסרקו 45 קבצים'
+                },
+                {
+                    timestamp: new Date(Date.now() - 50000).toISOString(),
+                    level: 'info',
+                    message: 'נמצאו 12 שגיאות ו-8 אזהרות'
+                },
+                {
+                    timestamp: new Date(Date.now() - 45000).toISOString(),
+                    level: 'info',
+                    message: 'זמן סריקה: 8500ms'
+                },
+                {
+                    timestamp: new Date(Date.now() - 40000).toISOString(),
+                    level: 'info',
+                    message: 'סריקה הושלמה בהצלחה'
+                }
+            ];
+
+            // שמירת לוגים ב-sessionStorage
+            sessionStorage.setItem('systemLogs', JSON.stringify(testLogs));
+
+            // בדיקת שחזור
+            const recoveredData = await logRecovery.recoverFromSystemLog();
+
+            // בדיקות
+            this.assert(Array.isArray(recoveredData), 'Should return array of recovered data');
+            this.assert(recoveredData.length >= 1, 'Should recover at least one data point');
+
+            if (recoveredData.length > 0) {
+                const firstPoint = recoveredData[0];
+
+                // בדיקת מבנה הנתונים
+                this.assert(firstPoint.timestamp, 'Should have timestamp');
+                this.assert(firstPoint.metrics, 'Should have metrics');
+                this.assert(typeof firstPoint.metrics.totalFiles === 'number', 'Should have totalFiles');
+                this.assert(typeof firstPoint.metrics.errors === 'number', 'Should have errors');
+                this.assert(typeof firstPoint.metrics.warnings === 'number', 'Should have warnings');
+                this.assert(typeof firstPoint.metrics.qualityScore === 'number', 'Should have qualityScore');
+
+                // בדיקת ערכים נכונים
+                this.assert(firstPoint.metrics.totalFiles >= 0, 'totalFiles should be non-negative');
+                this.assert(firstPoint.metrics.errors >= 0, 'errors should be non-negative');
+                this.assert(firstPoint.metrics.warnings >= 0, 'warnings should be non-negative');
+                this.assert(firstPoint.metrics.qualityScore >= 0 && firstPoint.metrics.qualityScore <= 100,
+                           'qualityScore should be between 0-100');
+            }
+
+            // בדיקת מיזוג נתונים
+            const existingData = [{
+                id: 'existing_1',
+                timestamp: new Date(Date.now() - 120000).toISOString(),
+                metrics: { totalFiles: 50, errors: 5, warnings: 3, qualityScore: 75 }
+            }];
+
+            const mergedData = logRecovery.mergeWithExistingData(existingData, recoveredData);
+            this.assert(mergedData.length >= existingData.length + recoveredData.length,
+                       'Should merge all data points');
+
+            // בדיקת ייצוא/יבוא
+            const exportedData = await logRecovery.exportToFile();
+            this.assert(typeof exportedData === 'string', 'Should export as string');
+            this.assert(exportedData.length > 0, 'Should have content');
+
+            const importSuccess = await logRecovery.importFromFile(exportedData);
+            this.assert(importSuccess, 'Should import successfully');
+
+            // בדיקת סטטיסטיקות
+            const stats = logRecovery.getRecoveryStats();
+            this.assert(typeof stats === 'object', 'Should return stats object');
+            this.assert(typeof stats.totalRecovered === 'number', 'Should have totalRecovered');
+
+            console.log('✅ Log Recovery System עובד נכון');
+            this.testPassed('testLogRecovery');
+
+        } catch (error) {
+            console.error('❌ שגיאה בבדיקת Log Recovery:', error);
+            this.testFailed('testLogRecovery', error);
+        }
+    }
+
+    /**
+     * בדיקת Chart Renderer System
+     */
+    async testChartRenderer() {
+        console.log('📊 בודק Chart Renderer System...');
+
+        try {
+            // בדיקת זמינות Chart.js
+            if (typeof Chart === 'undefined') {
+                console.warn('⚠️ Chart.js לא זמין - דילוג על בדיקות Chart Renderer');
+                return;
+            }
+
+            const chartRenderer = new ChartRenderer('testChartContainer');
+
+            // יצירת קונטיינר לבדיקה
+            let container = document.getElementById('testChartContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'testChartContainer';
+                container.style.width = '400px';
+                container.style.height = '200px';
+                container.style.position = 'absolute';
+                container.style.left = '-9999px'; // הסתר מהמשתמש
+                document.body.appendChild(container);
+            }
+
+            // הכנת נתוני בדיקה
+            const testData = [
+                {
+                    timestamp: new Date(Date.now() - 60000).toISOString(),
+                    metrics: { totalFiles: 100, errors: 5, warnings: 3, qualityScore: 85, scanDuration: 1000 }
+                },
+                {
+                    timestamp: new Date(Date.now() - 30000).toISOString(),
+                    metrics: { totalFiles: 120, errors: 8, warnings: 5, qualityScore: 78, scanDuration: 1200 }
+                },
+                {
+                    timestamp: new Date().toISOString(),
+                    metrics: { totalFiles: 110, errors: 6, warnings: 4, qualityScore: 82, scanDuration: 1100 }
+                }
+            ];
+
+            // בדיקת אתחול
+            await chartRenderer.initialize(testData);
+            this.assert(chartRenderer.isReady(), 'Chart Renderer should be ready after initialization');
+
+            // בדיקת סטטיסטיקות
+            const stats = chartRenderer.getChartStats();
+            this.assert(stats.initialized, 'Chart should be initialized');
+            this.assert(stats.dataPoints >= 3, 'Should have test data points');
+            this.assert(typeof stats.qualityDataset.avg === 'number', 'Should calculate quality average');
+            this.assert(typeof stats.errorDataset.avg === 'number', 'Should calculate error average');
+
+            // בדיקת עדכון נתונים
+            const newData = [
+                ...testData,
+                {
+                    timestamp: new Date(Date.now() + 30000).toISOString(),
+                    metrics: { totalFiles: 130, errors: 4, warnings: 2, qualityScore: 90, scanDuration: 900 }
+                }
+            ];
+            await chartRenderer.updateChart(newData, false); // ללא אנימציה לבדיקה
+
+            // בדיקת הוספת נקודה בודדת
+            const newPoint = {
+                timestamp: new Date(Date.now() + 60000).toISOString(),
+                metrics: { totalFiles: 125, errors: 3, warnings: 1, qualityScore: 95, scanDuration: 800 }
+            };
+            await chartRenderer.addDataPoint(newPoint);
+
+            // בדיקת ייצוא (אם זמין)
+            try {
+                const exportedImage = await chartRenderer.exportChart('png');
+                this.assert(typeof exportedImage === 'string', 'Should export chart as string');
+                this.assert(exportedImage.startsWith('data:image/png'), 'Should be PNG data URL');
+            } catch (exportError) {
+                console.warn('⚠️ ייצוא לא זמין:', exportError.message);
+            }
+
+            // בדיקת ניקוי
+            await chartRenderer.clearChart();
+            const clearedStats = chartRenderer.getChartStats();
+            this.assert(clearedStats.dataPoints === 0, 'Chart should be cleared');
+
+            // בדיקת הרס
+            chartRenderer.destroy();
+            this.assert(!chartRenderer.isReady(), 'Chart should be destroyed');
+
+            // ניקוי קונטיינר בדיקה
+            if (container && container.parentNode) {
+                container.parentNode.removeChild(container);
+            }
+
+            console.log('✅ Chart Renderer System עובד נכון');
+            this.testPassed('testChartRenderer');
+
+        } catch (error) {
+            console.error('❌ שגיאה בבדיקת Chart Renderer:', error);
+            this.testFailed('testChartRenderer', error);
+        }
+    }
+
+    /**
      * Assert פונקציה לבדיקות
      */
     assert(condition, message) {
@@ -405,12 +617,19 @@ class IndexedDBTester {
      * הדפסת סיכום הבדיקות
      */
     printSummary() {
-        console.log('\n' + '='.repeat(50));
-        console.log('📋 סיכום בדיקות IndexedDB');
-        console.log('='.repeat(50));
+        console.log('\n' + '='.repeat(60));
+        console.log('📋 סיכום בדיקות מקיפות - שלב 2.5');
+        console.log('IndexedDB + Log Recovery System');
+        console.log('='.repeat(60));
         console.log(`סה"כ בדיקות: ${this.testResults.total}`);
         console.log(`עברו: ${this.testResults.passed} (${Math.round(this.testResults.passed / this.testResults.total * 100)}%)`);
         console.log(`נכשלו: ${this.testResults.failed} (${Math.round(this.testResults.failed / this.testResults.total * 100)}%)`);
+
+        // פירוט לפי שלבים
+        console.log('\n📋 פירוט לפי שלבים:');
+        console.log('שלב 2.5.1 - תשתית IndexedDB: 8 בדיקות');
+        console.log('שלב 2.5.2 - Log Recovery System: 1 בדיקה');
+        console.log('שלב 2.5.3 - Chart Renderer System: 1 בדיקה');
 
         if (this.testResults.errors.length > 0) {
             console.log('\n❌ שגיאות:');
@@ -435,7 +654,7 @@ if (typeof window !== 'undefined') {
 
     // פונקציה גלובלית להרצת הבדיקה
     window.runIndexedDBTests = async function() {
-        console.log('🚀 מתחיל בדיקה מקיפה של IndexedDB...');
+        console.log('🚀 מתחיל בדיקה מקיפה של IndexedDB + Log Recovery + Chart Renderer (שלב 2.5)...');
         const tester = new IndexedDBTester();
         await tester.runAllTests();
         return tester.testResults;

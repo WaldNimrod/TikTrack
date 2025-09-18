@@ -20,25 +20,21 @@
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_level3_fix">
     
-    <!-- Error Handlers -->
-    <script src="scripts/error-handlers.js"></script>
-
-    <!-- Very early test -->
+    <!-- Simple test script -->
     <script>
-        console.log('🚀 Very early test - scripts loading...');
-        fetch('/api/debug/log', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: '🚀 Very early test - scripts loading...' })
-        }).catch(() => {});
+        console.log('🚀 JS Map page loaded');
+        window.testVariable = 'working';
 
         function pageLoaded() {
-            console.log('📄 Page body onload fired!');
-            fetch('/api/debug/log', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: '📄 Page body onload fired!' })
-            }).catch(() => {});
+            console.log('📄 Page onload fired!');
+            console.log('🔍 testVariable:', window.testVariable);
+            console.log('🔍 jsMapLoaded:', window.jsMapLoaded);
+
+            // Visual indicator
+            const testDiv = document.createElement('div');
+            testDiv.innerHTML = '<div style="position:fixed;top:10px;left:10px;background:green;color:white;padding:10px;z-index:10000;border-radius:5px;">✅ JS WORKING<br>jsMapLoaded: ' + (window.jsMapLoaded ? 'YES' : 'NO') + '</div>';
+            document.body.appendChild(testDiv);
+            setTimeout(() => testDiv.remove(), 5000);
         }
     </script>
 
@@ -193,14 +189,30 @@
         </div>
     </div>
 
-    <!-- Core System Scripts -->
-    <script src="scripts/console-cleanup.js"></script>
-    <script src="scripts/translation-utils.js"></script>
-    <script src="scripts/data-utils.js"></script>
-    <script src="scripts/linked-items.js"></script>
-
     <!-- Page Scripts -->
     <script src="scripts/js-map.js"></script>
+
+    <!-- Test if page initialization works -->
+    <script>
+        // Test after js-map.js loads
+        setTimeout(() => {
+            console.log('🔍 Checking after timeout...');
+            console.log('🔍 window.initializeJsMapPage exists:', typeof window.initializeJsMapPage);
+            console.log('🔍 window.getCurrentPageName exists:', typeof window.getCurrentPageName);
+
+            if (typeof window.initializeJsMapPage === 'function') {
+                console.log('✅ initializeJsMapPage found - calling it...');
+                try {
+                    window.initializeJsMapPage();
+                    console.log('✅ initializeJsMapPage called successfully');
+                } catch (e) {
+                    console.error('❌ Error calling initializeJsMapPage:', e);
+                }
+            } else {
+                console.error('❌ initializeJsMapPage not found');
+            }
+        }, 1000);
+    </script>
 
 </body>
 </html>

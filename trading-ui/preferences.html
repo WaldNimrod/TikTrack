@@ -40,7 +40,7 @@
 <body>
     <!-- 🔒 LOCKED TEMPLATE ZONE 1 - Header & Navigation (DO NOT MODIFY) -->
     <!-- ======================================================== -->
-    <div id="unified-header"></div>
+        <div id="unified-header"></div>
 
     <!-- 🔒 LOCKED TEMPLATE ZONE 2 - Main Content Container (DO NOT MODIFY) -->
     <!-- ======================================================== -->
@@ -58,24 +58,19 @@
                 <!-- ======================================================== -->
                 <!-- ===== CONTENT SECTIONS START (EDITABLE) ===== -->
                 
-                <!-- Header Section -->
+                <!-- Action Buttons Section -->
                 <div class="row mb-4">
                     <div class="col-12">
-                        <div class="page-header d-flex justify-content-between align-items-center">
-          <div>
-                                <h1>⚙️ העדפות</h1>
-          </div>
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-success" onclick="window.saveAllPreferences()" id="saveAllBtn">
-                                    <i class="bi bi-save"></i> שמור הכל
+                        <div class="d-flex justify-content-end gap-2">
+                            <button class="btn btn-success" onclick="window.saveAllPreferences()" id="saveAllBtn">
+                                <i class="bi bi-save"></i> שמור הכל
+          </button>
+                            <button class="btn btn-warning" onclick="window.resetToDefaults()" id="resetBtn">
+                                <i class="bi bi-arrow-clockwise"></i> איפוס
             </button>
-                                <button class="btn btn-warning" onclick="window.resetToDefaults()" id="resetBtn">
-                                    <i class="bi bi-arrow-clockwise"></i> איפוס
-                                </button>
-                                <button class="btn btn-outline-secondary" onclick="window.toggleAllSections()" id="toggleAllBtn">
-                                    <i class="bi bi-arrows-expand"></i> פתח/סגור הכל
+                            <button class="btn btn-outline-secondary" onclick="window.toggleAllSections()" id="toggleAllBtn">
+                                <i class="bi bi-arrows-expand"></i> פתח/סגור הכל
             </button>
-          </div>
         </div>
         </div>
       </div>
@@ -282,8 +277,8 @@
                                         <option>90 ימים אחרונים</option>
                                         <option>הכל</option>
                                         <option>מותאם אישית</option>
-                                    </select>
-                                </div>
+                </select>
+              </div>
             </div>
                             <div class="col-md-6">
                                 <h5>פילטרים נוספים</h5>
@@ -613,30 +608,30 @@
                                         <input type="color" id="valueNeutralColorLight" class="form-control form-control-color color-picker" data-color-key="value-neutral-color-light">
                                         <label class="form-label mb-0">כהה:</label>
                                         <input type="color" id="valueNeutralColorDark" class="form-control form-control-color color-picker" data-color-key="value-neutral-color-dark">
-              </div>
-                  </div>
                   </div>
                 </div>
+              </div>
+            </div>
               </div>
             </div>
             
             
                 <!-- Section 6: Admin Interface -->
-                <div class="content-section" id="section6">
-                    <div class="section-header">
+      <div class="content-section" id="section6">
+        <div class="section-header">
                         <h2>🔧 ממשק ניהול</h2>
                         <button class="filter-toggle-btn" onclick="window.toggleSection('section6')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
-                    </div>
-                    <div class="section-body">
+            <span class="section-toggle-icon">▼</span>
+          </button>
+        </div>
+        <div class="section-body">
                         <div id="adminInterfaceContainer">
                             <!-- Admin interface will be loaded here -->
-                        </div>
-                    </div>
-                </div>
-            
               </div>
+                  </div>
+                  </div>
+            
+                </div>
               </div>
             </div>
             
@@ -654,11 +649,11 @@
                     <button class="btn btn-info btn-lg" onclick="window.exportPreferences()" id="exportBtn">
                         <i class="bi bi-download"></i> ייצא הגדרות
           </button>
-        </div>
-    </div>
-    </div>
-  </div>
-  
+              </div>
+                </div>
+              </div>
+            </div>
+            
     <!-- Notification system -->
     <div class="notification-container" id="notificationContainer"></div>
 
@@ -668,10 +663,10 @@
                 <!-- ===== CONTENT SECTIONS END (EDITABLE) ===== -->
                 <!-- END OF TEMPLATE ZONE 4 -->
 
+              </div>
+              </div>
             </div>
-        </div>
-    </div>
-
+            
     <!-- 🔒 LOCKED TEMPLATE ZONE 5 - Footer & Scripts (DO NOT MODIFY ORDER) -->
     <!-- ======================================================== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -794,27 +789,13 @@
                     const data = await response.json();
                     const preferences = data.data.preferences || {};
                     
-                    // Load colors into color pickers
-                    const colorFields = [
-                        'primaryColor', 'secondaryColor', 'successColor', 'warningColor', 'dangerColor', 'infoColor',
-                        'entityTradeColor', 'entityTradeColorLight', 'entityTradeColorDark',
-                        'entityAccountColor', 'entityAccountColorLight', 'entityAccountColorDark',
-                        'entityTickerColor', 'entityTickerColorLight', 'entityTickerColorDark',
-                        'entityAlertColor', 'entityAlertColorLight', 'entityAlertColorDark',
-                        'entityCashFlowColor', 'entityCashFlowColorLight', 'entityCashFlowColorDark',
-                        'entityNoteColor', 'entityNoteColorLight', 'entityNoteColorDark',
-                        'entityTradePlanColor', 'entityTradePlanColorLight', 'entityTradePlanColorDark',
-                        'entityExecutionColor', 'entityExecutionColorLight', 'entityExecutionColorDark',
-                        'statusOpenColor', 'statusOpenColorLight', 'statusOpenColorDark',
-                        'statusClosedColor', 'statusClosedColorLight', 'statusClosedColorDark',
-                        'statusCancelledColor', 'statusCancelledColorLight', 'statusCancelledColorDark'
-                    ];
-                    
+                    // Load colors into color pickers - load all color pickers on the page
                     let loadedCount = 0;
-                    colorFields.forEach(fieldName => {
-                        const element = document.getElementById(fieldName);
-                        if (element && preferences[fieldName]) {
-                            element.value = preferences[fieldName];
+                    const allColorPickers = document.querySelectorAll('input[type="color"]');
+                    allColorPickers.forEach(picker => {
+                        const id = picker.id;
+                        if (preferences[id]) {
+                            picker.value = preferences[id];
                             loadedCount++;
                         }
                     });

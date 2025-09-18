@@ -1,3 +1,7 @@
+// Simple test to verify script loading
+window.jsMapLoaded = true;
+console.log('✅ js-map.js loaded successfully');
+
 /**
  * ==================================
  *
@@ -14,874 +18,875 @@
  * @lastUpdated September 18, 2025
  */
 
-        /**
-         * מערכת מפת פונקציות JS - גרסה מוטמעת
-         * מציגה מיפוי של עמודים לקבצים ופונקציות מפורטות
-         */
-
-        class JsMapSystem {
-            constructor() {
-                this.isInitialized = false;
-                this.pageMapping = {};
-                this.functionsData = {};
-                this.jsFiles = [];
-                this.htmlPages = [];
-            }
-
-            init() {
-                if (this.isInitialized) {
-                    return;
-                }
-
-                console.log('🚀 Initializing JS Map System');
-
-                // Load initial data
-                this.loadJsMapData();
-
-                this.isInitialized = true;
-            }
-
-            /**
-             * Load JS map data
-             */
-            async loadJsMapData() {
-                try {
-                    console.log('📊 loadJsMapData called successfully');
-
-                    // Show loading state
-                    this.showLoadingState();
-
-                    // Get page mapping
-                    await this.loadPageMapping();
-
-                    // Get functions data
-                    await this.loadFunctionsData();
-
-                    console.log('📊 Data loaded - Page mapping keys:', Object.keys(this.pageMapping));
-                    console.log('📊 Data loaded - Functions data keys:', Object.keys(this.functionsData));
-
-                    // Render data
-                    await this.renderPageMapping();
-                    this.renderFunctionsData();
-
-                    console.log('✅ JS map data loaded successfully');
-
-                } catch (error) {
-                    // Error loading JS map data
-                    this.showErrorState('שגיאה בטעינת נתונים');
-                }
-            }
-
-            /**
-             * Load page mapping data
-             */
-            async loadPageMapping() {
-                console.log('🔄 Starting loadPageMapping...');
-                // Always use local scan for consistent static data
-                console.log('🔄 Using local static page mapping...');
-                this.pageMapping = this.scanPageMappingLocally();
-                console.log('🔄 loadPageMapping completed. Page mapping:', this.pageMapping);
-            }
-
-            /**
-             * Load functions data
-             */
-            async loadFunctionsData() {
-                try {
-                    console.log('🔍 Fetching functions data from server...');
-                    const response = await fetch('/api/js-map/functions');
-                    console.log('📡 Response status:', response.status);
-
-                    if (response.ok) {
-                        this.functionsData = await response.json();
-                        console.log('✅ Functions data loaded from server:', Object.keys(this.functionsData));
-                        console.log('📊 Total files with functions:', Object.keys(this.functionsData).length);
-
-                        // Check if we have actual function data
-                        const filesWithFunctions = Object.keys(this.functionsData).filter(file =>
-                            this.functionsData[file] && this.functionsData[file].length > 0
-                        );
-                        console.log('📊 Files with actual functions:', filesWithFunctions.length);
-
-                        // Log some sample data
-                        }
-                    } else {
-                        console.warn('⚠️ Server response not ok, using local scan');
-                        this.functionsData = this.scanFunctionsLocally();
-                    }
-                } catch (error) {
-                    console.warn('⚠️ Using local functions scan due to error:', error);
-                    this.functionsData = this.scanFunctionsLocally();
-                }
-            }
-
-            /**
-             * Scan page mapping locally
-             */
-            scanPageMappingLocally() {
-                console.log('🔍 Starting scanPageMappingLocally...');
-                const mapping = {};
-
-                // Define known page to JS file mappings - FIXED LIST
-                // All existing pages except test-header-only.html (which is in tests submenu)
-                const pageMappings = {
-                };
-
-                // Get all JS files - FIXED LIST
-                this.jsFiles = [
-                    'translation-utils.js', 'data-utils.js', 'table-mappings.js',
-                    'date-utils.js', 'tables.js', 'linked-items.js', 'page-utils.js',
-                    'alerts.js?v=20250830_1', 'active-alerts-component.js?v=20250830_1', 'trades.js', 'trade_plans.js?v=20250830_1',
-                    'research.js', 'executions.js?v=20250830_1', 'tickers.js?v=20250830_1', 'ticker-service.js',
-                    'accounts.js?v=20250830_1', 'cash_flows.js', 'notes.js', 'preferences.js',
-                    'database.js', 'db-extradata.js', 'constraint-manager.js',
-                    'filter-system.js', 'currencies.js', 'auth.js',
-                    'js-map.js', 'js-scanner.js', 'console-cleanup.js'
-                ];
-
-                // Get all HTML pages
-                this.htmlPages = Object.keys(pageMappings);
-
-                // Create mapping table
-                this.htmlPages.forEach(page => {
-                    mapping[page] = pageMappings[page] || [];
-                });
-
-                console.log('🔍 Fixed page mapping created:', mapping);
-                console.log('📄 HTML Pages:', this.htmlPages);
-                console.log('📄 HTML Pages length:', this.htmlPages.length);
-                console.log('🗂️ JS Files:', this.jsFiles);
-                console.log('🗂️ JS Files length:', this.jsFiles.length);
-
-                return mapping;
-            }
-
-            /**
-             * Scan functions locally
-             */
-            async scanFunctionsLocally() {
-                const functions = {};
-
-                // Fallback to sample functions structure
-                console.log('⚠️ Using fallback sample functions structure');
-
-                // Sample functions for key files
-                    {
-                        name: 'SimpleFilter',
-                        description: 'מחלקה לניהול פילטרים פשוטים',
-                        params: 'אין פרמטרים',
-                        returns: 'אין ערך מוחזר',
-                        annotations: 'מחלקה לניהול פילטרים פשוטים לטבלת טריידים',
-                        code: 'class SimpleFilter {\n  constructor() {\n    this.currentFilters = {};\n  }\n}',
-                        line: 1,
-                        type: 'class'
-                    },
-                    {
-                        name: 'init',
-                        description: 'אתחול הפילטרים',
-                        params: 'אין פרמטרים',
-                        returns: 'אין ערך מוחזר',
-                        annotations: 'אתחול פילטרים למצב ברירת מחדל',
-                        code: 'init() {\n  this.waitForElements();\n  this.initializeDefaultFilters();\n}',
-                        line: 25,
-                        type: 'method'
-                    }
-                ];
-
-                    {
-                        name: 'HeaderSystem',
-                        description: 'מערכת ראש דף מאוחדת',
-                        params: 'אין פרמטרים',
-                        returns: 'אין ערך מוחזר',
-                        annotations: 'מערכת ראש דף מאוחדת עם פילטרים',
-                        code: 'class HeaderSystem {\n  constructor() {\n    this.isInitialized = false;\n  }\n}',
-                        line: 1,
-                        type: 'class'
-                    }
-                ];
-
-                functions['main.js'] = [
-                    {
-                        name: 'initializeApp',
-                        description: 'אתחול האפליקציה הראשי',
-                        params: 'אין פרמטרים',
-                        returns: 'אין ערך מוחזר',
-                        annotations: 'פונקציה ראשית לאתחול האפליקציה',
-                        code: 'function initializeApp() {\n  console.log("App initialized");\n}',
-                        line: 1,
-                        type: 'function'
-                    }
-                ];
-
-                // Add empty arrays for other files
-                this.jsFiles.forEach(file => {
-                    if (!functions[file]) {
-                        functions[file] = [];
-                    }
-                });
-
-                return functions;
-            }
-
-            /**
-             * Scan function calls across all JS files
-             */
-            scanFunctionCalls() {
-                console.log('🔍 Scanning function calls across all JS files...');
-
-                const functionCallCounts = {};
-
-                // Initialize counts for all JS files
-                this.jsFiles.forEach(file => {
-                    functionCallCounts[file] = 0;
-                });
-
-                // Sample function call data - in a real implementation, this would scan all files
-                // For now, we'll use a static mapping based on common patterns
-                const sampleFunctionCalls = {
-                    'ui-utils.js': 32,       // UI utility functions
-                    'main.js': 15,           // Main app functions
-                    'trades.js': 28,         // Trade-specific functions
-                    'alerts.js?v=20250830_1': 22,         // Alert functions
-                    'tickers.js?v=20250830_1': 25,        // Ticker functions
-                    'accounts.js?v=20250830_1': 18,       // Account functions
-                    'cash_flows.js': 16,     // Cash flow functions
-                    'notes.js': 14,          // Note functions
-                    'preferences.js': 12,    // Preference functions
-                    'database.js': 20,       // Database functions
-                    'db-extradata.js': 15,   // Extra data functions
-                    'constraint-manager.js': 8, // Constraint functions
-                    
-                    'filter-system.js': 10,  // Filter system functions
-                    'currencies.js': 8,      // Currency functions
-                    'auth.js': 5,            // Auth functions
-                    'js-map.js': 3,          // JS map functions
-                    'js-scanner.js': 2,      // JS scanner functions
-                    'translation-utils.js': 12, // Translation functions
-                    'data-utils.js': 18,     // Data utility functions
-                    'table-mappings.js': 14, // Table mapping functions
-                    'date-utils.js': 16,     // Date utility functions
-                    'tables.js': 20,         // Table functions
-                    'linked-items.js': 12,   // Linked items functions
-                    'page-utils.js': 15,     // Page utility functions
-                    'active-alerts-component.js?v=20250830_1': 8, // Active alerts component
-                    'trade_plans.js?v=20250830_1': 18,    // Trade plans functions
-                    'research.js': 16,       // Research functions
-                    'executions.js?v=20250830_1': 14,     // Execution functions
-                    'ticker-service.js': 12, // Ticker service functions
-                    'console-cleanup.js': 3  // Console cleanup functions
-                };
-
-                // Update counts with sample data
-                Object.keys(sampleFunctionCalls).forEach(file => {
-                    if (functionCallCounts.hasOwnProperty(file)) {
-                        functionCallCounts[file] = sampleFunctionCalls[file];
-                    }
-                });
-
-                console.log('✅ Function call counts:', functionCallCounts);
-                return functionCallCounts;
-            }
-
-            /**
-             * Render page mapping table
-             */
-            async renderPageMapping() {
-                const container = document.getElementById('pageMappingContent');
-                if (!container) {
-                    // Container not found: pageMappingContent
-                    return;
-                }
-
-                console.log('🔍 Rendering page mapping...');
-                console.log('📄 HTML Pages:', this.htmlPages);
-                console.log('📄 HTML Pages length:', this.htmlPages ? this.htmlPages.length : 'undefined');
-                console.log('🗂️ Page Mapping:', this.pageMapping);
-                console.log('🗂️ Page Mapping keys:', this.pageMapping ? Object.keys(this.pageMapping) : 'undefined');
-
-                // Sort JS files by generality (most general first)
-                const sortedJsFiles = this.sortJsFilesByGenerality();
-                console.log('📁 Sorted JS Files:', sortedJsFiles);
-                console.log('📁 Sorted JS Files length:', sortedJsFiles ? sortedJsFiles.length : 'undefined');
-
-                if (!this.htmlPages || this.htmlPages.length === 0) {
-                    // No HTML pages found!
-                    container.innerHTML = '<div class="error">לא נמצאו עמודים להצגה</div>';
-                    return;
-                }
-
-                if (!sortedJsFiles || sortedJsFiles.length === 0) {
-                    // No JS files found!
-                    container.innerHTML = '<div class="error">לא נמצאו קבצי JS להצגה</div>';
-                    return;
-                }
-
-                // Get function call counts
-                const functionCallCounts = await this.scanFunctionCalls();
-
-                let html = `
-                     <table class="page-mapping-table">
-                         <thead>
-                             <tr>
-                                 <th>עמוד</th>
-                                 ${sortedJsFiles.map(file => `<th class="js-file-cell">${file}</th>`).join('')}
-                             </tr>
-                             <tr class="function-calls-row">
-                                 <th style="background: var(--apple-blue); color: white; font-size: 0.9rem;">
-                                     <i class="fas fa-phone"></i> קריאות לפונקציות
-                                 </th>
-                                 ${sortedJsFiles.map(file => {
-                    const count = functionCallCounts[file] || 0;
-                    const colorClass = count > 30 ? 'high-usage' : count > 15 ? 'medium-usage' : 'low-usage';
-                    return `<td class="js-file-cell function-call-count ${colorClass}" onclick="showFunctionCallDetails('${file}', ${count})" style="cursor: pointer;" title="לחץ לפרטים">${count}</td>`;
-                }).join('')}
-                             </tr>
-                         </thead>
-                         <tbody>
-                 `;
-
-                this.htmlPages.forEach(page => {
-                    html += `
-                         <tr>
-                             <td><strong>${page}</strong></td>
-                             ${sortedJsFiles.map(file => {
-                        const isUsed = this.pageMapping[page] && this.pageMapping[page].includes(file);
-                        return `<td class="js-file-cell">${isUsed ? '✓' : ''}</td>`;
-                    }).join('')}
-                         </tr>
-                     `;
-                });
-
-                html += `
-                         </tbody>
-                     </table>
-                 `;
-
-                container.innerHTML = html;
-                console.log('✅ Page mapping rendered successfully with function call counts');
-            }
-
-            /**
-             * Render functions data
-             */
-            renderFunctionsData() {
-                const container = document.getElementById('functionsContent');
-                if (!container) return;
-
-                console.log('🔍 Rendering functions data...');
-                console.log('📁 Functions data:', this.functionsData);
-
-                let html = '';
-
-                Object.keys(this.functionsData).forEach(file => {
-                    const functions = this.functionsData[file];
-                    console.log(`📄 Rendering functions for ${file}: ${functions.length} functions`);
-
-                    html += `
-                         <div class="function-group">
-                             <div class="function-group-header" onclick="toggleFunctionGroup(this)">
-                                 <span>${file} (${functions.length} פונקציות)</span>
-                                 <span class="toggle-arrow">▼</span>
-                             </div>
-                             <div class="function-group-content">
-                                 <table class="function-table">
-                                     <thead>
-                                         <tr>
-                                             <th>שם הפונקציה</th>
-                                             <th>תיאור</th>
-                                             <th>פרמטרים</th>
-                                             <th>ערך מוחזר</th>
-                                         </tr>
-                                     </thead>
-                                     <tbody>
-                     `;
-
-                    functions.forEach(func => {
-                        html += `
-                             <tr class="function-row" onclick="openFunctionDetails('${file}', '${func.name}')">
-                                 <td class="function-name">${func.name}</td>
-                                 <td class="function-description">${func.description || 'אין תיאור'}</td>
-                                 <td class="function-params">${func.params || 'אין פרמטרים'}</td>
-                                 <td class="function-returns">${func.returns || 'אין ערך מוחזר'}</td>
-                             </tr>
-                         `;
-                    });
-
-                    html += `
-                                     </tbody>
-                                 </table>
-                             </div>
-                         </div>
-                     `;
-                });
-
-                container.innerHTML = html;
-                console.log('✅ Functions data rendered');
-            }
-
-            /**
-             * Sort JS files by generality (most general first)
-             */
-            sortJsFilesByGenerality() {
-                const generalityOrder = [
-                    // Most general files first
-                    'translation-utils.js', 'data-utils.js', 'table-mappings.js',
-                    'date-utils.js', 'tables.js', 'linked-items.js', 'page-utils.js',
-                    'filter-system.js', 'console-cleanup.js',
-                    // Specific page files
-                    'alerts.js?v=20250830_1', 'active-alerts-component.js?v=20250830_1', 'trades.js', 'trade_plans.js?v=20250830_1',
-                    'research.js', 'executions.js?v=20250830_1', 'tickers.js?v=20250830_1', 'ticker-service.js',
-                    'accounts.js?v=20250830_1', 'cash_flows.js', 'notes.js', 'preferences.js',
-                    'database.js', 'db-extradata.js', 'constraint-manager.js',
-                    'currencies.js', 'auth.js', 'js-map.js', 'js-scanner.js'
-                ];
-
-                return generalityOrder.filter(file => this.jsFiles.includes(file));
-            }
-
-            /**
-             * Show loading state
-             */
-            showLoadingState() {
-                const pageMappingContent = document.getElementById('pageMappingContent');
-                const functionsContent = document.getElementById('functionsContent');
-
-                if (pageMappingContent) {
-                    pageMappingContent.innerHTML = `
-                         <div class="loading">
-                             <div class="loading-spinner"></div>
-                             טוען מיפוי עמודים...
-                         </div>
-                     `;
-                }
-
-                if (functionsContent) {
-                    functionsContent.innerHTML = `
-                         <div class="loading">
-                             <div class="loading-spinner"></div>
-                             טוען פונקציות...
-                         </div>
-                     `;
-                }
-            }
-
-            /**
-             * Show error state
-             */
-            showErrorState(message) {
-                const pageMappingContent = document.getElementById('pageMappingContent');
-                const functionsContent = document.getElementById('functionsContent');
-
-                if (pageMappingContent) {
-                    pageMappingContent.innerHTML = `
-                         <div class="loading">
-                             <i class="fas fa-exclamation-triangle" style="color: #ff6b6b; font-size: 2rem; margin-bottom: 15px;"></i>
-                             <div>${message}</div>
-                         </div>
-                     `;
-                }
-
-                if (functionsContent) {
-                    functionsContent.innerHTML = `
-                         <div class="loading">
-                             <i class="fas fa-exclamation-triangle" style="color: #ff6b6b; font-size: 2rem; margin-bottom: 15px;"></i>
-                             <div>${message}</div>
-                         </div>
-                     `;
-                }
-            }
-
-            /**
-             * Refresh JS map data
-             */
-            async refreshJsMapData() {
-                try {
-                    console.log('🔄 Refreshing JS map data...');
-
-                    // Disable refresh button
-                    const refreshButton = document.getElementById('refreshButton');
-                    if (refreshButton) {
-                        refreshButton.disabled = true;
-                        refreshButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מרענן...';
-                    }
-
-                    // Show loading state
-                    this.showLoadingState();
-
-                    // Reload data
-                    await this.loadJsMapData();
-
-                    // Re-enable refresh button
-                    if (refreshButton) {
-                        refreshButton.disabled = false;
-                        refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> רענן נתונים';
-                    }
-
-                    console.log('✅ JS map data refreshed successfully');
-
-                } catch (error) {
-                    // Error refreshing JS map data:, error);
-                    this.showErrorState('שגיאה ברענון נתונים');
-
-                    // Re-enable refresh button
-                    const refreshButton = document.getElementById('refreshButton');
-                    if (refreshButton) {
-                        refreshButton.disabled = false;
-                        refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> רענן נתונים';
-                    }
-                }
-            }
+/**
+ * מערכת מפת פונקציות JS - גרסה מוטמעת
+ * מציגה מיפוי של עמודים לקבצים ופונקציות מפורטות
+ */
+
+class JsMapSystem {
+    constructor() {
+        this.isInitialized = false;
+        this.pageMapping = {};
+        this.functionsData = {};
+        this.jsFiles = [];
+        this.htmlPages = [];
+    }
+
+    init() {
+        if (this.isInitialized) {
+            return;
         }
 
-        // Global instance
-        window.jsMapSystem = new JsMapSystem();
+        console.log('🚀 Initializing JS Map System');
 
-        // Global functions
-        function loadJsMapData() {
-            console.log('🔄 loadJsMapData called');
-            if (window.jsMapSystem) {
-                console.log('🔄 Initializing jsMapSystem...');
-                window.jsMapSystem.init();
+        // Load initial data
+        this.loadJsMapData();
+
+        this.isInitialized = true;
+    }
+
+    /**
+     * Load JS map data
+     */
+    async loadJsMapData() {
+        try {
+            console.log('📊 loadJsMapData called successfully');
+
+            // Show loading state
+            this.showLoadingState();
+
+            // Get page mapping
+            await this.loadPageMapping();
+
+            // Get functions data
+            await this.loadFunctionsData();
+
+            console.log('📊 Data loaded - Page mapping keys:', Object.keys(this.pageMapping));
+            console.log('📊 Data loaded - Functions data keys:', Object.keys(this.functionsData));
+
+            // Render data
+            await this.renderPageMapping();
+            this.renderFunctionsData();
+
+            console.log('✅ JS map data loaded successfully');
+
+        } catch (error) {
+            // Error loading JS map data
+            this.showErrorState('שגיאה בטעינת נתונים');
+        }
+    }
+
+    /**
+     * Load page mapping data
+     */
+    async loadPageMapping() {
+        console.log('🔄 Starting loadPageMapping...');
+        // Always use local scan for consistent static data
+        console.log('🔄 Using local static page mapping...');
+        this.pageMapping = this.scanPageMappingLocally();
+        console.log('🔄 loadPageMapping completed. Page mapping:', this.pageMapping);
+    }
+
+    /**
+     * Load functions data
+     */
+    async loadFunctionsData() {
+        try {
+            console.log('🔍 Fetching functions data from server...');
+            const response = await fetch('/api/js-map/functions');
+            console.log('📡 Response status:', response.status);
+
+            if (response.ok) {
+                this.functionsData = await response.json();
+                console.log('✅ Functions data loaded from server:', Object.keys(this.functionsData));
+                console.log('📊 Total files with functions:', Object.keys(this.functionsData).length);
+
+                // Check if we have actual function data
+                const filesWithFunctions = Object.keys(this.functionsData).filter(file =>
+                    this.functionsData[file] && this.functionsData[file].length > 0
+                );
+                console.log('📊 Files with actual functions:', filesWithFunctions.length);
+
+                // Log some sample data
             } else {
-                // jsMapSystem not found!
+                console.warn('⚠️ Server response not ok, using local scan');
+                this.functionsData = this.scanFunctionsLocally();
             }
+        } catch (error) {
+            console.warn('⚠️ Using local functions scan due to error:', error);
+            this.functionsData = this.scanFunctionsLocally();
         }
+    }
 
-        function refreshJsMap() {
-            if (window.jsMapSystem) {
-                window.jsMapSystem.refreshJsMapData();
+    /**
+     * Scan page mapping locally
+     */
+    scanPageMappingLocally() {
+        console.log('🔍 Starting scanPageMappingLocally...');
+        const mapping = {};
+
+        // Define known page to JS file mappings - FIXED LIST
+        // All existing pages except test-header-only.html (which is in tests submenu)
+        const pageMappings = {
+        };
+
+        // Get all JS files - FIXED LIST
+        this.jsFiles = [
+            'translation-utils.js', 'data-utils.js', 'table-mappings.js',
+            'date-utils.js', 'tables.js', 'linked-items.js', 'page-utils.js',
+            'alerts.js?v=20250830_1', 'active-alerts-component.js?v=20250830_1', 'trades.js', 'trade_plans.js?v=20250830_1',
+            'research.js', 'executions.js?v=20250830_1', 'tickers.js?v=20250830_1', 'ticker-service.js',
+            'accounts.js?v=20250830_1', 'cash_flows.js', 'notes.js', 'preferences.js',
+            'database.js', 'db-extradata.js', 'constraint-manager.js',
+            'filter-system.js', 'currencies.js', 'auth.js',
+            'js-map.js', 'js-scanner.js', 'console-cleanup.js'
+        ];
+
+        // Get all HTML pages
+        this.htmlPages = Object.keys(pageMappings);
+
+        // Create mapping table
+        this.htmlPages.forEach(page => {
+            mapping[page] = pageMappings[page] || [];
+        });
+
+        console.log('🔍 Fixed page mapping created:', mapping);
+        console.log('📄 HTML Pages:', this.htmlPages);
+        console.log('📄 HTML Pages length:', this.htmlPages.length);
+        console.log('🗂️ JS Files:', this.jsFiles);
+        console.log('🗂️ JS Files length:', this.jsFiles.length);
+
+        return mapping;
+    }
+
+    /**
+     * Scan functions locally
+     */
+    async scanFunctionsLocally() {
+        const functions = {};
+
+        // Fallback to sample functions structure
+        console.log('⚠️ Using fallback sample functions structure');
+
+        // Sample functions for key files
+        functions['ui-utils.js'] = [
+            {
+                name: 'SimpleFilter',
+                description: 'מחלקה לניהול פילטרים פשוטים',
+                params: 'אין פרמטרים',
+                returns: 'אין ערך מוחזר',
+                annotations: 'מחלקה לניהול פילטרים פשוטים לטבלת טריידים',
+                code: 'class SimpleFilter {\n  constructor() {\n    this.currentFilters = {};\n  }\n}',
+                line: 1,
+                type: 'class'
+            },
+            {
+                name: 'init',
+                description: 'אתחול הפילטרים',
+                params: 'אין פרמטרים',
+                returns: 'אין ערך מוחזר',
+                annotations: 'אתחול פילטרים למצב ברירת מחדל',
+                code: 'init() {\n  this.waitForElements();\n  this.initializeDefaultFilters();\n}',
+                line: 25,
+                type: 'method'
             }
-        }
+        ];
 
-        async function refreshFunctionCalls() {
-            console.log('🔄 Refreshing function calls...');
-
-            if (window.jsScanner) {
-                try {
-                    // Show loading state for function calls row
-                    const functionCallsRow = document.querySelector('.function-calls-row');
-                    if (functionCallsRow) {
-                        const cells = functionCallsRow.querySelectorAll('td');
-                        cells.forEach(cell => {
-                            cell.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                        });
-                    }
-
-                    // Scan function calls
-                    const result = await window.jsScanner.scanFunctionCalls();
-
-                    // Update the function calls row
-                    if (functionCallsRow && result.counts) {
-                        const cells = functionCallsRow.querySelectorAll('td');
-                        let cellIndex = 0;
-
-                        Object.keys(result.counts).forEach(file => {
-                            if (cells[cellIndex]) {
-                                const count = result.counts[file];
-                                const colorClass = count > 30 ? 'high-usage' : count > 15 ? 'medium-usage' : 'low-usage';
-                                cells[cellIndex].innerHTML = `<span class="function-call-count ${colorClass}" onclick="showFunctionCallDetails('${file}', ${count})" style="cursor: pointer;" title="לחץ לפרטים">${count}</span>`;
-                                cellIndex++;
-                            }
-                        });
-                    }
-
-                    console.log('✅ Function calls refreshed successfully');
-
-                } catch (error) {
-                    // Error refreshing function calls:, error);
-                }
+        functions['header-system.js'] = [
+            {
+                name: 'HeaderSystem',
+                description: 'מערכת ראש דף מאוחדת',
+                params: 'אין פרמטרים',
+                returns: 'אין ערך מוחזר',
+                annotations: 'מערכת ראש דף מאוחדת עם פילטרים',
+                code: 'class HeaderSystem {\n  constructor() {\n    this.isInitialized = false;\n  }\n}',
+                line: 1,
+                type: 'class'
             }
-        }
+        ];
 
-        function toggleFunctionGroup(header) {
-            const content = header.nextElementSibling;
-            const arrow = header.querySelector('.toggle-arrow');
-
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                arrow.textContent = '▼';
-            } else {
-                content.classList.add('expanded');
-                arrow.textContent = '▲';
+        functions['main.js'] = [
+            {
+                name: 'initializeApp',
+                description: 'אתחול האפליקציה הראשי',
+                params: 'אין פרמטרים',
+                returns: 'אין ערך מוחזר',
+                annotations: 'פונקציה ראשית לאתחול האפליקציה',
+                code: 'function initializeApp() {\n  console.log("App initialized");\n}',
+                line: 1,
+                type: 'function'
             }
-        }
+        ];
 
-        function openFunctionDetails(file, functionName) {
-            console.log(`Opening function details: ${functionName} from ${file}`);
-
-            // Get function details from data
-            if (window.jsMapSystem && window.jsMapSystem.functionsData[file]) {
-                const functionDetails = window.jsMapSystem.functionsData[file].find(func => func.name === functionName);
-                if (functionDetails) {
-                    openFunctionModal(
-                        functionDetails.name,
-                        functionDetails.annotations || 'No annotations available',
-                        functionDetails.code || 'No code available'
-                    );
-                    return;
-                }
-            }
-
-            // Fallback to basic info
-            const annotations = `Function: ${functionName}\nFile: ${file}\n\nAnnotations will be loaded from actual function parsing.`;
-            const code = `// Function code will be loaded from actual file scanning\nfunction ${functionName}() {\n  // Implementation details...\n}`;
-
-            openFunctionModal(functionName, annotations, code);
-        }
-
-        // Initialize JS Map page
-        function initializeJsMapPage() {
-            console.log('🚀 Initializing JS Map page - FUNCTION CALLED!');
-            alert('🚀 JS Map page initialization started!');
-
-            console.log('📍 Current page name from getCurrentPageName:', typeof getCurrentPageName === 'function' ? getCurrentPageName() : 'function not available');
-
-            // Add visual indicator that JS is working
-            const testDiv = document.createElement('div');
-            testDiv.innerHTML = '<p style="color: green; font-weight: bold;">✅ JavaScript is working!</p>';
-            testDiv.style.position = 'fixed';
-            testDiv.style.top = '10px';
-            testDiv.style.right = '10px';
-            testDiv.style.background = 'white';
-            testDiv.style.padding = '10px';
-            testDiv.style.border = '1px solid green';
-            testDiv.style.zIndex = '9999';
-            document.body.appendChild(testDiv);
-
-            // Load initial data
-            console.log('🔄 Calling loadJsMapData...');
-            loadJsMapData();
-        }
-
-        // Export initialization function
-        window.initializeJsMapPage = initializeJsMapPage;
-
-        // Global functions for modal
-        function openFunctionModal(functionName, annotations, code) {
-            document.getElementById('modalFunctionName').textContent = functionName;
-            document.getElementById('modalAnnotations').textContent = annotations || 'No annotations available';
-            document.getElementById('modalCode').textContent = code || 'No code available';
-            document.getElementById('functionModal').style.display = 'block';
-        }
-
-        function closeFunctionModal() {
-            document.getElementById('functionModal').style.display = 'none';
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function (event) {
-            const modal = document.getElementById('functionModal');
-            const callsModal = document.getElementById('functionCallsModal');
-            if (event.target === modal) {
-                closeFunctionModal();
-            }
-            if (event.target === callsModal) {
-                closeFunctionCallsModal();
-            }
-        }
-
-        // Function calls modal functions
-        function showFunctionCallDetails(file, count) {
-            console.log(`Showing function call details for ${file} (${count} calls)`);
-
-            document.getElementById('modalFunctionCallsTitle').textContent = `קריאות לפונקציות - ${file}`;
-
-            let content = `
-                <div style="margin-bottom: 20px;">
-                    <h4>סה"כ קריאות: ${count}</h4>
-                    <p>קובץ: <code>${file}</code></p>
-                </div>
-            `;
-
-            // Try to get real function call details
-            if (window.jsScanner && window.jsScanner.functionCallDetails && window.jsScanner.functionCallDetails[file]) {
-                const calls = window.jsScanner.functionCallDetails[file];
-                content += `
-                    <div style="max-height: 400px; overflow-y: auto;">
-                        <h5>פירוט קריאות:</h5>
-                        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                            <thead>
-                                <tr style="background: var(--apple-bg-secondary);">
-                                    <th style="padding: 8px; border: 1px solid var(--apple-border-light);">פונקציה</th>
-                                    <th style="padding: 8px; border: 1px solid var(--apple-border-light);">שורה</th>
-                                    <th style="padding: 8px; border: 1px solid var(--apple-border-light);">הקשר</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                `;
-
-                calls.forEach(call => {
-                    content += `
-                        <tr>
-                            <td style="padding: 8px; border: 1px solid var(--apple-border-light); font-family: 'Courier New', monospace;">${call.functionName}</td>
-                            <td style="padding: 8px; border: 1px solid var(--apple-border-light);">${call.line}</td>
-                            <td style="padding: 8px; border: 1px solid var(--apple-border-light); font-size: 0.9rem;">${call.context}</td>
-                        </tr>
-                    `;
-                });
-
-                content += `
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-            } else {
-                content += `
-                    <div style="color: var(--apple-text-secondary); font-style: italic;">
-                        פרטי הקריאות לא זמינים כרגע. נסה לרענן את הנתונים.
-                    </div>
-                `;
-            }
-
-            document.getElementById('functionCallsContent').innerHTML = content;
-            document.getElementById('functionCallsModal').style.display = 'block';
-        }
-
-        function closeFunctionCallsModal() {
-            document.getElementById('functionCallsModal').style.display = 'none';
-        }
-
-        // Navigation function
-        function navigateToSection(sectionId) {
-            // Close all function groups first
-            const allGroups = document.querySelectorAll('.function-group-content');
-            allGroups.forEach(group => {
-                group.classList.remove('expanded');
-            });
-
-            // Update arrows
-            const allArrows = document.querySelectorAll('.toggle-arrow');
-            allArrows.forEach(arrow => {
-                arrow.textContent = '▼';
-            });
-
-            // Scroll to section
-            const section = document.getElementById(sectionId);
-            if (section) {
-                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-
-        // Back to Top functionality
-        function scrollToTop() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
-
-        // Show/hide back to top button based on scroll position
-        function toggleBackToTop() {
-            const backToTopBtn = document.getElementById('backToTopBtn');
-            if (window.scrollY > 300) {
-                backToTopBtn.classList.add('show');
-            } else {
-                backToTopBtn.classList.remove('show');
-            }
-        }
-
-        // Add scroll event listener
-        window.addEventListener('scroll', toggleBackToTop);
-
-        // Functions Dropdown
-        function toggleFunctionsDropdown() {
-            const dropdown = document.getElementById('functionsDropdown');
-            const toggle = document.querySelector('.dropdown-toggle');
-
-            if (dropdown.classList.contains('show')) {
-                dropdown.classList.remove('show');
-                toggle.classList.remove('active');
-            } else {
-                dropdown.classList.add('show');
-                toggle.classList.add('active');
-                populateFunctionsDropdown();
-            }
-        }
-
-        function populateFunctionsDropdown() {
-            const content = document.getElementById('functionsDropdownContent');
-            if (!content || !window.jsMapSystem || !window.jsMapSystem.functionsData) {
-                return;
-            }
-
-            let html = '';
-
-            Object.keys(window.jsMapSystem.functionsData).forEach(file => {
-                const functions = window.jsMapSystem.functionsData[file];
-                if (functions && functions.length > 0) {
-                    functions.forEach(func => {
-                        html += `
-                             <div class="function-dropdown-item" onclick="selectFunctionFromDropdown('${file}', '${func.name}')">
-                                 <span class="function-name">${func.name}</span>
-                                 <span class="function-file">${file}</span>
-                             </div>
-                         `;
-                    });
-                }
-            });
-
-            content.innerHTML = html;
-        }
-
-        function selectFunctionFromDropdown(file, functionName) {
-            // Close dropdown
-            const dropdown = document.getElementById('functionsDropdown');
-            const toggle = document.querySelector('.dropdown-toggle');
-            dropdown.classList.remove('show');
-            toggle.classList.remove('active');
-
-            // Navigate to functions section
-            navigateToSection('functions-section');
-
-            // Find and expand the function group
-            setTimeout(() => {
-                const functionGroups = document.querySelectorAll('.function-group-header');
-                functionGroups.forEach(group => {
-                    const groupTitle = group.querySelector('span').textContent;
-                    if (groupTitle.includes(file)) {
-                        // Expand this group
-                        const content = group.nextElementSibling;
-                        const arrow = group.querySelector('.toggle-arrow');
-
-                        // Close all other groups first
-                        document.querySelectorAll('.function-group-content').forEach(g => {
-                            g.classList.remove('expanded');
-                        });
-                        document.querySelectorAll('.toggle-arrow').forEach(a => {
-                            a.textContent = '▼';
-                        });
-
-                        // Open this group
-                        content.classList.add('expanded');
-                        arrow.textContent = '▲';
-
-                        // Scroll to the function
-                        const functionRows = content.querySelectorAll('.function-row');
-                        functionRows.forEach(row => {
-                            const funcName = row.querySelector('.function-name').textContent;
-                            if (funcName === functionName) {
-                                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                row.style.backgroundColor = 'var(--apple-blue)';
-                                row.style.color = 'white';
-                                setTimeout(() => {
-                                    row.style.backgroundColor = '';
-                                    row.style.color = '';
-                                }, 2000);
-                            }
-                        });
-                    }
-                });
-            }, 500);
-        }
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function (event) {
-            const dropdown = document.getElementById('functionsDropdown');
-            const toggle = document.querySelector('.dropdown-toggle');
-
-            if (!dropdown.contains(event.target) && !toggle.contains(event.target)) {
-                dropdown.classList.remove('show');
-                toggle.classList.remove('active');
+        // Add empty arrays for other files
+        this.jsFiles.forEach(file => {
+            if (!functions[file]) {
+                functions[file] = [];
             }
         });
+
+        return functions;
+    }
+
+    /**
+     * Scan function calls across all JS files
+     */
+    scanFunctionCalls() {
+        console.log('🔍 Scanning function calls across all JS files...');
+
+        const functionCallCounts = {};
+
+        // Initialize counts for all JS files
+        this.jsFiles.forEach(file => {
+            functionCallCounts[file] = 0;
+        });
+
+        // Sample function call data - in a real implementation, this would scan all files
+        // For now, we'll use a static mapping based on common patterns
+        const sampleFunctionCalls = {
+            'ui-utils.js': 32,       // UI utility functions
+            'main.js': 15,           // Main app functions
+            'trades.js': 28,         // Trade-specific functions
+            'alerts.js?v=20250830_1': 22,         // Alert functions
+            'tickers.js?v=20250830_1': 25,        // Ticker functions
+            'accounts.js?v=20250830_1': 18,       // Account functions
+            'cash_flows.js': 16,     // Cash flow functions
+            'notes.js': 14,          // Note functions
+            'preferences.js': 12,    // Preference functions
+            'database.js': 20,       // Database functions
+            'db-extradata.js': 15,   // Extra data functions
+            'constraint-manager.js': 8, // Constraint functions
+            
+            'filter-system.js': 10,  // Filter system functions
+            'currencies.js': 8,      // Currency functions
+            'auth.js': 5,            // Auth functions
+            'js-map.js': 3,          // JS map functions
+            'js-scanner.js': 2,      // JS scanner functions
+            'translation-utils.js': 12, // Translation functions
+            'data-utils.js': 18,     // Data utility functions
+            'table-mappings.js': 14, // Table mapping functions
+            'date-utils.js': 16,     // Date utility functions
+            'tables.js': 20,         // Table functions
+            'linked-items.js': 12,   // Linked items functions
+            'page-utils.js': 15,     // Page utility functions
+            'active-alerts-component.js?v=20250830_1': 8, // Active alerts component
+            'trade_plans.js?v=20250830_1': 18,    // Trade plans functions
+            'research.js': 16,       // Research functions
+            'executions.js?v=20250830_1': 14,     // Execution functions
+            'ticker-service.js': 12, // Ticker service functions
+            'console-cleanup.js': 3  // Console cleanup functions
+        };
+
+        // Update counts with sample data
+        Object.keys(sampleFunctionCalls).forEach(file => {
+            if (functionCallCounts.hasOwnProperty(file)) {
+                functionCallCounts[file] = sampleFunctionCalls[file];
+            }
+        });
+
+        console.log('✅ Function call counts:', functionCallCounts);
+        return functionCallCounts;
+    }
+
+    /**
+     * Render page mapping table
+     */
+    async renderPageMapping() {
+        const container = document.getElementById('pageMappingContent');
+        if (!container) {
+            // Container not found: pageMappingContent
+            return;
+        }
+
+        console.log('🔍 Rendering page mapping...');
+        console.log('📄 HTML Pages:', this.htmlPages);
+        console.log('📄 HTML Pages length:', this.htmlPages ? this.htmlPages.length : 'undefined');
+        console.log('🗂️ Page Mapping:', this.pageMapping);
+        console.log('🗂️ Page Mapping keys:', this.pageMapping ? Object.keys(this.pageMapping) : 'undefined');
+
+        // Sort JS files by generality (most general first)
+        const sortedJsFiles = this.sortJsFilesByGenerality();
+        console.log('📁 Sorted JS Files:', sortedJsFiles);
+        console.log('📁 Sorted JS Files length:', sortedJsFiles ? sortedJsFiles.length : 'undefined');
+
+        if (!this.htmlPages || this.htmlPages.length === 0) {
+            // No HTML pages found!
+            container.innerHTML = '<div class="error">לא נמצאו עמודים להצגה</div>';
+            return;
+        }
+
+        if (!sortedJsFiles || sortedJsFiles.length === 0) {
+            // No JS files found!
+            container.innerHTML = '<div class="error">לא נמצאו קבצי JS להצגה</div>';
+            return;
+        }
+
+        // Get function call counts
+        const functionCallCounts = await this.scanFunctionCalls();
+
+        let html = `
+             <table class="page-mapping-table">
+                 <thead>
+                     <tr>
+                         <th>עמוד</th>
+                         ${sortedJsFiles.map(file => `<th class="js-file-cell">${file}</th>`).join('')}
+                     </tr>
+                     <tr class="function-calls-row">
+                         <th style="background: var(--apple-blue); color: white; font-size: 0.9rem;">
+                             <i class="fas fa-phone"></i> קריאות לפונקציות
+                         </th>
+                         ${sortedJsFiles.map(file => {
+            const count = functionCallCounts[file] || 0;
+            const colorClass = count > 30 ? 'high-usage' : count > 15 ? 'medium-usage' : 'low-usage';
+            return `<td class="js-file-cell function-call-count ${colorClass}" onclick="showFunctionCallDetails('${file}', ${count})" style="cursor: pointer;" title="לחץ לפרטים">${count}</td>`;
+        }).join('')}
+                     </tr>
+                 </thead>
+                 <tbody>
+         `;
+
+        this.htmlPages.forEach(page => {
+            html += `
+                 <tr>
+                     <td><strong>${page}</strong></td>
+                     ${sortedJsFiles.map(file => {
+                const isUsed = this.pageMapping[page] && this.pageMapping[page].includes(file);
+                return `<td class="js-file-cell">${isUsed ? '✓' : ''}</td>`;
+            }).join('')}
+                 </tr>
+             `;
+        });
+
+        html += `
+                 </tbody>
+             </table>
+         `;
+
+        container.innerHTML = html;
+        console.log('✅ Page mapping rendered successfully with function call counts');
+    }
+
+    /**
+     * Render functions data
+     */
+    renderFunctionsData() {
+        const container = document.getElementById('functionsContent');
+        if (!container) return;
+
+        console.log('🔍 Rendering functions data...');
+        console.log('📁 Functions data:', this.functionsData);
+
+        let html = '';
+
+        Object.keys(this.functionsData).forEach(file => {
+            const functions = this.functionsData[file];
+            console.log(`📄 Rendering functions for ${file}: ${functions.length} functions`);
+
+            html += `
+                 <div class="function-group">
+                     <div class="function-group-header" onclick="toggleFunctionGroup(this)">
+                         <span>${file} (${functions.length} פונקציות)</span>
+                         <span class="toggle-arrow">▼</span>
+                     </div>
+                     <div class="function-group-content">
+                         <table class="function-table">
+                             <thead>
+                                 <tr>
+                                     <th>שם הפונקציה</th>
+                                     <th>תיאור</th>
+                                     <th>פרמטרים</th>
+                                     <th>ערך מוחזר</th>
+                                 </tr>
+                             </thead>
+                             <tbody>
+             `;
+
+            functions.forEach(func => {
+                html += `
+                     <tr class="function-row" onclick="openFunctionDetails('${file}', '${func.name}')">
+                         <td class="function-name">${func.name}</td>
+                         <td class="function-description">${func.description || 'אין תיאור'}</td>
+                         <td class="function-params">${func.params || 'אין פרמטרים'}</td>
+                         <td class="function-returns">${func.returns || 'אין ערך מוחזר'}</td>
+                     </tr>
+                 `;
+            });
+
+            html += `
+                             </tbody>
+                         </table>
+                     </div>
+                 </div>
+             `;
+        });
+
+        container.innerHTML = html;
+        console.log('✅ Functions data rendered');
+    }
+
+    /**
+     * Sort JS files by generality (most general first)
+     */
+    sortJsFilesByGenerality() {
+        const generalityOrder = [
+            // Most general files first
+            'translation-utils.js', 'data-utils.js', 'table-mappings.js',
+            'date-utils.js', 'tables.js', 'linked-items.js', 'page-utils.js',
+            'filter-system.js', 'console-cleanup.js',
+            // Specific page files
+            'alerts.js?v=20250830_1', 'active-alerts-component.js?v=20250830_1', 'trades.js', 'trade_plans.js?v=20250830_1',
+            'research.js', 'executions.js?v=20250830_1', 'tickers.js?v=20250830_1', 'ticker-service.js',
+            'accounts.js?v=20250830_1', 'cash_flows.js', 'notes.js', 'preferences.js',
+            'database.js', 'db-extradata.js', 'constraint-manager.js',
+            'currencies.js', 'auth.js', 'js-map.js', 'js-scanner.js'
+        ];
+
+        return generalityOrder.filter(file => this.jsFiles.includes(file));
+    }
+
+    /**
+     * Show loading state
+     */
+    showLoadingState() {
+        const pageMappingContent = document.getElementById('pageMappingContent');
+        const functionsContent = document.getElementById('functionsContent');
+
+        if (pageMappingContent) {
+            pageMappingContent.innerHTML = `
+                 <div class="loading">
+                     <div class="loading-spinner"></div>
+                     טוען מיפוי עמודים...
+                 </div>
+             `;
+        }
+
+        if (functionsContent) {
+            functionsContent.innerHTML = `
+                 <div class="loading">
+                     <div class="loading-spinner"></div>
+                     טוען פונקציות...
+                 </div>
+             `;
+        }
+    }
+
+    /**
+     * Show error state
+     */
+    showErrorState(message) {
+        const pageMappingContent = document.getElementById('pageMappingContent');
+        const functionsContent = document.getElementById('functionsContent');
+
+        if (pageMappingContent) {
+            pageMappingContent.innerHTML = `
+                 <div class="loading">
+                     <i class="fas fa-exclamation-triangle" style="color: #ff6b6b; font-size: 2rem; margin-bottom: 15px;"></i>
+                     <div>${message}</div>
+                 </div>
+             `;
+        }
+
+        if (functionsContent) {
+            functionsContent.innerHTML = `
+                 <div class="loading">
+                     <i class="fas fa-exclamation-triangle" style="color: #ff6b6b; font-size: 2rem; margin-bottom: 15px;"></i>
+                     <div>${message}</div>
+                 </div>
+             `;
+        }
+    }
+
+    /**
+     * Refresh JS map data
+     */
+    async refreshJsMapData() {
+        try {
+            console.log('🔄 Refreshing JS map data...');
+
+            // Disable refresh button
+            const refreshButton = document.getElementById('refreshButton');
+            if (refreshButton) {
+                refreshButton.disabled = true;
+                refreshButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מרענן...';
+            }
+
+            // Show loading state
+            this.showLoadingState();
+
+            // Reload data
+            await this.loadJsMapData();
+
+            // Re-enable refresh button
+            if (refreshButton) {
+                refreshButton.disabled = false;
+                refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> רענן נתונים';
+            }
+
+            console.log('✅ JS map data refreshed successfully');
+
+        } catch (error) {
+            // Error refreshing JS map data:, error);
+            this.showErrorState('שגיאה ברענון נתונים');
+
+            // Re-enable refresh button
+            const refreshButton = document.getElementById('refreshButton');
+            if (refreshButton) {
+                refreshButton.disabled = false;
+                refreshButton.innerHTML = '<i class="fas fa-sync-alt"></i> רענן נתונים';
+            }
+        }
+    }
+}
+
+// Global instance
+window.jsMapSystem = new JsMapSystem();
+
+// Global functions
+function loadJsMapData() {
+    console.log('🔄 loadJsMapData called');
+    if (window.jsMapSystem) {
+        console.log('🔄 Initializing jsMapSystem...');
+        window.jsMapSystem.init();
+    } else {
+        // jsMapSystem not found!
+    }
+}
+
+function refreshJsMap() {
+    if (window.jsMapSystem) {
+        window.jsMapSystem.refreshJsMapData();
+    }
+}
+
+async function refreshFunctionCalls() {
+    console.log('🔄 Refreshing function calls...');
+
+    if (window.jsScanner) {
+        try {
+            // Show loading state for function calls row
+            const functionCallsRow = document.querySelector('.function-calls-row');
+            if (functionCallsRow) {
+                const cells = functionCallsRow.querySelectorAll('td');
+                cells.forEach(cell => {
+                    cell.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                });
+            }
+
+            // Scan function calls
+            const result = await window.jsScanner.scanFunctionCalls();
+
+            // Update the function calls row
+            if (functionCallsRow && result.counts) {
+                const cells = functionCallsRow.querySelectorAll('td');
+                let cellIndex = 0;
+
+                Object.keys(result.counts).forEach(file => {
+                    if (cells[cellIndex]) {
+                        const count = result.counts[file];
+                        const colorClass = count > 30 ? 'high-usage' : count > 15 ? 'medium-usage' : 'low-usage';
+                        cells[cellIndex].innerHTML = `<span class="function-call-count ${colorClass}" onclick="showFunctionCallDetails('${file}', ${count})" style="cursor: pointer;" title="לחץ לפרטים">${count}</span>`;
+                        cellIndex++;
+                    }
+                });
+            }
+
+            console.log('✅ Function calls refreshed successfully');
+
+        } catch (error) {
+            // Error refreshing function calls:, error);
+        }
+    }
+}
+
+function toggleFunctionGroup(header) {
+    const content = header.nextElementSibling;
+    const arrow = header.querySelector('.toggle-arrow');
+
+    if (content.classList.contains('expanded')) {
+        content.classList.remove('expanded');
+        arrow.textContent = '▼';
+    } else {
+        content.classList.add('expanded');
+        arrow.textContent = '▲';
+    }
+}
+
+function openFunctionDetails(file, functionName) {
+    console.log(`Opening function details: ${functionName} from ${file}`);
+
+    // Get function details from data
+    if (window.jsMapSystem && window.jsMapSystem.functionsData[file]) {
+        const functionDetails = window.jsMapSystem.functionsData[file].find(func => func.name === functionName);
+        if (functionDetails) {
+            openFunctionModal(
+                functionDetails.name,
+                functionDetails.annotations || 'No annotations available',
+                functionDetails.code || 'No code available'
+            );
+            return;
+        }
+    }
+
+    // Fallback to basic info
+    const annotations = `Function: ${functionName}\nFile: ${file}\n\nAnnotations will be loaded from actual function parsing.`;
+    const code = `// Function code will be loaded from actual file scanning\nfunction ${functionName}() {\n  // Implementation details...\n}`;
+
+    openFunctionModal(functionName, annotations, code);
+}
+
+// Initialize JS Map page
+function initializeJsMapPage() {
+    console.log('🚀 Initializing JS Map page - FUNCTION CALLED!');
+    alert('🚀 JS Map page initialization started!');
+
+    console.log('📍 Current page name from getCurrentPageName:', typeof getCurrentPageName === 'function' ? getCurrentPageName() : 'function not available');
+
+    // Add visual indicator that JS is working
+    const testDiv = document.createElement('div');
+    testDiv.innerHTML = '<p style="color: green; font-weight: bold;">✅ JavaScript is working!</p>';
+    testDiv.style.position = 'fixed';
+    testDiv.style.top = '10px';
+    testDiv.style.right = '10px';
+    testDiv.style.background = 'white';
+    testDiv.style.padding = '10px';
+    testDiv.style.border = '1px solid green';
+    testDiv.style.zIndex = '9999';
+    document.body.appendChild(testDiv);
+
+    // Load initial data
+    console.log('🔄 Calling loadJsMapData...');
+    loadJsMapData();
+}
+
+// Export initialization function
+window.initializeJsMapPage = initializeJsMapPage;
+
+// Global functions for modal
+function openFunctionModal(functionName, annotations, code) {
+    document.getElementById('modalFunctionName').textContent = functionName;
+    document.getElementById('modalAnnotations').textContent = annotations || 'No annotations available';
+    document.getElementById('modalCode').textContent = code || 'No code available';
+    document.getElementById('functionModal').style.display = 'block';
+}
+
+function closeFunctionModal() {
+    document.getElementById('functionModal').style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.onclick = function (event) {
+    const modal = document.getElementById('functionModal');
+    const callsModal = document.getElementById('functionCallsModal');
+    if (event.target === modal) {
+        closeFunctionModal();
+    }
+    if (event.target === callsModal) {
+        closeFunctionCallsModal();
+    }
+}
+
+// Function calls modal functions
+function showFunctionCallDetails(file, count) {
+    console.log(`Showing function call details for ${file} (${count} calls)`);
+
+    document.getElementById('modalFunctionCallsTitle').textContent = `קריאות לפונקציות - ${file}`;
+
+    let content = `
+        <div style="margin-bottom: 20px;">
+            <h4>סה"כ קריאות: ${count}</h4>
+            <p>קובץ: <code>${file}</code></p>
+        </div>
+    `;
+
+    // Try to get real function call details
+    if (window.jsScanner && window.jsScanner.functionCallDetails && window.jsScanner.functionCallDetails[file]) {
+        const calls = window.jsScanner.functionCallDetails[file];
+        content += `
+            <div style="max-height: 400px; overflow-y: auto;">
+                <h5>פירוט קריאות:</h5>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <thead>
+                        <tr style="background: var(--apple-bg-secondary);">
+                            <th style="padding: 8px; border: 1px solid var(--apple-border-light);">פונקציה</th>
+                            <th style="padding: 8px; border: 1px solid var(--apple-border-light);">שורה</th>
+                            <th style="padding: 8px; border: 1px solid var(--apple-border-light);">הקשר</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        calls.forEach(call => {
+            content += `
+                <tr>
+                    <td style="padding: 8px; border: 1px solid var(--apple-border-light); font-family: 'Courier New', monospace;">${call.functionName}</td>
+                    <td style="padding: 8px; border: 1px solid var(--apple-border-light);">${call.line}</td>
+                    <td style="padding: 8px; border: 1px solid var(--apple-border-light); font-size: 0.9rem;">${call.context}</td>
+                </tr>
+            `;
+        });
+
+        content += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+    } else {
+        content += `
+            <div style="color: var(--apple-text-secondary); font-style: italic;">
+                פרטי הקריאות לא זמינים כרגע. נסה לרענן את הנתונים.
+            </div>
+        `;
+    }
+
+    document.getElementById('functionCallsContent').innerHTML = content;
+    document.getElementById('functionCallsModal').style.display = 'block';
+}
+
+function closeFunctionCallsModal() {
+    document.getElementById('functionCallsModal').style.display = 'none';
+}
+
+// Navigation function
+function navigateToSection(sectionId) {
+    // Close all function groups first
+    const allGroups = document.querySelectorAll('.function-group-content');
+    allGroups.forEach(group => {
+        group.classList.remove('expanded');
+    });
+
+    // Update arrows
+    const allArrows = document.querySelectorAll('.toggle-arrow');
+    allArrows.forEach(arrow => {
+        arrow.textContent = '▼';
+    });
+
+    // Scroll to section
+    const section = document.getElementById(sectionId);
+    if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+// Back to Top functionality
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
+
+// Show/hide back to top button based on scroll position
+function toggleBackToTop() {
+    const backToTopBtn = document.getElementById('backToTopBtn');
+    if (window.scrollY > 300) {
+        backToTopBtn.classList.add('show');
+    } else {
+        backToTopBtn.classList.remove('show');
+    }
+}
+
+// Add scroll event listener
+window.addEventListener('scroll', toggleBackToTop);
+
+// Functions Dropdown
+function toggleFunctionsDropdown() {
+    const dropdown = document.getElementById('functionsDropdown');
+    const toggle = document.querySelector('.dropdown-toggle');
+
+    if (dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+        toggle.classList.remove('active');
+    } else {
+        dropdown.classList.add('show');
+        toggle.classList.add('active');
+        populateFunctionsDropdown();
+    }
+}
+
+function populateFunctionsDropdown() {
+    const content = document.getElementById('functionsDropdownContent');
+    if (!content || !window.jsMapSystem || !window.jsMapSystem.functionsData) {
+        return;
+    }
+
+    let html = '';
+
+    Object.keys(window.jsMapSystem.functionsData).forEach(file => {
+        const functions = window.jsMapSystem.functionsData[file];
+        if (functions && functions.length > 0) {
+            functions.forEach(func => {
+                html += `
+                     <div class="function-dropdown-item" onclick="selectFunctionFromDropdown('${file}', '${func.name}')">
+                         <span class="function-name">${func.name}</span>
+                         <span class="function-file">${file}</span>
+                     </div>
+                 `;
+            });
+        }
+    });
+
+    content.innerHTML = html;
+}
+
+function selectFunctionFromDropdown(file, functionName) {
+    // Close dropdown
+    const dropdown = document.getElementById('functionsDropdown');
+    const toggle = document.querySelector('.dropdown-toggle');
+    dropdown.classList.remove('show');
+    toggle.classList.remove('active');
+
+    // Navigate to functions section
+    navigateToSection('functions-section');
+
+    // Find and expand the function group
+    setTimeout(() => {
+        const functionGroups = document.querySelectorAll('.function-group-header');
+        functionGroups.forEach(group => {
+            const groupTitle = group.querySelector('span').textContent;
+            if (groupTitle.includes(file)) {
+                // Expand this group
+                const content = group.nextElementSibling;
+                const arrow = group.querySelector('.toggle-arrow');
+
+                // Close all other groups first
+                document.querySelectorAll('.function-group-content').forEach(g => {
+                    g.classList.remove('expanded');
+                });
+                document.querySelectorAll('.toggle-arrow').forEach(a => {
+                    a.textContent = '▼';
+                });
+
+                // Open this group
+                content.classList.add('expanded');
+                arrow.textContent = '▲';
+
+                // Scroll to the function
+                const functionRows = content.querySelectorAll('.function-row');
+                functionRows.forEach(row => {
+                    const funcName = row.querySelector('.function-name').textContent;
+                    if (funcName === functionName) {
+                        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        row.style.backgroundColor = 'var(--apple-blue)';
+                        row.style.color = 'white';
+                        setTimeout(() => {
+                            row.style.backgroundColor = '';
+                            row.style.color = '';
+                        }, 2000);
+                    }
+                });
+            }
+        });
+    }, 500);
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function (event) {
+    const dropdown = document.getElementById('functionsDropdown');
+    const toggle = document.querySelector('.dropdown-toggle');
+
+    if (!dropdown.contains(event.target) && !toggle.contains(event.target)) {
+        dropdown.classList.remove('show');
+        toggle.classList.remove('active');
+    }
+});
 

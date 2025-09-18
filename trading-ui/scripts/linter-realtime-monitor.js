@@ -133,9 +133,9 @@ async function loadInitialData() {
 
         // Initialize Chart Renderer
         if (typeof window.ChartRenderer !== 'undefined') {
-            const canvas = document.getElementById('linterChart');
-            if (canvas) {
-                window.currentChartRenderer = new window.ChartRenderer('linterChart');
+            const container = document.getElementById('chartContainer');
+            if (container) {
+                window.currentChartRenderer = new window.ChartRenderer('chartContainer');
                 await window.currentChartRenderer.initialize();
                 console.log('✅ Chart Renderer initialized');
             }

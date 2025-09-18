@@ -215,14 +215,15 @@ class ChartRenderer {
             // הכנת נתונים
             const chartData = this.prepareChartData(initialData);
 
-            // יצירת קנבס אם לא קיים
-            if (!container.querySelector('canvas')) {
-                const canvas = document.createElement('canvas');
+            // מציאת או יצירת קנבס
+            let canvas = container.querySelector('canvas');
+            if (!canvas) {
+                canvas = document.createElement('canvas');
                 canvas.id = `${this.containerId}_canvas`;
                 container.appendChild(canvas);
             }
 
-            const ctx = container.querySelector('canvas').getContext('2d');
+            const ctx = canvas.getContext('2d');
 
             // יצירת הגרף
             this.chart = new Chart(ctx, {

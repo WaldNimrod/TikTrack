@@ -1,17 +1,18 @@
-         * ==================================
-         * 
-         * System for mapping and displaying JavaScript functions across the application
-         * 
-         * Features:
-         * - Page to JS file mapping
-         * - Function documentation and annotations
-         * - Interactive function browser
-         * - Auto-refresh capabilities
-         * 
-         * @author TikTrack Development Team
-         * @version 1.0
-         * @lastUpdated August 26, 2025
-         */
+/**
+ * ==================================
+ *
+ * System for mapping and displaying JavaScript functions across the application
+ *
+ * Features:
+ * - Page to JS file mapping
+ * - Function documentation and annotations
+ * - Interactive function browser
+ * - Auto-refresh capabilities
+ *
+ * @author TikTrack Development Team
+ * @version 2.0 - Updated to work with unified page template
+ * @lastUpdated September 18, 2025
+ */
 
         /**
          * מערכת מפת פונקציות JS - גרסה מוטמעת

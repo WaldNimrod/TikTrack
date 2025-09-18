@@ -1,50 +1,162 @@
 /* ========================================================
    PAGE-SCRIPTS-MATRIX.CSS - Minimal Override - September 2025
-   Only page-specific styles that can't use ITCSS classes
+   Ultra-narrow columns with 90° rotated headers
    ======================================================== */
 
-/* ===== MATRIX TABLE UNIQUE STYLING ===== */
-/* Narrow columns for technical table */
+/* ===== ULTRA-NARROW MATRIX TABLE ===== */
+/* Minimal width columns for technical table */
 #page-scripts-matrix-table th {
-    min-width: 40px;
-    max-width: 60px;
-    width: 50px;
-    padding: 4px 2px;
-    /* 90-degree rotation for compact headers */
+    min-width: 25px;
+    max-width: 35px;
+    width: 30px;
+    padding: 2px 1px;
+    font-size: 0.6rem;
+    /* 90-degree rotation for ultra-compact headers */
     transform: rotate(-90deg);
     white-space: nowrap;
-    height: 120px;
+    height: 80px;
+    vertical-align: bottom;
 }
 
 #page-scripts-matrix-table td {
-    min-width: 40px;
-    max-width: 60px;
-    width: 50px;
-    padding: 4px 2px;
+    min-width: 25px;
+    max-width: 35px;
+    width: 30px;
+    padding: 2px 1px;
+    font-size: 0.6rem;
+    text-align: center;
 }
 
-/* First column - sticky for navigation */
+/* First column - script names - sticky for navigation */
 #page-scripts-matrix-table th:first-child,
 #page-scripts-matrix-table td:first-child {
     position: sticky;
     left: 0;
-    z-index: 10;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    z-index: 20;
+    background: var(--color-background-primary);
+    box-shadow: 3px 0 8px rgba(0,0,0,0.15);
+    min-width: 100px;
+    max-width: 120px;
+    width: 110px;
 }
 
 #page-scripts-matrix-table th:first-child {
     transform: rotate(0deg);
-    width: 120px;
     writing-mode: horizontal-tb;
+    height: auto;
+    background: var(--color-primary);
+    color: var(--color-text-on-primary);
 }
 
-/* Table layout for consistent narrow columns */
+/* Table layout for ultra-narrow columns */
 #page-scripts-matrix-table {
     table-layout: fixed;
+    font-size: 0.65rem;
+}
+
+/* ===== LEGEND & NOTES STYLING ===== */
+.legend-section {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.legend-title {
+    color: var(--color-text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+}
+
+.legend-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+}
+
+.legend-color {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: var(--border-radius-sm);
+    flex-shrink: 0;
+}
+
+.notes-section h6 {
+    color: var(--color-text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+}
+
+.notes-list {
+    padding-right: var(--spacing-md);
+    margin: 0;
+}
+
+.notes-list li {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-xs);
+    line-height: 1.4;
+}
+
+/* ===== SECTION STYLING ===== */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--color-border-light);
+}
+
+.section-title.main-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: 0;
+    flex: 1;
+}
+
+.section-actions {
+    margin-left: auto;
+}
+
+.section-subtitle {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+.subsection-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.subsection-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.btn-xs {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.7rem;
+    line-height: 1;
 }
 
 /* ===== LEGEND COLORS ===== */
-/* Using semantic colors from ITCSS */
 .legend-color.primary-scripts {
     background-color: var(--color-background-secondary);
 }
@@ -65,7 +177,22 @@
 @media (max-width: 768px) {
     #page-scripts-matrix-table th,
     #page-scripts-matrix-table td {
-        font-size: 0.65rem;
-        padding: 2px 1px;
+        min-width: 20px;
+        max-width: 25px;
+        width: 22px;
+        font-size: 0.55rem;
+        padding: 1px;
+    }
+
+    #page-scripts-matrix-table th:first-child,
+    #page-scripts-matrix-table td:first-child {
+        min-width: 80px;
+        max-width: 100px;
+        width: 90px;
+    }
+
+    .legend-items {
+        flex-direction: column;
+        gap: var(--spacing-sm);
     }
 }

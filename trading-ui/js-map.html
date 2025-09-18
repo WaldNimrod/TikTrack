@@ -23,6 +23,25 @@
     <!-- Error Handlers -->
     <script src="scripts/error-handlers.js"></script>
 
+    <!-- Very early test -->
+    <script>
+        console.log('🚀 Very early test - scripts loading...');
+        fetch('/api/debug/log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: '🚀 Very early test - scripts loading...' })
+        }).catch(() => {});
+
+        function pageLoaded() {
+            console.log('📄 Page body onload fired!');
+            fetch('/api/debug/log', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: '📄 Page body onload fired!' })
+            }).catch(() => {});
+        }
+    </script>
+
     <!-- Test Script -->
     <script>
         console.log('🚀 JS Map HTML loaded successfully');
@@ -53,6 +72,16 @@
     <!-- UI Functions -->
     <script src="scripts/ui-utils.js"></script>
 
+    <!-- Test before main.js -->
+    <script>
+        console.log('📋 About to load main.js...');
+        fetch('/api/debug/log', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: '📋 About to load main.js...' })
+        }).catch(() => {});
+    </script>
+
     <!-- Table mappings -->
     <script src="scripts/table-mappings.js"></script>
 
@@ -69,7 +98,7 @@
     <script src="scripts/main.js"></script>
 </head>
 
-<body>
+<body onload="pageLoaded()">
     <!-- Unified Header Container -->
     <div id="unified-header"></div>
 

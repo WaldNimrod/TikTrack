@@ -223,6 +223,105 @@
                     </div>
                 </div>
 
+                <div class="content-section" id="indexeddbManagement">
+                    <div class="section-header">
+                        <h2>🗄️ ניהול IndexedDB</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('indexeddbManagement')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h3 class="mb-0"><i class="fas fa-database me-2"></i> ניהול IndexedDB</h3>
+                                    <button id="refresh-indexeddb" class="btn btn-secondary btn-sm" onclick="refreshIndexedDBStats()">
+                                        <i class="fas fa-sync me-1"></i> רענן
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- IndexedDB Stats -->
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <i class="fas fa-weight fa-2x text-info mb-2"></i>
+                                                <h6 class="card-title">גודל נוכחי</h6>
+                                                <span id="indexeddb-size" class="badge bg-info fs-5">-</span>
+                                                <small class="text-muted d-block">MB</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <i class="fas fa-maximize fa-2x text-warning mb-2"></i>
+                                                <h6 class="card-title">גודל מקסימאלי</h6>
+                                                <span id="indexeddb-max-size" class="badge bg-warning fs-5">100</span>
+                                                <small class="text-muted d-block">MB</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <i class="fas fa-percentage fa-2x text-success mb-2"></i>
+                                                <h6 class="card-title">אחוז שימוש</h6>
+                                                <span id="indexeddb-usage" class="badge bg-success fs-5">-</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card text-center">
+                                            <div class="card-body">
+                                                <i class="fas fa-list fa-2x text-primary mb-2"></i>
+                                                <h6 class="card-title">מספר רשומות</h6>
+                                                <span id="indexeddb-entries" class="badge bg-primary fs-5">-</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Control Settings -->
+                                <div class="card mb-3">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-cogs me-2"></i> הגדרות ניקוי אוטומטי</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="maxSizeInput" class="form-label">גודל מקסימאלי (MB)</label>
+                                                <input type="number" class="form-control" id="maxSizeInput" value="100" min="10" max="500">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="cleanupIntervalInput" class="form-label">מרווח ניקוי (שעות)</label>
+                                                <input type="number" class="form-control" id="cleanupIntervalInput" value="6" min="1" max="168">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <button id="manual-cleanup" class="btn btn-warning btn-sm" onclick="manualIndexedDBCleanup()">
+                                        <i class="fas fa-broom me-1"></i> ניקוי ידני
+                                    </button>
+                                    <button id="create-backup" class="btn btn-info btn-sm" onclick="createIndexedDBBackup()">
+                                        <i class="fas fa-save me-1"></i> יצירת גיבוי
+                                    </button>
+                                    <button id="restore-backup" class="btn btn-secondary btn-sm" onclick="restoreIndexedDBBackup()">
+                                        <i class="fas fa-upload me-1"></i> שחזור מגיבוי
+                                    </button>
+                                    <button id="clear-all" class="btn btn-danger btn-sm" onclick="clearAllIndexedDB()">
+                                        <i class="fas fa-trash-alt me-1"></i> נקה הכל
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="content-section" id="consoleLog">
                     <div class="section-header">
                         <h2>🖥️ לוג מערכת</h2>
@@ -577,6 +676,120 @@
             
             log('✅ מערכת ניהול משימות רקע אותחלה בהצלחה');
         });
+
+        // IndexedDB Management Functions
+        async function refreshIndexedDBStats() {
+            try {
+                log('📊 מרענן סטטיסטיקות IndexedDB...');
+                const data = await apiCall('/api/indexeddb/stats');
+
+                // Update UI with IndexedDB stats
+                document.getElementById('indexeddb-size').textContent = data.total_size_mb.toFixed(1);
+                document.getElementById('indexeddb-max-size').textContent = data.max_size_mb;
+                document.getElementById('indexeddb-usage').textContent = data.usage_percentage.toFixed(1) + '%';
+                document.getElementById('indexeddb-entries').textContent = data.total_entries;
+
+                // Update progress bar color based on usage
+                const usageElement = document.getElementById('indexeddb-usage');
+                const usagePercent = data.usage_percentage;
+
+                if (usagePercent < 60) {
+                    usageElement.className = 'badge bg-success fs-5';
+                } else if (usagePercent < 80) {
+                    usageElement.className = 'badge bg-warning fs-5';
+                } else {
+                    usageElement.className = 'badge bg-danger fs-5';
+                }
+
+                log(`✅ סטטיסטיקות IndexedDB עודכנו: ${data.total_size_mb.toFixed(1)}MB (${data.total_entries} רשומות)`);
+                window.showNotification && window.showNotification('סטטיסטיקות IndexedDB עודכנו', 'success');
+            } catch (error) {
+                log(`❌ שגיאה בעדכון סטטיסטיקות IndexedDB: ${error.message}`);
+                window.showNotification && window.showNotification(`שגיאה בעדכון סטטיסטיקות: ${error.message}`, 'error');
+            }
+        }
+
+        async function manualIndexedDBCleanup() {
+            try {
+                const maxSize = document.getElementById('maxSizeInput').value;
+                log(`🧹 מתחיל ניקוי ידני של IndexedDB (גודל מקסימאלי: ${maxSize}MB)...`);
+
+                const data = await apiCall(`/api/indexeddb/cleanup/${maxSize}`, 'POST');
+
+                log(`✅ ניקוי IndexedDB הושלם: נמחקו ${data.entries_removed} רשומות, פונו ${data.space_freed_mb}MB`);
+                window.showNotification && window.showNotification(
+                    `ניקוי הושלם: נמחקו ${data.entries_removed} רשומות (${data.space_freed_mb}MB פונו)`,
+                    'success'
+                );
+
+                // Refresh stats after cleanup
+                setTimeout(refreshIndexedDBStats, 1000);
+            } catch (error) {
+                log(`❌ שגיאה בניקוי IndexedDB: ${error.message}`);
+                window.showNotification && window.showNotification(`שגיאה בניקוי: ${error.message}`, 'error');
+            }
+        }
+
+        async function createIndexedDBBackup() {
+            try {
+                log('💾 יוצר גיבוי של IndexedDB...');
+                const data = await apiCall('/api/indexeddb/backup');
+
+                log(`✅ גיבוי נוצר: ${data.backup_file}`);
+                window.showNotification && window.showNotification(`גיבוי נוצר: ${data.backup_file}`, 'success');
+            } catch (error) {
+                log(`❌ שגיאה ביצירת גיבוי: ${error.message}`);
+                window.showNotification && window.showNotification(`שגיאה ביצירת גיבוי: ${error.message}`, 'error');
+            }
+        }
+
+        async function restoreIndexedDBBackup() {
+            try {
+                const backupFile = prompt('הכנס את שם קובץ הגיבוי:', 'indexeddb_backup_20250118.json');
+                if (!backupFile) return;
+
+                log(`🔄 משחזר מגיבוי: ${backupFile}...`);
+
+                const data = await apiCall('/api/indexeddb/restore', 'POST', {
+                    backup_file: backupFile
+                });
+
+                log(`✅ שחזור הושלם: שוחזרו ${data.entries_restored} רשומות`);
+                window.showNotification && window.showNotification(
+                    `שחזור הושלם: שוחזרו ${data.entries_restored} רשומות`,
+                    'success'
+                );
+
+                // Refresh stats after restore
+                setTimeout(refreshIndexedDBStats, 1000);
+            } catch (error) {
+                log(`❌ שגיאה בשחזור מגיבוי: ${error.message}`);
+                window.showNotification && window.showNotification(`שגיאה בשחזור: ${error.message}`, 'error');
+            }
+        }
+
+        async function clearAllIndexedDB() {
+            if (!confirm('⚠️ האם אתה בטוח שברצונך לנקות את כל IndexedDB?\nפעולה זו תמחק את כל הנתונים לצמיתות!')) {
+                return;
+            }
+
+            try {
+                log('🗑️ מנקה את כל IndexedDB...');
+                const data = await apiCall('/api/indexeddb/clear', 'POST');
+
+                log(`✅ IndexedDB נוקתה: נמחקו ${data.databases_cleared} מסדי נתונים`);
+                window.showNotification && window.showNotification(
+                    `IndexedDB נוקתה: נמחקו ${data.databases_cleared} מסדי נתונים`,
+                    'warning'
+                );
+
+                // Refresh stats after clear
+                setTimeout(refreshIndexedDBStats, 1000);
+            } catch (error) {
+                log(`❌ שגיאה בניקוי IndexedDB: ${error.message}`);
+                window.showNotification && window.showNotification(`שגיאה בניקוי: ${error.message}`, 'error');
+            }
+        }
 
         // Auto-refresh every 30 seconds
         setInterval(refreshStatus, 30000);

@@ -122,6 +122,7 @@ from routes.api.server_management import server_management_bp
 from routes.api.system_overview import system_overview_bp
 from routes.api.css_management import css_management_bp
 from routes.api.preferences import preferences_bp
+from routes.api.preferences_v3 import preferences_v3_bp
 
 # External Data Integration blueprints
 from routes.external_data.quotes import quotes_bp
@@ -202,6 +203,7 @@ app.register_blueprint(cash_flows_bp)
 app.register_blueprint(notes_bp)
 app.register_blueprint(executions_bp)
 app.register_blueprint(preferences_bp)
+app.register_blueprint(preferences_v3_bp)
 app.register_blueprint(users_bp)
 app.register_blueprint(background_tasks_bp)
 app.register_blueprint(entity_details_bp)

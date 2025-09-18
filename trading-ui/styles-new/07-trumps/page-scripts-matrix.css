@@ -133,12 +133,15 @@
     background-color: var(--color-success-light);
 }
 
-/* Section styling */
+/* Section styling - Button left, title right */
 .content-section {
     margin-bottom: var(--spacing-lg);
 }
 
 .section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
     margin-bottom: var(--spacing-sm);
 }
 
@@ -147,6 +150,7 @@
     border-color: var(--color-primary);
     color: var(--color-primary);
     font-size: var(--typography-body-sm);
+    flex-shrink: 0;
 }
 
 .section-toggle:hover {
@@ -154,11 +158,87 @@
     color: var(--color-text-on-primary);
 }
 
+.section-title {
+    font-weight: var(--typography-bold);
+    color: var(--color-text-primary);
+    font-size: var(--typography-h5-size);
+}
+
 .section-content {
     padding: var(--spacing-md);
     background-color: var(--color-background-primary);
     border-radius: var(--border-radius-md);
     border: 1px solid var(--color-border);
+}
+
+/* Table styling - Narrow columns, 90-degree headers */
+#page-scripts-matrix-table th {
+    background-color: var(--color-primary);
+    color: var(--color-text-on-primary);
+    border: none;
+    font-weight: var(--typography-bold);
+    font-size: var(--typography-body-xs);
+    text-align: center;
+    vertical-align: middle;
+    min-width: 40px; /* Much narrower */
+    max-width: 60px; /* Limit maximum width */
+    width: 50px; /* Fixed narrow width */
+    padding: var(--spacing-xs) var(--spacing-xxs);
+    /* 90-degree rotation for headers */
+    transform: rotate(-90deg);
+    white-space: nowrap;
+    height: 120px; /* Space for rotated text */
+}
+
+#page-scripts-matrix-table td {
+    vertical-align: middle;
+    border: 1px solid var(--color-border);
+    text-align: center;
+    font-size: var(--typography-body-xs);
+    padding: var(--spacing-xs) var(--spacing-xxs);
+    min-width: 40px;
+    max-width: 60px;
+    width: 50px;
+}
+
+/* First column (script names) - sticky */
+#page-scripts-matrix-table th:first-child,
+#page-scripts-matrix-table td:first-child {
+    position: sticky;
+    left: 0;
+    background-color: var(--color-background-secondary);
+    z-index: 10;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+#page-scripts-matrix-table th:first-child {
+    background-color: var(--color-primary);
+    transform: rotate(0deg); /* Don't rotate first column header */
+    height: auto;
+    width: 120px; /* Wider for script names */
+}
+
+/* Override rotation for first column header */
+#page-scripts-matrix-table thead tr:first-child th:first-child {
+    transform: none !important;
+    writing-mode: horizontal-tb;
+}
+
+/* Table container with horizontal scroll */
+.table-container {
+    background-color: var(--color-background-primary);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
+/* Ensure table takes full width */
+#page-scripts-matrix-table {
+    min-width: 100%;
+    table-layout: fixed; /* Fixed layout for consistent column widths */
 }
 
 /* Responsive design */

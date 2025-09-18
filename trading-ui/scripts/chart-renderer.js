@@ -22,18 +22,85 @@ class ChartRenderer {
                 tooltip: {
                     mode: 'index',
                     intersect: false,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    displayColors: true,
                     callbacks: {
                         title: (context) => {
-                            return new Date(context[0].parsed.x).toLocaleString('he-IL');
+                            const date = new Date(context[0].parsed.x);
+                            const formattedDate = date.toLocaleString('he-IL', {
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit'
+                            });
+                            return `📅 ${formattedDate}`;
+                        },
+                        beforeBody: (context) => {
+                            // הצגת מידע נוסף לפני הגרף
+                            const dataIndex = context[0].dataIndex;
+                            const allData = context[0].chart.data;
+                            if (allData.datasets && allData.datasets.length > 1) {
+                                const quality = allData.datasets[0].data[dataIndex] || 0;
+                                const errors = allData.datasets[1].data[dataIndex] || 0;
+                                const status = quality >= 90 ? '🟢 מצוין' :
+                                             quality >= 75 ? '🟡 טוב' :
+                                             quality >= 60 ? '🟠 בסדר' : '🔴 דורש שיפור';
+                                return `📊 סטטוס: ${status}`;
+                            }
+                            return '';
                         },
                         label: (context) => {
                             const label = context.dataset.label || '';
                             const value = context.parsed.y;
+
                             if (context.dataset.yAxisID === 'y1') {
-                                return `${label}: ${value} בעיות`;
+                                const errorCount = value;
+                                const severity = errorCount === 0 ? '✅ ללא בעיות' :
+                                               errorCount <= 5 ? '⚠️ מעט בעיות' :
+                                               errorCount <= 15 ? '🟡 בעיות בינוניות' : '🔴 הרבה בעיות';
+                                return `${label}: ${errorCount} בעיות (${severity})`;
                             } else {
-                                return `${label}: ${value.toFixed(1)}%`;
+                                const qualityPercent = value.toFixed(1);
+                                const qualityLevel = value >= 90 ? 'A' :
+                                                   value >= 80 ? 'B' :
+                                                   value >= 70 ? 'C' :
+                                                   value >= 60 ? 'D' : 'F';
+                                return `${label}: ${qualityPercent}% (דרגה ${qualityLevel})`;
                             }
+                        },
+                        afterBody: (context) => {
+                            // הצגת מידע נוסף לאחר הגרף
+                            const lines = [];
+                            const dataIndex = context[0].dataIndex;
+                            const allData = context[0].chart.data;
+
+                            if (allData.datasets && allData.datasets.length > 1) {
+                                const quality = allData.datasets[0].data[dataIndex] || 0;
+                                const errors = allData.datasets[1].data[dataIndex] || 0;
+
+                                // חישוב סטטיסטיקות נוספות
+                                lines.push(`🔍 פירוט נתונים:`);
+                                lines.push(`   • איכות קוד: ${quality.toFixed(1)}%`);
+                                lines.push(`   • מספר בעיות: ${errors}`);
+
+                                if (errors > 0) {
+                                    const avgErrors = allData.datasets[1].data.reduce((a, b) => a + b, 0) / allData.datasets[1].data.length;
+                                    const trend = errors > avgErrors ? '📈 מעל הממוצע' : '📉 מתחת לממוצע';
+                                    lines.push(`   • ${trend} (${avgErrors.toFixed(1)} ממוצע)`);
+                                }
+                            }
+
+                            return lines;
+                        },
+                        footer: (context) => {
+                            return '💡 לחץ לחקירה נוספת';
                         }
                     }
                 }
@@ -94,8 +161,21 @@ class ChartRenderer {
                 intersect: false
             },
             animation: {
-                duration: 1000,
-                easing: 'easeInOutQuart'
+                duration: function(context) {
+                    // אנימציה מהירה לנתונים מעטים, איטית לנתונים רבים
+                    const dataPoints = context.chart.data.labels.length;
+                    if (dataPoints < 20) return 1000; // אנימציה מלאה
+                    if (dataPoints < 50) return 500;  // אנימציה בינונית
+                    return 0; // ללא אנימציה לנתונים רבים
+                },
+                easing: 'easeInOutQuart',
+                onProgress: function(context) {
+                    // עדכון סטטוס אנימציה
+                    const progress = Math.round(context.currentStep / context.numSteps * 100);
+                    if (progress % 25 === 0) { // עדכון כל 25%
+                        console.log(`📊 אנימציה: ${progress}%`);
+                    }
+                }
             }
         };
     }

@@ -42,7 +42,7 @@ trading-ui/scripts/
 │   ├── executions.js              # Execution management (modal fixes)
 │   ├── cash_flows.js              # Cash flow management (ENUM/RANGE)
 │   ├── currencies.js              # Currency management
-│   ├── preferences-v2.js          # Preference management V2
+│   ├── preferences.js             # Preference management
 │   ├── research.js                # Research management
 
 │   ├── database.js                # Database management

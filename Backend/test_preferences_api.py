@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Test Preferences API V3
-========================
+Test Preferences API
+====================
 
-בדיקת API endpoints למערכת העדפות V3
+בדיקת API endpoints למערכת העדפות
 
 Author: TikTrack Development Team
 Date: January 2025
@@ -18,7 +18,7 @@ def test_preferences_api():
     
     base_url = "http://localhost:8080/api/v1/preferences"
     
-    print("🚀 מתחיל בדיקת Preferences API V3...")
+    print("🚀 מתחיל בדיקת Preferences API...")
     
     try:
         # בדיקה 1: Health Check

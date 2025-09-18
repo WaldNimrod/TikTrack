@@ -122,10 +122,10 @@ class EntityDetailsRenderer {
                 return;
             }
             
-            // Fallback ל-V1 userPreferences
+            // Fallback ל-userPreferences
             if (window.userPreferences && window.userPreferences.entityColors) {
                 Object.assign(this.entityColors, window.userPreferences.entityColors);
-                console.log('✅ Loaded entity colors from V1 userPreferences');
+                console.log('✅ Loaded entity colors from userPreferences');
                 return;
             }
             

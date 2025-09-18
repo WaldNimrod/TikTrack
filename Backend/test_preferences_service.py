@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Test Preferences Service V3
-===========================
+Test Preferences Service
+========================
 
-בדיקת השירות החדש למערכת העדפות V3
+בדיקת השירות החדש למערכת העדפות
 
 Author: TikTrack Development Team
 Date: January 2025

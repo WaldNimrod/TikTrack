@@ -2033,7 +2033,7 @@ grep "console-cleanup\|ui-utils\|main.js" trading-ui/page-name.html
 - הגדרות מערכת מותאמות אישית
 - פילטרים ברירת מחדל
 - הגדרות נתונים חיצוניים
-- תמיכה ב-V1 ו-V2
+- תמיכה במערכות קיימות
 - שמירה ב-API ובמסד נתונים
 
 #### 17.5 בדיקת תפקוד המערכות
@@ -2047,7 +2047,7 @@ grep "console-cleanup\|ui-utils\|main.js" trading-ui/page-name.html
 
 #### 17.6 כללים חשובים
 - **סדר טעינה**: הסקריפטים חייבים להיטען בסדר הנכון
-- **תאימות**: המערכות תואמות ל-V1 ו-V2 של ההעדפות
+- **תאימות**: המערכות תואמות למערכות ההעדפות הקיימות
 - **ביצועים**: הצבעים מתעדכנים בזמן אמת ללא טעינה מחדש
 - **נגישות**: תמיכה בערכות נושא לנגישות
 
@@ -2473,7 +2473,7 @@ grep "UI Content Section.*Start\|UI Content Section.*End" trading-ui/page-name.h
 - כל הקבצים עם `example`, `demo` בשם (שאינם מקושרים מהתפריט)
 - קבצי JavaScript גיבויים (`.js.backup`, `-clean.js`, `-old.js`, `-yesterday.js`)
 - קבצי CSS גיבויים (`.css.backup`, `-temp.css`)
-- קבצי תמונות כפילויות (`logoV2.svg`)
+- קבצי תמונות כפילויות (`logo.svg`)
 - תיקיות עבודה זמניות (`dist/`, `external_data_integration_client/`)
 
 #### 25.2 יצירת תיקיית גיבוי
@@ -2497,7 +2497,7 @@ mv trading-ui/scripts/*.backup trading-ui/scripts/*-clean.js trading-ui/scripts/
 mv trading-ui/styles/*.backup trading-ui/styles/*-temp.css trading-ui/styles-new/*.backup "$BACKUP_DIR/"
 
 # העברת קבצי תמונות כפילויות
-mv trading-ui/images/logoV2.svg "$BACKUP_DIR/"
+mv trading-ui/images/logo.svg "$BACKUP_DIR/"
 
 # העברת תיקיות עבודה זמניות
 mv trading-ui/dist trading-ui/external_data_integration_client "$BACKUP_DIR/"
@@ -2819,7 +2819,7 @@ read_lints trading-ui/db_extradata.html
 
 **תוכן מתאים לסקשן עליון:**
 - סטטיסטיקות מהירות (שווי תיק, תשואה, טריידים)
-- באנר מערכת העדפות V2
+- באנר מערכת העדפות
 - מידע חיוני שצריך להיות נגיש מיד
 
 **עקרון חשוב:**
@@ -2867,7 +2867,7 @@ window.quickAction = quickAction;
 ### 22.5.5 מבנה הסקשנים הסופי
 
 **5 סקשנים מאורגנים:**
-1. **סקשן עליון** - סטטיסטיקות מהירות + V2 banner
+1. **סקשן עליון** - סטטיסטיקות מהירות + banner
 2. **סקשן 1** - כרטיסי סקירה כללית
 3. **סקשן 2** - גרפים וניתוח ויזואלי
 4. **סקשן 3** - טבלאות מפורטות (3 טבלאות)
@@ -3017,7 +3017,7 @@ window.quickAction = quickAction;
 **עמוד מורכב עם מערכת צבעים דינמית:**
 - עמוד ההעדפות היה עם מבנה מורכב של 6 סקשנים
 - מערכת צבעים דינמית מתקדמת עם color-scheme-system.js
-- מערכת העדפות V1 ו-V2
+- מערכת העדפות
 - כפילויות במבנה HTML (unified-header כפול)
 - צורך בהבנה מעמיקה של מערכת הצבעים הדינמית
 
@@ -3093,7 +3093,7 @@ window.quickAction = quickAction;
 **עקרונות חשובים:**
 - **סדר טעינה** - color-scheme-system.js לפני preferences.js
 - **cache busting** - עדכון גרסאות CSS ו-JS
-- **אינטגרציה מלאה** - המערכת עובדת עם V1 ו-V2
+- **אינטגרציה מלאה** - המערכת עובדת עם כל המערכות
 
 ### 22.7.5 מבנה הסקשנים הסופי
 

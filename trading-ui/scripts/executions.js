@@ -171,10 +171,10 @@ async function showAddExecutionModal() {
         console.log(`✅ Using commission from preferences: ${defaultCommission}`);
       }
     } 
-    // Fallback לV1 userPreferences
+    // Fallback ל-userPreferences
     else if (window.userPreferences && window.userPreferences.defaultCommission) {
       defaultCommission = window.userPreferences.defaultCommission;
-      console.log(`✅ Using commission from V1 userPreferences: ${defaultCommission}`);
+      console.log(`✅ Using commission from userPreferences: ${defaultCommission}`);
     }
     
     document.getElementById('addExecutionCommission').value = defaultCommission;

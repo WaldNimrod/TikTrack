@@ -1665,14 +1665,14 @@ async function loadColorPreferences() {
       const data = await response.json();
       const preferences = data.data || data;
 
-      // עדכון מערכת הצבעים מV1
+      // עדכון מערכת הצבעים
       if (preferences.numericValueColors) {
         Object.assign(NUMERIC_VALUE_COLORS, preferences.numericValueColors);
       }
 
       if (preferences.entityColors) {
         Object.assign(ENTITY_COLORS, preferences.entityColors);
-        console.log('✅ צבעי ישויות V1 עודכנו:', preferences.entityColors);
+        console.log('✅ צבעי ישויות עודכנו:', preferences.entityColors);
       }
 
       // עדכון CSS Variables

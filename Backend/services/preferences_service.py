@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Preferences Service V3 - TikTrack
-=================================
+Preferences Service - TikTrack
+==============================
 
-שירות מתקדם למערכת העדפות V3 עם מטמון אופטימלי ופונקציות נגישות
+שירות מתקדם למערכת העדפות עם מטמון אופטימלי ופונקציות נגישות
 
 Author: TikTrack Development Team
 Version: 3.0
@@ -20,9 +20,9 @@ import os
 
 logger = logging.getLogger(__name__)
 
-class PreferencesServiceV3:
+class PreferencesService:
     """
-    שירות מתקדם למערכת העדפות V3
+    שירות מתקדם למערכת העדפות
     
     תכונות מרכזיות:
     - מטמון פר משתמש עם TTL ארוך
@@ -592,4 +592,4 @@ class PreferencesServiceV3:
 
 
 # יצירת מופע גלובלי
-preferences_service = PreferencesServiceV3()
+preferences_service = PreferencesService()

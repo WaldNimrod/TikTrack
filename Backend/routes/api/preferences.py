@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Preferences API V3 - TikTrack
-=============================
+Preferences API - TikTrack
+==========================
 
-API endpoints for preferences system V3 with advanced features
+API endpoints for preferences system with advanced features
 
 Author: TikTrack Development Team
-Version: 3.0
+Version: 1.0
 Date: January 2025
 """
 

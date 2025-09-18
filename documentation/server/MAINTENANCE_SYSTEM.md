@@ -20,6 +20,7 @@
 - **rotate_logs** (שבועי) - סיבוב קבצי לוג
 - **collect_metrics** (כל 30 דקות) - איסוף מדדי ביצועים
 - **database_maintenance** (שבועי) - תחזוקת בסיס נתונים
+- **indexeddb_cleanup** (כל 6 שעות) - ניקוי IndexedDB
 - **system_health_check** (שעתי) - בדיקת בריאות מערכת
 
 #### קובץ: `Backend/services/background_tasks.py`
@@ -119,6 +120,13 @@ class DatabaseOptimizer:
 - `GET /api/database/analyze` - ניתוח מבנה בסיס נתונים
 - `POST /api/database/optimize` - דוח אופטימיזציה
 
+### IndexedDB Management:
+- `GET /api/indexeddb/stats` - סטטיסטיקות IndexedDB
+- `POST /api/indexeddb/cleanup` - ניקוי אוטומטי של IndexedDB
+- `POST /api/indexeddb/cleanup/<max_size>` - ניקוי עם גודל מקסימאלי מותאם
+- `GET /api/indexeddb/backup` - יצירת גיבוי של IndexedDB
+- `POST /api/indexeddb/restore` - שחזור מ-gיבוי
+
 ## דוגמאות שימוש
 
 ### ניהול Background Tasks:
@@ -152,6 +160,26 @@ curl http://localhost:8080/api/database/analyze
 
 # דוח אופטימיזציה
 curl -X POST http://localhost:8080/api/database/optimize
+```
+
+### ניהול IndexedDB:
+```bash
+# בדיקת סטטיסטיקות IndexedDB
+curl http://localhost:8080/api/indexeddb/stats
+
+# ניקוי אוטומטי עם גודל ברירת מחדל (100MB)
+curl -X POST http://localhost:8080/api/indexeddb/cleanup
+
+# ניקוי עם גודל מקסימאלי מותאם (50MB)
+curl -X POST http://localhost:8080/api/indexeddb/cleanup/50
+
+# יצירת גיבוי לפני ניקוי
+curl http://localhost:8080/api/indexeddb/backup
+
+# שחזור מגיבוי
+curl -X POST http://localhost:8080/api/indexeddb/restore \
+  -H "Content-Type: application/json" \
+  -d '{"backup_file": "indexeddb_backup_20250118.json"}'
 ```
 
 ## משימות רקע מפורטות
@@ -192,7 +220,18 @@ def database_maintenance() -> Dict[str, Any]:
     pass
 ```
 
-### 5. System Health Check
+### 5. IndexedDB Cleanup
+```python
+def indexeddb_cleanup() -> Dict[str, Any]:
+    # ניקוי אוטומטי של IndexedDB
+    # שמירת נתונים רק בגודל מוגדר (ברירת מחדל: 100MB)
+    # מחיקת רשומות ישנות מעבר לגודל המקסימאלי
+    # שמירת גיבוי לפני ניקוי
+    # ניתוח ודוח על הנתונים שנמחקו
+    pass
+```
+
+### 6. System Health Check
 ```python
 def system_health_check() -> Dict[str, Any]:
     # בדיקת CPU, זיכרון, דיסק
@@ -243,6 +282,40 @@ def system_health_check() -> Dict[str, Any]:
 }
 ```
 
+### IndexedDB Statistics:
+```json
+{
+  "total_size_mb": 85.6,
+  "max_size_mb": 100,
+  "usage_percentage": 85.6,
+  "total_entries": 1250,
+  "oldest_entry_days": 7,
+  "newest_entry_hours": 2,
+  "databases": {
+    "chart_history": {
+      "size_mb": 45.2,
+      "entries": 680,
+      "last_cleanup": "2025-01-18T10:30:00Z"
+    },
+    "user_preferences": {
+      "size_mb": 32.1,
+      "entries": 420,
+      "last_cleanup": "2025-01-18T08:15:00Z"
+    },
+    "system_cache": {
+      "size_mb": 8.3,
+      "entries": 150,
+      "last_cleanup": "2025-01-18T12:45:00Z"
+    }
+  },
+  "cleanup_recommendations": [
+    "chart_history: 12 entries older than 30 days",
+    "user_preferences: 5 entries older than 90 days"
+  ],
+  "last_backup": "2025-01-18T06:00:00Z"
+}
+```
+
 ## הגדרת משימות חדשות
 
 ### רישום משימה חדשה:
@@ -259,6 +332,50 @@ background_task_manager.register_task(
     func=my_custom_task,
     schedule_interval="1h",
     description="My custom maintenance task"
+)
+
+### הגדרת משימת IndexedDB Cleanup:
+```python
+from services.indexeddb_service import IndexedDBService
+
+def indexeddb_cleanup_task(max_size_mb: int = 100) -> Dict[str, Any]:
+    """
+    משימת ניקוי אוטומטי של IndexedDB
+
+    Args:
+        max_size_mb: גודל מקסימאלי ב-MB (ברירת מחדל: 100)
+
+    Returns:
+        Dict עם תוצאות הניקוי
+    """
+    indexeddb = IndexedDBService()
+
+    # יצירת גיבוי לפני ניקוי
+    backup_result = indexeddb.create_backup()
+    if not backup_result['success']:
+        return {
+            'success': False,
+            'error': f'Backup failed: {backup_result["error"]}'
+        }
+
+    # ביצוע ניקוי
+    cleanup_result = indexeddb.cleanup_old_entries(max_size_mb)
+
+    return {
+        'success': True,
+        'backup_created': backup_result['filename'],
+        'entries_removed': cleanup_result['removed_count'],
+        'space_freed_mb': cleanup_result['space_freed_mb'],
+        'current_size_mb': cleanup_result['current_size_mb'],
+        'max_size_mb': max_size_mb
+    }
+
+# רישום המשימה עם פרמטרים
+background_task_manager.register_task(
+    name="indexeddb_cleanup",
+    func=lambda: indexeddb_cleanup_task(100),  # 100MB גודל מקסימאלי
+    schedule_interval="6h",  # כל 6 שעות
+    description="ניקוי אוטומטי של IndexedDB כדי למנוע הצטברות מידע רב"
 )
 ```
 
@@ -328,6 +445,7 @@ curl -X POST http://localhost:8080/api/tasks/run/system_health_check
 
 ---
 
-**גרסה**: 2.0.2  
-**תאריך**: ספטמבר 2025  
+**גרסה**: 2.0.3
+**תאריך**: ינואר 2025
 **סטטוס**: פעיל ויציב
+**עדכון אחרון**: נוסף ניהול IndexedDB אוטומטי

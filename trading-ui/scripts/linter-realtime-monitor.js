@@ -19,7 +19,7 @@
 //   ⏳ ממתין ליישום מלא של שחזור לוגים
 //
 // 📝 דוקומנטציה:
-//   - ראה: documentation/frontend/DIAGNOSTIC_LOG_SYSTEM.md (דוקומנטציה מרכזית)
+//   - ראה: documentation/frontend/LINTER_REALTIME_MONITOR.md (דוקומנטציה מרכזית)
 //   - ראה: documentation/frontend/LINTER_IMPLEMENTATION_TASKS.md (רשימת משימות)
 //
 // 🚀 הוראות למפתח עתידי:
@@ -556,7 +556,7 @@ function scanJavaScriptFiles() {
         const otherFiles = [
             'package.json',
             'README.md',
-            'documentation/frontend/DIAGNOSTIC_LOG_SYSTEM.md',
+            'documentation/frontend/LINTER_REALTIME_MONITOR.md',
             'documentation/frontend/NOTIFICATION_SYSTEM.md'
         ];
         allFiles = allFiles.concat(otherFiles);
@@ -1437,7 +1437,7 @@ window.discoverProjectFiles = () => {
     const otherFiles = [
         'package.json',
         'README.md',
-        'documentation/frontend/DIAGNOSTIC_LOG_SYSTEM.md',
+        'documentation/frontend/LINTER_REALTIME_MONITOR.md',
         'documentation/frontend/NOTIFICATION_SYSTEM.md',
         'Backend/models/user_preferences.py'
     ];

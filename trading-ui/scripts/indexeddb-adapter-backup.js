@@ -7,10 +7,10 @@
  */
 
 /**
- * @class LinterIndexedDBAdapter
+ * @class IndexedDBAdapter
  * @description מתאם לניהול מסד נתונים IndexedDB
  */
-class LinterIndexedDBAdapter {
+class IndexedDBAdapter {
     constructor() {
         this.dbName = 'LinterHistoryDB';
         this.version = 1;
@@ -732,7 +732,7 @@ class LinterIndexedDBAdapter {
 
 // ייצוא המחלקה לגלובל
 if (typeof window !== 'undefined') {
-    window.IndexedDBAdapter = LinterIndexedDBAdapter;
+    window.IndexedDBAdapter = IndexedDBAdapter;
 }
 
-console.log('🔧 LinterIndexedDBAdapter loaded successfully');
+console.log('🔧 IndexedDBAdapter loaded successfully');

@@ -91,7 +91,7 @@
             ניטור Linter בזמן אמת
           </div>
           <div class="table-actions">
-              <button class="btn btn-outline-primary btn-sm" onclick="window.copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+              <button class="btn btn-outline-primary btn-sm" onclick="if(typeof window.copyDetailedLog === 'function') window.copyDetailedLog(); else console.error('copyDetailedLog not defined')" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
                 <i class="fas fa-copy"></i> העתק לוג מפורט
               </button>
             <button class="filter-toggle-btn" onclick="window.toggleAllSections()" title="הצג/הסתר כל הסקשנים">
@@ -233,10 +233,10 @@
                   <i class="fas fa-clock"></i> בקרת ניטור:
                 </label>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                  <button class="btn btn-success btn-sm" id="startMonitoringBtn" onclick="window.startMonitoring()">
+                  <button class="btn btn-success btn-sm" id="startMonitoringBtn" onclick="if(typeof window.startMonitoring === 'function') window.startMonitoring(); else console.error('startMonitoring not defined')">
                     <i class="fas fa-play"></i> התחל ניטור
                   </button>
-                  <button class="btn btn-secondary btn-sm" id="stopMonitoringBtn" disabled onclick="window.stopMonitoring()">
+                  <button class="btn btn-secondary btn-sm" id="stopMonitoringBtn" disabled onclick="if(typeof window.stopMonitoring === 'function') window.stopMonitoring(); else console.error('stopMonitoring not defined')">
                     <i class="fas fa-stop"></i> עצור ניטור
                   </button>
                   <div style="display: flex; align-items: center; gap: 8px;">
@@ -262,7 +262,7 @@
                   <button class="btn btn-outline-warning btn-sm" onclick="window.resetFixedIssues()">
                     <i class="fas fa-undo"></i> איפוס תיקונים
                   </button>
-                  <button class="btn btn-outline-secondary" onclick="window.copyDetailedLog()">
+                  <button class="btn btn-outline-secondary" onclick="if(typeof window.copyDetailedLog === 'function') window.copyDetailedLog(); else console.error('copyDetailedLog not defined')">
                     <i class="fas fa-copy"></i> לוג מפורט
                   </button>
                 </div>

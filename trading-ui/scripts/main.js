@@ -3,6 +3,11 @@
  * =================================
  *
  * REFACTORING HISTORY & ARCHITECTURE:
+ */
+
+console.log('🎯 main.js loaded and executing');
+
+/*
  * ====================================
  *
  * This file has undergone significant refactoring to improve code organization:
@@ -266,11 +271,17 @@ function setupGlobalModalConfigurations() {
  */
 function initializeCurrentPage() {
   const currentPage = getCurrentPageName();
+  console.log('🔄 Initializing current page:', currentPage);
 
   // Call page-specific initialization if available
   const initFunctionName = `initialize${currentPage.charAt(0).toUpperCase() + currentPage.slice(1)}Page`;
+  console.log('🔍 Looking for function:', initFunctionName);
+  console.log('🔍 Function exists:', typeof window[initFunctionName] === 'function');
   if (typeof window[initFunctionName] === 'function') {
+    console.log('✅ Calling function:', initFunctionName);
     window[initFunctionName]();
+  } else {
+    console.log('❌ Function not found:', initFunctionName);
   }
 
   // שחזור מצב הסקשנים אחרי אתחול הדף

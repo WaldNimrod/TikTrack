@@ -45,7 +45,7 @@
              */
             async loadJsMapData() {
                 try {
-                    console.log('📊 Loading JS map data...');
+                    console.log('📊 loadJsMapData called successfully');
 
                     // Show loading state
                     this.showLoadingState();
@@ -631,6 +631,19 @@
         // Initialize JS Map page
         function initializeJsMapPage() {
             console.log('🚀 Initializing JS Map page...');
+            console.log('📍 Current page name from getCurrentPageName:', typeof getCurrentPageName === 'function' ? getCurrentPageName() : 'function not available');
+
+            // Add visual indicator that JS is working
+            const testDiv = document.createElement('div');
+            testDiv.innerHTML = '<p style="color: green; font-weight: bold;">✅ JavaScript is working!</p>';
+            testDiv.style.position = 'fixed';
+            testDiv.style.top = '10px';
+            testDiv.style.right = '10px';
+            testDiv.style.background = 'white';
+            testDiv.style.padding = '10px';
+            testDiv.style.border = '1px solid green';
+            testDiv.style.zIndex = '9999';
+            document.body.appendChild(testDiv);
 
             // Load initial data
             console.log('🔄 Calling loadJsMapData...');

@@ -269,14 +269,21 @@
                                 <div class="mb-3">
                                     <label class="form-label">טווח תאריכים</label>
                                     <select id="defaultDateRangeFilter" class="form-select">
-                  <option>היום</option>
-                                        <option selected>השבוע</option>
+                                        <option>היום</option>
+                                        <option>אתמול</option>
+                                        <option>השבוע</option>
+                                        <option>השבוע שעבר</option>
                                         <option>החודש</option>
+                                        <option>החודש שעבר</option>
                                         <option>השנה</option>
+                                        <option>השנה שעברה</option>
+                                        <option>7 ימים אחרונים</option>
+                                        <option>30 ימים אחרונים</option>
+                                        <option>90 ימים אחרונים</option>
                                         <option>הכל</option>
                                         <option>מותאם אישית</option>
-                </select>
-              </div>
+                                    </select>
+                                </div>
             </div>
                             <div class="col-md-6">
                                 <h5>פילטרים נוספים</h5>
@@ -613,78 +620,12 @@
               </div>
             </div>
             
-                <!-- Section 6: System Settings -->
-      <div class="content-section" id="section6">
-        <div class="section-header">
-                        <h2>⚙️ הגדרות מערכת ושרת</h2>
-                        <button class="filter-toggle-btn" onclick="window.toggleSection('section6')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
-          </button>
-        </div>
-        <div class="section-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5>הגדרות שרת</h5>
-                                <div class="mb-3">
-                                    <label class="form-label">כתובת שרת</label>
-                                    <input type="text" id="serverUrl" class="form-control">
-              </div>
-                                <div class="mb-3">
-                                    <label class="form-label">פורט</label>
-                                    <input type="number" id="serverPort" class="form-control control-narrow" min="1" max="65535">
-            </div>
             
-                                <h5 class="mt-4">הגדרות ביצועים</h5>
-                                <div class="mb-3">
-                                    <label class="form-label">מרווח רענון (דקות)</label>
-                                    <input type="number" id="refreshInterval" class="form-control control-narrow" min="1" max="60">
-              </div>
-                                <div class="mb-3">
-                                    <label class="form-label">זמן Cache (דקות)</label>
-                                    <input type="number" id="cacheTTL" class="form-control control-narrow" min="1" max="1440">
-                    </div>
-                                <div class="mb-3">
-                                    <label class="form-label">גודל זיכרון מקסימלי (MB)</label>
-                                    <input type="number" id="maxMemorySize" class="form-control control-narrow" min="100" max="2048">
-                  </div>
-                    </div>
-                            <div class="col-md-6">
-                                <h5>הגדרות קונסולה ולוג</h5>
-          <div class="mb-3">
-                                    <label class="form-label">זמן ניקוי קונסולה (דקות)</label>
-                                    <input type="number" id="consoleCleanupInterval" class="form-control control-narrow" min="5" max="1440">
-                  </div>
-          <div class="mb-3">
-          <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="manualConsoleCleanup">
-                                        <label class="form-check-label" for="manualConsoleCleanup">
-                                            ניקוי ידני של קונסולה
-            </label>
-                  </div>
-                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">רמת לוג</label>
-                                    <select id="logLevel" class="form-select control-narrow">
-                                        <option selected>Debug</option>
-                                        <option>Info</option>
-                                        <option>Warning</option>
-                                        <option>Error</option>
-                                    </select>
-              </div>
-                                <div class="mb-3">
-                                    <label class="form-label">גודל קובץ לוג מקסימלי (MB)</label>
-                                    <input type="number" id="maxLogFileSize" class="form-control control-narrow" min="1" max="100">
-            </div>
-          </div>
-        </div>
-      </div>
-        </div>
-            
-                <!-- Section 7: Admin Interface -->
-                <div class="content-section" id="section7">
+                <!-- Section 6: Admin Interface -->
+                <div class="content-section" id="section6">
                     <div class="section-header">
                         <h2>🔧 ממשק ניהול</h2>
-                        <button class="filter-toggle-btn" onclick="window.toggleSection('section7')" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="window.toggleSection('section6')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -740,6 +681,8 @@
     <script src="scripts/ui-utils.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/table-mappings.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/color-scheme-system.js"></script>
     <script src="scripts/header-system.js?v=20250115_level3_fix"></script>
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/main.js"></script>
@@ -772,6 +715,12 @@
                 console.warn('Admin interface functions not available');
             }
 
+            // Load accounts from database
+            loadAccountsForPreferences();
+            
+            // Load colors from database
+            loadColorsForPreferences();
+
             // Set page-specific preferences
             if (typeof setPagePreferences === 'function') {
                 setPagePreferences('preferences', {
@@ -802,6 +751,99 @@
                     }
                 });
             });
+        }
+
+        // Load accounts from database for preferences
+        async function loadAccountsForPreferences() {
+            try {
+                const response = await fetch('/api/v1/accounts/');
+                if (response.ok) {
+                    const data = await response.json();
+                    const accounts = data.data || [];
+                    
+                    const accountSelect = document.getElementById('defaultAccountFilter');
+                    if (accountSelect) {
+                        // Clear existing options except the first one
+                        accountSelect.innerHTML = '<option>כל החשבונות</option>';
+                        
+                        // Add active accounts
+                        accounts.forEach(account => {
+                            if (account.is_active) {
+                                const option = document.createElement('option');
+                                option.value = account.id;
+                                option.textContent = account.name;
+                                accountSelect.appendChild(option);
+                            }
+                        });
+                        
+                        console.log('✅ Loaded accounts for preferences:', accounts.length);
+                    }
+                } else {
+                    console.error('❌ Failed to load accounts:', response.status);
+                }
+            } catch (error) {
+                console.error('❌ Error loading accounts:', error);
+            }
+        }
+
+        // Load colors from database for preferences
+        async function loadColorsForPreferences() {
+            try {
+                const response = await fetch('/api/v1/preferences/user');
+                if (response.ok) {
+                    const data = await response.json();
+                    const preferences = data.data.preferences || {};
+                    
+                    // Load colors into color pickers
+                    const colorFields = [
+                        'primaryColor', 'secondaryColor', 'successColor', 'warningColor', 'dangerColor', 'infoColor',
+                        'entityTradeColor', 'entityTradeColorLight', 'entityTradeColorDark',
+                        'entityAccountColor', 'entityAccountColorLight', 'entityAccountColorDark',
+                        'entityTickerColor', 'entityTickerColorLight', 'entityTickerColorDark',
+                        'entityAlertColor', 'entityAlertColorLight', 'entityAlertColorDark',
+                        'entityCashFlowColor', 'entityCashFlowColorLight', 'entityCashFlowColorDark',
+                        'entityNoteColor', 'entityNoteColorLight', 'entityNoteColorDark',
+                        'entityTradePlanColor', 'entityTradePlanColorLight', 'entityTradePlanColorDark',
+                        'entityExecutionColor', 'entityExecutionColorLight', 'entityExecutionColorDark',
+                        'statusOpenColor', 'statusOpenColorLight', 'statusOpenColorDark',
+                        'statusClosedColor', 'statusClosedColorLight', 'statusClosedColorDark',
+                        'statusCancelledColor', 'statusCancelledColorLight', 'statusCancelledColorDark'
+                    ];
+                    
+                    let loadedCount = 0;
+                    colorFields.forEach(fieldName => {
+                        const element = document.getElementById(fieldName);
+                        if (element && preferences[fieldName]) {
+                            element.value = preferences[fieldName];
+                            loadedCount++;
+                        }
+                    });
+                    
+                    console.log(`✅ Loaded ${loadedCount} colors for preferences`);
+                } else {
+                    console.error('❌ Failed to load preferences:', response.status);
+                }
+            } catch (error) {
+                console.error('❌ Error loading colors:', error);
+            }
+        }
+
+        // Validate currency change
+        function validateCurrency(selectElement) {
+            const selectedValue = selectElement.value;
+            
+            // Check if not USD
+            if (!selectedValue.includes('USD')) {
+                // Show notification
+                if (typeof showNotification === 'function') {
+                    showNotification('המערכת תומכת כרגע רק בדולר אמריקאי (USD)', 'warning');
+                } else {
+                    alert('המערכת תומכת כרגע רק בדולר אמריקאי (USD)');
+                }
+                
+                // Reset to USD
+                selectElement.value = 'USD - דולר ארה"ב';
+            }
         }
     </script>
 </body>

@@ -2487,6 +2487,7 @@ window.applyChartSettings = async function() {
 // Make functions globally available
 window.addLogEntry = addLogEntry;
 window.initializeSession = initializeSession;
+window.copyDetailedLog = copyDetailedLog;
 window.getSelectedFileTypes = getSelectedFileTypes;
 window.calculateTotalSize = calculateTotalSize;
 window.updateChartIndicators = updateChartIndicators;

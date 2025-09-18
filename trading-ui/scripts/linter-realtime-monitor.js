@@ -1726,34 +1726,6 @@ function initializeControlButtons() {
 // Setup action buttons
 function setupActionButtons() {
     const buttons = [
-        { id: 'startMonitoring', action: () => {
-            isAutoRefreshActive = true;
-        startAutoRefresh();
-    const startBtn = document.getElementById('startMonitoring');
-    const stopBtn = document.getElementById('stopMonitoring');
-            if (startBtn) startBtn.disabled = true;
-            if (stopBtn) stopBtn.disabled = false;
-            // Use direct call to avoid recursion
-            if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('ניטור התחיל', 'מערכת הניטור פעילה');
-            }
-        } },
-        { id: 'stopMonitoring', action: () => {
-            isAutoRefreshActive = false;
-    if (autoRefreshInterval) {
-        clearInterval(autoRefreshInterval);
-        autoRefreshInterval = null;
-                console.log('✅ Auto refresh stopped');
-            }
-            const startBtn = document.getElementById('startMonitoring');
-            const stopBtn = document.getElementById('stopMonitoring');
-            if (startBtn) startBtn.disabled = false;
-            if (stopBtn) stopBtn.disabled = true;
-            // Use direct call to avoid recursion
-            if (typeof window.showInfoNotification === 'function') {
-                window.showInfoNotification('ניטור נעצר', 'מערכת הניטור הופסקה');
-            }
-        } },
         { id: 'clearLogs', action: () => {
             // Use direct call to avoid recursion
             if (typeof window.showSuccessNotification === 'function') {
@@ -1975,11 +1947,11 @@ window.stopMonitoring = () => {
     const startBtn = document.getElementById('startMonitoringBtn');
     const stopBtn = document.getElementById('stopMonitoringBtn');
 
-            if (startBtn) startBtn.disabled = false;
+    if (startBtn) startBtn.disabled = false;
     if (stopBtn) stopBtn.disabled = true;
 
     // Show notification
-        if (typeof window.showInfoNotification === 'function') {
+    if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('ניטור נעצר', 'הניטור האוטומטי הופסק');
     }
 };

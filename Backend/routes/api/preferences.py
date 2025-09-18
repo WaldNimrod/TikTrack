@@ -1,363 +1,527 @@
+#!/usr/bin/env python3
 """
-Preferences API Routes - TikTrack
-=================================
+Preferences API V3 - TikTrack
+=============================
 
-API endpoints for user preferences management.
+API endpoints for preferences system V3 with advanced features
 
 Author: TikTrack Development Team
-Version: 2.0
+Version: 3.0
 Date: January 2025
 """
 
 from flask import Blueprint, request, jsonify
-from sqlalchemy.orm import Session
-from config.database import SessionLocal
-from services.preferences_service import PreferencesService
-# from utils.response_optimizer import optimize_response
-from utils.rate_limiter import rate_limit_api
-from typing import Any
+from services.preferences_service_v3 import preferences_service
+from typing import Any, Dict, List
 import logging
+import json
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 # Create blueprint
-preferences_bp = Blueprint('preferences', __name__, url_prefix='/api/v1/preferences')
+preferences_v3_bp = Blueprint('preferences_v3', __name__, url_prefix='/api/v1/preferences-v3')
 
-@preferences_bp.route('/defaults', methods=['GET'])
-@rate_limit_api(requests_per_minute=30)
-def get_defaults() -> Any:
-    """Get default preferences"""
+# ============================================================================
+# User Preferences Endpoints
+# ============================================================================
+
+@preferences_v3_bp.route('/user', methods=['GET'])
+def get_user_preferences() -> Any:
+    """
+    קבלת העדפות משתמש
+    
+    Query Parameters:
+        - profile_id (optional): מזהה פרופיל
+        - use_cache (optional): האם להשתמש במטמון (default: true)
+    """
     try:
-        defaults = PreferencesService.get_fallback_defaults()
+        user_id = request.args.get('user_id', 1, type=int)  # ברירת מחדל: משתמש 1
+        profile_id = request.args.get('profile_id', type=int)
+        use_cache = request.args.get('use_cache', 'true').lower() == 'true'
+        
+        # קבלת כל ההעדפות
+        preferences = preferences_service.get_all_user_preferences(
+            user_id=user_id,
+            profile_id=profile_id,
+            use_cache=use_cache
+        )
         
         return jsonify({
             "success": True,
             "data": {
-                "defaults": defaults
+                "user_id": user_id,
+                "profile_id": profile_id,
+                "preferences": preferences,
+                "count": len(preferences)
             },
-            "timestamp": "2025-01-07T21:55:00Z"
+            "timestamp": datetime.now().isoformat()
         }), 200
-        
-    except Exception as e:
-        logger.error(f"Error getting defaults: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "timestamp": "2025-01-07T21:55:00Z"
-        }), 500
-
-@preferences_bp.route('/user', methods=['GET'])
-@rate_limit_api(requests_per_minute=30)
-def get_user_preferences() -> Any:
-    """Get user preferences from database"""
-    try:
-        db = SessionLocal()
-        try:
-            # Get current user (for now, use default user ID 1)
-            user_id = 1
-            
-            # Get preferences from database
-            preferences = PreferencesService.get_preferences(db, user_id)
-            if preferences:
-                # Return actual preferences from database
-                preferences_data = preferences.to_dict()
-                logger.info(f"✅ Retrieved preferences from database for user {user_id}")
-            else:
-                # No preferences found, return fallback defaults
-                preferences_data = PreferencesService.get_fallback_defaults()
-                logger.info(f"⚠️ No preferences found for user {user_id}, returning fallback defaults")
-            
-            # Get profiles
-            profiles = PreferencesService.get_profiles(db, user_id)
-            
-            return jsonify({
-                "success": True,
-                "data": {
-                    "preferences": preferences_data,
-                    "profiles": [profile.to_dict() for profile in profiles] if profiles else [{
-                        "id": 1,
-                        "name": "ברירת מחדל",
-                        "isDefault": True,
-                        "description": "פרופיל ברירת מחדל"
-                    }]
-                },
-                "timestamp": "2025-01-07T21:55:00Z"
-            }), 200
-            
-        finally:
-            db.close()
         
     except Exception as e:
         logger.error(f"Error getting user preferences: {e}")
         return jsonify({
             "success": False,
             "error": str(e),
-            "timestamp": "2025-01-07T21:55:00Z"
+            "timestamp": datetime.now().isoformat()
         }), 500
 
-@preferences_bp.route('/user', methods=['POST'])
-@rate_limit_api(requests_per_minute=60)
+@preferences_v3_bp.route('/user', methods=['POST'])
 def save_user_preferences() -> Any:
-    """Save user preferences"""
+    """
+    שמירת העדפות משתמש
+    
+    Body:
+        - preferences: מילון עם העדפות
+        - profile_id (optional): מזהה פרופיל
+    """
     try:
         data = request.get_json()
         if not data:
             return jsonify({
                 "success": False,
                 "error": "No data provided",
-                "timestamp": "2025-01-07T21:55:00Z"
+                "timestamp": datetime.now().isoformat()
             }), 400
         
-        # Save to database using PreferencesService
-        db = SessionLocal()
-        try:
-            # Get current user (for now, use default user ID 1)
-            user_id = 1
-            
-            # Save preferences using the service
-            result = PreferencesService.save_user_preferences(
-                db=db,
-                user_id=user_id,
-                preferences_data=data,
-                profile_name="ברירת מחדל"
-            )
-            
-            if result:
-                logger.info(f"✅ Preferences saved successfully for user {user_id}: {list(data.keys())}")
-                return jsonify({
-                    "success": True,
-                    "message": "Preferences saved successfully to database",
-                    "data": {
-                        "saved_keys": list(data.keys()),
-                        "user_id": user_id
-                    },
-                    "timestamp": "2025-01-07T21:55:00Z"
-                }), 200
-            else:
-                logger.error(f"❌ Failed to save preferences for user {user_id}")
-                return jsonify({
-                    "success": False,
-                    "error": "Failed to save preferences to database",
-                    "timestamp": "2025-01-07T21:55:00Z"
-                }), 500
-                
-        finally:
-            db.close()
+        user_id = data.get('user_id', 1)  # ברירת מחדל: משתמש 1
+        preferences = data.get('preferences', {})
+        profile_id = data.get('profile_id')
         
+        if not preferences:
+            return jsonify({
+                "success": False,
+                "error": "No preferences provided",
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+        # שמירת העדפות
+        success = preferences_service.save_preferences(
+            user_id=user_id,
+            preferences=preferences,
+            profile_id=profile_id
+        )
+        
+        if success:
+            return jsonify({
+                "success": True,
+                "data": {
+                    "user_id": user_id,
+                    "profile_id": profile_id,
+                    "saved_count": len(preferences)
+                },
+                "timestamp": datetime.now().isoformat()
+            }), 200
+        else:
+            return jsonify({
+                "success": False,
+                "error": "Failed to save preferences",
+                "timestamp": datetime.now().isoformat()
+            }), 500
+            
     except Exception as e:
         logger.error(f"Error saving user preferences: {e}")
         return jsonify({
             "success": False,
             "error": str(e),
-            "timestamp": "2025-01-07T21:55:00Z"
+            "timestamp": datetime.now().isoformat()
         }), 500
 
-@preferences_bp.route('/ui', methods=['GET', 'POST'])
-@rate_limit_api(requests_per_minute=30)
-def ui_preferences() -> Any:
-    """Get/Set UI preferences"""
+@preferences_v3_bp.route('/user/single', methods=['GET'])
+def get_single_preference() -> Any:
+    """
+    קבלת העדפה בודדת
+    
+    Query Parameters:
+        - preference_name: שם ההעדפה
+        - profile_id (optional): מזהה פרופיל
+        - use_cache (optional): האם להשתמש במטמון
+    """
     try:
-        if request.method == 'GET':
-            ui_prefs = PreferencesService.get_ui_preferences()
+        user_id = request.args.get('user_id', 1, type=int)
+        preference_name = request.args.get('preference_name')
+        profile_id = request.args.get('profile_id', type=int)
+        use_cache = request.args.get('use_cache', 'true').lower() == 'true'
+        
+        if not preference_name:
             return jsonify({
-                "success": True,
-                "data": {"ui_preferences": ui_prefs},
-                "timestamp": "2025-01-07T21:55:00Z"
-            }), 200
-        else:
-            data = request.get_json()
-            result = PreferencesService.set_ui_preferences(data)
-            return jsonify({
-                "success": True,
-                "data": {"updated": result},
-                "timestamp": "2025-01-07T21:55:00Z"
-            }), 200
-            
-    except Exception as e:
-        logger.error(f"Error with UI preferences: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "timestamp": "2025-01-07T21:55:00Z"
-        }), 500
-
-@preferences_bp.route('/system', methods=['GET', 'POST'])
-@rate_limit_api(requests_per_minute=30)
-def system_preferences() -> Any:
-    """Get/Set system preferences"""
-    try:
-        if request.method == 'GET':
-            system_prefs = PreferencesService.get_system_preferences()
-            return jsonify({
-                "success": True,
-                "data": {"system_preferences": system_prefs},
-                "timestamp": "2025-01-07T21:55:00Z"
-            }), 200
-        else:
-            data = request.get_json()
-            result = PreferencesService.set_system_preferences(data)
-            return jsonify({
-                "success": True,
-                "data": {"updated": result},
-                "timestamp": "2025-01-07T21:55:00Z"
-            }), 200
-            
-    except Exception as e:
-        logger.error(f"Error with system preferences: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "timestamp": "2025-01-07T21:55:00Z"
-        }), 500
-
-@preferences_bp.route('/advanced', methods=['GET', 'POST'])
-@rate_limit_api(requests_per_minute=30)
-def advanced_preferences() -> Any:
-    """Get/Set advanced preferences"""
-    try:
-        if request.method == 'GET':
-            advanced_prefs = PreferencesService.get_advanced_preferences()
-            return jsonify({
-                "success": True,
-                "data": {"advanced_preferences": advanced_prefs},
-                "timestamp": "2025-01-07T21:55:00Z"
-            }), 200
-        else:
-            data = request.get_json()
-            result = PreferencesService.set_advanced_preferences(data)
-            return jsonify({
-                "success": True,
-                "data": {"updated": result},
-                "timestamp": "2025-01-07T21:55:00Z"
-            }), 200
-            
-    except Exception as e:
-        logger.error(f"Error with advanced preferences: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "timestamp": "2025-01-07T21:55:00Z"
-        }), 500
-
-@preferences_bp.route('/profiles', methods=['GET'])
-@rate_limit_api(requests_per_minute=30)
-def get_profiles() -> Any:
-    """Get user profiles"""
-    try:
-        # For now, return fallback profile
-        profiles = [{
-            "id": 1,
-            "name": "ברירת מחדל",
-            "isDefault": True,
-            "description": "פרופיל ברירת מחדל"
-        }]
+                "success": False,
+                "error": "preference_name is required",
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+        # קבלת העדפה
+        value = preferences_service.get_preference(
+            user_id=user_id,
+            preference_name=preference_name,
+            profile_id=profile_id,
+            use_cache=use_cache
+        )
         
         return jsonify({
             "success": True,
-            "data": profiles,
-            "timestamp": "2025-01-07T21:55:00Z"
+            "data": {
+                "user_id": user_id,
+                "preference_name": preference_name,
+                "value": value,
+                "profile_id": profile_id
+            },
+            "timestamp": datetime.now().isoformat()
         }), 200
         
     except Exception as e:
-        logger.error(f"Error getting profiles: {e}")
+        logger.error(f"Error getting single preference: {e}")
         return jsonify({
             "success": False,
             "error": str(e),
-            "timestamp": "2025-01-07T21:55:00Z"
+            "timestamp": datetime.now().isoformat()
         }), 500
 
-@preferences_bp.route('/profiles/create', methods=['POST'])
-@rate_limit_api(requests_per_minute=10)
-def create_profile() -> Any:
-    """Create a new profile"""
+@preferences_v3_bp.route('/user/single', methods=['POST'])
+def save_single_preference() -> Any:
+    """
+    שמירת העדפה בודדת
+    
+    Body:
+        - preference_name: שם ההעדפה
+        - value: ערך ההעדפה
+        - profile_id (optional): מזהה פרופיל
+    """
     try:
         data = request.get_json()
         if not data:
             return jsonify({
                 "success": False,
                 "error": "No data provided",
-                "timestamp": "2025-01-07T21:55:00Z"
+                "timestamp": datetime.now().isoformat()
             }), 400
         
-        # Validate required fields
-        profile_name = data.get('name', '').strip()
-        if not profile_name:
+        user_id = data.get('user_id', 1)
+        preference_name = data.get('preference_name')
+        value = data.get('value')
+        profile_id = data.get('profile_id')
+        
+        if not preference_name:
             return jsonify({
                 "success": False,
-                "error": "Profile name is required",
-                "timestamp": "2025-01-07T21:55:00Z"
+                "error": "preference_name is required",
+                "timestamp": datetime.now().isoformat()
             }), 400
         
-        # Get user ID (for now, use 1 as default)
-        user_id = 1
-        
-        # Create new profile
-        db = SessionLocal()
-        new_profile = PreferencesService.create_profile(
-            db=db,
+        # שמירת העדפה
+        success = preferences_service.save_preference(
             user_id=user_id,
-            profile_name=profile_name,
-            description=data.get('description', ''),
-            is_default=False
+            preference_name=preference_name,
+            value=value,
+            profile_id=profile_id
         )
         
-        if new_profile:
+        if success:
             return jsonify({
                 "success": True,
-                "message": "Profile created successfully",
-                "data": new_profile.to_dict(),
-                "timestamp": "2025-01-07T21:55:00Z"
-            }), 201
+                "data": {
+                    "user_id": user_id,
+                    "preference_name": preference_name,
+                    "value": value,
+                    "profile_id": profile_id
+                },
+                "timestamp": datetime.now().isoformat()
+            }), 200
         else:
             return jsonify({
                 "success": False,
-                "error": "Failed to create profile",
-                "timestamp": "2025-01-07T21:55:00Z"
+                "error": "Failed to save preference",
+                "timestamp": datetime.now().isoformat()
             }), 500
-        
+            
     except Exception as e:
-        logger.error(f"Error creating profile: {e}")
+        logger.error(f"Error saving single preference: {e}")
         return jsonify({
             "success": False,
             "error": str(e),
-            "timestamp": "2025-01-07T21:55:00Z"
+            "timestamp": datetime.now().isoformat()
         }), 500
 
-@preferences_bp.route('/colors', methods=['GET'])
-@rate_limit_api(requests_per_minute=30)
-def get_colors() -> Any:
-    """Get color preferences"""
+@preferences_v3_bp.route('/user/group', methods=['GET'])
+def get_group_preferences() -> Any:
+    """
+    קבלת העדפות קבוצה
+    
+    Query Parameters:
+        - group_name: שם הקבוצה
+        - profile_id (optional): מזהה פרופיל
+        - use_cache (optional): האם להשתמש במטמון
+    """
     try:
-        # Return default colors for now
-        colors = {
-            "numeric-positive-color": "#28a745",
-            "numeric-negative-color": "#dc3545", 
-            "numeric-zero-color": "#6c757d",
-            "entity-trade-color": "#007bff",
-            "entity-account-color": "#28a745",
-            "entity-ticker-color": "#dc3545",
-            "entity-alert-color": "#ff9c05",
-            "entity-execution-color": "#17a2b8",
-            "entity-cash-flow-color": "#20c997",
-            "entity-trade-plan-color": "#17a2b8",
-            "entity-note-color": "#6f42c1",
-            "status-open-color": "#28a745",
-            "status-closed-color": "#6c757d",
-            "status-cancelled-color": "#dc3545",
-            "status-pending-color": "#ffc107",
-            "type-swing-color": "#007bff",
-            "type-investment-color": "#28a745",
-            "type-passive-color": "#6f42c1",
-            "type-day-trading-color": "#fd7e14",
-            "type-scalping-color": "#dc3545"
-        }
+        user_id = request.args.get('user_id', 1, type=int)
+        group_name = request.args.get('group_name')
+        profile_id = request.args.get('profile_id', type=int)
+        use_cache = request.args.get('use_cache', 'true').lower() == 'true'
         
-        return jsonify(colors), 200
+        if not group_name:
+            return jsonify({
+                "success": False,
+                "error": "group_name is required",
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+        # קבלת העדפות קבוצה
+        preferences = preferences_service.get_group_preferences(
+            user_id=user_id,
+            group_name=group_name,
+            profile_id=profile_id,
+            use_cache=use_cache
+        )
+        
+        return jsonify({
+            "success": True,
+            "data": {
+                "user_id": user_id,
+                "group_name": group_name,
+                "preferences": preferences,
+                "count": len(preferences),
+                "profile_id": profile_id
+            },
+            "timestamp": datetime.now().isoformat()
+        }), 200
         
     except Exception as e:
-        logger.error(f"Error getting colors: {e}")
+        logger.error(f"Error getting group preferences: {e}")
         return jsonify({
             "success": False,
             "error": str(e),
-            "timestamp": "2025-01-07T21:55:00Z"
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@preferences_v3_bp.route('/user/multiple', methods=['POST'])
+def get_multiple_preferences() -> Any:
+    """
+    קבלת העדפות מרובות
+    
+    Body:
+        - preference_names: רשימת שמות העדפות
+        - profile_id (optional): מזהה פרופיל
+        - use_cache (optional): האם להשתמש במטמון
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                "success": False,
+                "error": "No data provided",
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+        user_id = data.get('user_id', 1)
+        preference_names = data.get('preference_names', [])
+        profile_id = data.get('profile_id')
+        use_cache = data.get('use_cache', True)
+        
+        if not preference_names:
+            return jsonify({
+                "success": False,
+                "error": "preference_names is required",
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+        # קבלת העדפות מרובות
+        preferences = preferences_service.get_preferences_by_names(
+            user_id=user_id,
+            preference_names=preference_names,
+            profile_id=profile_id,
+            use_cache=use_cache
+        )
+        
+        return jsonify({
+            "success": True,
+            "data": {
+                "user_id": user_id,
+                "preference_names": preference_names,
+                "preferences": preferences,
+                "count": len(preferences),
+                "profile_id": profile_id
+            },
+            "timestamp": datetime.now().isoformat()
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting multiple preferences: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+# ============================================================================
+# Profile Management Endpoints
+# ============================================================================
+
+@preferences_v3_bp.route('/profiles', methods=['GET'])
+def get_user_profiles() -> Any:
+    """
+    קבלת פרופילים של משתמש
+    """
+    try:
+        user_id = request.args.get('user_id', 1, type=int)
+        
+        # קבלת פרופילים
+        profiles = preferences_service.get_user_profiles(user_id)
+        
+        return jsonify({
+            "success": True,
+            "data": {
+                "user_id": user_id,
+                "profiles": profiles,
+                "count": len(profiles)
+            },
+            "timestamp": datetime.now().isoformat()
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting user profiles: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+# ============================================================================
+# Admin Endpoints
+# ============================================================================
+
+@preferences_v3_bp.route('/admin/types', methods=['GET'])
+def get_preference_types() -> Any:
+    """
+    קבלת סוגי העדפות (Admin)
+    """
+    try:
+        # קבלת סוגי העדפות מהשירות
+        # זה דורש הרחבה של השירות
+        return jsonify({
+            "success": True,
+            "data": {
+                "message": "Admin endpoint - to be implemented"
+            },
+            "timestamp": datetime.now().isoformat()
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting preference types: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@preferences_v3_bp.route('/admin/groups', methods=['GET'])
+def get_preference_groups() -> Any:
+    """
+    קבלת קבוצות העדפות (Admin)
+    """
+    try:
+        # קבלת קבוצות העדפות מהשירות
+        # זה דורש הרחבה של השירות
+        return jsonify({
+            "success": True,
+            "data": {
+                "message": "Admin endpoint - to be implemented"
+            },
+            "timestamp": datetime.now().isoformat()
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting preference groups: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@preferences_v3_bp.route('/admin/search', methods=['POST'])
+def search_preferences() -> Any:
+    """
+    חיפוש העדפות (Admin)
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                "success": False,
+                "error": "No data provided",
+                "timestamp": datetime.now().isoformat()
+            }), 400
+        
+        # חיפוש העדפות
+        # זה דורש הרחבה של השירות
+        return jsonify({
+            "success": True,
+            "data": {
+                "message": "Admin search endpoint - to be implemented"
+            },
+            "timestamp": datetime.now().isoformat()
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error searching preferences: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+# ============================================================================
+# Utility Endpoints
+# ============================================================================
+
+@preferences_v3_bp.route('/info/<preference_name>', methods=['GET'])
+def get_preference_info(preference_name: str) -> Any:
+    """
+    קבלת מידע על העדפה
+    """
+    try:
+        # קבלת מידע על העדפה
+        info = preferences_service.get_preference_info(preference_name)
+        
+        return jsonify({
+            "success": True,
+            "data": {
+                "preference_name": preference_name,
+                "info": info
+            },
+            "timestamp": datetime.now().isoformat()
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting preference info: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@preferences_v3_bp.route('/health', methods=['GET'])
+def health_check() -> Any:
+    """
+    בדיקת תקינות השירות
+    """
+    try:
+        # בדיקה בסיסית של השירות
+        test_preference = preferences_service.get_preference(1, 'timezone')
+        
+        return jsonify({
+            "success": True,
+            "data": {
+                "status": "healthy",
+                "test_preference": test_preference,
+                "service": "preferences_v3"
+            },
+            "timestamp": datetime.now().isoformat()
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
         }), 500

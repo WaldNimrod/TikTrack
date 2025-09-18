@@ -304,6 +304,8 @@
 
 ### 🔧 **שלב 7.5: ניהול IndexedDB (חדש)**
 
+> 📋 **סטטוס נוכחי:** ראה `documentation/frontend/INDEXEDDB_IMPLEMENTATION_STATUS.md`
+
 #### ✅ **משימה 7.5.1: יישום IndexedDB Cleanup**
 - [ ] יצירת `IndexedDBService` ב-Backend
 - [ ] הטמעת פונקציית `cleanup_old_entries()`

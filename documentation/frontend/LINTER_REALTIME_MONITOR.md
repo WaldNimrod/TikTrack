@@ -253,6 +253,13 @@ const HistoricalChart = {
         // מוגדר ב: linter-realtime-monitor.js:94
         // סטטוס: הוסר - יחודש בעתיד
         console.log('Chart functionality removed - will be rebuilt');
+    },
+
+    // חשוב: לפני התחלת היישום יש לבדוק את תהליך IndexedDB
+    // ראה: documentation/frontend/LINTER_IMPLEMENTATION_TASKS.md משימה 7.5.5
+    validateIndexedDBSystem: function() {
+        // בדיקה מקיפה שכל הרכיבים מוכנים ליישום
+        return this.checkSystemReadiness();
     }
 };
 
@@ -868,10 +875,10 @@ const MaintenanceGuide = {
  * המערכת מיועדת למפתחים בלבד ולא למשתמשי קצה,
  * ומספקת כלים מתקדמים לניהול איכות הקוד.
  *
- * @version 3.0.1
+ * @version 3.0.2
  * @lastUpdated 2025-01-18
  * @maintainer AI Assistant
- * @change IndexedDB management system added
+ * @change IndexedDB management system + comprehensive testing task added
  */
 
 ### מבנה הקבצים

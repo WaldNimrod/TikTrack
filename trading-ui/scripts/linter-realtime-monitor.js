@@ -433,6 +433,14 @@ function updateProblemFilesTable(stats) {
     // Sort by total issues (most problematic first)
     problemFiles.sort((a, b) => b.total - a.total);
 
+    // Update counter in the new section header
+    const counterElement = document.getElementById('problemFilesCount');
+    if (counterElement) {
+        counterElement.textContent = problemFiles.length > 0 ?
+            `${problemFiles.length} קבצים` :
+            '0 קבצים';
+    }
+
     if (problemFiles.length === 0) {
         tableBody.innerHTML = `
             <tr>
@@ -2163,6 +2171,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Global functions
 window.copyDetailedLog = copyDetailedLog;
 window.startFileScan = startFileScan;
+window.updateProblemFilesTable = updateProblemFilesTable;
 window.fixAllIssues = async () => {
     console.log('🔧 Attempting to fix all issues...');
     console.log('📊 Current state:', {
@@ -2771,6 +2780,7 @@ window.applyChartSettings = async function() {
 window.addLogEntry = addLogEntry;
 window.initializeSession = initializeSession;
 window.copyDetailedLog = copyDetailedLog;
+window.updateProblemFilesTable = updateProblemFilesTable;
 window.getSelectedFileTypes = getSelectedFileTypes;
 window.calculateTotalSize = calculateTotalSize;
 window.updateChartIndicators = updateChartIndicators;

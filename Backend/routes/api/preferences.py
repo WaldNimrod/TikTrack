@@ -513,7 +513,7 @@ def health_check() -> Any:
             "data": {
                 "status": "healthy",
                 "test_preference": test_preference,
-                "service": "preferences_v3"
+                "service": "preferences"
             },
             "timestamp": datetime.now().isoformat()
         }), 200

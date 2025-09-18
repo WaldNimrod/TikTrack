@@ -7,7 +7,7 @@ Simple API Test
 """
 
 from flask import Flask, jsonify
-from services.preferences_service_v3 import preferences_service
+from services.preferences_service import preferences_service
 
 app = Flask(__name__)
 

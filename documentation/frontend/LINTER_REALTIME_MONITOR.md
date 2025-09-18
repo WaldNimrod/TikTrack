@@ -878,7 +878,7 @@ const MaintenanceGuide = {
  * @version 3.0.2
  * @lastUpdated 2025-01-18
  * @maintainer AI Assistant
- * @change IndexedDB management system + comprehensive testing task added
+ * @change IndexedDB management system + comprehensive testing stage 2.5 added
  */
 
 ### מבנה הקבצים

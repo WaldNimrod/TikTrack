@@ -407,6 +407,13 @@ function startFileScan() {
 
 // Scan files for issues based on selected file types
 function scanJavaScriptFiles() {
+    // Get file type selections - default to all if none selected (for auto-scan)
+    let scanJs = document.getElementById('scanJs')?.checked || false;
+    let scanHtml = document.getElementById('scanHtml')?.checked || false;
+    let scanPy = document.getElementById('scanPy')?.checked || false;
+    let scanCss = document.getElementById('scanCss')?.checked || false;
+    let scanOther = document.getElementById('scanOther')?.checked || false;
+
     // Show scan start notification
     const selectedTypes = [];
     if (scanJs) selectedTypes.push('JavaScript');
@@ -418,13 +425,6 @@ function scanJavaScriptFiles() {
     if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('סריקה התחילה', `סורק ${selectedTypes.join(', ')} קבצים בפרויקט...`);
     }
-
-    // Get file type selections - default to all if none selected (for auto-scan)
-    let scanJs = document.getElementById('scanJs')?.checked || false;
-    let scanHtml = document.getElementById('scanHtml')?.checked || false;
-    let scanPy = document.getElementById('scanPy')?.checked || false;
-    let scanCss = document.getElementById('scanCss')?.checked || false;
-    let scanOther = document.getElementById('scanOther')?.checked || false;
 
     // If no file types are selected, select all (for auto-scan compatibility)
     const noSelection = !scanJs && !scanHtml && !scanPy && !scanCss && !scanOther;

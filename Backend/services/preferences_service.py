@@ -54,8 +54,13 @@ class PreferencesService:
     - אופטימיזציה מקסימלית
     """
     
-    def __init__(self, db_path: str = 'db/simpleTrade_new.db'):
+    def __init__(self, db_path: str = None):
         """אתחול השירות"""
+        if db_path is None:
+            # Default database path
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            db_path = os.path.join(current_dir, "..", "db", "simpleTrade_new.db")
+
         self.db_path = db_path
         self.cache = {}  # מטמון פנימי
         self.cache_ttl = 24 * 60 * 60  # 24 שעות

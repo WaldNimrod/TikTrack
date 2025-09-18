@@ -13,12 +13,12 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from services.preferences_service_v3 import preferences_service
+from services.preferences_service import preferences_service
 
 def test_preferences_service():
     """בדיקת השירות החדש"""
     
-    print("🚀 מתחיל בדיקת Preferences Service V3...")
+    print("🚀 מתחיל בדיקת Preferences Service...")
     
     try:
         # בדיקה 1: קבלת העדפה בודדת

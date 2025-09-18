@@ -54,7 +54,7 @@ window.getPreference = async function(preferenceName, userId = 1, profileId = nu
         }
         
         // שאילתה לשרת
-        let url = `/api/v1/preferences-v3/user/single?preference_name=${preferenceName}&user_id=${userId}`;
+        let url = `/api/v1/preferences/user/single?preference_name=${preferenceName}&user_id=${userId}`;
         if (profileId) {
             url += `&profile_id=${profileId}`;
         }
@@ -101,7 +101,7 @@ window.getGroupPreferences = async function(groupName, userId = 1, profileId = n
         }
         
         // שאילתה לשרת
-        let url = `/api/v1/preferences-v3/user/group?group_name=${groupName}&user_id=${userId}`;
+        let url = `/api/v1/preferences/user/group?group_name=${groupName}&user_id=${userId}`;
         if (profileId) {
             url += `&profile_id=${profileId}`;
         }
@@ -120,9 +120,9 @@ window.getGroupPreferences = async function(groupName, userId = 1, profileId = n
             }
             
             return preferences;
-        } else {
+      } else {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
+      }
     } catch (error) {
         console.error(`❌ Error getting group preferences ${groupName}:`, error);
         throw error;
@@ -153,7 +153,7 @@ window.getPreferencesByNames = async function(preferenceNames, userId = 1, profi
         }
         
         // שאילתה לשרת
-        const response = await fetch('/api/v1/preferences-v3/user/multiple', {
+        const response = await fetch('/api/v1/preferences/user/multiple', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -178,7 +178,7 @@ window.getPreferencesByNames = async function(preferenceNames, userId = 1, profi
             }
             
             return preferences;
-        } else {
+          } else {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
     } catch (error) {
@@ -205,7 +205,7 @@ window.getAllUserPreferences = async function(userId = 1, profileId = null) {
         }
         
         // שאילתה לשרת
-        let url = `/api/v1/preferences-v3/user?user_id=${userId}`;
+        let url = `/api/v1/preferences/user?user_id=${userId}`;
         if (profileId) {
             url += `&profile_id=${profileId}`;
         }
@@ -244,7 +244,7 @@ window.savePreference = async function(preferenceName, value, userId = 1, profil
     try {
         console.log(`💾 Saving preference: ${preferenceName} = ${value}`);
         
-        const response = await fetch('/api/v1/preferences-v3/user/single', {
+        const response = await fetch('/api/v1/preferences/user/single', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -285,12 +285,12 @@ window.savePreference = async function(preferenceName, value, userId = 1, profil
 window.savePreferences = async function(preferences, userId = 1, profileId = null) {
     try {
         console.log(`💾 Saving multiple preferences:`, preferences);
-        
-        const response = await fetch('/api/v1/preferences-v3/user', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+      
+      const response = await fetch('/api/v1/preferences/user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
             body: JSON.stringify({
                 preferences: preferences,
                 user_id: userId,
@@ -327,7 +327,7 @@ window.getUserProfiles = async function(userId = 1) {
     try {
         console.log(`🔍 Getting user profiles for user ${userId}`);
         
-        const response = await fetch(`/api/v1/preferences-v3/profiles?user_id=${userId}`);
+        const response = await fetch(`/api/v1/preferences/profiles?user_id=${userId}`);
         if (response.ok) {
             const result = await response.json();
             const profiles = result.data?.profiles || [];
@@ -361,7 +361,7 @@ window.checkPreferencesServiceHealth = async function() {
     try {
         console.log(`🔍 Checking preferences service health`);
         
-        const response = await fetch('/api/v1/preferences-v3/health');
+        const response = await fetch('/api/v1/preferences/health');
         if (response.ok) {
             const result = await response.json();
             console.log(`✅ Preferences service is healthy:`, result.data);
@@ -385,16 +385,16 @@ window.getPreferenceInfo = async function(preferenceName) {
     try {
         console.log(`🔍 Getting preference info: ${preferenceName}`);
         
-        const response = await fetch(`/api/v1/preferences-v3/info/${preferenceName}`);
+        const response = await fetch(`/api/v1/preferences/info/${preferenceName}`);
         if (response.ok) {
             const result = await response.json();
             const info = result.data?.info;
             
             console.log(`✅ Retrieved preference info:`, info);
             return info;
-        } else {
+      } else {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
+      }
     } catch (error) {
         console.error(`❌ Error getting preference info:`, error);
         throw error;
@@ -484,17 +484,17 @@ window.initializePreferencesV3 = async function() {
         const isHealthy = await window.checkPreferencesServiceHealth();
         if (!isHealthy) {
             console.warn('⚠️ Preferences service is not healthy, using fallback');
-            return false;
-        }
-        
+        return false;
+      }
+      
         // טעינת העדפות ראשונית
         await window.getAllUserPreferences();
-        
+      
         console.log('✅ Preferences System V3 initialized successfully');
-        return true;
+      return true;
     } catch (error) {
         console.error('❌ Error initializing Preferences System V3:', error);
-        return false;
+      return false;
     }
 };
 

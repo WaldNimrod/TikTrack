@@ -1,8 +1,8 @@
 /**
- * Preferences Admin Interface V3
- * ==============================
+ * Preferences Admin Interface
+ * ===========================
  * 
- * ממשק ניהול למערכת העדפות V3
+ * ממשק ניהול למערכת העדפות
  * 
  * @version 3.0.0
  * @lastUpdated January 2025
@@ -30,7 +30,7 @@ window.createPreferencesAdminInterface = function() {
     adminInterface.className = 'preferences-admin-interface';
     adminInterface.innerHTML = `
         <div class="admin-header">
-            <h3><i class="bi bi-gear-fill"></i> ממשק ניהול העדפות V3</h3>
+            <h3><i class="bi bi-gear-fill"></i> ממשק ניהול העדפות</h3>
             <div class="admin-controls">
                 <button class="btn btn-sm btn-outline-primary" onclick="window.refreshAdminData()">
                     <i class="bi bi-arrow-clockwise"></i> רענן

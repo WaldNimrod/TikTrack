@@ -127,70 +127,145 @@
             </div>
           </div>
 
-          <!-- Linter Settings - Moved above logs -->
-          <div class="settings-section" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
-            <h5 style="margin-bottom: 15px; color: #495057;"><i class="fas fa-cogs"></i> הגדרות ניטור Linter</h5>
-            <div class="control-row" style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
-              <div class="control-input-group">
-                <label style="display: block; font-size: 12px; color: #666; margin-bottom: 5px;">תיקיות לסריקה</label>
-                <input type="text" class="control-input" id="scanPaths" value="trading-ui/" style="width: 200px; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px;">
-              </div>
-              <div class="control-input-group">
-                <label style="display: block; font-size: 12px; color: #666; margin-bottom: 5px;">רמת לוג</label>
-                <select class="control-input" id="logLevel" style="width: 120px; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px;">
-                  <option value="info">מידע</option>
-                  <option value="warning">אזהרות</option>
-                  <option value="error">שגיאות בלבד</option>
-                </select>
-              </div>
-              <div class="control-input-group">
-                <label style="display: block; font-size: 12px; color: #666; margin-bottom: 5px;">קצב ניטור (דקות)</label>
-                <input type="number" class="control-input" id="refreshInterval" value="2" min="1" max="30" style="width: 100px; padding: 6px 10px; border: 1px solid #ced4da; border-radius: 4px;">
-              </div>
+            <!-- Unified Control Panel - כל הכלים במקום אחד -->
+          <div class="unified-control-panel" style="margin-top: 20px; background: #f8f9fa; border-radius: 12px; border: 1px solid #dee2e6; overflow: hidden;">
+            <div style="background: linear-gradient(135deg, #29a6a8 0%, #2d7d7e 100%); padding: 15px 20px; color: white;">
+              <h4 style="margin: 0; font-size: 18px; font-weight: 600;">
+                <i class="fas fa-cogs"></i> פאנל בקרה מרכזי - Linter
+              </h4>
+              <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">
+                בחר סוגי קבצים, סרוק ותקן אוטומטית
+              </p>
             </div>
 
-            <!-- File type selection -->
-            <div class="control-row" style="margin-bottom: 15px;">
-              <label style="display: block; font-size: 14px; color: #495057; margin-bottom: 10px; font-weight: 500;">סוגי קבצים לסריקה:</label>
-              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
-                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+            <!-- File Type Selection -->
+            <div style="padding: 20px; border-bottom: 1px solid #dee2e6;">
+              <h5 style="margin-bottom: 15px; color: #495057; font-size: 16px; font-weight: 500;">
+                <i class="fas fa-file-alt"></i> בחירת סוגי קבצים לסריקה:
+              </h5>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; background: white; border-radius: 6px; border: 1px solid #e9ecef;">
                   <input type="checkbox" id="scanJs" checked style="margin: 0;">
-                  <span>JavaScript (.js)</span>
+                  <div>
+                    <span style="font-weight: 500; color: #29a6a8;">JavaScript</span>
+                    <br><small style="color: #6c757d; font-size: 11px;">.js files</small>
+                  </div>
                 </label>
-                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; background: white; border-radius: 6px; border: 1px solid #e9ecef;">
                   <input type="checkbox" id="scanHtml" style="margin: 0;">
-                  <span>HTML (.html)</span>
+                  <div>
+                    <span style="font-weight: 500; color: #e83e8c;">HTML</span>
+                    <br><small style="color: #6c757d; font-size: 11px;">.html files</small>
+                  </div>
                 </label>
-                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; background: white; border-radius: 6px; border: 1px solid #e9ecef;">
                   <input type="checkbox" id="scanPy" style="margin: 0;">
-                  <span>Python (.py)</span>
+                  <div>
+                    <span style="font-weight: 500; color: #28a745;">Python</span>
+                    <br><small style="color: #6c757d; font-size: 11px;">.py files</small>
+                  </div>
                 </label>
-                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; background: white; border-radius: 6px; border: 1px solid #e9ecef;">
                   <input type="checkbox" id="scanCss" style="margin: 0;">
-                  <span>CSS (.css)</span>
+                  <div>
+                    <span style="font-weight: 500; color: #ffc107;">CSS</span>
+                    <br><small style="color: #6c757d; font-size: 11px;">.css files</small>
+                  </div>
                 </label>
-                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; background: white; border-radius: 6px; border: 1px solid #e9ecef;">
                   <input type="checkbox" id="scanOther" style="margin: 0;">
-                  <span>אחרים (.json, .md, .sql)</span>
+                  <div>
+                    <span style="font-weight: 500; color: #6c757d;">אחרים</span>
+                    <br><small style="color: #6c757d; font-size: 11px;">.json, .md, .sql</small>
+                  </div>
                 </label>
               </div>
             </div>
 
-            <!-- Monitoring controls -->
-            <div class="monitoring-controls" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #dee2e6;">
-              <div class="control-row" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                <button class="btn btn-success btn-sm" id="startMonitoringBtn" onclick="window.startMonitoring()">
-                  <i class="fas fa-play"></i> התחל ניטור
+            <!-- Primary Actions -->
+            <div style="padding: 20px; border-bottom: 1px solid #dee2e6;">
+              <h5 style="margin-bottom: 15px; color: #495057; font-size: 16px; font-weight: 500;">
+                <i class="fas fa-play-circle"></i> פעולות עיקריות:
+              </h5>
+              <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+                <button class="btn btn-success btn-lg" onclick="window.startFileScan()" style="min-width: 180px;">
+                  <i class="fas fa-search fa-lg"></i> סרוק קבצים
                 </button>
-                <button class="btn btn-secondary btn-sm" id="stopMonitoringBtn" disabled onclick="window.stopMonitoring()">
-                  <i class="fas fa-stop"></i> עצור ניטור
+                <button class="btn btn-primary btn-lg" onclick="window.fixAllIssues()" style="min-width: 180px;">
+                  <i class="fas fa-magic fa-lg"></i> תיקון אוטומטי
                 </button>
-                <button class="btn btn-warning btn-sm" onclick="window.resetFixedIssues()" title="איפוס כל הבעיות שתוקנו (לצורכי בדיקה)">
-                  <i class="fas fa-undo"></i> איפוס תיקונים
+                <button class="btn btn-info btn-lg" onclick="window.copyUnresolvedIssuesLog()" style="min-width: 180px;">
+                  <i class="fas fa-clipboard-list fa-lg"></i> העתק בעיות
                 </button>
-                <span style="color: #666; font-size: 14px; margin: 0 10px;">
-                  <i class="fas fa-info-circle"></i> הניטור מתעדכן אוטומטית כל <span id="currentInterval">2</span> דקות
-                </span>
+              </div>
+              <p style="margin: 10px 0 0 0; color: #666; font-size: 14px;">
+                סורק את הקבצים שנבחרו, מתקן אוטומטית בעיות ניתנות לתיקון, ומאפשר העתקת רשימת הבעיות הנותרות
+              </p>
+            </div>
+
+            <!-- Advanced Actions -->
+            <div style="padding: 20px;">
+              <h5 style="margin-bottom: 15px; color: #495057; font-size: 16px; font-weight: 500;">
+                <i class="fas fa-tools"></i> פעולות מתקדמות:
+              </h5>
+
+              <!-- Fix Options Row -->
+              <div style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 14px; color: #495057; margin-bottom: 10px; font-weight: 500;">
+                  <i class="fas fa-wrench"></i> אפשרויות תיקון ספציפיות:
+                </label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                  <button class="btn btn-warning" onclick="window.fixAllErrors()">
+                    <i class="fas fa-exclamation-triangle"></i> תיקון שגיאות
+                  </button>
+                  <button class="btn btn-info" onclick="window.fixAllWarnings()">
+                    <i class="fas fa-exclamation-circle"></i> תיקון אזהרות
+                  </button>
+                  <button class="btn btn-secondary" onclick="window.ignoreAllIssues()">
+                    <i class="fas fa-eye-slash"></i> התעלם מהכל
+                  </button>
+                </div>
+              </div>
+
+              <!-- Monitoring Controls Row -->
+              <div style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 14px; color: #495057; margin-bottom: 10px; font-weight: 500;">
+                  <i class="fas fa-clock"></i> בקרת ניטור:
+                </label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                  <button class="btn btn-success btn-sm" id="startMonitoringBtn" onclick="window.startMonitoring()">
+                    <i class="fas fa-play"></i> התחל ניטור
+                  </button>
+                  <button class="btn btn-secondary btn-sm" id="stopMonitoringBtn" disabled onclick="window.stopMonitoring()">
+                    <i class="fas fa-stop"></i> עצור ניטור
+                  </button>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <label style="font-size: 14px; color: #666;">קצב:</label>
+                    <input type="number" class="form-control" id="refreshInterval" value="2" min="1" max="30" style="width: 80px; font-size: 14px;">
+                    <span style="font-size: 14px; color: #666;">דקות</span>
+                  </div>
+                  <span style="color: #666; font-size: 14px;">
+                    <i class="fas fa-info-circle"></i> מתעדכן כל <span id="currentInterval">2</span> דקות
+                  </span>
+                </div>
+              </div>
+
+              <!-- Utility Actions Row -->
+              <div>
+                <label style="display: block; font-size: 14px; color: #495057; margin-bottom: 10px; font-weight: 500;">
+                  <i class="fas fa-cog"></i> כלים עזר:
+                </label>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                  <button class="btn btn-outline-primary" onclick="window.discoverProjectFiles()">
+                    <i class="fas fa-search-plus"></i> עדכן רשימת קבצים
+                  </button>
+                  <button class="btn btn-outline-warning btn-sm" onclick="window.resetFixedIssues()">
+                    <i class="fas fa-undo"></i> איפוס תיקונים
+                  </button>
+                  <button class="btn btn-outline-secondary" onclick="window.copyDetailedLog()">
+                    <i class="fas fa-copy"></i> לוג מפורט
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -226,68 +301,6 @@
           </div>
         </div> <!-- End chart section -->
 
-        <!-- Fix Actions Section - Moved before logs -->
-        <div class="content-section" id="fixActionsSection" data-table-type="linter-realtime-monitor">
-          <!-- Fix Actions header -->
-          <div class="section-header">
-            <div class="table-title">
-              <img src="images/icons/development.svg" alt="תיקונים" class="section-icon">
-              פעולות תיקון אוטומטי וסריקה
-            </div>
-            <div class="table-actions">
-              <button class="filter-toggle-btn" onclick="window.toggleSection('fixActionsSection')" title="הצג/הסתר אזור תיקונים">
-                <span class="filter-icon">▲</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Fix Actions body -->
-          <div class="section-body">
-            <!-- Scan button moved here -->
-            <div class="scan-section" style="margin-bottom: 20px; text-align: center;">
-              <button class="btn btn-success btn-lg" onclick="window.startFileScan()" title="סרוק קבצי JavaScript ו-HTML לאיתור בעיות">
-                <i class="fas fa-search fa-lg"></i> סרוק קבצים
-              </button>
-              <p style="margin: 10px 0; color: #666; font-size: 14px;">סורק את הקבצים שנבחרו לאיתור בעיות קוד, נגישות, ביצועים ובטיחות</p>
-            </div>
-
-            <div class="fix-buttons" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
-              <button class="btn btn-success" onclick="window.fixAllIssues()" title="תקן את כל הבעיות הניתנות לתיקון">
-                <i class="fas fa-magic"></i> תיקון אוטומטי לכל הבעיות
-              </button>
-              <button class="btn btn-warning" onclick="window.fixAllErrors()" title="תקן רק שגיאות">
-                <i class="fas fa-exclamation-triangle"></i> תיקון שגיאות בלבד
-              </button>
-              <button class="btn btn-info" onclick="window.fixAllWarnings()" title="תקן רק אזהרות">
-                <i class="fas fa-exclamation-circle"></i> תיקון אזהרות בלבד
-              </button>
-              <button class="btn btn-secondary" onclick="window.ignoreAllIssues()" title="התעלם מכל הבעיות">
-                <i class="fas fa-eye-slash"></i> התעלם מהכל
-              </button>
-            </div>
-
-            <!-- Reset fixes for testing -->
-            <div class="reset-section" style="margin-top: 15px; text-align: center;">
-              <button class="btn btn-outline-danger btn-sm" onclick="window.resetFixedIssues()" title="איפוס כל התיקונים לבדיקה">
-                <i class="fas fa-undo"></i> איפוס תיקונים (לבדיקה)
-              </button>
-              <p style="margin: 5px 0; color: #dc3545; font-size: 12px;">מאפס את כל הבעיות שתוקנו לבדיקת התיקונים</p>
-            </div>
-
-            <!-- Export unresolved issues -->
-            <div class="export-section" style="margin-top: 20px; text-align: center;">
-              <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
-                <button class="btn btn-outline-info" onclick="window.copyUnresolvedIssuesLog()" title="העתק רשימה של הבעיות שלא נפתרו לתיקון ידני">
-                  <i class="fas fa-clipboard-list"></i> העתק לוג שגיאות ואזהרות
-                </button>
-                <button class="btn btn-outline-primary" onclick="window.discoverProjectFiles()" title="גלה אוטומטית את כל הקבצים בפרויקט">
-                  <i class="fas fa-search-plus"></i> עדכן רשימת קבצים
-                </button>
-              </div>
-              <p style="margin: 8px 0; color: #6c757d; font-size: 13px;">מעתיק רשימה של הבעיות שלא ניתן היה לתקן אוטומטית, או מגלה קבצים חדשים בפרויקט</p>
-            </div>
-          </div>
-        </div> <!-- End fix actions section -->
 
         <!-- Logs Section -->
         <div class="content-section" id="logsSection" data-table-type="linter-realtime-monitor">

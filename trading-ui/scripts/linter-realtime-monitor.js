@@ -240,10 +240,25 @@ function updateChart() {
         qualityChart.data.datasets[2].data = newData.warnings;
 
         // Calculate max issues for y1 axis - use actual values from historical data
-        const maxErrors = newData.errors.length > 0 ? Math.max(...newData.errors.filter(n => !isNaN(n))) : 0;
-        const maxWarnings = newData.warnings.length > 0 ? Math.max(...newData.warnings.filter(n => !isNaN(n))) : 0;
+        // Filter out any non-numeric values and handle empty arrays safely
+        const validErrors = newData.errors.filter(n => typeof n === 'number' && !isNaN(n) && isFinite(n));
+        const validWarnings = newData.warnings.filter(n => typeof n === 'number' && !isNaN(n) && isFinite(n));
+
+        const maxErrors = validErrors.length > 0 ? Math.max(...validErrors) : 0;
+        const maxWarnings = validWarnings.length > 0 ? Math.max(...validWarnings) : 0;
 
         const maxIssues = Math.max(maxErrors, maxWarnings, 10); // minimum of 10
+
+        console.log('📊 Axis calculation debug:', {
+            errorsArray: newData.errors.slice(-3),
+            warningsArray: newData.warnings.slice(-3),
+            validErrors,
+            validWarnings,
+            maxErrors,
+            maxWarnings,
+            maxIssues,
+            y1MaxCalculated: Math.max(50, maxIssues + 10)
+        });
 
         // Update y1 axis with proper scaling
         qualityChart.options.scales.y1.max = Math.max(50, maxIssues + 10);
@@ -258,6 +273,14 @@ function updateChart() {
         qualityChart.options.scales.y1.ticks = {
             precision: 0,
             beginAtZero: true
+        };
+
+        // Ensure left axis (y) is for code quality
+        qualityChart.options.scales.y.position = 'left';
+        qualityChart.options.scales.y.display = true;
+        qualityChart.options.scales.y.title = {
+            display: true,
+            text: 'איכות קוד (%)'
         };
 
         // Force chart to recalculate and redraw
@@ -573,7 +596,6 @@ function scanJavaScriptFiles() {
             'css-management.js',
             'dynamic-colors-display.js',
             'constraint-manager.js',
-            'constrains.js',
             'trade-plan-service.js',
             'system-management.js',
             'cache-test.js',

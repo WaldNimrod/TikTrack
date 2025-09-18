@@ -177,12 +177,20 @@ function generateHistoricalData() {
     const errors = [];
     const warnings = [];
 
-    const now = new Date();
+        const now = new Date();
 
     // Use real data from scanning results if available
     const realErrors = scanningResults.errors ? scanningResults.errors.length : 0;
     const realWarnings = scanningResults.warnings ? scanningResults.warnings.length : 0;
     const realFiles = scanningResults.totalFiles || 75;
+
+    console.log('📊 Using real scanning data for chart:', {
+        realErrors,
+        realWarnings,
+        realFiles,
+        hasScanningResults: scanningResults.totalFiles > 0,
+        currentTime: new Date().toISOString()
+    });
 
     for (let i = 23; i >= 0; i--) {
         const time = new Date(now.getTime() - i * 60 * 60 * 1000);
@@ -231,9 +239,9 @@ function updateChart() {
         qualityChart.data.datasets[1].data = newData.errors;
         qualityChart.data.datasets[2].data = newData.warnings;
 
-        // Calculate max issues for y1 axis - use actual values, not array lengths
-        const maxErrors = newData.errors.length > 0 ? Math.max(...newData.errors) : 0;
-        const maxWarnings = newData.warnings.length > 0 ? Math.max(...newData.warnings) : 0;
+        // Calculate max issues for y1 axis - use actual values from historical data
+        const maxErrors = newData.errors.length > 0 ? Math.max(...newData.errors.filter(n => !isNaN(n))) : 0;
+        const maxWarnings = newData.warnings.length > 0 ? Math.max(...newData.warnings.filter(n => !isNaN(n))) : 0;
 
         const maxIssues = Math.max(maxErrors, maxWarnings, 10); // minimum of 10
 
@@ -259,8 +267,16 @@ function updateChart() {
             qualityPoints: newData.quality.length,
             errorPoints: newData.errors.length,
             warningPoints: newData.warnings.length,
+            maxErrors: maxErrors,
+            maxWarnings: maxWarnings,
             maxIssues: maxIssues,
-            y1Max: qualityChart.options.scales.y1.max
+            y1Max: qualityChart.options.scales.y1.max,
+            y1Position: qualityChart.options.scales.y1.position,
+            dataSample: {
+                quality: newData.quality.slice(-3),
+                errors: newData.errors.slice(-3),
+                warnings: newData.warnings.slice(-3)
+            }
         });
     }
 
@@ -392,8 +408,15 @@ function startFileScan() {
 // Scan files for issues based on selected file types
 function scanJavaScriptFiles() {
     // Show scan start notification
+    const selectedTypes = [];
+    if (scanJs) selectedTypes.push('JavaScript');
+    if (scanHtml) selectedTypes.push('HTML');
+    if (scanPy) selectedTypes.push('Python');
+    if (scanCss) selectedTypes.push('CSS');
+    if (scanOther) selectedTypes.push('אחרים');
+
     if (typeof window.showInfoNotification === 'function') {
-        window.showInfoNotification('סריקה התחילה', 'סורק את הקבצים שנבחרו בפרויקט...');
+        window.showInfoNotification('סריקה התחילה', `סורק ${selectedTypes.join(', ')} קבצים בפרויקט...`);
     }
 
     // Get file type selections - default to all if none selected (for auto-scan)
@@ -457,6 +480,22 @@ function scanJavaScriptFiles() {
         scanningResults.scannedFiles = 0;
 
         console.log('🔍 Starting scan of', allFiles.length, 'discovered files');
+        console.log('📊 File type breakdown:', {
+            totalDiscovered: window.projectFiles.length,
+            jsSelected: scanJs,
+            htmlSelected: scanHtml,
+            pySelected: scanPy,
+            cssSelected: scanCss,
+            otherSelected: scanOther,
+            jsFiles: discoveredFiles.filter(f => f.endsWith('.js')).length,
+            htmlFiles: discoveredFiles.filter(f => f.endsWith('.html')).length,
+            pyFiles: discoveredFiles.filter(f => f.endsWith('.py')).length,
+            cssFiles: discoveredFiles.filter(f => f.endsWith('.css')).length,
+            otherFiles: discoveredFiles.filter(f =>
+                f.endsWith('.json') || f.endsWith('.md') || f.endsWith('.sql') ||
+                f.endsWith('.yml') || f.endsWith('.yaml')
+            ).length
+        });
 
         allFiles.forEach((fileName, index) => {
             setTimeout(() => {
@@ -1335,7 +1374,7 @@ window.copyUnresolvedIssuesLog = () => {
         instructions: "הבעיות הבאות לא ניתן היה לתקן אוטומטית. אנא טפל בהן ידנית או בקש עזרה מהמפתחים."
     };
 
-    // Copy to clipboard
+        // Copy to clipboard
     navigator.clipboard.writeText(JSON.stringify(logData, null, 2))
         .then(() => {
             console.log('✅ Unresolved issues log copied to clipboard');
@@ -1580,7 +1619,7 @@ function finishScan() {
     const totalErrorsStats = document.getElementById('totalErrorsStats');
     const totalWarningsStats = document.getElementById('totalWarningsStats');
     const overallStatus = document.getElementById('overallStatus');
-
+    
     if (totalFilesStats) totalFilesStats.textContent = scanningResults.totalFiles;
     if (totalErrorsStats) totalErrorsStats.textContent = scanningResults.errors.length;
     if (totalWarningsStats) totalWarningsStats.textContent = scanningResults.warnings.length;
@@ -1668,8 +1707,8 @@ function setupActionButtons() {
         { id: 'startMonitoring', action: () => {
             isAutoRefreshActive = true;
         startAutoRefresh();
-            const startBtn = document.getElementById('startMonitoring');
-            const stopBtn = document.getElementById('stopMonitoring');
+    const startBtn = document.getElementById('startMonitoring');
+    const stopBtn = document.getElementById('stopMonitoring');
             if (startBtn) startBtn.disabled = true;
             if (stopBtn) stopBtn.disabled = false;
             // Use direct call to avoid recursion
@@ -1711,10 +1750,10 @@ function setupActionButtons() {
         const element = document.getElementById(btn.id);
         if (element) {
             element.onclick = btn.action;
-        }
-    });
-}
-
+            }
+        });
+    }
+    
 // Direct notification functions - no wrapper to avoid recursion
 // Use these functions directly instead of creating a wrapper
 
@@ -1760,7 +1799,7 @@ function addLogEntry(level, message, details = {}) {
 }
 
 function updateLogDisplay() {
-    const logsContainer = document.getElementById('logsContainer');
+            const logsContainer = document.getElementById('logsContainer');
     if (!logsContainer) return;
 
     // Get last 10 entries for display
@@ -1918,7 +1957,7 @@ window.stopMonitoring = () => {
     if (stopBtn) stopBtn.disabled = true;
 
     // Show notification
-            if (typeof window.showInfoNotification === 'function') {
+        if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('ניטור נעצר', 'הניטור האוטומטי הופסק');
     }
 };
@@ -2026,6 +2065,14 @@ window.fixAllIssues = () => {
     }
 
     console.log('✅ Fix operation completed');
+    console.log('📊 Final state after fix:', {
+        errorsRemaining: scanningResults.errors.length,
+        warningsRemaining: scanningResults.warnings.length,
+        totalRemaining: scanningResults.errors.length + scanningResults.warnings.length,
+        fixedErrorsCount: fixedIssues.errors.size,
+        fixedWarningsCount: fixedIssues.warnings.size,
+        totalFixed: fixedIssues.errors.size + fixedIssues.warnings.size
+    });
 };
 window.fixAllErrors = () => {
     console.log('🔧 Fixing all errors...');

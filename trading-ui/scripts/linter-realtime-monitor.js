@@ -19,8 +19,8 @@
 //   ⏳ ממתין ליישום מלא של שחזור לוגים
 //
 // 📝 דוקומנטציה:
-//   - ראה: documentation/frontend/DIAGNOSTIC_LOG_SYSTEM.md
-//   - ראה: documentation/frontend/LINTER_CHART_SYSTEM.md (יבוא ליצירה)
+//   - ראה: documentation/frontend/DIAGNOSTIC_LOG_SYSTEM.md (דוקומנטציה מרכזית)
+//   - ראה: documentation/frontend/LINTER_IMPLEMENTATION_TASKS.md (רשימת משימות)
 //
 // 🚀 הוראות למפתח עתידי:
 //

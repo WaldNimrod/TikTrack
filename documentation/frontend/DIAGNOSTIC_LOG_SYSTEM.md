@@ -1,8 +1,206 @@
-# מערכת הלוג האבחוני - "העתק לוג מפורט"
+# מערכת הלינטר המלאה - Linter System Reference
 
-## 📋 סקירה כללית
+## 📋 סקירה כללית מערכת הלינטר
 
-מערכת הלוג האבחוני היא כלי אבחון מקיף המיועד לזהות ולדווח על בעיות בממשק המשתמש בזמן אמת. הכפתור "העתק לוג מפורט" מספק דוח מקיף על מצב העמוד הנוכחי, המאפשר למפתחים לזהות בעיות במהירות ולפתור אותן.
+מערכת הלינטר היא כלי מקיף לניתוח, אבחון וניהול איכות הקוד במערכת TikTrack. המערכת כוללת מספר רכיבים מרכזיים:
+
+- **🔍 סורק קוד** - סריקה אוטומטית של קבצי JavaScript, HTML, Python, CSS
+- **📊 גרף היסטורי** - הצגת מגמות איכות קוד לאורך זמן
+- **🔧 כלי תיקון אוטומטי** - תיקון בעיות נפוצות
+- **📋 לוג אבחוני** - דוח מפורט על מצב המערכת
+- **💾 אחסון היסטוריה** - שמירת נתונים לאורך זמן ב-IndexedDB
+
+## 🔧 רכיבי המערכת
+
+### 1. סורק הקוד (Code Scanner)
+**קבצים נתמכים:** JavaScript, HTML, Python, CSS, JSON, Markdown, SQL
+
+**סוגי בעיות המזוהות:**
+- JavaScript: console.log, alert(), missing semicolons, long lines, TODO comments
+- HTML: missing alt, broken links, inline styles, missing DOCTYPE
+- Python: syntax errors, security risks, missing docstrings, PEP8 violations
+- CSS: missing semicolons, !important usage, universal selectors, duplicate properties
+
+### 2. כלי תיקון אוטומטי (Auto Fix Tools)
+**פונקציות תיקון:**
+- `fixAllIssues()` - תיקון כל הבעיות (70-90% הצלחה)
+- `fixAllErrors()` - תיקון שגיאות בלבד (60-80% הצלחה)
+- `fixAllWarnings()` - תיקון אזהרות בלבד (80-95% הצלחה)
+- `ignoreAllIssues()` - התעלמות מכל הבעיות
+
+### 3. גרף היסטורי (Historical Chart)
+**מדדים מוצגים:**
+- **איכות קוד (%)** - ציר שמאל: `100 - (שגיאות × 5) - (אזהרות × 2)`
+- **שגיאות** - ציר ימין: מספר שגיאות שנמצאו
+- **אזהרות** - ציר ימין: מספר אזהרות שנמצאו
+
+**אחסון:** IndexedDB עם שחזור מהלוגים כגיבוי
+
+### 4. לוג אבחוני (Diagnostic Log)
+**כלי למפתחים** להבנת מצב העמוד:
+- בדיקת תקינות DOM
+- בדיקת פונקציונליות
+- בדיקת נתונים
+- בדיקת תלויות
+- בדיקת ביצועים
+- בדיקת חוויית משתמש
+
+## 🏗️ ארכיטקטורה טכנית
+
+### מבנה הקבצים
+```
+trading-ui/
+├── scripts/
+│   ├── linter-realtime-monitor.js      # קובץ ראשי
+│   ├── chart-renderer.js               # עיבוד גרף (לבנות)
+│   ├── data-collector.js               # איסוף נתונים (לבנות)
+│   └── log-recovery.js                 # שחזור לוגים (לבנות)
+├── linter-realtime-monitor.html        # ממשק משתמש
+└── documentation/
+    ├── frontend/
+    │   ├── DIAGNOSTIC_LOG_SYSTEM.md     # דוקומנטציה מרכזית
+    │   └── LINTER_IMPLEMENTATION_TASKS.md # רשימת משימות
+```
+
+### ממשקי API עיקריים
+
+#### ChartHistoryManager
+```javascript
+interface ChartHistoryManager {
+  // שמירה
+  saveData(data: ChartDataPoint): Promise<void>;
+  saveBatch(data: ChartDataPoint[]): Promise<void>;
+
+  // קריאה
+  loadHistory(hours: number): Promise<ChartDataPoint[]>;
+  loadLastNPoints(count: number): Promise<ChartDataPoint[]>;
+  loadByDateRange(start: Date, end: Date): Promise<ChartDataPoint[]>;
+
+  // ניהול
+  clearHistory(): Promise<void>;
+  exportData(): Promise<string>;
+  importData(jsonData: string): Promise<void>;
+}
+```
+
+#### IndexedDBAdapter
+```javascript
+interface IndexedDBAdapter {
+  // חיבור
+  openDB(): Promise<IDBDatabase>;
+  closeDB(): void;
+
+  // פעולות
+  save(data: ChartDataPoint): Promise<void>;
+  load(query: QueryOptions): Promise<ChartDataPoint[]>;
+  delete(id: string): Promise<void>;
+
+  // תחזוקה
+  cleanup(maxAge: number): Promise<void>;
+  getStats(): Promise<StorageStats>;
+}
+```
+
+#### ChartRenderer
+```javascript
+interface ChartRenderer {
+  // אתחול
+  initialize(container: HTMLElement): void;
+  destroy(): void;
+
+  // נתונים
+  renderChart(data: ChartDataPoint[]): void;
+  updateChart(newData: ChartDataPoint[]): void;
+  clearChart(): void;
+
+  // אינטראקציות
+  setTimeRange(hours: number): void;
+  toggleSeries(seriesName: string): void;
+  exportImage(): Promise<string>;
+}
+```
+
+### מבנה נתוני ChartDataPoint
+```javascript
+interface ChartDataPoint {
+  // מזהה ותזמון
+  id: string;
+  timestamp: string;        // ISO timestamp
+  sessionId: string;
+
+  // מדדי איכות
+  metrics: {
+    totalFiles: number;
+    errors: number;
+    warnings: number;
+    qualityScore: number;   // חישוב: 100 - (errors * 5) - (warnings * 2)
+    scanDuration: number;   // מילישניות
+    filesPerSecond: number;
+  };
+
+  // מידע על הסריקה
+  scanInfo: {
+    trigger: 'manual' | 'auto' | 'fix';
+    fileTypes: string[];    // ['js', 'html', 'py', 'css']
+    totalSize: number;      // bytes
+  };
+
+  // גרסה ומטא-דאטה
+  version: string;
+  metadata: {
+    browser: string;
+    platform: string;
+    userAgent: string;
+  };
+}
+```
+
+### זרימת עבודה טיפוסית
+
+#### 1. סריקה חדשה
+```javascript
+// 1. הפעלת סריקה
+startFileScan() → scanJavaScriptFiles()
+
+// 2. איסוף תוצאות
+results = await scanFiles()
+
+// 3. חישוב מדדים
+metrics = calculateMetrics(results)
+
+// 4. שמירה ב-IndexedDB
+await chartHistory.saveData(metrics)
+
+// 5. עדכון גרף
+chartRenderer.updateChart([metrics])
+```
+
+#### 2. טעינת עמוד
+```javascript
+// 1. טעינת היסטוריה
+history = await chartHistory.loadHistory(24)
+
+// 2. אם ריקה - שחזור מהלוגים
+if (!history.length) {
+  history = await logRecovery.rebuildFromLogs()
+}
+
+// 3. יצירת גרף
+chartRenderer.renderChart(history)
+```
+
+#### 3. ניקוי מטמון
+```javascript
+// 1. משתמש מנקה מטמון
+// 2. IndexedDB נמחק
+// 3. העמוד נטען מחדש
+// 4. שחזור אוטומטי מהלוגים
+pageLoad() {
+  if (!await chartHistory.hasData()) {
+    await logRecovery.restoreFromLogs()
+  }
+}
+```
 
 ## 🎯 מטרה ותפקיד
 

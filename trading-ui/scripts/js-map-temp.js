@@ -870,4 +870,13 @@
                 toggle.classList.remove('active');
             }
         });
+    </script>
 
+    <!-- Scripts -->
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/header-system.js?v=20250115_level3_fix"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/js-map.js"></script>
+
+</body>

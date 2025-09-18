@@ -1349,6 +1349,150 @@ def get_crud_test_status():
         }), 500
 
 
+# ===== INDEXEDDB MANAGEMENT ENDPOINTS =====
+
+@app.route("/api/indexeddb/stats", methods=["GET"])
+def get_indexeddb_stats():
+    """Get IndexedDB statistics"""
+    try:
+        # For now, return mock data as IndexedDB is client-side
+        # In a real implementation, this would connect to the client's IndexedDB
+        # or store statistics server-side
+
+        stats = {
+            "total_size_mb": 45.2,
+            "max_size_mb": 100,
+            "usage_percentage": 45.2,
+            "total_entries": 1250,
+            "last_cleanup": "2025-01-18T14:30:00Z",
+            "auto_cleanup_interval_hours": 6
+        }
+
+        return jsonify({
+            "success": True,
+            "data": stats
+        })
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to get IndexedDB stats: {str(e)}"
+        }), 500
+
+@app.route("/api/indexeddb/cleanup/<int:max_size>", methods=["POST"])
+def cleanup_indexeddb(max_size):
+    """Perform manual IndexedDB cleanup"""
+    try:
+        # In a real implementation, this would trigger cleanup on the client
+        # For now, return mock successful cleanup data
+
+        cleanup_result = {
+            "entries_removed": 234,
+            "space_freed_mb": 12.8,
+            "current_size_mb": 32.4,
+            "max_size_mb": max_size,
+            "cleanup_timestamp": "2025-01-18T14:35:00Z"
+        }
+
+        return jsonify({
+            "success": True,
+            "data": cleanup_result
+        })
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to cleanup IndexedDB: {str(e)}"
+        }), 500
+
+@app.route("/api/indexeddb/backup", methods=["POST"])
+def backup_indexeddb():
+    """Create IndexedDB backup"""
+    try:
+        # In a real implementation, this would create a backup of client-side data
+        # For now, return mock backup data
+
+        import datetime
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        backup_file = f"indexeddb_backup_{timestamp}.json"
+
+        backup_result = {
+            "backup_file": backup_file,
+            "entries_backed_up": 1250,
+            "backup_size_mb": 45.2,
+            "timestamp": datetime.datetime.now().isoformat()
+        }
+
+        return jsonify({
+            "success": True,
+            "data": backup_result
+        })
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to create backup: {str(e)}"
+        }), 500
+
+@app.route("/api/indexeddb/restore", methods=["POST"])
+def restore_indexeddb():
+    """Restore IndexedDB from backup"""
+    try:
+        data = request.get_json()
+        backup_file = data.get('backup_file')
+
+        if not backup_file:
+            return jsonify({
+                "success": False,
+                "error": "Backup file name is required"
+            }), 400
+
+        # In a real implementation, this would restore from the specified backup file
+        # For now, return mock restore data
+
+        restore_result = {
+            "backup_file": backup_file,
+            "entries_restored": 1250,
+            "restore_timestamp": "2025-01-18T14:40:00Z"
+        }
+
+        return jsonify({
+            "success": True,
+            "data": restore_result
+        })
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to restore backup: {str(e)}"
+        }), 500
+
+@app.route("/api/indexeddb/clear", methods=["POST"])
+def clear_indexeddb():
+    """Clear all IndexedDB data"""
+    try:
+        # In a real implementation, this would clear all client-side IndexedDB data
+        # For now, return mock clear data
+
+        clear_result = {
+            "entries_removed": 1250,
+            "space_freed_mb": 45.2,
+            "clear_timestamp": "2025-01-18T14:45:00Z"
+        }
+
+        return jsonify({
+            "success": True,
+            "data": clear_result
+        })
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": f"Failed to clear IndexedDB: {str(e)}"
+        }), 500
+
+# ===== END INDEXEDDB MANAGEMENT ENDPOINTS =====
+
 # Route for serving HTML files from trading-ui directory
 @app.route('/<path:filename>')
 def serve_static_files(filename):

@@ -27,6 +27,7 @@
 - [מבנה בסיס הנתונים](#מבנה-בסיס-הנתונים)
 - [פונקציות נגישות](#פונקציות-נגישות)
 - [Cache Strategy](#cache-strategy)
+- [Validation System](#validation-system)
 - [API Endpoints](#api-endpoints)
 - [Frontend JavaScript](#frontend-javascript)
 - [ממשק ניהול](#ממשק-ניהול)
@@ -248,6 +249,88 @@ def invalidate_user_cache(user_id: int, profile_id: int = None):
     
     cache.delete_pattern(cache_pattern)
 ```
+
+---
+
+## 🔒 Validation System
+
+המערכת כוללת מערכת אילוצים מתקדמת לוולידציה של ערכי העדפות:
+
+### תכונות מרכזיות
+
+1. **אילוצים דינמיים** - נשמרים בטבלת `constraints`
+2. **בדיקת סוג נתונים** - string, integer, float, boolean, json, color, date, time
+3. **אילוצים מותאמים** - enum values, length, format
+4. **הודעות שגיאה ברורות** - בעברית עם הסברים מפורטים
+
+### מבנה האילוצים
+
+```sql
+-- טבלת אילוצים
+CREATE TABLE constraints (
+    id INTEGER PRIMARY KEY,
+    table_name VARCHAR(100),
+    column_name VARCHAR(100), 
+    constraint_type VARCHAR(20),
+    constraint_name VARCHAR(100),
+    constraint_definition TEXT,
+    is_active BOOLEAN DEFAULT 1
+);
+
+-- ערכי enum
+CREATE TABLE enum_values (
+    id INTEGER PRIMARY KEY,
+    constraint_id INTEGER,
+    value VARCHAR(50),
+    display_name VARCHAR(100),
+    is_active BOOLEAN DEFAULT 1,
+    sort_order INTEGER DEFAULT 0
+);
+```
+
+### אילוצים קיימים
+
+#### preference_types
+- **group_id**: NOT_NULL, CHECK (positive)
+- **data_type**: NOT_NULL, ENUM (string, integer, float, boolean, json, color, date, time)
+- **preference_name**: NOT_NULL, UNIQUE, FORMAT (alphanumeric with underscores)
+- **is_required**: CHECK (boolean 0/1)
+- **is_active**: CHECK (boolean 0/1)
+
+#### user_preferences
+- **user_id**: NOT_NULL, CHECK (positive)
+- **profile_id**: NOT_NULL, CHECK (positive) 
+- **preference_id**: NOT_NULL, CHECK (positive)
+- **saved_value**: NOT_NULL
+
+### שימוש ב-Validation
+
+```python
+from services.preferences_service import PreferencesService, ValidationError
+
+service = PreferencesService()
+
+try:
+    # שמירה עם validation אוטומטי
+    service.save_preference(1, "primaryColor", "#ff5733")
+except ValidationError as e:
+    print(f"Validation error: {e}")
+```
+
+### סוגי בדיקות
+
+1. **סוג נתונים**:
+   - `integer`: בדיקת int()
+   - `float/number`: בדיקת float()
+   - `boolean`: true/false/1/0/yes/no
+   - `json`: בדיקת JSON תקין
+   - `color`: פורמט hex (#fff או #ffffff)
+
+2. **אילוצים מותאמים**:
+   - `NOT_NULL`: ערך חובה
+   - `UNIQUE`: ערך יחיד
+   - `ENUM`: רשימת ערכים מותרים
+   - `CHECK`: תנאים מותאמים
 
 ---
 

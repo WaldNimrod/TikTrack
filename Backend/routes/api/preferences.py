@@ -26,6 +26,108 @@ preferences_bp = Blueprint('preferences', __name__, url_prefix='/api/v1/preferen
 # User Preferences Endpoints
 # ============================================================================
 
+@preferences_bp.route('/user/group', methods=['GET'])
+def get_user_group_preferences() -> Any:
+    """
+    קבלת העדפות קבוצה של משתמש
+    
+    Query Parameters:
+        - group (required): שם הקבוצה
+        - user_id (optional): מזהה משתמש (default: 1)
+        - profile_id (optional): מזהה פרופיל
+        - use_cache (optional): האם להשתמש במטמון (default: true)
+    """
+    try:
+        group_name = request.args.get('group')
+        if not group_name:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required parameter: group',
+                'timestamp': datetime.now().isoformat()
+            }), 400
+        
+        user_id = request.args.get('user_id', 1, type=int)
+        profile_id = request.args.get('profile_id', type=int)
+        use_cache = request.args.get('use_cache', 'true').lower() == 'true'
+        
+        # קבלת העדפות הקבוצה
+        group_preferences = preferences_service.get_group_preferences(
+            user_id=user_id,
+            group_name=group_name,
+            profile_id=profile_id,
+            use_cache=use_cache
+        )
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'user_id': user_id,
+                'profile_id': profile_id,
+                'group_name': group_name,
+                'preferences': group_preferences
+            },
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting user group preferences: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
+@preferences_bp.route('/user/preference', methods=['GET'])
+def get_user_preference() -> Any:
+    """
+    קבלת העדפה בודדת של משתמש
+    
+    Query Parameters:
+        - name (required): שם ההעדפה
+        - user_id (optional): מזהה משתמש (default: 1)
+        - profile_id (optional): מזהה פרופיל
+        - use_cache (optional): האם להשתמש במטמון (default: true)
+    """
+    try:
+        preference_name = request.args.get('name')
+        if not preference_name:
+            return jsonify({
+                'success': False,
+                'error': 'Missing required parameter: name',
+                'timestamp': datetime.now().isoformat()
+            }), 400
+        
+        user_id = request.args.get('user_id', 1, type=int)
+        profile_id = request.args.get('profile_id', type=int)
+        use_cache = request.args.get('use_cache', 'true').lower() == 'true'
+        
+        # קבלת ההעדפה
+        preference_value = preferences_service.get_preference(
+            user_id=user_id,
+            preference_identifier=preference_name,
+            profile_id=profile_id,
+            use_cache=use_cache
+        )
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'user_id': user_id,
+                'profile_id': profile_id,
+                'preference_name': preference_name,
+                'value': preference_value
+            },
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting user preference: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
 @preferences_bp.route('/user', methods=['GET'])
 def get_user_preferences() -> Any:
     """
@@ -118,7 +220,7 @@ def save_user_preferences() -> Any:
                 "error": "Failed to save preferences",
                 "timestamp": datetime.now().isoformat()
             }), 500
-            
+        
     except Exception as e:
         logger.error(f"Error saving user preferences: {e}")
         return jsonify({
@@ -236,57 +338,6 @@ def save_single_preference() -> Any:
             
     except Exception as e:
         logger.error(f"Error saving single preference: {e}")
-        return jsonify({
-            "success": False,
-            "error": str(e),
-            "timestamp": datetime.now().isoformat()
-        }), 500
-
-@preferences_bp.route('/user/group', methods=['GET'])
-def get_group_preferences() -> Any:
-    """
-    קבלת העדפות קבוצה
-    
-    Query Parameters:
-        - group_name: שם הקבוצה
-        - profile_id (optional): מזהה פרופיל
-        - use_cache (optional): האם להשתמש במטמון
-    """
-    try:
-        user_id = request.args.get('user_id', 1, type=int)
-        group_name = request.args.get('group_name')
-        profile_id = request.args.get('profile_id', type=int)
-        use_cache = request.args.get('use_cache', 'true').lower() == 'true'
-        
-        if not group_name:
-            return jsonify({
-                "success": False,
-                "error": "group_name is required",
-                "timestamp": datetime.now().isoformat()
-            }), 400
-        
-        # קבלת העדפות קבוצה
-        preferences = preferences_service.get_group_preferences(
-            user_id=user_id,
-            group_name=group_name,
-            profile_id=profile_id,
-            use_cache=use_cache
-        )
-        
-        return jsonify({
-            "success": True,
-            "data": {
-                "user_id": user_id,
-                "group_name": group_name,
-                "preferences": preferences,
-                "count": len(preferences),
-                "profile_id": profile_id
-            },
-            "timestamp": datetime.now().isoformat()
-        }), 200
-        
-    except Exception as e:
-        logger.error(f"Error getting group preferences: {e}")
         return jsonify({
             "success": False,
             "error": str(e),

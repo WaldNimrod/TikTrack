@@ -17,8 +17,30 @@ import time
 from typing import Dict, List, Optional, Any, Union
 from datetime import datetime, timedelta
 import os
+import sys
+
+# Add constraint service
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from services.constraint_service import ConstraintService
 
 logger = logging.getLogger(__name__)
+
+# Custom exception classes
+class ValidationError(Exception):
+    """Exception raised for preference validation errors"""
+    pass
+
+class PreferenceNotFoundError(Exception):
+    """Exception raised when preference is not found"""
+    pass
+
+class UserNotFoundError(Exception):
+    """Exception raised when user is not found"""
+    pass
+
+class ProfileNotFoundError(Exception):
+    """Exception raised when profile is not found"""
+    pass
 
 class PreferencesService:
     """
@@ -39,9 +61,107 @@ class PreferencesService:
         self.cache_ttl = 24 * 60 * 60  # 24 שעות
         self.cache_timestamps = {}  # זמני יצירת מטמון
         
+        # Initialize constraint service for validation
+        self.constraint_service = ConstraintService(db_path)
+        
         # בדיקת קיום בסיס הנתונים
         if not os.path.exists(db_path):
             raise FileNotFoundError(f"Database not found: {db_path}")
+    
+    def _validate_preference_value(self, preference_name: str, value: Any) -> bool:
+        """
+        בדיקת תקינות ערך העדפה לפי constraints
+        
+        Args:
+            preference_name: שם ההעדפה
+            value: ערך ההעדפה לבדיקה
+            
+        Returns:
+            True אם הערך תקין
+            
+        Raises:
+            ValidationError: אם הערך לא תקין
+        """
+        try:
+            # קבלת constraints לטבלת preference_types
+            constraints = self.constraint_service.get_constraints_for_table('preference_types')
+            
+            # בדיקת constraints רלוונטיים
+            for constraint in constraints:
+                if constraint['constraint_type'] == 'ENUM' and constraint['column_name'] == 'data_type':
+                    # בדיקת סוג נתונים מותר
+                    enum_values = [ev['value'] for ev in constraint.get('enum_values', [])]
+                    logger.debug(f"Available data types: {enum_values}")
+            
+            # קבלת סוג הנתון של ההעדפה
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT data_type, constraints, is_required
+                FROM preference_types 
+                WHERE preference_name = ? AND is_active = 1
+            ''', (preference_name,))
+            
+            result = cursor.fetchone()
+            conn.close()
+            
+            if not result:
+                raise ValidationError(f"Preference '{preference_name}' not found")
+            
+            data_type, constraints_json, is_required = result
+            
+            # בדיקת ערך ריק
+            if value is None or str(value).strip() == '':
+                if is_required:
+                    raise ValidationError(f"Preference '{preference_name}' is required")
+                return True
+            
+            # בדיקת סוג נתונים
+            if data_type == 'integer':
+                try:
+                    int(value)
+                except (ValueError, TypeError):
+                    raise ValidationError(f"Preference '{preference_name}' must be an integer")
+            
+            elif data_type in ['float', 'number']:
+                try:
+                    float(value)
+                except (ValueError, TypeError):
+                    raise ValidationError(f"Preference '{preference_name}' must be a number")
+            
+            elif data_type == 'boolean':
+                if str(value).lower() not in ['true', 'false', '1', '0', 'yes', 'no']:
+                    raise ValidationError(f"Preference '{preference_name}' must be a boolean value")
+            
+            elif data_type == 'json':
+                try:
+                    if isinstance(value, str):
+                        json.loads(value)
+                except json.JSONDecodeError:
+                    raise ValidationError(f"Preference '{preference_name}' must be valid JSON")
+            
+            elif data_type == 'color':
+                value_str = str(value).strip()
+                if not value_str.startswith('#') or len(value_str) not in [4, 7]:
+                    raise ValidationError(f"Preference '{preference_name}' must be a valid color (hex format)")
+            
+            # בדיקת constraints נוספים
+            if constraints_json:
+                try:
+                    constraints_data = json.loads(constraints_json)
+                    # כאן ניתן להוסיף בדיקות נוספות לפי constraints
+                    logger.debug(f"Additional constraints for {preference_name}: {constraints_data}")
+                except json.JSONDecodeError:
+                    logger.warning(f"Invalid constraints JSON for {preference_name}")
+            
+            return True
+            
+        except ValidationError:
+            raise
+        except Exception as e:
+            logger.error(f"Error validating preference {preference_name}: {e}")
+            raise ValidationError(f"Validation failed for preference '{preference_name}': {str(e)}")
     
     def _get_cache_key(self, user_id: int, profile_id: int, preference_name: str = None, group_name: str = None) -> str:
         """יצירת מפתח מטמון"""
@@ -99,7 +219,7 @@ class PreferencesService:
                 return result[0]
             else:
                 raise ValueError(f"No active profile found for user {user_id}")
-                
+            
         except Exception as e:
             logger.error(f"Error getting active profile for user {user_id}: {e}")
             raise
@@ -122,7 +242,7 @@ class PreferencesService:
                 return result[0]
             else:
                 raise ValueError(f"Preference type not found: {preference_name}")
-                
+            
         except Exception as e:
             logger.error(f"Error getting preference type ID for {preference_name}: {e}")
             raise
@@ -232,7 +352,7 @@ class PreferencesService:
                     return value
                 else:
                     raise ValueError(f"Preference not found: {preference_name}")
-                    
+            
         except Exception as e:
             logger.error(f"Error getting preference {preference_name} for user {user_id}: {e}")
             raise
@@ -410,6 +530,9 @@ class PreferencesService:
             True אם השמירה הצליחה
         """
         try:
+            # בדיקת תקינות ערך לפי constraints
+            self._validate_preference_value(preference_name, value)
+            
             # קבלת פרופיל פעיל אם לא צוין
             if profile_id is None:
                 profile_id = self._get_active_profile_id(user_id)
@@ -477,7 +600,6 @@ class PreferencesService:
                         (user_id, profile_id, preference_id, saved_value, updated_at)
                         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
                     ''', (user_id, profile_id, preference_id, string_value))
-                    
                 except Exception as e:
                     logger.warning(f"Failed to save preference {preference_name}: {e}")
                     continue
@@ -549,7 +671,7 @@ class PreferencesService:
                 }
             else:
                 raise ValueError(f"Preference type not found: {preference_name}")
-                
+            
         except Exception as e:
             logger.error(f"Error getting preference info for {preference_name}: {e}")
             raise

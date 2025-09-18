@@ -23,6 +23,15 @@
  * SCOPE RULE: כל selector חייב להתחיל ב-#unified-header
  */
 
+/* ===== Header Actions (moved from buttons-base.css) ===== */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  justify-content: flex-end; /* יישור לשמאל (RTL) */
+}
+
 /* ===== סגנונות בסיסיים לכותרת ===== */
 #unified-header {
     background: var(--apple-bg-elevated);

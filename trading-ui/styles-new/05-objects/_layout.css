@@ -267,9 +267,21 @@
 /* תיקון לכפתורים קטנים */
 .container-fluid .main-content .btn-sm {
   min-height: 32px;
+  min-width: 70px;
   padding: 4px 8px;
   font-size: 13px;
   border-radius: 3px;
+}
+
+/* תיקון ספציפי לכפתורי "עצור" ו"התעלם" */
+.container-fluid .main-content .btn-warning,
+.container-fluid .main-content .btn-secondary {
+  min-width: 80px !important;
+}
+
+/* תיקון כללי לכפתורים קצרים */
+.container-fluid .main-content .btn {
+  min-width: 60px;
 }
 
 /* תיקון לכפתורים גדולים */

@@ -130,14 +130,6 @@ button:disabled,
   justify-content: flex-end; /* יישור לשמאל (RTL) */
 }
 
-/* כפתורים בכותרת הראשית */
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: nowrap;
-  justify-content: flex-end; /* יישור לשמאל (RTL) */
-}
 
 /* כפתורי פעולות בעמודות טבלה - יישור למרכז העמודה */
 td .btn,

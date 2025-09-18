@@ -217,8 +217,7 @@ def save_user_preferences() -> Any:
         else:
             return jsonify({
                 "success": False,
-                "error": "Failed to save preferences",
-                "timestamp": datetime.now().isoformat()
+                "error": "Failed to save preferences"
             }), 500
         
     except Exception as e:

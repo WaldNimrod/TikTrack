@@ -81,7 +81,7 @@
 
 > 📋 **דוקומנטציה מערכת נתונים חיצוניים**: [EXTERNAL_DATA_INTEGRATION_MODULE_DOCUMENTATION.md](EXTERNAL_DATA_INTEGRATION_MODULE_DOCUMENTATION.md)
 
-> 🚀 **מערכת העדפות**: [PREFERENCES_IMPLEMENTATION_REPORT.md](PREFERENCES_IMPLEMENTATION_REPORT.md)
+> 🚀 **מערכת העדפות**: [documentation/features/preferences/PREFERENCES_SYSTEM.md](documentation/features/preferences/PREFERENCES_SYSTEM.md) - דוקומנטציה מרכזית מלאה
 
 > 📊 **השוואת מערכות**: [PREFERENCES_COMPARISON.md](PREFERENCES_COMPARISON.md)
 

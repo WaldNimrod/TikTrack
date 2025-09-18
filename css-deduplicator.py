@@ -5,6 +5,7 @@ CSS Deduplicator - מסיר כפילויות וסותרות מ-CSS
 
 import re
 import os
+import sys
 from collections import defaultdict, OrderedDict
 
 def deduplicate_css(css_file):
@@ -94,8 +95,13 @@ def deduplicate_css(css_file):
     print(f"✅ Removed {len(rules) - len(merged_rules)} duplicate rules")
 
 if __name__ == "__main__":
-    css_file = "trading-ui/styles-new/unified.css"
     print("🧹 CSS Deduplicator - מסיר כפילויות וסותרות")
     print("=" * 60)
+
+    if len(sys.argv) > 1:
+        css_file = sys.argv[1]
+    else:
+        css_file = "trading-ui/styles-new/unified.css"
+
     deduplicate_css(css_file)
     print("\n✅ Deduplication complete!")

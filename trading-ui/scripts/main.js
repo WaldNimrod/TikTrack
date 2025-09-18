@@ -7,6 +7,13 @@
 
 console.log('🎯 main.js loaded and executing');
 
+// Immediate test
+fetch('/api/debug/log', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ message: '🎯 main.js loaded and executing' })
+}).catch(() => {});
+
 /*
  * ====================================
  *

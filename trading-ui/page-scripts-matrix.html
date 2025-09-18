@@ -8,7 +8,7 @@
     <!-- CSS Architecture - ITCSS System (September 2025) -->
     <!-- Bootstrap Framework -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
+    
     <!-- TikTrack CSS - ITCSS Individual Files (After Bootstrap to override) -->
     <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
     <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=v1.0.0">
@@ -44,7 +44,7 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
+    
     <!-- ✅ INLINE STYLES REMOVED - September 2025
          All styles moved to ITCSS system. Page-specific styles should be added to:
          - styles-new/07-trumps/_page-specific.css
@@ -55,32 +55,76 @@
     <!-- 🔒 LOCKED TEMPLATE ZONE 1 - Header & Navigation (DO NOT MODIFY) -->
     <!-- ======================================================== -->
     <div id="unified-header"></div>
-
+    
     <!-- 🔒 LOCKED TEMPLATE ZONE 2 - Main Content Container (DO NOT MODIFY) -->
     <!-- ======================================================== -->
     <div class="container-fluid main-content page-scripts-matrix-container">
         <div class="row">
             <div class="col-12">
-                <!-- 🔒 LOCKED TEMPLATE ZONE 3 - Page Title (DO NOT MODIFY) -->
-                <!-- ======================================================== -->
-                <div class="page-header-section">
-                    <h1 class="page-title">מטריצת סקריפטים ועמודים - TikTrack</h1>
-                    <p class="page-subtitle text-muted">עדכון אחרון: ספטמבר 2025</p>
-                </div>
-
                 <!-- 🔓 TEMPLATE ZONE 4 - Page Content (MODIFY ONLY CONTENT INSIDE) -->
                 <!-- ======================================================== -->
 
-                <!-- 📁 SECTION 1: Scripts Matrix Table -->
-                <div class="content-section" data-section-id="scripts-matrix-table">
+                <!-- 📁 SECTION 1: Main Content with Legend -->
+                <div class="content-section" data-section-id="main-content">
                     <div class="section-header">
-                        <button class="btn btn-sm btn-outline-primary section-toggle" onclick="toggleSection('scripts-matrix-content')">
+                        <button class="btn btn-sm btn-outline-secondary section-toggle" onclick="toggleSection('main-content-body')">
                             <i class="fas fa-chevron-down section-toggle-icon"></i>
                         </button>
-                        <span class="section-title">מטריצת סקריפטים ועמודים</span>
+                        <h1 class="section-title main-title">מטריצת סקריפטים ועמודים - TikTrack</h1>
+                        <div class="section-actions">
+                            <p class="section-subtitle text-muted mb-0">עדכון אחרון: ספטמבר 2025</p>
+                        </div>
                     </div>
-                    <div id="scripts-matrix-content" class="section-content">
-                        <div class="table-container">
+                    <div id="main-content-body" class="section-content">
+                        <!-- Legend Section -->
+                        <div class="legend-section mb-4">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5 class="legend-title">מקרא:</h5>
+                                    <div class="legend-items">
+                                        <div class="legend-item">
+                                            <span class="legend-color primary-scripts"></span>
+                                            סקריפטים ראשיים - פונקציונליות ספציפית לעמוד
+                                        </div>
+                                        <div class="legend-item">
+                                            <span class="legend-color utility-scripts"></span>
+                                            סקריפטים שירותיים - פונקציות כלליות
+                                        </div>
+                                        <div class="legend-item">
+                                            <span class="legend-color service-scripts"></span>
+                                            סקריפטי שירות - שירותים מיוחדים
+                                        </div>
+                                        <div class="legend-item">
+                                            <span class="legend-color connected"></span>
+                                            ✓ - הסקריפט נטען בעמוד זה
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="notes-section">
+                                        <h6>הערות:</h6>
+                                        <ul class="notes-list">
+                                            <li>המטריקס מציגה איזה קבצי JavaScript נטענים בכל עמוד HTML</li>
+                                            <li>סקריפטים ראשיים מכילים פונקציונליות ספציפית לכל עמוד</li>
+                                            <li>סקריפטים שירותיים מכילים פונקציות כלליות המשמשות בכל המערכת</li>
+                                            <li>סקריפטי שירות מספקים פונקציונליות מיוחדת כמו התראות, שירותי חשבונות וכו'</li>
+                                            <li>כל העמודים משתמשים במערכת הבסיסית: main.js, header-system.js, tables.js, table-mappings.js</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 📁 SUB-SECTION 1: Scripts Matrix Table -->
+                        <div class="content-subsection" data-section-id="scripts-matrix-table">
+                            <div class="subsection-header">
+                                <button class="btn btn-xs btn-outline-primary subsection-toggle" onclick="toggleSection('scripts-matrix-content')">
+                                    <i class="fas fa-chevron-down subsection-toggle-icon"></i>
+                                </button>
+                                <span class="subsection-title">טבלת מטריצת הסקריפטים</span>
+                            </div>
+                            <div id="scripts-matrix-content" class="subsection-content">
+        <div class="table-container">
             <table id="page-scripts-matrix-table" class="table table-bordered table-sm" data-table-type="page-scripts-matrix">
                 <thead>
                     <tr>
@@ -164,8 +208,8 @@
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
-                        <td></td>
-                        <td></td>
+                    <td></td>
+                    <td></td>
                     </tr>
                     <tr class="utility-scripts"><td class="script-name">tables.js</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td>
                     </tr>
@@ -219,61 +263,20 @@
                     </tr>
                 </tbody>
             </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 📁 SECTION 2: Legend & Notes -->
-                <div class="content-section" data-section-id="legend-notes">
-                    <div class="section-header">
-                        <button class="btn btn-sm btn-outline-primary section-toggle" onclick="toggleSection('legend-notes-content')">
-                            <i class="fas fa-chevron-down section-toggle-icon"></i>
-                        </button>
-                        <span class="section-title">מקרא והערות</span>
-                    </div>
-                    <div id="legend-notes-content" class="section-content">
-                        <div class="legend">
-            <h5>מקרא:</h5>
-            <div class="legend-item">
-                <span class="legend-color primary-scripts"></span>
-                סקריפטים ראשיים - פונקציונליות ספציפית לעמוד
-            </div>
-            <div class="legend-item">
-                <span class="legend-color utility-scripts"></span>
-                סקריפטים שירותיים - פונקציות כלליות
-            </div>
-            <div class="legend-item">
-                <span class="legend-color service-scripts"></span>
-                סקריפטי שירות - שירותים מיוחדים
-            </div>
-            <div class="legend-item">
-                <span class="legend-color connected"></span>
-                ✓ - הסקריפט נטען בעמוד זה
-            </div>
         </div>
+            </div>
+            </div>
 
-        <div class="mt-4">
-            <h5>הערות:</h5>
-            <ul>
-                <li>המטריקס מציגה איזה קבצי JavaScript נטענים בכל עמוד HTML</li>
-                <li>סקריפטים ראשיים מכילים פונקציונליות ספציפית לכל עמוד</li>
-                <li>סקריפטים שירותיים מכילים פונקציות כלליות המשמשות בכל המערכת</li>
-                <li>סקריפטי שירות מספקים פונקציונליות מיוחדת כמו התראות, שירותי חשבונות וכו'</li>
-                <li>כל העמודים משתמשים במערכת הבסיסית: main.js, header-system.js, tables.js, table-mappings.js</li>
-            </ul>
-                        </div>
-                    </div>
-                </div>
                 <!-- END OF TEMPLATE ZONE 4 -->
 
             </div>
+            </div>
         </div>
-    </div>
 
     <!-- 🔒 LOCKED TEMPLATE ZONE 5 - Footer & Scripts (DO NOT MODIFY ORDER) -->
     <!-- ======================================================== -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    
     <!-- TikTrack JavaScript Files - Exact Order Required -->
     <script src="scripts/console-cleanup.js"></script>
     <script src="scripts/ui-utils.js"></script>
@@ -305,8 +308,8 @@
             // Set page-specific preferences using global function
             if (typeof setPagePreferences === 'function') {
                 setPagePreferences('page-scripts-matrix', {
-                    sections: ['scripts-matrix-table', 'legend-notes'],
-                    defaultExpanded: ['scripts-matrix-content']
+                    sections: ['main-content', 'scripts-matrix-table'],
+                    defaultExpanded: ['main-content-body', 'scripts-matrix-content']
                 });
             }
 

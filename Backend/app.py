@@ -227,6 +227,15 @@ app.register_blueprint(quotes_v1_bp)
 
 app.register_blueprint(pages_bp)
 
+# Debug logging endpoint
+@app.route('/api/debug/log', methods=['POST'])
+def debug_log():
+    """Debug logging endpoint"""
+    data = request.get_json()
+    if data and 'message' in data:
+        app.logger.info(f"DEBUG: {data['message']}")
+    return jsonify({"status": "ok"})
+
 # Start background task scheduler automatically
 try:
     logger.info("🚀 Starting background task scheduler...")

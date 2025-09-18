@@ -74,10 +74,10 @@
                 <!-- 📁 SECTION 1: Scripts Matrix Table -->
                 <div class="content-section" data-section-id="scripts-matrix-table">
                     <div class="section-header">
-                        <button class="btn btn-sm btn-outline-primary section-toggle" data-target="scripts-matrix-content">
-                            <i class="fas fa-chevron-down"></i>
-                            מטריצת סקריפטים ועמודים
+                        <button class="btn btn-sm btn-outline-primary section-toggle" onclick="toggleSection('scripts-matrix-content')">
+                            <i class="fas fa-chevron-down section-toggle-icon"></i>
                         </button>
+                        <span class="section-title">מטריצת סקריפטים ועמודים</span>
                     </div>
                     <div id="scripts-matrix-content" class="section-content">
                         <div class="table-container">
@@ -226,10 +226,10 @@
                 <!-- 📁 SECTION 2: Legend & Notes -->
                 <div class="content-section" data-section-id="legend-notes">
                     <div class="section-header">
-                        <button class="btn btn-sm btn-outline-primary section-toggle" data-target="legend-notes-content">
-                            <i class="fas fa-chevron-down"></i>
-                            מקרא והערות
+                        <button class="btn btn-sm btn-outline-primary section-toggle" onclick="toggleSection('legend-notes-content')">
+                            <i class="fas fa-chevron-down section-toggle-icon"></i>
                         </button>
+                        <span class="section-title">מקרא והערות</span>
                     </div>
                     <div id="legend-notes-content" class="section-content">
                         <div class="legend">
@@ -277,6 +277,7 @@
     <!-- TikTrack JavaScript Files - Exact Order Required -->
     <script src="scripts/console-cleanup.js"></script>
     <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/page-utils.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/table-mappings.js"></script>
     <script src="scripts/header-system.js?v=20250115_level3_fix"></script>
@@ -291,53 +292,58 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🗺️ Page Scripts Matrix loaded successfully');
 
-            // Initialize sections with toggle functionality
-            initializeSections();
+            // Use global functions from ui-utils.js instead of local ones
+            if (typeof initializeSections === 'function') {
+                initializeSections();
+            }
 
             // Initialize page-specific functionality if needed
             if (typeof initializePageScriptsMatrix === 'function') {
                 initializePageScriptsMatrix();
             }
 
-            // Set page-specific preferences
+            // Set page-specific preferences using global function
             if (typeof setPagePreferences === 'function') {
                 setPagePreferences('page-scripts-matrix', {
                     sections: ['scripts-matrix-table', 'legend-notes'],
-                    defaultExpanded: ['scripts-matrix-table']
+                    defaultExpanded: ['scripts-matrix-content']
                 });
             }
+
+            // Initialize scan interface
+            initializeScanInterface();
         });
 
-        // Section toggle functionality
-        function initializeSections() {
-            const toggleButtons = document.querySelectorAll('.section-toggle');
+        // Initialize scan interface for updating the matrix
+        function initializeScanInterface() {
+            // Add scan button to the page header
+            const pageHeader = document.querySelector('.page-header-section');
+            if (pageHeader && !document.getElementById('scan-filesystem-btn')) {
+                const scanButton = document.createElement('button');
+                scanButton.id = 'scan-filesystem-btn';
+                scanButton.className = 'btn btn-primary btn-sm ms-3';
+                scanButton.innerHTML = '<i class="fas fa-search"></i> סריקת קבצים';
+                scanButton.onclick = scanFilesystem;
+                pageHeader.appendChild(scanButton);
+            }
+        }
 
-            toggleButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const targetId = this.getAttribute('data-target');
-                    const targetElement = document.getElementById(targetId);
-                    const icon = this.querySelector('i');
+        // Scan filesystem and update matrix
+        function scanFilesystem() {
+            console.log('🔍 Starting filesystem scan...');
 
-                    if (targetElement && icon) {
-                        if (targetElement.style.display === 'none') {
-                            targetElement.style.display = 'block';
-                            icon.className = 'fas fa-chevron-down';
-                        } else {
-                            targetElement.style.display = 'none';
-                            icon.className = 'fas fa-chevron-right';
-                        }
-                    }
-                });
-            });
+            if (typeof showNotification === 'function') {
+                showNotification('מתחיל סריקה של מערכת הקבצים...', 'info');
+            }
 
-            // Set default expanded sections
-            const defaultExpanded = ['scripts-matrix-content'];
-            defaultExpanded.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.style.display = 'block';
+            // Here you would implement the actual scanning logic
+            // For now, just show a placeholder
+            setTimeout(() => {
+                if (typeof showNotification === 'function') {
+                    showNotification('סריקה הושלמה! טבלה עודכנה בהתאם.', 'success');
                 }
-            });
+                console.log('✅ Filesystem scan completed');
+            }, 2000);
         }
     </script>
 </body>

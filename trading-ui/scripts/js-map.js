@@ -630,7 +630,9 @@
 
         // Initialize JS Map page
         function initializeJsMapPage() {
-            console.log('🚀 Initializing JS Map page...');
+            console.log('🚀 Initializing JS Map page - FUNCTION CALLED!');
+            alert('🚀 JS Map page initialization started!');
+
             console.log('📍 Current page name from getCurrentPageName:', typeof getCurrentPageName === 'function' ? getCurrentPageName() : 'function not available');
 
             // Add visual indicator that JS is working

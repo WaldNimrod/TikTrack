@@ -1,7 +1,7 @@
-# מערכת העדפות V3 - דוקומנטציה מרכזית מלאה
-## Preferences System V3 - Complete Central Documentation
+# מערכת העדפות - דוקומנטציה מרכזית מלאה
+## Preferences System - Complete Central Documentation
 
-> **גרסה 3.0** - מערכת העדפות גמישה ומתקדמת
+> **גרסה 1.0** - מערכת העדפות גמישה ומתקדמת
 
 ---
 

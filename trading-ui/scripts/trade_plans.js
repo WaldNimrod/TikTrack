@@ -2289,11 +2289,11 @@ function getTypeClass(type) {
  */
 async function loadUserPreferences() {
   try {
-    console.log('📋 Loading user preferences for trade_plans (/V1)...');
+    console.log('📋 Loading user preferences for trade_plans...');
     
     // נסה ראשית מערכת  גלובלית
     if (typeof window.getCurrentPreference === 'function') {
-      console.log('✅ Using global preferences system (/V1)');
+      console.log('✅ Using global preferences system');
       return {
         timezone: await window.getCurrentPreference('timezone') || 'Asia/Jerusalem',
         primaryCurrency: await window.getCurrentPreference('primaryCurrency') || 'USD',
@@ -2318,19 +2318,19 @@ async function loadUserPreferences() {
         }
       }
     } catch (newError) {
-      console.log('🔄 New API not available, trying V1...');
+      console.log('🔄 New API not available, trying fallback...');
     }
     
-    // Fallback ל-V1 API
+    // Fallback ל-API
     try {
-      const v1Response = await fetch('/api/v1/preferences/user');
-      if (v1Response.ok) {
-        const preferences = await v1Response.json();
-        console.log('✅ Using V1 API preferences');
+      const response = await fetch('/api/v1/preferences/user');
+      if (response.ok) {
+        const preferences = await response.json();
+        console.log('✅ Using API preferences');
         return preferences;
       }
     } catch (v1Error) {
-      console.log('🔄 V1 API not available, trying local config...');
+      console.log('🔄 API not available, trying local config...');
     }
     
     // Fallback אחרון - קובץ JSON מקומי (legacy)

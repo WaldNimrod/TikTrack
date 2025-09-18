@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Preferences System V3 - Database Migration
-==========================================
+Preferences System - Database Migration
+=====================================
 
-יצירת טבלאות חדשות למערכת העדפות V3
+יצירת טבלאות חדשות למערכת העדפות
 
 Author: TikTrack Development Team
 Date: January 2025
@@ -17,8 +17,8 @@ from datetime import datetime
 # הוסף את הנתיב למודולים
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-def create_preferences_v3_tables():
-    """יצירת טבלאות חדשות למערכת העדפות V3"""
+def create_preferences_tables():
+    """יצירת טבלאות חדשות למערכת העדפות"""
     
     # נתיב לבסיס הנתונים
     db_path = 'db/simpleTrade_new.db'
@@ -32,7 +32,7 @@ def create_preferences_v3_tables():
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        print("🚀 מתחיל יצירת טבלאות מערכת העדפות V3...")
+        print("🚀 מתחיל יצירת טבלאות מערכת העדפות...")
         
         # 1. יצירת טבלת preference_groups
         print("📋 יוצר טבלת preference_groups...")
@@ -202,7 +202,7 @@ def create_preferences_v3_tables():
         # שמירת שינויים
         conn.commit()
         
-        print("✅ טבלאות מערכת העדפות V3 נוצרו בהצלחה!")
+        print("✅ טבלאות מערכת העדפות נוצרו בהצלחה!")
         print("📊 נתונים בסיסיים הוכנסו")
         print("🔍 אינדקסים נוצרו")
         
@@ -233,11 +233,11 @@ def create_preferences_v3_tables():
         return False
 
 if __name__ == "__main__":
-    print("🚀 מתחיל יצירת טבלאות מערכת העדפות V3...")
-    success = create_preferences_v3_tables()
+    print("🚀 מתחיל יצירת טבלאות מערכת העדפות...")
+    success = create_preferences_tables()
     
     if success:
-        print("\n🎉 מערכת העדפות V3 הוכנה בהצלחה!")
+        print("\n🎉 מערכת העדפות הוכנה בהצלחה!")
         print("📋 הטבלאות הבאות נוצרו:")
         print("  - preference_groups")
         print("  - preference_types") 
@@ -249,5 +249,5 @@ if __name__ == "__main__":
         print("  - idx_preference_profiles_user_active")
         print("  - idx_user_preferences_v3_complex")
     else:
-        print("\n❌ שגיאה ביצירת מערכת העדפות V3")
+        print("\n❌ שגיאה ביצירת מערכת העדפות")
         sys.exit(1)

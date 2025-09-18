@@ -46,23 +46,23 @@
 
 ### 🔴 עמודים קריטיים (עדיפות גבוהה)
 
-#### 1. **Preferences-V2** - 55%
-- **קובץ:** `trading-ui/preferences-v2.html`
-- **סקריפט:** `trading-ui/scripts/preferences-v2.js`
+#### 1. **Preferences** - 55%
+- **קובץ:** `trading-ui/preferences.html`
+- **סקריפט:** `trading-ui/scripts/preferences.js`
 - **בעיות:**
   - 17 כפתורים ללא פונקציונליות מלאה
   - 25 פונקציות onclick ללא קישור לפונקציות
   - 12 מודלים ללא JavaScript מתאים
   - חסרות פונקציות CRUD בסיסיות
 - **פונקציות חסרות:**
-  - `loadPreferencesV2()`
-  - `updatePreferenceV2(key, value)`
-  - `deletePreferenceV2(key)`
-  - `createProfileV2(name, description)`
-  - `deleteProfileV2(profileId)`
+  - `loadPreferences()`
+  - `updatePreference(key, value)`
+  - `deletePreference(key)`
+  - `createProfile(name, description)`
+  - `deleteProfile(profileId)`
 - **תיעוד רלוונטי:**
   - [PREFERENCES_SYSTEM_ARCHITECTURE_NEW.md](./PREFERENCES_SYSTEM_ARCHITECTURE_NEW.md)
-  - [PREFERENCES_V2_FINAL_COMPLETION_REPORT.md](./PREFERENCES_V2_FINAL_COMPLETION_REPORT.md)
+  - [PREFERENCES_FINAL_COMPLETION_REPORT.md](./PREFERENCES_FINAL_COMPLETION_REPORT.md)
 
 #### 2. **Research** - 16%
 - **קובץ:** `trading-ui/research.html`
@@ -263,7 +263,7 @@
 ## 📋 תוכנית פעולה מומלצת
 
 ### שלב 1: עמודים קריטיים (עדיפות גבוהה)
-1. **Preferences-V2** - הוספת פונקציות CRUD חסרות
+1. **Preferences** - הוספת פונקציות CRUD חסרות
 2. **Research** - השלמת פונקציונליות בסיסית
 3. **DB Display** - הוספת פונקציות ניהול טבלאות
 4. **Index** - הוספת פונקציונליות דף הבית
@@ -292,8 +292,8 @@
 
 ### מסמכי העדפות
 - [PREFERENCES_SYSTEM_ARCHITECTURE_NEW.md](./PREFERENCES_SYSTEM_ARCHITECTURE_NEW.md) - ארכיטקטורת מערכת העדפות
-- [PREFERENCES_V2_FINAL_COMPLETION_REPORT.md](./PREFERENCES_V2_FINAL_COMPLETION_REPORT.md) - דוח השלמת העדפות V2
-- [PREFERENCES_V1_VS_V2_COMPARISON.md](./PREFERENCES_V1_VS_V2_COMPARISON.md) - השוואת V1 ו-V2
+- [PREFERENCES_FINAL_COMPLETION_REPORT.md](./PREFERENCES_FINAL_COMPLETION_REPORT.md) - דוח השלמת העדפות
+- [PREFERENCES_COMPARISON.md](./PREFERENCES_COMPARISON.md) - השוואת מערכות
 
 ### מסמכי CSS
 - [CSS_ARCHITECTURE_IMPLEMENTATION_COMPLETION_REPORT.md](./CSS_ARCHITECTURE_IMPLEMENTATION_COMPLETION_REPORT.md) - דוח השלמת ארכיטקטורת CSS
@@ -330,7 +330,7 @@
 3. **פונקציונליות חלקית** - עמודים רבים חסרים פונקציות בסיסיות
 
 ### 🚀 המלצות
-1. **התמקדות בעמודים קריטיים** - התחל עם Preferences-V2, Research, DB Display, Index
+1. **התמקדות בעמודים קריטיים** - התחל עם Preferences, Research, DB Display, Index
 2. **הוספת פונקציות JavaScript** - רוב הבעיות נובעות מחסר פונקציות JS
 3. **בדיקות אוטומטיות** - השתמש במערכת הבדיקות הקיימת לניטור התקדמות
 4. **תיעוד מתמשך** - עדכן את התיעוד עם כל שינוי

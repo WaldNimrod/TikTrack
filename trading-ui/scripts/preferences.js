@@ -1,15 +1,15 @@
 /**
- * Preferences System V3 - Frontend JavaScript
- * ===========================================
+ * Preferences System - Frontend JavaScript
+ * =======================================
  * 
- * מערכת העדפות V3 - JavaScript לממשק המשתמש
+ * מערכת העדפות - JavaScript לממשק המשתמש
  * 
- * @version 3.0.0
+ * @version 1.0.0
  * @lastUpdated January 2025
  * @author TikTrack Development Team
  */
 
-// ===== GLOBAL PREFERENCES SYSTEM V3 =====
+// ===== GLOBAL PREFERENCES SYSTEM =====
 
 // Global preferences cache
 window.preferencesCache = {
@@ -409,7 +409,7 @@ window.getPreferenceInfo = async function(preferenceName) {
  */
 window.loadPreferences = async function() {
     try {
-        console.log('📂 Loading preferences from V3 system...');
+        console.log('📂 Loading preferences from system...');
         
         const preferences = await window.getAllUserPreferences();
         
@@ -442,7 +442,7 @@ window.loadPreferences = async function() {
  */
 window.saveAllPreferences = async function() {
     try {
-        console.log('💾 Saving all preferences to V3 system...');
+        console.log('💾 Saving all preferences to system...');
         
         // Collect form data (if function exists)
         if (typeof window.collectFormData === 'function') {
@@ -474,11 +474,11 @@ window.saveAllPreferences = async function() {
 // ===== INITIALIZATION =====
 
 /**
- * אתחול מערכת העדפות V3
+ * אתחול מערכת העדפות
  */
-window.initializePreferencesV3 = async function() {
+window.initializePreferences = async function() {
     try {
-        console.log('🚀 Initializing Preferences System V3...');
+        console.log('🚀 Initializing Preferences System...');
         
         // בדיקת תקינות השירות
         const isHealthy = await window.checkPreferencesServiceHealth();
@@ -490,10 +490,10 @@ window.initializePreferencesV3 = async function() {
         // טעינת העדפות ראשונית
         await window.getAllUserPreferences();
       
-        console.log('✅ Preferences System V3 initialized successfully');
+        console.log('✅ Preferences System initialized successfully');
       return true;
     } catch (error) {
-        console.error('❌ Error initializing Preferences System V3:', error);
+        console.error('❌ Error initializing Preferences System:', error);
       return false;
     }
 };
@@ -502,14 +502,14 @@ window.initializePreferencesV3 = async function() {
 
 // אתחול אוטומטי כשהדף נטען
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📄 DOM loaded, initializing Preferences System V3...');
+    console.log('📄 DOM loaded, initializing Preferences System...');
     
     // אתחול המערכת
-    window.initializePreferencesV3().then(success => {
+    window.initializePreferences().then(success => {
         if (success) {
-            console.log('🎉 Preferences System V3 ready!');
+            console.log('🎉 Preferences System ready!');
         } else {
-            console.warn('⚠️ Preferences System V3 initialization failed');
+            console.warn('⚠️ Preferences System initialization failed');
         }
     });
 });
@@ -531,6 +531,6 @@ if (typeof module !== 'undefined' && module.exports) {
         getPreferenceInfo: window.getPreferenceInfo,
         loadPreferences: window.loadPreferences,
         saveAllPreferences: window.saveAllPreferences,
-        initializePreferencesV3: window.initializePreferencesV3
+        initializePreferences: window.initializePreferences
     };
 }

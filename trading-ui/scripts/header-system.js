@@ -4632,11 +4632,11 @@ async function getCurrentPreference(key) {
       }
     }
     
-    // Fallback ל-V1 API
+    // Fallback ל-API
     const response = await fetch('/api/v1/preferences/user');
     if (response.ok) {
       const preferences = await response.json();
-      console.log(`✅ Found V1 preference ${key}: ${preferences[key]}`);
+      console.log(`✅ Found preference ${key}: ${preferences[key]}`);
       return preferences[key];
     }
     return null;

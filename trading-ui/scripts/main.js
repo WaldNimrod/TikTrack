@@ -273,6 +273,15 @@ function initializeCurrentPage() {
   const currentPage = getCurrentPageName();
   console.log('🔄 Initializing current page:', currentPage);
 
+  // Log to server for debugging
+  fetch('/api/debug/log', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: '🔄 Initializing current page: ' + currentPage })
+  }).catch(() => {}); // Ignore errors
+
+  alert('🔄 Initializing current page: ' + currentPage);
+
   // Call page-specific initialization if available
   const initFunctionName = `initialize${currentPage.charAt(0).toUpperCase() + currentPage.slice(1)}Page`;
   console.log('🔍 Looking for function:', initFunctionName);

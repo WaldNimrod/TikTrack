@@ -133,7 +133,7 @@ async function loadInitialData() {
 
         // Initialize Chart Renderer
         if (typeof window.ChartRenderer !== 'undefined') {
-    const canvas = document.getElementById('linterChart');
+            const canvas = document.getElementById('linterChart');
             if (canvas) {
                 window.currentChartRenderer = new window.ChartRenderer('linterChart');
                 await window.currentChartRenderer.initialize();
@@ -1564,8 +1564,8 @@ async function finishScan() {
             });
 
             // Create data point and save to IndexedDB
-            const dataPoint = window.DataCollector.createDataPoint(scanMetrics);
-            const enhancedPoint = window.DataCollector.addMetadata(dataPoint);
+            const dataPoint = window.dataCollectorInstance.createDataPoint(scanMetrics);
+            const enhancedPoint = window.dataCollectorInstance.addMetadata(dataPoint);
 
             // Save to IndexedDB
             if (typeof window.IndexedDBAdapter !== 'undefined') {
@@ -1982,7 +1982,7 @@ window.fixAllIssues = async () => {
     // ===== INTEGRATION WITH DATA COLLECTOR =====
     // Collect fix data and save to IndexedDB
     try {
-        if (typeof window.DataCollector !== 'undefined') {
+        if (typeof window.dataCollectorInstance !== 'undefined' && typeof window.dataCollectorInstance.collectFromFix === 'function') {
             console.log('🔧 אוסף נתונים מתיקון עם Data Collector...');
 
             const fixResults = {
@@ -1995,11 +1995,11 @@ window.fixAllIssues = async () => {
                 fixDuration: Math.random() * 5000 + 1000 // 1-6 seconds
             };
 
-            const fixMetrics = window.DataCollector.collectFromFix(fixResults);
+            const fixMetrics = window.dataCollectorInstance.collectFromFix(fixResults);
 
             // Create data point and save to IndexedDB
-            const dataPoint = window.DataCollector.createDataPoint(fixMetrics);
-            const enhancedPoint = window.DataCollector.addMetadata(dataPoint);
+            const dataPoint = window.dataCollectorInstance.createDataPoint(fixMetrics);
+            const enhancedPoint = window.dataCollectorInstance.addMetadata(dataPoint);
 
             // Save to IndexedDB
             if (typeof window.IndexedDBAdapter !== 'undefined') {

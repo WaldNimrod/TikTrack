@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
-
+<head>
             <!-- ===== CSS Architecture - Unified CSS ===== -->
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -22,6 +22,16 @@
     
     <!-- Error Handlers -->
     <script src="scripts/error-handlers.js"></script>
+
+    <!-- Test Script -->
+    <script>
+        console.log('🚀 JS Map HTML loaded successfully');
+        try {
+            console.log('🔍 Current location:', window.location.pathname);
+        } catch (e) {
+            console.error('❌ Error accessing location:', e);
+        }
+    </script>
 
     <!-- Header System Script -->
     <script src="scripts/header-system.js?v=v35_updated"></script>
@@ -69,8 +79,8 @@
                 </div>
                 <div class="section-body">
                     <p>מפה מפורטת של כל הפונקציות והקבצים במערכת TikTrack</p>
-                </div>
-            </div>
+                            </div>
+                        </div>
             <!-- UI Content Section Top End -->
 
             <!-- UI Content Section 1 Start-->
@@ -82,13 +92,13 @@
                     </button>
                 </div>
                 <div class="section-body">
-                    <div id="pageMappingContent">
-                        <div class="loading">
-                            <div class="loading-spinner"></div>
-                            טוען מיפוי עמודים...
-                        </div>
+                <div id="pageMappingContent">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        טוען מיפוי עמודים...
                     </div>
                 </div>
+            </div>
             </div>
             <!-- UI Content Section 1 End -->
 
@@ -101,18 +111,18 @@
                     </button>
                 </div>
                 <div class="section-body">
-                    <div id="functionsContent">
-                        <div class="loading">
-                            <div class="loading-spinner"></div>
-                            טוען פונקציות...
-                        </div>
+                <div id="functionsContent">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        טוען פונקציות...
                     </div>
+                </div>
                 </div>
             </div>
             <!-- UI Content Section 2 End -->
+            </div>
         </div>
     </div>
-</div>
 
     <!-- Back to Top Button -->
     <button class="back-to-top" id="backToTopBtn" onclick="scrollToTop()" title="חזור לראש העמוד">

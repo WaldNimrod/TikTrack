@@ -7,11 +7,14 @@
  */
 
 class ChartRenderer {
-    constructor(containerId = 'chartContainer') {
-        this.containerId = containerId;
-        this.chart = null;
-        this.isInitialized = false;
-        this.config = {
+           constructor(containerId = 'chartContainer') {
+               this.containerId = containerId;
+               this.chart = null;
+               this.isInitialized = false;
+
+               // Chart.js date adapter is loaded via script tag in HTML
+
+               this.config = {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
@@ -194,9 +197,19 @@ class ChartRenderer {
                 throw new Error(`Container with id '${this.containerId}' not found`);
             }
 
-            // בדיקת זמינות Chart.js
+            // בדיקת זמינות Chart.js - המתנה אם צריך
             if (typeof Chart === 'undefined') {
-                throw new Error('Chart.js is not loaded');
+                console.log('⏳ ממתין לטעינת Chart.js...');
+                await new Promise((resolve) => {
+                    const checkChart = () => {
+                        if (typeof Chart !== 'undefined') {
+                            resolve();
+                        } else {
+                            setTimeout(checkChart, 100);
+                        }
+                    };
+                    checkChart();
+                });
             }
 
             // הכנת נתונים

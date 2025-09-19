@@ -717,6 +717,70 @@ class PreferencesService:
             logger.error(f"Error getting profiles for user {user_id}: {e}")
             raise
 
+    def get_preference_groups(self) -> List[Dict[str, Any]]:
+        """קבלת קבוצות העדפות"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                SELECT id, group_name, group_name, description, 
+                       1, 0, created_at
+                FROM preference_groups
+                ORDER BY group_name ASC
+            ''')
+            
+            results = cursor.fetchall()
+            conn.close()
+            
+            groups = []
+            for row in results:
+                groups.append({
+                    'id': row[0],
+                    'name': row[1],
+                    'display_name': row[2],
+                    'description': row[3],
+                    'active': bool(row[4]),
+                    'sort_order': row[5],
+                    'created_at': row[6]
+                })
+            
+            return groups
+            
+        except Exception as e:
+            logger.error(f"Error getting preference groups: {e}")
+            raise
+
+    def activate_profile(self, user_id: int, profile_id: int) -> bool:
+        """הפעלת פרופיל"""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            cursor = conn.cursor()
+            
+            # בטל הפעלה מכל הפרופילים של המשתמש
+            cursor.execute('''
+                UPDATE preference_profiles 
+                SET is_active = 0 
+                WHERE user_id = ?
+            ''', (user_id,))
+            
+            # הפעל את הפרופיל הנבחר
+            cursor.execute('''
+                UPDATE preference_profiles 
+                SET is_active = 1, last_used_at = CURRENT_TIMESTAMP,
+                    usage_count = usage_count + 1
+                WHERE user_id = ? AND id = ?
+            ''', (user_id, profile_id))
+            
+            conn.commit()
+            conn.close()
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error activating profile {profile_id} for user {user_id}: {e}")
+            return False
+
 
 # יצירת מופע גלובלי
 preferences_service = PreferencesService()

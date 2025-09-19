@@ -45,8 +45,8 @@ let lastScanDate = null;
 // ========================================
 
 function checkAndUpdateProjectFiles() {
-    const cached = localStorage.getItem('projectFiles');
-    const cacheTime = localStorage.getItem('projectFilesTime');
+    const cached = localStorage.getItem('linterProjectFiles');
+    const cacheTime = localStorage.getItem('linterProjectFilesTimestamp');
     
     if (cached && cacheTime) {
         const age = Date.now() - parseInt(cacheTime);
@@ -54,8 +54,9 @@ function checkAndUpdateProjectFiles() {
         
         if (age < maxAge) {
             window.projectFiles = JSON.parse(cached);
-            addLogEntry('INFO', `נטענו ${window.projectFiles.length} קבצים מהמטמון`, {
-                filesCount: window.projectFiles.length,
+            const totalFiles = Object.values(window.projectFiles).reduce((sum, files) => sum + files.length, 0);
+            addLogEntry('INFO', `נטענו ${totalFiles} קבצים מהמטמון`, {
+                filesCount: totalFiles,
                 cacheAge: Math.round(age / (60 * 60 * 1000)) + ' hours'
             });
         return;
@@ -376,8 +377,16 @@ function scanJavaScriptFiles() {
     let filesToScan = [];
     
     // Use discovered project files if available
-    if (window.projectFiles && window.projectFiles.length > 0) {
-        filesToScan = window.projectFiles.filter(file => {
+    if (window.projectFiles && typeof window.projectFiles === 'object') {
+        // Convert object to flat array
+        const allFiles = [];
+        Object.keys(window.projectFiles).forEach(type => {
+            if (window.projectFiles[type] && Array.isArray(window.projectFiles[type])) {
+                allFiles.push(...window.projectFiles[type]);
+            }
+        });
+        
+        filesToScan = allFiles.filter(file => {
             const type = getFileType(file);
             return selectedTypes.includes(type);
         });
@@ -572,9 +581,9 @@ function initializeControlButtons() {
             monitorButton.textContent = isMonitoring ? 'עצור ניטור' : 'התחל ניטור';
             
             if (isMonitoring) {
-                startAutoRefresh();
+        startAutoRefresh();
                 addLogEntry('SUCCESS', 'ניטור בזמן אמת הופעל');
-            } else {
+    } else {
                 if (autoRefreshInterval) {
                     clearInterval(autoRefreshInterval);
                 }
@@ -620,6 +629,9 @@ function initializeSession() {
     
     // Load existing logs
     loadLogs();
+    
+    // Load initial data from IndexedDB
+    updateStatisticsDisplay();
     
     // Initialize UI controls
     initializeControlButtons();
@@ -945,17 +957,27 @@ window.applyChartSettings = async function() {
 // Global Functions (Exposed to window)
 // ========================================
 
-window.startMonitoring = function() {
+function startMonitoring() {
     isMonitoring = true;
     startAutoRefresh();
     addLogEntry('SUCCESS', 'ניטור הופעל');
-};
+}
+
+function stopMonitoring() {
+    isMonitoring = false;
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+        refreshInterval = null;
+    }
+    addLogEntry('SUCCESS', 'ניטור הופסק');
+}
 
 window.copyDetailedLog = copyDetailedLog;
 window.discoverProjectFiles = discoverProjectFiles;
 window.startFileScan = startFileScan;
 window.startMonitoring = startMonitoring;
 window.stopMonitoring = stopMonitoring;
+window.initializeChart = initializeChart;
 window.fixAllIssues = fixAllIssues;
 window.fixAllErrors = fixAllErrors;
 window.fixAllWarnings = fixAllWarnings;
@@ -1022,7 +1044,18 @@ function discoverProjectFiles() {
         'trading-ui/scripts/color-scheme-system.js',
         'trading-ui/scripts/preferences.js',
         'trading-ui/scripts/header-system.js',
-        'trading-ui/scripts/filter-system.js'
+        'trading-ui/scripts/filter-system.js',
+        'trading-ui/scripts/accounts.js',
+        'trading-ui/scripts/executions.js',
+        'trading-ui/scripts/trades.js',
+        'trading-ui/scripts/database.js',
+        'trading-ui/scripts/background-tasks.js',
+        'trading-ui/scripts/alerts.js',
+        'trading-ui/scripts/tickers.js',
+        'trading-ui/scripts/trade_plans.js',
+        'trading-ui/scripts/entity-details-renderer.js',
+        'trading-ui/scripts/menu.js',
+        'trading-ui/scripts/preferences-page.js'
     ];
     
     // HTML files
@@ -1039,7 +1072,10 @@ function discoverProjectFiles() {
         'trading-ui/trades.html',
         'trading-ui/preferences.html',
         'trading-ui/database.html',
-        'trading-ui/background-tasks.html'
+        'trading-ui/background-tasks.html',
+        'trading-ui/alerts.html',
+        'trading-ui/tickers.html',
+        'trading-ui/trade_plans.html'
     ];
     
     // CSS files
@@ -1054,7 +1090,10 @@ function discoverProjectFiles() {
         'trading-ui/styles-new/07-utilities/_spacing.css',
         'trading-ui/styles-new/header-styles.css',
         'trading-ui/styles/header-styles.css',
-        'trading-ui/styles/main-styles.css'
+        'trading-ui/styles/main-styles.css',
+        'trading-ui/styles-new/08-themes/_dark-theme.css',
+        'trading-ui/styles-new/08-themes/_light-theme.css',
+        'trading-ui/styles-new/09-overrides/_bootstrap-overrides.css'
     ];
     
     // Python files
@@ -1071,7 +1110,14 @@ function discoverProjectFiles() {
         'Backend/accounts_service.py',
         'Backend/executions_service.py',
         'Backend/trades_service.py',
-        'Backend/database_service.py'
+        'Backend/database_service.py',
+        'Backend/app.py',
+        'Backend/config.py',
+        'Backend/models.py',
+        'Backend/services.py',
+        'Backend/utils.py',
+        'Backend/validators.py',
+        'Backend/external_data.py'
     ];
     
     // Other files
@@ -1084,7 +1130,28 @@ function discoverProjectFiles() {
         'documentation/frontend/INDEXEDDB_SYSTEM.md',
         'documentation/frontend/BACKGROUND_TASKS.md',
         'documentation/frontend/TESTING_SYSTEM.md',
-        'documentation/frontend/EXPORT_SYSTEM.md'
+        'documentation/frontend/EXPORT_SYSTEM.md',
+        'documentation/frontend/NOTIFICATION_SYSTEM.md',
+        'documentation/frontend/HEADER_SYSTEM.md',
+        'documentation/frontend/FILTER_SYSTEM.md',
+        'documentation/backend/API_DOCUMENTATION.md',
+        'documentation/backend/DATABASE_SCHEMA.md',
+        'documentation/backend/SERVICES_ARCHITECTURE.md',
+        'documentation/backend/EXTERNAL_DATA_INTEGRATION.md',
+        'documentation/backend/BACKGROUND_PROCESSES.md',
+        'documentation/backend/SECURITY_GUIDELINES.md',
+        'documentation/backend/PERFORMANCE_OPTIMIZATION.md',
+        'documentation/backend/DEPLOYMENT_GUIDE.md',
+        'documentation/backend/MONITORING_AND_LOGGING.md',
+        'documentation/backend/ERROR_HANDLING.md',
+        'documentation/backend/TESTING_STRATEGY.md',
+        'documentation/backend/MAINTENANCE_GUIDE.md',
+        'documentation/backend/TROUBLESHOOTING.md',
+        'documentation/backend/UPGRADE_PROCEDURES.md',
+        'documentation/backend/BACKUP_AND_RECOVERY.md',
+        'documentation/backend/SCALING_GUIDELINES.md',
+        'documentation/backend/INTEGRATION_GUIDE.md',
+        'documentation/backend/CUSTOMIZATION_GUIDE.md'
     ];
     
     // Combine all files

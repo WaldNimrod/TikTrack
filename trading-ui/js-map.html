@@ -21,10 +21,11 @@
     <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_level3_fix">
     
 
-    <!-- Core scripts -->
-    <script src="scripts/page-utils.js"></script>
+    <!-- Core scripts - Required order -->
+    <script src="scripts/header-system.js"></script>
+    <script src="scripts/color-scheme-system.js"></script>
+    <script src="scripts/preferences.js"></script>
     <script src="scripts/ui-utils.js"></script>
-    <script src="scripts/main.js"></script>
 </head>
 
 <body>
@@ -77,13 +78,13 @@
                     </button>
                 </div>
                 <div class="section-body">
-                    <div id="functionsContent">
-                        <div class="loading">
-                            <div class="loading-spinner"></div>
-                            טוען פונקציות...
-                        </div>
+                <div id="functionsContent">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        טוען פונקציות...
                     </div>
                 </div>
+            </div>
             </div>
             <!-- UI Content Section 2 End -->
         </div>
@@ -108,6 +109,114 @@
         </div>
     </div>
 
+    <!-- UI Content Section 2 - ניתוח כפילויות -->
+    <div class="content-section" id="section2">
+        <div class="section-header">
+            <h2>🔍 ניתוח כפילויות פונקציות</h2>
+            <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
+        </div>
+        <div class="section-body">
+            <div id="duplicatesContent">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>טוען ניתוח כפילויות...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Content Section 3 - זיהוי פונקציות מקומיות -->
+    <div class="content-section" id="section3">
+        <div class="section-header">
+            <h2>🏠 זיהוי פונקציות מקומיות</h2>
+            <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
+        </div>
+        <div class="section-body">
+            <div id="localFunctionsContent">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>טוען זיהוי פונקציות מקומיות...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Content Section 4 - ניתוח תלויות -->
+    <div class="content-section" id="section4">
+        <div class="section-header">
+            <h2>🔗 ניתוח תלויות בין קבצים</h2>
+            <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
+        </div>
+        <div class="section-body">
+            <div id="dependenciesContent">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>טוען ניתוח תלויות...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Content Section 5 - סטטיסטיקות מערכת -->
+    <div class="content-section" id="section5">
+        <div class="section-header">
+            <h2>📊 סטטיסטיקות מערכת</h2>
+            <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
+        </div>
+        <div class="section-body">
+            <div id="statisticsContent">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>טוען סטטיסטיקות...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Content Section 6 - ניהול אחסון נתונים -->
+    <div class="content-section" id="section6">
+        <div class="section-header">
+            <h2>💾 ניהול אחסון נתונים</h2>
+            <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
+        </div>
+        <div class="section-body">
+            <div id="storageContent">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>טוען ניהול אחסון...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Content Section 7 - בדיקת ארכיטקטורה -->
+    <div class="content-section" id="section7">
+        <div class="section-header">
+            <h2>🏗️ בדיקת ארכיטקטורה</h2>
+            <button class="filter-toggle-btn" onclick="toggleSection('section7')" title="הצג/הסתר סקשן">
+                <span class="section-toggle-icon">▼</span>
+            </button>
+        </div>
+        <div class="section-body">
+            <div id="architectureContent">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>טוען בדיקת ארכיטקטורה...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Function Calls Modal -->
     <div id="functionCallsModal" class="function-modal">
         <div class="function-modal-content">
@@ -121,7 +230,12 @@
         </div>
     </div>
 
-    <!-- Core System Scripts -->
+    <!-- Core System Scripts - Required order -->
+    <script src="scripts/table-mappings.js"></script>
+    <script src="scripts/date-utils.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/main.js"></script>
     <script src="scripts/console-cleanup.js"></script>
     <script src="scripts/translation-utils.js"></script>
     <script src="scripts/data-utils.js"></script>

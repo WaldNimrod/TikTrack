@@ -235,6 +235,19 @@ class ChartRenderer {
                 statusDiv.style.display = 'none';
             }
 
+            // השמדת גרף קיים אם קיים
+            if (this.chart) {
+                console.log('🗑️ משמיד גרף קיים...');
+                this.chart.destroy();
+                this.chart = null;
+            }
+
+            // בדיקה אם יש גרף קיים על הקנבס
+            if (Chart.getChart(canvas)) {
+                console.log('🗑️ משמיד גרף קיים מהקנבס...');
+                Chart.getChart(canvas).destroy();
+            }
+
             this.chart = new Chart(ctx, {
                 type: 'line',
                 data: chartData,

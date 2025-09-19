@@ -14,8 +14,10 @@ console.log('📄 Loading preferences-page.js...');
  */
 async function loadAccountsForPreferences() {
     try {
+        console.log('🔄 Loading accounts for preferences...');
         // Use global function to load accounts
         if (typeof window.loadAccountsDataFromAPI === 'function') {
+            console.log('📡 Calling loadAccountsDataFromAPI...');
             const accounts = await window.loadAccountsDataFromAPI();
             console.log('📊 Accounts loaded:', accounts);
             
@@ -24,9 +26,9 @@ async function loadAccountsForPreferences() {
                 // Clear existing options except the first one
                 accountSelect.innerHTML = '<option>כל החשבונות</option>';
                 
-                // Add active accounts
+                // Add active accounts (status = "open")
                 accounts.forEach(account => {
-                    if (account.is_active) {
+                    if (account.status === 'open') {
                         const option = document.createElement('option');
                         option.value = account.id;
                         option.textContent = account.name;
@@ -35,6 +37,8 @@ async function loadAccountsForPreferences() {
                 });
                 
                 console.log('✅ Loaded accounts for preferences:', accounts.length);
+            } else {
+                console.warn('⚠️ Account select element not found');
             }
         } else {
             console.warn('⚠️ Global loadAccountsDataFromAPI function not available');
@@ -219,7 +223,8 @@ async function initializePreferencesPage() {
     console.log('⚙️ Initializing preferences page...');
     
     // Load accounts from database
-    loadAccountsForPreferences();
+    console.log('🔄 Calling loadAccountsForPreferences...');
+    await loadAccountsForPreferences();
     
     // Load colors from database
     console.log('🎨 Calling loadColorsForPreferences...');
@@ -235,6 +240,12 @@ async function initializePreferencesPage() {
     
     // Initialize info summary
     initializeInfoSummary();
+    
+    // Load preferences to update form fields
+    if (typeof window.loadPreferences === 'function') {
+        console.log('🔄 Loading preferences to update form...');
+        window.loadPreferences();
+    }
     
     // Initialize admin interface
     if (typeof window.createPreferencesAdminInterface === 'function') {
@@ -348,6 +359,53 @@ async function initializeInfoSummary() {
                 if (typeof window.loadProfilesToDropdown === 'function') {
                     await window.loadProfilesToDropdown();
                 }
+                
+                // Add event listener for profile selection
+                const profileSelect = document.getElementById('profileSelect');
+                if (profileSelect) {
+                    profileSelect.addEventListener('change', async function() {
+                        const selectedProfile = this.value;
+                        console.log(`🔄 Profile changed to: ${selectedProfile}`);
+                        
+                        if (selectedProfile && selectedProfile !== 'ברירת מחדל') {
+                            // Get profile ID and switch to it
+                            const profiles = await window.getUserProfiles();
+                            const profile = profiles.find(p => p.name === selectedProfile);
+                            if (profile && typeof window.switchProfile === 'function') {
+                                console.log(`🔄 Switching to profile: ${profile.name} (ID: ${profile.id})`);
+                                await window.switchProfile(profile.id);
+                                
+                                // Reload preferences after switching profile
+                                if (typeof window.loadPreferences === 'function') {
+                                    await window.loadPreferences(1, profile.id);
+                                }
+                                
+                                // Show success notification
+                                if (typeof window.showSuccessNotification === 'function') {
+                                    window.showSuccessNotification(`פרופיל הוחלף ל: ${profile.name}`);
+                                }
+                            }
+                        } else if (selectedProfile === 'ברירת מחדל') {
+                            // Switch to default profile
+                            const profiles = await window.getUserProfiles();
+                            const defaultProfile = profiles.find(p => p.default);
+                            if (defaultProfile && typeof window.switchProfile === 'function') {
+                                console.log(`🔄 Switching to default profile: ${defaultProfile.name} (ID: ${defaultProfile.id})`);
+                                await window.switchProfile(defaultProfile.id);
+                                
+                                // Reload preferences after switching profile
+                                if (typeof window.loadPreferences === 'function') {
+                                    await window.loadPreferences(1, defaultProfile.id);
+                                }
+                                
+                                // Show success notification
+                                if (typeof window.showSuccessNotification === 'function') {
+                                    window.showSuccessNotification('פרופיל הוחלף לברירת מחדל');
+                                }
+                            }
+                        }
+                    });
+                }
             }
         }
 
@@ -383,9 +441,10 @@ function collectFormData() {
     
     // Collect all input elements
     const inputs = document.querySelectorAll('input, select, textarea');
+    console.log(`📋 Found ${inputs.length} input elements on page`);
     
     inputs.forEach(input => {
-        if (input.id && input.id !== 'saveAllBtn' && input.id !== 'resetBtn') {
+        if (input.id && input.id !== 'saveAllBtn' && input.id !== 'resetBtn' && !input.disabled) {
             let value = input.value;
             
             // Handle different input types
@@ -399,10 +458,12 @@ function collectFormData() {
             }
             
             formData[input.id] = value;
+            console.log(`📋 Collected: ${input.id} = ${value} (type: ${input.type})`);
         }
     });
     
     console.log('📝 Collected form data:', formData);
+    console.log(`📋 Total fields collected: ${Object.keys(formData).length}`);
     return formData;
 }
 
@@ -420,12 +481,42 @@ async function saveAllPreferences() {
             return false;
         }
         
+        // Get current active profile (not selected profile)
+        const profiles = await window.getUserProfiles();
+        const activeProfile = profiles.find(p => p.active);
+        let profileId = null;
+        
+        if (activeProfile) {
+            profileId = activeProfile.id;
+            console.log(`📂 Saving to active profile: ${activeProfile.name} (ID: ${profileId})`);
+        } else {
+            console.log('📂 No active profile found, saving to default');
+        }
+        
         // Use the preferences service to save
         if (typeof window.savePreferences === 'function') {
-            const result = await window.savePreferences(formData);
+            const result = await window.savePreferences(formData, 1, profileId);
             
             if (result) {
                 console.log('✅ All preferences saved successfully');
+                
+                // Clear cache manually to ensure fresh data
+                if (window.preferencesCache && window.preferencesCache.clear) {
+                    console.log('🗑️ Clearing preferences cache manually...');
+                    window.preferencesCache.clear();
+                }
+                
+                // Reload preferences to update form
+                if (typeof window.loadPreferences === 'function') {
+                    console.log('🔄 Reloading preferences to update form...');
+                    await window.loadPreferences(1, profileId);
+                }
+                
+                // Reload colors to update color pickers
+                if (typeof window.loadColorsForPreferences === 'function') {
+                    console.log('🎨 Reloading colors to update color pickers...');
+                    await window.loadColorsForPreferences();
+                }
                 
                 // Show success notification
                 if (typeof window.showSuccessNotification === 'function') {

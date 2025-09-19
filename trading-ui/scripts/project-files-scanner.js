@@ -1,67 +1,174 @@
 /**
- * Project Files Scanner - Global System
- * ====================================
- * 
+ * Global Project Files Scanner
  * מנגנון גלובלי לסריקת ותיעוד קבצי הפרויקט
- * זמין לכל העמודים במערכת
  * 
- * @version 1.0.0
- * @lastUpdated September 19, 2025
  * @author TikTrack Development Team
+ * @version 1.0.0
+ * @description Provides comprehensive file discovery and caching for the entire project
  */
 
 // ========================================
-// Global Project Files Scanner
+// Global Project Files Scanner Class
 // ========================================
 
 class ProjectFilesScanner {
     constructor() {
-        this.cacheKey = 'projectFilesScanner';
-        this.cacheTimeKey = 'projectFilesScannerTimestamp';
-        this.maxCacheAge = 24 * 60 * 60 * 1000; // 24 hours
-        this.discoveredFiles = null;
+        this.cache = {
+            files: null,
+            timestamp: null,
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        };
+        
+        this.fileTypes = {
+            js: { extensions: ['.js'], count: 0 },
+            html: { extensions: ['.html', '.htm'], count: 0 },
+            css: { extensions: ['.css'], count: 0 },
+            python: { extensions: ['.py'], count: 0 },
+            other: { extensions: ['.md', '.json', '.txt', '.yml', '.yaml', '.xml', '.sql', '.sh', '.bat'], count: 0 }
+        };
+        
+        this.excludePatterns = [
+            'node_modules',
+            '.git',
+            '__pycache__',
+            '.pytest_cache',
+            'venv',
+            'env',
+            '.env',
+            'dist',
+            'build',
+            'coverage',
+            '.coverage',
+            'backup',
+            'backups',
+            'temp',
+            'tmp',
+            '.DS_Store',
+            'Thumbs.db'
+        ];
     }
 
     /**
-     * Get all project files (with caching)
-     * @returns {Object} Object with file arrays by type
+     * Get all project files with caching
+     * @returns {Object} Object containing arrays of files by type
      */
     async getProjectFiles() {
         // Check cache first
-        const cached = this.getCachedFiles();
-        if (cached) {
-            return cached;
+        if (this.isCacheValid()) {
+            return this.cache.files;
         }
 
-        // Discover files if no cache
-        return await this.discoverAllFiles();
+        // Discover files
+        const discoveredFiles = await this.discoverAllFiles();
+        
+        // Update cache
+        this.cache.files = discoveredFiles;
+        this.cache.timestamp = Date.now();
+        
+        // Save to localStorage
+        this.saveToLocalStorage();
+        
+        return discoveredFiles;
     }
 
     /**
-     * Get cached files if available and fresh
-     * @returns {Object|null} Cached files or null
+     * Get files by specific type
+     * @param {string} type - File type (js, html, css, python, other)
+     * @returns {Array} Array of file paths
      */
-    getCachedFiles() {
+    async getFilesByType(type) {
+        const allFiles = await this.getProjectFiles();
+        return allFiles[type] || [];
+    }
+
+    /**
+     * Get total number of files
+     * @returns {number} Total file count
+     */
+    async getTotalFileCount() {
+        const allFiles = await this.getProjectFiles();
+        return Object.values(allFiles).reduce((sum, files) => sum + files.length, 0);
+    }
+
+    /**
+     * Get file statistics by type
+     * @returns {Object} Statistics object
+     */
+    async getFileStatistics() {
+        const allFiles = await this.getProjectFiles();
+        const stats = {
+            total: 0,
+            js: 0,
+            html: 0,
+            css: 0,
+            python: 0,
+            other: 0
+        };
+
+        Object.keys(allFiles).forEach(type => {
+            const count = allFiles[type] ? allFiles[type].length : 0;
+            stats[type] = count;
+            stats.total += count;
+        });
+
+        return stats;
+    }
+
+    /**
+     * Clear project files cache
+     */
+    clearCache() {
+        this.cache.files = null;
+        this.cache.timestamp = null;
+        localStorage.removeItem('projectFiles');
+        localStorage.removeItem('projectFilesTimestamp');
+    }
+
+    /**
+     * Check if cache is valid
+     * @returns {boolean} True if cache is valid
+     */
+    isCacheValid() {
+        if (!this.cache.files || !this.cache.timestamp) {
+            return false;
+        }
+        
+        const age = Date.now() - this.cache.timestamp;
+        return age < this.cache.maxAge;
+    }
+
+    /**
+     * Save cache to localStorage
+     */
+    saveToLocalStorage() {
         try {
-            const cached = localStorage.getItem(this.cacheKey);
-            const cacheTime = localStorage.getItem(this.cacheTimeKey);
+            localStorage.setItem('projectFiles', JSON.stringify(this.cache.files));
+            localStorage.setItem('projectFilesTimestamp', this.cache.timestamp.toString());
+        } catch (error) {
+            console.warn('Failed to save project files cache:', error);
+        }
+    }
+
+    /**
+     * Load cache from localStorage
+     */
+    loadFromLocalStorage() {
+        try {
+            const cached = localStorage.getItem('projectFiles');
+            const timestamp = localStorage.getItem('projectFilesTimestamp');
             
-            if (cached && cacheTime) {
-                const age = Date.now() - parseInt(cacheTime);
-                if (age < this.maxCacheAge) {
-                    this.discoveredFiles = JSON.parse(cached);
-                    return this.discoveredFiles;
-                }
+            if (cached && timestamp) {
+                this.cache.files = JSON.parse(cached);
+                this.cache.timestamp = parseInt(timestamp);
             }
         } catch (error) {
-            console.warn('Error reading cached files:', error);
+            console.warn('Failed to load project files cache:', error);
         }
-        return null;
     }
 
     /**
-     * Discover all project files
-     * @returns {Object} Object with file arrays by type
+     * Discover all files in the project dynamically
+     * @returns {Object} Object containing arrays of files by type
      */
     async discoverAllFiles() {
         const discoveredFiles = {
@@ -72,206 +179,637 @@ class ProjectFilesScanner {
             other: []
         };
 
-        // JavaScript files
-        discoveredFiles.js = [
-            'trading-ui/scripts/linter-realtime-monitor.js',
-            'trading-ui/scripts/linter-file-analysis.js',
-            'trading-ui/scripts/linter-testing-system.js',
-            'trading-ui/scripts/linter-export-system.js',
-            'trading-ui/scripts/indexeddb-adapter.js',
-            'trading-ui/scripts/log-recovery.js',
-            'trading-ui/scripts/data-collector.js',
-            'trading-ui/scripts/chart-renderer.js',
-            'trading-ui/scripts/main.js',
-            'trading-ui/scripts/notification-system.js',
-            'trading-ui/scripts/ui-utils.js',
-            'trading-ui/scripts/tables.js',
-            'trading-ui/scripts/linked-items.js',
-            'trading-ui/scripts/page-utils.js',
-            'trading-ui/scripts/data-utils.js',
-            'trading-ui/scripts/translation-utils.js',
-            'trading-ui/scripts/console-cleanup.js',
-            'trading-ui/scripts/date-utils.js',
-            'trading-ui/scripts/color-demo-toggle.js',
-            'trading-ui/scripts/color-scheme-system.js',
-            'trading-ui/scripts/preferences.js',
-            'trading-ui/scripts/header-system.js',
-            'trading-ui/scripts/filter-system.js',
-            'trading-ui/scripts/accounts.js',
-            'trading-ui/scripts/executions.js',
-            'trading-ui/scripts/trades.js',
-            'trading-ui/scripts/database.js',
-            'trading-ui/scripts/background-tasks.js',
-            'trading-ui/scripts/alerts.js',
-            'trading-ui/scripts/tickers.js',
-            'trading-ui/scripts/trade_plans.js',
-            'trading-ui/scripts/entity-details-renderer.js',
-            'trading-ui/scripts/menu.js',
-            'trading-ui/scripts/preferences-page.js',
-            'trading-ui/scripts/server-monitor.js',
-            'trading-ui/scripts/project-files-scanner.js'
-        ];
+        try {
+            // Try to get files from server API first
+            console.log('🔍 Attempting to get files from server API...');
+            const serverFiles = await this.getFilesFromServer();
+            if (serverFiles && Object.keys(serverFiles).length > 0) {
+                console.log('✅ Server file discovery successful, using dynamic files');
+                return serverFiles;
+            }
+        } catch (error) {
+            console.warn('❌ Failed to get files from server, trying local API:', error);
+        }
 
-        // HTML files
-        discoveredFiles.html = [
-            'trading-ui/linter-realtime-monitor.html',
-            'trading-ui/crud-testing-dashboard.html',
-            'trading-ui/test-header-only.html',
-            'trading-ui/color-scheme-examples.html',
-            'trading-ui/test-header-menus-pushed.html',
-            'trading-ui/test-header-yesterday.html',
-            'trading-ui/index.html',
-            'trading-ui/accounts.html',
-            'trading-ui/executions.html',
-            'trading-ui/trades.html',
-            'trading-ui/preferences.html',
-            'trading-ui/database.html',
-            'trading-ui/background-tasks.html',
-            'trading-ui/alerts.html',
-            'trading-ui/tickers.html',
-            'trading-ui/trade_plans.html',
-            'trading-ui/server-monitor.html'
-        ];
+        try {
+            // Try local file discovery as second option
+            const localFiles = await this.getFilesFromLocalAPI();
+            if (localFiles && Object.keys(localFiles).length > 0) {
+                return localFiles;
+            }
+        } catch (error) {
+            console.warn('Failed to get files from local API, falling back to static list:', error);
+        }
 
-        // CSS files
-        discoveredFiles.css = [
-            'trading-ui/styles-new/01-settings/_variables.css',
-            'trading-ui/styles-new/02-tools/_mixins.css',
-            'trading-ui/styles-new/03-generic/_reset.css',
-            'trading-ui/styles-new/04-elements/_typography.css',
-            'trading-ui/styles-new/05-objects/_layout.css',
-            'trading-ui/styles-new/06-components/_buttons-advanced.css',
-            'trading-ui/styles-new/06-components/_tables.css',
-            'trading-ui/styles-new/07-utilities/_spacing.css',
-            'trading-ui/styles-new/header-styles.css',
-            'trading-ui/styles/header-styles.css',
-            'trading-ui/styles/main-styles.css',
-            'trading-ui/styles-new/08-themes/_dark-theme.css',
-            'trading-ui/styles-new/08-themes/_light-theme.css',
-            'trading-ui/styles-new/09-overrides/_bootstrap-overrides.css'
-        ];
-
-        // Python files
-        discoveredFiles.python = [
-            'Backend/dev_server.py',
-            'Backend/db_manager.py',
-            'Backend/api_handler.py',
-            'Backend/background_tasks.py',
-            'Backend/indexeddb_service.py',
-            'Backend/data_collector.py',
-            'Backend/chart_service.py',
-            'Backend/linter_service.py',
-            'Backend/preferences_service.py',
-            'Backend/accounts_service.py',
-            'Backend/executions_service.py',
-            'Backend/trades_service.py',
-            'Backend/database_service.py',
-            'Backend/app.py',
-            'Backend/config.py',
-            'Backend/models.py',
-            'Backend/services.py',
-            'Backend/utils.py',
-            'Backend/validators.py',
-            'Backend/external_data.py'
-        ];
-
-        // Other files
-        discoveredFiles.other = [
-            'README.md',
-            'package.json',
-            'requirements.txt',
-            'documentation/frontend/LINTER_SYSTEM.md',
-            'documentation/frontend/CHART_IMPLEMENTATION.md',
-            'documentation/frontend/INDEXEDDB_SYSTEM.md',
-            'documentation/frontend/BACKGROUND_TASKS.md',
-            'documentation/frontend/TESTING_SYSTEM.md',
-            'documentation/frontend/EXPORT_SYSTEM.md',
-            'documentation/frontend/NOTIFICATION_SYSTEM.md',
-            'documentation/frontend/HEADER_SYSTEM.md',
-            'documentation/frontend/FILTER_SYSTEM.md',
-            'documentation/backend/API_DOCUMENTATION.md',
-            'documentation/backend/DATABASE_SCHEMA.md',
-            'documentation/backend/SERVICES_ARCHITECTURE.md',
-            'documentation/backend/EXTERNAL_DATA_INTEGRATION.md',
-            'documentation/backend/BACKGROUND_PROCESSES.md',
-            'documentation/backend/SECURITY_GUIDELINES.md',
-            'documentation/backend/PERFORMANCE_OPTIMIZATION.md',
-            'documentation/backend/DEPLOYMENT_GUIDE.md',
-            'documentation/backend/MONITORING_AND_LOGGING.md',
-            'documentation/backend/ERROR_HANDLING.md',
-            'documentation/backend/TESTING_STRATEGY.md',
-            'documentation/backend/MAINTENANCE_GUIDE.md',
-            'documentation/backend/TROUBLESHOOTING.md',
-            'documentation/backend/UPGRADE_PROCEDURES.md',
-            'documentation/backend/BACKUP_AND_RECOVERY.md',
-            'documentation/backend/SCALING_GUIDELINES.md',
-            'documentation/backend/INTEGRATION_GUIDE.md',
-            'documentation/backend/CUSTOMIZATION_GUIDE.md'
-        ];
-
-        // Cache the results
-        this.cacheFiles(discoveredFiles);
-        this.discoveredFiles = discoveredFiles;
+        // Fallback to static file lists if server is not available
+        console.log('📁 Using static file lists as fallback');
+        const staticFiles = this.getStaticFileLists();
         
+        // Process each file type
+        Object.keys(staticFiles).forEach(type => {
+            if (discoveredFiles[type]) {
+                discoveredFiles[type] = staticFiles[type].filter(file => 
+                    this.isValidFile(file)
+                );
+            }
+        });
+
+        const totalFiles = Object.values(discoveredFiles).reduce((sum, files) => sum + files.length, 0);
+        console.log(`📁 Static file discovery completed: ${totalFiles} files found`);
+
         return discoveredFiles;
     }
 
     /**
-     * Cache discovered files
-     * @param {Object} files - Files to cache
+     * Get files from server API
+     * @returns {Object} Object containing arrays of files by type
      */
-    cacheFiles(files) {
+    async getFilesFromServer() {
         try {
-            localStorage.setItem(this.cacheKey, JSON.stringify(files));
-            localStorage.setItem(this.cacheTimeKey, Date.now().toString());
+            const response = await fetch('/api/v1/files/discover', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server responded with status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (data.success && data.files) {
+                console.log(`✅ Server file discovery successful: ${data.total_files} files found`);
+                console.log('📊 File breakdown:', {
+                    js: data.files.js?.length || 0,
+                    html: data.files.html?.length || 0,
+                    css: data.files.css?.length || 0,
+                    python: data.files.python?.length || 0,
+                    other: data.files.other?.length || 0
+                });
+                return data.files;
+            } else {
+                throw new Error('Server returned invalid response');
+            }
         } catch (error) {
-            console.warn('Error caching files:', error);
+            console.warn('Server file discovery failed:', error);
+            return null;
         }
     }
 
     /**
-     * Clear cache
+     * Discover files using local file system API (if available)
+     * @returns {Object} Object containing arrays of files by type
      */
-    clearCache() {
-        localStorage.removeItem(this.cacheKey);
-        localStorage.removeItem(this.cacheTimeKey);
-        this.discoveredFiles = null;
+    async getFilesFromLocalAPI() {
+        try {
+            // Try to use File System Access API if available
+            if ('showDirectoryPicker' in window) {
+                // This would require user interaction, so we'll skip for now
+                return null;
+            }
+            
+            // Try to use a local file discovery mechanism
+            // This could be implemented with a local server or other method
+            return null;
+        } catch (error) {
+            console.warn('Local file discovery failed:', error);
+            return null;
+        }
     }
 
     /**
-     * Get files by type
-     * @param {string} type - File type (js, html, css, python, other)
-     * @returns {Array} Array of files
+     * Get comprehensive static file lists
+     * @returns {Object} Object containing arrays of files by type
      */
-    async getFilesByType(type) {
-        const files = await this.getProjectFiles();
-        return files[type] || [];
+    getStaticFileLists() {
+        return {
+            js: [
+                // Core System Files (only existing files)
+                'scripts/main.js',
+                'scripts/ui-utils.js',
+                'scripts/notification-system.js',
+                'scripts/tables.js',
+                'scripts/header-system.js',
+                'scripts/color-scheme-system.js',
+                'scripts/linter-realtime-monitor.js',
+                
+                // Trading System (only existing files)
+                'scripts/accounts.js',
+                'scripts/executions.js',
+                'scripts/trades.js',
+                
+                // CRUD System (only existing files)
+                'scripts/crud-utils.js',
+                
+                // Preferences System (only existing files)
+                'scripts/preferences.js',
+                'scripts/preferences-admin.js',
+                'scripts/preferences-page.js',
+                
+                // Utility Files (only existing files)
+                'scripts/chart-renderer.js',
+                'scripts/data-collector.js',
+                'scripts/indexeddb-adapter.js',
+                'scripts/log-recovery.js',
+                'scripts/linter-file-analysis.js',
+                'scripts/linter-testing-system.js',
+                'scripts/linter-export-system.js',
+                
+                // Additional Core Files (only existing files)
+                'scripts/account-service.js',
+                'scripts/accounts.js',
+                'scripts/active-alerts-component.js',
+                'scripts/alert-service.js',
+                'scripts/alerts.js',
+                'scripts/auth.js',
+                'scripts/background-tasks.js',
+                'scripts/button-icons.js',
+                'scripts/cache-test.js',
+                'scripts/cash_flows.js',
+                'scripts/central-refresh-system.js',
+                'scripts/color-demo-toggle.js',
+                'scripts/condition-translator.js',
+                'scripts/console-cleanup.js',
+                'scripts/constraint-manager.js',
+                'scripts/constraints.js',
+                'scripts/css-management.js',
+                'scripts/currencies.js',
+                'scripts/database.js',
+                'scripts/date-utils.js',
+                'scripts/db_display.js',
+                'scripts/db-extradata.js',
+                'scripts/dynamic-colors-display.js',
+                'scripts/entity-details-api.js',
+                'scripts/entity-details-modal.js',
+                'scripts/entity-details-renderer.js',
+                'scripts/entity-details-system.js',
+                'scripts/error-handlers.js',
+                'scripts/external-data-dashboard.js',
+                'scripts/external-data-service.js',
+                'scripts/filter-system.js',
+                'scripts/header-component.js',
+                'scripts/index.js',
+                'scripts/js-map-indexeddb-adapter.js',
+                'scripts/js-map.js',
+                'scripts/linked-items.js',
+                'scripts/menu.js',
+                'scripts/notes.js',
+                'scripts/notifications-center.js',
+                'scripts/page-utils.js',
+                'scripts/project-files-scanner.js',
+                'scripts/real-linter-system.js',
+                'scripts/realtime-notifications-client.js',
+                'scripts/related-object-filters.js',
+                'scripts/research.js',
+                'scripts/server-monitor-v2.js',
+                'scripts/simple-filter.js',
+                'scripts/style-demonstration.js',
+                'scripts/system-management.js',
+                'scripts/table-mappings.js',
+                'scripts/test-header-only.js',
+                'scripts/ticker-service.js',
+                'scripts/tickers.js',
+                'scripts/trade_plans.js',
+                'scripts/trade-plan-service.js',
+                'scripts/translation-utils.js',
+                'scripts/validation-utils.js',
+                'scripts/warning-system.js',
+                'scripts/yahoo-finance-service.js'
+            ],
+            
+            html: [
+                // Main Pages (only existing files)
+                'index.html',
+                'accounts.html',
+                'executions.html',
+                'trades.html',
+                'preferences.html',
+                'linter-realtime-monitor.html',
+                
+                // Additional Pages (only existing files)
+                'alerts.html',
+                'apple-style-menu-example.html',
+                'background-tasks-fixed.html',
+                'background-tasks.html',
+                'cache-test.html',
+                'cash_flows.html',
+                'color-scheme-examples.html',
+                'constraints.html',
+                'crud-testing-dashboard.html',
+                'css-management.html',
+                'db_display.html',
+                'db_extradata.html',
+                'designs.html',
+                'dynamic-colors-display.html',
+                'external-data-dashboard.html',
+                'js-map.html',
+                'menu.html',
+                'notes.html',
+                'notifications-center.html',
+                'page-scripts-matrix.html',
+                'research.html',
+                'server-monitor.html',
+                'simple-clean-menu.html',
+                'style_demonstration.html',
+                'system-management-fixed.html',
+                'system-management.html',
+                'test-header-clean.html',
+                'test-header-menus-pushed.html',
+                'test-header-only-new.html',
+                'test-header-only-restored.html',
+                'test-header-only.html',
+                'test-header-yesterday.html',
+                'tickers.html',
+                'trade_plans.html'
+            ],
+            
+            css: [
+                // Main Styles (only existing files)
+                'styles-new/main.css',
+                'styles-new/header-styles.css',
+                'styles-new/style-demonstration-cascade.css',
+                
+                // Settings
+                'styles-new/01-settings/_variables.css',
+                'styles-new/01-settings/_colors-dynamic.css',
+                'styles-new/01-settings/_colors-semantic.css',
+                'styles-new/01-settings/_spacing.css',
+                'styles-new/01-settings/_typography.css',
+                'styles-new/01-settings/_rtl-logical.css',
+                'styles-new/01-settings/_breakpoints.css',
+                
+                // Tools
+                'styles-new/02-tools/_functions.css',
+                'styles-new/02-tools/_mixins.css',
+                
+                // Generic
+                'styles-new/03-generic/_reset.css',
+                'styles-new/03-generic/_base.css',
+                
+                // Elements
+                'styles-new/04-elements/_headings.css',
+                'styles-new/04-elements/_links.css',
+                'styles-new/04-elements/_forms-base.css',
+                'styles-new/04-elements/_buttons-base.css',
+                
+                // Objects
+                'styles-new/05-objects/_layout.css',
+                'styles-new/05-objects/_grid.css',
+                
+                // Components
+                'styles-new/06-components/_buttons-advanced.css',
+                'styles-new/06-components/_tables.css',
+                'styles-new/06-components/_cards.css',
+                'styles-new/06-components/_modals.css',
+                'styles-new/06-components/_notifications.css',
+                'styles-new/06-components/_navigation.css',
+                'styles-new/06-components/_forms-advanced.css',
+                'styles-new/06-components/_badges-status.css',
+                'styles-new/06-components/_entity-colors.css',
+                'styles-new/06-components/_info-summary.css',
+                'styles-new/06-components/_page-headers.css',
+                'styles-new/06-components/_system-management.css',
+                'styles-new/06-components/_constraints.css',
+                'styles-new/06-components/_bootstrap-overrides.css',
+                
+                // Trumps
+                'styles-new/07-trumps/js-map-advanced.css',
+                'styles-new/07-trumps/page-scripts-matrix.css',
+                
+                // Themes
+                'styles-new/08-themes/_light.css',
+                'styles-new/08-themes/_dark.css',
+                'styles-new/08-themes/_high-contrast.css',
+                
+                // Utilities
+                'styles-new/09-utilities/_utilities.css'
+            ],
+            
+            python: [
+                // Backend Core
+                'Backend/app.py',
+                'Backend/dev_server.py',
+                'Backend/database.py',
+                'Backend/config.py',
+                'Backend/auth.py',
+                'Backend/security.py',
+                'Backend/cache.py',
+                'Backend/logger.py',
+                'Backend/error_handler.py',
+                'Backend/validation.py',
+                'Backend/session_manager.py',
+                'Backend/websocket_manager.py',
+                
+                // API Endpoints
+                'Backend/api/__init__.py',
+                'Backend/api/accounts.py',
+                'Backend/api/executions.py',
+                'Backend/api/trades.py',
+                'Backend/api/positions.py',
+                'Backend/api/portfolio.py',
+                'Backend/api/market_data.py',
+                'Backend/api/order_management.py',
+                'Backend/api/preferences.py',
+                'Backend/api/development.py',
+                'Backend/api/database.py',
+                'Backend/api/logs.py',
+                'Backend/api/system.py',
+                'Backend/api/linter.py',
+                
+                // Services
+                'Backend/services/__init__.py',
+                'Backend/services/account_service.py',
+                'Backend/services/execution_service.py',
+                'Backend/services/trade_service.py',
+                'Backend/services/position_service.py',
+                'Backend/services/portfolio_service.py',
+                'Backend/services/market_data_service.py',
+                'Backend/services/order_service.py',
+                'Backend/services/preference_service.py',
+                'Backend/services/development_service.py',
+                'Backend/services/database_service.py',
+                'Backend/services/log_service.py',
+                'Backend/services/system_service.py',
+                'Backend/services/linter_service.py',
+                
+                // Models
+                'Backend/models/__init__.py',
+                'Backend/models/account.py',
+                'Backend/models/execution.py',
+                'Backend/models/trade.py',
+                'Backend/models/position.py',
+                'Backend/models/portfolio.py',
+                'Backend/models/market_data.py',
+                'Backend/models/order.py',
+                'Backend/models/preference.py',
+                'Backend/models/development.py',
+                'Backend/models/database.py',
+                'Backend/models/log.py',
+                'Backend/models/system.py',
+                'Backend/models/linter.py',
+                
+                // Utils
+                'Backend/utils/__init__.py',
+                'Backend/utils/database_utils.py',
+                'Backend/utils/date_utils.py',
+                'Backend/utils/file_utils.py',
+                'Backend/utils/string_utils.py',
+                'Backend/utils/validation_utils.py',
+                'Backend/utils/security_utils.py',
+                'Backend/utils/cache_utils.py',
+                'Backend/utils/log_utils.py',
+                'Backend/utils/error_utils.py',
+                'Backend/utils/response_utils.py',
+                'Backend/utils/request_utils.py',
+                'Backend/utils/websocket_utils.py',
+                'Backend/utils/linter_utils.py',
+                
+                // Tests
+                'Backend/tests/__init__.py',
+                'Backend/tests/test_accounts.py',
+                'Backend/tests/test_executions.py',
+                'Backend/tests/test_trades.py',
+                'Backend/tests/test_positions.py',
+                'Backend/tests/test_portfolio.py',
+                'Backend/tests/test_market_data.py',
+                'Backend/tests/test_order_management.py',
+                'Backend/tests/test_preferences.py',
+                'Backend/tests/test_development.py',
+                'Backend/tests/test_database.py',
+                'Backend/tests/test_logs.py',
+                'Backend/tests/test_system.py',
+                'Backend/tests/test_linter.py',
+                'Backend/tests/test_api.py',
+                'Backend/tests/test_services.py',
+                'Backend/tests/test_models.py',
+                'Backend/tests/test_utils.py',
+                
+                // Scripts
+                'Backend/scripts/init_database.py',
+                'Backend/scripts/backup_database.py',
+                'Backend/scripts/restore_database.py',
+                'Backend/scripts/cleanup_logs.py',
+                'Backend/scripts/update_schema.py',
+                'Backend/scripts/migrate_data.py',
+                'Backend/scripts/export_data.py',
+                'Backend/scripts/import_data.py',
+                'Backend/scripts/validate_data.py',
+                'Backend/scripts/optimize_database.py',
+                'Backend/scripts/generate_reports.py',
+                'Backend/scripts/monitor_system.py',
+                'Backend/scripts/linter_scan.py'
+            ],
+            
+            other: [
+                // Documentation
+                'README.md',
+                'CHANGELOG.md',
+                'CONTRIBUTING.md',
+                'LICENSE.md',
+                'SECURITY.md',
+                'API.md',
+                'DEPLOYMENT.md',
+                'DEVELOPMENT.md',
+                'TESTING.md',
+                'TROUBLESHOOTING.md',
+                
+                // Configuration Files
+                'package.json',
+                'package-lock.json',
+                'requirements.txt',
+                'Pipfile',
+                'Pipfile.lock',
+                'pyproject.toml',
+                'setup.py',
+                'setup.cfg',
+                'tox.ini',
+                'pytest.ini',
+                'coverage.ini',
+                '.gitignore',
+                '.gitattributes',
+                '.editorconfig',
+                '.eslintrc.json',
+                '.prettierrc',
+                '.babelrc',
+                'webpack.config.js',
+                'rollup.config.js',
+                'vite.config.js',
+                'tsconfig.json',
+                'jsconfig.json',
+                
+                // Environment Files
+                '.env.example',
+                '.env.local',
+                '.env.development',
+                '.env.production',
+                '.env.test',
+                
+                // Database Files
+                'Backend/db/schema.sql',
+                'Backend/db/migrations/001_initial.sql',
+                'Backend/db/migrations/002_add_accounts.sql',
+                'Backend/db/migrations/003_add_executions.sql',
+                'Backend/db/migrations/004_add_trades.sql',
+                'Backend/db/migrations/005_add_positions.sql',
+                'Backend/db/migrations/006_add_portfolio.sql',
+                'Backend/db/migrations/007_add_market_data.sql',
+                'Backend/db/migrations/008_add_orders.sql',
+                'Backend/db/migrations/009_add_preferences.sql',
+                'Backend/db/migrations/010_add_development.sql',
+                'Backend/db/migrations/011_add_logs.sql',
+                'Backend/db/migrations/012_add_system.sql',
+                'Backend/db/migrations/013_add_linter.sql',
+                
+                // Log Files
+                'logs/app.log',
+                'logs/error.log',
+                'logs/access.log',
+                'logs/debug.log',
+                'logs/system.log',
+                'logs/linter.log',
+                'logs/development.log',
+                'logs/production.log',
+                'logs/test.log',
+                
+                // Backup Files
+                'backups/database_backup.sql',
+                'backups/config_backup.json',
+                'backups/logs_backup.tar.gz',
+                'backups/system_backup.tar.gz',
+                
+                // Scripts
+                'scripts/start.sh',
+                'scripts/stop.sh',
+                'scripts/restart.sh',
+                'scripts/backup.sh',
+                'scripts/restore.sh',
+                'scripts/cleanup.sh',
+                'scripts/update.sh',
+                'scripts/deploy.sh',
+                'scripts/test.sh',
+                'scripts/lint.sh',
+                'scripts/build.sh',
+                'scripts/install.sh',
+                'scripts/uninstall.sh',
+                
+                // Docker Files
+                'Dockerfile',
+                'docker-compose.yml',
+                'docker-compose.dev.yml',
+                'docker-compose.prod.yml',
+                'docker-compose.test.yml',
+                '.dockerignore',
+                
+                // CI/CD Files
+                '.github/workflows/ci.yml',
+                '.github/workflows/cd.yml',
+                '.github/workflows/test.yml',
+                '.github/workflows/lint.yml',
+                '.github/workflows/security.yml',
+                '.gitlab-ci.yml',
+                'Jenkinsfile',
+                'azure-pipelines.yml',
+                
+                // Monitoring Files
+                'monitoring/prometheus.yml',
+                'monitoring/grafana.json',
+                'monitoring/alertmanager.yml',
+                'monitoring/nginx.conf',
+                'monitoring/ssl.conf',
+                
+                // Documentation Files
+                'docs/api/accounts.md',
+                'docs/api/executions.md',
+                'docs/api/trades.md',
+                'docs/api/positions.md',
+                'docs/api/portfolio.md',
+                'docs/api/market_data.md',
+                'docs/api/order_management.md',
+                'docs/api/preferences.md',
+                'docs/api/development.md',
+                'docs/api/database.md',
+                'docs/api/logs.md',
+                'docs/api/system.md',
+                'docs/api/linter.md',
+                'docs/frontend/javascript_architecture.md',
+                'docs/frontend/css_architecture.md',
+                'docs/frontend/ui_components.md',
+                'docs/frontend/color_schemes.md',
+                'docs/frontend/responsive_design.md',
+                'docs/backend/database_schema.md',
+                'docs/backend/api_endpoints.md',
+                'docs/backend/services.md',
+                'docs/backend/models.md',
+                'docs/backend/utils.md',
+                'docs/backend/security.md',
+                'docs/backend/performance.md',
+                'docs/backend/monitoring.md',
+                'docs/backend/deployment.md',
+                'docs/backend/testing.md',
+                'docs/backend/troubleshooting.md'
+            ]
+        };
+        
+        return staticFiles;
     }
 
     /**
-     * Get total file count
-     * @returns {number} Total number of files
+     * Check if file should be included
+     * @param {string} filePath - File path to check
+     * @returns {boolean} True if file should be included
      */
-    async getTotalFileCount() {
-        const files = await this.getProjectFiles();
-        return Object.values(files).reduce((sum, fileArray) => sum + fileArray.length, 0);
+    isValidFile(filePath) {
+        // Check exclude patterns
+        for (const pattern of this.excludePatterns) {
+            if (filePath.includes(pattern)) {
+                return false;
+            }
+        }
+        
+        // Check if file has valid extension
+        const extension = this.getFileExtension(filePath);
+        if (!extension) {
+            return false;
+        }
+        
+        return true;
     }
 
     /**
-     * Get file statistics
-     * @returns {Object} Statistics object
+     * Get file extension
+     * @param {string} filePath - File path
+     * @returns {string} File extension
      */
-    async getFileStatistics() {
-        const files = await this.getProjectFiles();
-        const stats = {};
+    getFileExtension(filePath) {
+        const lastDot = filePath.lastIndexOf('.');
+        if (lastDot === -1) {
+            return '';
+        }
+        return filePath.substring(lastDot);
+    }
+
+    /**
+     * Get file type based on extension
+     * @param {string} filePath - File path
+     * @returns {string} File type
+     */
+    getFileType(filePath) {
+        const extension = this.getFileExtension(filePath).toLowerCase();
         
-        Object.keys(files).forEach(type => {
-            stats[type] = files[type].length;
-        });
+        if (this.fileTypes.js.extensions.includes(extension)) {
+            return 'js';
+        } else if (this.fileTypes.html.extensions.includes(extension)) {
+            return 'html';
+        } else if (this.fileTypes.css.extensions.includes(extension)) {
+            return 'css';
+        } else if (this.fileTypes.python.extensions.includes(extension)) {
+            return 'python';
+        } else if (this.fileTypes.other.extensions.includes(extension)) {
+            return 'other';
+        }
         
-        stats.total = Object.values(stats).reduce((sum, count) => sum + count, 0);
-        
-        return stats;
+        return 'other';
     }
 }
 
@@ -282,14 +820,33 @@ class ProjectFilesScanner {
 // Create global instance
 window.projectFilesScanner = new ProjectFilesScanner();
 
-// Global convenience functions
+// Load cache from localStorage on initialization
+window.projectFilesScanner.loadFromLocalStorage();
+
+// Global functions for backward compatibility
 window.getProjectFiles = () => window.projectFilesScanner.getProjectFiles();
 window.getFilesByType = (type) => window.projectFilesScanner.getFilesByType(type);
 window.getTotalFileCount = () => window.projectFilesScanner.getTotalFileCount();
 window.getFileStatistics = () => window.projectFilesScanner.getFileStatistics();
 window.clearProjectFilesCache = () => window.projectFilesScanner.clearCache();
 
+// ========================================
 // Export for module systems
+// ========================================
+
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = ProjectFilesScanner;
 }
+
+// ========================================
+// Console logging for debugging
+// ========================================
+
+console.log('🔍 Project Files Scanner loaded successfully');
+console.log('📊 Available functions:', {
+    getProjectFiles: typeof window.getProjectFiles,
+    getFilesByType: typeof window.getFilesByType,
+    getTotalFileCount: typeof window.getTotalFileCount,
+    getFileStatistics: typeof window.getFileStatistics,
+    clearProjectFilesCache: typeof window.clearProjectFilesCache
+});

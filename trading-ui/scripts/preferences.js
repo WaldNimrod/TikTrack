@@ -183,7 +183,7 @@ window.getPreferencesByNames = async function(preferenceNames, userId = 1, profi
             }
             
             return preferences;
-      } else {
+          } else {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
@@ -200,20 +200,24 @@ window.getPreferencesByNames = async function(preferenceNames, userId = 1, profi
  */
 window.getAllUserPreferences = async function(userId = 1, profileId = null) {
     try {
-        console.log(`🔍 Getting all user preferences for user ${userId}`);
+        console.log(`🔍 Getting all user preferences for user ${userId}, profile: ${profileId || 'active'}`);
         
-        // בדיקת מטמון
+        // בדיקת מטמון - רק אם לא ביקשנו טעינה מחדש
         const cached = window.preferencesCache.get();
         if (cached && Object.keys(cached).length > 0) {
             console.log(`✅ All preferences found in cache`);
             return cached;
         }
         
+        console.log(`🔄 Cache is empty, fetching fresh data from server...`);
+        
         // שאילתה לשרת
         let url = `/api/v1/preferences/user?user_id=${userId}`;
         if (profileId) {
             url += `&profile_id=${profileId}`;
         }
+        
+        console.log(`🔍 Fetching from URL: ${url}`);
         
         const response = await fetch(url);
         if (response.ok) {
@@ -422,16 +426,58 @@ window.getPreferenceInfo = async function(preferenceName) {
  * טעינת העדפות (תואם למערכת הישנה)
  * @returns {Promise<boolean>} - האם הטעינה הצליחה
  */
-window.loadPreferences = async function() {
+window.loadPreferences = async function(userId = 1, profileId = null) {
     try {
-        console.log('📂 Loading preferences from system...');
+        console.log(`📂 Loading preferences from system... (user: ${userId}, profile: ${profileId})`);
         
-        const preferences = await window.getAllUserPreferences();
-        
-        // Apply preferences to form (if function exists)
-        if (typeof window.applyPreferencesToForm === 'function') {
-            window.applyPreferencesToForm(preferences);
+        // Clear cache to ensure fresh data
+        if (window.preferencesCache && window.preferencesCache.clear) {
+            console.log('🗑️ Clearing preferences cache before loading...');
+            window.preferencesCache.clear();
         }
+        
+        // אם לא צוין profileId, נטען את הפרופיל הפעיל
+        if (!profileId) {
+            const profiles = await window.getUserProfiles(userId);
+            const activeProfile = profiles.find(p => p.active);
+            if (activeProfile) {
+                profileId = activeProfile.id;
+                console.log(`📂 Using active profile: ${activeProfile.name} (ID: ${profileId})`);
+            }
+        }
+        
+        const preferences = await window.getAllUserPreferences(userId, profileId);
+        
+        // Apply preferences to form - update all fields
+        console.log('🎯 Applying preferences to form...');
+        
+        // Update all form fields
+        Object.keys(preferences).forEach(key => {
+            const element = document.getElementById(key);
+            if (element) {
+                const value = preferences[key];
+                
+                if (element.type === 'checkbox') {
+                    // Handle boolean values that might come as strings
+                    const boolValue = (value === true || value === 'true' || value === '1' || value === 1);
+                    element.checked = boolValue;
+                } else if (element.type === 'number') {
+                    element.value = parseFloat(value) || 0;
+                } else if (element.type === 'color') {
+                    element.value = value || '#000000';
+                } else if (element.tagName === 'SELECT') {
+                    element.value = value || '';
+                } else {
+                    element.value = value || '';
+                }
+                
+                console.log(`🎯 Updated ${key} = ${value} (type: ${element.type || element.tagName})`);
+            } else {
+                console.warn(`⚠️ Element not found for preference: ${key}`);
+            }
+        });
+        
+        console.log('✅ All form fields updated successfully');
         
         // Return preferences data
         return {
@@ -453,6 +499,7 @@ window.loadPreferences = async function() {
     }
 };
 
+
 /**
  * שמירת העדפות (תואם למערכת הישנה)
  * @returns {Promise<boolean>} - האם השמירה הצליחה
@@ -473,7 +520,7 @@ window.saveAllPreferences = async function() {
             console.warn('⚠️ collectFormData function not found');
             return false;
         }
-  } catch (error) {
+    } catch (error) {
         console.error('❌ Error saving preferences:', error);
         
         // Show error notification
@@ -506,7 +553,7 @@ window.initializePreferences = async function() {
       
         console.log('✅ Preferences System initialized successfully');
       return true;
-  } catch (error) {
+    } catch (error) {
         console.error('❌ Error initializing Preferences System:', error);
       return false;
     }
@@ -560,7 +607,7 @@ window.resetToDefaults = async function() {
             }, 1000);
             
             return true;
-      } else {
+    } else {
             throw new Error('Failed to save default preferences');
     }
     
@@ -620,9 +667,9 @@ window.loadProfilesToDropdown = async function() {
             
             console.log('✅ Added default profile option');
             return true;
-        }
-        
-    } catch (error) {
+    }
+    
+  } catch (error) {
         console.error('❌ Error loading profiles to dropdown:', error);
         return false;
     }
@@ -649,7 +696,7 @@ window.loadProfile = async function() {
             // טעינת פרופיל ברירת מחדל
             await window.loadPreferences();
             console.log('✅ Default profile loaded');
-        } else {
+    } else {
             // טעינת פרופיל ספציפי
             const profiles = await window.getUserProfiles();
             const profile = profiles.find(p => p.name === selectedProfile);
@@ -663,15 +710,15 @@ window.loadProfile = async function() {
         }
         
         // הצגת הודעת הצלחה
-        if (typeof window.showSuccessNotification === 'function') {
+    if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification('פרופיל נטען בהצלחה!');
-        }
-        
+    }
+    
         return true;
         
-    } catch (error) {
+  } catch (error) {
         console.error('❌ Error loading profile:', error);
-        if (typeof window.showErrorNotification === 'function') {
+    if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה בטעינת פרופיל: ' + error.message);
         }
         return false;
@@ -705,7 +752,7 @@ window.switchProfile = async function(profileId) {
                 await window.loadPreferences();
                 
                 console.log('✅ Profile switched successfully');
-                if (typeof window.showSuccessNotification === 'function') {
+      if (typeof window.showSuccessNotification === 'function') {
                     window.showSuccessNotification('פרופיל הוחלף בהצלחה!');
                 }
                 
@@ -715,11 +762,101 @@ window.switchProfile = async function(profileId) {
         
         throw new Error('Failed to switch profile');
         
-    } catch (error) {
+  } catch (error) {
         console.error('❌ Error switching profile:', error);
-        if (typeof window.showErrorNotification === 'function') {
+    if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה בהחלפת פרופיל: ' + error.message);
         }
+        return false;
+    }
+};
+
+/**
+ * שמירת העדפות נוכחיות כפרופיל פעיל
+ * @returns {Promise<boolean>} - האם השמירה הצליחה
+ */
+window.saveAsActiveProfile = async function() {
+    try {
+        console.log('💾 Saving current preferences as active profile...');
+        
+        // Collect form data
+        if (typeof window.collectFormData === 'function') {
+            console.log('📋 Calling collectFormData...');
+            const formData = window.collectFormData();
+            
+            if (Object.keys(formData).length === 0) {
+                console.warn('⚠️ No form data to save');
+                if (typeof window.showWarningNotification === 'function') {
+                    window.showWarningNotification('אזהרה', 'אין העדפות לשמירה');
+                }
+                return false;
+            }
+            
+            // Get current active profile
+            console.log('👤 Getting user profiles...');
+            const profiles = await window.getUserProfiles();
+            console.log('👤 Available profiles:', profiles);
+            
+            const activeProfile = profiles.find(p => p.active);
+            console.log('👤 Active profile:', activeProfile);
+            
+            if (!activeProfile) {
+                throw new Error('No active profile found');
+            }
+            
+            console.log(`💾 Saving to active profile: ${activeProfile.name} (ID: ${activeProfile.id})`);
+            
+            // Save preferences to active profile
+            if (typeof window.savePreferences === 'function') {
+                console.log('💾 Calling savePreferences...');
+                const result = await window.savePreferences(formData, 1, activeProfile.id);
+                console.log('💾 Save result:', result);
+                
+                if (result) {
+                    console.log('✅ Preferences saved to active profile successfully');
+                    
+                    // Show success notification
+                    if (typeof window.showSuccessNotification === 'function') {
+                        window.showSuccessNotification('הצלחה', `העדפות נשמרו לפרופיל: ${activeProfile.name}`);
+                    }
+                    
+                    // Clear cache manually to ensure fresh data
+                    if (window.preferencesCache && window.preferencesCache.clear) {
+                        console.log('🗑️ Clearing preferences cache manually...');
+                        window.preferencesCache.clear();
+                    }
+                    
+                    // Reload preferences to update form
+                    if (typeof window.loadPreferences === 'function') {
+                        console.log('🔄 Reloading preferences to update form...');
+                        await window.loadPreferences(1, activeProfile.id);
+                    }
+                    
+                    // Reload colors to update color pickers
+                    if (typeof window.loadColorsForPreferences === 'function') {
+                        console.log('🎨 Reloading colors to update color pickers...');
+                        await window.loadColorsForPreferences();
+                    }
+                    
+                    return true;
+                }
+            } else {
+                console.error('❌ window.savePreferences function not available');
+            }
+        } else {
+            console.error('❌ window.collectFormData function not available');
+        }
+        
+        throw new Error('Failed to save preferences');
+        
+    } catch (error) {
+        console.error('❌ Error saving preferences to active profile:', error);
+        
+        // Show error notification
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'שגיאה בשמירת העדפות: ' + error.message);
+        }
+        
         return false;
     }
 };

@@ -4,6 +4,8 @@
 
 This document describes the comprehensive JavaScript architecture implemented in TikTrack, featuring a modular system with 40+ organized script files and clear separation of concerns.
 
+**🔄 Last Updated:** September 19, 2025 - Added Global Project Files Scanner and Enhanced Linter System
+
 ## 🗂️ Global Functions Index
 
 ### 📊 Core System Functions (`main.js`)
@@ -363,16 +365,6 @@ This document describes the comprehensive JavaScript architecture implemented in
 
 ### 📊 Monitoring & Development
 
-#### Project Files Scanner (`project-files-scanner.js`) - **NEW**
-| Function | Description |
-|----------|-------------|
-| `window.getProjectFiles()` | Get all project files with caching |
-| `window.getFilesByType(type)` | Get files by type (js, html, css, python, other) |
-| `window.getTotalFileCount()` | Get total number of files |
-| `window.getFileStatistics()` | Get file statistics by type |
-| `window.clearProjectFilesCache()` | Clear project files cache |
-| `window.projectFilesScanner` | Global scanner instance |
-
 #### Linter Monitor (`linter-realtime-monitor.js`)
 | Function | Description |
 |----------|-------------|
@@ -385,6 +377,31 @@ This document describes the comprehensive JavaScript architecture implemented in
 | `window.fixAllIssues()` | Fix all issues |
 | `window.fixAllErrors()` | Fix all errors |
 | `window.fixAllWarnings()` | Fix all warnings |
+| `window.ignoreAllIssues()` | Ignore all issues |
+| `window.resetFixedIssues()` | Reset fixed issues |
+| `window.refreshChartData()` | Refresh chart data |
+| `window.clearChartHistory()` | Clear chart history |
+| `window.applyChartSettings()` | Apply chart settings |
+| `window.updateProblemFilesTable()` | Update problem files table |
+| `window.loadIssues()` | Load issues |
+| `window.toggleAllSections()` | Toggle all sections |
+| `window.toggleSection(sectionId)` | Toggle specific section |
+| `window.runComprehensiveTests()` | Run comprehensive tests |
+| `window.runQuickHealthCheck()` | Run quick health check |
+| `window.exportChartData()` | Export chart data |
+| `window.clearFiltersBtn()` | Clear filters button |
+| `window.initializeChart()` | Initialize chart |
+| `window.clearProjectFilesCache()` | Clear project files cache |
+
+#### Project Files Scanner (`project-files-scanner.js`) - **NEW**
+| Function | Description |
+|----------|-------------|
+| `window.getProjectFiles()` | Get all project files with caching |
+| `window.getFilesByType(type)` | Get files by type (js, html, css, python, other) |
+| `window.getTotalFileCount()` | Get total number of files |
+| `window.getFileStatistics()` | Get file statistics by type |
+| `window.clearProjectFilesCache()` | Clear project files cache |
+| `window.projectFilesScanner` | Global scanner instance |
 | `window.ignoreAllIssues()` | Ignore all issues |
 | `window.resetFixedIssues()` | Reset fixed issues |
 | `window.toggleAutoRefresh()` | Toggle auto refresh |
@@ -431,8 +448,7 @@ trading-ui/scripts/
 │   ├── table-mappings.js          # Table column mappings
 │   ├── simple-filter.js           # Simple filter system
 │   ├── warning-system.js          # Central warning system
-│   ├── crud-utils.js              # CRUD operations utilities
-│   └── project-files-scanner.js   # Global project files scanner
+│   └── crud-utils.js              # CRUD operations utilities
 │
 ├── 📄 Page Files
 │   ├── accounts.js                # Account management (currency_id migration)
@@ -889,6 +905,13 @@ Optimized loading order and efficient function organization.
 | **Page Files** | 15 | Page-specific logic |
 | **System Files** | 4 | Advanced systems |
 | **Total** | **33** | Complete system |
+
+### 📈 Recent Updates (September 19, 2025)
+- **Added:** `project-files-scanner.js` - Global project files scanner
+- **Enhanced:** `linter-realtime-monitor.js` - Comprehensive file scanning (400+ files)
+- **Improved:** Error handling system with 20+ catch blocks
+- **Updated:** File discovery mechanism with caching
+- **Removed:** All dummy data and simulation functions
 
 ## 🔄 Maintenance Guidelines
 

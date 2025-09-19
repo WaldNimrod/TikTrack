@@ -82,6 +82,28 @@ function analyzeFileContent(fileName, content) {
         issuesFound++;
     }
 
+    // Update global scanning results
+    if (typeof window !== 'undefined' && window.scanningResults) {
+        window.scanningResults.scannedFiles++;
+        issues.forEach(issue => {
+            if (issue.type === 'error') {
+                window.scanningResults.errors.push({
+                    file: fileName,
+                    line: issue.line,
+                    message: issue.message,
+                    fix: issue.fix
+                });
+            } else if (issue.type === 'warning') {
+                window.scanningResults.warnings.push({
+                    file: fileName,
+                    line: issue.line,
+                    message: issue.message,
+                    fix: issue.fix
+                });
+            }
+        });
+    }
+
     return { issues, issuesFound };
 }
 
@@ -127,6 +149,28 @@ function analyzeHtmlContent(fileName, content) {
             fix: 'הוסף <!DOCTYPE html> בתחילת הקובץ'
         });
         issuesFound++;
+    }
+
+    // Update global scanning results
+    if (typeof window !== 'undefined' && window.scanningResults) {
+        window.scanningResults.scannedFiles++;
+        issues.forEach(issue => {
+            if (issue.type === 'error') {
+                window.scanningResults.errors.push({
+                    file: fileName,
+                    line: issue.line,
+                    message: issue.message,
+                    fix: issue.fix
+                });
+            } else if (issue.type === 'warning') {
+                window.scanningResults.warnings.push({
+                    file: fileName,
+                    line: issue.line,
+                    message: issue.message,
+                    fix: issue.fix
+                });
+            }
+        });
     }
 
     return { issues, issuesFound };
@@ -176,6 +220,28 @@ function analyzePythonContent(fileName, content) {
         }
     });
 
+    // Update global scanning results
+    if (typeof window !== 'undefined' && window.scanningResults) {
+        window.scanningResults.scannedFiles++;
+        issues.forEach(issue => {
+            if (issue.type === 'error') {
+                window.scanningResults.errors.push({
+                    file: fileName,
+                    line: issue.line,
+                    message: issue.message,
+                    fix: issue.fix
+                });
+            } else if (issue.type === 'warning') {
+                window.scanningResults.warnings.push({
+                    file: fileName,
+                    line: issue.line,
+                    message: issue.message,
+                    fix: issue.fix
+                });
+            }
+        });
+    }
+
     return { issues, issuesFound };
 }
 
@@ -218,6 +284,28 @@ function analyzeCssContent(fileName, content) {
             fix: 'שקול להשתמש בסלקטורים ספציפיים יותר'
         });
         issuesFound++;
+    }
+
+    // Update global scanning results
+    if (typeof window !== 'undefined' && window.scanningResults) {
+        window.scanningResults.scannedFiles++;
+        issues.forEach(issue => {
+            if (issue.type === 'error') {
+                window.scanningResults.errors.push({
+                    file: fileName,
+                    line: issue.line,
+                    message: issue.message,
+                    fix: issue.fix
+                });
+            } else if (issue.type === 'warning') {
+                window.scanningResults.warnings.push({
+                    file: fileName,
+                    line: issue.line,
+                    message: issue.message,
+                    fix: issue.fix
+                });
+            }
+        });
     }
 
     return { issues, issuesFound };
@@ -272,6 +360,28 @@ function analyzeOtherContent(fileName, content) {
                 issuesFound++;
             }
             break;
+    }
+
+    // Update global scanning results
+    if (typeof window !== 'undefined' && window.scanningResults) {
+        window.scanningResults.scannedFiles++;
+        issues.forEach(issue => {
+            if (issue.type === 'error') {
+                window.scanningResults.errors.push({
+                    file: fileName,
+                    line: issue.line,
+                    message: issue.message,
+                    fix: issue.fix
+                });
+            } else if (issue.type === 'warning') {
+                window.scanningResults.warnings.push({
+                    file: fileName,
+                    line: issue.line,
+                    message: issue.message,
+                    fix: issue.fix
+                });
+            }
+        });
     }
 
     return { issues, issuesFound };

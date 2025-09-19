@@ -150,6 +150,19 @@ def styles_files(filename: str) -> Any:
     
     return response
 
+@pages_bp.route('/styles-new/<path:filename>')
+def styles_new_files(filename: str) -> Any:
+    """New CSS architecture files"""
+    response = send_from_directory(UI_DIR / "styles-new", filename)
+    
+    # Add cache control headers for CSS files
+    if filename.endswith('.css'):
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+    
+    return response
+
 @pages_bp.route('/scripts/<path:filename>')
 def scripts_files(filename: str) -> Any:
     """JavaScript files"""

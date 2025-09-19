@@ -15,11 +15,11 @@
 
 /* ALL headers - vertical text from top to bottom */
 #page-scripts-matrix-table th {
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
+    transform: rotate(-90deg);
     width: 30px;
     padding: 0.1rem 0.05rem;
     height: 60px;
+    white-space: nowrap;
 }
 
 /* ALL data cells - narrow width */
@@ -34,7 +34,7 @@
 #page-scripts-matrix-table td:first-child {
     position: sticky;
     left: 0;
-    width: 80px;
+    width: 100px;
     writing-mode: horizontal-tb;
     text-orientation: initial;
     height: auto;

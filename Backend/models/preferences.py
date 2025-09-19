@@ -80,7 +80,8 @@ class PreferenceProfile(BaseModel):
     last_used_at = Column(DateTime)
     usage_count = Column(Integer, default=0)
     
-    # יחסים
+    # יחסים - מושבתים זמנית עד לבניית מודול משתמשים מלא
+    # user = relationship("User", back_populates="preference_profiles")
     user_preferences = relationship("UserPreference", back_populates="profile")
     
     def __repr__(self):

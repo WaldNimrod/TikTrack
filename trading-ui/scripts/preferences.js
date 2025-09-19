@@ -101,7 +101,7 @@ window.getGroupPreferences = async function(groupName, userId = 1, profileId = n
         }
         
         // שאילתה לשרת
-        let url = `/api/v1/preferences/user/group?group_name=${groupName}&user_id=${userId}`;
+        let url = `/api/v1/preferences/user/group?group=${groupName}&user_id=${userId}`;
         if (profileId) {
             url += `&profile_id=${profileId}`;
         }
@@ -424,9 +424,11 @@ window.loadPreferences = async function() {
             window.applyPreferencesToForm(preferences);
         }
         
-        // Preferences loaded successfully
-        
-        return true;
+        // Return preferences data
+        return {
+            success: true,
+            data: preferences
+        };
     } catch (error) {
         console.error('❌ Error loading preferences:', error);
         
@@ -435,7 +437,10 @@ window.loadPreferences = async function() {
             window.showError('שגיאה בטעינת העדפות', 'שגיאה בטעינת העדפות מהמערכת החדשה: ' + error.message);
         }
         
-        return false;
+        return {
+            success: false,
+            error: error.message
+        };
     }
 };
 

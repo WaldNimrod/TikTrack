@@ -43,9 +43,9 @@ class User(BaseModel):
                      comment="Unique username")
     email = Column(String(100), unique=True, nullable=True, 
                   comment="User email address")
-    first_name = Column(String(50), nullable=False, 
+    first_name = Column(String(50), nullable=True, 
                        comment="User first name")
-    last_name = Column(String(50), nullable=False, 
+    last_name = Column(String(50), nullable=True, 
                       comment="User last name")
     is_active = Column(Boolean, default=True, nullable=False,
                       comment="Whether user is active")
@@ -62,8 +62,8 @@ class User(BaseModel):
     # trades = relationship("Trade", back_populates="user")
     # alerts = relationship("Alert", back_populates="user")
     # notes = relationship("Note", back_populates="user")
-    user_preferences = relationship("UserPreferences", back_populates="user", uselist=False)
-    preference_profiles = relationship("PreferenceProfile", foreign_keys="[PreferenceProfile.user_id]", back_populates="user", uselist=True)
+    # user_preferences = relationship("UserPreferences", back_populates="user", uselist=False)  # Removed - using new preferences system
+    # preference_profiles = relationship("PreferenceProfile", foreign_keys="[PreferenceProfile.user_id]", back_populates="user", uselist=True)  # Disabled - causing mapper issues
     
     def __repr__(self) -> str:
         """String representation of the user"""
@@ -96,26 +96,33 @@ class User(BaseModel):
             str: Full name in format "First Last"
             
         Example:
-            >>> user = User(first_name="Nimrod", last_name="User")
+            >>> user = User(first_name="Nimrod", last_name="Developer")
             >>> user.full_name
-            'Nimrod User'
+            'Nimrod Developer'
         """
-        return f"{self.first_name} {self.last_name}"
+        if self.first_name and self.last_name:
+            return f"{self.first_name} {self.last_name}"
+        elif self.first_name:
+            return self.first_name
+        elif self.last_name:
+            return self.last_name
+        else:
+            return self.username
     
     @property
     def display_name(self) -> str:
         """
-        Display name of the user - username or full name
+        Display name of the user - full name or username
         
         Returns:
             str: Display name
             
         Example:
-            >>> user = User(username="nimrod", first_name="Nimrod")
+            >>> user = User(username="nimrod", first_name="Nimrod", last_name="Developer")
             >>> user.display_name
-            'nimrod'
+            'Nimrod Developer'
         """
-        return self.username
+        return self.full_name
     
     def get_preferences(self) -> Dict[str, Any]:
         """

@@ -57,7 +57,7 @@
 //
 // ====================================================================================================
 
-console.log('🚀 טעינת עמוד ניטור Linter בזמן אמת... v3.0');
+// Linter Realtime Monitor v3.0 loaded
 
 // Global variables
 let autoRefreshInterval;
@@ -73,7 +73,7 @@ let fixedIssues = {
 
 // Check if project files list exists and is up-to-date
 function checkAndUpdateProjectFiles() {
-    console.log('🔍 Checking project files list...');
+    // Checking project files list
     
     // Check if project files exist and are recent (within last 24 hours)
     const projectFilesKey = 'linter_project_files_cache';
@@ -86,18 +86,13 @@ function checkAndUpdateProjectFiles() {
     const oneDayInMs = 24 * 60 * 60 * 1000; // 24 hours
     const isRecent = lastUpdate && (now - parseInt(lastUpdate)) < oneDayInMs;
     
-    console.log('📊 Project files cache status:', {
-        hasCachedFiles: !!cachedFiles,
-        hasLastUpdate: !!lastUpdate,
-        isRecent: isRecent,
-        lastUpdateTime: lastUpdate ? new Date(parseInt(lastUpdate)).toLocaleString() : 'Never'
-    });
+    // Project files cache status checked
     
     if (cachedFiles && isRecent) {
         // Use cached files
         try {
             window.projectFiles = JSON.parse(cachedFiles);
-            console.log('✅ Using cached project files:', window.projectFiles.length, 'files');
+            // Using cached project files
             
             // Update UI to show cached files count
             const fileCountElement = document.getElementById('discoveredFileCount');
@@ -114,20 +109,20 @@ function checkAndUpdateProjectFiles() {
             }
             
         } catch (error) {
-            console.error('❌ Error parsing cached project files:', error);
+            // Error parsing cached project files
             // Fallback to auto-discovery
             autoDiscoverProjectFiles();
         }
     } else {
         // No cache or cache is old - auto-discover
-        console.log('🔄 No recent cache found, auto-discovering project files...');
+        // No recent cache found, auto-discovering project files
         autoDiscoverProjectFiles();
     }
 }
 
 // Auto-discover project files and cache them
 function autoDiscoverProjectFiles() {
-    console.log('🔍 Auto-discovering project files...');
+    // Auto-discovering project files
     
     // Show loading notification
     if (typeof window.showInfoNotification === 'function') {
@@ -138,13 +133,13 @@ function autoDiscoverProjectFiles() {
     if (typeof window.discoverProjectFiles === 'function') {
         window.discoverProjectFiles();
     } else {
-        console.error('❌ discoverProjectFiles function not found');
+        // discoverProjectFiles function not found
     }
 }
 
 // Clear project files cache
 window.clearProjectFilesCache = function() {
-    console.log('🗑️ Clearing project files cache...');
+    // Clearing project files cache
     
     const projectFilesKey = 'linter_project_files_cache';
     const lastUpdateKey = 'linter_project_files_last_update';
@@ -155,7 +150,7 @@ window.clearProjectFilesCache = function() {
     // Clear global variable
     window.projectFiles = null;
     
-    console.log('✅ Project files cache cleared');
+    // Project files cache cleared
     
     if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification(
@@ -172,7 +167,7 @@ window.clearProjectFilesCache = function() {
 
 // Initialize the linter monitor system
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('✅ DOM loaded - initializing linter monitor...');
+    // DOM loaded - initializing linter monitor
 
     // Initialize DataCollector instance if available
     if (typeof window.DataCollector !== 'undefined') {
@@ -250,10 +245,10 @@ async function loadInitialData() {
                 await window.currentChartRenderer.initialize();
                 console.log('✅ Chart Renderer initialized');
             } else {
-                console.error('❌ לא מצאתי chartContainer');
+                // לא מצאתי chartContainer
             }
         } else {
-            console.error('❌ ChartRenderer לא זמין');
+            // ChartRenderer לא זמין
         }
 
         // Load historical data from IndexedDB
@@ -302,7 +297,7 @@ async function loadInitialData() {
         }
 
     } catch (error) {
-        console.error('❌ Error initializing chart system:', error);
+        // Error initializing chart system
     }
 }
 
@@ -326,11 +321,21 @@ async function updateStatisticsDisplay() {
                     totalErrors = lastData.metrics.errors || totalErrors;
                     totalWarnings = lastData.metrics.warnings || totalWarnings;
                     lastScanDate = new Date(lastData.timestamp).toLocaleString('he-IL');
+                    
+                    // Update the global scanningResults with loaded data
+                    scanningResults.totalFiles = totalFiles;
+                    scanningResults.errors = Array(totalErrors).fill({});
+                    scanningResults.warnings = Array(totalWarnings).fill({});
+                    
+                    // Show notification that historical data was loaded
+                    if (typeof window.showInfoNotification === 'function') {
+                        window.showInfoNotification('נתונים היסטוריים נטענו', `נטענו נתונים מ-${lastScanDate}`);
+                    }
                 }
             }
         }
     } catch (error) {
-        console.log('Could not load previous scan data:', error);
+        // Silent error - no need to show notification for missing data
     }
 
     // Determine overall status based on issues
@@ -361,7 +366,7 @@ async function updateStatisticsDisplay() {
     if (lastScanDate) {
         const lastScanElement = document.getElementById('lastScanDate');
         if (lastScanElement) {
-            lastScanElement.textContent = `סריקה אחרונה: ${lastScanDate}`;
+            lastScanElement.textContent = lastScanDate;
         }
     }
 }
@@ -1652,7 +1657,7 @@ window.copyUnresolvedIssuesLog = () => {
             }
         })
         .catch(() => {
-            console.error('❌ Failed to copy unresolved issues log');
+            // Failed to copy unresolved issues log
             if (typeof window.showErrorNotification === 'function') {
                 window.showErrorNotification('שגיאה', 'לא הצלחנו להעתיק את הלוג');
             }
@@ -1892,7 +1897,7 @@ async function finishScan() {
             updateChartIndicators(enhancedPoint);
         }
     } catch (error) {
-        console.error('❌ שגיאה באיסוף נתונים מסריקה:', error);
+        // שגיאה באיסוף נתונים מסריקה
     }
 
     // Auto-cleanup chart after scan if enabled
@@ -1904,7 +1909,7 @@ async function finishScan() {
                     console.log('🧹 Chart auto-cleaned after scan');
                 }
             } catch (error) {
-                console.error('❌ Error in auto-cleanup after scan:', error);
+                // Error in auto-cleanup after scan
             }
         }, 2000); // Wait 2 seconds after scan completion
     }
@@ -1939,7 +1944,7 @@ function startAutoRefresh() {
                 
                 console.log('🔄 Auto refresh: updated stats, logs, and chart');
             } catch (error) {
-                console.error('❌ Error in auto refresh:', error);
+                // Error in auto refresh
             }
         }
     }, intervalMs);
@@ -2063,7 +2068,7 @@ function handleLogEntry(entry) {
         }
         
     } catch (error) {
-        console.error('❌ Error in handleLogEntry:', error);
+        // Error in handleLogEntry
     }
 }
 
@@ -2150,7 +2155,7 @@ window.runComprehensiveTests = async function() {
         return testResults;
 
     } catch (error) {
-        console.error('❌ Error in comprehensive tests:', error);
+        // Error in comprehensive tests
         addLogEntry('ERROR', 'Comprehensive tests failed', { error: error.message });
         return null;
     }
@@ -2595,7 +2600,7 @@ async function saveTestResults(testResults) {
         localStorage.setItem('linter_last_test_results', JSON.stringify(testResults));
         
     } catch (error) {
-        console.error('❌ Error saving test results:', error);
+        // Error saving test results
     }
 }
 
@@ -2624,7 +2629,7 @@ function displayTestResults(testResults) {
         updateTestResultsDisplay(testResults);
         
     } catch (error) {
-        console.error('❌ Error displaying test results:', error);
+        // Error displaying test results
     }
 }
 
@@ -2722,7 +2727,7 @@ function updateTestResultsDisplay(testResults) {
         }
         
     } catch (error) {
-        console.error('❌ Error updating test results display:', error);
+        // Error updating test results display
     }
 }
 
@@ -2796,7 +2801,7 @@ window.runQuickHealthCheck = async function() {
         return healthCheck;
         
     } catch (error) {
-        console.error('❌ Error in health check:', error);
+        // Error in health check
         addLogEntry('ERROR', 'Health check failed', { error: error.message });
         return null;
     }
@@ -2861,7 +2866,7 @@ function updateHealthCheckDisplay(healthCheck) {
         }
         
     } catch (error) {
-        console.error('❌ Error updating health check display:', error);
+        // Error updating health check display
     }
 }
 
@@ -2869,7 +2874,7 @@ function updateHealthCheckDisplay(healthCheck) {
 function handleCriticalError(entry) {
     try {
         // Log to console with enhanced formatting
-        console.error(`🚨 CRITICAL ERROR [${entry.id}]: ${entry.message}`, entry.details);
+        // CRITICAL ERROR logged
         
         // Show user notification
         if (typeof window.showErrorNotification === 'function') {
@@ -2890,7 +2895,7 @@ function handleCriticalError(entry) {
         }
         
     } catch (error) {
-        console.error('❌ Error in handleCriticalError:', error);
+        // Error in handleCriticalError
     }
 }
 
@@ -2914,7 +2919,7 @@ function handleWarning(entry) {
         }
         
     } catch (error) {
-        console.error('❌ Error in handleWarning:', error);
+        // Error in handleWarning
     }
 }
 
@@ -2932,7 +2937,7 @@ function handleSuccess(entry) {
         }
         
     } catch (error) {
-        console.error('❌ Error in handleSuccess:', error);
+        // Error in handleSuccess
     }
 }
 
@@ -2957,7 +2962,7 @@ function monitorPerformance(entry) {
             }
         }
     } catch (error) {
-        console.error('❌ Error in monitorPerformance:', error);
+        // Error in monitorPerformance
     }
 }
 
@@ -2984,7 +2989,7 @@ function monitorSecurity(entry) {
         });
         
     } catch (error) {
-        console.error('❌ Error in monitorSecurity:', error);
+        // Error in monitorSecurity
     }
 }
 
@@ -3005,7 +3010,7 @@ function attemptChartRecovery() {
             }, 2000);
         }
     } catch (error) {
-        console.error('❌ Error in attemptChartRecovery:', error);
+        // Error in attemptChartRecovery
     }
 }
 
@@ -3026,7 +3031,7 @@ function attemptStorageRecovery() {
             }, 2000);
         }
     } catch (error) {
-        console.error('❌ Error in attemptStorageRecovery:', error);
+        // Error in attemptStorageRecovery
     }
 }
 
@@ -3041,7 +3046,7 @@ function attemptNetworkRecovery() {
             addLogEntry('WARNING', 'רשת לא זמינה - בדוק את החיבור לאינטרנט');
         }
     } catch (error) {
-        console.error('❌ Error in attemptNetworkRecovery:', error);
+        // Error in attemptNetworkRecovery
     }
 }
 
@@ -3160,7 +3165,7 @@ function copyDetailedLog() {
             if (typeof window.showErrorNotification === 'function') {
                 window.showErrorNotification('שגיאה בהעתקה', 'לא הצלחנו להעתיק את הלוג ללוח. נסה שוב או השתמש ב-Ctrl+A וב-Ctrl+C.');
     } else {
-                console.error('Failed to copy diagnostic log to clipboard');
+                // Failed to copy diagnostic log to clipboard
             }
         });
 
@@ -3363,7 +3368,7 @@ window.fixAllIssues = async () => {
             updateChartIndicators(enhancedPoint);
             }
         } catch (error) {
-        console.error('❌ שגיאה באיסוף נתונים מתיקון:', error);
+        // שגיאה באיסוף נתונים מתיקון
     }
 
     // Auto-cleanup chart after fix if enabled
@@ -3375,7 +3380,7 @@ window.fixAllIssues = async () => {
                     console.log('🧹 Chart auto-cleaned after fix');
                 }
             } catch (error) {
-                console.error('❌ Error in auto-cleanup after fix:', error);
+                // Error in auto-cleanup after fix
             }
         }, 2000); // Wait 2 seconds after fix completion
     }
@@ -3449,7 +3454,7 @@ window.fixAllErrors = () => {
                     console.log('🧹 Chart auto-cleaned after error fix');
                 }
             } catch (error) {
-                console.error('❌ Error in auto-cleanup after error fix:', error);
+                // Error in auto-cleanup after error fix
             }
         }, 2000); // Wait 2 seconds after fix completion
     }
@@ -3525,7 +3530,7 @@ window.fixAllWarnings = () => {
                     console.log('🧹 Chart auto-cleaned after warning fix');
                 }
             } catch (error) {
-                console.error('❌ Error in auto-cleanup after warning fix:', error);
+                // Error in auto-cleanup after warning fix
             }
         }, 2000); // Wait 2 seconds after fix completion
     }
@@ -3589,7 +3594,7 @@ window.ignoreAllIssues = () => {
                     console.log('🧹 Chart auto-cleaned after ignore');
                 }
             } catch (error) {
-                console.error('❌ Error in auto-cleanup after ignore:', error);
+                // Error in auto-cleanup after ignore
             }
         }, 2000); // Wait 2 seconds after ignore completion
     }
@@ -3686,7 +3691,7 @@ function calculateTotalSize() {
         return totalFiles * 5000; // Assume average 5KB per file
         
     } catch (error) {
-        console.error('❌ שגיאה בחישוב גודל קבצים:', error);
+        // שגיאה בחישוב גודל קבצים
         return 0;
     }
 }
@@ -3710,7 +3715,7 @@ async function autoUpdateChart() {
             console.log('ℹ️ No data available for auto-update');
         }
     } catch (error) {
-        console.error('❌ Error in auto-update chart:', error);
+        // Error in auto-update chart
     }
 }
 
@@ -3802,7 +3807,7 @@ async function updateChartIndicators(latestDataPoint) {
         }
 
     } catch (error) {
-        console.error('❌ שגיאה בעדכון אינדיקטורים:', error);
+        // שגיאה בעדכון אינדיקטורים
     }
 }
 
@@ -3838,7 +3843,7 @@ window.refreshChartData = async function() {
         }
 
     } catch (error) {
-        console.error('❌ שגיאה ברענון נתוני גרף:', error);
+        // שגיאה ברענון נתוני גרף
     }
 };
 
@@ -3877,7 +3882,7 @@ window.clearChartHistory = async function() {
         }
 
     } catch (error) {
-        console.error('❌ שגיאה במחיקת היסטוריית גרף:', error);
+        // שגיאה במחיקת היסטוריית גרף
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'אירעה שגיאה במחיקת ההיסטוריה');
         }
@@ -3933,7 +3938,7 @@ window.exportChartData = async function() {
         }
 
         } catch (error) {
-        console.error('❌ שגיאה בייצוא נתוני גרף:', error);
+        // שגיאה בייצוא נתוני גרף
             if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'אירעה שגיאה בייצוא הנתונים');
         }
@@ -4007,7 +4012,7 @@ window.exportComprehensiveReport = async function() {
         }
 
     } catch (error) {
-        console.error('❌ שגיאה בייצוא דוח מקיף:', error);
+        // שגיאה בייצוא דוח מקיף
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'אירעה שגיאה בייצוא הדוח');
         }
@@ -4058,7 +4063,7 @@ window.exportCSVData = async function() {
         }
 
     } catch (error) {
-        console.error('❌ שגיאה בייצוא CSV:', error);
+        // שגיאה בייצוא CSV
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'אירעה שגיאה בייצוא CSV');
         }
@@ -4130,7 +4135,7 @@ function calculateExportStatistics(data) {
 
         return stats;
     } catch (error) {
-        console.error('❌ Error calculating export statistics:', error);
+        // Error calculating export statistics
         return {};
     }
 }
@@ -4179,7 +4184,7 @@ function createCSVContent(data) {
 
         return csvRows.join('\n');
     } catch (error) {
-        console.error('❌ Error creating CSV content:', error);
+        // Error creating CSV content
         return '';
     }
 }
@@ -4236,7 +4241,7 @@ function generateRecommendations(stats) {
 
         return recommendations;
     } catch (error) {
-        console.error('❌ Error generating recommendations:', error);
+        // Error generating recommendations
         return [];
     }
 }
@@ -4301,7 +4306,7 @@ window.createVersionSnapshot = async function() {
         }
 
     } catch (error) {
-        console.error('❌ שגיאה ביצירת צילום גרסה:', error);
+        // שגיאה ביצירת צילום גרסה
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'אירעה שגיאה ביצירת צילום הגרסה');
         }
@@ -4355,7 +4360,7 @@ window.restoreVersionSnapshot = async function(versionId) {
         }
 
     } catch (error) {
-        console.error('❌ שגיאה בשחזור גרסה:', error);
+        // שגיאה בשחזור גרסה
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'אירעה שגיאה בשחזור הגרסה');
         }
@@ -4393,7 +4398,7 @@ window.listAvailableVersions = function() {
         return versions;
 
     } catch (error) {
-        console.error('❌ שגיאה ברשימת גרסאות:', error);
+        // שגיאה ברשימת גרסאות
         return [];
     }
 };
@@ -4415,7 +4420,7 @@ window.deleteVersionSnapshot = function(versionId) {
         }
 
     } catch (error) {
-        console.error('❌ שגיאה במחיקת גרסה:', error);
+        // שגיאה במחיקת גרסה
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'אירעה שגיאה במחיקת הגרסה');
         }
@@ -4443,7 +4448,7 @@ function updateVersionList(newVersionId = null) {
         }
 
     } catch (error) {
-        console.error('❌ שגיאה בעדכון רשימת גרסאות:', error);
+        // שגיאה בעדכון רשימת גרסאות
     }
 }
 
@@ -4495,7 +4500,7 @@ window.applyChartSettings = async function() {
         }
 
     } catch (error) {
-        console.error('❌ שגיאה בהחלת הגדרות גרף:', error);
+        // שגיאה בהחלת הגדרות גרף
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'אירעה שגיאה בהחלת ההגדרות');
         }

@@ -1,308 +1,476 @@
+#!/usr/bin/env python3
 """
-User Management Service - TikTrack
-
-This module contains all business logic for managing users in the system.
-Includes user operations, preferences management, and fallback to default user.
-
-Classes:
-    UserService: Main service for user management
-
-Author: TikTrack Development Team
-Version: 1.0
-Date: August 2025
+User Service - Complete User Management
+Date: January 5, 2025
+Description: Complete user service for managing users and their preferences
 """
 
-from sqlalchemy.orm import Session
-from models.user import User
-from typing import List, Optional, Dict, Any
+import sqlite3
+import os
 import json
+from typing import Dict, List, Any, Optional
+from datetime import datetime
 import logging
+
+# Import preferences service
+from .preferences_service import PreferencesService
 
 logger = logging.getLogger(__name__)
 
 class UserService:
     """
-    Service for managing users in TikTrack system
+    Complete user service for managing users and their preferences
     
-    This service provides all functionality required for user management:
-    - Create, read, update and delete (CRUD)
-    - Preferences management
-    - Default user fallback
-    - User validation
+    This service provides functionality to:
+    - Manage user accounts (CRUD operations)
+    - Handle user preferences through the new preferences system
+    - Get user information and statistics
+    - Manage user sessions and authentication (future)
     """
     
-    # Constants
-    DEFAULT_USER_ID: int = 1
-    DEFAULT_USERNAME: str = "nimrod"
+    def __init__(self, db_path: str = None):
+        """Initialize the user service"""
+        if db_path is None:
+            # Default database path
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            db_path = os.path.join(current_dir, "..", "db", "simpleTrade_new.db")
+        
+        self.db_path = db_path
+        self.preferences_service = PreferencesService(db_path)
+        logger.info(f"UserService initialized with database: {db_path}")
     
-    @staticmethod
-    def get_default_user(db: Session) -> Optional[User]:
-        """Get the default user from database"""
-        try:
-            return db.query(User).filter(User.is_default == True).first()
-        except Exception as e:
-            logger.error(f"Error getting default user: {str(e)}")
-            return None
+    def get_db_connection(self) -> sqlite3.Connection:
+        """Get database connection"""
+        return sqlite3.connect(self.db_path)
     
-    @staticmethod
-    def create_default_user(db: Session) -> User:
-        """Create default user if not exists"""
+    def get_user_by_id(self, user_id: int) -> Optional[Dict[str, Any]]:
+        """
+        Get user by ID
+        
+        Args:
+            user_id: User ID
+            
+        Returns:
+            Dict with user information or None if not found
+        """
+        conn = self.get_db_connection()
+        cursor = conn.cursor()
+        
         try:
-            # Check if default user exists
-            default_user = UserService.get_default_user(db)
-            if default_user:
-                return default_user
+            cursor.execute("""
+                SELECT id, username, email, first_name, last_name, 
+                       is_active, is_default, created_at, updated_at
+                FROM users 
+                WHERE id = ?
+            """, (user_id,))
             
-            # Create default user with preferences from JSON file
-            default_preferences = UserService.load_default_preferences()
-            
-            default_user = User(
-                username=UserService.DEFAULT_USERNAME,
-                email="nimrod@tiktrack.com",
-                first_name="Nimrod",
-                last_name="User",
-                is_active=True,
-                is_default=True,
-                preferences=json.dumps(default_preferences, ensure_ascii=False)
-            )
-            
-            db.add(default_user)
-            db.commit()
-            db.refresh(default_user)
-            
-            logger.info(f"Created default user: {default_user.username}")
-            return default_user
-            
-        except Exception as e:
-            logger.error(f"Error creating default user: {str(e)}")
-            db.rollback()
-            raise
-    
-    @staticmethod
-    def get_user_by_id(db: Session, user_id: int) -> Optional[User]:
-        """Get user by ID with fallback to default user"""
-        try:
-            user = db.query(User).filter(User.id == user_id).first()
-            if user:
+            row = cursor.fetchone()
+            if row:
+                user = {
+                    'id': row[0],
+                    'username': row[1],
+                    'email': row[2],
+                    'first_name': row[3],
+                    'last_name': row[4],
+                    'is_active': bool(row[5]),
+                    'is_default': bool(row[6]),
+                    'created_at': row[7],
+                    'updated_at': row[8],
+                    'full_name': f"{row[3] or ''} {row[4] or ''}".strip() or row[1],
+                    'display_name': f"{row[3] or ''} {row[4] or ''}".strip() or row[1]
+                }
+                logger.info(f"Retrieved user {user_id}: {user['username']}")
                 return user
+            else:
+                logger.warning(f"User {user_id} not found")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Error getting user {user_id}: {e}")
+            return None
+        finally:
+            conn.close()
+    
+    def get_user_by_username(self, username: str) -> Optional[Dict[str, Any]]:
+        """
+        Get user by username
+        
+        Args:
+            username: Username
             
-            # Fallback to default user
-            logger.warning(f"User {user_id} not found, falling back to default user")
-            return UserService.get_default_user(db)
+        Returns:
+            Dict with user information or None if not found
+        """
+        conn = self.get_db_connection()
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute("""
+                SELECT id, username, email, first_name, last_name, 
+                       is_active, is_default, created_at, updated_at
+                FROM users 
+                WHERE username = ?
+            """, (username,))
+            
+            row = cursor.fetchone()
+            if row:
+                user = {
+                    'id': row[0],
+                    'username': row[1],
+                    'email': row[2],
+                    'first_name': row[3],
+                    'last_name': row[4],
+                    'is_active': bool(row[5]),
+                    'is_default': bool(row[6]),
+                    'created_at': row[7],
+                    'updated_at': row[8],
+                    'full_name': f"{row[3] or ''} {row[4] or ''}".strip() or row[1],
+                    'display_name': f"{row[3] or ''} {row[4] or ''}".strip() or row[1]
+                }
+                logger.info(f"Retrieved user by username {username}: {user['id']}")
+                return user
+            else:
+                logger.warning(f"User with username {username} not found")
+                return None
             
         except Exception as e:
-            logger.error(f"Error getting user by ID {user_id}: {str(e)}")
-            return UserService.get_default_user(db)
+            logger.error(f"Error getting user by username {username}: {e}")
+            return None
+        finally:
+            conn.close()
     
-    @staticmethod
-    def deep_merge_dicts(d1: Dict, d2: Dict) -> Dict:
-        """Deep merge two dictionaries"""
-        merged = d1.copy()
-        for k, v in d2.items():
-            if k in merged and isinstance(merged[k], dict) and isinstance(v, dict):
-                merged[k] = UserService.deep_merge_dicts(merged[k], v)
-            else:
-                merged[k] = v
-        return merged
-    
-    @staticmethod
-    def get_user_preferences(db: Session, user_id: int = None) -> Dict[str, Any]:
-        """Get user preferences using the new preferences system"""
+    def get_default_user(self) -> Optional[Dict[str, Any]]:
+        """
+        Get the default user
+        
+        Returns:
+            Dict with default user information or None if not found
+        """
+        conn = self.get_db_connection()
+        cursor = conn.cursor()
+        
         try:
-            # If no user_id provided, use default user
-            if user_id is None:
-                user_id = UserService.DEFAULT_USER_ID
+            cursor.execute("""
+                SELECT id, username, email, first_name, last_name, 
+                       is_active, is_default, created_at, updated_at
+                FROM users 
+                WHERE is_default = 1
+                LIMIT 1
+            """)
             
-            # Use the new preferences service
-            from services.preferences_service import preferences_service
-            result = preferences_service.get_all_user_preferences(user_id=user_id)
-            
-            if result and result.get('success'):
-                return result.get('data', {}).get('preferences', {})
+            row = cursor.fetchone()
+            if row:
+                user = {
+                    'id': row[0],
+                    'username': row[1],
+                    'email': row[2],
+                    'first_name': row[3],
+                    'last_name': row[4],
+                    'is_active': bool(row[5]),
+                    'is_default': bool(row[6]),
+                    'created_at': row[7],
+                    'updated_at': row[8],
+                    'full_name': f"{row[3] or ''} {row[4] or ''}".strip() or row[1],
+                    'display_name': f"{row[3] or ''} {row[4] or ''}".strip() or row[1]
+                }
+                logger.info(f"Retrieved default user: {user['username']}")
+                return user
             else:
-                logger.warning(f"Could not load preferences from new system for user {user_id}")
-                return UserService.load_default_preferences()
+                logger.warning("No default user found")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Error getting default user: {e}")
+            return None
+        finally:
+            conn.close()
+    
+    def get_all_users(self) -> List[Dict[str, Any]]:
+        """
+        Get all users
+        
+        Returns:
+            List of user dictionaries
+        """
+        conn = self.get_db_connection()
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute("""
+                SELECT id, username, email, first_name, last_name, 
+                       is_active, is_default, created_at, updated_at
+                FROM users 
+                ORDER BY is_default DESC, username ASC
+            """)
+            
+            users = []
+            for row in cursor.fetchall():
+                user = {
+                    'id': row[0],
+                    'username': row[1],
+                    'email': row[2],
+                    'first_name': row[3],
+                    'last_name': row[4],
+                    'is_active': bool(row[5]),
+                    'is_default': bool(row[6]),
+                    'created_at': row[7],
+                    'updated_at': row[8],
+                    'full_name': f"{row[3] or ''} {row[4] or ''}".strip() or row[1],
+                    'display_name': f"{row[3] or ''} {row[4] or ''}".strip() or row[1]
+                }
+                users.append(user)
+            
+            logger.info(f"Retrieved {len(users)} users")
+            return users
             
         except Exception as e:
-            logger.error(f"Error getting user preferences for user {user_id}: {str(e)}")
-            return UserService.load_default_preferences()
+            logger.error(f"Error getting all users: {e}")
+            return []
+        finally:
+            conn.close()
     
-    @staticmethod
-    def set_user_preferences(db: Session, preferences: Dict[str, Any], user_id: int = None) -> bool:
-        """Set user preferences using the new preferences system"""
+    def create_user(self, username: str, email: str = None, 
+                   first_name: str = None, last_name: str = None,
+                   is_default: bool = False) -> Optional[Dict[str, Any]]:
+        """
+        Create a new user
+        
+        Args:
+            username: Username (required)
+            email: Email address
+            first_name: First name
+            last_name: Last name
+            is_default: Whether this is the default user
+            
+        Returns:
+            Dict with created user information or None if failed
+        """
+        conn = self.get_db_connection()
+        cursor = conn.cursor()
+        
         try:
-            # If no user_id provided, use default user
-            if user_id is None:
-                user_id = UserService.DEFAULT_USER_ID
+            # Check if username already exists
+            cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
+            if cursor.fetchone():
+                logger.error(f"Username {username} already exists")
+                return None
             
-            # Use the new preferences service
-            from services.preferences_service import preferences_service
-            result = preferences_service.save_preferences(
-                user_id=user_id,
-                preferences=preferences
-            )
+            # If this is the default user, unset other default users
+            if is_default:
+                cursor.execute("UPDATE users SET is_default = 0")
             
-            if result and result.get('success'):
-                logger.info(f"Updated preferences for user {user_id} using new system")
-                return True
-            else:
-                logger.error(f"Could not update preferences for user {user_id} using new system")
+            # Create user
+            cursor.execute("""
+                INSERT INTO users (username, email, first_name, last_name, is_default, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (username, email, first_name, last_name, is_default, 
+                  datetime.now().isoformat(), datetime.now().isoformat()))
+            
+            user_id = cursor.lastrowid
+            conn.commit()
+            
+            # Get the created user
+            user = self.get_user_by_id(user_id)
+            logger.info(f"Created user {user_id}: {username}")
+            return user
+            
+        except Exception as e:
+            logger.error(f"Error creating user {username}: {e}")
+            conn.rollback()
+            return None
+        finally:
+            conn.close()
+    
+    def update_user(self, user_id: int, **kwargs) -> Optional[Dict[str, Any]]:
+        """
+        Update user information
+        
+        Args:
+            user_id: User ID
+            **kwargs: Fields to update (username, email, first_name, last_name, is_active, is_default)
+            
+        Returns:
+            Dict with updated user information or None if failed
+        """
+        conn = self.get_db_connection()
+        cursor = conn.cursor()
+        
+        try:
+            # Build update query
+            allowed_fields = ['username', 'email', 'first_name', 'last_name', 'is_active', 'is_default']
+            update_fields = []
+            values = []
+            
+            for field, value in kwargs.items():
+                if field in allowed_fields:
+                    update_fields.append(f"{field} = ?")
+                    values.append(value)
+            
+            if not update_fields:
+                logger.warning(f"No valid fields to update for user {user_id}")
+                return self.get_user_by_id(user_id)
+            
+            # Add updated_at
+            update_fields.append("updated_at = ?")
+            values.append(datetime.now().isoformat())
+            values.append(user_id)
+            
+            # Execute update
+            query = f"UPDATE users SET {', '.join(update_fields)} WHERE id = ?"
+            cursor.execute(query, values)
+            
+            if cursor.rowcount == 0:
+                logger.warning(f"User {user_id} not found for update")
+                return None
+            
+            # If setting as default, unset other default users
+            if kwargs.get('is_default'):
+                cursor.execute("UPDATE users SET is_default = 0 WHERE id != ?", (user_id,))
+            
+            conn.commit()
+            
+            # Get the updated user
+            user = self.get_user_by_id(user_id)
+            logger.info(f"Updated user {user_id}")
+            return user
+            
+        except Exception as e:
+            logger.error(f"Error updating user {user_id}: {e}")
+            conn.rollback()
+            return None
+        finally:
+            conn.close()
+    
+    def delete_user(self, user_id: int) -> bool:
+        """
+        Delete a user (soft delete by setting is_active = False)
+        
+        Args:
+            user_id: User ID
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        conn = self.get_db_connection()
+        cursor = conn.cursor()
+        
+        try:
+            # Don't allow deleting the default user
+            cursor.execute("SELECT is_default FROM users WHERE id = ?", (user_id,))
+            row = cursor.fetchone()
+            if not row:
+                logger.warning(f"User {user_id} not found for deletion")
                 return False
             
+            if row[0]:  # is_default
+                logger.error(f"Cannot delete default user {user_id}")
+                return False
+            
+            # Soft delete by setting is_active = False
+            cursor.execute("""
+                UPDATE users 
+                SET is_active = 0, updated_at = ?
+                WHERE id = ?
+            """, (datetime.now().isoformat(), user_id))
+            
+            conn.commit()
+            logger.info(f"Soft deleted user {user_id}")
+            return True
+            
         except Exception as e:
-            logger.error(f"Error setting user preferences for user {user_id}: {str(e)}")
+            logger.error(f"Error deleting user {user_id}: {e}")
+            conn.rollback()
+            return False
+        finally:
+            conn.close()
+    
+    def get_user_preferences(self, user_id: int) -> Dict[str, Any]:
+        """
+        Get user preferences using the new preferences system
+        
+        Args:
+            user_id: User ID
+            
+        Returns:
+            Dict with user preferences
+        """
+        try:
+            return self.preferences_service.get_all_user_preferences(user_id)
+        except Exception as e:
+            logger.error(f"Error getting preferences for user {user_id}: {e}")
+            return {}
+    
+    def set_user_preferences(self, user_id: int, preferences: Dict[str, Any]) -> bool:
+        """
+        Set user preferences using the new preferences system
+        
+        Args:
+            user_id: User ID
+            preferences: Dict with preferences to set
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            return self.preferences_service.save_preferences(user_id, preferences)
+        except Exception as e:
+            logger.error(f"Error setting preferences for user {user_id}: {e}")
             return False
     
-    @staticmethod
-    def update_user_preferences(db: Session, user_id: int, preferences: Dict[str, Any]) -> bool:
-        """Update user preferences using the new preferences system (alias for set_user_preferences)"""
-        return UserService.set_user_preferences(db, preferences, user_id)
-    
-    @staticmethod
-    def load_default_preferences() -> Dict[str, Any]:
-        """Load default preferences - hardcoded defaults only"""
-        # Hardcoded defaults - no more JSON file dependency
-        return {
-            "primaryCurrency": "USD",
-            "defaultStopLoss": 5,
-            "defaultTargetPrice": 10,
-            "defaultCommission": 1.0,
-            "consoleCleanupInterval": 60000,
-            "timezone": "Asia/Jerusalem",
-            "defaultStatusFilter": "open",
-            "defaultTypeFilter": "swing",
-            "defaultAccountFilter": "all",
-            "defaultDateRangeFilter": "this_week",
-            "defaultSearchFilter": "",
-            "primaryDataProvider": "yahoo",
-            "secondaryDataProvider": "google",
-            "cacheTTL": 5,
-            "maxBatchSize": 25,
-            "requestDelay": 200,
-            "retryAttempts": 2,
-            "retryDelay": 5,
-            "autoRefresh": False,
-            "verboseLogging": False,
-            # External data preferences
-            "showPercentageChanges": True,
-            "showVolume": True,
-            "notifyOnDataFailures": True,
-            "notifyOnStaleData": False,
-            "refreshOverrides": {},
-            # הגדרות שקיפות כותרות
-            "headerOpacity": {
-                "main": 60,
-                "sub": 30
-            },
-            # הגדרות צבעים לפי סטטוסים
-            "statusColors": {
-                "open": {
-                    "light": "rgba(40, 167, 69, 0.1)",
-                    "medium": "#28a745",
-                    "dark": "#155724",
-                    "border": "rgba(40, 167, 69, 0.3)"
-                },
-                "closed": {
-                    "light": "rgba(108, 117, 125, 0.1)",
-                    "medium": "#6c757d",
-                    "dark": "#383d41",
-                    "border": "rgba(108, 117, 125, 0.3)"
-                },
-                "cancelled": {
-                    "light": "rgba(220, 53, 69, 0.1)",
-                    "medium": "#dc3545",
-                    "dark": "#721c24",
-                    "border": "rgba(220, 53, 69, 0.3)"
-                }
-            },
-            # הגדרות צבעים לפי סוגי השקעה
-            "investmentTypeColors": {
-                "swing": {
-                    "light": "rgba(0, 123, 255, 0.1)",
-                    "medium": "#007bff",
-                    "dark": "#0056b3",
-                    "border": "rgba(0, 123, 255, 0.3)"
-                },
-                "investment": {
-                    "light": "rgba(40, 167, 69, 0.1)",
-                    "medium": "#28a745",
-                    "dark": "#155724",
-                    "border": "rgba(40, 167, 69, 0.3)"
-                },
-                "passive": {
-                    "light": "rgba(111, 66, 193, 0.1)",
-                    "medium": "#6f42c1",
-                    "dark": "#4a2c7a",
-                    "border": "rgba(111, 66, 193, 0.3)"
-                }
+    def get_user_statistics(self, user_id: int) -> Dict[str, Any]:
+        """
+        Get user statistics
+        
+        Args:
+            user_id: User ID
+            
+        Returns:
+            Dict with user statistics
+        """
+        try:
+            user = self.get_user_by_id(user_id)
+            if not user:
+                return {}
+            
+            # Get preferences count
+            preferences = self.get_user_preferences(user_id)
+            
+            # Get profiles count
+            conn = self.get_db_connection()
+            cursor = conn.cursor()
+            
+            cursor.execute("SELECT COUNT(*) FROM preference_profiles WHERE user_id = ?", (user_id,))
+            profiles_count = cursor.fetchone()[0]
+            
+            conn.close()
+            
+            return {
+                'user_id': user_id,
+                'username': user['username'],
+                'display_name': user['display_name'],
+                'is_default': user['is_default'],
+                'is_active': user['is_active'],
+                'preferences_count': len(preferences),
+                'profiles_count': profiles_count,
+                'created_at': user['created_at'],
+                'updated_at': user['updated_at']
             }
-        }
-    
-    @staticmethod
-    def get_current_user_id() -> int:
-        """Get current user ID (for now always returns default user ID)"""
-        return UserService.DEFAULT_USER_ID
-    
-    @staticmethod
-    def ensure_default_user_exists(db: Session) -> User:
-        """Ensure default user exists in database"""
-        try:
-            default_user = UserService.get_default_user(db)
-            if not default_user:
-                default_user = UserService.create_default_user(db)
-            
-            return default_user
             
         except Exception as e:
-            logger.error(f"Error ensuring default user exists: {str(e)}")
-            raise
+            logger.error(f"Error getting statistics for user {user_id}: {e}")
+            return {}
     
     @staticmethod
-    def get_all_users(db: Session) -> List[User]:
-        """Get all users from database"""
-        try:
-            return db.query(User).all()
-        except Exception as e:
-            logger.error(f"Error getting all users: {str(e)}")
-            return []
-    
-    @staticmethod
-    def validate_user_data(user_data: dict) -> Dict[str, Any]:
-        """Validate user data"""
-        errors = []
-        warnings = []
+    def update_user_preferences(user_id: int, preferences: Dict[str, Any]) -> bool:
+        """
+        Static method for updating user preferences (for backward compatibility)
         
-        # Username validation
-        username = user_data.get('username', '')
-        if username:
-            if len(username) < 3:
-                errors.append("Username must be at least 3 characters long")
-            if len(username) > 50:
-                errors.append("Username cannot be longer than 50 characters")
-            if not username.isalnum():
-                errors.append("Username can only contain letters and numbers")
-        
-        # Email validation
-        email = user_data.get('email', '')
-        if email:
-            if '@' not in email or '.' not in email:
-                errors.append("Email must be a valid email address")
-        
-        # Name validation
-        first_name = user_data.get('first_name', '')
-        if not first_name:
-            errors.append("First name is required")
-        elif len(first_name) > 50:
-            errors.append("First name cannot be longer than 50 characters")
-        
-        last_name = user_data.get('last_name', '')
-        if not last_name:
-            errors.append("Last name is required")
-        elif len(last_name) > 50:
-            errors.append("Last name cannot be longer than 50 characters")
-        
-        return {
-            'is_valid': len(errors) == 0,
-            'errors': errors,
-            'warnings': warnings
-        }
+        Args:
+            user_id: User ID
+            preferences: Dict with preferences to set
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        service = UserService()
+        return service.set_user_preferences(user_id, preferences)

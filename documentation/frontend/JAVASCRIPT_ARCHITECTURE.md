@@ -363,6 +363,16 @@ This document describes the comprehensive JavaScript architecture implemented in
 
 ### 📊 Monitoring & Development
 
+#### Project Files Scanner (`project-files-scanner.js`) - **NEW**
+| Function | Description |
+|----------|-------------|
+| `window.getProjectFiles()` | Get all project files with caching |
+| `window.getFilesByType(type)` | Get files by type (js, html, css, python, other) |
+| `window.getTotalFileCount()` | Get total number of files |
+| `window.getFileStatistics()` | Get file statistics by type |
+| `window.clearProjectFilesCache()` | Clear project files cache |
+| `window.projectFilesScanner` | Global scanner instance |
+
 #### Linter Monitor (`linter-realtime-monitor.js`)
 | Function | Description |
 |----------|-------------|
@@ -421,7 +431,8 @@ trading-ui/scripts/
 │   ├── table-mappings.js          # Table column mappings
 │   ├── simple-filter.js           # Simple filter system
 │   ├── warning-system.js          # Central warning system
-│   └── crud-utils.js              # CRUD operations utilities
+│   ├── crud-utils.js              # CRUD operations utilities
+│   └── project-files-scanner.js   # Global project files scanner
 │
 ├── 📄 Page Files
 │   ├── accounts.js                # Account management (currency_id migration)
@@ -874,10 +885,10 @@ Optimized loading order and efficient function organization.
 | **Category** | **Count** | **Purpose** |
 |-------------|-----------|-------------|
 | **Core Files** | 3 | System foundation |
-| **Utility Files** | 10 | Shared functionality |
+| **Utility Files** | 11 | Shared functionality |
 | **Page Files** | 15 | Page-specific logic |
 | **System Files** | 4 | Advanced systems |
-| **Total** | **32** | Complete system |
+| **Total** | **33** | Complete system |
 
 ## 🔄 Maintenance Guidelines
 

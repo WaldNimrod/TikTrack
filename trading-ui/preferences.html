@@ -36,16 +36,20 @@
             <div class="d-flex justify-content-between align-items-center">
                 <h2><i class="bi bi-info-circle"></i> מידע כללי על ההעדפות</h2>
                 <div class="section-header-controls">
+                    <button class="btn btn-outline-secondary btn-sm" onclick="window.toggleSection('infoSummary')" id="toggleInfoBtn">
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
                     <button class="btn btn-success btn-sm" onclick="window.saveAllPreferences()" id="saveAllBtn">
                         <i class="bi bi-save"></i> שמור הכל
-          </button>
+                    </button>
                     <button class="btn btn-warning btn-sm" onclick="window.resetToDefaults()" id="resetBtn">
                         <i class="bi bi-arrow-clockwise"></i> איפוס
-            </button>
+                    </button>
                     <button class="btn btn-outline-secondary btn-sm" onclick="window.toggleAllSections()" id="toggleAllBtn">
                         <i class="bi bi-arrows-expand"></i> פתח/סגור הכל
-            </button>
-          </div>
+                    </button>
+                </div>
+            </div>
         </div>
         </div>
             <div class="section-body" id="infoSummary">

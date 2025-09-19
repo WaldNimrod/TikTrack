@@ -69,10 +69,10 @@
       <!-- UI Content Section Top Start-->
       <div class="top-section">
         <div class="section-header">
+          <h2>מטריצת סקריפטים ועמודים - TikTrack</h2>
           <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
-          <h2>מטריצת סקריפטים ועמודים - TikTrack</h2>
         </div>
         <div class="section-body">
           <div class="info-summary" id="summaryStats">
@@ -89,10 +89,10 @@
       <!-- UI Content Section 1 Start-->
       <div class="content-section" id="section1">
         <div class="section-header">
+          <h2>טבלת מטריצת הסקריפטים</h2>
           <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
-          <h2>טבלת מטריצת הסקריפטים</h2>
         </div>
         <div class="section-body">
           <div class="table-responsive" id="scriptsMatrixContainer">
@@ -296,17 +296,16 @@
 
         // Initialize scan interface for updating the matrix
         function initializeScanInterface() {
-            // Add scan button to the top section header after the title
+            // Add scan button to the top section header at the end (left side in RTL)
             const topSectionHeader = document.querySelector('.top-section .section-header');
-            const titleElement = topSectionHeader.querySelector('h2');
-            if (topSectionHeader && titleElement && !document.getElementById('scan-filesystem-btn')) {
+            if (topSectionHeader && !document.getElementById('scan-filesystem-btn')) {
                 const scanButton = document.createElement('button');
                 scanButton.id = 'scan-filesystem-btn';
-                scanButton.className = 'btn btn-primary btn-sm ms-3';
+                scanButton.className = 'btn btn-primary btn-sm me-3';
                 scanButton.innerHTML = '<i class="fas fa-search"></i> סריקת קבצים';
                 scanButton.onclick = scanFilesystem;
-                // Insert after the title, before any existing buttons
-                titleElement.insertAdjacentElement('afterend', scanButton);
+                // Insert at the beginning (left side in RTL layout)
+                topSectionHeader.insertBefore(scanButton, topSectionHeader.firstChild);
             }
         }
 

@@ -363,14 +363,29 @@ class ChartRenderer {
             item.metrics?.qualityScore || 0
         );
         const errorData = sortedData.map(item =>
-            (item.metrics?.errors || 0) + (item.metrics?.warnings || 0)
+            item.metrics?.errors || 0
+        );
+        const warningData = sortedData.map(item =>
+            item.metrics?.warnings || 0
+        );
+        const complexityData = sortedData.map(item =>
+            item.metrics?.advancedMetrics?.complexityScore || 0
+        );
+        const maintainabilityData = sortedData.map(item =>
+            item.metrics?.advancedMetrics?.maintainabilityScore || 0
+        );
+        const securityData = sortedData.map(item =>
+            item.metrics?.advancedMetrics?.securityScore || 0
+        );
+        const performanceData = sortedData.map(item =>
+            item.metrics?.advancedMetrics?.performanceScore || 0
         );
 
         return {
             labels: labels,
             datasets: [
                 {
-                    label: 'איכות קוד',
+                    label: 'איכות קוד (%)',
                     data: qualityData,
                     borderColor: 'rgb(75, 192, 192)',
                     backgroundColor: 'rgba(75, 192, 192, 0.1)',
@@ -381,15 +396,70 @@ class ChartRenderer {
                     pointHoverRadius: 6
                 },
                 {
-                    label: 'שגיאות ואזהרות',
+                    label: 'שגיאות',
                     data: errorData,
                     borderColor: 'rgb(255, 99, 132)',
                     backgroundColor: 'rgba(255, 99, 132, 0.1)',
                     yAxisID: 'y1',
                     tension: 0.3,
-                    fill: true,
-                    pointRadius: 4,
-                    pointHoverRadius: 6
+                    fill: false,
+                    pointRadius: 3,
+                    pointHoverRadius: 5
+                },
+                {
+                    label: 'אזהרות',
+                    data: warningData,
+                    borderColor: 'rgb(255, 206, 86)',
+                    backgroundColor: 'rgba(255, 206, 86, 0.1)',
+                    yAxisID: 'y1',
+                    tension: 0.3,
+                    fill: false,
+                    pointRadius: 3,
+                    pointHoverRadius: 5
+                },
+                {
+                    label: 'מורכבות',
+                    data: complexityData,
+                    borderColor: 'rgb(153, 102, 255)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.1)',
+                    yAxisID: 'y2',
+                    tension: 0.3,
+                    fill: false,
+                    pointRadius: 2,
+                    pointHoverRadius: 4
+                },
+                {
+                    label: 'תחזוקה (%)',
+                    data: maintainabilityData,
+                    borderColor: 'rgb(54, 162, 235)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    yAxisID: 'y',
+                    tension: 0.3,
+                    fill: false,
+                    pointRadius: 2,
+                    pointHoverRadius: 4
+                },
+                {
+                    label: 'אבטחה (%)',
+                    data: securityData,
+                    borderColor: 'rgb(255, 159, 64)',
+                    backgroundColor: 'rgba(255, 159, 64, 0.1)',
+                    yAxisID: 'y',
+                    tension: 0.3,
+                    fill: false,
+                    pointRadius: 2,
+                    pointHoverRadius: 4
+                },
+                {
+                    label: 'ביצועים (%)',
+                    data: performanceData,
+                    borderColor: 'rgb(201, 203, 207)',
+                    backgroundColor: 'rgba(201, 203, 207, 0.1)',
+                    yAxisID: 'y',
+                    tension: 0.3,
+                    fill: false,
+                    pointRadius: 2,
+                    pointHoverRadius: 4
                 }
             ]
         };
@@ -416,6 +486,11 @@ class ChartRenderer {
             this.chart.data.labels = newChartData.labels;
             this.chart.data.datasets[0].data = newChartData.datasets[0].data;
             this.chart.data.datasets[1].data = newChartData.datasets[1].data;
+            this.chart.data.datasets[2].data = newChartData.datasets[2].data;
+            this.chart.data.datasets[3].data = newChartData.datasets[3].data;
+            this.chart.data.datasets[4].data = newChartData.datasets[4].data;
+            this.chart.data.datasets[5].data = newChartData.datasets[5].data;
+            this.chart.data.datasets[6].data = newChartData.datasets[6].data;
 
             // עדכון צירים
             await this.updateAxes(newData);
@@ -442,28 +517,53 @@ class ChartRenderer {
         }
 
         try {
-            // חישוב ערכי מקסימום לשגיאות
+            // חישוב ערכי מקסימום לשגיאות ואזהרות
             const allErrors = data
-                .map(item => (item.metrics?.errors || 0) + (item.metrics?.warnings || 0))
+                .map(item => item.metrics?.errors || 0)
                 .filter(n => !isNaN(n) && n >= 0);
+            const allWarnings = data
+                .map(item => item.metrics?.warnings || 0)
+                .filter(n => !isNaN(n) && n >= 0);
+            const allIssues = [...allErrors, ...allWarnings];
 
-            let maxErrors = 10; // ברירת מחדל
-            if (allErrors.length > 0) {
-                maxErrors = Math.max(...allErrors);
-                maxErrors = Math.max(maxErrors, 10); // מינימום 10
-                maxErrors = Math.ceil(maxErrors * 1.2); // 20% מרווח
+            let maxIssues = 10; // ברירת מחדל
+            if (allIssues.length > 0) {
+                maxIssues = Math.max(...allIssues);
+                maxIssues = Math.max(maxIssues, 10); // מינימום 10
+                maxIssues = Math.ceil(maxIssues * 1.2); // 20% מרווח
             }
 
-            // עדכון ציר y1 (שגיאות)
+            // עדכון ציר y1 (שגיאות ואזהרות)
             if (this.chart.options.scales.y1) {
-                this.chart.options.scales.y1.max = maxErrors;
+                this.chart.options.scales.y1.max = maxIssues;
                 this.chart.options.scales.y1.ticks = {
                     ...this.chart.options.scales.y1.ticks,
-                    stepSize: Math.max(1, Math.floor(maxErrors / 5))
+                    stepSize: Math.max(1, Math.floor(maxIssues / 5))
                 };
             }
 
-            console.log(`📊 עודכן ציר שגיאות: max=${maxErrors}`);
+            // חישוב ערכי מקסימום למורכבות
+            const allComplexity = data
+                .map(item => item.metrics?.advancedMetrics?.complexityScore || 0)
+                .filter(n => !isNaN(n) && n >= 0);
+
+            let maxComplexity = 10; // ברירת מחדל
+            if (allComplexity.length > 0) {
+                maxComplexity = Math.max(...allComplexity);
+                maxComplexity = Math.max(maxComplexity, 5); // מינימום 5
+                maxComplexity = Math.ceil(maxComplexity * 1.2); // 20% מרווח
+            }
+
+            // עדכון ציר y2 (מורכבות)
+            if (this.chart.options.scales.y2) {
+                this.chart.options.scales.y2.max = maxComplexity;
+                this.chart.options.scales.y2.ticks = {
+                    ...this.chart.options.scales.y2.ticks,
+                    stepSize: Math.max(0.5, Math.floor(maxComplexity / 5))
+                };
+            }
+
+            console.log(`📊 עודכן צירים: שגיאות/אזהרות max=${maxIssues}, מורכבות max=${maxComplexity}`);
 
         } catch (error) {
             console.warn('⚠️ שגיאה בעדכון צירים:', error);
@@ -531,6 +631,11 @@ class ChartRenderer {
             this.chart.data.labels = [];
             this.chart.data.datasets[0].data = [];
             this.chart.data.datasets[1].data = [];
+            this.chart.data.datasets[2].data = [];
+            this.chart.data.datasets[3].data = [];
+            this.chart.data.datasets[4].data = [];
+            this.chart.data.datasets[5].data = [];
+            this.chart.data.datasets[6].data = [];
             this.chart.update('none');
 
             console.log('🗑️ גרף נוקה');

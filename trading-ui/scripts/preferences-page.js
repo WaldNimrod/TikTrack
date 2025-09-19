@@ -47,7 +47,7 @@ async function loadAccountsForPreferences() {
 /**
  * Load colors using global preferences system
  */
-async function loadColorsForPreferences() {
+window.loadColorsForPreferences = async function() {
     try {
         // Use global preferences system
         if (typeof window.loadPreferences === 'function') {
@@ -220,7 +220,7 @@ function initializePreferencesPage() {
     
     // Load colors from database
     console.log('🎨 Calling loadColorsForPreferences...');
-    await loadColorsForPreferences();
+    await window.loadColorsForPreferences();
     
     // Load trading settings
     await loadTradingSettings();

@@ -26,7 +26,7 @@ def get_accounts():
         logger.error(f"Error getting accounts: {str(e)}")
         return jsonify({
             "status": "error",
-            "error": {"message": "Failed to retrieve accounts"},
+            "error": {"message": f"Failed to retrieve accounts: {str(e)}"},
             "version": "v1"
         }), 500
     finally:

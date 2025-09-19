@@ -73,7 +73,7 @@ window.loadColorsForPreferences = async function() {
                         colorValue = preferences[id];
                     }
                     
-                    if (colorValue) {
+                    if (colorValue && colorValue !== '#000000' && colorValue !== 'black') {
                         picker.value = colorValue;
                         loadedCount++;
                         console.log(`✅ Loaded color for ${id}: ${colorValue}`);

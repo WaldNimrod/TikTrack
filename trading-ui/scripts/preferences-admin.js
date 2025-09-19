@@ -96,11 +96,11 @@ window.createPreferencesAdminInterface = function() {
         </div>
     `;
     
-    // הוספת הממשק לעמוד
-    const mainContent = document.querySelector('.main-content');
-    if (mainContent) {
-        mainContent.appendChild(adminInterface);
-        console.log('✅ Admin interface created successfully');
+    // הוספת הממשק לקונטיינר הנכון
+    const adminContainer = document.getElementById('adminInterfaceContainer');
+    if (adminContainer) {
+        adminContainer.appendChild(adminInterface);
+        console.log('✅ Admin interface created successfully in adminInterfaceContainer');
         
         // טעינת נתונים ראשונית
         window.loadAdminData();
@@ -207,9 +207,9 @@ window.loadAdminPreferences = async function() {
         // טעינת מידע על העדפות
         const preferencesData = [];
         for (const [name, value] of Object.entries(allPreferences)) {
-            // דלג על העדפות שנמחקו
-            if (name === 'dataRefreshInterval') {
-                console.log(`⚠️ Skipping deleted preference: ${name}`);
+            // דלג על העדפות שנמחקו או שגויות
+            if (name === 'dataRefreshInterval' || name.startsWith('group_')) {
+                console.log(`⚠️ Skipping invalid preference: ${name}`);
                 continue;
             }
             

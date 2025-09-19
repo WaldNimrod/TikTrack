@@ -299,7 +299,6 @@ def get_page_mapping():
         }), 500
 
 @js_map_bp.route('/functions', methods=['GET'])
-@cache_for(ttl=300)  # Cache for 5 minutes
 def get_functions_data():
     """
     Get functions data from all JS files with enhanced metadata
@@ -411,6 +410,30 @@ def scan_js_files():
     except Exception as e:
         current_app.logger.error(f"Error scanning JS files: {e}")
         return jsonify({'error': 'Internal server error'}), 500
+
+@js_map_bp.route('/clear-cache', methods=['POST'])
+def clear_cache():
+    """
+    Clear cache for JS Map endpoints
+    """
+    try:
+        # Clear cache for specific endpoints
+        invalidate_cache('/api/js-map/page-mapping')
+        invalidate_cache('/api/js-map/functions')
+        invalidate_cache('/api/js-map/files-list')
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Cache cleared successfully',
+            'timestamp': os.path.getmtime(__file__)
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Error clearing cache: {e}")
+        return jsonify({
+            'status': 'error',
+            'error': str(e)
+        }), 500
 
 def sort_js_files_by_generality(js_files):
     """
@@ -654,3 +677,543 @@ def calculate_file_complexity(functions, line_count):
     ))
     
     return round(complexity_score, 2)
+
+# ===== NEW ADVANCED ENDPOINTS =====
+
+@js_map_bp.route('/analyze-duplicates', methods=['GET'])
+def analyze_duplicates():
+    """
+    Analyze function duplicates and similarities across all JS files
+    """
+    try:
+        # Get all functions data first
+        functions_response = get_functions_data()
+        if isinstance(functions_response, tuple):
+            # Error response
+            return functions_response
+        
+        functions_json = functions_response.get_json()
+        if functions_json.get('status') != 'success':
+            return jsonify({
+                'status': 'error',
+                'error': 'Failed to get functions data',
+                'data': {}
+            }), 500
+        
+        functions_data = functions_json.get('data', {})
+        
+        # Analyze duplicates
+        duplicates_analysis = analyze_function_duplicates(functions_data)
+        
+        return jsonify({
+            'status': 'success',
+            'data': duplicates_analysis,
+            'metadata': {
+                'total_files_analyzed': len(functions_data),
+                'analysis_timestamp': os.path.getmtime(__file__),
+                'duplicate_detection_algorithm': 'name_and_signature_matching'
+            }
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Error analyzing duplicates: {e}")
+        return jsonify({
+            'status': 'error',
+            'error': str(e),
+            'data': {}
+        }), 500
+
+@js_map_bp.route('/detect-local-functions', methods=['GET'])
+def detect_local_functions():
+    """
+    Detect pages using local functions instead of global ones
+    """
+    try:
+        # Get global functions index from documentation
+        global_functions = load_global_functions_index()
+        
+        # Get all functions data
+        functions_response = get_functions_data()
+        if isinstance(functions_response, tuple):
+            return functions_response
+        
+        functions_json = functions_response.get_json()
+        if functions_json.get('status') != 'success':
+            return jsonify({
+                'status': 'error',
+                'error': 'Failed to get functions data',
+                'data': {}
+            }), 500
+        
+        functions_data = functions_json.get('data', {})
+        
+        # Analyze local vs global function usage
+        local_functions_analysis = analyze_local_vs_global_functions(functions_data, global_functions)
+        
+        return jsonify({
+            'status': 'success',
+            'data': local_functions_analysis,
+            'metadata': {
+                'total_files_analyzed': len(functions_data),
+                'global_functions_count': len(global_functions),
+                'analysis_timestamp': os.path.getmtime(__file__)
+            }
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Error detecting local functions: {e}")
+        return jsonify({
+            'status': 'error',
+            'error': str(e),
+            'data': {}
+        }), 500
+
+@js_map_bp.route('/architecture-check', methods=['GET'])
+def architecture_check():
+    """
+    Check architecture compliance - ensure no functions in HTML files
+    """
+    try:
+        # Get all HTML files
+        html_files = list(TRADING_UI_PATH.glob('*.html'))
+        
+        # Check each HTML file for embedded functions
+        architecture_violations = []
+        
+        for html_file in html_files:
+            violations = check_html_for_functions(html_file)
+            if violations:
+                architecture_violations.extend(violations)
+        
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'violations': architecture_violations,
+                'compliant_files': len(html_files) - len(architecture_violations),
+                'total_html_files': len(html_files),
+                'is_compliant': len(architecture_violations) == 0
+            },
+            'metadata': {
+                'files_checked': [f.name for f in html_files],
+                'check_timestamp': os.path.getmtime(__file__),
+                'architecture_rule': 'No functions allowed in HTML files'
+            }
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Error checking architecture: {e}")
+        return jsonify({
+            'status': 'error',
+            'error': str(e),
+            'data': {}
+        }), 500
+
+@js_map_bp.route('/detailed-mapping-log', methods=['GET'])
+def detailed_mapping_log():
+    """
+    Generate detailed mapping log for clipboard copying
+    """
+    try:
+        # Get page mapping and functions data
+        page_mapping_response = get_page_mapping()
+        functions_response = get_functions_data()
+        
+        if isinstance(page_mapping_response, tuple) or isinstance(functions_response, tuple):
+            return jsonify({
+                'status': 'error',
+                'error': 'Failed to get required data',
+                'data': {}
+            }), 500
+        
+        page_mapping_json = page_mapping_response.get_json()
+        functions_json = functions_response.get_json()
+        
+        if (page_mapping_json.get('status') != 'success' or 
+            functions_json.get('status') != 'success'):
+            return jsonify({
+                'status': 'error',
+                'error': 'Failed to get valid data',
+                'data': {}
+            }), 500
+        
+        # Generate detailed log
+        detailed_log = generate_detailed_mapping_log(
+            page_mapping_json.get('data', {}),
+            functions_json.get('data', {})
+        )
+        
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'log_content': detailed_log,
+                'log_lines': len(detailed_log.split('\n')),
+                'clipboard_ready': True
+            },
+            'metadata': {
+                'generated_timestamp': os.path.getmtime(__file__),
+                'format': 'plain_text',
+                'purpose': 'developer_analysis_and_debugging'
+            }
+        })
+        
+    except Exception as e:
+        current_app.logger.error(f"Error generating detailed mapping log: {e}")
+        return jsonify({
+            'status': 'error',
+            'error': str(e),
+            'data': {}
+        }), 500
+
+# ===== HELPER FUNCTIONS FOR NEW ENDPOINTS =====
+
+def analyze_function_duplicates(functions_data):
+    """
+    Analyze function duplicates and similarities
+    """
+    duplicates = []
+    potential_duplicates = []
+    function_signatures = {}
+    
+    # Build function signatures database
+    for filename, file_data in functions_data.items():
+        if isinstance(file_data, dict) and 'functions' in file_data:
+            functions = file_data['functions']
+        else:
+            functions = file_data  # Fallback for old format
+        
+        for func in functions:
+            func_name = func.get('name', '')
+            func_params = func.get('params', '')
+            signature = f"{func_name}({func_params})"
+            
+            if signature not in function_signatures:
+                function_signatures[signature] = []
+            
+            function_signatures[signature].append({
+                'file': filename,
+                'function': func,
+                'signature': signature
+            })
+    
+    # Find exact duplicates
+    for signature, occurrences in function_signatures.items():
+        if len(occurrences) > 1:
+            duplicates.append({
+                'signature': signature,
+                'occurrences': len(occurrences),
+                'files': [occ['file'] for occ in occurrences],
+                'functions': [occ['function'] for occ in occurrences],
+                'duplicate_type': 'exact_match'
+            })
+    
+    # Find potential duplicates (similar names)
+    function_names = list(set([func['function']['name'] for funcs in function_signatures.values() for func in funcs]))
+    
+    for i, name1 in enumerate(function_names):
+        for name2 in function_names[i+1:]:
+            similarity = calculate_name_similarity(name1, name2)
+            if similarity > 0.8:  # 80% similarity threshold
+                potential_duplicates.append({
+                    'function1': name1,
+                    'function2': name2,
+                    'similarity_score': round(similarity, 2),
+                    'files1': [f for f, funcs in functions_data.items() 
+                              if any(func.get('name') == name1 for func in (funcs.get('functions', []) if isinstance(funcs, dict) else funcs))],
+                    'files2': [f for f, funcs in functions_data.items() 
+                              if any(func.get('name') == name2 for func in (funcs.get('functions', []) if isinstance(funcs, dict) else funcs))],
+                    'duplicate_type': 'similar_name'
+                })
+    
+    return {
+        'exact_duplicates': duplicates,
+        'potential_duplicates': potential_duplicates,
+        'summary': {
+            'total_exact_duplicates': len(duplicates),
+            'total_potential_duplicates': len(potential_duplicates),
+            'total_unique_signatures': len(function_signatures),
+            'duplicate_ratio': round(len(duplicates) / len(function_signatures) * 100, 2) if function_signatures else 0
+        }
+    }
+
+def analyze_local_vs_global_functions(functions_data, global_functions):
+    """
+    Analyze local vs global function usage
+    """
+    file_analysis = {}
+    
+    for filename, file_data in functions_data.items():
+        if isinstance(file_data, dict) and 'functions' in file_data:
+            functions = file_data['functions']
+        else:
+            functions = file_data  # Fallback for old format
+        
+        local_functions = []
+        should_be_global = []
+        
+        for func in functions:
+            func_name = func.get('name', '')
+            
+            # Check if this function should be global
+            if func_name in global_functions:
+                # This function exists in global list but is defined locally
+                should_be_global.append({
+                    'name': func_name,
+                    'line': func.get('line', 0),
+                    'global_location': global_functions[func_name]
+                })
+            else:
+                # Check if this looks like it should be global (used across pages)
+                if is_function_potentially_global(func_name, func):
+                    local_functions.append({
+                        'name': func_name,
+                        'line': func.get('line', 0),
+                        'reason': 'potentially_reusable'
+                    })
+        
+        if local_functions or should_be_global:
+            file_analysis[filename] = {
+                'local_functions': local_functions,
+                'should_be_global': should_be_global,
+                'total_local_issues': len(local_functions) + len(should_be_global)
+            }
+    
+    return {
+        'file_analysis': file_analysis,
+        'summary': {
+            'files_with_issues': len(file_analysis),
+            'total_local_function_issues': sum(data['total_local_issues'] for data in file_analysis.values()),
+            'files_analyzed': len(functions_data)
+        }
+    }
+
+def check_html_for_functions(html_file_path):
+    """
+    Check HTML file for embedded JavaScript functions
+    """
+    violations = []
+    
+    try:
+        with open(html_file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        lines = content.split('\n')
+        in_script_tag = False
+        
+        for i, line in enumerate(lines):
+            line_stripped = line.strip()
+            
+            # Track if we're inside a script tag
+            if '<script' in line_stripped:
+                in_script_tag = True
+            elif '</script>' in line_stripped:
+                in_script_tag = False
+                continue
+            
+            # Look for function definitions inside script tags
+            if in_script_tag:
+                # Check for function declarations
+                if re.search(r'\bfunction\s+\w+\s*\(', line_stripped):
+                    violations.append({
+                        'file': html_file_path.name,
+                        'line': i + 1,
+                        'content': line_stripped[:100] + '...' if len(line_stripped) > 100 else line_stripped,
+                        'violation_type': 'function_declaration',
+                        'severity': 'high'
+                    })
+                
+                # Check for arrow functions
+                if re.search(r'\w+\s*=\s*\([^)]*\)\s*=>', line_stripped):
+                    violations.append({
+                        'file': html_file_path.name,
+                        'line': i + 1,
+                        'content': line_stripped[:100] + '...' if len(line_stripped) > 100 else line_stripped,
+                        'violation_type': 'arrow_function',
+                        'severity': 'high'
+                    })
+    
+    except Exception as e:
+        current_app.logger.error(f"Error checking HTML file {html_file_path}: {e}")
+    
+    return violations
+
+def generate_detailed_mapping_log(page_mapping_data, functions_data):
+    """
+    Generate detailed mapping log for clipboard copying
+    """
+    log_lines = []
+    log_lines.append("=" * 80)
+    log_lines.append("TikTrack JS-Map System - Detailed Mapping Log")
+    log_lines.append("=" * 80)
+    log_lines.append(f"Generated: {os.path.getmtime(__file__)}")
+    log_lines.append("")
+    
+    # Page mapping section
+    log_lines.append("📋 PAGE TO JS FILE MAPPING")
+    log_lines.append("-" * 40)
+    
+    for page_name, page_data in page_mapping_data.items():
+        if isinstance(page_data, dict):
+            files = page_data.get('files', [])
+            page_type = page_data.get('page_type', 'unknown')
+            functions_count = page_data.get('functions_count', 0)
+        else:
+            files = page_data
+            page_type = 'unknown'
+            functions_count = 0
+        
+        log_lines.append(f"📄 {page_name} ({page_type})")
+        log_lines.append(f"   Functions: {functions_count}")
+        log_lines.append(f"   JS Files: {len(files)}")
+        
+        for file in files:
+            log_lines.append(f"     - {file}")
+        log_lines.append("")
+    
+    # Functions summary section
+    log_lines.append("⚙️ FUNCTIONS SUMMARY")
+    log_lines.append("-" * 40)
+    
+    total_functions = 0
+    for filename, file_data in functions_data.items():
+        if isinstance(file_data, dict) and 'functions' in file_data:
+            functions = file_data['functions']
+            metadata = file_data.get('metadata', {})
+        else:
+            functions = file_data
+            metadata = {}
+        
+        func_count = len(functions)
+        total_functions += func_count
+        
+        log_lines.append(f"📁 {filename}")
+        log_lines.append(f"   Functions: {func_count}")
+        
+        if metadata:
+            log_lines.append(f"   File Size: {metadata.get('file_size', 0)} bytes")
+            log_lines.append(f"   Lines: {metadata.get('line_count', 0)}")
+            log_lines.append(f"   Complexity: {metadata.get('complexity_score', 0)}")
+        
+        # List function names
+        if func_count > 0:
+            func_names = [func.get('name', 'unknown') for func in functions[:10]]  # First 10
+            log_lines.append(f"   Top Functions: {', '.join(func_names)}")
+            if func_count > 10:
+                log_lines.append(f"   ... and {func_count - 10} more")
+        
+        log_lines.append("")
+    
+    log_lines.append(f"📊 TOTAL FUNCTIONS: {total_functions}")
+    log_lines.append("=" * 80)
+    
+    return '\n'.join(log_lines)
+
+def load_global_functions_index():
+    """
+    Load global functions index from documentation
+    """
+    global_functions = {}
+    
+    try:
+        # Read the JAVASCRIPT_ARCHITECTURE.md file
+        doc_path = Path(__file__).parent.parent.parent.parent / 'documentation' / 'frontend' / 'JAVASCRIPT_ARCHITECTURE.md'
+        
+        if doc_path.exists():
+            with open(doc_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # Parse the global functions index from the documentation
+            # Look for function tables
+            lines = content.split('\n')
+            in_function_table = False
+            current_file = None
+            
+            for line in lines:
+                line_stripped = line.strip()
+                
+                # Detect function table headers
+                if '| Function | Description |' in line_stripped:
+                    in_function_table = True
+                    continue
+                elif line_stripped.startswith('###') and 'Functions' in line_stripped:
+                    # Extract file name from header
+                    if '`' in line_stripped:
+                        current_file = line_stripped.split('`')[1]
+                    continue
+                elif in_function_table and line_stripped.startswith('|') and not line_stripped.startswith('|---'):
+                    # Parse function row
+                    parts = [p.strip() for p in line_stripped.split('|')[1:-1]]
+                    if len(parts) >= 2:
+                        func_name = parts[0].replace('`', '').replace('window.', '')
+                        description = parts[1]
+                        
+                        if func_name and current_file:
+                            global_functions[func_name] = {
+                                'file': current_file,
+                                'description': description
+                            }
+                
+                # Reset table detection on empty line or new section
+                if not line_stripped or line_stripped.startswith('#'):
+                    in_function_table = False
+    
+    except Exception as e:
+        current_app.logger.error(f"Error loading global functions index: {e}")
+    
+    return global_functions
+
+def calculate_name_similarity(name1, name2):
+    """
+    Calculate similarity between two function names
+    """
+    # Simple similarity based on common characters and length
+    if not name1 or not name2:
+        return 0.0
+    
+    # Convert to lowercase for comparison
+    name1_lower = name1.lower()
+    name2_lower = name2.lower()
+    
+    # If names are identical
+    if name1_lower == name2_lower:
+        return 1.0
+    
+    # Calculate character overlap
+    common_chars = set(name1_lower) & set(name2_lower)
+    total_chars = set(name1_lower) | set(name2_lower)
+    
+    char_similarity = len(common_chars) / len(total_chars) if total_chars else 0
+    
+    # Calculate length similarity
+    max_len = max(len(name1), len(name2))
+    min_len = min(len(name1), len(name2))
+    length_similarity = min_len / max_len if max_len > 0 else 0
+    
+    # Combine similarities
+    similarity = (char_similarity * 0.7) + (length_similarity * 0.3)
+    
+    return similarity
+
+def is_function_potentially_global(func_name, func_data):
+    """
+    Check if a function looks like it should be global
+    """
+    # Functions that typically should be global
+    global_indicators = [
+        'get', 'set', 'load', 'save', 'update', 'delete', 'create',
+        'fetch', 'send', 'validate', 'format', 'parse', 'convert',
+        'show', 'hide', 'toggle', 'init', 'setup', 'configure'
+    ]
+    
+    func_name_lower = func_name.lower()
+    
+    # Check if function name contains global indicators
+    for indicator in global_indicators:
+        if indicator in func_name_lower:
+            return True
+    
+    # Check if function has generic utility purpose based on description
+    description = func_data.get('description', '').lower()
+    if any(word in description for word in ['utility', 'helper', 'common', 'shared', 'global']):
+        return True
+    
+    return False

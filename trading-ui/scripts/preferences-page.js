@@ -220,7 +220,12 @@ async function initializePreferencesPage() {
     
     // Load colors from database
     console.log('🎨 Calling loadColorsForPreferences...');
-    await window.loadColorsForPreferences();
+    try {
+        await window.loadColorsForPreferences();
+        console.log('✅ Colors loaded successfully');
+    } catch (error) {
+        console.error('❌ Error loading colors:', error);
+    }
     
     // Load trading settings
     await loadTradingSettings();
@@ -248,13 +253,22 @@ async function initializeInfoSummary() {
         
         // Load preferences count
         if (typeof window.getAllUserPreferences === 'function') {
-            const result = await window.getAllUserPreferences();
-            if (result && result.success) {
-                const preferences = result.data.preferences || {};
-                const count = Object.keys(preferences).length;
+            try {
+                const result = await window.getAllUserPreferences();
+                if (result && result.success) {
+                    const preferences = result.data.preferences || {};
+                    const count = Object.keys(preferences).length;
+                    const countElement = document.getElementById('preferencesCount');
+                    if (countElement) {
+                        countElement.textContent = count;
+                        console.log(`📊 Loaded preferences count: ${count}`);
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error loading preferences count:', error);
                 const countElement = document.getElementById('preferencesCount');
                 if (countElement) {
-                    countElement.textContent = count;
+                    countElement.textContent = 'שגיאה';
                 }
             }
         }

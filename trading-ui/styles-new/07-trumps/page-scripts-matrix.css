@@ -29,23 +29,25 @@
     writing-mode: vertical-rl;
     text-orientation: mixed;
     white-space: nowrap;
+    width: 20px;
 }
 
-/* First column - script names - sticky */
+/* First column - script names - sticky but narrow */
 #page-scripts-matrix-table th:first-child,
 #page-scripts-matrix-table td:first-child {
     position: sticky;
     left: 0;
     background: #e8f0fe;
     z-index: 10;
-    width: 100px;
+    width: 80px;
     writing-mode: horizontal-tb;
+    text-orientation: initial;
 }
 
 /* Data columns - ultra narrow */
 #page-scripts-matrix-table th:not(:first-child),
 #page-scripts-matrix-table td:not(:first-child) {
-    width: 15px;
+    width: 20px;
     padding: 0;
 }
 

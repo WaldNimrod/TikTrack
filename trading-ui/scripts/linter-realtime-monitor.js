@@ -265,32 +265,43 @@ function updateFileTypeStatistics(issues) {
     Object.keys(stats).forEach(type => {
         const stat = stats[type];
         
-        // Update file count
-        const fileCountElement = document.getElementById(`${type}FilesCount`);
-        if (fileCountElement) {
-            fileCountElement.textContent = stat.files;
-            console.log(`✅ Updated ${type}FilesCount to ${stat.files}`);
-        } else {
-            console.warn(`❌ Element ${type}FilesCount not found`);
-        }
-        
-        // Update error count
-        const errorCountElement = document.getElementById(`${type}ErrorsCount`);
-        if (errorCountElement) {
-            errorCountElement.textContent = stat.errors;
-            console.log(`✅ Updated ${type}ErrorsCount to ${stat.errors}`);
-        } else {
-            console.warn(`❌ Element ${type}ErrorsCount not found`);
-        }
-        
-        // Update warning count
-        const warningCountElement = document.getElementById(`${type}WarningsCount`);
-        if (warningCountElement) {
-            warningCountElement.textContent = stat.warnings;
-            console.log(`✅ Updated ${type}WarningsCount to ${stat.warnings}`);
-        } else {
-            console.warn(`❌ Element ${type}WarningsCount not found`);
-        }
+              // Map type names to element IDs
+              const elementIdMap = {
+                  'python': 'py',
+                  'css': 'css',
+                  'html': 'html',
+                  'js': 'js',
+                  'other': 'other'
+              };
+              
+              const elementId = elementIdMap[type] || type;
+              
+              // Update file count
+              const fileCountElement = document.getElementById(`${elementId}FilesCount`);
+              if (fileCountElement) {
+                  fileCountElement.textContent = stat.files;
+                  console.log(`✅ Updated ${elementId}FilesCount to ${stat.files}`);
+              } else {
+                  console.warn(`❌ Element ${elementId}FilesCount not found`);
+              }
+              
+              // Update error count
+              const errorCountElement = document.getElementById(`${elementId}ErrorsCount`);
+              if (errorCountElement) {
+                  errorCountElement.textContent = stat.errors;
+                  console.log(`✅ Updated ${elementId}ErrorsCount to ${stat.errors}`);
+              } else {
+                  console.warn(`❌ Element ${elementId}ErrorsCount not found`);
+              }
+              
+              // Update warning count
+              const warningCountElement = document.getElementById(`${elementId}WarningsCount`);
+              if (warningCountElement) {
+                  warningCountElement.textContent = stat.warnings;
+                  console.log(`✅ Updated ${elementId}WarningsCount to ${stat.warnings}`);
+              } else {
+                  console.warn(`❌ Element ${elementId}WarningsCount not found`);
+              }
     });
     
     // Update problem files table
@@ -989,8 +1000,23 @@ function copyDetailedLog() {
 // ========================================
 
 function getSelectedFileTypes() {
-    const checkboxes = document.querySelectorAll('input[name="fileType"]:checked');
-    return Array.from(checkboxes).map(cb => cb.value);
+    const typeMap = {
+        'scanJs': 'js',
+        'scanHtml': 'html', 
+        'scanPy': 'python',
+        'scanCss': 'css',
+        'scanOther': 'other'
+    };
+    
+    const selectedTypes = [];
+    Object.keys(typeMap).forEach(checkboxId => {
+        const checkbox = document.getElementById(checkboxId);
+        if (checkbox && checkbox.checked) {
+            selectedTypes.push(typeMap[checkboxId]);
+        }
+    });
+    
+    return selectedTypes;
 }
 
 function calculateTotalSize() {

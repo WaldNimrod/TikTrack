@@ -209,7 +209,6 @@ class UserService:
             "defaultAccountFilter": "all",
             "defaultDateRangeFilter": "this_week",
             "defaultSearchFilter": "",
-            "dataRefreshInterval": 5,
             "primaryDataProvider": "yahoo",
             "secondaryDataProvider": "google",
             "cacheTTL": 5,

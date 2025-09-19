@@ -73,9 +73,9 @@ window.getPreference = async function(preferenceName, userId = 1, profileId = nu
             }
             
             return value;
-        } else {
+      } else {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
+      }
     } catch (error) {
         console.error(`❌ Error getting preference ${preferenceName}:`, error);
         throw error;
@@ -154,10 +154,10 @@ window.getPreferencesByNames = async function(preferenceNames, userId = 1, profi
         
         // שאילתה לשרת
         const response = await fetch('/api/v1/preferences/user/multiple', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
             body: JSON.stringify({
                 preference_names: preferenceNames,
                 user_id: userId,
@@ -178,9 +178,9 @@ window.getPreferencesByNames = async function(preferenceNames, userId = 1, profi
             }
             
             return preferences;
-          } else {
+      } else {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
+      }
     } catch (error) {
         console.error(`❌ Error getting multiple preferences:`, error);
         throw error;
@@ -272,9 +272,9 @@ window.savePreference = async function(preferenceName, value, userId = 1, profil
             window.preferencesCache.set(cached);
             
             return true;
-        } else {
+      } else {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
+      }
     } catch (error) {
         console.error(`❌ Error saving preference ${preferenceName}:`, error);
         throw error;
@@ -313,9 +313,9 @@ window.savePreferences = async function(preferences, userId = 1, profileId = nul
             window.preferencesCache.set(cached);
             
             return true;
-        } else {
+      } else {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
+      }
     } catch (error) {
         console.error(`❌ Error saving multiple preferences:`, error);
         throw error;
@@ -372,13 +372,13 @@ window.checkPreferencesServiceHealth = async function() {
             const result = await response.json();
             console.log(`✅ Preferences service is healthy:`, result.data);
             return true;
-        } else {
+      } else {
             console.log(`❌ Preferences service is unhealthy: HTTP ${response.status}`);
-            return false;
-        }
+        return false;
+      }
     } catch (error) {
         console.error(`❌ Error checking preferences service health:`, error);
-        return false;
+      return false;
     }
 };
 
@@ -455,11 +455,11 @@ window.saveAllPreferences = async function() {
             // Preferences saved successfully
             
             return true;
-        } else {
+    } else {
             console.warn('⚠️ collectFormData function not found');
             return false;
         }
-    } catch (error) {
+  } catch (error) {
         console.error('❌ Error saving preferences:', error);
         
         // Show error notification
@@ -492,7 +492,7 @@ window.initializePreferences = async function() {
       
         console.log('✅ Preferences System initialized successfully');
       return true;
-    } catch (error) {
+  } catch (error) {
         console.error('❌ Error initializing Preferences System:', error);
       return false;
     }
@@ -546,11 +546,11 @@ window.resetToDefaults = async function() {
             }, 1000);
             
             return true;
-        } else {
+      } else {
             throw new Error('Failed to save default preferences');
-        }
-        
-    } catch (error) {
+    }
+    
+  } catch (error) {
         console.error('❌ Error resetting preferences to defaults:', error);
         
         if (typeof showNotification === 'function') {

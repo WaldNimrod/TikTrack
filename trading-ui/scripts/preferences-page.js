@@ -17,6 +17,7 @@ async function loadAccountsForPreferences() {
         // Use global function to load accounts
         if (typeof window.loadAccountsDataFromAPI === 'function') {
             const accounts = await window.loadAccountsDataFromAPI();
+            console.log('📊 Accounts loaded:', accounts);
             
             const accountSelect = document.getElementById('defaultAccountFilter');
             if (accountSelect && accounts) {
@@ -57,11 +58,45 @@ async function loadColorsForPreferences() {
                 // Load colors into color pickers - load all color pickers on the page
                 let loadedCount = 0;
                 const allColorPickers = document.querySelectorAll('input[type="color"]');
+                console.log(`🎨 Found ${allColorPickers.length} color pickers on page`);
+                
                 allColorPickers.forEach(picker => {
                     const id = picker.id;
-                    if (preferences[id]) {
-                        picker.value = preferences[id];
+                    const colorKey = picker.getAttribute('data-color-key');
+                    console.log(`🎨 Processing color picker: ${id} (key: ${colorKey})`);
+                    
+                    // Try to find by color key first, then by id
+                    let colorValue = null;
+                    if (colorKey && preferences[colorKey]) {
+                        colorValue = preferences[colorKey];
+                    } else if (preferences[id]) {
+                        colorValue = preferences[id];
+                    }
+                    
+                    if (colorValue) {
+                        picker.value = colorValue;
                         loadedCount++;
+                        console.log(`✅ Loaded color for ${id}: ${colorValue}`);
+                    } else {
+                        console.log(`⚠️ No preference found for ${id}, setting default`);
+                        // Set default color if none found
+                        if (id.includes('primary')) {
+                            picker.value = '#007bff';
+                        } else if (id.includes('success')) {
+                            picker.value = '#28a745';
+                        } else if (id.includes('warning')) {
+                            picker.value = '#ffc107';
+                        } else if (id.includes('danger')) {
+                            picker.value = '#dc3545';
+                        } else if (id.includes('positive')) {
+                            picker.value = '#28a745';
+                        } else if (id.includes('negative')) {
+                            picker.value = '#dc3545';
+                        } else if (id.includes('neutral')) {
+                            picker.value = '#6c757d';
+                        } else {
+                            picker.value = '#6c757d';
+                        }
                     }
                 });
                 
@@ -85,14 +120,92 @@ function validateCurrency(selectElement) {
     // Check if not USD
     if (!selectedValue.includes('USD')) {
         // Show notification
-        if (typeof showNotification === 'function') {
-            showNotification('המערכת תומכת כרגע רק בדולר אמריקאי (USD)', 'warning');
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('⚠️ המערכת תומכת כרגע רק בדולר אמריקאי (USD). השדה אופס לברירת המחדל.', 'warning');
         } else {
-            alert('המערכת תומכת כרגע רק בדולר אמריקאי (USD)');
+            alert('⚠️ המערכת תומכת כרגע רק בדולר אמריקאי (USD). השדה אופס לברירת המחדל.');
         }
         
         // Reset to USD
         selectElement.value = 'USD - דולר ארה"ב';
+    }
+}
+
+/**
+ * Load trading settings from preferences
+ */
+async function loadTradingSettings() {
+    try {
+        console.log('📈 Loading trading settings...');
+        
+        // Try multiple approaches to load trading settings
+        let settings = {};
+        
+        // Method 1: Try getGroupPreferences
+        if (typeof window.getGroupPreferences === 'function') {
+            try {
+                const result = await window.getGroupPreferences('trading_settings');
+                if (result && result.success) {
+                    settings = result.data.preferences || {};
+                    console.log('✅ Loaded via getGroupPreferences:', settings);
+                }
+            } catch (error) {
+                console.warn('⚠️ getGroupPreferences failed:', error);
+            }
+        }
+        
+        // Method 2: Try individual preferences
+        if (Object.keys(settings).length === 0) {
+            try {
+                const stopLoss = await window.getPreference('defaultStopLoss');
+                const targetPrice = await window.getPreference('defaultTargetPrice');
+                const commission = await window.getPreference('defaultCommission');
+                
+                if (stopLoss && stopLoss.success) settings.defaultStopLoss = stopLoss.data.value;
+                if (targetPrice && targetPrice.success) settings.defaultTargetPrice = targetPrice.data.value;
+                if (commission && commission.success) settings.defaultCommission = commission.data.value;
+                
+                console.log('✅ Loaded via individual preferences:', settings);
+            } catch (error) {
+                console.warn('⚠️ Individual preferences failed:', error);
+            }
+        }
+        
+        // Method 3: Use defaults if nothing loaded
+        if (Object.keys(settings).length === 0) {
+            settings = {
+                defaultStopLoss: '2.0',
+                defaultTargetPrice: '5.0',
+                defaultCommission: '0.5'
+            };
+            console.log('⚠️ Using default values:', settings);
+        }
+        
+        // Update UI
+        const stopLossElement = document.getElementById('defaultStopLoss');
+        const targetPriceElement = document.getElementById('defaultTargetPrice');
+        const commissionElement = document.getElementById('defaultCommission');
+        
+        if (stopLossElement) stopLossElement.value = settings.defaultStopLoss || '2.0';
+        if (targetPriceElement) targetPriceElement.value = settings.defaultTargetPrice || '5.0';
+        if (commissionElement) commissionElement.value = settings.defaultCommission || '0.5';
+        
+        console.log('✅ Trading settings UI updated:', { 
+            defaultStopLoss: settings.defaultStopLoss, 
+            defaultTargetPrice: settings.defaultTargetPrice, 
+            defaultCommission: settings.defaultCommission 
+        });
+    } catch (error) {
+        console.error('❌ Error loading trading settings:', error);
+        
+        // Fallback to defaults
+        const stopLossElement = document.getElementById('defaultStopLoss');
+        const targetPriceElement = document.getElementById('defaultTargetPrice');
+        const commissionElement = document.getElementById('defaultCommission');
+        
+        if (stopLossElement) stopLossElement.value = '2.0';
+        if (targetPriceElement) targetPriceElement.value = '5.0';
+        if (commissionElement) commissionElement.value = '0.5';
     }
 }
 
@@ -107,6 +220,9 @@ function initializePreferencesPage() {
     
     // Load colors from database
     loadColorsForPreferences();
+    
+    // Load trading settings
+    loadTradingSettings();
     
     // Initialize info summary
     initializeInfoSummary();
@@ -181,6 +297,7 @@ async function initializeInfoSummary() {
 // Export functions to global scope
 window.loadAccountsForPreferences = loadAccountsForPreferences;
 window.loadColorsForPreferences = loadColorsForPreferences;
+window.loadTradingSettings = loadTradingSettings;
 window.validateCurrency = validateCurrency;
 window.initializePreferencesPage = initializePreferencesPage;
 window.initializeInfoSummary = initializeInfoSummary;

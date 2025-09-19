@@ -29,47 +29,7 @@ window.createPreferencesAdminInterface = function() {
     adminInterface.id = 'preferences-admin-interface';
     adminInterface.className = 'preferences-admin-interface';
     adminInterface.innerHTML = `
-        <div class="admin-header">
-            <h3><i class="bi bi-gear-fill"></i> ממשק ניהול העדפות</h3>
-            <div class="admin-controls">
-                <button class="btn btn-sm btn-outline-primary" onclick="window.refreshAdminData()">
-                    <i class="bi bi-arrow-clockwise"></i> רענן
-                </button>
-                <button class="btn btn-sm btn-outline-secondary" onclick="window.toggleAdminInterface()">
-                    <i class="bi bi-x-lg"></i> סגור
-                </button>
-            </div>
-        </div>
-        
         <div class="admin-content">
-            <!-- חיפוש וסינון -->
-            <div class="admin-search-section">
-                <div class="row g-3 mb-3">
-                    <div class="col-md-3">
-                        <label class="form-label">משתמש:</label>
-                        <select class="form-select" id="admin-user-select">
-                            <option value="1">משתמש 1 (ברירת מחדל)</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">פרופיל:</label>
-                        <select class="form-select" id="admin-profile-select">
-                            <option value="">כל הפרופילים</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">קבוצה:</label>
-                        <select class="form-select" id="admin-group-select">
-                            <option value="">כל הקבוצות</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">חיפוש:</label>
-                        <input type="text" class="form-control" id="admin-search-input" placeholder="חפש העדפה...">
-                    </div>
-                </div>
-            </div>
-            
             <!-- טבלת העדפות -->
             <div class="admin-table-section">
                 <div class="table-responsive">

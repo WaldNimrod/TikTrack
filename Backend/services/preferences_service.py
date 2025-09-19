@@ -120,7 +120,7 @@ class PreferencesService:
             if value is None or str(value).strip() == '':
                 if is_required:
                     raise ValidationError(f"Preference '{preference_name}' is required")
-                return True
+            return True
             
             # בדיקת סוג נתונים
             if data_type == 'integer':
@@ -270,7 +270,7 @@ class PreferencesService:
                 return result[0]
             else:
                 raise ValueError(f"Group not found: {group_name}")
-                
+            
         except Exception as e:
             logger.error(f"Error getting group ID for {group_name}: {e}")
             raise
@@ -605,7 +605,7 @@ class PreferencesService:
                         (user_id, profile_id, preference_id, saved_value, updated_at)
                         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
                     ''', (user_id, profile_id, preference_id, string_value))
-                except Exception as e:
+        except Exception as e:
                     logger.warning(f"Failed to save preference {preference_name}: {e}")
                     continue
             

@@ -49,62 +49,65 @@ async function loadAccountsForPreferences() {
  */
 window.loadColorsForPreferences = async function() {
     try {
-        // Use global preferences system
-        if (typeof window.loadPreferences === 'function') {
-            const result = await window.loadPreferences();
-            if (result && result.success) {
-                const preferences = result.data.preferences || {};
+        // Load colors directly from API
+        const allColorPickers = document.querySelectorAll('input[type="color"]');
+        console.log(`🎨 Found ${allColorPickers.length} color pickers on page`);
+        
+        let loadedCount = 0;
+        
+        for (const picker of allColorPickers) {
+            const id = picker.id;
+            const colorKey = picker.getAttribute('data-color-key');
+            console.log(`🎨 Processing color picker: ${id} (key: ${colorKey})`);
+            
+            try {
+                // Try to get preference by name
+                const preferenceName = colorKey || id;
+                const response = await fetch(`/api/v1/preferences/user/preference?name=${preferenceName}&user_id=1`);
                 
-                // Load colors into color pickers - load all color pickers on the page
-                let loadedCount = 0;
-                const allColorPickers = document.querySelectorAll('input[type="color"]');
-                console.log(`🎨 Found ${allColorPickers.length} color pickers on page`);
-                
-                allColorPickers.forEach(picker => {
-                    const id = picker.id;
-                    const colorKey = picker.getAttribute('data-color-key');
-                    console.log(`🎨 Processing color picker: ${id} (key: ${colorKey})`);
-                    
-                    // Try to find by color key first, then by id
-                    let colorValue = null;
-                    if (colorKey && preferences[colorKey]) {
-                        colorValue = preferences[colorKey];
-                    } else if (preferences[id]) {
-                        colorValue = preferences[id];
-                    }
-                    
-                    if (colorValue && colorValue !== '#000000' && colorValue !== 'black') {
-                        picker.value = colorValue;
-                        loadedCount++;
-                        console.log(`✅ Loaded color for ${id}: ${colorValue}`);
-                    } else {
-                        console.log(`⚠️ No preference found for ${id}, setting default`);
-                        // Set default color if none found
-                        if (id.includes('primary')) {
-                            picker.value = '#007bff';
-                        } else if (id.includes('success')) {
-                            picker.value = '#28a745';
-                        } else if (id.includes('warning')) {
-                            picker.value = '#ffc107';
-                        } else if (id.includes('danger')) {
-                            picker.value = '#dc3545';
-                        } else if (id.includes('positive')) {
-                            picker.value = '#28a745';
-                        } else if (id.includes('negative')) {
-                            picker.value = '#dc3545';
-                        } else if (id.includes('neutral')) {
-                            picker.value = '#6c757d';
-                        } else {
-                            picker.value = '#6c757d';
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.data.value) {
+                        const colorValue = result.data.value;
+                        if (colorValue && colorValue !== '#000000' && colorValue !== 'black') {
+                            picker.value = colorValue;
+                            loadedCount++;
+                            console.log(`✅ Loaded color for ${id}: ${colorValue}`);
+                            continue;
                         }
                     }
-                });
+                }
                 
-                console.log(`✅ Loaded ${loadedCount} colors for preferences using global system`);
+                // Fallback to default colors
+                console.log(`⚠️ No preference found for ${id}, setting default`);
+                if (id.includes('primary')) {
+                    picker.value = '#007bff';
+                } else if (id.includes('success')) {
+                    picker.value = '#28a745';
+                } else if (id.includes('warning')) {
+                    picker.value = '#ffc107';
+                } else if (id.includes('danger')) {
+                    picker.value = '#dc3545';
+                } else if (id.includes('positive')) {
+                    picker.value = '#28a745';
+                } else if (id.includes('negative')) {
+                    picker.value = '#dc3545';
+                } else if (id.includes('neutral')) {
+                    picker.value = '#6c757d';
+                } else if (id.includes('entity')) {
+                    picker.value = '#6f42c1';
+                } else {
+                    picker.value = '#6c757d';
+                }
+                
+            } catch (error) {
+                console.error(`❌ Error loading color for ${id}:`, error);
+                // Set default color
+                picker.value = '#6c757d';
             }
-        } else {
-            console.warn('⚠️ Global loadPreferences function not available');
         }
+        
+        console.log(`🎨 Loaded ${loadedCount} colors from preferences`);
     } catch (error) {
         console.error('❌ Error loading colors:', error);
     }
@@ -252,24 +255,82 @@ async function initializeInfoSummary() {
         console.log('📊 Initializing info summary...');
         
         // Load preferences count
-        if (typeof window.getAllUserPreferences === 'function') {
-            try {
-                const result = await window.getAllUserPreferences();
-                if (result && result.success) {
-                    const preferences = result.data.preferences || {};
-                    const count = Object.keys(preferences).length;
+        try {
+            const response = await fetch('/api/v1/preferences/user?user_id=1');
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success && result.data.preferences) {
+                    const count = Object.keys(result.data.preferences).length;
                     const countElement = document.getElementById('preferencesCount');
                     if (countElement) {
                         countElement.textContent = count;
                         console.log(`📊 Loaded preferences count: ${count}`);
                     }
                 }
-            } catch (error) {
-                console.error('❌ Error loading preferences count:', error);
-                const countElement = document.getElementById('preferencesCount');
-                if (countElement) {
-                    countElement.textContent = 'שגיאה';
+            }
+        } catch (error) {
+            console.error('❌ Error loading preferences count:', error);
+            const countElement = document.getElementById('preferencesCount');
+            if (countElement) {
+                countElement.textContent = 'שגיאה';
+            }
+        }
+
+        // Load profiles count
+        if (typeof window.getUserProfiles === 'function') {
+            try {
+                const profiles = await window.getUserProfiles();
+                if (profiles && profiles.length > 0) {
+                    const profilesCountElement = document.getElementById('profilesCount');
+                    if (profilesCountElement) {
+                        profilesCountElement.textContent = profiles.length;
+                        console.log(`📊 Loaded profiles count: ${profiles.length}`);
+                    }
                 }
+            } catch (error) {
+                console.error('❌ Error loading profiles count:', error);
+                const profilesCountElement = document.getElementById('profilesCount');
+                if (profilesCountElement) {
+                    profilesCountElement.textContent = 'שגיאה';
+                }
+            }
+        }
+
+        // Load groups count
+        try {
+            const response = await fetch('/api/v1/preferences/groups');
+            if (response.ok) {
+                const result = await response.json();
+                if (result.success && result.data.groups) {
+                    const groupsCountElement = document.getElementById('groupsCount');
+                    if (groupsCountElement) {
+                        groupsCountElement.textContent = result.data.groups.length;
+                        console.log(`📊 Loaded groups count: ${result.data.groups.length}`);
+                    }
+                }
+            } else {
+                // Fallback: count groups from preferences
+                const response2 = await fetch('/api/v1/preferences/user?user_id=1');
+                if (response2.ok) {
+                    const result2 = await response2.json();
+                    if (result2.success && result2.data.preferences) {
+                        const groups = new Set();
+                        Object.values(result2.data.preferences).forEach(pref => {
+                            if (pref.group) groups.add(pref.group);
+                        });
+                        const groupsCountElement = document.getElementById('groupsCount');
+                        if (groupsCountElement) {
+                            groupsCountElement.textContent = groups.size;
+                            console.log(`📊 Loaded groups count from preferences: ${groups.size}`);
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('❌ Error loading groups count:', error);
+            const groupsCountElement = document.getElementById('groupsCount');
+            if (groupsCountElement) {
+                groupsCountElement.textContent = 'שגיאה';
             }
         }
 

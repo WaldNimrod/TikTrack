@@ -119,7 +119,12 @@ window.getGroupPreferences = async function(groupName, userId = 1, profileId = n
                 window.preferencesCache.set(cached);
             }
             
-            return preferences;
+            return {
+                success: true,
+                data: {
+                    preferences: preferences
+                }
+            };
       } else {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
@@ -310,10 +315,8 @@ window.savePreferences = async function(preferences, userId = 1, profileId = nul
             if (result.success) {
                 console.log(`✅ Saved multiple preferences:`, result);
                 
-                // עדכון מטמון
-                const cached = window.preferencesCache.get() || {};
-                Object.assign(cached, preferences);
-                window.preferencesCache.set(cached);
+                // עדכון מטמון - נקה מטמון כדי לטעון מחדש מהשרת
+                window.preferencesCache.clear();
                 
                 return true;
       } else {

@@ -58,7 +58,7 @@ function checkAndUpdateProjectFiles() {
                 filesCount: window.projectFiles.length,
                 cacheAge: Math.round(age / (60 * 60 * 1000)) + ' hours'
             });
-            return;
+        return;
         }
     }
     
@@ -460,8 +460,9 @@ function scanSingleFile(fileName) {
             if (typeof window.analyzeFileContent === 'function') {
                 window.analyzeFileContent(fileName, content);
             } else {
-                // Fallback to simulation if analysis module not loaded
-                simulateFileAnalysis(fileName);
+                // Analysis module not loaded - skip file analysis
+                addLogEntry('WARNING', `מודול ניתוח לא נטען - מדלג על ניתוח קובץ ${fileName}`);
+                scanningResults.scannedFiles++;
             }
         })
         .catch(error => {
@@ -469,7 +470,8 @@ function scanSingleFile(fileName) {
                 addLogEntry('WARNING', `קובץ לא נמצא: ${fileName} - מדלג`);
             } else {
                 addLogEntry('ERROR', `שגיאה בקריאת קובץ ${fileName}`, { error: error.message });
-                simulateFileAnalysis(fileName);
+                // No fake data - just count as scanned
+                scanningResults.scannedFiles++;
             }
         });
 }
@@ -477,32 +479,7 @@ function scanSingleFile(fileName) {
 // File analysis functions moved to linter-file-analysis.js module
 // Functions: analyzeFileContent, analyzeHtmlContent, analyzePythonContent, analyzeCssContent, analyzeOtherContent, getLineNumber
 
-function simulateFileAnalysis(fileName) {
-    const fileType = getFileType(fileName);
-    const issuesCount = Math.floor(Math.random() * 5);
-    
-    for (let i = 0; i < issuesCount; i++) {
-        const issue = {
-            type: Math.random() > 0.7 ? 'error' : 'warning',
-            message: `דמיית בעיה ${i + 1} בקובץ ${fileName}`,
-            file: fileName,
-            line: Math.floor(Math.random() * 100) + 1,
-            suggestion: 'הצעה לתיקון'
-        };
-        
-        if (issue.type === 'error') {
-            scanningResults.errors.push(issue);
-        } else {
-            scanningResults.warnings.push(issue);
-        }
-    }
-    
-    scanningResults.scannedFiles++;
-    addLogEntry('SUCCESS', `קובץ ${fileName} נסרק - נמצאו ${issuesCount} בעיות`, {
-        file: fileName,
-        issuesFound: issuesCount
-    });
-}
+// simulateFileAnalysis function removed - no more fake data!
 
 async function finishScan() {
     scanningResults.endTime = Date.now();
@@ -717,7 +694,7 @@ function handleLogEntry(entry) {
 function handleCriticalError(entry) {
     // Show notification
     if (typeof showNotification === 'function') {
-        showNotification('error', entry.message);
+        showNotification(entry.message, 'error', 'שגיאה קריטית');
     }
     
     // Attempt recovery based on error type
@@ -732,13 +709,13 @@ function handleCriticalError(entry) {
 
 function handleWarning(entry) {
     if (typeof showNotification === 'function') {
-        showNotification('warning', entry.message);
+        showNotification(entry.message, 'warning', 'אזהרה');
     }
 }
 
 function handleSuccess(entry) {
     if (typeof showNotification === 'function') {
-        showNotification('success', entry.message);
+        showNotification(entry.message, 'success', 'הצלחה');
     }
 }
 
@@ -830,8 +807,8 @@ function updateLogDisplay() {
                 <span class="log-time">${time}</span>
                 <span class="log-level">[${entry.level}]</span>
                 <span class="log-message">${entry.message}</span>
-            </div>
-        `;
+                    </div>
+                `;
     }).join('');
     
     // Scroll to bottom
@@ -975,6 +952,27 @@ window.startMonitoring = function() {
 };
 
 window.copyDetailedLog = copyDetailedLog;
+window.discoverProjectFiles = discoverProjectFiles;
+window.startFileScan = startFileScan;
+window.startMonitoring = startMonitoring;
+window.stopMonitoring = stopMonitoring;
+window.fixAllIssues = fixAllIssues;
+window.fixAllErrors = fixAllErrors;
+window.fixAllWarnings = fixAllWarnings;
+window.ignoreAllIssues = ignoreAllIssues;
+window.resetFixedIssues = resetFixedIssues;
+window.refreshChartData = refreshChartData;
+window.clearChartHistory = clearChartHistory;
+window.applyChartSettings = applyChartSettings;
+window.updateProblemFilesTable = updateProblemFilesTable;
+window.loadIssues = loadIssues;
+window.copyUnresolvedIssuesLog = copyUnresolvedIssuesLog;
+window.toggleAllSections = toggleAllSections;
+window.toggleSection = toggleSection;
+window.runComprehensiveTests = runComprehensiveTests;
+window.runQuickHealthCheck = runQuickHealthCheck;
+window.exportChartData = exportChartData;
+window.clearFiltersBtn = clearFiltersBtn;
 
 // ========================================
 // Initialization
@@ -984,6 +982,130 @@ document.addEventListener('DOMContentLoaded', function() {
     addLogEntry('INFO', 'DOM נטען - מאתחל מערכת...');
     initializeSession();
 });
+
+// ========================================
+// Project Files Discovery
+// ========================================
+
+function discoverProjectFiles() {
+    addLogEntry('INFO', 'מתחיל גילוי קבצי הפרויקט...');
+    
+    const discoveredFiles = {
+        js: [],
+        html: [],
+        css: [],
+        python: [],
+        other: []
+    };
+    
+    // JavaScript files
+    const jsFiles = [
+        'trading-ui/scripts/linter-realtime-monitor.js',
+        'trading-ui/scripts/linter-file-analysis.js',
+        'trading-ui/scripts/linter-testing-system.js',
+        'trading-ui/scripts/linter-export-system.js',
+        'trading-ui/scripts/indexeddb-adapter.js',
+        'trading-ui/scripts/log-recovery.js',
+        'trading-ui/scripts/data-collector.js',
+        'trading-ui/scripts/chart-renderer.js',
+        'trading-ui/scripts/main.js',
+        'trading-ui/scripts/notification-system.js',
+        'trading-ui/scripts/ui-utils.js',
+        'trading-ui/scripts/tables.js',
+        'trading-ui/scripts/linked-items.js',
+        'trading-ui/scripts/page-utils.js',
+        'trading-ui/scripts/data-utils.js',
+        'trading-ui/scripts/translation-utils.js',
+        'trading-ui/scripts/console-cleanup.js',
+        'trading-ui/scripts/date-utils.js',
+        'trading-ui/scripts/color-demo-toggle.js',
+        'trading-ui/scripts/color-scheme-system.js',
+        'trading-ui/scripts/preferences.js',
+        'trading-ui/scripts/header-system.js',
+        'trading-ui/scripts/filter-system.js'
+    ];
+    
+    // HTML files
+    const htmlFiles = [
+        'trading-ui/linter-realtime-monitor.html',
+        'trading-ui/crud-testing-dashboard.html',
+        'trading-ui/test-header-only.html',
+        'trading-ui/color-scheme-examples.html',
+        'trading-ui/test-header-menus-pushed.html',
+        'trading-ui/test-header-yesterday.html',
+        'trading-ui/index.html',
+        'trading-ui/accounts.html',
+        'trading-ui/executions.html',
+        'trading-ui/trades.html',
+        'trading-ui/preferences.html',
+        'trading-ui/database.html',
+        'trading-ui/background-tasks.html'
+    ];
+    
+    // CSS files
+    const cssFiles = [
+        'trading-ui/styles-new/01-settings/_variables.css',
+        'trading-ui/styles-new/02-tools/_mixins.css',
+        'trading-ui/styles-new/03-generic/_reset.css',
+        'trading-ui/styles-new/04-elements/_typography.css',
+        'trading-ui/styles-new/05-objects/_layout.css',
+        'trading-ui/styles-new/06-components/_buttons-advanced.css',
+        'trading-ui/styles-new/06-components/_tables.css',
+        'trading-ui/styles-new/07-utilities/_spacing.css',
+        'trading-ui/styles-new/header-styles.css',
+        'trading-ui/styles/header-styles.css',
+        'trading-ui/styles/main-styles.css'
+    ];
+    
+    // Python files
+    const pythonFiles = [
+        'Backend/dev_server.py',
+        'Backend/db_manager.py',
+        'Backend/api_handler.py',
+        'Backend/background_tasks.py',
+        'Backend/indexeddb_service.py',
+        'Backend/data_collector.py',
+        'Backend/chart_service.py',
+        'Backend/linter_service.py',
+        'Backend/preferences_service.py',
+        'Backend/accounts_service.py',
+        'Backend/executions_service.py',
+        'Backend/trades_service.py',
+        'Backend/database_service.py'
+    ];
+    
+    // Other files
+    const otherFiles = [
+        'README.md',
+        'package.json',
+        'requirements.txt',
+        'documentation/frontend/LINTER_SYSTEM.md',
+        'documentation/frontend/CHART_IMPLEMENTATION.md',
+        'documentation/frontend/INDEXEDDB_SYSTEM.md',
+        'documentation/frontend/BACKGROUND_TASKS.md',
+        'documentation/frontend/TESTING_SYSTEM.md',
+        'documentation/frontend/EXPORT_SYSTEM.md'
+    ];
+    
+    // Combine all files
+    discoveredFiles.js = jsFiles;
+    discoveredFiles.html = htmlFiles;
+    discoveredFiles.css = cssFiles;
+    discoveredFiles.python = pythonFiles;
+    discoveredFiles.other = otherFiles;
+    
+    // Store in global variable
+    window.projectFiles = discoveredFiles;
+    
+    // Cache the discovery
+    localStorage.setItem('linterProjectFiles', JSON.stringify(discoveredFiles));
+    localStorage.setItem('linterProjectFilesTimestamp', Date.now().toString());
+    
+    const totalFiles = jsFiles.length + htmlFiles.length + cssFiles.length + pythonFiles.length + otherFiles.length;
+    addLogEntry('SUCCESS', `גילוי הושלם - נמצאו ${totalFiles} קבצים (JS: ${jsFiles.length}, HTML: ${htmlFiles.length}, CSS: ${cssFiles.length}, Python: ${pythonFiles.length}, Other: ${otherFiles.length})`);
+    
+    return discoveredFiles;
+}
 
 // ========================================
 // Module References

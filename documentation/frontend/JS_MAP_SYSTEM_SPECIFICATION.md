@@ -41,6 +41,12 @@
 11. **בדיקת ארכיטקטורה** - וידוא שאין פונקציות בתוך קבצי HTML (כלל מערכת)
 12. **לוג מפה מפורט** - לוג מפורט של המפה והקשרים להעתקה ללוח לניתוח ותיקון שגיאות
 
+#### מטרות שמירת נתונים (חדשות - עדכון 19.9.2025)
+13. **שמירה קבועה** - שמירת נתוני ניתוח ב-IndexedDB למניעת איבוד אחרי ניקוי cache
+14. **היסטוריית ניתוחים** - שמירת היסטוריה של ניתוחים קודמים להשוואה
+15. **ניקוי אוטומטי** - ניקוי נתונים ישנים ושמירת גיבויים אוטומטית
+16. **ניהול אחסון** - ממשק ניהול אחסון עם סטטיסטיקות וגיבויים
+
 ### יתרונות המערכת
 
 - **שיפור איכות קוד** - זיהוי כפילויות ופונקציות לא יעילות
@@ -48,10 +54,55 @@
 - **תחזוקה קלה** - מפה ברורה של כל הפונקציות במערכת
 - **פיתוח מהיר** - חיפוש מהיר של פונקציות קיימות
 - **דוקומנטציה אוטומטית** - עדכון אוטומטי של אינדקס הפונקציות
+- **שמירת נתונים** - שמירה קבועה של נתוני ניתוח למניעת איבוד
+- **ניתוח היסטורי** - השוואת ניתוחים לאורך זמן וזיהוי מגמות
 
 ---
 
 ## 🏗️ ארכיטקטורת המערכת
+
+### מערכת שמירת נתונים (IndexedDB)
+
+המערכת משתמשת ב-**IndexedDB** לשמירה קבועה של נתוני ניתוח:
+
+#### מבנה הנתונים
+```javascript
+// Store: js_map_analysis_history
+{
+  id: "analysis_20250919_143045",
+  timestamp: "2025-09-19T14:30:45.123Z",
+  analysisType: "duplicates" | "local_functions" | "architecture_check" | "full_analysis",
+  data: {
+    // תוצאות הניתוח
+    summary: { ... },
+    details: [ ... ],
+    metadata: { ... }
+  },
+  sessionId: "session_123",
+  fileHashes: {
+    // hash של קבצים שנסרקו
+    "main.js": "abc123...",
+    "ui-utils.js": "def456..."
+  }
+}
+
+// Store: js_map_system_logs
+{
+  id: "log_12345",
+  timestamp: "2025-09-19T14:30:45.123Z",
+  level: "info" | "warning" | "error",
+  message: "Analysis completed successfully",
+  details: { ... },
+  sessionId: "session_123"
+}
+```
+
+#### תכונות המערכת
+- **שמירה אוטומטית** - כל ניתוח נשמר אוטומטית
+- **ניקוי אוטומטי** - ניקוי נתונים ישנים כל 6 שעות
+- **גיבויים** - שמירת גיבויים לפני ניקוי
+- **ניהול גודל** - הגבלת גודל מקסימלי (100MB)
+- **היסטוריה** - שמירת עד 30 יום של נתונים
 
 ### מבנה כללי
 
@@ -148,6 +199,15 @@ class JsMapSystem {
 /api/js-map/architecture-check
 /api/js-map/detailed-mapping-log
 
+# Data Persistence Endpoints (New - 19.9.2025)
+/api/js-map/save-analysis
+/api/js-map/load-analysis-history
+/api/js-map/delete-analysis
+/api/js-map/get-storage-stats
+/api/js-map/cleanup-old-data
+/api/js-map/backup-data
+/api/js-map/restore-data
+
 # Utility functions
 analyze_function_similarity()
 detect_local_vs_global_usage()
@@ -156,6 +216,9 @@ generate_detailed_report()
 analyze_dependencies()
 check_architecture_compliance()
 generate_mapping_log()
+save_analysis_to_indexeddb()
+load_analysis_from_indexeddb()
+cleanup_old_analyses()
 ```
 
 ### 3. Analysis Engine

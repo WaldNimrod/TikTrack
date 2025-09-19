@@ -180,3 +180,4 @@ def add_missing_entity_colors():
 
 if __name__ == "__main__":
     add_missing_entity_colors()
+

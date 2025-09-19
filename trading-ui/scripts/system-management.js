@@ -259,6 +259,9 @@ class SystemManagement {
     try {
       console.log('📊 Loading system data...');
       
+      // Load primary data provider
+      await SystemManagement.loadPrimaryDataProvider();
+      
       // Load system overview
       const overviewResponse = await fetch('/api/system/overview');
       const overviewData = await overviewResponse.json();
@@ -787,6 +790,14 @@ class SystemManagement {
       });
     }
 
+    // Primary data provider change
+    const primaryDataProviderSelect = document.getElementById('primaryDataProvider');
+    if (primaryDataProviderSelect) {
+      primaryDataProviderSelect.addEventListener('change', (e) => {
+        SystemManagement.savePrimaryDataProvider(e.target.value);
+      });
+    }
+
     // Refresh button
     const refreshButton = document.querySelector('.refresh-btn');
     if (refreshButton) {
@@ -816,6 +827,73 @@ class SystemManagement {
       
       entry.style.display = levelMatch && searchMatch ? 'block' : 'none';
     });
+  }
+
+  /**
+   * Save primary data provider
+   * שמירת ספק נתונים ראשי
+   */
+  static async savePrimaryDataProvider(provider) {
+    try {
+      console.log(`💾 Saving primary data provider: ${provider}`);
+      
+      const response = await fetch('/api/v1/preferences/user/preference', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          preference_name: 'primaryDataProvider',
+          value: provider,
+          user_id: 1
+        })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          console.log('✅ Primary data provider saved successfully');
+          if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('הצלחה', `ספק נתונים ראשי נשמר: ${provider}`);
+          }
+        } else {
+          throw new Error(result.message || 'Failed to save primary data provider');
+        }
+      } else {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error('❌ Error saving primary data provider:', error);
+      if (typeof window.showErrorNotification === 'function') {
+        window.showErrorNotification('שגיאה', 'שגיאה בשמירת ספק נתונים ראשי: ' + error.message);
+      }
+    }
+  }
+
+  /**
+   * Load primary data provider
+   * טעינת ספק נתונים ראשי
+   */
+  static async loadPrimaryDataProvider() {
+    try {
+      console.log('📡 Loading primary data provider...');
+      
+      const response = await fetch('/api/v1/preferences/user/preference?name=primaryDataProvider&user_id=1');
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          const provider = result.data.value;
+          const select = document.getElementById('primaryDataProvider');
+          if (select) {
+            select.value = provider;
+            console.log(`✅ Primary data provider loaded: ${provider}`);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error loading primary data provider:', error);
+    }
   }
 
   destroy() {

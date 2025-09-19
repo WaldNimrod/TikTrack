@@ -116,6 +116,7 @@ from routes.api.currencies import currencies_bp
 from routes.api.linked_items import linked_items_bp
 from routes.api.note_relation_types import note_relation_types_bp
 from routes.api.js_map import js_map_bp
+from routes.api.page_scripts_matrix import page_scripts_matrix_bp
 from routes.api.cache_management import cache_management_bp
 from routes.api.query_optimization import query_optimization_bp
 from routes.api.server_management import server_management_bp
@@ -212,6 +213,7 @@ app.register_blueprint(currencies_bp)
 app.register_blueprint(linked_items_bp)
 app.register_blueprint(note_relation_types_bp)
 app.register_blueprint(js_map_bp)
+app.register_blueprint(page_scripts_matrix_bp)
 app.register_blueprint(cache_management_bp)
 app.register_blueprint(query_optimization_bp)
 app.register_blueprint(server_management_bp)
@@ -1519,6 +1521,96 @@ def serve_static_files(filename):
     # If not found, return 404
     return "File not found", 404
 
+@app.route("/api/v1/files/discover", methods=["GET"])
+@rate_limit_api(requests_per_minute=30)
+def discover_files():
+    """Discover all project files dynamically"""
+    try:
+        import os
+        import glob
+        from pathlib import Path
+        
+        # Get project root directory
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        
+        # Define file type patterns
+        file_patterns = {
+            'js': ['**/*.js'],
+            'html': ['**/*.html', '**/*.htm'],
+            'css': ['**/*.css'],
+            'python': ['**/*.py'],
+            'other': ['**/*.md', '**/*.json', '**/*.txt', '**/*.yml', '**/*.yaml', '**/*.xml', '**/*.sql', '**/*.sh', '**/*.bat']
+        }
+        
+        # Exclude patterns
+        exclude_patterns = [
+            'node_modules',
+            '.git',
+            '__pycache__',
+            '.pytest_cache',
+            'venv',
+            'env',
+            '.env',
+            'dist',
+            'build',
+            'coverage',
+            '.coverage',
+            'backup',
+            'backups',
+            'temp',
+            'tmp',
+            '.DS_Store',
+            'Thumbs.db'
+        ]
+        
+        discovered_files = {
+            'js': [],
+            'html': [],
+            'css': [],
+            'python': [],
+            'other': []
+        }
+        
+        # Scan for files
+        for file_type, patterns in file_patterns.items():
+            for pattern in patterns:
+                # Use glob to find files
+                full_pattern = os.path.join(project_root, pattern)
+                files = glob.glob(full_pattern, recursive=True)
+                
+                for file_path in files:
+                    # Convert to relative path
+                    rel_path = os.path.relpath(file_path, project_root)
+                    
+                    # Check if file should be excluded
+                    should_exclude = False
+                    for exclude_pattern in exclude_patterns:
+                        if exclude_pattern in rel_path:
+                            should_exclude = True
+                            break
+                    
+                    if not should_exclude:
+                        discovered_files[file_type].append(rel_path)
+        
+        # Remove duplicates and sort
+        for file_type in discovered_files:
+            discovered_files[file_type] = sorted(list(set(discovered_files[file_type])))
+        
+        return jsonify({
+            "success": True,
+            "files": discovered_files,
+            "total_files": sum(len(files) for files in discovered_files.values()),
+            "discovery_timestamp": datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "files": {},
+            "total_files": 0
+        }), 500
+
 if __name__ == "__main__":
     # 🎯 **New Configuration - Flask-SocketIO Development Server**
     # 
@@ -1535,6 +1627,7 @@ if __name__ == "__main__":
     # - **Location:** `backups/20250820_flask_simple_configuration/`
     # - **Date:** August 20, 2025
     # - **Status:** Archive - not in use
+
     #
     # ✅ **New Configuration:** Flask-SocketIO with real-time notifications
     

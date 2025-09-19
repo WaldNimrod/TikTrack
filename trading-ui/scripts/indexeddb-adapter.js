@@ -728,11 +728,70 @@ class LinterIndexedDBAdapter {
             };
         });
     }
+
+    /**
+     * קבלת הנתונים האחרונים
+     * @returns {Promise<Array>} רשימת הנתונים האחרונים
+     */
+    async getLatestData() {
+        if (!this.isReady()) {
+            throw new Error('IndexedDB לא מאותחל');
+        }
+
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([this.stores.chartHistory], 'readonly');
+            const store = transaction.objectStore(this.stores.chartHistory);
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                const data = request.result || [];
+                // מחזיר את 10 הרשומות האחרונות
+                const latestData = data.slice(-10);
+                console.log(`📊 נטענו ${latestData.length} רשומות אחרונות`);
+                resolve(latestData);
+            };
+
+            request.onerror = () => {
+                console.error('❌ שגיאה בטעינת נתונים אחרונים:', request.error);
+                reject(request.error);
+            };
+        });
+    }
+
+    /**
+     * קבלת נתונים היסטוריים
+     * @param {number} limit - מספר הרשומות המקסימלי
+     * @returns {Promise<Array>} רשימת הנתונים ההיסטוריים
+     */
+    async getHistoricalData(limit = 50) {
+        if (!this.isReady()) {
+            throw new Error('IndexedDB לא מאותחל');
+        }
+
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction([this.stores.chartHistory], 'readonly');
+            const store = transaction.objectStore(this.stores.chartHistory);
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                const data = request.result || [];
+                // מחזיר את הרשומות האחרונות לפי הגבלה
+                const historicalData = data.slice(-limit);
+                console.log(`📊 נטענו ${historicalData.length} רשומות היסטוריות`);
+                resolve(historicalData);
+            };
+
+            request.onerror = () => {
+                console.error('❌ שגיאה בטעינת נתונים היסטוריים:', request.error);
+                reject(request.error);
+            };
+        });
+    }
 }
 
 // ייצוא המחלקה לגלובל
 if (typeof window !== 'undefined') {
-    window.IndexedDBAdapter = LinterIndexedDBAdapter;
+    window.LinterIndexedDBAdapter = LinterIndexedDBAdapter;
 }
 
 console.log('🔧 LinterIndexedDBAdapter loaded successfully');

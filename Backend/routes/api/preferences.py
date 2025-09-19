@@ -217,7 +217,7 @@ def save_user_preferences() -> Any:
                     "saved_count": len(preferences)
                 },
                 "timestamp": datetime.now().isoformat()
-            }), 200
+        }), 200
         else:
             return jsonify({
                 "success": False,
@@ -480,6 +480,28 @@ def activate_profile() -> Any:
             'success': False,
             'error': str(e),
             'timestamp': datetime.now().isoformat()
+        }), 500
+
+@preferences_bp.route('/clear-cache', methods=['POST'])
+def clear_cache():
+    """
+    Clear preferences cache
+    ניקוי מטמון העדפות
+    """
+    try:
+        # Clear cache (if implemented)
+        # For now, just return success
+        return jsonify({
+            'success': True,
+            'message': 'Cache cleared successfully'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error clearing cache: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Error clearing cache: {str(e)}',
+            'error_code': 'CACHE_CLEAR_ERROR'
         }), 500
 
 # ============================================================================

@@ -274,6 +274,29 @@ function setupGlobalModalConfigurations() {
 }
 
 /**
+ * Get current page name from URL path
+ * @returns {string} Current page name
+ */
+function getCurrentPageName() {
+  const path = window.location.pathname;
+  const segments = path.split('/').filter(segment => segment.length > 0);
+  
+  if (segments.length === 0) {
+    return 'index';
+  }
+  
+  // Get the last segment (page name)
+  const pageName = segments[segments.length - 1];
+  
+  // Handle special cases
+  if (pageName === 'index.html' || pageName === '') {
+    return 'index';
+  }
+  
+  return pageName;
+}
+
+/**
  * Initialize current page specific functionality
  * Determines current page and calls appropriate initialization
  */
@@ -292,14 +315,32 @@ function initializeCurrentPage() {
   // Page initialization completed
 
   // Call page-specific initialization if available
-  const initFunctionName = `initialize${currentPage.charAt(0).toUpperCase() + currentPage.slice(1)}Page`;
+  // Convert hyphens to camelCase for function name
+  const camelCasePageName = currentPage.replace(/-([a-z])/g, (match, letter) => letter.toUpperCase());
+  const initFunctionName = `initialize${camelCasePageName.charAt(0).toUpperCase() + camelCasePageName.slice(1)}Page`;
   console.log('🔍 Looking for function:', initFunctionName);
   console.log('🔍 Function exists:', typeof window[initFunctionName] === 'function');
+  
   if (typeof window[initFunctionName] === 'function') {
     console.log('✅ Calling function:', initFunctionName);
     window[initFunctionName]();
   } else {
     console.log('❌ Function not found:', initFunctionName);
+    // Wait for the function to be available (for scripts loaded after main.js)
+    let attempts = 0;
+    const maxAttempts = 50; // 5 seconds max wait
+    const checkFunction = () => {
+      attempts++;
+      if (typeof window[initFunctionName] === 'function') {
+        console.log('✅ Function found after delay, calling:', initFunctionName);
+        window[initFunctionName]();
+      } else if (attempts < maxAttempts) {
+        setTimeout(checkFunction, 100); // Check every 100ms
+      } else {
+        console.log('❌ Function still not found after waiting:', initFunctionName);
+      }
+    };
+    setTimeout(checkFunction, 100);
   }
 
   // שחזור מצב הסקשנים אחרי אתחול הדף

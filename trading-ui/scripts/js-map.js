@@ -46,6 +46,79 @@ class JsMapSystem {
     }
 
     /**
+     * Load global functions index from functions data
+     */
+    async loadGlobalFunctionsIndex() {
+        try {
+            console.log('🔍 Loading global functions index...');
+            
+            // Try to load from the functions endpoint
+            const response = await fetch('/api/js-map/functions');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.status === 'success' && data.data) {
+                    // Extract global functions from the functions data
+                    this.globalFunctionsIndex = this.extractGlobalFunctions(data.data);
+                    console.log('✅ Global functions index loaded:', Object.keys(this.globalFunctionsIndex).length, 'functions');
+                } else {
+                    console.warn('⚠️ No functions data available for global index');
+                }
+            } else {
+                console.warn('⚠️ Could not load functions data for global index');
+            }
+        } catch (error) {
+            console.error('❌ Error loading global functions index:', error);
+        }
+    }
+
+    /**
+     * Extract global functions from functions data
+     */
+    extractGlobalFunctions(functionsData) {
+        const globalFunctions = {};
+        
+        // Define files that typically contain global functions
+        const globalFiles = [
+            'main.js', 'ui-utils.js', 'data-utils.js', 'translation-utils.js',
+            'tables.js', 'date-utils.js', 'linked-items.js', 'page-utils.js',
+            'header-system.js', 'notification-system.js', 'color-scheme-system.js'
+        ];
+        
+        for (const filename in functionsData) {
+            if (globalFiles.includes(filename) && functionsData[filename].functions) {
+                const functions = functionsData[filename].functions;
+                for (const func of functions) {
+                    if (func.name && this.isGlobalFunction(func)) {
+                        globalFunctions[func.name] = {
+                            file: filename,
+                            description: func.description || 'אין תיאור',
+                            line: func.line || 0,
+                            type: func.type || 'unknown'
+                        };
+                    }
+                }
+            }
+        }
+        
+        return globalFunctions;
+    }
+
+    /**
+     * Check if a function should be considered global
+     */
+    isGlobalFunction(func) {
+        // Functions that are typically global
+        const globalPatterns = [
+            'show', 'hide', 'toggle', 'load', 'save', 'update', 'delete', 'create',
+            'format', 'validate', 'get', 'set', 'init', 'setup', 'configure',
+            'apiCall', 'showNotification', 'formatDate', 'formatDateTime'
+        ];
+        
+        const funcName = func.name.toLowerCase();
+        return globalPatterns.some(pattern => funcName.includes(pattern));
+    }
+
+    /**
      * Load JS map data
      */
     async loadJsMapData() {
@@ -57,6 +130,9 @@ class JsMapSystem {
 
             // Get page mapping
             await this.loadPageMapping();
+            
+            // Load global functions index
+            await this.loadGlobalFunctionsIndex();
 
             // Get functions data
             await this.loadFunctionsData();
@@ -82,20 +158,167 @@ class JsMapSystem {
     async loadPageMapping() {
         console.log('🔄 Starting loadPageMapping...');
         try {
-            console.log('🌐 Fetching page mapping from API...');
-            const response = await fetch('/api/js-map/page-mapping');
+            console.log('🌐 Fetching page mapping from Page Scripts Matrix API...');
+            const response = await fetch('/api/page-scripts-matrix/scan-results');
             if (response.ok) {
-                this.pageMapping = await response.json();
-                console.log('✅ Page mapping loaded from API:', Object.keys(this.pageMapping));
+                const data = await response.json();
+                // Convert Page Scripts Matrix format to JS-Map format
+                this.pageMapping = this.convertPageScriptsMatrixToJsMap(data.data);
+                console.log('✅ Page mapping loaded from Page Scripts Matrix API:', Object.keys(this.pageMapping));
             } else {
-                console.warn('⚠️ API failed, using local scan');
-                this.pageMapping = this.scanPageMappingLocally();
+                console.warn('⚠️ Page Scripts Matrix API failed, trying JS-Map API...');
+                const fallbackResponse = await fetch('/api/js-map/page-mapping');
+                if (fallbackResponse.ok) {
+                    this.pageMapping = await fallbackResponse.json();
+                    console.log('✅ Page mapping loaded from JS-Map API:', Object.keys(this.pageMapping));
+                } else {
+                    console.warn('⚠️ Both APIs failed, using local scan');
+                    this.pageMapping = this.scanPageMappingLocally();
+                }
             }
         } catch (error) {
             console.warn('⚠️ Fetch failed, using local scan:', error);
             this.pageMapping = this.scanPageMappingLocally();
         }
         console.log('🔄 loadPageMapping completed. Page mapping keys:', Object.keys(this.pageMapping));
+    }
+
+    /**
+     * Convert Page Scripts Matrix format to JS-Map format
+     */
+    convertPageScriptsMatrixToJsMap(pageScriptsData) {
+        console.log('🔄 Converting Page Scripts Matrix data to JS-Map format...');
+        
+        const jsMapFormat = {};
+        
+        if (pageScriptsData && pageScriptsData.matrix) {
+            for (const [pageName, scripts] of Object.entries(pageScriptsData.matrix)) {
+                // Get scripts that are actually used by this page
+                const usedScripts = Object.entries(scripts)
+                    .filter(([scriptName, isUsed]) => isUsed === true)
+                    .map(([scriptName]) => scriptName);
+                
+                jsMapFormat[pageName] = {
+                    files: usedScripts,
+                    page_type: 'standard',
+                    functions_count: 0, // Will be calculated later
+                    last_modified: new Date().toISOString(),
+                    file_sizes: {},
+                    dependencies: usedScripts
+                };
+            }
+        }
+        
+        console.log('✅ Converted Page Scripts Matrix data:', Object.keys(jsMapFormat));
+        return jsMapFormat;
+    }
+
+    /**
+     * Check integration status with Page Scripts Matrix
+     */
+    async checkIntegrationStatus() {
+        console.log('🔍 Checking integration status with Page Scripts Matrix...');
+        
+        try {
+            // Test Page Scripts Matrix API
+            const response = await fetch('/api/page-scripts-matrix/scan-results');
+            if (response.ok) {
+                const data = await response.json();
+                console.log('✅ Page Scripts Matrix API is working');
+                console.log('📊 Available pages:', Object.keys(data.data.matrix || {}).length);
+                console.log('📊 Available scripts:', Object.keys(data.data.scripts || {}).length);
+                return {
+                    status: 'integrated',
+                    pages: Object.keys(data.data.matrix || {}).length,
+                    scripts: Object.keys(data.data.scripts || {}).length,
+                    lastScan: data.data.lastScan
+                };
+            } else {
+                console.warn('⚠️ Page Scripts Matrix API not available');
+                return { status: 'fallback', reason: 'API not available' };
+            }
+        } catch (error) {
+            console.warn('⚠️ Page Scripts Matrix integration check failed:', error);
+            return { status: 'fallback', reason: error.message };
+        }
+    }
+
+    /**
+     * Load integration status
+     */
+    async loadIntegrationStatus() {
+        try {
+            console.log('🔍 Loading integration status...');
+            
+            const integrationStatus = await this.checkIntegrationStatus();
+            
+            const container = document.getElementById('integrationContent');
+            if (!container) {
+                console.warn('⚠️ integrationContent container not found');
+                return;
+            }
+
+            let html = `
+                <div class="integration-status">
+                    <h3>🔗 סטטוס אינטגרציה עם מערכת Page Scripts Matrix</h3>
+                    <div class="status-info">
+                        <div class="status-item">
+                            <span class="status-label">סטטוס:</span>
+                            <span class="status-value ${integrationStatus.status === 'integrated' ? 'status-success' : 'status-warning'}">
+                                ${integrationStatus.status === 'integrated' ? '✅ מחובר' : '⚠️ מצב גיבוי'}
+                            </span>
+                        </div>
+            `;
+
+            if (integrationStatus.status === 'integrated') {
+                html += `
+                        <div class="status-item">
+                            <span class="status-label">עמודים זמינים:</span>
+                            <span class="status-value">${integrationStatus.pages}</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">סקריפטים זמינים:</span>
+                            <span class="status-value">${integrationStatus.scripts}</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">סריקה אחרונה:</span>
+                            <span class="status-value">${new Date(integrationStatus.lastScan).toLocaleString('he-IL')}</span>
+                        </div>
+                `;
+            } else {
+                html += `
+                        <div class="status-item">
+                            <span class="status-label">סיבה:</span>
+                            <span class="status-value">${integrationStatus.reason}</span>
+                        </div>
+                `;
+            }
+
+            html += `
+                    </div>
+                    <div class="integration-actions">
+                        <button class="action-btn" onclick="checkIntegrationStatus()">🔄 בדוק שוב</button>
+                        <button class="action-btn" onclick="loadPageMapping()">📊 טען נתונים מחדש</button>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+            console.log('✅ Integration status loaded successfully');
+            
+        } catch (error) {
+            console.error('❌ Error loading integration status:', error);
+            
+            const container = document.getElementById('integrationContent');
+            if (container) {
+                container.innerHTML = `
+                    <div class="error-message">
+                        <p>❌ שגיאה בטעינת סטטוס האינטגרציה</p>
+                        <button class="retry-btn" onclick="window.jsMapSystem.loadIntegrationStatus()">🔄 נסה שוב</button>
+                    </div>
+                `;
+            }
+        }
     }
 
     /**
@@ -113,9 +336,17 @@ class JsMapSystem {
                 console.log('📊 Total files with functions:', Object.keys(this.functionsData).length);
 
                 // Check if we have actual function data
-                const filesWithFunctions = Object.keys(this.functionsData).filter(file =>
-                    this.functionsData[file] && this.functionsData[file].length > 0
-                );
+                const filesWithFunctions = Object.keys(this.functionsData).filter(file => {
+                    const fileData = this.functionsData[file];
+                    if (fileData) {
+                        if (Array.isArray(fileData)) {
+                            return fileData.length > 0;
+                        } else if (fileData.functions && Array.isArray(fileData.functions)) {
+                            return fileData.functions.length > 0;
+                        }
+                    }
+                    return false;
+                });
                 console.log('📊 Files with actual functions:', filesWithFunctions.length);
 
                 // Log some sample data
@@ -390,7 +621,18 @@ class JsMapSystem {
         let html = '';
 
         Object.keys(this.functionsData).forEach(file => {
-            const functions = this.functionsData[file];
+            const fileData = this.functionsData[file];
+            let functions = [];
+            
+            // Handle different data structures
+            if (fileData) {
+                if (Array.isArray(fileData)) {
+                    functions = fileData;
+                } else if (fileData.functions && Array.isArray(fileData.functions)) {
+                    functions = fileData.functions;
+                }
+            }
+            
             console.log(`📄 Rendering functions for ${file}: ${functions.length} functions`);
 
             html += `
@@ -807,7 +1049,18 @@ function populateFunctionsDropdown() {
     let html = '';
 
     Object.keys(window.jsMapSystem.functionsData).forEach(file => {
-        const functions = window.jsMapSystem.functionsData[file];
+        const fileData = window.jsMapSystem.functionsData[file];
+        let functions = [];
+        
+        // Handle different data structures
+        if (fileData) {
+            if (Array.isArray(fileData)) {
+                functions = fileData;
+            } else if (fileData.functions && Array.isArray(fileData.functions)) {
+                functions = fileData.functions;
+            }
+        }
+        
         if (functions && functions.length > 0) {
             functions.forEach(func => {
                 html += `
@@ -891,31 +1144,49 @@ document.addEventListener('click', function (event) {
  * ==========================================
  */
 
-/**
- * Load and render duplicates analysis
- */
-async function loadDuplicatesAnalysis() {
-    try {
-        console.log('🔍 Loading duplicates analysis...');
-        
-        const response = await fetch('/api/js-map/analyze-duplicates');
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+    /**
+     * Load and render duplicates analysis
+     */
+    async function loadDuplicatesAnalysis() {
+        try {
+            console.log('🔍 Loading duplicates analysis...');
+            
+            // Check if endpoint exists first
+            const testResponse = await fetch('/api/js-map/analyze-duplicates', { method: 'HEAD' });
+            if (!testResponse.ok) {
+                console.warn('⚠️ Duplicates analysis endpoint not available, showing placeholder');
+                showDuplicatesPlaceholder();
+                return;
+            }
+            
+            const response = await fetch('/api/js-map/analyze-duplicates');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                // שמירה ב-IndexedDB
+                if (window.jsMapIndexedDBAdapter && window.jsMapIndexedDBAdapter.isReady()) {
+                    try {
+                        await window.jsMapIndexedDBAdapter.saveDuplicatesAnalysis(data.data);
+                        console.log('✅ ניתוח כפילויות נשמר ב-IndexedDB');
+                    } catch (saveError) {
+                        console.warn('⚠️ שגיאה בשמירת ניתוח כפילויות:', saveError);
+                    }
+                }
+                
+                renderDuplicatesAnalysis(data.data);
+            } else {
+                throw new Error(data.error || 'Unknown error');
+            }
+            
+        } catch (error) {
+            console.error('❌ Error loading duplicates analysis:', error);
+            showDuplicatesError('שגיאה בטעינת ניתוח כפילויות: ' + error.message);
         }
-        
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            renderDuplicatesAnalysis(data.data);
-        } else {
-            throw new Error(data.error || 'Unknown error');
-        }
-        
-    } catch (error) {
-        console.error('❌ Error loading duplicates analysis:', error);
-        showDuplicatesError('שגיאה בטעינת ניתוח כפילויות: ' + error.message);
     }
-}
 
 /**
  * Render duplicates analysis results
@@ -1014,15 +1285,21 @@ function renderPotentialDuplicates(duplicates) {
     let html = '<div class="duplicates-list">';
     
     duplicates.forEach((group, index) => {
+        // בדיקה שהקבוצה קיימת ויש לה קבצים
+        if (!group || !group.files || !Array.isArray(group.files)) {
+            console.warn('⚠️ קבוצת כפילויות לא תקינה:', group);
+            return;
+        }
+        
         html += `
             <div class="duplicate-group">
-                <h4>קבוצה ${index + 1}: דמיון ${group.similarity_score}%</h4>
+                <h4>קבוצה ${index + 1}: דמיון ${group.similarity_score || 0}%</h4>
                 <div class="duplicate-files">
                     ${group.files.map(file => `
                         <div class="duplicate-file">
-                            <span class="file-name">${file.filename}</span>
-                            <span class="function-name">${file.function_name}</span>
-                            <span class="line-number">שורה ${file.line_number}</span>
+                            <span class="file-name">${file.filename || 'לא ידוע'}</span>
+                            <span class="function-name">${file.function_name || 'לא ידוע'}</span>
+                            <span class="line-number">שורה ${file.line_number || 0}</span>
                         </div>
                     `).join('')}
                 </div>
@@ -1068,6 +1345,34 @@ function showDuplicatesError(message) {
             <div class="error-message">
                 <i class="fas fa-exclamation-triangle"></i>
                 <p>${message}</p>
+                <button onclick="loadDuplicatesAnalysis()" class="retry-btn">🔄 נסה שוב</button>
+            </div>
+        `;
+    }
+}
+
+/**
+ * Show duplicates placeholder when endpoint is not available
+ */
+function showDuplicatesPlaceholder() {
+    const container = document.getElementById('duplicatesContent');
+    if (container) {
+        container.innerHTML = `
+            <div class="placeholder-message">
+                <div class="placeholder-icon">
+                    <i class="fas fa-cog fa-spin"></i>
+                </div>
+                <h3>🔧 ניתוח כפילויות - בפיתוח</h3>
+                <p>הפונקציונליות הזו נמצאת בפיתוח. ה-API endpoint לא זמין כרגע.</p>
+                <div class="placeholder-features">
+                    <h4>מה יקרה כאן:</h4>
+                    <ul>
+                        <li>זיהוי פונקציות זהות או דומות</li>
+                        <li>הצגת המלצות לאיחוד קוד</li>
+                        <li>ניתוח חתימות פונקציות</li>
+                        <li>דירוג רמת הדמיון</li>
+                    </ul>
+                </div>
                 <button onclick="loadDuplicatesAnalysis()" class="retry-btn">🔄 נסה שוב</button>
             </div>
         `;
@@ -1143,31 +1448,49 @@ function generateDuplicatesLog(data) {
     return log;
 }
 
-/**
- * Load and render local functions analysis
- */
-async function loadLocalFunctionsAnalysis() {
-    try {
-        console.log('🏠 Loading local functions analysis...');
-        
-        const response = await fetch('/api/js-map/detect-local-functions');
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+    /**
+     * Load and render local functions analysis
+     */
+    async function loadLocalFunctionsAnalysis() {
+        try {
+            console.log('🏠 Loading local functions analysis...');
+            
+            // Check if endpoint exists first
+            const testResponse = await fetch('/api/js-map/detect-local-functions', { method: 'HEAD' });
+            if (!testResponse.ok) {
+                console.warn('⚠️ Local functions analysis endpoint not available, showing placeholder');
+                showLocalFunctionsPlaceholder();
+                return;
+            }
+            
+            const response = await fetch('/api/js-map/detect-local-functions');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                // שמירה ב-IndexedDB
+                if (window.jsMapIndexedDBAdapter && window.jsMapIndexedDBAdapter.isReady()) {
+                    try {
+                        await window.jsMapIndexedDBAdapter.saveLocalFunctionsAnalysis(data.data);
+                        console.log('✅ ניתוח פונקציות מקומיות נשמר ב-IndexedDB');
+                    } catch (saveError) {
+                        console.warn('⚠️ שגיאה בשמירת ניתוח פונקציות מקומיות:', saveError);
+                    }
+                }
+                
+                renderLocalFunctionsAnalysis(data.data);
+            } else {
+                throw new Error(data.error || 'Unknown error');
+            }
+            
+        } catch (error) {
+            console.error('❌ Error loading local functions analysis:', error);
+            showLocalFunctionsError('שגיאה בטעינת ניתוח פונקציות מקומיות: ' + error.message);
         }
-        
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            renderLocalFunctionsAnalysis(data.data);
-        } else {
-            throw new Error(data.error || 'Unknown error');
-        }
-        
-    } catch (error) {
-        console.error('❌ Error loading local functions analysis:', error);
-        showLocalFunctionsError('שגיאה בטעינת ניתוח פונקציות מקומיות: ' + error.message);
     }
-}
 
 /**
  * Render local functions analysis results
@@ -1217,13 +1540,20 @@ function renderLocalFunctionsAnalysis(data) {
  * Render file analysis
  */
 function renderFileAnalysis(fileAnalysis) {
-    if (!fileAnalysis || fileAnalysis.length === 0) {
+    // בדיקה שהנתונים תקינים
+    if (!fileAnalysis || !Array.isArray(fileAnalysis) || fileAnalysis.length === 0) {
+        console.warn('⚠️ נתוני ניתוח קבצים לא תקינים:', fileAnalysis);
         return '<p>לא נמצאו בעיות בפונקציות מקומיות</p>';
     }
     
     let html = '';
     
     fileAnalysis.forEach((file, index) => {
+        // בדיקה שהקובץ תקין
+        if (!file || !file.filename) {
+            console.warn('⚠️ נתוני קובץ לא תקינים:', file);
+            return;
+        }
         html += `
             <div class="file-analysis-item">
                 <h4>📁 ${file.filename}</h4>
@@ -1261,6 +1591,34 @@ function showLocalFunctionsError(message) {
             <div class="error-message">
                 <i class="fas fa-exclamation-triangle"></i>
                 <p>${message}</p>
+                <button onclick="loadLocalFunctionsAnalysis()" class="retry-btn">🔄 נסה שוב</button>
+            </div>
+        `;
+    }
+}
+
+/**
+ * Show local functions placeholder when endpoint is not available
+ */
+function showLocalFunctionsPlaceholder() {
+    const container = document.getElementById('localFunctionsContent');
+    if (container) {
+        container.innerHTML = `
+            <div class="placeholder-message">
+                <div class="placeholder-icon">
+                    <i class="fas fa-home fa-spin"></i>
+                </div>
+                <h3>🏠 זיהוי פונקציות מקומיות - בפיתוח</h3>
+                <p>הפונקציונליות הזו נמצאת בפיתוח. ה-API endpoint לא זמין כרגע.</p>
+                <div class="placeholder-features">
+                    <h4>מה יקרה כאן:</h4>
+                    <ul>
+                        <li>זיהוי פונקציות מקומיות שניתן להעביר לגלובליות</li>
+                        <li>השוואה עם פונקציות גלובליות קיימות</li>
+                        <li>הצעות לאיחוד פונקציות דומות</li>
+                        <li>ניתוח שימוש בפונקציות מקומיות</li>
+                    </ul>
+                </div>
                 <button onclick="loadLocalFunctionsAnalysis()" class="retry-btn">🔄 נסה שוב</button>
             </div>
         `;
@@ -1334,31 +1692,41 @@ function generateLocalFunctionsLog(data) {
     return log;
 }
 
-/**
- * Load and render architecture check
- */
-async function loadArchitectureCheck() {
-    try {
-        console.log('🏗️ Loading architecture check...');
-        
-        const response = await fetch('/api/js-map/architecture-check');
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+    /**
+     * Load and render architecture check
+     */
+    async function loadArchitectureCheck() {
+        try {
+            console.log('🏗️ Loading architecture check...');
+            
+            const response = await fetch('/api/js-map/architecture-check');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                // שמירה ב-IndexedDB
+                if (window.jsMapIndexedDBAdapter && window.jsMapIndexedDBAdapter.isReady()) {
+                    try {
+                        await window.jsMapIndexedDBAdapter.saveArchitectureCheck(data.data);
+                        console.log('✅ בדיקת ארכיטקטורה נשמרה ב-IndexedDB');
+                    } catch (saveError) {
+                        console.warn('⚠️ שגיאה בשמירת בדיקת ארכיטקטורה:', saveError);
+                    }
+                }
+                
+                renderArchitectureCheck(data.data);
+            } else {
+                throw new Error(data.error || 'Unknown error');
+            }
+            
+        } catch (error) {
+            console.error('❌ Error loading architecture check:', error);
+            showArchitectureError('שגיאה בטעינת בדיקת ארכיטקטורה: ' + error.message);
         }
-        
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            renderArchitectureCheck(data.data);
-        } else {
-            throw new Error(data.error || 'Unknown error');
-        }
-        
-    } catch (error) {
-        console.error('❌ Error loading architecture check:', error);
-        showArchitectureError('שגיאה בטעינת בדיקת ארכיטקטורה: ' + error.message);
     }
-}
 
 /**
  * Render architecture check results
@@ -1530,14 +1898,33 @@ function initializeAdvancedSections() {
                 const sectionId = entry.target.id;
                 
                 switch(sectionId) {
-                    case 'section2':
-                        loadDuplicatesAnalysis();
+                    case 'section2-duplicates':
+                        if (typeof loadDuplicatesAnalysis === 'function') {
+                            loadDuplicatesAnalysis();
+                        } else {
+                            console.warn('⚠️ loadDuplicatesAnalysis לא זמין');
+                        }
                         break;
                     case 'section3':
-                        loadLocalFunctionsAnalysis();
+                        if (typeof loadLocalFunctionsAnalysis === 'function') {
+                            loadLocalFunctionsAnalysis();
+                        } else {
+                            console.warn('⚠️ loadLocalFunctionsAnalysis לא זמין');
+                        }
                         break;
                     case 'section7':
-                        loadArchitectureCheck();
+                        if (window.jsMapSystem) {
+                            window.jsMapSystem.loadIntegrationStatus();
+                        } else {
+                            console.warn('⚠️ jsMapSystem לא זמין');
+                        }
+                        break;
+                    case 'section8':
+                        if (typeof loadArchitectureCheck === 'function') {
+                            loadArchitectureCheck();
+                        } else {
+                            console.warn('⚠️ loadArchitectureCheck לא זמין');
+                        }
                         break;
                 }
             }
@@ -1545,7 +1932,7 @@ function initializeAdvancedSections() {
     }, { threshold: 0.1 });
     
     // Observe sections
-    ['section2', 'section3', 'section7'].forEach(sectionId => {
+    ['section2-duplicates', 'section3', 'section7'].forEach(sectionId => {
         const section = document.getElementById(sectionId);
         if (section) {
             observer.observe(section);
@@ -1553,13 +1940,615 @@ function initializeAdvancedSections() {
     });
 }
 
+    /**
+     * Initialize when DOM is ready
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🎯 JS-Map advanced functionality loaded');
+        
+        // Initialize advanced sections after a short delay
+        setTimeout(initializeAdvancedSections, 1000);
+        
+        // Initialize IndexedDB integration
+        setTimeout(initializeIndexedDBIntegration, 1500);
+    });
+
+    /**
+     * Initialize IndexedDB integration
+     */
+    async function initializeIndexedDBIntegration() {
+        try {
+            if (window.jsMapIndexedDBAdapter && window.jsMapIndexedDBAdapter.isReady()) {
+                console.log('✅ IndexedDB Adapter מוכן לשימוש');
+                
+                // טעינת היסטוריית ניתוחים
+                await loadAnalysisHistory();
+                
+                // הוספת כפתורי ניהול אחסון
+                addStorageManagementButtons();
+            } else {
+                console.warn('⚠️ IndexedDB Adapter לא מוכן');
+            }
+        } catch (error) {
+            console.error('❌ שגיאה באתחול IndexedDB integration:', error);
+        }
+    }
+
+    /**
+     * Load and display analysis history
+     */
+    async function loadAnalysisHistory() {
+        try {
+            const history = await window.jsMapIndexedDBAdapter.loadAnalysisHistory(null, 20);
+            
+            if (history.length > 0) {
+                console.log(`📊 נטענו ${history.length} ניתוחים מההיסטוריה`);
+                
+                // הצגת היסטוריה בסקשן 6 (ניהול אחסון)
+                displayAnalysisHistory(history);
+            }
+        } catch (error) {
+            console.error('❌ שגיאה בטעינת היסטוריית ניתוחים:', error);
+        }
+    }
+
+    /**
+     * Display analysis history
+     */
+    function displayAnalysisHistory(history) {
+        const container = document.getElementById('storageContent');
+        if (!container) {
+            console.warn('⚠️ storageContent container not found');
+            return;
+        }
+
+        let html = `
+            <div class="analysis-history">
+                <h3>📊 היסטוריית ניתוחים</h3>
+                <div class="history-list">
+                    ${history.map(item => `
+                        <div class="history-item">
+                            <div class="history-header">
+                                <span class="analysis-type">${getAnalysisTypeDisplay(item.id)}</span>
+                                <span class="timestamp">${formatTimestamp(item.timestamp)}</span>
+                            </div>
+                            <div class="history-summary">
+                                ${getAnalysisSummary(item)}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        // הוספה לתחילת התוכן
+        container.innerHTML = html + container.innerHTML;
+    }
+
+    /**
+     * Get analysis type display name
+     */
+    function getAnalysisTypeDisplay(id) {
+        if (id.startsWith('duplicates_')) return 'ניתוח כפילויות';
+        if (id.startsWith('local_functions_')) return 'ניתוח פונקציות מקומיות';
+        if (id.startsWith('architecture_')) return 'בדיקת ארכיטקטורה';
+        if (id.startsWith('stats_')) return 'סטטיסטיקות מערכת';
+        return 'ניתוח כללי';
+    }
+
+    /**
+     * Format timestamp for display
+     */
+    function formatTimestamp(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleString('he-IL');
+    }
+
+    /**
+     * Get analysis summary
+     */
+    function getAnalysisSummary(item) {
+        if (item.summary) {
+            if (item.summary.total_exact_duplicates !== undefined) {
+                return `כפילויות מדויקות: ${item.summary.total_exact_duplicates}, פוטנציאליות: ${item.summary.total_potential_duplicates}`;
+            }
+            if (item.summary.files_analyzed !== undefined) {
+                return `קבצים נסרקו: ${item.summary.files_analyzed}, בעיות: ${item.summary.total_local_function_issues}`;
+            }
+            if (item.total_html_files !== undefined) {
+                return `קבצי HTML: ${item.total_html_files}, הפרות: ${item.violations?.length || 0}`;
+            }
+        }
+        return 'ניתוח כללי';
+    }
+
+    /**
+     * Add storage management buttons
+     */
+    function addStorageManagementButtons() {
+        const container = document.getElementById('storageContent');
+        if (!container) {
+            return;
+        }
+
+        const buttonsHtml = `
+            <div class="storage-management">
+                <h3>🗂️ ניהול אחסון</h3>
+                <div class="storage-actions">
+                    <button class="action-btn" onclick="showStorageStats()">📊 סטטיסטיקות אחסון</button>
+                    <button class="action-btn" onclick="cleanupOldData()">🧹 ניקוי נתונים ישנים</button>
+                    <button class="action-btn" onclick="backupData()">💾 גיבוי נתונים</button>
+                    <button class="action-btn" onclick="loadAnalysisHistory()">🔄 רענון היסטוריה</button>
+                </div>
+            </div>
+        `;
+
+        container.innerHTML = buttonsHtml + container.innerHTML;
+    }
+
+    /**
+     * Show storage statistics
+     */
+    async function showStorageStats() {
+        try {
+            const stats = await window.jsMapIndexedDBAdapter.getStorageStats();
+            
+            const message = `
+                📊 סטטיסטיקות אחסון:
+                
+                ניתוח כפילויות: ${stats.duplicatesAnalysis}
+                ניתוח פונקציות מקומיות: ${stats.localFunctionsAnalysis}
+                בדיקות ארכיטקטורה: ${stats.architectureCheck}
+                סטטיסטיקות מערכת: ${stats.systemStats}
+                
+                סה"כ: ${stats.total} ניתוחים
+                עודכן: ${new Date(stats.lastUpdated).toLocaleString('he-IL')}
+            `;
+            
+            if (window.showNotification) {
+                window.showNotification(message, 'info');
+            } else {
+                alert(message);
+            }
+        } catch (error) {
+            console.error('❌ שגיאה בטעינת סטטיסטיקות אחסון:', error);
+            if (window.showNotification) {
+                window.showNotification('שגיאה בטעינת סטטיסטיקות אחסון', 'error');
+            } else {
+                alert('שגיאה בטעינת סטטיסטיקות אחסון');
+            }
+        }
+    }
+
+    /**
+     * Cleanup old data
+     */
+    async function cleanupOldData() {
+        try {
+            const deleted = await window.jsMapIndexedDBAdapter.cleanupOldData(30); // 30 ימים
+            
+            if (window.showNotification) {
+                window.showNotification(`נוקו ${deleted} רשומות ישנות (מעל 30 ימים)`, 'success');
+            } else {
+                alert(`נוקו ${deleted} רשומות ישנות (מעל 30 ימים)`);
+            }
+            
+            // רענון היסטוריה
+            await loadAnalysisHistory();
+        } catch (error) {
+            console.error('❌ שגיאה בניקוי נתונים ישנים:', error);
+            if (window.showNotification) {
+                window.showNotification('שגיאה בניקוי נתונים ישנים', 'error');
+            } else {
+                alert('שגיאה בניקוי נתונים ישנים');
+            }
+        }
+    }
+
+    /**
+     * Backup data
+     */
+    async function backupData() {
+        try {
+            const backup = await window.jsMapIndexedDBAdapter.backupData();
+            
+            // יצירת קובץ להורדה
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `js-map-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            if (window.showNotification) {
+                window.showNotification('גיבוי נתונים הושלם והורד', 'success');
+            } else {
+                alert('גיבוי נתונים הושלם והורד');
+            }
+        } catch (error) {
+            console.error('❌ שגיאה בגיבוי נתונים:', error);
+            if (window.showNotification) {
+                window.showNotification('שגיאה בגיבוי נתונים', 'error');
+            } else {
+                alert('שגיאה בגיבוי נתונים');
+            }
+        }
+    }
+
+// Export global functions for advanced sections
+window.loadDuplicatesAnalysis = loadDuplicatesAnalysis;
+window.loadLocalFunctionsAnalysis = loadLocalFunctionsAnalysis;
+window.loadArchitectureCheck = loadArchitectureCheck;
+
 /**
- * Initialize when DOM is ready
+ * Generate and copy detailed system log
+ * This function creates a comprehensive log of all system interfaces and their current state
  */
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🎯 JS-Map advanced functionality loaded');
+async function copyDetailedLog() {
+    console.log('📋 Generating detailed system log...');
     
-    // Initialize advanced sections after a short delay
-    setTimeout(initializeAdvancedSections, 1000);
+    // Show loading message
+    if (window.showNotification) {
+        window.showNotification('יוצר לוג מפורט...', 'info');
+    }
+    
+    const timestamp = new Date().toLocaleString('he-IL');
+    let detailedLog = `=== לוג מפורט של מערכת JS-Map ===\n`;
+    detailedLog += `זמן: ${timestamp}\n`;
+    detailedLog += `URL: ${window.location.href}\n\n`;
+    
+    // System Status
+    detailedLog += `=== סטטוס מערכת ===\n`;
+    detailedLog += `User Agent: ${navigator.userAgent}\n`;
+    detailedLog += `Viewport: ${window.innerWidth}x${window.innerHeight}\n`;
+    detailedLog += `Language: ${navigator.language}\n`;
+    detailedLog += `Online: ${navigator.onLine ? 'כן' : 'לא'}\n\n`;
+    
+        // JS-Map System Status
+        detailedLog += `=== סטטוס מערכת JS-Map ===\n`;
+        if (window.jsMapSystem) {
+            detailedLog += `מערכת JS-Map: ✅ טעונה\n`;
+            detailedLog += `Page Mapping: ${window.jsMapSystem.pageMapping ? Object.keys(window.jsMapSystem.pageMapping).length + ' עמודים' : '❌ לא זמין'}\n`;
+            detailedLog += `Functions Data: ${window.jsMapSystem.functionsData ? Object.keys(window.jsMapSystem.functionsData).length + ' קבצים' : '❌ לא זמין'}\n`;
+            detailedLog += `Global Functions Index: ${window.jsMapSystem.globalFunctionsIndex ? Object.keys(window.jsMapSystem.globalFunctionsIndex).length + ' פונקציות' : '❌ לא זמין'}\n`;
+        } else {
+            detailedLog += `מערכת JS-Map: ❌ לא טעונה\n`;
+        }
+    
+    // IndexedDB Status
+    detailedLog += `\n=== סטטוס IndexedDB ===\n`;
+    if (window.jsMapIndexedDBAdapter) {
+        try {
+            const stats = await window.jsMapIndexedDBAdapter.getStatistics();
+            detailedLog += `מסד נתונים: ✅ זמין\n`;
+            detailedLog += `סך רשומות: ${stats.totalRecords}\n`;
+            detailedLog += `גודל נתונים: ${(stats.totalSize / 1024).toFixed(2)} KB\n`;
+            detailedLog += `תאריך עדכון אחרון: ${stats.lastUpdated}\n`;
+        } catch (error) {
+            detailedLog += `מסד נתונים: ❌ שגיאה - ${error.message}\n`;
+        }
+    } else {
+        detailedLog += `מסד נתונים: ❌ לא זמין\n`;
+    }
+    
+    // Section Visibility Status
+    detailedLog += `\n=== סטטוס תצוגת סקשנים ===\n`;
+    const sections = ['section1', 'section2', 'section2-duplicates', 'section3', 'section4', 'section5', 'section6', 'section7', 'section8'];
+    sections.forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            const isVisible = section.style.display !== 'none';
+            const body = section.querySelector('.section-body');
+            const hasContent = body && body.children.length > 0;
+            detailedLog += `${sectionId}: ${isVisible ? '✅ גלוי' : '❌ מוסתר'} | תוכן: ${hasContent ? '✅' : '❌'}\n`;
+        } else {
+            detailedLog += `${sectionId}: ❌ לא קיים\n`;
+        }
+    });
+    
+        // API Endpoints Status
+        detailedLog += `\n=== סטטוס API Endpoints ===\n`;
+        const endpoints = [
+            '/api/js-map/page-mapping',
+            '/api/js-map/functions',
+            '/api/js-map/analyze-duplicates',
+            '/api/js-map/detect-local-functions',
+            '/api/js-map/architecture-check',
+            '/api/page-scripts-matrix/scan-results'
+        ];
+    
+    for (const endpoint of endpoints) {
+        try {
+            const response = await fetch(endpoint, { method: 'HEAD' });
+            detailedLog += `${endpoint}: ${response.ok ? '✅ זמין' : '❌ שגיאה ' + response.status}\n`;
+        } catch (error) {
+            detailedLog += `${endpoint}: ❌ לא זמין - ${error.message}\n`;
+        }
+    }
+    
+    // Console Errors
+    detailedLog += `\n=== שגיאות JavaScript (10 האחרונות) ===\n`;
+    if (window.consoleErrors) {
+        window.consoleErrors.slice(-10).forEach(error => {
+            detailedLog += `${error.timestamp}: ${error.message}\n`;
+            if (error.stack) {
+                detailedLog += `Stack: ${error.stack.substring(0, 200)}...\n`;
+            }
+        });
+    } else {
+        detailedLog += `אין מעקב אחר שגיאות JavaScript\n`;
+    }
+    
+    // Network Status
+    detailedLog += `\n=== סטטוס רשת ===\n`;
+    if ('connection' in navigator) {
+        const connection = navigator.connection;
+        detailedLog += `חיבור: ${connection.effectiveType || 'לא זמין'}\n`;
+        detailedLog += `מהירות: ${connection.downlink || 'לא זמין'} Mbps\n`;
+        detailedLog += `RTT: ${connection.rtt || 'לא זמין'} ms\n`;
+    } else {
+        detailedLog += `מידע חיבור: לא זמין בדפדפן זה\n`;
+    }
+    
+    // Memory Usage (if available)
+    if ('memory' in performance) {
+        detailedLog += `\n=== שימוש בזיכרון ===\n`;
+        detailedLog += `זיכרון משומש: ${(performance.memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB\n`;
+        detailedLog += `זיכרון כולל: ${(performance.memory.totalJSHeapSize / 1024 / 1024).toFixed(2)} MB\n`;
+        detailedLog += `זיכרון מקסימלי: ${(performance.memory.jsHeapSizeLimit / 1024 / 1024).toFixed(2)} MB\n`;
+    }
+    
+    // Always show modal for manual copying - more reliable than clipboard API
+    console.log('🔄 Showing log modal for manual copying...');
+    showLogModal(detailedLog);
+    
+    console.log('📋 Detailed System Log:');
+    console.log(detailedLog);
+}
+
+// Make copyDetailedLog globally available
+window.copyDetailedLog = copyDetailedLog;
+
+/**
+ * Show log in modal with copy functionality
+ */
+function showLogModal(logText) {
+    // Remove existing modal if any
+    const existingModal = document.getElementById('logModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Create modal
+    const modal = document.createElement('div');
+    modal.id = 'logModal';
+    modal.className = 'log-modal-overlay';
+        modal.innerHTML = `
+            <div class="log-modal-content">
+                <div class="log-modal-header">
+                    <h3>📋 לוג מפורט של מערכת JS-Map</h3>
+                    <button class="log-modal-close" onclick="closeLogModal()">&times;</button>
+                </div>
+                <div class="log-modal-body">
+                    <div class="log-actions">
+                        <button class="log-copy-btn" onclick="copyFromModal()">
+                            <i class="fas fa-copy"></i> העתק ללוח
+                        </button>
+                        <button class="log-download-btn" onclick="downloadLog()">
+                            <i class="fas fa-download"></i> הורד כקובץ
+                        </button>
+                    </div>
+                    <div class="log-instructions">
+                        <p><strong>הוראות:</strong> הטקסט נבחר אוטומטית. אם ההעתקה האוטומטית לא עובדת, השתמש ב-<kbd>Cmd+C</kbd> (Mac) או <kbd>Ctrl+C</kbd> (Windows/Linux) להעתקה ידנית.</p>
+                    </div>
+                    <textarea id="logTextarea" readonly class="log-textarea">${logText}</textarea>
+                </div>
+            </div>
+        `;
+    
+    document.body.appendChild(modal);
+    
+    // Auto-select text for easy copying
+    const textarea = document.getElementById('logTextarea');
+    textarea.focus();
+    textarea.select();
+}
+
+/**
+ * Close log modal
+ */
+function closeLogModal() {
+    const modal = document.getElementById('logModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+/**
+ * Copy from modal textarea
+ */
+function copyFromModal() {
+    const textarea = document.getElementById('logTextarea');
+    if (textarea) {
+        console.log('🔄 Attempting to copy from modal...');
+        
+        // Select all text first
+        textarea.focus();
+        textarea.select();
+        textarea.setSelectionRange(0, 99999); // For mobile devices
+        
+        // Try multiple copy methods
+        let copySuccess = false;
+        
+        // Method 1: Modern clipboard API
+        if (navigator.clipboard && window.isSecureContext) {
+            try {
+                navigator.clipboard.writeText(textarea.value).then(() => {
+                    console.log('✅ Modern clipboard API successful');
+                    if (window.showNotification) {
+                        window.showNotification('לוג הועתק ללוח', 'success');
+                    } else {
+                        alert('לוג הועתק ללוח');
+                    }
+                    copySuccess = true;
+                }).catch(error => {
+                    console.warn('⚠️ Modern clipboard API failed:', error.message);
+                    tryFallbackCopy();
+                });
+                return; // Exit early if modern API is available
+            } catch (error) {
+                console.warn('⚠️ Modern clipboard API not available:', error.message);
+            }
+        }
+        
+        // Method 2: Fallback with execCommand
+        function tryFallbackCopy() {
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    console.log('✅ execCommand copy successful');
+                    if (window.showNotification) {
+                        window.showNotification('לוג הועתק ללוח', 'success');
+                    } else {
+                        alert('לוג הועתק ללוח');
+                    }
+                    copySuccess = true;
+                } else {
+                    throw new Error('execCommand returned false');
+                }
+            } catch (error) {
+                console.error('❌ All copy methods failed:', error);
+                if (window.showNotification) {
+                    window.showNotification('הטקסט נבחר - העתק ידנית (Cmd+C או Ctrl+C)', 'info');
+                } else {
+                    alert('הטקסט נבחר - העתק ידנית (Cmd+C או Ctrl+C)');
+                }
+            }
+        }
+        
+        // Try fallback if modern API is not available
+        if (!copySuccess) {
+            tryFallbackCopy();
+        }
+    }
+}
+
+/**
+ * Download log as file
+ */
+function downloadLog() {
+    const textarea = document.getElementById('logTextarea');
+    if (textarea) {
+        const blob = new Blob([textarea.value], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `js-map-log-${new Date().toISOString().split('T')[0]}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        if (window.showNotification) {
+            window.showNotification('לוג הורד כקובץ', 'success');
+        } else {
+            alert('לוג הורד כקובץ');
+        }
+    }
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('logModal');
+    if (modal && event.target === modal) {
+        closeLogModal();
+    }
 });
+
+// Make functions globally available
+window.showLogModal = showLogModal;
+window.closeLogModal = closeLogModal;
+window.copyFromModal = copyFromModal;
+window.downloadLog = downloadLog;
+
+/**
+ * Initialize error tracking for detailed logging
+ */
+function initializeErrorTracking() {
+    console.log('🔍 Initializing error tracking...');
+    
+    // Initialize console errors array
+    if (!window.consoleErrors) {
+        window.consoleErrors = [];
+    }
+    
+    // Override console.error to track errors
+    const originalError = console.error;
+    console.error = function(...args) {
+        // Call original error function
+        originalError.apply(console, args);
+        
+        // Track the error
+        const errorMessage = args.join(' ');
+        const errorEntry = {
+            timestamp: new Date().toLocaleString('he-IL'),
+            message: errorMessage,
+            stack: new Error().stack
+        };
+        
+        window.consoleErrors.push(errorEntry);
+        
+        // Keep only last 50 errors
+        if (window.consoleErrors.length > 50) {
+            window.consoleErrors = window.consoleErrors.slice(-50);
+        }
+    };
+    
+    // Track unhandled promise rejections
+    window.addEventListener('unhandledrejection', function(event) {
+        const errorEntry = {
+            timestamp: new Date().toLocaleString('he-IL'),
+            message: `Unhandled Promise Rejection: ${event.reason}`,
+            stack: event.reason?.stack || 'No stack trace'
+        };
+        
+        window.consoleErrors.push(errorEntry);
+        
+        // Keep only last 50 errors
+        if (window.consoleErrors.length > 50) {
+            window.consoleErrors = window.consoleErrors.slice(-50);
+        }
+    });
+    
+    // Track global JavaScript errors
+    window.addEventListener('error', function(event) {
+        const errorEntry = {
+            timestamp: new Date().toLocaleString('he-IL'),
+            message: `JavaScript Error: ${event.message}`,
+            stack: event.error?.stack || 'No stack trace',
+            filename: event.filename,
+            lineno: event.lineno,
+            colno: event.colno
+        };
+        
+        window.consoleErrors.push(errorEntry);
+        
+        // Keep only last 50 errors
+        if (window.consoleErrors.length > 50) {
+            window.consoleErrors = window.consoleErrors.slice(-50);
+        }
+    });
+    
+    console.log('✅ Error tracking initialized');
+}
+
+// Initialize error tracking when script loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeErrorTracking);
+} else {
+    initializeErrorTracking();
+}
 

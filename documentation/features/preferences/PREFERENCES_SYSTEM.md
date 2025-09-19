@@ -193,6 +193,10 @@ const basicSettings = await window.getGroupPreferences('basic_settings');
 await window.savePreference('primaryCurrency', 'USD');
 await window.saveAllPreferences(); // שמירת כל הטופס
 
+// פונקציות ספציפיות לעמוד
+await window.loadColorsForPreferences(); // טעינת צבעים
+const formData = window.collectFormData(); // איסוף נתוני טופס
+
 // ניהול פרופילים
 const profiles = await window.getUserProfiles();
 await window.resetToDefaults(); // איפוס לברירות מחדל
@@ -327,19 +331,31 @@ await window.resetToDefaults();
 - פרופיל "Nimrod" → `preference_profiles` עם נתונים אמיתיים
 - העדפות משתמש → `user_preferences` עם פרופיל ברירת מחדל
 
+### שינויים אחרונים (ינואר 2025):
+1. **הוספת 12 העדפות צבעים חסרות** - `valuePositiveColor`, `valueNegativeColor`, `valueNeutralColor` + גרסאות Light/Dark
+2. **תיקון פונקציית שמירת העדפות** - `savePreferences` ב-`preferences.js`
+3. **הוספת פונקציות לעמוד** - `collectFormData` ו-`saveAllPreferences` ב-`preferences-page.js`
+4. **עדכון UserService** - מעבר מלא למערכת העדפות החדשה
+5. **הסרת עמודים מיותרים** - `planning.html`, `currencies.html`, `database.html`
+
 ---
 
 ## 🎯 קבצים מרכזיים
 
 ### Backend:
+- `Backend/models/preferences.py` - מודלי SQLAlchemy
 - `Backend/services/preferences_service.py` - שירות מרכזי
+- `Backend/services/user_service.py` - שירות משתמשים (משולב עם העדפות)
 - `Backend/routes/api/preferences.py` - API endpoints
 - `Backend/migrations/create_preferences_tables.py` - יצירת טבלאות
-- `Backend/migrations/migrate_preferences.py` - מיגרציה
+- `Backend/migrations/add_preferences_constraints.py` - הוספת אילוצים
+- `Backend/migrations/add_missing_color_preferences.py` - הוספת צבעים חסרים
 
 ### Frontend:
 - `trading-ui/scripts/preferences.js` - פונקציות גלובליות
+- `trading-ui/scripts/preferences-page.js` - פונקציות ספציפיות לעמוד
 - `trading-ui/scripts/preferences-admin.js` - ממשק ניהול
+- `trading-ui/preferences.html` - עמוד העדפות
 - `trading-ui/scripts/preferences-page.js` - פונקציות עמוד
 - `trading-ui/preferences.html` - עמוד העדפות
 
@@ -360,9 +376,10 @@ await window.resetToDefaults();
 
 ### מדדי ביצועים:
 - **קריאת העדפה בודדת**: < 10ms (עם cache)
-- **טעינת כל ההעדפות**: < 50ms
-- **שמירת העדפות**: < 100ms
+- **טעינת כל ההעדפות**: < 50ms (59 העדפות)
+- **שמירת העדפות**: < 100ms (3 העדפות)
 - **Cache hit ratio**: > 95%
+- **37 העדפות** שמורות למשתמש
 
 ---
 

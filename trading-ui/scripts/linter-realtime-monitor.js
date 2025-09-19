@@ -3553,9 +3553,10 @@ window.fixAllWarnings = () => {
 window.ignoreAllIssues = () => {
     // Ignoring all issues...
     // Current state before ignore logged
+    const currentStateBeforeIgnore = {
         errors: scanningResults.errors.length,
         warnings: scanningResults.warnings.length
-    });
+    };
 
     if (scanningResults.errors.length === 0 && scanningResults.warnings.length === 0) {
         // Use direct call to avoid recursion
@@ -3575,12 +3576,13 @@ window.ignoreAllIssues = () => {
     scanningResults.warnings = [];
 
     // Issues actually cleared logged
+    const issuesCleared = {
         errorsIgnored,
         warningsIgnored,
         totalIgnored: ignoredCount,
         errorsRemaining: scanningResults.errors.length,
         warningsRemaining: scanningResults.warnings.length
-    });
+    };
 
     addLogEntry('WARNING', `כל ${ignoredCount} הבעיות הועברו להתעלמות`, {
         ignoredCount: ignoredCount,
@@ -4530,4 +4532,4 @@ window.calculateTotalSize = calculateTotalSize;
 window.updateChartIndicators = updateChartIndicators;
 window.autoUpdateChart = autoUpdateChart;
 
-console.log('✅ Linter monitor script loaded successfully!');
+// Linter monitor script loaded successfully!

@@ -305,14 +305,20 @@ window.savePreferences = async function(preferences, userId = 1, profileId = nul
         });
         
         if (response.ok) {
-            console.log(`✅ Saved multiple preferences`);
+            const result = await response.json();
             
-            // עדכון מטמון
-            const cached = window.preferencesCache.get() || {};
-            Object.assign(cached, preferences);
-            window.preferencesCache.set(cached);
-            
-            return true;
+            if (result.success) {
+                console.log(`✅ Saved multiple preferences:`, result);
+                
+                // עדכון מטמון
+                const cached = window.preferencesCache.get() || {};
+                Object.assign(cached, preferences);
+                window.preferencesCache.set(cached);
+                
+                return true;
+      } else {
+                throw new Error(`API returned success: false - ${result.message || 'Unknown error'}`);
+            }
       } else {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }

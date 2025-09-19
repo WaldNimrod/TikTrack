@@ -62,22 +62,22 @@
 .btn-primary-emphasized,
 button.btn-emphasized,
 button.btn-primary-emphasized {
-  background-color: white !important;
-  color: #ff9c05 !important;
-  border: 2px solid #ff9c05 !important;
-  border-radius: 6px !important;
-  padding: 0.5rem 1rem !important;
-  font-size: 0.875rem !important;
-  font-weight: 600 !important;
-  transition: all 0.2s ease !important;
+  background-color: white;
+  color: #ff9c05;
+  border: 2px solid #ff9c05;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
 .btn-emphasized:hover,
 .btn-primary-emphasized:hover {
-  background-color: #ff9c05 !important;
-  color: white !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(255, 156, 5, 0.3) !important;
+  background-color: #ff9c05;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(255, 156, 5, 0.3);
 }
 
 /* כפתורי שמירה עם צבע הלוגו */
@@ -86,37 +86,37 @@ button.btn-primary-emphasized {
 button[onclick*="saveTradeRecord"],
 button[onclick*="saveNewTradeRecord"],
 .btn-success {
-  background-color: white !important;
-  color: #29a6a8 !important;
-  border: 1px solid #29a6a8 !important;
-  border-radius: 8px !important;
-  padding: 0.3rem 0.6rem !important;
-  font-size: 0.7rem !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
+  background-color: white;
+  color: #29a6a8;
+  border: 1px solid #29a6a8;
+  border-radius: 8px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .btn-success:hover {
-  background-color: #29a6a8 !important;
-  color: white !important;
-  border-color: #29a6a8 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(41, 166, 168, 0.3) !important;
+  background-color: #29a6a8;
+  color: white;
+  border-color: #29a6a8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(41, 166, 168, 0.3);
 }
 
 /* כפתורי מחיקה */
 .btn-danger {
-  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
-  color: #dc3545 !important;
-  border-color: #dc3545 !important;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  color: #dc3545;
+  border-color: #dc3545;
 }
 
 .btn-danger:hover {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
-  color: white !important;
-  border-color: #dc3545 !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 16px rgba(220, 53, 69, 0.3) !important;
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  border-color: #dc3545;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(220, 53, 69, 0.3);
 }
 
 /* כפתורי outline */
@@ -149,39 +149,39 @@ button[onclick*="saveNewTradeRecord"],
 }
 
 .btn-outline-danger {
-  border: 2px solid #dc3545 !important;
-  background-color: white !important;
-  color: #dc3545 !important;
-  padding: 0.375rem 0.75rem !important;
-  font-size: 0.875rem !important;
-  border-radius: 0.25rem !important;
-  transition: all 0.2s ease !important;
+  border: 2px solid #dc3545;
+  background-color: white;
+  color: #dc3545;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
 }
 
 .btn-outline-danger:hover {
-  background-color: #dc3545 !important;
-  color: white !important;
-  border-color: #dc3545 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
+  background-color: #dc3545;
+  color: white;
+  border-color: #dc3545;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
 }
 
 /* כפתור ביטול לא פעיל */
 .btn-cancel-disabled {
-  border: 1px solid #6c757d !important;
-  background-color: #f8f9fa !important;
-  color: #6c757d !important;
-  cursor: not-allowed !important;
-  opacity: 0.65 !important;
-  transition: none !important;
+  border: 1px solid #6c757d;
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.65;
+  transition: none;
 }
 
 .btn-cancel-disabled:hover {
-  border: 1px solid #6c757d !important;
-  background-color: #f8f9fa !important;
-  color: #6c757d !important;
-  transform: none !important;
-  box-shadow: none !important;
+  border: 1px solid #6c757d;
+  background-color: #f8f9fa;
+  color: #6c757d;
+  transform: none;
+  box-shadow: none;
 }
 
 /* כפתור סגירה עם X */
@@ -200,176 +200,176 @@ button[onclick*="saveNewTradeRecord"],
 
 /* כפתורים בסיסיים Bootstrap */
 .btn-primary {
-  background-color: #007bff !important;
-  color: white !important;
-  border: 1px solid #007bff !important;
-  padding: 0.375rem 0.75rem !important;
-  font-size: 0.875rem !important;
-  border-radius: 0.25rem !important;
-  transition: all 0.2s ease !important;
+  background-color: #007bff;
+  color: white;
+  border: 1px solid #007bff;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
 }
 
 .btn-primary:hover {
-  background-color: #0056b3 !important;
-  border-color: #0056b3 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+  background-color: #0056b3;
+  border-color: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .btn-warning {
-  background-color: white !important;
-  color: #ff9c05 !important;
-  border: 1px solid #ff9c05 !important;
-  padding: 0.375rem 0.75rem !important;
-  font-size: 0.875rem !important;
-  border-radius: 0.25rem !important;
-  transition: all 0.2s ease !important;
+  background-color: white;
+  color: #ff9c05;
+  border: 1px solid #ff9c05;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
 }
 
 .btn-warning:hover {
-  background-color: #ff9c05 !important;
-  color: white !important;
-  border-color: #ff9c05 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3) !important;
+  background-color: #ff9c05;
+  color: white;
+  border-color: #ff9c05;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
 }
 
 .btn-info {
-  background-color: #17a2b8 !important;
-  color: white !important;
-  border: 1px solid #17a2b8 !important;
-  padding: 0.375rem 0.75rem !important;
-  font-size: 0.875rem !important;
-  border-radius: 0.25rem !important;
-  transition: all 0.2s ease !important;
+  background-color: #17a2b8;
+  color: white;
+  border: 1px solid #17a2b8;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
 }
 
 .btn-info:hover {
-  background-color: #138496 !important;
-  border-color: #138496 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(23, 162, 184, 0.3) !important;
+  background-color: #138496;
+  border-color: #138496;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(23, 162, 184, 0.3);
 }
 
 /* כפתורי secondary */
 .btn-secondary {
-  background: #ffffff !important;
-  color: #29a6a8 !important;
-  border: 1px solid #29a6a8 !important;
-  border-radius: 8px !important;
-  padding: 0.3rem 0.6rem !important;
-  font-size: 0.7rem !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
+  background: #ffffff;
+  color: #29a6a8;
+  border: 1px solid #29a6a8;
+  border-radius: 8px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
 .btn-secondary:hover {
-  background: #ffffff !important;
-  color: #1f8a8c !important;
-  border-color: #1f8a8c !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  background: #ffffff;
+  color: #1f8a8c;
+  border-color: #1f8a8c;
+  transform: translateY(-1px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* כפתורים קטנים */
 .btn-sm.btn-primary {
-  background-color: #007bff !important;
-  color: white !important;
-  border: 1px solid #007bff !important;
-  padding: 0.25rem 0.5rem !important;
-  font-size: 0.75rem !important;
-  border-radius: 0.25rem !important;
-  transition: all 0.2s ease !important;
+  background-color: #007bff;
+  color: white;
+  border: 1px solid #007bff;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
 }
 
 .btn-sm.btn-primary:hover {
-  background-color: #0056b3 !important;
-  border-color: #0056b3 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) !important;
+  background-color: #0056b3;
+  border-color: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .btn-sm.btn-warning {
-  background-color: white !important;
-  color: #ff9c05 !important;
-  border: 1px solid #ff9c05 !important;
-  padding: 0.25rem 0.5rem !important;
-  font-size: 0.75rem !important;
-  border-radius: 0.25rem !important;
-  transition: all 0.2s ease !important;
+  background-color: white;
+  color: #ff9c05;
+  border: 1px solid #ff9c05;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
 }
 
 .btn-sm.btn-warning:hover {
-  background-color: #ff9c05 !important;
-  color: white !important;
-  border-color: #ff9c05 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3) !important;
+  background-color: #ff9c05;
+  color: white;
+  border-color: #ff9c05;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
 }
 
 .btn-sm.btn-danger {
-  background-color: white !important;
-  color: #dc3545 !important;
-  border: 1px solid #dc3545 !important;
-  padding: 0.25rem 0.5rem !important;
-  font-size: 0.75rem !important;
-  border-radius: 0.25rem !important;
-  transition: all 0.2s ease !important;
+  background-color: white;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
 }
 
 .btn-sm.btn-danger:hover {
-  background-color: #dc3545 !important;
-  color: white !important;
-  border-color: #dc3545 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
+  background-color: #dc3545;
+  color: white;
+  border-color: #dc3545;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
 }
 
 .btn-sm.btn-secondary {
-  background: #ffffff !important;
-  color: #29a6a8 !important;
-  border: 1px solid #29a6a8 !important;
-  border-radius: 8px !important;
-  padding: 0.25rem 0.5rem !important;
-  font-size: 0.75rem !important;
-  width: 28px !important;
-  height: 28px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: all 0.2s ease !important;
+  background: #ffffff;
+  color: #29a6a8;
+  border: 1px solid #29a6a8;
+  border-radius: 8px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
 .btn-sm.btn-secondary:hover {
-  background: #ffffff !important;
-  color: #1f8a8c !important;
-  border-color: #1f8a8c !important;
-  transform: none !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  background: #ffffff;
+  color: #1f8a8c;
+  border-color: #1f8a8c;
+  transform: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* כפתורי הוספה מיוחדים */
 .add-btn {
-  background: transparent !important;
-  color: #000000 !important;
-  border: 2px solid #29a6a8 !important;
-  box-shadow: none !important;
-  padding: 6px 13px !important;
-  border-radius: 6px !important;
-  font-size: 11px !important;
-  font-weight: 500 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 5px !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
+  background: transparent;
+  color: #000000;
+  border: 2px solid #29a6a8;
+  box-shadow: none;
+  padding: 6px 13px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .add-btn:hover {
-  background-color: #29a6a8 !important;
-  color: white !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(41, 166, 168, 0.3) !important;
+  background-color: #29a6a8;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(41, 166, 168, 0.3);
 }
 
 /* כפתורי restore/reactivate */
@@ -378,13 +378,13 @@ button[onclick*="restore"],
 button[onclick*="reactivate"],
 button[title*="החזר"],
 button[title*="הפעל מחדש"] {
-  border: 1px solid #28a745 !important;
-  background-color: transparent !important;
-  color: #28a745 !important;
-  padding: 0.375rem 0.75rem !important;
-  font-size: 0.875rem !important;
-  border-radius: 0.25rem !important;
-  transition: all 0.2s ease !important;
+  border: 1px solid #28a745;
+  background-color: transparent;
+  color: #28a745;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
 }
 
 .restore-button:hover,
@@ -392,134 +392,134 @@ button[onclick*="restore"]:hover,
 button[onclick*="reactivate"]:hover,
 button[title*="החזר"]:hover,
 button[title*="הפעל מחדש"]:hover {
-  background-color: #28a745 !important;
-  color: #ffffff !important;
-  border-color: #28a745 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3) !important;
+  background-color: #28a745;
+  color: #ffffff;
+  border-color: #28a745;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
 }
 
 /* כפתורי outline נוספים */
 .btn-success-outline {
-  border: 2px solid #28a745 !important;
-  background-color: white !important;
-  color: #28a745 !important;
-  padding: 0.375rem 0.75rem !important;
-  font-size: 0.875rem !important;
-  border-radius: 0.25rem !important;
-  transition: all 0.2s ease !important;
+  border: 2px solid #28a745;
+  background-color: white;
+  color: #28a745;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
 }
 
 .btn-success-outline:hover {
-  background-color: #28a745 !important;
-  color: white !important;
-  border-color: #28a745 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3) !important;
+  background-color: #28a745;
+  color: white;
+  border-color: #28a745;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
 }
 
 .btn-danger-outline {
-  border: 2px solid #dc3545 !important;
-  background-color: white !important;
-  color: #dc3545 !important;
-  padding: 0.375rem 0.75rem !important;
-  font-size: 0.875rem !important;
-  border-radius: 0.25rem !important;
-  transition: all 0.2s ease !important;
+  border: 2px solid #dc3545;
+  background-color: white;
+  color: #dc3545;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
 }
 
 .btn-danger-outline:hover {
-  background-color: #dc3545 !important;
-  color: white !important;
-  border-color: #dc3545 !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3) !important;
+  background-color: #dc3545;
+  color: white;
+  border-color: #dc3545;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
 }
 
 /* כפתורי secondary במודלים */
 .modal-footer .btn-secondary {
-  background: white !important;
-  border: 2px solid #ff9c05 !important;
-  color: #ff9c05 !important;
-  padding: 9px 18px !important;
-  font-size: 0.825rem !important;
-  border-radius: 0.25rem !important;
-  transition: all 0.2s ease !important;
+  background: white;
+  border: 2px solid #ff9c05;
+  color: #ff9c05;
+  padding: 9px 18px;
+  font-size: 0.825rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
 }
 
 .modal-footer .btn-secondary:hover {
-  background: #ff9c05 !important;
-  border-color: #ff9c05 !important;
-  color: white !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15) !important;
+  background: #ff9c05;
+  border-color: #ff9c05;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
 }
 
 .modal .btn-secondary,
 .modal .btn-warning {
-  background: white !important;
-  border: 2px solid #ff9c05 !important;
-  color: #ff9c05 !important;
-  padding: 0.375rem 0.75rem !important;
-  font-size: 0.875rem !important;
-  border-radius: 0.25rem !important;
-  transition: all 0.2s ease !important;
+  background: white;
+  border: 2px solid #ff9c05;
+  color: #ff9c05;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
 }
 
 .modal .btn-secondary:hover,
 .modal .btn-warning:hover {
-  background: #ff9c05 !important;
-  border-color: #ff9c05 !important;
-  color: white !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3) !important;
+  background: #ff9c05;
+  border-color: #ff9c05;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
 }
 
 /* כפתורי secondary מותאמים אישית */
 .btn-secondary-custom,
 button.btn-secondary-custom {
-  background-color: white !important;
-  color: #29a6a8 !important;
-  border: 2px solid #29a6a8 !important;
-  border-radius: 4px !important;
-  padding: 0.375rem 0.75rem !important;
-  font-size: 0.875rem !important;
-  transition: all 0.2s ease !important;
+  background-color: white;
+  color: #29a6a8;
+  border: 2px solid #29a6a8;
+  border-radius: 4px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
 }
 
 .btn-secondary-custom:hover,
 button.btn-secondary-custom:hover {
-  background-color: #f8f9fa !important;
-  color: #1f8a8c !important;
-  border-color: #1f8a8c !important;
-  transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(41, 166, 168, 0.2) !important;
+  background-color: #f8f9fa;
+  color: #1f8a8c;
+  border-color: #1f8a8c;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(41, 166, 168, 0.2);
 }
 
 /* כפתורי פעולות בטבלאות */
 .actions-cell .btn-sm.btn-secondary {
-  background: #ffffff !important;
-  color: #29a6a8 !important;
-  border: 1px solid #29a6a8 !important;
-  border-radius: 8px !important;
-  padding: 0.3rem !important;
-  width: 28px !important;
-  height: 28px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  transition: all 0.2s ease !important;
+  background: #ffffff;
+  color: #29a6a8;
+  border: 1px solid #29a6a8;
+  border-radius: 8px;
+  padding: 0.3rem;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
 .actions-cell .btn-sm.btn-secondary:hover {
-  background: #ffffff !important;
-  color: #1f8a8c !important;
-  border-color: #1f8a8c !important;
-  transform: none !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  background: #ffffff;
+  color: #1f8a8c;
+  border-color: #1f8a8c;
+  transform: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* כפתורים עם רוחב מינימלי */
 .btn-info, .btn-success, .btn-warning, .btn-danger, .btn-primary, .btn-secondary {
-  min-width: 30px !important;
+  min-width: 30px;
 }

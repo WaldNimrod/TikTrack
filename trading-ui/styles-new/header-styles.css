@@ -1,6 +1,5 @@
 /* Header Styles - Exception to unified CSS system - v38 - Fixed Filters */
 /* This file contains all styles for the header component */
-/* It's separate from unified.css as per design decision */
 
 /* ===== Header System Styles ===== */
 /**
@@ -387,7 +386,7 @@
             position: relative;
         }
         
-        /* Bootstrap 5 submenu base positioning - REMOVED - handled by unified.css */
+        /* Bootstrap 5 submenu base positioning */
 
 /* Cache clear button */
 .cache-clear-btn {

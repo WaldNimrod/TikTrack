@@ -207,6 +207,12 @@ window.loadAdminPreferences = async function() {
         // טעינת מידע על העדפות
         const preferencesData = [];
         for (const [name, value] of Object.entries(allPreferences)) {
+            // דלג על העדפות שנמחקו
+            if (name === 'dataRefreshInterval') {
+                console.log(`⚠️ Skipping deleted preference: ${name}`);
+                continue;
+            }
+            
             try {
                 const info = await window.getPreferenceInfo(name);
                 preferencesData.push({

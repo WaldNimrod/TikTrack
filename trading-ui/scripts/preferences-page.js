@@ -219,10 +219,11 @@ function initializePreferencesPage() {
     loadAccountsForPreferences();
     
     // Load colors from database
-    loadColorsForPreferences();
+    console.log('🎨 Calling loadColorsForPreferences...');
+    await loadColorsForPreferences();
     
     // Load trading settings
-    loadTradingSettings();
+    await loadTradingSettings();
     
     // Initialize info summary
     initializeInfoSummary();

@@ -149,6 +149,10 @@ def get_user_preferences() -> Any:
             use_cache=use_cache
         )
         
+        # קבלת הפרופיל שנבחר (אם לא צוין)
+        if profile_id is None:
+            profile_id = preferences_service._get_active_profile_id(user_id)
+        
         return jsonify({
             "success": True,
             "data": {

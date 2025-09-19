@@ -885,3 +885,681 @@ document.addEventListener('click', function (event) {
     }
 });
 
+/**
+ * ==========================================
+ * NEW FUNCTIONALITY - Advanced Analysis
+ * ==========================================
+ */
+
+/**
+ * Load and render duplicates analysis
+ */
+async function loadDuplicatesAnalysis() {
+    try {
+        console.log('🔍 Loading duplicates analysis...');
+        
+        const response = await fetch('/api/js-map/analyze-duplicates');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            renderDuplicatesAnalysis(data.data);
+        } else {
+            throw new Error(data.error || 'Unknown error');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error loading duplicates analysis:', error);
+        showDuplicatesError('שגיאה בטעינת ניתוח כפילויות: ' + error.message);
+    }
+}
+
+/**
+ * Render duplicates analysis results
+ */
+function renderDuplicatesAnalysis(data) {
+    const container = document.getElementById('duplicatesContent');
+    if (!container) {
+        console.error('❌ duplicatesContent container not found');
+        return;
+    }
+    
+    const summary = data.summary;
+    const exactDuplicates = data.exact_duplicates || [];
+    const potentialDuplicates = data.potential_duplicates || [];
+    
+    let html = `
+        <div class="analysis-summary">
+            <h3>📊 סיכום ניתוח כפילויות</h3>
+            <div class="summary-stats">
+                <div class="stat-item">
+                    <span class="stat-label">כפילויות מדויקות:</span>
+                    <span class="stat-value">${summary.total_exact_duplicates}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">כפילויות פוטנציאליות:</span>
+                    <span class="stat-value">${summary.total_potential_duplicates}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">חתימות ייחודיות:</span>
+                    <span class="stat-value">${summary.total_unique_signatures}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">יחס כפילויות:</span>
+                    <span class="stat-value">${summary.duplicate_ratio.toFixed(2)}%</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="analysis-tabs">
+            <button class="tab-btn active" onclick="showDuplicatesTab('exact')">כפילויות מדויקות</button>
+            <button class="tab-btn" onclick="showDuplicatesTab('potential')">כפילויות פוטנציאליות</button>
+            <button class="tab-btn" onclick="copyDuplicatesLog()">📋 העתק לוג</button>
+        </div>
+        
+        <div id="exactDuplicatesTab" class="tab-content active">
+            ${renderExactDuplicates(exactDuplicates)}
+        </div>
+        
+        <div id="potentialDuplicatesTab" class="tab-content">
+            ${renderPotentialDuplicates(potentialDuplicates)}
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+/**
+ * Render exact duplicates
+ */
+function renderExactDuplicates(duplicates) {
+    if (!duplicates || duplicates.length === 0) {
+        return '<p>לא נמצאו כפילויות מדויקות</p>';
+    }
+    
+    let html = '<div class="duplicates-list">';
+    
+    duplicates.forEach((group, index) => {
+        html += `
+            <div class="duplicate-group">
+                <h4>קבוצה ${index + 1}: ${group.signature}</h4>
+                <div class="duplicate-files">
+                    ${group.files.map(file => `
+                        <div class="duplicate-file">
+                            <span class="file-name">${file.filename}</span>
+                            <span class="function-name">${file.function_name}</span>
+                            <span class="line-number">שורה ${file.line_number}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    return html;
+}
+
+/**
+ * Render potential duplicates
+ */
+function renderPotentialDuplicates(duplicates) {
+    if (!duplicates || duplicates.length === 0) {
+        return '<p>לא נמצאו כפילויות פוטנציאליות</p>';
+    }
+    
+    let html = '<div class="duplicates-list">';
+    
+    duplicates.forEach((group, index) => {
+        html += `
+            <div class="duplicate-group">
+                <h4>קבוצה ${index + 1}: דמיון ${group.similarity_score}%</h4>
+                <div class="duplicate-files">
+                    ${group.files.map(file => `
+                        <div class="duplicate-file">
+                            <span class="file-name">${file.filename}</span>
+                            <span class="function-name">${file.function_name}</span>
+                            <span class="line-number">שורה ${file.line_number}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    return html;
+}
+
+/**
+ * Show duplicates tab
+ */
+function showDuplicatesTab(tabName) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Remove active class from all buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show selected tab
+    const selectedTab = document.getElementById(tabName + 'DuplicatesTab');
+    if (selectedTab) {
+        selectedTab.classList.add('active');
+    }
+    
+    // Add active class to clicked button
+    event.target.classList.add('active');
+}
+
+/**
+ * Show duplicates error
+ */
+function showDuplicatesError(message) {
+    const container = document.getElementById('duplicatesContent');
+    if (container) {
+        container.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>${message}</p>
+                <button onclick="loadDuplicatesAnalysis()" class="retry-btn">🔄 נסה שוב</button>
+            </div>
+        `;
+    }
+}
+
+/**
+ * Copy duplicates log to clipboard
+ */
+async function copyDuplicatesLog() {
+    try {
+        const response = await fetch('/api/js-map/analyze-duplicates');
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            const logText = generateDuplicatesLog(data.data);
+            await navigator.clipboard.writeText(logText);
+            
+            // Show success message
+            if (window.showNotification) {
+                window.showNotification('לוג ניתוח כפילויות הועתק ללוח', 'success');
+            } else {
+                alert('לוג ניתוח כפילויות הועתק ללוח');
+            }
+        }
+    } catch (error) {
+        console.error('❌ Error copying duplicates log:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בהעתקת הלוג', 'error');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}
+
+/**
+ * Generate duplicates log text
+ */
+function generateDuplicatesLog(data) {
+    const summary = data.summary;
+    
+    let log = `=== לוג ניתוח כפילויות פונקציות ===\n`;
+    log += `תאריך: ${new Date().toLocaleString('he-IL')}\n\n`;
+    
+    log += `סיכום:\n`;
+    log += `- כפילויות מדויקות: ${summary.total_exact_duplicates}\n`;
+    log += `- כפילויות פוטנציאליות: ${summary.total_potential_duplicates}\n`;
+    log += `- חתימות ייחודיות: ${summary.total_unique_signatures}\n`;
+    log += `- יחס כפילויות: ${summary.duplicate_ratio.toFixed(2)}%\n\n`;
+    
+    if (data.exact_duplicates && data.exact_duplicates.length > 0) {
+        log += `כפילויות מדויקות:\n`;
+        data.exact_duplicates.forEach((group, index) => {
+            log += `${index + 1}. ${group.signature}\n`;
+            group.files.forEach(file => {
+                log += `   - ${file.filename}:${file.line_number} (${file.function_name})\n`;
+            });
+            log += `\n`;
+        });
+    }
+    
+    if (data.potential_duplicates && data.potential_duplicates.length > 0) {
+        log += `כפילויות פוטנציאליות:\n`;
+        data.potential_duplicates.forEach((group, index) => {
+            log += `${index + 1}. דמיון ${group.similarity_score}%\n`;
+            group.files.forEach(file => {
+                log += `   - ${file.filename}:${file.line_number} (${file.function_name})\n`;
+            });
+            log += `\n`;
+        });
+    }
+    
+    return log;
+}
+
+/**
+ * Load and render local functions analysis
+ */
+async function loadLocalFunctionsAnalysis() {
+    try {
+        console.log('🏠 Loading local functions analysis...');
+        
+        const response = await fetch('/api/js-map/detect-local-functions');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            renderLocalFunctionsAnalysis(data.data);
+        } else {
+            throw new Error(data.error || 'Unknown error');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error loading local functions analysis:', error);
+        showLocalFunctionsError('שגיאה בטעינת ניתוח פונקציות מקומיות: ' + error.message);
+    }
+}
+
+/**
+ * Render local functions analysis results
+ */
+function renderLocalFunctionsAnalysis(data) {
+    const container = document.getElementById('localFunctionsContent');
+    if (!container) {
+        console.error('❌ localFunctionsContent container not found');
+        return;
+    }
+    
+    const summary = data.summary;
+    const fileAnalysis = data.file_analysis || [];
+    
+    let html = `
+        <div class="analysis-summary">
+            <h3>📊 סיכום ניתוח פונקציות מקומיות</h3>
+            <div class="summary-stats">
+                <div class="stat-item">
+                    <span class="stat-label">קבצים נסרקו:</span>
+                    <span class="stat-value">${summary.files_analyzed}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">קבצים עם בעיות:</span>
+                    <span class="stat-value">${summary.files_with_issues}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">סה"כ בעיות:</span>
+                    <span class="stat-value">${summary.total_local_function_issues}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="analysis-actions">
+            <button class="action-btn" onclick="copyLocalFunctionsLog()">📋 העתק לוג</button>
+        </div>
+        
+        <div class="file-analysis-list">
+            ${renderFileAnalysis(fileAnalysis)}
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+/**
+ * Render file analysis
+ */
+function renderFileAnalysis(fileAnalysis) {
+    if (!fileAnalysis || fileAnalysis.length === 0) {
+        return '<p>לא נמצאו בעיות בפונקציות מקומיות</p>';
+    }
+    
+    let html = '';
+    
+    fileAnalysis.forEach((file, index) => {
+        html += `
+            <div class="file-analysis-item">
+                <h4>📁 ${file.filename}</h4>
+                <div class="analysis-details">
+                    <p><strong>פונקציות מקומיות:</strong> ${file.local_functions_count}</p>
+                    <p><strong>פונקציות גלובליות זמינות:</strong> ${file.available_global_functions}</p>
+                </div>
+                
+                ${file.local_functions.length > 0 ? `
+                    <div class="local-functions-list">
+                        <h5>פונקציות מקומיות שזוהו:</h5>
+                        ${file.local_functions.map(func => `
+                            <div class="local-function-item">
+                                <span class="function-name">${func.name}</span>
+                                <span class="line-number">שורה ${func.line_number}</span>
+                                ${func.suggested_global ? `<span class="suggestion">💡 הצעה: ${func.suggested_global}</span>` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    });
+    
+    return html;
+}
+
+/**
+ * Show local functions error
+ */
+function showLocalFunctionsError(message) {
+    const container = document.getElementById('localFunctionsContent');
+    if (container) {
+        container.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>${message}</p>
+                <button onclick="loadLocalFunctionsAnalysis()" class="retry-btn">🔄 נסה שוב</button>
+            </div>
+        `;
+    }
+}
+
+/**
+ * Copy local functions log to clipboard
+ */
+async function copyLocalFunctionsLog() {
+    try {
+        const response = await fetch('/api/js-map/detect-local-functions');
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            const logText = generateLocalFunctionsLog(data.data);
+            await navigator.clipboard.writeText(logText);
+            
+            // Show success message
+            if (window.showNotification) {
+                window.showNotification('לוג ניתוח פונקציות מקומיות הועתק ללוח', 'success');
+            } else {
+                alert('לוג ניתוח פונקציות מקומיות הועתק ללוח');
+            }
+        }
+    } catch (error) {
+        console.error('❌ Error copying local functions log:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בהעתקת הלוג', 'error');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}
+
+/**
+ * Generate local functions log text
+ */
+function generateLocalFunctionsLog(data) {
+    const summary = data.summary;
+    
+    let log = `=== לוג ניתוח פונקציות מקומיות ===\n`;
+    log += `תאריך: ${new Date().toLocaleString('he-IL')}\n\n`;
+    
+    log += `סיכום:\n`;
+    log += `- קבצים נסרקו: ${summary.files_analyzed}\n`;
+    log += `- קבצים עם בעיות: ${summary.files_with_issues}\n`;
+    log += `- סה"כ בעיות: ${summary.total_local_function_issues}\n\n`;
+    
+    if (data.file_analysis && data.file_analysis.length > 0) {
+        log += `ניתוח מפורט:\n`;
+        data.file_analysis.forEach((file, index) => {
+            log += `${index + 1}. ${file.filename}\n`;
+            log += `   - פונקציות מקומיות: ${file.local_functions_count}\n`;
+            log += `   - פונקציות גלובליות זמינות: ${file.available_global_functions}\n`;
+            
+            if (file.local_functions && file.local_functions.length > 0) {
+                log += `   - פונקציות מקומיות:\n`;
+                file.local_functions.forEach(func => {
+                    log += `     * ${func.name} (שורה ${func.line_number})`;
+                    if (func.suggested_global) {
+                        log += ` - הצעה: ${func.suggested_global}`;
+                    }
+                    log += `\n`;
+                });
+            }
+            log += `\n`;
+        });
+    }
+    
+    return log;
+}
+
+/**
+ * Load and render architecture check
+ */
+async function loadArchitectureCheck() {
+    try {
+        console.log('🏗️ Loading architecture check...');
+        
+        const response = await fetch('/api/js-map/architecture-check');
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            renderArchitectureCheck(data.data);
+        } else {
+            throw new Error(data.error || 'Unknown error');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error loading architecture check:', error);
+        showArchitectureError('שגיאה בטעינת בדיקת ארכיטקטורה: ' + error.message);
+    }
+}
+
+/**
+ * Render architecture check results
+ */
+function renderArchitectureCheck(data) {
+    const container = document.getElementById('architectureContent');
+    if (!container) {
+        console.error('❌ architectureContent container not found');
+        return;
+    }
+    
+    const violations = data.violations || [];
+    const compliantFiles = data.compliant_files;
+    const totalHtmlFiles = data.total_html_files;
+    const isCompliant = data.is_compliant;
+    
+    let html = `
+        <div class="analysis-summary">
+            <h3>📊 סיכום בדיקת ארכיטקטורה</h3>
+            <div class="summary-stats">
+                <div class="stat-item">
+                    <span class="stat-label">קבצי HTML נבדקו:</span>
+                    <span class="stat-value">${totalHtmlFiles}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">קבצים עומדים בכללים:</span>
+                    <span class="stat-value">${compliantFiles}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">הפרות זוהו:</span>
+                    <span class="stat-value">${violations.length}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">סטטוס:</span>
+                    <span class="stat-value ${isCompliant ? 'compliant' : 'non-compliant'}">${isCompliant ? '✅ עומד' : '❌ לא עומד'}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="analysis-actions">
+            <button class="action-btn" onclick="copyArchitectureLog()">📋 העתק לוג</button>
+        </div>
+        
+        <div class="violations-list">
+            ${renderViolations(violations)}
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
+
+/**
+ * Render violations
+ */
+function renderViolations(violations) {
+    if (!violations || violations.length === 0) {
+        return '<p>✅ לא נמצאו הפרות ארכיטקטורה</p>';
+    }
+    
+    let html = '<h4>🚨 הפרות ארכיטקטורה:</h4>';
+    
+    violations.forEach((violation, index) => {
+        html += `
+            <div class="violation-item">
+                <div class="violation-header">
+                    <span class="violation-file">📁 ${violation.file}</span>
+                    <span class="violation-line">שורה ${violation.line}</span>
+                    <span class="violation-severity severity-${violation.severity}">${violation.severity}</span>
+                </div>
+                <div class="violation-content">
+                    <code>${violation.content}</code>
+                </div>
+                <div class="violation-type">
+                    סוג הפרה: ${violation.violation_type}
+                </div>
+            </div>
+        `;
+    });
+    
+    return html;
+}
+
+/**
+ * Show architecture error
+ */
+function showArchitectureError(message) {
+    const container = document.getElementById('architectureContent');
+    if (container) {
+        container.innerHTML = `
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>${message}</p>
+                <button onclick="loadArchitectureCheck()" class="retry-btn">🔄 נסה שוב</button>
+            </div>
+        `;
+    }
+}
+
+/**
+ * Copy architecture log to clipboard
+ */
+async function copyArchitectureLog() {
+    try {
+        const response = await fetch('/api/js-map/architecture-check');
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            const logText = generateArchitectureLog(data.data);
+            await navigator.clipboard.writeText(logText);
+            
+            // Show success message
+            if (window.showNotification) {
+                window.showNotification('לוג בדיקת ארכיטקטורה הועתק ללוח', 'success');
+            } else {
+                alert('לוג בדיקת ארכיטקטורה הועתק ללוח');
+            }
+        }
+    } catch (error) {
+        console.error('❌ Error copying architecture log:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בהעתקת הלוג', 'error');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}
+
+/**
+ * Generate architecture log text
+ */
+function generateArchitectureLog(data) {
+    const violations = data.violations || [];
+    const compliantFiles = data.compliant_files;
+    const totalHtmlFiles = data.total_html_files;
+    const isCompliant = data.is_compliant;
+    
+    let log = `=== לוג בדיקת ארכיטקטורה ===\n`;
+    log += `תאריך: ${new Date().toLocaleString('he-IL')}\n\n`;
+    
+    log += `סיכום:\n`;
+    log += `- קבצי HTML נבדקו: ${totalHtmlFiles}\n`;
+    log += `- קבצים עומדים בכללים: ${compliantFiles}\n`;
+    log += `- הפרות זוהו: ${violations.length}\n`;
+    log += `- סטטוס: ${isCompliant ? 'עומד' : 'לא עומד'}\n\n`;
+    
+    if (violations.length > 0) {
+        log += `הפרות מפורטות:\n`;
+        violations.forEach((violation, index) => {
+            log += `${index + 1}. ${violation.file}:${violation.line}\n`;
+            log += `   סוג: ${violation.violation_type}\n`;
+            log += `   חומרה: ${violation.severity}\n`;
+            log += `   תוכן: ${violation.content}\n\n`;
+        });
+    }
+    
+    return log;
+}
+
+/**
+ * Initialize all new sections when page loads
+ */
+function initializeAdvancedSections() {
+    console.log('🚀 Initializing advanced JS-Map sections...');
+    
+    // Load data for each section when it becomes visible
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const sectionId = entry.target.id;
+                
+                switch(sectionId) {
+                    case 'section2':
+                        loadDuplicatesAnalysis();
+                        break;
+                    case 'section3':
+                        loadLocalFunctionsAnalysis();
+                        break;
+                    case 'section7':
+                        loadArchitectureCheck();
+                        break;
+                }
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    // Observe sections
+    ['section2', 'section3', 'section7'].forEach(sectionId => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+            observer.observe(section);
+        }
+    });
+}
+
+/**
+ * Initialize when DOM is ready
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎯 JS-Map advanced functionality loaded');
+    
+    // Initialize advanced sections after a short delay
+    setTimeout(initializeAdvancedSections, 1000);
+});
+

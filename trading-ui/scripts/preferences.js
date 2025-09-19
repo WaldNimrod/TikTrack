@@ -580,11 +580,63 @@ window.resetToDefaults = async function() {
 // ===== PROFILE MANAGEMENT =====
 
 /**
+ * טעינת פרופילים לרשימה הנפתחת
+ */
+window.loadProfilesToDropdown = async function() {
+    try {
+        console.log('📂 Loading profiles to dropdown...');
+        
+        const profiles = await window.getUserProfiles();
+        const profileSelect = document.getElementById('profileSelect');
+        
+        if (!profileSelect) {
+            console.warn('⚠️ Profile select element not found');
+            return false;
+        }
+        
+        // נקה את הרשימה
+        profileSelect.innerHTML = '';
+        
+        if (profiles && profiles.length > 0) {
+            profiles.forEach(profile => {
+                const option = document.createElement('option');
+                option.value = profile.name;
+                option.textContent = profile.name;
+                if (profile.active) {
+                    option.selected = true;
+                }
+                profileSelect.appendChild(option);
+            });
+            
+            console.log(`✅ Loaded ${profiles.length} profiles to dropdown`);
+            return true;
+        } else {
+            // הוסף אפשרות ברירת מחדל
+            const defaultOption = document.createElement('option');
+            defaultOption.value = 'ברירת מחדל';
+            defaultOption.textContent = 'ברירת מחדל';
+            defaultOption.selected = true;
+            profileSelect.appendChild(defaultOption);
+            
+            console.log('✅ Added default profile option');
+            return true;
+        }
+        
+    } catch (error) {
+        console.error('❌ Error loading profiles to dropdown:', error);
+        return false;
+    }
+};
+
+/**
  * טעינת פרופיל
  */
 window.loadProfile = async function() {
     try {
         console.log('📂 Loading profile...');
+        
+        // טען פרופילים לרשימה הנפתחת
+        await window.loadProfilesToDropdown();
         
         // קבלת פרופיל נבחר
         const profileSelect = document.getElementById('profileSelect');

@@ -7,34 +7,32 @@
     overflow-x: auto;
 }
 
-/* Table with fixed layout */
+/* Table with auto layout - no fixed widths */
 #page-scripts-matrix-table {
-    table-layout: fixed;
+    width: 100%;
     border-collapse: collapse;
 }
 
 /* ALL headers - vertical text from top to bottom */
 #page-scripts-matrix-table th {
     transform: rotate(-90deg);
-    width: 30px;
     padding: 0.1rem 0.05rem;
     height: 60px;
     white-space: nowrap;
 }
 
-/* ALL data cells - narrow width */
+/* ALL data cells - auto width */
 #page-scripts-matrix-table td {
-    width: 30px;
     padding: 0.1rem 0.05rem;
     text-align: center;
 }
 
-/* First column - sticky and wider for script names */
+/* First column - sticky for script names */
 #page-scripts-matrix-table th:first-child,
 #page-scripts-matrix-table td:first-child {
     position: sticky;
     left: 0;
-    width: 100px;
+    background: #e8f0fe;
     writing-mode: horizontal-tb;
     text-orientation: initial;
     height: auto;

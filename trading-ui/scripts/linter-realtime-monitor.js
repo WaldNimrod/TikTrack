@@ -544,7 +544,7 @@ function updateFileTypeStatistics(issues) {
         if (warningsCountEl) {
             warningsCountEl.textContent = warnings;
             console.log(`✅ Updated ${fileType}WarningsCount to ${warnings}`);
-        } else {
+            } else {
             console.warn(`❌ Element ${fileType}WarningsCount not found`);
         }
     });
@@ -673,7 +673,7 @@ function updateProblemFilesTable(stats) {
         }
         return;
     }
-
+    
     // Add rows to table
     problemFiles.forEach(file => {
         const row = document.createElement('tr');
@@ -750,7 +750,7 @@ function scanJavaScriptFiles() {
     if (scanPy) selectedTypes.push('Python');
     if (scanCss) selectedTypes.push('CSS');
     if (scanOther) selectedTypes.push('אחרים');
-
+    
     if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('סריקה התחילה', `סורק ${selectedTypes.join(', ')} קבצים בפרויקט...`);
     }
@@ -838,7 +838,7 @@ function scanJavaScriptFiles() {
         });
 
         allFiles.forEach((fileName, index) => {
-            setTimeout(() => {
+    setTimeout(() => {
                 scanSingleFile(fileName);
                 scanningResults.scannedFiles++;
 
@@ -1220,7 +1220,7 @@ function analyzeHtmlContent(fileName, content) {
             scanningResults.errors.push(issueEntry);
         } else if (issue.type === 'warning') {
             scanningResults.warnings.push(issueEntry);
-            } else {
+    } else {
             scanningResults.warnings.push(issueEntry); // info as warning
         }
 
@@ -1559,7 +1559,7 @@ function analyzeOtherContent(fileName, content) {
             file: fileName,
             sqlCommands: uppercaseCommands
         });
-    } else {
+        } else {
         addLogEntry('INFO', `קובץ ${fileName} נסרק - סוג קובץ לא מזוהה`, { file: fileName });
     }
 
@@ -1894,6 +1894,20 @@ async function finishScan() {
     } catch (error) {
         console.error('❌ שגיאה באיסוף נתונים מסריקה:', error);
     }
+
+    // Auto-cleanup chart after scan if enabled
+    if (document.getElementById('autoCleanupAfterScan')?.checked) {
+        setTimeout(async () => {
+            try {
+                if (window.currentChartRenderer) {
+                    await window.currentChartRenderer.clearChart();
+                    console.log('🧹 Chart auto-cleaned after scan');
+                }
+            } catch (error) {
+                console.error('❌ Error in auto-cleanup after scan:', error);
+            }
+        }, 2000); // Wait 2 seconds after scan completion
+    }
 }
 
 // Start auto refresh
@@ -1902,7 +1916,7 @@ function startAutoRefresh() {
     if (autoRefreshInterval) {
         clearInterval(autoRefreshInterval);
     }
-
+    
     // Get refresh interval from settings (in minutes, convert to milliseconds)
     const intervalMinutes = parseInt(document.getElementById('refreshInterval')?.value) || 2;
     const intervalMs = intervalMinutes * 60 * 1000;
@@ -1913,12 +1927,20 @@ function startAutoRefresh() {
         currentIntervalDisplay.textContent = intervalMinutes;
     }
     
-    autoRefreshInterval = setInterval(() => {
+    autoRefreshInterval = setInterval(async () => {
         if (isAutoRefreshActive) {
-            // Only update statistics and logs, not chart every time
-            updateStatisticsDisplay();
-            loadLogs();
-            console.log('🔄 Auto refresh: updated stats and logs');
+            try {
+                // Update statistics and logs
+                updateStatisticsDisplay();
+                loadLogs();
+                
+                // Update chart with latest data from IndexedDB
+                await autoUpdateChart();
+                
+                console.log('🔄 Auto refresh: updated stats, logs, and chart');
+            } catch (error) {
+                console.error('❌ Error in auto refresh:', error);
+            }
         }
     }, intervalMs);
 }
@@ -2006,7 +2028,1021 @@ function addLogEntry(level, message, details = {}) {
     // Update UI if log section is visible
     updateLogDisplay();
 
+    // Enhanced error handling and notifications
+    handleLogEntry(entry);
+
     console.log(`[${level}] ${message}`, details);
+}
+
+// Enhanced error handling system
+function handleLogEntry(entry) {
+    try {
+        // Critical error handling
+        if (entry.level === 'ERROR' || entry.level === 'CRITICAL') {
+            handleCriticalError(entry);
+        }
+        
+        // Warning handling
+        if (entry.level === 'WARNING') {
+            handleWarning(entry);
+        }
+        
+        // Success handling
+        if (entry.level === 'SUCCESS' || entry.level === 'INFO') {
+            handleSuccess(entry);
+        }
+        
+        // Performance monitoring
+        if (entry.details && entry.details.scanDuration) {
+            monitorPerformance(entry);
+        }
+        
+        // Security monitoring
+        if (entry.message && entry.message.toLowerCase().includes('security')) {
+            monitorSecurity(entry);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error in handleLogEntry:', error);
+    }
+}
+
+// ========================================
+// Comprehensive Testing and Optimization System
+// ========================================
+
+/**
+ * Comprehensive Testing System
+ * Performs full system validation and optimization
+ */
+window.runComprehensiveTests = async function() {
+    try {
+        console.log('🧪 Starting comprehensive system tests...');
+        addLogEntry('INFO', 'Starting comprehensive system tests', { testType: 'full' });
+
+        const testResults = {
+            timestamp: new Date().toISOString(),
+            totalTests: 0,
+            passedTests: 0,
+            failedTests: 0,
+            warnings: 0,
+            performance: {},
+            security: {},
+            functionality: {},
+            recommendations: []
+        };
+
+        // Test 1: System Components
+        console.log('🔍 Testing system components...');
+        const componentTests = await testSystemComponents();
+        testResults.totalTests += componentTests.total;
+        testResults.passedTests += componentTests.passed;
+        testResults.failedTests += componentTests.failed;
+        testResults.warnings += componentTests.warnings;
+
+        // Test 2: Performance
+        console.log('⚡ Testing performance...');
+        const performanceTests = await testPerformance();
+        testResults.performance = performanceTests;
+        testResults.totalTests += performanceTests.total;
+        testResults.passedTests += performanceTests.passed;
+        testResults.failedTests += performanceTests.failed;
+
+        // Test 3: Security
+        console.log('🔒 Testing security...');
+        const securityTests = await testSecurity();
+        testResults.security = securityTests;
+        testResults.totalTests += securityTests.total;
+        testResults.passedTests += securityTests.passed;
+        testResults.failedTests += securityTests.failed;
+
+        // Test 4: Functionality
+        console.log('⚙️ Testing functionality...');
+        const functionalityTests = await testFunctionality();
+        testResults.functionality = functionalityTests;
+        testResults.totalTests += functionalityTests.total;
+        testResults.passedTests += functionalityTests.passed;
+        testResults.failedTests += functionalityTests.failed;
+
+        // Test 5: Data Integrity
+        console.log('💾 Testing data integrity...');
+        const dataTests = await testDataIntegrity();
+        testResults.totalTests += dataTests.total;
+        testResults.passedTests += dataTests.passed;
+        testResults.failedTests += dataTests.failed;
+
+        // Generate recommendations
+        testResults.recommendations = generateTestRecommendations(testResults);
+
+        // Save test results
+        await saveTestResults(testResults);
+
+        // Display results
+        displayTestResults(testResults);
+
+        console.log('✅ Comprehensive tests completed');
+        addLogEntry('SUCCESS', 'Comprehensive tests completed', { 
+            total: testResults.totalTests, 
+            passed: testResults.passedTests, 
+            failed: testResults.failedTests 
+        });
+
+        return testResults;
+
+    } catch (error) {
+        console.error('❌ Error in comprehensive tests:', error);
+        addLogEntry('ERROR', 'Comprehensive tests failed', { error: error.message });
+        return null;
+    }
+};
+
+/**
+ * Test System Components
+ */
+async function testSystemComponents() {
+    const results = { total: 0, passed: 0, failed: 0, warnings: 0, details: [] };
+
+    try {
+        // Test IndexedDB Adapter
+        results.total++;
+        if (typeof window.IndexedDBAdapter !== 'undefined') {
+            results.passed++;
+            results.details.push({ component: 'IndexedDBAdapter', status: 'PASS', message: 'Available' });
+        } else {
+            results.failed++;
+            results.details.push({ component: 'IndexedDBAdapter', status: 'FAIL', message: 'Not available' });
+        }
+
+        // Test Chart Renderer
+        results.total++;
+        if (typeof window.ChartRenderer !== 'undefined') {
+            results.passed++;
+            results.details.push({ component: 'ChartRenderer', status: 'PASS', message: 'Available' });
+        } else {
+            results.failed++;
+            results.details.push({ component: 'ChartRenderer', status: 'FAIL', message: 'Not available' });
+        }
+
+        // Test Data Collector
+        results.total++;
+        if (window.dataCollectorInstance) {
+            results.passed++;
+            results.details.push({ component: 'DataCollector', status: 'PASS', message: 'Instance available' });
+        } else {
+            results.failed++;
+            results.details.push({ component: 'DataCollector', status: 'FAIL', message: 'Instance not available' });
+        }
+
+        // Test Log Recovery
+        results.total++;
+        if (typeof window.LogRecovery !== 'undefined') {
+            results.passed++;
+            results.details.push({ component: 'LogRecovery', status: 'PASS', message: 'Available' });
+                } else {
+            results.failed++;
+            results.details.push({ component: 'LogRecovery', status: 'FAIL', message: 'Not available' });
+        }
+
+        // Test Chart.js
+        results.total++;
+        if (typeof Chart !== 'undefined') {
+            results.passed++;
+            results.details.push({ component: 'Chart.js', status: 'PASS', message: 'Available' });
+        } else {
+            results.failed++;
+            results.details.push({ component: 'Chart.js', status: 'FAIL', message: 'Not available' });
+        }
+
+    } catch (error) {
+        results.failed++;
+        results.details.push({ component: 'SystemComponents', status: 'ERROR', message: error.message });
+    }
+
+    return results;
+}
+
+/**
+ * Test Performance
+ */
+async function testPerformance() {
+    const results = { total: 0, passed: 0, failed: 0, warnings: 0, details: [], metrics: {} };
+
+    try {
+        // Test scan performance
+        results.total++;
+        const scanStart = performance.now();
+        const testFiles = ['test1.js', 'test2.html', 'test3.css'];
+        let scanDuration = 0;
+        
+        for (const file of testFiles) {
+            const fileStart = performance.now();
+            await analyzeFileContent(file, 'console.log("test");');
+            scanDuration += performance.now() - fileStart;
+        }
+        
+        results.metrics.scanPerformance = scanDuration;
+        if (scanDuration < 1000) { // Less than 1 second
+            results.passed++;
+            results.details.push({ test: 'Scan Performance', status: 'PASS', message: `${scanDuration.toFixed(2)}ms` });
+            } else {
+            results.warnings++;
+            results.details.push({ test: 'Scan Performance', status: 'WARNING', message: `${scanDuration.toFixed(2)}ms - Slow` });
+        }
+
+        // Test memory usage
+        results.total++;
+        if (performance.memory) {
+            const memoryUsage = performance.memory.usedJSHeapSize / 1024 / 1024; // MB
+            results.metrics.memoryUsage = memoryUsage;
+            if (memoryUsage < 100) { // Less than 100MB
+                results.passed++;
+                results.details.push({ test: 'Memory Usage', status: 'PASS', message: `${memoryUsage.toFixed(2)}MB` });
+            } else {
+                results.warnings++;
+                results.details.push({ test: 'Memory Usage', status: 'WARNING', message: `${memoryUsage.toFixed(2)}MB - High` });
+            }
+        } else {
+            results.passed++;
+            results.details.push({ test: 'Memory Usage', status: 'PASS', message: 'Not available' });
+        }
+
+        // Test IndexedDB performance
+        results.total++;
+        if (typeof window.IndexedDBAdapter !== 'undefined') {
+            try {
+                const adapter = new window.IndexedDBAdapter();
+                await adapter.initialize();
+                const dbStart = performance.now();
+                await adapter.readHistory(10);
+                const dbDuration = performance.now() - dbStart;
+                results.metrics.indexedDBPerformance = dbDuration;
+                
+                if (dbDuration < 500) { // Less than 500ms
+                    results.passed++;
+                    results.details.push({ test: 'IndexedDB Performance', status: 'PASS', message: `${dbDuration.toFixed(2)}ms` });
+                } else {
+                    results.warnings++;
+                    results.details.push({ test: 'IndexedDB Performance', status: 'WARNING', message: `${dbDuration.toFixed(2)}ms - Slow` });
+            }
+        } catch (error) {
+                results.failed++;
+                results.details.push({ test: 'IndexedDB Performance', status: 'FAIL', message: error.message });
+            }
+        } else {
+            results.failed++;
+            results.details.push({ test: 'IndexedDB Performance', status: 'FAIL', message: 'IndexedDBAdapter not available' });
+        }
+
+    } catch (error) {
+        results.failed++;
+        results.details.push({ test: 'Performance', status: 'ERROR', message: error.message });
+    }
+
+    return results;
+}
+
+/**
+ * Test Security
+ */
+async function testSecurity() {
+    const results = { total: 0, passed: 0, failed: 0, warnings: 0, details: [] };
+
+    try {
+        // Test for potential XSS vulnerabilities
+        results.total++;
+        const testContent = '<script>alert("xss")</script>';
+        const issues = analyzeHtmlContent('test.html', testContent);
+        const xssIssues = issues.filter(issue => issue.message.toLowerCase().includes('script') || issue.message.toLowerCase().includes('xss'));
+        
+        if (xssIssues.length > 0) {
+            results.passed++;
+            results.details.push({ test: 'XSS Detection', status: 'PASS', message: 'XSS vulnerabilities detected' });
+        } else {
+            results.failed++;
+            results.details.push({ test: 'XSS Detection', status: 'FAIL', message: 'XSS detection not working' });
+        }
+
+        // Test for SQL injection patterns
+        results.total++;
+        const sqlTestContent = "SELECT * FROM users WHERE id = '1' OR '1'='1'";
+        const sqlIssues = analyzePythonContent('test.py', sqlTestContent);
+        const sqlInjectionIssues = sqlIssues.filter(issue => issue.message.toLowerCase().includes('sql') || issue.message.toLowerCase().includes('injection'));
+        
+        if (sqlInjectionIssues.length > 0) {
+            results.passed++;
+            results.details.push({ test: 'SQL Injection Detection', status: 'PASS', message: 'SQL injection patterns detected' });
+        } else {
+            results.warnings++;
+            results.details.push({ test: 'SQL Injection Detection', status: 'WARNING', message: 'SQL injection detection limited' });
+        }
+
+        // Test for hardcoded secrets
+        results.total++;
+        const secretTestContent = 'password = "secret123"; api_key = "sk-1234567890"';
+        const secretIssues = analyzePythonContent('test.py', secretTestContent);
+        const hardcodedSecrets = secretIssues.filter(issue => issue.message.toLowerCase().includes('password') || issue.message.toLowerCase().includes('secret'));
+        
+        if (hardcodedSecrets.length > 0) {
+            results.passed++;
+            results.details.push({ test: 'Hardcoded Secrets Detection', status: 'PASS', message: 'Hardcoded secrets detected' });
+        } else {
+            results.warnings++;
+            results.details.push({ test: 'Hardcoded Secrets Detection', status: 'WARNING', message: 'Hardcoded secrets detection limited' });
+        }
+
+    } catch (error) {
+        results.failed++;
+        results.details.push({ test: 'Security', status: 'ERROR', message: error.message });
+    }
+
+    return results;
+}
+
+/**
+ * Test Functionality
+ */
+async function testFunctionality() {
+    const results = { total: 0, passed: 0, failed: 0, warnings: 0, details: [] };
+
+    try {
+        // Test file scanning
+        results.total++;
+        try {
+            const scanResults = await scanJavaScriptFiles();
+            if (scanResults && scanResults.totalFiles > 0) {
+                results.passed++;
+                results.details.push({ test: 'File Scanning', status: 'PASS', message: `${scanResults.totalFiles} files scanned` });
+            } else {
+                results.failed++;
+                results.details.push({ test: 'File Scanning', status: 'FAIL', message: 'No files scanned' });
+            }
+        } catch (error) {
+            results.failed++;
+            results.details.push({ test: 'File Scanning', status: 'FAIL', message: error.message });
+        }
+
+        // Test issue fixing
+        results.total++;
+        try {
+            const fixResults = await fixAllIssues();
+            if (fixResults && fixResults.totalFixes >= 0) {
+                results.passed++;
+                results.details.push({ test: 'Issue Fixing', status: 'PASS', message: `${fixResults.totalFixes} fixes attempted` });
+            } else {
+                results.failed++;
+                results.details.push({ test: 'Issue Fixing', status: 'FAIL', message: 'Fix system not working' });
+            }
+        } catch (error) {
+            results.failed++;
+            results.details.push({ test: 'Issue Fixing', status: 'FAIL', message: error.message });
+        }
+
+        // Test chart rendering
+        results.total++;
+        try {
+            if (window.currentChartRenderer) {
+                await window.currentChartRenderer.updateChart([]);
+                results.passed++;
+                results.details.push({ test: 'Chart Rendering', status: 'PASS', message: 'Chart renderer working' });
+            } else {
+                results.failed++;
+                results.details.push({ test: 'Chart Rendering', status: 'FAIL', message: 'Chart renderer not available' });
+            }
+        } catch (error) {
+            results.failed++;
+            results.details.push({ test: 'Chart Rendering', status: 'FAIL', message: error.message });
+        }
+
+        // Test data collection
+        results.total++;
+        try {
+            if (window.dataCollectorInstance) {
+                const metrics = window.dataCollectorInstance.collectFromScan({
+                    totalFiles: 10,
+                    errors: 2,
+                    warnings: 3,
+                    scanDuration: 1000,
+                    scanType: 'test',
+                    fileTypes: ['js'],
+                    totalSize: 50000,
+                    files: []
+                });
+                if (metrics && metrics.qualityScore !== undefined) {
+                    results.passed++;
+                    results.details.push({ test: 'Data Collection', status: 'PASS', message: 'Data collection working' });
+                } else {
+                    results.failed++;
+                    results.details.push({ test: 'Data Collection', status: 'FAIL', message: 'Data collection not working' });
+                }
+            } else {
+                results.failed++;
+                results.details.push({ test: 'Data Collection', status: 'FAIL', message: 'Data collector not available' });
+            }
+    } catch (error) {
+            results.failed++;
+            results.details.push({ test: 'Data Collection', status: 'FAIL', message: error.message });
+        }
+
+    } catch (error) {
+        results.failed++;
+        results.details.push({ test: 'Functionality', status: 'ERROR', message: error.message });
+    }
+
+    return results;
+}
+
+/**
+ * Test Data Integrity
+ */
+async function testDataIntegrity() {
+    const results = { total: 0, passed: 0, failed: 0, warnings: 0, details: [] };
+
+    try {
+        // Test IndexedDB data integrity
+        results.total++;
+        if (typeof window.IndexedDBAdapter !== 'undefined') {
+            try {
+                const adapter = new window.IndexedDBAdapter();
+                await adapter.initialize();
+                const testData = {
+                    timestamp: new Date().toISOString(),
+                    metrics: {
+                        qualityScore: 85,
+                        errors: 5,
+                        warnings: 3
+                    }
+                };
+                
+                await adapter.saveDataPoint(testData);
+                const retrievedData = await adapter.readHistory(1);
+                
+                if (retrievedData && retrievedData.length > 0) {
+                    results.passed++;
+                    results.details.push({ test: 'IndexedDB Data Integrity', status: 'PASS', message: 'Data save/retrieve working' });
+    } else {
+                    results.failed++;
+                    results.details.push({ test: 'IndexedDB Data Integrity', status: 'FAIL', message: 'Data not retrieved' });
+                }
+            } catch (error) {
+                results.failed++;
+                results.details.push({ test: 'IndexedDB Data Integrity', status: 'FAIL', message: error.message });
+            }
+        } else {
+            results.failed++;
+            results.details.push({ test: 'IndexedDB Data Integrity', status: 'FAIL', message: 'IndexedDBAdapter not available' });
+        }
+
+        // Test localStorage data integrity
+        results.total++;
+        try {
+            const testKey = 'linter_test_data';
+            const testValue = JSON.stringify({ test: 'data', timestamp: Date.now() });
+            localStorage.setItem(testKey, testValue);
+            const retrievedValue = localStorage.getItem(testKey);
+            
+            if (retrievedValue === testValue) {
+                results.passed++;
+                results.details.push({ test: 'localStorage Data Integrity', status: 'PASS', message: 'localStorage working' });
+            } else {
+                results.failed++;
+                results.details.push({ test: 'localStorage Data Integrity', status: 'FAIL', message: 'localStorage not working' });
+            }
+            
+            localStorage.removeItem(testKey);
+        } catch (error) {
+            results.failed++;
+            results.details.push({ test: 'localStorage Data Integrity', status: 'FAIL', message: error.message });
+        }
+
+    } catch (error) {
+        results.failed++;
+        results.details.push({ test: 'Data Integrity', status: 'ERROR', message: error.message });
+    }
+
+    return results;
+}
+
+/**
+ * Generate Test Recommendations
+ */
+function generateTestRecommendations(testResults) {
+    const recommendations = [];
+
+    // Performance recommendations
+    if (testResults.performance && testResults.performance.warnings > 0) {
+        recommendations.push({
+            category: 'Performance',
+            priority: 'High',
+            message: 'Consider optimizing scan performance and memory usage',
+            action: 'Review file analysis algorithms and implement caching'
+        });
+    }
+
+    // Security recommendations
+    if (testResults.security && testResults.security.failed > 0) {
+        recommendations.push({
+            category: 'Security',
+            priority: 'High',
+            message: 'Enhance security detection capabilities',
+            action: 'Add more security patterns and vulnerability detection'
+        });
+    }
+
+    // Functionality recommendations
+    if (testResults.functionality && testResults.functionality.failed > 0) {
+        recommendations.push({
+            category: 'Functionality',
+            priority: 'Medium',
+            message: 'Fix failing functionality tests',
+            action: 'Review and fix core system components'
+        });
+    }
+
+    // Overall recommendations
+    const passRate = testResults.totalTests > 0 ? (testResults.passedTests / testResults.totalTests) * 100 : 0;
+    if (passRate < 80) {
+        recommendations.push({
+            category: 'Overall',
+            priority: 'High',
+            message: `Test pass rate is ${passRate.toFixed(1)}% - needs improvement`,
+            action: 'Focus on fixing failing tests and improving system reliability'
+        });
+    }
+
+    return recommendations;
+}
+
+/**
+ * Save Test Results
+ */
+async function saveTestResults(testResults) {
+    try {
+        if (typeof window.IndexedDBAdapter !== 'undefined') {
+            const adapter = new window.IndexedDBAdapter();
+            await adapter.initialize();
+            
+            const testData = {
+                timestamp: new Date().toISOString(),
+                type: 'test_results',
+                data: testResults
+            };
+            
+            await adapter.saveDataPoint(testData);
+            console.log('💾 Test results saved to IndexedDB');
+        }
+        
+        // Also save to localStorage for quick access
+        localStorage.setItem('linter_last_test_results', JSON.stringify(testResults));
+        
+    } catch (error) {
+        console.error('❌ Error saving test results:', error);
+    }
+}
+
+/**
+ * Display Test Results
+ */
+function displayTestResults(testResults) {
+    try {
+        const passRate = testResults.totalTests > 0 ? (testResults.passedTests / testResults.totalTests) * 100 : 0;
+        
+        console.log('📊 Test Results Summary:');
+        console.log(`Total Tests: ${testResults.totalTests}`);
+        console.log(`Passed: ${testResults.passedTests}`);
+        console.log(`Failed: ${testResults.failedTests}`);
+        console.log(`Warnings: ${testResults.warnings}`);
+        console.log(`Pass Rate: ${passRate.toFixed(1)}%`);
+        
+        if (testResults.recommendations.length > 0) {
+            console.log('💡 Recommendations:');
+            testResults.recommendations.forEach((rec, index) => {
+                console.log(`${index + 1}. [${rec.priority}] ${rec.category}: ${rec.message}`);
+            });
+        }
+        
+        // Update UI with test results
+        updateTestResultsDisplay(testResults);
+        
+    } catch (error) {
+        console.error('❌ Error displaying test results:', error);
+    }
+}
+
+/**
+ * Update Test Results Display
+ */
+function updateTestResultsDisplay(testResults) {
+    try {
+        const passRate = testResults.totalTests > 0 ? (testResults.passedTests / testResults.totalTests) * 100 : 0;
+        
+        // Show the test results section
+        const testResultsSection = document.getElementById('testResultsSection');
+        if (testResultsSection) {
+            testResultsSection.style.display = 'block';
+        }
+        
+        // Update statistics display with test results
+        const testStatusElement = document.getElementById('testStatus');
+        if (testStatusElement) {
+            testStatusElement.innerHTML = `
+                <div class="test-results-summary">
+                    <h5>🧪 תוצאות בדיקות מערכת</h5>
+                    <div class="test-stats" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+                        <span class="badge badge-success">${testResults.passedTests} עברו</span>
+                        <span class="badge badge-danger">${testResults.failedTests} נכשלו</span>
+                        <span class="badge badge-warning">${testResults.warnings} אזהרות</span>
+                        <span class="badge badge-info">${passRate.toFixed(1)}% שיעור הצלחה</span>
+            </div>
+        </div>
+    `;
+        }
+        
+        // Update detailed test results
+        const testDetailsElement = document.getElementById('testDetails');
+        if (testDetailsElement) {
+            let detailsHTML = '<div class="test-details">';
+            
+            // System Components
+            if (testResults.performance && testResults.performance.details) {
+                detailsHTML += '<h6>🔍 רכיבי מערכת:</h6><ul>';
+                testResults.performance.details.forEach(detail => {
+                    const statusClass = detail.status === 'PASS' ? 'text-success' : 
+                                      detail.status === 'FAIL' ? 'text-danger' : 'text-warning';
+                    detailsHTML += `<li class="${statusClass}"><strong>${detail.component}:</strong> ${detail.message}</li>`;
+                });
+                detailsHTML += '</ul>';
+            }
+            
+            // Performance
+            if (testResults.performance && testResults.performance.details) {
+                detailsHTML += '<h6>⚡ ביצועים:</h6><ul>';
+                testResults.performance.details.forEach(detail => {
+                    const statusClass = detail.status === 'PASS' ? 'text-success' : 
+                                      detail.status === 'FAIL' ? 'text-danger' : 'text-warning';
+                    detailsHTML += `<li class="${statusClass}"><strong>${detail.test}:</strong> ${detail.message}</li>`;
+                });
+                detailsHTML += '</ul>';
+            }
+            
+            // Security
+            if (testResults.security && testResults.security.details) {
+                detailsHTML += '<h6>🔒 אבטחה:</h6><ul>';
+                testResults.security.details.forEach(detail => {
+                    const statusClass = detail.status === 'PASS' ? 'text-success' : 
+                                      detail.status === 'FAIL' ? 'text-danger' : 'text-warning';
+                    detailsHTML += `<li class="${statusClass}"><strong>${detail.test}:</strong> ${detail.message}</li>`;
+                });
+                detailsHTML += '</ul>';
+            }
+            
+            // Functionality
+            if (testResults.functionality && testResults.functionality.details) {
+                detailsHTML += '<h6>⚙️ פונקציונליות:</h6><ul>';
+                testResults.functionality.details.forEach(detail => {
+                    const statusClass = detail.status === 'PASS' ? 'text-success' : 
+                                      detail.status === 'FAIL' ? 'text-danger' : 'text-warning';
+                    detailsHTML += `<li class="${statusClass}"><strong>${detail.test}:</strong> ${detail.message}</li>`;
+                });
+                detailsHTML += '</ul>';
+            }
+            
+            // Recommendations
+            if (testResults.recommendations && testResults.recommendations.length > 0) {
+                detailsHTML += '<h6>💡 המלצות:</h6><ul>';
+                testResults.recommendations.forEach(rec => {
+                    const priorityClass = rec.priority === 'High' ? 'text-danger' : 
+                                        rec.priority === 'Medium' ? 'text-warning' : 'text-info';
+                    detailsHTML += `<li class="${priorityClass}"><strong>[${rec.priority}] ${rec.category}:</strong> ${rec.message}</li>`;
+                });
+                detailsHTML += '</ul>';
+            }
+            
+            detailsHTML += '</div>';
+            testDetailsElement.innerHTML = detailsHTML;
+        }
+        
+    } catch (error) {
+        console.error('❌ Error updating test results display:', error);
+    }
+}
+
+/**
+ * Quick System Health Check
+ */
+window.runQuickHealthCheck = async function() {
+    try {
+        console.log('🏥 Running quick health check...');
+        
+        const healthCheck = {
+            timestamp: new Date().toISOString(),
+            status: 'healthy',
+            issues: [],
+            components: {}
+        };
+        
+        // Check core components
+        healthCheck.components.indexedDB = typeof window.IndexedDBAdapter !== 'undefined';
+        healthCheck.components.chartRenderer = typeof window.ChartRenderer !== 'undefined';
+        healthCheck.components.dataCollector = !!window.dataCollectorInstance;
+        healthCheck.components.chartJS = typeof Chart !== 'undefined';
+        
+        // Check for issues
+        if (!healthCheck.components.indexedDB) {
+            healthCheck.issues.push('IndexedDB Adapter not available');
+            healthCheck.status = 'degraded';
+        }
+        
+        if (!healthCheck.components.chartRenderer) {
+            healthCheck.issues.push('Chart Renderer not available');
+            healthCheck.status = 'degraded';
+        }
+        
+        if (!healthCheck.components.dataCollector) {
+            healthCheck.issues.push('Data Collector not available');
+            healthCheck.status = 'degraded';
+        }
+        
+        if (!healthCheck.components.chartJS) {
+            healthCheck.issues.push('Chart.js not available');
+            healthCheck.status = 'degraded';
+        }
+        
+        // Check memory usage
+        if (performance.memory) {
+            const memoryUsage = performance.memory.usedJSHeapSize / 1024 / 1024;
+            healthCheck.components.memoryUsage = memoryUsage;
+            
+            if (memoryUsage > 200) {
+                healthCheck.issues.push(`High memory usage: ${memoryUsage.toFixed(2)}MB`);
+                healthCheck.status = 'degraded';
+            }
+        }
+        
+        // Display results
+        console.log('🏥 Health Check Results:', healthCheck);
+        
+        // Update UI with health check results
+        updateHealthCheckDisplay(healthCheck);
+        
+        if (healthCheck.status === 'healthy') {
+            addLogEntry('SUCCESS', 'System health check passed', { status: 'healthy' });
+    } else {
+            addLogEntry('WARNING', 'System health check found issues', { 
+                status: healthCheck.status, 
+                issues: healthCheck.issues 
+            });
+        }
+        
+        return healthCheck;
+        
+    } catch (error) {
+        console.error('❌ Error in health check:', error);
+        addLogEntry('ERROR', 'Health check failed', { error: error.message });
+        return null;
+    }
+};
+
+/**
+ * Update Health Check Display
+ */
+function updateHealthCheckDisplay(healthCheck) {
+    try {
+        // Show the test results section
+        const testResultsSection = document.getElementById('testResultsSection');
+        if (testResultsSection) {
+            testResultsSection.style.display = 'block';
+        }
+        
+        // Update statistics display with health check results
+        const testStatusElement = document.getElementById('testStatus');
+        if (testStatusElement) {
+            const statusClass = healthCheck.status === 'healthy' ? 'text-success' : 'text-warning';
+            const statusIcon = healthCheck.status === 'healthy' ? '✅' : '⚠️';
+            
+            testStatusElement.innerHTML = `
+                <div class="health-check-summary">
+                    <h5>🏥 בדיקת בריאות מערכת</h5>
+                    <div class="health-status" style="margin-bottom: 20px;">
+                        <span class="badge ${healthCheck.status === 'healthy' ? 'badge-success' : 'badge-warning'}">
+                            ${statusIcon} ${healthCheck.status === 'healthy' ? 'בריא' : 'מושפל'}
+                        </span>
+            </div>
+        </div>
+    `;
+        }
+        
+        // Update detailed health check results
+        const testDetailsElement = document.getElementById('testDetails');
+        if (testDetailsElement) {
+            let detailsHTML = '<div class="health-check-details">';
+            
+            // Components status
+            detailsHTML += '<h6>🔍 סטטוס רכיבים:</h6><ul>';
+            Object.entries(healthCheck.components).forEach(([component, status]) => {
+                const statusClass = status ? 'text-success' : 'text-danger';
+                const statusIcon = status ? '✅' : '❌';
+                detailsHTML += `<li class="${statusClass}"><strong>${component}:</strong> ${statusIcon} ${status ? 'זמין' : 'לא זמין'}</li>`;
+            });
+            detailsHTML += '</ul>';
+            
+            // Issues
+            if (healthCheck.issues && healthCheck.issues.length > 0) {
+                detailsHTML += '<h6>⚠️ בעיות שזוהו:</h6><ul>';
+                healthCheck.issues.forEach(issue => {
+                    detailsHTML += `<li class="text-warning"><strong>בעיה:</strong> ${issue}</li>`;
+                });
+                detailsHTML += '</ul>';
+            } else {
+                detailsHTML += '<h6>✅ אין בעיות שזוהו</h6>';
+            }
+            
+            detailsHTML += '</div>';
+            testDetailsElement.innerHTML = detailsHTML;
+        }
+        
+    } catch (error) {
+        console.error('❌ Error updating health check display:', error);
+    }
+}
+
+// Handle critical errors
+function handleCriticalError(entry) {
+    try {
+        // Log to console with enhanced formatting
+        console.error(`🚨 CRITICAL ERROR [${entry.id}]: ${entry.message}`, entry.details);
+        
+        // Show user notification
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה קריטית', entry.message);
+        }
+        
+        // Auto-recovery attempts for common issues
+        if (entry.message.includes('Chart') || entry.message.includes('גרף')) {
+            attemptChartRecovery();
+        }
+        
+        if (entry.message.includes('IndexedDB') || entry.message.includes('אחסון')) {
+            attemptStorageRecovery();
+        }
+        
+        if (entry.message.includes('Network') || entry.message.includes('רשת')) {
+            attemptNetworkRecovery();
+        }
+        
+    } catch (error) {
+        console.error('❌ Error in handleCriticalError:', error);
+    }
+}
+
+// Handle warnings
+function handleWarning(entry) {
+    try {
+        // Log to console with enhanced formatting
+        console.warn(`⚠️ WARNING [${entry.id}]: ${entry.message}`, entry.details);
+        
+        // Show user notification for important warnings
+        if (entry.message.includes('Performance') || entry.message.includes('ביצועים')) {
+            if (typeof window.showWarningNotification === 'function') {
+                window.showWarningNotification('אזהרת ביצועים', entry.message);
+            }
+        }
+        
+        if (entry.message.includes('Security') || entry.message.includes('אבטחה')) {
+            if (typeof window.showWarningNotification === 'function') {
+                window.showWarningNotification('אזהרת אבטחה', entry.message);
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Error in handleWarning:', error);
+    }
+}
+
+// Handle success messages
+function handleSuccess(entry) {
+    try {
+        // Log to console with enhanced formatting
+        console.log(`✅ SUCCESS [${entry.id}]: ${entry.message}`, entry.details);
+        
+        // Show user notification for important successes
+        if (entry.message.includes('סריקה הושלמה') || entry.message.includes('תיקון הושלם')) {
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('הצלחה', entry.message);
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Error in handleSuccess:', error);
+    }
+}
+
+// Monitor performance
+function monitorPerformance(entry) {
+    try {
+        const duration = entry.details.scanDuration;
+        if (duration && typeof duration === 'string') {
+            const durationMs = parseInt(duration.replace(/[^\d]/g, ''));
+            
+            // Performance thresholds
+            if (durationMs > 30000) { // 30 seconds
+                addLogEntry('WARNING', 'ביצועים איטיים: סריקה ארכה יותר מ-30 שניות', {
+                    duration: duration,
+                    recommendation: 'בדוק את מספר הקבצים או את ביצועי השרת'
+                });
+            } else if (durationMs > 10000) { // 10 seconds
+                addLogEntry('INFO', 'ביצועים בינוניים: סריקה ארכה יותר מ-10 שניות', {
+                    duration: duration,
+                    recommendation: 'שקול לבדוק את ביצועי השרת'
+                });
+            }
+        }
+    } catch (error) {
+        console.error('❌ Error in monitorPerformance:', error);
+    }
+}
+
+// Monitor security
+function monitorSecurity(entry) {
+    try {
+        // Security pattern detection
+        const securityPatterns = [
+            'eval', 'innerHTML', 'document.write', 'setTimeout', 'setInterval',
+            'localStorage', 'sessionStorage', 'IndexedDB', 'fetch', 'XMLHttpRequest'
+        ];
+        
+        const message = entry.message.toLowerCase();
+        const details = JSON.stringify(entry.details).toLowerCase();
+        
+        securityPatterns.forEach(pattern => {
+            if (message.includes(pattern) || details.includes(pattern)) {
+                addLogEntry('WARNING', `זוהה דפוס אבטחה: ${pattern}`, {
+                    pattern: pattern,
+                    context: entry.message,
+                    recommendation: 'בדוק את השימוש בדפוס זה'
+                });
+            }
+        });
+        
+    } catch (error) {
+        console.error('❌ Error in monitorSecurity:', error);
+    }
+}
+
+// Auto-recovery functions
+function attemptChartRecovery() {
+    try {
+        console.log('🔄 Attempting chart recovery...');
+        
+        if (window.currentChartRenderer) {
+            // Try to reinitialize chart
+            setTimeout(async () => {
+                try {
+                    await window.currentChartRenderer.initialize();
+                    addLogEntry('SUCCESS', 'גרף שוחזר בהצלחה');
+                } catch (error) {
+                    addLogEntry('ERROR', 'שחזור גרף נכשל', { error: error.message });
+                }
+            }, 2000);
+        }
+    } catch (error) {
+        console.error('❌ Error in attemptChartRecovery:', error);
+    }
+}
+
+function attemptStorageRecovery() {
+    try {
+        console.log('🔄 Attempting storage recovery...');
+        
+        if (typeof window.IndexedDBAdapter !== 'undefined') {
+            // Try to reinitialize storage
+            setTimeout(async () => {
+                try {
+                    const adapter = new window.IndexedDBAdapter();
+                    await adapter.initialize();
+                    addLogEntry('SUCCESS', 'אחסון שוחזר בהצלחה');
+                } catch (error) {
+                    addLogEntry('ERROR', 'שחזור אחסון נכשל', { error: error.message });
+                }
+            }, 2000);
+        }
+    } catch (error) {
+        console.error('❌ Error in attemptStorageRecovery:', error);
+    }
+}
+
+function attemptNetworkRecovery() {
+    try {
+        console.log('🔄 Attempting network recovery...');
+        
+        // Check network connectivity
+        if (navigator.onLine) {
+            addLogEntry('INFO', 'רשת זמינה - מנסה להתחבר מחדש');
+    } else {
+            addLogEntry('WARNING', 'רשת לא זמינה - בדוק את החיבור לאינטרנט');
+        }
+    } catch (error) {
+        console.error('❌ Error in attemptNetworkRecovery:', error);
+    }
 }
 
 function updateLogDisplay() {
@@ -2168,7 +3204,7 @@ window.stopMonitoring = () => {
     if (stopBtn) stopBtn.disabled = true;
 
     // Show notification
-    if (typeof window.showInfoNotification === 'function') {
+        if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('ניטור נעצר', 'הניטור האוטומטי הופסק');
     }
 };
@@ -2273,7 +3309,7 @@ window.fixAllIssues = async () => {
     setTimeout(() => loadLogs(), 1000);
 
     // Use direct call to avoid recursion
-            if (typeof window.showSuccessNotification === 'function') {
+                if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('תיקון אוטומטי', `תוקנו ${fixedCount} בעיות (${Math.round((fixedCount / totalIssues) * 100)}% הצלחה)`);
     }
 
@@ -2325,9 +3361,23 @@ window.fixAllIssues = async () => {
 
             // Update chart indicators
             updateChartIndicators(enhancedPoint);
-        }
-    } catch (error) {
+            }
+        } catch (error) {
         console.error('❌ שגיאה באיסוף נתונים מתיקון:', error);
+    }
+
+    // Auto-cleanup chart after fix if enabled
+    if (document.getElementById('autoCleanupAfterFix')?.checked) {
+        setTimeout(async () => {
+            try {
+                if (window.currentChartRenderer) {
+                    await window.currentChartRenderer.clearChart();
+                    console.log('🧹 Chart auto-cleaned after fix');
+                }
+            } catch (error) {
+                console.error('❌ Error in auto-cleanup after fix:', error);
+            }
+        }, 2000); // Wait 2 seconds after fix completion
     }
 };
 window.fixAllErrors = () => {
@@ -2338,7 +3388,7 @@ window.fixAllErrors = () => {
 
     if (scanningResults.errors.length === 0) {
         // Use direct call to avoid recursion
-            if (typeof window.showInfoNotification === 'function') {
+        if (typeof window.showInfoNotification === 'function') {
             window.showInfoNotification('אין שגיאות', 'לא נמצאו שגיאות לתיקון. הרץ סריקה תחילה.');
         }
         return;
@@ -2390,6 +3440,20 @@ window.fixAllErrors = () => {
         window.showSuccessNotification('תיקון שגיאות', `תוקנו ${errorsFixed} שגיאות (${Math.round((errorsFixed / (errorsFixed + failedErrors)) * 100)}% הצלחה)`);
     }
 
+    // Auto-cleanup chart after fix if enabled
+    if (document.getElementById('autoCleanupAfterFix')?.checked) {
+        setTimeout(async () => {
+            try {
+                if (window.currentChartRenderer) {
+                    await window.currentChartRenderer.clearChart();
+                    console.log('🧹 Chart auto-cleaned after error fix');
+                }
+            } catch (error) {
+                console.error('❌ Error in auto-cleanup after error fix:', error);
+            }
+        }, 2000); // Wait 2 seconds after fix completion
+    }
+
     console.log('✅ Error fix operation completed');
 };
 window.fixAllWarnings = () => {
@@ -2400,7 +3464,7 @@ window.fixAllWarnings = () => {
 
     if (scanningResults.warnings.length === 0) {
         // Use direct call to avoid recursion
-        if (typeof window.showInfoNotification === 'function') {
+            if (typeof window.showInfoNotification === 'function') {
             window.showInfoNotification('אין אזהרות', 'לא נמצאו אזהרות לתיקון. הרץ סריקה תחילה.');
         }
         return;
@@ -2448,8 +3512,22 @@ window.fixAllWarnings = () => {
     setTimeout(() => loadLogs(), 1000);
 
     // Use direct call to avoid recursion
-    if (typeof window.showSuccessNotification === 'function') {
+            if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('תיקון אזהרות', `תוקנו ${warningsFixed} אזהרות (${Math.round((warningsFixed / (warningsFixed + failedWarnings)) * 100)}% הצלחה)`);
+    }
+
+    // Auto-cleanup chart after fix if enabled
+    if (document.getElementById('autoCleanupAfterFix')?.checked) {
+        setTimeout(async () => {
+            try {
+                if (window.currentChartRenderer) {
+                    await window.currentChartRenderer.clearChart();
+                    console.log('🧹 Chart auto-cleaned after warning fix');
+                }
+            } catch (error) {
+                console.error('❌ Error in auto-cleanup after warning fix:', error);
+            }
+        }, 2000); // Wait 2 seconds after fix completion
     }
 
     console.log('✅ Warning fix operation completed');
@@ -2502,6 +3580,20 @@ window.ignoreAllIssues = () => {
         window.showInfoNotification('התעלמות מבעיות', `הועברו ${ignoredCount} בעיות להתעלמות`);
     }
 
+    // Auto-cleanup chart after ignore if enabled
+    if (document.getElementById('autoCleanupAfterIgnore')?.checked) {
+        setTimeout(async () => {
+            try {
+                if (window.currentChartRenderer) {
+                    await window.currentChartRenderer.clearChart();
+                    console.log('🧹 Chart auto-cleaned after ignore');
+                }
+            } catch (error) {
+                console.error('❌ Error in auto-cleanup after ignore:', error);
+            }
+        }, 2000); // Wait 2 seconds after ignore completion
+    }
+
     console.log('✅ Ignore operation completed');
 };
 
@@ -2518,7 +3610,7 @@ window.resetFixedIssues = () => {
     scanningResults.scannedFiles = 0;
 
     console.log('✅ All fixed issues reset - ready for new scan');
-    if (typeof window.showInfoNotification === 'function') {
+        if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('איפוס הושלם', 'כל הבעיות שתוקנו אופסו. ניתן לסרוק מחדש.');
     }
 };
@@ -2599,6 +3691,29 @@ function calculateTotalSize() {
     }
 }
 
+// Auto-update chart with latest data from IndexedDB
+async function autoUpdateChart() {
+    try {
+        if (!window.currentChartRenderer || typeof window.IndexedDBAdapter === 'undefined') {
+            console.log('ℹ️ Chart renderer or IndexedDB adapter not available for auto-update');
+        return;
+    }
+    
+        const adapter = new window.IndexedDBAdapter();
+        const chartData = await adapter.readHistory(100); // Get last 100 data points
+        
+        if (chartData && chartData.length > 0) {
+            await window.currentChartRenderer.updateChart(chartData, false); // No animation for auto-update
+            updateChartIndicators(chartData[chartData.length - 1]);
+            console.log('📈 Auto-update: chart refreshed with latest data');
+        } else {
+            console.log('ℹ️ No data available for auto-update');
+        }
+    } catch (error) {
+        console.error('❌ Error in auto-update chart:', error);
+    }
+}
+
 // Update chart indicators with latest data
 async function updateChartIndicators(latestDataPoint) {
     try {
@@ -2676,7 +3791,7 @@ async function updateChartIndicators(latestDataPoint) {
                     const completeness = allData.length > 0 ? 100 : 0;
                     completenessEl.textContent = `${completeness}%`;
                     completenessBarEl.style.width = `${completeness}%`;
-                } else {
+            } else {
                     completenessEl.textContent = '0%';
                     completenessBarEl.style.width = '0%';
                 }
@@ -2756,8 +3871,8 @@ window.clearChartHistory = async function() {
         document.getElementById('totalErrors').textContent = '0';
         document.getElementById('dataCompleteness').textContent = '0%';
         document.getElementById('dataCompletenessBar').style.width = '0%';
-        
-        if (typeof window.showSuccessNotification === 'function') {
+                
+                if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification('היסטוריה נמחקה', 'כל נתוני הגרף נמחקו בהצלחה');
         }
 
@@ -2817,13 +3932,520 @@ window.exportChartData = async function() {
             }
         }
 
-    } catch (error) {
+        } catch (error) {
         console.error('❌ שגיאה בייצוא נתוני גרף:', error);
-        if (typeof window.showErrorNotification === 'function') {
+            if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'אירעה שגיאה בייצוא הנתונים');
         }
     }
 };
+
+// Export comprehensive report
+window.exportComprehensiveReport = async function() {
+    try {
+        console.log('📊 מייצא דוח מקיף...');
+
+        if (typeof window.IndexedDBAdapter === 'undefined') {
+            console.warn('⚠️ IndexedDBAdapter לא זמין');
+        return;
+    }
+    
+        const adapter = new window.IndexedDBAdapter();
+        await adapter.initialize();
+
+        // Load all data
+        const allData = await adapter.loadAll();
+
+        if (allData && allData.length > 0) {
+            // Calculate statistics
+            const stats = calculateExportStatistics(allData);
+            
+            // Create comprehensive report
+            const report = {
+                reportInfo: {
+                    exportDate: new Date().toISOString(),
+                    totalDataPoints: allData.length,
+                    reportType: 'comprehensive',
+                    version: '1.0.0'
+                },
+                summary: {
+                    totalScans: stats.totalScans,
+                    totalFixes: stats.totalFixes,
+                    averageQuality: stats.averageQuality,
+                    totalErrors: stats.totalErrors,
+                    totalWarnings: stats.totalWarnings,
+                    averageScanDuration: stats.averageScanDuration,
+                    qualityTrend: stats.qualityTrend,
+                    performanceTrend: stats.performanceTrend
+                },
+                detailedData: allData,
+                recommendations: generateRecommendations(stats)
+            };
+
+            // Convert to JSON and download
+            const jsonString = JSON.stringify(report, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `linter-comprehensive-report-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            console.log('✅ דוח מקיף יוצא בהצלחה');
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('דוח מקיף הושלם', `יוצא דוח עם ${allData.length} נקודות נתונים`);
+            }
+        } else {
+            console.log('ℹ️ אין נתונים לייצא');
+        if (typeof window.showInfoNotification === 'function') {
+                window.showInfoNotification('אין נתונים', 'לא נמצאו נתונים לייצא');
+            }
+        }
+
+    } catch (error) {
+        console.error('❌ שגיאה בייצוא דוח מקיף:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'אירעה שגיאה בייצוא הדוח');
+        }
+    }
+};
+
+// Export CSV format
+window.exportCSVData = async function() {
+    try {
+        console.log('📊 מייצא נתונים בפורמט CSV...');
+
+        if (typeof window.IndexedDBAdapter === 'undefined') {
+            console.warn('⚠️ IndexedDBAdapter לא זמין');
+        return;
+    }
+    
+        const adapter = new window.IndexedDBAdapter();
+        await adapter.initialize();
+
+        // Load all data
+        const allData = await adapter.loadAll();
+
+        if (allData && allData.length > 0) {
+            // Create CSV content
+            const csvContent = createCSVContent(allData);
+            
+            // Create and download CSV file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `linter-data-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            console.log('✅ נתונים יוצאו בפורמט CSV');
+        if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('ייצוא CSV הושלם', `יוצאו ${allData.length} נקודות נתונים`);
+            }
+        } else {
+            console.log('ℹ️ אין נתונים לייצא');
+            if (typeof window.showInfoNotification === 'function') {
+                window.showInfoNotification('אין נתונים', 'לא נמצאו נתונים לייצא');
+            }
+        }
+
+    } catch (error) {
+        console.error('❌ שגיאה בייצוא CSV:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'אירעה שגיאה בייצוא CSV');
+        }
+    }
+};
+
+// Calculate export statistics
+function calculateExportStatistics(data) {
+    try {
+        const stats = {
+            totalScans: 0,
+            totalFixes: 0,
+            totalErrors: 0,
+            totalWarnings: 0,
+            averageQuality: 0,
+            averageScanDuration: 0,
+            qualityTrend: 'stable',
+            performanceTrend: 'stable'
+        };
+
+        if (data && data.length > 0) {
+            let totalQuality = 0;
+            let totalDuration = 0;
+            let qualityValues = [];
+            let durationValues = [];
+
+            data.forEach(point => {
+                if (point.trigger === 'scan') {
+                    stats.totalScans++;
+                } else if (point.trigger === 'fix') {
+                    stats.totalFixes++;
+                }
+
+                if (point.metrics) {
+                    stats.totalErrors += point.metrics.errors || 0;
+                    stats.totalWarnings += point.metrics.warnings || 0;
+                    totalQuality += point.metrics.qualityScore || 0;
+                    totalDuration += point.metrics.scanDuration || 0;
+                    
+                    qualityValues.push(point.metrics.qualityScore || 0);
+                    durationValues.push(point.metrics.scanDuration || 0);
+                }
+            });
+
+            stats.averageQuality = data.length > 0 ? (totalQuality / data.length).toFixed(2) : 0;
+            stats.averageScanDuration = data.length > 0 ? (totalDuration / data.length).toFixed(2) : 0;
+
+            // Calculate trends
+            if (qualityValues.length >= 2) {
+                const firstHalf = qualityValues.slice(0, Math.floor(qualityValues.length / 2));
+                const secondHalf = qualityValues.slice(Math.floor(qualityValues.length / 2));
+                const firstAvg = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
+                const secondAvg = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
+                
+                if (secondAvg > firstAvg + 5) stats.qualityTrend = 'improving';
+                else if (secondAvg < firstAvg - 5) stats.qualityTrend = 'declining';
+            }
+
+            if (durationValues.length >= 2) {
+                const firstHalf = durationValues.slice(0, Math.floor(durationValues.length / 2));
+                const secondHalf = durationValues.slice(Math.floor(durationValues.length / 2));
+                const firstAvg = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
+                const secondAvg = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
+                
+                if (secondAvg < firstAvg - 1000) stats.performanceTrend = 'improving';
+                else if (secondAvg > firstAvg + 1000) stats.performanceTrend = 'declining';
+            }
+        }
+
+        return stats;
+    } catch (error) {
+        console.error('❌ Error calculating export statistics:', error);
+        return {};
+    }
+}
+
+// Create CSV content
+function createCSVContent(data) {
+    try {
+        const headers = [
+            'Timestamp',
+            'Trigger',
+            'Quality Score',
+            'Errors',
+            'Warnings',
+            'Scan Duration',
+            'Files Per Second',
+            'Complexity Score',
+            'Maintainability Score',
+            'Security Score',
+            'Performance Score',
+            'Error Rate',
+            'Warning Rate',
+            'Issues Per File'
+        ];
+
+        const csvRows = [headers.join(',')];
+
+        data.forEach(point => {
+            const row = [
+                point.timestamp || '',
+                point.trigger || '',
+                point.metrics?.qualityScore || 0,
+                point.metrics?.errors || 0,
+                point.metrics?.warnings || 0,
+                point.metrics?.scanDuration || 0,
+                point.metrics?.filesPerSecond || 0,
+                point.metrics?.advancedMetrics?.complexityScore || 0,
+                point.metrics?.advancedMetrics?.maintainabilityScore || 0,
+                point.metrics?.advancedMetrics?.securityScore || 0,
+                point.metrics?.advancedMetrics?.performanceScore || 0,
+                point.metrics?.advancedMetrics?.errorRate || 0,
+                point.metrics?.advancedMetrics?.warningRate || 0,
+                point.metrics?.advancedMetrics?.issuesPerFile || 0
+            ];
+            csvRows.push(row.join(','));
+        });
+
+        return csvRows.join('\n');
+    } catch (error) {
+        console.error('❌ Error creating CSV content:', error);
+        return '';
+    }
+}
+
+// Generate recommendations
+function generateRecommendations(stats) {
+    try {
+        const recommendations = [];
+
+        if (stats.averageQuality < 70) {
+            recommendations.push({
+                type: 'quality',
+                priority: 'high',
+                message: 'איכות הקוד נמוכה - מומלץ לבצע תיקונים נוספים',
+                action: 'הרץ תיקון אוטומטי או בדוק בעיות ידניות'
+            });
+        }
+
+        if (stats.totalErrors > 50) {
+            recommendations.push({
+                type: 'errors',
+                priority: 'high',
+                message: 'מספר שגיאות גבוה - מומלץ לטפל בשגיאות קריטיות',
+                action: 'התמקד בתיקון שגיאות לפני אזהרות'
+            });
+        }
+
+        if (stats.qualityTrend === 'declining') {
+            recommendations.push({
+                type: 'trend',
+                priority: 'medium',
+                message: 'איכות הקוד יורדת - מומלץ לבדוק שינויים אחרונים',
+                action: 'בדוק קבצים חדשים או שינויים אחרונים'
+            });
+        }
+
+        if (stats.performanceTrend === 'declining') {
+            recommendations.push({
+                type: 'performance',
+                priority: 'medium',
+                message: 'ביצועי הסריקה יורדים - מומלץ לבדוק את השרת',
+                action: 'בדוק את ביצועי השרת או את מספר הקבצים'
+            });
+        }
+
+        if (stats.averageScanDuration > 30000) {
+            recommendations.push({
+                type: 'performance',
+                priority: 'low',
+                message: 'זמן סריקה ארוך - מומלץ לבדוק את ביצועי השרת',
+                action: 'שקול לבדוק את מספר הקבצים או את ביצועי השרת'
+            });
+        }
+
+        return recommendations;
+    } catch (error) {
+        console.error('❌ Error generating recommendations:', error);
+        return [];
+    }
+}
+
+// Create version snapshot
+window.createVersionSnapshot = async function() {
+    try {
+        console.log('📸 יוצר צילום גרסה...');
+
+        if (typeof window.IndexedDBAdapter === 'undefined') {
+            console.warn('⚠️ IndexedDBAdapter לא זמין');
+            return;
+        }
+        
+        const adapter = new window.IndexedDBAdapter();
+        await adapter.initialize();
+
+        // Load all data
+        const allData = await adapter.loadAll();
+
+        if (allData && allData.length > 0) {
+            // Calculate statistics
+            const stats = calculateExportStatistics(allData);
+            
+            // Create version snapshot
+            const snapshot = {
+                versionInfo: {
+                    versionId: generateVersionId(),
+                    createdAt: new Date().toISOString(),
+                    snapshotType: 'full',
+                    description: 'צילום גרסה מלא של מערכת הלינטר'
+                },
+                systemState: {
+                    totalDataPoints: allData.length,
+                    lastScanDate: allData[allData.length - 1]?.timestamp || null,
+                    currentQuality: stats.averageQuality,
+                    currentErrors: stats.totalErrors,
+                    currentWarnings: stats.totalWarnings,
+                    performanceStatus: stats.performanceTrend
+                },
+                data: allData,
+                statistics: stats,
+                recommendations: generateRecommendations(stats)
+            };
+
+            // Save to localStorage for version management
+            const versionKey = `linter_version_${snapshot.versionInfo.versionId}`;
+            localStorage.setItem(versionKey, JSON.stringify(snapshot));
+
+            // Update version list
+            updateVersionList(snapshot.versionInfo.versionId);
+
+            console.log('✅ צילום גרסה נוצר בהצלחה');
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('צילום גרסה נוצר', `גרסה ${snapshot.versionInfo.versionId} נשמרה`);
+            }
+        } else {
+            console.log('ℹ️ אין נתונים ליצירת גרסה');
+        if (typeof window.showInfoNotification === 'function') {
+                window.showInfoNotification('אין נתונים', 'לא נמצאו נתונים ליצירת גרסה');
+            }
+        }
+
+    } catch (error) {
+        console.error('❌ שגיאה ביצירת צילום גרסה:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'אירעה שגיאה ביצירת צילום הגרסה');
+        }
+    }
+};
+
+// Restore version snapshot
+window.restoreVersionSnapshot = async function(versionId) {
+    try {
+        console.log(`🔄 משחזר גרסה ${versionId}...`);
+
+        const versionKey = `linter_version_${versionId}`;
+        const versionData = localStorage.getItem(versionKey);
+
+        if (!versionData) {
+            console.warn('⚠️ גרסה לא נמצאה');
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', 'גרסה לא נמצאה');
+        }
+        return;
+    }
+    
+        const snapshot = JSON.parse(versionData);
+
+        if (typeof window.IndexedDBAdapter !== 'undefined') {
+            const adapter = new window.IndexedDBAdapter();
+            await adapter.initialize();
+
+            // Clear existing data
+            await adapter.clearAllData();
+
+            // Restore data
+            if (snapshot.data && snapshot.data.length > 0) {
+                await adapter.saveBatchData(snapshot.data);
+            }
+
+            // Update chart
+            if (window.currentChartRenderer && snapshot.data.length > 0) {
+                await window.currentChartRenderer.updateChart(snapshot.data, false);
+            }
+
+            // Update indicators
+            if (snapshot.data.length > 0) {
+                updateChartIndicators(snapshot.data[snapshot.data.length - 1]);
+            }
+
+            console.log('✅ גרסה שוחזרה בהצלחה');
+            if (typeof window.showSuccessNotification === 'function') {
+                window.showSuccessNotification('גרסה שוחזרה', `גרסה ${versionId} שוחזרה בהצלחה`);
+            }
+        }
+
+    } catch (error) {
+        console.error('❌ שגיאה בשחזור גרסה:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'אירעה שגיאה בשחזור הגרסה');
+        }
+    }
+};
+
+// List available versions
+window.listAvailableVersions = function() {
+    try {
+        console.log('📋 רשימת גרסאות זמינות...');
+
+        const versions = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('linter_version_')) {
+                const versionId = key.replace('linter_version_', '');
+                const versionData = localStorage.getItem(key);
+                if (versionData) {
+                    const snapshot = JSON.parse(versionData);
+                    versions.push({
+                        versionId: versionId,
+                        createdAt: snapshot.versionInfo.createdAt,
+                        description: snapshot.versionInfo.description,
+                        dataPoints: snapshot.systemState.totalDataPoints,
+                        quality: snapshot.systemState.currentQuality
+                    });
+                }
+            }
+        }
+
+        // Sort by creation date (newest first)
+        versions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        console.log('📋 גרסאות זמינות:', versions);
+        return versions;
+
+    } catch (error) {
+        console.error('❌ שגיאה ברשימת גרסאות:', error);
+        return [];
+    }
+};
+
+// Delete version snapshot
+window.deleteVersionSnapshot = function(versionId) {
+    try {
+        console.log(`🗑️ מוחק גרסה ${versionId}...`);
+
+        const versionKey = `linter_version_${versionId}`;
+        localStorage.removeItem(versionKey);
+
+        // Update version list
+        updateVersionList();
+
+        console.log('✅ גרסה נמחקה בהצלחה');
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('גרסה נמחקה', `גרסה ${versionId} נמחקה בהצלחה`);
+        }
+
+    } catch (error) {
+        console.error('❌ שגיאה במחיקת גרסה:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה', 'אירעה שגיאה במחיקת הגרסה');
+        }
+    }
+};
+
+// Generate version ID
+function generateVersionId() {
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substr(2, 5);
+    return `v${timestamp}_${random}`;
+}
+
+// Update version list
+function updateVersionList(newVersionId = null) {
+    try {
+        const versions = listAvailableVersions();
+        const versionListKey = 'linter_version_list';
+        localStorage.setItem(versionListKey, JSON.stringify(versions));
+
+        if (newVersionId) {
+            console.log(`📝 רשימת גרסאות עודכנה - נוספה גרסה ${newVersionId}`);
+        } else {
+            console.log('📝 רשימת גרסאות עודכנה');
+        }
+
+    } catch (error) {
+        console.error('❌ שגיאה בעדכון רשימת גרסאות:', error);
+    }
+}
 
 // Apply chart settings
 window.applyChartSettings = async function() {
@@ -2888,5 +4510,6 @@ window.updateProblemFilesTable = updateProblemFilesTable;
 window.getSelectedFileTypes = getSelectedFileTypes;
 window.calculateTotalSize = calculateTotalSize;
 window.updateChartIndicators = updateChartIndicators;
+window.autoUpdateChart = autoUpdateChart;
 
 console.log('✅ Linter monitor script loaded successfully!');

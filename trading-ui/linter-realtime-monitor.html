@@ -268,6 +268,12 @@
                         <button class="btn btn-secondary btn-sm" onclick="window.ignoreAllIssues()">
                           <i class="fas fa-eye-slash"></i> התעלם
                         </button>
+                        <button class="btn btn-success btn-sm" onclick="window.runComprehensiveTests()">
+                          <i class="fas fa-vial"></i> בדיקות מקיפות
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="window.runQuickHealthCheck()">
+                          <i class="fas fa-heartbeat"></i> בדיקת בריאות
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -475,6 +481,34 @@
             </div>
           </div>
         </div> <!-- End chart section -->
+
+        <!-- Test Results Section -->
+        <div class="content-section" id="testResultsSection" data-table-type="linter-realtime-monitor" style="display: none;">
+          <!-- Test Results header -->
+          <div class="section-header">
+            <div class="table-title">
+              <img src="images/icons/development.svg" alt="בדיקות" class="section-icon">
+              תוצאות בדיקות מערכת
+            </div>
+            <div class="table-actions">
+              <button class="btn btn-success btn-sm" onclick="window.runComprehensiveTests()" title="הרץ בדיקות מקיפות של המערכת">
+                <i class="fas fa-vial"></i> בדיקות מקיפות
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="window.runQuickHealthCheck()" title="בדיקת בריאות מהירה">
+                <i class="fas fa-heartbeat"></i> בדיקת בריאות
+              </button>
+              <div class="action-separator"></div>
+              <button class="filter-toggle-btn" onclick="window.toggleSection('testResultsSection')" title="הצג/הסתר אזור בדיקות">
+                <span class="filter-icon">▲</span>
+              </button>
+            </div>
+          </div>
+          <!-- Test Results body -->
+          <div class="section-body">
+            <div id="testStatus"></div>
+            <div id="testDetails" style="margin-top: 15px;"></div>
+          </div>
+        </div> <!-- End test results section -->
 
         <!-- Problem Files Section -->
         <div class="content-section" id="problemFilesSection" data-table-type="linter-realtime-monitor">

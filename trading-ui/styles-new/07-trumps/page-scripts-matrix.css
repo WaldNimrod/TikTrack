@@ -1,280 +1,64 @@
 /* ========================================================
-   PAGE-SCRIPTS-MATRIX.CSS - Minimal Override - September 2025
-   Ultra-narrow columns with 90° rotated headers
+   PAGE-SCRIPTS-MATRIX.CSS - Simple & Clean - September 2025
+   Ultra-compact table with vertical headers
    ======================================================== */
 
-/* ===== ULTRA-COMPACT MATRIX TABLE ===== */
-/* Table with horizontal scroll and ultra-narrow columns */
+/* Table with horizontal scroll */
 #page-scripts-matrix-table {
     table-layout: fixed;
     width: 100%;
-    min-width: 1200px; /* Force horizontal scroll */
+    min-width: 800px;
     border-collapse: collapse;
-    background: white;
-    font-size: 0.6rem;
-    line-height: 1.1;
 }
 
-/* Ultra-narrow headers with minimal padding */
+/* Container with scroll */
+.table-container {
+    overflow-x: auto;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+/* All headers - vertical text */
 #page-scripts-matrix-table th {
-    padding: 0.1rem; /* Ultra-minimal padding */
-    font-size: 0.45rem;
-    font-weight: 500;
-    background: #f1f3f4;
-    border: 1px solid #dadce0;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    vertical-align: top;
-    line-height: 1.1;
-}
-
-/* Header spans with icon + text */
-#page-scripts-matrix-table th span {
-    display: block;
+    padding: 0;
     font-size: 0.4rem;
-    line-height: 1.1;
-    margin: 0;
-    padding: 0.05rem 0.1rem; /* 5px top/bottom, 10px left/right */
+    background: #f1f3f4;
+    border: 1px solid #ddd;
+    text-align: center;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
     white-space: nowrap;
-    text-align: center;
 }
 
-/* First column (script names) - wider but still compact */
-#page-scripts-matrix-table th:first-child {
-    width: 120px;
-    min-width: 120px;
-    max-width: 120px;
-    padding: 0.2rem;
-    font-size: 0.55rem;
-    background: #e8f0fe;
-    font-weight: 600;
-}
-
-/* Ultra-narrow data columns - fixed width */
-#page-scripts-matrix-table th:nth-child(n+2),
-#page-scripts-matrix-table td:nth-child(n+2) {
-    width: 24px;
-    min-width: 24px;
-    max-width: 24px;
-    padding: 0.1rem 0;
-}
-
-/* Ultra-compact table cells */
-#page-scripts-matrix-table td {
-    padding: 0.15rem 0.05rem; /* Minimal padding for ultra-compact */
-    font-size: 0.5rem;
-    text-align: center;
-    border: 1px solid #dadce0;
-    background: white;
-}
-
-/* Hover effects for better UX */
-#page-scripts-matrix-table tbody tr:hover td {
-    background-color: #f8f9fa;
-}
-
-/* Zebra striping for readability */
-#page-scripts-matrix-table tbody tr:nth-child(even) td {
-    background-color: #fafbfc;
-}
-
-/* Special styling for connected scripts */
-#page-scripts-matrix-table td.connected {
-    background-color: #d4edda;
-    color: #155724;
-    font-weight: 600;
-}
-
-/* Script type categories with subtle colors */
-#page-scripts-matrix-table tr.primary-scripts th:first-child {
-    background: #e3f2fd;
-    color: #1565c0;
-}
-
-#page-scripts-matrix-table tr.utility-scripts th:first-child {
-    background: #fff3e0;
-    color: #f57c00;
-}
-
-#page-scripts-matrix-table tr.service-scripts th:first-child {
-    background: #e0f2f1;
-    color: #00695c;
-}
-
-/* First column - script names - sticky for navigation */
+/* First column - script names - sticky */
 #page-scripts-matrix-table th:first-child,
 #page-scripts-matrix-table td:first-child {
     position: sticky;
     left: 0;
-    z-index: 10;
     background: #e8f0fe;
-    box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+    z-index: 10;
+    width: 100px;
+    writing-mode: horizontal-tb;
 }
 
-/* Container for the table with horizontal scroll */
-.table-container {
-    overflow-x: auto;
-    overflow-y: visible;
-    padding: 0.5rem;
-    background: #f8f9fa;
-    border-radius: 8px;
-    margin: 1rem 0;
-    border: 1px solid #e9ecef;
+/* Data columns - ultra narrow */
+#page-scripts-matrix-table th:not(:first-child),
+#page-scripts-matrix-table td:not(:first-child) {
+    width: 15px;
+    padding: 0;
 }
 
-/* ===== LEGEND & NOTES STYLING ===== */
-.legend-section {
-    background: var(--color-background-secondary);
-    border-radius: var(--border-radius-md);
-    padding: var(--spacing-lg);
-    margin-bottom: var(--spacing-xl);
+/* Table cells */
+#page-scripts-matrix-table td {
+    padding: 0.1rem;
+    font-size: 0.5rem;
+    text-align: center;
+    border: 1px solid #ddd;
 }
 
-.legend-title {
-    color: var(--color-text-primary);
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: var(--spacing-md);
-}
-
-.legend-items {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-md);
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    font-size: 0.85rem;
-    color: var(--color-text-secondary);
-}
-
-.legend-color {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border-radius: var(--border-radius-sm);
-    flex-shrink: 0;
-}
-
-.notes-section h6 {
-    color: var(--color-text-primary);
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: var(--spacing-sm);
-}
-
-.notes-list {
-    padding-right: var(--spacing-md);
-    margin: 0;
-}
-
-.notes-list li {
-    font-size: 0.8rem;
-    color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-xs);
-    line-height: 1.4;
-}
-
-/* ===== SECTION STYLING ===== */
-.section-header {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
-    padding-bottom: var(--spacing-sm);
-    border-bottom: 2px solid var(--color-border-light);
-}
-
-.section-title.main-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--color-primary);
-    margin: 0;
-    flex: 1;
-}
-
-.section-actions {
-    margin-left: auto;
-}
-
-.section-subtitle {
-    font-size: 0.9rem;
-    color: var(--color-text-muted);
-}
-
-.subsection-header {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-md);
-}
-
-.subsection-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--color-text-primary);
-}
-
-.btn-xs {
-    padding: 0.2rem 0.4rem;
-    font-size: 0.7rem;
-    line-height: 1;
-}
-
-/* ===== LEGEND COLORS ===== */
-.legend-color.primary-scripts {
-    background-color: var(--color-background-secondary);
-}
-
-.legend-color.utility-scripts {
-    background-color: var(--color-warning-light);
-}
-
-.legend-color.service-scripts {
-    background-color: var(--color-info-light);
-}
-
-.legend-color.connected {
-    background-color: var(--color-success-light);
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-    #page-scripts-matrix-table {
-        min-width: 800px; /* Smaller minimum width for mobile */
-        font-size: 0.5rem;
-    }
-
-    #page-scripts-matrix-table th:first-child {
-        width: 100px;
-        min-width: 100px;
-        max-width: 100px;
-        font-size: 0.5rem;
-    }
-
-    #page-scripts-matrix-table th:nth-child(n+2),
-    #page-scripts-matrix-table td:nth-child(n+2) {
-        width: 24px;
-        min-width: 24px;
-        max-width: 24px;
-    }
-
-    #page-scripts-matrix-table th span {
-        font-size: 0.35rem;
-        padding: 0.03rem 0.05rem;
-    }
-
-    .table-container {
-        padding: 0.25rem;
-    }
-
-    .legend-items {
-        flex-direction: column;
-        gap: var(--spacing-sm);
-    }
+/* Connected scripts - green */
+#page-scripts-matrix-table td.connected {
+    background-color: #d4edda;
+    color: #155724;
 }

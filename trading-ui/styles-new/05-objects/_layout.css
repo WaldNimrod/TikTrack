@@ -49,170 +49,116 @@
   box-sizing: border-box;
 }
 
-/* Container with border */
-.container-with-border {
-  background: var(--apple-bg-elevated);
-  border-radius: var(--apple-radius-large);
-  box-shadow: var(--apple-shadow-light);
-  border: 1px solid var(--apple-border-light);
-  padding: var(--apple-spacing-lg);
-  margin-bottom: var(--apple-spacing-md);
+/* ===== סגנונות לסקשנים ===== */
+
+/* Content sections */
+.content-section {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+  margin-bottom: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* ===== סגנונות קונטיינרים מהמערכת הישנה ===== */
-
-/* כותרת סקשן */
+/* Section headers */
 .section-header {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 15px 20px;
+  border-bottom: 1px solid #dee2e6;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  border-bottom: 1px solid var(--apple-border-light);
-  border-radius: 8px;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
 }
 
-/* רקע ברירת מחדל לכותרות ללא מחלקות דינמיות */
-.section-header:not([class*="entity-"]) {
-  background: #ffffff;
-}
-
-/* כותרות עם שקיפות מוגברת */
-.section-header.transparent {
-  background: rgba(255, 255, 255, 0.8);
-}
-
-/* כותרות עם רקע צבעוני */
-.section-header.colored {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 249, 250, 0.9));
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* גוף סקשן */
+/* Section body */
 .section-body {
-  background: var(--apple-bg);
-  border-radius: 8px;
-  overflow: hidden;
+  padding: 20px;
 }
 
-.section-body .table {
-  margin: 0;
-  background: var(--apple-bg);
-}
-
-/* אזור עליון */
-.top-section {
-  margin: 0;
-  border-radius: 0;
-  box-shadow: none;
-  padding: 15px 0 0 0;
-  max-width: 1400px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.top-section .section-header {
-  margin-bottom: 2rem;
-  padding: 1rem;
-}
-
-.top-section .content-section {
-  padding: 0;
-}
-
-/* אזור תוכן */
-.content-section {
-  background: white;
-  padding: 2rem;
-  border-radius: 16px;
-  border: 1px solid #e8e8e8;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-  margin-bottom: 10px;
-  margin-left: auto;
-  margin-right: auto;
-  transition: opacity 0.3s ease;
-}
-
-/* מיכל סקשן */
-.section-container {
-  background: var(--apple-bg-elevated);
-  padding: 2rem;
-  border-radius: 12px;
-  border: 1px solid var(--apple-border-light);
-  box-shadow: var(--apple-shadow-light);
-  margin-bottom: var(--apple-spacing-md);
-}
-
-/* מצב סגור */
-.content-section.collapsed {
-  padding: 20px 0 !important;
-}
-
-.section-body.collapsed {
-  padding: 20px 0 !important;
-}
-
-/* אזור פעולות הכותרת */
-.table-actions {
-  display: flex !important;
-  gap: 0.5rem !important;
-  align-items: center;
-}
-
-/* כפתור רענון */
-.refresh-btn {
-  background: var(--apple-bg-primary);
-  border: 1px solid var(--apple-border);
-  border-radius: var(--apple-radius-small);
-  padding: 0.5rem 1rem;
-  color: var(--apple-text-primary);
-  cursor: pointer;
-  transition: all 0.2s ease;
+/* Table title */
+.table-title {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  font-size: 18px;
+  font-weight: 600;
+  color: #495057;
+}
+
+/* Section Icon - consistent with site design */
+.section-icon {
+  width: 20px !important;
+  height: 20px !important;
+  margin-left: 8px !important;
+  vertical-align: middle !important;
+}
+
+/* Table count */
+.table-count {
+  background: #e9ecef;
+  color: #495057;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Table actions */
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Action separator */
+.action-separator {
+  width: 1px;
+  height: 20px;
+  background: #dee2e6;
+  margin: 0 4px;
+}
+
+/* Refresh button */
+.refresh-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background-color 0.2s;
 }
 
 .refresh-btn:hover {
-  background: var(--apple-gray-1);
-  border-color: var(--apple-border);
+  background: #218838;
 }
 
-/* כפתור פילטר */
+/* Filter toggle button */
 .filter-toggle-btn {
-  background: var(--apple-bg-primary);
-  border: 1px solid var(--apple-border);
-  border-radius: var(--apple-radius-small);
-  padding: 0.5rem;
-  color: var(--apple-text-primary);
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
   cursor: pointer;
-  transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
+  gap: 4px;
+  transition: background-color 0.2s;
 }
 
 .filter-toggle-btn:hover {
-  background: var(--apple-gray-1);
-  border-color: var(--apple-border);
+  background: #5a6268;
 }
 
-/* איקון פעולה */
-.action-icon {
-  font-size: 1rem;
-  line-height: 1;
-}
-
-/* איקון פילטר */
 .filter-icon {
-  font-size: 1rem;
-  line-height: 1;
-  transition: transform 0.2s ease;
+  font-size: 12px;
+  transition: transform 0.2s;
 }
 
 .filter-toggle-btn:hover .filter-icon {
@@ -290,4 +236,144 @@
   padding: 8px 16px;
   font-size: 16px;
   border-radius: 5px;
+}
+
+/* ===== סגנונות נוספים ===== */
+
+/* Status items */
+.status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.status-item:last-child {
+  border-bottom: none;
+}
+
+.status-item .label {
+  color: #6c757d;
+  font-size: 14px;
+}
+
+.status-item .value {
+  color: #495057;
+  font-weight: 500;
+}
+
+/* Status dot */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.status-dot.connected {
+  background: #28a745;
+}
+
+.status-dot.disconnected {
+  background: #dc3545;
+}
+
+/* Chart container */
+.chart-container {
+  position: relative;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+/* Indicator cards */
+.indicator-card {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+}
+
+.indicator-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #495057;
+  margin-bottom: 5px;
+}
+
+.indicator-label {
+  font-size: 12px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* Log entries */
+.log-entry {
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.log-timestamp {
+  font-size: 12px;
+  color: #6c757d;
+  font-family: monospace;
+}
+
+.log-level {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.log-level.info {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.log-level.warning {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.log-level.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.log-message {
+  font-size: 14px;
+  color: #495057;
+  line-height: 1.4;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 0.5rem;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  
+  .table-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }

@@ -295,6 +295,83 @@ async function initializeInfoSummary() {
     }
 }
 
+/**
+ * Collect form data from all preference inputs
+ */
+function collectFormData() {
+    const formData = {};
+    
+    // Collect all input elements
+    const inputs = document.querySelectorAll('input, select, textarea');
+    
+    inputs.forEach(input => {
+        if (input.id && input.id !== 'saveAllBtn' && input.id !== 'resetBtn') {
+            let value = input.value;
+            
+            // Handle different input types
+            if (input.type === 'checkbox') {
+                value = input.checked;
+            } else if (input.type === 'number') {
+                value = parseFloat(value) || 0;
+            } else if (input.type === 'color') {
+                // Keep color values as strings
+                value = value || '#000000';
+            }
+            
+            formData[input.id] = value;
+        }
+    });
+    
+    console.log('📝 Collected form data:', formData);
+    return formData;
+}
+
+/**
+ * Save all preferences from form
+ */
+async function saveAllPreferences() {
+    try {
+        console.log('💾 Saving all preferences...');
+        
+        const formData = collectFormData();
+        
+        if (Object.keys(formData).length === 0) {
+            console.warn('⚠️ No form data to save');
+            return false;
+        }
+        
+        // Use the preferences service to save
+        if (typeof window.savePreferences === 'function') {
+            const result = await window.savePreferences(formData);
+            
+            if (result) {
+                console.log('✅ All preferences saved successfully');
+                
+                // Show success notification
+                if (typeof window.showSuccessNotification === 'function') {
+                    window.showSuccessNotification('העדפות נשמרו בהצלחה!');
+                }
+                
+                return true;
+            } else {
+                throw new Error('Save preferences returned false');
+            }
+        } else {
+            throw new Error('savePreferences function not available');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error saving preferences:', error);
+        
+        // Show error notification
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בשמירת העדפות: ' + error.message);
+        }
+        
+        return false;
+    }
+}
+
 // Export functions to global scope
 window.loadAccountsForPreferences = loadAccountsForPreferences;
 window.loadColorsForPreferences = loadColorsForPreferences;
@@ -302,5 +379,7 @@ window.loadTradingSettings = loadTradingSettings;
 window.validateCurrency = validateCurrency;
 window.initializePreferencesPage = initializePreferencesPage;
 window.initializeInfoSummary = initializeInfoSummary;
+window.collectFormData = collectFormData;
+window.saveAllPreferences = saveAllPreferences;
 
 console.log('✅ preferences-page.js loaded successfully');

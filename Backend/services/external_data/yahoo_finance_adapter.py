@@ -115,7 +115,7 @@ class YahooFinanceAdapter:
         """Load user timezone preference"""
         try:
             # Get user preferences (default user for now)
-            user_preferences = UserService.get_user_preferences(self.db_session)
+            user_preferences = UserService.get_user_preferences(1)  # Default user ID
             timezone_str = user_preferences.get('timezone', 'Asia/Jerusalem')
             
             # Validate timezone

@@ -3433,10 +3433,11 @@ window.fixAllErrors = () => {
 
         scanningResults.errors = scanningResults.errors.slice(0, scanningResults.errors.length - errorsFixed);
         // Errors actually removed and marked as fixed
+        const errorsRemoved = {
             errorsRemoved: errorsFixed,
             errorsRemaining: scanningResults.errors.length,
             totalFixedErrors: fixedIssues.errors.size
-        });
+        };
     }
 
     addLogEntry('INFO', `תוקנו ${errorsFixed} שגיאות${failedErrors > 0 ? `, ${failedErrors} שגיאות נשארו` : ''}`, {
@@ -3473,12 +3474,13 @@ window.fixAllErrors = () => {
 window.fixAllWarnings = () => {
     // Fixing all warnings...
     // Current warnings state logged
+    const currentWarningsState = {
         warnings: scanningResults.warnings.length
-    });
+    };
 
     if (scanningResults.warnings.length === 0) {
         // Use direct call to avoid recursion
-            if (typeof window.showInfoNotification === 'function') {
+        if (typeof window.showInfoNotification === 'function') {
             window.showInfoNotification('אין אזהרות', 'לא נמצאו אזהרות לתיקון. הרץ סריקה תחילה.');
         }
         return;
@@ -3490,11 +3492,12 @@ window.fixAllWarnings = () => {
     const failedWarnings = scanningResults.warnings.length - warningsFixed;
 
     // Warning fix calculation logged
+    const warningFixCalculation = {
         totalWarnings: scanningResults.warnings.length,
         fixablePercentage: Math.round(fixablePercentage * 100) + '%',
         warningsFixed,
         failedWarnings
-    });
+    };
 
     // Remove fixed warnings from results and mark them as fixed
     if (warningsFixed > 0) {
@@ -3509,10 +3512,11 @@ window.fixAllWarnings = () => {
 
         scanningResults.warnings = scanningResults.warnings.slice(0, scanningResults.warnings.length - warningsFixed);
         // Warnings actually removed and marked as fixed
+        const warningsRemoved = {
             warningsRemoved: warningsFixed,
             warningsRemaining: scanningResults.warnings.length,
             totalFixedWarnings: fixedIssues.warnings.size
-        });
+        };
     }
 
     addLogEntry('INFO', `תוקנו ${warningsFixed} אזהרות${failedWarnings > 0 ? `, ${failedWarnings} אזהרות נשארו` : ''}`, {

@@ -19,6 +19,12 @@
 2. **הוספת קבוצה חדשה** - עדכן את `preference_groups` table  
 3. **שינוי מבנה** - עדכן את המודלים ב-`Backend/models/preferences.py`
 
+### סטטיסטיקות מערכת נוכחיות:
+- **59 העדפות** פעילות במערכת
+- **14 קבוצות** העדפות מאורגנות
+- **2 פרופילים** משתמש (ברירת מחדל + נימרוד)
+- **37 העדפות** שמורות למשתמש
+
 ---
 
 ## 🗄️ מבנה בסיס הנתונים
@@ -191,6 +197,36 @@ await window.saveAllPreferences(); // שמירת כל הטופס
 const profiles = await window.getUserProfiles();
 await window.resetToDefaults(); // איפוס לברירות מחדל
 ```
+
+---
+
+## 🎨 מערכת צבעים
+
+### צבעי מערכת בסיסיים:
+- `primaryColor` - צבע ראשי (#007bff)
+- `secondaryColor` - צבע משני (#6c757d)
+- `successColor` - צבע הצלחה (#28a745)
+- `warningColor` - צבע אזהרה (#ffc107)
+- `dangerColor` - צבע סכנה (#dc3545)
+
+### צבעי ישויות:
+- `entityAccountColor` - צבע חשבונות (#28a745)
+- `entityTickerColor` - צבע מטבעות (#17a2b8)
+- `entityTradeColor` - צבע עסקאות (#007bff)
+- `entityCashFlowColor` - צבע תזרים מזומנים (#20c997)
+- `entityCashFlowColorLight` - צבע בהיר לתזרים (#20c997)
+- `entityCashFlowColorDark` - צבע כהה לתזרים (#138496)
+
+### צבעי ערכים מספריים:
+- `valuePositiveColor` - צבע ערכים חיוביים (#28a745)
+- `valuePositiveColorLight` - צבע בהיר לחיוביים (#34ce57)
+- `valuePositiveColorDark` - צבע כהה לחיוביים (#1e7e34)
+- `valueNegativeColor` - צבע ערכים שליליים (#dc3545)
+- `valueNegativeColorLight` - צבע בהיר לשליליים (#e74c3c)
+- `valueNegativeColorDark` - צבע כהה לשליליים (#c82333)
+- `valueNeutralColor` - צבע ערכים ניטרליים (#6c757d)
+- `valueNeutralColorLight` - צבע בהיר לניטרליים (#adb5bd)
+- `valueNeutralColorDark` - צבע כהה לניטרליים (#495057)
 
 ---
 

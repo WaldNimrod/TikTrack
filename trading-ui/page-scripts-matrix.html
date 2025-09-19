@@ -66,27 +66,36 @@
       <div class="main-content">
       <!-- ===== CONTENT SECTIONS START (EDITABLE) ===== -->
       
-      <!-- Top Section Start -->
-      <div class="top-section page-scripts-matrix-page">
-        <!-- Page Title Section -->
-        <div class="page-title-section">
-        <h1 class="page-title">מטריצת סקריפטים ועמודים - TikTrack</h1>
-          <p class="page-subtitle text-muted">עדכון אחרון: ספטמבר 2025</p>
+      <!-- UI Content Section Top Start-->
+      <div class="top-section">
+        <div class="section-header">
+          <h2>📊 מטריצת סקריפטים ועמודים - TikTrack</h2>
+          <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
+        </div>
+        <div class="section-body">
+          <div class="info-summary" id="summaryStats">
+            <div>עמודים במערכת: <strong id="totalPages">30</strong></div>
+            <div>סקריפטים ראשיים: <strong id="primaryScripts">12</strong></div>
+            <div>סקריפטים שירותיים: <strong id="utilityScripts">18</strong></div>
+            <div>סקריפטי שירות: <strong id="serviceScripts">9</strong></div>
+            <div>עדכון אחרון: <strong>ספטמבר 2025</strong></div>
+          </div>
         </div>
       </div>
-      <!-- Top Section End -->
+      <!-- UI Content Section Top End -->  
 
-      <!-- Main Content Section Start -->
-      <div class="main-content-section">
-        <!-- Scripts Matrix Table Section -->
-        <div class="content-section" data-section-id="scripts-matrix-table">
-          <div class="section-header">
-            <button class="btn btn-sm btn-outline-primary section-toggle" onclick="toggleSection('scripts-matrix-content')">
-              <i class="fas fa-chevron-down section-toggle-icon"></i>
-            </button>
-            <span class="section-title">מטריצת סקריפטים ועמודים</span>
-          </div>
-          <div id="scripts-matrix-content" class="section-content">
+      <!-- UI Content Section 1 Start-->
+      <div class="content-section" id="section1">
+        <div class="section-header">
+          <h2>📋 טבלת מטריצת הסקריפטים</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
+        </div>
+        <div class="section-body">
+          <div class="table-responsive" id="scriptsMatrixContainer">
         <div class="table-container">
             <table id="page-scripts-matrix-table" class="table table-bordered table-sm" data-table-type="page-scripts-matrix">
                 <thead>
@@ -276,8 +285,8 @@
             // Set page-specific preferences using global function
             if (typeof setPagePreferences === 'function') {
                 setPagePreferences('page-scripts-matrix', {
-                    sections: ['scripts-matrix-table'],
-                    defaultExpanded: ['scripts-matrix-content']
+                    sections: ['section1'],
+                    defaultExpanded: ['section1']
                 });
             }
 
@@ -287,15 +296,15 @@
 
         // Initialize scan interface for updating the matrix
         function initializeScanInterface() {
-            // Add scan button to the page title section
-            const pageTitleSection = document.querySelector('.page-title-section');
-            if (pageTitleSection && !document.getElementById('scan-filesystem-btn')) {
+            // Add scan button to the top section header
+            const topSectionHeader = document.querySelector('.top-section .section-header');
+            if (topSectionHeader && !document.getElementById('scan-filesystem-btn')) {
                 const scanButton = document.createElement('button');
                 scanButton.id = 'scan-filesystem-btn';
                 scanButton.className = 'btn btn-primary btn-sm ms-3';
                 scanButton.innerHTML = '<i class="fas fa-search"></i> סריקת קבצים';
                 scanButton.onclick = scanFilesystem;
-                pageTitleSection.appendChild(scanButton);
+                topSectionHeader.appendChild(scanButton);
             }
         }
 

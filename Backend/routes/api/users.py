@@ -1,241 +1,272 @@
+#!/usr/bin/env python3
 """
-Users API - TikTrack
-
-This module provides API endpoints for managing users.
-Supports multi-user system with fallback to default user.
-
-Author: TikTrack Development Team
-Version: 1.0
-Date: August 2025
+Users API Routes
+Date: January 5, 2025
+Description: API endpoints for user management
 """
 
 from flask import Blueprint, request, jsonify
-from sqlalchemy.orm import Session
-from config.database import get_db
+from typing import Dict, Any
+import logging
+
+# Import user service
 from services.user_service import UserService
-from models.user import User
-from services.advanced_cache_service import cache_for, invalidate_cache
+
+logger = logging.getLogger(__name__)
 
 # Create blueprint
-users_bp = Blueprint('users', __name__)
+users_bp = Blueprint('users', __name__, url_prefix='/api/v1/users')
 
-@users_bp.route('/api/v1/users/', methods=['GET'])
-@cache_for(ttl=300)  # Cache for 5 minutes - users don't change frequently
-def get_users():
+# Initialize user service
+user_service = UserService()
+
+@users_bp.route('/', methods=['GET'])
+def get_all_users():
     """Get all users"""
     try:
-        db: Session = next(get_db())
-        users = UserService.get_all_users(db)
-        
+        users = user_service.get_all_users()
         return jsonify({
-            "success": True,
-            "data": [user.to_dict() for user in users],
-            "count": len(users)
-        })
+            'status': 'success',
+            'data': users,
+            'count': len(users)
+        }), 200
     except Exception as e:
-        print(f"❌ Error getting users: {e}")
-        return jsonify({"success": False, "message": "Error getting users"}), 500
+        logger.error(f"Error getting all users: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
 
-@users_bp.route('/api/v1/users/<int:user_id>', methods=['GET'])
-def get_user(user_id):
-    """Get user by ID with fallback to default user"""
+@users_bp.route('/<int:user_id>', methods=['GET'])
+def get_user(user_id: int):
+    """Get user by ID"""
     try:
-        db: Session = next(get_db())
-        user = UserService.get_user_by_id(db, user_id)
-        
+        user = user_service.get_user_by_id(user_id)
         if user:
             return jsonify({
-                "success": True,
-                "data": user.to_dict()
-            })
+                'status': 'success',
+                'data': user
+            }), 200
         else:
-            return jsonify({"success": False, "message": "User not found"}), 404
+            return jsonify({
+                'status': 'error',
+                'message': f'User {user_id} not found'
+            }), 404
     except Exception as e:
-        print(f"❌ Error getting user {user_id}: {e}")
-        return jsonify({"success": False, "message": "Error getting user"}), 500
+        logger.error(f"Error getting user {user_id}: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
 
-@users_bp.route('/api/v1/users/default', methods=['GET'])
+@users_bp.route('/username/<username>', methods=['GET'])
+def get_user_by_username(username: str):
+    """Get user by username"""
+    try:
+        user = user_service.get_user_by_username(username)
+        if user:
+            return jsonify({
+                'status': 'success',
+                'data': user
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'message': f'User with username {username} not found'
+            }), 404
+    except Exception as e:
+        logger.error(f"Error getting user by username {username}: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+@users_bp.route('/default', methods=['GET'])
 def get_default_user():
     """Get default user"""
     try:
-        db: Session = next(get_db())
-        default_user = UserService.get_default_user(db)
-        
-        if default_user:
+        user = user_service.get_default_user()
+        if user:
             return jsonify({
-                "success": True,
-                "data": default_user.to_dict()
-            })
+                'status': 'success',
+                'data': user
+            }), 200
         else:
-            return jsonify({"success": False, "message": "Default user not found"}), 404
+            return jsonify({
+                'status': 'error',
+                'message': 'No default user found'
+            }), 404
     except Exception as e:
-        print(f"❌ Error getting default user: {e}")
-        return jsonify({"success": False, "message": "Error getting default user"}), 500
+        logger.error(f"Error getting default user: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
 
-@users_bp.route('/api/v1/users/current', methods=['GET'])
-def get_current_user():
-    """Get current user (for now returns default user)"""
+@users_bp.route('/', methods=['POST'])
+def create_user():
+    """Create a new user"""
     try:
-        db: Session = next(get_db())
-        current_user_id = UserService.get_current_user_id()
-        user = UserService.get_user_by_id(db, current_user_id)
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'status': 'error',
+                'message': 'No data provided'
+            }), 400
+        
+        username = data.get('username')
+        if not username:
+            return jsonify({
+                'status': 'error',
+                'message': 'Username is required'
+            }), 400
+        
+        user = user_service.create_user(
+            username=username,
+            email=data.get('email'),
+            first_name=data.get('first_name'),
+            last_name=data.get('last_name'),
+            is_default=data.get('is_default', False)
+        )
         
         if user:
             return jsonify({
-                "success": True,
-                "data": user.to_dict()
-            })
+                'status': 'success',
+                'data': user,
+                'message': f'User {username} created successfully'
+            }), 201
         else:
-            return jsonify({"success": False, "message": "Current user not found"}), 404
-    except Exception as e:
-        print(f"❌ Error getting current user: {e}")
-        return jsonify({"success": False, "message": "Error getting current user"}), 500
-
-@users_bp.route('/api/v1/users/', methods=['POST'])
-def create_user():
-    """Create new user"""
-    try:
-        db: Session = next(get_db())
-        user_data = request.json
-        
-        if not user_data:
-            return jsonify({"success": False, "message": "User data is required"}), 400
-        
-        # Validate user data
-        validation = UserService.validate_user_data(user_data)
-        if not validation['is_valid']:
             return jsonify({
-                "success": False, 
-                "message": "Invalid user data",
-                "errors": validation['errors']
+                'status': 'error',
+                'message': f'Failed to create user {username}'
             }), 400
-        
-        # Check if username already exists
-        existing_user = UserService.get_user_by_username(db, user_data.get('username', ''))
-        if existing_user:
-            return jsonify({"success": False, "message": "Username already exists"}), 409
-        
-        # Create new user
-        new_user = User(
-            username=user_data.get('username'),
-            email=user_data.get('email'),
-            first_name=user_data.get('first_name'),
-            last_name=user_data.get('last_name'),
-            is_active=user_data.get('is_active', True),
-            is_default=user_data.get('is_default', False),
-            preferences=user_data.get('preferences', '{}')
-        )
-        
-        db.add(new_user)
-        db.commit()
-        db.refresh(new_user)
-        
-        return jsonify({
-            "success": True,
-            "message": "User created successfully",
-            "data": new_user.to_dict()
-        }), 201
-        
+            
     except Exception as e:
-        print(f"❌ Error creating user: {e}")
-        db.rollback()
-        return jsonify({"success": False, "message": "Error creating user"}), 500
+        logger.error(f"Error creating user: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
 
-@users_bp.route('/api/v1/users/<int:user_id>', methods=['PUT'])
-def update_user(user_id):
+@users_bp.route('/<int:user_id>', methods=['PUT'])
+def update_user(user_id: int):
     """Update user"""
     try:
-        db: Session = next(get_db())
-        user = UserService.get_user_by_id(db, user_id)
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'status': 'error',
+                'message': 'No data provided'
+            }), 400
         
-        if not user:
-            return jsonify({"success": False, "message": "User not found"}), 404
-        
-        user_data = request.json
-        if not user_data:
-            return jsonify({"success": False, "message": "User data is required"}), 400
-        
-        # Update user fields
-        if 'username' in user_data:
-            # Check if new username already exists
-            existing_user = UserService.get_user_by_username(db, user_data['username'])
-            if existing_user and existing_user.id != user_id:
-                return jsonify({"success": False, "message": "Username already exists"}), 409
-            user.username = user_data['username']
-        
-        if 'email' in user_data:
-            user.email = user_data['email']
-        
-        if 'first_name' in user_data:
-            user.first_name = user_data['first_name']
-        
-        if 'last_name' in user_data:
-            user.last_name = user_data['last_name']
-        
-        if 'is_active' in user_data:
-            user.is_active = user_data['is_active']
-        
-        if 'is_default' in user_data:
-            user.is_default = user_data['is_default']
-        
-        if 'preferences' in user_data:
-            user.set_preferences(user_data['preferences'])
-        
-        db.commit()
-        db.refresh(user)
-        
-        return jsonify({
-            "success": True,
-            "message": "User updated successfully",
-            "data": user.to_dict()
-        })
-        
+        user = user_service.update_user(user_id, **data)
+        if user:
+            return jsonify({
+                'status': 'success',
+                'data': user,
+                'message': f'User {user_id} updated successfully'
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'message': f'User {user_id} not found or update failed'
+            }), 404
+            
     except Exception as e:
-        print(f"❌ Error updating user {user_id}: {e}")
-        db.rollback()
-        return jsonify({"success": False, "message": "Error updating user"}), 500
+        logger.error(f"Error updating user {user_id}: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
 
-@users_bp.route('/api/v1/users/<int:user_id>', methods=['DELETE'])
-def delete_user(user_id):
-    """Delete user (soft delete by setting is_active=False)"""
+@users_bp.route('/<int:user_id>', methods=['DELETE'])
+def delete_user(user_id: int):
+    """Delete user (soft delete)"""
     try:
-        db: Session = next(get_db())
-        user = UserService.get_user_by_id(db, user_id)
-        
-        if not user:
-            return jsonify({"success": False, "message": "User not found"}), 404
-        
-        # Don't allow deleting default user
-        if user.is_default:
-            return jsonify({"success": False, "message": "Cannot delete default user"}), 400
-        
-        # Soft delete by setting is_active=False
-        user.is_active = False
-        db.commit()
-        
-        return jsonify({
-            "success": True,
-            "message": "User deleted successfully"
-        })
-        
+        success = user_service.delete_user(user_id)
+        if success:
+            return jsonify({
+                'status': 'success',
+                'message': f'User {user_id} deleted successfully'
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'message': f'User {user_id} not found or cannot be deleted'
+            }), 404
+            
     except Exception as e:
-        print(f"❌ Error deleting user {user_id}: {e}")
-        db.rollback()
-        return jsonify({"success": False, "message": "Error deleting user"}), 500
+        logger.error(f"Error deleting user {user_id}: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
 
-@users_bp.route('/api/v1/users/ensure-default', methods=['POST'])
-def ensure_default_user():
-    """Ensure default user exists in database"""
+@users_bp.route('/<int:user_id>/preferences', methods=['GET'])
+def get_user_preferences(user_id: int):
+    """Get user preferences"""
     try:
-        db: Session = next(get_db())
-        default_user = UserService.ensure_default_user_exists(db)
-        
+        preferences = user_service.get_user_preferences(user_id)
         return jsonify({
-            "success": True,
-            "message": "Default user ensured",
-            "data": default_user.to_dict()
-        })
-        
+            'status': 'success',
+            'data': preferences,
+            'count': len(preferences)
+        }), 200
     except Exception as e:
-        print(f"❌ Error ensuring default user: {e}")
-        return jsonify({"success": False, "message": "Error ensuring default user"}), 500
+        logger.error(f"Error getting preferences for user {user_id}: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+@users_bp.route('/<int:user_id>/preferences', methods=['POST'])
+def set_user_preferences(user_id: int):
+    """Set user preferences"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'status': 'error',
+                'message': 'No preferences data provided'
+            }), 400
+        
+        success = user_service.set_user_preferences(user_id, data)
+        if success:
+            return jsonify({
+                'status': 'success',
+                'message': f'Preferences for user {user_id} updated successfully'
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'message': f'Failed to update preferences for user {user_id}'
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error setting preferences for user {user_id}: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
+@users_bp.route('/<int:user_id>/statistics', methods=['GET'])
+def get_user_statistics(user_id: int):
+    """Get user statistics"""
+    try:
+        stats = user_service.get_user_statistics(user_id)
+        if stats:
+            return jsonify({
+                'status': 'success',
+                'data': stats
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'message': f'User {user_id} not found'
+            }), 404
+    except Exception as e:
+        logger.error(f"Error getting statistics for user {user_id}: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500

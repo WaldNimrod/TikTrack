@@ -212,7 +212,7 @@ async function loadTradingSettings() {
 /**
  * Initialize preferences page
  */
-function initializePreferencesPage() {
+async function initializePreferencesPage() {
     console.log('⚙️ Initializing preferences page...');
     
     // Load accounts from database

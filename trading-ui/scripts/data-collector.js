@@ -42,8 +42,15 @@ class DataCollector {
             const warnings = scanResults.warnings || 0;
             const scanDuration = scanResults.scanDuration || (performance.now() - startTime);
 
-            // חישוב מדדי איכות
-            const qualityScore = this.calculateQualityScore(errors, warnings);
+            // חישוב מדדי איכות מתקדמים
+            const additionalMetrics = {
+                complexityScore: this.calculateComplexityScore(scanResults.files || []),
+                maintainabilityScore: this.calculateMaintainabilityScore(scanResults.files || []),
+                securityScore: this.calculateSecurityScore(scanResults.files || []),
+                performanceScore: this.calculatePerformanceScore(scanDuration, totalFiles)
+            };
+            
+            const qualityScore = this.calculateQualityScore(errors, warnings, totalFiles, additionalMetrics);
             const performanceMetrics = this.calculatePerformanceMetrics(totalFiles, scanDuration);
 
             const metrics = {
@@ -54,6 +61,15 @@ class DataCollector {
                 scanDuration: scanDuration,
                 filesPerSecond: totalFiles > 0 ? (totalFiles / (scanDuration / 1000)).toFixed(2) : 0,
                 performanceMetrics: performanceMetrics,
+                advancedMetrics: {
+                    complexityScore: additionalMetrics.complexityScore,
+                    maintainabilityScore: additionalMetrics.maintainabilityScore,
+                    securityScore: additionalMetrics.securityScore,
+                    performanceScore: additionalMetrics.performanceScore,
+                    errorRate: totalFiles > 0 ? ((errors / totalFiles) * 100).toFixed(2) : 0,
+                    warningRate: totalFiles > 0 ? ((warnings / totalFiles) * 100).toFixed(2) : 0,
+                    issuesPerFile: totalFiles > 0 ? ((errors + warnings) / totalFiles).toFixed(2) : 0
+                },
                 sessionId: this.generateSessionId(),
                 timestamp: new Date().toISOString(),
                 trigger: 'scan',
@@ -104,7 +120,13 @@ class DataCollector {
 
             // חישוב מדדי איכות לאחר תיקון
             const remainingErrors = Math.max(0, baseMetrics.errors - successfulFixes);
-            const newQualityScore = this.calculateQualityScore(remainingErrors, baseMetrics.warnings);
+            const additionalMetrics = {
+                complexityScore: baseMetrics.advancedMetrics?.complexityScore || 0,
+                maintainabilityScore: baseMetrics.advancedMetrics?.maintainabilityScore || 0,
+                securityScore: baseMetrics.advancedMetrics?.securityScore || 0,
+                performanceScore: baseMetrics.advancedMetrics?.performanceScore || 0
+            };
+            const newQualityScore = this.calculateQualityScore(remainingErrors, baseMetrics.warnings, baseMetrics.totalFiles, additionalMetrics);
 
             const metrics = {
                 totalFiles: baseMetrics.totalFiles,
@@ -113,13 +135,20 @@ class DataCollector {
                 qualityScore: newQualityScore,
                 scanDuration: baseMetrics.scanDuration,
                 filesPerSecond: baseMetrics.filesPerSecond,
+                advancedMetrics: {
+                    ...baseMetrics.advancedMetrics,
+                    errorRate: baseMetrics.totalFiles > 0 ? ((remainingErrors / baseMetrics.totalFiles) * 100).toFixed(2) : 0,
+                    warningRate: baseMetrics.totalFiles > 0 ? ((baseMetrics.warnings / baseMetrics.totalFiles) * 100).toFixed(2) : 0,
+                    issuesPerFile: baseMetrics.totalFiles > 0 ? ((remainingErrors + baseMetrics.warnings) / baseMetrics.totalFiles).toFixed(2) : 0
+                },
                 fixMetrics: {
                     totalFixes: totalFixes,
                     successfulFixes: successfulFixes,
                     failedFixes: failedFixes,
                     fixSuccessRate: totalFixes > 0 ? (successfulFixes / totalFixes * 100).toFixed(1) : 0,
                     fixDuration: fixDuration,
-                    qualityImprovement: (newQualityScore - baseMetrics.qualityScore).toFixed(1)
+                    qualityImprovement: (newQualityScore - baseMetrics.qualityScore).toFixed(1),
+                    errorReduction: ((baseMetrics.errors - remainingErrors) / Math.max(1, baseMetrics.errors) * 100).toFixed(1)
                 },
                 sessionId: this.generateSessionId(),
                 timestamp: new Date().toISOString(),
@@ -141,12 +170,14 @@ class DataCollector {
     }
 
     /**
-     * חישוב ציון איכות קוד
+     * חישוב ציון איכות קוד מתקדם
      * @param {number} errors - מספר שגיאות
      * @param {number} warnings - מספר אזהרות
+     * @param {number} totalFiles - סך כל הקבצים
+     * @param {Object} additionalMetrics - מדדים נוספים
      * @returns {number} ציון איכות (0-100)
      */
-    calculateQualityScore(errors, warnings) {
+    calculateQualityScore(errors, warnings, totalFiles = 0, additionalMetrics = {}) {
         try {
             if (typeof errors !== 'number' || typeof warnings !== 'number') {
                 return 0;
@@ -154,6 +185,30 @@ class DataCollector {
 
             // חישוב בסיסי: 100 - (שגיאות * 5) - (אזהרות * 2)
             let qualityScore = 100 - (errors * 5) - (warnings * 2);
+
+            // בונוס לקבצים רבים ללא בעיות
+            if (totalFiles > 0) {
+                const errorRate = errors / totalFiles;
+                const warningRate = warnings / totalFiles;
+                
+                // בונוס לאיכות גבוהה
+                if (errorRate < 0.01) qualityScore += 5; // פחות מ-1% שגיאות
+                if (warningRate < 0.05) qualityScore += 3; // פחות מ-5% אזהרות
+                
+                // בונוס לקבצים רבים
+                if (totalFiles > 100) qualityScore += 2;
+                if (totalFiles > 500) qualityScore += 3;
+            }
+
+            // בונוס למדדים נוספים
+            if (additionalMetrics.complexityScore) {
+                const complexityBonus = Math.max(0, 10 - additionalMetrics.complexityScore);
+                qualityScore += complexityBonus * 0.5;
+            }
+
+            if (additionalMetrics.maintainabilityScore) {
+                qualityScore += additionalMetrics.maintainabilityScore * 0.3;
+            }
 
             // הגבלות טווח
             qualityScore = Math.max(0, Math.min(100, qualityScore));
@@ -229,6 +284,147 @@ class DataCollector {
             }
             return 0;
         } catch (error) {
+            return 0;
+        }
+    }
+
+    /**
+     * חישוב ציון מורכבות קוד
+     * @param {Array} files - רשימת קבצים
+     * @returns {number} ציון מורכבות (0-10)
+     */
+    calculateComplexityScore(files = []) {
+        try {
+            if (!files || files.length === 0) return 0;
+
+            let totalComplexity = 0;
+            let fileCount = 0;
+
+            files.forEach(file => {
+                if (file && file.content) {
+                    const lines = file.content.split('\n').length;
+                    const complexity = Math.min(10, lines / 50); // 50 שורות = מורכבות 1
+                    totalComplexity += complexity;
+                    fileCount++;
+                }
+            });
+
+            return fileCount > 0 ? Math.round((totalComplexity / fileCount) * 10) / 10 : 0;
+        } catch (error) {
+            console.error('❌ שגיאה בחישוב ציון מורכבות:', error);
+            return 0;
+        }
+    }
+
+    /**
+     * חישוב ציון תחזוקה
+     * @param {Array} files - רשימת קבצים
+     * @returns {number} ציון תחזוקה (0-100)
+     */
+    calculateMaintainabilityScore(files = []) {
+        try {
+            if (!files || files.length === 0) return 100;
+
+            let maintainabilityScore = 100;
+            let fileCount = 0;
+
+            files.forEach(file => {
+                if (file && file.content) {
+                    const content = file.content;
+                    
+                    // קנס על קוד לא מתועד
+                    if (!content.includes('//') && !content.includes('/*')) {
+                        maintainabilityScore -= 2;
+                    }
+                    
+                    // קנס על פונקציות ארוכות
+                    const longFunctions = (content.match(/function\s+\w+\s*\([^)]*\)\s*\{[^}]{200,}\}/g) || []).length;
+                    maintainabilityScore -= longFunctions * 1;
+                    
+                    // קנס על קוד מורכב
+                    const complexPatterns = (content.match(/if\s*\([^)]*\)\s*\{[^}]*if\s*\([^)]*\)/g) || []).length;
+                    maintainabilityScore -= complexPatterns * 0.5;
+                    
+                    fileCount++;
+                }
+            });
+
+            return Math.max(0, Math.round(maintainabilityScore / Math.max(1, fileCount / 10)));
+        } catch (error) {
+            console.error('❌ שגיאה בחישוב ציון תחזוקה:', error);
+            return 100;
+        }
+    }
+
+    /**
+     * חישוב ציון אבטחה
+     * @param {Array} files - רשימת קבצים
+     * @returns {number} ציון אבטחה (0-100)
+     */
+    calculateSecurityScore(files = []) {
+        try {
+            if (!files || files.length === 0) return 100;
+
+            let securityScore = 100;
+            let fileCount = 0;
+
+            files.forEach(file => {
+                if (file && file.content) {
+                    const content = file.content.toLowerCase();
+                    
+                    // בדיקת דפוסי אבטחה מסוכנים
+                    const dangerousPatterns = [
+                        /eval\s*\(/g,
+                        /innerhtml\s*=/g,
+                        /document\.write/g,
+                        /settimeout\s*\([^,]*,[^)]*\)/g,
+                        /setinterval\s*\([^,]*,[^)]*\)/g
+                    ];
+
+                    dangerousPatterns.forEach(pattern => {
+                        const matches = (content.match(pattern) || []).length;
+                        securityScore -= matches * 5;
+                    });
+
+                    // בונוס על שימוש בטוח
+                    if (content.includes('textcontent') || content.includes('addEventListener')) {
+                        securityScore += 2;
+                    }
+
+                    fileCount++;
+                }
+            });
+
+            return Math.max(0, Math.min(100, Math.round(securityScore / Math.max(1, fileCount / 10))));
+        } catch (error) {
+            console.error('❌ שגיאה בחישוב ציון אבטחה:', error);
+            return 100;
+        }
+    }
+
+    /**
+     * חישוב ציון ביצועים
+     * @param {number} scanDuration - זמן סריקה
+     * @param {number} totalFiles - מספר קבצים
+     * @returns {number} ציון ביצועים (0-100)
+     */
+    calculatePerformanceScore(scanDuration, totalFiles) {
+        try {
+            if (totalFiles <= 0 || scanDuration <= 0) return 0;
+
+            const filesPerSecond = totalFiles / (scanDuration / 1000);
+            let performanceScore = 0;
+
+            // ציון מבוסס על קבצים לשנייה
+            if (filesPerSecond >= 50) performanceScore = 100;
+            else if (filesPerSecond >= 25) performanceScore = 80;
+            else if (filesPerSecond >= 10) performanceScore = 60;
+            else if (filesPerSecond >= 5) performanceScore = 40;
+            else if (filesPerSecond >= 1) performanceScore = 20;
+
+            return performanceScore;
+        } catch (error) {
+            console.error('❌ שגיאה בחישוב ציון ביצועים:', error);
             return 0;
         }
     }

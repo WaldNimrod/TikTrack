@@ -1866,7 +1866,8 @@ async function finishScan() {
                 scanDuration: scanDuration,
                 scanType: 'full',
                 fileTypes: getSelectedFileTypes(),
-                totalSize: calculateTotalSize()
+                totalSize: calculateTotalSize(),
+                files: scanningResults.files || [] // Pass file data for advanced metrics
             });
 
             // Create data point and save to IndexedDB
@@ -2556,9 +2557,46 @@ function getSelectedFileTypes() {
 
 // Calculate approximate total size of scanned files
 function calculateTotalSize() {
-    // Rough estimation based on file count
-    const totalFiles = scanningResults.totalFiles || 0;
-    return totalFiles * 5000; // Assume average 5KB per file
+    try {
+        // Try to get more accurate size estimation
+        if (window.projectFiles && window.projectFiles.length > 0) {
+            let totalSize = 0;
+            window.projectFiles.forEach(fileName => {
+                // Estimate based on file type
+                const fileType = getFileType(fileName);
+                let estimatedSize = 5000; // Default 5KB
+                
+                switch (fileType) {
+                    case 'js':
+                        estimatedSize = 8000; // JavaScript files are typically larger
+                        break;
+                    case 'html':
+                        estimatedSize = 3000; // HTML files are typically smaller
+                        break;
+                    case 'css':
+                        estimatedSize = 2000; // CSS files are typically smaller
+                        break;
+                    case 'py':
+                        estimatedSize = 6000; // Python files are medium size
+                        break;
+                    default:
+                        estimatedSize = 4000; // Other files
+                }
+                
+                totalSize += estimatedSize;
+            });
+            
+            return totalSize;
+        }
+        
+        // Fallback to simple estimation
+        const totalFiles = scanningResults.totalFiles || 0;
+        return totalFiles * 5000; // Assume average 5KB per file
+        
+    } catch (error) {
+        console.error('❌ שגיאה בחישוב גודל קבצים:', error);
+        return 0;
+    }
 }
 
 // Update chart indicators with latest data

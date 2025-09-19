@@ -267,23 +267,88 @@ class ChartRenderer {
             rawData = [
                 {
                     timestamp: new Date(now.getTime() - 4 * 60 * 60 * 1000).toISOString(),
-                    metrics: { qualityScore: 85, errors: 12, warnings: 8 }
+                    metrics: { 
+                        qualityScore: 85, 
+                        errors: 12, 
+                        warnings: 8,
+                        advancedMetrics: {
+                            complexityScore: 3.2,
+                            maintainabilityScore: 78,
+                            securityScore: 92,
+                            performanceScore: 85,
+                            errorRate: 2.4,
+                            warningRate: 1.6,
+                            issuesPerFile: 4.0
+                        }
+                    }
                 },
                 {
                     timestamp: new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString(),
-                    metrics: { qualityScore: 78, errors: 18, warnings: 15 }
+                    metrics: { 
+                        qualityScore: 78, 
+                        errors: 18, 
+                        warnings: 15,
+                        advancedMetrics: {
+                            complexityScore: 4.1,
+                            maintainabilityScore: 65,
+                            securityScore: 88,
+                            performanceScore: 72,
+                            errorRate: 3.6,
+                            warningRate: 3.0,
+                            issuesPerFile: 6.6
+                        }
+                    }
                 },
                 {
                     timestamp: new Date(now.getTime() - 2 * 60 * 60 * 1000).toISOString(),
-                    metrics: { qualityScore: 92, errors: 5, warnings: 3 }
+                    metrics: { 
+                        qualityScore: 92, 
+                        errors: 5, 
+                        warnings: 3,
+                        advancedMetrics: {
+                            complexityScore: 2.8,
+                            maintainabilityScore: 88,
+                            securityScore: 95,
+                            performanceScore: 92,
+                            errorRate: 1.0,
+                            warningRate: 0.6,
+                            issuesPerFile: 1.6
+                        }
+                    }
                 },
                 {
                     timestamp: new Date(now.getTime() - 1 * 60 * 60 * 1000).toISOString(),
-                    metrics: { qualityScore: 88, errors: 8, warnings: 6 }
+                    metrics: { 
+                        qualityScore: 88, 
+                        errors: 8, 
+                        warnings: 6,
+                        advancedMetrics: {
+                            complexityScore: 3.5,
+                            maintainabilityScore: 82,
+                            securityScore: 90,
+                            performanceScore: 88,
+                            errorRate: 1.6,
+                            warningRate: 1.2,
+                            issuesPerFile: 2.8
+                        }
+                    }
                 },
                 {
                     timestamp: now.toISOString(),
-                    metrics: { qualityScore: 95, errors: 2, warnings: 1 }
+                    metrics: { 
+                        qualityScore: 95, 
+                        errors: 2, 
+                        warnings: 1,
+                        advancedMetrics: {
+                            complexityScore: 2.1,
+                            maintainabilityScore: 95,
+                            securityScore: 98,
+                            performanceScore: 96,
+                            errorRate: 0.4,
+                            warningRate: 0.2,
+                            issuesPerFile: 0.6
+                        }
+                    }
                 }
             ];
         }

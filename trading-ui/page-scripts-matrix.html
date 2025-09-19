@@ -53,36 +53,41 @@
          - Or create: styles-new/07-trumps/page-scripts-matrix.css
     -->
 </head>
-<body>
-    <!-- 🔒 LOCKED TEMPLATE ZONE 1 - Header & Navigation (DO NOT MODIFY) -->
-    <!-- ======================================================== -->
+<body class="page-scripts-matrix-page">
+    <!-- Unified Header Container -->
     <div id="unified-header"></div>
-    
-    <!-- 🔒 LOCKED TEMPLATE ZONE 2 - Main Content Container (DO NOT MODIFY) -->
-    <!-- ======================================================== -->
-    <div class="container-fluid main-content page-scripts-matrix-container">
-        <div class="row">
-            <div class="col-12">
-                <!-- 🔒 LOCKED TEMPLATE ZONE 3 - Page Title (DO NOT MODIFY) -->
-                <!-- ======================================================== -->
-                <div class="page-header-section">
-                    <h1 class="page-title">מטריצת סקריפטים ועמודים - TikTrack</h1>
-                    <p class="page-subtitle text-muted">עדכון אחרון: ספטמבר 2025</p>
-                </div>
+  <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
+  <div class="background-wrapper">
+    <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
 
-                <!-- 🔓 TEMPLATE ZONE 4 - Page Content (MODIFY ONLY CONTENT INSIDE) -->
-                <!-- ======================================================== -->
+    <!-- ===== TEMPLATE ZONE 3: PAGE BODY (LOCKED) ===== -->
+    <div class="page-body">
+      <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT (EDITABLE) ===== -->
+      <div class="main-content">
+      <!-- ===== CONTENT SECTIONS START (EDITABLE) ===== -->
+      
+      <!-- Top Section Start -->
+      <div class="top-section page-scripts-matrix-page">
+        <!-- Page Title Section -->
+        <div class="page-title-section">
+        <h1 class="page-title">מטריצת סקריפטים ועמודים - TikTrack</h1>
+          <p class="page-subtitle text-muted">עדכון אחרון: ספטמבר 2025</p>
+        </div>
+      </div>
+      <!-- Top Section End -->
 
-                <!-- 📁 SECTION 1: Scripts Matrix Table -->
-                <div class="content-section" data-section-id="scripts-matrix-table">
-                    <div class="section-header">
-                        <button class="btn btn-sm btn-outline-primary section-toggle" onclick="toggleSection('scripts-matrix-content')">
-                            <i class="fas fa-chevron-down section-toggle-icon"></i>
-                        </button>
-                        <span class="section-title">מטריצת סקריפטים ועמודים</span>
-                    </div>
-                    <div id="scripts-matrix-content" class="section-content">
-                        <div class="table-container">
+      <!-- Main Content Section Start -->
+      <div class="main-content-section">
+        <!-- Scripts Matrix Table Section -->
+        <div class="content-section" data-section-id="scripts-matrix-table">
+          <div class="section-header">
+            <button class="btn btn-sm btn-outline-primary section-toggle" onclick="toggleSection('scripts-matrix-content')">
+              <i class="fas fa-chevron-down section-toggle-icon"></i>
+            </button>
+            <span class="section-title">מטריצת סקריפטים ועמודים</span>
+          </div>
+          <div id="scripts-matrix-content" class="section-content">
+        <div class="table-container">
             <table id="page-scripts-matrix-table" class="table table-bordered table-sm" data-table-type="page-scripts-matrix">
                 <thead>
                     <tr>
@@ -171,8 +176,8 @@
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
                         <td class="connected">✓</td>
-                    <td></td>
-                    <td></td>
+                        <td></td>
+                        <td></td>
                     <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                     <tr class="utility-scripts"><td class="script-name">tables.js</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td>
                     <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -282,15 +287,15 @@
 
         // Initialize scan interface for updating the matrix
         function initializeScanInterface() {
-            // Add scan button to the page header
-            const pageHeader = document.querySelector('.page-header-section');
-            if (pageHeader && !document.getElementById('scan-filesystem-btn')) {
+            // Add scan button to the page title section
+            const pageTitleSection = document.querySelector('.page-title-section');
+            if (pageTitleSection && !document.getElementById('scan-filesystem-btn')) {
                 const scanButton = document.createElement('button');
                 scanButton.id = 'scan-filesystem-btn';
                 scanButton.className = 'btn btn-primary btn-sm ms-3';
                 scanButton.innerHTML = '<i class="fas fa-search"></i> סריקת קבצים';
                 scanButton.onclick = scanFilesystem;
-                pageHeader.appendChild(scanButton);
+                pageTitleSection.appendChild(scanButton);
             }
         }
 
@@ -312,6 +317,14 @@
             }, 2000);
         }
     </script>
+    </div>
+    <!-- ===== CONTENT SECTIONS END (EDITABLE) ===== -->
+    </div>
+    <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT END (EDITABLE) ===== -->
+    </div>
+    <!-- ===== TEMPLATE ZONE 3: PAGE BODY END (LOCKED) ===== -->
+    </div>
+    <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER END (LOCKED) ===== -->
 </body>
 </html>
 

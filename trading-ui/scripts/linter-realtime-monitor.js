@@ -503,12 +503,13 @@ function updateFileTypeStatistics(issues) {
     });
 
     // File type statistics calculated (including all scanned files)
+    const statistics = {
         js: { files: stats.js.files.size, errors: stats.js.errors, warnings: stats.js.warnings },
         html: { files: stats.html.files.size, errors: stats.html.errors, warnings: stats.html.warnings },
         py: { files: stats.py.files.size, errors: stats.py.errors, warnings: stats.py.warnings },
         css: { files: stats.css.files.size, errors: stats.css.errors, warnings: stats.css.warnings },
         other: { files: stats.other.files.size, errors: stats.other.errors, warnings: stats.other.warnings }
-    });
+    };
 
     // Update UI counters
     Object.keys(stats).forEach(fileType => {
@@ -522,6 +523,7 @@ function updateFileTypeStatistics(issues) {
         const warningsCountEl = document.getElementById(`${fileType}WarningsCount`);
 
         // Updating file type counters
+        const counterData = {
             files: fileCount,
             errors: errors,
             warnings: warnings,
@@ -530,7 +532,7 @@ function updateFileTypeStatistics(issues) {
                 errors: !!errorsCountEl,
                 warnings: !!warningsCountEl
             }
-        });
+        };
 
         if (filesCountEl) {
             filesCountEl.textContent = fileCount;
@@ -549,7 +551,7 @@ function updateFileTypeStatistics(issues) {
         if (warningsCountEl) {
             warningsCountEl.textContent = warnings;
             // Updated warning count
-            } else {
+        } else {
             console.warn(`❌ Element ${fileType}WarningsCount not found`);
         }
     });
@@ -832,6 +834,7 @@ function scanJavaScriptFiles() {
 
         // Starting scan of unique files
         // File type breakdown
+        const fileTypeBreakdown = {
             js: scanJs ? allFiles.filter(f => f.endsWith('.js')).length : 0,
             html: scanHtml ? allFiles.filter(f => f.endsWith('.html')).length : 0,
             py: scanPy ? allFiles.filter(f => f.endsWith('.py')).length : 0,
@@ -840,7 +843,7 @@ function scanJavaScriptFiles() {
                 f.endsWith('.json') || f.endsWith('.md') || f.endsWith('.sql') ||
                 f.endsWith('.yml') || f.endsWith('.yaml')
             ).length : 0
-        });
+        };
 
         allFiles.forEach((fileName, index) => {
     setTimeout(() => {
@@ -898,7 +901,7 @@ function scanJavaScriptFiles() {
     // Starting scan of static files
 
     allFiles.forEach((fileName, index) => {
-        setTimeout(() => {
+    setTimeout(() => {
             scanSingleFile(fileName);
             scanningResults.scannedFiles++;
 
@@ -3238,9 +3241,10 @@ window.updateProblemFilesTable = updateProblemFilesTable;
 window.fixAllIssues = async () => {
     // Attempting to fix all issues...
     // Current state logged
+    const currentState = {
         errors: scanningResults.errors.length,
         warnings: scanningResults.warnings.length
-    });
+    };
 
     // Only fix issues that were actually found during scanning
     const totalIssues = scanningResults.errors.length + scanningResults.warnings.length;
@@ -3258,11 +3262,12 @@ window.fixAllIssues = async () => {
     const failedCount = totalIssues - fixedCount;
 
     // Fix calculation logged
+    const fixCalculation = {
         totalIssues,
         fixablePercentage: Math.round(fixablePercentage * 100) + '%',
         fixedCount,
         failedCount
-    });
+    };
 
     // Remove fixed issues from results and mark them as fixed
     const originalErrors = scanningResults.errors.length;
@@ -3294,13 +3299,14 @@ window.fixAllIssues = async () => {
         scanningResults.warnings = scanningResults.warnings.slice(0, scanningResults.warnings.length - warningsToFix);
 
         // Issues actually removed and marked as fixed
+        const issuesRemoved = {
             errorsRemoved: errorsToFix,
             warningsRemoved: warningsToFix,
             totalFixed: fixedCount,
             errorsRemaining: scanningResults.errors.length,
             warningsRemaining: scanningResults.warnings.length,
             totalFixedIssues: fixedIssues.errors.size + fixedIssues.warnings.size
-        });
+        };
     }
 
     addLogEntry('INFO', `תוקנו ${fixedCount} בעיות אוטומטית${failedCount > 0 ? `, ${failedCount} בעיות נשארו` : ''}`, {
@@ -3320,13 +3326,14 @@ window.fixAllIssues = async () => {
 
     // Fix operation completed
     // Final state after fix logged
+    const finalState = {
         errorsRemaining: scanningResults.errors.length,
         warningsRemaining: scanningResults.warnings.length,
         totalRemaining: scanningResults.errors.length + scanningResults.warnings.length,
         fixedErrorsCount: fixedIssues.errors.size,
         fixedWarningsCount: fixedIssues.warnings.size,
         totalFixed: fixedIssues.errors.size + fixedIssues.warnings.size
-    });
+    };
 
     // ===== INTEGRATION WITH DATA COLLECTOR =====
     // Collect fix data and save to IndexedDB
@@ -3388,8 +3395,9 @@ window.fixAllIssues = async () => {
 window.fixAllErrors = () => {
     // Fixing all errors...
     // Current errors state logged
+    const currentErrorsState = {
         errors: scanningResults.errors.length
-    });
+    };
 
     if (scanningResults.errors.length === 0) {
         // Use direct call to avoid recursion
@@ -3405,11 +3413,12 @@ window.fixAllErrors = () => {
     const failedErrors = scanningResults.errors.length - errorsFixed;
 
     // Error fix calculation logged
+    const errorFixCalculation = {
         totalErrors: scanningResults.errors.length,
         fixablePercentage: Math.round(fixablePercentage * 100) + '%',
         errorsFixed,
         failedErrors
-    });
+    };
 
     // Remove fixed errors from results and mark them as fixed
     if (errorsFixed > 0) {
@@ -3480,7 +3489,7 @@ window.fixAllWarnings = () => {
     const warningsFixed = Math.min(Math.floor(scanningResults.warnings.length * fixablePercentage), scanningResults.warnings.length);
     const failedWarnings = scanningResults.warnings.length - warningsFixed;
 
-    console.log('🔧 Warning fix calculation:', {
+    // Warning fix calculation logged
         totalWarnings: scanningResults.warnings.length,
         fixablePercentage: Math.round(fixablePercentage * 100) + '%',
         warningsFixed,
@@ -3499,7 +3508,7 @@ window.fixAllWarnings = () => {
         }
 
         scanningResults.warnings = scanningResults.warnings.slice(0, scanningResults.warnings.length - warningsFixed);
-        console.log('✅ Warnings actually removed and marked as fixed:', {
+        // Warnings actually removed and marked as fixed
             warningsRemoved: warningsFixed,
             warningsRemaining: scanningResults.warnings.length,
             totalFixedWarnings: fixedIssues.warnings.size
@@ -3527,7 +3536,7 @@ window.fixAllWarnings = () => {
             try {
                 if (window.currentChartRenderer) {
                     await window.currentChartRenderer.clearChart();
-                    console.log('🧹 Chart auto-cleaned after warning fix');
+                    // Chart auto-cleaned after warning fix
                 }
             } catch (error) {
                 // Error in auto-cleanup after warning fix
@@ -3535,11 +3544,11 @@ window.fixAllWarnings = () => {
         }, 2000); // Wait 2 seconds after fix completion
     }
 
-    console.log('✅ Warning fix operation completed');
+    // Warning fix operation completed
 };
 window.ignoreAllIssues = () => {
-    console.log('🙈 Ignoring all issues...');
-    console.log('📊 Current state before ignore:', {
+    // Ignoring all issues...
+    // Current state before ignore logged
         errors: scanningResults.errors.length,
         warnings: scanningResults.warnings.length
     });
@@ -3561,7 +3570,7 @@ window.ignoreAllIssues = () => {
     scanningResults.errors = [];
     scanningResults.warnings = [];
 
-    console.log('🗑️ Issues actually cleared:', {
+    // Issues actually cleared logged
         errorsIgnored,
         warningsIgnored,
         totalIgnored: ignoredCount,
@@ -3591,7 +3600,7 @@ window.ignoreAllIssues = () => {
             try {
                 if (window.currentChartRenderer) {
                     await window.currentChartRenderer.clearChart();
-                    console.log('🧹 Chart auto-cleaned after ignore');
+                    // Chart auto-cleaned after ignore
                 }
             } catch (error) {
                 // Error in auto-cleanup after ignore
@@ -3599,12 +3608,12 @@ window.ignoreAllIssues = () => {
         }, 2000); // Wait 2 seconds after ignore completion
     }
 
-    console.log('✅ Ignore operation completed');
+    // Ignore operation completed
 };
 
 // Reset all fixed issues (for testing purposes)
 window.resetFixedIssues = () => {
-    console.log('🔄 Resetting all fixed issues...');
+    // Resetting all fixed issues...
     fixedIssues.errors.clear();
     fixedIssues.warnings.clear();
 
@@ -3614,7 +3623,7 @@ window.resetFixedIssues = () => {
     scanningResults.totalFiles = 0;
     scanningResults.scannedFiles = 0;
 
-    console.log('✅ All fixed issues reset - ready for new scan');
+    // All fixed issues reset - ready for new scan
         if (typeof window.showInfoNotification === 'function') {
         window.showInfoNotification('איפוס הושלם', 'כל הבעיות שתוקנו אופסו. ניתן לסרוק מחדש.');
     }
@@ -3700,7 +3709,7 @@ function calculateTotalSize() {
 async function autoUpdateChart() {
     try {
         if (!window.currentChartRenderer || typeof window.IndexedDBAdapter === 'undefined') {
-            console.log('ℹ️ Chart renderer or IndexedDB adapter not available for auto-update');
+            // Chart renderer or IndexedDB adapter not available for auto-update
         return;
     }
     
@@ -3710,9 +3719,9 @@ async function autoUpdateChart() {
         if (chartData && chartData.length > 0) {
             await window.currentChartRenderer.updateChart(chartData, false); // No animation for auto-update
             updateChartIndicators(chartData[chartData.length - 1]);
-            console.log('📈 Auto-update: chart refreshed with latest data');
+            // Auto-update: chart refreshed with latest data
         } else {
-            console.log('ℹ️ No data available for auto-update');
+            // No data available for auto-update
         }
     } catch (error) {
         // Error in auto-update chart
@@ -3816,7 +3825,7 @@ async function updateChartIndicators(latestDataPoint) {
 // Refresh chart data from IndexedDB
 window.refreshChartData = async function() {
     try {
-        console.log('🔄 מרענן נתוני גרף מ-IndexedDB...');
+        // Refreshing chart data from IndexedDB...
 
         if (typeof window.IndexedDBAdapter === 'undefined') {
             console.warn('⚠️ IndexedDBAdapter לא זמין');
@@ -3833,13 +3842,13 @@ window.refreshChartData = async function() {
             // Update chart if available
             if (typeof window.ChartRenderer !== 'undefined' && window.currentChartRenderer) {
                 await window.currentChartRenderer.updateChart(chartData);
-                console.log('✅ גרף עודכן עם נתונים חדשים');
+                // Chart updated with new data
             }
 
             // Update indicators
             updateChartIndicators(chartData[chartData.length - 1]);
         } else {
-            console.log('ℹ️ לא נמצאו נתונים ב-IndexedDB');
+            // No data found in IndexedDB
         }
 
     } catch (error) {
@@ -3854,19 +3863,19 @@ window.clearChartHistory = async function() {
         return;
     }
     
-        console.log('🗑️ מנקה היסטוריית גרף...');
+        // Clearing chart history...
 
         if (typeof window.IndexedDBAdapter !== 'undefined') {
             const adapter = new window.IndexedDBAdapter();
             await adapter.initialize();
             await adapter.clearAllData();
-            console.log('✅ נתוני גרף נמחקו מ-IndexedDB');
+            // Chart data deleted from IndexedDB
         }
 
         // Clear chart display
         if (typeof window.ChartRenderer !== 'undefined' && window.currentChartRenderer) {
             await window.currentChartRenderer.clearChart();
-            console.log('✅ תצוגת גרף נוקתה');
+            // Chart display cleared
         }
 
         // Reset indicators
@@ -3892,7 +3901,7 @@ window.clearChartHistory = async function() {
 // Export chart data
 window.exportChartData = async function() {
     try {
-        console.log('📤 מייצא נתוני גרף...');
+        // Exporting chart data...
 
         if (typeof window.IndexedDBAdapter === 'undefined') {
             console.warn('⚠️ IndexedDBAdapter לא זמין');
@@ -3926,12 +3935,12 @@ window.exportChartData = async function() {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            console.log('✅ נתוני גרף יוצאו בהצלחה');
+            // Chart data exported successfully
         if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('ייצוא הושלם', `יוצאו ${allData.length} נקודות נתונים`);
             }
         } else {
-            console.log('ℹ️ אין נתונים לייצא');
+            // No data to export
         if (typeof window.showInfoNotification === 'function') {
                 window.showInfoNotification('אין נתונים', 'לא נמצאו נתונים לייצא');
             }
@@ -3948,7 +3957,7 @@ window.exportChartData = async function() {
 // Export comprehensive report
 window.exportComprehensiveReport = async function() {
     try {
-        console.log('📊 מייצא דוח מקיף...');
+        // Exporting comprehensive report...
 
         if (typeof window.IndexedDBAdapter === 'undefined') {
             console.warn('⚠️ IndexedDBAdapter לא זמין');
@@ -4000,12 +4009,12 @@ window.exportComprehensiveReport = async function() {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            console.log('✅ דוח מקיף יוצא בהצלחה');
+            // Comprehensive report exported successfully
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('דוח מקיף הושלם', `יוצא דוח עם ${allData.length} נקודות נתונים`);
             }
         } else {
-            console.log('ℹ️ אין נתונים לייצא');
+            // No data to export
         if (typeof window.showInfoNotification === 'function') {
                 window.showInfoNotification('אין נתונים', 'לא נמצאו נתונים לייצא');
             }
@@ -4022,7 +4031,7 @@ window.exportComprehensiveReport = async function() {
 // Export CSV format
 window.exportCSVData = async function() {
     try {
-        console.log('📊 מייצא נתונים בפורמט CSV...');
+        // Exporting data in CSV format...
 
         if (typeof window.IndexedDBAdapter === 'undefined') {
             console.warn('⚠️ IndexedDBAdapter לא זמין');
@@ -4051,12 +4060,12 @@ window.exportCSVData = async function() {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            console.log('✅ נתונים יוצאו בפורמט CSV');
+            // Data exported in CSV format
         if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('ייצוא CSV הושלם', `יוצאו ${allData.length} נקודות נתונים`);
             }
         } else {
-            console.log('ℹ️ אין נתונים לייצא');
+            // No data to export
             if (typeof window.showInfoNotification === 'function') {
                 window.showInfoNotification('אין נתונים', 'לא נמצאו נתונים לייצא');
             }
@@ -4249,7 +4258,7 @@ function generateRecommendations(stats) {
 // Create version snapshot
 window.createVersionSnapshot = async function() {
     try {
-        console.log('📸 יוצר צילום גרסה...');
+        // Creating version snapshot...
 
         if (typeof window.IndexedDBAdapter === 'undefined') {
             console.warn('⚠️ IndexedDBAdapter לא זמין');
@@ -4294,12 +4303,12 @@ window.createVersionSnapshot = async function() {
             // Update version list
             updateVersionList(snapshot.versionInfo.versionId);
 
-            console.log('✅ צילום גרסה נוצר בהצלחה');
+            // Version snapshot created successfully
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('צילום גרסה נוצר', `גרסה ${snapshot.versionInfo.versionId} נשמרה`);
             }
         } else {
-            console.log('ℹ️ אין נתונים ליצירת גרסה');
+            // No data to create version
         if (typeof window.showInfoNotification === 'function') {
                 window.showInfoNotification('אין נתונים', 'לא נמצאו נתונים ליצירת גרסה');
             }
@@ -4316,7 +4325,7 @@ window.createVersionSnapshot = async function() {
 // Restore version snapshot
 window.restoreVersionSnapshot = async function(versionId) {
     try {
-        console.log(`🔄 משחזר גרסה ${versionId}...`);
+        // Restoring version
 
         const versionKey = `linter_version_${versionId}`;
         const versionData = localStorage.getItem(versionKey);
@@ -4353,7 +4362,7 @@ window.restoreVersionSnapshot = async function(versionId) {
                 updateChartIndicators(snapshot.data[snapshot.data.length - 1]);
             }
 
-            console.log('✅ גרסה שוחזרה בהצלחה');
+            // Version restored successfully
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('גרסה שוחזרה', `גרסה ${versionId} שוחזרה בהצלחה`);
             }
@@ -4370,7 +4379,7 @@ window.restoreVersionSnapshot = async function(versionId) {
 // List available versions
 window.listAvailableVersions = function() {
     try {
-        console.log('📋 רשימת גרסאות זמינות...');
+        // Available versions list...
 
         const versions = [];
         for (let i = 0; i < localStorage.length; i++) {
@@ -4394,7 +4403,7 @@ window.listAvailableVersions = function() {
         // Sort by creation date (newest first)
         versions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        console.log('📋 גרסאות זמינות:', versions);
+        // Available versions logged
         return versions;
 
     } catch (error) {
@@ -4406,7 +4415,7 @@ window.listAvailableVersions = function() {
 // Delete version snapshot
 window.deleteVersionSnapshot = function(versionId) {
     try {
-        console.log(`🗑️ מוחק גרסה ${versionId}...`);
+        // Deleting version
 
         const versionKey = `linter_version_${versionId}`;
         localStorage.removeItem(versionKey);
@@ -4414,7 +4423,7 @@ window.deleteVersionSnapshot = function(versionId) {
         // Update version list
         updateVersionList();
 
-        console.log('✅ גרסה נמחקה בהצלחה');
+        // Version deleted successfully
         if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification('גרסה נמחקה', `גרסה ${versionId} נמחקה בהצלחה`);
         }
@@ -4442,9 +4451,9 @@ function updateVersionList(newVersionId = null) {
         localStorage.setItem(versionListKey, JSON.stringify(versions));
 
         if (newVersionId) {
-            console.log(`📝 רשימת גרסאות עודכנה - נוספה גרסה ${newVersionId}`);
+            // Version list updated - new version added
         } else {
-            console.log('📝 רשימת גרסאות עודכנה');
+            // Version list updated
         }
 
     } catch (error) {
@@ -4455,7 +4464,7 @@ function updateVersionList(newVersionId = null) {
 // Apply chart settings
 window.applyChartSettings = async function() {
     try {
-        console.log('⚙️ מחיל הגדרות גרף...');
+        // Applying chart settings...
 
         if (typeof window.ChartRenderer === 'undefined' || !window.currentChartRenderer) {
             console.warn('⚠️ Chart Renderer לא זמין');
@@ -4494,7 +4503,7 @@ window.applyChartSettings = async function() {
             }
         }
 
-        console.log('✅ הגדרות גרף הוחלו בהצלחה');
+        // Chart settings applied successfully
         if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification('הגדרות עודכנו', 'הגדרות הגרף הוחלו בהצלחה');
         }

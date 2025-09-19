@@ -376,21 +376,29 @@ function scanJavaScriptFiles() {
     
     let filesToScan = [];
     
-    // Use discovered project files if available
-    if (window.projectFiles && typeof window.projectFiles === 'object') {
-        // Convert object to flat array
-        const allFiles = [];
-        Object.keys(window.projectFiles).forEach(type => {
-            if (window.projectFiles[type] && Array.isArray(window.projectFiles[type])) {
-                allFiles.push(...window.projectFiles[type]);
-            }
-        });
-        
-        filesToScan = allFiles.filter(file => {
-            const type = getFileType(file);
-            return selectedTypes.includes(type);
-        });
-    } else {
+    // Use global project files scanner if available
+    if (typeof window.projectFilesScanner !== 'undefined') {
+        try {
+            const projectFiles = await window.projectFilesScanner.getProjectFiles();
+            const allFiles = [];
+            Object.keys(projectFiles).forEach(type => {
+                if (projectFiles[type] && Array.isArray(projectFiles[type])) {
+                    allFiles.push(...projectFiles[type]);
+                }
+            });
+            
+            filesToScan = allFiles.filter(file => {
+                const type = getFileType(file);
+                return selectedTypes.includes(type);
+            });
+        } catch (error) {
+            addLogEntry('WARNING', 'שגיאה בטעינת קבצי הפרויקט מהמנגנון הגלובלי', { error: error.message });
+            // Fall back to static lists
+        }
+    }
+    
+    // Fallback to static lists if global scanner not available or failed
+    if (filesToScan.length === 0) {
         // Fallback to static lists
         const staticFiles = {
             js: [
@@ -1009,167 +1017,44 @@ document.addEventListener('DOMContentLoaded', function() {
 // Project Files Discovery
 // ========================================
 
-function discoverProjectFiles() {
+async function discoverProjectFiles() {
     addLogEntry('INFO', 'מתחיל גילוי קבצי הפרויקט...');
     
+    try {
+        // Use global project files scanner if available
+        if (typeof window.projectFilesScanner !== 'undefined') {
+            const discoveredFiles = await window.projectFilesScanner.getProjectFiles();
+            const stats = await window.projectFilesScanner.getFileStatistics();
+            
+            // Store in global variable for backward compatibility
+            window.projectFiles = discoveredFiles;
+            
+            addLogEntry('SUCCESS', `גילוי הושלם - נמצאו ${stats.total} קבצים (JS: ${stats.js}, HTML: ${stats.html}, CSS: ${stats.css}, Python: ${stats.python}, Other: ${stats.other})`);
+            
+            return discoveredFiles;
+        } else {
+            addLogEntry('WARNING', 'מנגנון סריקת קבצים גלובלי לא זמין - משתמש ברשימה סטטית');
+            return await discoverProjectFilesFallback();
+        }
+    } catch (error) {
+        addLogEntry('ERROR', 'שגיאה בגילוי קבצי הפרויקט', { error: error.message });
+        return await discoverProjectFilesFallback();
+    }
+}
+
+async function discoverProjectFilesFallback() {
+    // Fallback to static discovery (simplified version)
     const discoveredFiles = {
-        js: [],
-        html: [],
-        css: [],
-        python: [],
-        other: []
+        js: ['trading-ui/scripts/main.js', 'trading-ui/scripts/ui-utils.js'],
+        html: ['trading-ui/index.html', 'trading-ui/accounts.html'],
+        css: ['trading-ui/styles/main-styles.css'],
+        python: ['Backend/app.py', 'Backend/dev_server.py'],
+        other: ['README.md']
     };
     
-    // JavaScript files
-    const jsFiles = [
-        'trading-ui/scripts/linter-realtime-monitor.js',
-        'trading-ui/scripts/linter-file-analysis.js',
-        'trading-ui/scripts/linter-testing-system.js',
-        'trading-ui/scripts/linter-export-system.js',
-        'trading-ui/scripts/indexeddb-adapter.js',
-        'trading-ui/scripts/log-recovery.js',
-        'trading-ui/scripts/data-collector.js',
-        'trading-ui/scripts/chart-renderer.js',
-        'trading-ui/scripts/main.js',
-        'trading-ui/scripts/notification-system.js',
-        'trading-ui/scripts/ui-utils.js',
-        'trading-ui/scripts/tables.js',
-        'trading-ui/scripts/linked-items.js',
-        'trading-ui/scripts/page-utils.js',
-        'trading-ui/scripts/data-utils.js',
-        'trading-ui/scripts/translation-utils.js',
-        'trading-ui/scripts/console-cleanup.js',
-        'trading-ui/scripts/date-utils.js',
-        'trading-ui/scripts/color-demo-toggle.js',
-        'trading-ui/scripts/color-scheme-system.js',
-        'trading-ui/scripts/preferences.js',
-        'trading-ui/scripts/header-system.js',
-        'trading-ui/scripts/filter-system.js',
-        'trading-ui/scripts/accounts.js',
-        'trading-ui/scripts/executions.js',
-        'trading-ui/scripts/trades.js',
-        'trading-ui/scripts/database.js',
-        'trading-ui/scripts/background-tasks.js',
-        'trading-ui/scripts/alerts.js',
-        'trading-ui/scripts/tickers.js',
-        'trading-ui/scripts/trade_plans.js',
-        'trading-ui/scripts/entity-details-renderer.js',
-        'trading-ui/scripts/menu.js',
-        'trading-ui/scripts/preferences-page.js'
-    ];
-    
-    // HTML files
-    const htmlFiles = [
-        'trading-ui/linter-realtime-monitor.html',
-        'trading-ui/crud-testing-dashboard.html',
-        'trading-ui/test-header-only.html',
-        'trading-ui/color-scheme-examples.html',
-        'trading-ui/test-header-menus-pushed.html',
-        'trading-ui/test-header-yesterday.html',
-        'trading-ui/index.html',
-        'trading-ui/accounts.html',
-        'trading-ui/executions.html',
-        'trading-ui/trades.html',
-        'trading-ui/preferences.html',
-        'trading-ui/database.html',
-        'trading-ui/background-tasks.html',
-        'trading-ui/alerts.html',
-        'trading-ui/tickers.html',
-        'trading-ui/trade_plans.html'
-    ];
-    
-    // CSS files
-    const cssFiles = [
-        'trading-ui/styles-new/01-settings/_variables.css',
-        'trading-ui/styles-new/02-tools/_mixins.css',
-        'trading-ui/styles-new/03-generic/_reset.css',
-        'trading-ui/styles-new/04-elements/_typography.css',
-        'trading-ui/styles-new/05-objects/_layout.css',
-        'trading-ui/styles-new/06-components/_buttons-advanced.css',
-        'trading-ui/styles-new/06-components/_tables.css',
-        'trading-ui/styles-new/07-utilities/_spacing.css',
-        'trading-ui/styles-new/header-styles.css',
-        'trading-ui/styles/header-styles.css',
-        'trading-ui/styles/main-styles.css',
-        'trading-ui/styles-new/08-themes/_dark-theme.css',
-        'trading-ui/styles-new/08-themes/_light-theme.css',
-        'trading-ui/styles-new/09-overrides/_bootstrap-overrides.css'
-    ];
-    
-    // Python files
-    const pythonFiles = [
-        'Backend/dev_server.py',
-        'Backend/db_manager.py',
-        'Backend/api_handler.py',
-        'Backend/background_tasks.py',
-        'Backend/indexeddb_service.py',
-        'Backend/data_collector.py',
-        'Backend/chart_service.py',
-        'Backend/linter_service.py',
-        'Backend/preferences_service.py',
-        'Backend/accounts_service.py',
-        'Backend/executions_service.py',
-        'Backend/trades_service.py',
-        'Backend/database_service.py',
-        'Backend/app.py',
-        'Backend/config.py',
-        'Backend/models.py',
-        'Backend/services.py',
-        'Backend/utils.py',
-        'Backend/validators.py',
-        'Backend/external_data.py'
-    ];
-    
-    // Other files
-    const otherFiles = [
-        'README.md',
-        'package.json',
-        'requirements.txt',
-        'documentation/frontend/LINTER_SYSTEM.md',
-        'documentation/frontend/CHART_IMPLEMENTATION.md',
-        'documentation/frontend/INDEXEDDB_SYSTEM.md',
-        'documentation/frontend/BACKGROUND_TASKS.md',
-        'documentation/frontend/TESTING_SYSTEM.md',
-        'documentation/frontend/EXPORT_SYSTEM.md',
-        'documentation/frontend/NOTIFICATION_SYSTEM.md',
-        'documentation/frontend/HEADER_SYSTEM.md',
-        'documentation/frontend/FILTER_SYSTEM.md',
-        'documentation/backend/API_DOCUMENTATION.md',
-        'documentation/backend/DATABASE_SCHEMA.md',
-        'documentation/backend/SERVICES_ARCHITECTURE.md',
-        'documentation/backend/EXTERNAL_DATA_INTEGRATION.md',
-        'documentation/backend/BACKGROUND_PROCESSES.md',
-        'documentation/backend/SECURITY_GUIDELINES.md',
-        'documentation/backend/PERFORMANCE_OPTIMIZATION.md',
-        'documentation/backend/DEPLOYMENT_GUIDE.md',
-        'documentation/backend/MONITORING_AND_LOGGING.md',
-        'documentation/backend/ERROR_HANDLING.md',
-        'documentation/backend/TESTING_STRATEGY.md',
-        'documentation/backend/MAINTENANCE_GUIDE.md',
-        'documentation/backend/TROUBLESHOOTING.md',
-        'documentation/backend/UPGRADE_PROCEDURES.md',
-        'documentation/backend/BACKUP_AND_RECOVERY.md',
-        'documentation/backend/SCALING_GUIDELINES.md',
-        'documentation/backend/INTEGRATION_GUIDE.md',
-        'documentation/backend/CUSTOMIZATION_GUIDE.md'
-    ];
-    
-    // Combine all files
-    discoveredFiles.js = jsFiles;
-    discoveredFiles.html = htmlFiles;
-    discoveredFiles.css = cssFiles;
-    discoveredFiles.python = pythonFiles;
-    discoveredFiles.other = otherFiles;
-    
-    // Store in global variable
     window.projectFiles = discoveredFiles;
-    
-    // Cache the discovery
-    localStorage.setItem('linterProjectFiles', JSON.stringify(discoveredFiles));
-    localStorage.setItem('linterProjectFilesTimestamp', Date.now().toString());
-    
-    const totalFiles = jsFiles.length + htmlFiles.length + cssFiles.length + pythonFiles.length + otherFiles.length;
-    addLogEntry('SUCCESS', `גילוי הושלם - נמצאו ${totalFiles} קבצים (JS: ${jsFiles.length}, HTML: ${htmlFiles.length}, CSS: ${cssFiles.length}, Python: ${pythonFiles.length}, Other: ${otherFiles.length})`);
+    const totalFiles = Object.values(discoveredFiles).reduce((sum, files) => sum + files.length, 0);
+    addLogEntry('SUCCESS', `גילוי חלופי הושלם - נמצאו ${totalFiles} קבצים`);
     
     return discoveredFiles;
 }

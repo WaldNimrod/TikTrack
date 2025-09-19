@@ -338,10 +338,15 @@ async function initializeInfoSummary() {
         if (typeof window.getUserProfiles === 'function') {
             const profiles = await window.getUserProfiles();
             if (profiles && profiles.length > 0) {
-                const activeProfile = profiles.find(p => p.is_active) || profiles[0];
+                const activeProfile = profiles.find(p => p.active) || profiles[0];
                 const profileElement = document.getElementById('activeProfileInfo');
                 if (profileElement) {
-                    profileElement.textContent = activeProfile.profile_name || 'ברירת מחדל';
+                    profileElement.textContent = activeProfile.name || 'ברירת מחדל';
+                }
+                
+                // Load profiles to dropdown using the dedicated function
+                if (typeof window.loadProfilesToDropdown === 'function') {
+                    await window.loadProfilesToDropdown();
                 }
             }
         }

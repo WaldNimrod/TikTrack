@@ -63,70 +63,26 @@
     <div class="container-fluid main-content page-scripts-matrix-container">
         <div class="row">
             <div class="col-12">
+                <!-- 🔒 LOCKED TEMPLATE ZONE 3 - Page Title (DO NOT MODIFY) -->
+                <!-- ======================================================== -->
+                <div class="page-header-section">
+                    <h1 class="page-title">מטריצת סקריפטים ועמודים - TikTrack</h1>
+                    <p class="page-subtitle text-muted">עדכון אחרון: ספטמבר 2025</p>
+                </div>
+
                 <!-- 🔓 TEMPLATE ZONE 4 - Page Content (MODIFY ONLY CONTENT INSIDE) -->
                 <!-- ======================================================== -->
 
-                <!-- 📁 SECTION 1: Main Content with Legend -->
-                <div class="content-section" data-section-id="main-content">
+                <!-- 📁 SECTION 1: Scripts Matrix Table -->
+                <div class="content-section" data-section-id="scripts-matrix-table">
                     <div class="section-header">
-                        <button class="btn btn-sm btn-outline-secondary section-toggle" onclick="toggleSection('main-content-body')">
+                        <button class="btn btn-sm btn-outline-primary section-toggle" onclick="toggleSection('scripts-matrix-content')">
                             <i class="fas fa-chevron-down section-toggle-icon"></i>
                         </button>
-                        <h1 class="section-title main-title">מטריצת סקריפטים ועמודים - TikTrack</h1>
-                        <div class="section-actions">
-                            <p class="section-subtitle text-muted mb-0">עדכון אחרון: ספטמבר 2025</p>
-                        </div>
+                        <span class="section-title">מטריצת סקריפטים ועמודים</span>
                     </div>
-                    <div id="main-content-body" class="section-content">
-                        <!-- Legend Section -->
-                        <div class="legend-section mb-4">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <h5 class="legend-title">מקרא:</h5>
-                                    <div class="legend-items">
-                                        <div class="legend-item">
-                                            <span class="legend-color primary-scripts"></span>
-                                            סקריפטים ראשיים - פונקציונליות ספציפית לעמוד
-                                        </div>
-                                        <div class="legend-item">
-                                            <span class="legend-color utility-scripts"></span>
-                                            סקריפטים שירותיים - פונקציות כלליות
-                                        </div>
-                                        <div class="legend-item">
-                                            <span class="legend-color service-scripts"></span>
-                                            סקריפטי שירות - שירותים מיוחדים
-                                        </div>
-                                        <div class="legend-item">
-                                            <span class="legend-color connected"></span>
-                                            ✓ - הסקריפט נטען בעמוד זה
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="notes-section">
-                                        <h6>הערות:</h6>
-                                        <ul class="notes-list">
-                                            <li>המטריקס מציגה איזה קבצי JavaScript נטענים בכל עמוד HTML</li>
-                                            <li>סקריפטים ראשיים מכילים פונקציונליות ספציפית לכל עמוד</li>
-                                            <li>סקריפטים שירותיים מכילים פונקציות כלליות המשמשות בכל המערכת</li>
-                                            <li>סקריפטי שירות מספקים פונקציונליות מיוחדת כמו התראות, שירותי חשבונות וכו'</li>
-                                            <li>כל העמודים משתמשים במערכת הבסיסית: main.js, header-system.js, tables.js, table-mappings.js</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 📁 SUB-SECTION 1: Scripts Matrix Table -->
-                        <div class="content-subsection" data-section-id="scripts-matrix-table">
-                            <div class="subsection-header">
-                                <button class="btn btn-xs btn-outline-primary subsection-toggle" onclick="toggleSection('scripts-matrix-content')">
-                                    <i class="fas fa-chevron-down subsection-toggle-icon"></i>
-                                </button>
-                                <span class="subsection-title">טבלת מטריצת הסקריפטים</span>
-                            </div>
-                            <div id="scripts-matrix-content" class="subsection-content">
-        <div class="table-container">
+                    <div id="scripts-matrix-content" class="section-content">
+                        <div class="table-container">
             <table id="page-scripts-matrix-table" class="table table-bordered table-sm" data-table-type="page-scripts-matrix">
                 <thead>
                     <tr>
@@ -315,8 +271,8 @@
             // Set page-specific preferences using global function
             if (typeof setPagePreferences === 'function') {
                 setPagePreferences('page-scripts-matrix', {
-                    sections: ['main-content', 'scripts-matrix-table'],
-                    defaultExpanded: ['main-content-body', 'scripts-matrix-content']
+                    sections: ['scripts-matrix-table'],
+                    defaultExpanded: ['scripts-matrix-content']
                 });
             }
 

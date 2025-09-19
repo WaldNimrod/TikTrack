@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize DataCollector instance if available
     if (typeof window.DataCollector !== 'undefined') {
         window.dataCollectorInstance = new window.DataCollector();
-        console.log('📊 DataCollector instance created');
+        // DataCollector instance created
     }
 
     // Check if project files list exists and is up-to-date
@@ -188,12 +188,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // NOTE: Auto-scan removed - scanning now only on user request
     // The monitoring system will work independently
-    console.log('📊 System initialized - monitoring active, scanning on user request only');
+    // System initialized - monitoring active, scanning on user request only
 });
 
 // Initialize Chart.js chart
 function initializeChart() {
-    console.log('📊 Chart functionality removed - will be reimplemented with real data tracking');
+    // Chart functionality removed - will be reimplemented with real data tracking
     // Chart initialization code removed - will be rebuilt with proper architecture
 }
 
@@ -213,7 +213,7 @@ function initializeChart() {
 
 // Load initial data
 async function loadInitialData() {
-    console.log('📊 Loading initial data...');
+    // Loading initial data...
 
     // Update stats with real data or defaults
     updateStatisticsDisplay();
@@ -224,16 +224,16 @@ async function loadInitialData() {
     // ===== INTEGRATION WITH CHART SYSTEM =====
     // Initialize chart and load historical data
     try {
-        console.log('📈 Initializing chart system...');
+        // Initializing chart system...
 
         // Initialize Chart Renderer
         if (typeof window.ChartRenderer !== 'undefined') {
             const container = document.getElementById('chartContainer');
-            console.log('🎨 מצאתי container:', container);
+            // Found container
             if (container) {
-                console.log('🎨 יוצר ChartRenderer...');
+                // Creating ChartRenderer...
                 window.currentChartRenderer = new window.ChartRenderer('chartContainer');
-                console.log('🎨 קורא ל-initialize...');
+                // Calling initialize...
 
                 // הצגת הודעת טעינה
                 const statusDiv = document.getElementById('chartStatus');
@@ -243,7 +243,7 @@ async function loadInitialData() {
                 }
 
                 await window.currentChartRenderer.initialize();
-                console.log('✅ Chart Renderer initialized');
+                // Chart Renderer initialized
             } else {
                 // לא מצאתי chartContainer
             }
@@ -260,22 +260,22 @@ async function loadInitialData() {
 
                 // Try to load last 24 hours of data
                 historicalData = await adapter.loadHistory(24);
-                console.log(`📊 Loaded ${historicalData.length} historical data points from IndexedDB`);
+                // Loaded historical data points from IndexedDB
 
                 // If no data in IndexedDB, try Log Recovery
                 if (historicalData.length === 0 && typeof window.LogRecovery !== 'undefined') {
-                    console.log('🔄 No data in IndexedDB, attempting Log Recovery...');
+                    // No data in IndexedDB, attempting Log Recovery...
                     const logRecovery = new window.LogRecovery();
                     historicalData = await logRecovery.recoverFromSystemLog();
 
                     if (historicalData.length > 0) {
-                        console.log(`🔄 Recovered ${historicalData.length} data points from system logs`);
+                        // Recovered data points from system logs
 
                         // Save recovered data to IndexedDB
                         for (const dataPoint of historicalData) {
                             await adapter.saveDataPoint(dataPoint);
                         }
-                        console.log('💾 Recovered data saved to IndexedDB');
+                        // Recovered data saved to IndexedDB
                     }
                 }
             } catch (adapterError) {
@@ -286,9 +286,9 @@ async function loadInitialData() {
         // Render chart with historical data
         if (window.currentChartRenderer && historicalData.length > 0) {
             await window.currentChartRenderer.updateChart(historicalData, false); // No animation for initial load
-            console.log('📈 Chart rendered with historical data');
+            // Chart rendered with historical data
         } else {
-            console.log('ℹ️ No historical data available - chart will be empty initially');
+            // No historical data available - chart will be empty initially
         }
 
         // Update chart indicators
@@ -464,7 +464,7 @@ function getAllLogEntries() {
 
 // Update file type statistics counters
 function updateFileTypeStatistics(issues) {
-    console.log('📊 Updating file type statistics with', issues.length, 'issues');
+    // Updating file type statistics with issues
     
     // Initialize counters with all scanned files
     const stats = {
@@ -502,7 +502,7 @@ function updateFileTypeStatistics(issues) {
         }
     });
 
-    console.log('📊 File type statistics calculated (including all scanned files):', {
+    // File type statistics calculated (including all scanned files)
         js: { files: stats.js.files.size, errors: stats.js.errors, warnings: stats.js.warnings },
         html: { files: stats.html.files.size, errors: stats.html.errors, warnings: stats.html.warnings },
         py: { files: stats.py.files.size, errors: stats.py.errors, warnings: stats.py.warnings },
@@ -521,7 +521,7 @@ function updateFileTypeStatistics(issues) {
         const errorsCountEl = document.getElementById(`${fileType}ErrorsCount`);
         const warningsCountEl = document.getElementById(`${fileType}WarningsCount`);
 
-        console.log(`📊 Updating ${fileType} counters:`, {
+        // Updating file type counters
             files: fileCount,
             errors: errors,
             warnings: warnings,
@@ -534,21 +534,21 @@ function updateFileTypeStatistics(issues) {
 
         if (filesCountEl) {
             filesCountEl.textContent = fileCount;
-            console.log(`✅ Updated ${fileType}FilesCount to ${fileCount}`);
+            // Updated file count
         } else {
             console.warn(`❌ Element ${fileType}FilesCount not found`);
         }
         
         if (errorsCountEl) {
             errorsCountEl.textContent = errors;
-            console.log(`✅ Updated ${fileType}ErrorsCount to ${errors}`);
+            // Updated error count
         } else {
             console.warn(`❌ Element ${fileType}ErrorsCount not found`);
         }
         
         if (warningsCountEl) {
             warningsCountEl.textContent = warnings;
-            console.log(`✅ Updated ${fileType}WarningsCount to ${warnings}`);
+            // Updated warning count
             } else {
             console.warn(`❌ Element ${fileType}WarningsCount not found`);
         }
@@ -712,7 +712,7 @@ let scanningResults = {
 
 // Start file scanning
 function startFileScan() {
-    console.log('🔍 מתחיל סריקה של קבצים...');
+    // Starting file scan...
     scanningResults = {
         totalFiles: 0,
         scannedFiles: 0,
@@ -729,7 +729,7 @@ function startFileScan() {
 
     // Initialize file type statistics with all discovered files
     if (window.projectFiles && window.projectFiles.length > 0) {
-        console.log('📊 Initializing file type statistics with discovered files...');
+        // Initializing file type statistics with discovered files...
         updateFileTypeStatistics([]); // Start with empty issues to show all files
     }
 
@@ -746,7 +746,7 @@ function scanJavaScriptFiles() {
     let scanCss = document.getElementById('scanCss')?.checked || false;
     let scanOther = document.getElementById('scanOther')?.checked || false;
 
-    console.log('🔍 Scan settings:', { scanJs, scanHtml, scanPy, scanCss, scanOther });
+    // Scan settings configured
 
     // Show scan start notification
     const selectedTypes = [];
@@ -768,7 +768,7 @@ function scanJavaScriptFiles() {
         scanPy = true;
         scanCss = true;
         scanOther = true;
-        console.log('🔍 Auto-scan: No file types selected, scanning all types');
+        // Auto-scan: No file types selected, scanning all types
 
         // Update checkboxes to show what's being scanned
         const jsCheckbox = document.getElementById('scanJs');
@@ -786,32 +786,32 @@ function scanJavaScriptFiles() {
 
     // Use dynamic file discovery if available, otherwise use static lists
     if (window.projectFiles && window.projectFiles.length > 0) {
-        console.log('📁 Using discovered files:', window.projectFiles.length);
+        // Using discovered files
         
         // Filter files based on selection and file type
         let allFiles = [];
         
         if (scanJs) {
             const jsFiles = window.projectFiles.filter(f => f.endsWith('.js'));
-            console.log('📄 JS files found:', jsFiles.length);
+            // JS files found
             allFiles = allFiles.concat(jsFiles);
         }
         
         if (scanHtml) {
             const htmlFiles = window.projectFiles.filter(f => f.endsWith('.html'));
-            console.log('📄 HTML files found:', htmlFiles.length);
+            // HTML files found
             allFiles = allFiles.concat(htmlFiles);
         }
         
         if (scanPy) {
             const pyFiles = window.projectFiles.filter(f => f.endsWith('.py'));
-            console.log('🐍 Python files found:', pyFiles.length);
+            // Python files found
             allFiles = allFiles.concat(pyFiles);
         }
         
         if (scanCss) {
             const cssFiles = window.projectFiles.filter(f => f.endsWith('.css'));
-            console.log('🎨 CSS files found:', cssFiles.length);
+            // CSS files found
             allFiles = allFiles.concat(cssFiles);
         }
         
@@ -820,7 +820,7 @@ function scanJavaScriptFiles() {
                 f.endsWith('.json') || f.endsWith('.md') || f.endsWith('.sql') ||
                 f.endsWith('.yml') || f.endsWith('.yaml')
             );
-            console.log('📋 Other files found:', otherFiles.length);
+            // Other files found
             allFiles = allFiles.concat(otherFiles);
         }
 
@@ -830,8 +830,8 @@ function scanJavaScriptFiles() {
         scanningResults.totalFiles = allFiles.length;
         scanningResults.scannedFiles = 0;
 
-        console.log('🔍 Starting scan of', allFiles.length, 'unique files');
-        console.log('📊 File type breakdown:', {
+        // Starting scan of unique files
+        // File type breakdown
             js: scanJs ? allFiles.filter(f => f.endsWith('.js')).length : 0,
             html: scanHtml ? allFiles.filter(f => f.endsWith('.html')).length : 0,
             py: scanPy ? allFiles.filter(f => f.endsWith('.py')).length : 0,
@@ -864,38 +864,38 @@ function scanJavaScriptFiles() {
     }
 
     // Fallback: Use static file lists if no discovered files
-    console.log('⚠️ No discovered files found, using static fallback');
+    // No discovered files found, using static fallback
     
     let allFiles = [];
     
     if (scanJs) {
         const jsFiles = ['main.js', 'preferences.js', 'ui-utils.js'];
         allFiles = allFiles.concat(jsFiles);
-        console.log('📄 JS files (static):', jsFiles.length);
+        // JS files (static)
     }
     
     if (scanHtml) {
         const htmlFiles = ['index.html', 'preferences.html', 'accounts.html'];
         allFiles = allFiles.concat(htmlFiles);
-        console.log('📄 HTML files (static):', htmlFiles.length);
+        // HTML files (static)
     }
     
     if (scanPy) {
-        console.log('🐍 Python files: 0 (not accessible from web)');
+        // Python files: 0 (not accessible from web)
     }
     
     if (scanCss) {
-        console.log('🎨 CSS files: 0 (not accessible from web)');
+        // CSS files: 0 (not accessible from web)
     }
     
     if (scanOther) {
-        console.log('📋 Other files: 0 (not accessible from web)');
+        // Other files: 0 (not accessible from web)
     }
 
     scanningResults.totalFiles = allFiles.length;
     scanningResults.scannedFiles = 0;
 
-    console.log('🔍 Starting scan of', allFiles.length, 'static files');
+    // Starting scan of static files
 
     allFiles.forEach((fileName, index) => {
         setTimeout(() => {
@@ -967,7 +967,7 @@ function scanSingleFile(fileName) {
     ];
 
     if (skipFiles.some(skipFile => fileName.includes(skipFile))) {
-        console.log(`⏭️ Skipping file: ${fileName} (known non-accessible)`);
+        // Skipping file: known non-accessible
         scanningResults.scannedFiles++;
         return;
     }
@@ -996,7 +996,7 @@ function scanSingleFile(fileName) {
         .catch(error => {
             // For 404 errors, just skip without warning
             if (error.message.includes('404') || error.message.includes('NOT FOUND')) {
-                console.log(`📁 File not found: ${fileName} - skipping`);
+                // File not found - skipping
             } else {
                 // For other errors, use fallback
                 simulateFileAnalysis(fileName);
@@ -1608,7 +1608,7 @@ function simulateFileAnalysis(fileName) {
 
 // Copy unresolved issues log for manual fixing
 window.copyUnresolvedIssuesLog = () => {
-    console.log('📋 Copying unresolved issues log...');
+    // Copying unresolved issues log...
 
     const unresolvedErrors = scanningResults.errors || [];
     const unresolvedWarnings = scanningResults.warnings || [];
@@ -1648,7 +1648,7 @@ window.copyUnresolvedIssuesLog = () => {
         // Copy to clipboard
     navigator.clipboard.writeText(JSON.stringify(logData, null, 2))
         .then(() => {
-            console.log('✅ Unresolved issues log copied to clipboard');
+            // Unresolved issues log copied to clipboard
     if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification(
                     'לוג הועתק',
@@ -1666,7 +1666,7 @@ window.copyUnresolvedIssuesLog = () => {
 
 // Auto-discover all project files
 window.discoverProjectFiles = () => {
-    console.log('🔍 Discovering project files...');
+    // Discovering project files...
 
     // Show loading notification
     if (typeof window.showInfoNotification === 'function') {
@@ -1764,7 +1764,7 @@ window.discoverProjectFiles = () => {
     try {
         localStorage.setItem(projectFilesKey, JSON.stringify(discoveredFiles));
         localStorage.setItem(lastUpdateKey, Date.now().toString());
-        console.log('💾 Project files cached successfully');
+        // Project files cached successfully
     } catch (error) {
         console.warn('⚠️ Failed to cache project files:', error);
     }
@@ -1777,7 +1777,7 @@ window.discoverProjectFiles = () => {
     const otherCount = otherFiles.length;
     const totalCount = discoveredFiles.length;
 
-    console.log(`✅ Discovered ${totalCount} files: ${jsCount} JS, ${htmlCount} HTML, ${pyCount} PY, ${cssCount} CSS, ${otherCount} Other`);
+    // Discovered files summary
 
     if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification(
@@ -1862,7 +1862,7 @@ async function finishScan() {
     // Collect scan data and save to IndexedDB
     try {
         if (typeof window.dataCollectorInstance !== 'undefined' && typeof window.dataCollectorInstance.collectFromScan === 'function') {
-            console.log('📊 אוסף נתונים מסריקה עם Data Collector...');
+            // Collecting data from scan with Data Collector...
 
             const scanMetrics = window.dataCollectorInstance.collectFromScan({
                 totalFiles: scanningResults.totalFiles,
@@ -1884,13 +1884,13 @@ async function finishScan() {
                 const adapter = new window.IndexedDBAdapter();
                 await adapter.initialize();
                 await adapter.saveDataPoint(enhancedPoint);
-                console.log('💾 נתוני סריקה נשמרו ל-IndexedDB:', enhancedPoint.id);
+                // Scan data saved to IndexedDB
             }
 
             // Update chart if available
             if (typeof window.ChartRenderer !== 'undefined' && window.currentChartRenderer) {
                 await window.currentChartRenderer.addDataPoint(enhancedPoint);
-                console.log('📈 גרף עודכן עם נתוני סריקה חדשים');
+                // Chart updated with new scan data
             }
 
             // Update chart indicators
@@ -1906,7 +1906,7 @@ async function finishScan() {
             try {
                 if (window.currentChartRenderer) {
                     await window.currentChartRenderer.clearChart();
-                    console.log('🧹 Chart auto-cleaned after scan');
+                    // Chart auto-cleaned after scan
                 }
             } catch (error) {
                 // Error in auto-cleanup after scan
@@ -1917,7 +1917,7 @@ async function finishScan() {
 
 // Start auto refresh
 function startAutoRefresh() {
-    console.log('🔄 Starting auto refresh...');
+    // Starting auto refresh...
     if (autoRefreshInterval) {
         clearInterval(autoRefreshInterval);
     }
@@ -1942,7 +1942,7 @@ function startAutoRefresh() {
                 // Update chart with latest data from IndexedDB
                 await autoUpdateChart();
                 
-                console.log('🔄 Auto refresh: updated stats, logs, and chart');
+                // Auto refresh: updated stats, logs, and chart
             } catch (error) {
                 // Error in auto refresh
             }
@@ -1952,13 +1952,13 @@ function startAutoRefresh() {
 
 // Initialize control buttons
 function initializeControlButtons() {
-    console.log('🔧 Setting up control buttons...');
+    // Setting up control buttons...
 
     // Copy log button
     const copyBtn = document.querySelector('button[onclick*="copyDetailedLog"]');
     if (copyBtn) {
         copyBtn.onclick = function() {
-            console.log('📋 Copy log clicked');
+            // Copy log clicked
             copyDetailedLog();
         };
     }
@@ -2003,7 +2003,7 @@ function initializeSession() {
     sessionStorage.setItem('linter_session', sessionId);
     sessionStorage.setItem('linter_start_time', startTime);
 
-    console.log('🔄 Session initialized:', sessionId);
+    // Session initialized
     
     // Add initial log entries
     addLogEntry('INFO', 'מערכת ניטור Linter הופעלה');
@@ -2036,7 +2036,7 @@ function addLogEntry(level, message, details = {}) {
     // Enhanced error handling and notifications
     handleLogEntry(entry);
 
-    console.log(`[${level}] ${message}`, details);
+    // Log entry
 }
 
 // Enhanced error handling system
@@ -2082,7 +2082,7 @@ function handleLogEntry(entry) {
  */
 window.runComprehensiveTests = async function() {
     try {
-        console.log('🧪 Starting comprehensive system tests...');
+        // Starting comprehensive system tests...
         addLogEntry('INFO', 'Starting comprehensive system tests', { testType: 'full' });
 
         const testResults = {
@@ -2098,7 +2098,7 @@ window.runComprehensiveTests = async function() {
         };
 
         // Test 1: System Components
-        console.log('🔍 Testing system components...');
+        // Testing system components...
         const componentTests = await testSystemComponents();
         testResults.totalTests += componentTests.total;
         testResults.passedTests += componentTests.passed;
@@ -2106,7 +2106,7 @@ window.runComprehensiveTests = async function() {
         testResults.warnings += componentTests.warnings;
 
         // Test 2: Performance
-        console.log('⚡ Testing performance...');
+        // Testing performance...
         const performanceTests = await testPerformance();
         testResults.performance = performanceTests;
         testResults.totalTests += performanceTests.total;
@@ -2114,7 +2114,7 @@ window.runComprehensiveTests = async function() {
         testResults.failedTests += performanceTests.failed;
 
         // Test 3: Security
-        console.log('🔒 Testing security...');
+        // Testing security...
         const securityTests = await testSecurity();
         testResults.security = securityTests;
         testResults.totalTests += securityTests.total;
@@ -2122,7 +2122,7 @@ window.runComprehensiveTests = async function() {
         testResults.failedTests += securityTests.failed;
 
         // Test 4: Functionality
-        console.log('⚙️ Testing functionality...');
+        // Testing functionality...
         const functionalityTests = await testFunctionality();
         testResults.functionality = functionalityTests;
         testResults.totalTests += functionalityTests.total;
@@ -2130,7 +2130,7 @@ window.runComprehensiveTests = async function() {
         testResults.failedTests += functionalityTests.failed;
 
         // Test 5: Data Integrity
-        console.log('💾 Testing data integrity...');
+        // Testing data integrity...
         const dataTests = await testDataIntegrity();
         testResults.totalTests += dataTests.total;
         testResults.passedTests += dataTests.passed;
@@ -2145,7 +2145,7 @@ window.runComprehensiveTests = async function() {
         // Display results
         displayTestResults(testResults);
 
-        console.log('✅ Comprehensive tests completed');
+        // Comprehensive tests completed
         addLogEntry('SUCCESS', 'Comprehensive tests completed', { 
             total: testResults.totalTests, 
             passed: testResults.passedTests, 
@@ -2593,7 +2593,7 @@ async function saveTestResults(testResults) {
             };
             
             await adapter.saveDataPoint(testData);
-            console.log('💾 Test results saved to IndexedDB');
+            // Test results saved to IndexedDB
         }
         
         // Also save to localStorage for quick access
@@ -2611,17 +2611,17 @@ function displayTestResults(testResults) {
     try {
         const passRate = testResults.totalTests > 0 ? (testResults.passedTests / testResults.totalTests) * 100 : 0;
         
-        console.log('📊 Test Results Summary:');
-        console.log(`Total Tests: ${testResults.totalTests}`);
-        console.log(`Passed: ${testResults.passedTests}`);
-        console.log(`Failed: ${testResults.failedTests}`);
-        console.log(`Warnings: ${testResults.warnings}`);
-        console.log(`Pass Rate: ${passRate.toFixed(1)}%`);
+        // Test Results Summary
+        // Total Tests logged
+        // Passed tests logged
+        // Failed tests logged
+        // Warnings logged
+        // Pass Rate calculated
         
         if (testResults.recommendations.length > 0) {
-            console.log('💡 Recommendations:');
+            // Recommendations available
             testResults.recommendations.forEach((rec, index) => {
-                console.log(`${index + 1}. [${rec.priority}] ${rec.category}: ${rec.message}`);
+                // Recommendation logged
             });
         }
         
@@ -2736,7 +2736,7 @@ function updateTestResultsDisplay(testResults) {
  */
 window.runQuickHealthCheck = async function() {
     try {
-        console.log('🏥 Running quick health check...');
+        // Running quick health check...
         
         const healthCheck = {
             timestamp: new Date().toISOString(),
@@ -2784,7 +2784,7 @@ window.runQuickHealthCheck = async function() {
         }
         
         // Display results
-        console.log('🏥 Health Check Results:', healthCheck);
+        // Health Check Results available
         
         // Update UI with health check results
         updateHealthCheckDisplay(healthCheck);
@@ -2927,7 +2927,7 @@ function handleWarning(entry) {
 function handleSuccess(entry) {
     try {
         // Log to console with enhanced formatting
-        console.log(`✅ SUCCESS [${entry.id}]: ${entry.message}`, entry.details);
+        // Success entry logged
         
         // Show user notification for important successes
         if (entry.message.includes('סריקה הושלמה') || entry.message.includes('תיקון הושלם')) {
@@ -2996,7 +2996,7 @@ function monitorSecurity(entry) {
 // Auto-recovery functions
 function attemptChartRecovery() {
     try {
-        console.log('🔄 Attempting chart recovery...');
+        // Attempting chart recovery...
         
         if (window.currentChartRenderer) {
             // Try to reinitialize chart
@@ -3016,7 +3016,7 @@ function attemptChartRecovery() {
 
 function attemptStorageRecovery() {
     try {
-        console.log('🔄 Attempting storage recovery...');
+        // Attempting storage recovery...
         
         if (typeof window.IndexedDBAdapter !== 'undefined') {
             // Try to reinitialize storage
@@ -3037,7 +3037,7 @@ function attemptStorageRecovery() {
 
 function attemptNetworkRecovery() {
     try {
-        console.log('🔄 Attempting network recovery...');
+        // Attempting network recovery...
         
         // Check network connectivity
         if (navigator.onLine) {
@@ -3073,7 +3073,7 @@ function updateLogDisplay() {
 
 // Diagnostic log function
 function copyDetailedLog() {
-    console.log('🔍 יוצר לוג אבחון מלא - בודק את מצב העמוד...');
+    // Creating full diagnostic log - checking page state...
 
     const diagnosticData = {
         timestamp: new Date().toISOString(),
@@ -3174,7 +3174,7 @@ function copyDetailedLog() {
 
 // Monitoring control functions
 window.startMonitoring = () => {
-    console.log('▶️ Starting monitoring...');
+    // Starting monitoring...
     isAutoRefreshActive = true;
     startAutoRefresh();
 
@@ -3193,7 +3193,7 @@ window.startMonitoring = () => {
 };
 
 window.stopMonitoring = () => {
-    console.log('⏹️ Stopping monitoring...');
+    // Stopping monitoring...
     isAutoRefreshActive = false;
 
     if (autoRefreshInterval) {
@@ -3236,8 +3236,8 @@ window.copyDetailedLog = copyDetailedLog;
 window.startFileScan = startFileScan;
 window.updateProblemFilesTable = updateProblemFilesTable;
 window.fixAllIssues = async () => {
-    console.log('🔧 Attempting to fix all issues...');
-    console.log('📊 Current state:', {
+    // Attempting to fix all issues...
+    // Current state logged
         errors: scanningResults.errors.length,
         warnings: scanningResults.warnings.length
     });
@@ -3257,7 +3257,7 @@ window.fixAllIssues = async () => {
     const fixedCount = Math.min(Math.floor(totalIssues * fixablePercentage), totalIssues);
     const failedCount = totalIssues - fixedCount;
 
-    console.log('🔧 Fix calculation:', {
+    // Fix calculation logged
         totalIssues,
         fixablePercentage: Math.round(fixablePercentage * 100) + '%',
         fixedCount,
@@ -3293,7 +3293,7 @@ window.fixAllIssues = async () => {
         scanningResults.errors = scanningResults.errors.slice(0, scanningResults.errors.length - errorsToFix);
         scanningResults.warnings = scanningResults.warnings.slice(0, scanningResults.warnings.length - warningsToFix);
 
-        console.log('✅ Issues actually removed and marked as fixed:', {
+        // Issues actually removed and marked as fixed
             errorsRemoved: errorsToFix,
             warningsRemoved: warningsToFix,
             totalFixed: fixedCount,
@@ -3318,8 +3318,8 @@ window.fixAllIssues = async () => {
         window.showSuccessNotification('תיקון אוטומטי', `תוקנו ${fixedCount} בעיות (${Math.round((fixedCount / totalIssues) * 100)}% הצלחה)`);
     }
 
-    console.log('✅ Fix operation completed');
-    console.log('📊 Final state after fix:', {
+    // Fix operation completed
+    // Final state after fix logged
         errorsRemaining: scanningResults.errors.length,
         warningsRemaining: scanningResults.warnings.length,
         totalRemaining: scanningResults.errors.length + scanningResults.warnings.length,
@@ -3332,7 +3332,7 @@ window.fixAllIssues = async () => {
     // Collect fix data and save to IndexedDB
     try {
         if (typeof window.dataCollectorInstance !== 'undefined' && typeof window.dataCollectorInstance.collectFromFix === 'function') {
-            console.log('🔧 אוסף נתונים מתיקון עם Data Collector...');
+            // Collecting data from fix with Data Collector...
 
             const fixResults = {
                 totalFixes: fixedCount,
@@ -3355,13 +3355,13 @@ window.fixAllIssues = async () => {
                 const adapter = new window.IndexedDBAdapter();
                 await adapter.initialize();
                 await adapter.saveDataPoint(enhancedPoint);
-                console.log('💾 נתוני תיקון נשמרו ל-IndexedDB:', enhancedPoint.id);
+                // Fix data saved to IndexedDB
             }
 
             // Update chart if available
             if (typeof window.ChartRenderer !== 'undefined' && window.currentChartRenderer) {
                 await window.currentChartRenderer.addDataPoint(enhancedPoint);
-                console.log('📈 גרף עודכן עם נתוני תיקון חדשים');
+                // Chart updated with new fix data
             }
 
             // Update chart indicators
@@ -3377,7 +3377,7 @@ window.fixAllIssues = async () => {
             try {
                 if (window.currentChartRenderer) {
                     await window.currentChartRenderer.clearChart();
-                    console.log('🧹 Chart auto-cleaned after fix');
+                    // Chart auto-cleaned after fix
                 }
             } catch (error) {
                 // Error in auto-cleanup after fix
@@ -3386,8 +3386,8 @@ window.fixAllIssues = async () => {
     }
 };
 window.fixAllErrors = () => {
-    console.log('🔧 Fixing all errors...');
-    console.log('📊 Current errors state:', {
+    // Fixing all errors...
+    // Current errors state logged
         errors: scanningResults.errors.length
     });
 
@@ -3404,7 +3404,7 @@ window.fixAllErrors = () => {
     const errorsFixed = Math.min(Math.floor(scanningResults.errors.length * fixablePercentage), scanningResults.errors.length);
     const failedErrors = scanningResults.errors.length - errorsFixed;
 
-    console.log('🔧 Error fix calculation:', {
+    // Error fix calculation logged
         totalErrors: scanningResults.errors.length,
         fixablePercentage: Math.round(fixablePercentage * 100) + '%',
         errorsFixed,
@@ -3423,7 +3423,7 @@ window.fixAllErrors = () => {
         }
 
         scanningResults.errors = scanningResults.errors.slice(0, scanningResults.errors.length - errorsFixed);
-        console.log('✅ Errors actually removed and marked as fixed:', {
+        // Errors actually removed and marked as fixed
             errorsRemoved: errorsFixed,
             errorsRemaining: scanningResults.errors.length,
             totalFixedErrors: fixedIssues.errors.size
@@ -3451,7 +3451,7 @@ window.fixAllErrors = () => {
             try {
                 if (window.currentChartRenderer) {
                     await window.currentChartRenderer.clearChart();
-                    console.log('🧹 Chart auto-cleaned after error fix');
+                    // Chart auto-cleaned after error fix
                 }
             } catch (error) {
                 // Error in auto-cleanup after error fix
@@ -3459,11 +3459,11 @@ window.fixAllErrors = () => {
         }, 2000); // Wait 2 seconds after fix completion
     }
 
-    console.log('✅ Error fix operation completed');
+    // Error fix operation completed
 };
 window.fixAllWarnings = () => {
-    console.log('🔧 Fixing all warnings...');
-    console.log('📊 Current warnings state:', {
+    // Fixing all warnings...
+    // Current warnings state logged
         warnings: scanningResults.warnings.length
     });
 

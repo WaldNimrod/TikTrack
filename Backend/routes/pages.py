@@ -83,6 +83,11 @@ def db_extradata() -> Any:
     """Extra data tables page"""
     return send_from_directory(UI_DIR, "db_extradata.html")
 
+@pages_bp.route('/currencies')
+def currencies() -> Any:
+    """Currencies page"""
+    return send_from_directory(UI_DIR, "currencies.html")
+
 @pages_bp.route('/preferences')
 def preferences() -> Any:
     """Preferences page"""

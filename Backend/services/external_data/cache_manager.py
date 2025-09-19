@@ -51,7 +51,7 @@ class CacheManager:
             from services.user_service import UserService
             
             # Get user preferences
-            user_preferences = UserService.get_user_preferences(self.db_session)
+            user_preferences = UserService.get_user_preferences(1)  # Default user ID
             
             # Cache TTL settings (in seconds) - from preferences or defaults
             cache_ttl_minutes = user_preferences.get('cacheTTL', 5)

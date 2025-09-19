@@ -30,7 +30,7 @@ def main():
         
         try:
             # Create Yahoo Finance adapter
-            adapter = YahooFinanceAdapter(db_session)
+            adapter = YahooFinanceAdapter(db_session, provider_id=1)
             print("✅ Yahoo Finance adapter created")
             
             # Get provider status

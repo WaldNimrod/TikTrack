@@ -275,7 +275,6 @@ if (typeof window.getCurrentPreference === 'function') {
 "defaultStatusFilter": "open" (במקום "all")
 "defaultTypeFilter": "swing" (במקום "all") 
 "defaultDateRangeFilter": "this_week" (במקום "all")
-"dataRefreshInterval": 5 (במקום 1)
 "autoRefresh": false (במקום true)
 ```
 

@@ -181,7 +181,6 @@ def create_preferences_tables():
             
             # קבוצת external_data
             (5, 'string', 'primaryDataProvider', 'ספק נתונים ראשי', '{"options": ["yahoo", "google", "alpha_vantage"]}', 'yahoo', False),
-            (5, 'number', 'dataRefreshInterval', 'מרווח רענון נתונים (דקות)', '{"min": 1, "max": 1440}', '5', False),
             (5, 'number', 'cacheTTL', 'זמן חיים של מטמון (דקות)', '{"min": 1, "max": 1440}', '5', False),
             
             # קבוצת notifications

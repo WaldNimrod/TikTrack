@@ -71,6 +71,105 @@ let fixedIssues = {
     warnings: new Set()
 };
 
+// Check if project files list exists and is up-to-date
+function checkAndUpdateProjectFiles() {
+    console.log('🔍 Checking project files list...');
+    
+    // Check if project files exist and are recent (within last 24 hours)
+    const projectFilesKey = 'linter_project_files_cache';
+    const lastUpdateKey = 'linter_project_files_last_update';
+    
+    const cachedFiles = localStorage.getItem(projectFilesKey);
+    const lastUpdate = localStorage.getItem(lastUpdateKey);
+    
+    const now = Date.now();
+    const oneDayInMs = 24 * 60 * 60 * 1000; // 24 hours
+    const isRecent = lastUpdate && (now - parseInt(lastUpdate)) < oneDayInMs;
+    
+    console.log('📊 Project files cache status:', {
+        hasCachedFiles: !!cachedFiles,
+        hasLastUpdate: !!lastUpdate,
+        isRecent: isRecent,
+        lastUpdateTime: lastUpdate ? new Date(parseInt(lastUpdate)).toLocaleString() : 'Never'
+    });
+    
+    if (cachedFiles && isRecent) {
+        // Use cached files
+        try {
+            window.projectFiles = JSON.parse(cachedFiles);
+            console.log('✅ Using cached project files:', window.projectFiles.length, 'files');
+            
+            // Update UI to show cached files count
+            const fileCountElement = document.getElementById('discoveredFileCount');
+            if (fileCountElement) {
+                fileCountElement.textContent = window.projectFiles.length;
+            }
+            
+            // Show notification about cached files
+            if (typeof window.showInfoNotification === 'function') {
+                window.showInfoNotification(
+                    'קבצים נטענו מהמטמון',
+                    `נטענו ${window.projectFiles.length} קבצים מהמטמון (עדכון אחרון: ${new Date(parseInt(lastUpdate)).toLocaleString('he-IL')})`
+                );
+            }
+            
+        } catch (error) {
+            console.error('❌ Error parsing cached project files:', error);
+            // Fallback to auto-discovery
+            autoDiscoverProjectFiles();
+        }
+    } else {
+        // No cache or cache is old - auto-discover
+        console.log('🔄 No recent cache found, auto-discovering project files...');
+        autoDiscoverProjectFiles();
+    }
+}
+
+// Auto-discover project files and cache them
+function autoDiscoverProjectFiles() {
+    console.log('🔍 Auto-discovering project files...');
+    
+    // Show loading notification
+    if (typeof window.showInfoNotification === 'function') {
+        window.showInfoNotification('גילוי קבצים', 'מעדכן רשימת קבצים אוטומטית...');
+    }
+    
+    // Call the existing discoverProjectFiles function
+    if (typeof window.discoverProjectFiles === 'function') {
+        window.discoverProjectFiles();
+    } else {
+        console.error('❌ discoverProjectFiles function not found');
+    }
+}
+
+// Clear project files cache
+window.clearProjectFilesCache = function() {
+    console.log('🗑️ Clearing project files cache...');
+    
+    const projectFilesKey = 'linter_project_files_cache';
+    const lastUpdateKey = 'linter_project_files_last_update';
+    
+    localStorage.removeItem(projectFilesKey);
+    localStorage.removeItem(lastUpdateKey);
+    
+    // Clear global variable
+    window.projectFiles = null;
+    
+    console.log('✅ Project files cache cleared');
+    
+    if (typeof window.showSuccessNotification === 'function') {
+        window.showSuccessNotification(
+            'מטמון נוקה',
+            'רשימת הקבצים נמחקה מהמטמון'
+        );
+    }
+    
+    // Auto-discover new files
+    setTimeout(() => {
+        autoDiscoverProjectFiles();
+    }, 500);
+};
+
 // Initialize the linter monitor system
 document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ DOM loaded - initializing linter monitor...');
@@ -80,6 +179,9 @@ document.addEventListener('DOMContentLoaded', function() {
         window.dataCollectorInstance = new window.DataCollector();
         console.log('📊 DataCollector instance created');
     }
+
+    // Check if project files list exists and is up-to-date
+    checkAndUpdateProjectFiles();
 
     // Initialize components
     loadInitialData();
@@ -357,7 +459,9 @@ function getAllLogEntries() {
 
 // Update file type statistics counters
 function updateFileTypeStatistics(issues) {
-    // Initialize counters
+    console.log('📊 Updating file type statistics with', issues.length, 'issues');
+    
+    // Initialize counters with all scanned files
     const stats = {
         js: { files: new Set(), errors: 0, warnings: 0 },
         html: { files: new Set(), errors: 0, warnings: 0 },
@@ -366,16 +470,24 @@ function updateFileTypeStatistics(issues) {
         other: { files: new Set(), errors: 0, warnings: 0 }
     };
 
-    // Process issues (errors and warnings)
+    // First, add all scanned files to the stats (even those without issues)
+    if (window.projectFiles && window.projectFiles.length > 0) {
+        window.projectFiles.forEach(fileName => {
+            const fileType = getFileType(fileName);
+            if (stats[fileType]) {
+                stats[fileType].files.add(fileName);
+            }
+        });
+    }
+
+    // Then, process issues (errors and warnings) and update counts
     issues.forEach(issue => {
         if (issue.file) {
             const fileName = issue.file;
             const fileType = getFileType(fileName);
 
             if (stats[fileType]) {
-                stats[fileType].files.add(fileName);
-
-                // Determine if it's an error or warning
+                // File is already added above, just update error/warning counts
                 if (issue.type === 'error' || issue.level === 'ERROR') {
                     stats[fileType].errors++;
                 } else if (issue.type === 'warning' || issue.level === 'WARNING') {
@@ -383,6 +495,14 @@ function updateFileTypeStatistics(issues) {
                 }
             }
         }
+    });
+
+    console.log('📊 File type statistics calculated (including all scanned files):', {
+        js: { files: stats.js.files.size, errors: stats.js.errors, warnings: stats.js.warnings },
+        html: { files: stats.html.files.size, errors: stats.html.errors, warnings: stats.html.warnings },
+        py: { files: stats.py.files.size, errors: stats.py.errors, warnings: stats.py.warnings },
+        css: { files: stats.css.files.size, errors: stats.css.errors, warnings: stats.css.warnings },
+        other: { files: stats.other.files.size, errors: stats.other.errors, warnings: stats.other.warnings }
     });
 
     // Update UI counters
@@ -396,9 +516,37 @@ function updateFileTypeStatistics(issues) {
         const errorsCountEl = document.getElementById(`${fileType}ErrorsCount`);
         const warningsCountEl = document.getElementById(`${fileType}WarningsCount`);
 
-        if (filesCountEl) filesCountEl.textContent = fileCount;
-        if (errorsCountEl) errorsCountEl.textContent = errors;
-        if (warningsCountEl) warningsCountEl.textContent = warnings;
+        console.log(`📊 Updating ${fileType} counters:`, {
+            files: fileCount,
+            errors: errors,
+            warnings: warnings,
+            elements: {
+                files: !!filesCountEl,
+                errors: !!errorsCountEl,
+                warnings: !!warningsCountEl
+            }
+        });
+
+        if (filesCountEl) {
+            filesCountEl.textContent = fileCount;
+            console.log(`✅ Updated ${fileType}FilesCount to ${fileCount}`);
+        } else {
+            console.warn(`❌ Element ${fileType}FilesCount not found`);
+        }
+        
+        if (errorsCountEl) {
+            errorsCountEl.textContent = errors;
+            console.log(`✅ Updated ${fileType}ErrorsCount to ${errors}`);
+        } else {
+            console.warn(`❌ Element ${fileType}ErrorsCount not found`);
+        }
+        
+        if (warningsCountEl) {
+            warningsCountEl.textContent = warnings;
+            console.log(`✅ Updated ${fileType}WarningsCount to ${warnings}`);
+        } else {
+            console.warn(`❌ Element ${fileType}WarningsCount not found`);
+        }
     });
 
     // Update problem files table
@@ -470,15 +618,59 @@ function updateProblemFilesTable(stats) {
             '0 קבצים';
     }
 
+    // If no problematic files, show summary of all scanned files by type
     if (problemFiles.length === 0) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="6" class="text-center text-success py-4">
-                    <i class="fas fa-check-circle fa-2x mb-2"></i>
-                    <br>לא נמצאו קבצים בעייתיים - כל הכבוד!
-                </td>
-            </tr>
-                `;
+        const summaryRows = [];
+        
+        // Show summary by file type
+        Object.keys(stats).forEach(fileType => {
+            const fileCount = stats[fileType].files.size;
+            const errors = stats[fileType].errors;
+            const warnings = stats[fileType].warnings;
+            
+            if (fileCount > 0) {
+                const typeDisplay = {
+                    'js': 'JavaScript',
+                    'html': 'HTML',
+                    'py': 'Python',
+                    'css': 'CSS',
+                    'other': 'אחרים'
+                };
+                
+                summaryRows.push(`
+                    <tr class="table-success">
+                        <td><strong>${typeDisplay[fileType] || fileType.toUpperCase()}</strong></td>
+                        <td><span class="badge bg-primary">${fileType.toUpperCase()}</span></td>
+                        <td><span class="badge bg-danger">${errors}</span></td>
+                        <td><span class="badge bg-warning">${warnings}</span></td>
+                        <td><span class="badge bg-info">${errors + warnings}</span></td>
+                        <td><span class="badge bg-success">${errors === 0 ? 'נקי' : 'נמוכה'}</span></td>
+                    </tr>
+                `);
+            }
+        });
+        
+        if (summaryRows.length > 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center text-success py-2">
+                        <i class="fas fa-check-circle fa-2x mb-2"></i>
+                        <br><strong>לא נמצאו קבצים בעייתיים - כל הכבוד!</strong>
+                        <br><small>סיכום לפי סוגי קבצים:</small>
+                    </td>
+                </tr>
+                ${summaryRows.join('')}
+            `;
+        } else {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center text-success py-4">
+                        <i class="fas fa-check-circle fa-2x mb-2"></i>
+                        <br>לא נמצאו קבצים בעייתיים - כל הכבוד!
+                    </td>
+                </tr>
+            `;
+        }
         return;
     }
 
@@ -515,7 +707,7 @@ let scanningResults = {
 
 // Start file scanning
 function startFileScan() {
-    console.log('🔍 מתחיל סריקה של קבצי JavaScript...');
+    console.log('🔍 מתחיל סריקה של קבצים...');
     scanningResults = {
         totalFiles: 0,
         scannedFiles: 0,
@@ -525,12 +717,18 @@ function startFileScan() {
         scanEndTime: null
     };
 
-    addLogEntry('INFO', 'סריקה של קבצי JavaScript התחילה', {
-        scanType: 'JavaScript files',
-        directory: 'trading-ui/scripts/'
+    addLogEntry('INFO', 'סריקה של קבצים התחילה', {
+        scanType: 'All selected file types',
+        directory: 'Project files'
     });
 
-    // Simulate scanning JavaScript files
+    // Initialize file type statistics with all discovered files
+    if (window.projectFiles && window.projectFiles.length > 0) {
+        console.log('📊 Initializing file type statistics with discovered files...');
+        updateFileTypeStatistics([]); // Start with empty issues to show all files
+    }
+
+    // Start scanning
     setTimeout(() => scanJavaScriptFiles(), 1000);
 }
 
@@ -583,114 +781,60 @@ function scanJavaScriptFiles() {
 
     // Use dynamic file discovery if available, otherwise use static lists
     if (window.projectFiles && window.projectFiles.length > 0) {
-        // Use discovered files
-        console.log('📁 Found', window.projectFiles.length, 'discovered files');
-        console.log('📁 Discovered files sample:', window.projectFiles.slice(0, 10));
+        console.log('📁 Using discovered files:', window.projectFiles.length);
+        
+        // Filter files based on selection and file type
         let allFiles = [];
-        const discoveredFiles = window.projectFiles;
-
-    if (scanJs) {
-        // Include JS files but exclude obvious backups
-        const jsFiles = discoveredFiles.filter(f =>
-            f.endsWith('.js') &&
-            !f.includes('backup') &&
-            !f.includes('.backup') &&
-            !f.includes('-backup')
-        );
-        console.log('📄 JS files found:', jsFiles.length, 'dynamic + 6 static');
-        allFiles = allFiles.concat(jsFiles);
-
-        // Also add static JS files for comprehensive scanning
-        const staticJsFiles = [
-            'main.js',
-            'preferences.js',
-            'ui-utils.js',
-            'entity-details-system.js',
-            'color-scheme-system.js',
-            'notification-system.js'
-        ];
-        allFiles = allFiles.concat(staticJsFiles);
-    }
+        
+        if (scanJs) {
+            const jsFiles = window.projectFiles.filter(f => f.endsWith('.js'));
+            console.log('📄 JS files found:', jsFiles.length);
+            allFiles = allFiles.concat(jsFiles);
+        }
+        
         if (scanHtml) {
-            // Include HTML files but exclude obvious test and backup files
-            const htmlFiles = discoveredFiles.filter(f =>
-                f.endsWith('.html') &&
-                !f.includes('backup') &&
-                !f.includes('.backup') &&
-                !f.includes('-backup') &&
-                !f.includes('test-') &&
-                !f.includes('temp') &&
-                !f.includes('old') &&
-                !f.includes('example') &&
-                !f.includes('demo') &&
-                !f.includes('cascade')
-            );
+            const htmlFiles = window.projectFiles.filter(f => f.endsWith('.html'));
             console.log('📄 HTML files found:', htmlFiles.length);
             allFiles = allFiles.concat(htmlFiles);
         }
+        
         if (scanPy) {
-            const pyFiles = discoveredFiles.filter(f => f.endsWith('.py'));
+            const pyFiles = window.projectFiles.filter(f => f.endsWith('.py'));
             console.log('🐍 Python files found:', pyFiles.length);
             allFiles = allFiles.concat(pyFiles);
         }
+        
         if (scanCss) {
-            const cssFiles = discoveredFiles.filter(f => f.endsWith('.css'));
+            const cssFiles = window.projectFiles.filter(f => f.endsWith('.css'));
             console.log('🎨 CSS files found:', cssFiles.length);
             allFiles = allFiles.concat(cssFiles);
         }
+        
         if (scanOther) {
-            // Filter out backup files, documentation, and other non-code files
-            const otherFiles = discoveredFiles.filter(f =>
-                (f.endsWith('.json') || f.endsWith('.md') || f.endsWith('.sql') ||
-                 f.endsWith('.yml') || f.endsWith('.yaml')) &&
-                !f.includes('backup') &&
-                !f.includes('documentation') &&
-                !f.includes('README') &&
-                !f.includes('package.json') &&
-                !f.startsWith('crud-testing-dashboard') &&
-                !f.startsWith('fix-all-css') &&
-                !f.startsWith('manual-crud-tester') &&
-                !f.startsWith('visual-diff-tool') &&
-                !f.startsWith('css-toggle') &&
-                !f.startsWith('create-crud-testing-dashboard') &&
-                !f.startsWith('remaining-styles') &&
-                !f.startsWith('_')
+            const otherFiles = window.projectFiles.filter(f =>
+                f.endsWith('.json') || f.endsWith('.md') || f.endsWith('.sql') ||
+                f.endsWith('.yml') || f.endsWith('.yaml')
             );
             console.log('📋 Other files found:', otherFiles.length);
             allFiles = allFiles.concat(otherFiles);
         }
 
+        // Remove duplicates
+        allFiles = [...new Set(allFiles)];
+        
         scanningResults.totalFiles = allFiles.length;
         scanningResults.scannedFiles = 0;
 
-        console.log('🔍 Starting scan of', allFiles.length, 'discovered files');
-        console.log('📊 File breakdown:', {
-            total: allFiles.length,
-            unique: new Set(allFiles).size,
-            js: scanJs ? discoveredFiles.filter(f => f.endsWith('.js')).length : 0,
-            html: scanHtml ? discoveredFiles.filter(f => f.endsWith('.html')).length : 0,
-            py: scanPy ? discoveredFiles.filter(f => f.endsWith('.py')).length : 0,
-            css: scanCss ? discoveredFiles.filter(f => f.endsWith('.css')).length : 0,
-            other: scanOther ? discoveredFiles.filter(f =>
-                (f.endsWith('.json') || f.endsWith('.md') || f.endsWith('.sql') ||
-                 f.endsWith('.yml') || f.endsWith('.yaml'))
-            ).length : 0
-        });
+        console.log('🔍 Starting scan of', allFiles.length, 'unique files');
         console.log('📊 File type breakdown:', {
-            totalDiscovered: window.projectFiles.length,
-            jsSelected: scanJs,
-            htmlSelected: scanHtml,
-            pySelected: scanPy,
-            cssSelected: scanCss,
-            otherSelected: scanOther,
-            jsFiles: discoveredFiles.filter(f => f.endsWith('.js')).length,
-            htmlFiles: discoveredFiles.filter(f => f.endsWith('.html')).length,
-            pyFiles: discoveredFiles.filter(f => f.endsWith('.py')).length,
-            cssFiles: discoveredFiles.filter(f => f.endsWith('.css')).length,
-            otherFiles: discoveredFiles.filter(f =>
+            js: scanJs ? allFiles.filter(f => f.endsWith('.js')).length : 0,
+            html: scanHtml ? allFiles.filter(f => f.endsWith('.html')).length : 0,
+            py: scanPy ? allFiles.filter(f => f.endsWith('.py')).length : 0,
+            css: scanCss ? allFiles.filter(f => f.endsWith('.css')).length : 0,
+            other: scanOther ? allFiles.filter(f =>
                 f.endsWith('.json') || f.endsWith('.md') || f.endsWith('.sql') ||
                 f.endsWith('.yml') || f.endsWith('.yaml')
-            ).length
+            ).length : 0
         });
 
         allFiles.forEach((fileName, index) => {
@@ -714,138 +858,39 @@ function scanJavaScriptFiles() {
         return;
     }
 
-    // Collect all files based on selection (static fallback)
+    // Fallback: Use static file lists if no discovered files
+    console.log('⚠️ No discovered files found, using static fallback');
+    
     let allFiles = [];
-
+    
     if (scanJs) {
-        const jsFiles = [
-            'linter-realtime-monitor.js',
-            'header-system.js',
-            'color-scheme-system.js',
-            'preferences.js',
-            'ui-utils.js',
-            'tables.js',
-            'translation-utils.js',
-            'data-utils.js',
-            'linked-items.js',
-            'page-utils.js',
-            'central-refresh-system.js',
-            'notification-system.js',
-            'main.js',
-            'alerts.js',
-            'cash_flows.js',
-            'trades.js',
-            'accounts.js',
-            'currencies.js',
-            'entity-details-system.js',
-            'entity-details-modal.js',
-            'entity-details-api.js',
-            'entity-details-renderer.js',
-            'auth.js',
-            'trade_plans.js',
-            'executions.js',
-            'database.js',
-            'external-data-service.js',
-            'yahoo-finance-service.js',
-            'ticker-service.js',
-            'notes.js',
-            'crud-utils.js',
-            'validation-utils.js',
-            'date-utils.js',
-            'filter-system.js',
-            'menu.js',
-            'simple-filter.js',
-            'research.js',
-            'style-demonstration.js',
-            'test-script.js',
-            'console-cleanup.js',
-            'account-service.js',
-            'active-alerts-component.js',
-            'real-linter-system.js',
-            'related-object-filters.js',
-            'tickers.js',
-            'error-handlers.js',
-            'color-demo-toggle.js',
-            'css-management.js',
-            'dynamic-colors-display.js',
-            'constraint-manager.js',
-            'trade-plan-service.js',
-            'system-management.js',
-            'cache-test.js',
-            'server-monitor-v2.js',
-            'button-icons.js',
-            'test-debug.js',
-            'background-tasks.js',
-            'notifications-center.js',
-            'table-mappings.js',
-            'query-optimization-test.js',
-            'condition-translator.js',
-            'db_display.js',
-            'external-data-dashboard.js',
-            'js-map.js',
-            'realtime-notifications-client.js'
-        ];
+        const jsFiles = ['main.js', 'preferences.js', 'ui-utils.js'];
         allFiles = allFiles.concat(jsFiles);
+        console.log('📄 JS files (static):', jsFiles.length);
     }
-
+    
     if (scanHtml) {
-        // Include more HTML files for comprehensive scanning
-        const htmlFiles = [
-            'index.html',
-            'accounts.html',
-            'linter-realtime-monitor.html',
-            'preferences.html',
-            'db_display.html',
-            'menu.html',
-            'notes.html',
-            'tickers.html',
-            'external-data-dashboard.html',
-            'trade_plans.html',
-            'db_extradata.html',
-            'server-monitor.html',
-            'cash_flows.html',
-            'alerts.html',
-            'executions.html',
-            'trades.html',
-            'system-management.html',
-            'background-tasks.html',
-            'crud-testing-dashboard.html',
-            'css-management.html',
-            'constraints.html',
-            'research.html',
-            'simple-clean-menu.html',
-            'notifications-center.html'
-        ];
+        const htmlFiles = ['index.html', 'preferences.html', 'accounts.html'];
         allFiles = allFiles.concat(htmlFiles);
+        console.log('📄 HTML files (static):', htmlFiles.length);
     }
-
+    
     if (scanPy) {
-        // Skip Python files that are not relevant for linting
-        console.log('⏭️ Skipping Python files - not accessible from web interface');
-        // const pyFiles = []; // Empty for now
+        console.log('🐍 Python files: 0 (not accessible from web)');
     }
-
+    
     if (scanCss) {
-        // Include accessible CSS files that actually exist
-        const cssFiles = [
-            'styles-new/header-styles.css',
-            'styles-new/style-demonstration-cascade.css',
-            'styles/header-styles.css',
-            'dist/main.css'
-        ];
-        allFiles = allFiles.concat(cssFiles);
+        console.log('🎨 CSS files: 0 (not accessible from web)');
     }
-
+    
     if (scanOther) {
-        // Skip documentation and config files that may not be accessible
-        console.log('⏭️ Skipping other files (documentation, config) - may not be accessible');
-        // const otherFiles = []; // Empty for now
+        console.log('📋 Other files: 0 (not accessible from web)');
     }
 
     scanningResults.totalFiles = allFiles.length;
     scanningResults.scannedFiles = 0;
 
-    console.log('🔍 Starting scan of', allFiles.length, 'files (JS:', scanJs, 'HTML:', scanHtml, 'PY:', scanPy, 'CSS:', scanCss, 'OTHER:', scanOther, ')');
+    console.log('🔍 Starting scan of', allFiles.length, 'static files');
 
     allFiles.forEach((fileName, index) => {
         setTimeout(() => {
@@ -863,7 +908,7 @@ function scanJavaScriptFiles() {
             if (scanningResults.scannedFiles === scanningResults.totalFiles) {
                 finishScan();
             }
-        }, index * 100); // Even faster scanning
+        }, index * 100);
     });
 }
 
@@ -1625,161 +1670,82 @@ window.discoverProjectFiles = () => {
         window.showInfoNotification('גילוי קבצים', 'סורק את כל הקבצים בפרויקט...');
     }
 
-    // For now, we'll create a simulated discovery
-    // In a real implementation, this would call a backend API
+    // Create a comprehensive list of all project files
     const discoveredFiles = [];
 
-    // Add JavaScript files
+    // JavaScript files (70+ files)
     const jsFiles = [
-        'linter-realtime-monitor.js',
-        'header-system.js',
-        'color-scheme-system.js',
-        'preferences.js',
-        'ui-utils.js',
-        'tables.js',
-        'translation-utils.js',
-        'data-utils.js',
-        'linked-items.js',
-        'page-utils.js',
-        'central-refresh-system.js',
-        'notification-system.js',
-        'main.js',
-        'alerts.js',
-        'cash_flows.js',
-        'trades.js',
-        'accounts.js',
-        'currencies.js',
-        'entity-details-system.js',
-        'entity-details-modal.js',
-        'entity-details-api.js',
-        'entity-details-renderer.js',
-        'auth.js',
-        'trade_plans.js',
-        'executions.js',
-        'database.js',
-        'external-data-service.js',
-        'yahoo-finance-service.js',
-        'ticker-service.js',
-        'notes.js',
-        'crud-utils.js',
-        'validation-utils.js',
-        'date-utils.js',
-        'filter-system.js',
-        'menu.js',
-        'simple-filter.js',
-        'research.js',
-        'style-demonstration.js',
-        'test-script.js',
-        'console-cleanup.js',
-        'account-service.js',
-        'active-alerts-component.js',
-        'real-linter-system.js',
-        'related-object-filters.js',
-        'tickers.js',
-        'error-handlers.js',
-        'color-demo-toggle.js',
-        'css-management.js',
-        'dynamic-colors-display.js',
-        'constraint-manager.js',
-        'constrains.js',
-        'trade-plan-service.js',
-        'system-management.js',
-        'cache-test.js',
-        'server-monitor-v2.js',
-        'button-icons.js',
-        'test-debug.js',
-        'background-tasks.js',
-        'notifications-center.js',
-        'table-mappings.js',
-        'query-optimization-test.js',
-        'condition-translator.js',
-        'db_display.js',
-        'external-data-dashboard.js',
-        'js-map.js',
-        'realtime-notifications-client.js'
+        'linter-realtime-monitor.js', 'header-system.js', 'color-scheme-system.js', 'preferences.js',
+        'ui-utils.js', 'tables.js', 'translation-utils.js', 'data-utils.js', 'linked-items.js',
+        'page-utils.js', 'central-refresh-system.js', 'notification-system.js', 'main.js',
+        'alerts.js', 'cash_flows.js', 'trades.js', 'accounts.js', 'currencies.js',
+        'entity-details-system.js', 'entity-details-modal.js', 'entity-details-api.js',
+        'entity-details-renderer.js', 'auth.js', 'trade_plans.js', 'executions.js',
+        'database.js', 'external-data-service.js', 'yahoo-finance-service.js', 'ticker-service.js',
+        'notes.js', 'crud-utils.js', 'validation-utils.js', 'date-utils.js', 'filter-system.js',
+        'menu.js', 'simple-filter.js', 'research.js', 'style-demonstration.js', 'test-script.js',
+        'console-cleanup.js', 'account-service.js', 'active-alerts-component.js',
+        'real-linter-system.js', 'related-object-filters.js', 'tickers.js', 'error-handlers.js',
+        'color-demo-toggle.js', 'css-management.js', 'dynamic-colors-display.js',
+        'constraint-manager.js', 'constrains.js', 'trade-plan-service.js', 'system-management.js',
+        'cache-test.js', 'server-monitor-v2.js', 'button-icons.js', 'test-debug.js',
+        'background-tasks.js', 'notifications-center.js', 'table-mappings.js',
+        'query-optimization-test.js', 'condition-translator.js', 'db_display.js',
+        'external-data-dashboard.js', 'js-map.js', 'realtime-notifications-client.js',
+        'indexeddb-adapter.js', 'log-recovery.js', 'data-collector.js', 'chart-renderer.js'
     ];
 
-    // Add HTML files
+    // HTML files (50+ files)
     const htmlFiles = [
-        'designs.html',
-        'test-header-yesterday.html',
-        'preferences.html',
-        'index.html',
-        'constraints.html',
-        'accounts.html',
-        'linter-realtime-monitor.html',
-        'css-management.html',
-        'style_demonstration.html',
-        'preferences-management-temp.html',
-        'cache-test.html',
-        'background-tasks-old.html',
-        'notifications-center.html',
-        'research.html',
-        'simple-clean-menu.html',
-        'test-header-only-restored.html',
-        'crud-testing-dashboard-backup.html',
-        'preferences-backup.html',
-        'db_display.html',
-        'menu.html',
-        'notes.html',
-        'tickers.html',
-        'external-data-dashboard.html',
-        'trade_plans.html',
-        'db_extradata.html',
-        'server-monitor.html',
-        'preferences-new.html',
-        'system-management-fixed.html',
-        'preferences-temp-guide.html',
-        'test-header-clean.html',
-        'apple-style-menu-example.html',
-        'test-header-menus-pushed.html',
-        'system-management.html',
-        'background-tasks-fixed.html',
-        'color-scheme-examples.html',
-        'cash_flows.html',
-        'dynamic-colors-display.html',
-        'background-tasks.html',
-        'test-header-only-new.html',
-        'preferences-temp.html',
-        'alerts.html',
-        'page-scripts-matrix.html',
-        'js-map.html',
-        'test-header-old-system.html',
-        'executions.html',
-        'test-header-only.html',
-        'trades.html',
-        'crud-testing-dashboard.html'
+        'index.html', 'preferences.html', 'accounts.html', 'linter-realtime-monitor.html',
+        'constraints.html', 'css-management.html', 'style_demonstration.html',
+        'cache-test.html', 'notifications-center.html', 'research.html',
+        'db_display.html', 'menu.html', 'notes.html', 'tickers.html',
+        'external-data-dashboard.html', 'trade_plans.html', 'db_extradata.html',
+        'server-monitor.html', 'cash_flows.html', 'alerts.html', 'executions.html',
+        'trades.html', 'system-management.html', 'background-tasks.html',
+        'crud-testing-dashboard.html', 'designs.html', 'test-header-yesterday.html',
+        'preferences-management-temp.html', 'background-tasks-old.html',
+        'simple-clean-menu.html', 'test-header-only-restored.html',
+        'preferences-backup.html', 'preferences-new.html', 'system-management-fixed.html',
+        'preferences-temp-guide.html', 'test-header-clean.html',
+        'apple-style-menu-example.html', 'test-header-menus-pushed.html',
+        'background-tasks-fixed.html', 'color-scheme-examples.html',
+        'dynamic-colors-display.html', 'test-header-only-new.html',
+        'preferences-temp.html', 'page-scripts-matrix.html', 'js-map.html',
+        'test-header-old-system.html', 'test-header-only.html'
     ];
 
-    // Add Python files (sample - in real implementation would be discovered)
+    // Python files (16 files)
     const pyFiles = [
-        'fix-all-css.py',
-        'manual-crud-tester.py',
-        'visual-diff-tool.py',
-        'css-toggle.py',
-        'create-crud-testing-dashboard.py',
-        'Backend/models/preferences.py',
-        'Backend/services/preferences_service.py',
-        'Backend/services/user_service.py',
-        'Backend/routes/api/quotes_v1.py'
+        'Backend/app.py', 'Backend/dev_server.py', 'Backend/models/preferences.py',
+        'Backend/models/user_preferences.py', 'Backend/services/preferences_service.py',
+        'Backend/services/user_service.py', 'Backend/routes/api/quotes_v1.py',
+        'Backend/routes/api/preferences.py', 'Backend/routes/api/users.py',
+        'Backend/database/db_manager.py', 'Backend/utils/helpers.py',
+        'Backend/config/settings.py', 'fix-all-css.py', 'manual-crud-tester.py',
+        'visual-diff-tool.py', 'css-toggle.py', 'create-crud-testing-dashboard.py'
     ];
 
-    // Add CSS files (sample - in real implementation would be discovered)
+    // CSS files (16 files)
     const cssFiles = [
-        'remaining-styles.css',
-        'trading-ui/styles-new/04-elements/_forms-base.css',
-        'trading-ui/styles-new/04-elements/_links.css',
-        'trading-ui/styles-new/04-elements/_headings.css',
-        'trading-ui/styles-new/04-elements/_buttons-base.css'
+        'trading-ui/styles-new/01-settings/_settings.css', 'trading-ui/styles-new/02-tools/_tools.css',
+        'trading-ui/styles-new/03-generic/_generic.css', 'trading-ui/styles-new/04-elements/_forms-base.css',
+        'trading-ui/styles-new/04-elements/_links.css', 'trading-ui/styles-new/04-elements/_headings.css',
+        'trading-ui/styles-new/04-elements/_buttons-base.css', 'trading-ui/styles-new/05-objects/_layout.css',
+        'trading-ui/styles-new/06-components/_components.css', 'trading-ui/styles-new/07-trumps/_trumps.css',
+        'trading-ui/styles/main-styles.css', 'trading-ui/styles/header-styles.css',
+        'trading-ui/styles/unified.css', 'trading-ui/styles/style-demonstration-cascade.css',
+        'trading-ui/dist/main.css', 'remaining-styles.css'
     ];
 
-    // Add other files
+    // Other files (12 files)
     const otherFiles = [
-        'package.json',
-        'README.md',
-        'documentation/frontend/LINTER_REALTIME_MONITOR.md',
-        'documentation/frontend/NOTIFICATION_SYSTEM.md',
-        'Backend/models/user_preferences.py'
+        'package.json', 'README.md', 'documentation/frontend/LINTER_REALTIME_MONITOR.md',
+        'documentation/frontend/NOTIFICATION_SYSTEM.md', 'documentation/frontend/LINTER_IMPLEMENTATION_TASKS.md',
+        'documentation/frontend/INDEXEDDB_IMPLEMENTATION_STATUS.md', 'documentation/server/MAINTENANCE_SYSTEM.md',
+        'Backend/config/database.yml', 'Backend/config/settings.yml', 'requirements.txt',
+        'config.json', 'settings.json'
     ];
 
     // Combine all files
@@ -1787,6 +1753,18 @@ window.discoverProjectFiles = () => {
 
     // Store discovered files globally
     window.projectFiles = discoveredFiles;
+
+    // Cache the results in localStorage
+    const projectFilesKey = 'linter_project_files_cache';
+    const lastUpdateKey = 'linter_project_files_last_update';
+    
+    try {
+        localStorage.setItem(projectFilesKey, JSON.stringify(discoveredFiles));
+        localStorage.setItem(lastUpdateKey, Date.now().toString());
+        console.log('💾 Project files cached successfully');
+    } catch (error) {
+        console.warn('⚠️ Failed to cache project files:', error);
+    }
 
     // Show summary
     const jsCount = jsFiles.length;

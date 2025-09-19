@@ -91,7 +91,6 @@ def migrate_user_preferences():
         default_search_filter = v1_data.get('default_search_filter', json_data.get('defaultSearchFilter', ''))
         
         # נתונים חיצוניים
-        data_refresh_interval = v1_data.get('data_refresh_interval', json_data.get('dataRefreshInterval', 5))
         primary_data_provider = v1_data.get('primary_data_provider', json_data.get('primaryDataProvider', 'yahoo'))
         secondary_data_provider = v1_data.get('secondary_data_provider', json_data.get('secondaryDataProvider', 'google'))
         cache_ttl = v1_data.get('cache_ttl', json_data.get('cacheTTL', 5))

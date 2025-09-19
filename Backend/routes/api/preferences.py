@@ -439,6 +439,49 @@ def get_user_profiles() -> Any:
             "timestamp": datetime.now().isoformat()
         }), 500
 
+@preferences_bp.route('/profiles/activate', methods=['POST'])
+def activate_profile() -> Any:
+    """
+    הפעלת פרופיל
+    """
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        profile_id = data.get('profile_id')
+        
+        if not user_id or not profile_id:
+            return jsonify({
+                'success': False,
+                'error': 'user_id and profile_id are required',
+                'timestamp': datetime.now().isoformat()
+            }), 400
+        
+        # הפעלת פרופיל
+        success = preferences_service.activate_profile(user_id, profile_id)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'data': {
+                    'message': 'Profile activated successfully'
+                },
+                'timestamp': datetime.now().isoformat()
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Failed to activate profile',
+                'timestamp': datetime.now().isoformat()
+            }), 500
+        
+    except Exception as e:
+        logger.error(f"Error activating profile: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 500
+
 # ============================================================================
 # Admin Endpoints
 # ============================================================================
@@ -467,18 +510,44 @@ def get_preference_types() -> Any:
             "timestamp": datetime.now().isoformat()
         }), 500
 
-@preferences_bp.route('/admin/groups', methods=['GET'])
+@preferences_bp.route('/groups', methods=['GET'])
 def get_preference_groups() -> Any:
+    """
+    קבלת קבוצות העדפות
+    """
+    try:
+        # קבלת קבוצות העדפות מהשירות
+        groups = preferences_service.get_preference_groups()
+        
+        return jsonify({
+            "success": True,
+            "data": {
+                "groups": groups
+            },
+            "timestamp": datetime.now().isoformat()
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting preference groups: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
+@preferences_bp.route('/admin/groups', methods=['GET'])
+def get_preference_groups_admin() -> Any:
     """
     קבלת קבוצות העדפות (Admin)
     """
     try:
         # קבלת קבוצות העדפות מהשירות
-        # זה דורש הרחבה של השירות
+        groups = preferences_service.get_preference_groups()
+        
         return jsonify({
             "success": True,
             "data": {
-                "message": "Admin endpoint - to be implemented"
+                "groups": groups
             },
             "timestamp": datetime.now().isoformat()
         }), 200

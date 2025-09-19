@@ -348,12 +348,30 @@ cleanup_old_analyses()
 </div>
 ```
 
-#### Section 6 - בדיקת ארכיטקטורה
+#### Section 6 - ניהול אחסון נתונים (חדש - 19.9.2025)
 ```html
 <div class="content-section" id="section6">
     <div class="section-header">
-        <h2>🏗️ בדיקת ארכיטקטורה</h2>
+        <h2>💾 ניהול אחסון נתונים</h2>
         <button class="filter-toggle-btn" onclick="toggleSection('section6')">
+            <span class="section-toggle-icon">▼</span>
+        </button>
+    </div>
+    <div class="section-body">
+        <!-- סטטיסטיקות אחסון -->
+        <!-- היסטוריית ניתוחים -->
+        <!-- ניהול גיבויים -->
+        <!-- כפתורי ניקוי ותחזוקה -->
+    </div>
+</div>
+```
+
+#### Section 7 - בדיקת ארכיטקטורה
+```html
+<div class="content-section" id="section7">
+    <div class="section-header">
+        <h2>🏗️ בדיקת ארכיטקטורה</h2>
+        <button class="filter-toggle-btn" onclick="toggleSection('section7')">
             <span class="section-toggle-icon">▼</span>
         </button>
     </div>

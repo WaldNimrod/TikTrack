@@ -577,6 +577,101 @@ window.resetToDefaults = async function() {
     }
 };
 
+// ===== PROFILE MANAGEMENT =====
+
+/**
+ * טעינת פרופיל
+ */
+window.loadProfile = async function() {
+    try {
+        console.log('📂 Loading profile...');
+        
+        // קבלת פרופיל נבחר
+        const profileSelect = document.getElementById('profileSelect');
+        if (!profileSelect) {
+            throw new Error('Profile select element not found');
+        }
+        
+        const selectedProfile = profileSelect.value;
+        if (!selectedProfile || selectedProfile === 'ברירת מחדל') {
+            // טעינת פרופיל ברירת מחדל
+            await window.loadPreferences();
+            console.log('✅ Default profile loaded');
+        } else {
+            // טעינת פרופיל ספציפי
+            const profiles = await window.getUserProfiles();
+            const profile = profiles.find(p => p.name === selectedProfile);
+            
+            if (profile) {
+                await window.loadPreferences(1, profile.id);
+                console.log(`✅ Profile loaded: ${selectedProfile}`);
+            } else {
+                throw new Error(`Profile not found: ${selectedProfile}`);
+            }
+        }
+        
+        // הצגת הודעת הצלחה
+        if (typeof window.showSuccessNotification === 'function') {
+            window.showSuccessNotification('פרופיל נטען בהצלחה!');
+        }
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Error loading profile:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בטעינת פרופיל: ' + error.message);
+        }
+        return false;
+    }
+};
+
+/**
+ * החלפת פרופיל פעיל
+ */
+window.switchProfile = async function(profileId) {
+    try {
+        console.log(`🔄 Switching to profile: ${profileId}`);
+        
+        // עדכון פרופיל פעיל בשרת
+        const response = await fetch('/api/v1/preferences/profiles/activate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                user_id: 1,
+                profile_id: profileId
+            })
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            if (result.success) {
+                // נקה מטמון וטען מחדש
+                window.preferencesCache.clear();
+                await window.loadPreferences();
+                
+                console.log('✅ Profile switched successfully');
+                if (typeof window.showSuccessNotification === 'function') {
+                    window.showSuccessNotification('פרופיל הוחלף בהצלחה!');
+                }
+                
+                return true;
+            }
+        }
+        
+        throw new Error('Failed to switch profile');
+        
+    } catch (error) {
+        console.error('❌ Error switching profile:', error);
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בהחלפת פרופיל: ' + error.message);
+        }
+        return false;
+    }
+};
+
 // ===== AUTO-INITIALIZATION =====
 
 // אתחול אוטומטי כשהדף נטען

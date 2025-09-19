@@ -148,17 +148,17 @@
 
 /* מצב סגור */
 .content-section.collapsed {
-  padding: 20px 0 !important;
+  padding: 20px 0;
 }
 
 .section-body.collapsed {
-  padding: 20px 0 !important;
+  padding: 20px 0;
 }
 
 /* אזור פעולות הכותרת */
 .table-actions {
-  display: flex !important;
-  gap: 0.5rem !important;
+  display: flex;
+  gap: 0.5rem;
   align-items: center;
 }
 
@@ -260,28 +260,31 @@
 .container-fluid .main-content .btn-outline-primary,
 .container-fluid .main-content .btn-outline-warning,
 .container-fluid .main-content .btn-outline-secondary {
-  border-width: 1px !important;
-  box-sizing: border-box !important;
+  border-width: 1px;
+  box-sizing: border-box;
 }
 
 /* תיקון לכפתורים קטנים */
 .container-fluid .main-content .btn-sm {
   min-height: 32px;
-  min-width: 70px;
-  padding: 4px 8px;
+  padding: 6px 12px;
   font-size: 13px;
   border-radius: 3px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
-/* תיקון ספציפי לכפתורי "עצור" ו"התעלם" */
-.container-fluid .main-content .btn-warning,
-.container-fluid .main-content .btn-secondary {
-  min-width: 80px !important;
-}
-
-/* תיקון כללי לכפתורים קצרים */
+/* תיקון כללי לכפתורים */
 .container-fluid .main-content .btn {
-  min-width: 60px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 12px;
 }
 
 /* תיקון לכפתורים גדולים */

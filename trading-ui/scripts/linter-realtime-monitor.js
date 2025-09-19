@@ -948,8 +948,6 @@ function scanSingleFile(fileName) {
         'LINTER_REALTIME_MONITOR.md',
         'NOTIFICATION_SYSTEM.md',
         // Skip specific CSS files that are not web-accessible
-        'unified.css',
-        'styles-new/unified.css',
         // Skip all files in subdirectories that are not web-accessible
         'styles-new/01-settings/',
         'styles-new/02-tools/',
@@ -1735,7 +1733,7 @@ window.discoverProjectFiles = () => {
         'trading-ui/styles-new/04-elements/_buttons-base.css', 'trading-ui/styles-new/05-objects/_layout.css',
         'trading-ui/styles-new/06-components/_components.css', 'trading-ui/styles-new/07-trumps/_trumps.css',
         'trading-ui/styles/main-styles.css', 'trading-ui/styles/header-styles.css',
-        'trading-ui/styles/unified.css', 'trading-ui/styles/style-demonstration-cascade.css',
+        'trading-ui/styles/style-demonstration-cascade.css',
         'trading-ui/dist/main.css', 'remaining-styles.css'
     ];
 

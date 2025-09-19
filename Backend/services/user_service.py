@@ -107,39 +107,21 @@ class UserService:
     
     @staticmethod
     def get_user_preferences(db: Session, user_id: int = None) -> Dict[str, Any]:
-        """Get user preferences with fallback to default user"""
+        """Get user preferences using the new preferences system"""
         try:
             # If no user_id provided, use default user
             if user_id is None:
                 user_id = UserService.DEFAULT_USER_ID
             
-            # Start with default preferences
-            default_preferences = UserService.load_default_preferences()
+            # Use the new preferences service
+            from services.preferences_service import preferences_service
+            result = preferences_service.get_all_user_preferences(user_id=user_id)
             
-            # Try to get preferences from the new user_preferences table
-            try:
-                from models.preferences import UserPreferences
-                user_prefs = db.query(UserPreferences).filter(UserPreferences.user_id == user_id).first()
-                if user_prefs:
-                    # Convert database preferences to dictionary format
-                    db_preferences = user_prefs.to_dict()
-                    # Deep merge with defaults (database preferences override defaults)
-                    current_user_preferences = UserService.deep_merge_dicts(default_preferences, db_preferences)
-                    return current_user_preferences
-            except Exception as e:
-                logger.warning(f"Could not load preferences from user_preferences table: {e}")
-            
-            # Fallback to old method (user.get_preferences() from legacy JSON field)
-            user = UserService.get_user_by_id(db, user_id)
-            if user:
-                user_preferences = user.get_preferences()
-                # Deep merge user preferences with defaults (user preferences override defaults)
-                current_user_preferences = UserService.deep_merge_dicts(default_preferences, user_preferences)
-                return current_user_preferences
-            
-            # Fallback to default preferences
-            logger.warning(f"User {user_id} not found, using default preferences")
-            return default_preferences
+            if result and result.get('success'):
+                return result.get('data', {}).get('preferences', {})
+            else:
+                logger.warning(f"Could not load preferences from new system for user {user_id}")
+                return UserService.load_default_preferences()
             
         except Exception as e:
             logger.error(f"Error getting user preferences for user {user_id}: {str(e)}")
@@ -147,51 +129,34 @@ class UserService:
     
     @staticmethod
     def set_user_preferences(db: Session, preferences: Dict[str, Any], user_id: int = None) -> bool:
-        """Set user preferences with fallback to default user"""
+        """Set user preferences using the new preferences system"""
         try:
             # If no user_id provided, use default user
             if user_id is None:
                 user_id = UserService.DEFAULT_USER_ID
             
-            # Try to get preferences from the new user_preferences table
-            try:
-                from models.preferences import UserPreferences
-                user_prefs = db.query(UserPreferences).filter(UserPreferences.user_id == user_id).first()
-                if user_prefs:
-                    # Get current preferences and merge with new ones
-                    current_db_preferences = UserService.get_user_preferences(db, user_id)
-                    merged_preferences_to_save = UserService.deep_merge_dicts(current_db_preferences, preferences)
-                    
-                    # Update the preferences object
-                    user_prefs.from_dict(merged_preferences_to_save)
-                    db.commit()
-                    logger.info(f"Updated preferences for user {user_id} in user_preferences table")
-                    return True
-            except Exception as e:
-                logger.warning(f"Could not update preferences in user_preferences table: {e}")
+            # Use the new preferences service
+            from services.preferences_service import preferences_service
+            result = preferences_service.save_preferences(
+                user_id=user_id,
+                preferences=preferences
+            )
             
-            # Fallback to old method (user.set_preferences() from legacy JSON field)
-            user = UserService.get_user_by_id(db, user_id)
-            if user:
-                # Get current preferences and merge with new ones
-                current_preferences = user.get_preferences()
-                # Start with default preferences and merge with current and new
-                default_preferences = UserService.load_default_preferences()
-                merged_preferences = default_preferences.copy()
-                merged_preferences.update(current_preferences)
-                merged_preferences.update(preferences)
-                user.set_preferences(merged_preferences)
-                db.commit()
-                logger.info(f"Updated preferences for user {user_id} in legacy field")
+            if result and result.get('success'):
+                logger.info(f"Updated preferences for user {user_id} using new system")
                 return True
-            
-            logger.error(f"User {user_id} not found, cannot update preferences")
-            return False
+            else:
+                logger.error(f"Could not update preferences for user {user_id} using new system")
+                return False
             
         except Exception as e:
             logger.error(f"Error setting user preferences for user {user_id}: {str(e)}")
-            db.rollback()
             return False
+    
+    @staticmethod
+    def update_user_preferences(db: Session, user_id: int, preferences: Dict[str, Any]) -> bool:
+        """Update user preferences using the new preferences system (alias for set_user_preferences)"""
+        return UserService.set_user_preferences(db, preferences, user_id)
     
     @staticmethod
     def load_default_preferences() -> Dict[str, Any]:

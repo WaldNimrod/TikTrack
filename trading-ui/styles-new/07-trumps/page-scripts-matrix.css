@@ -1,56 +1,39 @@
 /* ========================================================
-   PAGE-SCRIPTS-MATRIX.CSS - Clean & Simple
+   PAGE-SCRIPTS-MATRIX.CSS - Only what you asked for
    ======================================================== */
 
-/* Table */
+/* Container with horizontal scroll */
+.table-container {
+    overflow-x: auto;
+}
+
+/* Table with fixed layout */
 #page-scripts-matrix-table {
     table-layout: fixed;
     border-collapse: collapse;
-    min-width: 600px;
 }
 
-/* Container */
-.table-container {
-    overflow-x: auto;
-    background: #f8f9fa;
-    border-radius: 8px;
-}
-
-/* All headers - vertical text */
+/* ALL headers - vertical text from top to bottom */
 #page-scripts-matrix-table th {
-    width: 20px;
-    padding: 0;
-    font-size: 0.35rem;
-    background: #f1f3f4;
-    border: 1px solid #ddd;
-    text-align: center;
     writing-mode: vertical-rl;
     text-orientation: mixed;
+    width: 20px;
+    padding: 0;
 }
 
-/* All cells */
+/* ALL data cells - narrow width */
 #page-scripts-matrix-table td {
     width: 20px;
     padding: 0;
-    font-size: 0.4rem;
     text-align: center;
-    border: 1px solid #ddd;
 }
 
-/* First column - sticky */
+/* First column - sticky and wider for script names */
 #page-scripts-matrix-table th:first-child,
 #page-scripts-matrix-table td:first-child {
     position: sticky;
     left: 0;
-    background: #e8f0fe;
-    z-index: 10;
     width: 80px;
     writing-mode: horizontal-tb;
     text-orientation: initial;
-}
-
-/* Connected scripts */
-#page-scripts-matrix-table td.connected {
-    background-color: #d4edda;
-    color: #155724;
 }

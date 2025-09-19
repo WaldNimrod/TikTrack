@@ -357,6 +357,8 @@ function getAllLogEntries() {
 
 // Update file type statistics counters
 function updateFileTypeStatistics(issues) {
+    console.log('📊 Updating file type statistics with', issues.length, 'issues');
+    
     // Initialize counters
     const stats = {
         js: { files: new Set(), errors: 0, warnings: 0 },
@@ -385,6 +387,14 @@ function updateFileTypeStatistics(issues) {
         }
     });
 
+    console.log('📊 File type statistics calculated:', {
+        js: { files: stats.js.files.size, errors: stats.js.errors, warnings: stats.js.warnings },
+        html: { files: stats.html.files.size, errors: stats.html.errors, warnings: stats.html.warnings },
+        py: { files: stats.py.files.size, errors: stats.py.errors, warnings: stats.py.warnings },
+        css: { files: stats.css.files.size, errors: stats.css.errors, warnings: stats.css.warnings },
+        other: { files: stats.other.files.size, errors: stats.other.errors, warnings: stats.other.warnings }
+    });
+
     // Update UI counters
     Object.keys(stats).forEach(fileType => {
         const fileCount = stats[fileType].files.size;
@@ -396,9 +406,37 @@ function updateFileTypeStatistics(issues) {
         const errorsCountEl = document.getElementById(`${fileType}ErrorsCount`);
         const warningsCountEl = document.getElementById(`${fileType}WarningsCount`);
 
-        if (filesCountEl) filesCountEl.textContent = fileCount;
-        if (errorsCountEl) errorsCountEl.textContent = errors;
-        if (warningsCountEl) warningsCountEl.textContent = warnings;
+        console.log(`📊 Updating ${fileType} counters:`, {
+            files: fileCount,
+            errors: errors,
+            warnings: warnings,
+            elements: {
+                files: !!filesCountEl,
+                errors: !!errorsCountEl,
+                warnings: !!warningsCountEl
+            }
+        });
+
+        if (filesCountEl) {
+            filesCountEl.textContent = fileCount;
+            console.log(`✅ Updated ${fileType}FilesCount to ${fileCount}`);
+        } else {
+            console.warn(`❌ Element ${fileType}FilesCount not found`);
+        }
+        
+        if (errorsCountEl) {
+            errorsCountEl.textContent = errors;
+            console.log(`✅ Updated ${fileType}ErrorsCount to ${errors}`);
+        } else {
+            console.warn(`❌ Element ${fileType}ErrorsCount not found`);
+        }
+        
+        if (warningsCountEl) {
+            warningsCountEl.textContent = warnings;
+            console.log(`✅ Updated ${fileType}WarningsCount to ${warnings}`);
+        } else {
+            console.warn(`❌ Element ${fileType}WarningsCount not found`);
+        }
     });
 
     // Update problem files table

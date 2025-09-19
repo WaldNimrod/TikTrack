@@ -217,7 +217,7 @@ Welcome to the comprehensive documentation for the TikTrack Trading Management S
 
 #### **Core Features**
 - **[User Management System](USER_MANAGEMENT_SYSTEM.md)** - Complete user management with fallback system
-- **[Preferences System](features/preferences/README.md)** - User preferences management
+- **[Preferences System](features/preferences/PREFERENCES_SYSTEM.md)** - User preferences management
 - **[Currencies System](features/currencies/SUMMARY.md)** - Currency management
 - **[External Data Integration](features/external_data/EXTERNAL_DATA_SYSTEM.md)** - Real-time market data integration
 - **[Notification System](frontend/NOTIFICATION_SYSTEM_README.md)** - Unified notification system for all pages

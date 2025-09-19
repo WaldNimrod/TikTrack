@@ -108,44 +108,206 @@ def get_file_content():
         return jsonify({'error': 'Internal server error'}), 500
 
 @js_map_bp.route('/page-mapping', methods=['GET'])
+@cache_for(ttl=300)  # Cache for 5 minutes
 def get_page_mapping():
     """
-    Get page to JS file mapping
+    Get page to JS file mapping with enhanced metadata
     """
     try:
-        # Define known page to JS file mappings
+        # Define known page to JS file mappings with metadata
         page_mappings = {
-            'index.html': ['main.js', 'header-system.js', 'simple-filter.js'],
-            'trades.html': ['trades.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'trade_plans.html': ['trade_plans.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'research.html': ['research.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'alerts.html': ['alerts.js', 'active-alerts-component.js', 'header-system.js', 'simple-filter.js'],
-            'executions.html': ['executions.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'tickers.html': ['tickers.js', 'ticker-service.js', 'header-system.js', 'simple-filter.js'],
-            'accounts.html': ['accounts.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'cash_flows.html': ['cash_flows.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'notes.html': ['notes.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'preferences.html': ['preferences.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
-            'db_display.html': ['database.js', 'db-extradata.js', 'header-system.js', 'simple-filter.js'],
-            'db_extradata.html': ['db-extradata.js', 'header-system.js', 'simple-filter.js'],
-            'constraints.html': ['constraint-manager.js', 'header-system.js', 'simple-filter.js'],
-        
-            'styles.html': ['header-system.js', 'simple-filter.js']
+            'index.html': {
+                'files': ['main.js', 'header-system.js', 'simple-filter.js'],
+                'page_type': 'dashboard',
+                'functions_count': 0,  # Will be calculated
+                'last_modified': None,  # Will be calculated
+                'file_sizes': {},  # Will be calculated
+                'dependencies': []
+            },
+            'trades.html': {
+                'files': ['trades.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
+                'page_type': 'data_management',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': ['ui-utils.js']
+            },
+            'trade_plans.html': {
+                'files': ['trade_plans.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
+                'page_type': 'data_management',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': ['ui-utils.js']
+            },
+            'research.html': {
+                'files': ['research.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
+                'page_type': 'analysis',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': ['ui-utils.js']
+            },
+            'alerts.html': {
+                'files': ['alerts.js', 'active-alerts-component.js', 'header-system.js', 'simple-filter.js'],
+                'page_type': 'monitoring',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': ['active-alerts-component.js']
+            },
+            'executions.html': {
+                'files': ['executions.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
+                'page_type': 'data_management',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': ['ui-utils.js']
+            },
+            'tickers.html': {
+                'files': ['tickers.js', 'ticker-service.js', 'header-system.js', 'simple-filter.js'],
+                'page_type': 'data_management',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': ['ticker-service.js']
+            },
+            'accounts.html': {
+                'files': ['accounts.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
+                'page_type': 'data_management',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': ['ui-utils.js']
+            },
+            'cash_flows.html': {
+                'files': ['cash_flows.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
+                'page_type': 'data_management',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': ['ui-utils.js']
+            },
+            'notes.html': {
+                'files': ['notes.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
+                'page_type': 'data_management',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': ['ui-utils.js']
+            },
+            'preferences.html': {
+                'files': ['preferences.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
+                'page_type': 'settings',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': ['ui-utils.js']
+            },
+            'db_display.html': {
+                'files': ['database.js', 'db-extradata.js', 'header-system.js', 'simple-filter.js'],
+                'page_type': 'development',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': ['db-extradata.js']
+            },
+            'db_extradata.html': {
+                'files': ['db-extradata.js', 'header-system.js', 'simple-filter.js'],
+                'page_type': 'development',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': []
+            },
+            'constraints.html': {
+                'files': ['constraint-manager.js', 'header-system.js', 'simple-filter.js'],
+                'page_type': 'development',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': []
+            },
+            'styles.html': {
+                'files': ['header-system.js', 'simple-filter.js'],
+                'page_type': 'development',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': []
+            },
+            'js-map.html': {
+                'files': ['js-map.js', 'header-system.js', 'simple-filter.js', 'ui-utils.js'],
+                'page_type': 'development',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': ['ui-utils.js']
+            }
         }
         
-        return jsonify(page_mappings)
+        # Calculate metadata for each page
+        for page_name, page_data in page_mappings.items():
+            total_functions = 0
+            latest_modified = None
+            file_sizes = {}
+            
+            for filename in page_data['files']:
+                file_path = SCRIPTS_PATH / filename
+                if file_path.exists():
+                    # Count functions in this file
+                    functions = extract_functions_from_file(file_path)
+                    total_functions += len(functions)
+                    
+                    # Get file modification time
+                    file_mtime = os.path.getmtime(file_path)
+                    if latest_modified is None or file_mtime > latest_modified:
+                        latest_modified = file_mtime
+                    
+                    # Get file size
+                    file_sizes[filename] = os.path.getsize(file_path)
+            
+            # Update page metadata
+            page_data['functions_count'] = total_functions
+            page_data['last_modified'] = latest_modified
+            page_data['file_sizes'] = file_sizes
+        
+        # Calculate total statistics
+        total_pages = len(page_mappings)
+        total_files = len(set([f for page_data in page_mappings.values() for f in page_data['files']]))
+        total_functions = sum([page_data['functions_count'] for page_data in page_mappings.values()])
+        
+        return jsonify({
+            'status': 'success',
+            'data': page_mappings,
+            'metadata': {
+                'total_pages': total_pages,
+                'total_files': total_files,
+                'total_functions': total_functions,
+                'last_updated': os.path.getmtime(__file__),
+                'cache_ttl': 300
+            }
+        })
         
     except Exception as e:
         current_app.logger.error(f"Error getting page mapping: {e}")
-        return jsonify({}), 500
+        return jsonify({
+            'status': 'error',
+            'error': str(e),
+            'data': {},
+            'metadata': {}
+        }), 500
 
 @js_map_bp.route('/functions', methods=['GET'])
+@cache_for(ttl=300)  # Cache for 5 minutes
 def get_functions_data():
     """
-    Get functions data from all JS files
+    Get functions data from all JS files with enhanced metadata
     """
     try:
         functions_data = {}
+        total_functions = 0
+        file_stats = {}
         
         # Get list of JS files
         js_files = [f.name for f in SCRIPTS_PATH.glob('*.js')]
@@ -155,13 +317,77 @@ def get_functions_data():
             file_path = SCRIPTS_PATH / filename
             if file_path.exists():
                 functions = extract_functions_from_file(file_path)
-                functions_data[filename] = functions
+                
+                # Calculate file statistics
+                file_size = os.path.getsize(file_path)
+                file_mtime = os.path.getmtime(file_path)
+                line_count = len(open(file_path, 'r', encoding='utf-8').readlines())
+                
+                # Count functions by type
+                function_types = {}
+                for func in functions:
+                    func_type = func.get('type', 'unknown')
+                    function_types[func_type] = function_types.get(func_type, 0) + 1
+                
+                # Enhanced function data with metadata
+                functions_data[filename] = {
+                    'functions': functions,
+                    'metadata': {
+                        'total_functions': len(functions),
+                        'function_types': function_types,
+                        'file_size': file_size,
+                        'line_count': line_count,
+                        'last_modified': file_mtime,
+                        'file_path': str(file_path),
+                        'complexity_score': calculate_file_complexity(functions, line_count)
+                    }
+                }
+                
+                # Update totals
+                total_functions += len(functions)
+                file_stats[filename] = {
+                    'functions': len(functions),
+                    'size': file_size,
+                    'lines': line_count,
+                    'modified': file_mtime
+                }
         
-        return jsonify(functions_data)
+        # Calculate overall statistics
+        function_types_total = {}
+        total_size = 0
+        total_lines = 0
+        
+        for file_data in functions_data.values():
+            for func_type, count in file_data['metadata']['function_types'].items():
+                function_types_total[func_type] = function_types_total.get(func_type, 0) + count
+            total_size += file_data['metadata']['file_size']
+            total_lines += file_data['metadata']['line_count']
+        
+        return jsonify({
+            'status': 'success',
+            'data': functions_data,
+            'metadata': {
+                'total_files': len(js_files),
+                'total_functions': total_functions,
+                'function_types_distribution': function_types_total,
+                'total_size_bytes': total_size,
+                'total_lines': total_lines,
+                'average_functions_per_file': round(total_functions / len(js_files), 2) if js_files else 0,
+                'average_file_size': round(total_size / len(js_files), 2) if js_files else 0,
+                'last_updated': os.path.getmtime(__file__),
+                'cache_ttl': 300
+            },
+            'file_stats': file_stats
+        })
         
     except Exception as e:
         current_app.logger.error(f"Error getting functions data: {e}")
-        return jsonify({}), 500
+        return jsonify({
+            'status': 'error',
+            'error': str(e),
+            'data': {},
+            'metadata': {}
+        }), 500
 
 @js_map_bp.route('/scan', methods=['POST'])
 def scan_js_files():
@@ -398,3 +624,33 @@ def extract_description(annotations):
         return trimmed
     
     return 'אין תיאור'
+
+def calculate_file_complexity(functions, line_count):
+    """
+    Calculate file complexity score based on functions and lines
+    """
+    if line_count == 0:
+        return 0
+    
+    # Basic complexity factors
+    function_count = len(functions)
+    functions_per_line = function_count / line_count
+    
+    # Calculate average function complexity
+    total_params = 0
+    for func in functions:
+        params = func.get('params', '')
+        if params and params != 'אין פרמטרים':
+            param_count = len([p.strip() for p in params.split(',') if p.strip()])
+            total_params += param_count
+    
+    avg_params = total_params / function_count if function_count > 0 else 0
+    
+    # Calculate complexity score (0-100)
+    complexity_score = min(100, (
+        (function_count * 2) +  # Function count factor
+        (functions_per_line * 100) +  # Functions per line factor
+        (avg_params * 5)  # Average parameters factor
+    ))
+    
+    return round(complexity_score, 2)

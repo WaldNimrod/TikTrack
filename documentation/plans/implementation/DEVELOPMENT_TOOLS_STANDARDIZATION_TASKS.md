@@ -54,7 +54,7 @@
 | **linter-realtime-monitor.html** | ❌ | ❌ | ❌ | ❌ | ❌ | 🔄 נדרש |
 | **notifications-center.html** | ❌ | ❌ | ❌ | ❌ | ✅ | 🔄 נדרש |
 | **server-monitor.html** | ❌ | ❌ | ❌ | ❌ | ✅ | 🔄 נדרש |
-| **system-management.html** | ❌ | ❌ | ❌ | ❌ | ✅ | 🔄 נדרש |
+| **system-management.html** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ הושלם |
 | **external-data-dashboard.html** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ הושלם |
 
 ---

@@ -558,7 +558,8 @@ window.clearAllCache = () => {
     'notesData',
     'researchData',
     'allData',
-    'currenciesData', 'currenciesLoaded'
+    'currenciesData', 'currenciesLoaded',
+    'scanningResults', 'projectFiles'
   ];
   
   globalVars.forEach(varName => {
@@ -583,6 +584,111 @@ window.clearAllCache = () => {
   // הצגת התראה למשתמש
   if (typeof showNotification === 'function') {
     showNotification('המטמון נוקה בהצלחה', 'success');
+  }
+  
+  // הוספת הודעה ברורה בלוג לדף לינטר
+  if (window.location.pathname.includes('linter-realtime-monitor')) {
+    console.log('⚠️ CACHE CLEARED - Linter data reset. Scan required for fresh data.');
+    if (typeof addLogEntry === 'function') {
+      addLogEntry('WARNING', 'מטמון נוקה - נתוני הלינטר אופסו. נדרשת סריקה חדשה לקבלת נתונים עדכניים');
+    }
+  }
+  
+  // עדכון ממשק משתמש לדף לינטר
+  console.log('🔍 Current page path:', window.location.pathname);
+  if (window.location.pathname.includes('linter-realtime-monitor')) {
+    console.log('✅ Detected linter page - updating UI after cache clear');
+    // עדכון סטטיסטיקות לינטר
+    const errorCountElement = document.getElementById('totalErrorsStats');
+    const warningCountElement = document.getElementById('totalWarningsStats');
+    const totalFilesElement = document.getElementById('totalFilesStats');
+    const lastScanElement = document.getElementById('lastScanDate');
+    
+    if (errorCountElement) {
+      errorCountElement.textContent = '0';
+    }
+    if (warningCountElement) {
+      warningCountElement.textContent = '0';
+    }
+    if (totalFilesElement) {
+      totalFilesElement.textContent = '0';
+    }
+    if (lastScanElement) {
+      lastScanElement.textContent = 'טרם בוצעה';
+    }
+    
+    // עדכון סטטיסטיקות לפי סוג קובץ
+    if (typeof updateFileTypeStatistics === 'function') {
+      updateFileTypeStatistics([]);
+    }
+    if (typeof updateFileTypeCardsProgress === 'function') {
+      updateFileTypeCardsProgress();
+    }
+    if (typeof updateProblemFilesTable === 'function') {
+      updateProblemFilesTable();
+    }
+    
+    // הצגת הודעה ברורה בממשק עצמו
+    const statusElement = document.getElementById('overallStatus');
+    if (statusElement) {
+      statusElement.innerHTML = '<span style="color: #ff6b35; font-weight: bold;">מטמון נוקה - נדרשת סריקה</span>';
+    }
+    
+    // הוספת הודעה ברורה בממשק עצמו
+    const summaryStats = document.getElementById('summaryStats');
+    if (summaryStats) {
+      // הוספת הודעה ברורה
+      const cacheClearMessage = document.createElement('div');
+      cacheClearMessage.id = 'cacheClearMessage';
+      cacheClearMessage.style.cssText = `
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 12px;
+        margin: 10px 0;
+        color: #856404;
+        font-weight: 500;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      `;
+      cacheClearMessage.innerHTML = `
+        <i class="fas fa-exclamation-triangle" style="color: #ff6b35; margin-left: 8px;"></i>
+        <strong>מטמון נוקה - נתוני הלינטר אופסו</strong>
+        <br>
+        <small>מומלץ לבצע סריקה חדשה לקבלת נתונים עדכניים</small>
+      `;
+      
+      // הוספה אחרי הסטטיסטיקות
+      summaryStats.parentNode.insertBefore(cacheClearMessage, summaryStats.nextSibling);
+    }
+    
+    // הצגת הודעה ברורה עם הצעה לסריקה
+    setTimeout(() => {
+      console.log('🔔 Showing cache clear notification...');
+      if (typeof showNotification === 'function') {
+        showNotification(
+          'המטמון נוקה - נתוני הלינטר אופסו. מומלץ לבצע סריקה חדשה לקבלת נתונים עדכניים.',
+          'info',
+          'ניקוי מטמון הושלם',
+          8000
+        );
+        console.log('✅ Cache clear notification shown');
+      } else {
+        console.error('❌ showNotification function not available');
+      }
+      
+      // הצגת כפתור לסריקה מהירה
+      const scanButton = document.getElementById('startScan');
+      if (scanButton) {
+        scanButton.style.backgroundColor = '#ff6b35';
+        scanButton.style.borderColor = '#ff6b35';
+        scanButton.innerHTML = '<i class="fas fa-search"></i> סרוק עכשיו (מומלץ)';
+        scanButton.title = 'לחץ לסריקה מהירה אחרי ניקוי מטמון';
+        console.log('✅ Scan button updated after cache clear');
+      } else {
+        console.error('❌ startScan button not found');
+      }
+    }, 1000);
   }
 };
 

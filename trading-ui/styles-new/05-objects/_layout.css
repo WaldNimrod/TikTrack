@@ -75,6 +75,15 @@
   transition: all 0.3s ease;
 }
 
+/* יישור כל האלמנטים במרכז שורת הכותרת */
+.section-header h1,
+.section-header h2,
+.section-header h3 {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
 /* יישור לאמצע הגובה לכל האלמנטים ב-section-header */
 .section-header > * {
   align-self: center;
@@ -97,6 +106,8 @@
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  justify-content: flex-end;
+  order: 2; /* לפני כפתור הפתיחה/סגירה */
 }
 
 /* רקע ברירת מחדל לכותרות ללא מחלקות דינמיות */
@@ -222,6 +233,7 @@
   align-self: center; /* מיושר לאמצע בגובה */
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05); /* מסגרת דקה נוספת */
   margin-inline-start: 0.5rem; /* הפרדה מהכפתורים שלפני */
+  order: 3; /* אחרון בשורה */
 }
 
 .filter-toggle-btn:hover {

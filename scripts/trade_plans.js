@@ -1163,7 +1163,7 @@ function updateTradePlansTable(trade_plans) {
   console.log(`🔄 updateTradePlansTable called with ${trade_plans ? trade_plans.length : 0} trade plans`);
 
   const tbody = document.querySelector('#trade_plansTable tbody');
-  console.log(`🔍 Looking for tbody:`, tbody);
+
   // Looking for table body
 
   if (!tbody) {
@@ -1350,7 +1350,7 @@ function updateTradePlansTable(trade_plans) {
   console.log(`🔄 Table HTML built successfully, length: ${tableHTML.length}`);
   console.log(`🔄 Setting tbody.innerHTML with ${trade_plans.length} rows`);
   tbody.innerHTML = tableHTML;
-
+  console.log(`✅ Table updated successfully`);
 
       // Updating record count
     const countElement = document.querySelector('#trade_plansCount');

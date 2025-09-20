@@ -138,7 +138,7 @@
 | external-data-dashboard | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **הושלם** |
 | notifications-center | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **הושלם** |
 | crud-testing-dashboard | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **הושלם** |
-| css-management | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | **ממתין** |
+| css-management | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **הושלם** |
 | cache-test | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | **ממתין** |
 | constraints | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | **ממתין** |
 | server-monitor | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | **ממתין** |

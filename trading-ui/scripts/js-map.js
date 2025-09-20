@@ -146,6 +146,9 @@ class JsMapSystem {
       // Get functions data
       await this.loadFunctionsData();
 
+      // Load page mapping
+      this.pageMapping = this.scanPageMappingLocally();
+
             console.log('📊 Data loaded - Page mapping keys:', Object.keys(this.pageMapping));
             console.log('📊 Data loaded - Functions data keys:', Object.keys(this.functionsData));
 
@@ -154,12 +157,134 @@ class JsMapSystem {
 
       this.renderFunctionsData();
 
+      // Populate functions dropdown
+      populateFunctionsDropdown();
+
+      // Render page mapping
+      this.renderPageMapping();
+
+      // Load local functions analysis
+      if (typeof loadLocalFunctionsAnalysis === 'function') {
+        loadLocalFunctionsAnalysis();
+      }
+
+      // Render system stats
+      this.renderSystemStats();
+
             console.log('✅ JS map data loaded successfully');
 
         } catch (error) {
       // Error loading JS map data
       this.showErrorState('שגיאה בטעינת נתונים');
     }
+  }
+
+  /**
+     * Render page mapping data
+     */
+  renderPageMapping() {
+    const container = document.getElementById('pageMappingContent');
+    if (!container) return;
+
+    console.log('🔍 Rendering page mapping...');
+    console.log('📁 Page mapping:', this.pageMapping);
+
+    let html = '';
+
+    if (Object.keys(this.pageMapping).length === 0) {
+      html = '<p>אין מיפוי עמודים זמין</p>';
+      } else {
+      html += `
+        <div class="page-mapping-table-container">
+          <table class="page-mapping-table js-map-table">
+            <thead>
+              <tr>
+                <th>עמוד HTML</th>
+                <th>קבצי JavaScript</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      Object.keys(this.pageMapping).forEach(page => {
+        const mapping = this.pageMapping[page];
+        const files = mapping.files || mapping || [];
+        
+        html += `
+          <tr>
+            <td class="page-name">${page}</td>
+            <td class="js-files">${Array.isArray(files) ? files.join(', ') : 'לא זמין'}</td>
+          </tr>
+        `;
+      });
+
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    container.innerHTML = html;
+  }
+
+  /**
+     * Render system statistics
+     */
+  renderSystemStats() {
+    const container = document.getElementById('systemStatsContent');
+    if (!container) return;
+
+    console.log('🔍 Rendering system stats...');
+
+    // Count total functions
+    let totalFunctions = 0;
+    let filesData = {};
+    if (this.functionsData.data) {
+        filesData = this.functionsData.data;
+    } else {
+        filesData = this.functionsData;
+    }
+
+    Object.keys(filesData).forEach(file => {
+      const fileData = filesData[file];
+      if (fileData) {
+        if (Array.isArray(fileData)) {
+          totalFunctions += fileData.length;
+        } else if (fileData.functions && Array.isArray(fileData.functions)) {
+          totalFunctions += fileData.functions.length;
+        }
+      }
+    });
+
+    // Count total JS files
+    const totalJsFiles = Object.keys(filesData).length;
+
+    // Count total pages
+    const totalPages = Object.keys(this.pageMapping).length;
+
+    const html = `
+      <div class="system-stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">${totalPages}</div>
+          <div class="stat-label">עמודי HTML</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${totalJsFiles}</div>
+          <div class="stat-label">קבצי JavaScript</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${totalFunctions}</div>
+          <div class="stat-label">פונקציות JavaScript</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${Object.keys(this.globalFunctionsIndex || {}).length}</div>
+          <div class="stat-label">פונקציות גלובליות</div>
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = html;
   }
 
   /**
@@ -327,7 +452,7 @@ class JsMapSystem {
         }
 
         return stats;
-    }
+  }
 
   /**
      * Load functions data
@@ -569,8 +694,18 @@ class JsMapSystem {
 
     let html = '';
 
-    Object.keys(this.functionsData).forEach(file => {
-            const fileData = this.functionsData[file];
+    // Handle different data structures
+    let filesData = {};
+    if (this.functionsData.data) {
+        // New structure: { data: { filename: { functions: [...] } } }
+        filesData = this.functionsData.data;
+    } else {
+        // Old structure: { filename: { functions: [...] } }
+        filesData = this.functionsData;
+    }
+
+    Object.keys(filesData).forEach(file => {
+            const fileData = filesData[file];
             let functions = [];
             
             // Handle different data structures
@@ -1048,8 +1183,8 @@ function toggleTopSection() {
 
 // Functions Dropdown
 function toggleFunctionsDropdown() {
-    const dropdown = document.getElementById('functionsDropdown');
-    const toggle = document.querySelector('.dropdown-toggle');
+    const dropdown = document.getElementById('functionsDropdownContent');
+    const toggle = document.getElementById('functionsDropdown');
 
     if (dropdown && dropdown.classList.contains('show')) {
         dropdown.classList.remove('show');
@@ -1069,8 +1204,18 @@ function populateFunctionsDropdown() {
 
     let html = '';
 
-    Object.keys(window.jsMapSystem.functionsData).forEach(file => {
-        const fileData = window.jsMapSystem.functionsData[file];
+    // Handle different data structures
+    let filesData = {};
+    if (window.jsMapSystem.functionsData.data) {
+        // New structure: { data: { filename: { functions: [...] } } }
+        filesData = window.jsMapSystem.functionsData.data;
+    } else {
+        // Old structure: { filename: { functions: [...] } }
+        filesData = window.jsMapSystem.functionsData;
+    }
+
+    Object.keys(filesData).forEach(file => {
+        const fileData = filesData[file];
         let functions = [];
         
         // Handle different data structures
@@ -1151,8 +1296,8 @@ function selectFunctionFromDropdown(file, functionName) {
 
 // Close dropdown when clicking outside
 document.addEventListener('click', function (event) {
-    const dropdown = document.getElementById('functionsDropdown');
-    const toggle = document.querySelector('.dropdown-toggle');
+    const dropdown = document.getElementById('functionsDropdownContent');
+    const toggle = document.getElementById('functionsDropdown');
 
     if (dropdown && toggle && !dropdown.contains(event.target) && !toggle.contains(event.target)) {
         dropdown.classList.remove('show');
@@ -1519,9 +1664,9 @@ function generateDuplicatesLog(data) {
  * Render local functions analysis results
  */
 function renderLocalFunctionsAnalysis(data) {
-    const container = document.getElementById('localFunctionsContent');
+    const container = document.getElementById('dependenciesContent');
     if (!container) {
-        console.error('❌ localFunctionsContent container not found');
+        console.error('❌ dependenciesContent container not found');
         return;
     }
     
@@ -1608,7 +1753,7 @@ function renderFileAnalysis(fileAnalysis) {
  * Show local functions error
  */
 function showLocalFunctionsError(message) {
-    const container = document.getElementById('localFunctionsContent');
+    const container = document.getElementById('dependenciesContent');
     if (container) {
         container.innerHTML = `
             <div class="error-message">
@@ -1624,7 +1769,7 @@ function showLocalFunctionsError(message) {
  * Show local functions placeholder when endpoint is not available
  */
 function showLocalFunctionsPlaceholder() {
-    const container = document.getElementById('localFunctionsContent');
+    const container = document.getElementById('dependenciesContent');
     if (container) {
         container.innerHTML = `
             <div class="placeholder-message">
@@ -2199,14 +2344,21 @@ async function copyDetailedLog() {
     const uiElements = [
         { id: 'quickSearch', name: 'חיפוש מהיר' },
         { id: 'quickSearchResults', name: 'תוצאות חיפוש' },
-        { id: 'functionsDropdown', name: 'תפריט פונקציות' },
+        { id: 'functionsDropdownContent', name: 'תפריט פונקציות' },
         { id: 'backToTopBtn', name: 'כפתור חזרה לראש' }
     ];
     
     uiElements.forEach(element => {
         const el = document.getElementById(element.id);
         if (el) {
-            const isVisible = el.style.display !== 'none' && el.offsetParent !== null;
+            let isVisible;
+            if (element.id === 'functionsDropdownContent') {
+                // For dropdown, check if it has 'show' class
+                isVisible = el.classList.contains('show');
+            } else {
+                // For other elements, check display and offsetParent
+                isVisible = el.style.display !== 'none' && el.offsetParent !== null;
+            }
             detailedLog += `${element.id} (${element.name}): ${isVisible ? '✅ גלוי' : '❌ מוסתר'}\n`;
         } else {
             detailedLog += `${element.id} (${element.name}): ❌ לא קיים\n`;

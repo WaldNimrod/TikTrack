@@ -17,7 +17,8 @@
   gap: 0.5rem;
   margin-top: 1rem;
   justify-content: flex-start; /* משמאל */
-  flex-wrap: wrap; /* מאפשר מעבר לשורה הבאה אם צריך */
+  flex-wrap: nowrap; /* תמיד בשורה אחת */
+  align-items: center;
 }
 
 .btn-group-default .btn,

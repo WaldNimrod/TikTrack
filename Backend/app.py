@@ -1524,8 +1524,19 @@ def serve_static_files(filename):
 @app.route("/api/v1/files/discover", methods=["GET"])
 @rate_limit_api(requests_per_minute=30)
 def discover_files():
-    """Discover all project files dynamically"""
+    """Discover all project files dynamically with timeout protection"""
     try:
+        import signal
+        
+        # Set timeout for file discovery (30 seconds)
+        def timeout_handler(signum, frame):
+            raise TimeoutError("File discovery timed out after 30 seconds")
+        
+        # Set the timeout
+        signal.signal(signal.SIGALRM, timeout_handler)
+        signal.alarm(30)
+        
+        try:
         import os
         import glob
         from pathlib import Path
@@ -1596,14 +1607,28 @@ def discover_files():
         for file_type in discovered_files:
             discovered_files[file_type] = sorted(list(set(discovered_files[file_type])))
         
+            return jsonify({
+                "success": True,
+                "files": discovered_files,
+                "total_files": sum(len(files) for files in discovered_files.values()),
+                "discovery_timestamp": datetime.now().isoformat()
+            })
+            
+        finally:
+            # Cancel the timeout
+            signal.alarm(0)
+        
+    except TimeoutError as e:
+        logger.error(f"File discovery timed out: {e}")
         return jsonify({
-            "success": True,
-            "files": discovered_files,
-            "total_files": sum(len(files) for files in discovered_files.values()),
-            "discovery_timestamp": datetime.now().isoformat()
-        })
+            "success": False,
+            "error": "File discovery timed out after 30 seconds",
+            "files": {},
+            "total_files": 0
+        }), 408  # Request Timeout
         
     except Exception as e:
+        logger.error(f"File discovery error: {e}")
         return jsonify({
             "success": False,
             "error": str(e),

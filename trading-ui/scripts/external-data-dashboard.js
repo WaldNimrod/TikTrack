@@ -79,6 +79,7 @@ class ExternalDataDashboard {
         this.updateDatabaseStatus(data);
         this.updateAPIStatus(data);
         this.updateInfoSummary(data);
+        this.updateStatisticsCards(data);
 
       } else {
         // console.error('❌ Error loading system status:', response.status);
@@ -251,6 +252,142 @@ class ExternalDataDashboard {
         detailsElement.innerHTML = `
           <div class="status-detail error">❌ לא ניתן לקבוע סטטוס API</div>
         `;
+      }
+    }
+  }
+
+  updateInfoSummary(data) {
+    // Update providers count
+    const providersCountElement = document.getElementById('providers-count');
+    if (providersCountElement && data.providers) {
+      providersCountElement.textContent = data.providers.total || 0;
+    }
+
+    // Update active data count (cache stats)
+    const activeDataCountElement = document.getElementById('active-data-count');
+    if (activeDataCountElement && data.cache) {
+      activeDataCountElement.textContent = (data.cache.total_quotes || 0).toLocaleString();
+    }
+
+    // Update last update time
+    const lastUpdateTimeElement = document.getElementById('last-update-time');
+    if (lastUpdateTimeElement && data.cache) {
+      const lastUpdate = data.cache.last_update;
+      if (lastUpdate) {
+        const updateTime = new Date(lastUpdate);
+        const now = new Date();
+        const diffMinutes = Math.floor((now - updateTime) / (1000 * 60));
+        
+        if (diffMinutes < 1) {
+          lastUpdateTimeElement.textContent = 'עכשיו';
+        } else if (diffMinutes < 60) {
+          lastUpdateTimeElement.textContent = `לפני ${diffMinutes} דקות`;
+        } else {
+          const diffHours = Math.floor(diffMinutes / 60);
+          lastUpdateTimeElement.textContent = `לפני ${diffHours} שעות`;
+        }
+      } else {
+        lastUpdateTimeElement.textContent = 'לא ידוע';
+      }
+    }
+
+    // Update overall status
+    const overallStatusElement = document.getElementById('overall-status');
+    if (overallStatusElement) {
+      if (data.success === true && data.overall_health) {
+        overallStatusElement.textContent = 'פעיל';
+        overallStatusElement.className = 'text-success';
+      } else {
+        overallStatusElement.textContent = 'בעיה';
+        overallStatusElement.className = 'text-warning';
+      }
+    }
+  }
+
+  updateStatisticsCards(data) {
+    // Update records count
+    const recordsCountElement = document.getElementById('records-count');
+    if (recordsCountElement && data.cache) {
+      recordsCountElement.textContent = (data.cache.total_quotes || 0).toLocaleString();
+    }
+
+    // Update cache size
+    const cacheSizeElement = document.getElementById('cache-size');
+    if (cacheSizeElement && data.cache) {
+      const cacheSize = (data.cache.total_quotes || 0) * 0.15; // Estimate ~150KB per quote
+      if (cacheSize > 1000000) {
+        cacheSizeElement.textContent = `${(cacheSize / 1000000).toFixed(1)}M`;
+      } else if (cacheSize > 1000) {
+        cacheSizeElement.textContent = `${(cacheSize / 1000).toFixed(1)}K`;
+      } else {
+        cacheSizeElement.textContent = `${Math.round(cacheSize)}B`;
+      }
+    }
+
+    // Update hit rate
+    const hitRateElement = document.getElementById('hit-rate');
+    if (hitRateElement && data.cache) {
+      hitRateElement.textContent = `${(data.cache.cache_hit_rate || 0).toFixed(1)}%`;
+    }
+
+    // Update general status
+    const generalStatusElement = document.getElementById('general-status');
+    if (generalStatusElement) {
+      if (data.success === true && data.overall_health) {
+        generalStatusElement.textContent = 'פעיל';
+        generalStatusElement.className = 'text-success';
+      } else {
+        generalStatusElement.textContent = 'בעיה';
+        generalStatusElement.className = 'text-warning';
+      }
+    }
+
+    // Update provider last update times
+    this.updateProviderLastUpdateTimes(data);
+  }
+
+  updateProviderLastUpdateTimes(data) {
+    // Update Yahoo Finance last update
+    const yahooLastUpdateElement = document.getElementById('yahoo-last-update');
+    if (yahooLastUpdateElement && data.providers?.details) {
+      const yahooProvider = data.providers.details.find(p => p.name === 'yahoo_finance');
+      if (yahooProvider && yahooProvider.last_successful_request) {
+        const lastUpdate = new Date(yahooProvider.last_successful_request);
+        const now = new Date();
+        const diffMinutes = Math.floor((now - lastUpdate) / (1000 * 60));
+        
+        if (diffMinutes < 1) {
+          yahooLastUpdateElement.textContent = 'עכשיו';
+        } else if (diffMinutes < 60) {
+          yahooLastUpdateElement.textContent = `לפני ${diffMinutes} דקות`;
+        } else {
+          const diffHours = Math.floor(diffMinutes / 60);
+          yahooLastUpdateElement.textContent = `לפני ${diffHours} שעות`;
+        }
+      } else {
+        yahooLastUpdateElement.textContent = 'לא ידוע';
+      }
+    }
+
+    // Update Alpha Vantage last update
+    const alphaLastUpdateElement = document.getElementById('alpha-last-update');
+    if (alphaLastUpdateElement && data.providers?.details) {
+      const alphaProvider = data.providers.details.find(p => p.name === 'alpha_vantage');
+      if (alphaProvider && alphaProvider.last_successful_request) {
+        const lastUpdate = new Date(alphaProvider.last_successful_request);
+        const now = new Date();
+        const diffMinutes = Math.floor((now - lastUpdate) / (1000 * 60));
+        
+        if (diffMinutes < 1) {
+          alphaLastUpdateElement.textContent = 'עכשיו';
+        } else if (diffMinutes < 60) {
+          alphaLastUpdateElement.textContent = `לפני ${diffMinutes} דקות`;
+        } else {
+          const diffHours = Math.floor(diffMinutes / 60);
+          alphaLastUpdateElement.textContent = `לפני ${diffHours} שעות`;
+        }
+      } else {
+        alphaLastUpdateElement.textContent = 'לא ידוע';
       }
     }
   }

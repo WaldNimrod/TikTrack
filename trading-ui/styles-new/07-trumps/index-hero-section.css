@@ -22,6 +22,11 @@
   box-shadow: none;
 }
 
+/* רווח מתחת לסקשן העליון */
+.top-section {
+  margin-bottom: 10px;
+}
+
 .hero-bg-illustration {
   position: absolute;
   top: 0;

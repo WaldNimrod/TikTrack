@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ניתוח פונקציות JavaScript - TikTrack</title>
+    <title>מפת JavaScript - TikTrack</title>
     
-            <!-- ===== CSS Architecture - Unified CSS ===== -->
+    <!-- ===== CSS Architecture - Unified CSS ===== -->
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
@@ -29,7 +29,6 @@
     
     <!-- Page-Specific CSS - Last to override all previous styles -->
     <link rel="stylesheet" href="styles/js-map.css?v=v1.0.0">
-    
 
     <!-- Core scripts - Required order -->
     <script src="scripts/header-system.js"></script>
@@ -48,10 +47,10 @@
         <div class="page-body">
         <!-- Main content limited in width -->
         <div class="main-content">
-            <!-- Top Section - לפי מפרט המערכת -->
+            <!-- Top Section - מפת JavaScript -->
             <div class="top-section">
                 <div class="section-header">
-                    <h2>⚙️ ניתוח פונקציות JavaScript</h2>
+                    <h2>🗺️ מפת JavaScript</h2>
                     <div class="header-actions">
                         <button class="action-btn copy-log-btn" onclick="copyDetailedLog()" title="העתק לוג מפורט של כל הממשקים">
                             <i class="fas fa-copy"></i> העתק לוג מפורט
@@ -85,16 +84,6 @@
                                 <div class="stat-value" id="globalFunctionsCount">-</div>
                                 <div class="stat-label">פונקציות גלובליות</div>
                             </div>
-                            <div class="stat-card">
-                                <div class="stat-icon">🔍</div>
-                                <div class="stat-value" id="duplicatesCount">-</div>
-                                <div class="stat-label">כפילויות זוהו</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon">🏠</div>
-                                <div class="stat-value" id="localFunctionsCount">-</div>
-                                <div class="stat-label">פונקציות מקומיות</div>
-                            </div>
                         </div>
                     </div>
                     
@@ -107,6 +96,17 @@
                             </button>
                         </div>
                         <div id="quickSearchResults" class="search-results"></div>
+                    </div>
+                    
+                    <!-- תפריט פונקציות -->
+                    <div class="functions-dropdown">
+                        <button id="functionsDropdown" class="dropdown-toggle" onclick="toggleFunctionsDropdown()">
+                            <i class="fas fa-list"></i> תפריט פונקציות
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div id="functionsDropdownContent" class="dropdown-content">
+                            <!-- תוכן התפריט יטען דינמית -->
+                        </div>
                     </div>
                     
                     <!-- כפתורי פעולה מהירה -->
@@ -124,61 +124,85 @@
                             <i class="fas fa-file-alt"></i> יצירת דוח
                         </button>
                     </div>
-                    
-                    <!-- Functions Dropdown -->
-                    <div class="functions-dropdown-container">
-                        <button class="dropdown-toggle" onclick="toggleFunctionsDropdown()">
-                            <i class="fas fa-search"></i> חיפוש פונקציות מתקדם
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div id="functionsDropdown" class="functions-dropdown">
-                            <div id="functionsDropdownContent" class="functions-dropdown-content">
-                                <div class="loading">טוען פונקציות...</div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
             <!-- UI Content Section Top End -->
 
-
-            <!-- UI Content Section 1 - ניתוח כפילויות -->
+            <!-- UI Content Section 1 - מיפוי עמודים לקבצי JS -->
             <div class="content-section" id="section1">
                 <div class="section-header">
-                    <h2>🔍 ניתוח פונקציות כפולות ודומות</h2>
+                    <h2>🗺️ מיפוי עמודים לקבצי JS</h2>
                     <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
                         <span class="section-toggle-icon">▼</span>
                     </button>
                 </div>
                 <div class="section-body">
-                    <div id="duplicatesContent">
-                    <div class="loading">
-                        <div class="loading-spinner"></div>
-                            <p>טוען ניתוח כפילויות...</p>
+                    <div id="pageMappingContent">
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                            <p>טוען מיפוי עמודים...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- UI Content Section 1 End -->
+
+            <!-- UI Content Section 2 - מפת פונקציות מפורטת -->
+            <div class="content-section" id="section2">
+                <div class="section-header">
+                    <h2>⚙️ מפת פונקציות מפורטת</h2>
+                    <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                        <span class="section-toggle-icon">▼</span>
+                    </button>
+                </div>
+                <div class="section-body">
+                    <div id="functionsMapContent">
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                            <p>טוען מפת פונקציות...</p>
                         </div>
                     </div>
                 </div>
             </div>
             <!-- UI Content Section 2 End -->
 
-            <!-- UI Content Section 2 - פונקציות מפורטות -->
-            <div class="content-section" id="section2">
+            <!-- UI Content Section 3 - ניתוח תלויות -->
+            <div class="content-section" id="section3">
                 <div class="section-header">
-                    <h2>⚙️ פונקציות מפורטות</h2>
-                    <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                    <h2>🔗 ניתוח תלויות</h2>
+                    <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
                         <span class="section-toggle-icon">▼</span>
                     </button>
                 </div>
                 <div class="section-body">
-                <div id="functionsContent">
-                    <div class="loading">
-                        <div class="loading-spinner"></div>
-                        טוען פונקציות...
+                    <div id="dependenciesContent">
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                            <p>טוען ניתוח תלויות...</p>
+                        </div>
                     </div>
                 </div>
             </div>
+            <!-- UI Content Section 3 End -->
+
+            <!-- UI Content Section 4 - סטטיסטיקות מערכת -->
+            <div class="content-section" id="section4">
+                <div class="section-header">
+                    <h2>📊 סטטיסטיקות מערכת</h2>
+                    <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                        <span class="section-toggle-icon">▼</span>
+                    </button>
+                </div>
+                <div class="section-body">
+                    <div id="systemStatsContent">
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                            <p>טוען סטטיסטיקות מערכת...</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- UI Content Section 2.1 End -->
+            <!-- UI Content Section 4 End -->
         </div>
     </div>
 
@@ -197,40 +221,6 @@
             <div class="function-modal-body">
                 <div class="function-annotations" id="modalAnnotations"></div>
                 <div class="function-code" id="modalCode"></div>
-            </div>
-
-            <!-- UI Content Section 3 - זיהוי פונקציות מקומיות -->
-            <div class="content-section" id="section3">
-                <div class="section-header">
-                    <h2>🏠 זיהוי פונקציות מקומיות</h2>
-                    <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
-                        <span class="section-toggle-icon">▼</span>
-                    </button>
-                </div>
-                <div class="section-body">
-            <div id="localFunctionsContent">
-                <div class="loading">
-                    <div class="loading-spinner"></div>
-                    <p>טוען זיהוי פונקציות מקומיות...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- UI Content Section 4 - סטטיסטיקות פונקציות -->
-    <div class="content-section" id="section4">
-        <div class="section-header">
-            <h2>📊 סטטיסטיקות פונקציות</h2>
-            <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
-                <span class="section-toggle-icon">▼</span>
-            </button>
-        </div>
-        <div class="section-body">
-            <div id="functionsStatsContent">
-                <div class="loading">
-                    <div class="loading-spinner"></div>
-                    <p>טוען סטטיסטיקות פונקציות...</p>
-                </div>
             </div>
         </div>
     </div>

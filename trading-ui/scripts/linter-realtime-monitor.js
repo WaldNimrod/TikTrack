@@ -126,17 +126,50 @@ async function loadInitialData() {
             // Wait for IndexedDB to be initialized
             await adapter.initialize();
             
-            const historicalData = await adapter.getHistoricalData();
+            // Load latest scanning results from IndexedDB
+            const latestData = await adapter.getLatestData();
+            console.log('🔍 IndexedDB latest data:', latestData);
             
-            if (historicalData && historicalData.length > 0) {
-                addLogEntry('SUCCESS', `נטענו ${historicalData.length} נקודות נתונים היסטוריות`);
+            if (latestData && latestData.length > 0) {
+                // Get the most recent scan data
+                const latestScan = latestData[latestData.length - 1];
                 
-                if (chartRendererInstance) {
-                    chartRendererInstance.updateChart(historicalData);
+                if (latestScan && latestScan.errors && latestScan.warnings) {
+                    // Restore scanning results from the latest scan
+                    window.scanningResults = {
+                        errors: latestScan.errors || [],
+                        warnings: latestScan.warnings || [],
+                        totalFiles: latestScan.metrics?.totalFiles || 0,
+                        scannedFiles: latestScan.filesScanned || 0,
+                        startTime: latestScan.timestamp ? new Date(latestScan.timestamp).getTime() : null,
+                        endTime: latestScan.timestamp ? new Date(latestScan.timestamp).getTime() : null
+                    };
+                    
+                    addLogEntry('SUCCESS', `נטענו נתוני סריקה אחרונים: ${window.scanningResults.scannedFiles} קבצים, ${window.scanningResults.errors.length} שגיאות, ${window.scanningResults.warnings.length} אזהרות`);
+                    
+                    // Update last scan date
+                    if (latestScan.timestamp) {
+                        lastScanDate = latestScan.timestamp;
+                        const lastScanElement = document.getElementById('lastScanDate');
+                        if (lastScanElement) {
+                            lastScanElement.textContent = new Date(latestScan.timestamp).toLocaleString('he-IL');
+                        }
+                    }
+                    
+                    // Update UI with loaded data
+                    updateStatisticsDisplay();
+                    updateProblemFilesTable();
+                    updateFileTypeStatistics(window.scanningResults.errors.concat(window.scanningResults.warnings));
+                    updateFileTypeCardsProgress();
                 }
                 
-                // Update statistics display with latest data
-                updateStatisticsDisplay();
+                // Update chart with historical data
+                if (chartRendererInstance) {
+                    chartRendererInstance.updateChart(latestData);
+                    console.log('✅ Chart updated with historical data from IndexedDB:', latestData);
+                }
+                
+                addLogEntry('SUCCESS', `נטענו ${latestData.length} נקודות נתונים היסטוריות`);
             } else {
                 addLogEntry('INFO', 'לא נמצאו נתונים היסטוריים - מתחיל עם גרף ריק');
             }
@@ -158,21 +191,27 @@ async function updateStatisticsDisplay() {
                 console.log('IndexedDB already initialized or initialization failed:', initError.message);
             }
             
-            const latestData = await adapter.getLatestData();
-            
-            if (latestData) {
+                const latestData = await adapter.getLatestData();
+                
+                console.log('🔍 IndexedDB Debug - latestData:', latestData);
+                console.log('🔍 IndexedDB Debug - latestData length:', latestData ? latestData.length : 'null');
+                
+                if (latestData && latestData.length > 0) {
+                // Get the most recent scan data
+                const latestScan = latestData[latestData.length - 1];
+                
                 // Update global scanning results with loaded data
-                window.scanningResults.errors = latestData.errors || [];
-                window.scanningResults.warnings = latestData.warnings || [];
-                window.scanningResults.totalFiles = latestData.totalFiles || 0;
-                window.scanningResults.scannedFiles = latestData.scannedFiles || 0;
+                window.scanningResults.errors = latestScan.errors || [];
+                window.scanningResults.warnings = latestScan.warnings || [];
+                window.scanningResults.totalFiles = latestScan.metrics?.totalFiles || 0;
+                window.scanningResults.scannedFiles = latestScan.filesScanned || 0;
                 
                 // Update last scan date display
                 const lastScanElement = document.getElementById('lastScanDate');
-                if (lastScanElement && latestData.timestamp) {
-                    const scanDate = new Date(latestData.timestamp);
+                if (lastScanElement && latestScan.timestamp) {
+                    const scanDate = new Date(latestScan.timestamp);
                     lastScanElement.textContent = scanDate.toLocaleString('he-IL');
-                    lastScanDate = latestData.timestamp;
+                    lastScanDate = latestScan.timestamp;
                 } else if (lastScanElement) {
                     lastScanElement.textContent = 'טרם בוצעה';
                 }
@@ -180,6 +219,7 @@ async function updateStatisticsDisplay() {
                 // Update error and warning counts
                 const errorCountElement = document.getElementById('totalErrorsStats');
                 const warningCountElement = document.getElementById('totalWarningsStats');
+                const totalFilesElement = document.getElementById('totalFilesStats');
                 
                 if (errorCountElement) {
                     errorCountElement.textContent = window.scanningResults.errors.length;
@@ -187,6 +227,15 @@ async function updateStatisticsDisplay() {
                 if (warningCountElement) {
                     warningCountElement.textContent = window.scanningResults.warnings.length;
                 }
+                if (totalFilesElement) {
+                    totalFilesElement.textContent = window.scanningResults.scannedFiles;
+                }
+                
+                console.log('✅ Updated statistics from IndexedDB:', {
+                    errors: window.scanningResults.errors.length,
+                    warnings: window.scanningResults.warnings.length,
+                    scannedFiles: window.scanningResults.scannedFiles
+                });
                 
                 // Update file type statistics with loaded data
                 updateFileTypeStatistics(window.scanningResults.errors.concat(window.scanningResults.warnings));
@@ -194,12 +243,175 @@ async function updateStatisticsDisplay() {
                 // Update file type cards with loaded data
                 updateFileTypeCardsProgress();
                 
+                // Update problem files table with loaded data
+                updateProblemFilesTable();
+                
+                // Update chart indicators
+                updateChartIndicators();
+                
                 addLogEntry('SUCCESS', 'סטטיסטיקות עודכנו מהנתונים השמורים');
         } else {
+            // Try to load from localStorage as backup
+            const savedData = localStorage.getItem('linterScanningResults');
+            console.log('🔍 localStorage Debug - savedData:', savedData);
+            console.log('🔍 localStorage Debug - savedData length:', savedData ? savedData.length : 'null');
+            
+            // Debug: Check all localStorage keys
+            console.log('🔍 localStorage Debug - All keys:', Object.keys(localStorage));
+            console.log('🔍 localStorage Debug - All keys with linter:', Object.keys(localStorage).filter(key => key.includes('linter')));
+            
+            if (savedData) {
+                try {
+                    const parsedData = JSON.parse(savedData);
+                    if (parsedData && (parsedData.errors?.length > 0 || parsedData.warnings?.length > 0)) {
+                        window.scanningResults = parsedData;
+                        
+                        // Update UI with loaded data
+                        const errorCountElement = document.getElementById('totalErrorsStats');
+                        const warningCountElement = document.getElementById('totalWarningsStats');
+                        const totalFilesElement = document.getElementById('totalFilesStats');
+                        const lastScanElement = document.getElementById('lastScanDate');
+                        
+                        if (errorCountElement) {
+                            errorCountElement.textContent = window.scanningResults.errors.length;
+                        }
+                        if (warningCountElement) {
+                            warningCountElement.textContent = window.scanningResults.warnings.length;
+                        }
+                        if (totalFilesElement) {
+                            totalFilesElement.textContent = window.scanningResults.scannedFiles || 0;
+                        }
+                        if (lastScanElement && window.scanningResults.lastScanTime) {
+                            const scanDate = new Date(window.scanningResults.lastScanTime);
+                            lastScanElement.textContent = scanDate.toLocaleString('he-IL');
+                        }
+                        
+                        updateFileTypeStatistics(window.scanningResults.errors.concat(window.scanningResults.warnings));
+                        updateFileTypeCardsProgress();
+                        updateProblemFilesTable();
+                        updateChartIndicators();
+                        
+                        addLogEntry('SUCCESS', 'נתונים נטענו מ-localStorage');
+                        console.log('✅ Loaded data from localStorage:', window.scanningResults);
+                    } else {
+                        addLogEntry('INFO', 'לא נמצאו נתונים שמורים - מתחיל עם נתונים ריקים');
+                        
+                        // Show confirmation dialog to start first scan
+                        setTimeout(() => {
+                            if (typeof window.showConfirmationDialog === 'function') {
+                                window.showConfirmationDialog(
+                                    'סריקה ראשונה',
+                                    'לא נמצאו נתוני סריקה קודמים.\n\nהאם תרצה לבצע סריקה ראשונה עכשיו?',
+                                    () => {
+                                        scanJavaScriptFiles();
+                                    },
+                                    () => {
+                                        addLogEntry('INFO', 'סריקה ראשונה בוטלה על ידי המשתמש');
+                                    },
+                                    'info'
+                                );
+                            } else {
+                                // Fallback to regular confirm if showConfirmationDialog is not available
+                                if (confirm('לא נמצאו נתוני סריקה קודמים.\n\nהאם תרצה לבצע סריקה ראשונה עכשיו?')) {
+                                    scanJavaScriptFiles();
+                                }
+                            }
+                        }, 1000);
+                    }
+                } catch (error) {
+                    addLogEntry('WARNING', 'שגיאה בטעינת נתונים מ-localStorage', { error: error.message });
+                    addLogEntry('INFO', 'לא נמצאו נתונים שמורים - מתחיל עם נתונים ריקים');
+                }
+            } else {
                 addLogEntry('INFO', 'לא נמצאו נתונים שמורים - מתחיל עם נתונים ריקים');
+                
+                // Show confirmation dialog to start first scan
+                setTimeout(() => {
+                    if (typeof window.showConfirmationDialog === 'function') {
+                        window.showConfirmationDialog(
+                            'סריקה ראשונה',
+                            'לא נמצאו נתוני סריקה קודמים.\n\nהאם תרצה לבצע סריקה ראשונה עכשיו?',
+                            () => {
+                                scanJavaScriptFiles();
+                            },
+                            () => {
+                                addLogEntry('INFO', 'סריקה ראשונה בוטלה על ידי המשתמש');
+                            },
+                            'info'
+                        );
+                    } else {
+                        // Fallback to regular confirm if showConfirmationDialog is not available
+                        if (confirm('לא נמצאו נתוני סריקה קודמים.\n\nהאם תרצה לבצע סריקה ראשונה עכשיו?')) {
+                            scanJavaScriptFiles();
+                        }
+                    }
+                }, 1000);
             }
+            
+            // Initialize empty scanning results
+            if (!window.scanningResults) {
+                window.scanningResults = {
+                    errors: [],
+                    warnings: [],
+                    totalFiles: 0,
+                    scannedFiles: 0,
+                    startTime: null,
+                    endTime: null
+                };
+            }
+            
+            // Update UI with empty data
+            const errorCountElement = document.getElementById('totalErrorsStats');
+            const warningCountElement = document.getElementById('totalWarningsStats');
+            const totalFilesElement = document.getElementById('totalFilesStats');
+            const lastScanElement = document.getElementById('lastScanDate');
+            
+            if (errorCountElement) {
+                errorCountElement.textContent = '0';
+            }
+            if (warningCountElement) {
+                warningCountElement.textContent = '0';
+            }
+            if (totalFilesElement) {
+                totalFilesElement.textContent = '0';
+            }
+            if (lastScanElement) {
+                lastScanElement.textContent = 'טרם בוצעה';
+            }
+        }
         } else {
             addLogEntry('WARNING', 'IndexedDB לא זמין - משתמש בנתונים מקומיים בלבד');
+            
+            // Initialize empty scanning results
+            if (!window.scanningResults) {
+                window.scanningResults = {
+                    errors: [],
+                    warnings: [],
+                    totalFiles: 0,
+                    scannedFiles: 0,
+                    startTime: null,
+                    endTime: null
+                };
+            }
+            
+            // Update UI with empty data
+            const errorCountElement = document.getElementById('totalErrorsStats');
+            const warningCountElement = document.getElementById('totalWarningsStats');
+            const totalFilesElement = document.getElementById('totalFilesStats');
+            const lastScanElement = document.getElementById('lastScanDate');
+            
+            if (errorCountElement) {
+                errorCountElement.textContent = '0';
+            }
+            if (warningCountElement) {
+                warningCountElement.textContent = '0';
+            }
+            if (totalFilesElement) {
+                totalFilesElement.textContent = '0';
+            }
+            if (lastScanElement) {
+                lastScanElement.textContent = 'טרם בוצעה';
+            }
         }
     } catch (error) {
         addLogEntry('ERROR', 'שגיאה בעדכון תצוגת הסטטיסטיקות', { error: error.message });
@@ -217,6 +429,9 @@ function loadLogs() {
         // Just update the display once with all logs, don't call handleLogEntry for each
         updateLogDisplay();
         addLogEntry('SUCCESS', `נטענו ${logs.length} רשומות לוג`);
+        
+        // Try to load scanning results from localStorage as backup
+        loadScanningResultsFromLocalStorage();
     } catch (error) {
         addLogEntry('ERROR', 'שגיאה בטעינת הלוגים', { error: error.message });
     }
@@ -231,9 +446,158 @@ function getAllLogEntries() {
     }
 }
 
+function loadScanningResultsFromLocalStorage() {
+    try {
+        // Try to load scanning results from localStorage
+        const savedResults = localStorage.getItem('linterScanningResults');
+        console.log('🔍 Checking localStorage for scanning results:', savedResults ? 'Found' : 'Not found');
+        
+        if (savedResults) {
+            const results = JSON.parse(savedResults);
+            console.log('📊 Loaded scanning results from localStorage:', results);
+            
+            // Update global scanning results
+            window.scanningResults = {
+                errors: results.errors || [],
+                warnings: results.warnings || [],
+                totalFiles: results.totalFiles || 0,
+                scannedFiles: results.scannedFiles || 0,
+                startTime: results.startTime || null,
+                endTime: results.endTime || null
+            };
+            
+            console.log('✅ Updated window.scanningResults:', window.scanningResults);
+            
+            // Update UI with loaded data
+            updateRealtimeProgress();
+            updateFileTypeStatistics(window.scanningResults.errors.concat(window.scanningResults.warnings));
+            updateFileTypeCardsProgress();
+            updateProblemFilesTable();
+            
+            addLogEntry('SUCCESS', `נתוני סריקה נטענו מ-localStorage: ${window.scanningResults.scannedFiles} קבצים, ${window.scanningResults.errors.length} שגיאות, ${window.scanningResults.warnings.length} אזהרות`);
+        } else {
+            console.log('❌ No scanning results found in localStorage');
+            addLogEntry('INFO', 'לא נמצאו נתוני סריקה ב-localStorage');
+        }
+    } catch (error) {
+        console.error('❌ Error loading scanning results from localStorage:', error);
+        addLogEntry('ERROR', 'שגיאה בטעינת נתוני סריקה מ-localStorage', { error: error.message });
+    }
+}
+
 // ========================================
 // Statistics and Display Management
 // ========================================
+
+/**
+ * Update chart indicators display
+ * Updates the chart indicators section with current data
+ */
+function updateChartIndicators() {
+    try {
+        // Get current data
+        const totalErrors = window.scanningResults?.errors?.length || 0;
+        const totalWarnings = window.scanningResults?.warnings?.length || 0;
+        const totalFiles = window.scanningResults?.scannedFiles || 0;
+        const lastScanTime = window.scanningResults?.lastScanTime || null;
+        
+        // Calculate data points (number of scans)
+        const dataPoints = window.scanningResults?.scanCount || 0;
+        
+        // Calculate average quality score
+        const qualityScore = Math.max(0, 100 - (totalErrors * 5) - (totalWarnings * 2));
+        
+        // Calculate storage size (approximate)
+        const storageSize = calculateStorageSize();
+        
+        // Update DOM elements
+        const totalDataPointsElement = document.getElementById('totalDataPoints');
+        const lastUpdateTimeElement = document.getElementById('lastUpdateTime');
+        const storageSizeElement = document.getElementById('storageSize');
+        const avgQualityElement = document.getElementById('avgQuality');
+        const totalErrorsElement = document.getElementById('totalErrors');
+        
+        if (totalDataPointsElement) {
+            totalDataPointsElement.textContent = dataPoints;
+        }
+        
+        if (lastUpdateTimeElement) {
+            if (lastScanTime) {
+                const updateDate = new Date(lastScanTime);
+                lastUpdateTimeElement.textContent = updateDate.toLocaleString('he-IL');
+            } else {
+                lastUpdateTimeElement.textContent = 'טרם בוצעה';
+            }
+        }
+        
+        if (storageSizeElement) {
+            storageSizeElement.textContent = storageSize;
+        }
+        
+        if (avgQualityElement) {
+            avgQualityElement.textContent = `${qualityScore}%`;
+            // Add color based on quality
+            if (qualityScore >= 90) {
+                avgQualityElement.style.color = '#28a745'; // Green
+            } else if (qualityScore >= 70) {
+                avgQualityElement.style.color = '#ffc107'; // Yellow
+            } else {
+                avgQualityElement.style.color = '#dc3545'; // Red
+            }
+        }
+        
+        if (totalErrorsElement) {
+            totalErrorsElement.textContent = totalErrors;
+            // Add color based on error count
+            if (totalErrors === 0) {
+                totalErrorsElement.style.color = '#28a745'; // Green
+            } else if (totalErrors < 5) {
+                totalErrorsElement.style.color = '#ffc107'; // Yellow
+            } else {
+                totalErrorsElement.style.color = '#dc3545'; // Red
+            }
+        }
+        
+        console.log('✅ Chart indicators updated:', {
+            dataPoints,
+            lastScanTime,
+            storageSize,
+            qualityScore,
+            totalErrors
+        });
+        
+    } catch (error) {
+        console.error('❌ Error updating chart indicators:', error);
+        addLogEntry('ERROR', 'שגיאה בעדכון אינדיקטורים', { error: error.message });
+    }
+}
+
+/**
+ * Calculate approximate storage size
+ * Returns a human-readable storage size
+ */
+function calculateStorageSize() {
+    try {
+        // Calculate localStorage size
+        let localStorageSize = 0;
+        for (let key in localStorage) {
+            if (localStorage.hasOwnProperty(key)) {
+                localStorageSize += localStorage[key].length;
+            }
+        }
+        
+        // Convert to human readable format
+        if (localStorageSize < 1024) {
+            return `${localStorageSize} B`;
+        } else if (localStorageSize < 1024 * 1024) {
+            return `${(localStorageSize / 1024).toFixed(1)} KB`;
+        } else {
+            return `${(localStorageSize / (1024 * 1024)).toFixed(1)} MB`;
+        }
+    } catch (error) {
+        return 'לא זמין';
+    }
+}
 
 function updateFileTypeStatistics(issues) {
     console.log('🔄 updateFileTypeStatistics called with issues:', issues ? issues.length : 0);
@@ -346,7 +710,7 @@ function updateFileTypeStatistics(issues) {
         if (warningCountElement) {
             warningCountElement.textContent = stat.warnings;
             console.log(`✅ Updated ${elementId}WarningsCount to ${stat.warnings}`);
-        } else {
+    } else {
             console.warn(`❌ Element ${elementId}WarningsCount not found`);
         }
     });
@@ -452,7 +816,7 @@ function updateProblemFilesTable(stats) {
         row.innerHTML = `<td colspan="6" class="text-center">אין קבצים בעייתיים - הכל תקין! 🎉</td>`;
         return;
     }
-    
+
     // Group issues by file
     const filesWithIssues = {};
     allIssues.forEach(issue => {
@@ -476,6 +840,12 @@ function updateProblemFilesTable(stats) {
     
     // Convert to array and sort by total issues (descending)
     const sortedFiles = Object.values(filesWithIssues).sort((a, b) => b.total - a.total);
+    
+    // Update problem files count
+    const problemFilesCountElement = document.getElementById('problemFilesCount');
+    if (problemFilesCountElement) {
+        problemFilesCountElement.textContent = `${sortedFiles.length} קבצים`;
+    }
     
     // Display files with issues
     sortedFiles.forEach(fileInfo => {
@@ -976,6 +1346,7 @@ async function finishScan() {
                 
                 // Update statistics
     updateFileTypeStatistics(window.scanningResults.errors.concat(window.scanningResults.warnings));
+    updateChartIndicators();
     
     // Update UI
     const scanButton = document.getElementById('startScan');
@@ -990,6 +1361,12 @@ async function finishScan() {
         overallStatusElement.textContent = 'סריקה הושלמה';
     }
     
+    // הסרת הודעת ניקוי מטמון אם קיימת
+    const cacheClearMessage = document.getElementById('cacheClearMessage');
+    if (cacheClearMessage) {
+        cacheClearMessage.remove();
+    }
+    
     // Final update of file type cards with actual results
     updateFileTypeCardsProgress();
     
@@ -998,6 +1375,35 @@ async function finishScan() {
     const lastScanElement = document.getElementById('lastScanDate');
     if (lastScanElement) {
         lastScanElement.textContent = new Date().toLocaleString('he-IL');
+    }
+    
+    // Update chart with real scan data
+    if (chartRendererInstance) {
+        const chartData = {
+            timestamp: new Date().toISOString(),
+            metrics: {
+                totalFiles: window.scanningResults.totalFiles,
+                errors: window.scanningResults.errors.length,
+                warnings: window.scanningResults.warnings.length,
+                qualityScore: Math.max(0, 100 - (window.scanningResults.errors.length * 5) - (window.scanningResults.warnings.length * 2))
+            },
+            filesScanned: window.scanningResults.scannedFiles,
+            scanDuration: duration,
+            errors: window.scanningResults.errors,
+            warnings: window.scanningResults.warnings
+        };
+        
+        // Update chart with real data
+        chartRendererInstance.updateChart([chartData]);
+        console.log('✅ Chart updated with real scan data:', chartData);
+    }
+    
+    // Save scanning results to localStorage for next load
+    try {
+        localStorage.setItem('linterScanningResults', JSON.stringify(window.scanningResults));
+        console.log('✅ Saved scanning results to localStorage:', window.scanningResults);
+    } catch (error) {
+        console.warn('Failed to save scanning results to localStorage:', error);
     }
     
     // Save data to IndexedDB
@@ -1021,7 +1427,9 @@ async function finishScan() {
             };
             
             await adapter.saveDataPoint(dataPoint);
+            console.log('✅ Saved data point to IndexedDB:', dataPoint);
         } catch (error) {
+            console.error('❌ Failed to save data point to IndexedDB:', error);
         }
     }
     
@@ -1127,7 +1535,7 @@ function setupActionButtons() {
 // Session Management
 // ========================================
 
-function initializeSession() {
+async function initializeSession() {
     addLogEntry('INFO', 'מאתחל מערכת לינטר...');
     
     // Check and update project files
@@ -1140,7 +1548,7 @@ function initializeSession() {
     loadLogs();
     
     // Load initial data from IndexedDB
-    updateStatisticsDisplay();
+    await updateStatisticsDisplay();
     
     // Initialize UI controls
     initializeControlButtons();
@@ -1282,7 +1690,7 @@ function attemptChartRecovery() {
     setTimeout(() => {
         try {
             initializeChart();
-        } catch (error) {
+    } catch (error) {
         }
     }, 2000);
 }
@@ -1305,7 +1713,7 @@ function attemptNetworkRecovery() {
         .then(response => {
             if (response.ok) {
                 addLogEntry('SUCCESS', 'קישוריות הרשת תקינה');
-            } else {
+    } else {
                 addLogEntry('WARNING', 'בעיה בקישוריות הרשת');
             }
         })
@@ -1454,6 +1862,43 @@ window.clearChartHistory = async function() {
                 chartRendererInstance.clearChart();
             }
             
+            // Clear localStorage as well
+            localStorage.removeItem('linterScanningResults');
+            
+            // Reset scanning results
+            window.scanningResults = {
+                errors: [],
+                warnings: [],
+                totalFiles: 0,
+                scannedFiles: 0,
+                startTime: null,
+                endTime: null
+            };
+            
+            // Update UI with cleared data
+            const errorCountElement = document.getElementById('totalErrorsStats');
+            const warningCountElement = document.getElementById('totalWarningsStats');
+            const totalFilesElement = document.getElementById('totalFilesStats');
+            const lastScanElement = document.getElementById('lastScanDate');
+            
+            if (errorCountElement) {
+                errorCountElement.textContent = '0';
+            }
+            if (warningCountElement) {
+                warningCountElement.textContent = '0';
+            }
+            if (totalFilesElement) {
+                totalFilesElement.textContent = '0';
+            }
+            if (lastScanElement) {
+                lastScanElement.textContent = 'טרם בוצעה';
+            }
+            
+            // Update file type statistics
+            updateFileTypeStatistics([]);
+            updateFileTypeCardsProgress();
+            updateProblemFilesTable();
+            
             addLogEntry('SUCCESS', 'היסטוריית הגרף נוקתה בהצלחה');
         } catch (error) {
             addLogEntry('ERROR', 'שגיאה בניקוי היסטוריית הגרף', { error: error.message });
@@ -1489,7 +1934,24 @@ window.applyChartSettings = async function() {
 function startMonitoring() {
     isMonitoring = true;
     startAutoRefresh();
-    addLogEntry('SUCCESS', 'ניטור הופעל');
+    
+    // עדכון כפתורים
+    const startBtn = document.getElementById('startMonitoringBtn');
+    const stopBtn = document.getElementById('stopMonitoringBtn');
+    
+    if (startBtn) {
+            startBtn.disabled = true;
+        startBtn.innerHTML = '<i class="fas fa-play"></i> פועל...';
+        startBtn.className = 'btn btn-success btn-sm';
+    }
+    
+    if (stopBtn) {
+        stopBtn.disabled = false;
+        stopBtn.innerHTML = '<i class="fas fa-stop"></i> עצור';
+        stopBtn.className = 'btn btn-danger btn-sm';
+    }
+    
+    addLogEntry('SUCCESS', 'ניטור הופעל - המערכת תסרוק קבצים אוטומטית');
 }
 
 function stopMonitoring() {
@@ -1498,7 +1960,24 @@ function stopMonitoring() {
         clearInterval(autoRefreshInterval);
         autoRefreshInterval = null;
     }
-    addLogEntry('SUCCESS', 'ניטור הופסק');
+    
+    // עדכון כפתורים
+    const startBtn = document.getElementById('startMonitoringBtn');
+    const stopBtn = document.getElementById('stopMonitoringBtn');
+    
+    if (startBtn) {
+        startBtn.disabled = false;
+        startBtn.innerHTML = '<i class="fas fa-play"></i> התחל';
+        startBtn.className = 'btn btn-success btn-sm';
+    }
+    
+    if (stopBtn) {
+            stopBtn.disabled = true;
+        stopBtn.innerHTML = '<i class="fas fa-stop"></i> עצור';
+        stopBtn.className = 'btn btn-secondary btn-sm';
+    }
+    
+    addLogEntry('SUCCESS', 'ניטור הופסק - המערכת לא תסרוק קבצים אוטומטית');
 }
 
 
@@ -1563,9 +2042,9 @@ function initializeLinterRealtimeMonitorPage() {
 // Initialization
 // ========================================
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     addLogEntry('INFO', 'DOM נטען - מאתחל מערכת...');
-    initializeSession();
+    await initializeSession();
 });
 
 // ========================================
@@ -1578,19 +2057,144 @@ window.fixedIssues = {
     warnings: new Set()
 };
 
-async function fixAllIssues() {
-    addLogEntry('INFO', 'מתחיל תיקון אוטומטי של כל הבעיות...');
+// Global tracking for clear feedback
+window.fixProgress = {
+    totalFiles: 0,
+    fixedFiles: 0,
+    totalIssues: 0,
+    fixedIssues: 0,
+    currentFile: '',
+    startTime: null
+};
+
+// Function to update the clear feedback display
+function updateFixProgressDisplay() {
+    const progressElement = document.getElementById('fixProgressDisplay');
+    if (!progressElement) return;
     
-    const totalIssues = window.scanningResults.errors.length + window.scanningResults.warnings.length;
-    if (totalIssues === 0) {
+    const progress = window.fixProgress;
+    const percentage = progress.totalIssues > 0 ? Math.round((progress.fixedIssues / progress.totalIssues) * 100) : 0;
+    const elapsed = progress.startTime ? Math.round((Date.now() - progress.startTime) / 1000) : 0;
+    
+    progressElement.innerHTML = `
+        <div class="fix-progress-container">
+            <div class="fix-progress-header">
+                <h4>תיקון אוטומטי - התקדמות</h4>
+                <span class="fix-progress-percentage">${percentage}%</span>
+            </div>
+            <div class="fix-progress-details">
+                <div class="fix-progress-item">
+                    <span class="label">קבצים תוקנו:</span>
+                    <span class="value">${progress.fixedFiles}/${progress.totalFiles}</span>
+                </div>
+                <div class="fix-progress-item">
+                    <span class="label">בעיות תוקנו:</span>
+                    <span class="value">${progress.fixedIssues}/${progress.totalIssues}</span>
+                </div>
+                <div class="fix-progress-item">
+                    <span class="label">קובץ נוכחי:</span>
+                    <span class="value">${progress.currentFile}</span>
+                </div>
+                <div class="fix-progress-item">
+                    <span class="label">זמן שחלף:</span>
+                    <span class="value">${elapsed} שניות</span>
+                </div>
+            </div>
+            <div class="fix-progress-bar">
+                <div class="fix-progress-fill" style="width: ${percentage}%"></div>
+            </div>
+                    </div>
+                `;
+}
+
+// Function to show final results
+function showFixResults() {
+    const progressElement = document.getElementById('fixProgressDisplay');
+    if (!progressElement) return;
+    
+    const progress = window.fixProgress;
+    const successRate = progress.totalIssues > 0 ? Math.round((progress.fixedIssues / progress.totalIssues) * 100) : 0;
+    const elapsed = progress.startTime ? Math.round((Date.now() - progress.startTime) / 1000) : 0;
+    
+    progressElement.innerHTML = `
+        <div class="fix-results-container">
+            <div class="fix-results-header">
+                <h4>תיקון הושלם!</h4>
+                <span class="fix-results-success-rate">${successRate}% הצלחה</span>
+            </div>
+            <div class="fix-results-details">
+                <div class="fix-results-item">
+                    <span class="label">קבצים תוקנו:</span>
+                    <span class="value">${progress.fixedFiles}</span>
+                </div>
+                <div class="fix-results-item">
+                    <span class="label">בעיות תוקנו:</span>
+                    <span class="value">${progress.fixedIssues}</span>
+                </div>
+                <div class="fix-results-item">
+                    <span class="label">זמן כולל:</span>
+                    <span class="value">${elapsed} שניות</span>
+                </div>
+            </div>
+            <div class="fix-results-actions">
+                <button onclick="resetFixProgress()" class="btn btn-secondary">איפוס</button>
+                <button onclick="hideFixProgress()" class="btn btn-primary">סגור</button>
+            </div>
+                    </div>
+                `;
+}
+
+// Function to reset fix progress
+function resetFixProgress() {
+    window.fixProgress = {
+        totalFiles: 0,
+        fixedFiles: 0,
+        totalIssues: 0,
+        fixedIssues: 0,
+        currentFile: '',
+        startTime: null
+    };
+    updateFixProgressDisplay();
+}
+
+// Function to hide fix progress
+function hideFixProgress() {
+    const progressElement = document.getElementById('fixProgressDisplay');
+    if (progressElement) {
+        progressElement.style.display = 'none';
+    }
+}
+
+async function fixAllIssues() {
+    // Initialize progress tracking
+    window.fixProgress = {
+        totalFiles: 0,
+        fixedFiles: 0,
+        totalIssues: window.scanningResults.errors.length + window.scanningResults.warnings.length,
+        fixedIssues: 0,
+        currentFile: '',
+        startTime: Date.now()
+    };
+    
+    // Show progress display
+    const progressElement = document.getElementById('fixProgressDisplay');
+    if (progressElement) {
+        progressElement.style.display = 'block';
+    }
+    
+    updateFixProgressDisplay();
+    
+    if (window.fixProgress.totalIssues === 0) {
         addLogEntry('INFO', 'אין בעיות לתיקון');
+        showFixResults();
         return;
     }
     
-    addLogEntry('INFO', `מתחיל תיקון ${totalIssues} בעיות - זה עלול לקחת זמן...`);
+    addLogEntry('INFO', `מתחיל תיקון ${window.fixProgress.totalIssues} בעיות...`);
     
-    let fixedCount = 0;
+            let fixedCount = 0;
     let failedCount = 0;
+    const fixedFiles = new Set();
     
     // Fix errors first (more critical)
     const totalErrors = window.scanningResults.errors.length;
@@ -1602,9 +2206,9 @@ async function fixAllIssues() {
             continue; // Already fixed
         }
         
-        // Show progress
-        const progress = Math.round(((totalErrors - i) / totalErrors) * 50); // 50% for errors
-        addLogEntry('INFO', `מתקן שגיאות... ${progress}% (${totalErrors - i}/${totalErrors})`);
+        // Update current file
+        window.fixProgress.currentFile = error.file;
+        updateFixProgressDisplay();
         
         try {
             const success = await fixSingleIssue(error);
@@ -1612,11 +2216,17 @@ async function fixAllIssues() {
                 window.fixedIssues.errors.add(issueId);
                 window.scanningResults.errors.splice(i, 1);
                 fixedCount++;
-    } else {
+                window.fixProgress.fixedIssues++;
+                fixedFiles.add(error.file);
+                
+                // Update progress display
+                updateFixProgressDisplay();
+            } else {
                 failedCount++;
             }
+            // Add delay to prevent rate limiting
+            await new Promise(resolve => setTimeout(resolve, 200)); // 200ms delay
         } catch (err) {
-            addLogEntry('ERROR', `שגיאה בתיקון ${error.file}:${error.line}`, { error: err.message });
             failedCount++;
         }
     }
@@ -1628,12 +2238,12 @@ async function fixAllIssues() {
         const issueId = `${warning.file}:${warning.line}:${warning.message}`;
         
         if (window.fixedIssues.warnings.has(issueId)) {
-            continue; // Already fixed
+            continue;
         }
         
-        // Show progress
-        const progress = 50 + Math.round(((totalWarnings - i) / totalWarnings) * 50); // 50-100% for warnings
-        addLogEntry('INFO', `מתקן אזהרות... ${progress}% (${totalWarnings - i}/${totalWarnings})`);
+        // Update current file
+        window.fixProgress.currentFile = warning.file;
+        updateFixProgressDisplay();
         
         try {
             const success = await fixSingleIssue(warning);
@@ -1641,21 +2251,34 @@ async function fixAllIssues() {
                 window.fixedIssues.warnings.add(issueId);
                 window.scanningResults.warnings.splice(i, 1);
                 fixedCount++;
+                window.fixProgress.fixedIssues++;
+                fixedFiles.add(warning.file);
+                
+                // Update progress display
+                updateFixProgressDisplay();
             } else {
                 failedCount++;
             }
+            // Add delay to prevent rate limiting
+            await new Promise(resolve => setTimeout(resolve, 200)); // 200ms delay
         } catch (err) {
-            addLogEntry('ERROR', `שגיאה בתיקון ${warning.file}:${warning.line}`, { error: err.message });
             failedCount++;
         }
     }
+    
+    // Update final progress
+    window.fixProgress.fixedFiles = fixedFiles.size;
+    window.fixProgress.currentFile = 'הושלם';
     
     // Update UI
     updateRealtimeProgress();
     updateProblemFilesTable();
     
-    const successRate = totalIssues > 0 ? Math.round((fixedCount / totalIssues) * 100) : 0;
-    addLogEntry('SUCCESS', `תיקון הושלם! תוקנו ${fixedCount} בעיות מתוך ${totalIssues} (${successRate}% הצלחה)`);
+    // Show final results
+    showFixResults();
+    
+    const successRate = window.fixProgress.totalIssues > 0 ? Math.round((fixedCount / window.fixProgress.totalIssues) * 100) : 0;
+    addLogEntry('SUCCESS', `תיקון הושלם! תוקנו ${fixedCount} בעיות מתוך ${window.fixProgress.totalIssues} (${successRate}% הצלחה)`);
     
     if (failedCount > 0) {
         addLogEntry('WARNING', `${failedCount} בעיות לא תוקנו - נדרש תיקון ידני`);
@@ -1690,8 +2313,13 @@ async function fixAllErrors() {
             } else {
                 failedCount++;
             }
+            // Add delay to prevent rate limiting
+            await new Promise(resolve => setTimeout(resolve, 200)); // 200ms delay
         } catch (err) {
-            addLogEntry('ERROR', `שגיאה בתיקון ${error.file}:${error.line}`, { error: err.message });
+            // Only log critical errors, not every failure
+            if (failedCount === 0) {
+                addLogEntry('ERROR', `שגיאה בתיקון ${error.file}:${error.line}`, { error: err.message });
+            }
             failedCount++;
         }
     }
@@ -1733,8 +2361,13 @@ async function fixAllWarnings() {
     } else {
                 failedCount++;
             }
+            // Add delay to prevent rate limiting
+            await new Promise(resolve => setTimeout(resolve, 200)); // 200ms delay
         } catch (err) {
-            addLogEntry('ERROR', `שגיאה בתיקון ${warning.file}:${warning.line}`, { error: err.message });
+            // Only log critical errors, not every failure
+            if (failedCount === 0) {
+                addLogEntry('ERROR', `שגיאה בתיקון ${warning.file}:${warning.line}`, { error: err.message });
+            }
             failedCount++;
         }
     }
@@ -1785,13 +2418,23 @@ async function saveFixedFile(fileName, content) {
         });
         
         if (response.ok) {
+            // Add delay to prevent rate limiting
+            await new Promise(resolve => setTimeout(resolve, 200)); // 200ms delay
             return true;
         } else {
-            addLogEntry('WARNING', `שרת לא תומך בשמירת קבצים - ${response.status}`);
+            // Only log first failure to avoid spam
+            if (!window.saveFileWarningLogged) {
+                addLogEntry('WARNING', `שרת לא תומך בשמירת קבצים - ${response.status}`);
+                window.saveFileWarningLogged = true;
+            }
             return false;
         }
     } catch (error) {
-        addLogEntry('WARNING', `לא ניתן לשמור קובץ ${fileName} - ${error.message}`);
+        // Only log first error to avoid spam
+        if (!window.saveFileErrorLogged) {
+            addLogEntry('WARNING', `לא ניתן לשמור קובץ ${fileName} - ${error.message}`);
+            window.saveFileErrorLogged = true;
+        }
         return false;
     }
 }
@@ -1801,12 +2444,19 @@ async function fixSingleIssue(issue) {
         // Get file content
         const response = await fetch(issue.file);
         if (!response.ok) {
-            addLogEntry('WARNING', `לא ניתן לקרוא קובץ ${issue.file} לתיקון`);
+            // Only log first error to avoid spam
+            if (!window.readFileErrorLogged) {
+                addLogEntry('WARNING', `לא ניתן לקרוא קובץ ${issue.file} לתיקון`);
+                window.readFileErrorLogged = true;
+            }
             return false;
         }
         
         const content = await response.text();
         const lines = content.split('\n');
+        
+        // Add delay to prevent rate limiting
+        await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
         
         // Apply fix based on issue type
         let fixed = false;
@@ -1888,20 +2538,45 @@ async function fixSingleIssue(issue) {
             const fixedContent = lines.join('\n');
             const saveSuccess = await saveFixedFile(issue.file, fixedContent);
             
+            // Add delay to prevent rate limiting
+            await new Promise(resolve => setTimeout(resolve, 200)); // 200ms delay
+            
             if (saveSuccess) {
-                addLogEntry('SUCCESS', `תוקן ${issue.file}:${issue.line} - ${issue.message}`);
+                // Only log first success to avoid spam
+                if (!window.fixSuccessLogged) {
+                    addLogEntry('SUCCESS', `תוקן ${issue.file}:${issue.line} - ${issue.message}`);
+                    window.fixSuccessLogged = true;
+                }
+            // Add delay to prevent rate limiting
+            await new Promise(resolve => setTimeout(resolve, 300)); // 300ms delay
                 return true;
             } else {
-                addLogEntry('ERROR', `לא ניתן לשמור קובץ ${issue.file} אחרי התיקון`);
+                // Only log first failure to avoid spam
+                if (!window.saveFileErrorLogged) {
+                    addLogEntry('ERROR', `לא ניתן לשמור קובץ ${issue.file} אחרי התיקון`);
+                    window.saveFileErrorLogged = true;
+                }
                 return false;
             }
         } else {
-            addLogEntry('WARNING', `לא ניתן לתקן ${issue.file}:${issue.line} - ${issue.message}`);
+            // Only log first failure to avoid spam
+            if (!window.fixWarningLogged) {
+                addLogEntry('WARNING', `לא ניתן לתקן ${issue.file}:${issue.line} - ${issue.message}`);
+                window.fixWarningLogged = true;
+            }
+            // Add delay to prevent rate limiting
+            await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
             return false;
         }
         
-    } catch (error) {
-        addLogEntry('ERROR', `שגיאה בתיקון ${issue.file}:${issue.line}`, { error: error.message });
+        } catch (error) {
+        // Only log first error to avoid spam
+        if (!window.fixErrorLogged) {
+            addLogEntry('ERROR', `שגיאה בתיקון ${issue.file}:${issue.line}`, { error: error.message });
+            window.fixErrorLogged = true;
+        }
+        // Add delay to prevent rate limiting
+        await new Promise(resolve => setTimeout(resolve, 100)); // 100ms delay
         return false;
     }
 }
@@ -2067,3 +2742,8 @@ window.clearFiltersBtn = clearFiltersBtn;
 window.updateRealtimeProgress = updateRealtimeProgress;
 window.updateFileTypeCardsProgress = updateFileTypeCardsProgress;
 window.initializeLinterRealtimeMonitorPage = initializeLinterRealtimeMonitorPage;
+// New fix progress functions
+window.updateFixProgressDisplay = updateFixProgressDisplay;
+window.showFixResults = showFixResults;
+window.resetFixProgress = resetFixProgress;
+window.hideFixProgress = hideFixProgress;

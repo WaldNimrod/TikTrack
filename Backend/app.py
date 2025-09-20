@@ -1612,7 +1612,7 @@ def discover_files():
         }), 500
 
 @app.route("/api/v1/files/save", methods=["POST"])
-@rate_limit_api(requests_per_minute=10)
+@rate_limit_api(requests_per_minute=1000)
 def save_file():
     """Save file content after auto-fix"""
     try:

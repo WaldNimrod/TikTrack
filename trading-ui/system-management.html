@@ -81,11 +81,36 @@
                 <div class="top-section">
                     <div class="section-header">
                         <h2>🔧 מנהל מערכת</h2>
-                        <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="refreshSystemData()" title="רענן נתוני מערכת">
+                                <i class="fas fa-sync-alt"></i> רענן
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
+                        <!-- בריאות מערכת - Info Summary -->
+                        <div class="info-summary" id="healthSummary">
+                            <div class="summary-item">
+                                <span class="summary-label">🏥 בריאות מערכת:</span>
+                                <span class="summary-value" id="overallHealthStatus">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">📊 ציון כללי:</span>
+                                <span class="summary-value" id="systemScore">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">⏱️ זמן תגובה:</span>
+                                <span class="summary-value" id="responseTime">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">🔄 זמן פעילות:</span>
+                                <span class="summary-value" id="uptime">טוען...</span>
+                            </div>
+                        </div>
+                        
                         <!-- תוכן בשתי עמודות -->
                         <div class="row">
                             <!-- עמודה שמאלית - סטטוס מהיר -->
@@ -138,6 +163,9 @@
                                             <button class="btn btn-info btn-sm" onclick="clearCache()">
                                                 🗑️ נקה מטמון
                                             </button>
+                                            <button class="btn btn-warning btn-sm" onclick="copyDetailedLog()">
+                                                📋 העתק לוג מפורט
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -147,87 +175,6 @@
                 </div>
                 <!-- UI Content Section Top End -->  
 
-                <!-- UI Content Section 1 Start-->
-                <div class="content-section" id="section1">
-                    <div class="section-header">
-                        <h2>🏥 בריאות מערכת</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
-                    </div>
-                    <div class="section-body">
-                        <!-- תוכן בשתי עמודות -->
-                        <div class="row">
-                            <!-- עמודה שמאלית - סטטוס בריאות -->
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h3>🏥 בריאות מערכת</h3>
-                                        <div class="system-score-small">
-                                            <span class="score-label">ציון כללי:</span>
-                                            <span class="system-score excellent">טוען...</span>
-                                        </div>
-                                        <div class="score-details" style="margin-top: 0.5rem; font-size: 0.875rem;"></div>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="health-grid">
-                                            <div class="status-card">
-                                                <div class="card-header">
-                                                    <h3>שרת</h3>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="health-status active">פעיל</div>
-                                                    <div class="health-details">זמן פעילות: 24 שעות</div>
-                                                </div>
-                                            </div>
-                                            <div class="status-card">
-                                                <div class="card-header">
-                                                    <h3>בסיס נתונים</h3>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="health-status active">מחובר</div>
-                                                    <div class="health-details">גודל: 15.2 MB</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- עמודה ימנית - רכיבי מערכת נוספים -->
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h3>🔧 רכיבי מערכת</h3>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="health-grid">
-                                            <div class="status-card">
-                                                <div class="card-header">
-                                                    <h3>מטמון</h3>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="health-status active">בריא</div>
-                                                    <div class="health-details">אחוז פגיעות: 87%</div>
-                                                </div>
-                                            </div>
-                                            <div class="status-card">
-                                                <div class="card-header">
-                                                    <h3>רשת</h3>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="health-status active">יציב</div>
-                                                    <div class="health-details">עיכוב: 12ms</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- UI Content Section 1 End -->   
 
                 <!-- UI Content Section 2 Start-->
                 <div class="content-section" id="section2">
@@ -238,78 +185,26 @@
                         </button>
                     </div>
                     <div class="section-body">
-                        <!-- תוכן בשתי עמודות -->
-                        <div class="row">
-                            <!-- עמודה שמאלית - מעבד וזיכרון -->
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h3>💻 מעבד וזיכרון</h3>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="performance-grid">
-                                            <div class="status-card">
-                                                <div class="card-header">
-                                                    <h3>מעבד (CPU)</h3>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="performance-indicator" data-type="cpu">
-                                                        <div class="progress-bar">0%</div>
-                                                    </div>
-                                                    <div class="performance-value cpu-usage">0%</div>
-                                                </div>
-                                            </div>
-                                            <div class="status-card">
-                                                <div class="card-header">
-                                                    <h3>זיכרון (RAM)</h3>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="performance-indicator" data-type="memory">
-                                                        <div class="progress-bar">0%</div>
-                                                    </div>
-                                                    <div class="performance-value memory-usage">0%</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                        <!-- ביצועי מערכת - Info Summary נוף -->
+                        <div class="info-summary performance-overview" id="performanceSummary">
+                            <div class="summary-item">
+                                <span class="summary-label">💻 מעבד:</span>
+                                <span class="summary-value" id="cpuUsage">טוען...</span>
                             </div>
-                            
-                            <!-- עמודה ימנית - אחסון ומטמון -->
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h3>💾 אחסון ומטמון</h3>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="performance-grid">
-                                            <div class="status-card">
-                                                <div class="card-header">
-                                                    <h3>דיסק</h3>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="performance-indicator" data-type="disk">
-                                                        <div class="progress-bar">0%</div>
-                                                    </div>
-                                                    <div class="performance-value disk-usage">0%</div>
-                                                </div>
-                                            </div>
-                                            <div class="status-card">
-                                                <div class="card-header">
-                                                    <h3>מטמון</h3>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="performance-indicator" data-type="cache">
-                                                        <div class="progress-bar">0%</div>
-                                                    </div>
-                                                    <div class="performance-value cache-usage">0%</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="summary-item">
+                                <span class="summary-label">🧠 זיכרון:</span>
+                                <span class="summary-value" id="memoryUsage">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">💾 אחסון:</span>
+                                <span class="summary-value" id="diskUsage">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">🌐 רשת:</span>
+                                <span class="summary-value" id="networkStatus">טוען...</span>
                             </div>
                         </div>
+                        
                     </div>
                 </div>
                 <!-- UI Content Section 2 End--> 
@@ -453,11 +348,8 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="alerts-list" id="alerts-list">
-                                            <div class="alert-item">
-                                                <div class="alert-timestamp">טוען...</div>
-                                                <div class="alert-level">INFO</div>
-                                                <div class="alert-message">טוען התראות...</div>
-                                            </div>
+                                            <!-- התראות יטענו אוטומטית מהמערכת הגלובלית -->
+                                            <active-alerts></active-alerts>
                                         </div>
                                     </div>
                                 </div>
@@ -476,6 +368,26 @@
                         </button>
                     </div>
                     <div class="section-body">
+                        <!-- אבטחה - Info Summary -->
+                        <div class="info-summary security-overview" id="securitySummary">
+                            <div class="summary-item">
+                                <span class="summary-label">🛡️ סטטוס אבטחה:</span>
+                                <span class="summary-value" id="securityStatus">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">🔐 הצפנה:</span>
+                                <span class="summary-value" id="encryptionStatus">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">👤 משתמשים פעילים:</span>
+                                <span class="summary-value" id="activeUsers">טוען...</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">🚨 התראות אבטחה:</span>
+                                <span class="summary-value" id="securityAlerts">טוען...</span>
+                            </div>
+                        </div>
+                        
                         <!-- תוכן בשתי עמודות -->
                         <div class="row">
                             <!-- עמודה שמאלית - ניטור איומים -->
@@ -531,46 +443,47 @@
                         </button>
                     </div>
                     <div class="section-body">
-                        <!-- תוכן בשתי עמודות -->
-                        <div class="row">
-                            <!-- עמודה שמאלית - פילטרים -->
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h3>🔍 פילטרים</h3>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="logs-section">
-                                            <div class="log-filters">
-                                                <select id="log-level-filter">
-                                                    <option value="all">כל הרמות</option>
-                                                    <option value="info">מידע</option>
-                                                    <option value="warning">אזהרה</option>
-                                                    <option value="error">שגיאה</option>
-                                                </select>
-                                                <input type="text" id="log-search" placeholder="חיפוש בלוגים...">
-                                                <button class="refresh-btn" title="רענן נתונים">🔄 רענן</button>
-                                            </div>
-                                        </div>
+                        <!-- פילטרים לכל הרוחב -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h3>🔍 פילטרים וממשק ניהול</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="logs-section">
+                                    <div class="log-filters">
+                                        <select id="log-level-filter" class="form-select">
+                                            <option value="all">כל הרמות</option>
+                                            <option value="info">מידע</option>
+                                            <option value="warning">אזהרה</option>
+                                            <option value="error">שגיאה</option>
+                                        </select>
+                                        <input type="text" id="log-search" class="form-control" placeholder="חיפוש בלוגים...">
+                                        <button class="btn btn-outline-primary refresh-btn" title="רענן נתונים">🔄 רענן</button>
+                                        <button class="btn btn-outline-success" onclick="copyDetailedLog()">
+                                            📋 העתק לוג מפורט
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <!-- עמודה ימנית - תוכן לוגים -->
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h3>📄 תוכן לוגים</h3>
+                        </div>
+                        
+                        <!-- תוכן לוגים לכל הרוחב -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>📄 תוכן לוגים</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="log-content" id="log-content">
+                                    <div class="log-entry log-info">
+                                        <div class="log-timestamp">טוען...</div>
+                                        <div class="log-level">INFO</div>
+                                        <div class="log-message">טוען נתוני מערכת...</div>
                                     </div>
-                                    <div class="card-body">
-                                        <div class="log-content" id="log-content">
-                                            <div class="log-entry log-info">
-                                                <div class="log-timestamp">טוען...</div>
-                                                <div class="log-level">INFO</div>
-                                                <div class="log-message">טוען נתוני מערכת...</div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                </div>
+                                <div class="log-actions mt-3">
+                                    <small class="text-muted">
+                                        💡 הלוג כולל מידע מפורט על מצב המערכת, ביצועים והתראות
+                                    </small>
                                 </div>
                             </div>
                         </div>
@@ -609,10 +522,13 @@
                                                         <strong>📁 מיקום:</strong> /backups/system_backup_YYYY-MM-DD.sql
                                                     </div>
                                                     <div class="backup-size">
-                                                        <strong>📊 גודל:</strong> 156.7 MB
+                                                        <strong>📊 גודל:</strong> <span id="lastBackupSize">טוען...</span>
                                                     </div>
                                                     <div class="backup-last">
-                                                        <strong>🕐 אחרון:</strong> ${new Date().toLocaleDateString('he-IL')} בשעה 02:00
+                                                        <strong>🕐 אחרון:</strong> <span id="lastBackupDate">טוען...</span>
+                                                    </div>
+                                                    <div class="backup-status">
+                                                        <strong>✅ סטטוס:</strong> <span id="backupStatus">בודק...</span>
                                                     </div>
                                                 </div>
                                                 
@@ -626,8 +542,19 @@
                                                         <li>📝 לוגים מערכת</li>
                                                         <li>🎨 קבצי CSS ו-JS</li>
                                                     </ul>
+                                                    <div class="backup-info mt-2">
+                                                        <small class="text-muted">
+                                                            🔒 הגיבוי מוצפן ומאובטח - ניתן לשחזר בכל עת
+                                                        </small>
+                                                    </div>
                                                 </div>
                                                 <button class="btn btn-primary" onclick="runBackup()">הפעל גיבוי עכשיו</button>
+                                        <button class="btn btn-secondary copy-log-btn" onclick="copyDetailedLog()">📋 העתק לוג מפורט</button>
+                                        <div class="backup-status mt-3">
+                                            <small class="text-muted">
+                                                💡 <strong>טיפ:</strong> הגיבוי כולל את כל הנתונים, הגדרות ולוגים של המערכת
+                                            </small>
+                                        </div>
                                             </div>
                                         </div>
                                     </div>
@@ -648,6 +575,11 @@
                                             <div class="card-body">
                                                 <p>שחזור מגיבוי אחרון</p>
                                                 <button class="btn btn-warning" onclick="restoreFromBackup()">שחזר מערכת</button>
+                                                <div class="restore-warning mt-3">
+                                                    <small class="text-warning">
+                                                        ⚠️ <strong>אזהרה:</strong> שחזור ימחק את כל הנתונים הנוכחיים
+                                                    </small>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

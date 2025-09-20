@@ -83,9 +83,9 @@
             <button class="action-btn" onclick="cleanupOldData()" title="ניקוי נתונים ישנים">
               <i class="fas fa-trash"></i> ניקוי
             </button>
-            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
-              <span class="section-toggle-icon">▼</span>
-            </button>
+          <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
             <button class="action-btn toggle-all-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
               <i class="fas fa-expand-arrows-alt"></i> כל הסקשנים
             </button>
@@ -106,160 +106,15 @@
       <!-- UI Content Section 1 Start-->
       <div class="content-section" id="section1">
         <div class="section-header">
-          <h2>🗺️ מיפוי עמודים לקבצים</h2>
+          <h2>📊 סטטיסטיקות מערכת</h2>
           <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
         </div>
         <div class="section-body">
-          <div class="table-responsive" id="scriptsMatrixContainer">
-        <div class="table-container">
-            <table id="page-scripts-matrix-table" class="table table-bordered table-sm" data-table-type="page-scripts-matrix">
-                <thead>
-                    <tr>
-                        <th>שם הסקריפט</th>
-                        <!-- Main Pages -->
-                        <th title="עמוד ראשי">ראשי</th>
-                        <th title="חשבונות">חשבונות</th>
-                        <th title="התראות">התראות</th>
-                        <th title="תזרימי מזומנים">מזומנים</th>
-                        <th title="טריידים">טריידים</th>
-                        <th title="תוכניות טריידים">תוכניות</th>
-                        <th title="טיקרים">טיקרים</th>
-                        <th title="הערות">הערות</th>
-                        <th title="ביצועים">ביצועים</th>
-                        <th title="מסד נתונים">מסד נתונים</th>
-                        <th title="נתונים נוספים">נוספים</th>
-                        <th title="מחקר">מחקר</th>
-                        <th title="העדפות">העדפות</th>
-                        <th title="אילוצים">אילוצים</th>
-                        <th title="עיצובים">עיצובים</th>
-                        <th title="בדיקות">בדיקות</th>
-                        <th title="הדגמת סגנונות">הדגמה</th>
-                        <th title="מפת JS">מפה</th>
-                        <th title="אלמנט ראש הדף">ראש</th>
-                        <th title="משימות רקע">רקע</th>
-                        <th title="ניהול מערכת">מערכת</th>
-                        <th title="מוניטור שרת">שרת</th>
-                        <th title="מרכז התראות">התראות</th>
-                        <th title="דשבורד נתונים חיצוניים">חיצוני</th>
-                        <th title="ניהול CSS">CSS</th>
-                        <th title="ניהול תפריט">תפריט</th>
-                        <th title="תפריט פשוט">פשוט</th>
-                        <th title="מעקב לינטר">לינטר</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Primary Scripts -->
-                    <tr class="primary-scripts"><td class="script-name">accounts.js</td><td></td><td></td><td></td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="primary-scripts"><td class="script-name">alerts.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="primary-scripts"><td class="script-name">cash_flows.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="primary-scripts"><td class="script-name">trades.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="primary-scripts"><td class="script-name">trade_plans.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="connected">✓</td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="primary-scripts"><td class="script-name">tickers.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="primary-scripts"><td class="script-name">notes.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="primary-scripts"><td class="script-name">executions.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="connected">✓</td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="primary-scripts"><td class="script-name">db_display.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="primary-scripts"><td class="script-name">db-extradata.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-
-                    <tr class="primary-scripts"><td class="script-name">preferences.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="primary-scripts"><td class="script-name">constraint-manager.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-
-                    <!-- Utility Scripts -->
-                    <tr class="utility-scripts"><td class="script-name">main.js</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="utility-scripts">
-                        <td class="script-name">header-system.js</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td class="connected">✓</td>
-                        <td></td>
-                        <td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="utility-scripts"><td class="script-name">tables.js</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="utility-scripts"><td class="script-name">table-mappings.js</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="utility-scripts"><td class="script-name">ui-utils.js</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="utility-scripts"><td class="script-name">data-utils.js</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="utility-scripts"><td class="script-name">date-utils.js</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="utility-scripts"><td class="script-name">translation-utils.js</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="utility-scripts"><td class="script-name">page-utils.js</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="utility-scripts"><td class="script-name">linked-items.js</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="utility-scripts"><td class="script-name">notification-system.js</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="utility-scripts"><td class="script-name">validation-utils.js</td><td></td><td></td><td></td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="utility-scripts"><td class="script-name">crud-utils.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="utility-scripts"><td class="script-name">filter-system.js</td><td></td><td></td><td></td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="utility-scripts"><td class="script-name">button-icons.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="utility-scripts"><td class="script-name">console-cleanup.js</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="utility-scripts"><td class="script-name">error-handlers.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="utility-scripts"><td class="script-name">related-object-filters.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-
-                    <!-- Service Scripts -->
-                    <tr class="service-scripts"><td class="script-name">active-alerts-component.js</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="service-scripts"><td class="script-name">account-service.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td><td class="connected">✓</td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="service-scripts"><td class="script-name">alert-service.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td class="connected">✓</td><td></td><td></td><td></td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td><td class="connected">✓</td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="service-scripts"><td class="script-name">trade-plan-service.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td class="connected">✓</td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="service-scripts"><td class="script-name">ticker-service.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="service-scripts"><td class="script-name">auth.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="service-scripts"><td class="script-name">currencies.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                    <tr class="service-scripts"><td class="script-name">js-map.js</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-                </tbody>
-            </table>
-        </div>
-            </div>
-            </div>
+          <div id="systemStatsContent">
+            <p>טוען סטטיסטיקות...</p>
+          </div>
       <!-- UI Content Section 1 End -->
 
       <!-- UI Content Section 2 Start-->
@@ -300,7 +155,7 @@
       <!-- UI Content Section 4 Start-->
       <div class="content-section" id="section4">
         <div class="section-header">
-          <h2>📊 סטטיסטיקות מערכת</h2>
+          <h2>💾 ניהול אחסון נתונים</h2>
           <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
@@ -316,7 +171,7 @@
       <!-- UI Content Section 5 Start-->
       <div class="content-section" id="section5">
         <div class="section-header">
-          <h2>💾 ניהול אחסון נתונים</h2>
+          <h2>🏗️ בדיקת ארכיטקטורה</h2>
           <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
@@ -332,7 +187,7 @@
       <!-- UI Content Section 6 Start-->
       <div class="content-section" id="section6">
         <div class="section-header">
-          <h2>🏗️ בדיקת ארכיטקטורה</h2>
+          <h2>🔗 סטטוס אינטגרציה עם מערכת סריקת קבצים</h2>
           <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
@@ -348,7 +203,7 @@
       <!-- UI Content Section 7 Start-->
       <div class="content-section" id="section7">
         <div class="section-header">
-          <h2>🔗 סטטוס אינטגרציה עם מערכת סריקת קבצים</h2>
+          <h2>🗺️ מיפוי עמודים לקבצים</h2>
           <button class="filter-toggle-btn" onclick="toggleSection('section7')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>

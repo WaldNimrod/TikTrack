@@ -39,12 +39,12 @@ let isMonitoring = false;
 let autoRefreshInterval = null;
 let projectFiles = [];
 
-// UI state
-let lastScanDate = null;
-
 // Scanning state management
 let isScanning = false;
 let scanningPromise = null;
+
+// UI state
+let lastScanDate = null;
 
 // ========================================
 // File Discovery and Management

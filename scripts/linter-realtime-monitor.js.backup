@@ -42,10 +42,6 @@ let projectFiles = [];
 // UI state
 let lastScanDate = null;
 
-// Scanning state management
-let isScanning = false;
-let scanningPromise = null;
-
 // ========================================
 // File Discovery and Management
 // ========================================
@@ -1006,29 +1002,6 @@ async function startFileScan() {
 async function scanJavaScriptFiles() {
     console.log('🚀 scanJavaScriptFiles called!');
     
-    // Prevent multiple simultaneous scans
-    if (isScanning) {
-        console.log('⚠️ Scan already in progress, waiting for completion...');
-        if (scanningPromise) {
-            return await scanningPromise;
-        }
-        return;
-    }
-    
-    isScanning = true;
-    scanningPromise = performScan();
-    
-    try {
-        const result = await scanningPromise;
-        return result;
-    } finally {
-        isScanning = false;
-        scanningPromise = null;
-    }
-}
-
-async function performScan() {
-    
     const selectedTypes = getSelectedFileTypes();
     console.log('🔍 Selected types:', selectedTypes);
     
@@ -1634,8 +1607,6 @@ function setupActionButtons() {
 // ========================================
 
 async function initializeSession() {
-    addLogEntry('INFO', 'מאתחל מערכת לינטר...');
-    
     // Check and update project files
     checkAndUpdateProjectFiles();
     
@@ -1652,11 +1623,7 @@ async function initializeSession() {
     initializeControlButtons();
     setupActionButtons();
     
-    // Initialize data collector
-    if (typeof DataCollector !== 'undefined') {
-        window.dataCollectorInstance = new DataCollector();
-        addLogEntry('SUCCESS', 'אספן נתונים אותחל בהצלחה');
-    }
+    // Data collector is already initialized in initializeLinterSystem()
     
     addLogEntry('SUCCESS', 'מערכת לינטר אותחלה בהצלחה');
 }
@@ -2095,7 +2062,7 @@ function stopMonitoring() {
 /**
  * אתחול מערכת הלינטר
  */
-function initializeLinterSystem() {
+async function initializeLinterSystem() {
     try {
         addLogEntry('INFO', 'מאתחל מערכת לינטר...');
         
@@ -2115,6 +2082,9 @@ function initializeLinterSystem() {
             addLogEntry('INFO', 'אספן נתונים אותחל בהצלחה');
         }
         
+        // Initialize session (includes charts, UI, etc.)
+        await initializeSession();
+        
         addLogEntry('INFO', 'מערכת לינטר אותחלה בהצלחה');
     } catch (error) {
         addLogEntry('ERROR', `שגיאה באתחול מערכת הלינטר: ${error.message}`);
@@ -2131,13 +2101,8 @@ function initializeLinterSystem() {
 function initializeLinterRealtimeMonitorPage() {
     console.log('🎯 Initializing Linter Realtime Monitor Page...');
     
-    // Initialize the linter system
+    // Initialize the linter system (includes charts, UI, etc.)
     initializeLinterSystem();
-    
-    // Initialize charts
-    if (typeof window.initializeCharts === 'function') {
-        window.initializeCharts();
-    }
     
     // Start auto discovery
     autoDiscoverProjectFiles();
@@ -2151,7 +2116,7 @@ function initializeLinterRealtimeMonitorPage() {
 
 document.addEventListener('DOMContentLoaded', async function() {
     addLogEntry('INFO', 'DOM נטען - מאתחל מערכת...');
-    await initializeSession();
+    // Note: initializeSession() is called from initializeLinterSystem() to avoid duplication
 });
 
 // ========================================

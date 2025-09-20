@@ -2221,9 +2221,82 @@ ls -la trading-ui/scripts/page-name.js
 - שימוש ב-`button-group` לכפתורים ברצף
 - שימוש ב-`section-actions` לכפתורים מרכזיים
 
-### שלב 21: שימוש מקיף במערכת הצבעים הדינאמית
+### שלב 21: מיקום כפתורים בשורת הכותרת
 
-#### 21.1 עקרונות שימוש במערכת הצבעים
+#### 21.1 כפתורי ייצוא ורענון
+
+**מיקום נכון:**
+- כפתורי ייצוא ורענון ממוקמים בשורת הכותרת של הסקשן
+- בסוף שורת הכותרת, לפני כפתור הפתיחה/סגירה
+- בהפרדה ברורה מכפתור הפתיחה/סגירה
+
+**מבנה נכון:**
+```html
+<div class="section-header">
+    <h2>כותרת הסקשן</h2>
+    
+    <!-- כפתורי ייצוא ורענון -->
+    <div class="section-actions">
+        <button class="btn btn-sm btn-outline-primary" onclick="refreshData()">
+            <i class="bi bi-arrow-clockwise"></i> רענן
+        </button>
+        <button class="btn btn-sm btn-outline-success" onclick="exportData()">
+            <i class="bi bi-download"></i> ייצוא
+        </button>
+    </div>
+    
+    <!-- כפתור פתיחה/סגירה -->
+    <button class="filter-toggle-btn" onclick="toggleSection('section1')">
+        <span class="section-toggle-icon">▼</span>
+    </button>
+</div>
+```
+
+#### 21.2 כפתורי גרפים
+
+**מיקום נכון:**
+- כפתורי רענון וייצוא של גרפים ממוקמים בשורת הכותרת של הגרף
+- בסוף שורת הכותרת של הגרף
+- בהפרדה ברורה מכפתור הפתיחה/סגירה
+
+**מבנה נכון:**
+```html
+<div class="chart-card">
+    <div class="chart-header">
+        <h3 class="chart-title">📈 כותרת הגרף</h3>
+        
+        <!-- כפתורי גרף -->
+        <div class="chart-actions">
+            <button class="btn btn-sm btn-outline-primary" onclick="refreshChart()" title="רענן">
+                🔄
+            </button>
+            <button class="btn btn-sm btn-outline-success" onclick="exportChart()" title="ייצא">
+                📊
+            </button>
+        </div>
+    </div>
+    <div class="chart-body">
+        <!-- תוכן הגרף -->
+    </div>
+</div>
+```
+
+#### 21.3 כללים חשובים
+
+**עקרונות מיקום:**
+- כפתורי פעולה תמיד בשורת הכותרת
+- בסוף שורת הכותרת, לפני כפתור הפתיחה/סגירה
+- הפרדה ברורה מכפתור הפתיחה/סגירה
+- יישור לאמצע הגובה לכל האלמנטים
+
+**סגנונות נדרשים:**
+- שימוש ב-`section-actions` לכפתורי סקשן
+- שימוש ב-`chart-actions` לכפתורי גרף
+- יישור אוטומטי עם `align-self: center`
+
+### שלב 22: שימוש מקיף במערכת הצבעים הדינאמית
+
+#### 22.1 עקרונות שימוש במערכת הצבעים
 
 **חובה להשתמש במערכת הצבעים הדינאמית:**
 - צבעים ראשיים ומשניים

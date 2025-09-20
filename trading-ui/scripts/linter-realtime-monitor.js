@@ -42,6 +42,10 @@ let projectFiles = [];
 // UI state
 let lastScanDate = null;
 
+// Scanning state management
+let isScanning = false;
+let scanningPromise = null;
+
 // ========================================
 // File Discovery and Management
 // ========================================
@@ -1001,6 +1005,29 @@ async function startFileScan() {
 
 async function scanJavaScriptFiles() {
     console.log('🚀 scanJavaScriptFiles called!');
+    
+    // Prevent multiple simultaneous scans
+    if (isScanning) {
+        console.log('⚠️ Scan already in progress, waiting for completion...');
+        if (scanningPromise) {
+            return await scanningPromise;
+        }
+        return;
+    }
+    
+    isScanning = true;
+    scanningPromise = performScan();
+    
+    try {
+        const result = await scanningPromise;
+        return result;
+    } finally {
+        isScanning = false;
+        scanningPromise = null;
+    }
+}
+
+async function performScan() {
     
     const selectedTypes = getSelectedFileTypes();
     console.log('🔍 Selected types:', selectedTypes);

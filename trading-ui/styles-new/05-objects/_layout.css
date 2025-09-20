@@ -75,6 +75,30 @@
   transition: all 0.3s ease;
 }
 
+/* יישור לאמצע הגובה לכל האלמנטים ב-section-header */
+.section-header > * {
+  align-self: center;
+}
+
+/* כפתורים בשורת הכותרת - ייצוא ורענון */
+.section-header .btn,
+.section-header .action-btn,
+.section-header .export-btn,
+.section-header .refresh-btn {
+  margin-inline-end: 0.5rem;
+  align-self: center;
+}
+
+/* הפרדה בין כפתורי פעולה לכפתור הפתיחה/סגירה */
+.section-header .section-actions,
+.section-header .chart-actions,
+.section-header .table-actions {
+  margin-inline-end: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
 /* רקע ברירת מחדל לכותרות ללא מחלקות דינמיות */
 .section-header:not([class*="entity-"]) {
   background: #ffffff;
@@ -197,6 +221,7 @@
   height: 40px;
   align-self: center; /* מיושר לאמצע בגובה */
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05); /* מסגרת דקה נוספת */
+  margin-inline-start: 0.5rem; /* הפרדה מהכפתורים שלפני */
 }
 
 .filter-toggle-btn:hover {

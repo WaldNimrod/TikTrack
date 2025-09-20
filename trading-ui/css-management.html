@@ -72,16 +72,21 @@
                 <div class="top-section">
                     <div class="section-header">
                         <h2>🎨 ניהול CSS</h2>
-                        <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <div class="header-actions">
+                            <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט">
+                                <i class="fas fa-copy"></i> העתק לוג
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
                         <div class="info-summary">
-                            <div>קבצי CSS: <strong>25</strong></div>
+                            <div>קבצי CSS: <strong id="activeCssFiles">25</strong></div>
                             <div>שכבות ITCSS: <strong>6</strong></div>
-                            <div>גודל כולל: <strong>2.1MB</strong></div>
+                            <div>גודל כולל: <strong id="totalCssSize">2.1MB</strong></div>
                             <div>סטטוס: <strong>פעיל</strong></div>
                         </div>
                     </div>
@@ -103,7 +108,7 @@
                                 <div class="card text-center">
                                     <div class="card-body">
                                         <h5 class="card-title text-primary">📁 קבצים</h5>
-                                        <h3 class="text-primary">25</h3>
+                                        <h3 class="text-primary" id="activeCssFiles">25</h3>
                                     </div>
                                 </div>
                             </div>
@@ -111,7 +116,7 @@
                                 <div class="card text-center">
                                     <div class="card-body">
                                         <h5 class="card-title text-info">💾 גודל</h5>
-                                        <h3 class="text-info">2.1MB</h3>
+                                        <h3 class="text-info" id="totalCssSize">2.1MB</h3>
                                     </div>
                                 </div>
                             </div>
@@ -126,8 +131,8 @@
                             <div class="col-md-3">
                                 <div class="card text-center">
                                     <div class="card-body">
-                                        <h5 class="card-title text-warning">🔧 סטטוס</h5>
-                                        <h6 class="text-warning">פעיל</h6>
+                                        <h5 class="card-title text-warning">📏 כללים</h5>
+                                        <h3 class="text-warning" id="totalCssRules">856</h3>
                                     </div>
                                 </div>
                             </div>

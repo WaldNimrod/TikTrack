@@ -291,10 +291,7 @@
         </div>
         <div class="section-body">
           <div id="dependenciesContent">
-            <div class="loading">
-              <div class="loading-spinner"></div>
-              טוען ניתוח תלויות...
-            </div>
+            <p>טוען נתוני תלויות...</p>
           </div>
         </div>
       </div>
@@ -309,11 +306,8 @@
           </button>
         </div>
         <div class="section-body">
-          <div id="statisticsContent">
-            <div class="loading">
-              <div class="loading-spinner"></div>
-              טוען סטטיסטיקות...
-            </div>
+          <div id="systemStatsContent">
+            <p>טוען סטטיסטיקות...</p>
           </div>
         </div>
       </div>
@@ -329,10 +323,7 @@
         </div>
         <div class="section-body">
           <div id="storageContent">
-            <div class="loading">
-              <div class="loading-spinner"></div>
-              טוען ניהול אחסון...
-            </div>
+            <p>טוען נתוני אחסון...</p>
           </div>
         </div>
       </div>
@@ -348,10 +339,7 @@
         </div>
         <div class="section-body">
           <div id="architectureContent">
-            <div class="loading">
-              <div class="loading-spinner"></div>
-              טוען בדיקת ארכיטקטורה...
-            </div>
+            <p>טוען נתוני ארכיטקטורה...</p>
           </div>
         </div>
       </div>
@@ -366,6 +354,12 @@
           </button>
         </div>
         <div class="section-body">
+          <div id="integrationContent">
+            <p>טוען סטטוס אינטגרציה...</p>
+          </div>
+        </div>
+      </div>
+      <!-- UI Content Section 7 End -->
           <div id="integrationContent">
             <div class="loading">
               <div class="loading-spinner"></div>
@@ -394,11 +388,13 @@
     <script src="scripts/table-mappings.js"></script>
     <script src="scripts/header-system.js?v=20250115_level3_fix"></script>
     <script src="scripts/notification-system.js"></script>
+  <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/main.js"></script>
 
     <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
     <!-- ======================================================== -->
     <!-- Page-specific JavaScript for page-scripts-matrix -->
+    <script src="scripts/page-scripts-matrix.js"></script>
     <script>
         // Page initialization - September 2025
         document.addEventListener('DOMContentLoaded', function() {
@@ -459,43 +455,7 @@
             }, 2000);
         }
 
-        // Quick action functions
-        function refreshAllData() {
-            console.log('🔄 Refreshing all data...');
-            if (typeof showNotification === 'function') {
-                showNotification('מרענן את כל הנתונים...', 'info');
-            }
-            // Implement refresh logic
-        }
-
-        function backupData() {
-            console.log('💾 Backing up data...');
-            if (typeof showNotification === 'function') {
-                showNotification('יוצר גיבוי נתונים...', 'info');
-            }
-            // Implement backup logic
-        }
-
-        function cleanupOldData() {
-            console.log('🧹 Cleaning up old data...');
-            if (typeof showNotification === 'function') {
-                showNotification('מנקה נתונים ישנים...', 'info');
-            }
-            // Implement cleanup logic
-        }
-
-        function toggleAllSections() {
-            console.log('📂 Toggling all sections...');
-            // Implement toggle all sections logic
-        }
-
-        function copyDetailedLog() {
-            console.log('📋 Copying detailed log...');
-            if (typeof showNotification === 'function') {
-                showNotification('יוצר לוג מפורט...', 'info');
-            }
-            // Implement detailed log copy logic
-        }
+        // Quick action functions are now handled by page-scripts-matrix.js
     </script>
     </div>
     <!-- ===== CONTENT SECTIONS END (EDITABLE) ===== -->

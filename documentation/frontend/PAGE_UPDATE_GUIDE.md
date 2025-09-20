@@ -249,15 +249,20 @@ console.log('Notification styles:', {
 <link href="styles-new/06-components/_notifications.css?v=v1.0.1" rel="stylesheet">
 ```
 
-3. **קובץ JavaScript**:
+3. **קבצי JavaScript**:
 ```html
+<!-- מערכת התראות בסיסית -->
 <script src="scripts/notification-system.js?v=v1.0.0"></script>
+
+<!-- אוסף התראות גלובלי (חדש - ספטמבר 2025) -->
+<script src="scripts/global-notification-collector.js"></script>
 ```
 
 4. **סדר טעינה נכון**:
 ```html
-<!-- הסקריפט חייב להיטען לפני קבצי העמוד -->
+<!-- הסקריפטים חייבים להיטען לפני קבצי העמוד -->
 <script src="scripts/notification-system.js?v=v1.0.0"></script>
+<script src="scripts/global-notification-collector.js"></script>
 <script src="scripts/[PAGE].js?v=v1.0.0"></script>
 ```
 
@@ -1997,6 +2002,10 @@ grep "console-cleanup\|ui-utils\|main.js" trading-ui/page-name.html
 <script src="scripts/linked-items.js"></script>
 <script src="scripts/page-utils.js"></script>
 <script src="scripts/main.js"></script>
+
+<!-- Notification System Scripts -->
+<script src="scripts/notification-system.js"></script>
+<script src="scripts/global-notification-collector.js"></script>
 ```
 
 #### 17.4 מה המערכות מספקות
@@ -3456,6 +3465,7 @@ async function saveStatusColorsToPreferences(statusColors) {
 
 **סקריפטים נדרשים:**
 - `notification-system.js` - מערכת התראות בסיסית
+- `global-notification-collector.js` - אוסף התראות גלובלי מכל העמודים (חדש - ספטמבר 2025)
 - `realtime-notifications-client.js` - התראות בזמן אמת
 - `notifications-center.js` - ניהול מרכז התראות
 
@@ -3463,6 +3473,14 @@ async function saveStatusColorsToPreferences(statusColors) {
 - **אינטגרציה עם WebSocket** - התראות בזמן אמת
 - **ניהול היסטוריה** - שמירה וטעינה של היסטוריית התראות
 - **הגדרות אישיות** - שמירה וטעינה של הגדרות משתמש
+- **איסוף גלובלי** - אוסף התראות מכל העמודים אוטומטית (חדש)
+
+**מערכת איסוף התראות גלובלית (חדש - ספטמבר 2025):**
+- **איסוף אוטומטי** - כל עמוד אוסף התראות מעצמו כל 10 שניות
+- **זיהוי חכם** - מזהה שגיאות, הצלחות, אזהרות ומידע מהעמוד
+- **סינון כפילויות** - מונע התראות כפולות
+- **שמירה גלובלית** - שומר להיסטוריה הגלובלית ב-localStorage
+- **אין צורך בקריאות ידניות** - עובד אוטומטית בכל עמוד
 
 ### 22.8.7 תובנות על מבנה TEMPLATE ZONE
 

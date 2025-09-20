@@ -712,7 +712,7 @@ async function saveTicker() {
         }
       });
       
-      console.log('✅ המערכת הגלובלית החזירה:', handled);
+
       
       if (handled) {
         return; // המערכת הגלובלית טיפלה בהכל
@@ -1574,7 +1574,7 @@ async function confirmDeleteTicker(id) {
         successMessage: `טיקר ${tickerInfo} נמחק בהצלחה מהמערכת`
       });
       
-
+      console.log('✅ המערכת הגלובלית החזירה במחיקה:', handled);
       
       if (handled) {
         return; // המערכת הגלובלית טיפלה בהכל

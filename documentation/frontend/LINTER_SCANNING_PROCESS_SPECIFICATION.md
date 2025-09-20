@@ -221,3 +221,4 @@ function addLogEntry(level, message, scanState) {
 
 ---
 **מסמך זה מגדיר את הבעיה והפתרון לתהליך הסריקה במערכת הלינטר**
+

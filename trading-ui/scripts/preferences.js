@@ -33,6 +33,40 @@ window.preferencesCache = {
     }
 };
 
+// ===== PAGINATION PREFERENCES =====
+
+/**
+ * קבלת העדפת גודל עמוד לטבלאות
+ * @param {string} tableType - סוג הטבלה (ברירת מחדל: 'default')
+ * @returns {Promise<number>} - מספר רשומות לעמוד
+ */
+window.getPaginationSize = async function(tableType = 'default') {
+    try {
+        const preferenceName = `pagination_size_${tableType}`;
+        const size = await window.getPreference(preferenceName);
+        return size || 25; // ברירת מחדל: 25 רשומות לעמוד
+    } catch (error) {
+        console.warn('Failed to get pagination size preference, using default:', error);
+        return 25;
+    }
+};
+
+/**
+ * שמירת העדפת גודל עמוד לטבלאות
+ * @param {string} tableType - סוג הטבלה
+ * @param {number} size - מספר רשומות לעמוד
+ * @returns {Promise<boolean>} - האם השמירה הצליחה
+ */
+window.setPaginationSize = async function(tableType = 'default', size = 25) {
+    try {
+        const preferenceName = `pagination_size_${tableType}`;
+        return await window.setPreference(preferenceName, size);
+    } catch (error) {
+        console.error('Failed to set pagination size preference:', error);
+        return false;
+    }
+};
+
 // ===== CORE ACCESS FUNCTIONS =====
 
 /**
@@ -877,6 +911,89 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// ===== COPY DETAILED LOG =====
+
+/**
+ * העתקת לוג מפורט של מערכת העדפות
+ */
+window.copyDetailedLog = function() {
+    try {
+        const timestamp = new Date().toLocaleString('he-IL');
+        const activeProfile = document.getElementById('activeProfileInfo')?.textContent || 'לא זמין';
+        const preferencesCount = document.getElementById('preferencesCount')?.textContent || 'לא זמין';
+        const profilesCount = document.getElementById('profilesCount')?.textContent || 'לא זמין';
+        
+        // איסוף מידע על כל הסקשנים
+        const sections = [];
+        for (let i = 1; i <= 7; i++) {
+            const section = document.getElementById(`section${i}`);
+            if (section) {
+                const title = section.querySelector('h2')?.textContent || `סקשן ${i}`;
+                const isVisible = !section.classList.contains('d-none');
+                sections.push(`  ${i}. ${title}: ${isVisible ? 'פתוח' : 'סגור'}`);
+            }
+        }
+        
+        // איסוף מידע על העדפות פעילות
+        const activePreferences = [];
+        const preferenceInputs = document.querySelectorAll('input[type="checkbox"], input[type="range"], select');
+        preferenceInputs.forEach(input => {
+            if (input.type === 'checkbox') {
+                activePreferences.push(`  ${input.name || input.id}: ${input.checked ? 'פעיל' : 'לא פעיל'}`);
+            } else if (input.type === 'range') {
+                activePreferences.push(`  ${input.name || input.id}: ${input.value}`);
+            } else if (input.tagName === 'SELECT') {
+                activePreferences.push(`  ${input.name || input.id}: ${input.value}`);
+            }
+        });
+        
+        const logContent = `🔔 לוג מפורט - מערכת העדפות
+📅 תאריך ושעה: ${timestamp}
+👤 פרופיל פעיל: ${activeProfile}
+📊 מספר העדפות: ${preferencesCount}
+👥 מספר פרופילים: ${profilesCount}
+
+📋 סטטוס סקשנים:
+${sections.join('\n')}
+
+⚙️ העדפות פעילות:
+${activePreferences.slice(0, 20).join('\n')}${activePreferences.length > 20 ? '\n  ... ועוד ' + (activePreferences.length - 20) + ' העדפות' : ''}
+
+🔧 מידע טכני:
+  - מערכת העדפות: פעילה
+  - Cache: ${window.preferencesCache.isValid() ? 'תקין' : 'לא תקין'}
+  - שירות: ${window.preferencesService ? 'זמין' : 'לא זמין'}
+
+📝 הערות:
+  - לוג זה מכיל מידע על מצב מערכת העדפות
+  - כולל פרופיל פעיל, העדפות, וסטטוס סקשנים
+  - נוצר אוטומטית על ידי מערכת העדפות`;
+
+        navigator.clipboard.writeText(logContent).then(() => {
+            if (window.showSuccessNotification) {
+                window.showSuccessNotification('לוג מפורט הועתק ללוח');
+            } else {
+                alert('לוג מפורט הועתק ללוח');
+            }
+        }).catch(err => {
+            console.error('שגיאה בהעתקה:', err);
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה בהעתקת הלוג');
+            } else {
+                alert('שגיאה בהעתקת הלוג');
+            }
+        });
+        
+    } catch (error) {
+        console.error('שגיאה ביצירת לוג מפורט:', error);
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה ביצירת הלוג');
+        } else {
+            alert('שגיאה ביצירת הלוג');
+        }
+    }
+};
+
 // ===== EXPORT FOR TESTING =====
 
 // Export functions for testing
@@ -895,6 +1012,7 @@ if (typeof module !== 'undefined' && module.exports) {
         loadPreferences: window.loadPreferences,
         saveAllPreferences: window.saveAllPreferences,
         resetToDefaults: window.resetToDefaults,
-        initializePreferences: window.initializePreferences
+        initializePreferences: window.initializePreferences,
+        copyDetailedLog: window.copyDetailedLog
     };
 }

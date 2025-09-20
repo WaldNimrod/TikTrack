@@ -137,15 +137,17 @@
 #unified-header .header-nav {
     display: flex;
     align-items: center;
-    justify-content: center; /* יישור למרכז */
+    justify-content: flex-end; /* יישור לימין - תחילת השורה */
     flex: 1; /* תופס את כל הרוחב הזמין */
+    direction: rtl; /* RTL לניווט */
 }
 
 #unified-header .main-nav {
     display: flex;
     align-items: center;
-    justify-content: center; /* יישור למרכז */
+    justify-content: flex-end; /* יישור לימין - תחילת השורה */
     gap: 1rem; /* רווח בין פריטי התפריט */
+    direction: rtl; /* RTL לתפריט */
 }
 
 /* ===== התאמה למסכים קטנים ===== */

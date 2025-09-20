@@ -33,6 +33,40 @@ window.preferencesCache = {
     }
 };
 
+// ===== PAGINATION PREFERENCES =====
+
+/**
+ * קבלת העדפת גודל עמוד לטבלאות
+ * @param {string} tableType - סוג הטבלה (ברירת מחדל: 'default')
+ * @returns {Promise<number>} - מספר רשומות לעמוד
+ */
+window.getPaginationSize = async function(tableType = 'default') {
+    try {
+        const preferenceName = `pagination_size_${tableType}`;
+        const size = await window.getPreference(preferenceName);
+        return size || 20; // ברירת מחדל: 20 רשומות לעמוד
+    } catch (error) {
+        console.warn('Failed to get pagination size preference, using default:', error);
+        return 20;
+    }
+};
+
+/**
+ * שמירת העדפת גודל עמוד לטבלאות
+ * @param {string} tableType - סוג הטבלה
+ * @param {number} size - מספר רשומות לעמוד
+ * @returns {Promise<boolean>} - האם השמירה הצליחה
+ */
+window.setPaginationSize = async function(tableType = 'default', size = 20) {
+    try {
+        const preferenceName = `pagination_size_${tableType}`;
+        return await window.setPreference(preferenceName, size);
+    } catch (error) {
+        console.error('Failed to set pagination size preference:', error);
+        return false;
+    }
+};
+
 // ===== CORE ACCESS FUNCTIONS =====
 
 /**
@@ -506,7 +540,7 @@ window.loadPreferences = async function(userId = 1, profileId = null) {
  */
 window.saveAllPreferences = async function() {
     try {
-
+        console.log('💾 Saving all preferences to system...');
         
         // Collect form data (if function exists)
         if (typeof window.collectFormData === 'function') {

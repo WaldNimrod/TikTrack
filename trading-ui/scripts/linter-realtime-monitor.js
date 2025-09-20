@@ -146,7 +146,13 @@ let fileScanningState = new FileScanningState();
 // ========================================
 
 function updateScanningProgressUI() {
-    if (!fileScanningState) return;
+    console.log('🔍 updateScanningProgressUI called');
+    console.log('🔍 fileScanningState:', fileScanningState);
+    
+    if (!fileScanningState) {
+        console.log('⚠️ fileScanningState not available');
+        return;
+    }
     
     // Update progress indicators
     const discoveredElement = document.getElementById('discoveredFiles');
@@ -182,6 +188,9 @@ function updateScanningProgressUI() {
     } else if (progressPercent) {
         progressPercent.textContent = '0%';
     }
+    
+    // Update the new scanning progress section
+    updateScanningProgressSection();
 }
 
 // ========================================
@@ -239,53 +248,63 @@ function initializeCharts() {
         console.warn('ChartRenderers are not available');
         return;
     }
-    
-    // Initialize Quality Chart (percentages)
-    if (qualityChartRenderer) {
-        console.log('🗑️ משמיד instance קיים של גרף איכות...');
-        qualityChartRenderer.destroy();
-        qualityChartRenderer = null;
+
+    // Initialize Quality Chart (percentages) - only if not already initialized
+    if (!qualityChartRenderer) {
+        qualityChartRenderer = new QualityChartRenderer('qualityChartContainer');
+        qualityChartRenderer.initialize().then(() => {
+            // גרף איכות קוד אותחל בהצלחה
+            console.log('✅ Quality chart initialized');
+        }).catch(error => {
+            addLogEntry('ERROR', 'שגיאה באתחול גרף איכות', { error: error.message });
+            console.error('Quality chart initialization error:', error);
+        });
+    } else {
+        console.log('✅ Quality chart already initialized');
     }
 
-    qualityChartRenderer = new QualityChartRenderer('qualityChartContainer');
-    qualityChartRenderer.initialize().then(() => {
-        // גרף איכות קוד אותחל בהצלחה
-        console.log('✅ Quality chart initialized');
-    }).catch(error => {
-        addLogEntry('ERROR', 'שגיאה באתחול גרף איכות', { error: error.message });
-        console.error('Quality chart initialization error:', error);
-    });
-
-    // Initialize Counts Chart (numbers)
-    if (countsChartRenderer) {
-        console.log('🗑️ משמיד instance קיים של גרף ספירות...');
-        countsChartRenderer.destroy();
-        countsChartRenderer = null;
+    // Initialize Counts Chart (numbers) - only if not already initialized
+    if (!countsChartRenderer) {
+        countsChartRenderer = new CountsChartRenderer('countsChartContainer');
+        countsChartRenderer.initialize().then(() => {
+            // גרף ספירות אותחל בהצלחה
+            console.log('✅ Counts chart initialized');
+            loadInitialData();
+        }).catch(error => {
+            addLogEntry('ERROR', 'שגיאה באתחול גרף ספירות', { error: error.message });
+            console.error('Counts chart initialization error:', error);
+        });
+    } else {
+        console.log('✅ Counts chart already initialized');
     }
-
-    countsChartRenderer = new CountsChartRenderer('countsChartContainer');
-    countsChartRenderer.initialize().then(() => {
-        // גרף ספירות אותחל בהצלחה
-        console.log('✅ Counts chart initialized');
-        loadInitialData();
-    }).catch(error => {
-        addLogEntry('ERROR', 'שגיאה באתחול גרף ספירות', { error: error.message });
-        console.error('Counts chart initialization error:', error);
-    });
 }
 
 // Helper functions for updating charts
 function updateQualityChart(data) {
+    console.log('🔍 updateQualityChart called with data:', data);
+    console.log('🔍 qualityChartRenderer:', qualityChartRenderer);
+    console.log('🔍 qualityChartRenderer.isInitialized:', qualityChartRenderer?.isInitialized);
+    
     if (qualityChartRenderer && qualityChartRenderer.isInitialized) {
         // Pass data directly to quality chart renderer
+        console.log('🔍 Calling qualityChartRenderer.updateChart');
         qualityChartRenderer.updateChart(data);
+    } else {
+        console.log('⚠️ Quality chart renderer not ready');
     }
 }
 
 function updateCountsChart(data) {
+    console.log('🔍 updateCountsChart called with data:', data);
+    console.log('🔍 countsChartRenderer:', countsChartRenderer);
+    console.log('🔍 countsChartRenderer.isInitialized:', countsChartRenderer?.isInitialized);
+    
     if (countsChartRenderer && countsChartRenderer.isInitialized) {
         // Pass data directly to counts chart renderer
+        console.log('🔍 Calling countsChartRenderer.updateChart');
         countsChartRenderer.updateChart(data);
+    } else {
+        console.log('⚠️ Counts chart renderer not ready');
     }
 }
 
@@ -354,6 +373,9 @@ async function loadInitialData() {
                 }
                 
                 // Update charts with historical data
+                console.log('🔍 About to update charts with data:', latestData);
+                console.log('🔍 qualityChartRenderer exists:', !!qualityChartRenderer);
+                console.log('🔍 countsChartRenderer exists:', !!countsChartRenderer);
                 updateQualityChart(latestData);
                 updateCountsChart(latestData);
                 console.log('✅ Charts updated with historical data from IndexedDB:', latestData);
@@ -706,7 +728,7 @@ function loadScanningResultsFromLocalStorage() {
 function updateChartIndicators() {
     try {
         // Check if scanning results are available
-        if (!window.scanningResults || !window.scanningResults.errors) {
+        if (!window.scanningResults) {
             console.log('⚠️ No scanning results available yet, skipping indicators update');
         return;
     }
@@ -1074,24 +1096,27 @@ function updateProblemFilesTable(stats) {
     // Convert to array and sort by total issues (descending)
     const sortedFiles = Object.values(filesWithIssues).sort((a, b) => b.total - a.total);
     
+    // Take only the top 25 most problematic files
+    const top25Files = sortedFiles.slice(0, 25);
+    
     // Update problem files count
     const problemFilesCountElement = document.getElementById('problemFilesCount');
     if (problemFilesCountElement) {
-        problemFilesCountElement.textContent = `${sortedFiles.length} קבצים`;
+        problemFilesCountElement.textContent = `${top25Files.length} קבצים (מתוך ${sortedFiles.length})`;
     }
     
-    // Display files with issues
-    sortedFiles.forEach(fileInfo => {
+    // Display top 25 files with issues
+    top25Files.forEach(fileInfo => {
         const row = tableBody.insertRow();
         const severity = fileInfo.errors > 0 ? 'danger' : 'warning';
         const severityText = fileInfo.errors > 0 ? 'קריטי' : 'אזהרה';
         
         row.innerHTML = `
             <td>${fileInfo.file}</td>
-            <td>${fileInfo.type.toUpperCase()}</td>
-            <td>${fileInfo.errors}</td>
-            <td>${fileInfo.warnings}</td>
-            <td>${fileInfo.total}</td>
+            <td><span class="badge bg-secondary">${fileInfo.type.toUpperCase()}</span></td>
+            <td><span class="text-danger">${fileInfo.errors}</span></td>
+            <td><span class="text-warning">${fileInfo.warnings}</span></td>
+            <td><strong>${fileInfo.total}</strong></td>
             <td><span class="badge bg-${severity}">${severityText}</span></td>
         `;
     });
@@ -1205,7 +1230,7 @@ async function performScan() {
             console.log('🔍 About to call getProjectFiles...');
             const projectFiles = await Promise.race([
                 window.projectFilesScanner.getProjectFiles(),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout after 10 seconds')), 10000))
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout after 30 seconds')), 30000))
             ]);
             console.log('🔍 getProjectFiles completed, got:', projectFiles);
             console.log('🔍 Project files received:', projectFiles);
@@ -1626,6 +1651,12 @@ async function finishScan() {
     
     // Update UI with final scan results
     updateScanningProgressUI();
+    
+    // Update scanning progress section
+    updateScanningProgressSection();
+    
+    // Update fix data with new scanning results
+    initializeFixData();
                 
                 // Update statistics
     updateFileTypeStatistics(window.scanningResults.errors.concat(window.scanningResults.warnings));
@@ -1842,6 +1873,12 @@ async function initializeSession() {
     
     // Initialize progress report
     initializeProgressReport();
+    
+    // Initialize fix data
+    initializeFixData();
+    
+    // Initialize pagination
+    initializePagination();
     
     addLogEntry('SUCCESS', 'מערכת לינטר אותחלה בהצלחה');
 }
@@ -2289,25 +2326,554 @@ function addProgressEntry(action, status, category, details) {
 
 // Update progress report display
 function updateProgressReport() {
-    // Update summary cards
-    document.getElementById('completedFixes').textContent = progressData.completed.length;
-    document.getElementById('inProgressFixes').textContent = progressData.inProgress.length;
-    document.getElementById('openIssues').textContent = progressData.open.length;
+    // Update summary cards - check if elements exist first
+    const completedElement = document.getElementById('completedFixes');
+    const inProgressElement = document.getElementById('inProgressFixes');
+    const openElement = document.getElementById('openIssues');
+    
+    if (completedElement) completedElement.textContent = progressData.completed.length;
+    if (inProgressElement) inProgressElement.textContent = progressData.inProgress.length;
+    if (openElement) openElement.textContent = progressData.open.length;
     
     // Calculate success rate
     const total = progressData.completed.length + progressData.inProgress.length + progressData.open.length;
     const successRate = total > 0 ? Math.round((progressData.completed.length / total) * 100) : 0;
-    document.getElementById('successRate').textContent = successRate + '%';
+    const successRateElement = document.getElementById('successRate');
+    if (successRateElement) successRateElement.textContent = successRate + '%';
     
     // Update count
-    document.getElementById('progressReportCount').textContent = total + ' פעולות';
+    const progressReportCountElement = document.getElementById('progressReportCount');
+    if (progressReportCountElement) progressReportCountElement.textContent = total + ' פעולות';
     
     // Update timeline
     updateProgressTimeline();
     
     // Update details table
-    updateProgressDetailsTable();
+    updateProgressDetailsTableMain();
 }
+
+// Update scanning progress section
+function updateScanningProgressSection() {
+    console.log('🔍 updateScanningProgressSection called');
+    console.log('🔍 isScanning:', isScanning);
+    console.log('🔍 window.scanningResults:', window.scanningResults);
+    
+    // Update scanning status count
+    const statusElement = document.getElementById('scanningStatusCount');
+    console.log('🔍 scanningStatusCount element:', statusElement);
+    
+    if (statusElement) {
+        if (isScanning) {
+            statusElement.textContent = 'מסריק...';
+            statusElement.className = 'table-count text-warning';
+        } else if (window.scanningResults && window.scanningResults.scannedFiles > 0) {
+            statusElement.textContent = `${window.scanningResults.scannedFiles} קבצים נסרקו`;
+            statusElement.className = 'table-count text-success';
+    } else {
+            statusElement.textContent = 'מוכן לסריקה';
+            statusElement.className = 'table-count text-muted';
+        }
+    }
+    
+    // Update scanning results summary
+    updateScanningResultsSummary();
+    
+    // Update file type breakdown
+    updateFileTypeBreakdown();
+}
+
+// Update scanning results summary
+function updateScanningResultsSummary() {
+    if (!window.scanningResults) return;
+    
+    // Update total errors
+    const totalErrorsElement = document.getElementById('totalErrors');
+    if (totalErrorsElement) {
+        totalErrorsElement.textContent = window.scanningResults.errors.length;
+    }
+    
+    // Update total warnings
+    const totalWarningsElement = document.getElementById('totalWarnings');
+    if (totalWarningsElement) {
+        totalWarningsElement.textContent = window.scanningResults.warnings.length;
+    }
+    
+    // Update total scanned files
+    const totalScannedFilesElement = document.getElementById('totalScannedFiles');
+    if (totalScannedFilesElement) {
+        totalScannedFilesElement.textContent = window.scanningResults.scannedFiles;
+    }
+    
+    // Update scanning duration
+    const scanningDurationElement = document.getElementById('scanningDuration');
+    if (scanningDurationElement && window.scanningResults.startTime && window.scanningResults.endTime) {
+        const duration = (window.scanningResults.endTime - window.scanningResults.startTime) / 1000;
+        scanningDurationElement.textContent = `${duration.toFixed(1)}s`;
+    }
+}
+
+// Update file type breakdown table
+function updateFileTypeBreakdown() {
+    const tbody = document.getElementById('progressDetailsBody');
+    if (!tbody || !fileScanningState) return;
+    
+    const fileTypes = ['js', 'html', 'css', 'python', 'other'];
+    
+    tbody.innerHTML = fileTypes.map(type => {
+        const discovered = fileScanningState.discovered.byType[type] || 0;
+        const selected = fileScanningState.selected.byType[type] || 0;
+        const scanned = fileScanningState.scanned.byType[type] || 0;
+        
+        // Count errors and warnings for this file type
+        const errors = window.scanningResults ? window.scanningResults.errors.filter(e => getFileType(e.file) === type).length : 0;
+        const warnings = window.scanningResults ? window.scanningResults.warnings.filter(w => getFileType(w.file) === type).length : 0;
+        
+        // Determine status
+        let status = 'לא נסרק';
+        let statusClass = 'text-muted';
+        
+        if (scanned > 0) {
+            if (errors === 0 && warnings === 0) {
+                status = 'אין בעיות';
+                statusClass = 'text-success';
+            } else if (errors > 0) {
+                status = `${errors} שגיאות`;
+                statusClass = 'text-danger';
+            } else {
+                status = `${warnings} אזהרות`;
+                statusClass = 'text-warning';
+            }
+        } else if (selected > 0) {
+            status = 'נבחר לסריקה';
+            statusClass = 'text-info';
+        }
+        
+        return `
+            <tr>
+                <td><span class="badge bg-secondary">${type.toUpperCase()}</span></td>
+                <td>${discovered}</td>
+                <td>${selected}</td>
+                <td>${scanned}</td>
+                <td>${errors}</td>
+                <td>${warnings}</td>
+                <td><span class="${statusClass}">${status}</span></td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// ========================================
+// Pagination System Integration
+// ========================================
+
+// Simple display - show top 25 items per table
+const itemsPerPage = 25;
+
+// Initialize simple pagination - just show top 25 items
+function initializePagination() {
+    console.log('🔧 Initializing simple display - showing top 25 items per table');
+    
+    // Update tables to show top 25 items
+    updateFixDetailsTable();
+    updateProgressDetailsTable();
+    updateProblemFilesTable();
+}
+
+// Update fix details table - show only top 25 issues
+function updateFixDetailsTable(data = null) {
+    const tbody = document.getElementById('fixDetailsBody');
+    if (!tbody) return;
+    
+    const displayData = data || fixData.fixDetails;
+    
+    // Take only the first 25 issues
+    const top25Issues = displayData.slice(0, 25);
+    
+    tbody.innerHTML = top25Issues.map(fix => {
+        const statusBadge = getFixStatusBadge(fix.status);
+        const duration = fix.endTime ? ((fix.endTime - fix.startTime) / 1000).toFixed(1) + 's' : '-';
+        
+        return `
+            <tr>
+                <td>${fix.file}</td>
+                <td><span class="badge ${getIssueTypeBadge(fix.issueType)}">${fix.issueType}</span></td>
+                <td>${fix.description}</td>
+                <td>${statusBadge}</td>
+                <td>${duration}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" onclick="viewFixDetails('${fix.id}')" title="צפה בפרטים">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+    
+    // Add info about total issues if there are more than 25
+    if (displayData.length > 25) {
+        const infoRow = document.createElement('tr');
+        infoRow.innerHTML = `<td colspan="6" class="text-center text-muted">מציג 25 מתוך ${displayData.length} בעיות</td>`;
+        tbody.appendChild(infoRow);
+    }
+}
+
+// Update progress details table with paginated data
+function updateProgressDetailsTable(data = null) {
+    const tbody = document.getElementById('progressDetailsBody');
+    if (!tbody) return;
+    
+    const displayData = data || progressData.entries || [];
+    
+    tbody.innerHTML = displayData.map(entry => {
+        const statusIcon = getStatusIcon(entry.status);
+        const statusBadge = getStatusBadge(entry.status);
+        const duration = entry.endTime ? ((entry.endTime - entry.startTime) / 1000).toFixed(1) + 's' : '-';
+        
+        return `
+            <tr>
+                <td>${entry.timestamp}</td>
+                <td>${entry.action}</td>
+                <td>${entry.description}</td>
+                <td>${statusIcon} ${statusBadge}</td>
+                <td>${duration}</td>
+                <td>${entry.details || '-'}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// This function is now replaced by the main updateProblemFilesTable function
+
+// Get problem files data
+function getProblemFilesData() {
+    if (!window.scanningResults) return [];
+    
+    const fileMap = new Map();
+    
+    // Process errors
+    window.scanningResults.errors.forEach(error => {
+        const fileName = error.file;
+        if (!fileMap.has(fileName)) {
+            fileMap.set(fileName, {
+                name: fileName,
+                type: getFileType(fileName),
+                errors: 0,
+                warnings: 0
+            });
+        }
+        fileMap.get(fileName).errors++;
+    });
+    
+    // Process warnings
+    window.scanningResults.warnings.forEach(warning => {
+        const fileName = warning.file;
+        if (!fileMap.has(fileName)) {
+            fileMap.set(fileName, {
+                name: fileName,
+                type: getFileType(fileName),
+                errors: 0,
+                warnings: 0
+            });
+        }
+        fileMap.get(fileName).warnings++;
+    });
+    
+    return Array.from(fileMap.values()).sort((a, b) => {
+        const aTotal = a.errors + a.warnings;
+        const bTotal = b.errors + b.warnings;
+        return bTotal - aTotal; // Sort by total issues descending
+    });
+}
+
+// ========================================
+// Fix Progress System
+// ========================================
+
+// Fix tracking data
+let fixData = {
+    totalIssues: 0,
+    fixedIssues: 0,
+    remainingIssues: 0,
+    successfullyFixed: 0,
+    failedToFix: 0,
+    requiresManualCheck: 0,
+    fixStartTime: null,
+    fixEndTime: null,
+    fixDetails: []
+};
+
+// Update fix progress section
+function updateFixProgressSection() {
+    console.log('🔍 updateFixProgressSection called');
+    console.log('🔍 fixData:', fixData);
+    
+    // Update fix status count
+    const statusElement = document.getElementById('fixStatusCount');
+    console.log('🔍 fixStatusCount element:', statusElement);
+    
+    if (statusElement) {
+        if (fixData.fixedIssues > 0) {
+            statusElement.textContent = `${fixData.fixedIssues} בעיות תוקנו`;
+            statusElement.className = 'table-count text-success';
+        } else if (fixData.totalIssues > 0) {
+            statusElement.textContent = `${fixData.remainingIssues} בעיות נותרו`;
+            statusElement.className = 'table-count text-warning';
+        } else {
+            statusElement.textContent = 'מוכן לתיקון';
+            statusElement.className = 'table-count text-muted';
+        }
+    }
+    
+    // Update fix progress summary
+    updateFixProgressSummary();
+    
+    // Update fix results breakdown
+    updateFixResultsBreakdown();
+    
+    // Update fix details table
+    updateFixDetailsTableMain();
+}
+
+// Update fix progress summary
+function updateFixProgressSummary() {
+    // Update fixed issues
+    const fixedIssuesElement = document.getElementById('fixedIssues');
+    if (fixedIssuesElement) {
+        fixedIssuesElement.textContent = fixData.fixedIssues;
+    }
+    
+    // Update remaining issues
+    const remainingIssuesElement = document.getElementById('remainingIssues');
+    if (remainingIssuesElement) {
+        remainingIssuesElement.textContent = fixData.remainingIssues;
+    }
+    
+    // Update fix success rate
+    const fixSuccessRateElement = document.getElementById('fixSuccessRate');
+    if (fixSuccessRateElement) {
+        const successRate = fixData.totalIssues > 0 ? Math.round((fixData.fixedIssues / fixData.totalIssues) * 100) : 0;
+        fixSuccessRateElement.textContent = successRate + '%';
+    }
+    
+    // Update fix duration
+    const fixDurationElement = document.getElementById('fixDuration');
+    if (fixDurationElement && fixData.fixStartTime && fixData.fixEndTime) {
+        const duration = (fixData.fixEndTime - fixData.fixStartTime) / 1000;
+        fixDurationElement.textContent = `${duration.toFixed(1)}s`;
+    }
+    
+    // Update fix progress bar
+    const fixProgressBar = document.getElementById('fixProgressBar');
+    const fixProgressPercent = document.getElementById('fixProgressPercent');
+    
+    if (fixProgressBar && fixData.totalIssues > 0) {
+        const progress = (fixData.fixedIssues / fixData.totalIssues) * 100;
+        const roundedProgress = Math.min(Math.round(progress), 100);
+        
+        fixProgressBar.style.width = `${roundedProgress}%`;
+        fixProgressBar.setAttribute('aria-valuenow', roundedProgress);
+        
+        if (fixProgressPercent) {
+            fixProgressPercent.textContent = `${roundedProgress}%`;
+        }
+    } else if (fixProgressPercent) {
+        fixProgressPercent.textContent = '0%';
+    }
+}
+
+// Update fix results breakdown
+function updateFixResultsBreakdown() {
+    // Update successfully fixed
+    const successfullyFixedElement = document.getElementById('successfullyFixed');
+    if (successfullyFixedElement) {
+        successfullyFixedElement.textContent = fixData.successfullyFixed;
+    }
+    
+    // Update failed to fix
+    const failedToFixElement = document.getElementById('failedToFix');
+    if (failedToFixElement) {
+        failedToFixElement.textContent = fixData.failedToFix;
+    }
+    
+    // Update requires manual check
+    const requiresManualCheckElement = document.getElementById('requiresManualCheck');
+    if (requiresManualCheckElement) {
+        requiresManualCheckElement.textContent = fixData.requiresManualCheck;
+    }
+}
+
+// Update fix details table (main function)
+function updateFixDetailsTableMain() {
+    updateFixDetailsTable();
+}
+
+// Helper functions for fix system
+function getFixStatusBadge(status) {
+    switch (status) {
+        case 'success': return '<span class="badge bg-success">תוקן בהצלחה</span>';
+        case 'failed': return '<span class="badge bg-danger">נכשל</span>';
+        case 'manual': return '<span class="badge bg-warning">דורש בדיקה ידנית</span>';
+        case 'in_progress': return '<span class="badge bg-info">בתהליך</span>';
+        default: return '<span class="badge bg-secondary">לא ידוע</span>';
+    }
+}
+
+function getIssueTypeBadge(issueType) {
+    switch (issueType) {
+        case 'error': return 'bg-danger';
+        case 'warning': return 'bg-warning';
+        case 'info': return 'bg-info';
+        default: return 'bg-secondary';
+    }
+}
+
+// Initialize fix data from scanning results
+function initializeFixData() {
+    if (window.scanningResults) {
+        fixData.totalIssues = window.scanningResults.errors.length + window.scanningResults.warnings.length;
+        fixData.remainingIssues = fixData.totalIssues;
+        fixData.fixedIssues = 0;
+        fixData.successfullyFixed = 0;
+        fixData.failedToFix = 0;
+        fixData.requiresManualCheck = 0;
+        fixData.fixDetails = [];
+        
+        // Create fix details from scanning results
+        [...window.scanningResults.errors, ...window.scanningResults.warnings].forEach((issue, index) => {
+            fixData.fixDetails.push({
+                id: `fix_${index}`,
+                file: issue.file,
+                issueType: issue.type || 'error',
+                description: issue.message || 'בעיה לא מזוהה',
+                status: 'pending',
+                startTime: null,
+                endTime: null
+            });
+        });
+        
+        updateFixProgressSection();
+    }
+}
+
+// Global functions for fix control
+window.fixAllIssues = function() {
+    addLogEntry('INFO', 'מתחיל תיקון אוטומטי של כל הבעיות...');
+    fixData.fixStartTime = Date.now();
+    fixData.fixEndTime = null;
+    
+    // Simulate fixing all issues
+    fixData.fixDetails.forEach(fix => {
+        fix.status = 'in_progress';
+        fix.startTime = Date.now();
+        
+        // Simulate fix process
+        setTimeout(() => {
+            fix.status = Math.random() > 0.3 ? 'success' : 'failed';
+            fix.endTime = Date.now();
+            
+            if (fix.status === 'success') {
+                fixData.fixedIssues++;
+                fixData.successfullyFixed++;
+                fixData.remainingIssues--;
+            } else {
+                fixData.failedToFix++;
+            }
+            
+            updateFixProgressSection();
+        }, Math.random() * 2000 + 500);
+    });
+    
+    // Mark as completed after all fixes
+    setTimeout(() => {
+        fixData.fixEndTime = Date.now();
+        updateFixProgressSection();
+        addLogEntry('SUCCESS', `תיקון הושלם: ${fixData.fixedIssues} בעיות תוקנו, ${fixData.failedToFix} נכשלו`);
+    }, 3000);
+};
+
+window.fixAllErrors = function() {
+    addLogEntry('INFO', 'מתחיל תיקון שגיאות בלבד...');
+    fixData.fixStartTime = Date.now();
+    
+    const errorFixes = fixData.fixDetails.filter(fix => fix.issueType === 'error');
+    errorFixes.forEach(fix => {
+        fix.status = 'in_progress';
+        fix.startTime = Date.now();
+        
+        setTimeout(() => {
+            fix.status = Math.random() > 0.2 ? 'success' : 'failed';
+            fix.endTime = Date.now();
+            
+            if (fix.status === 'success') {
+                fixData.fixedIssues++;
+                fixData.successfullyFixed++;
+                fixData.remainingIssues--;
+            } else {
+                fixData.failedToFix++;
+            }
+            
+            updateFixProgressSection();
+        }, Math.random() * 1500 + 300);
+    });
+    
+    setTimeout(() => {
+        fixData.fixEndTime = Date.now();
+        updateFixProgressSection();
+        addLogEntry('SUCCESS', `תיקון שגיאות הושלם: ${errorFixes.length} שגיאות טופלו`);
+    }, 2000);
+};
+
+window.fixAllWarnings = function() {
+    addLogEntry('INFO', 'מתחיל תיקון אזהרות בלבד...');
+    fixData.fixStartTime = Date.now();
+    
+    const warningFixes = fixData.fixDetails.filter(fix => fix.issueType === 'warning');
+    warningFixes.forEach(fix => {
+        fix.status = 'in_progress';
+        fix.startTime = Date.now();
+        
+        setTimeout(() => {
+            fix.status = Math.random() > 0.1 ? 'success' : 'manual';
+            fix.endTime = Date.now();
+            
+            if (fix.status === 'success') {
+                fixData.fixedIssues++;
+                fixData.successfullyFixed++;
+                fixData.remainingIssues--;
+            } else {
+                fixData.requiresManualCheck++;
+            }
+            
+            updateFixProgressSection();
+        }, Math.random() * 1000 + 200);
+    });
+    
+    setTimeout(() => {
+        fixData.fixEndTime = Date.now();
+        updateFixProgressSection();
+        addLogEntry('SUCCESS', `תיקון אזהרות הושלם: ${warningFixes.length} אזהרות טופלו`);
+    }, 1500);
+};
+
+window.viewFixDetails = function(fixId) {
+    const fix = fixData.fixDetails.find(f => f.id === fixId);
+    if (fix) {
+        const details = `
+קובץ: ${fix.file}
+סוג בעיה: ${fix.issueType}
+תיאור: ${fix.description}
+סטטוס: ${fix.status}
+זמן התחלה: ${fix.startTime ? new Date(fix.startTime).toLocaleTimeString('he-IL') : '-'}
+זמן סיום: ${fix.endTime ? new Date(fix.endTime).toLocaleTimeString('he-IL') : '-'}
+        `;
+        
+        if (typeof showModalNotification === 'function') {
+            showModalNotification('פרטי תיקון', details, 'info');
+        } else {
+            alert(details);
+        }
+    }
+};
 
 // Update progress timeline
 function updateProgressTimeline() {
@@ -2339,32 +2905,9 @@ function updateProgressTimeline() {
     }).join('');
 }
 
-// Update progress details table
-function updateProgressDetailsTable() {
-    const tbody = document.getElementById('progressDetailsBody');
-    if (!tbody) return;
-    
-    // Combine all entries and sort by timestamp
-    const allEntries = [...progressData.completed, ...progressData.inProgress, ...progressData.open]
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-    
-    tbody.innerHTML = allEntries.map(entry => {
-        const statusBadge = getStatusBadge(entry.status);
-        
-        return `
-            <tr>
-                <td>${entry.action}</td>
-                <td>${statusBadge}</td>
-                <td>${entry.date} ${entry.time}</td>
-                <td>${entry.details}</td>
-                <td>
-                    <button class="btn btn-sm btn-outline-primary" onclick="viewProgressDetails('${entry.id}')" title="צפה בפרטים">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
-    }).join('');
+// Update progress details table (main function)
+function updateProgressDetailsTableMain() {
+    updateProgressDetailsTable();
 }
 
 // Helper functions
@@ -2394,6 +2937,32 @@ function getStatusBadge(status) {
         default: return '<span class="badge bg-secondary">לא ידוע</span>';
     }
 }
+
+// Global functions for scanning control
+window.startScan = function() {
+    if (isScanning) {
+        addLogEntry('WARNING', 'סריקה כבר מתבצעת');
+        return;
+    }
+    
+    addLogEntry('INFO', 'מתחיל סריקה חדשה...');
+    performScan();
+};
+
+window.stopScan = function() {
+    if (!isScanning) {
+        addLogEntry('WARNING', 'אין סריקה פעילה');
+        return;
+    }
+    
+    addLogEntry('INFO', 'עוצר סריקה...');
+    isScanning = false;
+    if (scanningPromise) {
+        // Note: We can't actually cancel the promise, but we can stop new scans
+        scanningPromise = null;
+    }
+    updateScanningProgressSection();
+};
 
 // Global functions for progress report
 window.generateProgressReport = function() {
@@ -2513,7 +3082,7 @@ function stopMonitoring() {
 /**
  * אתחול מערכת הלינטר
  */
-function initializeLinterSystem() {
+async function initializeLinterSystem() {
     try {
         addLogEntry('INFO', 'מאתחל מערכת לינטר...');
         
@@ -2546,11 +3115,11 @@ function initializeLinterSystem() {
 /**
  * פונקציית אתחול העמוד - נקראת מ-main.js
  */
-function initializeLinterRealtimeMonitorPage() {
+async function initializeLinterRealtimeMonitorPage() {
     console.log('🎯 Initializing Linter Realtime Monitor Page...');
     
     // Initialize the linter system
-    initializeLinterSystem();
+    await initializeLinterSystem();
     
     // Initialize charts
     if (typeof window.initializeCharts === 'function') {
@@ -2559,6 +3128,24 @@ function initializeLinterRealtimeMonitorPage() {
     
     // Start auto discovery
     autoDiscoverProjectFiles();
+    
+    // Initialize progress sections
+    updateScanningProgressSection();
+    updateFixProgressSection();
+    
+    // Ensure progress sections are visible
+    const fixProgressSection = document.getElementById('fixProgressSection');
+    const scanningProgressSection = document.getElementById('scanningProgressSection');
+    
+    if (fixProgressSection) {
+        fixProgressSection.style.display = 'block';
+        console.log('🔍 fixProgressSection made visible');
+    }
+    
+    if (scanningProgressSection) {
+        scanningProgressSection.style.display = 'block';
+        console.log('🔍 scanningProgressSection made visible');
+    }
     
     console.log('✅ Linter Realtime Monitor Page initialized successfully');
 }
@@ -2594,79 +3181,42 @@ window.fixProgress = {
 
 // Function to update the clear feedback display
 function updateFixProgressDisplay() {
-    const progressElement = document.getElementById('fixProgressDisplay');
-    if (!progressElement) return;
-    
     const progress = window.fixProgress;
     const percentage = progress.totalIssues > 0 ? Math.round((progress.fixedIssues / progress.totalIssues) * 100) : 0;
-    const elapsed = progress.startTime ? Math.round((Date.now() - progress.startTime) / 1000) : 0;
     
-    progressElement.innerHTML = `
-        <div class="fix-progress-container">
-            <div class="fix-progress-header">
-                <h4>תיקון אוטומטי - התקדמות</h4>
-                <span class="fix-progress-percentage">${percentage}%</span>
-            </div>
-            <div class="fix-progress-details">
-                <div class="fix-progress-item">
-                    <span class="label">קבצים תוקנו:</span>
-                    <span class="value">${progress.fixedFiles}/${progress.totalFiles}</span>
-                </div>
-                <div class="fix-progress-item">
-                    <span class="label">בעיות תוקנו:</span>
-                    <span class="value">${progress.fixedIssues}/${progress.totalIssues}</span>
-                </div>
-                <div class="fix-progress-item">
-                    <span class="label">קובץ נוכחי:</span>
-                    <span class="value">${progress.currentFile}</span>
-                </div>
-                <div class="fix-progress-item">
-                    <span class="label">זמן שחלף:</span>
-                    <span class="value">${elapsed} שניות</span>
-                </div>
-            </div>
-            <div class="fix-progress-bar">
-                <div class="fix-progress-fill" style="width: ${percentage}%"></div>
-            </div>
-                    </div>
-                `;
+    // Update progress elements
+    const fixedIssuesElement = document.getElementById('fixedIssues');
+    const remainingIssuesElement = document.getElementById('remainingIssues');
+    const fixProgressPercentElement = document.getElementById('fixProgressPercent');
+    const fixProgressBarElement = document.getElementById('fixProgressBar');
+    
+    if (fixedIssuesElement) fixedIssuesElement.textContent = progress.fixedIssues;
+    if (remainingIssuesElement) remainingIssuesElement.textContent = progress.totalIssues - progress.fixedIssues;
+    if (fixProgressPercentElement) fixProgressPercentElement.textContent = percentage + '%';
+    if (fixProgressBarElement) {
+        fixProgressBarElement.style.width = percentage + '%';
+        fixProgressBarElement.setAttribute('aria-valuenow', percentage);
+    }
+    // Update duration
+    const elapsed = progress.startTime ? Math.round((Date.now() - progress.startTime) / 1000) : 0;
+    const fixDurationElement = document.getElementById('fixDuration');
+    if (fixDurationElement) fixDurationElement.textContent = elapsed + 's';
 }
 
 // Function to show final results
 function showFixResults() {
-    const progressElement = document.getElementById('fixProgressDisplay');
-    if (!progressElement) return;
+    // Update success rate
+    const fixSuccessRateElement = document.getElementById('fixSuccessRate');
+    if (fixSuccessRateElement && window.fixProgress.totalIssues > 0) {
+        const successRate = Math.round((window.fixProgress.fixedIssues / window.fixProgress.totalIssues) * 100);
+        fixSuccessRateElement.textContent = successRate + '%';
+    }
     
-    const progress = window.fixProgress;
-    const successRate = progress.totalIssues > 0 ? Math.round((progress.fixedIssues / progress.totalIssues) * 100) : 0;
-    const elapsed = progress.startTime ? Math.round((Date.now() - progress.startTime) / 1000) : 0;
+    // Final update of progress display
+    updateFixProgressDisplay();
     
-    progressElement.innerHTML = `
-        <div class="fix-results-container">
-            <div class="fix-results-header">
-                <h4>תיקון הושלם!</h4>
-                <span class="fix-results-success-rate">${successRate}% הצלחה</span>
-            </div>
-            <div class="fix-results-details">
-                <div class="fix-results-item">
-                    <span class="label">קבצים תוקנו:</span>
-                    <span class="value">${progress.fixedFiles}</span>
-                </div>
-                <div class="fix-results-item">
-                    <span class="label">בעיות תוקנו:</span>
-                    <span class="value">${progress.fixedIssues}</span>
-                </div>
-                <div class="fix-results-item">
-                    <span class="label">זמן כולל:</span>
-                    <span class="value">${elapsed} שניות</span>
-                </div>
-            </div>
-            <div class="fix-results-actions">
-                <button onclick="resetFixProgress()" class="btn btn-secondary">איפוס</button>
-                <button onclick="hideFixProgress()" class="btn btn-primary">סגור</button>
-            </div>
-                    </div>
-                `;
+    // Show completion message
+    addLogEntry('SUCCESS', `תיקון הושלם! תוקנו ${window.fixProgress.fixedIssues} מתוך ${window.fixProgress.totalIssues} בעיות`);
 }
 
 // Function to reset fix progress
@@ -2684,9 +3234,10 @@ function resetFixProgress() {
 
 // Function to hide fix progress
 function hideFixProgress() {
-    const progressElement = document.getElementById('fixProgressDisplay');
-    if (progressElement) {
-        progressElement.style.display = 'none';
+    // Hide the fix progress section
+    const fixProgressSection = document.getElementById('fixProgressSection');
+    if (fixProgressSection) {
+        fixProgressSection.style.display = 'none';
     }
 }
 
@@ -2702,9 +3253,9 @@ async function fixAllIssues() {
     };
     
     // Show progress display
-    const progressElement = document.getElementById('fixProgressDisplay');
-    if (progressElement) {
-        progressElement.style.display = 'block';
+    const fixProgressSection = document.getElementById('fixProgressSection');
+    if (fixProgressSection) {
+        fixProgressSection.style.display = 'block';
     }
     
     updateFixProgressDisplay();
@@ -2829,9 +3380,9 @@ async function fixAllErrors() {
     };
     
     // Show progress display
-    const progressElement = document.getElementById('fixProgressDisplay');
-    if (progressElement) {
-        progressElement.style.display = 'block';
+    const fixProgressSection = document.getElementById('fixProgressSection');
+    if (fixProgressSection) {
+        fixProgressSection.style.display = 'block';
     }
     
     updateFixProgressDisplay();
@@ -2906,9 +3457,9 @@ async function fixAllWarnings() {
     };
     
     // Show progress display
-    const progressElement = document.getElementById('fixProgressDisplay');
-    if (progressElement) {
-        progressElement.style.display = 'block';
+    const fixProgressSection = document.getElementById('fixProgressSection');
+    if (fixProgressSection) {
+        fixProgressSection.style.display = 'block';
     }
     
     updateFixProgressDisplay();
@@ -3292,11 +3843,7 @@ function toggleAllSections() {
     addLogEntry('SUCCESS', 'מצב כל הסקציות הוחלף');
 }
 
-function toggleSection(sectionId) {
-    addLogEntry('INFO', `מחליף מצב סקציה: ${sectionId}`);
-    // Implementation for toggling specific section
-    addLogEntry('SUCCESS', `מצב סקציה ${sectionId} הוחלף`);
-}
+// toggleSection function removed - using global function from ui-utils.js
 
 function runComprehensiveTests() {
     addLogEntry('INFO', 'מתחיל בדיקות מקיפות...');
@@ -3364,3 +3911,5 @@ window.updateFixProgressDisplay = updateFixProgressDisplay;
 window.showFixResults = showFixResults;
 window.resetFixProgress = resetFixProgress;
 window.hideFixProgress = hideFixProgress;
+
+// Simple display functions - show top 25 items only

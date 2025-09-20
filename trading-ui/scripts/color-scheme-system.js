@@ -231,26 +231,8 @@ let INVESTMENT_TYPE_COLORS = {
  * @param {Object} preferences - העדפות המשתמש
  */
 function loadEntityColorsFromPreferences(preferences) {
-  if (preferences && preferences.entityColors) {
-    ENTITY_COLORS = { ...preferences.entityColors };
-    
-    // חישוב צבעי רקע שקופים
-    ENTITY_BACKGROUND_COLORS = {};
-    ENTITY_TEXT_COLORS = {};
-    ENTITY_BORDER_COLORS = {};
-    
-    for (const [entityType, color] of Object.entries(ENTITY_COLORS)) {
-      if (color) {
-        // המרת hex ל-rgba
-        const rgb = hexToRgb(color);
-        if (rgb) {
-          ENTITY_BACKGROUND_COLORS[entityType] = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.1)`;
-          ENTITY_BORDER_COLORS[entityType] = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`;
-          ENTITY_TEXT_COLORS[entityType] = darkenColor(color, 0.2);
-        }
-      }
-    }
-  }
+  // הסרנו את preferences.entityColors כי הוא לא קיים במערכת ההעדפות
+  // במקום זה משתמשים במשתנים ספציפיים: entityTradeColor, entityAccountColor וכו'
   
   // יצירת CSS דינמי
   generateAndApplyEntityCSS();
@@ -313,9 +295,8 @@ function generateAndApplyStatusCSS() {
  * @param {Object} preferences - העדפות המשתמש
  */
 function loadStatusColorsFromPreferences(preferences) {
-  if (preferences && preferences.statusColors) {
-    STATUS_COLORS = { ...preferences.statusColors };
-  }
+  // הסרנו את preferences.statusColors כי הוא לא קיים במערכת ההעדפות
+  // במקום זה משתמשים במשתנים ספציפיים
 }
 
 /**
@@ -325,9 +306,8 @@ function loadStatusColorsFromPreferences(preferences) {
  * @param {Object} preferences - העדפות המשתמש
  */
 function loadInvestmentTypeColorsFromPreferences(preferences) {
-  if (preferences && preferences.investmentTypeColors) {
-    INVESTMENT_TYPE_COLORS = { ...preferences.investmentTypeColors };
-  }
+  // הסרנו את preferences.investmentTypeColors כי הוא לא קיים במערכת ההעדפות
+  // במקום זה משתמשים במשתנים ספציפיים
 }
 
 /**
@@ -1504,8 +1484,8 @@ function getColorPreferences() {
 
   // ברירת מחדל
   return {
-    numericValueColors: NUMERIC_VALUE_COLORS,
-    entityColors: ENTITY_COLORS,
+    // הסרנו numericValueColors כי הוא לא קיים במערכת ההעדפות
+    // הסרנו entityColors כי הוא לא קיים במערכת ההעדפות
   };
 }
 
@@ -1520,77 +1500,175 @@ function updateCSSVariablesFromPreferences(preferences) {
   try {
     console.log('🎨 עדכון CSS Variables מהעדפות...');
 
-    // עדכון צבעי ערכים מספריים
-    if (preferences.numericValueColors) {
-      const colors = preferences.numericValueColors;
-
-      // עדכון CSS Variables
-      if (colors.positive) {
-        document.documentElement.style.setProperty('--numeric-positive-light', colors.positive.light);
-        document.documentElement.style.setProperty('--numeric-positive-medium', colors.positive.medium);
-        document.documentElement.style.setProperty('--numeric-positive-dark', colors.positive.dark);
-        document.documentElement.style.setProperty('--numeric-positive-border', colors.positive.border);
+      // עדכון צבעי ערכים מספריים - לפי השמות במערכת ההעדפות
+      if (preferences.valuePositiveColor) {
+        document.documentElement.style.setProperty('--numeric-positive-light', preferences.valuePositiveColorLight || 'rgba(0, 144, 81, 0.1)');
+        document.documentElement.style.setProperty('--numeric-positive-medium', preferences.valuePositiveColor);
+        document.documentElement.style.setProperty('--numeric-positive-dark', preferences.valuePositiveColorDark || '#096037');
+        document.documentElement.style.setProperty('--numeric-positive-border', `rgba(${hexToRgb(preferences.valuePositiveColor)?.r || 0}, ${hexToRgb(preferences.valuePositiveColor)?.g || 144}, ${hexToRgb(preferences.valuePositiveColor)?.b || 81}, 0.3)`);
+      }
+      if (preferences.valueNegativeColor) {
+        document.documentElement.style.setProperty('--numeric-negative-light', preferences.valueNegativeColorLight || 'rgba(181, 18, 0, 0.1)');
+        document.documentElement.style.setProperty('--numeric-negative-medium', preferences.valueNegativeColor);
+        document.documentElement.style.setProperty('--numeric-negative-dark', preferences.valueNegativeColorDark || '#850000');
+        document.documentElement.style.setProperty('--numeric-negative-border', `rgba(${hexToRgb(preferences.valueNegativeColor)?.r || 181}, ${hexToRgb(preferences.valueNegativeColor)?.g || 18}, ${hexToRgb(preferences.valueNegativeColor)?.b || 0}, 0.3)`);
+      }
+      if (preferences.valueNeutralColor) {
+        document.documentElement.style.setProperty('--numeric-zero-light', preferences.valueNeutralColorLight || 'rgba(96, 96, 96, 0.1)');
+        document.documentElement.style.setProperty('--numeric-zero-medium', preferences.valueNeutralColor);
+        document.documentElement.style.setProperty('--numeric-zero-dark', preferences.valueNeutralColorDark || '#6c757d');
+        document.documentElement.style.setProperty('--numeric-zero-border', `rgba(${hexToRgb(preferences.valueNeutralColor)?.r || 96}, ${hexToRgb(preferences.valueNeutralColor)?.g || 96}, ${hexToRgb(preferences.valueNeutralColor)?.b || 96}, 0.3)`);
+      }
+      
+      // עדכון צבעי ערכים מספריים נוספים - Dark/Light variants
+      if (preferences.valuePositiveColorDark) {
+        document.documentElement.style.setProperty('--numeric-positive-dark', preferences.valuePositiveColorDark);
+      }
+      if (preferences.valuePositiveColorLight) {
+        document.documentElement.style.setProperty('--numeric-positive-light', preferences.valuePositiveColorLight);
+      }
+      if (preferences.valueNegativeColorDark) {
+        document.documentElement.style.setProperty('--numeric-negative-dark', preferences.valueNegativeColorDark);
+      }
+      if (preferences.valueNegativeColorLight) {
+        document.documentElement.style.setProperty('--numeric-negative-light', preferences.valueNegativeColorLight);
+      }
+      if (preferences.valueNeutralColorDark) {
+        document.documentElement.style.setProperty('--numeric-zero-dark', preferences.valueNeutralColorDark);
+      }
+      if (preferences.valueNeutralColorLight) {
+        document.documentElement.style.setProperty('--numeric-zero-light', preferences.valueNeutralColorLight);
       }
 
-      if (colors.negative) {
-        document.documentElement.style.setProperty('--numeric-negative-light', colors.negative.light);
-        document.documentElement.style.setProperty('--numeric-negative-medium', colors.negative.medium);
-        document.documentElement.style.setProperty('--numeric-negative-dark', colors.negative.dark);
-        document.documentElement.style.setProperty('--numeric-negative-border', colors.negative.border);
-      }
-
-      if (colors.zero) {
-        document.documentElement.style.setProperty('--numeric-zero-light', colors.zero.light);
-        document.documentElement.style.setProperty('--numeric-zero-medium', colors.zero.medium);
-        document.documentElement.style.setProperty('--numeric-zero-dark', colors.zero.dark);
-        document.documentElement.style.setProperty('--numeric-zero-border', colors.zero.border);
-      }
+    // עדכון צבעים בסיסיים
+    if (preferences.primaryColor) {
+      document.documentElement.style.setProperty('--primary-color', preferences.primaryColor);
+    }
+    if (preferences.secondaryColor) {
+      document.documentElement.style.setProperty('--secondary-color', preferences.secondaryColor);
+    }
+    if (preferences.successColor) {
+      document.documentElement.style.setProperty('--success-color', preferences.successColor);
+    }
+    if (preferences.infoColor) {
+      document.documentElement.style.setProperty('--info-color', preferences.infoColor);
+    }
+    if (preferences.warningColor) {
+      document.documentElement.style.setProperty('--warning-color', preferences.warningColor);
+    }
+    if (preferences.dangerColor) {
+      document.documentElement.style.setProperty('--danger-color', preferences.dangerColor);
     }
 
-    // עדכון צבעי ישויות
-    if (preferences.entityColors) {
-      const colors = preferences.entityColors;
-
-      // עדכון צבעי ישויות עיקריות
-      if (colors.trade) {
-        document.documentElement.style.setProperty('--entity-trade-color', colors.trade);
+      // עדכון צבעי ישויות - לפי השמות במערכת ההעדפות
+      if (preferences.entityTradeColor) {
+        document.documentElement.style.setProperty('--entity-trade-color', preferences.entityTradeColor);
+        document.documentElement.style.setProperty('--entity-trade-bg', preferences.entityTradeColorLight || 'rgba(251, 90, 5, 0.1)');
+        document.documentElement.style.setProperty('--entity-trade-text', preferences.entityTradeColorDark || '#752a0b');
+        document.documentElement.style.setProperty('--entity-trade-border', `rgba(${hexToRgb(preferences.entityTradeColor)?.r || 251}, ${hexToRgb(preferences.entityTradeColor)?.g || 90}, ${hexToRgb(preferences.entityTradeColor)?.b || 5}, 0.3)`);
       }
-      if (colors.trade_plan) {
-        document.documentElement.style.setProperty('--entity-trade-plan-color', colors.trade_plan);
+      
+      // עדכון צבעי ישויות נוספים - Dark/Light variants
+      if (preferences.entityAccountColorDark) {
+        document.documentElement.style.setProperty('--entity-account-dark', preferences.entityAccountColorDark);
       }
-      if (colors.execution) {
-        document.documentElement.style.setProperty('--entity-execution-color', colors.execution);
+      if (preferences.entityAccountColorLight) {
+        document.documentElement.style.setProperty('--entity-account-light', preferences.entityAccountColorLight);
       }
-      if (colors.account) {
-        document.documentElement.style.setProperty('--entity-account-color', colors.account);
+      if (preferences.entityAlertColorDark) {
+        document.documentElement.style.setProperty('--entity-alert-dark', preferences.entityAlertColorDark);
       }
-      if (colors.cash_flow) {
-        document.documentElement.style.setProperty('--entity-cash-flow-color', colors.cash_flow);
+      if (preferences.entityAlertColorLight) {
+        document.documentElement.style.setProperty('--entity-alert-light', preferences.entityAlertColorLight);
       }
-      if (colors.ticker) {
-        document.documentElement.style.setProperty('--entity-ticker-color', colors.ticker);
+      if (preferences.entityCashFlowColorDark) {
+        document.documentElement.style.setProperty('--entity-cash-flow-dark', preferences.entityCashFlowColorDark);
       }
-      if (colors.alert) {
-        document.documentElement.style.setProperty('--entity-alert-color', colors.alert);
+      if (preferences.entityCashFlowColorLight) {
+        document.documentElement.style.setProperty('--entity-cash-flow-light', preferences.entityCashFlowColorLight);
       }
-      if (colors.note) {
-        document.documentElement.style.setProperty('--entity-note-color', colors.note);
+      if (preferences.entityExecutionColorDark) {
+        document.documentElement.style.setProperty('--entity-execution-dark', preferences.entityExecutionColorDark);
       }
-      if (colors.constraint) {
-        document.documentElement.style.setProperty('--entity-constraint-color', colors.constraint);
+      if (preferences.entityExecutionColorLight) {
+        document.documentElement.style.setProperty('--entity-execution-light', preferences.entityExecutionColorLight);
       }
-      if (colors.design) {
-        document.documentElement.style.setProperty('--entity-design-color', colors.design);
+      if (preferences.entityNoteColorDark) {
+        document.documentElement.style.setProperty('--entity-note-dark', preferences.entityNoteColorDark);
       }
-      if (colors.research) {
-        document.documentElement.style.setProperty('--entity-research-color', colors.research);
+      if (preferences.entityNoteColorLight) {
+        document.documentElement.style.setProperty('--entity-note-light', preferences.entityNoteColorLight);
       }
-      if (colors.preference) {
-        document.documentElement.style.setProperty('--entity-preference-color', colors.preference);
+      if (preferences.entityTickerColorDark) {
+        document.documentElement.style.setProperty('--entity-ticker-dark', preferences.entityTickerColorDark);
       }
+      if (preferences.entityTickerColorLight) {
+        document.documentElement.style.setProperty('--entity-ticker-light', preferences.entityTickerColorLight);
+      }
+      if (preferences.entityTradeColorDark) {
+        document.documentElement.style.setProperty('--entity-trade-dark', preferences.entityTradeColorDark);
+      }
+      if (preferences.entityTradeColorLight) {
+        document.documentElement.style.setProperty('--entity-trade-light', preferences.entityTradeColorLight);
+      }
+      if (preferences.entityTradePlanColorDark) {
+        document.documentElement.style.setProperty('--entity-trade-plan-dark', preferences.entityTradePlanColorDark);
+      }
+      if (preferences.entityTradePlanColorLight) {
+        document.documentElement.style.setProperty('--entity-trade-plan-light', preferences.entityTradePlanColorLight);
+      }
+    if (preferences.entityTradePlanColor) {
+      document.documentElement.style.setProperty('--entity-trade-plan-color', preferences.entityTradePlanColor);
+      document.documentElement.style.setProperty('--entity-trade-plan-bg', preferences.entityTradePlanColorLight || 'rgba(255, 169, 0, 0.1)');
+      document.documentElement.style.setProperty('--entity-trade-plan-text', preferences.entityTradePlanColorDark || '#b35d00');
+      document.documentElement.style.setProperty('--entity-trade-plan-border', `rgba(${hexToRgb(preferences.entityTradePlanColor)?.r || 255}, ${hexToRgb(preferences.entityTradePlanColor)?.g || 169}, ${hexToRgb(preferences.entityTradePlanColor)?.b || 0}, 0.3)`);
+    }
+    if (preferences.entityExecutionColor) {
+      document.documentElement.style.setProperty('--entity-execution-color', preferences.entityExecutionColor);
+      document.documentElement.style.setProperty('--entity-execution-bg', preferences.entityExecutionColorLight || 'rgba(169, 206, 26, 0.1)');
+      document.documentElement.style.setProperty('--entity-execution-text', preferences.entityExecutionColorDark || '#688016');
+      document.documentElement.style.setProperty('--entity-execution-border', `rgba(${hexToRgb(preferences.entityExecutionColor)?.r || 169}, ${hexToRgb(preferences.entityExecutionColor)?.g || 206}, ${hexToRgb(preferences.entityExecutionColor)?.b || 26}, 0.3)`);
+    }
+    if (preferences.entityAccountColor) {
+      document.documentElement.style.setProperty('--entity-account-color', preferences.entityAccountColor);
+      document.documentElement.style.setProperty('--entity-account-bg', preferences.entityAccountColorLight || 'rgba(0, 66, 170, 0.1)');
+      document.documentElement.style.setProperty('--entity-account-text', preferences.entityAccountColorDark || '#032e78');
+      document.documentElement.style.setProperty('--entity-account-border', `rgba(${hexToRgb(preferences.entityAccountColor)?.r || 0}, ${hexToRgb(preferences.entityAccountColor)?.g || 66}, ${hexToRgb(preferences.entityAccountColor)?.b || 170}, 0.3)`);
+    }
+    if (preferences.entityCashFlowColor) {
+      document.documentElement.style.setProperty('--entity-cash-flow-color', preferences.entityCashFlowColor);
+      document.documentElement.style.setProperty('--entity-cash-flow-bg', preferences.entityCashFlowColorLight || 'rgba(148, 90, 0, 0.1)');
+      document.documentElement.style.setProperty('--entity-cash-flow-text', preferences.entityCashFlowColorDark || '#5a3704');
+      document.documentElement.style.setProperty('--entity-cash-flow-border', `rgba(${hexToRgb(preferences.entityCashFlowColor)?.r || 148}, ${hexToRgb(preferences.entityCashFlowColor)?.g || 90}, ${hexToRgb(preferences.entityCashFlowColor)?.b || 0}, 0.3)`);
+    }
+    if (preferences.entityTickerColor) {
+      document.documentElement.style.setProperty('--entity-ticker-color', preferences.entityTickerColor);
+      document.documentElement.style.setProperty('--entity-ticker-bg', preferences.entityTickerColorLight || 'rgba(153, 41, 189, 0.1)');
+      document.documentElement.style.setProperty('--entity-ticker-text', preferences.entityTickerColorDark || '#770087');
+      document.documentElement.style.setProperty('--entity-ticker-border', `rgba(${hexToRgb(preferences.entityTickerColor)?.r || 153}, ${hexToRgb(preferences.entityTickerColor)?.g || 41}, ${hexToRgb(preferences.entityTickerColor)?.b || 189}, 0.3)`);
+    }
+    if (preferences.entityAlertColor) {
+      document.documentElement.style.setProperty('--entity-alert-color', preferences.entityAlertColor);
+      document.documentElement.style.setProperty('--entity-alert-bg', preferences.entityAlertColorLight || 'rgba(200, 23, 0, 0.1)');
+      document.documentElement.style.setProperty('--entity-alert-text', preferences.entityAlertColorDark || '#9e0000');
+      document.documentElement.style.setProperty('--entity-alert-border', `rgba(${hexToRgb(preferences.entityAlertColor)?.r || 200}, ${hexToRgb(preferences.entityAlertColor)?.g || 23}, ${hexToRgb(preferences.entityAlertColor)?.b || 0}, 0.3)`);
+    }
+    if (preferences.entityNoteColor) {
+      document.documentElement.style.setProperty('--entity-note-color', preferences.entityNoteColor);
+      document.documentElement.style.setProperty('--entity-note-bg', preferences.entityNoteColorLight || 'rgba(196, 188, 0, 0.1)');
+      document.documentElement.style.setProperty('--entity-note-text', preferences.entityNoteColorDark || '#89840a');
+      document.documentElement.style.setProperty('--entity-note-border', `rgba(${hexToRgb(preferences.entityNoteColor)?.r || 196}, ${hexToRgb(preferences.entityNoteColor)?.g || 188}, ${hexToRgb(preferences.entityNoteColor)?.b || 0}, 0.3)`);
     }
 
     console.log('✅ CSS Variables עודכנו בהצלחה');
+    console.log('🎨 צבעים מעודכנים:', {
+      primary: preferences.primaryColor,
+      secondary: preferences.secondaryColor,
+      trade: preferences.entityTradeColor,
+      account: preferences.entityAccountColor,
+      positive: preferences.valuePositiveColor,
+      negative: preferences.valueNegativeColor
+    });
 
   } catch (error) {
     console.error('❌ שגיאה בעדכון CSS Variables:', error);
@@ -1666,14 +1744,11 @@ async function loadColorPreferences() {
       const preferences = data.data || data;
 
       // עדכון מערכת הצבעים
-      if (preferences.numericValueColors) {
-        Object.assign(NUMERIC_VALUE_COLORS, preferences.numericValueColors);
-      }
+      // הסרנו את preferences.numericValueColors כי הוא לא קיים במערכת ההעדפות
+      // במקום זה משתמשים במשתנים ספציפיים: valuePositiveColor, valueNegativeColor וכו'
 
-      if (preferences.entityColors) {
-        Object.assign(ENTITY_COLORS, preferences.entityColors);
-        console.log('✅ צבעי ישויות עודכנו:', preferences.entityColors);
-      }
+      // הסרנו את preferences.entityColors כי הוא לא קיים במערכת ההעדפות
+      // במקום זה משתמשים במשתנים ספציפיים: entityTradeColor, entityAccountColor וכו'
 
       // עדכון CSS Variables
       updateCSSVariablesFromPreferences(preferences);
@@ -1720,11 +1795,10 @@ async function loadColorPreferences() {
  */
 function updateEntityColors(preferences) {
   try {
-    if (preferences && preferences.entityColors) {
-      Object.assign(ENTITY_COLORS, preferences.entityColors);
+    // הסרנו את preferences.entityColors כי הוא לא קיים במערכת ההעדפות
+    // במקום זה משתמשים במשתנים ספציפיים
       updateCSSVariablesFromPreferences(preferences);
       console.log('✅ צבעי ישויות עודכנו מהעדפות');
-    }
   } catch (error) {
     console.error('❌ שגיאה בעדכון צבעי ישויות:', error);
   }

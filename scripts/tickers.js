@@ -6,7 +6,7 @@
  */
 function editTicker(tickerId) {
   try {
-    console.log('✏️ עורך טיקר:', tickerId);
+
     
     // חיפוש הטיקר בנתונים
     const ticker = window.tickersData.find(t => t.id === tickerId);
@@ -2046,7 +2046,7 @@ async function loadColorsAndApplyToHeaders() {
     if (!window.currentPreferences) {
       if (window.preferences && window.preferences.loadPreferences) {
         await window.preferences.loadPreferences();
-
+        console.log('✅ Loaded  preferences for tickers');
       } else if (window.loadPreferences) {
         await window.loadPreferences();
         console.log('🔄 Loaded preferences for tickers (fallback)');

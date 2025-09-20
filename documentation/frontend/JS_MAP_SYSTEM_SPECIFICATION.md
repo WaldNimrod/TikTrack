@@ -1,7 +1,9 @@
-# מערכת JS-Map מתקדמת - מפרט מלא
-## Advanced JS-Map System - Complete Specification
+# מערכת ניתוח פונקציות JavaScript - מפרט מלא
+## JavaScript Functions Analyzer System - Complete Specification
 
-> **גרסה 2.0** - מערכת מיפוי JavaScript מתקדמת עם ניתוח כפילויות ופונקציות מקומיות
+> **גרסה 3.0** - מערכת ניתוח פונקציות JavaScript מתקדמת וממוקדת
+> 
+> **עדכון מרץ 2025:** המערכת פוצלה לשתי מערכות נפרדות. עמוד זה מתמחה בניתוח פונקציות JavaScript בלבד.
 
 ---
 

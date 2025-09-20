@@ -87,6 +87,9 @@
                             <button class="btn btn-sm btn-outline-primary" onclick="copyNotificationsToClipboard()" title="העתק לוג התראות ללוח">
                                 <i class="fas fa-copy"></i> העתק ללוח
                             </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="copyDetailedLog()" title="העתק לוג מפורט ללוח">
+                                <i class="fas fa-clipboard-list"></i> לוג מפורט
+                            </button>
                             <button class="btn btn-sm btn-success" onclick="testSuccessNotification()" title="בדיקת הודעת הצלחה">
                                 <i class="fas fa-check"></i> הצלחה
                             </button>
@@ -190,85 +193,7 @@
 
 
                 <!-- UI Content Section 1 Start-->
-                <div class="content-section" id="section1">
-                    <div class="section-header">
-                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-                        <h2>⚙️ הגדרות התראות</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
-                    </div>
-                    <div class="section-body">
-                        <!-- הגדרות התראות -->
-                        <div class="settings-card">
-                            <div class="card-header">
-                                <h3><i class="fas fa-cog"></i> הגדרות התראות</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="settings-column">
-                                            <div class="setting-item">
-                                                <label class="setting-label">
-                                                    <input type="checkbox" id="enableRealtime" checked>
-                                                    <span class="checkmark"></span>
-                                                    התראות בזמן אמת
-                                                </label>
-                                            </div>
-                                            <div class="setting-item">
-                                                <label class="setting-label">
-                                                    <input type="checkbox" id="enableSounds" checked disabled>
-                                                    <span class="checkmark"></span>
-                                                    צלילי התראה (מבוטל זמנית)
-                                                </label>
-                                            </div>
-                                            <div class="setting-item">
-                                                <label class="setting-label">
-                                                    <input type="checkbox" id="enableBackgroundTasks" checked>
-                                                    <span class="checkmark"></span>
-                                                    משימות ברקע
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="settings-column">
-                                            <div class="setting-item">
-                                                <label class="setting-label">
-                                                    <input type="checkbox" id="enableDataUpdates" checked>
-                                                    <span class="checkmark"></span>
-                                                    עדכוני נתונים
-                                                </label>
-                                            </div>
-                                            <div class="setting-item">
-                                                <label class="setting-label">
-                                                    <input type="checkbox" id="enableExternalData" checked>
-                                                    <span class="checkmark"></span>
-                                                    נתונים חיצוניים
-                                                </label>
-                                            </div>
-                                            <div class="setting-item">
-                                                <label class="setting-label">
-                                                    <input type="checkbox" id="enableSystemEvents" checked>
-                                                    <span class="checkmark"></span>
-                                                    אירועי מערכת
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="settings-actions actions-default">
-                                    <button class="btn btn-primary" onclick="saveNotificationSettings()">
-                                        <i class="fas fa-save"></i> שמור הגדרות
-                                    </button>
-                                    <button class="btn btn-outline-secondary" onclick="resetNotificationSettings()">
-                                        <i class="fas fa-undo"></i> אפס הגדרות
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- הגדרות התראות הועברו למערכת ההעדפות הגלובלית -->
                 <!-- UI Content Section 1 End--> 
 
                 <!-- UI Content Section 2 Start-->
@@ -297,12 +222,18 @@
                                         <option value="warning">אזהרה</option>
                                         <option value="info">מידע</option>
                                     </select>
+                                    <select id="pageFilter" class="form-select form-select-sm" onchange="filterHistory()">
+                                        <option value="">כל העמודים</option>
+                                    </select>
                                     <select id="historyPeriod" class="form-select form-select-sm" onchange="filterHistory()">
                                         <option value="1h">שעה אחרונה</option>
                                         <option value="24h" selected>24 שעות אחרונות</option>
                                         <option value="7d">שבוע אחרון</option>
                                         <option value="30d">חודש אחרון</option>
                                     </select>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="copyFilteredHistoryToClipboard()" title="העתק היסטוריה מסוננת ללוח">
+                                        <i class="fas fa-copy"></i> העתק לוג
+                                    </button>
                                 </div>
                             </div>
                             <div class="card-body">

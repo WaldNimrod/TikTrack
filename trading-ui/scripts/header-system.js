@@ -685,42 +685,31 @@ class HeaderSystem {
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
-                        <!-- 🗑️ פעולות מערכת -->
-                        <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">🗑️ פעולות מערכת</a>
-                          <ul class="level3-submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 ניהול מערכת</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/css-management">🎨 מנהל CSS</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/crud-testing-dashboard">🧪 דשבורד בדיקות CRUD</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/notifications-center">מרכז התראות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/background-tasks">ניהול משימות ברקע</a></li>
-                          </ul>
-                        </li>
-
-                        <!-- 🔍 בדיקות ונתונים -->
-                        <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">🔍 בדיקות ונתונים</a>
-                          <ul class="level3-submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/external-data-dashboard">דשבורד נתונים חיצוניים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/server-monitor">ניטור שרת</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/cache-test">בדיקת Cache</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/constraints">אילוצים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/linter-realtime-monitor">ניטור Linter בזמן אמת</a></li>
-                          </ul>
-                        </li>
-
-                        <!-- 🎨 ממשק משתמש -->
-                        <li class="dropdown-submenu">
-                          <a class="tiktrack-dropdown-item" href="#">🎨 ממשק משתמש</a>
-                          <ul class="level3-submenu">
-                            <li><a class="tiktrack-dropdown-item" href="/style_demonstration">הדגמת סגנונות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/dynamic-colors-display">תצוגת מערכת צבעים דינמית</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/test-header-only">בדיקת כותרת</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/designs">עיצובים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">מיפוי סקריפטים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/js-map">מפת JS</a></li>
-                          </ul>
-                        </li>
+                        <!-- ניהול מערכת -->
+                        <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 ניהול מערכת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/external-data-dashboard">📊 דשבורד נתונים חיצוניים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/notifications-center">🔔 מרכז התראות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/background-tasks">⚙️ ניהול משימות ברקע</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/server-monitor">🖥️ ניטור שרת</a></li>
+                        
+                        <li class="separator"></li>
+                        
+                        <!-- כלי פיתוח -->
+                        <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">📋 מפת JS</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/js-map">🗺️ מפת JS</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/linter-realtime-monitor">🔍 דשבורד Linter</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/css-management">🎨 מנהל CSS</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/crud-testing-dashboard">🧪 בדיקות CRUD</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/cache-test">💾 בדיקת Cache</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/constraints">🔒 אילוצים</a></li>
+                        
+                        <li class="separator"></li>
+                        
+                        <!-- ממשק משתמש -->
+                        <li><a class="tiktrack-dropdown-item" href="/style_demonstration">🎨 הדגמת סגנונות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/dynamic-colors-display">🌈 צבעים דינמיים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/test-header-only">🧪 בדיקת כותרת</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/designs">🎭 עיצובים</a></li>
 
 
                       </ul>

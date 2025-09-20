@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מטריצת סקריפטים ועמודים - TikTrack</title>
+    <title>מטריצת סקריפטים ועמודים - מנהל קבצים - TikTrack</title>
     
     <!-- CSS Architecture - ITCSS System (September 2025) -->
     <!-- Bootstrap Framework -->
@@ -69,10 +69,27 @@
       <!-- UI Content Section Top Start-->
       <div class="top-section">
         <div class="section-header">
-          <h2>מטריצת סקריפטים ועמודים - TikTrack</h2>
-          <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
-          </button>
+          <h2>🗺️ מטריצת סקריפטים ועמודים - מנהל קבצים</h2>
+          <div class="header-actions">
+            <button class="action-btn copy-log-btn" onclick="copyDetailedLog()" title="העתק לוג מפורט של כל הממשקים">
+              <i class="fas fa-copy"></i> העתק לוג מפורט
+            </button>
+            <button class="action-btn" onclick="refreshAllData()" title="רענן את כל הנתונים">
+              <i class="fas fa-sync-alt"></i> רענן
+            </button>
+            <button class="action-btn" onclick="backupData()" title="גיבוי נתונים">
+              <i class="fas fa-download"></i> גיבוי
+            </button>
+            <button class="action-btn" onclick="cleanupOldData()" title="ניקוי נתונים ישנים">
+              <i class="fas fa-trash"></i> ניקוי
+            </button>
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
+              <span class="section-toggle-icon">▼</span>
+            </button>
+            <button class="action-btn toggle-all-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+              <i class="fas fa-expand-arrows-alt"></i> כל הסקשנים
+            </button>
+          </div>
         </div>
         <div class="section-body">
           <div class="info-summary" id="summaryStats">
@@ -89,7 +106,7 @@
       <!-- UI Content Section 1 Start-->
       <div class="content-section" id="section1">
         <div class="section-header">
-          <h2>טבלת מטריצת הסקריפטים</h2>
+          <h2>🗺️ מיפוי עמודים לקבצים</h2>
           <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
@@ -243,6 +260,121 @@
         </div>
             </div>
             </div>
+      <!-- UI Content Section 1 End -->
+
+      <!-- UI Content Section 2 Start-->
+      <div class="content-section" id="section2">
+        <div class="section-header">
+          <h2>📁 ניהול קבצי JavaScript</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
+        </div>
+        <div class="section-body">
+          <div id="jsFilesContent">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              טוען ניהול קבצי JavaScript...
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- UI Content Section 2 End -->
+
+      <!-- UI Content Section 3 Start-->
+      <div class="content-section" id="section3">
+        <div class="section-header">
+          <h2>🔗 ניתוח תלויות בין קבצים</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
+        </div>
+        <div class="section-body">
+          <div id="dependenciesContent">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              טוען ניתוח תלויות...
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- UI Content Section 3 End -->
+
+      <!-- UI Content Section 4 Start-->
+      <div class="content-section" id="section4">
+        <div class="section-header">
+          <h2>📊 סטטיסטיקות מערכת</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
+        </div>
+        <div class="section-body">
+          <div id="statisticsContent">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              טוען סטטיסטיקות...
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- UI Content Section 4 End -->
+
+      <!-- UI Content Section 5 Start-->
+      <div class="content-section" id="section5">
+        <div class="section-header">
+          <h2>💾 ניהול אחסון נתונים</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
+        </div>
+        <div class="section-body">
+          <div id="storageContent">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              טוען ניהול אחסון...
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- UI Content Section 5 End -->
+
+      <!-- UI Content Section 6 Start-->
+      <div class="content-section" id="section6">
+        <div class="section-header">
+          <h2>🏗️ בדיקת ארכיטקטורה</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
+        </div>
+        <div class="section-body">
+          <div id="architectureContent">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              טוען בדיקת ארכיטקטורה...
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- UI Content Section 6 End -->
+
+      <!-- UI Content Section 7 Start-->
+      <div class="content-section" id="section7">
+        <div class="section-header">
+          <h2>🔗 סטטוס אינטגרציה עם מערכת סריקת קבצים</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section7')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
+        </div>
+        <div class="section-body">
+          <div id="integrationContent">
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              בודק סטטוס אינטגרציה...
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- UI Content Section 7 End -->
 
                 <!-- END OF TEMPLATE ZONE 4 -->
 
@@ -285,7 +417,7 @@
             // Set page-specific preferences using global function
             if (typeof setPagePreferences === 'function') {
                 setPagePreferences('page-scripts-matrix', {
-                    sections: ['section1'],
+                    sections: ['section1', 'section2', 'section3', 'section4', 'section5', 'section6', 'section7'],
                     defaultExpanded: ['section1']
                 });
             }
@@ -325,6 +457,44 @@
                 }
                 console.log('✅ Filesystem scan completed');
             }, 2000);
+        }
+
+        // Quick action functions
+        function refreshAllData() {
+            console.log('🔄 Refreshing all data...');
+            if (typeof showNotification === 'function') {
+                showNotification('מרענן את כל הנתונים...', 'info');
+            }
+            // Implement refresh logic
+        }
+
+        function backupData() {
+            console.log('💾 Backing up data...');
+            if (typeof showNotification === 'function') {
+                showNotification('יוצר גיבוי נתונים...', 'info');
+            }
+            // Implement backup logic
+        }
+
+        function cleanupOldData() {
+            console.log('🧹 Cleaning up old data...');
+            if (typeof showNotification === 'function') {
+                showNotification('מנקה נתונים ישנים...', 'info');
+            }
+            // Implement cleanup logic
+        }
+
+        function toggleAllSections() {
+            console.log('📂 Toggling all sections...');
+            // Implement toggle all sections logic
+        }
+
+        function copyDetailedLog() {
+            console.log('📋 Copying detailed log...');
+            if (typeof showNotification === 'function') {
+                showNotification('יוצר לוג מפורט...', 'info');
+            }
+            // Implement detailed log copy logic
         }
     </script>
     </div>

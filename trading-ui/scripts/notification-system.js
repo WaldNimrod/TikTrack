@@ -112,6 +112,9 @@ function getNotificationIcon(type) {
 function showNotification(message, type = 'info', title = 'מערכת', duration = 5000) {
   console.log('🔔 showNotification נקרא:', { message, type, title, duration });
   
+  // שמירת התראה ב-localStorage עבור מרכז התראות (גלובלי)
+  saveNotificationToGlobalHistory(type, title, message);
+  
   // אם מרכז ההתראות זמין, הוסף את ההתראה אליו
   if (window.notificationsCenter && typeof window.notificationsCenter.addNotification === 'function') {
     console.log('✅ מוסיף התראה למרכז התראות');
@@ -387,6 +390,126 @@ function showNotificationLegacy(message, type = 'info', duration = 4000) {
   }
 }
 
+// ===== GLOBAL NOTIFICATION HISTORY SYSTEM =====
+/**
+ * Save notification to global history for notifications center
+ * NOTIFICATION SYSTEM - Saves all notifications to localStorage for global access
+ *
+ * @param {string} type - Notification type
+ * @param {string} title - Notification title
+ * @param {string} message - Notification message
+ */
+function saveNotificationToGlobalHistory(type, title, message) {
+  try {
+    // יצירת אובייקט התראה
+    const notification = {
+      id: Date.now() + Math.random(),
+      type,
+      title,
+      message,
+      time: new Date(),
+      timestamp: Date.now(),
+      page: window.location.pathname,
+      url: window.location.href
+    };
+
+    // טעינת היסטוריה קיימת
+    let globalHistory = [];
+    try {
+      const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
+      if (savedHistory) {
+        globalHistory = JSON.parse(savedHistory);
+      }
+    } catch (e) {
+      console.warn('שגיאה בטעינת היסטוריית התראות:', e);
+    }
+
+    // הוספת התראה חדשה לתחילת הרשימה
+    globalHistory.unshift(notification);
+
+    // הגבלת גודל ההיסטוריה (1000 התראות אחרונות)
+    if (globalHistory.length > 1000) {
+      globalHistory = globalHistory.slice(0, 1000);
+    }
+
+    // שמירה ל-localStorage
+    localStorage.setItem('tiktrack_global_notifications_history', JSON.stringify(globalHistory));
+
+    // עדכון סטטיסטיקות גלובליות
+    updateGlobalNotificationStats(globalHistory);
+
+    console.log('✅ התראה נשמרה להיסטוריה גלובלית');
+  } catch (error) {
+    console.warn('שגיאה בשמירת התראה להיסטוריה גלובלית:', error);
+  }
+}
+
+/**
+ * Update global notification statistics
+ * NOTIFICATION SYSTEM - Updates global stats for notifications center
+ *
+ * @param {Array} history - Global notification history
+ */
+function updateGlobalNotificationStats(history) {
+  try {
+    const stats = {
+      success: history.filter(n => n.type === 'success').length,
+      error: history.filter(n => n.type === 'error').length,
+      warning: history.filter(n => n.type === 'warning').length,
+      info: history.filter(n => n.type === 'info').length,
+      total: history.length,
+      lastUpdated: Date.now()
+    };
+
+    localStorage.setItem('tiktrack_global_notifications_stats', JSON.stringify(stats));
+  } catch (error) {
+    console.warn('שגיאה בעדכון סטטיסטיקות גלובליות:', error);
+  }
+}
+
+/**
+ * Load global notification history
+ * NOTIFICATION SYSTEM - Loads global history for notifications center
+ *
+ * @returns {Array} Global notification history
+ */
+function loadGlobalNotificationHistory() {
+  try {
+    const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
+    return savedHistory ? JSON.parse(savedHistory) : [];
+  } catch (error) {
+    console.warn('שגיאה בטעינת היסטוריית התראות גלובלית:', error);
+    return [];
+  }
+}
+
+/**
+ * Load global notification statistics
+ * NOTIFICATION SYSTEM - Loads global stats for notifications center
+ *
+ * @returns {Object} Global notification statistics
+ */
+function loadGlobalNotificationStats() {
+  try {
+    const savedStats = localStorage.getItem('tiktrack_global_notifications_stats');
+    if (savedStats) {
+      return JSON.parse(savedStats);
+    }
+  } catch (error) {
+    console.warn('שגיאה בטעינת סטטיסטיקות גלובליות:', error);
+  }
+
+  // סטטיסטיקות ברירת מחדל
+  return {
+    success: 0,
+    error: 0,
+    warning: 0,
+    info: 0,
+    total: 0,
+    lastUpdated: Date.now()
+  };
+}
+
 // ===== EXPORT TO GLOBAL SCOPE =====
 
 // Export ALERTS SYSTEM functions to global scope
@@ -402,6 +525,13 @@ window.showSuccessNotification = showSuccessNotification;
 window.showErrorNotification = showErrorNotification;
 window.showWarningNotification = showWarningNotification;
 window.showInfoNotification = showInfoNotification;
+
+// Export GLOBAL NOTIFICATION HISTORY functions
+window.saveNotificationToGlobalHistory = saveNotificationToGlobalHistory;
+window.loadGlobalNotificationHistory = loadGlobalNotificationHistory;
+window.loadGlobalNotificationStats = loadGlobalNotificationStats;
+window.updateGlobalNotificationStats = updateGlobalNotificationStats;
+
 // WARNING SYSTEM functions now exported from warning-system.js
 // window.showValidationWarning, window.showConfirmationDialog, window.showDeleteWarning
 

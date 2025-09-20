@@ -39,8 +39,8 @@ class PreferenceGroup(BaseModel):
     group_name = Column(String(100), nullable=False, unique=True)
     description = Column(Text)
     
-    # יחסים
-    preference_types = relationship("PreferenceType", back_populates="group")
+    # יחסים - מושבתים זמנית עד לבניית מודול משתמשים מלא
+    # preference_types = relationship("PreferenceType", back_populates="group")
     
     def __repr__(self):
         return f"<PreferenceGroup(name='{self.group_name}')>"
@@ -59,9 +59,9 @@ class PreferenceType(BaseModel):
     is_required = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
     
-    # יחסים
-    group = relationship("PreferenceGroup", back_populates="preference_types")
-    user_preferences = relationship("UserPreference", back_populates="preference_type")
+    # יחסים - מושבתים זמנית עד לבניית מודול משתמשים מלא
+    # group = relationship("PreferenceGroup", back_populates="preference_types")
+    # user_preferences = relationship("UserPreference", back_populates="preference_type")
     
     def __repr__(self):
         return f"<PreferenceType(name='{self.preference_name}', type='{self.data_type}')>"
@@ -85,7 +85,7 @@ class PreferenceProfile(BaseModel):
     
     # יחסים - מושבתים זמנית עד לבניית מודול משתמשים מלא
     # user = relationship("User", foreign_keys=[user_id], back_populates="preference_profiles")
-    user_preferences = relationship("UserPreference", back_populates="profile")
+    # user_preferences = relationship("UserPreference", back_populates="profile")
     
     def __repr__(self):
         return f"<PreferenceProfile(user_id={self.user_id}, name='{self.profile_name}')>"

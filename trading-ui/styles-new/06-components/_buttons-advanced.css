@@ -11,21 +11,25 @@
 /* הגדרה כללית לכפתורים - ברירת מחדל */
 .btn-group-default,
 .actions-default,
-.controls-default {
+.controls-default,
+.actions-row {
   display: flex;
   gap: 0.5rem;
   margin-top: 1rem;
   justify-content: flex-start; /* משמאל */
+  flex-wrap: wrap; /* מאפשר מעבר לשורה הבאה אם צריך */
 }
 
 .btn-group-default .btn,
 .actions-default .btn,
-.controls-default .btn {
+.controls-default .btn,
+.actions-row .action-btn {
   margin: 0;
 }
 
 /* סגנון כללי לכפתורים - תמיד בשורה עם רווח */
-.btn {
+.btn,
+.action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;

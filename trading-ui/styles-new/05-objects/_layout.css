@@ -195,6 +195,8 @@
   justify-content: center;
   width: 40px;
   height: 40px;
+  align-self: center; /* מיושר לאמצע בגובה */
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05); /* מסגרת דקה נוספת */
 }
 
 .filter-toggle-btn:hover {

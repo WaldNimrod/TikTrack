@@ -77,10 +77,10 @@
             <div class="main-content" data-section="notifications-center">
                 <!-- UI Content Section Top Start-->
                 <div class="top-section">
-                    <div class="section-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: nowrap; gap: 10px;">
+                    <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-                        <h2 style="margin: 0; flex-shrink: 0;">🔔 מרכז התראות</h2>
-                        <div class="header-actions" style="display: flex; align-items: center; gap: 5px; flex-wrap: nowrap;">
+                        <h2>🔔 מרכז התראות</h2>
+                        <div class="header-actions">
                             <button class="btn btn-sm btn-outline-primary" onclick="copyNotificationsToClipboard()" title="העתק לוג התראות ללוח">
                                 <i class="fas fa-copy"></i> העתק ללוח
                             </button>
@@ -99,7 +99,7 @@
                             <button class="btn btn-sm btn-info" onclick="testInfoNotification()" title="בדיקת הודעת מידע">
                                 <i class="fas fa-info"></i> מידע
                             </button>
-                            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן" style="flex-shrink: 0;">
+                            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -198,11 +198,11 @@
                         </button>
                     </div>
                     <div class="section-body">
-                        <div class="info-summary">
-                            <div>התראות פעילות: <strong>12</strong></div>
-                            <div>הודעות חדשות: <strong>3</strong></div>
-                            <div>עדכון אחרון: <strong>לפני דקה</strong></div>
-                            <div>סטטוס: <strong>פעיל</strong></div>
+                        <div class="info-summary" id="overviewStats">
+                            <div>התראות פעילות: <strong id="activeAlertsCount">0</strong></div>
+                            <div>הודעות חדשות: <strong id="newMessagesCount">0</strong></div>
+                            <div>עדכון אחרון: <strong id="lastUpdateTime">-</strong></div>
+                            <div>סטטוס: <strong id="systemStatus">בדיקה...</strong></div>
                         </div>
                     </div>
                 </div>

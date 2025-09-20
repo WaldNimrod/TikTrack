@@ -10,7 +10,7 @@
  */
 function executeTradePlan(planId) {
   try {
-
+    console.log('⚡ מבצע תוכנית מסחר:', planId);
     
     // חיפוש התוכנית בנתונים
     const plan = window.tradePlansData.find(p => p.id === planId);
@@ -1350,7 +1350,7 @@ function updateTradePlansTable(trade_plans) {
   console.log(`🔄 Table HTML built successfully, length: ${tableHTML.length}`);
   console.log(`🔄 Setting tbody.innerHTML with ${trade_plans.length} rows`);
   tbody.innerHTML = tableHTML;
-  console.log(`✅ Table updated successfully`);
+
 
       // Updating record count
     const countElement = document.querySelector('#trade_plansCount');

@@ -78,9 +78,14 @@
                 <div class="top-section">
                     <div class="section-header">
                         <h2>🌐 דשבורד נתונים חיצוניים</h2>
-                        <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-info" onclick="copyDetailedLog()" title="העתק לוג מפורט">
+                                📋 העתק לוג
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
@@ -109,7 +114,7 @@
                                 <div class="card text-center">
                                     <div class="card-body">
                                         <h5 class="card-title text-primary">📈 רשומות</h5>
-                                        <h3 class="text-primary">15,420</h3>
+                                        <h3 class="text-primary" id="records-count">טוען...</h3>
                                     </div>
                                 </div>
                             </div>
@@ -117,7 +122,7 @@
                                 <div class="card text-center">
                                     <div class="card-body">
                                         <h5 class="card-title text-info">💾 מטמון</h5>
-                                        <h3 class="text-info">2.1M</h3>
+                                        <h3 class="text-info" id="cache-size">טוען...</h3>
                                     </div>
                                 </div>
                             </div>
@@ -125,7 +130,7 @@
                                 <div class="card text-center">
                                     <div class="card-body">
                                         <h5 class="card-title text-success">⚡ אחוז פגיעות</h5>
-                                        <h3 class="text-success">94.2%</h3>
+                                        <h3 class="text-success" id="hit-rate">טוען...</h3>
                                     </div>
                                 </div>
                             </div>
@@ -133,7 +138,7 @@
                                 <div class="card text-center">
                                     <div class="card-body">
                                         <h5 class="card-title text-warning">🔧 סטטוס כללי</h5>
-                                        <h6 class="text-warning">פעיל</h6>
+                                        <h6 class="text-warning" id="general-status">טוען...</h6>
                                     </div>
                                 </div>
                             </div>
@@ -165,9 +170,9 @@
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">עדכון אחרון:</label>
-                                            <span>לפני 2 דקות</span>
+                                            <span id="yahoo-last-update">טוען...</span>
                                         </div>
-                                        <button class="btn btn-primary">רענן נתונים</button>
+                                        <button class="btn btn-primary" onclick="refreshProviders()">רענן נתונים</button>
                                     </div>
                                 </div>
                             </div>
@@ -184,9 +189,9 @@
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">עדכון אחרון:</label>
-                                            <span>לפני 15 דקות</span>
+                                            <span id="alpha-last-update">טוען...</span>
                                         </div>
-                                        <button class="btn btn-secondary">רענן נתונים</button>
+                                        <button class="btn btn-secondary" onclick="refreshProviders()">רענן נתונים</button>
                                     </div>
                                 </div>
                             </div>
@@ -207,17 +212,17 @@
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
                         <div class="row">
                             <div class="col-md-4">
-                                <button class="btn btn-success w-100 mb-3">
+                                <button class="btn btn-success w-100 mb-3" onclick="testAllProviders()">
                                     <i class="fas fa-sync"></i> רענן כל הנתונים
                                 </button>
                             </div>
                             <div class="col-md-4">
-                                <button class="btn btn-info w-100 mb-3">
+                                <button class="btn btn-info w-100 mb-3" onclick="exportData()">
                                     <i class="fas fa-download"></i> ייצא נתונים
                                 </button>
                             </div>
                             <div class="col-md-4">
-                                <button class="btn btn-warning w-100 mb-3">
+                                <button class="btn btn-warning w-100 mb-3" onclick="backupData()">
                                     <i class="fas fa-database"></i> גיבוי נתונים
                                 </button>
                             </div>

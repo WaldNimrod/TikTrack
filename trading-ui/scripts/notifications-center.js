@@ -166,6 +166,7 @@ class NotificationsCenter {
     // עדכון UI
     this.updateHistoryUI();
     this.updateStatsUI();
+    this.updateOverviewStats();
 
     // שמירה ללוקל סטורג'
     this.saveToLocalStorage();
@@ -372,6 +373,47 @@ class NotificationsCenter {
     if (errorCount) {errorCount.textContent = this.stats.error;}
     if (warningCount) {warningCount.textContent = this.stats.warning;}
     if (infoCount) {infoCount.textContent = this.stats.info;}
+
+    // עדכון סטטיסטיקות סקירה כללית
+    this.updateOverviewStats();
+  }
+
+  updateOverviewStats() {
+    // עדכון סטטיסטיקות בסקירה הכללית
+    const activeAlertsCount = document.getElementById('activeAlertsCount');
+    const newMessagesCount = document.getElementById('newMessagesCount');
+    const lastUpdateTime = document.getElementById('lastUpdateTime');
+    const systemStatus = document.getElementById('systemStatus');
+
+    if (activeAlertsCount) {
+      activeAlertsCount.textContent = this.history.length;
+    }
+    
+    if (newMessagesCount) {
+      // ספירת הודעות חדשות מהשעה האחרונה
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      const newMessages = this.history.filter(n => new Date(n.time) > oneHourAgo).length;
+      newMessagesCount.textContent = newMessages;
+    }
+    
+    if (lastUpdateTime) {
+      if (this.history.length > 0) {
+        const lastNotification = this.history[0];
+        lastUpdateTime.textContent = NotificationsCenter.getTimeAgo(lastNotification.time);
+      } else {
+        lastUpdateTime.textContent = '-';
+      }
+    }
+    
+    if (systemStatus) {
+      if (window.realtimeNotificationsClient && window.realtimeNotificationsClient.isConnected()) {
+        systemStatus.textContent = 'פעיל';
+        systemStatus.className = 'text-success';
+      } else {
+        systemStatus.textContent = 'לא מחובר';
+        systemStatus.className = 'text-warning';
+      }
+    }
   }
 
   async loadNotificationPreferences() {
@@ -441,16 +483,16 @@ class NotificationsCenter {
 
   static getIconClass(type) {
     switch (type) {
-      case 'success':
-        return 'fas fa-check-circle';
-      case 'error':
-        return 'fas fa-exclamation-circle';
-      case 'warning':
-        return 'fas fa-exclamation-triangle';
-      case 'info':
-        return 'fas fa-info-circle';
-      default:
-        return 'fas fa-bell';
+    case 'success':
+      return 'fas fa-check-circle';
+    case 'error':
+      return 'fas fa-exclamation-circle';
+    case 'warning':
+      return 'fas fa-exclamation-triangle';
+    case 'info':
+      return 'fas fa-info-circle';
+    default:
+      return 'fas fa-bell';
     }
   }
 
@@ -555,6 +597,7 @@ class NotificationsCenter {
     // עדכון UI
     this.updateHistoryUI();
     this.updateStatsUI();
+    this.updateOverviewStats();
   }
 
   loadPageFilterOptions() {
@@ -706,6 +749,7 @@ class NotificationsCenter {
 
       this.updateHistoryUI();
       this.updateStatsUI();
+      this.updateOverviewStats();
       this.saveToLocalStorage();
 
       // הודעה ישירה לממשק ללא לולאה
@@ -749,6 +793,7 @@ class NotificationsCenter {
     this.loadFromLocalStorage();
     this.updateHistoryUI();
     this.updateStatsUI();
+    this.updateOverviewStats();
 
     // הודעה ישירה לממשק ללא לולאה
     // console.log('✅ ההתראות רועננו בהצלחה');
@@ -835,6 +880,11 @@ class NotificationsCenter {
         this.updateConnectionTime();
       }
     }, 1000);
+
+    // עדכון סטטיסטיקות כל 30 שניות
+    setInterval(() => {
+      this.updateOverviewStats();
+    }, 30000);
   }
 
   updateConnectionTime() {
@@ -998,10 +1048,17 @@ function copyDetailedLog() {
     // סטטוס חיבור
     log += '🔗 סטטוס חיבור:\n';
     log += `WebSocket: ${window.realtimeNotificationsClient?.isConnected() ? 'מחובר' : 'לא מחובר'}\n`;
-    log += `סטטוס נוכחי: ${document.getElementById('connectionStatus')?.querySelector('.status-text')?.textContent || 'לא ידוע'}\n`;
     log += `WebSocket Status: ${document.getElementById('websocketStatus')?.textContent || 'לא ידוע'}\n`;
     log += `זמן חיבור: ${document.getElementById('connectionTime')?.textContent || 'לא ידוע'}\n`;
-    log += `הודעות נשלחו: ${document.getElementById('messagesSent')?.textContent || '0'}\n\n`;
+    log += `הודעות נשלחו: ${document.getElementById('messagesSent')?.textContent || '0'}\n`;
+    log += `סטטוס מערכת: ${document.getElementById('overallStatus')?.textContent || 'לא ידוע'}\n\n`;
+    
+    // סקירה כללית
+    log += '📊 סקירה כללית:\n';
+    log += `התראות פעילות: ${document.getElementById('activeAlertsCount')?.textContent || '0'}\n`;
+    log += `הודעות חדשות: ${document.getElementById('newMessagesCount')?.textContent || '0'}\n`;
+    log += `עדכון אחרון: ${document.getElementById('lastUpdateTime')?.textContent || '-'}\n`;
+    log += `סטטוס: ${document.getElementById('systemStatus')?.textContent || 'לא ידוע'}\n\n`;
     
     // הגדרות התראות הועברו למערכת ההעדפות הגלובלית
     log += '⚙️ הגדרות:\n';
@@ -1013,29 +1070,6 @@ function copyDetailedLog() {
     log += `❌ שגיאות: ${document.getElementById('errorCount')?.textContent || '0'}\n`;
     log += `⚠️ אזהרות: ${document.getElementById('warningCount')?.textContent || '0'}\n`;
     log += `ℹ️ הודעות מידע: ${document.getElementById('infoCount')?.textContent || '0'}\n\n`;
-    
-    // התראות פעילות
-    log += '🔔 התראות פעילות:\n';
-    const liveContainer = document.getElementById('liveNotifications');
-    if (liveContainer) {
-      const notifications = liveContainer.querySelectorAll('.notification-item');
-      if (notifications && notifications.length > 0) {
-        // המרה ל-Array כדי שנוכל להשתמש ב-forEach
-        const notificationsArray = Array.from(notifications);
-        notificationsArray.forEach((notification, index) => {
-          const type = notification.className.match(/notification-item (\w+)/)?.[1] || 'unknown';
-          const title = notification.querySelector('.notification-title')?.textContent || 'ללא כותרת';
-          const message = notification.querySelector('.notification-message')?.textContent || 'ללא הודעה';
-          const time = notification.querySelector('.notification-time')?.textContent || 'ללא זמן';
-          log += `${index + 1}. [${type.toUpperCase()}] ${title}: ${message} (${time})\n`;
-        });
-      } else {
-        log += 'אין התראות פעילות\n';
-      }
-    } else {
-      log += 'אלמנט התראות פעילות לא נמצא\n';
-    }
-    log += '\n';
     
     // היסטוריה גלובלית עם סינון
     const currentFilter = document.getElementById('historyFilter')?.value || 'all';
@@ -1070,11 +1104,11 @@ function copyDetailedLog() {
           
           if (filteredHistory.length === 0) {
             log += 'אין התראות המתאימות לסינון הפעיל\n';
-          }
-        } else {
-          log += 'אין היסטוריית התראות גלובלית\n';
         }
       } else {
+          log += 'אין היסטוריית התראות גלובלית\n';
+      }
+    } else {
         log += 'פונקציית טעינת היסטוריה גלובלית לא זמינה\n';
       }
     } catch (error) {
@@ -1086,20 +1120,6 @@ function copyDetailedLog() {
     log += '🔍 פילטרים:\n';
     log += `פילטר סוג: ${document.getElementById('historyFilter')?.value || 'כל ההתראות'}\n`;
     log += `פילטר זמן: ${document.getElementById('historyPeriod')?.value || '24 שעות אחרונות'}\n\n`;
-    
-    // לוג קונסול
-    log += '🖥️ לוג קונסול (אחרונות):\n';
-    try {
-      // נסיון לקבל לוג קונסול - זה לא תמיד עובד בדפדפנים
-      if (window.console && window.console.log) {
-        log += 'לוג קונסול זמין (פרטים לא נגישים מהסקריפט)\n';
-      } else {
-        log += 'לוג קונסול לא זמין\n';
-      }
-    } catch (error) {
-      log += `שגיאה בגישה ללוג קונסול: ${error.message}\n`;
-    }
-    log += '\n';
     
     // מידע נוסף
     log += '🔧 מידע נוסף:\n';
@@ -1280,172 +1300,41 @@ function filterHistory() {
 
 // פונקציות בדיקת התראות
 function testSuccessNotification() {
-  console.log('🔍 testSuccessNotification נקרא!');
-  console.log('🔍 window.showSuccessNotification זמין?', typeof window.showSuccessNotification);
-  
   if (window.showSuccessNotification) {
-    console.log('✅ קורא ל-showSuccessNotification...');
     window.showSuccessNotification('בדיקת הצלחה', 'זוהי הודעת הצלחה לבדיקה - הכל עובד תקין!');
-    console.log('✅ showSuccessNotification נקרא בהצלחה');
   } else {
     console.error('❌ showSuccessNotification לא זמין');
-    // נסיון ישיר ליצירת התראה
-    console.log('🔧 מנסה ליצור התראה ישירה...');
-    const container = document.createElement('div');
-    container.id = 'notification-container';
-    container.className = 'notification-container';
-    document.body.appendChild(container);
-    
-    const notification = document.createElement('div');
-    notification.className = 'notification success';
-    notification.innerHTML = `
-      <div class="notification-icon">
-        <i class="fas fa-check-circle"></i>
-      </div>
-      <div class="notification-content">
-        <div class="notification-title">בדיקת הצלחה</div>
-        <div class="notification-message">זוהי הודעת הצלחה לבדיקה - הכל עובד תקין!</div>
-      </div>
-      <button type="button" class="notification-close" onclick="this.parentElement.remove()">
-        <i class="fas fa-times"></i>
-      </button>
-    `;
-    
-    container.appendChild(notification);
-    setTimeout(() => {
-      notification.classList.add('show');
-    }, 10);
-    
-    console.log('✅ התראה נוצרה ישירות');
   }
 }
 
 function testErrorNotification() {
-  console.log('🔍 testErrorNotification נקרא!');
-  console.log('🔍 window.showErrorNotification זמין?', typeof window.showErrorNotification);
-  
   if (window.showErrorNotification) {
-    console.log('✅ קורא ל-showErrorNotification...');
     window.showErrorNotification('בדיקת שגיאה', 'זוהי הודעת שגיאה לבדיקה - הכל עובד תקין!');
-    console.log('✅ showErrorNotification נקרא בהצלחה');
   } else {
     console.error('❌ showErrorNotification לא זמין');
-    // נסיון ישיר ליצירת התראה
-    console.log('🔧 מנסה ליצור התראה ישירה...');
-    const container = document.createElement('div');
-    container.id = 'notification-container';
-    container.className = 'notification-container';
-    document.body.appendChild(container);
-    
-    const notification = document.createElement('div');
-    notification.className = 'notification error';
-    notification.innerHTML = `
-      <div class="notification-icon">
-        <i class="fas fa-exclamation-circle"></i>
-      </div>
-      <div class="notification-content">
-        <div class="notification-title">בדיקת שגיאה</div>
-        <div class="notification-message">זוהי הודעת שגיאה לבדיקה - הכל עובד תקין!</div>
-      </div>
-      <button type="button" class="notification-close" onclick="this.parentElement.remove()">
-        <i class="fas fa-times"></i>
-      </button>
-    `;
-    
-    container.appendChild(notification);
-    setTimeout(() => {
-      notification.classList.add('show');
-    }, 10);
-    
-    console.log('✅ התראה נוצרה ישירות');
   }
 }
 
 function testWarningNotification() {
-  console.log('🔍 testWarningNotification נקרא!');
-  console.log('🔍 window.showWarningNotification זמין?', typeof window.showWarningNotification);
-  
   if (window.showWarningNotification) {
-    console.log('✅ קורא ל-showWarningNotification...');
     window.showWarningNotification('בדיקת אזהרה', 'זוהי הודעת אזהרה לבדיקה - הכל עובד תקין!');
-    console.log('✅ showWarningNotification נקרא בהצלחה');
   } else {
     console.error('❌ showWarningNotification לא זמין');
-    // נסיון ישיר ליצירת התראה
-    console.log('🔧 מנסה ליצור התראה ישירה...');
-    const container = document.createElement('div');
-    container.id = 'notification-container';
-    container.className = 'notification-container';
-    document.body.appendChild(container);
-    
-    const notification = document.createElement('div');
-    notification.className = 'notification warning';
-    notification.innerHTML = `
-      <div class="notification-icon">
-        <i class="fas fa-exclamation-triangle"></i>
-      </div>
-      <div class="notification-content">
-        <div class="notification-title">בדיקת אזהרה</div>
-        <div class="notification-message">זוהי הודעת אזהרה לבדיקה - הכל עובד תקין!</div>
-      </div>
-      <button type="button" class="notification-close" onclick="this.parentElement.remove()">
-        <i class="fas fa-times"></i>
-      </button>
-    `;
-    
-    container.appendChild(notification);
-    setTimeout(() => {
-      notification.classList.add('show');
-    }, 10);
-    
-    console.log('✅ התראה נוצרה ישירות');
   }
 }
 
 function testInfoNotification() {
-  console.log('🔍 testInfoNotification נקרא!');
-  console.log('🔍 window.showInfoNotification זמין?', typeof window.showInfoNotification);
-  
   if (window.showInfoNotification) {
-    console.log('✅ קורא ל-showInfoNotification...');
     window.showInfoNotification('בדיקת מידע', 'זוהי הודעת מידע לבדיקה - הכל עובד תקין!');
-    console.log('✅ showInfoNotification נקרא בהצלחה');
   } else {
     console.error('❌ showInfoNotification לא זמין');
-    // נסיון ישיר ליצירת התראה
-    console.log('🔧 מנסה ליצור התראה ישירה...');
-    const container = document.createElement('div');
-    container.id = 'notification-container';
-    container.className = 'notification-container';
-    document.body.appendChild(container);
-    
-    const notification = document.createElement('div');
-    notification.className = 'notification info';
-    notification.innerHTML = `
-      <div class="notification-icon">
-        <i class="fas fa-info-circle"></i>
-      </div>
-      <div class="notification-content">
-        <div class="notification-title">בדיקת מידע</div>
-        <div class="notification-message">זוהי הודעת מידע לבדיקה - הכל עובד תקין!</div>
-      </div>
-      <button type="button" class="notification-close" onclick="this.parentElement.remove()">
-        <i class="fas fa-times"></i>
-      </button>
-    `;
-    
-    container.appendChild(notification);
-    setTimeout(() => {
-      notification.classList.add('show');
-    }, 10);
-    
-    console.log('✅ התראה נוצרה ישירות');
   }
 }
 
 // ייצוא פונקציות ל-window scope
 window.copyNotificationsToClipboard = copyNotificationsToClipboard;
 window.copyFilteredHistoryToClipboard = copyFilteredHistoryToClipboard;
+window.copyDetailedLog = copyDetailedLog;
 window.clearHistory = clearHistory;
 window.refreshNotifications = refreshNotifications;
 window.filterHistory = filterHistory;

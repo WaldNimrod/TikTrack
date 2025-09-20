@@ -227,12 +227,18 @@ class ProjectFilesScanner {
     async getFilesFromServer() {
         try {
             console.log('🔍 Fetching files from server API...');
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 35000); // 35 seconds timeout
+            
             const response = await fetch('/api/v1/files/discover', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
+                signal: controller.signal
             });
+            
+            clearTimeout(timeoutId);
 
             console.log('🔍 Response status:', response.status);
             if (!response.ok) {
@@ -259,7 +265,11 @@ class ProjectFilesScanner {
                 throw new Error('Server returned invalid response');
             }
         } catch (error) {
-            console.error('❌ Server file discovery failed:', error);
+            if (error.name === 'AbortError') {
+                console.error('❌ Server file discovery timed out after 35 seconds');
+            } else {
+                console.error('❌ Server file discovery failed:', error);
+            }
             return null;
         }
     }

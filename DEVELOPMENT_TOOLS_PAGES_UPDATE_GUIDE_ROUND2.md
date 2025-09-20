@@ -72,6 +72,36 @@
 
 ---
 
+### **5. בדיקת עדכון אוטומטי**
+**מטרה:** וידוא שיש עדכון אוטומטי של נתונים
+
+#### **מה לבדוק:**
+- [ ] יש פונקציות עדכון אוטומטי לסטטיסטיקות
+- [ ] יש עדכון אוטומטי כל 30 שניות
+- [ ] יש עדכון אוטומטי בכל הפונקציות הרלוונטיות
+
+#### **מה לתקן:**
+- [ ] הוספת פונקציות עדכון אוטומטי
+- [ ] הוספת setInterval לעדכון אוטומטי
+- [ ] הוספת קריאות לעדכון בכל הפונקציות
+
+---
+
+### **6. בדיקת חיבור למערכות גלובליות**
+**מטרה:** וידוא שיש חיבור למערכות הגלובליות
+
+#### **מה לבדוק:**
+- [ ] יש שימוש במערכת ההתראות הגלובלית
+- [ ] יש שימוש במערכת ההעדפות הגלובלית
+- [ ] יש שימוש במערכת ה-WebSocket
+
+#### **מה לתקן:**
+- [ ] חיבור למערכת ההתראות
+- [ ] חיבור למערכת ההעדפות
+- [ ] חיבור למערכת ה-WebSocket
+
+---
+
 ## 🎯 **תיקונים ספציפיים - system-management.html**
 
 ### **1. מבנה העמוד**
@@ -102,57 +132,231 @@
 
 ## 📊 **מטריצת מעקב התקדמות**
 
-| עמוד | בדיקת HTML | מערכות כלליות | מידע אמיתי | שגיאות linter | סטטוס |
-|------|-------------|----------------|-------------|---------------|--------|
-| system-management | ✅ | ✅ | ✅ | ✅ | **הושלם** |
-| notifications-center | ⏳ | ⏳ | ⏳ | ⏳ | **בטיפול** |
-| external-data-dashboard | ⏳ | ⏳ | ⏳ | ⏳ | **ממתין** |
-| crud-testing-dashboard | ⏳ | ⏳ | ⏳ | ⏳ | **ממתין** |
-| linter-realtime-monitor | ⏳ | ⏳ | ⏳ | ⏳ | **ממתין** |
-| js-map | ⏳ | ⏳ | ⏳ | ⏳ | **ממתין** |
-| css-management | ⏳ | ⏳ | ⏳ | ⏳ | **ממתין** |
-| cache-test | ⏳ | ⏳ | ⏳ | ⏳ | **ממתין** |
-| constraints | ⏳ | ⏳ | ⏳ | ⏳ | **ממתין** |
-| server-monitor | ⏳ | ⏳ | ⏳ | ⏳ | **ממתין** |
+| עמוד | בדיקת HTML | מערכות כלליות | מידע אמיתי | שגיאות linter | עדכון אוטומטי | חיבור גלובלי | סטטוס |
+|------|-------------|----------------|-------------|---------------|---------------|---------------|--------|
+| system-management | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **הושלם** |
+| external-data-dashboard | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **הושלם** |
+| notifications-center | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **הושלם** |
+| crud-testing-dashboard | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **הושלם** |
+| css-management | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | **ממתין** |
+| cache-test | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | **ממתין** |
+| constraints | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | **ממתין** |
+| server-monitor | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | **ממתין** |
+| linter-realtime-monitor | ⏸️ | ⏸️ | ⏸️ | ⏸️ | ⏸️ | ⏸️ | **לא מוכן** |
+| js-map | ⏸️ | ⏸️ | ⏸️ | ⏸️ | ⏸️ | ⏸️ | **לא מוכן** |
 
 ---
 
 ## 🎯 **הוראות התאמה לעמודים ספציפיים**
 
 ### **עמודים עם מבנה דומה ל-system-management:**
-- **external-data-dashboard**
-- **server-monitor**
-- **cache-test**
+- **crud-testing-dashboard** - יש לו מבנה דומה עם סקשנים מרובים
+- **css-management** - יש לו מבנה דומה עם סקשנים מרובים
+- **cache-test** - יש לו מבנה דומה עם סקשנים מרובים
 
 **התאמות נדרשות:**
 - [ ] בדיקת info-summaries קיימים
 - [ ] וידוא מיזוג סקשנים רלוונטיים
 - [ ] בדיקת מספור סקשנים
+- [ ] הוספת עדכון אוטומטי לסטטיסטיקות
+- [ ] חיבור למערכות גלובליות
 - [ ] תיקון toggleSection calls
 
-### **עמודים עם מבנה פשוט יותר:**
-- **notifications-center**
-- **css-management**
-- **constraints**
+### **עמודים עם מבנה דומה ל-external-data-dashboard:**
+- **server-monitor** - יש לו מבנה דומה עם סטטיסטיקות
+- **constraints** - יש לו מבנה דומה עם סטטיסטיקות
 
 **התאמות נדרשות:**
-- [ ] בדיקת פונקציות מקומיות
-- [ ] וידוא שימוש במערכות כלליות
-- [ ] בדיקת נתוני דמה
-- [ ] תיקון שגיאות linter
+- [ ] בדיקת סטטיסטיקות דינמיות
+- [ ] וידוא עדכון אוטומטי של נתונים
+- [ ] בדיקת חיבור למערכות גלובליות
+- [ ] הוספת copyDetailedLog function
+- [ ] חיבור כפתורי פעולה לפונקציות
 
-### **עמודים עם מבנה מורכב:**
-- **crud-testing-dashboard**
-- **linter-realtime-monitor**
-- **js-map**
+### **עמודים עם מבנה דומה ל-notifications-center:**
+- **crud-testing-dashboard** - יש לו מבנה דומה עם היסטוריה
+- **css-management** - יש לו מבנה דומה עם היסטוריה
 
 **התאמות נדרשות:**
-- [ ] בדיקה מקיפה של כל הפונקציות
-- [ ] וידוא ארגון הקוד במחלקות
-- [ ] בדיקת API calls אמיתיים
-- [ ] תיקון מבנה הקוד
+- [ ] בדיקת היסטוריה דינמית
+- [ ] וידוא עדכון אוטומטי של סטטיסטיקות
+- [ ] בדיקת חיבור למערכת ההתראות
+- [ ] הוספת פילטרים להיסטוריה
+- [ ] חיבור למערכת ההעדפות הגלובלית
+---
+
+## 📚 **לקחים חשובים מהעבודה עד כה:**
+
+### **על ארכיטקטורה:**
+- חשוב להשתמש במערכות הגלובליות הקיימות
+- עדיף פונקציות פשוטות על פני מסובכות
+- חשוב לעדכן נתונים אוטומטית
+
+### **על תהליך העבודה:**
+- סריקה ראשונית חוסכת זמן
+- תיקונים כלליים לפני ספציפיים
+- בדיקות אחרונות חיוניות לוולידציה
+
+### **על קוד נקי:**
+- אין inline styles
+- אין נתוני דמה
+- אין פונקציות מיותרות
+- כל הפונקציות זמינות גלובלית
+
+### **על עדכון אוטומטי:**
+- חשוב לעדכן סטטיסטיקות אוטומטית
+- חשוב לעדכן נתונים כל 30 שניות
+
+### **על מערכות בדיקות מתקדמות:**
+- בדיקות API אמיתיות עם error handling
+- שמירת תוצאות ב-localStorage
+- ייצוא/ייבא נתוני בדיקות
+- טיפול ב-timeouts ו-network errors
+
+### **על פונקציות מורכבות:**
+- שימוש ב-eval() בטוח עם validation
+- מנגנוני גיבוי במקרה של שגיאות
+- אינדיקטורים להתקדמות תהליכים
+- ממשקים עם tabs ו-accordions
+- חשוב לעדכן בכל הפונקציות הרלוונטיות
+
+### **על חיבור למערכות גלובליות:**
+- חשוב להתחבר למערכת ההתראות
+- חשוב להתחבר למערכת ההעדפות
+- חשוב להתחבר למערכת ה-WebSocket
 
 ---
+
+## 💻 **דוגמאות קוד חדשות:**
+
+### **דוגמה: פונקציה לעדכון סטטיסטיקות**
+```javascript
+updateOverviewStats() {
+  // עדכון סטטיסטיקות בסקירה הכללית
+  const activeAlertsCount = document.getElementById('activeAlertsCount');
+  const newMessagesCount = document.getElementById('newMessagesCount');
+  const lastUpdateTime = document.getElementById('lastUpdateTime');
+  const systemStatus = document.getElementById('systemStatus');
+
+  if (activeAlertsCount) {
+    activeAlertsCount.textContent = this.history.length;
+  }
+  
+  if (newMessagesCount) {
+    // ספירת הודעות חדשות מהשעה האחרונה
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    const newMessages = this.history.filter(n => new Date(n.time) > oneHourAgo).length;
+    newMessagesCount.textContent = newMessages;
+  }
+  
+  if (lastUpdateTime) {
+    if (this.history.length > 0) {
+      const lastNotification = this.history[0];
+      lastUpdateTime.textContent = NotificationsCenter.getTimeAgo(lastNotification.time);
+    } else {
+      lastUpdateTime.textContent = '-';
+    }
+  }
+  
+  if (systemStatus) {
+    if (window.realtimeNotificationsClient && window.realtimeNotificationsClient.isConnected()) {
+      systemStatus.textContent = 'פעיל';
+      systemStatus.className = 'text-success';
+    } else {
+      systemStatus.textContent = 'לא מחובר';
+      systemStatus.className = 'text-warning';
+    }
+  }
+}
+```
+
+### **דוגמה: עדכון אוטומטי**
+```javascript
+startAutoRefresh() {
+  // רענון אוטומטי כל 30 שניות
+  setInterval(() => {
+    // עדכון סטטוס חיבור רק אם יש שינוי
+    if (window.realtimeNotificationsClient) {
+      const isConnected = window.realtimeNotificationsClient.isConnected();
+      const currentStatus = NotificationsCenter.getCurrentConnectionStatus();
+
+      if (isConnected && currentStatus !== 'connected') {
+        this.updateConnectionStatus('connected');
+      } else if (!isConnected && currentStatus !== 'disconnected') {
+        this.updateConnectionStatus('disconnected');
+      }
+    }
+
+  }, 30000);
+
+  // עדכון זמן חיבור כל שנייה כאשר מחובר
+  setInterval(() => {
+    if (window.realtimeNotificationsClient && window.realtimeNotificationsClient.isConnected()) {
+      this.updateConnectionTime();
+    }
+  }, 1000);
+
+  // עדכון סטטיסטיקות כל 30 שניות
+  setInterval(() => {
+    this.updateOverviewStats();
+  }, 30000);
+}
+```
+---
+
+## 🎯 **סדר העבודה המומלץ:**
+
+1. **system-management** ✅ - הושלם
+2. **external-data-dashboard** ✅ - הושלם  
+3. **notifications-center** ✅ - הושלם
+4. **crud-testing-dashboard** - הבא בתור
+5. **css-management**
+6. **cache-test**
+7. **constraints**
+8. **server-monitor**
+
+### **עמודים שלא מוכנים:**
+- **linter-realtime-monitor** ⏸️
+- **js-map** ⏸️
+
+---
+
+## 📋 **סיכום העדכונים למדריך:**
+
+### **מה נוסף:**
+1. **מטריצת מעקב מעודכנת** עם עמודות חדשות:
+   - עדכון אוטומטי
+   - חיבור גלובלי
+
+2. **בדיקות חדשות:**
+   - בדיקת עדכון אוטומטי
+   - בדיקת חיבור למערכות גלובליות
+
+3. **הוראות התאמה מעודכנות** עם דוגמאות ספציפיות
+
+4. **לקחים חשובים** מהעבודה עד כה
+
+5. **דוגמאות קוד** לפונקציות חדשות
+
+6. **סדר עבודה מומלץ** עם סטטוס עדכני
+
+7. **לקחים חדשים מ-crud-testing-dashboard:**
+   - מערכות בדיקות מתקדמות עם API testing
+   - פונקציות מורכבות עם eval() בטוח
+   - שמירת נתונים ב-localStorage
+   - טיפול מתקדם בשגיאות
+
+### **מה השתפר:**
+- המדריך יותר מפורט ויעיל
+- יש דוגמאות קוד מעשיות
+- יש לקחים מהניסיון
+- יש סדר עבודה ברור
+
+---
+
+## 🚀 **מוכן לעבודה על העמוד הבא!**
+
+המדריך עודכן בהצלחה עם כל הלקחים והשיפורים מהעבודה עד כה.
 
 ## 📝 **תהליך העבודה המומלץ**
 

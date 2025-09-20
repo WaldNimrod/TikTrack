@@ -2204,7 +2204,7 @@ async function refreshYahooFinanceDataSilently() {
 
 // פונקציה לפילטר טיקרים לפי סוג (פילטר פשוט - סוג אחד בלבד)
 function filterTickersByType(type) {
-  console.log(`🔍 Filtering tickers by type: ${type}`);
+
   
   // עדכון מצב הכפתורים - רק אחד פעיל בכל פעם
   const buttons = document.querySelectorAll('.ticker-type-filter [data-type]');
@@ -2265,7 +2265,7 @@ function filterTickersByType(type) {
     countElement.textContent = `${filteredData.length} טיקרים${type !== 'all' ? ` (${typeText})` : ''}`;
   }
 
-
+  console.log(`🔍 Filtered ${filteredData.length} tickers out of ${window.tickersData.length} for type: ${type}`);
 }
 
 // פונקציה עזר לקבלת שם תצוגה לסוג

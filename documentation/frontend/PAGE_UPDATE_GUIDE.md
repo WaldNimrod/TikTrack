@@ -2304,7 +2304,7 @@ ls -la trading-ui/scripts/page-name.js
 - צבעי ישויות
 - צבעים לערכים מספריים
 
-#### 21.2 צבעים ראשיים ומשניים
+#### 22.2 צבעים ראשיים ומשניים
 
 **שימוש נכון:**
 ```html
@@ -2317,7 +2317,7 @@ ls -la trading-ui/scripts/page-name.js
 <button class="btn" style="background-color: #6c757d;">פעולה משנית</button>
 ```
 
-#### 21.3 צבעי הודעות ומשוב
+#### 22.3 צבעי הודעות ומשוב
 
 **שימוש נכון:**
 ```html

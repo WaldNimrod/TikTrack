@@ -116,7 +116,7 @@ function copyTradePlan(planId) {
       return response.json();
     })
     .then(data => {
-      console.log('✅ תוכנית מסחר הועתקה:', data);
+
       
       // רענון הטבלה
       loadTradePlansData();
@@ -1163,7 +1163,7 @@ function updateTradePlansTable(trade_plans) {
   console.log(`🔄 updateTradePlansTable called with ${trade_plans ? trade_plans.length : 0} trade plans`);
 
   const tbody = document.querySelector('#trade_plansTable tbody');
-
+  console.log(`🔍 Looking for tbody:`, tbody);
   // Looking for table body
 
   if (!tbody) {

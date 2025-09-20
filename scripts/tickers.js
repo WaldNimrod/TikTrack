@@ -2049,7 +2049,7 @@ async function loadColorsAndApplyToHeaders() {
         console.log('✅ Loaded  preferences for tickers');
       } else if (window.loadPreferences) {
         await window.loadPreferences();
-        console.log('🔄 Loaded preferences for tickers (fallback)');
+        ');
       }
     }
 
@@ -2204,7 +2204,7 @@ async function refreshYahooFinanceDataSilently() {
 
 // פונקציה לפילטר טיקרים לפי סוג (פילטר פשוט - סוג אחד בלבד)
 function filterTickersByType(type) {
-
+  console.log(`🔍 Filtering tickers by type: ${type}`);
   
   // עדכון מצב הכפתורים - רק אחד פעיל בכל פעם
   const buttons = document.querySelectorAll('.ticker-type-filter [data-type]');

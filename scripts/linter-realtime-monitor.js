@@ -2756,9 +2756,17 @@ async function fixSingleIssue(issue) {
 async function discoverProjectFiles() {
     addLogEntry('INFO', 'מתחיל גילוי קבצי הפרויקט...');
     
+    // Show progress indicator
+    const progressElement = document.getElementById('fileDiscoveryProgress');
+    if (progressElement) {
+        progressElement.style.display = 'block';
+        progressElement.textContent = 'מגלה קבצים...';
+    }
+    
     try {
         // Use global project files scanner if available
         if (typeof window.projectFilesScanner !== 'undefined') {
+            addLogEntry('INFO', 'משתמש במנגנון סריקת קבצים גלובלי...');
             const discoveredFiles = await window.projectFilesScanner.getProjectFiles();
             const stats = await window.projectFilesScanner.getFileStatistics();
             

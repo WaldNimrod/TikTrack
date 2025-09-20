@@ -1183,24 +1183,40 @@ function toggleTopSection() {
 
 // Functions Dropdown
 function toggleFunctionsDropdown() {
+    console.log('🔍 toggleFunctionsDropdown called');
     const dropdown = document.getElementById('functionsDropdownContent');
     const toggle = document.getElementById('functionsDropdown');
 
     if (dropdown && dropdown.classList.contains('show')) {
+        console.log('🔽 Closing dropdown');
         dropdown.classList.remove('show');
         if (toggle) toggle.classList.remove('active');
     } else if (dropdown) {
+        console.log('🔼 Opening dropdown');
         dropdown.classList.add('show');
         if (toggle) toggle.classList.add('active');
         populateFunctionsDropdown();
+    } else {
+        console.error('❌ functionsDropdownContent not found');
     }
 }
 
 function populateFunctionsDropdown() {
+    console.log('🔍 populateFunctionsDropdown called');
     const content = document.getElementById('functionsDropdownContent');
-    if (!content || !window.jsMapSystem || !window.jsMapSystem.functionsData) {
+    if (!content) {
+        console.error('❌ functionsDropdownContent not found');
         return;
     }
+    if (!window.jsMapSystem) {
+        console.error('❌ jsMapSystem not found');
+        return;
+    }
+    if (!window.jsMapSystem.functionsData) {
+        console.error('❌ functionsData not found');
+        return;
+    }
+    console.log('✅ All conditions met, populating dropdown...');
 
     let html = '';
 
@@ -1241,6 +1257,7 @@ function populateFunctionsDropdown() {
     });
 
     content.innerHTML = html;
+    console.log(`✅ Dropdown populated with ${html.split('function-dropdown-item').length - 1} items`);
 }
 
 function selectFunctionFromDropdown(file, functionName) {

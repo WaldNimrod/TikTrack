@@ -541,8 +541,50 @@ const GlobalFunctions = {
  */
 
 /**
- * ScanningResults - תוצאות סריקה
- * @description מכיל את כל תוצאות הסריקה הנוכחית
+ * FileScanningState - מצב סריקת קבצים
+ * @description מנהל את כל שלבי תהליך הסריקה בצורה מובנית
+ * @location global variable
+ */
+const FileScanningStateStructure = {
+    discovered: {
+        total: 0,           // סך כל הקבצים שנמצאו
+        byType: {           // פירוט לפי סוג
+            js: 0,
+            html: 0,
+            css: 0,
+            python: 0,
+            other: 0
+        }
+    },
+    selected: {
+        total: 0,           // מספר הקבצים שנבחרו לסריקה
+        byType: {           // פירוט לפי סוג
+            js: 0,
+            html: 0,
+            css: 0,
+            python: 0,
+            other: 0
+        }
+    },
+    scanned: {
+        total: 0,           // מספר הקבצים שנסרקו בפועל
+        byType: {           // פירוט לפי סוג
+            js: 0,
+            html: 0,
+            css: 0,
+            python: 0,
+            other: 0
+        }
+    },
+    results: {
+        errors: [],         // מערך השגיאות שנמצאו
+        warnings: []        // מערך האזהרות שנמצאו
+    }
+};
+
+/**
+ * ScanningResults - תוצאות סריקה (legacy)
+ * @description מכיל את כל תוצאות הסריקה הנוכחית - נשמר לתאימות לאחור
  * @location global variable
  */
 const ScanningResultsStructure = {
@@ -620,15 +662,18 @@ const SystemLogStructure = {
  */
 
 /**
- * זרימת עבודה - סריקה מלאה
+ * זרימת עבודה - סריקה מלאה (מתוקנת)
  */
 const FullScanWorkflow = {
     step1: 'User clicks "סרוק קבצים"',
     step2: 'startFileScan() → scanJavaScriptFiles()',
-    step3: 'For each file: scanSingleFile() → analyzeFileContent()',
-    step4: 'Collect results in scanningResults',
-    step5: 'finishScan() → update UI and chart',
-    step6: 'Show notification with results'
+    step3: 'discoverProjectFiles() → fileScanningState.updateDiscovered()',
+    step4: 'getSelectedFileTypes() → fileScanningState.updateSelected()',
+    step5: 'For each file: scanSingleFile() → analyzeFileContent()',
+    step6: 'Collect results in scanningResults',
+    step7: 'finishScan() → fileScanningState.updateScanned()',
+    step8: 'update UI and chart with correct statistics',
+    step9: 'Show notification with accurate results'
 };
 
 /**
@@ -875,10 +920,16 @@ const MaintenanceGuide = {
  * המערכת מיועדת למפתחים בלבד ולא למשתמשי קצה,
  * ומספקת כלים מתקדמים לניהול איכות הקוד.
  *
- * @version 3.0.2
- * @lastUpdated 2025-01-18
+ * 🔧 תיקון חשוב (20 בינואר 2025):
+ * - תוקן חוסר התאמה בספירת קבצים בין שלבי הסריקה
+ * - נוספה מחלקת FileScanningState לניהול מצב הסריקה
+ * - הודעות לוג מדויקות לכל שלב (נמצאו/נבחרו/נסרקו)
+ * - הפרדה ברורה בין קבצים שנמצאו לקבצים שנסרקו
+ *
+ * @version 3.1.0
+ * @lastUpdated 2025-01-20
  * @maintainer AI Assistant
- * @change IndexedDB management system + comprehensive testing stage 2.5 added
+ * @change File scanning state management + accurate counting system
  */
 
 ### מבנה הקבצים

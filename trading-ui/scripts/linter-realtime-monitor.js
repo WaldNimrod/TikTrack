@@ -236,10 +236,13 @@ function getAllLogEntries() {
 // ========================================
 
 function updateFileTypeStatistics(issues) {
-    console.log('🔄 updateFileTypeStatistics called with issues:', issues.length);
+    console.log('🔄 updateFileTypeStatistics called with issues:', issues ? issues.length : 0);
     console.log('📁 window.projectFiles:', window.projectFiles);
     
     const stats = {};
+    
+    // Ensure issues is an array
+    const issuesArray = issues || [];
     
     // First, add all discovered files to stats (even those without issues)
     if (window.projectFiles) {
@@ -277,16 +280,18 @@ function updateFileTypeStatistics(issues) {
     }
     
     // Then add issues to the stats
-    issues.forEach(issue => {
-        const type = getFileType(issue.file);
-        if (!stats[type]) {
-            stats[type] = { files: 0, errors: 0, warnings: 0 };
-        }
-        
-        if (issue.type === 'error') {
-            stats[type].errors++;
-        } else if (issue.type === 'warning') {
-            stats[type].warnings++;
+    issuesArray.forEach(issue => {
+        if (issue && issue.file) {
+            const type = getFileType(issue.file);
+            if (!stats[type]) {
+                stats[type] = { files: 0, errors: 0, warnings: 0 };
+            }
+            
+            if (issue.type === 'error') {
+                stats[type].errors++;
+            } else if (issue.type === 'warning') {
+                stats[type].warnings++;
+            }
         }
     });
     
@@ -347,7 +352,7 @@ function updateFileTypeStatistics(issues) {
     });
     
     // Update problem files table
-    updateProblemFilesTable(stats);
+    updateProblemFilesTable();
 }
 
 function updateFileTypeCardsProgress() {
@@ -434,51 +439,59 @@ function getFileType(fileName) {
 }
 
 function updateProblemFilesTable(stats) {
-    const tableBody = document.querySelector('#problemFilesTable tbody');
+    const tableBody = document.getElementById('problemFilesTableBody');
     if (!tableBody) return;
     
     tableBody.innerHTML = '';
     
-    const problemFiles = [];
+    // Get all issues from scanning results
+    const allIssues = (window.scanningResults?.errors || []).concat(window.scanningResults?.warnings || []);
     
-    // Collect files with issues
-    Object.keys(stats).forEach(type => {
-        const stat = stats[type];
-        if (stat.errors > 0 || stat.warnings > 0) {
-            problemFiles.push({
-                type: type,
-                files: stat.files,
-                errors: stat.errors,
-                warnings: stat.warnings,
-                total: stat.errors + stat.warnings
-            });
-        }
-    });
-    
-    // Always show all file types, even if no issues
-    Object.keys(stats).forEach(type => {
-        const stat = stats[type];
-        if (stat.files > 0) {
-            const row = tableBody.insertRow();
-            const hasIssues = stat.errors > 0 || stat.warnings > 0;
-            const severity = stat.errors > 0 ? 'danger' : (stat.warnings > 0 ? 'warning' : 'success');
-            const statusText = hasIssues ? 'בעיות' : 'תקין';
-            
-            row.innerHTML = `
-                <td>${type.toUpperCase()}</td>
-                <td>${stat.files}</td>
-                <td>${stat.errors}</td>
-                <td>${stat.warnings}</td>
-                <td>${stat.errors + stat.warnings}</td>
-                <td><span class="badge bg-${severity}">${statusText}</span></td>
-            `;
-        }
-    });
-    
-    if (Object.keys(stats).length === 0) {
+    if (allIssues.length === 0) {
         const row = tableBody.insertRow();
-        row.innerHTML = `<td colspan="6" class="text-center">לא נמצאו קבצים לסריקה</td>`;
+        row.innerHTML = `<td colspan="6" class="text-center">אין קבצים בעייתיים - הכל תקין! 🎉</td>`;
+        return;
     }
+    
+    // Group issues by file
+    const filesWithIssues = {};
+    allIssues.forEach(issue => {
+        if (!filesWithIssues[issue.file]) {
+            filesWithIssues[issue.file] = {
+                file: issue.file,
+                errors: 0,
+                warnings: 0,
+                total: 0,
+                type: getFileType(issue.file)
+            };
+        }
+        
+        if (issue.type === 'error') {
+            filesWithIssues[issue.file].errors++;
+        } else if (issue.type === 'warning') {
+            filesWithIssues[issue.file].warnings++;
+        }
+        filesWithIssues[issue.file].total++;
+    });
+    
+    // Convert to array and sort by total issues (descending)
+    const sortedFiles = Object.values(filesWithIssues).sort((a, b) => b.total - a.total);
+    
+    // Display files with issues
+    sortedFiles.forEach(fileInfo => {
+        const row = tableBody.insertRow();
+        const severity = fileInfo.errors > 0 ? 'danger' : 'warning';
+        const severityText = fileInfo.errors > 0 ? 'קריטי' : 'אזהרה';
+        
+        row.innerHTML = `
+            <td>${fileInfo.file}</td>
+            <td>${fileInfo.type.toUpperCase()}</td>
+            <td>${fileInfo.errors}</td>
+            <td>${fileInfo.warnings}</td>
+            <td>${fileInfo.total}</td>
+            <td><span class="badge bg-${severity}">${severityText}</span></td>
+        `;
+    });
 }
 
 // ========================================
@@ -486,8 +499,6 @@ function updateProblemFilesTable(stats) {
 // ========================================
 
 async function startFileScan() {
-    console.log('🚀 startFileScan called!');
-    addLogEntry('INFO', 'startFileScan נקראה!');
     
     // Check if analysis functions are loaded
     if (typeof window.analyzeFileContent !== 'function') {
@@ -504,8 +515,6 @@ async function startFileScan() {
         }
     }
     
-    addLogEntry('SUCCESS', 'מודולי ניתוח הקבצים זמינים - מתחיל סריקה');
-    console.log('✅ Analysis functions are available');
     
     // Reset scanning results
     window.scanningResults = {
@@ -541,7 +550,6 @@ async function startFileScan() {
     if (totalFilesElement) totalFilesElement.textContent = '0';
     if (overallStatusElement) overallStatusElement.textContent = 'מתחיל סריקה...';
     
-    addLogEntry('INFO', 'מתחיל סריקת קבצים...');
     
     // Start scanning
     await scanJavaScriptFiles();
@@ -549,15 +557,12 @@ async function startFileScan() {
 
 async function scanJavaScriptFiles() {
     console.log('🚀 scanJavaScriptFiles called!');
-    addLogEntry('INFO', 'scanJavaScriptFiles נקראה!');
     
     const selectedTypes = getSelectedFileTypes();
-    addLogEntry('INFO', `סוגי קבצים נבחרים: ${selectedTypes.join(', ')}`);
     console.log('🔍 Selected types:', selectedTypes);
     
     // אם לא נבחרו סוגי קבצים, נבחר את כולם
     if (selectedTypes.length === 0) {
-        addLogEntry('WARNING', 'לא נבחרו סוגי קבצים - בוחר את כולם');
         selectedTypes.push('js', 'html', 'css', 'python', 'other');
     }
     
@@ -568,19 +573,15 @@ async function scanJavaScriptFiles() {
     if (typeof window.projectFilesScanner !== 'undefined') {
         try {
             console.log('🔍 Using global project files scanner...');
-            addLogEntry('INFO', 'משתמש בסורק קבצי הפרויקט הגלובלי...');
             console.log('🔍 About to call getProjectFiles...');
-            addLogEntry('INFO', 'קורא לפונקציה getProjectFiles...');
             const projectFiles = await Promise.race([
                 window.projectFilesScanner.getProjectFiles(),
                 new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout after 10 seconds')), 10000))
             ]);
             console.log('🔍 getProjectFiles completed, got:', projectFiles);
-            addLogEntry('INFO', 'getProjectFiles הושלמה בהצלחה');
             console.log('🔍 Project files received:', projectFiles);
             console.log('🔍 Project files keys:', Object.keys(projectFiles));
             console.log('🔍 Project files counts:', Object.keys(projectFiles).map(k => `${k}: ${projectFiles[k]?.length || 0}`));
-            addLogEntry('INFO', `קיבלתי ${Object.keys(projectFiles).length} סוגי קבצים מהסורק`);
             
             // Store in global variable for statistics
             window.projectFiles = projectFiles;
@@ -607,32 +608,26 @@ async function scanJavaScriptFiles() {
             });
             
             console.log('🔍 Files to scan:', filesToScan.length);
-            addLogEntry('INFO', `נמצאו ${allFiles.length} קבצים בסך הכל, ${filesToScan.length} מתאימים לסריקה`);
         } catch (error) {
-            addLogEntry('ERROR', 'שגיאה בטעינת קבצי הפרויקט מהמנגנון הגלובלי', { error: error.message });
             console.error('🔍 Error getting project files:', error);
             // Fall back to static lists
                 }
-            } else {
-        addLogEntry('ERROR', 'סורק קבצי הפרויקט הגלובלי לא זמין');
+        } else {
         console.error('🔍 projectFilesScanner not available');
     }
     
     // Fallback to static lists if global scanner not available or failed
     if (filesToScan.length === 0) {
-        addLogEntry('WARNING', 'נכשל בקבלת קבצים מהסורק - עובר לרשימה סטטית');
         console.log('🔍 Fallback to static files...');
         
         // Try direct API call as fallback
         try {
             console.log('🔍 Trying direct API call...');
-            addLogEntry('INFO', 'מנסה קריאה ישירה ל-API...');
             
             const response = await fetch('/api/v1/files/discover');
             if (response.ok) {
                 const data = await response.json();
                 console.log('🔍 Direct API call successful:', data);
-                addLogEntry('SUCCESS', `API ישיר הצליח - ${data.total_files} קבצים`);
                 
                 if (data.success && data.files) {
                     const allFiles = [];
@@ -648,16 +643,13 @@ async function scanJavaScriptFiles() {
                     });
                     
                     console.log('🔍 Direct API - Files to scan:', filesToScan.length);
-                    addLogEntry('INFO', `API ישיר - ${filesToScan.length} קבצים לסריקה`);
                 }
             }
         } catch (apiError) {
             console.error('🔍 Direct API call failed:', apiError);
-            addLogEntry('ERROR', 'קריאה ישירה ל-API נכשלה: ' + apiError.message);
         }
         
         // No static fallback - stop with clear error message
-        addLogEntry('ERROR', 'לא ניתן למצוא קבצים לסריקה - הסריקה נעצרת');
         console.error('🔍 No files found for scanning - stopping');
         
         // Reset UI and stop scanning
@@ -671,12 +663,10 @@ async function scanJavaScriptFiles() {
     }
 
     window.scanningResults.totalFiles = filesToScan.length;
-    addLogEntry('INFO', `נמצאו ${filesToScan.length} קבצים לסריקה`);
     console.log('🔍 About to scan files:', filesToScan.slice(0, 5));
     
     // Scan each file sequentially to avoid overwhelming the system
     console.log('🔍 Starting sequential file scanning...');
-    addLogEntry('INFO', `מתחיל סריקה רציפה של ${filesToScan.length} קבצים`);
     
     // Process files one by one to avoid overwhelming the system
     for (let i = 0; i < filesToScan.length; i++) {
@@ -685,9 +675,8 @@ async function scanJavaScriptFiles() {
         
         try {
             await scanSingleFile(fileName);
-        } catch (error) {
+    } catch (error) {
             console.error(`❌ Error scanning file ${fileName}:`, error);
-            addLogEntry('ERROR', `שגיאה בסריקת קובץ ${fileName}`, { error: error.message });
             
             // Count as scanned to avoid infinite loops
             window.scanningResults.scannedFiles++;
@@ -702,7 +691,6 @@ async function scanJavaScriptFiles() {
     
     // Finish scanning after all files are processed
     console.log('🔍 All files processed, finishing scan...');
-    addLogEntry('INFO', 'כל הקבצים עובדו - מסיים סריקה');
     await finishScan();
 }
 
@@ -758,10 +746,9 @@ async function scanSingleFile(fileName) {
     
     // Skip files that are known to be problematic
     if (skipFiles.some(skip => fileName.includes(skip))) {
-        addLogEntry('INFO', `מדלג על קובץ: ${fileName} (קובץ לא נגיש או גיבוי)`);
         return;
     }
-    
+
     // Check scan options from UI
     const skipBackupFolders = document.getElementById('skipBackupFolders')?.checked ?? true;
     const skipTestFiles = document.getElementById('skipTestFiles')?.checked ?? true;
@@ -784,7 +771,6 @@ async function scanSingleFile(fileName) {
         fileName.includes('README') ||
         fileName.includes('CHANGELOG') ||
         fileName.includes('LICENSE'))) {
-        addLogEntry('INFO', `מדלג על קובץ: ${fileName} (קובץ תיעוד)`);
         return;
     }
     
@@ -794,7 +780,6 @@ async function scanSingleFile(fileName) {
         fileName.includes('backups/') ||
         fileName.includes('_backup') ||
         fileName.includes('_BACKUP'))) {
-        addLogEntry('INFO', `מדלג על קובץ: ${fileName} (קובץ גיבוי)`);
         return;
     }
     
@@ -806,7 +791,6 @@ async function scanSingleFile(fileName) {
         fileName.includes('spec/') ||
         fileName.includes('tests/') ||
         fileName.includes('__tests__/'))) {
-        addLogEntry('INFO', `מדלג על קובץ: ${fileName} (קובץ בדיקה)`);
         return;
     }
     
@@ -846,8 +830,7 @@ async function scanSingleFile(fileName) {
             case 'js':
                 if (typeof window.analyzeFileContent === 'function') {
                     window.analyzeFileContent(cleanFileName, content);
-                } else {
-                    addLogEntry('WARNING', `מודול ניתוח JS לא נטען - מדלג על ניתוח קובץ ${cleanFileName}`);
+    } else {
                     window.scanningResults.scannedFiles++;
                 }
                 break;
@@ -855,7 +838,6 @@ async function scanSingleFile(fileName) {
                 if (typeof window.analyzeHtmlContent === 'function') {
                     window.analyzeHtmlContent(cleanFileName, content);
                 } else {
-                    addLogEntry('WARNING', `מודול ניתוח HTML לא נטען - מדלג על ניתוח קובץ ${cleanFileName}`);
                     window.scanningResults.scannedFiles++;
                 }
                 break;
@@ -863,7 +845,6 @@ async function scanSingleFile(fileName) {
                 if (typeof window.analyzeCssContent === 'function') {
                     window.analyzeCssContent(cleanFileName, content);
                 } else {
-                    addLogEntry('WARNING', `מודול ניתוח CSS לא נטען - מדלג על ניתוח קובץ ${cleanFileName}`);
                     window.scanningResults.scannedFiles++;
                 }
                 break;
@@ -871,7 +852,6 @@ async function scanSingleFile(fileName) {
                 if (typeof window.analyzePythonContent === 'function') {
                     window.analyzePythonContent(cleanFileName, content);
                 } else {
-                    addLogEntry('WARNING', `מודול ניתוח Python לא נטען - מדלג על ניתוח קובץ ${cleanFileName}`);
                     window.scanningResults.scannedFiles++;
                 }
                 break;
@@ -879,7 +859,6 @@ async function scanSingleFile(fileName) {
                 if (typeof window.analyzeOtherContent === 'function') {
                     window.analyzeOtherContent(cleanFileName, content);
                 } else {
-                    addLogEntry('WARNING', `מודול ניתוח Other לא נטען - מדלג על ניתוח קובץ ${cleanFileName}`);
                     window.scanningResults.scannedFiles++;
                 }
                 break;
@@ -890,9 +869,7 @@ async function scanSingleFile(fileName) {
         
     } catch (error) {
         if (error.message.includes('404')) {
-            addLogEntry('WARNING', `קובץ לא נמצא: ${cleanFileName} - מדלג`);
         } else {
-            addLogEntry('ERROR', `שגיאה בקריאת קובץ ${cleanFileName}`, { error: error.message });
         }
         // Count as scanned to avoid infinite loops
         window.scanningResults.scannedFiles++;
@@ -931,7 +908,7 @@ function updateRealtimeProgress() {
                 overallStatusElement.textContent = 'סריקה הושלמה';
             }
             console.log(`✅ Updated overallStatus to: ${overallStatusElement.textContent}`);
-        } else {
+                } else {
             console.warn('❌ overallStatus element not found');
         }
         
@@ -950,7 +927,7 @@ function updateRealtimeProgress() {
         if (warningCountElement) {
             warningCountElement.textContent = window.scanningResults.warnings.length;
             console.log(`✅ Updated totalWarningsStats to ${window.scanningResults.warnings.length}`);
-        } else {
+            } else {
             console.warn('❌ totalWarningsStats element not found');
         }
         
@@ -968,6 +945,9 @@ function updateRealtimeProgress() {
         // Force update of file type cards with current scan progress
         updateFileTypeCardsProgress();
         
+        // Update problem files table in real-time
+        updateProblemFilesTable();
+        
         // Update scan button text with progress
         const scanButton = document.getElementById('startScan');
         if (scanButton) {
@@ -977,7 +957,6 @@ function updateRealtimeProgress() {
         // Add progress log entry every 10 files or at completion
         if (window.scanningResults.scannedFiles % 10 === 0 || 
             window.scanningResults.scannedFiles === window.scanningResults.totalFiles) {
-            addLogEntry('INFO', `נסרקו ${window.scanningResults.scannedFiles}/${window.scanningResults.totalFiles} קבצים (${progress}%) - ${window.scanningResults.errors.length} שגיאות, ${window.scanningResults.warnings.length} אזהרות`);
         }
     } catch (error) {
         console.error('Error updating real-time progress:', error);
@@ -994,9 +973,8 @@ async function finishScan() {
     const duration = (window.scanningResults.endTime - window.scanningResults.startTime) / 1000;
     
     addLogEntry('SUCCESS', `סריקה הושלמה! נסרקו ${window.scanningResults.scannedFiles} קבצים תוך ${duration.toFixed(1)} שניות`);
-    addLogEntry('INFO', `נמצאו ${window.scanningResults.errors.length} שגיאות ו-${window.scanningResults.warnings.length} אזהרות`);
-    
-    // Update statistics
+                
+                // Update statistics
     updateFileTypeStatistics(window.scanningResults.errors.concat(window.scanningResults.warnings));
     
     // Update UI
@@ -1043,9 +1021,7 @@ async function finishScan() {
             };
             
             await adapter.saveDataPoint(dataPoint);
-            addLogEntry('SUCCESS', 'נתוני הסריקה נשמרו ב-IndexedDB');
         } catch (error) {
-            addLogEntry('ERROR', 'שגיאה בשמירת נתוני הסריקה ב-IndexedDB', { error: error.message });
         }
     }
     
@@ -1056,9 +1032,7 @@ async function finishScan() {
                 getSelectedFileTypes(),
                 calculateTotalSize()
             );
-            addLogEntry('SUCCESS', 'נתוני הסריקה נשמרו ב-DataCollector');
         } catch (error) {
-            addLogEntry('ERROR', 'שגיאה בשמירת נתוני הסריקה ב-DataCollector', { error: error.message });
         }
     }
     
@@ -1078,9 +1052,7 @@ async function finishScan() {
             };
             
             chartRendererInstance.addDataPoint(latestDataPoint);
-            addLogEntry('SUCCESS', 'גרף עודכן עם נתוני הסריקה החדשים');
         } catch (error) {
-            addLogEntry('ERROR', 'שגיאה בעדכון הגרף', { error: error.message });
             console.error('Chart update error:', error);
         }
     }
@@ -1101,7 +1073,6 @@ function startAutoRefresh() {
         }
     }, 5 * 60 * 1000); // 5 minutes
     
-    addLogEntry('INFO', 'רענון אוטומטי הופעל (כל 5 דקות)');
 }
 
 // ========================================
@@ -1122,12 +1093,10 @@ function initializeControlButtons() {
             
             if (isMonitoring) {
         startAutoRefresh();
-                addLogEntry('SUCCESS', 'ניטור בזמן אמת הופעל');
     } else {
                 if (autoRefreshInterval) {
                     clearInterval(autoRefreshInterval);
                 }
-                addLogEntry('INFO', 'ניטור בזמן אמת הופסק');
             }
         });
     }
@@ -1303,11 +1272,9 @@ function monitorSecurity(entry) {
 }
 
 function attemptChartRecovery() {
-    addLogEntry('INFO', 'מנסה לשחזר את הגרף...');
     
     // הגרף כבר מאותחל כראוי - אין צורך באתחול חוזר
     if (chartRendererInstance && chartRendererInstance.isInitialized) {
-        addLogEntry('SUCCESS', 'הגרף כבר פועל כראוי');
         return;
     }
     
@@ -1315,15 +1282,12 @@ function attemptChartRecovery() {
     setTimeout(() => {
         try {
             initializeChart();
-            addLogEntry('SUCCESS', 'גרף שוחזר בהצלחה');
         } catch (error) {
-            addLogEntry('ERROR', 'שחזור הגרף נכשל', { error: error.message });
         }
     }, 2000);
 }
 
 function attemptStorageRecovery() {
-    addLogEntry('INFO', 'מנסה לשחזר את מערכת האחסון...');
     
     try {
         // Clear potentially corrupted data
@@ -1366,8 +1330,8 @@ function updateLogDisplay() {
                 <span class="log-time">${time}</span>
                 <span class="log-level">[${entry.level}]</span>
                 <span class="log-message">${entry.message}</span>
-                    </div>
-                `;
+        </div>
+    `;
     }).join('');
     
     // Scroll to bottom
@@ -1603,6 +1567,344 @@ document.addEventListener('DOMContentLoaded', function() {
     addLogEntry('INFO', 'DOM נטען - מאתחל מערכת...');
     initializeSession();
 });
+
+// ========================================
+// Auto Fix Tools
+// ========================================
+
+// Global tracking of fixed issues to prevent re-fixing
+window.fixedIssues = {
+    errors: new Set(),
+    warnings: new Set()
+};
+
+async function fixAllIssues() {
+    addLogEntry('INFO', 'מתחיל תיקון אוטומטי של כל הבעיות...');
+    
+    const totalIssues = window.scanningResults.errors.length + window.scanningResults.warnings.length;
+    if (totalIssues === 0) {
+        addLogEntry('INFO', 'אין בעיות לתיקון');
+        return;
+    }
+    
+    addLogEntry('INFO', `מתחיל תיקון ${totalIssues} בעיות - זה עלול לקחת זמן...`);
+    
+    let fixedCount = 0;
+    let failedCount = 0;
+    
+    // Fix errors first (more critical)
+    const totalErrors = window.scanningResults.errors.length;
+    for (let i = window.scanningResults.errors.length - 1; i >= 0; i--) {
+        const error = window.scanningResults.errors[i];
+        const issueId = `${error.file}:${error.line}:${error.message}`;
+        
+        if (window.fixedIssues.errors.has(issueId)) {
+            continue; // Already fixed
+        }
+        
+        // Show progress
+        const progress = Math.round(((totalErrors - i) / totalErrors) * 50); // 50% for errors
+        addLogEntry('INFO', `מתקן שגיאות... ${progress}% (${totalErrors - i}/${totalErrors})`);
+        
+        try {
+            const success = await fixSingleIssue(error);
+            if (success) {
+                window.fixedIssues.errors.add(issueId);
+                window.scanningResults.errors.splice(i, 1);
+                fixedCount++;
+    } else {
+                failedCount++;
+            }
+        } catch (err) {
+            addLogEntry('ERROR', `שגיאה בתיקון ${error.file}:${error.line}`, { error: err.message });
+            failedCount++;
+        }
+    }
+    
+    // Fix warnings
+    const totalWarnings = window.scanningResults.warnings.length;
+    for (let i = window.scanningResults.warnings.length - 1; i >= 0; i--) {
+        const warning = window.scanningResults.warnings[i];
+        const issueId = `${warning.file}:${warning.line}:${warning.message}`;
+        
+        if (window.fixedIssues.warnings.has(issueId)) {
+            continue; // Already fixed
+        }
+        
+        // Show progress
+        const progress = 50 + Math.round(((totalWarnings - i) / totalWarnings) * 50); // 50-100% for warnings
+        addLogEntry('INFO', `מתקן אזהרות... ${progress}% (${totalWarnings - i}/${totalWarnings})`);
+        
+        try {
+            const success = await fixSingleIssue(warning);
+            if (success) {
+                window.fixedIssues.warnings.add(issueId);
+                window.scanningResults.warnings.splice(i, 1);
+                fixedCount++;
+            } else {
+                failedCount++;
+            }
+        } catch (err) {
+            addLogEntry('ERROR', `שגיאה בתיקון ${warning.file}:${warning.line}`, { error: err.message });
+            failedCount++;
+        }
+    }
+    
+    // Update UI
+    updateRealtimeProgress();
+    updateProblemFilesTable();
+    
+    const successRate = totalIssues > 0 ? Math.round((fixedCount / totalIssues) * 100) : 0;
+    addLogEntry('SUCCESS', `תיקון הושלם! תוקנו ${fixedCount} בעיות מתוך ${totalIssues} (${successRate}% הצלחה)`);
+    
+    if (failedCount > 0) {
+        addLogEntry('WARNING', `${failedCount} בעיות לא תוקנו - נדרש תיקון ידני`);
+    }
+}
+
+async function fixAllErrors() {
+    addLogEntry('INFO', 'מתחיל תיקון אוטומטי של שגיאות בלבד...');
+    
+    if (window.scanningResults.errors.length === 0) {
+        addLogEntry('INFO', 'אין שגיאות לתיקון');
+        return;
+    }
+    
+    let fixedCount = 0;
+    let failedCount = 0;
+    
+    for (let i = window.scanningResults.errors.length - 1; i >= 0; i--) {
+        const error = window.scanningResults.errors[i];
+        const issueId = `${error.file}:${error.line}:${error.message}`;
+        
+        if (window.fixedIssues.errors.has(issueId)) {
+            continue;
+        }
+        
+        try {
+            const success = await fixSingleIssue(error);
+            if (success) {
+                window.fixedIssues.errors.add(issueId);
+                window.scanningResults.errors.splice(i, 1);
+                fixedCount++;
+            } else {
+                failedCount++;
+            }
+        } catch (err) {
+            addLogEntry('ERROR', `שגיאה בתיקון ${error.file}:${error.line}`, { error: err.message });
+            failedCount++;
+        }
+    }
+    
+    // Update UI
+    updateRealtimeProgress();
+    updateProblemFilesTable();
+    
+    const successRate = window.scanningResults.errors.length + fixedCount > 0 ? 
+        Math.round((fixedCount / (window.scanningResults.errors.length + fixedCount)) * 100) : 0;
+    addLogEntry('SUCCESS', `תיקון שגיאות הושלם! תוקנו ${fixedCount} שגיאות (${successRate}% הצלחה)`);
+}
+
+async function fixAllWarnings() {
+    addLogEntry('INFO', 'מתחיל תיקון אוטומטי של אזהרות בלבד...');
+    
+    if (window.scanningResults.warnings.length === 0) {
+        addLogEntry('INFO', 'אין אזהרות לתיקון');
+        return;
+    }
+    
+    let fixedCount = 0;
+    let failedCount = 0;
+    
+    for (let i = window.scanningResults.warnings.length - 1; i >= 0; i--) {
+        const warning = window.scanningResults.warnings[i];
+        const issueId = `${warning.file}:${warning.line}:${warning.message}`;
+        
+        if (window.fixedIssues.warnings.has(issueId)) {
+            continue;
+        }
+        
+        try {
+            const success = await fixSingleIssue(warning);
+            if (success) {
+                window.fixedIssues.warnings.add(issueId);
+                window.scanningResults.warnings.splice(i, 1);
+                fixedCount++;
+    } else {
+                failedCount++;
+            }
+        } catch (err) {
+            addLogEntry('ERROR', `שגיאה בתיקון ${warning.file}:${warning.line}`, { error: err.message });
+            failedCount++;
+        }
+    }
+    
+    // Update UI
+    updateRealtimeProgress();
+    updateProblemFilesTable();
+    
+    const successRate = window.scanningResults.warnings.length + fixedCount > 0 ? 
+        Math.round((fixedCount / (window.scanningResults.warnings.length + fixedCount)) * 100) : 0;
+    addLogEntry('SUCCESS', `תיקון אזהרות הושלם! תוקנו ${fixedCount} אזהרות (${successRate}% הצלחה)`);
+}
+
+async function ignoreAllIssues() {
+    addLogEntry('INFO', 'מתעלם מכל הבעיות...');
+    
+    const totalIssues = window.scanningResults.errors.length + window.scanningResults.warnings.length;
+    
+    // Clear all issues
+    window.scanningResults.errors = [];
+    window.scanningResults.warnings = [];
+    
+    // Update UI
+    updateRealtimeProgress();
+    updateProblemFilesTable();
+    
+    addLogEntry('SUCCESS', `הוסרו ${totalIssues} בעיות מהרשימה`);
+}
+
+function resetFixedIssues() {
+    window.fixedIssues.errors.clear();
+    window.fixedIssues.warnings.clear();
+    addLogEntry('SUCCESS', 'אופסו כל התיקונים - ניתן לתקן שוב');
+}
+
+async function saveFixedFile(fileName, content) {
+    try {
+        // Try to save via backend API first
+        const response = await fetch('/api/v1/files/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                file: fileName,
+                content: content
+            })
+        });
+        
+        if (response.ok) {
+            return true;
+        } else {
+            addLogEntry('WARNING', `שרת לא תומך בשמירת קבצים - ${response.status}`);
+            return false;
+        }
+    } catch (error) {
+        addLogEntry('WARNING', `לא ניתן לשמור קובץ ${fileName} - ${error.message}`);
+        return false;
+    }
+}
+
+async function fixSingleIssue(issue) {
+    try {
+        // Get file content
+        const response = await fetch(issue.file);
+        if (!response.ok) {
+            addLogEntry('WARNING', `לא ניתן לקרוא קובץ ${issue.file} לתיקון`);
+            return false;
+        }
+        
+        const content = await response.text();
+        const lines = content.split('\n');
+        
+        // Apply fix based on issue type
+        let fixed = false;
+        
+        if (issue.message.includes('console.log') || issue.message.includes('console.')) {
+            // Remove all console statements
+            const lineIndex = issue.line - 1;
+            if (lineIndex >= 0 && lineIndex < lines.length) {
+                const originalLine = lines[lineIndex];
+                lines[lineIndex] = lines[lineIndex].replace(/console\.(log|warn|error|info|debug)\([^)]*\);?/g, '');
+                // If line is now empty or only whitespace, remove it entirely
+                if (lines[lineIndex].trim() === '') {
+                    lines[lineIndex] = '';
+                }
+                fixed = true;
+            }
+        } else if (issue.message.includes('alert(')) {
+            // Replace alert with notification system
+            const lineIndex = issue.line - 1;
+            if (lineIndex >= 0 && lineIndex < lines.length) {
+                lines[lineIndex] = lines[lineIndex].replace(/alert\([^)]*\)/g, 'showNotification("הודעה", "info")');
+                fixed = true;
+            }
+        } else if (issue.message.includes('Missing semicolon') || issue.message.includes('semicolon')) {
+            // Add semicolon
+            const lineIndex = issue.line - 1;
+            if (lineIndex >= 0 && lineIndex < lines.length && !lines[lineIndex].endsWith(';')) {
+                lines[lineIndex] = lines[lineIndex].trim() + ';';
+                fixed = true;
+            }
+        } else if (issue.message.includes('Line too long') || issue.message.includes('too long')) {
+            // Split long lines (simplified)
+            const lineIndex = issue.line - 1;
+            if (lineIndex >= 0 && lineIndex < lines.length && lines[lineIndex].length > 150) {
+                // Simple split at comma or operator
+                const line = lines[lineIndex];
+                const splitPoint = line.lastIndexOf(',', 100) || line.lastIndexOf(' ', 100);
+                if (splitPoint > 50) {
+                    lines[lineIndex] = line.substring(0, splitPoint + 1) + '\n    ' + line.substring(splitPoint + 1);
+                    fixed = true;
+                }
+            }
+        } else if (issue.message.includes('var ') || issue.message.includes('let ') || issue.message.includes('const ')) {
+            // Fix variable declarations
+            const lineIndex = issue.line - 1;
+            if (lineIndex >= 0 && lineIndex < lines.length) {
+                let line = lines[lineIndex];
+                // Replace var with let
+                line = line.replace(/\bvar\b/g, 'let');
+                // Add semicolon if missing
+                if (!line.endsWith(';')) {
+                    line = line.trim() + ';';
+                }
+                lines[lineIndex] = line;
+                fixed = true;
+            }
+        } else if (issue.message.includes('unused') || issue.message.includes('unreachable')) {
+            // Remove unused code or unreachable code
+            const lineIndex = issue.line - 1;
+            if (lineIndex >= 0 && lineIndex < lines.length) {
+                lines[lineIndex] = '';
+                fixed = true;
+            }
+        } else if (issue.message.includes('indentation') || issue.message.includes('spacing')) {
+            // Fix indentation
+            const lineIndex = issue.line - 1;
+            if (lineIndex >= 0 && lineIndex < lines.length) {
+                const line = lines[lineIndex];
+                // Remove extra spaces and add proper indentation
+                const trimmed = line.trim();
+                const indent = '    '.repeat(Math.max(0, lineIndex > 0 ? 1 : 0));
+                lines[lineIndex] = indent + trimmed;
+                fixed = true;
+            }
+        }
+        
+        if (fixed) {
+            // Save fixed content back to file
+            const fixedContent = lines.join('\n');
+            const saveSuccess = await saveFixedFile(issue.file, fixedContent);
+            
+            if (saveSuccess) {
+                addLogEntry('SUCCESS', `תוקן ${issue.file}:${issue.line} - ${issue.message}`);
+                return true;
+            } else {
+                addLogEntry('ERROR', `לא ניתן לשמור קובץ ${issue.file} אחרי התיקון`);
+                return false;
+            }
+        } else {
+            addLogEntry('WARNING', `לא ניתן לתקן ${issue.file}:${issue.line} - ${issue.message}`);
+            return false;
+        }
+        
+    } catch (error) {
+        addLogEntry('ERROR', `שגיאה בתיקון ${issue.file}:${issue.line}`, { error: error.message });
+        return false;
+    }
+}
 
 // ========================================
 // Project Files Discovery

@@ -1611,6 +1611,56 @@ def discover_files():
             "total_files": 0
         }), 500
 
+@app.route("/api/v1/files/save", methods=["POST"])
+@rate_limit_api(requests_per_minute=10)
+def save_file():
+    """Save file content after auto-fix"""
+    try:
+        data = request.get_json()
+        
+        if not data or 'file' not in data or 'content' not in data:
+            return jsonify({
+                "success": False,
+                "error": "Missing file or content in request"
+            }), 400
+        
+        file_path = data['file']
+        content = data['content']
+        
+        # Get project root directory
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        
+        # Build full file path
+        full_path = os.path.join(project_root, file_path)
+        
+        # Security check - ensure file is within project directory
+        if not os.path.abspath(full_path).startswith(os.path.abspath(project_root)):
+            return jsonify({
+                "success": False,
+                "error": "File path outside project directory"
+            }), 403
+        
+        # Create directory if it doesn't exist
+        os.makedirs(os.path.dirname(full_path), exist_ok=True)
+        
+        # Write file content
+        with open(full_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+        
+        return jsonify({
+            "success": True,
+            "message": f"File {file_path} saved successfully",
+            "timestamp": datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error saving file: {e}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }), 500
+
 if __name__ == "__main__":
     # 🎯 **New Configuration - Flask-SocketIO Development Server**
     # 

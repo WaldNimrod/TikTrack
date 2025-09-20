@@ -15,8 +15,32 @@
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- TikTrack ITCSS Main CSS - אחרי Bootstrap כדי לדרוס אותו -->
-    <link rel="stylesheet" href="styles-new/main.css?v=v1.0.0">
+    <!-- TikTrack CSS - Unified CSS (No @import) -->
+    <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
+    <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=v1.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=v1.0.0">
 
     <!-- Header Styles - נפרד מ-ITCSS -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_level3_fix">
@@ -39,6 +63,9 @@
             <div class="d-flex justify-content-between align-items-center">
                 <h2><i class="bi bi-info-circle"></i> מידע כללי על ההעדפות</h2>
                 <div class="section-header-controls">
+                    <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט">
+                        <i class="fas fa-copy"></i> העתק לוג
+                    </button>
                     <button class="btn btn-outline-secondary btn-sm" onclick="window.toggleSection('infoSummary')" id="toggleInfoBtn">
                         <i class="bi bi-chevron-down"></i>
           </button>

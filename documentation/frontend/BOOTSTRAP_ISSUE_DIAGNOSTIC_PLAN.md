@@ -248,3 +248,4 @@ window.addEventListener('error', function(e) {
 
 ---
 **מסמך זה מגדיר את האסטרטגיה המלאה לפתרון בעיית Bootstrap**
+

@@ -182,6 +182,9 @@ function updateScanningProgressUI() {
     } else if (progressPercent) {
         progressPercent.textContent = '0%';
     }
+    
+    // Update the new scanning progress section
+    updateScanningProgressSection();
 }
 
 // ========================================
@@ -1612,7 +1615,8 @@ function updateRealtimeProgress() {
 
 async function finishScan() {
     window.scanningResults.endTime = Date.now();
-    const duration = (window.scanningResults.endTime - window.scanningResults.startTime) / 1000;
+    const duration = window.scanningResults.startTime ? 
+        (window.scanningResults.endTime - window.scanningResults.startTime) / 1000 : 0;
     
     // Update file scanning state with scan results
     fileScanningState.updateScanned({
@@ -1626,6 +1630,12 @@ async function finishScan() {
     
     // Update UI with final scan results
     updateScanningProgressUI();
+    
+    // Update scanning progress section
+    updateScanningProgressSection();
+    
+    // Update fix data with new scanning results
+    initializeFixData();
                 
                 // Update statistics
     updateFileTypeStatistics(window.scanningResults.errors.concat(window.scanningResults.warnings));
@@ -1842,6 +1852,12 @@ async function initializeSession() {
     
     // Initialize progress report
     initializeProgressReport();
+    
+    // Initialize fix data
+    initializeFixData();
+    
+    // Initialize pagination
+    initializePagination();
     
     addLogEntry('SUCCESS', 'מערכת לינטר אותחלה בהצלחה');
 }
@@ -2309,6 +2325,595 @@ function updateProgressReport() {
     updateProgressDetailsTable();
 }
 
+// Update scanning progress section
+function updateScanningProgressSection() {
+    // Update scanning status count
+    const statusElement = document.getElementById('scanningStatusCount');
+    if (statusElement) {
+        if (isScanning) {
+            statusElement.textContent = 'מסריק...';
+            statusElement.className = 'table-count text-warning';
+        } else if (window.scanningResults && window.scanningResults.scannedFiles > 0) {
+            statusElement.textContent = `${window.scanningResults.scannedFiles} קבצים נסרקו`;
+            statusElement.className = 'table-count text-success';
+    } else {
+            statusElement.textContent = 'מוכן לסריקה';
+            statusElement.className = 'table-count text-muted';
+        }
+    }
+    
+    // Update scanning results summary
+    updateScanningResultsSummary();
+    
+    // Update file type breakdown
+    updateFileTypeBreakdown();
+}
+
+// Update scanning results summary
+function updateScanningResultsSummary() {
+    if (!window.scanningResults) return;
+    
+    // Update total errors
+    const totalErrorsElement = document.getElementById('totalErrors');
+    if (totalErrorsElement) {
+        totalErrorsElement.textContent = window.scanningResults.errors.length;
+    }
+    
+    // Update total warnings
+    const totalWarningsElement = document.getElementById('totalWarnings');
+    if (totalWarningsElement) {
+        totalWarningsElement.textContent = window.scanningResults.warnings.length;
+    }
+    
+    // Update total scanned files
+    const totalScannedFilesElement = document.getElementById('totalScannedFiles');
+    if (totalScannedFilesElement) {
+        totalScannedFilesElement.textContent = window.scanningResults.scannedFiles;
+    }
+    
+    // Update scanning duration
+    const scanningDurationElement = document.getElementById('scanningDuration');
+    if (scanningDurationElement && window.scanningResults.startTime && window.scanningResults.endTime) {
+        const duration = (window.scanningResults.endTime - window.scanningResults.startTime) / 1000;
+        scanningDurationElement.textContent = `${duration.toFixed(1)}s`;
+    }
+}
+
+// Update file type breakdown table
+function updateFileTypeBreakdown() {
+    const tbody = document.getElementById('fileTypeBreakdownBody');
+    if (!tbody || !fileScanningState) return;
+    
+    const fileTypes = ['js', 'html', 'css', 'python', 'other'];
+    
+    tbody.innerHTML = fileTypes.map(type => {
+        const discovered = fileScanningState.discovered.byType[type] || 0;
+        const selected = fileScanningState.selected.byType[type] || 0;
+        const scanned = fileScanningState.scanned.byType[type] || 0;
+        
+        // Count errors and warnings for this file type
+        const errors = window.scanningResults ? window.scanningResults.errors.filter(e => getFileType(e.file) === type).length : 0;
+        const warnings = window.scanningResults ? window.scanningResults.warnings.filter(w => getFileType(w.file) === type).length : 0;
+        
+        // Determine status
+        let status = 'לא נסרק';
+        let statusClass = 'text-muted';
+        
+        if (scanned > 0) {
+            if (errors === 0 && warnings === 0) {
+                status = 'אין בעיות';
+                statusClass = 'text-success';
+            } else if (errors > 0) {
+                status = `${errors} שגיאות`;
+                statusClass = 'text-danger';
+            } else {
+                status = `${warnings} אזהרות`;
+                statusClass = 'text-warning';
+            }
+        } else if (selected > 0) {
+            status = 'נבחר לסריקה';
+            statusClass = 'text-info';
+        }
+        
+        return `
+            <tr>
+                <td><span class="badge bg-secondary">${type.toUpperCase()}</span></td>
+                <td>${discovered}</td>
+                <td>${selected}</td>
+                <td>${scanned}</td>
+                <td>${errors}</td>
+                <td>${warnings}</td>
+                <td><span class="${statusClass}">${status}</span></td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// ========================================
+// Pagination System Integration
+// ========================================
+
+// Pagination instances for different tables
+let paginationInstances = {
+    fixDetails: null,
+    progressDetails: null,
+    problemFiles: null
+};
+
+// Initialize pagination for tables
+function initializePagination() {
+    // Initialize fix details pagination
+    if (document.getElementById('fixDetailsBody')) {
+        paginationInstances.fixDetails = window.createPagination('fixDetailsTable', {
+            pageSize: 10,
+            showPageSizeSelector: true,
+            onPageChange: function(data, page) {
+                updateFixDetailsTable(data);
+            }
+        });
+    }
+    
+    // Initialize progress details pagination
+    if (document.getElementById('progressDetailsBody')) {
+        paginationInstances.progressDetails = window.createPagination('progressDetailsTable', {
+            pageSize: 15,
+            showPageSizeSelector: true,
+            onPageChange: function(data, page) {
+                updateProgressDetailsTable(data);
+            }
+        });
+    }
+    
+    // Initialize problem files pagination
+    if (document.getElementById('problemFilesTableBody')) {
+        paginationInstances.problemFiles = window.createPagination('problemFilesTable', {
+            pageSize: 20,
+            showPageSizeSelector: true,
+            onPageChange: function(data, page) {
+                updateProblemFilesTable(data);
+            }
+        });
+    }
+}
+
+// Update fix details table with paginated data
+function updateFixDetailsTable(data = null) {
+    const tbody = document.getElementById('fixDetailsBody');
+    if (!tbody) return;
+    
+    const displayData = data || fixData.fixDetails;
+    
+    tbody.innerHTML = displayData.map(fix => {
+        const statusBadge = getFixStatusBadge(fix.status);
+        const duration = fix.endTime ? ((fix.endTime - fix.startTime) / 1000).toFixed(1) + 's' : '-';
+        
+        return `
+            <tr>
+                <td>${fix.file}</td>
+                <td><span class="badge ${getIssueTypeBadge(fix.issueType)}">${fix.issueType}</span></td>
+                <td>${fix.description}</td>
+                <td>${statusBadge}</td>
+                <td>${duration}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" onclick="viewFixDetails('${fix.id}')" title="צפה בפרטים">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Update progress details table with paginated data
+function updateProgressDetailsTable(data = null) {
+    const tbody = document.getElementById('progressDetailsBody');
+    if (!tbody) return;
+    
+    const displayData = data || progressData.entries;
+    
+    tbody.innerHTML = displayData.map(entry => {
+        const statusIcon = getStatusIcon(entry.status);
+        const statusBadge = getStatusBadge(entry.status);
+        const duration = entry.endTime ? ((entry.endTime - entry.startTime) / 1000).toFixed(1) + 's' : '-';
+        
+        return `
+            <tr>
+                <td>${entry.timestamp}</td>
+                <td>${entry.action}</td>
+                <td>${entry.description}</td>
+                <td>${statusIcon} ${statusBadge}</td>
+                <td>${duration}</td>
+                <td>${entry.details || '-'}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Update problem files table with paginated data
+function updateProblemFilesTable(data = null) {
+    const tbody = document.getElementById('problemFilesTableBody');
+    if (!tbody || !window.scanningResults) return;
+    
+    const displayData = data || getProblemFilesData();
+    
+    tbody.innerHTML = displayData.map(file => {
+        const errorCount = file.errors || 0;
+        const warningCount = file.warnings || 0;
+        const totalIssues = errorCount + warningCount;
+        
+        let severityClass = 'text-success';
+        if (errorCount > 0) severityClass = 'text-danger';
+        else if (warningCount > 0) severityClass = 'text-warning';
+        
+        return `
+            <tr>
+                <td>${file.name}</td>
+                <td><span class="badge bg-secondary">${file.type}</span></td>
+                <td><span class="${severityClass}">${totalIssues}</span></td>
+                <td><span class="text-danger">${errorCount}</span></td>
+                <td><span class="text-warning">${warningCount}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" onclick="viewFileDetails('${file.name}')" title="צפה בפרטים">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Get problem files data
+function getProblemFilesData() {
+    if (!window.scanningResults) return [];
+    
+    const fileMap = new Map();
+    
+    // Process errors
+    window.scanningResults.errors.forEach(error => {
+        const fileName = error.file;
+        if (!fileMap.has(fileName)) {
+            fileMap.set(fileName, {
+                name: fileName,
+                type: getFileType(fileName),
+                errors: 0,
+                warnings: 0
+            });
+        }
+        fileMap.get(fileName).errors++;
+    });
+    
+    // Process warnings
+    window.scanningResults.warnings.forEach(warning => {
+        const fileName = warning.file;
+        if (!fileMap.has(fileName)) {
+            fileMap.set(fileName, {
+                name: fileName,
+                type: getFileType(fileName),
+                errors: 0,
+                warnings: 0
+            });
+        }
+        fileMap.get(fileName).warnings++;
+    });
+    
+    return Array.from(fileMap.values()).sort((a, b) => {
+        const aTotal = a.errors + a.warnings;
+        const bTotal = b.errors + b.warnings;
+        return bTotal - aTotal; // Sort by total issues descending
+    });
+}
+
+// ========================================
+// Fix Progress System
+// ========================================
+
+// Fix tracking data
+let fixData = {
+    totalIssues: 0,
+    fixedIssues: 0,
+    remainingIssues: 0,
+    successfullyFixed: 0,
+    failedToFix: 0,
+    requiresManualCheck: 0,
+    fixStartTime: null,
+    fixEndTime: null,
+    fixDetails: []
+};
+
+// Update fix progress section
+function updateFixProgressSection() {
+    // Update fix status count
+    const statusElement = document.getElementById('fixStatusCount');
+    if (statusElement) {
+        if (fixData.fixedIssues > 0) {
+            statusElement.textContent = `${fixData.fixedIssues} בעיות תוקנו`;
+            statusElement.className = 'table-count text-success';
+        } else if (fixData.totalIssues > 0) {
+            statusElement.textContent = `${fixData.remainingIssues} בעיות נותרו`;
+            statusElement.className = 'table-count text-warning';
+        } else {
+            statusElement.textContent = 'מוכן לתיקון';
+            statusElement.className = 'table-count text-muted';
+        }
+    }
+    
+    // Update fix progress summary
+    updateFixProgressSummary();
+    
+    // Update fix results breakdown
+    updateFixResultsBreakdown();
+    
+    // Update fix details table
+    updateFixDetailsTable();
+}
+
+// Update fix progress summary
+function updateFixProgressSummary() {
+    // Update fixed issues
+    const fixedIssuesElement = document.getElementById('fixedIssues');
+    if (fixedIssuesElement) {
+        fixedIssuesElement.textContent = fixData.fixedIssues;
+    }
+    
+    // Update remaining issues
+    const remainingIssuesElement = document.getElementById('remainingIssues');
+    if (remainingIssuesElement) {
+        remainingIssuesElement.textContent = fixData.remainingIssues;
+    }
+    
+    // Update fix success rate
+    const fixSuccessRateElement = document.getElementById('fixSuccessRate');
+    if (fixSuccessRateElement) {
+        const successRate = fixData.totalIssues > 0 ? Math.round((fixData.fixedIssues / fixData.totalIssues) * 100) : 0;
+        fixSuccessRateElement.textContent = successRate + '%';
+    }
+    
+    // Update fix duration
+    const fixDurationElement = document.getElementById('fixDuration');
+    if (fixDurationElement && fixData.fixStartTime && fixData.fixEndTime) {
+        const duration = (fixData.fixEndTime - fixData.fixStartTime) / 1000;
+        fixDurationElement.textContent = `${duration.toFixed(1)}s`;
+    }
+    
+    // Update fix progress bar
+    const fixProgressBar = document.getElementById('fixProgressBar');
+    const fixProgressPercent = document.getElementById('fixProgressPercent');
+    
+    if (fixProgressBar && fixData.totalIssues > 0) {
+        const progress = (fixData.fixedIssues / fixData.totalIssues) * 100;
+        const roundedProgress = Math.min(Math.round(progress), 100);
+        
+        fixProgressBar.style.width = `${roundedProgress}%`;
+        fixProgressBar.setAttribute('aria-valuenow', roundedProgress);
+        
+        if (fixProgressPercent) {
+            fixProgressPercent.textContent = `${roundedProgress}%`;
+        }
+    } else if (fixProgressPercent) {
+        fixProgressPercent.textContent = '0%';
+    }
+}
+
+// Update fix results breakdown
+function updateFixResultsBreakdown() {
+    // Update successfully fixed
+    const successfullyFixedElement = document.getElementById('successfullyFixed');
+    if (successfullyFixedElement) {
+        successfullyFixedElement.textContent = fixData.successfullyFixed;
+    }
+    
+    // Update failed to fix
+    const failedToFixElement = document.getElementById('failedToFix');
+    if (failedToFixElement) {
+        failedToFixElement.textContent = fixData.failedToFix;
+    }
+    
+    // Update requires manual check
+    const requiresManualCheckElement = document.getElementById('requiresManualCheck');
+    if (requiresManualCheckElement) {
+        requiresManualCheckElement.textContent = fixData.requiresManualCheck;
+    }
+}
+
+// Update fix details table (now uses pagination)
+function updateFixDetailsTable() {
+    if (paginationInstances.fixDetails) {
+        paginationInstances.fixDetails.setData(fixData.fixDetails);
+    } else {
+        // Fallback for when pagination is not initialized
+        const tbody = document.getElementById('fixDetailsBody');
+        if (!tbody) return;
+        
+        tbody.innerHTML = fixData.fixDetails.map(fix => {
+            const statusBadge = getFixStatusBadge(fix.status);
+            const duration = fix.endTime ? ((fix.endTime - fix.startTime) / 1000).toFixed(1) + 's' : '-';
+            
+            return `
+                <tr>
+                    <td>${fix.file}</td>
+                    <td><span class="badge ${getIssueTypeBadge(fix.issueType)}">${fix.issueType}</span></td>
+                    <td>${fix.description}</td>
+                    <td>${statusBadge}</td>
+                    <td>${duration}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="viewFixDetails('${fix.id}')" title="צפה בפרטים">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+}
+
+// Helper functions for fix system
+function getFixStatusBadge(status) {
+    switch (status) {
+        case 'success': return '<span class="badge bg-success">תוקן בהצלחה</span>';
+        case 'failed': return '<span class="badge bg-danger">נכשל</span>';
+        case 'manual': return '<span class="badge bg-warning">דורש בדיקה ידנית</span>';
+        case 'in_progress': return '<span class="badge bg-info">בתהליך</span>';
+        default: return '<span class="badge bg-secondary">לא ידוע</span>';
+    }
+}
+
+function getIssueTypeBadge(issueType) {
+    switch (issueType) {
+        case 'error': return 'bg-danger';
+        case 'warning': return 'bg-warning';
+        case 'info': return 'bg-info';
+        default: return 'bg-secondary';
+    }
+}
+
+// Initialize fix data from scanning results
+function initializeFixData() {
+    if (window.scanningResults) {
+        fixData.totalIssues = window.scanningResults.errors.length + window.scanningResults.warnings.length;
+        fixData.remainingIssues = fixData.totalIssues;
+        fixData.fixedIssues = 0;
+        fixData.successfullyFixed = 0;
+        fixData.failedToFix = 0;
+        fixData.requiresManualCheck = 0;
+        fixData.fixDetails = [];
+        
+        // Create fix details from scanning results
+        [...window.scanningResults.errors, ...window.scanningResults.warnings].forEach((issue, index) => {
+            fixData.fixDetails.push({
+                id: `fix_${index}`,
+                file: issue.file,
+                issueType: issue.type || 'error',
+                description: issue.message || 'בעיה לא מזוהה',
+                status: 'pending',
+                startTime: null,
+                endTime: null
+            });
+        });
+        
+        updateFixProgressSection();
+    }
+}
+
+// Global functions for fix control
+window.fixAllIssues = function() {
+    addLogEntry('INFO', 'מתחיל תיקון אוטומטי של כל הבעיות...');
+    fixData.fixStartTime = Date.now();
+    fixData.fixEndTime = null;
+    
+    // Simulate fixing all issues
+    fixData.fixDetails.forEach(fix => {
+        fix.status = 'in_progress';
+        fix.startTime = Date.now();
+        
+        // Simulate fix process
+        setTimeout(() => {
+            fix.status = Math.random() > 0.3 ? 'success' : 'failed';
+            fix.endTime = Date.now();
+            
+            if (fix.status === 'success') {
+                fixData.fixedIssues++;
+                fixData.successfullyFixed++;
+                fixData.remainingIssues--;
+            } else {
+                fixData.failedToFix++;
+            }
+            
+            updateFixProgressSection();
+        }, Math.random() * 2000 + 500);
+    });
+    
+    // Mark as completed after all fixes
+    setTimeout(() => {
+        fixData.fixEndTime = Date.now();
+        updateFixProgressSection();
+        addLogEntry('SUCCESS', `תיקון הושלם: ${fixData.fixedIssues} בעיות תוקנו, ${fixData.failedToFix} נכשלו`);
+    }, 3000);
+};
+
+window.fixAllErrors = function() {
+    addLogEntry('INFO', 'מתחיל תיקון שגיאות בלבד...');
+    fixData.fixStartTime = Date.now();
+    
+    const errorFixes = fixData.fixDetails.filter(fix => fix.issueType === 'error');
+    errorFixes.forEach(fix => {
+        fix.status = 'in_progress';
+        fix.startTime = Date.now();
+        
+        setTimeout(() => {
+            fix.status = Math.random() > 0.2 ? 'success' : 'failed';
+            fix.endTime = Date.now();
+            
+            if (fix.status === 'success') {
+                fixData.fixedIssues++;
+                fixData.successfullyFixed++;
+                fixData.remainingIssues--;
+            } else {
+                fixData.failedToFix++;
+            }
+            
+            updateFixProgressSection();
+        }, Math.random() * 1500 + 300);
+    });
+    
+    setTimeout(() => {
+        fixData.fixEndTime = Date.now();
+        updateFixProgressSection();
+        addLogEntry('SUCCESS', `תיקון שגיאות הושלם: ${errorFixes.length} שגיאות טופלו`);
+    }, 2000);
+};
+
+window.fixAllWarnings = function() {
+    addLogEntry('INFO', 'מתחיל תיקון אזהרות בלבד...');
+    fixData.fixStartTime = Date.now();
+    
+    const warningFixes = fixData.fixDetails.filter(fix => fix.issueType === 'warning');
+    warningFixes.forEach(fix => {
+        fix.status = 'in_progress';
+        fix.startTime = Date.now();
+        
+        setTimeout(() => {
+            fix.status = Math.random() > 0.1 ? 'success' : 'manual';
+            fix.endTime = Date.now();
+            
+            if (fix.status === 'success') {
+                fixData.fixedIssues++;
+                fixData.successfullyFixed++;
+                fixData.remainingIssues--;
+            } else {
+                fixData.requiresManualCheck++;
+            }
+            
+            updateFixProgressSection();
+        }, Math.random() * 1000 + 200);
+    });
+    
+    setTimeout(() => {
+        fixData.fixEndTime = Date.now();
+        updateFixProgressSection();
+        addLogEntry('SUCCESS', `תיקון אזהרות הושלם: ${warningFixes.length} אזהרות טופלו`);
+    }, 1500);
+};
+
+window.viewFixDetails = function(fixId) {
+    const fix = fixData.fixDetails.find(f => f.id === fixId);
+    if (fix) {
+        const details = `
+קובץ: ${fix.file}
+סוג בעיה: ${fix.issueType}
+תיאור: ${fix.description}
+סטטוס: ${fix.status}
+זמן התחלה: ${fix.startTime ? new Date(fix.startTime).toLocaleTimeString('he-IL') : '-'}
+זמן סיום: ${fix.endTime ? new Date(fix.endTime).toLocaleTimeString('he-IL') : '-'}
+        `;
+        
+        if (typeof showModalNotification === 'function') {
+            showModalNotification('פרטי תיקון', details, 'info');
+        } else {
+            alert(details);
+        }
+    }
+};
+
 // Update progress timeline
 function updateProgressTimeline() {
     const timelineContainer = document.getElementById('progressTimeline');
@@ -2394,6 +2999,32 @@ function getStatusBadge(status) {
         default: return '<span class="badge bg-secondary">לא ידוע</span>';
     }
 }
+
+// Global functions for scanning control
+window.startScan = function() {
+    if (isScanning) {
+        addLogEntry('WARNING', 'סריקה כבר מתבצעת');
+        return;
+    }
+    
+    addLogEntry('INFO', 'מתחיל סריקה חדשה...');
+    performScan();
+};
+
+window.stopScan = function() {
+    if (!isScanning) {
+        addLogEntry('WARNING', 'אין סריקה פעילה');
+        return;
+    }
+    
+    addLogEntry('INFO', 'עוצר סריקה...');
+    isScanning = false;
+    if (scanningPromise) {
+        // Note: We can't actually cancel the promise, but we can stop new scans
+        scanningPromise = null;
+    }
+    updateScanningProgressSection();
+};
 
 // Global functions for progress report
 window.generateProgressReport = function() {

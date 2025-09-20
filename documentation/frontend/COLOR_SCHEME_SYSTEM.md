@@ -11,6 +11,7 @@
 - **תחזוקה קשה**: צורך לעדכן צבעים במקומות רבים
 - **חוסר עקביות**: עיצוב שונה לאותם אלמנטים
 - **קושי בהוספת ישויות חדשות**: צורך להגדיר צבעים בכל עמוד בנפרד
+- **סינכרון עם העדפות**: חיבור מלא למערכת ההעדפות של המשתמש
 
 ## 🏗️ ארכיטקטורה
 
@@ -26,8 +27,15 @@ color-scheme-system.js
 ├── מפתחות צבעים
 ├── פונקציות עזר
 ├── יצירת CSS דינמי
+├── חיבור למערכת ההעדפות
 └── ייצוא לפונקציות גלובליות
 ```
+
+### חיבור למערכת ההעדפות
+המערכת מחוברת באופן מלא למערכת ההעדפות של המשתמש:
+- **טעינה אוטומטית**: צבעים נטענים אוטומטית מההעדפות
+- **עדכון דינמי**: שינויים בהעדפות מתעדכנים מיד בממשק
+- **סינכרון מלא**: כל 38 משתני הצבעים מסונכרנים עם ההעדפות
 
 ## 🎨 סוגי ישויות נתמכים
 
@@ -62,6 +70,58 @@ color-scheme-system.js
 | **`design`** | `#495057` | `rgba(73, 80, 87, 0.1)` | `#343a40` | `rgba(73, 80, 87, 0.3)` |
 | **`research`** | `#343a40` | `rgba(52, 58, 64, 0.1)` | `#212529` | `rgba(52, 58, 64, 0.3)` |
 | **`preference`** | `#adb5bd` | `rgba(173, 181, 189, 0.1)` | `#6c757d` | `rgba(173, 181, 189, 0.3)` |
+
+## 🔗 חיבור למערכת ההעדפות
+
+### משתני צבעים נתמכים (38 משתנים)
+
+המערכת מטפלת בכל 38 משתני הצבעים הקיימים במערכת ההעדפות:
+
+#### צבעים בסיסיים (6 משתנים)
+- `primaryColor` - צבע ראשי
+- `secondaryColor` - צבע משני  
+- `successColor` - צבע הצלחה
+- `infoColor` - צבע מידע
+- `warningColor` - צבע אזהרה
+- `dangerColor` - צבע סכנה
+
+#### צבעי ישויות (18 משתנים)
+- `entityTradeColor`, `entityTradeColorDark`, `entityTradeColorLight`
+- `entityTradePlanColor`, `entityTradePlanColorDark`, `entityTradePlanColorLight`
+- `entityExecutionColor`, `entityExecutionColorDark`, `entityExecutionColorLight`
+- `entityAccountColor`, `entityAccountColorDark`, `entityAccountColorLight`
+- `entityCashFlowColor`, `entityCashFlowColorDark`, `entityCashFlowColorLight`
+- `entityTickerColor`, `entityTickerColorDark`, `entityTickerColorLight`
+- `entityAlertColor`, `entityAlertColorDark`, `entityAlertColorLight`
+- `entityNoteColor`, `entityNoteColorDark`, `entityNoteColorLight`
+
+#### צבעי ערכים מספריים (6 משתנים)
+- `valuePositiveColor`, `valuePositiveColorDark`, `valuePositiveColorLight`
+- `valueNegativeColor`, `valueNegativeColorDark`, `valueNegativeColorLight`
+- `valueNeutralColor`, `valueNeutralColorDark`, `valueNeutralColorLight`
+
+### עדכון אוטומטי
+```javascript
+// הפונקציה updateCSSVariablesFromPreferences מעדכנת את כל המשתנים
+function updateCSSVariablesFromPreferences(preferences) {
+  // עדכון צבעים בסיסיים
+  if (preferences.primaryColor) {
+    document.documentElement.style.setProperty('--primary-color', preferences.primaryColor);
+  }
+  
+  // עדכון צבעי ישויות
+  if (preferences.entityTradeColor) {
+    document.documentElement.style.setProperty('--entity-trade-color', preferences.entityTradeColor);
+    // + עוד 17 משתנים...
+  }
+  
+  // עדכון צבעי ערכים מספריים
+  if (preferences.valuePositiveColor) {
+    document.documentElement.style.setProperty('--numeric-positive-medium', preferences.valuePositiveColor);
+    // + עוד 5 משתנים...
+  }
+}
+```
 
 ## 🔧 פונקציות המערכת
 
@@ -507,9 +567,44 @@ window.ENTITY_COLORS['new_entity'] = '#ff6b6b';
 
 ---
 
-## 🔧 שינויים טכניים שבוצעו (גרסה 2.1.0)
+## 🔧 שינויים טכניים שבוצעו (גרסה 2.2.0)
 
-### 1. אתחול אוטומטי גלובלי
+### 1. סינכרון מלא עם מערכת ההעדפות
+```javascript
+// עדכון updateCSSVariablesFromPreferences לכל 38 המשתנים
+function updateCSSVariablesFromPreferences(preferences) {
+  // צבעים בסיסיים (6 משתנים)
+  if (preferences.primaryColor) {
+    document.documentElement.style.setProperty('--primary-color', preferences.primaryColor);
+  }
+  // ... כל הצבעים הבסיסיים
+  
+  // צבעי ישויות (18 משתנים)
+  if (preferences.entityTradeColor) {
+    document.documentElement.style.setProperty('--entity-trade-color', preferences.entityTradeColor);
+    document.documentElement.style.setProperty('--entity-trade-dark', preferences.entityTradeColorDark);
+    document.documentElement.style.setProperty('--entity-trade-light', preferences.entityTradeColorLight);
+  }
+  // ... כל צבעי הישויות
+  
+  // צבעי ערכים מספריים (6 משתנים)
+  if (preferences.valuePositiveColor) {
+    document.documentElement.style.setProperty('--numeric-positive-medium', preferences.valuePositiveColor);
+    document.documentElement.style.setProperty('--numeric-positive-dark', preferences.valuePositiveColorDark);
+    document.documentElement.style.setProperty('--numeric-positive-light', preferences.valuePositiveColorLight);
+  }
+  // ... כל צבעי הערכים המספריים
+}
+```
+
+### 2. הסרת משתנים עודפים
+הסרנו 4 משתנים גנריים שלא קיימים במערכת ההעדפות:
+- `preferences.entityColors` → הוחלף במשתנים ספציפיים
+- `preferences.investmentTypeColors` → הוסר
+- `preferences.numericValueColors` → הוחלף במשתנים ספציפיים  
+- `preferences.statusColors` → הוסר
+
+### 3. אתחול אוטומטי גלובלי
 ```javascript
 // הוספה ל-main.js
 function initializeCoreSystems() {
@@ -566,7 +661,7 @@ document.addEventListener('keydown', function(e) {
 
 ---
 
-**גרסה**: 2.1.0  
+**גרסה**: 2.2.0  
 **תאריך עדכון**: 9 בינואר 2025  
 **מפתח**: TikTrack System  
-**תאימות**: כל הגרסאות הקיימות + שיפורים חדשים
+**תאימות**: כל הגרסאות הקיימות + סינכרון מלא עם מערכת ההעדפות

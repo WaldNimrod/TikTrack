@@ -24,7 +24,39 @@ This guide describes the complete process for building a new page or updating an
 
 ## 📊 טבלת סטטוס עמודים במערכת
 
-> **עדכון אחרון**: 15 בינואר 2025 (סטנדרטיזציה מקיפה של 16 עמודי כלי פיתוח)
+> **עדכון אחרון**: ינואר 2025 (הוספת מערכת Pagination כללית ושיפור מבנה הסקשנים)
+
+## 🆕 מערכת Pagination כללית - עדכון חדש!
+
+### סקירה כללית
+הוספנו מערכת Pagination כללית חדשה לטבלאות גדולות במערכת. המערכת מספקת:
+- **ביצועים מיטביים** - טעינה רק של הנתונים הנדרשים
+- **ממשק אחיד** - אותו עיצוב בכל הטבלאות
+- **התאמה אישית** - שמירת העדפות גודל עמוד
+- **תמיכה מלאה ב-RTL** - עיצוב מותאם לעברית
+
+### קבצים חדשים
+- **`scripts/pagination-system.js`** - הלוגיקה הראשית
+- **`styles-new/06-components/_pagination-system.css`** - עיצוב
+- **`documentation/frontend/PAGINATION_SYSTEM.md`** - דוקומנטציה מלאה
+
+### שימוש במערכת
+```javascript
+// יצירת pagination חדש
+const pagination = window.createPagination('myTable', {
+    pageSize: 20,
+    showPageSizeSelector: true,
+    onPageChange: function(data, page) {
+        updateTable(data);
+    }
+});
+
+// עדכון נתונים
+pagination.setData(myDataArray);
+```
+
+### עמודים שכבר משתמשים במערכת
+- **`linter-realtime-monitor.html`** - טבלאות תיקונים, התקדמות, קבצים בעייתיים
 
 ### עמודים תחת תפריט "כלי פיתוח -> פעולות מערכת"
 
@@ -36,7 +68,7 @@ This guide describes the complete process for building a new page or updating an
 | **מרכז התראות** | `/notifications-center` | 3 | ✅ סטנדרטיזציה מלאה | ✅ toggleTopSection | 2 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |
 | **⚙️ משימות רקע** | `/background-tasks` | 6 | ✅ עדכון מלא | ✅ יושם | 5 סקשני תוכן + 1 עליון |
 | **🖥️ ניטור שרת** | `/server-monitor` | 4 | ✅ סטנדרטיזציה מלאה | ✅ toggleAllSections | 3 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |
-| **🔍 ניטור Linter** | `/linter-realtime-monitor` | 5 | ✅ סטנדרטיזציה מלאה | ✅ toggleAllSections | 4 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |
+| **🔍 ניטור Linter** | `/linter-realtime-monitor` | 5 | ✅ סטנדרטיזציה מלאה + Pagination | ✅ toggleAllSections | 4 סקשני תוכן + 1 עליון - **מערכת Pagination חדשה** |
 | **🗺️ מפת JS** | `/js-map` | 5 | ✅ סטנדרטיזציה מלאה | ✅ toggleAllSections | 4 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |
 | **🔒 מוניטור אילוצים** | `/constraints` | 5 | ✅ סטנדרטיזציה מלאה | ✅ toggleAllSections | 4 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |
 | **🎨 תצוגת צבעים דינמית** | `/dynamic-colors-display` | 5 | ✅ סטנדרטיזציה מלאה | ✅ toggleAllSections | 4 סקשני תוכן + 1 עליון - **כל 16 העמודים הושלמו** |

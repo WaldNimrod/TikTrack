@@ -122,11 +122,15 @@ class QualityChartRenderer {
                 throw new Error(`Container ${this.containerId} not found`);
             }
 
-            // Create canvas element inside the container
-            const canvas = document.createElement('canvas');
-            canvas.style.width = '100%';
-            canvas.style.height = '100%';
-            container.appendChild(canvas);
+            // Check if canvas already exists
+            let canvas = container.querySelector('canvas');
+            if (!canvas) {
+                // Create canvas element inside the container
+                canvas = document.createElement('canvas');
+                canvas.style.width = '100%';
+                canvas.style.height = '100%';
+                container.appendChild(canvas);
+            }
 
             const ctx = canvas.getContext('2d');
             if (!ctx) {

@@ -1,0 +1,19 @@
+/**
+ * Background Tasks Page Styles
+ * ניהול משימות רקע - עיצוב עמוד
+ * 
+ * קובץ זה מכיל סגנונות ייחודיים לעמוד ניהול משימות רקע
+ * הסגנונות מיועדים לרכיבים שאין להם מחלקות קיימות במערכת
+ */
+
+/* ===== CONSOLE OUTPUT ===== */
+.console-output {
+    white-space: pre-line;
+    font-family: 'Courier New', monospace;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+

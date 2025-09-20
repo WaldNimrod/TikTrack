@@ -75,13 +75,14 @@
   transition: all 0.3s ease;
 }
 
-/* יישור כל האלמנטים במרכז שורת הכותרת */
+/* יישור כל האלמנטים לימין - תחילת השורה */
 .section-header h1,
 .section-header h2,
 .section-header h3 {
   margin: 0;
   flex: 1;
-  text-align: center;
+  text-align: right; /* יישור לימין - תחילת השורה */
+  direction: rtl; /* RTL לכותרת */
 }
 
 /* יישור לאמצע הגובה לכל האלמנטים ב-section-header */
@@ -263,13 +264,22 @@
 /* Section Toggle Icon */
 .section-toggle-icon {
   transition: transform 0.3s ease;
-  font-size: 0.8rem;
-  color: white;
+  font-size: 0.9rem; /* טיפה יותר גדול */
+  color: var(--secondary-color, #6c757d);
   font-weight: bold;
+  border: 1px solid var(--secondary-color, #6c757d);
+  border-radius: 50%; /* עגול במקום מרובע */
+  padding: 4px 6px; /* יותר גדול */
+  width: 24px; /* רוחב קבוע */
+  height: 24px; /* גובה קבוע */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .filter-toggle-btn:hover .section-toggle-icon {
-  color: white;
+  color: var(--secondary-color, #6c757d);
+  border-color: var(--secondary-color, #6c757d);
 }
 
 .filter-toggle-btn.collapsed .section-toggle-icon {

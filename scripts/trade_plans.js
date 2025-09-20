@@ -10,7 +10,7 @@
  */
 function executeTradePlan(planId) {
   try {
-
+    console.log('⚡ מבצע תוכנית מסחר:', planId);
     
     // חיפוש התוכנית בנתונים
     const plan = window.tradePlansData.find(p => p.id === planId);
@@ -1172,7 +1172,7 @@ function updateTradePlansTable(trade_plans) {
   }
 
   // Checking if there is data to display
-  console.log(`🔍 Checking data: trade_plans =`, trade_plans, `length =`, trade_plans?.length);
+
   console.log(`🔍 Condition check: !trade_plans =`, !trade_plans, `trade_plans.length === 0 =`, trade_plans?.length === 0);
   if (!trade_plans || trade_plans.length === 0) {
     console.log(`❌ No data to display - entering error condition`);

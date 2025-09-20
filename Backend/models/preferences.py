@@ -71,17 +71,20 @@ class PreferenceProfile(BaseModel):
     """פרופיל העדפות"""
     __tablename__ = 'preference_profiles'
     
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    # Temporarily remove foreign key constraints to avoid mapping issues
+    # user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_id = Column(Integer, nullable=False)
     profile_name = Column(String(100), nullable=False)
     is_active = Column(Boolean, default=True)
     is_default = Column(Boolean, default=False)
     description = Column(Text)
-    created_by = Column(Integer, ForeignKey('users.id'))
+    # created_by = Column(Integer, ForeignKey('users.id'))
+    created_by = Column(Integer)
     last_used_at = Column(DateTime)
     usage_count = Column(Integer, default=0)
     
     # יחסים - מושבתים זמנית עד לבניית מודול משתמשים מלא
-    # user = relationship("User", back_populates="preference_profiles")
+    # user = relationship("User", foreign_keys=[user_id], back_populates="preference_profiles")
     user_preferences = relationship("UserPreference", back_populates="profile")
     
     def __repr__(self):
@@ -92,14 +95,16 @@ class UserPreference(BaseModel):
     """העדפת משתמש"""
     __tablename__ = 'user_preferences_v3'
     
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    # Temporarily remove foreign key constraints to avoid mapping issues
+    # user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    user_id = Column(Integer, nullable=False)
     profile_id = Column(Integer, ForeignKey('preference_profiles.id'), nullable=False)
     preference_id = Column(Integer, ForeignKey('preference_types.id'), nullable=False)
     saved_value = Column(Text)
     
-    # יחסים
-    preference_type = relationship("PreferenceType", back_populates="user_preferences")
-    profile = relationship("PreferenceProfile", back_populates="user_preferences")
+    # יחסים - מושבתים זמנית עד לבניית מודול משתמשים מלא
+    # preference_type = relationship("PreferenceType", back_populates="user_preferences")
+    # profile = relationship("PreferenceProfile", back_populates="user_preferences")
     
     def __repr__(self):
         return f"<UserPreference(user_id={self.user_id}, preference='{self.preference_type.preference_name if self.preference_type else 'unknown'}', value='{self.saved_value}')>"

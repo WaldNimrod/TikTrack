@@ -17,128 +17,6 @@
  * @lastUpdated September 2, 2025
  */
 
-// ===== UTILITY FUNCTIONS =====
-
-/**
- * Copy detailed logs to clipboard
- * This function collects all relevant information and copies it to clipboard
- */
-function copyDetailedLog() {
-  try {
-    // console.log('📋 Collecting detailed logs...');
-
-    // Collect system information
-    const systemInfo = {
-      timestamp: new Date().toISOString(),
-      userAgent: navigator.userAgent,
-      pageUrl: window.location.href,
-      pageTitle: document.title,
-    };
-
-    // Collect dashboard status
-    const dashboardStatus = {
-      isInitialized: window.externalDataDashboard?.isInitialized || false,
-      providers: window.externalDataDashboard?.providers || [],
-      cacheStats: window.externalDataDashboard?.cacheStats || null,
-    };
-
-    // Collect console logs (if available)
-    const consoleLogs = [];
-    if (window.console && window.console.log) {
-      // Try to get recent console logs
-      consoleLogs.push('Console logs collected at: ' + new Date().toISOString());
-    }
-
-    // Collect API status
-    const apiStatus = {
-      yahooFinance: document.getElementById('yahoo-status')?.textContent || 'Unknown',
-      cache: document.getElementById('cache-status-indicator')?.textContent || 'Unknown',
-      database: document.getElementById('db-status')?.textContent || 'Unknown',
-      api: document.getElementById('api-status-indicator')?.textContent || 'Unknown',
-    };
-
-    // Collect error information
-    const errors = [];
-    if (window.lastErrors) {
-      errors.push(...window.lastErrors);
-    }
-
-    // Build detailed log
-    const detailedLog = {
-      systemInfo,
-      dashboardStatus,
-      apiStatus,
-      errors,
-      consoleLogs,
-      timestamp: new Date().toISOString(),
-    };
-
-    // Convert to formatted string
-    const logText = `=== TikTrack External Data Dashboard - Detailed Log ===
-Timestamp: ${detailedLog.timestamp}
-Page: ${detailedLog.systemInfo.pageTitle}
-URL: ${detailedLog.systemInfo.pageUrl}
-
-=== System Information ===
-User Agent: ${detailedLog.systemInfo.userAgent}
-
-=== Dashboard Status ===
-Initialized: ${detailedLog.dashboardStatus.isInitialized}
-Providers Count: ${detailedLog.dashboardStatus.providers.length}
-Cache Stats Available: ${detailedLog.dashboardStatus.cacheStats ? 'Yes' : 'No'}
-
-=== API Status ===
-Yahoo Finance: ${detailedLog.apiStatus.yahooFinance}
-Cache: ${detailedLog.apiStatus.cache}
-Database: ${detailedLog.apiStatus.database}
-API: ${detailedLog.apiStatus.api}
-
-=== Errors ===
-${detailedLog.errors.length > 0 ? detailedLog.errors.join('\n') : 'No errors recorded'}
-
-=== Console Logs ===
-${detailedLog.consoleLogs.join('\n')}
-
-=== End of Log ===`;
-
-    // Copy to clipboard
-    navigator.clipboard.writeText(logText).then(() => {
-      // console.log('✅ Detailed log copied to clipboard');
-
-      // Show success notification
-      if (window.showNotification) {
-        window.showNotification('לוג מפורט הועתק ללוח', 'success');
-      } else {
-        if (window.showSuccessNotification) {
-          window.showSuccessNotification('לוג מפורט הועתק ללוח!');
-        }
-      }
-
-      // Also log to console for easy access
-      // console.log('📋 DETAILED LOG COPIED TO CLIPBOARD:');
-      // console.log(logText);
-
-    }).catch(_err => {
-      // Failed to copy to clipboard
-
-      // Fallback: show in alert
-      if (window.showErrorNotification) {
-        window.showErrorNotification('שגיאה בהעתקה ללוח. הלוג מוצג בקונסול.');
-      }
-      // DETAILED LOG (copy manually):
-      // logText
-    });
-
-  } catch (_error) {
-    // Error collecting detailed logs
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה באיסוף הלוגים. בדוק את הקונסול.');
-    }
-  }
-}
-
-// Export to global scope
-window.copyDetailedLog = copyDetailedLog;
 
 // ===== EXTERNAL DATA DASHBOARD CLASS =====
 
@@ -200,6 +78,7 @@ class ExternalDataDashboard {
         this.updateCacheStatus(data);
         this.updateDatabaseStatus(data);
         this.updateAPIStatus(data);
+        this.updateInfoSummary(data);
 
       } else {
         // console.error('❌ Error loading system status:', response.status);
@@ -948,6 +827,124 @@ class ExternalDataDashboard {
     }
     this.isInitialized = false;
   }
+
+  /**
+   * Copy detailed logs to clipboard
+   * This function collects all relevant information and copies it to clipboard
+   */
+  static copyDetailedLog() {
+    try {
+      // console.log('📋 Collecting detailed logs...');
+
+      // Collect system information
+      const systemInfo = {
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        pageUrl: window.location.href,
+        pageTitle: document.title,
+      };
+
+      // Collect dashboard status
+      const dashboardStatus = {
+        isInitialized: window.externalDataDashboard?.isInitialized || false,
+        providers: window.externalDataDashboard?.providers || [],
+        cacheStats: window.externalDataDashboard?.cacheStats || null,
+      };
+
+      // Collect console logs (if available)
+      const consoleLogs = [];
+      if (window.console && window.console.log) {
+        // Try to get recent console logs
+        consoleLogs.push('Console logs collected at: ' + new Date().toISOString());
+      }
+
+      // Collect API status
+      const apiStatus = {
+        yahooFinance: document.getElementById('yahoo-status')?.textContent || 'Unknown',
+        cache: document.getElementById('cache-status-indicator')?.textContent || 'Unknown',
+        database: document.getElementById('db-status')?.textContent || 'Unknown',
+        api: document.getElementById('api-status-indicator')?.textContent || 'Unknown',
+      };
+
+      // Collect error information
+      const errors = [];
+      if (window.lastErrors) {
+        errors.push(...window.lastErrors);
+      }
+
+      // Build detailed log
+      const detailedLog = {
+        systemInfo,
+        dashboardStatus,
+        apiStatus,
+        errors,
+        consoleLogs,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Convert to formatted string
+      const logText = `=== TikTrack External Data Dashboard - Detailed Log ===
+Timestamp: ${detailedLog.timestamp}
+Page: ${detailedLog.systemInfo.pageTitle}
+URL: ${detailedLog.systemInfo.pageUrl}
+
+=== System Information ===
+User Agent: ${detailedLog.systemInfo.userAgent}
+
+=== Dashboard Status ===
+Initialized: ${detailedLog.dashboardStatus.isInitialized}
+Providers Count: ${detailedLog.dashboardStatus.providers.length}
+Cache Stats Available: ${detailedLog.dashboardStatus.cacheStats ? 'Yes' : 'No'}
+
+=== API Status ===
+Yahoo Finance: ${detailedLog.apiStatus.yahooFinance}
+Cache: ${detailedLog.apiStatus.cache}
+Database: ${detailedLog.apiStatus.database}
+API: ${detailedLog.apiStatus.api}
+
+=== Errors ===
+${detailedLog.errors.length > 0 ? detailedLog.errors.join('\n') : 'No errors recorded'}
+
+=== Console Logs ===
+${detailedLog.consoleLogs.join('\n')}
+
+=== End of Log ===`;
+
+      // Copy to clipboard
+      navigator.clipboard.writeText(logText).then(() => {
+        // console.log('✅ Detailed log copied to clipboard');
+
+        // Show success notification
+        if (window.showNotification) {
+          window.showNotification('לוג מפורט הועתק ללוח', 'success');
+        } else {
+          if (window.showSuccessNotification) {
+            window.showSuccessNotification('לוג מפורט הועתק ללוח!');
+          }
+        }
+
+        // Also log to console for easy access
+        // console.log('📋 DETAILED LOG COPIED TO CLIPBOARD:');
+        // console.log(logText);
+
+      }).catch(_err => {
+        // Failed to copy to clipboard
+
+        // Fallback: show in alert
+        if (window.showErrorNotification) {
+          window.showErrorNotification('שגיאה בהעתקה ללוח. הלוג מוצג בקונסול.');
+        }
+        // DETAILED LOG (copy manually):
+        // logText
+      });
+
+    } catch (_error) {
+      // Error collecting detailed logs
+      if (window.showErrorNotification) {
+        window.showErrorNotification('שגיאה באיסוף הלוגים. בדוק את הקונסול.');
+      }
+    }
+  }
 }
 
 // Global functions for button onclick handlers
@@ -1049,6 +1046,9 @@ window.exportGroupHistory = function() {
 document.addEventListener('DOMContentLoaded', () => {
   window.externalDataDashboard = new ExternalDataDashboard();
   window.externalDataDashboard.init();
+  
+  // Make functions globally available
+  window.copyDetailedLog = ExternalDataDashboard.copyDetailedLog;
 });
 
 // Cleanup on page unload

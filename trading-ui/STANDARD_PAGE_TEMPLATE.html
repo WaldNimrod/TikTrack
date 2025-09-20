@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ניהול CSS - TikTrack</title>
+    <title>[PAGE_TITLE] - TikTrack</title>
     
     <!-- 
     ===== IMPORTANT DEVELOPMENT RULES =====
@@ -55,8 +55,17 @@
     <!-- Header Styles -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=v38_fixed">
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js?v=v34_fixes"></script>
+    
+    <!-- Dynamic Color System Scripts -->
+    <script src="scripts/color-scheme-system.js"></script>
+    
+    <!-- Preferences System Scripts -->
+    <script src="scripts/preferences.js"></script>
+    
+    <!-- Color Demo Toggle Script -->
+    <script src="scripts/color-demo-toggle.js"></script>
 </head>
 
 <body>
@@ -71,19 +80,14 @@
                 <!-- UI Content Section Top Start-->
                 <div class="top-section">
                     <div class="section-header">
-                        <h2>🎨 ניהול CSS</h2>
-                        <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                        <h2>[SECTION_TITLE] - כותרת סקשן עליון</h2>
+                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
-                        <div class="info-summary">
-                            <div>קבצי CSS: <strong>25</strong></div>
-                            <div>שכבות ITCSS: <strong>6</strong></div>
-                            <div>גודל כולל: <strong>2.1MB</strong></div>
-                            <div>סטטוס: <strong>פעיל</strong></div>
-                        </div>
+                        <h4>תוכן סקשן עליון</h4>
                     </div>
                 </div>
                 <!-- UI Content Section Top End -->  
@@ -91,47 +95,14 @@
                 <!-- UI Content Section 1 Start-->
                 <div class="content-section" id="section1">
                     <div class="section-header">
-                        <h2>📊 סטטיסטיקות CSS</h2>
+                        <h2>[SECTION_1_TITLE] - כותרת סקשן 1</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="card text-center">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-primary">📁 קבצים</h5>
-                                        <h3 class="text-primary">25</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card text-center">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-info">💾 גודל</h5>
-                                        <h3 class="text-info">2.1MB</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card text-center">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-success">🎨 שכבות</h5>
-                                        <h3 class="text-success">6</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card text-center">
-                                    <div class="card-body">
-                                        <h5 class="card-title text-warning">🔧 סטטוס</h5>
-                                        <h6 class="text-warning">פעיל</h6>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <h4>תוכן סקשן מספר 1</h4>
                     </div>
                 </div>
                 <!-- UI Content Section 1 End -->   
@@ -139,52 +110,14 @@
                 <!-- UI Content Section 2 Start-->
                 <div class="content-section" id="section2">
                     <div class="section-header">
-                        <h2>🎯 ניהול שכבות</h2>
+                        <h2>[SECTION_2_TITLE] - כותרת סקשן 2</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h3>🎨 שכבות ITCSS</h3>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="mb-3">
-                                            <label class="form-label">Settings:</label>
-                                            <span class="badge bg-success">פעיל</span>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Components:</label>
-                                            <span class="badge bg-success">פעיל</span>
-                                        </div>
-                                        <button class="btn btn-primary">רענן שכבות</button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h3>🔧 כלי ניהול</h3>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="mb-3">
-                                            <label class="form-label">אופטימיזציה:</label>
-                                            <span class="badge bg-warning">מוגבל</span>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">דחיסה:</label>
-                                            <span class="badge bg-success">פעיל</span>
-                                        </div>
-                                        <button class="btn btn-secondary">רענן כלים</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <h4>תוכן סקשן מספר 2</h4>
                     </div>
                 </div>
                 <!-- UI Content Section 2 End--> 
@@ -192,30 +125,14 @@
                 <!-- UI Content Section 3 Start-->
                 <div class="content-section" id="section3">
                     <div class="section-header">
-                        <h2>📋 פעולות CSS</h2>
+                        <h2>[SECTION_3_TITLE] - כותרת סקשן 3</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
-                        <div class="row">
-                            <div class="col-md-4">
-                                <button class="btn btn-success w-100 mb-3">
-                                    <i class="fas fa-sync"></i> רענן CSS
-                                </button>
-                            </div>
-                            <div class="col-md-4">
-                                <button class="btn btn-info w-100 mb-3">
-                                    <i class="fas fa-compress"></i> דחוס קבצים
-                                </button>
-                            </div>
-                            <div class="col-md-4">
-                                <button class="btn btn-warning w-100 mb-3">
-                                    <i class="fas fa-check"></i> בדוק תקינות
-                                </button>
-                            </div>
-                        </div>
+                        <h4>תוכן סקשן מספר 3</h4>
                     </div>
                 </div>
                 <!-- UI Content Section 3 End--> 
@@ -240,10 +157,7 @@
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/global-notification-collector.js"></script>
     
-    <!-- Header System Script -->
-    <script src="scripts/header-system.js"></script>
-    
-    <!-- Page-specific scripts -->
-    <script src="scripts/css-management.js"></script>
+    <!-- Page-specific scripts will be added here -->
+    <!-- Example: <script src="scripts/page-name.js"></script> -->
 </body>
 </html>

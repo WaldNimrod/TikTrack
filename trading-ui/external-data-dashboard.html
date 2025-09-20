@@ -1,4 +1,4 @@
-יי<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -24,9 +24,6 @@
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Bootstrap JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Unified CSS - אחרי Bootstrap כדי לדרוס אותו -->
     <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
@@ -58,113 +55,40 @@
     <!-- Header Styles -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=v38_fixed">
     
-    <!-- לוגים CSS -->
-    <style>
-        .log-container {
-            max-height: 500px;
-            overflow-y: auto;
-            border: 1px solid #dee2e6;
-            border-radius: 0.375rem;
-            background: #f8f9fa;
-        }
-        
-        .log-entry {
-            border-left: 4px solid;
-            transition: all 0.2s ease;
-        }
-        
-        .log-entry:hover {
-            background-color: #e9ecef !important;
-            transform: translateX(2px);
-        }
-        
-        .log-entry.border-danger {
-            border-left-color: #dc3545;
-        }
-        
-        .log-entry.border-warning {
-            border-left-color: #ffc107;
-        }
-        
-        .log-entry.border-info {
-            border-left-color: #0dcaf0;
-        }
-        
-        .log-entry.border-success {
-            border-left-color: #198754;
-        }
-    </style>
-    
-    <!-- Header System Script -->
-    <script src="scripts/header-system.js?v=v34_fixes"></script>
-    
     <!-- Dynamic Color System Scripts -->
     <script src="scripts/color-scheme-system.js"></script>
     
     <!-- Preferences System Scripts -->
     <script src="scripts/preferences.js"></script>
+    
+    <!-- Color Demo Toggle Script -->
+    <script src="scripts/color-demo-toggle.js"></script>
 </head>
 
 <body>
     <div class="background-wrapper">
         <!-- Header System -->
         <div id="unified-header"></div>
-        
+
         <!-- Page body -->
         <div class="page-body">
             <!-- Main content limited in width -->
             <div class="main-content">
                 <!-- UI Content Section Top Start-->
-            <div class="top-section">
-                <div class="section-header">
-                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-                        <h2>🔌 דשבורד נתונים חיצוניים</h2>
-                        <div class="header-actions">
-                            <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט ללוח">
-                                <i class="fas fa-copy"></i> העתק לוג מפורט
-                            </button>
-                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
+                <div class="top-section">
+                    <div class="section-header">
+                        <h2>🌐 דשבורד נתונים חיצוניים</h2>
+                        <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
                     </div>
                     <div class="section-body">
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
-                        <div class="info-summary" id="summaryStats">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <h5 class="card-title text-primary">🏢 ספקי נתונים</h5>
-                                            <h3 class="text-primary" id="providersStats">4</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <h5 class="card-title text-info">💾 ציטוטים במטמון</h5>
-                                            <h3 class="text-info" id="cacheStats">2.1M</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <h5 class="card-title text-success">⚡ אחוז פגיעות</h5>
-                                            <h3 class="text-success" id="hitRateStats">94.2%</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <h5 class="card-title text-warning">🔧 סטטוס כללי</h5>
-                                            <h6 class="text-warning" id="overallStatus">פעיל</h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="info-summary">
+                            <div>ספקי נתונים: <strong id="providers-count">טוען...</strong></div>
+                            <div>נתונים פעילים: <strong id="active-data-count">טוען...</strong></div>
+                            <div>עדכון אחרון: <strong id="last-update-time">טוען...</strong></div>
+                            <div>סטטוס: <strong id="overall-status">טוען...</strong></div>
                         </div>
                     </div>
                 </div>
@@ -173,50 +97,47 @@
                 <!-- UI Content Section 1 Start-->
                 <div class="content-section" id="section1">
                     <div class="section-header">
-                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-                        <h2>🔌 סטטוס מערכת</h2>
+                        <h2>📊 סטטיסטיקות מערכת</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
-                        <div class="info-summary">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <h5 class="card-title text-success">🔌 Yahoo Finance</h5>
-                                            <h6 class="text-success" id="yahoo-status">מחובר</h6>
-                                        </div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary">📈 רשומות</h5>
+                                        <h3 class="text-primary">15,420</h3>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <h5 class="card-title text-primary">💾 מטמון</h5>
-                                            <h6 class="text-primary" id="cache-status-indicator">פעיל</h6>
-                                        </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-info">💾 מטמון</h5>
+                                        <h3 class="text-info">2.1M</h3>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <h5 class="card-title text-info">🗄️ בסיס נתונים</h5>
-                                            <h6 class="text-info" id="db-status">מחובר</h6>
-                                        </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-success">⚡ אחוז פגיעות</h5>
+                                        <h3 class="text-success">94.2%</h3>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <h5 class="card-title text-warning">🔌 API</h5>
-                                            <h6 class="text-warning" id="api-status-indicator">זמין</h6>
-                                        </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-warning">🔧 סטטוס כללי</h5>
+                                        <h6 class="text-warning">פעיל</h6>
                                     </div>
                                 </div>
-                    </div>
-                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- UI Content Section 1 End -->   
@@ -224,297 +145,89 @@
                 <!-- UI Content Section 2 Start-->
                 <div class="content-section" id="section2">
                     <div class="section-header">
-                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-                        <h2>📊 ניהול נתונים</h2>
+                        <h2>🔗 ספקי נתונים</h2>
                         <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
-            </div>
+                    </div>
                     <div class="section-body">
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
-                        <div class="control-buttons mb-3">
-                            <button class="btn btn-primary btn-sm" onclick="analyzeData()">
-                                <i class="fas fa-chart-bar"></i> נתח נתונים
-                            </button>
-                            <button class="btn btn-success btn-sm" onclick="exportData()">
-                                <i class="fas fa-file-export"></i> ייצא נתונים
-                            </button>
-                            <button class="btn btn-warning btn-sm" onclick="backupData()">
-                                <i class="fas fa-save"></i> גבה נתונים
-                            </button>
-            </div>
-
-                        <!-- Results containers -->
-                        <div id="analysis-results" class="mb-3"></div>
-                        <div id="export-results" class="mb-3"></div>
-                        <div id="backup-results" class="mb-3"></div>
-                        
-                        <div class="alert alert-info">
-                            <strong>📊 ניהול נתונים:</strong> כלים לניתוח, ייצוא וגיבוי של נתוני המערכת.
-            </div>
-            </div>
-        </div>
-                <!-- UI Content Section 2 End -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>📊 Yahoo Finance</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">סטטוס:</label>
+                                            <span class="badge bg-success">פעיל</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">עדכון אחרון:</label>
+                                            <span>לפני 2 דקות</span>
+                                        </div>
+                                        <button class="btn btn-primary">רענן נתונים</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3>📈 Alpha Vantage</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">סטטוס:</label>
+                                            <span class="badge bg-warning">מוגבל</span>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">עדכון אחרון:</label>
+                                            <span>לפני 15 דקות</span>
+                                        </div>
+                                        <button class="btn btn-secondary">רענן נתונים</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 2 End--> 
 
                 <!-- UI Content Section 3 Start-->
                 <div class="content-section" id="section3">
                     <div class="section-header">
-                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-            <h2>🏢 ספקי נתונים</h2>
-                        <div class="header-actions">
-                            <button class="btn btn-primary btn-sm" onclick="refreshProviders()">
-                                <i class="fas fa-sync-alt"></i> רענן ספקים
-                            </button>
-                            <button class="btn btn-warning btn-sm" onclick="testAllProviders()">
-                                <i class="fas fa-vial"></i> בדוק כל הספקים
-                            </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                        <!-- כאן נכנס התוכן של גוף הסקשן -->
-                        <!-- ספקי נתונים - רק ספק אמיתי -->
-                        <div class="row justify-content-center">
-                            <!-- Yahoo Finance - הספק היחיד שפועל -->
-                            <div class="col-lg-6 col-md-8 mb-3">
-                                <div class="card h-100">
-                                    <div class="card-header d-flex justify-content-between align-items-center">
-                                        <div class="d-flex align-items-center">
-                                            <i class="fas fa-chart-line text-primary me-2"></i>
-                                            <div>
-                                                <h6 class="mb-0">Yahoo Finance</h6>
-                                                <small class="text-muted">הספק היחיד שפועל</small>
-                                            </div>
-                                        </div>
-                                        <span class="badge bg-success" id="yahoo-status">פעיל</span>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row text-center mb-3">
-                                            <div class="col-4">
-                                                <div class="text-success">
-                                                    <i class="fas fa-check-circle fa-lg"></i>
-                                                    <div class="small mt-1">מחובר</div>
-                                                </div>
-                                            </div>
-                                            <div class="col-4">
-                                                <div class="text-info">
-                                                    <i class="fas fa-clock fa-lg"></i>
-                                                    <div class="small mt-1" id="yahoo-latency">120ms</div>
-                                                </div>
-                                            </div>
-                                            <div class="col-4">
-                                                <div class="text-primary">
-                                                    <i class="fas fa-database fa-lg"></i>
-                                                    <div class="small mt-1" id="yahoo-data">1.2M</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="d-grid gap-2">
-                                            <button class="btn btn-outline-primary btn-sm" onclick="testProvider('yahoo')">
-                                                <i class="fas fa-play me-1"></i> בדוק חיבור
-                                            </button>
-                                            <button class="btn btn-outline-secondary btn-sm" onclick="configureProvider('yahoo')">
-                                                <i class="fas fa-cog me-1"></i> הגדרות
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- הודעה על ספקים נוספים -->
-                        <div class="alert alert-info text-center">
-                            <i class="fas fa-info-circle me-2"></i>
-                            <strong>ספקים נוספים:</strong> כרגע רק Yahoo Finance פועל. ספקים נוספים יתווספו בעתיד.
-            </div>
-            </div>
-        </div>
-                <!-- UI Content Section 2 End -->
-
-                <!-- UI Content Section 4 Start-->
-                <div class="content-section" id="section4">
-                    <div class="section-header">
-                        <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
-            <h2>📊 סטטיסטיקות מטמון</h2>
-                        <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                        <h2>📋 ניהול נתונים</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
-                        <div class="control-buttons mb-3">
-                            <button class="btn btn-success btn-sm" onclick="optimizeCache()">
-                                <i class="fas fa-bolt"></i> אופטמציה למטמון
-                            </button>
-                            <button class="btn btn-danger btn-sm" onclick="clearCache()">
-                                <i class="fas fa-trash"></i> נקה מטמון
-                            </button>
-                        </div>
-                        <div class="info-summary" id="cache-stats">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <h5 class="card-title text-primary">📊 סה"כ רשומות</h5>
-                                            <h3 class="text-primary" id="totalCacheRecords">1,247</h3>
-                                            <small class="text-muted">רשומות במטמון</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <h5 class="card-title text-success">⚡ אחוז פגיעות</h5>
-                                            <h3 class="text-success" id="cacheHitRate">87.3%</h3>
-                                            <small class="text-muted">פגיעות מוצלחות</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <h5 class="card-title text-warning">⏰ זמן ממוצע</h5>
-                                            <h3 class="text-warning" id="avgCacheTime">45ms</h3>
-                                            <small class="text-muted">זמן תגובה ממוצע</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="card text-center">
-                                        <div class="card-body">
-                                            <h5 class="card-title text-info">💾 גודל מטמון</h5>
-                                            <h3 class="text-info" id="cacheSize">12.4 MB</h3>
-                                            <small class="text-muted">גודל זיכרון</small>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <button class="btn btn-success w-100 mb-3">
+                                    <i class="fas fa-sync"></i> רענן כל הנתונים
+                                </button>
                             </div>
-            </div>
-            </div>
-        </div>
-                <!-- UI Content Section 4 End -->
-
-                <!-- UI Content Section 5 Start - לוגים קבוצתיים -->
-                <div class="content-section" id="section5">
-                    <div class="section-header">
-            <h2>📊 היסטוריית עדכונים קבוצתיים</h2>
-                        <div class="header-actions">
-                            <button class="btn btn-primary btn-sm" onclick="refreshGroupHistory()">
-                                <i class="fas fa-sync-alt"></i> רענן
-                            </button>
-                            <button class="btn btn-danger btn-sm" onclick="clearGroupLogs()">
-                                <i class="fas fa-trash"></i> נקה
-                            </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
+                            <div class="col-md-4">
+                                <button class="btn btn-info w-100 mb-3">
+                                    <i class="fas fa-download"></i> ייצא נתונים
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-warning w-100 mb-3">
+                                    <i class="fas fa-database"></i> גיבוי נתונים
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div class="section-body">
-                        <!-- פילטרים -->
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <select id="groupLogLevelFilter" class="form-select form-select-sm">
-                    <option value="all">כל הרמות</option>
-                    <option value="completed">הושלם</option>
-                    <option value="failed">נכשל</option>
-                    <option value="started">התחיל</option>
-                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <input type="text" id="groupLogSearchInput" class="form-control form-control-sm" placeholder="חיפוש בלוגים...">
-            </div>
-                            <div class="col-md-4">
-                                <select id="groupLogTimeFilter" class="form-select form-select-sm">
-                                    <option value="all">כל הזמנים</option>
-                                    <option value="today">היום</option>
-                                    <option value="hour">השעה האחרונה</option>
-                                    <option value="week">השבוע האחרון</option>
-                                </select>
-            </div>
-        </div>
-
-                        <!-- רשימת לוגים -->
-                        <div id="groupLogsContainer" class="log-container">
-                            <!-- הלוגים יוצגו כאן -->
-                        </div>
-                    </div>
-            </div>
-                <!-- UI Content Section 5 End -->
-
-                <!-- UI Content Section 6 Start - לוגים מערכתיים -->
-                <div class="content-section" id="section6">
-                    <div class="section-header">
-            <h2>📋 לוגים מערכתיים</h2>
-                        <div class="header-actions">
-                            <button class="btn btn-primary btn-sm" onclick="refreshSystemLogs()">
-                                <i class="fas fa-sync-alt"></i> רענן
-                            </button>
-                            <button class="btn btn-danger btn-sm" onclick="clearSystemLogs()">
-                                <i class="fas fa-trash"></i> נקה
-                            </button>
-                            <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                        <!-- פילטרים -->
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <select id="logLevelFilter" class="form-select form-select-sm">
-                    <option value="all">כל הרמות</option>
-                    <option value="info">מידע</option>
-                    <option value="warning">אזהרה</option>
-                    <option value="error">שגיאה</option>
-                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <input type="text" id="logSearchInput" class="form-control form-control-sm" placeholder="חיפוש בלוגים...">
-                            </div>
-                            <div class="col-md-4">
-                                <select id="logTimeFilter" class="form-select form-select-sm">
-                                    <option value="all">כל הזמנים</option>
-                                    <option value="today">היום</option>
-                                    <option value="hour">השעה האחרונה</option>
-                                    <option value="week">השבוע האחרון</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <!-- רשימת לוגים -->
-                        <div id="systemLogsContainer" class="log-container">
-                            <!-- הלוגים יוצגו כאן -->
-                        </div>
-                    </div>
-            </div>
-                <!-- UI Content Section 6 End -->
-
-
-            </div>
-        </div>
-            </div>
-
-    <!-- Provider Configuration Modal -->
-    <div class="modal fade" id="providerConfigModal" tabindex="-1" aria-labelledby="providerConfigModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="providerConfigTitle">הגדרות ספק</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body" id="providerConfigBody">
-                    <!-- Dynamic content will be inserted here -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
-                    <button type="button" class="btn btn-primary" onclick="saveProviderConfig()">שמור הגדרות</button>
-                </div>
+                <!-- UI Content Section 3 End--> 
             </div>
         </div>
-            </div>
+    </div>
 
     <!-- Core System Scripts -->
     <script src="scripts/console-cleanup.js"></script>
@@ -529,765 +242,14 @@
     <script src="scripts/central-refresh-system.js"></script>
     <script src="scripts/main.js"></script>
     
-    <!-- Notification system -->
+    <!-- Notification System Scripts -->
     <script src="scripts/notification-system.js"></script>
-  <script src="scripts/global-notification-collector.js"></script>
+    <script src="scripts/global-notification-collector.js"></script>
+    
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js"></script>
     
     <!-- Page-specific scripts -->
     <script src="scripts/external-data-dashboard.js"></script>
-    
-    <script>
-        // External Data Dashboard Functions - Use global systems only
-        function refreshProviders() {
-            console.log('🔄 רענון ספקי נתונים...');
-            showNotification('מתחיל רענון ספקי נתונים...', 'info');
-            
-            setTimeout(() => {
-                // Only Yahoo Finance is active
-                const results = {
-                    yahoo: { status: 'success', latency: '85ms', records: 1250 },
-                    total: { success: 1, failed: 0, total: 1 }
-                };
-                
-                // Update Yahoo provider card
-                const statusElement = document.getElementById('yahoo-status');
-                const latencyElement = document.getElementById('yahoo-latency');
-                const dataElement = document.getElementById('yahoo-data');
-                
-                if (statusElement && latencyElement && dataElement) {
-                    const result = results.yahoo;
-                    
-                    statusElement.className = 'badge bg-success';
-                    statusElement.textContent = 'פעיל';
-                    latencyElement.textContent = result.latency;
-                    dataElement.textContent = result.records.toLocaleString();
-                }
-                
-                const message = `רענון הושלם: ${results.total.success}/${results.total.total} ספקים פעילים`;
-                showNotification(message, 'success');
-            }, 2000);
-        }
-        
-        function testAllProviders() {
-            console.log('🧪 בדיקת כל הספקים...');
-            showNotification('מתחיל בדיקת כל הספקים...', 'info');
-            
-            setTimeout(() => {
-                const testResults = {
-                    yahoo: { status: 'success', responseTime: '120ms', dataCount: 1250 },
-                    total: { success: 1, failed: 0, total: 1 }
-                };
-                
-                // Update Yahoo provider card
-                const statusElement = document.getElementById('yahoo-status');
-                const latencyElement = document.getElementById('yahoo-latency');
-                const dataElement = document.getElementById('yahoo-data');
-                
-                if (statusElement && latencyElement && dataElement) {
-                    const result = testResults.yahoo;
-                    
-                    statusElement.className = 'badge bg-success';
-                    statusElement.textContent = 'פעיל';
-                    latencyElement.textContent = result.responseTime;
-                    dataElement.textContent = result.dataCount.toLocaleString();
-                }
-                
-                const message = `בדיקה הושלמה: ${testResults.total.success}/${testResults.total.total} ספקים פעילים`;
-                showNotification(message, 'success');
-            }, 3000);
-        }
-        
-        function testProvider(providerName) {
-            console.log(`🧪 בדיקת ספק: ${providerName}`);
-            showNotification(`מתחיל בדיקת ספק ${providerName}...`, 'info');
-            
-            setTimeout(() => {
-                const success = Math.random() > 0.3; // 70% success rate
-                const result = {
-                    status: success ? 'success' : 'failed',
-                    responseTime: success ? `${Math.floor(Math.random() * 500) + 50}ms` : 'timeout',
-                    dataCount: success ? Math.floor(Math.random() * 2000) + 100 : 0
-                };
-                
-                // Find and update the specific provider card using IDs
-                const statusElement = document.getElementById(`${providerName}-status`);
-                const latencyElement = document.getElementById(`${providerName}-latency`);
-                const dataElement = document.getElementById(`${providerName}-data`);
-                
-                if (statusElement && latencyElement && dataElement) {
-                    if (result.status === 'success') {
-                        statusElement.className = 'badge bg-success';
-                        statusElement.textContent = 'פעיל';
-                        latencyElement.textContent = result.responseTime;
-                        dataElement.textContent = result.dataCount.toLocaleString();
-                        showNotification(`בדיקת ${providerName} הצליחה - ${result.responseTime}`, 'success');
-                    } else {
-                        statusElement.className = 'badge bg-danger';
-                        statusElement.textContent = 'לא פעיל';
-                        latencyElement.textContent = 'N/A';
-                        dataElement.textContent = '0';
-                        showNotification(`בדיקת ${providerName} נכשלה - timeout`, 'error');
-                    }
-                }
-            }, 1500);
-        }
-        
-        function configureProvider(providerName) {
-            console.log(`⚙️ הגדרת ספק: ${providerName}`);
-            showNotification(`פותח הגדרות עבור ספק ${providerName}...`, 'info');
-            
-            // Show provider configuration modal using vanilla JavaScript
-            const modal = document.getElementById('providerConfigModal');
-            const modalTitle = document.getElementById('providerConfigTitle');
-            const modalBody = document.getElementById('providerConfigBody');
-            
-            modalTitle.textContent = `הגדרות ${providerName}`;
-            modalBody.innerHTML = `
-                <div class="mb-3">
-                    <label class="form-label">API Key</label>
-                    <input type="password" class="form-control" id="apiKey" placeholder="הכנס API Key...">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Timeout (שניות)</label>
-                    <input type="number" class="form-control" id="timeout" value="30" min="5" max="120">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Retry Attempts</label>
-                    <input type="number" class="form-control" id="retries" value="3" min="1" max="10">
-                </div>
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="enabled" checked>
-                        <label class="form-check-label" for="enabled">
-                            ספק פעיל
-                        </label>
-                    </div>
-                </div>
-            `;
-            
-            // Show modal using vanilla JavaScript (Bootstrap fallback)
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                const bsModal = new bootstrap.Modal(modal);
-                bsModal.show();
-            } else {
-                // Fallback to vanilla JavaScript
-                modal.style.display = 'block';
-                modal.classList.add('show');
-                document.body.classList.add('modal-open');
-            }
-        }
-        
-        function saveProviderConfig() {
-            const apiKey = document.getElementById('apiKey').value;
-            const timeout = document.getElementById('timeout').value;
-            const retries = document.getElementById('retries').value;
-            const enabled = document.getElementById('enabled').checked;
-            
-            if (!apiKey) {
-                showNotification('נא להכניס API Key', 'error');
-                return;
-            }
-            
-            // Simulate saving configuration
-            setTimeout(() => {
-                showNotification('הגדרות נשמרו בהצלחה', 'success');
-                const modal = document.getElementById('providerConfigModal');
-                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                    const bsModal = bootstrap.Modal.getInstance(modal);
-                    if (bsModal) {
-                        bsModal.hide();
-                    }
-                } else {
-                    // Fallback to vanilla JavaScript
-                    modal.style.display = 'none';
-                    modal.classList.remove('show');
-                    document.body.classList.remove('modal-open');
-                }
-            }, 1000);
-        }
-        
-        function optimizeCache() {
-            console.log('⚡ אופטמציית מטמון...');
-            showNotification('מתחיל אופטמציית מטמון...', 'info');
-            
-            setTimeout(() => {
-                const optimizationResults = {
-                    recordsOptimized: 1247,
-                    memorySaved: '2.3MB',
-                    performanceGain: '15%',
-                    processingTime: '1.2s'
-                };
-                
-                const resultMessage = `אופטמציה הושלמה: ${optimizationResults.recordsOptimized} רשומות, חיסכון זיכרון: ${optimizationResults.memorySaved}, שיפור ביצועים: ${optimizationResults.performanceGain}`;
-                showNotification(resultMessage, 'success');
-                
-                // Update cache stats with optimized values
-                const totalRecordsElement = document.getElementById('totalCacheRecords');
-                const hitRateElement = document.getElementById('cacheHitRate');
-                const avgTimeElement = document.getElementById('avgCacheTime');
-                const cacheSizeElement = document.getElementById('cacheSize');
-                
-                if (totalRecordsElement) totalRecordsElement.textContent = optimizationResults.recordsOptimized.toLocaleString();
-                if (hitRateElement) hitRateElement.textContent = '92.1%'; // Improved hit rate
-                if (avgTimeElement) avgTimeElement.textContent = '38ms'; // Improved response time
-                if (cacheSizeElement) cacheSizeElement.textContent = '10.1 MB'; // Reduced size
-            }, 2000);
-        }
-        
-        function clearCache() {
-            console.log('🗑️ ניקוי מטמון...');
-            showNotification('מתחיל ניקוי מטמון...', 'info');
-            
-            setTimeout(() => {
-                // Reset cache stats to empty/default values
-                const totalRecordsElement = document.getElementById('totalCacheRecords');
-                const hitRateElement = document.getElementById('cacheHitRate');
-                const avgTimeElement = document.getElementById('avgCacheTime');
-                const cacheSizeElement = document.getElementById('cacheSize');
-                
-                if (totalRecordsElement) totalRecordsElement.textContent = '0';
-                if (hitRateElement) hitRateElement.textContent = '0%';
-                if (avgTimeElement) avgTimeElement.textContent = '0ms';
-                if (cacheSizeElement) cacheSizeElement.textContent = '0 MB';
-                
-                showNotification('מטמון נוקה בהצלחה', 'success');
-            }, 1500);
-        }
-        
-        // Initialize cache statistics on page load
-        function initializeCacheStats() {
-            const totalRecordsElement = document.getElementById('totalCacheRecords');
-            const hitRateElement = document.getElementById('cacheHitRate');
-            const avgTimeElement = document.getElementById('avgCacheTime');
-            const cacheSizeElement = document.getElementById('cacheSize');
-            
-            // Ensure all elements show their initial values
-            if (totalRecordsElement && !totalRecordsElement.textContent.trim()) {
-                totalRecordsElement.textContent = '1,247';
-            }
-            if (hitRateElement && !hitRateElement.textContent.trim()) {
-                hitRateElement.textContent = '87.3%';
-            }
-            if (avgTimeElement && !avgTimeElement.textContent.trim()) {
-                avgTimeElement.textContent = '45ms';
-            }
-            if (cacheSizeElement && !cacheSizeElement.textContent.trim()) {
-                cacheSizeElement.textContent = '12.4 MB';
-            }
-        }
-        
-        // מערכת לוגים מערכתיים
-        let systemLogs = [];
-        
-        function addSystemLog(level, message, details = '') {
-            const log = {
-                id: Date.now(),
-                timestamp: new Date(),
-                level: level,
-                message: message,
-                details: details
-            };
-            systemLogs.unshift(log);
-            
-            if (systemLogs.length > 100) {
-                systemLogs = systemLogs.slice(0, 100);
-            }
-            
-            renderSystemLogs();
-        }
-        
-        function renderSystemLogs() {
-            const container = document.getElementById('systemLogsContainer');
-            if (!container) return;
-            
-            const levelFilter = document.getElementById('logLevelFilter')?.value || 'all';
-            const searchFilter = document.getElementById('logSearchInput')?.value.toLowerCase() || '';
-            const timeFilter = document.getElementById('logTimeFilter')?.value || 'all';
-            
-            let filteredLogs = systemLogs.filter(log => {
-                if (levelFilter !== 'all' && log.level !== levelFilter) return false;
-                if (searchFilter && !log.message.toLowerCase().includes(searchFilter) && 
-                    !log.details.toLowerCase().includes(searchFilter)) return false;
-                
-                const now = new Date();
-                const logTime = new Date(log.timestamp);
-                
-                if (timeFilter === 'today') {
-                    return logTime.toDateString() === now.toDateString();
-                } else if (timeFilter === 'hour') {
-                    return (now - logTime) < 60 * 60 * 1000;
-                } else if (timeFilter === 'week') {
-                    return (now - logTime) < 7 * 24 * 60 * 60 * 1000;
-                }
-                
-                return true;
-            });
-            
-            if (filteredLogs.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center text-muted p-4">
-                        <i class="fas fa-clipboard-list fa-2x mb-2"></i>
-                        <p>אין לוגים להצגה</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = filteredLogs.map(log => {
-                const levelClass = {
-                    'info': 'text-info',
-                    'warning': 'text-warning', 
-                    'error': 'text-danger',
-                    'success': 'text-success'
-                }[log.level] || 'text-muted';
-                
-                const levelIcon = {
-                    'info': 'fas fa-info-circle',
-                    'warning': 'fas fa-exclamation-triangle',
-                    'error': 'fas fa-times-circle',
-                    'success': 'fas fa-check-circle'
-                }[log.level] || 'fas fa-circle';
-                
-                return `
-                    <div class="log-entry mb-2 p-3 border-start border-3 border-${log.level === 'error' ? 'danger' : log.level === 'warning' ? 'warning' : 'info'} bg-light">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div class="d-flex align-items-center gap-2 flex-grow-1">
-                                <i class="${levelIcon} ${levelClass}"></i>
-                                <strong class="${levelClass}">${log.message}</strong>
-                                <span class="text-muted small">${log.timestamp.toLocaleTimeString('he-IL')}</span>
-                            </div>
-                            <span class="badge bg-${log.level === 'error' ? 'danger' : log.level === 'warning' ? 'warning' : 'info'}">${log.level}</span>
-                        </div>
-                        ${log.details ? `<div class="text-muted small mt-1">${log.details}</div>` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        function refreshSystemLogs() {
-            console.log('🔄 רענון לוגים מערכתיים...');
-            showNotification('מתחיל רענון לוגים...', 'info');
-            
-            addSystemLog('info', 'רענון לוגים', 'לוגים מערכתיים עודכנו בהצלחה');
-            
-            setTimeout(() => {
-                showNotification('רענון לוגים הושלם', 'success');
-            }, 1000);
-        }
-        
-        function clearSystemLogs() {
-            console.log('🗑️ ניקוי לוגים מערכתיים...');
-            showNotification('מתחיל ניקוי לוגים...', 'info');
-            
-            setTimeout(() => {
-                systemLogs = [];
-                renderSystemLogs();
-                showNotification('ניקוי לוגים הושלם', 'success');
-            }, 1000);
-        }
-        
-        // אתחול לוגים ראשוניים
-        function initializeSystemLogs() {
-            const initialLogs = [
-                { level: 'info', message: 'מערכת הופעלה', details: 'דשבורד נתונים חיצוניים נטען בהצלחה' },
-                { level: 'success', message: 'חיבור לספק', details: 'Yahoo Finance מחובר בהצלחה' },
-                { level: 'info', message: 'טעינת נתונים', details: '1,247 רשומות נטענו מהמטמון' },
-                { level: 'warning', message: 'אזהרת מטמון', details: 'שימוש במטמון: 87.3%' },
-                { level: 'info', message: 'בדיקת תקינות', details: 'כל המערכות פועלות תקין' }
-            ];
-            
-            initialLogs.forEach(log => {
-                addSystemLog(log.level, log.message, log.details);
-            });
-        }
-        
-        // אתחול פילטרים
-        function initializeLogFilters() {
-            const levelFilter = document.getElementById('logLevelFilter');
-            const searchInput = document.getElementById('logSearchInput');
-            const timeFilter = document.getElementById('logTimeFilter');
-            
-            if (levelFilter) levelFilter.addEventListener('change', renderSystemLogs);
-            if (searchInput) searchInput.addEventListener('input', renderSystemLogs);
-            if (timeFilter) timeFilter.addEventListener('change', renderSystemLogs);
-        }
-        
-        // מערכת לוגים קבוצתיים
-        let groupLogs = [];
-        
-        function addGroupLog(processName, status, details = '') {
-            console.log('📝 מוסיף לוג קבוצתי:', processName, status, details);
-            const log = {
-                id: Date.now(),
-                timestamp: new Date(),
-                processName: processName,
-                status: status,
-                details: details
-            };
-            groupLogs.unshift(log);
-            
-            if (groupLogs.length > 50) {
-                groupLogs = groupLogs.slice(0, 50);
-            }
-            
-            renderGroupLogs();
-        }
-        
-        function renderGroupLogs() {
-            const container = document.getElementById('groupLogsContainer');
-            if (!container) {
-                console.error('❌ groupLogsContainer לא נמצא!');
-                return;
-            }
-            console.log('🔍 renderGroupLogs נקרא, יש', groupLogs.length, 'לוגים');
-            
-            const levelFilter = document.getElementById('groupLogLevelFilter')?.value || 'all';
-            const searchFilter = document.getElementById('groupLogSearchInput')?.value.toLowerCase() || '';
-            const timeFilter = document.getElementById('groupLogTimeFilter')?.value || 'all';
-            
-            let filteredLogs = groupLogs.filter(log => {
-                if (levelFilter !== 'all' && log.status !== levelFilter) return false;
-                if (searchFilter && !log.processName.toLowerCase().includes(searchFilter) && 
-                    !log.details.toLowerCase().includes(searchFilter)) return false;
-                
-                const now = new Date();
-                const logTime = new Date(log.timestamp);
-                
-                if (timeFilter === 'today') {
-                    return logTime.toDateString() === now.toDateString();
-                } else if (timeFilter === 'hour') {
-                    return (now - logTime) < 60 * 60 * 1000;
-                } else if (timeFilter === 'week') {
-                    return (now - logTime) < 7 * 24 * 60 * 60 * 1000;
-                }
-                
-                return true;
-            });
-            
-            if (filteredLogs.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center text-muted p-4">
-                        <i class="fas fa-clipboard-list fa-2x mb-2"></i>
-                        <p>אין לוגים להצגה</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = filteredLogs.map(log => {
-                const levelClass = {
-                    'completed': 'text-success',
-                    'failed': 'text-danger',
-                    'started': 'text-warning'
-                }[log.status] || 'text-muted';
-                
-                const levelIcon = {
-                    'completed': 'fas fa-check-circle',
-                    'failed': 'fas fa-times-circle',
-                    'started': 'fas fa-clock'
-                }[log.status] || 'fas fa-circle';
-                
-                return `
-                    <div class="log-entry mb-2 p-3 border-start border-3 border-${log.status === 'failed' ? 'danger' : log.status === 'started' ? 'warning' : 'success'} bg-light">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div class="d-flex align-items-center gap-2 flex-grow-1">
-                                <i class="${levelIcon} ${levelClass}"></i>
-                                <strong class="${levelClass}">${log.processName}</strong>
-                                <span class="text-muted small">${log.timestamp.toLocaleTimeString('he-IL')}</span>
-                            </div>
-                            <span class="badge bg-${log.status === 'failed' ? 'danger' : log.status === 'started' ? 'warning' : 'success'}">${log.status}</span>
-                        </div>
-                        ${log.details ? `<div class="text-muted small mt-1">${log.details}</div>` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        function refreshGroupHistory() {
-            console.log('🔄 רענון היסטוריה קבוצתית...');
-            showNotification('מתחיל רענון היסטוריה קבוצתית...', 'info');
-            
-            setTimeout(() => {
-                const newLogs = [
-                    { processName: 'עדכון טיקרים פעילים', status: 'completed', details: '15 טיקרים עודכנו בהצלחה' },
-                    { processName: 'סינכרון נתונים', status: 'completed', details: '1,247 רשומות סונכרנו' },
-                    { processName: 'בדיקת חיבורים', status: 'completed', details: 'כל החיבורים תקינים' }
-                ];
-                
-                newLogs.forEach(log => addGroupLog(log.processName, log.status, log.details));
-                showNotification('רענון היסטוריה הושלם', 'success');
-            }, 1500);
-        }
-        
-        function clearGroupLogs() {
-            console.log('🗑️ ניקוי לוגים קבוצתיים...');
-            groupLogs = [];
-            renderGroupLogs();
-            showNotification('לוגים קבוצתיים נוקו', 'success');
-        }
-        
-        function exportGroupHistory() {
-            console.log('📥 ייצוא היסטוריה קבוצתית...');
-            showNotification('מתחיל ייצוא היסטוריה קבוצתית...', 'info');
-            
-            setTimeout(() => {
-                const exportData = {
-                    fileName: `group_history_${new Date().toISOString().split('T')[0]}.json`,
-                    recordsExported: groupLogs.length,
-                    fileSize: `${(groupLogs.length * 0.1).toFixed(1)}KB`
-                };
-                
-                showNotification(`ייצוא הושלם: ${exportData.recordsExported} רשומות ל-${exportData.fileName}`, 'success');
-            }, 1000);
-        }
-        
-        // אתחול לוגים קבוצתיים ראשוניים
-        function initializeGroupLogs() {
-            console.log('🚀 מתחיל אתחול לוגים קבוצתיים...');
-            const initialGroupLogs = [
-                { processName: 'עדכון ראשוני', status: 'completed', details: 'מערכת הופעלה בהצלחה - 15 טיקרים עודכנו' },
-                { processName: 'טעינת נתונים', status: 'completed', details: '1,247 רשומות נטענו מהמטמון - זמן: 2.3s' },
-                { processName: 'בדיקת ספקים', status: 'completed', details: 'Yahoo Finance מחובר - זמן תגובה: 120ms' },
-                { processName: 'סינכרון מטמון', status: 'completed', details: 'מטמון סונכרן - 87.3% פגיעות' },
-                { processName: 'בדיקת תקינות', status: 'completed', details: 'כל המערכות פועלות תקין - 0 שגיאות' }
-            ];
-            
-            initialGroupLogs.forEach(log => addGroupLog(log.processName, log.status, log.details));
-            console.log('✅ אתחול לוגים קבוצתיים הושלם, יש', groupLogs.length, 'לוגים');
-        }
-        
-        // אתחול פילטרים ללוגים קבוצתיים
-        function initializeGroupFilters() {
-            console.log('🔧 מאתחל פילטרים ללוגים קבוצתיים...');
-            const levelFilter = document.getElementById('groupLogLevelFilter');
-            const searchInput = document.getElementById('groupLogSearchInput');
-            const timeFilter = document.getElementById('groupLogTimeFilter');
-            
-            console.log('פילטרים נמצאו:', {
-                levelFilter: !!levelFilter,
-                searchInput: !!searchInput,
-                timeFilter: !!timeFilter
-            });
-            
-            if (levelFilter) levelFilter.addEventListener('change', renderGroupLogs);
-            if (searchInput) searchInput.addEventListener('input', renderGroupLogs);
-            if (timeFilter) timeFilter.addEventListener('change', renderGroupLogs);
-        }
-        
-        // אתחול המערכת
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 מתחיל אתחול מערכת דשבורד נתונים חיצוניים...');
-            initializeCacheStats();
-            initializeSystemLogs();
-            initializeLogFilters();
-            initializeGroupLogs();
-            initializeGroupFilters();
-            console.log('✅ אתחול מערכת הושלם');
-        });
-        
-        
-        function copyDetailedLog() {
-            console.log('📋 העתקת לוג מפורט...');
-            
-            let detailedLog = '=== לוג מפורט של דשבורד נתונים חיצוניים ===\n';
-            detailedLog += `זמן יצירה: ${new Date().toLocaleString('he-IL')}\n\n`;
-            
-            // סטטיסטיקות כלליות
-            detailedLog += '--- סטטיסטיקות כלליות ---\n';
-            const providersCount = document.querySelectorAll('.card').length;
-            const cacheStats = document.getElementById('cacheStats')?.textContent || 'לא זמין';
-            const hitRateStats = document.getElementById('hitRateStats')?.textContent || 'לא זמין';
-            const overallStatus = document.getElementById('overallStatus')?.textContent || 'לא זמין';
-            
-            detailedLog += `מספר ספקי נתונים: ${providersCount}\n`;
-            detailedLog += `ציטוטים במטמון: ${cacheStats}\n`;
-            detailedLog += `אחוז פגיעות: ${hitRateStats}\n`;
-            detailedLog += `סטטוס כללי: ${overallStatus}\n\n`;
-            
-            // ספקי נתונים
-            detailedLog += '--- ספקי נתונים ---\n';
-            const providerCards = document.querySelectorAll('#providers-grid .card');
-            providerCards.forEach((card, index) => {
-                const name = card.querySelector('h5')?.textContent || 'לא זמין';
-                const status = card.querySelector('.badge')?.textContent || 'לא זמין';
-                const connection = card.querySelector('.text-success')?.textContent || 'לא זמין';
-                const latency = card.querySelector('.text-info')?.textContent || 'לא זמין';
-                const dataCount = card.querySelector('.text-primary')?.textContent || 'לא זמין';
-                
-                detailedLog += `ספק ${index + 1}: ${name}\n`;
-                detailedLog += `  סטטוס: ${status}\n`;
-                detailedLog += `  חיבור: ${connection}\n`;
-                detailedLog += `  זמן תגובה: ${latency}\n`;
-                detailedLog += `  כמות נתונים: ${dataCount}\n\n`;
-            });
-            
-            // סטטיסטיקות מטמון
-            detailedLog += '--- סטטיסטיקות מטמון ---\n';
-            const cacheCards = document.querySelectorAll('#cache-stats .card');
-            cacheCards.forEach((card, index) => {
-                const title = card.querySelector('.card-title')?.textContent || 'לא זמין';
-                const value = card.querySelector('h3')?.textContent || 'לא זמין';
-                detailedLog += `${title}: ${value}\n`;
-            });
-            detailedLog += '\n';
-            
-            // לוגים קבוצתיים
-            detailedLog += '--- לוגים קבוצתיים ---\n';
-            const groupLogs = document.querySelectorAll('#group-refresh-content .log-entry');
-            if (groupLogs.length === 0) {
-                detailedLog += 'אין לוגים קבוצתיים זמינים\n';
-            } else {
-                groupLogs.forEach((entry, index) => {
-                    const processName = entry.querySelector('strong')?.textContent || 'לא זמין';
-                    const timestamp = entry.querySelector('.text-muted')?.textContent || 'לא זמין';
-                    const status = entry.querySelector('.fw-bold')?.textContent || 'לא זמין';
-                    const details = entry.querySelector('.text-muted.small')?.textContent || 'לא זמין';
-                    
-                    detailedLog += `רשומה ${index + 1}: ${processName}\n`;
-                    detailedLog += `  זמן: ${timestamp}\n`;
-                    detailedLog += `  סטטוס: ${status}\n`;
-                    detailedLog += `  פרטים: ${details}\n\n`;
-                });
-            }
-            
-            // לוגים מערכתיים
-            detailedLog += '--- לוגים מערכתיים ---\n';
-            const systemLogs = document.querySelectorAll('#log-content .log-entry');
-            if (systemLogs.length === 0) {
-                detailedLog += 'אין לוגים מערכתיים זמינים\n';
-            } else {
-                systemLogs.forEach((entry, index) => {
-                    const processName = entry.querySelector('strong')?.textContent || 'לא זמין';
-                    const timestamp = entry.querySelector('.text-muted')?.textContent || 'לא זמין';
-                    const status = entry.querySelector('.fw-bold')?.textContent || 'לא זמין';
-                    const details = entry.querySelector('.text-muted.small')?.textContent || 'לא זמין';
-                    
-                    detailedLog += `רשומה ${index + 1}: ${processName}\n`;
-                    detailedLog += `  זמן: ${timestamp}\n`;
-                    detailedLog += `  סטטוס: ${status}\n`;
-                    detailedLog += `  פרטים: ${details}\n\n`;
-                });
-            }
-            
-            // מצב מערכת
-            detailedLog += '--- מצב מערכת ---\n';
-            detailedLog += `זמן נוכחי: ${new Date().toLocaleString('he-IL')}\n`;
-            detailedLog += `דפדפן: ${navigator.userAgent}\n`;
-            detailedLog += `רזולוציה: ${window.innerWidth}x${window.innerHeight}\n`;
-            detailedLog += `URL: ${window.location.href}\n\n`;
-            
-            detailedLog += '=== סוף הלוג ===';
-            
-            // Copy to clipboard
-            navigator.clipboard.writeText(detailedLog).then(() => {
-                showNotification('לוג מפורט הועתק ללוח בהצלחה', 'success');
-                console.log('📋 לוג מפורט הועתק:', detailedLog);
-            }).catch(err => {
-                console.error('שגיאה בהעתקת הלוג:', err);
-                showNotification('שגיאה בהעתקת הלוג', 'error');
-            });
-        }
-        
-        function analyzeData() {
-            console.log('📊 ניתוח נתונים...');
-            showNotification('מתחיל ניתוח נתונים...', 'info');
-            
-            setTimeout(() => {
-                // Simulate data analysis
-                const analysisResults = {
-                    totalRecords: 15420,
-                    processedRecords: 15200,
-                    errors: 220,
-                    warnings: 45,
-                    processingTime: '2.3s',
-                    memoryUsage: '145MB'
-                };
-                
-                const resultMessage = `ניתוח הושלם: ${analysisResults.processedRecords}/${analysisResults.totalRecords} רשומות עובדו, ${analysisResults.errors} שגיאות, ${analysisResults.warnings} אזהרות`;
-                showNotification(resultMessage, 'success');
-                
-                // Update UI with results
-                const analysisDiv = document.getElementById('analysis-results');
-                if (analysisDiv) {
-                    analysisDiv.innerHTML = `
-                        <div class="alert alert-success">
-                            <h6>📊 תוצאות ניתוח:</h6>
-                            <ul class="mb-0">
-                                <li>רשומות מעובדות: ${analysisResults.processedRecords}/${analysisResults.totalRecords}</li>
-                                <li>שגיאות: ${analysisResults.errors}</li>
-                                <li>אזהרות: ${analysisResults.warnings}</li>
-                                <li>זמן עיבוד: ${analysisResults.processingTime}</li>
-                                <li>שימוש זיכרון: ${analysisResults.memoryUsage}</li>
-                            </ul>
-                        </div>
-                    `;
-                }
-            }, 2000);
-        }
-        
-        function exportData() {
-            console.log('📥 ייצוא נתונים...');
-            showNotification('מתחיל ייצוא נתונים...', 'info');
-            
-            setTimeout(() => {
-                const exportInfo = {
-                    fileName: `data_export_${new Date().toISOString().split('T')[0]}.json`,
-                    recordsExported: 15200,
-                    fileSize: '12.5MB',
-                    downloadUrl: '#'
-                };
-                
-                showNotification(`ייצוא הושלם: ${exportInfo.recordsExported} רשומות ל-${exportInfo.fileName}`, 'success');
-                
-                // Create download link
-                const exportDiv = document.getElementById('export-results');
-                if (exportDiv) {
-                    exportDiv.innerHTML = `
-                        <div class="alert alert-info">
-                            <h6>📥 ייצוא הושלם:</h6>
-                            <p>קובץ: <strong>${exportInfo.fileName}</strong></p>
-                            <p>גודל: <strong>${exportInfo.fileSize}</strong></p>
-                            <p>רשומות: <strong>${exportInfo.recordsExported}</strong></p>
-                            <a href="${exportInfo.downloadUrl}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-download"></i> הורד קובץ
-                            </a>
-                        </div>
-                    `;
-                }
-            }, 1500);
-        }
-        
-        function backupData() {
-            console.log('💾 גיבוי נתונים...');
-            showNotification('מתחיל גיבוי נתונים...', 'info');
-            
-            setTimeout(() => {
-                const backupInfo = {
-                    backupId: `backup_${Date.now()}`,
-                    timestamp: new Date().toLocaleString('he-IL'),
-                    size: '45.2MB',
-                    records: 15420,
-                    status: 'completed'
-                };
-                
-                showNotification(`גיבוי הושלם: ${backupInfo.backupId}`, 'success');
-                
-                // Display backup info next to button
-                const backupDiv = document.getElementById('backup-results');
-                if (backupDiv) {
-                    backupDiv.innerHTML = `
-                        <div class="alert alert-success">
-                            <h6>💾 גיבוי נוצר:</h6>
-                            <p><strong>ID:</strong> ${backupInfo.backupId}</p>
-                            <p><strong>זמן:</strong> ${backupInfo.timestamp}</p>
-                            <p><strong>גודל:</strong> ${backupInfo.size}</p>
-                            <p><strong>רשומות:</strong> ${backupInfo.records}</p>
-                        </div>
-                    `;
-                }
-            }, 3000);
-        }
-        
-    </script>
 </body>
 </html>

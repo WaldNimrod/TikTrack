@@ -427,9 +427,9 @@ function saveNotificationToGlobalHistory(type, title, message) {
     // הוספת התראה חדשה לתחילת הרשימה
     globalHistory.unshift(notification);
 
-    // הגבלת גודל ההיסטוריה (1000 התראות אחרונות)
-    if (globalHistory.length > 1000) {
-      globalHistory = globalHistory.slice(0, 1000);
+    // הגבלת גודל ההיסטוריה (100 התראות אחרונות)
+    if (globalHistory.length > 100) {
+      globalHistory = globalHistory.slice(0, 100);
     }
 
     // שמירה ל-localStorage

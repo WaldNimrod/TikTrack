@@ -4,7 +4,7 @@
 
 This document describes the comprehensive JavaScript architecture implemented in TikTrack, featuring a modular system with 40+ organized script files and clear separation of concerns.
 
-**🔄 Last Updated:** September 19, 2025 - Added Global Project Files Scanner and Enhanced Linter System
+**🔄 Last Updated:** September 20, 2025 - Added Global confirm() Replacement System
 
 ## 🗂️ Global Functions Index
 
@@ -13,7 +13,7 @@ This document describes the comprehensive JavaScript architecture implemented in
 |----------|-------------|
 | `window.initializeApplication()` | Initialize the entire application |
 | `window.checkDependencies()` | Check if all required modules are available |
-| `window.initializeCoreSystems()` | Initialize header and notification systems |
+| `window.initializeCoreSystems()` | Initialize header, notification systems, and global confirm replacement |
 | `window.initializeCurrentPage()` | Initialize current page functionality |
 | `window.initializeDynamicColorScheme()` | Initialize dynamic color scheme system |
 | `window.isModuleAvailable(moduleName, functionName)` | Check if a module/function is available |
@@ -22,6 +22,15 @@ This document describes the comprehensive JavaScript architecture implemented in
 | `window.filterDataByFilters(data, pageName)` | Filter data by page-specific filters |
 | `window.updateSortIcons(tableType, activeColumnIndex, direction)` | Update sort icons in tables |
 | `window.restoreAllSectionStates()` | Restore all section states from localStorage |
+
+### 🔄 Global confirm() Replacement System (NEW!)
+| Function | Description |
+|----------|-------------|
+| `window.confirm()` | **OVERRIDDEN** - Now shows custom styled confirmation dialog |
+| `window._originalConfirm` | Original browser confirm function (backup) |
+| `window.showConfirmationDialog()` | Custom confirmation dialog with styling |
+| `window.globalConfirm()` | Alternative confirmation function |
+| `window.overrideNativeConfirm()` | Function to override native confirm |
 
 ### 🎨 UI Utilities (`ui-utils.js`)
 | Function | Description |

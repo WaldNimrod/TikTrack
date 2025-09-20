@@ -202,6 +202,34 @@ function initializeCoreSystems() {
     window.headerSystem.init();
   }
 
+  // Initialize global confirm replacement - Simple approach
+  if (typeof window.showConfirmationDialog === 'function') {
+    // Store original confirm function
+    window._originalConfirm = window.confirm;
+    
+    // Override confirm with a simple wrapper
+    window.confirm = function(message, title = 'אישור') {
+      // Show custom dialog and return false to prevent immediate execution
+      window.showConfirmationDialog(
+        title,
+        message,
+        () => {
+          console.log('✅ User confirmed:', message);
+        },
+        () => {
+          console.log('❌ User cancelled:', message);
+        },
+        'warning'
+      );
+      
+      // Always return false to prevent old code from executing immediately
+      // The actual logic will be handled by the dialog callbacks
+      return false;
+    };
+    
+    console.log('✅ Global confirm replacement initialized (simple approach)');
+  }
+
   // Initialize dynamic color scheme system
   initializeDynamicColorScheme();
 

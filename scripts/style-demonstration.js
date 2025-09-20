@@ -32,7 +32,7 @@ function toggleStylesState(enabled) {
     
     if (enabled) {
         htmlElement.className = htmlElement.className.replace('styles-disabled', 'styles-enabled');
-        console.log('🎨 [CASCADE] Enabled all styles via CSS cascade control');
+
     } else {
         htmlElement.className = htmlElement.className.replace('styles-enabled', 'styles-disabled');
         console.log('🎨 [CASCADE] Disabled all styles via CSS cascade control');
@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const cssLinks = document.querySelectorAll('link[rel="stylesheet"]');
     console.log('Loaded CSS files:');
     cssLinks.forEach(link => {
-
+        console.log(`- ${link.href}`);
     });
     
     // Test the toggle functions

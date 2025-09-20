@@ -39,7 +39,7 @@
     <link rel="stylesheet" href="styles-new/header-styles.css?v=v33_green_orange">
 
     <!-- Page-Specific CSS - Last to override all previous styles -->
-    <link rel="stylesheet" href="styles-new/07-trumps/page-scripts-matrix.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles/page-scripts-matrix.css?v=v1.0.0">
 
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -54,17 +54,14 @@
     -->
 </head>
 <body class="page-scripts-matrix-page">
-    <!-- Unified Header Container -->
-    <div id="unified-header"></div>
-  <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
   <div class="background-wrapper">
-    <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
+    <!-- Header System -->
+    <div id="unified-header"></div>
 
-    <!-- ===== TEMPLATE ZONE 3: PAGE BODY (LOCKED) ===== -->
+    <!-- Page body -->
     <div class="page-body">
-      <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT (EDITABLE) ===== -->
+      <!-- Main content limited in width -->
       <div class="main-content">
-      <!-- ===== CONTENT SECTIONS START (EDITABLE) ===== -->
       
       <!-- UI Content Section Top Start-->
       <div class="top-section">
@@ -83,45 +80,79 @@
             <button class="action-btn" onclick="cleanupOldData()" title="ניקוי נתונים ישנים">
               <i class="fas fa-trash"></i> ניקוי
             </button>
-          <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
+          <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
             <span class="section-toggle-icon">▼</span>
           </button>
-            <button class="action-btn toggle-all-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
-              <i class="fas fa-expand-arrows-alt"></i> כל הסקשנים
-            </button>
           </div>
         </div>
         <div class="section-body">
+          <style>
+            .stat-card {
+              border: none;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+              transition: transform 0.2s;
+              margin-bottom: 15px;
+            }
+            .stat-card:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            }
+            .stat-number {
+              font-size: 2rem;
+              font-weight: bold;
+              margin: 10px 0;
+            }
+            .card-title i {
+              font-size: 1.5rem;
+            }
+          </style>
           <div class="info-summary" id="summaryStats">
-            <div>עמודים במערכת: <strong id="totalPages">30</strong></div>
-            <div>סקריפטים ראשיים: <strong id="primaryScripts">12</strong></div>
-            <div>סקריפטים שירותיים: <strong id="utilityScripts">18</strong></div>
-            <div>סקריפטי שירות: <strong id="serviceScripts">9</strong></div>
-            <div>עדכון אחרון: <strong>ספטמבר 2025</strong></div>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="card stat-card">
+                  <div class="card-body text-center">
+                    <h5 class="card-title text-primary">
+                      <i class="fas fa-file-code"></i>
+                    </h5>
+                    <h3 class="stat-number" id="totalPages">טוען...</h3>
+                    <p class="card-text">עמודים במערכת</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card stat-card">
+                  <div class="card-body text-center">
+                    <h5 class="card-title text-success">
+                      <i class="fas fa-code"></i>
+                    </h5>
+                    <h3 class="stat-number" id="totalScripts">טוען...</h3>
+                    <p class="card-text">קבצי JavaScript</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card stat-card">
+                  <div class="card-body text-center">
+                    <h5 class="card-title text-info">
+                      <i class="fas fa-clock"></i>
+                    </h5>
+                    <h3 class="stat-number" id="lastUpdate">טוען...</h3>
+                    <p class="card-text">עדכון אחרון</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
       <!-- UI Content Section Top End -->  
 
+
       <!-- UI Content Section 1 Start-->
       <div class="content-section" id="section1">
         <div class="section-header">
-          <h2>📊 סטטיסטיקות מערכת</h2>
-          <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
-          </button>
-        </div>
-        <div class="section-body">
-          <div id="systemStatsContent">
-            <p>טוען סטטיסטיקות...</p>
-          </div>
-      <!-- UI Content Section 1 End -->
-
-      <!-- UI Content Section 2 Start-->
-      <div class="content-section" id="section2">
-        <div class="section-header">
           <h2>📁 ניהול קבצי JavaScript</h2>
-          <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+          <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
         </div>
@@ -130,17 +161,17 @@
             <div class="loading">
               <div class="loading-spinner"></div>
               טוען ניהול קבצי JavaScript...
-            </div>
-          </div>
         </div>
+            </div>
+            </div>
       </div>
-      <!-- UI Content Section 2 End -->
+      <!-- UI Content Section 1 End -->
 
-      <!-- UI Content Section 3 Start-->
-      <div class="content-section" id="section3">
+      <!-- UI Content Section 2 Start-->
+      <div class="content-section" id="section2">
         <div class="section-header">
           <h2>🔗 ניתוח תלויות בין קבצים</h2>
-          <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+          <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
         </div>
@@ -150,29 +181,13 @@
           </div>
         </div>
       </div>
-      <!-- UI Content Section 3 End -->
+      <!-- UI Content Section 2 End -->
 
-      <!-- UI Content Section 4 Start-->
-      <div class="content-section" id="section4">
+      <!-- UI Content Section 3 Start-->
+      <div class="content-section" id="section3">
         <div class="section-header">
           <h2>💾 ניהול אחסון נתונים</h2>
-          <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
-          </button>
-        </div>
-        <div class="section-body">
-          <div id="systemStatsContent">
-            <p>טוען סטטיסטיקות...</p>
-          </div>
-        </div>
-      </div>
-      <!-- UI Content Section 4 End -->
-
-      <!-- UI Content Section 5 Start-->
-      <div class="content-section" id="section5">
-        <div class="section-header">
-          <h2>🏗️ בדיקת ארכיטקטורה</h2>
-          <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
+          <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
         </div>
@@ -182,13 +197,13 @@
           </div>
         </div>
       </div>
-      <!-- UI Content Section 5 End -->
+      <!-- UI Content Section 3 End -->
 
-      <!-- UI Content Section 6 Start-->
-      <div class="content-section" id="section6">
+      <!-- UI Content Section 4 Start-->
+      <div class="content-section" id="section4">
         <div class="section-header">
-          <h2>🔗 סטטוס אינטגרציה עם מערכת סריקת קבצים</h2>
-          <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
+          <h2>🏗️ בדיקת ארכיטקטורה</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
         </div>
@@ -198,53 +213,63 @@
           </div>
         </div>
       </div>
-      <!-- UI Content Section 6 End -->
+      <!-- UI Content Section 4 End -->
 
-      <!-- UI Content Section 7 Start-->
-      <div class="content-section" id="section7">
+      <!-- UI Content Section 5 Start-->
+      <div class="content-section" id="section5">
         <div class="section-header">
-          <h2>🗺️ מיפוי עמודים לקבצים</h2>
-          <button class="filter-toggle-btn" onclick="toggleSection('section7')" title="הצג/הסתר סקשן">
+          <h2>🔗 סטטוס אינטגרציה עם מערכת סריקת קבצים</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
             <span class="section-toggle-icon">▼</span>
           </button>
         </div>
         <div class="section-body">
           <div id="integrationContent">
-            <p>טוען סטטוס אינטגרציה...</p>
+            <p>טוען נתוני אינטגרציה...</p>
           </div>
         </div>
       </div>
-      <!-- UI Content Section 7 End -->
-          <div id="integrationContent">
-            <div class="loading">
-              <div class="loading-spinner"></div>
-              בודק סטטוס אינטגרציה...
-            </div>
+      <!-- UI Content Section 5 End -->
+
+      <!-- UI Content Section 6 Start-->
+      <div class="content-section" id="section6">
+        <div class="section-header">
+          <h2>🗺️ מיפוי עמודים לקבצים</h2>
+          <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
+            <span class="section-toggle-icon">▼</span>
+          </button>
+        </div>
+        <div class="section-body">
+          <div id="pageMappingContent">
+            <p>טוען מיפוי עמודים...</p>
           </div>
         </div>
       </div>
-      <!-- UI Content Section 7 End -->
-
-                <!-- END OF TEMPLATE ZONE 4 -->
+      <!-- UI Content Section 6 End -->
 
             </div>
             </div>
         </div>
-
-    <!-- 🔒 LOCKED TEMPLATE ZONE 5 - Footer & Scripts (DO NOT MODIFY ORDER) -->
-    <!-- ======================================================== -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- TikTrack JavaScript Files - Exact Order Required -->
+    <!-- Core System Scripts -->
     <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
     <script src="scripts/ui-utils.js"></script>
-    <script src="scripts/page-utils.js"></script>
-    <script src="scripts/tables.js"></script>
     <script src="scripts/table-mappings.js"></script>
-    <script src="scripts/header-system.js?v=20250115_level3_fix"></script>
-    <script src="scripts/notification-system.js"></script>
-  <script src="scripts/global-notification-collector.js"></script>
+    <script src="scripts/date-utils.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/linked-items.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/central-refresh-system.js"></script>
     <script src="scripts/main.js"></script>
+    
+    <!-- Notification System Scripts -->
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/warning-system.js"></script>
+    <script src="scripts/global-notification-collector.js"></script>
+    
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js"></script>
 
     <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
     <!-- ======================================================== -->
@@ -268,7 +293,7 @@
             // Set page-specific preferences using global function
             if (typeof setPagePreferences === 'function') {
                 setPagePreferences('page-scripts-matrix', {
-                    sections: ['section1', 'section2', 'section3', 'section4', 'section5', 'section6', 'section7'],
+                    sections: ['section1', 'section2', 'section3', 'section4', 'section5', 'section6'],
                     defaultExpanded: ['section1']
                 });
             }
@@ -279,16 +304,23 @@
 
         // Initialize scan interface for updating the matrix
         function initializeScanInterface() {
-            // Add scan button to the top section header at the end (left side in RTL)
-            const topSectionHeader = document.querySelector('.top-section .section-header');
-            if (topSectionHeader && !document.getElementById('scan-filesystem-btn')) {
+            // Add scan button after the top section header (not inside it)
+            const topSection = document.querySelector('.top-section');
+            if (topSection && !document.getElementById('scan-filesystem-btn')) {
                 const scanButton = document.createElement('button');
                 scanButton.id = 'scan-filesystem-btn';
                 scanButton.className = 'btn btn-primary btn-sm me-3';
                 scanButton.innerHTML = '<i class="fas fa-search"></i> סריקת קבצים';
                 scanButton.onclick = scanFilesystem;
-                // Insert at the beginning (left side in RTL layout)
-                topSectionHeader.insertBefore(scanButton, topSectionHeader.firstChild);
+                scanButton.style.marginTop = '10px';
+                scanButton.style.marginBottom = '10px';
+                // Insert after the section-header, before the section-body
+                const sectionBody = topSection.querySelector('.section-body');
+                if (sectionBody) {
+                    topSection.insertBefore(scanButton, sectionBody);
+                } else {
+                    topSection.appendChild(scanButton);
+                }
             }
         }
 

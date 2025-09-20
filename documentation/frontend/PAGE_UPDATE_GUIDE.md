@@ -6,10 +6,17 @@
 
 This guide describes the complete process for building a new page or updating an existing page to the new base template with proper section structure, unified menu, and separated styles.
 
-> ⚠️ **Important Warning!** Before starting work, it is **mandatory** to read the documentation of the systems relevant to the user interface. Without understanding these systems, the work may fail or create problems in the system.
+> ⚠️ **אזהרה חשובה!** לפני התחלת העבודה, **חובה** לקרוא את הדוקומנטציה של המערכות הרלוונטיות לממשק המשתמש. ללא הבנת מערכות אלה, העבודה עלולה להיכשל או ליצור בעיות במערכת.
+> 
+> **📚 קריאת דוקומנטציה חובה:**
+> 1. **מערכות חובה** - יש לקרוא את כל 5 המערכות החובה לפני התחלת העבודה
+> 2. **חוקי ברזל** - יש להכיר את חוקי המותר והאסור במערכת
+> 3. **מערכות נוספות** - מומלץ לקרוא גם את המערכות הנוספות הרלוונטיות
+> 4. **תבנית סטנדרטית** - יש להכיר את התבנית הסטנדרטית לפני התחלת העבודה
 
 ## קבצים קשורים
 
+- **תבנית סטנדרטית**: `trading-ui/STANDARD_PAGE_TEMPLATE.html` - התבנית הסטנדרטית המלאה לכל עמוד
 - **תבנית בסיס**: `trading-ui/designs.html` - קובץ התבנית הבסיסי לכל עמוד
 - **תבנית מבנה**: `documentation/frontend/PAGE_STRUCTURE_TEMPLATE.md` - דוקומנטציה של מבנה העמוד הסטנדרטי
 - **גרסה 1**: `documentation/frontend/PAGE_UPDATE_GUIDE_v1.md` - מדריך עדכון עמוד קיים לתבנית בסיס נכונה
@@ -17,7 +24,7 @@ This guide describes the complete process for building a new page or updating an
 
 ## 📊 טבלת סטטוס עמודים במערכת
 
-> **עדכון אחרון**: 18 בספטמבר 2025 (עמוד js-map הושלם)
+> **עדכון אחרון**: 15 בינואר 2025 (סטנדרטיזציה מקיפה של 16 עמודי כלי פיתוח)
 
 ### עמודים תחת תפריט "כלי פיתוח -> פעולות מערכת"
 
@@ -79,7 +86,13 @@ This guide describes the complete process for building a new page or updating an
 ### 📖 מערכות נוספות - מומלץ
 - **מבנה עמוד**: `documentation/frontend/PAGE_STRUCTURE_TEMPLATE.md` - מבנה העמוד הסטנדרטי
 - **מערכת טבלאות**: `documentation/frontend/TABLE_SYSTEM.md` - מערכת הטבלאות
-- **מערכת פילטרים**: `documentation/frontend/FILTER_SYSTEM.md` - מערכת הפילטרים
+- **מערכת פילטרים**: `documentation/frontend/FILTER_SYSTEM_README.md` - מערכת הפילטרים
+- **מערכת כפתורים**: `documentation/frontend/button-system.md` - מערכת הכפתורים המרכזית
+- **מערכת אימות**: `documentation/frontend/VALIDATION_SYSTEM.md` - מערכת אימות טפסים
+- **מערכת ראש הדף**: `documentation/frontend/HEADER_SYSTEM_README.md` - מערכת התפריט והפילטרים
+- **מערכת RTL**: `documentation/frontend/RTL_DEVELOPMENT_GUIDE.md` - פיתוח RTL ועברית
+- **ארכיטקטורת CSS**: `documentation/frontend/CSS_ARCHITECTURE_GUIDE.md` - ארכיטקטורת ITCSS
+- **ארכיטקטורת JavaScript**: `documentation/frontend/JAVASCRIPT_ARCHITECTURE.md` - ארכיטקטורת JS
 
 ## 📋 אינדקס שלבים
 
@@ -2695,6 +2708,35 @@ ls -la trading-ui/*.html | grep -E "(index|trade_plans|trades|research|alerts|no
 - **אין חזרות**: אם תוכן מופיע בסקשן עליון, אל תחזור עליו בסקשנים אחרים
 - **סדר התוכן**: שמור על סדר התוכן המקורי מהעמוד הישן
 - **מחיקת סקשנים ריקים**: מחק סקשנים שלא קיבלו תוכן ייחודי
+
+## ⚠️ חוקי ברזל - מותר ואסור במערכת
+
+### 🔴 דברים אסורים לחלוטין
+
+**❌ אסור בהחלט:**
+- **סקריפטים אינליין** - אין לכתוב JavaScript בתוך העמוד
+- **CSS אינליין** - אין לכתוב סגנונות בתוך העמוד (מלבד מערכת ראש הדף)
+- **שינוי קבצי CSS סטטיים** - אין לשנות קבצי header-styles.css או קבצי ITCSS סטטיים
+- **עקיפת מערכת ההתראות** - אין ליצור popups או התראות חלופיות
+- **שינוי מבנה התבנית** - אין לשנות את מבנה הסקשנים הסטנדרטי
+- **עקיפת מערכת הצבעים** - אין להשתמש בצבעים קשיחים במקום מערכת הצבעים הדינמית
+
+### 🟢 דברים מותרים
+
+**✅ מותר ומחויב:**
+- **שימוש במערכות קיימות** - חובה להשתמש במערכות ההתראות, הצבעים וההעדפות הקיימות
+- **עקיפת מערכת הטבלאות** - חובה להשתמש במערכת הטבלאות הסטנדרטית
+- **שימוש בקבצי ITCSS** - חובה להשתמש בקבצי הסגנונות הסטנדרטיים
+- **מבנה סקשנים סטנדרטי** - חובה להשתמש במבנה הסקשנים הסטנדרטי
+- **כפתורי toggle סטנדרטיים** - חובה להשתמש בכפתורי הפתיחה/סגירה הסטנדרטיים
+
+### 🟡 כללי זהירות
+
+**⚠️ זהירות מיוחדת:**
+- **טעינת סקריפטים** - יש לטעון header-system.js בסוף body, לא ב-head
+- **מספור סקשנים** - יש למספור סקשנים בסדר נכון (section1, section2, וכו')
+- **כפתורי toggle** - יש להשתמש ב-toggleAllSections אם יש יותר מ-3 סקשנים
+- **גיבוי לפני שינויים** - חובה לבצע גיבוי לפני כל שינוי משמעותי
 
 ## כללים חשובים לעדכון עמודים
 

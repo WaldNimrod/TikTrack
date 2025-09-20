@@ -961,28 +961,39 @@ class SystemManagement {
       page: 'system-management',
       url: window.location.href,
       sections: {
-        section1: document.getElementById('section1') ? 'exists' : 'missing',
-        section2: document.getElementById('section2') ? 'exists' : 'missing',
-        section3: document.getElementById('section3') ? 'exists' : 'missing',
-        section4: document.getElementById('section4') ? 'exists' : 'missing',
-        section5: document.getElementById('section5') ? 'exists' : 'missing',
-        section6: document.getElementById('section6') ? 'exists' : 'missing',
-        section7: document.getElementById('section7') ? 'exists' : 'missing'
+        healthSummary: document.getElementById('healthSummary') ? 'exists' : 'missing',
+        performanceSummary: document.getElementById('performanceSummary') ? 'exists' : 'missing',
+        externalDataSection: document.getElementById('section2') ? 'exists' : 'missing',
+        alertsSection: document.getElementById('section3') ? 'exists' : 'missing',
+        securitySummary: document.getElementById('securitySummary') ? 'exists' : 'missing',
+        logsSection: document.getElementById('section5') ? 'exists' : 'missing',
+        backupSection: document.getElementById('section6') ? 'exists' : 'missing'
       },
       stats: {
-        serverHealth: document.getElementById('serverHealthStats')?.textContent || 'not found',
-        databaseHealth: document.getElementById('databaseHealthStats')?.textContent || 'not found',
-        cacheHealth: document.getElementById('cacheHealthStats')?.textContent || 'not found',
-        overallStatus: document.getElementById('overallStatus')?.textContent || 'not found'
+        overallHealth: document.getElementById('overallHealthStatus')?.textContent || 'not found',
+        systemScore: document.getElementById('systemScore')?.textContent || 'not found',
+        responseTime: document.getElementById('responseTime')?.textContent || 'not found',
+        uptime: document.getElementById('uptime')?.textContent || 'not found'
       },
       performance: {
-        uptime: document.getElementById('uptimeStats')?.textContent || 'not found',
-        memory: document.getElementById('memoryStats')?.textContent || 'not found',
-        cpu: document.getElementById('cpuStats')?.textContent || 'not found',
-        disk: document.getElementById('diskStats')?.textContent || 'not found'
+        cpuUsage: document.getElementById('cpuUsage')?.textContent || 'not found',
+        memoryUsage: document.getElementById('memoryUsage')?.textContent || 'not found',
+        diskUsage: document.getElementById('diskUsage')?.textContent || 'not found',
+        networkStatus: document.getElementById('networkStatus')?.textContent || 'not found'
       },
       charts: {
         performanceChart: document.getElementById('performanceChart') ? 'exists' : 'missing'
+      },
+      backup: {
+        lastBackupSize: document.getElementById('lastBackupSize')?.textContent || 'not found',
+        lastBackupDate: document.getElementById('lastBackupDate')?.textContent || 'not found',
+        backupStatus: document.getElementById('backupStatus')?.textContent || 'not found'
+      },
+      security: {
+        securityStatus: document.getElementById('securityStatus')?.textContent || 'not found',
+        encryptionStatus: document.getElementById('encryptionStatus')?.textContent || 'not found',
+        activeUsers: document.getElementById('activeUsers')?.textContent || 'not found',
+        securityAlerts: document.getElementById('securityAlerts')?.textContent || 'not found'
       },
       console: {
         errors: window.console?.error ? 'console.error available' : 'console.error missing',
@@ -998,28 +1009,39 @@ class SystemManagement {
 🔗 URL: ${logData.url}
 
 📋 סקשנים:
-- סקשן 1 (בריאות מערכת): ${logData.sections.section1}
-- סקשן 2 (ביצועי מערכת): ${logData.sections.section2}
-- סקשן 3 (נתונים חיצוניים): ${logData.sections.section3}
-- סקשן 4 (התראות מערכת): ${logData.sections.section4}
-- סקשן 5 (אבטחה): ${logData.sections.section5}
-- סקשן 6 (לוגים וניטור): ${logData.sections.section6}
-- סקשן 7 (גיבויים ושחזור): ${logData.sections.section7}
+- סיכום בריאות מערכת: ${logData.sections.healthSummary}
+- סיכום ביצועי מערכת: ${logData.sections.performanceSummary}
+- סקשן נתונים חיצוניים: ${logData.sections.externalDataSection}
+- סקשן התראות מערכת: ${logData.sections.alertsSection}
+- סיכום אבטחה: ${logData.sections.securitySummary}
+- סקשן לוגים וניטור: ${logData.sections.logsSection}
+- סקשן גיבויים ושחזור: ${logData.sections.backupSection}
 
-📊 סטטיסטיקות:
-- בריאות שרת: ${logData.stats.serverHealth}
-- בריאות בסיס נתונים: ${logData.stats.databaseHealth}
-- בריאות מטמון: ${logData.stats.cacheHealth}
-- סטטוס כללי: ${logData.stats.overallStatus}
+📊 סטטיסטיקות בריאות:
+- בריאות כללית: ${logData.stats.overallHealth}
+- ציון מערכת: ${logData.stats.systemScore}
+- זמן תגובה: ${logData.stats.responseTime}
+- זמן פעילות: ${logData.stats.uptime}
 
 ⚡ ביצועים:
-- זמן פעילות: ${logData.performance.uptime}
-- זיכרון: ${logData.performance.memory}
-- מעבד: ${logData.performance.cpu}
-- דיסק: ${logData.performance.disk}
+- מעבד: ${logData.performance.cpuUsage}
+- זיכרון: ${logData.performance.memoryUsage}
+- דיסק: ${logData.performance.diskUsage}
+- רשת: ${logData.performance.networkStatus}
 
 📈 גרפים:
 - גרף ביצועים: ${logData.charts.performanceChart}
+
+💾 גיבויים:
+- גודל גיבוי אחרון: ${logData.backup.lastBackupSize}
+- תאריך גיבוי אחרון: ${logData.backup.lastBackupDate}
+- סטטוס גיבוי: ${logData.backup.backupStatus}
+
+🔒 אבטחה:
+- סטטוס אבטחה: ${logData.security.securityStatus}
+- סטטוס הצפנה: ${logData.security.encryptionStatus}
+- משתמשים פעילים: ${logData.security.activeUsers}
+- התראות אבטחה: ${logData.security.securityAlerts}
 
 🔧 קונסול:
 - console.error: ${logData.console.errors}
@@ -1158,6 +1180,12 @@ class SystemManagement {
     
     // Update info summaries
     this.updateInfoSummaries(data);
+    
+    // Update external data
+    this.updateExternalData();
+    
+    // Update alerts
+    this.updateAlerts();
     
     // Update logs
     this.updateLogs(data);
@@ -1373,8 +1401,8 @@ class SystemManagement {
                                       data.health.response_time_ms < 500 ? 'summary-value text-warning' : 'summary-value text-danger';
     }
     
-    if (uptimeElement && data.health?.uptime) {
-      uptimeElement.textContent = data.health.uptime;
+    if (uptimeElement && data.summary?.uptime) {
+      uptimeElement.textContent = data.summary.uptime;
       uptimeElement.className = 'summary-value text-info';
     }
   }
@@ -1389,22 +1417,22 @@ class SystemManagement {
     const diskElement = document.getElementById('diskUsage');
     const networkElement = document.getElementById('networkStatus');
     
-    if (cpuElement && data.performance?.cpu_usage_percent !== undefined) {
-      const cpuUsage = data.performance.cpu_usage_percent;
+    if (cpuElement && data.summary?.cpu_usage_percent !== undefined) {
+      const cpuUsage = data.summary.cpu_usage_percent;
       cpuElement.textContent = `${cpuUsage}%`;
       cpuElement.className = cpuUsage < 70 ? 'summary-value text-success' :
                              cpuUsage < 90 ? 'summary-value text-warning' : 'summary-value text-danger';
     }
     
-    if (memoryElement && data.performance?.memory_usage_percent !== undefined) {
-      const memoryUsage = data.performance.memory_usage_percent;
+    if (memoryElement && data.summary?.memory_usage_percent !== undefined) {
+      const memoryUsage = data.summary.memory_usage_percent;
       memoryElement.textContent = `${memoryUsage}%`;
       memoryElement.className = memoryUsage < 70 ? 'summary-value text-success' :
                                 memoryUsage < 90 ? 'summary-value text-warning' : 'summary-value text-danger';
     }
     
-    if (diskElement && data.performance?.disk_usage_percent !== undefined) {
-      const diskUsage = data.performance.disk_usage_percent;
+    if (diskElement && data.summary?.disk_usage_percent !== undefined) {
+      const diskUsage = data.summary.disk_usage_percent;
       diskElement.textContent = `${diskUsage}%`;
       diskElement.className = diskUsage < 80 ? 'summary-value text-success' :
                               diskUsage < 95 ? 'summary-value text-warning' : 'summary-value text-danger';
@@ -1444,6 +1472,133 @@ class SystemManagement {
     if (securityAlertsElement) {
       securityAlertsElement.textContent = '0';
       securityAlertsElement.className = 'summary-value text-success';
+    }
+  }
+
+  /**
+   * Update external data summary
+   * עדכון סיכום נתונים חיצוניים
+   */
+  async updateExternalData() {
+    try {
+      const response = await fetch('/api/external-data/status/');
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        const data = result.data;
+        
+        // Update summary values
+        const activeProvidersElement = document.getElementById('activeProvidersCount');
+        const lastUpdateElement = document.getElementById('lastDataUpdate');
+        const accuracyElement = document.getElementById('dataAccuracy');
+        const cacheStatusElement = document.getElementById('cacheStatus');
+        
+        if (activeProvidersElement) {
+          const activeCount = data.providers?.filter(p => p.status === 'active').length || 0;
+          activeProvidersElement.textContent = `${activeCount}`;
+          activeProvidersElement.className = activeCount > 0 ? 'summary-value text-success' : 'summary-value text-danger';
+        }
+        
+        if (lastUpdateElement) {
+          const lastUpdate = data.last_update || 'לא זמין';
+          lastUpdateElement.textContent = lastUpdate;
+          lastUpdateElement.className = 'summary-value text-info';
+        }
+        
+        if (accuracyElement) {
+          const accuracy = data.accuracy_percent || 0;
+          accuracyElement.textContent = `${accuracy}%`;
+          accuracyElement.className = accuracy >= 90 ? 'summary-value text-success' : 
+                                     accuracy >= 70 ? 'summary-value text-warning' : 'summary-value text-danger';
+        }
+        
+        if (cacheStatusElement) {
+          const cacheStatus = data.cache?.status || 'לא זמין';
+          cacheStatusElement.textContent = cacheStatus === 'healthy' ? 'בריא' : cacheStatus;
+          cacheStatusElement.className = cacheStatus === 'healthy' ? 'summary-value text-success' : 'summary-value text-warning';
+        }
+        
+        // Update providers list
+        this.updateProvidersList(data.providers || []);
+        
+        console.log('✅ External data updated successfully');
+      } else {
+        console.log('⚠️ External data API returned no data');
+      }
+    } catch (error) {
+      console.error('❌ Error updating external data:', error);
+    }
+  }
+
+  /**
+   * Update providers list
+   * עדכון רשימת ספקים
+   */
+  updateProvidersList(providers) {
+    const providerListElement = document.getElementById('providerList');
+    if (!providerListElement || !providers.length) return;
+    
+    providerListElement.innerHTML = providers.map(provider => `
+      <div class="provider-item ${provider.status === 'active' ? 'active' : 'inactive'}">
+        <div class="provider-info">
+          <span class="provider-name">${provider.name || 'Unknown Provider'}</span>
+          <span class="provider-status ${provider.status === 'active' ? 'active' : 'inactive'}">
+            ${provider.status === 'active' ? 'פעיל' : 'לא פעיל'}
+          </span>
+        </div>
+        <div class="provider-details">
+          <small class="text-muted">
+            ${provider.last_update ? `עדכון אחרון: ${provider.last_update}` : 'אין עדכונים'}
+          </small>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /**
+   * Update alerts summary
+   * עדכון סיכום התראות
+   */
+  async updateAlerts() {
+    try {
+      // Get alerts from localStorage (global notification system)
+      const globalHistory = JSON.parse(localStorage.getItem('globalNotificationHistory') || '[]');
+      
+      // Count alerts by type
+      const errorCount = globalHistory.filter(alert => alert.type === 'error').length;
+      const warningCount = globalHistory.filter(alert => alert.type === 'warning').length;
+      const infoCount = globalHistory.filter(alert => alert.type === 'info').length;
+      const totalAlerts = globalHistory.length;
+      
+      // Update summary elements
+      const errorElement = document.getElementById('errorCount');
+      const warningElement = document.getElementById('warningCount');
+      const infoElement = document.getElementById('infoCount');
+      const totalElement = document.getElementById('totalAlerts');
+      
+      if (errorElement) {
+        errorElement.textContent = errorCount;
+        errorElement.className = errorCount > 0 ? 'summary-value text-danger' : 'summary-value text-success';
+      }
+      
+      if (warningElement) {
+        warningElement.textContent = warningCount;
+        warningElement.className = warningCount > 0 ? 'summary-value text-warning' : 'summary-value text-success';
+      }
+      
+      if (infoElement) {
+        infoElement.textContent = infoCount;
+        infoElement.className = 'summary-value text-info';
+      }
+      
+      if (totalElement) {
+        totalElement.textContent = totalAlerts;
+        totalElement.className = totalAlerts > 0 ? 'summary-value text-warning' : 'summary-value text-success';
+      }
+      
+      console.log('✅ Alerts summary updated successfully');
+    } catch (error) {
+      console.error('❌ Error updating alerts summary:', error);
     }
   }
 
@@ -1926,10 +2081,12 @@ class SystemManagement {
     }
     this.isInitialized = false;
   }
-}
 
-// Global function for copying detailed log
-async function copyDetailedLog() {
+  /**
+   * Copy detailed log to clipboard
+   * העתקת לוג מפורט ללוח
+   */
+  static async copyDetailedLog() {
   try {
     console.log('📋 Generating detailed log...');
     
@@ -1991,8 +2148,7 @@ async function copyDetailedLog() {
     }
   }
 }
-
-// Initialize dashboard when DOM is ready
+}// Initialize dashboard when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
   window.systemManagement = new SystemManagement();
   window.systemManagement.init();
@@ -2013,4 +2169,3 @@ window.addEventListener('beforeunload', () => {
     window.systemManagement.destroy();
   }
 });
-

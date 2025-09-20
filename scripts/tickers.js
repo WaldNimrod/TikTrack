@@ -6,7 +6,7 @@
  */
 function editTicker(tickerId) {
   try {
-    console.log('✏️ עורך טיקר:', tickerId);
+
     
     // חיפוש הטיקר בנתונים
     const ticker = window.tickersData.find(t => t.id === tickerId);
@@ -712,7 +712,7 @@ async function saveTicker() {
         }
       });
       
-
+      console.log('✅ המערכת הגלובלית החזירה:', handled);
       
       if (handled) {
         return; // המערכת הגלובלית טיפלה בהכל

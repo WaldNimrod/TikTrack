@@ -19,6 +19,30 @@
   justify-content: flex-start; /* משמאל */
   flex-wrap: nowrap; /* תמיד בשורה אחת */
   align-items: center;
+  width: 100%;
+}
+
+/* כפתורי פעולות מהירות - פריסה נכונה */
+.actions-row .action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #e9ecef);
+  background: var(--card-bg, #ffffff);
+  transition: all 0.3s ease;
+  min-width: 120px;
+  text-decoration: none;
+  color: var(--text-primary, #212529);
+}
+
+.actions-row .action-btn:hover {
+  background: var(--primary-color, #007bff);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
 }
 
 .btn-group-default .btn,

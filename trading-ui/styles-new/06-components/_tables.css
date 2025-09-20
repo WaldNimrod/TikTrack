@@ -14,11 +14,13 @@ table,
 .data-table {
   width: 100%;
   min-width: 100%;
+  max-width: 1400px; /* רוחב מסך מלא */
   table-layout: auto;
   direction: rtl;
   border-collapse: separate;
   border-spacing: 0;
   font-family: var(--font-family-primary);
+  overflow-x: visible; /* ללא גלילה אופקית */
 }
 
 /* כותרות טבלה */

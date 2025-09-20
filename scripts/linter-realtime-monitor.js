@@ -1880,11 +1880,13 @@ function getSelectedFileTypes() {
     const selectedTypes = [];
     Object.keys(typeMap).forEach(checkboxId => {
         const checkbox = document.getElementById(checkboxId);
+        console.log(`🔍 Checking checkbox ${checkboxId}:`, checkbox ? `found, checked=${checkbox.checked}` : 'not found');
         if (checkbox && checkbox.checked) {
             selectedTypes.push(typeMap[checkboxId]);
         }
     });
     
+    console.log('📋 Final selected types:', selectedTypes);
     return selectedTypes;
 }
 
@@ -2769,6 +2771,9 @@ async function discoverProjectFiles() {
             addLogEntry('INFO', 'משתמש במנגנון סריקת קבצים גלובלי...');
             const discoveredFiles = await window.projectFilesScanner.getProjectFiles();
             const stats = await window.projectFilesScanner.getFileStatistics();
+            
+            console.log('📁 Discovered files:', discoveredFiles);
+            console.log('📊 File statistics:', stats);
             
             // Store in global variable for backward compatibility
             window.projectFiles = discoveredFiles;

@@ -65,7 +65,11 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <style>
+    <!-- Cache Test Styles -->
+    <link rel="stylesheet" href="styles-new/06-components/_cache-test.css?v=1.0.0">
+    
+    <!-- Cache Test Styles - MOVED TO EXTERNAL CSS FILE -->
+    <!-- <style>
         /* Dependency Tree Styles */
         .dependency-tree {
             background: #f8f9fa;
@@ -125,7 +129,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             height: 300px;
         }
-    </style>
+    </style> -->
     
     <!-- Error Handlers -->
     <script src="scripts/error-handlers.js"></script>
@@ -356,7 +360,7 @@
                     </div>
                     <div class="section-body">
                         <div class="button-row mb-3">
-                            <div class="input-group" style="max-width: 300px;">
+                            <div class="input-group cache-search-input">
                                 <input type="text" class="form-control" id="cacheSearch" placeholder="חיפוש במטמון..." onkeyup="searchCacheEntries()">
                                 <button class="btn btn-outline-secondary" type="button" onclick="searchCacheEntries()">
                                     <i class="fas fa-search"></i>

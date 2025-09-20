@@ -23,6 +23,19 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+/* רקע בצבע ראשי עם שקיפות 0.2 מאחורי האיור */
+.hero-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-color, #007bff);
+  opacity: 0.2;
+  z-index: 0;
+}
+
 /* רווח מתחת לסקשן העליון */
 .top-section {
   margin-bottom: 10px;

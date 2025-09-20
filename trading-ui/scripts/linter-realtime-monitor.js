@@ -1034,8 +1034,11 @@ async function performScan() {
     
     // אם לא נבחרו סוגי קבצים, נבחר את כולם
     if (selectedTypes.length === 0) {
+        console.log('⚠️ No file types selected, defaulting to all types');
         selectedTypes.push('js', 'html', 'css', 'python', 'other');
     }
+    
+    console.log('📁 Will scan files of types:', selectedTypes);
     
     let filesToScan = [];
     console.log('🔍 Starting file discovery...');
@@ -1877,11 +1880,13 @@ function getSelectedFileTypes() {
     const selectedTypes = [];
     Object.keys(typeMap).forEach(checkboxId => {
         const checkbox = document.getElementById(checkboxId);
+        console.log(`🔍 Checking checkbox ${checkboxId}:`, checkbox ? `found, checked=${checkbox.checked}` : 'not found');
         if (checkbox && checkbox.checked) {
             selectedTypes.push(typeMap[checkboxId]);
         }
     });
     
+    console.log('📋 Final selected types:', selectedTypes);
     return selectedTypes;
 }
 
@@ -2753,11 +2758,22 @@ async function fixSingleIssue(issue) {
 async function discoverProjectFiles() {
     addLogEntry('INFO', 'מתחיל גילוי קבצי הפרויקט...');
     
+    // Show progress indicator
+    const progressElement = document.getElementById('fileDiscoveryProgress');
+    if (progressElement) {
+        progressElement.style.display = 'block';
+        progressElement.textContent = 'מגלה קבצים...';
+    }
+    
     try {
         // Use global project files scanner if available
         if (typeof window.projectFilesScanner !== 'undefined') {
+            addLogEntry('INFO', 'משתמש במנגנון סריקת קבצים גלובלי...');
             const discoveredFiles = await window.projectFilesScanner.getProjectFiles();
             const stats = await window.projectFilesScanner.getFileStatistics();
+            
+            console.log('📁 Discovered files:', discoveredFiles);
+            console.log('📊 File statistics:', stats);
             
             // Store in global variable for backward compatibility
             window.projectFiles = discoveredFiles;
@@ -2767,6 +2783,11 @@ async function discoverProjectFiles() {
             
             addLogEntry('INFO', `גילוי הושלם - נמצאו ${stats.total} קבצים (JS: ${stats.js}, HTML: ${stats.html}, CSS: ${stats.css}, Python: ${stats.python}, Other: ${stats.other})`);
             
+            // Hide progress indicator
+            if (progressElement) {
+                progressElement.style.display = 'none';
+            }
+            
             return discoveredFiles;
             } else {
             addLogEntry('WARNING', 'מנגנון סריקת קבצים גלובלי לא זמין - משתמש ברשימה סטטית');
@@ -2774,6 +2795,12 @@ async function discoverProjectFiles() {
             }
         } catch (error) {
         addLogEntry('ERROR', 'שגיאה בגילוי קבצי הפרויקט', { error: error.message });
+        
+        // Hide progress indicator on error
+        if (progressElement) {
+            progressElement.style.display = 'none';
+        }
+        
         return await discoverProjectFilesFallback();
     }
 }

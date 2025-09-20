@@ -117,21 +117,25 @@ class QualityChartRenderer {
 
     async initialize() {
         try {
+            console.log(`🎯 Initializing QualityChartRenderer for container: ${this.containerId}`);
             const container = document.getElementById(this.containerId);
             if (!container) {
                 throw new Error(`Container ${this.containerId} not found`);
             }
+            console.log('✅ Container found:', container);
 
             // Create canvas element inside the container
             const canvas = document.createElement('canvas');
             canvas.style.width = '100%';
             canvas.style.height = '100%';
             container.appendChild(canvas);
+            console.log('✅ Canvas created and appended');
 
             const ctx = canvas.getContext('2d');
             if (!ctx) {
                 throw new Error('Could not get 2D context');
             }
+            console.log('✅ 2D context obtained');
 
             this.chart = new Chart(ctx, {
                 type: 'line',
@@ -200,7 +204,7 @@ class QualityChartRenderer {
             });
 
             this.isInitialized = true;
-            console.log('✅ Quality chart initialized successfully');
+
         } catch (error) {
             console.error('❌ Quality chart initialization error:', error);
             throw error;

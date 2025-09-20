@@ -18,7 +18,7 @@ function showNotification(message, type = 'info', title = 'מערכת', duration
         window.showNotification(message, type, title, duration);
     } else {
         // Fallback to console.log if global system is not available
-        console.log(`[${type.toUpperCase()}] ${title}: ${message}`);
+        }] ${title}: ${message}`);
     }
 }
 
@@ -32,7 +32,7 @@ function toggleStylesState(enabled) {
     
     if (enabled) {
         htmlElement.className = htmlElement.className.replace('styles-disabled', 'styles-enabled');
-
+        console.log('🎨 [CASCADE] Enabled all styles via CSS cascade control');
     } else {
         htmlElement.className = htmlElement.className.replace('styles-enabled', 'styles-disabled');
         console.log('🎨 [CASCADE] Disabled all styles via CSS cascade control');

@@ -33,7 +33,7 @@
   height: 100%;
   background: var(--primary-color, #007bff);
   opacity: 0.2;
-  z-index: 0;
+  z-index: -1; /* מאחורי האיור */
 }
 
 /* רווח מתחת לסקשן העליון */
@@ -49,6 +49,7 @@
   height: 100%;
   opacity: 1;
   z-index: 1;
+  pointer-events: none; /* לא מפריע לאינטראקציה */
 }
 
 .hero-content {

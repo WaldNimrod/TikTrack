@@ -10,7 +10,7 @@
  */
 function executeTradePlan(planId) {
   try {
-    console.log('⚡ מבצע תוכנית מסחר:', planId);
+
     
     // חיפוש התוכנית בנתונים
     const plan = window.tradePlansData.find(p => p.id === planId);
@@ -44,7 +44,7 @@ function executeTradePlan(planId) {
         return response.json();
       })
       .then(data => {
-
+        console.log('✅ תוכנית מסחר בוצעה:', data);
         
         // רענון הטבלה
         loadTradePlansData();

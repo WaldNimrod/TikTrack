@@ -517,7 +517,6 @@
     
     <!-- Notification System -->
     <script src="scripts/notification-system.js"></script>
-    <script src="scripts/warning-system.js"></script>
   <script src="scripts/global-notification-collector.js"></script>
     
     <!-- Main Utilities -->

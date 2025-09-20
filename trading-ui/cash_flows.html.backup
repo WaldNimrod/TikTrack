@@ -466,7 +466,6 @@
     <script src="scripts/ui-utils.js"></script>
     <script src="scripts/validation-utils.js"></script>
     <script src="scripts/notification-system.js"></script>
-    <script src="scripts/warning-system.js"></script>
   <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/error-handlers.js"></script>
     <!-- Filter System Script -->

@@ -62,13 +62,16 @@
 </head>
 <body class="server-monitor-page">
     <!-- Unified Header Container -->
-    <div id="unified-header"></div>
-    
     <div class="background-wrapper">
-        <!-- Page body - All content after header -->
+        <!-- Header System -->
+        <div id="unified-header"></div>
+
+        <!-- Page body -->
         <div class="page-body">
-            <!-- Page area - top-Section -->
-            <div class="top-section">
+            <!-- Main content limited in width -->
+            <div class="main-content">
+                <!-- UI Content Section Top Start-->
+                <div class="top-section">
                 <!-- Main header -->
                 <div class="section-header">
                     <div class="table-title">
@@ -80,7 +83,7 @@
                         <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
                             <i class="fas fa-copy"></i> העתק לוג מפורט
                         </button>
-                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור ניטור שרת">
+                        <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר אזור ניטור שרת">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -106,13 +109,11 @@
                         <div>סטטוס כללי: <strong id="overallStatus">בדיקה...</strong></div>
                     </div>
                 </div>
-            </div> <!-- End top-section -->
+                </div>
+                <!-- UI Content Section Top End -->  
 
-            <!-- Main content -->
-            <div class="main-content" data-section="server-monitor">
-                <div class="container">
-                    <!-- UI Content Section 1 Start-->
-                    <div class="content-section" id="section1">
+                <!-- UI Content Section 1 Start-->
+                <div class="content-section" id="section1">
                         <div class="section-header">
                             <h2>⚡ פעולות מהירות</h2>
                             <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
@@ -277,9 +278,10 @@
                     </div>
                     <!-- UI Content Section 3 End-->
                 </div>
-            </div> <!-- End main-content -->
-        </div> <!-- End page-body -->
-    </div> <!-- End background-wrapper -->
+                </div>
+            </div>
+        </div>
+    </div>
     
     <!-- Scripts -->
     <script src="scripts/header-system.js?v=v34_fixes"></script>

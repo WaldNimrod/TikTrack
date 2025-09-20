@@ -32,7 +32,9 @@ window.scanningResults = {
 // Chart and data management
 let chartInstance = null;
 let dataCollectorInstance = null;
-let chartRendererInstance = null;
+// Global chart renderer instances
+let qualityChartRenderer = null;
+let countsChartRenderer = null;
 let isMonitoring = false;
 let autoRefreshInterval = null;
 let projectFiles = [];
@@ -89,32 +91,106 @@ window.clearProjectFilesCache = function() {
 // Chart Management
 // ========================================
 
-function initializeChart() {
-    // בדיקה אם הגרף כבר מאותחל
-    if (chartRendererInstance && chartRendererInstance.isInitialized) {
-        console.log('📊 הגרף כבר מאותחל - מדלג על אתחול חוזר');
+function initializeCharts() {
+    if (typeof ChartRenderer === 'undefined') {
+        addLogEntry('WARNING', 'ChartRenderer לא זמין - הגרפים לא יוצגו');
+        console.warn('ChartRenderer is not available');
         return;
     }
-    
-    if (typeof ChartRenderer !== 'undefined') {
-        // השמדת instance קיים אם קיים
-        if (chartRendererInstance) {
-            console.log('🗑️ משמיד instance קיים של הגרף...');
-            chartRendererInstance.destroy();
-            chartRendererInstance = null;
-        }
 
-        chartRendererInstance = new ChartRenderer('chartContainer');
-        chartRendererInstance.initialize().then(() => {
-            addLogEntry('SUCCESS', 'גרף הלינטר אותחל בהצלחה');
-            loadInitialData();
-        }).catch(error => {
-            addLogEntry('ERROR', 'שגיאה באתחול הגרף', { error: error.message });
-            console.error('Chart initialization error:', error);
-        });
-    } else {
-        addLogEntry('WARNING', 'ChartRenderer לא זמין - הגרף לא יוצג');
-        console.warn('ChartRenderer is not available');
+    // Initialize Quality Chart (percentages)
+    if (qualityChartRenderer) {
+        console.log('🗑️ משמיד instance קיים של גרף איכות...');
+        qualityChartRenderer.destroy();
+        qualityChartRenderer = null;
+    }
+
+    qualityChartRenderer = new ChartRenderer('qualityChartContainer');
+    qualityChartRenderer.initialize().then(() => {
+        addLogEntry('SUCCESS', 'גרף איכות קוד אותחל בהצלחה');
+        console.log('✅ Quality chart initialized');
+    }).catch(error => {
+        addLogEntry('ERROR', 'שגיאה באתחול גרף איכות', { error: error.message });
+        console.error('Quality chart initialization error:', error);
+    });
+
+    // Initialize Counts Chart (numbers)
+    if (countsChartRenderer) {
+        console.log('🗑️ משמיד instance קיים של גרף ספירות...');
+        countsChartRenderer.destroy();
+        countsChartRenderer = null;
+    }
+
+    countsChartRenderer = new ChartRenderer('countsChartContainer');
+    countsChartRenderer.initialize().then(() => {
+        addLogEntry('SUCCESS', 'גרף ספירות אותחל בהצלחה');
+        console.log('✅ Counts chart initialized');
+        loadInitialData();
+    }).catch(error => {
+        addLogEntry('ERROR', 'שגיאה באתחול גרף ספירות', { error: error.message });
+        console.error('Counts chart initialization error:', error);
+    });
+}
+
+// Helper functions for updating charts
+function updateQualityChart(data) {
+    if (qualityChartRenderer && qualityChartRenderer.isInitialized) {
+        // Filter data for quality metrics (percentages)
+        const qualityData = data.map(item => ({
+            timestamp: item.timestamp,
+            metrics: {
+                qualityScore: item.metrics.qualityScore
+            }
+        }));
+        qualityChartRenderer.updateChart(qualityData);
+    }
+}
+
+function updateCountsChart(data) {
+    if (countsChartRenderer && countsChartRenderer.isInitialized) {
+        // Filter data for count metrics (numbers)
+        const countsData = data.map(item => ({
+            timestamp: item.timestamp,
+            metrics: {
+                totalFiles: item.metrics.totalFiles,
+                errors: item.metrics.errors,
+                warnings: item.metrics.warnings
+            }
+        }));
+        countsChartRenderer.updateChart(countsData);
+    }
+}
+
+function addDataPointToCharts(dataPoint) {
+    if (qualityChartRenderer && qualityChartRenderer.isInitialized) {
+        const qualityPoint = {
+            timestamp: dataPoint.timestamp,
+            metrics: {
+                qualityScore: dataPoint.metrics.qualityScore
+            }
+        };
+        qualityChartRenderer.addDataPoint(qualityPoint);
+    }
+    
+    if (countsChartRenderer && countsChartRenderer.isInitialized) {
+        const countsPoint = {
+            timestamp: dataPoint.timestamp,
+            metrics: {
+                totalFiles: dataPoint.metrics.totalFiles,
+                errors: dataPoint.metrics.errors,
+                warnings: dataPoint.metrics.warnings
+            }
+        };
+        countsChartRenderer.addDataPoint(countsPoint);
+    }
+}
+
+function clearCharts() {
+    if (qualityChartRenderer) {
+        qualityChartRenderer.clearChart();
+    }
+    if (countsChartRenderer) {
+        countsChartRenderer.clearChart();
     }
 }
 
@@ -163,11 +239,10 @@ async function loadInitialData() {
                     updateFileTypeCardsProgress();
                 }
                 
-                // Update chart with historical data
-                if (chartRendererInstance) {
-                    chartRendererInstance.updateChart(latestData);
-                    console.log('✅ Chart updated with historical data from IndexedDB:', latestData);
-                }
+                // Update charts with historical data
+                updateQualityChart(latestData);
+                updateCountsChart(latestData);
+                console.log('✅ Charts updated with historical data from IndexedDB:', latestData);
                 
                 addLogEntry('SUCCESS', `נטענו ${latestData.length} נקודות נתונים היסטוריות`);
             } else {
@@ -297,7 +372,7 @@ async function updateStatisticsDisplay() {
                         addLogEntry('INFO', 'לא נמצאו נתונים שמורים - מתחיל עם נתונים ריקים');
                         
                         // Show confirmation dialog to start first scan
-                        setTimeout(() => {
+    setTimeout(() => {
                             if (typeof window.showConfirmationDialog === 'function') {
                                 window.showConfirmationDialog(
                                     'סריקה ראשונה',
@@ -311,10 +386,18 @@ async function updateStatisticsDisplay() {
                                     'info'
                                 );
                             } else {
-                                // Fallback to regular confirm if showConfirmationDialog is not available
-                                if (confirm('לא נמצאו נתוני סריקה קודמים.\n\nהאם תרצה לבצע סריקה ראשונה עכשיו?')) {
-                                    scanJavaScriptFiles();
-                                }
+                                // Show custom confirmation dialog
+                                showConfirmationDialog(
+                                    'סריקה ראשונה',
+                                    'לא נמצאו נתוני סריקה קודמים.\n\nהאם תרצה לבצע סריקה ראשונה עכשיו?',
+                                    () => {
+                                        scanJavaScriptFiles();
+                                    },
+                                    () => {
+                                        addLogEntry('INFO', 'סריקה ראשונה בוטלה על ידי המשתמש');
+                                    },
+                                    'info'
+                                );
                             }
                         }, 1000);
                     }
@@ -340,10 +423,18 @@ async function updateStatisticsDisplay() {
                             'info'
                         );
                     } else {
-                        // Fallback to regular confirm if showConfirmationDialog is not available
-                        if (confirm('לא נמצאו נתוני סריקה קודמים.\n\nהאם תרצה לבצע סריקה ראשונה עכשיו?')) {
-                            scanJavaScriptFiles();
-                        }
+                        // Show custom confirmation dialog
+                        showConfirmationDialog(
+                            'סריקה ראשונה',
+                            'לא נמצאו נתוני סריקה קודמים.\n\nהאם תרצה לבצע סריקה ראשונה עכשיו?',
+                            () => {
+                                scanJavaScriptFiles();
+                            },
+                            () => {
+                                addLogEntry('INFO', 'סריקה ראשונה בוטלה על ידי המשתמש');
+                            },
+                            'info'
+                        );
                     }
                 }, 1000);
             }
@@ -541,7 +632,7 @@ function updateChartIndicators() {
                 avgQualityElement.style.color = '#28a745'; // Green
             } else if (qualityScore >= 70) {
                 avgQualityElement.style.color = '#ffc107'; // Yellow
-            } else {
+        } else {
                 avgQualityElement.style.color = '#dc3545'; // Red
             }
         }
@@ -1377,26 +1468,25 @@ async function finishScan() {
         lastScanElement.textContent = new Date().toLocaleString('he-IL');
     }
     
-    // Update chart with real scan data
-    if (chartRendererInstance) {
-        const chartData = {
-            timestamp: new Date().toISOString(),
-            metrics: {
-                totalFiles: window.scanningResults.totalFiles,
-                errors: window.scanningResults.errors.length,
-                warnings: window.scanningResults.warnings.length,
-                qualityScore: Math.max(0, 100 - (window.scanningResults.errors.length * 5) - (window.scanningResults.warnings.length * 2))
-            },
-            filesScanned: window.scanningResults.scannedFiles,
-            scanDuration: duration,
-            errors: window.scanningResults.errors,
-            warnings: window.scanningResults.warnings
-        };
-        
-        // Update chart with real data
-        chartRendererInstance.updateChart([chartData]);
-        console.log('✅ Chart updated with real scan data:', chartData);
-    }
+    // Update charts with real scan data
+    const chartData = {
+        timestamp: new Date().toISOString(),
+        metrics: {
+            totalFiles: window.scanningResults.totalFiles,
+            errors: window.scanningResults.errors.length,
+            warnings: window.scanningResults.warnings.length,
+            qualityScore: Math.max(0, 100 - (window.scanningResults.errors.length * 5) - (window.scanningResults.warnings.length * 2))
+        },
+        filesScanned: window.scanningResults.scannedFiles,
+        scanDuration: duration,
+        errors: window.scanningResults.errors,
+        warnings: window.scanningResults.warnings
+    };
+    
+    // Update charts with real data
+    updateQualityChart([chartData]);
+    updateCountsChart([chartData]);
+    console.log('✅ Charts updated with real scan data:', chartData);
     
     // Save scanning results to localStorage for next load
     try {
@@ -1444,25 +1534,23 @@ async function finishScan() {
         }
     }
     
-    // Update chart
-    if (chartRendererInstance) {
-        try {
-            const latestDataPoint = {
-                timestamp: new Date().toISOString(),
-                metrics: {
-                    qualityScore: Math.max(0, 100 - (window.scanningResults.errors.length * 5) - (window.scanningResults.warnings.length * 2)),
-                    errors: window.scanningResults.errors.length,
-                    warnings: window.scanningResults.warnings.length,
-                    totalFiles: window.scanningResults.totalFiles,
-                    scannedFiles: window.scanningResults.scannedFiles,
-                    scanDuration: duration
-                }
-            };
-            
-            chartRendererInstance.addDataPoint(latestDataPoint);
-        } catch (error) {
-            console.error('Chart update error:', error);
-        }
+    // Update charts
+    try {
+        const latestDataPoint = {
+            timestamp: new Date().toISOString(),
+            metrics: {
+                qualityScore: Math.max(0, 100 - (window.scanningResults.errors.length * 5) - (window.scanningResults.warnings.length * 2)),
+                errors: window.scanningResults.errors.length,
+                warnings: window.scanningResults.warnings.length,
+                totalFiles: window.scanningResults.totalFiles,
+                scannedFiles: window.scanningResults.scannedFiles,
+                scanDuration: duration
+            }
+        };
+        
+        addDataPointToCharts(latestDataPoint);
+    } catch (error) {
+        console.error('Chart update error:', error);
     }
 }
 
@@ -1541,8 +1629,8 @@ async function initializeSession() {
     // Check and update project files
     checkAndUpdateProjectFiles();
     
-    // Initialize chart
-    initializeChart();
+    // Initialize charts
+    initializeCharts();
     
     // Load existing logs
     loadLogs();
@@ -1681,15 +1769,16 @@ function monitorSecurity(entry) {
 
 function attemptChartRecovery() {
     
-    // הגרף כבר מאותחל כראוי - אין צורך באתחול חוזר
-    if (chartRendererInstance && chartRendererInstance.isInitialized) {
+    // הגרפים כבר מאותחלים כראוי - אין צורך באתחול חוזר
+    if ((qualityChartRenderer && qualityChartRenderer.isInitialized) && 
+        (countsChartRenderer && countsChartRenderer.isInitialized)) {
         return;
     }
     
     // רק אם הגרף לא מאותחל, ננסה לאתחל אותו
     setTimeout(() => {
         try {
-            initializeChart();
+            initializeCharts();
     } catch (error) {
         }
     }, 2000);
@@ -1792,19 +1881,20 @@ function calculateTotalSize() {
     return window.scanningResults.scannedFiles * avgFileSize;
 }
 
-async function autoUpdateChart() {
-    if (chartRendererInstance && typeof window.LinterIndexedDBAdapter !== 'undefined') {
+async function autoUpdateCharts() {
+    if ((qualityChartRenderer || countsChartRenderer) && typeof window.LinterIndexedDBAdapter !== 'undefined') {
         try {
             const adapter = new window.LinterIndexedDBAdapter();
             await adapter.initialize();
             const latestData = await adapter.getHistoricalData();
             
             if (latestData && latestData.length > 0) {
-                chartRendererInstance.updateChart(latestData);
-                addLogEntry('INFO', 'גרף עודכן אוטומטית');
+                updateQualityChart(latestData);
+                updateCountsChart(latestData);
+                addLogEntry('INFO', 'גרפים עודכנו אוטומטית');
             }
         } catch (error) {
-            addLogEntry('ERROR', 'שגיאה בעדכון אוטומטי של הגרף', { error: error.message });
+            addLogEntry('ERROR', 'שגיאה בעדכון אוטומטי של הגרפים', { error: error.message });
         }
     }
 }
@@ -1833,24 +1923,28 @@ async function updateChartIndicators(latestDataPoint) {
 // ========================================
 
 window.refreshChartData = async function() {
-    addLogEntry('INFO', 'מרענן נתוני גרף...');
+    addLogEntry('INFO', 'מרענן נתוני גרפים...');
     
-    if (chartRendererInstance && typeof window.LinterIndexedDBAdapter !== 'undefined') {
+    if ((qualityChartRenderer || countsChartRenderer) && typeof window.LinterIndexedDBAdapter !== 'undefined') {
         try {
             const adapter = new window.LinterIndexedDBAdapter();
             await adapter.initialize();
             const historicalData = await adapter.getHistoricalData();
             
-            chartRendererInstance.updateChart(historicalData);
-            addLogEntry('SUCCESS', 'נתוני הגרף עודכנו בהצלחה');
+            updateQualityChart(historicalData);
+            updateCountsChart(historicalData);
+            addLogEntry('SUCCESS', 'נתוני הגרפים עודכנו בהצלחה');
         } catch (error) {
-            addLogEntry('ERROR', 'שגיאה ברענון נתוני הגרף', { error: error.message });
+            addLogEntry('ERROR', 'שגיאה ברענון נתוני הגרפים', { error: error.message });
         }
     }
 };
 
 window.clearChartHistory = async function() {
-    if (confirm('האם אתה בטוח שברצונך לנקות את כל ההיסטוריה?')) {
+    showConfirmationDialog(
+        'ניקוי היסטוריה',
+        'האם אתה בטוח שברצונך לנקות את כל ההיסטוריה?',
+        async () => {
         try {
             if (typeof window.LinterIndexedDBAdapter !== 'undefined') {
                 const adapter = new window.LinterIndexedDBAdapter();
@@ -1858,9 +1952,7 @@ window.clearChartHistory = async function() {
                 await adapter.clearAllData();
             }
             
-            if (chartRendererInstance) {
-                chartRendererInstance.clearChart();
-            }
+            clearCharts();
             
             // Clear localStorage as well
             localStorage.removeItem('linterScanningResults');
@@ -1903,7 +1995,12 @@ window.clearChartHistory = async function() {
         } catch (error) {
             addLogEntry('ERROR', 'שגיאה בניקוי היסטוריית הגרף', { error: error.message });
         }
-    }
+        },
+        () => {
+            addLogEntry('INFO', 'ניקוי היסטוריה בוטל על ידי המשתמש');
+        },
+        'warning'
+    );
 };
 
 window.applyChartSettings = async function() {
@@ -2027,9 +2124,9 @@ function initializeLinterRealtimeMonitorPage() {
     // Initialize the linter system
     initializeLinterSystem();
     
-    // Initialize chart
-    if (typeof window.initializeChart === 'function') {
-        window.initializeChart();
+    // Initialize charts
+    if (typeof window.initializeCharts === 'function') {
+        window.initializeCharts();
     }
     
     // Start auto discovery
@@ -2293,6 +2390,24 @@ async function fixAllErrors() {
         return;
     }
     
+    // Initialize progress tracking
+    window.fixProgress = {
+        totalFiles: 0,
+        fixedFiles: 0,
+        totalIssues: window.scanningResults.errors.length,
+        fixedIssues: 0,
+        currentFile: '',
+        startTime: Date.now()
+    };
+    
+    // Show progress display
+    const progressElement = document.getElementById('fixProgressDisplay');
+    if (progressElement) {
+        progressElement.style.display = 'block';
+    }
+    
+    updateFixProgressDisplay();
+    
     let fixedCount = 0;
     let failedCount = 0;
     
@@ -2304,12 +2419,20 @@ async function fixAllErrors() {
             continue;
         }
         
+        // Update current file
+        window.fixProgress.currentFile = error.file;
+        updateFixProgressDisplay();
+        
         try {
             const success = await fixSingleIssue(error);
             if (success) {
                 window.fixedIssues.errors.add(issueId);
                 window.scanningResults.errors.splice(i, 1);
                 fixedCount++;
+                window.fixProgress.fixedIssues++;
+                
+                // Update progress display
+                updateFixProgressDisplay();
             } else {
                 failedCount++;
             }
@@ -2331,6 +2454,9 @@ async function fixAllErrors() {
     const successRate = window.scanningResults.errors.length + fixedCount > 0 ? 
         Math.round((fixedCount / (window.scanningResults.errors.length + fixedCount)) * 100) : 0;
     addLogEntry('SUCCESS', `תיקון שגיאות הושלם! תוקנו ${fixedCount} שגיאות (${successRate}% הצלחה)`);
+    
+    // Show final results
+    showFixResults();
 }
 
 async function fixAllWarnings() {
@@ -2340,6 +2466,24 @@ async function fixAllWarnings() {
         addLogEntry('INFO', 'אין אזהרות לתיקון');
         return;
     }
+    
+    // Initialize progress tracking
+    window.fixProgress = {
+        totalFiles: 0,
+        fixedFiles: 0,
+        totalIssues: window.scanningResults.warnings.length,
+        fixedIssues: 0,
+        currentFile: '',
+        startTime: Date.now()
+    };
+    
+    // Show progress display
+    const progressElement = document.getElementById('fixProgressDisplay');
+    if (progressElement) {
+        progressElement.style.display = 'block';
+    }
+    
+    updateFixProgressDisplay();
     
     let fixedCount = 0;
     let failedCount = 0;
@@ -2352,13 +2496,21 @@ async function fixAllWarnings() {
             continue;
         }
         
+        // Update current file
+        window.fixProgress.currentFile = warning.file;
+        updateFixProgressDisplay();
+        
         try {
             const success = await fixSingleIssue(warning);
             if (success) {
                 window.fixedIssues.warnings.add(issueId);
                 window.scanningResults.warnings.splice(i, 1);
                 fixedCount++;
-    } else {
+                window.fixProgress.fixedIssues++;
+                
+                // Update progress display
+                updateFixProgressDisplay();
+            } else {
                 failedCount++;
             }
             // Add delay to prevent rate limiting
@@ -2379,6 +2531,9 @@ async function fixAllWarnings() {
     const successRate = window.scanningResults.warnings.length + fixedCount > 0 ? 
         Math.round((fixedCount / (window.scanningResults.warnings.length + fixedCount)) * 100) : 0;
     addLogEntry('SUCCESS', `תיקון אזהרות הושלם! תוקנו ${fixedCount} אזהרות (${successRate}% הצלחה)`);
+    
+    // Show final results
+    showFixResults();
 }
 
 async function ignoreAllIssues() {
@@ -2721,7 +2876,11 @@ window.discoverProjectFiles = discoverProjectFiles;
 window.startFileScan = startFileScan;
 window.startMonitoring = startMonitoring;
 window.stopMonitoring = stopMonitoring;
-window.initializeChart = initializeChart;
+window.initializeCharts = initializeCharts;
+window.updateQualityChart = updateQualityChart;
+window.updateCountsChart = updateCountsChart;
+window.addDataPointToCharts = addDataPointToCharts;
+window.clearCharts = clearCharts;
 window.fixAllIssues = fixAllIssues;
 window.fixAllErrors = fixAllErrors;
 window.fixAllWarnings = fixAllWarnings;

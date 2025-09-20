@@ -219,6 +219,21 @@
   transform: scale(1.1);
 }
 
+/* Section Toggle Icon */
+.section-toggle-icon {
+  transition: transform 0.3s ease;
+  font-size: 0.8rem;
+  color: var(--apple-text-secondary);
+}
+
+.filter-toggle-btn:hover .section-toggle-icon {
+  color: var(--apple-text-primary);
+}
+
+.filter-toggle-btn.collapsed .section-toggle-icon {
+  transform: rotate(-90deg);
+}
+
 /* ===== תיקוני כפתורים ===== */
 
 /* תיקון לכפתורים עם container-fluid main-content */

@@ -695,7 +695,7 @@ class HeaderSystem {
                         <li class="separator"></li>
                         
                         <!-- כלי פיתוח -->
-                        <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">📋 מפת JS</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">📄 קבצי JS</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/js-map">🗺️ מפת JS</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/linter-realtime-monitor">🔍 דשבורד Linter</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/css-management">🎨 מנהל CSS</a></li>

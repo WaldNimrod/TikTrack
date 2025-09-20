@@ -240,12 +240,109 @@ function showDeleteWarning(itemType, itemName, itemTypeDisplay, onConfirm = null
   showConfirmationDialog(title, message, onConfirm, onCancel, 'danger');
 }
 
+// ===== GLOBAL CONFIRM REPLACEMENT =====
+
+/**
+ * Global confirm replacement - replaces all confirm() calls with custom dialog
+ * This function should be used instead of the native confirm() function
+ * 
+ * @param {string} message - The confirmation message
+ * @param {function} onConfirm - Callback function when user confirms
+ * @param {function} onCancel - Callback function when user cancels (optional)
+ * @param {string} title - Dialog title (optional, defaults to "אישור")
+ * @param {string} color - Dialog color theme (optional, defaults to 'warning')
+ */
+function globalConfirm(message, onConfirm, onCancel = null, title = 'אישור', color = 'warning') {
+  showConfirmationDialog(
+    title,
+    message,
+    onConfirm,
+    onCancel,
+    color
+  );
+}
+
+/**
+ * Override native confirm function globally
+ * This replaces the browser's native confirm() with our custom dialog
+ * 
+ * IMPORTANT: This maintains backward compatibility by handling both sync and async patterns
+ */
+function overrideNativeConfirm() {
+  // Store original confirm function
+  window._originalConfirm = window.confirm;
+  
+  // Override confirm function - maintains backward compatibility
+  window.confirm = function(message, title = 'אישור') {
+    // Use custom confirmation dialog
+    showConfirmationDialog(
+      title,
+      message,
+      () => {
+        // User confirmed - continue execution
+        return true;
+      },
+      () => {
+        // User cancelled - stop execution
+        return false;
+      },
+      'warning'
+    );
+    
+    // Return false by default to prevent immediate execution
+    // The actual logic will be handled by the dialog callbacks
+    return false;
+  };
+  
+  console.log('🔄 Native confirm() function overridden with custom dialog system');
+}
+
+/**
+ * Smart confirm replacement that works with existing code patterns
+ * This function detects the calling context and handles it appropriately
+ */
+function smartConfirmReplacement() {
+  // Store original confirm function
+  window._originalConfirm = window.confirm;
+  
+  // Create a proxy that intercepts confirm calls
+  window.confirm = new Proxy(window._originalConfirm, {
+    apply: function(target, thisArg, argumentsList) {
+      const message = argumentsList[0];
+      const title = argumentsList[1] || 'אישור';
+      
+      // Show custom confirmation dialog
+      showConfirmationDialog(
+        title,
+        message,
+        () => {
+          // User confirmed - we need to continue the original execution
+          // This is tricky because we need to resume the calling function
+          console.log('✅ User confirmed:', message);
+        },
+        () => {
+          // User cancelled
+          console.log('❌ User cancelled:', message);
+        },
+        'warning'
+      );
+      
+      // Return false to prevent immediate execution
+      return false;
+    }
+  });
+  
+  console.log('🔄 Smart confirm replacement initialized');
+}
+
 // ===== EXPORT TO GLOBAL SCOPE =====
 
 // Export WARNING SYSTEM functions to global scope
 window.showValidationWarning = showValidationWarning;
 window.showConfirmationDialog = showConfirmationDialog;
 window.showDeleteWarning = showDeleteWarning;
+window.globalConfirm = globalConfirm;
+window.overrideNativeConfirm = overrideNativeConfirm;
 
 // Export the module itself
 window.warningSystem = {

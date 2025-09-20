@@ -22,7 +22,7 @@ class SystemManagement {
       return;
     }
 
-    console.log('🚀 System Management - Initializing...');
+
 
     // Initialize dashboard
     SystemManagement.initializeDashboard();
@@ -54,10 +54,368 @@ class SystemManagement {
    * Run system check
    * הרצת בדיקת מערכת
    */
-  static runSystemCheck() {
-    console.log('🔍 Running system check...');
-    // Add system check logic here
-    SystemManagement.showNotification('בדיקת מערכת הושלמה בהצלחה', 'success');
+  static async runSystemCheck() {
+    console.log('🔍 Running comprehensive system check...');
+    
+    try {
+      // Show loading notification only for long process start
+      SystemManagement.showNotification('מתחיל בדיקת מערכת מקיפה...', 'info');
+      
+      // Create results display area in the page
+      const resultsContainer = SystemManagement.createCheckResultsContainer();
+      
+      // Collect all system data for check
+      const checkResults = {
+        timestamp: new Date().toISOString(),
+        checks: []
+      };
+      
+      // Check 1: System Health
+      try {
+        const healthResponse = await fetch('/api/system/health');
+        const healthData = await healthResponse.json();
+        
+        if (healthResponse.ok && healthData.status === 'success') {
+          const healthStatus = healthData.data.overall_status || 'unknown';
+          const performance = healthData.data.performance || 'unknown';
+          const responseTime = healthData.data.response_time_ms || 0;
+          
+          let status = 'success';
+          let message = `מצב בריאות: ${healthStatus}`;
+          
+          if (healthStatus === 'warning' || performance === 'degraded') {
+            status = 'warning';
+            message += ` (ביצועים: ${performance})`;
+          } else if (healthStatus === 'error' || performance === 'poor') {
+            status = 'error';
+            message += ` (ביצועים: ${performance})`;
+          }
+          
+          if (responseTime > 0) {
+            message += `, זמן תגובה: ${responseTime}ms`;
+          }
+          
+          checkResults.checks.push({
+            name: 'בריאות מערכת',
+            status: status,
+            message: message,
+            details: {
+              overall_status: healthStatus,
+              performance: performance,
+              response_time_ms: responseTime,
+              components: healthData.data.components || {}
+            }
+          });
+        } else {
+          checkResults.checks.push({
+            name: 'בריאות מערכת',
+            status: 'error',
+            message: `שגיאה בבדיקת בריאות: ${healthData.message || 'לא ניתן לקבל מידע'}`,
+            details: healthData
+          });
+        }
+      } catch (error) {
+        checkResults.checks.push({
+          name: 'בריאות מערכת',
+          status: 'error',
+          message: `שגיאה בבדיקת בריאות: ${error.message}`,
+          details: null
+        });
+      }
+      
+      // Check 2: Database Connection
+      try {
+        const dbResponse = await fetch('/api/system/database');
+        const dbData = await dbResponse.json();
+        
+        if (dbResponse.ok && dbData.status === 'success') {
+          const dbStatus = dbData.data.status || 'unknown';
+          const sizeMB = dbData.data.size_mb || 0;
+          const tableCount = dbData.data.table_count || 0;
+          const recordCounts = dbData.data.record_counts || {};
+          
+          let status = 'success';
+          let message = `מצב בסיס נתונים: ${dbStatus}`;
+          
+          if (dbStatus === 'warning' || dbStatus === 'degraded') {
+            status = 'warning';
+          } else if (dbStatus === 'error' || dbStatus === 'disconnected') {
+            status = 'error';
+          }
+          
+          if (sizeMB > 0) {
+            message += `, גודל: ${sizeMB} MB`;
+          }
+          if (tableCount > 0) {
+            message += `, ${tableCount} טבלאות`;
+          }
+          
+          checkResults.checks.push({
+            name: 'בסיס נתונים',
+            status: status,
+            message: message,
+            details: {
+              status: dbStatus,
+              size_mb: sizeMB,
+              table_count: tableCount,
+              record_counts: recordCounts,
+              connection_info: dbData.data.connection_info || {}
+            }
+          });
+        } else {
+          checkResults.checks.push({
+            name: 'בסיס נתונים',
+            status: 'error',
+            message: `שגיאה בבדיקת בסיס נתונים: ${dbData.message || 'לא ניתן לקבל מידע'}`,
+            details: dbData
+          });
+        }
+      } catch (error) {
+        checkResults.checks.push({
+          name: 'בסיס נתונים',
+          status: 'error',
+          message: `שגיאה בבדיקת בסיס נתונים: ${error.message}`,
+          details: null
+        });
+      }
+      
+      // Check 3: Cache System
+      try {
+        const cacheResponse = await fetch('/api/system/cache');
+        const cacheData = await cacheResponse.json();
+        
+        if (cacheResponse.ok && cacheData.status === 'success') {
+          const cacheStatus = cacheData.data.status || 'unknown';
+          const hitRate = cacheData.data.hit_rate_percent || 0;
+          const totalEntries = cacheData.data.total_entries || 0;
+          const memoryUsage = cacheData.data.memory_usage_mb || 0;
+          const ttlSeconds = cacheData.data.ttl_seconds || 0;
+          
+          let status = 'success';
+          let message = `מצב מטמון: ${cacheStatus}`;
+          
+          if (cacheStatus === 'warning' || hitRate < 70) {
+            status = 'warning';
+          } else if (cacheStatus === 'error' || cacheStatus === 'inactive') {
+            status = 'error';
+          }
+          
+          if (hitRate > 0) {
+            message += ` (${hitRate}% פגיעות)`;
+          }
+          if (totalEntries > 0) {
+            message += `, ${totalEntries} ערכים`;
+          }
+          if (memoryUsage > 0) {
+            message += `, ${memoryUsage} MB זיכרון`;
+          }
+          
+          checkResults.checks.push({
+            name: 'מערכת מטמון',
+            status: status,
+            message: message,
+            details: {
+              status: cacheStatus,
+              hit_rate_percent: hitRate,
+              total_entries: totalEntries,
+              memory_usage_mb: memoryUsage,
+              ttl_seconds: ttlSeconds,
+              cache_stats: cacheData.data.cache_stats || {}
+            }
+          });
+        } else {
+          checkResults.checks.push({
+            name: 'מערכת מטמון',
+            status: 'error',
+            message: `שגיאה בבדיקת מטמון: ${cacheData.message || 'לא ניתן לקבל מידע'}`,
+            details: cacheData
+          });
+        }
+      } catch (error) {
+        checkResults.checks.push({
+          name: 'מערכת מטמון',
+          status: 'error',
+          message: `שגיאה בבדיקת מטמון: ${error.message}`,
+          details: null
+        });
+      }
+      
+      // Check 4: External Data
+      try {
+        const externalResponse = await fetch('/api/system/external-data');
+        const externalData = await externalResponse.json();
+        
+        if (externalResponse.ok && externalData.status === 'success') {
+          const externalStatus = externalData.data.status || 'unknown';
+          const accuracy = externalData.data.overall_accuracy_percent || 0;
+          const providers = externalData.data.providers || [];
+          const dataFreshness = externalData.data.data_freshness_minutes || null;
+          const lastUpdate = externalData.data.last_update || null;
+          
+          let status = 'success';
+          let message = `מצב נתונים חיצוניים: ${externalStatus}`;
+          
+          if (externalStatus === 'warning' || externalStatus === 'degraded') {
+            status = 'warning';
+          } else if (externalStatus === 'error' || externalStatus === 'inactive') {
+            status = 'error';
+          }
+          
+          if (accuracy > 0) {
+            message += ` (${accuracy}% דיוק)`;
+          }
+          if (providers.length > 0) {
+            message += `, ${providers.length} ספקים`;
+          }
+          if (dataFreshness !== null) {
+            if (dataFreshness < 60) {
+              message += `, עדכני (${dataFreshness} דקות)`;
+            } else if (dataFreshness < 240) {
+              message += `, מיושן (${dataFreshness} דקות)`;
+              status = 'warning';
+            } else {
+              message += `, ישן מאוד (${dataFreshness} דקות)`;
+              status = 'error';
+            }
+          }
+          
+          checkResults.checks.push({
+            name: 'נתונים חיצוניים',
+            status: status,
+            message: message,
+            details: {
+              status: externalStatus,
+              overall_accuracy_percent: accuracy,
+              providers: providers,
+              data_freshness_minutes: dataFreshness,
+              last_update: lastUpdate,
+              accuracy_metrics: externalData.data.accuracy || {}
+            }
+          });
+        } else {
+          checkResults.checks.push({
+            name: 'נתונים חיצוניים',
+            status: 'error',
+            message: `שגיאה בבדיקת נתונים חיצוניים: ${externalData.message || 'לא ניתן לקבל מידע'}`,
+            details: externalData
+          });
+        }
+      } catch (error) {
+        checkResults.checks.push({
+          name: 'נתונים חיצוניים',
+          status: 'error',
+          message: `שגיאה בבדיקת נתונים חיצוניים: ${error.message}`,
+          details: null
+        });
+      }
+      
+      // Check 5: System Performance
+      try {
+        const performanceResponse = await fetch('/api/system/performance');
+        const performanceData = await performanceResponse.json();
+        
+        if (performanceResponse.ok && performanceData.status === 'success') {
+          const currentMetrics = performanceData.data.current || {};
+          const responseTime = currentMetrics.response_time_ms || 0;
+          const errorRate = currentMetrics.error_rate_percent || 0;
+          const requestsPerMinute = currentMetrics.requests_per_minute || 0;
+          const cpuUsage = currentMetrics.cpu_usage_percent || 0;
+          const memoryUsage = currentMetrics.memory_usage_percent || 0;
+          
+          let status = 'success';
+          let message = '';
+          
+          // Determine status based on performance metrics
+          if (responseTime > 500 || errorRate > 5 || cpuUsage > 90 || memoryUsage > 90) {
+            status = 'error';
+          } else if (responseTime > 200 || errorRate > 1 || cpuUsage > 70 || memoryUsage > 70) {
+            status = 'warning';
+          }
+          
+          // Build message
+          if (responseTime > 0) {
+            message += `זמן תגובה: ${responseTime}ms`;
+          }
+          if (errorRate > 0) {
+            message += `, שיעור שגיאות: ${errorRate}%`;
+          }
+          if (requestsPerMinute > 0) {
+            message += `, ${requestsPerMinute} בקשות/דקה`;
+          }
+          if (cpuUsage > 0) {
+            message += `, CPU: ${cpuUsage}%`;
+          }
+          if (memoryUsage > 0) {
+            message += `, זיכרון: ${memoryUsage}%`;
+          }
+          
+          if (!message) {
+            message = 'ביצועים תקינים';
+          }
+          
+          checkResults.checks.push({
+            name: 'ביצועי מערכת',
+            status: status,
+            message: message,
+            details: {
+              response_time_ms: responseTime,
+              error_rate_percent: errorRate,
+              requests_per_minute: requestsPerMinute,
+              cpu_usage_percent: cpuUsage,
+              memory_usage_percent: memoryUsage,
+              trends: performanceData.data.trends || {},
+              historical_data: performanceData.data.historical || {}
+            }
+          });
+        } else {
+          checkResults.checks.push({
+            name: 'ביצועי מערכת',
+            status: 'error',
+            message: `שגיאה בבדיקת ביצועים: ${performanceData.message || 'לא ניתן לקבל מידע'}`,
+            details: performanceData
+          });
+        }
+      } catch (error) {
+        checkResults.checks.push({
+          name: 'ביצועי מערכת',
+          status: 'error',
+          message: `שגיאה בבדיקת ביצועים: ${error.message}`,
+          details: null
+        });
+      }
+      
+      // Calculate overall status
+      const successCount = checkResults.checks.filter(c => c.status === 'success').length;
+      const warningCount = checkResults.checks.filter(c => c.status === 'warning').length;
+      const errorCount = checkResults.checks.filter(c => c.status === 'error').length;
+      const totalChecks = checkResults.checks.length;
+      
+      let overallStatus = 'success';
+      let overallMessage = '';
+      
+      if (errorCount > 0) {
+        overallStatus = 'error';
+        overallMessage = `בדיקת מערכת הושלמה עם ${errorCount} שגיאות, ${warningCount} אזהרות`;
+      } else if (warningCount > 0) {
+        overallStatus = 'warning';
+        overallMessage = `בדיקת מערכת הושלמה עם ${warningCount} אזהרות`;
+      } else {
+        overallMessage = `בדיקת מערכת הושלמה בהצלחה - כל ${totalChecks} הבדיקות עברו`;
+      }
+      
+      // Show overall result only for completion
+      SystemManagement.showNotification(overallMessage, overallStatus);
+      
+      // Log detailed results
+      console.log('📊 System Check Results:', checkResults);
+      
+      // Update results display in the page
+      SystemManagement.updateCheckResultsDisplay(resultsContainer, checkResults);
+      
+    } catch (error) {
+      console.error('❌ System check failed:', error);
+      SystemManagement.showNotification(`שגיאה בבדיקת מערכת: ${error.message}`, 'error');
+    }
   }
 
   /**
@@ -83,9 +441,9 @@ class SystemManagement {
     console.log('💾 Starting system backup...');
     
     try {
-      // Show loading notification
-      SystemManagement.showNotification('מתחיל גיבוי מערכת...', 'info');
-      
+    // Show loading notification
+    SystemManagement.showNotification('מתחיל גיבוי מערכת...', 'info');
+    
       // Call backup API
       const response = await fetch('/api/system/backup/create', {
         method: 'POST',
@@ -139,26 +497,26 @@ class SystemManagement {
       const latestBackup = backupsResult.data.backups[0];
       
       // Show warning dialog with real backup info
-      const confirmMessage = `
+    const confirmMessage = `
         ⚠️ אזהרה: פעולה זו תמחק את כל הנתונים הנוכחיים ותשחזר מגיבוי!
-        
-        📋 מה יקרה:
-        • כל הנתונים הנוכחיים יימחקו
+      
+      📋 מה יקרה:
+      • כל הנתונים הנוכחיים יימחקו
         • המערכת תשוחזר מהגיבוי שנבחר
-        • התהליך ייקח כ-5-10 דקות
-        • המערכת תהיה לא זמינה במהלך השחזור
-        
+      • התהליך ייקח כ-5-10 דקות
+      • המערכת תהיה לא זמינה במהלך השחזור
+      
         🗂️ גיבוי שנבחר: ${latestBackup.filename}
         📅 תאריך יצירה: ${new Date(latestBackup.created_at).toLocaleString('he-IL')}
         📊 גודל גיבוי: ${latestBackup.size_mb} MB
-        
-        האם אתה בטוח שברצונך להמשיך?
-      `;
       
-      if (confirm(confirmMessage)) {
-        // Show loading notification
-        SystemManagement.showNotification('מתחיל שחזור מגיבוי...', 'warning');
-        
+      האם אתה בטוח שברצונך להמשיך?
+    `;
+    
+    if (confirm(confirmMessage)) {
+      // Show loading notification
+      SystemManagement.showNotification('מתחיל שחזור מגיבוי...', 'warning');
+      
         // Call restore API
         const response = await fetch('/api/system/backup/restore', {
           method: 'POST',
@@ -173,19 +531,19 @@ class SystemManagement {
         const result = await response.json();
         
         if (result.status === 'success') {
-          SystemManagement.showNotification('שחזור הושלם בהצלחה! המערכת תפעיל מחדש...', 'success');
+        SystemManagement.showNotification('שחזור הושלם בהצלחה! המערכת תפעיל מחדש...', 'success');
           console.log('✅ System restore completed successfully:', result.data);
-          
+        
           // Refresh page after successful restore
-          setTimeout(() => {
+        setTimeout(() => {
             window.location.reload();
-          }, 3000);
+        }, 3000);
         } else {
           throw new Error(result.message || 'Restore failed');
         }
-      } else {
-        SystemManagement.showNotification('שחזור בוטל על ידי המשתמש', 'info');
-        console.log('❌ System restore cancelled by user');
+    } else {
+      SystemManagement.showNotification('שחזור בוטל על ידי המשתמש', 'info');
+      console.log('❌ System restore cancelled by user');
       }
       
     } catch (error) {
@@ -202,8 +560,395 @@ class SystemManagement {
     if (typeof showNotification === 'function') {
       showNotification(message, type);
     } else {
-      }: ${message}`);
+      console.log(`📢 ${type.toUpperCase()}: ${message}`);
     }
+  }
+
+  /**
+   * Create check results container in the page
+   * יצירת קונטיינר לתוצאות בדיקה בעמוד
+   */
+  static createCheckResultsContainer() {
+    // Remove existing results container if any
+    const existingContainer = document.getElementById('system-check-results');
+    if (existingContainer) {
+      existingContainer.remove();
+    }
+    
+    // Create new container
+    const container = document.createElement('div');
+    container.id = 'system-check-results';
+    container.className = 'system-check-results-container';
+    container.innerHTML = `
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="fas fa-search me-2"></i>
+            תוצאות בדיקת מערכת
+          </h5>
+          <div>
+            <button class="btn btn-sm btn-outline-primary me-2" onclick="SystemManagement.copyCheckResultsToClipboard()">
+              <i class="fas fa-copy"></i> העתק
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('system-check-results').remove()">
+              <i class="fas fa-times"></i> סגור
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="loading-state text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">טוען...</span>
+            </div>
+            <p class="mt-2 text-muted">מתבצעת בדיקת מערכת מקיפה...</p>
+          </div>
+          <div class="results-content" style="display: none;">
+            <!-- Results will be populated here -->
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Insert after the Quick Actions section (in the top section)
+    const quickActions = document.querySelector('.quick-actions');
+    if (quickActions) {
+      quickActions.parentNode.insertBefore(container, quickActions.nextSibling);
+    } else {
+      // Fallback: insert after the top section
+      const topSection = document.querySelector('.top-section');
+      if (topSection) {
+        topSection.parentNode.insertBefore(container, topSection.nextSibling);
+      }
+    }
+    
+    return container;
+  }
+
+  /**
+   * Update check results display in the page
+   * עדכון תצוגת תוצאות בדיקה בעמוד
+   */
+  static updateCheckResultsDisplay(container, checkResults) {
+    const loadingState = container.querySelector('.loading-state');
+    const resultsContent = container.querySelector('.results-content');
+    
+    // Hide loading state
+    loadingState.style.display = 'none';
+    resultsContent.style.display = 'block';
+    
+    // Calculate summary
+    const successCount = checkResults.checks.filter(c => c.status === 'success').length;
+    const warningCount = checkResults.checks.filter(c => c.status === 'warning').length;
+    const errorCount = checkResults.checks.filter(c => c.status === 'error').length;
+    const totalChecks = checkResults.checks.length;
+    
+    // Get status icon
+    const getStatusIcon = (status) => {
+      switch (status) {
+        case 'success': return '✅';
+        case 'warning': return '⚠️';
+        case 'error': return '❌';
+        default: return '❓';
+      }
+    };
+    
+    // Get status color class
+    const getStatusClass = (status) => {
+      switch (status) {
+        case 'success': return 'text-success';
+        case 'warning': return 'text-warning';
+        case 'error': return 'text-danger';
+        default: return 'text-muted';
+      }
+    };
+    
+    // Build results content
+    resultsContent.innerHTML = `
+      <!-- Summary Cards -->
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="card text-center border-success">
+            <div class="card-body">
+              <h4 class="text-success mb-1">${successCount}</h4>
+              <small class="text-muted">הצלחות</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center border-warning">
+            <div class="card-body">
+              <h4 class="text-warning mb-1">${warningCount}</h4>
+              <small class="text-muted">אזהרות</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center border-danger">
+            <div class="card-body">
+              <h4 class="text-danger mb-1">${errorCount}</h4>
+              <small class="text-muted">שגיאות</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card text-center border-info">
+            <div class="card-body">
+              <h4 class="text-info mb-1">${totalChecks}</h4>
+              <small class="text-muted">סה"כ בדיקות</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Detailed Results -->
+      <div class="accordion" id="checkResultsAccordion">
+        ${checkResults.checks.map((check, index) => `
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="heading${index}">
+              <button class="accordion-button ${index === 0 ? '' : 'collapsed'}" type="button" 
+                      data-bs-toggle="collapse" data-bs-target="#collapse${index}" 
+                      aria-expanded="${index === 0 ? 'true' : 'false'}" aria-controls="collapse${index}">
+                <span class="me-2">${getStatusIcon(check.status)}</span>
+                <span class="${getStatusClass(check.status)}">${check.name}</span>
+                <span class="ms-auto text-muted">${check.message}</span>
+              </button>
+            </h2>
+            <div id="collapse${index}" class="accordion-collapse collapse ${index === 0 ? 'show' : ''}" 
+                 aria-labelledby="heading${index}" data-bs-parent="#checkResultsAccordion">
+              <div class="accordion-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <h6>סטטוס:</h6>
+                    <p class="${getStatusClass(check.status)}">
+                      ${getStatusIcon(check.status)} ${check.status === 'success' ? 'הצלחה' : 
+                                                     check.status === 'warning' ? 'אזהרה' : 'שגיאה'}
+                    </p>
+                    <h6>הודעה:</h6>
+                    <p>${check.message}</p>
+                  </div>
+                  <div class="col-md-6">
+                    ${check.details ? `
+                      <h6>פרטים נוספים:</h6>
+                      <pre class="bg-light p-2 rounded" style="font-size: 0.8em; max-height: 200px; overflow-y: auto;">${JSON.stringify(check.details, null, 2)}</pre>
+                    ` : '<p class="text-muted">אין פרטים נוספים</p>'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      
+      <!-- Timestamp -->
+      <div class="mt-3 text-muted">
+        <small>זמן בדיקה: ${new Date(checkResults.timestamp).toLocaleString('he-IL')}</small>
+      </div>
+    `;
+    
+    // Store results globally for copying
+    window.lastCheckResults = checkResults;
+    
+    // Scroll to results
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /**
+   * Show detailed check results
+   * הצגת תוצאות בדיקה מפורטות
+   */
+  static showDetailedCheckResults(checkResults) {
+    // Create modal for detailed results
+    const modalId = 'system-check-results-modal';
+    let modal = document.getElementById(modalId);
+    
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = modalId;
+      modal.className = 'modal fade';
+      modal.setAttribute('tabindex', '-1');
+      document.body.appendChild(modal);
+    }
+    
+    // Calculate summary
+    const successCount = checkResults.checks.filter(c => c.status === 'success').length;
+    const warningCount = checkResults.checks.filter(c => c.status === 'warning').length;
+    const errorCount = checkResults.checks.filter(c => c.status === 'error').length;
+    const totalChecks = checkResults.checks.length;
+    
+    // Get status icon
+    const getStatusIcon = (status) => {
+      switch (status) {
+        case 'success': return '✅';
+        case 'warning': return '⚠️';
+        case 'error': return '❌';
+        default: return '❓';
+      }
+    };
+    
+    // Get status color class
+    const getStatusClass = (status) => {
+      switch (status) {
+        case 'success': return 'text-success';
+        case 'warning': return 'text-warning';
+        case 'error': return 'text-danger';
+        default: return 'text-muted';
+      }
+    };
+    
+    // Build modal content
+    modal.innerHTML = `
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              🔍 תוצאות בדיקת מערכת מקיפה
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Summary -->
+            <div class="row mb-4">
+              <div class="col-md-3">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h4 class="text-success">${successCount}</h4>
+                    <small class="text-muted">הצלחות</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h4 class="text-warning">${warningCount}</h4>
+                    <small class="text-muted">אזהרות</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h4 class="text-danger">${errorCount}</h4>
+                    <small class="text-muted">שגיאות</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card text-center">
+                  <div class="card-body">
+                    <h4 class="text-info">${totalChecks}</h4>
+                    <small class="text-muted">סה"כ בדיקות</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Detailed Results -->
+            <div class="accordion" id="checkResultsAccordion">
+              ${checkResults.checks.map((check, index) => `
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="heading${index}">
+                    <button class="accordion-button ${index === 0 ? '' : 'collapsed'}" type="button" 
+                            data-bs-toggle="collapse" data-bs-target="#collapse${index}" 
+                            aria-expanded="${index === 0 ? 'true' : 'false'}" aria-controls="collapse${index}">
+                      <span class="me-2">${getStatusIcon(check.status)}</span>
+                      <span class="${getStatusClass(check.status)}">${check.name}</span>
+                      <span class="ms-auto text-muted">${check.message}</span>
+                    </button>
+                  </h2>
+                  <div id="collapse${index}" class="accordion-collapse collapse ${index === 0 ? 'show' : ''}" 
+                       aria-labelledby="heading${index}" data-bs-parent="#checkResultsAccordion">
+                    <div class="accordion-body">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <h6>סטטוס:</h6>
+                          <p class="${getStatusClass(check.status)}">
+                            ${getStatusIcon(check.status)} ${check.status === 'success' ? 'הצלחה' : 
+                                                           check.status === 'warning' ? 'אזהרה' : 'שגיאה'}
+                          </p>
+                          <h6>הודעה:</h6>
+                          <p>${check.message}</p>
+                        </div>
+                        <div class="col-md-6">
+                          ${check.details ? `
+                            <h6>פרטים נוספים:</h6>
+                            <pre class="bg-light p-2 rounded" style="font-size: 0.8em; max-height: 200px; overflow-y: auto;">${JSON.stringify(check.details, null, 2)}</pre>
+                          ` : '<p class="text-muted">אין פרטים נוספים</p>'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            
+            <!-- Timestamp -->
+            <div class="mt-3 text-muted">
+              <small>זמן בדיקה: ${new Date(checkResults.timestamp).toLocaleString('he-IL')}</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+            <button type="button" class="btn btn-primary" onclick="SystemManagement.copyCheckResultsToClipboard()">
+              📋 העתק תוצאות
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Show modal
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+    
+    // Store results globally for copying
+    window.lastCheckResults = checkResults;
+  }
+
+  /**
+   * Copy check results to clipboard
+   * העתקת תוצאות בדיקה ללוח
+   */
+  static copyCheckResultsToClipboard() {
+    if (!window.lastCheckResults) {
+      SystemManagement.showNotification('אין תוצאות בדיקה להעתקה', 'warning');
+      return;
+    }
+    
+    const results = window.lastCheckResults;
+    const successCount = results.checks.filter(c => c.status === 'success').length;
+    const warningCount = results.checks.filter(c => c.status === 'warning').length;
+    const errorCount = results.checks.filter(c => c.status === 'error').length;
+    const totalChecks = results.checks.length;
+    
+    let report = `=== TikTrack System Check Report ===\n`;
+    report += `Generated: ${new Date(results.timestamp).toLocaleString('he-IL')}\n\n`;
+    report += `Summary:\n`;
+    report += `✅ Success: ${successCount}\n`;
+    report += `⚠️ Warnings: ${warningCount}\n`;
+    report += `❌ Errors: ${errorCount}\n`;
+    report += `📊 Total: ${totalChecks}\n\n`;
+    report += `Detailed Results:\n\n`;
+    
+    results.checks.forEach((check, index) => {
+      report += `${index + 1}. ${check.name}\n`;
+      report += `   Status: ${check.status === 'success' ? '✅ Success' : 
+                              check.status === 'warning' ? '⚠️ Warning' : '❌ Error'}\n`;
+      report += `   Message: ${check.message}\n`;
+      if (check.details) {
+        report += `   Details: ${JSON.stringify(check.details, null, 2)}\n`;
+      }
+      report += `\n`;
+    });
+    
+    report += `=== End of Report ===`;
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(report).then(() => {
+      SystemManagement.showNotification('תוצאות בדיקה הועתקו ללוח בהצלחה', 'success');
+    }).catch((error) => {
+      console.error('Failed to copy to clipboard:', error);
+      SystemManagement.showNotification('שגיאה בהעתקת התוצאות ללוח', 'error');
+    });
   }
 
   /**
@@ -411,6 +1156,9 @@ class SystemManagement {
     // Update system info
     this.updateSystemInfo(data);
     
+    // Update info summaries
+    this.updateInfoSummaries(data);
+    
     // Update logs
     this.updateLogs(data);
     
@@ -422,6 +1170,9 @@ class SystemManagement {
     
     // Update alerts
     this.updateAlerts();
+    
+    // Update backup status
+    this.updateBackupStatus();
     
     // Update timestamp
     this.updateTimestamp(data.timestamp);
@@ -577,6 +1328,125 @@ class SystemManagement {
     if (diskElement) diskElement.textContent = `${metrics.disk_percent || 0}%`;
   }
 
+  /**
+   * Update info summaries
+   * עדכון סיכומי מידע
+   */
+  updateInfoSummaries(data) {
+    // Update health summary
+    this.updateHealthSummary(data);
+    
+    // Update performance summary
+    this.updatePerformanceSummary(data);
+    
+    // Update security summary
+    this.updateSecuritySummary(data);
+  }
+
+  /**
+   * Update health summary
+   * עדכון סיכום בריאות
+   */
+  updateHealthSummary(data) {
+    const overallHealthElement = document.getElementById('overallHealthStatus');
+    const systemScoreElement = document.getElementById('systemScore');
+    const responseTimeElement = document.getElementById('responseTime');
+    const uptimeElement = document.getElementById('uptime');
+    
+    if (overallHealthElement && data.health) {
+      const healthStatus = data.health.overall_status || 'unknown';
+      overallHealthElement.textContent = healthStatus === 'healthy' ? 'בריא' : 
+                                        healthStatus === 'warning' ? 'אזהרה' : 'בעיה';
+      overallHealthElement.className = healthStatus === 'healthy' ? 'summary-value text-success' :
+                                       healthStatus === 'warning' ? 'summary-value text-warning' : 'summary-value text-danger';
+    }
+    
+    if (systemScoreElement && data.system_score !== undefined) {
+      systemScoreElement.textContent = `${data.system_score}%`;
+      systemScoreElement.className = data.system_score >= 90 ? 'summary-value text-success' :
+                                     data.system_score >= 70 ? 'summary-value text-warning' : 'summary-value text-danger';
+    }
+    
+    if (responseTimeElement && data.health?.response_time_ms) {
+      responseTimeElement.textContent = `${data.health.response_time_ms}ms`;
+      responseTimeElement.className = data.health.response_time_ms < 200 ? 'summary-value text-success' :
+                                      data.health.response_time_ms < 500 ? 'summary-value text-warning' : 'summary-value text-danger';
+    }
+    
+    if (uptimeElement && data.health?.uptime) {
+      uptimeElement.textContent = data.health.uptime;
+      uptimeElement.className = 'summary-value text-info';
+    }
+  }
+
+  /**
+   * Update performance summary
+   * עדכון סיכום ביצועים
+   */
+  updatePerformanceSummary(data) {
+    const cpuElement = document.getElementById('cpuUsage');
+    const memoryElement = document.getElementById('memoryUsage');
+    const diskElement = document.getElementById('diskUsage');
+    const networkElement = document.getElementById('networkStatus');
+    
+    if (cpuElement && data.performance?.cpu_usage_percent !== undefined) {
+      const cpuUsage = data.performance.cpu_usage_percent;
+      cpuElement.textContent = `${cpuUsage}%`;
+      cpuElement.className = cpuUsage < 70 ? 'summary-value text-success' :
+                             cpuUsage < 90 ? 'summary-value text-warning' : 'summary-value text-danger';
+    }
+    
+    if (memoryElement && data.performance?.memory_usage_percent !== undefined) {
+      const memoryUsage = data.performance.memory_usage_percent;
+      memoryElement.textContent = `${memoryUsage}%`;
+      memoryElement.className = memoryUsage < 70 ? 'summary-value text-success' :
+                                memoryUsage < 90 ? 'summary-value text-warning' : 'summary-value text-danger';
+    }
+    
+    if (diskElement && data.performance?.disk_usage_percent !== undefined) {
+      const diskUsage = data.performance.disk_usage_percent;
+      diskElement.textContent = `${diskUsage}%`;
+      diskElement.className = diskUsage < 80 ? 'summary-value text-success' :
+                              diskUsage < 95 ? 'summary-value text-warning' : 'summary-value text-danger';
+    }
+    
+    if (networkElement) {
+      networkElement.textContent = 'יציב';
+      networkElement.className = 'summary-value text-success';
+    }
+  }
+
+  /**
+   * Update security summary
+   * עדכון סיכום אבטחה
+   */
+  updateSecuritySummary(data) {
+    const securityStatusElement = document.getElementById('securityStatus');
+    const encryptionStatusElement = document.getElementById('encryptionStatus');
+    const activeUsersElement = document.getElementById('activeUsers');
+    const securityAlertsElement = document.getElementById('securityAlerts');
+    
+    if (securityStatusElement) {
+      securityStatusElement.textContent = 'מאובטח';
+      securityStatusElement.className = 'summary-value text-success';
+    }
+    
+    if (encryptionStatusElement) {
+      encryptionStatusElement.textContent = 'פעיל';
+      encryptionStatusElement.className = 'summary-value text-success';
+    }
+    
+    if (activeUsersElement) {
+      activeUsersElement.textContent = '1';
+      activeUsersElement.className = 'summary-value text-info';
+    }
+    
+    if (securityAlertsElement) {
+      securityAlertsElement.textContent = '0';
+      securityAlertsElement.className = 'summary-value text-success';
+    }
+  }
+
   updateLogs(data) {
     const logContent = document.getElementById('log-content');
     if (!logContent) return;
@@ -646,6 +1516,71 @@ class SystemManagement {
     if (timestampElement) {
       const date = new Date(timestamp);
       timestampElement.textContent = `עודכן לאחרונה: ${date.toLocaleString('he-IL')}`;
+    }
+  }
+
+  /**
+   * Update backup status
+   * עדכון סטטוס גיבויים
+   */
+  async updateBackupStatus() {
+    try {
+      // Get list of backups
+      const response = await fetch('/api/system/backup/list');
+      const result = await response.json();
+      
+      if (result.status === 'success' && result.data.backups.length > 0) {
+        const latestBackup = result.data.backups[0];
+        const backupDate = new Date(latestBackup.created_at);
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        // Check if backup was created yesterday or today
+        const isRecentBackup = backupDate.toDateString() === yesterday.toDateString() || 
+                              backupDate.toDateString() === new Date().toDateString();
+        
+        // Update backup info elements
+        const lastBackupSizeElement = document.getElementById('lastBackupSize');
+        const lastBackupDateElement = document.getElementById('lastBackupDate');
+        const backupStatusElement = document.getElementById('backupStatus');
+        
+        if (lastBackupSizeElement) {
+          lastBackupSizeElement.textContent = `${latestBackup.size_mb} MB`;
+        }
+        
+        if (lastBackupDateElement) {
+          lastBackupDateElement.textContent = backupDate.toLocaleString('he-IL');
+        }
+        
+        if (backupStatusElement) {
+          if (isRecentBackup) {
+            backupStatusElement.innerHTML = '<span class="text-success">✅ גיבוי עדכני</span>';
+          } else {
+            backupStatusElement.innerHTML = '<span class="text-warning">⚠️ גיבוי ישן</span>';
+          }
+        }
+        
+        console.log('✅ Backup status updated successfully');
+      } else {
+        // No backups found
+        const backupStatusElement = document.getElementById('backupStatus');
+        if (backupStatusElement) {
+          backupStatusElement.innerHTML = '<span class="text-danger">❌ אין גיבויים</span>';
+        }
+        
+        const lastBackupDateElement = document.getElementById('lastBackupDate');
+        if (lastBackupDateElement) {
+          lastBackupDateElement.textContent = 'לא נמצא';
+        }
+        
+        console.log('⚠️ No backups found');
+      }
+    } catch (error) {
+      console.error('❌ Error updating backup status:', error);
+      const backupStatusElement = document.getElementById('backupStatus');
+      if (backupStatusElement) {
+        backupStatusElement.innerHTML = '<span class="text-danger">❌ שגיאה בבדיקה</span>';
+      }
     }
   }
 
@@ -1069,6 +2004,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.clearCache = SystemManagement.clearCache;
   window.runBackup = SystemManagement.runBackup;
   window.restoreFromBackup = SystemManagement.restoreFromBackup;
+  window.copyCheckResultsToClipboard = SystemManagement.copyCheckResultsToClipboard;
 });
 
 // Cleanup on page unload

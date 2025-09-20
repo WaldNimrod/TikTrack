@@ -576,7 +576,8 @@ class JsMapSystem {
                          <span class="toggle-arrow">▼</span>
                      </div>
                      <div class="function-group-content">
-                         <table class="function-table">
+                         <div class="js-map-table-container">
+                             <table class="function-table js-map-table">
                              <thead>
                                  <tr>
                                      <th>שם הפונקציה</th>
@@ -604,7 +605,8 @@ class JsMapSystem {
 
             html += `
                              </tbody>
-                         </table>
+                             </table>
+                         </div>
                      </div>
                  </div>
              `;
@@ -861,11 +863,17 @@ function openFunctionModal(functionName, annotations, code) {
     document.getElementById('modalFunctionName').textContent = functionName;
     document.getElementById('modalAnnotations').textContent = annotations || 'No annotations available';
     document.getElementById('modalCode').textContent = code || 'No code available';
-    document.getElementById('functionModal').style.display = 'block';
+    
+    // Show modal without Bootstrap dependency
+    const modal = document.getElementById('functionModal');
+    modal.style.display = 'block';
+    modal.classList.add('show');
 }
 
 function closeFunctionModal() {
-    document.getElementById('functionModal').style.display = 'none';
+    const modal = document.getElementById('functionModal');
+    modal.style.display = 'none';
+    modal.classList.remove('show');
 }
 
 // Close modal when clicking outside
@@ -934,11 +942,17 @@ function showFunctionCallDetails(file, count) {
     }
 
     document.getElementById('functionCallsContent').innerHTML = content;
-    document.getElementById('functionCallsModal').style.display = 'block';
+    
+    // Show modal without Bootstrap dependency
+    const modal = document.getElementById('functionCallsModal');
+    modal.style.display = 'block';
+    modal.classList.add('show');
 }
 
 function closeFunctionCallsModal() {
-    document.getElementById('functionCallsModal').style.display = 'none';
+    const modal = document.getElementById('functionCallsModal');
+    modal.style.display = 'none';
+    modal.classList.remove('show');
 }
 
 // Navigation function

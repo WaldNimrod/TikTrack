@@ -27,6 +27,9 @@
     <!-- JS-Map Advanced Styles -->
     <link rel="stylesheet" href="styles-new/07-trumps/js-map-advanced.css">
     
+    <!-- Page-Specific CSS - Last to override all previous styles -->
+    <link rel="stylesheet" href="styles/js-map.css?v=v1.0.0">
+    
 
     <!-- Core scripts - Required order -->
     <script src="scripts/header-system.js"></script>
@@ -36,12 +39,13 @@
     <script src="scripts/js-map-indexeddb-adapter.js"></script>
 </head>
 
-<body>
-    <!-- Unified Header Container -->
-    <div id="unified-header"></div>
+<body class="js-map">
+    <div class="background-wrapper">
+        <!-- Header System -->
+        <div id="unified-header"></div>
 
-    <!-- Page Body -->
-    <div class="page-body">
+        <!-- Page body -->
+        <div class="page-body">
         <!-- Main content limited in width -->
         <div class="main-content">
             <!-- Top Section - לפי מפרט המערכת -->
@@ -52,7 +56,7 @@
                         <button class="action-btn copy-log-btn" onclick="copyDetailedLog()" title="העתק לוג מפורט של כל הממשקים">
                             <i class="fas fa-copy"></i> העתק לוג מפורט
                         </button>
-                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
+                        <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
@@ -138,11 +142,11 @@
             <!-- UI Content Section Top End -->
 
 
-            <!-- UI Content Section 2 - ניתוח כפילויות -->
-            <div class="content-section" id="section2">
+            <!-- UI Content Section 1 - ניתוח כפילויות -->
+            <div class="content-section" id="section1">
                 <div class="section-header">
                     <h2>🔍 ניתוח פונקציות כפולות ודומות</h2>
-                    <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                    <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
                         <span class="section-toggle-icon">▼</span>
                     </button>
                 </div>
@@ -157,11 +161,11 @@
             </div>
             <!-- UI Content Section 2 End -->
 
-            <!-- UI Content Section 1 - פונקציות מפורטות -->
-            <div class="content-section" id="section1">
+            <!-- UI Content Section 2 - פונקציות מפורטות -->
+            <div class="content-section" id="section2">
                 <div class="section-header">
                     <h2>⚙️ פונקציות מפורטות</h2>
-                    <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                    <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
                         <span class="section-toggle-icon">▼</span>
                     </button>
                 </div>
@@ -257,7 +261,7 @@
 
     <!-- Page Scripts -->
     <script src="scripts/js-map.js"></script>
-
-
+        </div>
+    </div>
 </body>
 </html>

@@ -135,6 +135,7 @@ class JsMapSystem {
   async loadJsMapData() {
     try {
             console.log('📊 loadJsMapData called successfully');
+            console.log('🔍 Starting to load JS Map data...');
 
       // Show loading state
       this.showLoadingState();
@@ -172,6 +173,7 @@ class JsMapSystem {
       this.renderSystemStats();
 
             console.log('✅ JS map data loaded successfully');
+            console.log('🎉 All rendering functions called');
 
         } catch (error) {
       // Error loading JS map data
@@ -183,10 +185,13 @@ class JsMapSystem {
      * Render page mapping data
      */
   renderPageMapping() {
+    console.log('🔍 renderPageMapping called');
     const container = document.getElementById('pageMappingContent');
-    if (!container) return;
-
-    console.log('🔍 Rendering page mapping...');
+    if (!container) {
+      console.error('❌ pageMappingContent not found');
+      return;
+    }
+    console.log('✅ pageMappingContent found, rendering...');
     console.log('📁 Page mapping:', this.pageMapping);
 
     let html = '';
@@ -232,9 +237,13 @@ class JsMapSystem {
      * Render system statistics
      */
   renderSystemStats() {
+    console.log('🔍 renderSystemStats called');
     const container = document.getElementById('systemStatsContent');
-    if (!container) return;
-
+    if (!container) {
+      console.error('❌ systemStatsContent not found');
+      return;
+    }
+    console.log('✅ systemStatsContent found, rendering...');
     console.log('🔍 Rendering system stats...');
 
     // Count total functions
@@ -686,9 +695,13 @@ class JsMapSystem {
      * Render functions data
      */
   renderFunctionsData() {
-    const container = document.getElementById('functionsContent');
-        if (!container) return;
-
+    console.log('🔍 renderFunctionsData called');
+    const container = document.getElementById('functionsMapContent');
+        if (!container) {
+      console.error('❌ functionsMapContent not found');
+      return;
+    }
+    console.log('✅ functionsMapContent found, rendering...');
         console.log('🔍 Rendering functions data...');
         console.log('📁 Functions data:', this.functionsData);
 

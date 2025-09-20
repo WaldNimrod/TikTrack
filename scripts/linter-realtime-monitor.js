@@ -47,6 +47,144 @@ let isScanning = false;
 let scanningPromise = null;
 
 // ========================================
+// File Scanning State Management
+// ========================================
+
+class FileScanningState {
+    constructor() {
+        this.discovered = { total: 0, byType: {} };
+        this.selected = { total: 0, byType: {} };
+        this.scanned = { total: 0, byType: {} };
+        this.results = { errors: [], warnings: [] };
+    }
+    
+    updateDiscovered(files) {
+        if (Array.isArray(files)) {
+            this.discovered = this.calculateStatsFromArray(files);
+        } else if (typeof files === 'object') {
+            this.discovered = this.calculateStatsFromObject(files);
+        }
+        console.log('📁 Updated discovered files:', this.discovered);
+    }
+    
+    updateSelected(types) {
+        this.selected = this.filterByTypes(this.discovered, types);
+        console.log('🎯 Updated selected files:', this.selected);
+    }
+    
+    updateScanned(results) {
+        this.scanned = results;
+        console.log('✅ Updated scanned files:', this.scanned);
+    }
+    
+    calculateStatsFromArray(files) {
+        const stats = { total: 0, byType: {} };
+        files.forEach(file => {
+            const type = getFileType(file);
+            if (!stats.byType[type]) {
+                stats.byType[type] = 0;
+            }
+            stats.byType[type]++;
+            stats.total++;
+        });
+        return stats;
+    }
+    
+    calculateStatsFromObject(files) {
+        const stats = { total: 0, byType: {} };
+        Object.keys(files).forEach(type => {
+            if (files[type] && Array.isArray(files[type])) {
+                stats.byType[type] = files[type].length;
+                stats.total += files[type].length;
+            }
+        });
+        return stats;
+    }
+    
+    filterByTypes(discovered, types) {
+        const filtered = { total: 0, byType: {} };
+        types.forEach(type => {
+            if (discovered.byType[type]) {
+                filtered.byType[type] = discovered.byType[type];
+                filtered.total += discovered.byType[type];
+            }
+        });
+        return filtered;
+    }
+    
+    getStatsMessage() {
+        const discoveredMsg = this.formatStatsMessage(this.discovered, 'נמצאו');
+        const selectedMsg = this.formatStatsMessage(this.selected, 'נבחרו');
+        const scannedMsg = this.formatStatsMessage(this.scanned, 'נסרקו');
+        
+        return {
+            discovered: discoveredMsg,
+            selected: selectedMsg,
+            scanned: scannedMsg
+        };
+    }
+    
+    formatStatsMessage(stats, verb) {
+        if (stats.total === 0) {
+            return `${verb} 0 קבצים`;
+        }
+        
+        const typeDetails = Object.keys(stats.byType)
+            .filter(type => stats.byType[type] > 0)
+            .map(type => `${type.toUpperCase()}: ${stats.byType[type]}`)
+            .join(', ');
+        
+        return `${verb} ${stats.total} קבצים (${typeDetails})`;
+    }
+}
+
+// Global scanning state instance
+let fileScanningState = new FileScanningState();
+
+// ========================================
+// UI Update Functions
+// ========================================
+
+function updateScanningProgressUI() {
+    if (!fileScanningState) return;
+    
+    // Update progress indicators
+    const discoveredElement = document.getElementById('discoveredFiles');
+    const selectedElement = document.getElementById('selectedFiles');
+    const scannedElement = document.getElementById('scannedFiles');
+    
+    if (discoveredElement) {
+        discoveredElement.textContent = fileScanningState.discovered.total;
+    }
+    
+    if (selectedElement) {
+        selectedElement.textContent = fileScanningState.selected.total;
+    }
+    
+    if (scannedElement) {
+        scannedElement.textContent = fileScanningState.scanned.total;
+    }
+    
+    // Update progress bar
+    const progressBar = document.getElementById('scanningProgressBar');
+    const progressPercent = document.getElementById('scanningProgressPercent');
+    
+    if (progressBar && fileScanningState.discovered.total > 0) {
+        const progress = (fileScanningState.scanned.total / fileScanningState.discovered.total) * 100;
+        const roundedProgress = Math.min(Math.round(progress), 100);
+        
+        progressBar.style.width = `${roundedProgress}%`;
+        progressBar.setAttribute('aria-valuenow', roundedProgress);
+        
+        if (progressPercent) {
+            progressPercent.textContent = `${roundedProgress}%`;
+        }
+    } else if (progressPercent) {
+        progressPercent.textContent = '0%';
+    }
+}
+
+// ========================================
 // File Discovery and Management
 // ========================================
 
@@ -686,39 +824,56 @@ function updateFileTypeStatistics(issues) {
     // Ensure issues is an array
     const issuesArray = issues || [];
     
-    // First, add all discovered files to stats (even those without issues)
-    if (window.projectFiles) {
-        console.log('📁 Processing project files...');
-        // Handle both array and object formats
-        if (Array.isArray(window.projectFiles)) {
-            console.log('📁 Project files is array format');
-            window.projectFiles.forEach(file => {
-                const type = getFileType(file);
-                if (!stats[type]) {
-                    stats[type] = { files: 0, errors: 0, warnings: 0 };
-                }
-                stats[type].files++;
-            });
-        } else if (typeof window.projectFiles === 'object') {
-            console.log('📁 Project files is object format');
-            // Handle object format {js: [...], html: [...], css: [...], etc.}
-            Object.keys(window.projectFiles).forEach(type => {
-                if (window.projectFiles[type] && Array.isArray(window.projectFiles[type])) {
+    // Use FileScanningState for accurate statistics
+    if (fileScanningState && fileScanningState.discovered.total > 0) {
+        console.log('📁 Using FileScanningState for statistics...');
+        
+        // Initialize stats with discovered files
+        Object.keys(fileScanningState.discovered.byType).forEach(type => {
+            stats[type] = { 
+                files: fileScanningState.discovered.byType[type] || 0, 
+                errors: 0, 
+                warnings: 0 
+            };
+        });
+        
+        console.log('📁 Updated stats from FileScanningState:', stats);
+    } else {
+        console.warn('❌ FileScanningState not available, using fallback');
+        // Fallback to old method if FileScanningState not available
+        if (window.projectFiles) {
+            console.log('📁 Processing project files...');
+            // Handle both array and object formats
+            if (Array.isArray(window.projectFiles)) {
+                console.log('📁 Project files is array format');
+                window.projectFiles.forEach(file => {
+                    const type = getFileType(file);
                     if (!stats[type]) {
                         stats[type] = { files: 0, errors: 0, warnings: 0 };
                     }
-                    stats[type].files = window.projectFiles[type].length;
-                    console.log(`📁 ${type}: ${stats[type].files} files`);
-                }
+                    stats[type].files++;
+                });
+            } else if (typeof window.projectFiles === 'object') {
+                console.log('📁 Project files is object format');
+                // Handle object format {js: [...], html: [...], css: [...], etc.}
+                Object.keys(window.projectFiles).forEach(type => {
+                    if (window.projectFiles[type] && Array.isArray(window.projectFiles[type])) {
+                        if (!stats[type]) {
+                            stats[type] = { files: 0, errors: 0, warnings: 0 };
+                        }
+                        stats[type].files = window.projectFiles[type].length;
+                        console.log(`📁 ${type}: ${stats[type].files} files`);
+                    }
+                });
+            }
+        } else {
+            console.warn('❌ window.projectFiles is not available');
+            // If no project files available, initialize with empty stats for all types
+            const allTypes = ['js', 'html', 'css', 'python', 'other'];
+            allTypes.forEach(type => {
+                stats[type] = { files: 0, errors: 0, warnings: 0 };
             });
-                }
-            } else {
-        console.warn('❌ window.projectFiles is not available');
-        // If no project files available, initialize with empty stats for all types
-        const allTypes = ['js', 'html', 'css', 'python', 'other'];
-        allTypes.forEach(type => {
-            stats[type] = { files: 0, errors: 0, warnings: 0 };
-        });
+        }
     }
     
     // Then add issues to the stats
@@ -1060,6 +1215,12 @@ async function performScan() {
             // Store in global variable for statistics
             window.projectFiles = projectFiles;
             
+            // Update file scanning state with discovered files
+            fileScanningState.updateDiscovered(projectFiles);
+            
+            // Update selected files based on user selection
+            fileScanningState.updateSelected(selectedTypes);
+            
             // Update file type statistics immediately
             updateFileTypeStatistics([]);
             
@@ -1082,6 +1243,13 @@ async function performScan() {
             });
             
             console.log('🔍 Files to scan:', filesToScan.length);
+            
+            // Log the selection process
+            const messages = fileScanningState.getStatsMessage();
+            addLogEntry('INFO', messages.selected);
+            
+            // Update UI with selection data
+            updateScanningProgressUI();
         } catch (error) {
             console.error('🔍 Error getting project files:', error);
             // Fall back to static lists
@@ -1446,7 +1614,18 @@ async function finishScan() {
     window.scanningResults.endTime = Date.now();
     const duration = (window.scanningResults.endTime - window.scanningResults.startTime) / 1000;
     
-    addLogEntry('SUCCESS', `סריקה הושלמה! נסרקו ${window.scanningResults.scannedFiles} קבצים תוך ${duration.toFixed(1)} שניות`);
+    // Update file scanning state with scan results
+    fileScanningState.updateScanned({
+        total: window.scanningResults.scannedFiles,
+        byType: {} // Will be calculated from actual results
+    });
+    
+    // Use the new state management for logging
+    const messages = fileScanningState.getStatsMessage();
+    addLogEntry('SUCCESS', `סריקה הושלמה - ${messages.scanned} תוך ${duration.toFixed(1)} שניות`);
+    
+    // Update UI with final scan results
+    updateScanningProgressUI();
                 
                 // Update statistics
     updateFileTypeStatistics(window.scanningResults.errors.concat(window.scanningResults.warnings));
@@ -2778,10 +2957,18 @@ async function discoverProjectFiles() {
             // Store in global variable for backward compatibility
             window.projectFiles = discoveredFiles;
             
+            // Update file scanning state
+            fileScanningState.updateDiscovered(discoveredFiles);
+            
             // Update file type statistics immediately
             updateFileTypeStatistics([]);
             
-            addLogEntry('INFO', `גילוי הושלם - נמצאו ${stats.total} קבצים (JS: ${stats.js}, HTML: ${stats.html}, CSS: ${stats.css}, Python: ${stats.python}, Other: ${stats.other})`);
+            // Update UI with new data
+            updateScanningProgressUI();
+            
+            // Use the new state management for logging
+            const messages = fileScanningState.getStatsMessage();
+            addLogEntry('INFO', messages.discovered);
             
             // Hide progress indicator
             if (progressElement) {

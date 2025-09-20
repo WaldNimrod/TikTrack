@@ -552,6 +552,50 @@
                       <div id="fileDiscoveryProgress" style="display: none; font-size: 12px; color: #007bff; font-weight: 500;">
                         <i class="fas fa-spinner fa-spin"></i> מגלה קבצים...
                       </div>
+                      
+                      <!-- File Scanning Progress Display -->
+                      <div class="scanning-progress" style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
+                        <h6 style="margin-bottom: 15px; color: #495057; font-weight: 600;">
+                          <i class="fas fa-chart-line"></i> התקדמות סריקה
+                        </h6>
+                        
+                        <div class="row g-3">
+                          <!-- Discovered Files -->
+                          <div class="col-md-4">
+                            <div class="progress-indicator text-center">
+                              <div class="progress-value" id="discoveredFiles" style="font-size: 24px; font-weight: bold; color: #007bff;">-</div>
+                              <div class="progress-label" style="font-size: 12px; color: #6c757d;">קבצים שנמצאו</div>
+                            </div>
+                          </div>
+                          
+                          <!-- Selected Files -->
+                          <div class="col-md-4">
+                            <div class="progress-indicator text-center">
+                              <div class="progress-value" id="selectedFiles" style="font-size: 24px; font-weight: bold; color: #28a745;">-</div>
+                              <div class="progress-label" style="font-size: 12px; color: #6c757d;">קבצים שנבחרו</div>
+                            </div>
+                          </div>
+                          
+                          <!-- Scanned Files -->
+                          <div class="col-md-4">
+                            <div class="progress-indicator text-center">
+                              <div class="progress-value" id="scannedFiles" style="font-size: 24px; font-weight: bold; color: #dc3545;">-</div>
+                              <div class="progress-label" style="font-size: 12px; color: #6c757d;">קבצים שנסרקו</div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!-- Progress Bar -->
+                        <div class="mt-3">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <small class="text-muted">התקדמות סריקה:</small>
+                            <small class="text-muted" id="scanningProgressPercent">0%</small>
+                          </div>
+                          <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-primary" role="progressbar" id="scanningProgressBar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                          </div>
+                        </div>
+                      </div>
                       <button class="btn btn-outline-warning btn-sm" onclick="window.resetFixedIssues()">
                         <i class="fas fa-undo"></i> איפוס
                       </button>

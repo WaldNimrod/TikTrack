@@ -11,6 +11,10 @@
 :root {
   /* ===== צבעי ישויות דינמיים ===== */
   
+  /* צבעים ראשיים */
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+  
   /* טרייד - Trade */
   --entity-trade-color: #007bff;
   --entity-trade-bg: rgba(0, 123, 255, 0.1);

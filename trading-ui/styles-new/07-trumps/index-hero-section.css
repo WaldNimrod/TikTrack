@@ -12,16 +12,14 @@
 
 .hero-banner {
   position: relative;
-  background: linear-gradient(135deg, 
-    var(--primary-color, #007bff) 0%, 
-    var(--secondary-color, #6c757d) 100%);
+  background: transparent;
   border-radius: 16px;
   overflow: hidden;
   margin-bottom: 2rem;
   min-height: 400px;
   display: flex;
   align-items: center;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
 }
 
 .hero-bg-illustration {
@@ -30,7 +28,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.15;
+  opacity: 1;
   z-index: 1;
 }
 
@@ -52,19 +50,16 @@
   font-size: 3rem;
   font-weight: 700;
   margin-bottom: 1rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  background: linear-gradient(45deg, #ffffff, #e3f2fd);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-primary, #212529);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .hero-subtitle {
   font-size: 1.25rem;
   font-weight: 300;
   margin-bottom: 2rem;
-  opacity: 0.9;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  color: var(--text-secondary, #6c757d);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* ===== סגנונות סטטיסטיקות הירו ===== */
@@ -79,33 +74,34 @@
 .hero-stat {
   text-align: center;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--card-bg, #ffffff);
   border-radius: 12px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--border-color, #e9ecef);
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .hero-stat:hover {
   transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  background: var(--card-bg-hover, #f8f9fa);
+  border-color: var(--primary-color, #007bff);
+  box-shadow: 0 4px 16px rgba(0, 123, 255, 0.1);
 }
 
 .hero-stat-number {
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
-  color: white;
+  color: var(--text-primary, #212529);
 }
 
 .hero-stat-number.positive {
-  color: #4caf50;
+  color: var(--success-color, #28a745);
 }
 
 .hero-stat-label {
   font-size: 0.875rem;
-  opacity: 0.8;
+  color: var(--text-secondary, #6c757d);
   font-weight: 500;
 }
 
@@ -126,20 +122,21 @@
   justify-content: center;
   width: 44px;
   height: 44px;
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--card-bg, #ffffff);
   border-radius: 12px;
   text-decoration: none;
   font-size: 1.25rem;
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--border-color, #e9ecef);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .quick-link-icon:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--primary-color, #007bff);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 123, 255, 0.2);
   color: white;
+  border-color: var(--primary-color, #007bff);
 }
 
 .quick-link-icon.gradient-bg {

@@ -2778,6 +2778,11 @@ async function discoverProjectFiles() {
             
             addLogEntry('INFO', `גילוי הושלם - נמצאו ${stats.total} קבצים (JS: ${stats.js}, HTML: ${stats.html}, CSS: ${stats.css}, Python: ${stats.python}, Other: ${stats.other})`);
             
+            // Hide progress indicator
+            if (progressElement) {
+                progressElement.style.display = 'none';
+            }
+            
             return discoveredFiles;
             } else {
             addLogEntry('WARNING', 'מנגנון סריקת קבצים גלובלי לא זמין - משתמש ברשימה סטטית');
@@ -2785,6 +2790,12 @@ async function discoverProjectFiles() {
             }
         } catch (error) {
         addLogEntry('ERROR', 'שגיאה בגילוי קבצי הפרויקט', { error: error.message });
+        
+        // Hide progress indicator on error
+        if (progressElement) {
+            progressElement.style.display = 'none';
+        }
+        
         return await discoverProjectFilesFallback();
     }
 }

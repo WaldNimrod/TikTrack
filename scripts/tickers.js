@@ -1574,7 +1574,7 @@ async function confirmDeleteTicker(id) {
         successMessage: `טיקר ${tickerInfo} נמחק בהצלחה מהמערכת`
       });
       
-      console.log('✅ המערכת הגלובלית החזירה במחיקה:', handled);
+
       
       if (handled) {
         return; // המערכת הגלובלית טיפלה בהכל
@@ -2046,7 +2046,7 @@ async function loadColorsAndApplyToHeaders() {
     if (!window.currentPreferences) {
       if (window.preferences && window.preferences.loadPreferences) {
         await window.preferences.loadPreferences();
-
+        console.log('✅ Loaded  preferences for tickers');
       } else if (window.loadPreferences) {
         await window.loadPreferences();
         console.log('🔄 Loaded preferences for tickers (fallback)');

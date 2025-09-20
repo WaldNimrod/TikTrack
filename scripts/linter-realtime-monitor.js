@@ -1034,8 +1034,11 @@ async function performScan() {
     
     // אם לא נבחרו סוגי קבצים, נבחר את כולם
     if (selectedTypes.length === 0) {
+        console.log('⚠️ No file types selected, defaulting to all types');
         selectedTypes.push('js', 'html', 'css', 'python', 'other');
     }
+    
+    console.log('📁 Will scan files of types:', selectedTypes);
     
     let filesToScan = [];
     console.log('🔍 Starting file discovery...');

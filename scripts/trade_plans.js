@@ -44,7 +44,7 @@ function executeTradePlan(planId) {
         return response.json();
       })
       .then(data => {
-        console.log('✅ תוכנית מסחר בוצעה:', data);
+
         
         // רענון הטבלה
         loadTradePlansData();
@@ -116,7 +116,7 @@ function copyTradePlan(planId) {
       return response.json();
     })
     .then(data => {
-
+      console.log('✅ תוכנית מסחר הועתקה:', data);
       
       // רענון הטבלה
       loadTradePlansData();

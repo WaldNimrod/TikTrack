@@ -18,7 +18,7 @@ function showNotification(message, type = 'info', title = 'מערכת', duration
         window.showNotification(message, type, title, duration);
     } else {
         // Fallback to console.log if global system is not available
-        }] ${title}: ${message}`);
+        console.log(`[${type.toUpperCase()}] ${title}: ${message}`);
     }
 }
 
@@ -225,7 +225,7 @@ Loading order: Bootstrap → ITCSS files → Header styles
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Style Demonstration Page Loaded');
+
     
     // REMOVED: updateColorSystem() call - this was causing inline styles to be applied
     // The color system should be handled by external CSS files only

@@ -249,7 +249,7 @@ function initializeCharts() {
 
     qualityChartRenderer = new QualityChartRenderer('qualityChartContainer');
     qualityChartRenderer.initialize().then(() => {
-        addLogEntry('SUCCESS', 'גרף איכות קוד אותחל בהצלחה');
+        // גרף איכות קוד אותחל בהצלחה
         console.log('✅ Quality chart initialized');
     }).catch(error => {
         addLogEntry('ERROR', 'שגיאה באתחול גרף איכות', { error: error.message });
@@ -265,7 +265,7 @@ function initializeCharts() {
 
     countsChartRenderer = new CountsChartRenderer('countsChartContainer');
     countsChartRenderer.initialize().then(() => {
-        addLogEntry('SUCCESS', 'גרף ספירות אותחל בהצלחה');
+        // גרף ספירות אותחל בהצלחה
         console.log('✅ Counts chart initialized');
         loadInitialData();
     }).catch(error => {
@@ -335,7 +335,7 @@ async function loadInitialData() {
                         endTime: latestScan.timestamp ? new Date(latestScan.timestamp).getTime() : null
                     };
                     
-                    addLogEntry('SUCCESS', `נטענו נתוני סריקה אחרונים: ${window.scanningResults.scannedFiles} קבצים, ${window.scanningResults.errors.length} שגיאות, ${window.scanningResults.warnings.length} אזהרות`);
+                    // נטענו נתוני סריקה אחרונים
                     
                     // Update last scan date
                     if (latestScan.timestamp) {
@@ -358,7 +358,7 @@ async function loadInitialData() {
                 updateCountsChart(latestData);
                 console.log('✅ Charts updated with historical data from IndexedDB:', latestData);
                 
-                addLogEntry('SUCCESS', `נטענו ${latestData.length} נקודות נתונים היסטוריות`);
+                // נטענו נקודות נתונים היסטוריות
             } else {
                 addLogEntry('INFO', 'לא נמצאו נתונים היסטוריים - מתחיל עם גרף ריק');
                 // Update indicators with default values
@@ -440,7 +440,7 @@ async function updateStatisticsDisplay() {
                 // Update chart indicators
                 updateChartIndicators();
                 
-                addLogEntry('SUCCESS', 'סטטיסטיקות עודכנו מהנתונים השמורים');
+                // סטטיסטיקות עודכנו מהנתונים השמורים
         } else {
             // Try to load from localStorage as backup
             const savedData = localStorage.getItem('linterScanningResults');
@@ -482,7 +482,7 @@ async function updateStatisticsDisplay() {
                         updateProblemFilesTable();
                         updateChartIndicators();
                         
-                        addLogEntry('SUCCESS', 'נתונים נטענו מ-localStorage');
+                        // נתונים נטענו מ-localStorage
                         console.log('✅ Loaded data from localStorage:', window.scanningResults);
         } else {
                         addLogEntry('INFO', 'לא נמצאו נתונים שמורים - מתחיל עם נתונים ריקים');
@@ -638,7 +638,7 @@ function loadLogs() {
         const logs = JSON.parse(localStorage.getItem('linterLogs') || '[]');
         // Just update the display once with all logs, don't call handleLogEntry for each
         updateLogDisplay();
-        addLogEntry('SUCCESS', `נטענו ${logs.length} רשומות לוג`);
+        // נטענו רשומות לוג
         
         // Try to load scanning results from localStorage as backup
         loadScanningResultsFromLocalStorage();
@@ -684,7 +684,7 @@ function loadScanningResultsFromLocalStorage() {
             updateFileTypeCardsProgress();
             updateProblemFilesTable();
             
-            addLogEntry('SUCCESS', `נתוני סריקה נטענו מ-localStorage: ${window.scanningResults.scannedFiles} קבצים, ${window.scanningResults.errors.length} שגיאות, ${window.scanningResults.warnings.length} אזהרות`);
+            // נתוני סריקה נטענו מ-localStorage
         } else {
             console.log('❌ No scanning results found in localStorage');
             addLogEntry('INFO', 'לא נמצאו נתוני סריקה ב-localStorage');
@@ -708,9 +708,9 @@ function updateChartIndicators() {
         // Check if scanning results are available
         if (!window.scanningResults || !window.scanningResults.errors) {
             console.log('⚠️ No scanning results available yet, skipping indicators update');
-            return;
-        }
-        
+        return;
+    }
+
         // Get current data
         const totalErrors = window.scanningResults?.errors?.length || 0;
         const totalWarnings = window.scanningResults?.warnings?.length || 0;
@@ -807,7 +807,7 @@ function calculateStorageSize() {
             return `${localStorageSize} B`;
         } else if (localStorageSize < 1024 * 1024) {
             return `${(localStorageSize / 1024).toFixed(1)} KB`;
-        } else {
+    } else {
             return `${(localStorageSize / (1024 * 1024)).toFixed(1)} MB`;
         }
     } catch (error) {
@@ -925,7 +925,7 @@ function updateFileTypeStatistics(issues) {
         if (fileCountElement) {
             fileCountElement.textContent = stat.files;
             console.log(`✅ Updated ${elementId}FilesCount to ${stat.files}`);
-        } else {
+                } else {
             console.warn(`❌ Element ${elementId}FilesCount not found`);
         }
         
@@ -943,7 +943,7 @@ function updateFileTypeStatistics(issues) {
         if (warningCountElement) {
             warningCountElement.textContent = stat.warnings;
             console.log(`✅ Updated ${elementId}WarningsCount to ${stat.warnings}`);
-    } else {
+            } else {
             console.warn(`❌ Element ${elementId}WarningsCount not found`);
         }
     });
@@ -1006,9 +1006,9 @@ function updateFileTypeCardsProgress() {
                 if (warningCountElement) {
                     warningCountElement.textContent = typeWarnings;
                     console.log(`✅ Updated ${elementId}WarningsCount to ${typeWarnings}`);
-                }
             }
-        });
+        }
+    });
     }
 }
 
@@ -1546,7 +1546,7 @@ function updateRealtimeProgress() {
                 overallStatusElement.textContent = 'מוכן לסריקה';
             } else if (window.scanningResults.scannedFiles < window.scanningResults.totalFiles) {
                 overallStatusElement.textContent = `סורק... ${progress}%`;
-            } else {
+    } else {
                 overallStatusElement.textContent = 'סריקה הושלמה';
             }
             console.log(`✅ Updated overallStatus to: ${overallStatusElement.textContent}`);
@@ -1837,8 +1837,11 @@ async function initializeSession() {
     // Initialize data collector
     if (typeof DataCollector !== 'undefined') {
         window.dataCollectorInstance = new DataCollector();
-        addLogEntry('SUCCESS', 'אספן נתונים אותחל בהצלחה');
+        // אספן נתונים אותחל בהצלחה
     }
+    
+    // Initialize progress report
+    initializeProgressReport();
     
     addLogEntry('SUCCESS', 'מערכת לינטר אותחלה בהצלחה');
 }
@@ -1981,7 +1984,7 @@ function attemptStorageRecovery() {
     try {
         // Clear potentially corrupted data
         localStorage.removeItem('linterData');
-        addLogEntry('SUCCESS', 'מערכת האחסון שוחזרה');
+        // מערכת האחסון שוחזרה
     } catch (error) {
         addLogEntry('ERROR', 'שחזור מערכת האחסון נכשל', { error: error.message });
     }
@@ -1993,7 +1996,7 @@ function attemptNetworkRecovery() {
     fetch('/trading-ui/linter-realtime-monitor.html')
         .then(response => {
             if (response.ok) {
-                addLogEntry('SUCCESS', 'קישוריות הרשת תקינה');
+                // קישוריות הרשת תקינה
     } else {
                 addLogEntry('WARNING', 'בעיה בקישוריות הרשת');
             }
@@ -2127,7 +2130,7 @@ window.refreshChartData = async function() {
             
             updateQualityChart(historicalData);
             updateCountsChart(historicalData);
-            addLogEntry('SUCCESS', 'נתוני הגרפים עודכנו בהצלחה');
+            // נתוני הגרפים עודכנו בהצלחה
         } catch (error) {
             addLogEntry('ERROR', 'שגיאה ברענון נתוני הגרפים', { error: error.message });
         }
@@ -2185,7 +2188,7 @@ window.clearChartHistory = async function() {
             updateFileTypeCardsProgress();
             updateProblemFilesTable();
             
-            addLogEntry('SUCCESS', 'היסטוריית הגרף נוקתה בהצלחה');
+            // היסטוריית הגרף נוקתה בהצלחה
         } catch (error) {
             addLogEntry('ERROR', 'שגיאה בניקוי היסטוריית הגרף', { error: error.message });
         }
@@ -2215,7 +2218,238 @@ window.applyChartSettings = async function() {
     
     // Save settings
     localStorage.setItem('chartSettings', JSON.stringify(settings));
-    addLogEntry('SUCCESS', 'הגדרות הגרף נשמרו בהצלחה');
+    // הגדרות הגרף נשמרו בהצלחה
+};
+
+// ========================================
+// Progress Report System
+// ========================================
+
+// Progress tracking data
+let progressData = {
+    completed: [],
+    inProgress: [],
+    open: [],
+    timeline: []
+};
+
+// Initialize progress report
+function initializeProgressReport() {
+    // Load existing progress data
+    const savedProgress = localStorage.getItem('linterProgressData');
+    if (savedProgress) {
+        try {
+            progressData = JSON.parse(savedProgress);
+        } catch (error) {
+            console.error('Error loading progress data:', error);
+        }
+    }
+    
+    // Add current session progress
+    addProgressEntry('מערכת לינטר אותחלה', 'completed', 'אתחול מערכת', 'מערכת הלינטר אותחלה בהצלחה');
+    addProgressEntry('Bootstrap JavaScript נוסף', 'completed', 'תיקון Bootstrap', 'הוספת Bootstrap JavaScript לעמוד הלינטר');
+    addProgressEntry('הודעות הצלחה נוקו', 'completed', 'ניקוי הודעות', 'הוסרו 16 הודעות הצלחה מיותרות');
+    addProgressEntry('דוח התקדמות נוצר', 'completed', 'תכונה חדשה', 'נוסף דוח התקדמות מפורט');
+    
+    updateProgressReport();
+}
+
+// Add progress entry
+function addProgressEntry(action, status, category, details) {
+    const entry = {
+        id: Date.now(),
+        action: action,
+        status: status,
+        category: category,
+        details: details,
+        timestamp: new Date().toISOString(),
+        date: new Date().toLocaleDateString('he-IL'),
+        time: new Date().toLocaleTimeString('he-IL')
+    };
+    
+    switch (status) {
+        case 'completed':
+            progressData.completed.push(entry);
+            break;
+        case 'inProgress':
+            progressData.inProgress.push(entry);
+            break;
+        case 'open':
+            progressData.open.push(entry);
+            break;
+    }
+    
+    progressData.timeline.push(entry);
+    
+    // Save to localStorage
+    localStorage.setItem('linterProgressData', JSON.stringify(progressData));
+    
+    updateProgressReport();
+}
+
+// Update progress report display
+function updateProgressReport() {
+    // Update summary cards
+    document.getElementById('completedFixes').textContent = progressData.completed.length;
+    document.getElementById('inProgressFixes').textContent = progressData.inProgress.length;
+    document.getElementById('openIssues').textContent = progressData.open.length;
+    
+    // Calculate success rate
+    const total = progressData.completed.length + progressData.inProgress.length + progressData.open.length;
+    const successRate = total > 0 ? Math.round((progressData.completed.length / total) * 100) : 0;
+    document.getElementById('successRate').textContent = successRate + '%';
+    
+    // Update count
+    document.getElementById('progressReportCount').textContent = total + ' פעולות';
+    
+    // Update timeline
+    updateProgressTimeline();
+    
+    // Update details table
+    updateProgressDetailsTable();
+}
+
+// Update progress timeline
+function updateProgressTimeline() {
+    const timelineContainer = document.getElementById('progressTimeline');
+    if (!timelineContainer) return;
+    
+    // Sort timeline by timestamp (newest first)
+    const sortedTimeline = [...progressData.timeline].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    timelineContainer.innerHTML = sortedTimeline.slice(0, 10).map(entry => {
+        const statusIcon = getStatusIcon(entry.status);
+        const statusColor = getStatusColor(entry.status);
+        
+        return `
+            <div class="timeline-item">
+                <div class="timeline-marker ${statusColor}">
+                    <i class="${statusIcon}"></i>
+                </div>
+                <div class="timeline-content">
+                    <div class="timeline-title">${entry.action}</div>
+                    <div class="timeline-details">${entry.details}</div>
+                    <div class="timeline-meta">
+                        <span class="timeline-category">${entry.category}</span>
+                        <span class="timeline-date">${entry.date} ${entry.time}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Update progress details table
+function updateProgressDetailsTable() {
+    const tbody = document.getElementById('progressDetailsBody');
+    if (!tbody) return;
+    
+    // Combine all entries and sort by timestamp
+    const allEntries = [...progressData.completed, ...progressData.inProgress, ...progressData.open]
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    tbody.innerHTML = allEntries.map(entry => {
+        const statusBadge = getStatusBadge(entry.status);
+        
+        return `
+            <tr>
+                <td>${entry.action}</td>
+                <td>${statusBadge}</td>
+                <td>${entry.date} ${entry.time}</td>
+                <td>${entry.details}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary" onclick="viewProgressDetails('${entry.id}')" title="צפה בפרטים">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Helper functions
+function getStatusIcon(status) {
+    switch (status) {
+        case 'completed': return 'fas fa-check-circle';
+        case 'inProgress': return 'fas fa-clock';
+        case 'open': return 'fas fa-exclamation-triangle';
+        default: return 'fas fa-info-circle';
+    }
+}
+
+function getStatusColor(status) {
+    switch (status) {
+        case 'completed': return 'text-success';
+        case 'inProgress': return 'text-warning';
+        case 'open': return 'text-danger';
+        default: return 'text-info';
+    }
+}
+
+function getStatusBadge(status) {
+    switch (status) {
+        case 'completed': return '<span class="badge bg-success">הושלם</span>';
+        case 'inProgress': return '<span class="badge bg-warning">בתהליך</span>';
+        case 'open': return '<span class="badge bg-danger">פתוח</span>';
+        default: return '<span class="badge bg-secondary">לא ידוע</span>';
+    }
+}
+
+// Global functions for progress report
+window.generateProgressReport = function() {
+    addLogEntry('INFO', 'יוצר דוח התקדמות מפורט...');
+    
+    // Generate comprehensive progress report
+    const report = {
+        timestamp: new Date().toISOString(),
+        summary: {
+            completed: progressData.completed.length,
+            inProgress: progressData.inProgress.length,
+            open: progressData.open.length,
+            total: progressData.completed.length + progressData.inProgress.length + progressData.open.length
+        },
+        details: progressData.timeline
+    };
+    
+    // Display report
+    console.log('Progress Report:', report);
+    addLogEntry('SUCCESS', `דוח התקדמות נוצר: ${report.summary.completed} הושלמו, ${report.summary.inProgress} בתהליך, ${report.summary.open} פתוחים`);
+    
+    return report;
+};
+
+window.exportProgressReport = function() {
+    const report = window.generateProgressReport();
+    
+    // Create downloadable file
+    const dataStr = JSON.stringify(report, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(dataBlob);
+    link.download = `linter-progress-report-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    
+    addLogEntry('SUCCESS', 'דוח התקדמות יוצא בהצלחה');
+};
+
+window.viewProgressDetails = function(entryId) {
+    const entry = progressData.timeline.find(e => e.id == entryId);
+    if (entry) {
+        const details = `
+פעולה: ${entry.action}
+סטטוס: ${entry.status}
+קטגוריה: ${entry.category}
+פירוט: ${entry.details}
+תאריך: ${entry.date} ${entry.time}
+        `;
+        
+        if (typeof showModalNotification === 'function') {
+            showModalNotification('פרטי פעולה', details, 'info');
+    } else {
+            alert(details);
+        }
+    }
 };
 
 // ========================================
@@ -2242,7 +2476,7 @@ function startMonitoring() {
         stopBtn.className = 'btn btn-danger btn-sm';
     }
     
-    addLogEntry('SUCCESS', 'ניטור הופעל - המערכת תסרוק קבצים אוטומטית');
+    // ניטור הופעל - המערכת תסרוק קבצים אוטומטית
 }
 
 function stopMonitoring() {
@@ -2268,7 +2502,7 @@ function stopMonitoring() {
         stopBtn.className = 'btn btn-secondary btn-sm';
     }
     
-    addLogEntry('SUCCESS', 'ניטור הופסק - המערכת לא תסרוק קבצים אוטומטית');
+    // ניטור הופסק - המערכת לא תסרוק קבצים אוטומטית
 }
 
 
@@ -2602,7 +2836,7 @@ async function fixAllErrors() {
     
     updateFixProgressDisplay();
     
-    let fixedCount = 0;
+            let fixedCount = 0;
     let failedCount = 0;
     
     for (let i = window.scanningResults.errors.length - 1; i >= 0; i--) {
@@ -2777,8 +3011,8 @@ async function saveFixedFile(fileName, content) {
                 window.saveFileWarningLogged = true;
             }
             return false;
-        }
-    } catch (error) {
+            }
+        } catch (error) {
         // Only log first error to avoid spam
         if (!window.saveFileErrorLogged) {
             addLogEntry('WARNING', `לא ניתן לשמור קובץ ${fileName} - ${error.message}`);

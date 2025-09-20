@@ -320,31 +320,35 @@
 
 /* תיקון לכפתורים קטנים */
 .container-fluid .main-content .btn-sm {
-  min-height: 32px;
   padding: 6px 12px;
   font-size: 13px;
   border-radius: 3px;
-  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
+  width: auto; /* רוחב אוטומטי לפי התוכן */
+  min-width: auto; /* ללא רוחב מינימלי */
+  white-space: normal; /* מאפשר מעבר שורה אם צריך */
 }
 
 /* תיקון כללי לכפתורים */
 .container-fluid .main-content .btn {
-  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
   padding: 6px 12px;
+  width: auto; /* רוחב אוטומטי לפי התוכן */
+  min-width: auto; /* ללא רוחב מינימלי */
+  white-space: normal; /* מאפשר מעבר שורה אם צריך */
 }
 
 /* תיקון לכפתורים גדולים */
 .container-fluid .main-content .btn-lg {
-  min-height: 44px;
   padding: 8px 16px;
+  width: auto; /* רוחב אוטומטי לפי התוכן */
+  min-width: auto; /* ללא רוחב מינימלי */
   font-size: 16px;
   border-radius: 5px;
 }

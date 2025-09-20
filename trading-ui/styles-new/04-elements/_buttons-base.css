@@ -82,6 +82,9 @@ button:disabled,
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
   border-radius: calc(var(--apple-radius-small) * 0.75);
+  width: auto; /* רוחב אוטומטי לפי התוכן */
+  min-width: auto; /* ללא רוחב מינימלי */
+  white-space: normal; /* מאפשר מעבר שורה אם צריך */
 }
 
 /* Large buttons */

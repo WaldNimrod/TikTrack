@@ -156,13 +156,28 @@ class JsMapSystem {
             // Update system stats
             this.updateSystemStats();
 
-      this.renderFunctionsData();
+      // Update dashboard stats
+      updateDashboardStats();
+
+      // Apply view mode and render data
+      const savedViewMode = localStorage.getItem('jsMapViewMode') || 'cards';
+      setViewMode(savedViewMode);
+
+      // Render data based on view mode
+      if (savedViewMode === 'cards') {
+        renderCardsView(this.functionsData, 'functionsMapContent');
+        renderCardsView(this.pageMapping, 'pageMappingContent');
+      } else if (savedViewMode === 'list') {
+        renderListView(this.functionsData, 'functionsMapContent');
+        renderListView(this.pageMapping, 'pageMappingContent');
+      } else {
+        // Table view - use existing functions
+        this.renderFunctionsData();
+        this.renderPageMapping();
+      }
 
       // Populate functions dropdown
       populateFunctionsDropdown();
-
-      // Render page mapping
-      this.renderPageMapping();
 
       // Load local functions analysis
       if (typeof loadLocalFunctionsAnalysis === 'function') {
@@ -1820,6 +1835,483 @@ function showLocalFunctionsPlaceholder() {
                 <button onclick="loadLocalFunctionsAnalysis()" class="retry-btn">🔄 נסה שוב</button>
             </div>
         `;
+    }
+}
+
+/**
+ * Update Dashboard Stats - Smart Dashboard with live statistics
+ */
+function updateDashboardStats() {
+    console.log('📊 Updating Dashboard Stats...');
+    
+    // Get data from jsMapSystem
+    const functionsData = window.jsMapSystem?.functionsData;
+    const pageMapping = window.jsMapSystem?.pageMapping;
+    const globalFunctionsIndex = window.jsMapSystem?.globalFunctionsIndex;
+    
+    // Calculate statistics
+    let totalPages = 0;
+    let totalJsFiles = 0;
+    let totalFunctions = 0;
+    let globalFunctions = 0;
+    
+    // Count pages from page mapping
+    if (pageMapping && Object.keys(pageMapping).length > 0) {
+        totalPages = Object.keys(pageMapping).length;
+        
+        // Count JS files from page mapping
+        Object.values(pageMapping).forEach(files => {
+            if (Array.isArray(files)) {
+                totalJsFiles += files.length;
+            }
+        });
+    }
+    
+    // Count functions from functions data
+    if (functionsData && functionsData.data) {
+        Object.keys(functionsData.data).forEach(file => {
+            const fileData = functionsData.data[file];
+            if (fileData && fileData.functions) {
+                totalFunctions += fileData.functions.length;
+            }
+        });
+    }
+    
+    // Count global functions
+    if (globalFunctionsIndex && Array.isArray(globalFunctionsIndex)) {
+        globalFunctions = globalFunctionsIndex.length;
+    }
+    
+    // Update DOM elements
+    updateStatCard('totalPagesCount', totalPages);
+    updateStatCard('totalJsFilesCount', totalJsFiles);
+    updateStatCard('totalFunctionsCount', totalFunctions);
+    updateStatCard('globalFunctionsCount', globalFunctions);
+    
+    console.log(`✅ Dashboard Stats Updated: ${totalPages} pages, ${totalJsFiles} JS files, ${totalFunctions} functions, ${globalFunctions} global`);
+}
+
+/**
+ * Update individual stat card
+ */
+function updateStatCard(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        // Add animation effect
+        element.style.opacity = '0.5';
+        element.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            element.textContent = value.toLocaleString();
+            element.style.opacity = '1';
+            element.style.transform = 'scale(1)';
+        }, 150);
+    }
+}
+
+/**
+ * Perform Global Search - Real-time search with highlighting
+ */
+function performGlobalSearch(query) {
+    console.log('🔍 Performing global search for:', query);
+    
+    if (!query || query.trim().length < 2) {
+        hideSearchResults();
+        return;
+    }
+    
+    const results = [];
+    const functionsData = window.jsMapSystem?.functionsData;
+    
+    // Search in functions data
+    if (functionsData && functionsData.data) {
+        Object.keys(functionsData.data).forEach(file => {
+            const fileData = functionsData.data[file];
+            if (fileData && fileData.functions) {
+                fileData.functions.forEach(func => {
+                    if (func.name.toLowerCase().includes(query.toLowerCase())) {
+                        results.push({
+                            type: 'function',
+                            file: file,
+                            name: func.name,
+                            description: func.description || 'ללא תיאור',
+                            line: func.line || 'לא ידוע'
+                        });
+                    }
+                });
+            }
+        });
+    }
+    
+    // Search in page mapping
+    const pageMapping = window.jsMapSystem?.pageMapping;
+    if (pageMapping) {
+        Object.keys(pageMapping).forEach(page => {
+            if (page.toLowerCase().includes(query.toLowerCase())) {
+                results.push({
+                    type: 'page',
+                    name: page,
+                    files: pageMapping[page],
+                    description: `עמוד ${page} עם ${pageMapping[page].length} קבצי JS`
+                });
+            }
+        });
+    }
+    
+    displaySearchResults(results, query);
+}
+
+/**
+ * Display Search Results with highlighting
+ */
+function displaySearchResults(results, query) {
+    const resultsContainer = document.getElementById('quickSearchResults');
+    if (!resultsContainer) return;
+    
+    if (results.length === 0) {
+        resultsContainer.innerHTML = `
+            <div class="no-results">
+                <i class="fas fa-search"></i>
+                <p>לא נמצאו תוצאות עבור "${query}"</p>
+            </div>
+        `;
+        resultsContainer.classList.add('show');
+        return;
+    }
+    
+    let html = `<div class="search-results-header">
+        <h4>תוצאות חיפוש עבור "${query}" (${results.length})</h4>
+    </div>`;
+    
+    results.forEach((result, index) => {
+        if (result.type === 'function') {
+            html += `
+                <div class="search-result-item function-result" onclick="showFunctionDetails('${result.file}', '${result.name}')">
+                    <div class="result-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div class="result-content">
+                        <div class="result-title">${highlightText(result.name, query)}</div>
+                        <div class="result-subtitle">${result.file} - שורה ${result.line}</div>
+                        <div class="result-description">${highlightText(result.description, query)}</div>
+                    </div>
+                </div>
+            `;
+        } else if (result.type === 'page') {
+            html += `
+                <div class="search-result-item page-result" onclick="showPageDetails('${result.name}')">
+                    <div class="result-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="result-content">
+                        <div class="result-title">${highlightText(result.name, query)}</div>
+                        <div class="result-subtitle">עמוד HTML</div>
+                        <div class="result-description">${result.description}</div>
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    resultsContainer.innerHTML = html;
+    resultsContainer.classList.add('show');
+}
+
+/**
+ * Highlight search terms in text
+ */
+function highlightText(text, query) {
+    if (!text || !query) return text;
+    
+    const regex = new RegExp(`(${query})`, 'gi');
+    return text.replace(regex, '<mark class="search-highlight">$1</mark>');
+}
+
+/**
+ * Hide search results
+ */
+function hideSearchResults() {
+    const resultsContainer = document.getElementById('quickSearchResults');
+    if (resultsContainer) {
+        resultsContainer.classList.remove('show');
+    }
+}
+
+/**
+ * Show function details (placeholder)
+ */
+function showFunctionDetails(file, functionName) {
+    console.log('Showing function details:', file, functionName);
+    // This would open a modal or navigate to the function
+    if (window.openFunctionModal) {
+        window.openFunctionModal(file, functionName);
+    }
+}
+
+/**
+ * Show page details (placeholder)
+ */
+function showPageDetails(pageName) {
+    console.log('Showing page details:', pageName);
+    // This would show page mapping details
+    alert(`פרטי העמוד: ${pageName}`);
+}
+
+/**
+ * Perform Quick Search (wrapper function)
+ */
+function performQuickSearch(query) {
+    performGlobalSearch(query);
+}
+
+/**
+ * Set View Mode - Cards, List, or Table
+ */
+function setViewMode(mode) {
+    console.log('🎨 Setting view mode to:', mode);
+    
+    // Update active button
+    const buttons = document.querySelectorAll('.view-mode-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    const activeBtn = document.querySelector(`[data-mode="${mode}"]`);
+    if (activeBtn) {
+        activeBtn.classList.add('active');
+    }
+    
+    // Store preference
+    localStorage.setItem('jsMapViewMode', mode);
+    
+    // Apply view mode to all sections
+    applyViewMode(mode);
+}
+
+/**
+ * Apply view mode to all sections
+ */
+function applyViewMode(mode) {
+    const sections = ['pageMappingContent', 'functionsMapContent', 'dependenciesContent', 'systemStatsContent'];
+    
+    sections.forEach(sectionId => {
+        const container = document.getElementById(sectionId);
+        if (container) {
+            container.className = container.className.replace(/view-\w+/g, '');
+            container.classList.add(`view-${mode}`);
+        }
+    });
+}
+
+/**
+ * Render Cards View
+ */
+function renderCardsView(data, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    if (containerId === 'functionsMapContent') {
+        renderFunctionsCardsView(data, container);
+    } else if (containerId === 'pageMappingContent') {
+        renderPageMappingCardsView(data, container);
+    }
+}
+
+/**
+ * Render Functions Cards View
+ */
+function renderFunctionsCardsView(functionsData, container) {
+    if (!functionsData || !functionsData.data) {
+        container.innerHTML = '<div class="no-data">אין נתוני פונקציות</div>';
+        return;
+    }
+    
+    let html = '<div class="functions-cards-grid">';
+    
+    Object.keys(functionsData.data).forEach(file => {
+        const fileData = functionsData.data[file];
+        if (fileData && fileData.functions) {
+            html += `
+                <div class="file-card">
+                    <div class="file-card-header">
+                        <h3 class="file-name">${file}</h3>
+                        <span class="functions-count">${fileData.functions.length} פונקציות</span>
+                    </div>
+                    <div class="functions-list">
+                        ${fileData.functions.slice(0, 5).map(func => `
+                            <div class="function-item" onclick="showFunctionDetails('${file}', '${func.name}')">
+                                <i class="fas fa-code"></i>
+                                <span class="function-name">${func.name}</span>
+                                <span class="function-line">שורה ${func.line || 'לא ידוע'}</span>
+                            </div>
+                        `).join('')}
+                        ${fileData.functions.length > 5 ? `<div class="more-functions">+${fileData.functions.length - 5} פונקציות נוספות</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+/**
+ * Render Page Mapping Cards View
+ */
+function renderPageMappingCardsView(pageMapping, container) {
+    if (!pageMapping || Object.keys(pageMapping).length === 0) {
+        container.innerHTML = '<div class="no-data">אין נתוני מיפוי עמודים</div>';
+        return;
+    }
+    
+    let html = '<div class="pages-cards-grid">';
+    
+    Object.keys(pageMapping).forEach(page => {
+        const files = pageMapping[page];
+        html += `
+            <div class="page-card">
+                <div class="page-card-header">
+                    <h3 class="page-name">${page}</h3>
+                    <span class="files-count">${files.length} קבצי JS</span>
+                </div>
+                <div class="js-files-list">
+                    ${files.map(file => `
+                        <div class="js-file-item">
+                            <i class="fas fa-file-code"></i>
+                            <span class="file-name">${file}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+/**
+ * Render List View
+ */
+function renderListView(data, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    if (containerId === 'functionsMapContent') {
+        renderFunctionsListView(data, container);
+    } else if (containerId === 'pageMappingContent') {
+        renderPageMappingListView(data, container);
+    }
+}
+
+/**
+ * Render Functions List View
+ */
+function renderFunctionsListView(functionsData, container) {
+    if (!functionsData || !functionsData.data) {
+        container.innerHTML = '<div class="no-data">אין נתוני פונקציות</div>';
+        return;
+    }
+    
+    let html = '<div class="functions-list-view">';
+    
+    Object.keys(functionsData.data).forEach(file => {
+        const fileData = functionsData.data[file];
+        if (fileData && fileData.functions) {
+            html += `
+                <div class="file-section">
+                    <div class="file-header">
+                        <h3 class="file-name">${file}</h3>
+                        <span class="functions-count">${fileData.functions.length} פונקציות</span>
+                    </div>
+                    <div class="functions-list">
+                        ${fileData.functions.map(func => `
+                            <div class="function-row" onclick="showFunctionDetails('${file}', '${func.name}')">
+                                <div class="function-name">${func.name}</div>
+                                <div class="function-line">שורה ${func.line || 'לא ידוע'}</div>
+                                <div class="function-description">${func.description || 'ללא תיאור'}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+/**
+ * Render Page Mapping List View
+ */
+function renderPageMappingListView(pageMapping, container) {
+    if (!pageMapping || Object.keys(pageMapping).length === 0) {
+        container.innerHTML = '<div class="no-data">אין נתוני מיפוי עמודים</div>';
+        return;
+    }
+    
+    let html = '<div class="pages-list-view">';
+    
+    Object.keys(pageMapping).forEach(page => {
+        const files = pageMapping[page];
+        html += `
+            <div class="page-row">
+                <div class="page-name">${page}</div>
+                <div class="files-list">
+                    ${files.map(file => `<span class="file-tag">${file}</span>`).join('')}
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+/**
+ * Render Table View (existing functionality)
+ */
+function renderTableView(data, containerId) {
+    // This uses the existing table rendering functions
+    if (containerId === 'functionsMapContent') {
+        if (window.jsMapSystem && window.jsMapSystem.renderFunctionsData) {
+            window.jsMapSystem.renderFunctionsData();
+        }
+    } else if (containerId === 'pageMappingContent') {
+        if (window.jsMapSystem && window.jsMapSystem.renderPageMapping) {
+            window.jsMapSystem.renderPageMapping();
+        }
+    }
+}
+
+/**
+ * Refresh Dashboard Data
+ */
+function refreshDashboardData() {
+    console.log('🔄 Refreshing Dashboard Data...');
+    
+    // Show loading state
+    const statCards = document.querySelectorAll('.stat-card .stat-value');
+    statCards.forEach(card => {
+        card.textContent = '...';
+        card.style.opacity = '0.5';
+    });
+    
+    // Reload data and update stats
+    if (window.jsMapSystem && window.jsMapSystem.loadJsMapData) {
+        window.jsMapSystem.loadJsMapData().then(() => {
+            updateDashboardStats();
+        }).catch(error => {
+            console.error('❌ Error refreshing dashboard data:', error);
+            // Show error state
+            statCards.forEach(card => {
+                card.textContent = '❌';
+                card.style.opacity = '1';
+            });
+        });
+    } else {
+        // Fallback: just update stats with current data
+        updateDashboardStats();
     }
 }
 

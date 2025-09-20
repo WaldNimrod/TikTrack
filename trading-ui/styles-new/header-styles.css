@@ -137,11 +137,15 @@
 #unified-header .header-nav {
     display: flex;
     align-items: center;
+    justify-content: center; /* יישור למרכז */
+    flex: 1; /* תופס את כל הרוחב הזמין */
 }
 
 #unified-header .main-nav {
     display: flex;
     align-items: center;
+    justify-content: center; /* יישור למרכז */
+    gap: 1rem; /* רווח בין פריטי התפריט */
 }
 
 /* ===== התאמה למסכים קטנים ===== */

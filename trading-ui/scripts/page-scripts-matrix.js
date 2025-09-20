@@ -155,6 +155,9 @@ class PageScriptsMatrixSystem {
         this.renderStorageManagement();
         this.renderArchitectureCheck();
         this.renderIntegrationStatus();
+        
+        // Start file monitoring
+        this.startFileMonitoring();
     }
 
     /**
@@ -1596,6 +1599,103 @@ class PageScriptsMatrixSystem {
         if (window.showNotification) {
             window.showNotification(message, 'error');
         }
+    }
+
+    /**
+     * Start file monitoring for dynamic changes
+     */
+    startFileMonitoring() {
+        console.log('👀 Starting file monitoring...');
+        
+        // Monitor file changes every 30 seconds
+        this.fileMonitoringInterval = setInterval(async () => {
+            await this.checkForFileChanges();
+        }, 30000);
+        
+        // Initial check
+        setTimeout(() => {
+            this.checkForFileChanges();
+        }, 2000);
+    }
+
+    /**
+     * Check for file changes
+     */
+    async checkForFileChanges() {
+        try {
+            const currentFiles = await this.loadJavaScriptFilesList();
+            const currentFileCount = currentFiles.length;
+            
+            // Compare with previous count
+            if (this.previousFileCount !== undefined && this.previousFileCount !== currentFileCount) {
+                const difference = currentFileCount - this.previousFileCount;
+                
+                if (difference > 0) {
+                    // Files added
+                    this.notifyFileChanges('added', difference, currentFiles);
+                } else {
+                    // Files removed
+                    this.notifyFileChanges('removed', Math.abs(difference));
+                }
+                
+                // Refresh the files display
+                await this.refreshFilesList();
+            }
+            
+            this.previousFileCount = currentFileCount;
+            
+        } catch (error) {
+            console.warn('⚠️ Error checking for file changes:', error);
+        }
+    }
+
+    /**
+     * Notify about file changes
+     */
+    notifyFileChanges(type, count, files = null) {
+        const message = type === 'added' 
+            ? `נוספו ${count} קבצי JavaScript חדשים`
+            : `הוסרו ${count} קבצי JavaScript`;
+        
+        console.log(`📁 ${message}`);
+        
+        if (window.showNotification) {
+            window.showNotification(message, 'info');
+        }
+        
+        // Show detailed notification if files were added
+        if (type === 'added' && files) {
+            const newFiles = files.slice(-count);
+            const fileList = newFiles.join(', ');
+            
+            setTimeout(() => {
+                if (window.showNotification) {
+                    window.showNotification(`קבצים חדשים: ${fileList}`, 'info');
+                }
+            }, 2000);
+        }
+    }
+
+    /**
+     * Stop file monitoring
+     */
+    stopFileMonitoring() {
+        if (this.fileMonitoringInterval) {
+            clearInterval(this.fileMonitoringInterval);
+            this.fileMonitoringInterval = null;
+            console.log('🛑 File monitoring stopped');
+        }
+    }
+
+    /**
+     * Get file monitoring status
+     */
+    getFileMonitoringStatus() {
+        return {
+            active: this.fileMonitoringInterval !== null,
+            previousFileCount: this.previousFileCount,
+            lastCheck: new Date().toLocaleString('he-IL')
+        };
     }
 }
 

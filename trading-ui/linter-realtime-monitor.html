@@ -221,6 +221,36 @@
               </div>
             </div>
 
+            <!-- Scan Options -->
+            <div style="padding: 20px; border-bottom: 1px solid #dee2e6;">
+              <h5 style="margin-bottom: 15px; color: #495057; font-size: 16px; font-weight: 500;">
+                <i class="fas fa-cog"></i> אפשרויות סריקה:
+              </h5>
+              <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; background: white; border-radius: 6px; border: 1px solid #e9ecef;">
+                  <input type="checkbox" id="skipBackupFolders" checked style="margin: 0;">
+                  <div>
+                    <span style="font-weight: 500; color: #6c757d;">דלג על תיקיות גיבוי</span>
+                    <br><small style="color: #6c757d; font-size: 11px;">backup/, backups/, *_backup</small>
+                  </div>
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; background: white; border-radius: 6px; border: 1px solid #e9ecef;">
+                  <input type="checkbox" id="skipTestFiles" checked style="margin: 0;">
+                  <div>
+                    <span style="font-weight: 500; color: #6c757d;">דלג על קבצי בדיקה</span>
+                    <br><small style="color: #6c757d; font-size: 11px;">test_*, *_test, spec/</small>
+                  </div>
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 12px; background: white; border-radius: 6px; border: 1px solid #e9ecef;">
+                  <input type="checkbox" id="skipDocumentation" checked style="margin: 0;">
+                  <div>
+                    <span style="font-weight: 500; color: #6c757d;">דלג על תיעוד</span>
+                    <br><small style="color: #6c757d; font-size: 11px;">*.md, *.txt, docs/</small>
+                  </div>
+                </label>
+              </div>
+            </div>
+
             <!-- Actions Layout - Left column for all actions, right column for monitoring -->
             <div style="display: flex; gap: 30px; padding: 20px;">
 
@@ -359,8 +389,7 @@
           </div>
           <!-- Chart body -->
           <div class="section-body">
-            <div id="chartContainer" class="chart-container" style="width: 100%; height: 500px; margin: 0 auto; border: 1px solid #ddd; background: #f9f9f9;">
-              <canvas id="linterChart" style="width: 100%; height: 100%; display: block;"></canvas>
+            <div id="chartContainer" class="chart-container" style="width: 100%; height: 500px; margin: 0 auto; border: 1px solid #ddd; background: #f9f9f9; position: relative;">
               <div id="chartStatus" style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: none;">
                 טוען גרף...
               </div>

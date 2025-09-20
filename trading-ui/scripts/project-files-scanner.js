@@ -226,6 +226,7 @@ class ProjectFilesScanner {
      */
     async getFilesFromServer() {
         try {
+            console.log('🔍 Fetching files from server API...');
             const response = await fetch('/api/v1/files/discover', {
                 method: 'GET',
                 headers: {
@@ -233,11 +234,16 @@ class ProjectFilesScanner {
                 }
             });
 
+            console.log('🔍 Response status:', response.status);
             if (!response.ok) {
                 throw new Error(`Server responded with status: ${response.status}`);
             }
 
             const data = await response.json();
+            console.log('🔍 Server response data:', data);
+            console.log('🔍 Data success:', data.success);
+            console.log('🔍 Data files:', data.files);
+            
             if (data.success && data.files) {
                 console.log(`✅ Server file discovery successful: ${data.total_files} files found`);
                 console.log('📊 File breakdown:', {
@@ -249,10 +255,11 @@ class ProjectFilesScanner {
                 });
                 return data.files;
             } else {
+                console.error('❌ Server returned invalid response:', data);
                 throw new Error('Server returned invalid response');
             }
         } catch (error) {
-            console.warn('Server file discovery failed:', error);
+            console.error('❌ Server file discovery failed:', error);
             return null;
         }
     }
@@ -818,10 +825,14 @@ class ProjectFilesScanner {
 // ========================================
 
 // Create global instance
+console.log('🔧 Initializing ProjectFilesScanner...');
 window.projectFilesScanner = new ProjectFilesScanner();
+console.log('✅ ProjectFilesScanner initialized');
 
 // Load cache from localStorage on initialization
+console.log('🔧 Loading from localStorage...');
 window.projectFilesScanner.loadFromLocalStorage();
+console.log('✅ ProjectFilesScanner loaded from localStorage');
 
 // Global functions for backward compatibility
 window.getProjectFiles = () => window.projectFilesScanner.getProjectFiles();

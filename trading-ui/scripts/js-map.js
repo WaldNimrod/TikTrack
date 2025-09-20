@@ -85,8 +85,19 @@ class JsMapSystem {
         ];
         
         for (const filename in functionsData) {
-            if (globalFiles.includes(filename) && functionsData[filename].functions) {
-                const functions = functionsData[filename].functions;
+            const fileData = functionsData[filename];
+            let functions = [];
+            
+            // Handle different data structures
+            if (fileData) {
+                if (Array.isArray(fileData)) {
+                    functions = fileData;
+                } else if (fileData.functions && Array.isArray(fileData.functions)) {
+                    functions = fileData.functions;
+                }
+            }
+            
+            if (globalFiles.includes(filename) && functions && Array.isArray(functions)) {
                 for (const func of functions) {
                     if (func.name && this.isGlobalFunction(func)) {
                         globalFunctions[func.name] = {
@@ -128,8 +139,6 @@ class JsMapSystem {
             // Show loading state
             this.showLoadingState();
 
-            // Get page mapping
-            await this.loadPageMapping();
             
             // Load global functions index
             await this.loadGlobalFunctionsIndex();
@@ -140,8 +149,9 @@ class JsMapSystem {
             console.log('📊 Data loaded - Page mapping keys:', Object.keys(this.pageMapping));
             console.log('📊 Data loaded - Functions data keys:', Object.keys(this.functionsData));
 
-            // Render data
-            await this.renderPageMapping();
+            // Update system stats
+            this.updateSystemStats();
+
             this.renderFunctionsData();
 
             console.log('✅ JS map data loaded successfully');
@@ -153,172 +163,170 @@ class JsMapSystem {
     }
 
     /**
-     * Load page mapping data
+     * Update system statistics in top section
      */
-    async loadPageMapping() {
-        console.log('🔄 Starting loadPageMapping...');
-        try {
-            console.log('🌐 Fetching page mapping from Page Scripts Matrix API...');
-            const response = await fetch('/api/page-scripts-matrix/scan-results');
-            if (response.ok) {
-                const data = await response.json();
-                // Convert Page Scripts Matrix format to JS-Map format
-                this.pageMapping = this.convertPageScriptsMatrixToJsMap(data.data);
-                console.log('✅ Page mapping loaded from Page Scripts Matrix API:', Object.keys(this.pageMapping));
-            } else {
-                console.warn('⚠️ Page Scripts Matrix API failed, trying JS-Map API...');
-                const fallbackResponse = await fetch('/api/js-map/page-mapping');
-                if (fallbackResponse.ok) {
-                    this.pageMapping = await fallbackResponse.json();
-                    console.log('✅ Page mapping loaded from JS-Map API:', Object.keys(this.pageMapping));
-                } else {
-                    console.warn('⚠️ Both APIs failed, using local scan');
-                    this.pageMapping = this.scanPageMappingLocally();
-                }
+    updateSystemStats() {
+        // Count pages
+        const pagesCount = Object.keys(this.pageMapping).length;
+        document.getElementById('totalPagesCount').textContent = pagesCount;
+
+        // Count JS files
+        const jsFiles = new Set();
+        Object.values(this.pageMapping).forEach(mapping => {
+            if (mapping.files) {
+                mapping.files.forEach(file => jsFiles.add(file));
+            } else if (Array.isArray(mapping)) {
+                mapping.forEach(file => jsFiles.add(file));
             }
-        } catch (error) {
-            console.warn('⚠️ Fetch failed, using local scan:', error);
-            this.pageMapping = this.scanPageMappingLocally();
-        }
-        console.log('🔄 loadPageMapping completed. Page mapping keys:', Object.keys(this.pageMapping));
+        });
+        document.getElementById('totalJsFilesCount').textContent = jsFiles.size;
+
+        // Count functions
+        let totalFunctions = 0;
+        Object.values(this.functionsData).forEach(fileData => {
+            if (Array.isArray(fileData)) {
+                totalFunctions += fileData.length;
+            } else if (fileData.functions && Array.isArray(fileData.functions)) {
+                totalFunctions += fileData.functions.length;
+            }
+        });
+        document.getElementById('totalFunctionsCount').textContent = totalFunctions;
+
+        // Count global functions
+        const globalFunctionsCount = this.globalFunctionsIndex ? Object.keys(this.globalFunctionsIndex).length : 0;
+        document.getElementById('globalFunctionsCount').textContent = globalFunctionsCount;
+
+        // Initialize other counters (will be updated by other functions)
+        document.getElementById('duplicatesCount').textContent = '0';
+        document.getElementById('localFunctionsCount').textContent = '0';
     }
 
-    /**
-     * Convert Page Scripts Matrix format to JS-Map format
-     */
-    convertPageScriptsMatrixToJsMap(pageScriptsData) {
-        console.log('🔄 Converting Page Scripts Matrix data to JS-Map format...');
-        
-        const jsMapFormat = {};
-        
-        if (pageScriptsData && pageScriptsData.matrix) {
-            for (const [pageName, scripts] of Object.entries(pageScriptsData.matrix)) {
-                // Get scripts that are actually used by this page
-                const usedScripts = Object.entries(scripts)
-                    .filter(([scriptName, isUsed]) => isUsed === true)
-                    .map(([scriptName]) => scriptName);
-                
-                jsMapFormat[pageName] = {
-                    files: usedScripts,
-                    page_type: 'standard',
-                    functions_count: 0, // Will be calculated later
-                    last_modified: new Date().toISOString(),
-                    file_sizes: {},
-                    dependencies: usedScripts
-                };
-            }
-        }
-        
-        console.log('✅ Converted Page Scripts Matrix data:', Object.keys(jsMapFormat));
-        return jsMapFormat;
-    }
+
+
 
     /**
-     * Check integration status with Page Scripts Matrix
+     * Load functions statistics
      */
-    async checkIntegrationStatus() {
-        console.log('🔍 Checking integration status with Page Scripts Matrix...');
-        
+    async loadFunctionsStatistics() {
         try {
-            // Test Page Scripts Matrix API
-            const response = await fetch('/api/page-scripts-matrix/scan-results');
-            if (response.ok) {
-                const data = await response.json();
-                console.log('✅ Page Scripts Matrix API is working');
-                console.log('📊 Available pages:', Object.keys(data.data.matrix || {}).length);
-                console.log('📊 Available scripts:', Object.keys(data.data.scripts || {}).length);
-                return {
-                    status: 'integrated',
-                    pages: Object.keys(data.data.matrix || {}).length,
-                    scripts: Object.keys(data.data.scripts || {}).length,
-                    lastScan: data.data.lastScan
-                };
-            } else {
-                console.warn('⚠️ Page Scripts Matrix API not available');
-                return { status: 'fallback', reason: 'API not available' };
-            }
-        } catch (error) {
-            console.warn('⚠️ Page Scripts Matrix integration check failed:', error);
-            return { status: 'fallback', reason: error.message };
-        }
-    }
-
-    /**
-     * Load integration status
-     */
-    async loadIntegrationStatus() {
-        try {
-            console.log('🔍 Loading integration status...');
+            console.log('📊 Loading functions statistics...');
             
-            const integrationStatus = await this.checkIntegrationStatus();
-            
-            const container = document.getElementById('integrationContent');
+            const container = document.getElementById('functionsStatsContent');
             if (!container) {
-                console.warn('⚠️ integrationContent container not found');
+                console.warn('⚠️ functionsStatsContent container not found');
                 return;
             }
 
+            // Calculate statistics from functions data
+            const stats = this.calculateFunctionsStatistics();
+            
             let html = `
-                <div class="integration-status">
-                    <h3>🔗 סטטוס אינטגרציה עם מערכת Page Scripts Matrix</h3>
-                    <div class="status-info">
-                        <div class="status-item">
-                            <span class="status-label">סטטוס:</span>
-                            <span class="status-value ${integrationStatus.status === 'integrated' ? 'status-success' : 'status-warning'}">
-                                ${integrationStatus.status === 'integrated' ? '✅ מחובר' : '⚠️ מצב גיבוי'}
-                            </span>
+                <div class="functions-stats">
+                    <h3>📊 סטטיסטיקות פונקציות</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📁</div>
+                            <div class="stat-label">קבצים עם פונקציות</div>
+                            <div class="stat-value">${stats.filesWithFunctions}</div>
                         </div>
-            `;
-
-            if (integrationStatus.status === 'integrated') {
-                html += `
-                        <div class="status-item">
-                            <span class="status-label">עמודים זמינים:</span>
-                            <span class="status-value">${integrationStatus.pages}</span>
+                        <div class="stat-card">
+                            <div class="stat-icon">⚙️</div>
+                            <div class="stat-label">סה"כ פונקציות</div>
+                            <div class="stat-value">${stats.totalFunctions}</div>
                         </div>
-                        <div class="status-item">
-                            <span class="status-label">סקריפטים זמינים:</span>
-                            <span class="status-value">${integrationStatus.scripts}</span>
+                        <div class="stat-card">
+                            <div class="stat-icon">🌐</div>
+                            <div class="stat-label">פונקציות גלובליות</div>
+                            <div class="stat-value">${stats.globalFunctions}</div>
                         </div>
-                        <div class="status-item">
-                            <span class="status-label">סריקה אחרונה:</span>
-                            <span class="status-value">${new Date(integrationStatus.lastScan).toLocaleString('he-IL')}</span>
+                        <div class="stat-card">
+                            <div class="stat-icon">📝</div>
+                            <div class="stat-label">פונקציות עם תיעוד</div>
+                            <div class="stat-value">${stats.documentedFunctions}</div>
                         </div>
-                `;
-            } else {
-                html += `
-                        <div class="status-item">
-                            <span class="status-label">סיבה:</span>
-                            <span class="status-value">${integrationStatus.reason}</span>
-                        </div>
-                `;
-            }
-
-            html += `
                     </div>
-                    <div class="integration-actions">
-                        <button class="action-btn" onclick="checkIntegrationStatus()">🔄 בדוק שוב</button>
-                        <button class="action-btn" onclick="loadPageMapping()">📊 טען נתונים מחדש</button>
+                    
+                    <div class="functions-breakdown">
+                        <h4>📋 פירוט לפי קבצים:</h4>
+                        <div class="files-list">
+                            ${stats.filesBreakdown.map(file => `
+                                <div class="file-stat">
+                                    <span class="file-name">${file.name}</span>
+                                    <span class="file-count">${file.count} פונקציות</span>
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                 </div>
             `;
-
+            
             container.innerHTML = html;
-            console.log('✅ Integration status loaded successfully');
+            console.log('✅ Functions statistics loaded successfully');
             
         } catch (error) {
-            console.error('❌ Error loading integration status:', error);
+            console.error('❌ Error loading functions statistics:', error);
             
-            const container = document.getElementById('integrationContent');
+            const container = document.getElementById('functionsStatsContent');
             if (container) {
                 container.innerHTML = `
                     <div class="error-message">
-                        <p>❌ שגיאה בטעינת סטטוס האינטגרציה</p>
-                        <button class="retry-btn" onclick="window.jsMapSystem.loadIntegrationStatus()">🔄 נסה שוב</button>
+                        <p>❌ שגיאה בטעינת סטטיסטיקות פונקציות</p>
+                        <p>${error.message}</p>
                     </div>
                 `;
             }
         }
+    }
+
+    /**
+     * Calculate functions statistics
+     */
+    calculateFunctionsStatistics() {
+        const stats = {
+            filesWithFunctions: 0,
+            totalFunctions: 0,
+            globalFunctions: 0,
+            documentedFunctions: 0,
+            filesBreakdown: []
+        };
+
+        // Count functions in each file
+        Object.keys(this.functionsData).forEach(file => {
+            const fileData = this.functionsData[file];
+            let functions = [];
+            
+            if (fileData) {
+                if (Array.isArray(fileData)) {
+                    functions = fileData;
+                } else if (fileData.functions && Array.isArray(fileData.functions)) {
+                    functions = fileData.functions;
+                }
+            }
+
+            if (functions.length > 0) {
+                stats.filesWithFunctions++;
+                stats.totalFunctions += functions.length;
+                
+                // Count documented functions
+                const documentedCount = functions.filter(func => 
+                    func.description && func.description.trim() !== ''
+                ).length;
+                stats.documentedFunctions += documentedCount;
+                
+                // Add to breakdown
+                stats.filesBreakdown.push({
+                    name: file,
+                    count: functions.length
+                });
+            }
+        });
+
+        // Count global functions
+        if (this.globalFunctionsIndex) {
+            stats.globalFunctions = Object.keys(this.globalFunctionsIndex).length;
+        }
+
+        return stats;
     }
 
     /**
@@ -533,80 +541,6 @@ class JsMapSystem {
     /**
      * Render page mapping table
      */
-    async renderPageMapping() {
-        const container = document.getElementById('pageMappingContent');
-        if (!container) {
-            // Container not found: pageMappingContent
-            return;
-        }
-
-        console.log('🔍 Rendering page mapping...');
-        console.log('📄 HTML Pages:', this.htmlPages);
-        console.log('📄 HTML Pages length:', this.htmlPages ? this.htmlPages.length : 'undefined');
-        console.log('🗂️ Page Mapping:', this.pageMapping);
-        console.log('🗂️ Page Mapping keys:', this.pageMapping ? Object.keys(this.pageMapping) : 'undefined');
-
-        // Sort JS files by generality (most general first)
-        const sortedJsFiles = this.sortJsFilesByGenerality();
-        console.log('📁 Sorted JS Files:', sortedJsFiles);
-        console.log('📁 Sorted JS Files length:', sortedJsFiles ? sortedJsFiles.length : 'undefined');
-
-        if (!this.htmlPages || this.htmlPages.length === 0) {
-            // No HTML pages found!
-            container.innerHTML = '<div class="error">לא נמצאו עמודים להצגה</div>';
-            return;
-        }
-
-        if (!sortedJsFiles || sortedJsFiles.length === 0) {
-            // No JS files found!
-            container.innerHTML = '<div class="error">לא נמצאו קבצי JS להצגה</div>';
-            return;
-        }
-
-        // Get function call counts
-        const functionCallCounts = await this.scanFunctionCalls();
-
-        let html = `
-             <table class="page-mapping-table">
-                 <thead>
-                     <tr>
-                         <th>עמוד</th>
-                         ${sortedJsFiles.map(file => `<th class="js-file-cell">${file}</th>`).join('')}
-                     </tr>
-                     <tr class="function-calls-row">
-                         <th style="background: var(--apple-blue); color: white; font-size: 0.9rem;">
-                             <i class="fas fa-phone"></i> קריאות לפונקציות
-                         </th>
-                         ${sortedJsFiles.map(file => {
-            const count = functionCallCounts[file] || 0;
-            const colorClass = count > 30 ? 'high-usage' : count > 15 ? 'medium-usage' : 'low-usage';
-            return `<td class="js-file-cell function-call-count ${colorClass}" onclick="showFunctionCallDetails('${file}', ${count})" style="cursor: pointer;" title="לחץ לפרטים">${count}</td>`;
-        }).join('')}
-                     </tr>
-                 </thead>
-                 <tbody>
-         `;
-
-        this.htmlPages.forEach(page => {
-            html += `
-                 <tr>
-                     <td><strong>${page}</strong></td>
-                     ${sortedJsFiles.map(file => {
-                const isUsed = this.pageMapping[page] && this.pageMapping[page].includes(file);
-                return `<td class="js-file-cell">${isUsed ? '✓' : ''}</td>`;
-            }).join('')}
-                 </tr>
-             `;
-        });
-
-        html += `
-                 </tbody>
-             </table>
-         `;
-
-        container.innerHTML = html;
-        console.log('✅ Page mapping rendered successfully with function call counts');
-    }
 
     /**
      * Render functions data
@@ -654,16 +588,19 @@ class JsMapSystem {
                              <tbody>
              `;
 
-            functions.forEach(func => {
-                html += `
-                     <tr class="function-row" onclick="openFunctionDetails('${file}', '${func.name}')">
-                         <td class="function-name">${func.name}</td>
-                         <td class="function-description">${func.description || 'אין תיאור'}</td>
-                         <td class="function-params">${func.params || 'אין פרמטרים'}</td>
-                         <td class="function-returns">${func.returns || 'אין ערך מוחזר'}</td>
-                     </tr>
-                 `;
-            });
+            // Ensure functions is an array before calling forEach
+            if (functions && Array.isArray(functions)) {
+                functions.forEach(func => {
+                    html += `
+                         <tr class="function-row" onclick="openFunctionDetails('${file}', '${func.name}')">
+                             <td class="function-name">${func.name}</td>
+                             <td class="function-description">${func.description || 'אין תיאור'}</td>
+                             <td class="function-params">${func.params || 'אין פרמטרים'}</td>
+                             <td class="function-returns">${func.returns || 'אין ערך מוחזר'}</td>
+                         </tr>
+                     `;
+                });
+            }
 
             html += `
                              </tbody>
@@ -677,41 +614,15 @@ class JsMapSystem {
         console.log('✅ Functions data rendered');
     }
 
-    /**
-     * Sort JS files by generality (most general first)
-     */
-    sortJsFilesByGenerality() {
-        const generalityOrder = [
-            // Most general files first
-            'translation-utils.js', 'data-utils.js', 'table-mappings.js',
-            'date-utils.js', 'tables.js', 'linked-items.js', 'page-utils.js',
-            'filter-system.js', 'console-cleanup.js',
-            // Specific page files
-            'alerts.js?v=20250830_1', 'active-alerts-component.js?v=20250830_1', 'trades.js', 'trade_plans.js?v=20250830_1',
-            'research.js', 'executions.js?v=20250830_1', 'tickers.js?v=20250830_1', 'ticker-service.js',
-            'accounts.js?v=20250830_1', 'cash_flows.js', 'notes.js', 'preferences.js',
-            'database.js', 'db-extradata.js', 'constraint-manager.js',
-            'currencies.js', 'auth.js', 'js-map.js', 'js-scanner.js'
-        ];
-
-        return generalityOrder.filter(file => this.jsFiles.includes(file));
-    }
 
     /**
      * Show loading state
      */
     showLoadingState() {
-        const pageMappingContent = document.getElementById('pageMappingContent');
         const functionsContent = document.getElementById('functionsContent');
-
-        if (pageMappingContent) {
-            pageMappingContent.innerHTML = `
-                 <div class="loading">
-                     <div class="loading-spinner"></div>
-                     טוען מיפוי עמודים...
-                 </div>
-             `;
-        }
+        const duplicatesContent = document.getElementById('duplicatesContent');
+        const localFunctionsContent = document.getElementById('localFunctionsContent');
+        const functionsStatsContent = document.getElementById('functionsStatsContent');
 
         if (functionsContent) {
             functionsContent.innerHTML = `
@@ -721,27 +632,74 @@ class JsMapSystem {
                  </div>
              `;
         }
+
+        if (duplicatesContent) {
+            duplicatesContent.innerHTML = `
+                 <div class="loading">
+                     <div class="loading-spinner"></div>
+                     טוען ניתוח כפילויות...
+                 </div>
+             `;
+        }
+
+        if (localFunctionsContent) {
+            localFunctionsContent.innerHTML = `
+                 <div class="loading">
+                     <div class="loading-spinner"></div>
+                     טוען זיהוי פונקציות מקומיות...
+                 </div>
+             `;
+        }
+
+        if (functionsStatsContent) {
+            functionsStatsContent.innerHTML = `
+                 <div class="loading">
+                     <div class="loading-spinner"></div>
+                     טוען סטטיסטיקות פונקציות...
+                 </div>
+             `;
+        }
     }
 
     /**
      * Show error state
      */
     showErrorState(message) {
-        const pageMappingContent = document.getElementById('pageMappingContent');
         const functionsContent = document.getElementById('functionsContent');
+        const duplicatesContent = document.getElementById('duplicatesContent');
+        const localFunctionsContent = document.getElementById('localFunctionsContent');
+        const functionsStatsContent = document.getElementById('functionsStatsContent');
 
-        if (pageMappingContent) {
-            pageMappingContent.innerHTML = `
-                 <div class="loading">
+        if (functionsContent) {
+            functionsContent.innerHTML = `
+                 <div class="error">
                      <i class="fas fa-exclamation-triangle" style="color: #ff6b6b; font-size: 2rem; margin-bottom: 15px;"></i>
                      <div>${message}</div>
                  </div>
              `;
         }
 
-        if (functionsContent) {
-            functionsContent.innerHTML = `
-                 <div class="loading">
+        if (duplicatesContent) {
+            duplicatesContent.innerHTML = `
+                 <div class="error">
+                     <i class="fas fa-exclamation-triangle" style="color: #ff6b6b; font-size: 2rem; margin-bottom: 15px;"></i>
+                     <div>${message}</div>
+                 </div>
+             `;
+        }
+
+        if (localFunctionsContent) {
+            localFunctionsContent.innerHTML = `
+                 <div class="error">
+                     <i class="fas fa-exclamation-triangle" style="color: #ff6b6b; font-size: 2rem; margin-bottom: 15px;"></i>
+                     <div>${message}</div>
+                 </div>
+             `;
+        }
+
+        if (functionsStatsContent) {
+            functionsStatsContent.innerHTML = `
+                 <div class="error">
                      <i class="fas fa-exclamation-triangle" style="color: #ff6b6b; font-size: 2rem; margin-bottom: 15px;"></i>
                      <div>${message}</div>
                  </div>
@@ -1025,6 +983,40 @@ function toggleBackToTop() {
 // Add scroll event listener
 window.addEventListener('scroll', toggleBackToTop);
 
+// Section toggle function
+function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+    
+    const body = section.querySelector('.section-body');
+    const icon = section.querySelector('.section-toggle-icon');
+    
+    if (body.style.display === 'none' || body.style.display === '') {
+        body.style.display = 'block';
+        icon.textContent = '▼';
+    } else {
+        body.style.display = 'none';
+        icon.textContent = '▶';
+    }
+}
+
+// Top section toggle function
+function toggleTopSection() {
+    const topSection = document.querySelector('.top-section');
+    if (!topSection) return;
+    
+    const body = topSection.querySelector('.section-body');
+    const icon = topSection.querySelector('.section-toggle-icon');
+    
+    if (body.style.display === 'none' || body.style.display === '') {
+        body.style.display = 'block';
+        icon.textContent = '▼';
+    } else {
+        body.style.display = 'none';
+        icon.textContent = '▶';
+    }
+}
+
 // Functions Dropdown
 function toggleFunctionsDropdown() {
     const dropdown = document.getElementById('functionsDropdown');
@@ -1061,7 +1053,8 @@ function populateFunctionsDropdown() {
             }
         }
         
-        if (functions && functions.length > 0) {
+        // Ensure functions is an array before calling forEach
+        if (functions && Array.isArray(functions) && functions.length > 0) {
             functions.forEach(func => {
                 html += `
                      <div class="function-dropdown-item" onclick="selectFunctionFromDropdown('${file}', '${func.name}')">
@@ -1695,195 +1688,11 @@ function generateLocalFunctionsLog(data) {
     /**
      * Load and render architecture check
      */
-    async function loadArchitectureCheck() {
-        try {
-            console.log('🏗️ Loading architecture check...');
-            
-            const response = await fetch('/api/js-map/architecture-check');
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            
-            const data = await response.json();
-            
-            if (data.status === 'success') {
-                // שמירה ב-IndexedDB
-                if (window.jsMapIndexedDBAdapter && window.jsMapIndexedDBAdapter.isReady()) {
-                    try {
-                        await window.jsMapIndexedDBAdapter.saveArchitectureCheck(data.data);
-                        console.log('✅ בדיקת ארכיטקטורה נשמרה ב-IndexedDB');
-                    } catch (saveError) {
-                        console.warn('⚠️ שגיאה בשמירת בדיקת ארכיטקטורה:', saveError);
-                    }
-                }
-                
-                renderArchitectureCheck(data.data);
-            } else {
-                throw new Error(data.error || 'Unknown error');
-            }
-            
-        } catch (error) {
-            console.error('❌ Error loading architecture check:', error);
-            showArchitectureError('שגיאה בטעינת בדיקת ארכיטקטורה: ' + error.message);
-        }
-    }
 
-/**
- * Render architecture check results
- */
-function renderArchitectureCheck(data) {
-    const container = document.getElementById('architectureContent');
-    if (!container) {
-        console.error('❌ architectureContent container not found');
-        return;
-    }
-    
-    const violations = data.violations || [];
-    const compliantFiles = data.compliant_files;
-    const totalHtmlFiles = data.total_html_files;
-    const isCompliant = data.is_compliant;
-    
-    let html = `
-        <div class="analysis-summary">
-            <h3>📊 סיכום בדיקת ארכיטקטורה</h3>
-            <div class="summary-stats">
-                <div class="stat-item">
-                    <span class="stat-label">קבצי HTML נבדקו:</span>
-                    <span class="stat-value">${totalHtmlFiles}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">קבצים עומדים בכללים:</span>
-                    <span class="stat-value">${compliantFiles}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">הפרות זוהו:</span>
-                    <span class="stat-value">${violations.length}</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">סטטוס:</span>
-                    <span class="stat-value ${isCompliant ? 'compliant' : 'non-compliant'}">${isCompliant ? '✅ עומד' : '❌ לא עומד'}</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="analysis-actions">
-            <button class="action-btn" onclick="copyArchitectureLog()">📋 העתק לוג</button>
-        </div>
-        
-        <div class="violations-list">
-            ${renderViolations(violations)}
-        </div>
-    `;
-    
-    container.innerHTML = html;
-}
 
-/**
- * Render violations
- */
-function renderViolations(violations) {
-    if (!violations || violations.length === 0) {
-        return '<p>✅ לא נמצאו הפרות ארכיטקטורה</p>';
-    }
-    
-    let html = '<h4>🚨 הפרות ארכיטקטורה:</h4>';
-    
-    violations.forEach((violation, index) => {
-        html += `
-            <div class="violation-item">
-                <div class="violation-header">
-                    <span class="violation-file">📁 ${violation.file}</span>
-                    <span class="violation-line">שורה ${violation.line}</span>
-                    <span class="violation-severity severity-${violation.severity}">${violation.severity}</span>
-                </div>
-                <div class="violation-content">
-                    <code>${violation.content}</code>
-                </div>
-                <div class="violation-type">
-                    סוג הפרה: ${violation.violation_type}
-                </div>
-            </div>
-        `;
-    });
-    
-    return html;
-}
 
-/**
- * Show architecture error
- */
-function showArchitectureError(message) {
-    const container = document.getElementById('architectureContent');
-    if (container) {
-        container.innerHTML = `
-            <div class="error-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                <p>${message}</p>
-                <button onclick="loadArchitectureCheck()" class="retry-btn">🔄 נסה שוב</button>
-            </div>
-        `;
-    }
-}
 
-/**
- * Copy architecture log to clipboard
- */
-async function copyArchitectureLog() {
-    try {
-        const response = await fetch('/api/js-map/architecture-check');
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            const logText = generateArchitectureLog(data.data);
-            await navigator.clipboard.writeText(logText);
-            
-            // Show success message
-            if (window.showNotification) {
-                window.showNotification('לוג בדיקת ארכיטקטורה הועתק ללוח', 'success');
-            } else {
-                alert('לוג בדיקת ארכיטקטורה הועתק ללוח');
-            }
-        }
-    } catch (error) {
-        console.error('❌ Error copying architecture log:', error);
-        if (window.showNotification) {
-            window.showNotification('שגיאה בהעתקת הלוג', 'error');
-        } else {
-            alert('שגיאה בהעתקת הלוג');
-        }
-    }
-}
 
-/**
- * Generate architecture log text
- */
-function generateArchitectureLog(data) {
-    const violations = data.violations || [];
-    const compliantFiles = data.compliant_files;
-    const totalHtmlFiles = data.total_html_files;
-    const isCompliant = data.is_compliant;
-    
-    let log = `=== לוג בדיקת ארכיטקטורה ===\n`;
-    log += `תאריך: ${new Date().toLocaleString('he-IL')}\n\n`;
-    
-    log += `סיכום:\n`;
-    log += `- קבצי HTML נבדקו: ${totalHtmlFiles}\n`;
-    log += `- קבצים עומדים בכללים: ${compliantFiles}\n`;
-    log += `- הפרות זוהו: ${violations.length}\n`;
-    log += `- סטטוס: ${isCompliant ? 'עומד' : 'לא עומד'}\n\n`;
-    
-    if (violations.length > 0) {
-        log += `הפרות מפורטות:\n`;
-        violations.forEach((violation, index) => {
-            log += `${index + 1}. ${violation.file}:${violation.line}\n`;
-            log += `   סוג: ${violation.violation_type}\n`;
-            log += `   חומרה: ${violation.severity}\n`;
-            log += `   תוכן: ${violation.content}\n\n`;
-        });
-    }
-    
-    return log;
-}
 
 /**
  * Initialize all new sections when page loads
@@ -1898,7 +1707,7 @@ function initializeAdvancedSections() {
                 const sectionId = entry.target.id;
                 
                 switch(sectionId) {
-                    case 'section2-duplicates':
+                    case 'section2':
                         if (typeof loadDuplicatesAnalysis === 'function') {
                             loadDuplicatesAnalysis();
                         } else {
@@ -1912,18 +1721,12 @@ function initializeAdvancedSections() {
                             console.warn('⚠️ loadLocalFunctionsAnalysis לא זמין');
                         }
                         break;
-                    case 'section7':
-                        if (window.jsMapSystem) {
-                            window.jsMapSystem.loadIntegrationStatus();
+                    case 'section4':
+                        // Load functions statistics
+                        if (window.jsMapSystem && window.jsMapSystem.loadFunctionsStatistics) {
+                            window.jsMapSystem.loadFunctionsStatistics();
                         } else {
-                            console.warn('⚠️ jsMapSystem לא זמין');
-                        }
-                        break;
-                    case 'section8':
-                        if (typeof loadArchitectureCheck === 'function') {
-                            loadArchitectureCheck();
-                        } else {
-                            console.warn('⚠️ loadArchitectureCheck לא זמין');
+                            console.warn('⚠️ loadFunctionsStatistics לא זמין');
                         }
                         break;
                 }
@@ -1932,7 +1735,7 @@ function initializeAdvancedSections() {
     }, { threshold: 0.1 });
     
     // Observe sections
-    ['section2-duplicates', 'section3', 'section7'].forEach(sectionId => {
+    ['section2', 'section3', 'section4'].forEach(sectionId => {
         const section = document.getElementById(sectionId);
         if (section) {
             observer.observe(section);
@@ -2196,7 +1999,7 @@ async function copyDetailedLog() {
     }
     
     const timestamp = new Date().toLocaleString('he-IL');
-    let detailedLog = `=== לוג מפורט של מערכת JS-Map ===\n`;
+    let detailedLog = `=== לוג מפורט של מערכת ניתוח פונקציות JavaScript ===\n`;
     detailedLog += `זמן: ${timestamp}\n`;
     detailedLog += `URL: ${window.location.href}\n\n`;
     
@@ -2207,15 +2010,14 @@ async function copyDetailedLog() {
     detailedLog += `Language: ${navigator.language}\n`;
     detailedLog += `Online: ${navigator.onLine ? 'כן' : 'לא'}\n\n`;
     
-        // JS-Map System Status
-        detailedLog += `=== סטטוס מערכת JS-Map ===\n`;
+        // Functions Analysis System Status
+        detailedLog += `=== סטטוס מערכת ניתוח פונקציות ===\n`;
         if (window.jsMapSystem) {
-            detailedLog += `מערכת JS-Map: ✅ טעונה\n`;
-            detailedLog += `Page Mapping: ${window.jsMapSystem.pageMapping ? Object.keys(window.jsMapSystem.pageMapping).length + ' עמודים' : '❌ לא זמין'}\n`;
+            detailedLog += `מערכת ניתוח פונקציות: ✅ טעונה\n`;
             detailedLog += `Functions Data: ${window.jsMapSystem.functionsData ? Object.keys(window.jsMapSystem.functionsData).length + ' קבצים' : '❌ לא זמין'}\n`;
             detailedLog += `Global Functions Index: ${window.jsMapSystem.globalFunctionsIndex ? Object.keys(window.jsMapSystem.globalFunctionsIndex).length + ' פונקציות' : '❌ לא זמין'}\n`;
         } else {
-            detailedLog += `מערכת JS-Map: ❌ לא טעונה\n`;
+            detailedLog += `מערכת ניתוח פונקציות: ❌ לא טעונה\n`;
         }
     
     // IndexedDB Status
@@ -2236,7 +2038,7 @@ async function copyDetailedLog() {
     
     // Section Visibility Status
     detailedLog += `\n=== סטטוס תצוגת סקשנים ===\n`;
-    const sections = ['section1', 'section2', 'section2-duplicates', 'section3', 'section4', 'section5', 'section6', 'section7', 'section8'];
+    const sections = ['section1', 'section2', 'section3', 'section4'];
     sections.forEach(sectionId => {
         const section = document.getElementById(sectionId);
         if (section) {
@@ -2249,15 +2051,12 @@ async function copyDetailedLog() {
         }
     });
     
-        // API Endpoints Status
-        detailedLog += `\n=== סטטוס API Endpoints ===\n`;
+        // API Endpoints Status (Functions Analysis)
+        detailedLog += `\n=== סטטוס API Endpoints (ניתוח פונקציות) ===\n`;
         const endpoints = [
-            '/api/js-map/page-mapping',
             '/api/js-map/functions',
             '/api/js-map/analyze-duplicates',
-            '/api/js-map/detect-local-functions',
-            '/api/js-map/architecture-check',
-            '/api/page-scripts-matrix/scan-results'
+            '/api/js-map/detect-local-functions'
         ];
     
     for (const endpoint of endpoints) {
@@ -2473,6 +2272,341 @@ window.showLogModal = showLogModal;
 window.closeLogModal = closeLogModal;
 window.copyFromModal = copyFromModal;
 window.downloadLog = downloadLog;
+
+/**
+ * Quick search functionality
+ */
+function performQuickSearch(searchTerm) {
+    console.log('🔍 Performing quick search for:', searchTerm);
+    
+    if (!searchTerm || searchTerm.length < 2) {
+        document.getElementById('quickSearchResults').classList.remove('show');
+        return;
+    }
+    
+    const results = [];
+    const searchLower = searchTerm.toLowerCase();
+    
+    // Search in functions data
+    if (window.jsMapSystem && window.jsMapSystem.functionsData) {
+        Object.keys(window.jsMapSystem.functionsData).forEach(file => {
+            const fileData = window.jsMapSystem.functionsData[file];
+            let functions = [];
+            
+            if (Array.isArray(fileData)) {
+                functions = fileData;
+            } else if (fileData.functions && Array.isArray(fileData.functions)) {
+                functions = fileData.functions;
+            }
+            
+            functions.forEach(func => {
+                if (func.name.toLowerCase().includes(searchLower) ||
+                    (func.description && func.description.toLowerCase().includes(searchLower))) {
+                    results.push({
+                        name: func.name,
+                        file: file,
+                        description: func.description || 'אין תיאור',
+                        type: 'function'
+                    });
+                }
+            });
+        });
+    }
+    
+    // Search in global functions
+    if (window.jsMapSystem && window.jsMapSystem.globalFunctionsIndex) {
+        Object.keys(window.jsMapSystem.globalFunctionsIndex).forEach(funcName => {
+            if (funcName.toLowerCase().includes(searchLower)) {
+                const funcInfo = window.jsMapSystem.globalFunctionsIndex[funcName];
+                results.push({
+                    name: funcName,
+                    file: funcInfo.file,
+                    description: funcInfo.description,
+                    type: 'global'
+                });
+            }
+        });
+    }
+    
+    // Display results
+    displayQuickSearchResults(results.slice(0, 10)); // Limit to 10 results
+}
+
+/**
+ * Display quick search results
+ */
+function displayQuickSearchResults(results) {
+    const container = document.getElementById('quickSearchResults');
+    
+    if (results.length === 0) {
+        container.innerHTML = '<div class="search-result-item">לא נמצאו תוצאות</div>';
+        container.classList.add('show');
+        return;
+    }
+    
+    let html = '';
+    results.forEach(result => {
+        const typeIcon = result.type === 'global' ? '🌍' : '⚙️';
+        html += `
+            <div class="search-result-item" onclick="navigateToFunction('${result.file}', '${result.name}')">
+                <div style="font-weight: 600;">${typeIcon} ${result.name}</div>
+                <div style="font-size: 0.8rem; color: var(--apple-text-secondary);">${result.file}</div>
+                <div style="font-size: 0.8rem; color: var(--apple-text-secondary);">${result.description}</div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    container.classList.add('show');
+}
+
+/**
+ * Navigate to specific function
+ */
+function navigateToFunction(file, functionName) {
+    // Close search results
+    document.getElementById('quickSearchResults').classList.remove('show');
+    
+    // Navigate to functions section
+    navigateToSection('section2-1');
+    
+    // Find and highlight the function
+    setTimeout(() => {
+        const functionGroups = document.querySelectorAll('.function-group-header');
+        functionGroups.forEach(group => {
+            const groupTitle = group.querySelector('span').textContent;
+            if (groupTitle.includes(file)) {
+                // Expand this group
+                const content = group.nextElementSibling;
+                const arrow = group.querySelector('.toggle-arrow');
+
+                // Open this group
+                content.classList.add('expanded');
+                arrow.textContent = '▲';
+
+                // Scroll to the function
+                const functionRows = content.querySelectorAll('.function-row');
+                functionRows.forEach(row => {
+                    const funcName = row.querySelector('.function-name').textContent;
+                    if (funcName === functionName) {
+                        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        row.style.backgroundColor = 'var(--apple-blue)';
+                        row.style.color = 'white';
+                        setTimeout(() => {
+                            row.style.backgroundColor = '';
+                            row.style.color = '';
+                        }, 3000);
+                    }
+                });
+            }
+        });
+    }, 500);
+}
+
+/**
+ * Refresh all data
+ */
+function refreshAllData() {
+    console.log('🔄 Refreshing all data...');
+    
+    if (window.jsMapSystem) {
+        // Show loading message
+        if (window.showNotification) {
+            window.showNotification('מרענן את כל הנתונים...', 'info');
+        }
+        
+        // Refresh data
+        window.jsMapSystem.refreshJsMapData();
+        
+        // Refresh advanced sections
+        setTimeout(() => {
+            if (typeof loadDuplicatesAnalysis === 'function') {
+                loadDuplicatesAnalysis();
+            }
+            if (typeof loadLocalFunctionsAnalysis === 'function') {
+                loadLocalFunctionsAnalysis();
+            }
+            if (typeof loadArchitectureCheck === 'function') {
+                loadArchitectureCheck();
+            }
+            if (window.jsMapSystem && window.jsMapSystem.loadIntegrationStatus) {
+                window.jsMapSystem.loadIntegrationStatus();
+            }
+        }, 1000);
+    }
+}
+
+/**
+ * Export to CSV
+ */
+function exportToCSV() {
+    console.log('📊 Exporting to CSV...');
+    
+    if (!window.jsMapSystem || !window.jsMapSystem.functionsData) {
+        if (window.showNotification) {
+            window.showNotification('אין נתונים לייצוא', 'warning');
+        }
+        return;
+    }
+    
+    let csvContent = 'קובץ,פונקציה,תיאור,סוג,שורה\n';
+    
+    Object.keys(window.jsMapSystem.functionsData).forEach(file => {
+        const fileData = window.jsMapSystem.functionsData[file];
+        let functions = [];
+        
+        if (Array.isArray(fileData)) {
+            functions = fileData;
+        } else if (fileData.functions && Array.isArray(fileData.functions)) {
+            functions = fileData.functions;
+        }
+        
+        functions.forEach(func => {
+            csvContent += `"${file}","${func.name}","${func.description || ''}","${func.type || ''}","${func.line || ''}"\n`;
+        });
+    });
+    
+    // Download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `js-map-functions-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    if (window.showNotification) {
+        window.showNotification('קובץ CSV נוצר והורד בהצלחה', 'success');
+    }
+}
+
+/**
+ * Export to JSON
+ */
+function exportToJSON() {
+    console.log('📄 Exporting to JSON...');
+    
+    if (!window.jsMapSystem) {
+        if (window.showNotification) {
+            window.showNotification('אין נתונים לייצוא', 'warning');
+        }
+        return;
+    }
+    
+    const exportData = {
+        timestamp: new Date().toISOString(),
+        pageMapping: window.jsMapSystem.pageMapping,
+        functionsData: window.jsMapSystem.functionsData,
+        globalFunctionsIndex: window.jsMapSystem.globalFunctionsIndex,
+        metadata: {
+            totalPages: Object.keys(window.jsMapSystem.pageMapping || {}).length,
+            totalFunctions: Object.keys(window.jsMapSystem.functionsData || {}).length,
+            globalFunctions: Object.keys(window.jsMapSystem.globalFunctionsIndex || {}).length
+        }
+    };
+    
+    // Download JSON
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `js-map-data-${new Date().toISOString().split('T')[0]}.json`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    if (window.showNotification) {
+        window.showNotification('קובץ JSON נוצר והורד בהצלחה', 'success');
+    }
+}
+
+/**
+ * Generate comprehensive report
+ */
+function generateReport() {
+    console.log('📝 Generating comprehensive report...');
+    
+    if (!window.jsMapSystem) {
+        if (window.showNotification) {
+            window.showNotification('אין נתונים ליצירת דוח', 'warning');
+        }
+        return;
+    }
+    
+    const timestamp = new Date().toLocaleString('he-IL');
+    let report = `=== דוח מפורט של מערכת JS-Map ===\n`;
+    report += `תאריך ושעה: ${timestamp}\n`;
+    report += `URL: ${window.location.href}\n\n`;
+    
+    // System overview
+    report += `=== סקירת המערכת ===\n`;
+    report += `עמודי HTML: ${Object.keys(window.jsMapSystem.pageMapping || {}).length}\n`;
+    report += `קבצי JavaScript: ${Object.keys(window.jsMapSystem.functionsData || {}).length}\n`;
+    
+    let totalFunctions = 0;
+    Object.values(window.jsMapSystem.functionsData || {}).forEach(fileData => {
+        if (Array.isArray(fileData)) {
+            totalFunctions += fileData.length;
+        } else if (fileData.functions && Array.isArray(fileData.functions)) {
+            totalFunctions += fileData.functions.length;
+        }
+    });
+    report += `סה"כ פונקציות: ${totalFunctions}\n`;
+    report += `פונקציות גלובליות: ${Object.keys(window.jsMapSystem.globalFunctionsIndex || {}).length}\n\n`;
+    
+    // Page mapping details
+    report += `=== מיפוי עמודים ===\n`;
+    Object.keys(window.jsMapSystem.pageMapping || {}).forEach(page => {
+        const mapping = window.jsMapSystem.pageMapping[page];
+        const files = mapping.files || mapping || [];
+        report += `${page}: ${Array.isArray(files) ? files.join(', ') : 'לא זמין'}\n`;
+    });
+    
+    // Functions details
+    report += `\n=== פירוט פונקציות ===\n`;
+    Object.keys(window.jsMapSystem.functionsData || {}).forEach(file => {
+        const fileData = window.jsMapSystem.functionsData[file];
+        let functions = [];
+        
+        if (Array.isArray(fileData)) {
+            functions = fileData;
+        } else if (fileData.functions && Array.isArray(fileData.functions)) {
+            functions = fileData.functions;
+        }
+        
+        report += `\n${file} (${functions.length} פונקציות):\n`;
+        functions.forEach(func => {
+            report += `  - ${func.name}: ${func.description || 'אין תיאור'}\n`;
+        });
+    });
+    
+    // Download report
+    const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `js-map-report-${new Date().toISOString().split('T')[0]}.txt`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    if (window.showNotification) {
+        window.showNotification('דוח מפורט נוצר והורד בהצלחה', 'success');
+    }
+}
+
+// Make new functions globally available
+window.performQuickSearch = performQuickSearch;
+window.displayQuickSearchResults = displayQuickSearchResults;
+window.navigateToFunction = navigateToFunction;
+window.refreshAllData = refreshAllData;
+window.exportToCSV = exportToCSV;
+window.exportToJSON = exportToJSON;
+window.generateReport = generateReport;
 
 /**
  * Initialize error tracking for detailed logging

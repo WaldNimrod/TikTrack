@@ -1973,23 +1973,6 @@ async function discoverProjectFilesFallback() {
 // Missing Functions - Added for UI compatibility
 // ========================================
 
-function fixAllIssues() {
-    addLogEntry('INFO', 'מתחיל תיקון כל הבעיות...');
-    // Implementation for fixing all issues
-    addLogEntry('SUCCESS', 'כל הבעיות תוקנו');
-}
-
-function fixAllErrors() {
-    addLogEntry('INFO', 'מתחיל תיקון כל השגיאות...');
-    // Implementation for fixing all errors
-    addLogEntry('SUCCESS', 'כל השגיאות תוקנו');
-}
-
-function fixAllWarnings() {
-    addLogEntry('INFO', 'מתחיל תיקון כל האזהרות...');
-    // Implementation for fixing all warnings
-    addLogEntry('SUCCESS', 'כל האזהרות תוקנו');
-}
 
 function ignoreAllIssues() {
     addLogEntry('INFO', 'מתעלם מכל הבעיות...');

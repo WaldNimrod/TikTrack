@@ -20,10 +20,12 @@
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
+  justify-content: center; /* יישור למרכז */
   gap: var(--spacing-md);
   list-style: none;
   margin: 0;
   padding: 0;
+  width: 100%; /* תופס את כל הרוחב */
 }
 
 /* פריטי תפריט */

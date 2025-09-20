@@ -12,14 +12,15 @@
 
 .hero-banner {
   position: relative;
-  background: transparent;
+  background: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e9ecef);
   border-radius: 16px;
   overflow: hidden;
   margin-bottom: 2rem;
   min-height: 400px;
   display: flex;
   align-items: center;
-  box-shadow: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 /* רווח מתחת לסקשן העליון */
@@ -42,7 +43,13 @@
   z-index: 2;
   width: 100%;
   padding: 2rem;
-  color: white;
+  color: var(--text-primary, #212529);
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  margin: 1rem;
 }
 
 .hero-text {
@@ -74,6 +81,12 @@
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 1.5rem;
   margin-top: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .hero-stat {

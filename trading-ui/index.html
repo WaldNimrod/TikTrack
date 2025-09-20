@@ -731,8 +731,16 @@
         </div>
     </div>
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js - Load dynamically to avoid 404 errors -->
+    <script>
+        // Load Chart.js dynamically to avoid 404 map file errors
+        const chartScript = document.createElement('script');
+        chartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js';
+        chartScript.onerror = function() {
+            console.warn('Chart.js failed to load - charts will be disabled');
+        };
+        document.head.appendChild(chartScript);
+    </script>
     
     <!-- Core System Scripts -->
     <script src="scripts/console-cleanup.js"></script>

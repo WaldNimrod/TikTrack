@@ -1,8 +1,34 @@
 // Index page specific JavaScript
 
+// Function to wait for Chart.js to load
+function waitForChartJS() {
+    return new Promise((resolve, reject) => {
+        if (typeof Chart !== 'undefined') {
+            resolve();
+            return;
+        }
+        
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds max wait
+        
+        const checkChart = () => {
+            attempts++;
+            if (typeof Chart !== 'undefined') {
+                resolve();
+            } else if (attempts >= maxAttempts) {
+                reject(new Error('Chart.js failed to load'));
+            } else {
+                setTimeout(checkChart, 100);
+            }
+        };
+        
+        checkChart();
+    });
+}
+
 // Chart.js library needed for charts
 if (typeof Chart === 'undefined') {
-    console.warn('⚠️ Chart.js library not loaded - charts will not display');
+    console.log('📊 Chart.js will be loaded dynamically');
 }
 
 // Chart instances
@@ -282,8 +308,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load action buttons after a short delay to ensure UI utils are loaded
     setTimeout(loadActionButtons, 500);
     
-    // Initialize charts after a delay to ensure Chart.js is loaded
-    setTimeout(initializeCharts, 1000);
+    // Initialize charts after Chart.js is loaded
+    waitForChartJS().then(() => {
+        initializeCharts();
+    }).catch(() => {
+        console.warn('Chart.js not available - charts disabled');
+    });
     
 });
 

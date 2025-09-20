@@ -68,9 +68,9 @@
   align-items: center;
   margin-bottom: 1.5rem;
   padding: 1rem;
-  border-bottom: 1px solid var(--apple-border-light);
+  border-bottom: 1px solid var(--border-color, #e9ecef);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--card-bg, #ffffff);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
 }
@@ -218,11 +218,11 @@
 
 /* כפתור פילטר */
 .filter-toggle-btn {
-  background: var(--apple-bg-primary);
-  border: 1px solid var(--apple-border);
-  border-radius: var(--apple-radius-small);
+  background: var(--secondary-color, #6c757d);
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: 6px;
   padding: 0.5rem;
-  color: var(--apple-text-primary);
+  color: white;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -231,14 +231,16 @@
   width: 40px;
   height: 40px;
   align-self: center; /* מיושר לאמצע בגובה */
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05); /* מסגרת דקה נוספת */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* מסגרת דקה נוספת */
   margin-inline-start: 0.5rem; /* הפרדה מהכפתורים שלפני */
   order: 3; /* אחרון בשורה */
 }
 
 .filter-toggle-btn:hover {
-  background: var(--apple-gray-1);
-  border-color: var(--apple-border);
+  background: var(--primary-color, #007bff);
+  border-color: var(--primary-color, #007bff);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 /* איקון פעולה */
@@ -262,11 +264,12 @@
 .section-toggle-icon {
   transition: transform 0.3s ease;
   font-size: 0.8rem;
-  color: var(--apple-text-secondary);
+  color: white;
+  font-weight: bold;
 }
 
 .filter-toggle-btn:hover .section-toggle-icon {
-  color: var(--apple-text-primary);
+  color: white;
 }
 
 .filter-toggle-btn.collapsed .section-toggle-icon {

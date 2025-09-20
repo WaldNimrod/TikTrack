@@ -6,7 +6,7 @@
  */
 function editTicker(tickerId) {
   try {
-
+    console.log('✏️ עורך טיקר:', tickerId);
     
     // חיפוש הטיקר בנתונים
     const ticker = window.tickersData.find(t => t.id === tickerId);
@@ -2265,7 +2265,7 @@ function filterTickersByType(type) {
     countElement.textContent = `${filteredData.length} טיקרים${type !== 'all' ? ` (${typeText})` : ''}`;
   }
 
-  console.log(`🔍 Filtered ${filteredData.length} tickers out of ${window.tickersData.length} for type: ${type}`);
+
 }
 
 // פונקציה עזר לקבלת שם תצוגה לסוג

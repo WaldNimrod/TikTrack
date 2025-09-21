@@ -633,7 +633,7 @@ trading-ui/styles-new/
 1. **Advanced Themes**: More sophisticated theme system
 2. **CSS Variables**: Enhanced CSS custom properties usage
 3. **Animation System**: Advanced animation and transition system
-4. **Dark Mode**: Dark mode theme support
+4. **Dark Mode**: Dark mode theme support (planned for future release - not currently implemented)
 
 ### Technical Debt
 1. **CSS Optimization**: Further CSS optimization and minification

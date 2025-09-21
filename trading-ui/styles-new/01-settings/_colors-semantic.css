@@ -4,8 +4,10 @@
  * קובץ זה מכיל צבעים לפי משמעות סמנטית
  * הצלחה, שגיאה, אזהרה, מידע וכו'
  * 
- * @version 1.0.0
- * @lastUpdated January 5, 2025
+ * ⚠️ Dark mode removed - light mode only
+ * 
+ * @version 1.1.0
+ * @lastUpdated January 21, 2025
  */
 
 :root {
@@ -14,25 +16,21 @@
   /* הצלחה - Success */
   --color-success: #28a745;
   --color-success-light: #d4edda;
-  --color-success-dark: #155724;
   --color-success-border: #c3e6cb;
   
   /* שגיאה - Danger */
   --color-danger: #dc3545;
   --color-danger-light: #f8d7da;
-  --color-danger-dark: #721c24;
   --color-danger-border: #f5c6cb;
   
   /* אזהרה - Warning */
   --color-warning: #ffc107;
   --color-warning-light: #fff3cd;
-  --color-warning-dark: #856404;
   --color-warning-border: #ffeaa7;
   
   /* מידע - Info */
   --color-info: #007bff;
   --color-info-light: #d1ecf1;
-  --color-info-dark: #0c5460;
   --color-info-border: #bee5eb;
   
   /* ===== צבעי ערכים מספריים ===== */
@@ -40,18 +38,15 @@
   /* חיובי - Positive */
   --numeric-positive-light: #d4edda;
   --numeric-positive-medium: #28a745;
-  --numeric-positive-dark: #155724;
   --numeric-positive-border: #c3e6cb;
   
   /* שלילי - Negative */
   --numeric-negative-light: #f8d7da;
   --numeric-negative-medium: #dc3545;
-  --numeric-negative-dark: #721c24;
   --numeric-negative-border: #f5c6cb;
   
   /* אפס - Zero */
   --numeric-zero-light: #e2e3e5;
   --numeric-zero-medium: #6c757d;
-  --numeric-zero-dark: #383d41;
   --numeric-zero-border: #d6d8db;
 }

@@ -35,9 +35,10 @@
     align-items: center;
     margin-bottom: var(--spacing-md, 16px);
     padding: var(--spacing-md, 16px);
-    background: var(--color-bg-secondary, #f8f9fa);
-    border: 1px solid var(--color-border-light, #dee2e6);
+    background: var(--apple-bg-secondary, #F2F2F7);
+    border: 1px solid var(--apple-border, #C6C6C8);
     border-radius: var(--spacing-border-radius, 8px);
+    color: var(--apple-text-primary, #000000);
 }
 
 .control-group {
@@ -48,7 +49,7 @@
 
 .control-group label {
     font-weight: var(--typography-font-weight-medium, 500);
-    color: var(--color-text-primary, #212529);
+    color: var(--apple-text-primary, #000000);
     font-size: var(--typography-font-size-sm, 14px);
 }
 
@@ -59,11 +60,11 @@
 
 .control-group select {
     padding: var(--spacing-xs, 8px);
-    border: 1px solid var(--color-border-light, #dee2e6);
+    border: 1px solid var(--apple-border, #C6C6C8);
     border-radius: var(--spacing-border-radius-sm, 6px);
-    background: var(--color-bg-primary, #ffffff);
+    background: var(--apple-bg-primary, #FFFFFF);
     font-size: var(--typography-font-size-sm, 14px);
-    color: var(--color-text-primary, #212529);
+    color: var(--apple-text-primary, #000000);
 }
 
 /* Info Summary Component Styles */
@@ -246,105 +247,8 @@
 }
 
 
-/* Dark Theme Support - All Components */
-@media (prefers-color-scheme: dark) {
-    /* Monitoring Status */
-    .monitoring-status {
-        background: var(--color-bg-primary-dark, #1a202c);
-        border-color: var(--color-border-dark, #4a5568);
-    }
-
-    .status-text {
-        color: var(--color-text-primary-dark, #ffffff);
-    }
-
-    .last-check {
-        color: var(--color-text-secondary-dark, #a0aec0);
-    }
-
-    /* Monitoring Controls */
-    .monitoring-controls {
-        background: var(--color-bg-secondary-dark, #2d3748);
-        border-color: var(--color-border-dark, #4a5568);
-    }
-
-    .control-group label {
-        color: var(--color-text-primary-dark, #ffffff);
-    }
-
-    .control-group select {
-        background: var(--color-bg-primary-dark, #1a202c);
-        border-color: var(--color-border-dark, #4a5568);
-        color: var(--color-text-primary-dark, #ffffff);
-    }
-
-    /* Info Summary */
-    .info-summary {
-        background: var(--color-bg-secondary-dark, #2d3748);
-        border-color: var(--color-border-dark, #4a5568);
-        color: var(--color-text-secondary-dark, #a0aec0);
-    }
-
-    .info-summary strong {
-        color: var(--color-text-primary-dark, #ffffff);
-    }
-
-    /* System Info */
-    .info-item {
-        background: var(--color-bg-primary-dark, #1a202c);
-        border-color: var(--color-border-dark, #4a5568);
-    }
-
-    .info-item:hover {
-        border-color: var(--color-primary-dark, #63b3ed);
-    }
-
-    .info-label {
-        color: var(--color-text-secondary-dark, #a0aec0);
-    }
-
-    .info-value {
-        color: var(--color-text-primary-dark, #ffffff);
-    }
-
-    /* Cards */
-    .card {
-        background: var(--color-bg-primary-dark, #1a202c);
-        border-color: var(--color-border-dark, #4a5568);
-    }
-
-    .card-header {
-        background: var(--color-bg-secondary-dark, #2d3748);
-        border-color: var(--color-border-dark, #4a5568);
-    }
-
-    .card-header h5 {
-        color: var(--color-text-primary-dark, #ffffff);
-    }
-
-    /* Logs */
-    .logs-container {
-        background: var(--color-bg-primary-dark, #1a202c);
-        border-color: var(--color-border-dark, #4a5568);
-    }
-
-    .log-entry:hover {
-        background: var(--color-bg-secondary-dark, #2d3748);
-        border-color: var(--color-border-dark, #4a5568);
-    }
-
-    .log-title {
-        color: var(--color-text-primary-dark, #ffffff);
-    }
-
-    .log-message {
-        color: var(--color-text-secondary-dark, #a0aec0);
-    }
-
-    .log-time {
-        color: var(--color-text-muted-dark, #718096);
-    }
-}
+/* ===== Light Mode Only - No Dark Mode ===== */
+/* ⚠️ Dark mode removed - all components use light mode colors by default */
 
 /* Responsive design */
 @media (max-width: 768px) {

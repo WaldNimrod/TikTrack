@@ -162,7 +162,7 @@
 .tooltip .tooltiptext {
     visibility: hidden;
     width: 120px;
-    background-color: var(--dark-color);
+    background-color: #343a40;
     color: white;
     text-align: center;
     border-radius: 6px;
@@ -182,23 +182,8 @@
     opacity: 1;
 }
 
-/* Dark Theme Overrides */
-[data-theme="dark"] .chart-item {
-    background: var(--dark-card-background);
-    border-color: var(--dark-border-color);
-}
-
-[data-theme="dark"] .stat-card {
-    background: var(--dark-card-background);
-    border-color: var(--dark-border-color);
-}
-
-[data-theme="dark"] .setting-group select,
-[data-theme="dark"] .setting-group input[type="number"] {
-    background: var(--dark-input-background);
-    border-color: var(--dark-border-color);
-    color: var(--dark-text-color);
-}
+/* ===== Light Mode Only - No Dark Mode ===== */
+/* ⚠️ Dark mode removed - all chart management components use light mode colors by default */
 
 /* High Contrast Mode */
 @media (prefers-contrast: high) {

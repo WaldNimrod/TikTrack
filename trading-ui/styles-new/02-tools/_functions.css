@@ -15,10 +15,8 @@
   @return color-mix(in srgb, $color $amount, white);
 }
 
-/* פונקציה ליצירת צבעים כהים */
-@function darken($color, $amount: 10%) {
-  @return color-mix(in srgb, $color $amount, black);
-}
+/* ===== Light Mode Only - No Dark Mode ===== */
+/* Dark color functions removed - only light mode supported */
 
 /* פונקציה ליצירת צבעים שקופים */
 @function transparentize($color, $amount: 0.1) {

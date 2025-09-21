@@ -54,7 +54,7 @@ class ChartTheme {
                 danger: 'var(--danger-color)',
                 info: 'var(--info-color)',
                 light: 'var(--light-color)',
-                dark: 'var(--dark-color)'
+                // dark removed - light mode only
             },
             fonts: {
                 family: 'Noto Sans Hebrew, Arial, sans-serif',
@@ -78,39 +78,8 @@ class ChartTheme {
             }
         });
 
-        // Dark theme
-        this.registerTheme('dark', {
-            colors: {
-                primary: '#007bff',
-                secondary: '#6c757d',
-                success: '#28a745',
-                warning: '#ffc107',
-                danger: '#dc3545',
-                info: '#17a2b8',
-                light: '#f8f9fa',
-                dark: '#343a40'
-            },
-            fonts: {
-                family: 'Noto Sans Hebrew, Arial, sans-serif',
-                size: 12,
-                weight: 'normal'
-            },
-            animations: {
-                duration: 300,
-                easing: 'easeInOutQuart'
-            },
-            grid: {
-                color: 'rgba(255, 255, 255, 0.1)',
-                drawBorder: false
-            },
-            tooltip: {
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                titleColor: '#000000',
-                bodyColor: '#000000',
-                borderColor: 'rgba(0, 0, 0, 0.2)',
-                borderWidth: 1
-            }
-        });
+        /* ===== Light Mode Only - No Dark Mode ===== */
+        /* Dark theme removed - only light mode supported */
     }
 
     /**
@@ -193,7 +162,7 @@ class ChartTheme {
                 danger: this.dynamicColors.dangerColor,
                 info: this.dynamicColors.infoColor,
                 light: this.dynamicColors.lightColor,
-                dark: this.dynamicColors.darkColor,
+                // dark removed - light mode only
                 chartBackground: this.dynamicColors.chartBackgroundColor,
                 chartText: this.dynamicColors.chartTextColor,
                 chartGrid: this.dynamicColors.chartGridColor,
@@ -225,7 +194,7 @@ class ChartTheme {
             danger: 'var(--danger-color)',
             info: 'var(--info-color)',
             light: 'var(--light-color)',
-            dark: 'var(--dark-color)',
+            // dark removed - light mode only
             chartBackground: 'var(--chart-background-color)',
             chartText: 'var(--chart-text-color)',
             chartGrid: 'var(--chart-grid-color)',
@@ -312,24 +281,8 @@ class ChartTheme {
         return color;
     }
 
-    /**
-     * Get darker variant of color
-     * קבל גרסה כהה יותר של הצבע
-     * @param {string} colorName - Color name
-     * @param {number} amount - Darkening amount (0-1)
-     * @returns {string} Darker color
-     */
-    getDarkerColor(colorName, amount = 0.2) {
-        const color = this.getColor(colorName);
-        if (color.startsWith('#')) {
-            const hex = color.replace('#', '');
-            const r = Math.max(0, parseInt(hex.substr(0, 2), 16) - Math.floor(255 * amount));
-            const g = Math.max(0, parseInt(hex.substr(2, 2), 16) - Math.floor(255 * amount));
-            const b = Math.max(0, parseInt(hex.substr(4, 2), 16) - Math.floor(255 * amount));
-            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-        }
-        return color;
-    }
+    /* ===== Light Mode Only - No Dark Mode ===== */
+    /* getDarkerColor function removed - only light mode supported */
 
     /**
      * Get lighter variant of color
@@ -373,7 +326,7 @@ class ChartTheme {
                             size: theme.fonts.size,
                             weight: theme.fonts.weight
                         },
-                        color: colors.dark
+                        color: colors.medium
                     }
                 },
                 tooltip: {
@@ -404,7 +357,7 @@ class ChartTheme {
                             family: theme.fonts.family,
                             size: theme.fonts.size
                         },
-                        color: colors.dark
+                        color: colors.medium
                     }
                 },
                 y: {
@@ -417,7 +370,7 @@ class ChartTheme {
                             family: theme.fonts.family,
                             size: theme.fonts.size
                         },
-                        color: colors.dark
+                        color: colors.medium
                     }
                 }
             },
@@ -513,7 +466,7 @@ window.getChartTheme = (themeName) => window.ChartTheme.getTheme(themeName);
 window.setChartTheme = (themeName) => window.ChartTheme.setTheme(themeName);
 window.getChartColorPalette = () => window.ChartTheme.getChartColorPalette();
 window.getChartColorWithOpacity = (colorName, opacity) => window.ChartTheme.getColorWithOpacity(colorName, opacity);
-window.getChartDarkerColor = (colorName, amount) => window.ChartTheme.getDarkerColor(colorName, amount);
+/* getChartDarkerColor removed - only light mode supported */
 window.getChartLighterColor = (colorName, amount) => window.ChartTheme.getLighterColor(colorName, amount);
 
 console.log('✅ Chart Theme System ready');

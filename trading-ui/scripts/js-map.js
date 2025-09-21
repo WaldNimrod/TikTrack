@@ -62,14 +62,14 @@ class JsMapSystem {
             console.log('🎨 Initializing UI components...');
             this.initializeUIComponents();
             
-            // Render all sections first
+            // Render all sections after data is loaded
             console.log('🎨 Rendering all sections...');
             this.renderAllSections();
             
             // Update dashboard stats after rendering with a small delay
             setTimeout(() => {
                 console.log('📊 Updating dashboard stats...');
-                this.updateDashboardStats();
+            this.updateDashboardStats();
             }, 100);
             
             // Skip system status update for now
@@ -116,9 +116,6 @@ class JsMapSystem {
             
             // Show success notification
             this.showSuccessNotification('הצלחה', 'נתונים נטענו מהשרת בהצלחה');
-            
-            // Render all sections with the loaded data
-            this.renderAllSections();
             
         } catch (error) {
             console.error('❌ Failed to load data from APIs:', error);
@@ -236,7 +233,7 @@ class JsMapSystem {
         
         try {
             console.log('🎨 Rendering system stats...');
-            this.renderSystemStats();
+        this.renderSystemStats();
             
             console.log('🎨 Rendering page mapping...');
             this.renderPageMappingData();
@@ -298,10 +295,10 @@ class JsMapSystem {
                     this.renderFunctions();
                     break;
                 case 'pages':
-                    this.renderPageMapping();
+        this.renderPageMapping();
                     break;
                 case 'dependencies':
-                    this.renderDependencies();
+        this.renderDependencies();
                     break;
                 case 'analysis':
                     this.renderAnalysis();
@@ -369,7 +366,9 @@ class JsMapSystem {
         console.log('🔄 Refreshing system status...');
         this.updateSystemStatus();
         this.addRecentAction('רענון מצב מערכת');
-        this.showLocalNotification('מצב מערכת עודכן', 'success', 'הצלחה', 2000);
+        if (window.showNotification) {
+            window.showNotification('מצב מערכת עודכן', 'success', 'הצלחה', 2000);
+        }
     }
 
     /**
@@ -390,7 +389,9 @@ class JsMapSystem {
         URL.revokeObjectURL(url);
         
         this.addRecentAction('ייצוא מצב מערכת');
-        this.showLocalNotification('מצב מערכת יוצא בהצלחה', 'success', 'הצלחה', 3000);
+        if (window.showNotification) {
+            window.showNotification('מצב מערכת יוצא בהצלחה', 'success', 'הצלחה', 3000);
+        }
     }
 
     /**
@@ -406,14 +407,18 @@ class JsMapSystem {
             const responseTime = endTime - startTime;
             
             if (response.ok) {
-                this.showLocalNotification(`חיבור תקין (${responseTime}ms)`, 'success', 'הצלחה', 3000);
+                if (window.showNotification) {
+                    window.showNotification(`חיבור תקין (${responseTime}ms)`, 'success', 'הצלחה', 3000);
+                }
                 this.addRecentAction(`בדיקת חיבור - ${responseTime}ms`);
             } else {
                 throw new Error(`HTTP ${response.status}`);
             }
         } catch (error) {
             console.error('❌ Connectivity test failed:', error);
-            this.showLocalNotification('בדיקת חיבור נכשלה', 'error', 'שגיאה', 3000);
+            if (window.showNotification) {
+                window.showNotification('בדיקת חיבור נכשלה', 'error', 'שגיאה', 3000);
+            }
             this.addRecentAction('בדיקת חיבור נכשלה');
         }
     }
@@ -441,12 +446,16 @@ class JsMapSystem {
                 }
             });
             
-            this.showLocalNotification('מטמון נוקה בהצלחה', 'success', 'הצלחה', 3000);
+            if (window.showNotification) {
+                window.showNotification('מטמון נוקה בהצלחה', 'success', 'הצלחה', 3000);
+            }
             this.addRecentAction('ניקוי מטמון');
             this.updateSystemStatus();
         } catch (error) {
             console.error('❌ Failed to clear cache:', error);
-            this.showLocalNotification('שגיאה בניקוי מטמון', 'error', 'שגיאה', 3000);
+            if (window.showNotification) {
+                window.showNotification('שגיאה בניקוי מטמון', 'error', 'שגיאה', 3000);
+            }
         }
     }
 
@@ -459,11 +468,15 @@ class JsMapSystem {
         try {
             await this.loadDataFromAPIs();
             this.updateSystemStatus();
-            this.showLocalNotification('נתונים נטענו מחדש', 'success', 'הצלחה', 3000);
+            if (window.showNotification) {
+                window.showNotification('נתונים נטענו מחדש', 'success', 'הצלחה', 3000);
+            }
             this.addRecentAction('טעינה מחדש של נתונים');
         } catch (error) {
             console.error('❌ Failed to reload data:', error);
-            this.showLocalNotification('שגיאה בטעינה מחדש', 'error', 'שגיאה', 3000);
+            if (window.showNotification) {
+                window.showNotification('שגיאה בטעינה מחדש', 'error', 'שגיאה', 3000);
+            }
         }
     }
 
@@ -508,7 +521,9 @@ class JsMapSystem {
         // Copy function
         window.copyDiagnostics = () => {
             navigator.clipboard.writeText(JSON.stringify(diagnostics, null, 2));
-            this.showLocalNotification('אבחון הועתק ללוח', 'success', 'הצלחה', 2000);
+            if (window.showNotification) {
+                window.showNotification('אבחון הועתק ללוח', 'success', 'הצלחה', 2000);
+            }
         };
         
         this.addRecentAction('הצגת אבחון מערכת');
@@ -672,7 +687,9 @@ class JsMapSystem {
             }
         } catch (error) {
             console.error('❌ Failed to analyze duplicates:', error);
-            this.showLocalNotification('שגיאה בניתוח כפילויות', 'error', 'שגיאה', 3000);
+            if (window.showNotification) {
+                window.showNotification('שגיאה בניתוח כפילויות', 'error', 'שגיאה', 3000);
+            }
         }
     }
 
@@ -694,7 +711,9 @@ class JsMapSystem {
             }
         } catch (error) {
             console.error('❌ Failed to detect local functions:', error);
-            this.showLocalNotification('שגיאה בזיהוי פונקציות מקומיות', 'error', 'שגיאה', 3000);
+            if (window.showNotification) {
+                window.showNotification('שגיאה בזיהוי פונקציות מקומיות', 'error', 'שגיאה', 3000);
+            }
         }
     }
 
@@ -924,9 +943,7 @@ class JsMapSystem {
      * מציג הודעת שגיאה באמצעות המערכת הכללית
      */
     showErrorNotification(title, message) {
-        if (this.showLocalNotification) {
-            this.showLocalNotification(message, 'error', title, 8000);
-        } else if (window.showNotification) {
+        if (window.showNotification) {
             window.showNotification(message, 'error', title, 8000);
         } else {
             console.error(`${title}: ${message}`);
@@ -978,13 +995,13 @@ class JsMapSystem {
         console.log('📊 Rendering system statistics...');
         
         // Try to find the statistics tab content
-        const container = document.getElementById('statistics-tab');
+        const container = document.getElementById('statisticsContent');
         if (!container) {
-            console.error('❌ statistics-tab container not found');
+            console.error('❌ statisticsContent container not found');
             return;
         }
         
-        console.log('✅ Found statistics-tab container');
+        console.log('✅ Found statisticsContent container');
         
         // Update the stat cards directly in the HTML structure
         this.updateDashboardStats();
@@ -1037,22 +1054,16 @@ class JsMapSystem {
     renderPageMappingData() {
         console.log('🗺️ Rendering page mapping...');
         
-        const container = document.getElementById('pages-tab');
+        const container = document.getElementById('pageMappingContent');
         if (!container) {
-            console.error('❌ pages-tab container not found');
+            console.error('❌ pageMappingContent container not found');
             return;
         }
         
-        console.log('✅ Found pages-tab container');
+        console.log('✅ Found pageMappingContent container');
         
-        // Find the content area within the pages tab
-        const contentArea = container.querySelector('#pageMappingContent');
-        if (!contentArea) {
-            console.error('❌ pageMappingContent not found in pages-tab');
-            return;
-        }
-        
-        console.log('✅ Found tab-body in pages-tab');
+        // Use the container directly since it's already the content area
+        const contentArea = container;
 
         if (!this.pageMapping || Object.keys(this.pageMapping).length === 0) {
             contentArea.innerHTML = '<div class="no-data">אין נתוני מיפוי זמינים</div>';
@@ -1091,22 +1102,16 @@ class JsMapSystem {
     renderDependenciesData() {
         console.log('🔗 Rendering dependencies analysis...');
         
-        const container = document.getElementById('dependencies-tab');
+        const container = document.getElementById('dependenciesContent');
         if (!container) {
-            console.error('❌ dependencies-tab container not found');
+            console.error('❌ dependenciesContent container not found');
             return;
         }
         
-        console.log('✅ Found dependencies-tab container');
+        console.log('✅ Found dependenciesContent container');
         
-        // Find the content area within the dependencies tab
-        const contentArea = container.querySelector('#dependenciesContent');
-        if (!contentArea) {
-            console.error('❌ dependenciesContent not found in dependencies-tab');
-            return;
-        }
-        
-        console.log('✅ Found tab-body in dependencies-tab');
+        // Use the container directly since it's already the content area
+        const contentArea = container;
 
         const html = `
             <div class="dependencies-analysis">
@@ -1147,22 +1152,16 @@ class JsMapSystem {
     renderFunctionsData() {
         console.log('⚙️ Rendering functions data...');
         
-        const container = document.getElementById('functions-tab');
+        const container = document.getElementById('functionsContent');
         if (!container) {
-            console.error('❌ functions-tab container not found');
+            console.error('❌ functionsContent container not found');
             return;
         }
         
-        console.log('✅ Found functions-tab container');
+        console.log('✅ Found functionsContent container');
         
-        // Find the content area within the functions tab
-        const contentArea = container.querySelector('#functionsContent');
-        if (!contentArea) {
-            console.error('❌ functionsContent not found in functions-tab');
-            return;
-        }
-        
-        console.log('✅ Found functionsContent in functions-tab');
+        // Use the container directly since it's already the content area
+        const contentArea = container;
 
         if (!this.functionsData || Object.keys(this.functionsData).length === 0) {
             contentArea.innerHTML = '<div class="no-data">אין נתוני פונקציות זמינים</div>';
@@ -1206,22 +1205,16 @@ class JsMapSystem {
     renderDuplicatesData() {
         console.log('🔍 Rendering duplicates analysis...');
         
-        const container = document.getElementById('analysis-tab');
+        const container = document.getElementById('duplicatesContent');
         if (!container) {
-            console.error('❌ analysis-tab container not found');
+            console.error('❌ duplicatesContent container not found');
             return;
         }
         
-        console.log('✅ Found analysis-tab container');
+        console.log('✅ Found duplicatesContent container');
         
-        // Find the content area within the analysis tab
-        const contentArea = container.querySelector('#duplicatesContent');
-        if (!contentArea) {
-            console.error('❌ duplicatesContent not found in analysis-tab');
-            return;
-        }
-        
-        console.log('✅ Found duplicatesContent in analysis-tab');
+        // Use the container directly since it's already the content area
+        const contentArea = container;
 
         const html = `
             <div class="duplicates-analysis">
@@ -1428,8 +1421,8 @@ async function copyJsMapDetailedLog() {
         }
         
         // Show loading notification using local method
-        if (system.showLocalNotification) {
-            system.showLocalNotification('מייצר לוג מפורט...', 'info', 'מערכת', 3000);
+        if (window.showNotification) {
+            window.showNotification('מייצר לוג מפורט...', 'info', 'מערכת', 3000);
         }
         
         // Get additional data from server
@@ -1471,9 +1464,17 @@ async function copyJsMapDetailedLog() {
             errors: system.errors || [],
             performance: {
                 memoryUsage: performance.memory ? `${Math.round(performance.memory.usedJSHeapSize / 1024 / 1024)}MB` : 'לא זמין',
-                loadTime: performance.timing ? `${performance.timing.loadEventEnd - performance.timing.navigationStart}ms` : 'לא זמין'
+                loadTime: performance.timing ? `${performance.timing.loadEventEnd - performance.timing.navigationStart}ms` : 'לא זמין',
+                domElements: document.querySelectorAll('*').length,
+                scriptsLoaded: document.querySelectorAll('script').length,
+                stylesheetsLoaded: document.querySelectorAll('link[rel="stylesheet"]').length
             }
         };
+        
+        // Get detailed UI information
+        console.log('🔍 About to call getDetailedUIInfo');
+        const uiInfo = system.getDetailedUIInfo();
+        console.log('🔍 getDetailedUIInfo returned:', uiInfo.length, 'characters');
         
         const logText = `🔔 לוג מפורט - מערכת JS-Map
 📅 תאריך ושעה: ${logData.timestamp}
@@ -1499,6 +1500,9 @@ async function copyJsMapDetailedLog() {
 • זיכרון: ${logData.performance.memoryUsage}
 • זמן טעינה: ${logData.performance.loadTime}
 
+🖼️ מידע מפורט על הממשקים:
+${uiInfo}
+
 🔧 נתונים מפורטים:
 ${JSON.stringify(logData, null, 2)}`;
         
@@ -1511,8 +1515,8 @@ ${JSON.stringify(logData, null, 2)}`;
         
         // Show error notification using local method
         const system = window.jsMapSystem;
-        if (system && system.showLocalNotification) {
-            system.showLocalNotification(`שגיאה ביצירת הלוג: ${error.message}`, 'error', 'שגיאה', 8000);
+        if (window.showNotification) {
+            window.showNotification(`שגיאה ביצירת הלוג: ${error.message}`, 'error', 'שגיאה', 8000);
         }
     }
 }
@@ -1687,8 +1691,8 @@ JsMapSystem.prototype.showLogModal = function(logText) {
         if (document.execCommand('copy')) {
             // Note: 'this' context is lost in onclick, need to get system reference
             const system = window.jsMapSystem;
-            if (system && system.showLocalNotification) {
-                system.showLocalNotification('לוג הועתק ללוח בהצלחה!', 'success', 'הצלחה', 3000);
+            if (window.showNotification) {
+                window.showNotification('לוג הועתק ללוח בהצלחה!', 'success', 'הצלחה', 3000);
             }
         }
     };
@@ -1726,77 +1730,177 @@ JsMapSystem.prototype.showLogModal = function(logText) {
     
     console.log('✅ Log modal displayed');
     
-    this.showLocalNotification('לוג מפורט מוצג בחלון נפרד', 'info', 'מידע', 3000);
+    if (window.showNotification) {
+        window.showNotification('לוג מפורט מוצג בחלון נפרד', 'info', 'מידע', 3000);
+    }
 }
 
-// Local notification function - not dependent on global systems
-JsMapSystem.prototype.showLocalNotification = function(message, type = 'info', title = 'מערכת', duration = 5000) {
-    console.log(`🔔 Local notification: ${title} - ${message}`);
+// Note: Using global notification system instead of local notifications
+
+/**
+ * Get detailed UI information for the log
+ * איסוף מידע מפורט על הממשקים
+ */
+JsMapSystem.prototype.getDetailedUIInfo = function() {
+    let uiInfo = '';
+    console.log('🔍 getDetailedUIInfo called');
     
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `js-map-local-notification ${type}`;
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: white;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        padding: 16px;
-        max-width: 400px;
-        z-index: 10000;
-        transform: translateX(100%);
-        opacity: 0;
-        transition: all 0.3s ease;
-        pointer-events: auto;
-    `;
-    
-    // Set border color based on type
-    if (type === 'success') {
-        notification.style.borderLeft = '4px solid #28a745';
-    } else if (type === 'error') {
-        notification.style.borderLeft = '4px solid #dc3545';
-    } else if (type === 'warning') {
-        notification.style.borderLeft = '4px solid #ffc107';
-    } else {
-        notification.style.borderLeft = '4px solid #007bff';
+    try {
+        // 1. Top Section Information
+        uiInfo += '📋 סקשן עליון:\n';
+        const topSection = document.querySelector('.top-section');
+        if (topSection) {
+            const quickActions = topSection.querySelectorAll('.btn');
+            uiInfo += `  • כפתורי פעולה מהירה: ${quickActions.length}\n`;
+            
+            const statCards = topSection.querySelectorAll('.stat-card, .overview-stat-card');
+            uiInfo += `  • כרטיסי סטטיסטיקה: ${statCards.length}\n`;
+            
+            const searchBox = topSection.querySelector('.central-quick-search');
+            if (searchBox) {
+                uiInfo += `  • תיבת חיפוש: קיימת\n`;
+            }
+        } else {
+            uiInfo += `  • סקשן עליון: לא נמצא\n`;
+        }
+        
+        // 2. Content Sections Information
+        uiInfo += '\n📄 סקשנים לתוכן:\n';
+        const contentSections = document.querySelectorAll('.content-section');
+        uiInfo += `  • סך הכל סקשנים: ${contentSections.length}\n`;
+        
+        contentSections.forEach((section, index) => {
+            const sectionId = section.id || `section${index + 1}`;
+            const header = section.querySelector('.section-header');
+            const body = section.querySelector('.section-body');
+            
+            if (header) {
+                const title = header.querySelector('h2, h3, h4');
+                const titleText = title ? title.textContent.trim() : 'ללא כותרת';
+                uiInfo += `  • ${sectionId}: "${titleText}"\n`;
+                
+                // Check if section is expanded
+                const isExpanded = body && body.style.display !== 'none';
+                uiInfo += `    - פתוח: ${isExpanded ? 'כן' : 'לא'}\n`;
+                
+                    // Count content elements
+                    if (body) {
+                        const tables = body.querySelectorAll('table');
+                        const cards = body.querySelectorAll('.card, .stat-card, .overview-stat-card');
+                        const buttons = body.querySelectorAll('.btn, button');
+                        const lists = body.querySelectorAll('ul, ol');
+                        const tabsInSection = body.querySelectorAll('.tab-btn, [data-tab]');
+                        
+                        uiInfo += `    - טבלאות: ${tables.length}\n`;
+                        uiInfo += `    - כרטיסים: ${cards.length}\n`;
+                        uiInfo += `    - כפתורים: ${buttons.length}\n`;
+                        uiInfo += `    - רשימות: ${lists.length}\n`;
+                        if (tabsInSection.length > 0) {
+                            uiInfo += `    - טאבים בסקשן: ${tabsInSection.length}\n`;
+                        }
+                    
+                    // Check for specific content
+                    if (body.textContent.trim() === '' || body.textContent.trim() === 'טוען...') {
+                        uiInfo += `    - תוכן: ריק או טוען\n`;
+                    } else {
+                        const contentLength = body.textContent.trim().length;
+                        uiInfo += `    - תוכן: ${contentLength} תווים\n`;
+                    }
+                }
+            }
+        });
+        
+        // 3. Tab System Information (if exists)
+        uiInfo += '\n🗂️ מערכת טאבים:\n';
+        const tabButtons = document.querySelectorAll('.tab-btn, [data-tab], button[data-tab]');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const functionsTabsContainer = document.querySelector('.functions-tabs-container');
+        console.log('🔍 Debug: Found tab buttons:', tabButtons.length, tabButtons);
+        console.log('🔍 Debug: Found functions tabs container:', !!functionsTabsContainer);
+        console.log('🔍 Debug: All elements with data-tab:', document.querySelectorAll('[data-tab]').length);
+        console.log('🔍 Debug: All button elements:', document.querySelectorAll('button').length);
+        console.log('🔍 Debug: All elements with class tab-btn:', document.querySelectorAll('.tab-btn').length);
+        console.log('🔍 Debug: All elements with class functions-tabs:', document.querySelectorAll('.functions-tabs').length);
+        
+        if (tabButtons.length > 0) {
+            uiInfo += `  • כפתורי טאבים: ${tabButtons.length}\n`;
+            tabButtons.forEach((btn, index) => {
+                const tabName = btn.dataset.tab || btn.textContent.trim();
+                const isActive = btn.classList.contains('active');
+                uiInfo += `    - טאב ${index + 1}: "${tabName}" (${isActive ? 'פעיל' : 'לא פעיל'})\n`;
+            });
+        } else {
+            uiInfo += `  • כפתורי טאבים: 0 (לא נמצאו)\n`;
+            if (functionsTabsContainer) {
+                uiInfo += `  • קונטיינר טאבים: נמצא (functions-tabs-container)\n`;
+            } else {
+                uiInfo += `  • קונטיינר טאבים: לא נמצא\n`;
+            }
+        }
+        
+        if (tabContents.length > 0) {
+            uiInfo += `  • תוכן טאבים: ${tabContents.length}\n`;
+            tabContents.forEach((content, index) => {
+                const isVisible = content.style.display !== 'none';
+                const contentLength = content.textContent.trim().length;
+                uiInfo += `    - תוכן ${index + 1}: ${isVisible ? 'גלוי' : 'מוסתר'} (${contentLength} תווים)\n`;
+            });
+        } else {
+            uiInfo += `  • תוכן טאבים: 0 (לא נמצאו)\n`;
+        }
+        
+        // 4. Form Elements
+        uiInfo += '\n📝 אלמנטי טופס:\n';
+        const inputs = document.querySelectorAll('input, select, textarea');
+        const forms = document.querySelectorAll('form');
+        console.log('🔍 Debug: Found inputs:', inputs.length, inputs);
+        uiInfo += `  • שדות קלט: ${inputs.length}\n`;
+        uiInfo += `  • טפסים: ${forms.length}\n`;
+        
+        // 5. Interactive Elements
+        uiInfo += '\n🖱️ אלמנטים אינטראקטיביים:\n';
+        const clickableElements = document.querySelectorAll('button, .btn, a, [onclick]');
+        console.log('🔍 Debug: Found clickable elements:', clickableElements.length);
+        uiInfo += `  • אלמנטים ניתנים ללחיצה: ${clickableElements.length}\n`;
+        
+        // 6. Data Tables
+        uiInfo += '\n📊 טבלאות נתונים:\n';
+        const dataTables = document.querySelectorAll('table');
+        uiInfo += `  • טבלאות: ${dataTables.length}\n`;
+        dataTables.forEach((table, index) => {
+            const rows = table.querySelectorAll('tr');
+            const cells = table.querySelectorAll('td, th');
+            uiInfo += `    - טבלה ${index + 1}: ${rows.length} שורות, ${cells.length} תאים\n`;
+        });
+        
+        // 7. Notifications
+        uiInfo += '\n🔔 התראות:\n';
+        const notifications = document.querySelectorAll('.notification, .alert, .toast');
+        uiInfo += `  • התראות פעילות: ${notifications.length}\n`;
+        
+        // 8. Modal Dialogs
+        uiInfo += '\n🪟 חלונות מודאליים:\n';
+        const modals = document.querySelectorAll('.modal, .dialog');
+        uiInfo += `  • חלונות מודאליים: ${modals.length}\n`;
+        
+        // 9. Loading States
+        uiInfo += '\n⏳ מצבי טעינה:\n';
+        const loadingElements = document.querySelectorAll('[class*="loading"], [class*="spinner"], .fa-spinner');
+        uiInfo += `  • אלמנטי טעינה: ${loadingElements.length}\n`;
+        
+        // 10. Error States
+        uiInfo += '\n❌ מצבי שגיאה:\n';
+        const errorElements = document.querySelectorAll('[class*="error"], [class*="danger"], .text-danger');
+        uiInfo += `  • אלמנטי שגיאה: ${errorElements.length}\n`;
+        
+    } catch (error) {
+        uiInfo += `\n❌ שגיאה באיסוף מידע על הממשקים: ${error.message}\n`;
+        console.error('❌ Error in getDetailedUIInfo:', error);
     }
     
-    // Create notification content
-    const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
-    notification.innerHTML = `
-        <div style="display: flex; align-items: flex-start; gap: 12px;">
-            <div style="font-size: 18px; flex-shrink: 0;">${icon}</div>
-            <div style="flex: 1;">
-                <div style="font-weight: 600; font-size: 14px; color: #495057; margin-bottom: 4px;">${title}</div>
-                <div style="font-size: 13px; color: #6c757d; line-height: 1.4;">${message}</div>
-            </div>
-            <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: #6c757d; cursor: pointer; padding: 4px; border-radius: 4px; font-size: 16px;">✕</button>
-        </div>
-    `;
-    
-    // Add to page
-    document.body.appendChild(notification);
-    
-    // Animate in
-    setTimeout(() => {
-        notification.style.transform = 'translateX(0)';
-        notification.style.opacity = '1';
-    }, 100);
-    
-    // Auto remove
-    setTimeout(() => {
-        notification.style.transform = 'translateX(100%)';
-        notification.style.opacity = '0';
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 300);
-    }, duration);
-}
+    console.log('🔍 getDetailedUIInfo returning:', uiInfo.length, 'characters');
+    return uiInfo;
+};
 
 // ========================================
 // Page Scripts Matrix Integration Methods
@@ -2340,13 +2444,13 @@ JsMapSystem.prototype.clearCache = async function() {
         await this.indexedDB.deleteSystemStats('js_map_cache');
         console.log('🗑️ Cache cleared successfully');
         
-        if (this.showLocalNotification) {
-            this.showLocalNotification('המטמון נוקה בהצלחה', 'success', 'מטמון', 3000);
+        if (window.showNotification) {
+            window.showNotification('המטמון נוקה בהצלחה', 'success', 'מטמון', 3000);
         }
     } catch (error) {
         console.error('❌ Failed to clear cache:', error);
-        if (this.showLocalNotification) {
-            this.showLocalNotification('שגיאה בניקוי המטמון', 'error', 'שגיאה', 3000);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בניקוי המטמון', 'error', 'שגיאה', 3000);
         }
     }
 }
@@ -2374,13 +2478,13 @@ JsMapSystem.prototype.refreshData = async function() {
         
         console.log('✅ Data refreshed successfully');
         
-        if (this.showLocalNotification) {
-            this.showLocalNotification('נתונים רוענו בהצלחה', 'success', 'רענון', 3000);
+        if (window.showNotification) {
+            window.showNotification('נתונים רוענו בהצלחה', 'success', 'רענון', 3000);
         }
     } catch (error) {
         console.error('❌ Failed to refresh data:', error);
-        if (this.showLocalNotification) {
-            this.showLocalNotification('שגיאה ברענון הנתונים', 'error', 'שגיאה', 3000);
+        if (window.showNotification) {
+            window.showNotification('שגיאה ברענון הנתונים', 'error', 'שגיאה', 3000);
         }
     }
 }
@@ -2588,14 +2692,18 @@ JsMapSystem.prototype.syncGlobalFunctions = async function() {
         
         if (result.status === 'success') {
             console.log('✅ Global functions sync completed:', result.data);
-            this.showLocalNotification('סנכרון פונקציות גלובליות הושלם בהצלחה', 'success', 'הצלחה', 3000);
+            if (window.showNotification) {
+                window.showNotification('סנכרון פונקציות גלובליות הושלם בהצלחה', 'success', 'הצלחה', 3000);
+            }
             return result.data;
         } else {
             throw new Error(result.error || 'Unknown error');
         }
     } catch (error) {
         console.error('❌ Failed to sync global functions:', error);
-        this.showLocalNotification('שגיאה בסנכרון פונקציות גלובליות', 'error', 'שגיאה', 3000);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בסנכרון פונקציות גלובליות', 'error', 'שגיאה', 3000);
+        }
         throw error;
     }
 };
@@ -2790,6 +2898,14 @@ window.refreshAnalysis = function() {
 window.exportAnalysis = function() {
     if (window.jsMapSystem) {
         return window.jsMapSystem.exportAnalysis();
+    }
+    console.error('❌ jsMapSystem not available');
+};
+
+// System Statistics Functions
+window.updateSystemStats = function() {
+    if (window.jsMapSystem) {
+        return window.jsMapSystem.updateSystemStats();
     }
     console.error('❌ jsMapSystem not available');
 };

@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Charts initialization disabled for now
         console.log('📊 Charts initialization disabled');
         
-        } catch (error) {
+    } catch (error) {
         console.error('❌ Failed to initialize Linter Realtime Monitor:', error);
     }
 });
@@ -404,7 +404,12 @@ async function discoverProjectFiles() {
             // Update total files count with discovered files
             const totalDiscoveredFiles = Object.values(discoveredFiles).reduce((sum, files) => sum + files.length, 0);
             window.scanningResults.totalFiles = totalDiscoveredFiles;
-            window.scanningResults.scannedFiles = totalDiscoveredFiles;
+            window.scanningResults.scannedFiles = 0; // Reset scanned files after new mapping
+            window.scanningResults.errors = []; // Reset errors after new mapping
+            window.scanningResults.warnings = []; // Reset warnings after new mapping
+            window.scanningResults.startTime = null; // Reset start time
+            window.scanningResults.endTime = null; // Reset end time
+            window.scanningResults.lastScanTime = null; // Reset last scan time
             
             // Update file mapping status display
             updateFileMappingStatus();
@@ -492,7 +497,7 @@ async function discoverProjectFilesFallback() {
     try {
         localStorage.setItem('linterScanningResults', JSON.stringify(window.scanningResults));
         console.log('✅ Saved empty scanning results to localStorage');
-    } catch (error) {
+        } catch (error) {
         console.warn('Failed to save empty scanning results to localStorage:', error);
     }
     
@@ -546,369 +551,7 @@ async function startFileScan() {
     await scanJavaScriptFiles();
 }
 
-async function copyDetailedLog() {
-    try {
-        const timestamp = new Date().toLocaleString('he-IL');
-        
-        // קבלת מידע על המשתמש הפעיל
-        let activeProfile = 'לא זמין';
-        if (typeof window.TikTrackAuth !== 'undefined' && window.TikTrackAuth.getCurrentUser) {
-            const currentUser = window.TikTrackAuth.getCurrentUser();
-            if (currentUser) {
-                activeProfile = currentUser.name || currentUser.username || 'נימרוד';
-            }
-        }
-        
-        // קבלת מידע על סריקות
-        let totalFiles = 0;
-        let totalErrors = 0;
-        let totalWarnings = 0;
-        let lastScanTime = 'לא בוצעה';
-        let isFileDiscoveryOnly = false;
-        
-        if (window.scanningResults) {
-            totalFiles = window.scanningResults.scannedFiles || window.scanningResults.totalFiles || 0;
-            totalErrors = window.scanningResults.errors ? window.scanningResults.errors.length : 0;
-            totalWarnings = window.scanningResults.warnings ? window.scanningResults.warnings.length : 0;
-            
-            // Check if we have files but no scan time - means file discovery was done
-            // Also check if we have 0 errors and 0 warnings (indicating file discovery only)
-            if (totalFiles > 0 && totalErrors === 0 && totalWarnings === 0 && 
-                (!window.scanningResults.lastScanTime && !window.scanningResults.timestamp && !window.scanningResults.endTime)) {
-                lastScanTime = 'גילוי קבצים הושלם';
-                isFileDiscoveryOnly = true;
-            } else {
-                lastScanTime = window.scanningResults.lastScanTime || window.scanningResults.timestamp || 
-                              (window.scanningResults.endTime ? new Date(window.scanningResults.endTime).toLocaleString('he-IL') : 'לא בוצעה');
-            }
-        } else {
-            // Debug: Check localStorage for data
-            const savedResults = localStorage.getItem('linterScanningResults');
-            if (savedResults) {
-                try {
-                    const results = JSON.parse(savedResults);
-                    totalFiles = results.scannedFiles || results.totalFiles || 0;
-                    totalErrors = results.errors ? results.errors.length : 0;
-                    totalWarnings = results.warnings ? results.warnings.length : 0;
-                    // Check if we have files but no scan time - means file discovery was done
-                    // Also check if we have 0 errors and 0 warnings (indicating file discovery only)
-                    if (totalFiles > 0 && totalErrors === 0 && totalWarnings === 0 && 
-                        (!results.timestamp && !results.endTime)) {
-                        lastScanTime = 'גילוי קבצים הושלם';
-                        isFileDiscoveryOnly = true;
-                    } else {
-                        lastScanTime = results.timestamp || (results.endTime ? new Date(results.endTime).toLocaleString('he-IL') : 'לא בוצעה');
-                    }
-                } catch (error) {
-                    console.error('Error parsing localStorage data:', error);
-                }
-            }
-        }
-        
-        // קבלת מידע על גרפים
-        let chartsStatus = 'לא מאותחלים';
-        if (typeof window.initializeCharts === 'function') {
-            chartsStatus = 'מוכנים';
-        }
-        
-        // קבלת מידע על לוגים (מקומי לעמוד)
-        let logEntries = 0;
-        // נשתמש בלוגים מקומיים של העמוד במקום פונקציות גלובליות
-        
-        // קבלת סטטיסטיקות לפי סוגי קבצים
-        function getFileTypeStatistics() {
-            const stats = {};
-            let totalFiles = 0;
-            
-            // Collect statistics from multiple sources
-            if (fileScanningState && fileScanningState.discovered.total > 0) {
-                // Use FileScanningState for accurate statistics
-                Object.keys(fileScanningState.discovered.byType).forEach(type => {
-                    stats[type] = fileScanningState.discovered.byType[type] || 0;
-                    totalFiles += stats[type];
-                });
-            } else if (window.projectFiles && typeof window.projectFiles === 'object') {
-                // Fallback to projectFiles
-                if (Array.isArray(window.projectFiles)) {
-                    window.projectFiles.forEach(file => {
-                        const type = getFileType(file);
-                        stats[type] = (stats[type] || 0) + 1;
-                        totalFiles++;
-                    });
-                } else {
-                    Object.keys(window.projectFiles).forEach(type => {
-                        if (window.projectFiles[type] && Array.isArray(window.projectFiles[type])) {
-                            stats[type] = window.projectFiles[type].length;
-                            totalFiles += stats[type];
-                        }
-                    });
-                }
-            }
-            
-            // Format statistics for display
-            const typeLabels = {
-                'js': 'JavaScript',
-                'html': 'HTML',
-                'css': 'CSS',
-                'python': 'Python',
-                'other': 'אחרים'
-            };
-            
-            let result = '';
-            Object.keys(typeLabels).forEach(type => {
-                const count = stats[type] || 0;
-                result += `  - ${typeLabels[type]}: ${count} קבצים\n`;
-            });
-            
-            result += `  - סה"כ: ${totalFiles} קבצים`;
-            return result;
-        }
-        
-        // קבלת מידע מפורט על כל שדה בממשק
-        function getDetailedInterfaceInfo() {
-            let interfaceInfo = '';
-            
-            // 1. סקשן עליון - 5 יחידות סטטיסטיקה
-            interfaceInfo += '\n📊 סקשן עליון - 5 יחידות סטטיסטיקה:\n';
-            
-            // כרטיסיה כללית
-            const overallStatus = document.getElementById('overallStatus');
-            interfaceInfo += `  - סטטוס מערכת: ${overallStatus ? overallStatus.textContent : 'לא זמין'}\n`;
-            
-            // Phase 1: File Mapping Summary
-            const mappedFilesCount = document.getElementById('mappedFilesCount');
-            const discoveryStatus = document.getElementById('discoveryStatus');
-            const lastMappingUpdate = document.getElementById('lastMappingUpdate');
-            interfaceInfo += `  - מיפוי קבצים: ${mappedFilesCount ? mappedFilesCount.textContent : 'לא זמין'} קבצים\n`;
-            interfaceInfo += `  - סטטוס גילוי: ${discoveryStatus ? discoveryStatus.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `  - עדכון אחרון: ${lastMappingUpdate ? lastMappingUpdate.textContent : 'לא זמין'}\n`;
-            
-            // Phase 2: Scanning Summary (Updated with new IDs)
-            const discoveredFiles = document.getElementById('discoveredFiles');
-            const selectedFiles = document.getElementById('selectedFiles');
-            const scannedFiles = document.getElementById('scannedFiles');
-            interfaceInfo += `  - קבצים שנמצאו: ${discoveredFiles ? discoveredFiles.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `  - קבצים שנבחרו: ${selectedFiles ? selectedFiles.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `  - קבצים שנסרקו: ${scannedFiles ? scannedFiles.textContent : 'לא זמין'}\n`;
-            
-            // Phase 3: Tools & Fixes Summary
-            const totalErrorsStats = document.getElementById('totalErrorsStats');
-            const totalWarningsStats = document.getElementById('totalWarningsStats');
-            const fixStatus = document.getElementById('fixStatus');
-            interfaceInfo += `  - שגיאות נמצאו: ${totalErrorsStats ? totalErrorsStats.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `  - אזהרות נמצאו: ${totalWarningsStats ? totalWarningsStats.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `  - סטטוס תיקון: ${fixStatus ? fixStatus.textContent : 'לא זמין'}\n`;
-            
-            // Phase 4: Monitoring & Control Summary
-            const monitoringStatus = document.getElementById('monitoringStatus');
-            const logEntriesCount = document.getElementById('logEntriesCount');
-            const chartsStatus = document.getElementById('chartsStatus');
-            interfaceInfo += `  - סטטוס ניטור: ${monitoringStatus ? monitoringStatus.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `  - רשומות לוג: ${logEntriesCount ? logEntriesCount.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `  - מצב גרפים: ${chartsStatus ? chartsStatus.textContent : 'לא זמין'}\n`;
-            
-            // 2. דשבורד מיפוי קבצים מרכזי
-            interfaceInfo += '\n🗺️ דשבורד מיפוי קבצים מרכזי:\n';
-            
-            // Main Status Row
-            interfaceInfo += '  שורת סטטוס ראשי:\n';
-            interfaceInfo += `    - מיפוי קבצים: ${mappedFilesCount ? mappedFilesCount.textContent : 'לא זמין'} קבצים זוהו\n`;
-            interfaceInfo += `    - סטטוס גילוי: ${discoveryStatus ? discoveryStatus.textContent : 'לא זמין'} (מצב תהליך)\n`;
-            interfaceInfo += `    - עדכון אחרון: ${lastMappingUpdate ? lastMappingUpdate.textContent : 'לא זמין'} (זמן פעילות)\n`;
-            
-            // Detailed Statistics Row
-            interfaceInfo += '  שורת סטטיסטיקות מפורטות:\n';
-            const jsFilesCount = document.getElementById('jsFilesCount');
-            const htmlFilesCount = document.getElementById('htmlFilesCount');
-            const pyFilesCount = document.getElementById('pyFilesCount');
-            const cssFilesCount = document.getElementById('cssFilesCount');
-            const otherFilesCount = document.getElementById('otherFilesCount');
-            interfaceInfo += `    - קבצי JavaScript: ${jsFilesCount ? jsFilesCount.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `    - קבצי HTML: ${htmlFilesCount ? htmlFilesCount.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `    - קבצי Python: ${pyFilesCount ? pyFilesCount.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `    - קבצי CSS: ${cssFilesCount ? cssFilesCount.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `    - קבצים אחרים: ${otherFilesCount ? otherFilesCount.textContent : 'לא זמין'}\n`;
-            
-            // Progress Bar Row
-            const mappingProgressFill = document.getElementById('mappingProgressFill');
-            const mappingProgressPercentage = document.getElementById('mappingProgressPercentage');
-            interfaceInfo += '  שורת פס התקדמות:\n';
-            interfaceInfo += `    - התקדמות מיפוי: ${mappingProgressPercentage ? mappingProgressPercentage.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `    - פס התקדמות: ${mappingProgressFill ? (mappingProgressFill.style.width || '0%') : 'לא זמין'}\n`;
-            
-            // Action Status Row
-            interfaceInfo += '  שורת אינדיקטורי פעולה:\n';
-            interfaceInfo += '    - מערכת מוכנה למיפוי\n';
-            interfaceInfo += '    - ביצועים אופטימליים\n';
-            interfaceInfo += '    - אבטחת נתונים מובטחת\n';
-            
-            // 3. דשבורד סריקה מרכזי
-            interfaceInfo += '\n🔍 דשבורד סריקה מרכזי:\n';
-            
-            // Main Status Row
-            interfaceInfo += '  שורת סטטוס ראשי:\n';
-            const scannedFilesCount = document.getElementById('scannedFilesCount');
-            const scanningErrorsCount = document.getElementById('scanningErrorsCount');
-            const scanningDuration = document.getElementById('scanningDuration');
-            interfaceInfo += `    - קבצים נסרקו: ${scannedFilesCount ? scannedFilesCount.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `    - שגיאות נמצאו: ${scanningErrorsCount ? scanningErrorsCount.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `    - זמן סריקה: ${scanningDuration ? scanningDuration.textContent : 'לא זמין'}\n`;
-            
-            // Detailed Statistics Row
-            interfaceInfo += '  שורת סטטיסטיקות מפורטות:\n';
-            const criticalErrorsCount = document.getElementById('criticalErrorsCount');
-            const warningsCount = document.getElementById('warningsCount');
-            const suggestionsCount = document.getElementById('suggestionsCount');
-            const cleanFilesCount = document.getElementById('cleanFilesCount');
-            const totalScannedCount = document.getElementById('totalScannedCount');
-            interfaceInfo += `    - שגיאות קריטיות: ${criticalErrorsCount ? criticalErrorsCount.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `    - אזהרות: ${warningsCount ? warningsCount.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `    - הצעות שיפור: ${suggestionsCount ? suggestionsCount.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `    - קבצים תקינים: ${cleanFilesCount ? cleanFilesCount.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `    - סה"כ נבדק: ${totalScannedCount ? totalScannedCount.textContent : 'לא זמין'}\n`;
-            
-            // Results Summary Row
-            interfaceInfo += '  שורת סיכום תוצאות:\n';
-            const scanningTotalErrors = document.getElementById('scanningTotalErrors');
-            const scanningTotalWarnings = document.getElementById('scanningTotalWarnings');
-            const totalScannedFiles = document.getElementById('totalScannedFiles');
-            interfaceInfo += `    - שגיאות: ${scanningTotalErrors ? scanningTotalErrors.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `    - אזהרות: ${scanningTotalWarnings ? scanningTotalWarnings.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `    - קבצים נסרקו: ${totalScannedFiles ? totalScannedFiles.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `    - זמן סריקה: ${scanningDuration ? scanningDuration.textContent : 'לא זמין'}\n`;
-            
-            // 4. אינדיקטורי פעולה
-            interfaceInfo += '\n⚡ אינדיקטורי פעולה:\n';
-            const scanningStatusIndicator = document.getElementById('scanningStatusIndicator');
-            const scanningPerformanceIndicator = document.getElementById('scanningPerformanceIndicator');
-            const scanningQualityIndicator = document.getElementById('scanningQualityIndicator');
-            interfaceInfo += `  - סטטוס סריקה: ${scanningStatusIndicator ? scanningStatusIndicator.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `  - ביצועים: ${scanningPerformanceIndicator ? scanningPerformanceIndicator.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `  - איכות: ${scanningQualityIndicator ? scanningQualityIndicator.textContent : 'לא זמין'}\n`;
-            
-            // 5. פס התקדמות
-            const scanningProgressFill = document.getElementById('scanningProgressFill');
-            const scanningProgressPercentage = document.getElementById('scanningProgressPercentage');
-            interfaceInfo += '\n📊 פס התקדמות:\n';
-            interfaceInfo += `  - התקדמות סריקה: ${scanningProgressPercentage ? scanningProgressPercentage.textContent : 'לא זמין'}\n`;
-            interfaceInfo += `  - פס התקדמות: ${scanningProgressFill ? (scanningProgressFill.style.width || '0%') : 'לא זמין'}\n`;
-            
-            return interfaceInfo;
-        }
-        
-        // בדיקת בעיות צבעים בממשק
-        function checkColorIssues() {
-            let colorIssues = '';
-            const issues = [];
-            
-            // בדיקת רקעים שחורים או כמעט שחורים
-            const darkBackgrounds = document.querySelectorAll('*');
-            darkBackgrounds.forEach(element => {
-                const computedStyle = window.getComputedStyle(element);
-                const backgroundColor = computedStyle.backgroundColor;
-                const color = computedStyle.color;
-                
-                // בדיקת רקע כהה
-                if (backgroundColor && backgroundColor !== 'rgba(0, 0, 0, 0)' && backgroundColor !== 'transparent') {
-                    const rgb = backgroundColor.match(/\d+/g);
-                    if (rgb && rgb.length >= 3) {
-                        const r = parseInt(rgb[0]);
-                        const g = parseInt(rgb[1]);
-                        const b = parseInt(rgb[2]);
-                        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-                        
-                        if (brightness < 50) { // רקע כהה מאוד
-                            const elementInfo = `${element.tagName}${element.className ? '.' + element.className.split(' ').join('.') : ''}${element.id ? '#' + element.id : ''}`;
-                            issues.push(`רקע כהה: ${elementInfo} - ${backgroundColor}`);
-                        }
-                    }
-                }
-                
-                // בדיקת טקסט לבן על רקע לבן
-                if (color && backgroundColor && backgroundColor !== 'rgba(0, 0, 0, 0)' && backgroundColor !== 'transparent') {
-                    const textRgb = color.match(/\d+/g);
-                    const bgRgb = backgroundColor.match(/\d+/g);
-                    
-                    if (textRgb && bgRgb && textRgb.length >= 3 && bgRgb.length >= 3) {
-                        const textBrightness = (parseInt(textRgb[0]) * 299 + parseInt(textRgb[1]) * 587 + parseInt(textRgb[2]) * 114) / 1000;
-                        const bgBrightness = (parseInt(bgRgb[0]) * 299 + parseInt(bgRgb[1]) * 587 + parseInt(bgRgb[2]) * 114) / 1000;
-                        
-                        if (textBrightness > 200 && bgBrightness > 200) { // טקסט לבן על רקע לבן
-                            const elementInfo = `${element.tagName}${element.className ? '.' + element.className.split(' ').join('.') : ''}${element.id ? '#' + element.id : ''}`;
-                            issues.push(`טקסט לבן על רקע לבן: ${elementInfo} - טקסט: ${color}, רקע: ${backgroundColor}`);
-                        }
-                    }
-                }
-            });
-            
-            if (issues.length > 0) {
-                colorIssues = '\n🎨 בעיות צבעים זוהו:\n';
-                issues.forEach(issue => {
-                    colorIssues += `  - ${issue}\n`;
-                });
-            } else {
-                colorIssues = '\n🎨 בדיקת צבעים: לא נמצאו בעיות צבעים';
-            }
-            
-            return colorIssues;
-        }
-        
-        // Determine the correct label based on whether it's file discovery or actual scanning
-        const filesLabel = isFileDiscoveryOnly ? 'קבצים ממופים' : 'קבצים נסרקו';
-        
-        const logContent = `🔔 לוג מפורט - Linter Realtime Monitor
-📅 תאריך ושעה: ${timestamp}
-👤 משתמש פעיל: ${activeProfile}
-
-📊 סטטיסטיקות ${isFileDiscoveryOnly ? 'מיפוי' : 'סריקה'}:
-  - ${filesLabel}: ${totalFiles}
-  - שגיאות: ${totalErrors}
-  - אזהרות: ${totalWarnings}
-  - ${isFileDiscoveryOnly ? 'מיפוי אחרון' : 'סריקה אחרונה'}: ${lastScanTime}
-
-📁 סטטיסטיקות לפי סוגי קבצים:
-${getFileTypeStatistics()}
-
-${getDetailedInterfaceInfo()}
-
-📈 מצב גרפים: ${chartsStatus}
-📝 מספר רשומות לוג: ${logEntries}
-
-🔧 מידע טכני:
-  - מערכת Linter: פעילה
-  - IndexedDB: ${typeof window.LinterIndexedDBAdapter !== 'undefined' ? 'זמין' : 'לא זמין'}
-  - מערכת אימות: ${typeof window.TikTrackAuth !== 'undefined' ? 'זמין' : 'לא זמין'}
-  - מערכת העדפות: ${typeof window.getPreference === 'function' ? 'זמין' : 'לא זמין'}
-
-${checkColorIssues()}
-
-📝 הערות:
-  - לוג זה מכיל מידע על מצב מערכת Linter Realtime Monitor
-  - כולל סטטיסטיקות סריקה, גרפים, ולוגים
-  - נוצר אוטומטית על ידי מערכת Linter
-  - כולל בדיקת בעיות צבעים בממשק
-         
-🔍 Debug Info:
-  - window.scanningResults: ${window.scanningResults ? 'קיים' : 'לא קיים'}
-  - localStorage data: ${localStorage.getItem('linterScanningResults') ? 'קיים' : 'לא קיים'}
-  - IndexedDB adapter: ${typeof window.LinterIndexedDBAdapter !== 'undefined' ? 'זמין' : 'לא זמין'}
-  - window.projectFiles: ${window.projectFiles ? 'קיים' : 'לא קיים'}
-  - fileScanningState: ${typeof fileScanningState !== 'undefined' ? 'קיים' : 'לא קיים'}`;
-
-        navigator.clipboard.writeText(logContent).then(() => {
-            console.log('✅ לוג מפורט של Linter הועתק ללוח');
-            // הודעה מקומית לעמוד
-            alert('לוג מפורט של Linter הועתק ללוח בהצלחה!');
-        }).catch(error => {
-            console.error('❌ שגיאה בהעתקת הלוג:', error);
-            alert('שגיאה בהעתקת הלוג ללוח');
-        });
-        
-    } catch (error) {
-        console.error('❌ שגיאה ביצירת לוג מפורט:', error);
-        alert('שגיאה ביצירת הלוג המפורט: ' + error.message);
-    }
-}
+// REMOVED: copyDetailedLog function - development mechanism, page-specific only
 
 function toggleTopSection() {
   if (typeof window.toggleTopSectionGlobal === 'function') {
@@ -969,24 +612,39 @@ async function scanJavaScriptFiles() {
     // Collect all files from projectFiles and filter existing ones
     Object.keys(window.projectFiles).forEach(type => {
         if (window.projectFiles[type] && Array.isArray(window.projectFiles[type])) {
-            // Filter out files that don't exist or are not accessible
+            // Filter out files that are likely to not exist or are not scannable
             const existingFiles = window.projectFiles[type].filter(file => {
-                // Skip files that are likely to be 404 (like CSS imports, HTML files, etc.)
+                // Skip files that are likely to be 404 or not scannable
                 return !file.includes('.css') && 
                        !file.includes('.html') && 
+                       !file.includes('.md') &&
+                       !file.includes('.txt') &&
+                       !file.includes('.json') &&
+                       !file.includes('.sh') &&
+                       !file.includes('.py') &&
                        !file.includes('documentation/') &&
                        !file.includes('external_data_integration_client/') &&
                        !file.includes('Backend/') &&
                        !file.includes('test-') &&
                        !file.includes('BACKUP-') &&
-                       !file.includes('UPDATED-');
+                       !file.includes('UPDATED-') &&
+                       !file.includes('requirements.') &&
+                       !file.includes('package') &&
+                       !file.includes('README') &&
+                       !file.includes('__init__') &&
+                       !file.includes('.git') &&
+                       file.includes('.js'); // Only scan JavaScript files for now
             });
             filesToScan.push(...existingFiles);
         }
     });
     
+    // Count original files vs filtered files
+    const originalFileCount = Object.values(window.projectFiles).reduce((sum, files) => sum + files.length, 0);
+    
     window.scanningResults.totalFiles = filesToScan.length;
-    addLogEntry('INFO', `📊 נמצאו ${filesToScan.length} קבצים לסריקה`);
+    addLogEntry('INFO', `📊 סוננו ${originalFileCount} קבצים ← ${filesToScan.length} קבצי JavaScript לסריקה`);
+    addLogEntry('INFO', `🔍 מתחיל סריקת ${filesToScan.length} קבצי JavaScript בלבד`);
     
     // Scan each file sequentially
     for (let i = 0; i < filesToScan.length; i++) {
@@ -999,17 +657,21 @@ async function scanJavaScriptFiles() {
         
         try {
             await scanSingleFile(fileName);
+            // Only count as scanned if no error occurred
+            window.scanningResults.scannedFiles++;
         } catch (error) {
             console.error(`❌ Error scanning file ${fileName}:`, error);
-            // Add error to results but don't count as scanned
-            if (!window.scanningResults.errors) {
-                window.scanningResults.errors = [];
+            // Only add to errors if it's not a 404 (file not found)
+            if (!error.message.includes('404')) {
+                if (!window.scanningResults.errors) {
+                    window.scanningResults.errors = [];
+                }
+                window.scanningResults.errors.push({
+                    file: fileName,
+                    message: error.message,
+                    severity: 'error'
+                });
             }
-            window.scanningResults.errors.push({
-                file: fileName,
-                message: error.message,
-                severity: 'error'
-            });
         }
         
         // Small delay to prevent overwhelming the system
@@ -1030,12 +692,22 @@ async function scanSingleFile(fileName) {
         // Check if file exists before trying to fetch
         const response = await fetch(fileName, { method: 'HEAD' });
         if (!response.ok) {
+            // Skip files that don't exist (404) - don't treat as error
+            if (response.status === 404) {
+                console.log(`⚠️ Skipping non-existent file: ${fileName}`);
+                return; // Skip this file without error
+            }
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
         // Now fetch the actual content
         const contentResponse = await fetch(fileName);
         if (!contentResponse.ok) {
+            // Skip files that don't exist (404) - don't treat as error
+            if (contentResponse.status === 404) {
+                console.log(`⚠️ Skipping non-existent file: ${fileName}`);
+                return; // Skip this file without error
+            }
             throw new Error(`HTTP ${contentResponse.status}: ${contentResponse.statusText}`);
         }
         
@@ -1071,14 +743,14 @@ async function scanSingleFile(fileName) {
                 break;
         }
         
-        window.scanningResults.scannedFiles++;
+        // File was successfully scanned (no need to count here, it's counted in the caller)
         
         // Update UI with real-time progress
         updateRealtimeProgress();
         
     } catch (error) {
         console.error(`❌ Error scanning file ${fileName}:`, error);
-        window.scanningResults.scannedFiles++;
+        // Don't count as scanned if there was an error
         updateRealtimeProgress();
     }
 }
@@ -1206,6 +878,61 @@ function updateFileMappingStatus() {
     });
     console.log(`✅ Updated lastMappingUpdate to '${mappingUpdateText}' in ${lastMappingUpdateElements.length} locations`);
     
+    // Update scanning availability
+    const availableForScanningElement = document.getElementById('availableForScanning');
+    if (availableForScanningElement) {
+        availableForScanningElement.textContent = totalFiles;
+    }
+    
+    // Update scanning summary elements
+    const discoveredFilesElement = document.getElementById('discoveredFiles');
+    if (discoveredFilesElement) {
+        discoveredFilesElement.textContent = totalFiles;
+    }
+    
+    const selectedFilesElement = document.getElementById('selectedFiles');
+    if (selectedFilesElement) {
+        selectedFilesElement.textContent = window.scanningResults ? window.scanningResults.scannedFiles || 0 : 0;
+    }
+    
+    const scannedFilesElement = document.getElementById('scannedFiles');
+    if (scannedFilesElement) {
+        scannedFilesElement.textContent = window.scanningResults ? window.scanningResults.scannedFiles || 0 : 0;
+    }
+    
+    // Update error and warning statistics in top section
+    const totalErrorsStatsElement = document.getElementById('totalErrorsStats');
+    if (totalErrorsStatsElement) {
+        totalErrorsStatsElement.textContent = window.scanningResults ? window.scanningResults.errors.length || 0 : 0;
+    }
+    
+    const totalWarningsStatsElement = document.getElementById('totalWarningsStats');
+    if (totalWarningsStatsElement) {
+        totalWarningsStatsElement.textContent = window.scanningResults ? window.scanningResults.warnings.length || 0 : 0;
+    }
+    
+    // Update scanning section status elements
+    const lastScanTimeElement = document.getElementById('lastScanTime');
+    if (lastScanTimeElement) {
+        if (window.scanningResults && window.scanningResults.lastScanTime) {
+            lastScanTimeElement.textContent = window.scanningResults.lastScanTime;
+        } else {
+            lastScanTimeElement.textContent = 'טרם בוצעה';
+        }
+    }
+    
+    const currentScanStatusElement = document.getElementById('currentScanStatus');
+    if (currentScanStatusElement) {
+        if (window.scanningResults && window.scanningResults.scannedFiles > 0) {
+            currentScanStatusElement.textContent = 'הושלמה';
+        } else {
+            currentScanStatusElement.textContent = 'מוכן';
+        }
+    }
+    
+    // Update scanning dashboard elements
+    updateScanningDashboard();
+    
     // Update Detailed File Type Statistics in Dashboard
     // Use the same logic as updateFileTypeStatistics
     let fileTypeStats = {};
@@ -1293,26 +1020,6 @@ function updateFileMappingStatus() {
         }
     }
     
-    // Update Phase 2: Scanning Summary (New IDs)
-    const discoveredFilesElement = document.getElementById('discoveredFiles');
-    const selectedFilesElement = document.getElementById('selectedFiles');
-    const scannedFilesElement = document.getElementById('scannedFiles');
-    
-    if (window.scanningResults) {
-        const totalFiles = window.scanningResults.totalFiles || 0;
-        const scannedFiles = window.scanningResults.scannedFiles || 0;
-        const selectedFiles = scannedFiles; // For now, assume all scanned files are selected
-        
-        if (discoveredFilesElement) discoveredFilesElement.textContent = totalFiles;
-        if (selectedFilesElement) selectedFilesElement.textContent = selectedFiles;
-        if (scannedFilesElement) scannedFilesElement.textContent = scannedFiles;
-        
-        console.log(`✅ Updated scanning summary: ${totalFiles} discovered, ${selectedFiles} selected, ${scannedFiles} scanned`);
-    } else {
-        if (discoveredFilesElement) discoveredFilesElement.textContent = '-';
-        if (selectedFilesElement) selectedFilesElement.textContent = '-';
-        if (scannedFilesElement) scannedFilesElement.textContent = '-';
-    }
     
     // Update Phase 3: Tools & Fixes Summary
     const totalErrorsElement = document.getElementById('totalErrorsStats');
@@ -1328,7 +1035,7 @@ function updateFileMappingStatus() {
         
         if (totalErrors > 0 || totalWarnings > 0) {
             fixStatusElement.textContent = 'מוכן לתיקון';
-        } else {
+    } else {
             fixStatusElement.textContent = 'אין בעיות';
         }
         console.log(`✅ Updated tools & fixes summary: ${totalErrors} errors, ${totalWarnings} warnings`);
@@ -1812,9 +1519,24 @@ function updateScanningDetailedStats() {
         const scannedFiles = window.scanningResults.scannedFiles || 0;
         
         // Calculate statistics
-        const criticalErrors = errors.filter(error => error.severity === 'error').length;
-        const suggestions = warnings.filter(warning => warning.severity === 'suggestion').length;
-        const cleanFiles = scannedFiles - errors.length - warnings.length;
+        // All errors are considered critical if they exist
+        const criticalErrors = errors.length;
+        // All warnings are considered suggestions if they exist
+        const suggestions = warnings.length;
+        // Clean files = total scanned - files with any issues
+        const filesWithIssues = new Set();
+        
+        // Add files that have errors
+        errors.forEach(error => {
+            if (error.file) filesWithIssues.add(error.file);
+        });
+        
+        // Add files that have warnings
+        warnings.forEach(warning => {
+            if (warning.file) filesWithIssues.add(warning.file);
+        });
+        
+        const cleanFiles = Math.max(0, scannedFiles - filesWithIssues.size);
         
         if (criticalErrorsElement) criticalErrorsElement.textContent = criticalErrors;
         if (warningsElement) warningsElement.textContent = warnings.length;
@@ -2017,6 +1739,7 @@ function updateScanningProgressBar() {
     }
 }
 
+
 // Export functions to global scope
 window.refreshChartData = refreshChartData;
 window.clearChartHistory = clearChartHistory;
@@ -2027,7 +1750,8 @@ window.initializeCharts = initializeCharts;
 window.discoverProjectFiles = discoverProjectFiles;
 window.updateFileMappingStatus = updateFileMappingStatus;
 window.startFileScan = startFileScan;
-window.copyLinterDetailedLog = copyDetailedLog;
+// window.copyDetailedLog = copyDetailedLog; // REMOVED: Development mechanism - page-specific only
+// window.copyLinterDetailedLog = copyDetailedLog; // REMOVED: Development mechanism - page-specific only
 window.toggleTopSection = toggleTopSection;
 window.toggleSection = toggleSection;
 window.refreshFileList = refreshFileList;
@@ -2035,7 +1759,7 @@ window.clearFileCache = clearFileCache;
 window.exportFileList = exportFileList;
 window.updateActionIndicators = updateActionIndicators;
 window.updateTrafficLights = updateTrafficLights;
-window.updateGeneralSystemStatus = updateGeneralSystemStatus;
 window.updateScanningDashboard = updateScanningDashboard;
+window.updateGeneralSystemStatus = updateGeneralSystemStatus;
 
 console.log('✅ Linter Realtime Monitor ready');

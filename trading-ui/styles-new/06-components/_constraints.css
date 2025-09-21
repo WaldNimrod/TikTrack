@@ -24,7 +24,8 @@
 .filter-controls .form-select,
 .filter-controls .form-control {
     border-radius: 0.375rem;
-    border: 1px solid var(--bs-border-color);
+    border: 1px solid var(--apple-gray, #8E8E93);
+    background: rgba(var(--apple-gray-rgb, 142, 142, 147), 0.2);
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
@@ -87,7 +88,7 @@
 
 .constraint-name {
     font-weight: 600;
-    color: var(--bs-dark);
+    color: #343a40;
     font-size: 1rem;
 }
 
@@ -118,7 +119,7 @@
 }
 
 .constraint-details strong {
-    color: var(--bs-dark);
+    color: #343a40;
     font-weight: 600;
 }
 
@@ -130,7 +131,7 @@
 
 .badge-not-null {
     background-color: var(--bs-warning) !important;
-    color: var(--bs-dark) !important;
+    color: #343a40 !important;
 }
 
 .badge-foreign-key {
@@ -163,7 +164,7 @@
     border: 1px solid var(--bs-border-color);
     border-bottom: none;
     font-weight: 600;
-    color: var(--bs-dark);
+    color: #343a40;
 }
 
 .table-header span:first-child {
@@ -350,38 +351,8 @@
     }
 }
 
-/* ===== DARK MODE SUPPORT ===== */
-@media (prefers-color-scheme: dark) {
-    .constraint-card {
-        background: var(--bs-dark);
-        border-color: var(--bs-border-color);
-        color: var(--bs-light);
-    }
-    
-    .constraint-name {
-        color: var(--bs-light);
-    }
-    
-    .constraint-details strong {
-        color: var(--bs-light);
-    }
-    
-    .filter-controls {
-        background: var(--bs-dark);
-        border-color: var(--bs-border-color);
-    }
-    
-    .table-header {
-        background: var(--bs-dark);
-        border-color: var(--bs-border-color);
-        color: var(--bs-light);
-    }
-    
-    .constraint-grid {
-        background: var(--bs-dark);
-        border-color: var(--bs-border-color);
-    }
-}
+/* ===== Light Mode Only - No Dark Mode ===== */
+/* ⚠️ Dark mode removed - all constraint components use light mode colors by default */
 
 /* ===== ANIMATIONS ===== */
 @keyframes fadeIn {

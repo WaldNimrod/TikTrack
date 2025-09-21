@@ -107,14 +107,13 @@
       <!-- CONTENT SECTIONS EDITABLE - START -->
       <!-- UI Content Section Top Start-->
       <div class="top-section linter-realtime-monitor-page" id="topSection" data-table-type="linter-realtime-monitor">
-        <!-- Linter Realtime Monitor header -->
         <div class="section-header entity-development-main-header">
           <div class="table-title">
             <img src="images/icons/development.svg" alt="ניטור Linter" class="table-icon">
             ניטור Linter בזמן אמת
           </div>
           <div class="table-actions">
-            <button class="btn btn-outline-primary btn-sm" onclick="copyLinterDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+            <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
               <i class="fas fa-copy"></i> העתק לוג מפורט
             </button>
             <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור סיכום">
@@ -223,7 +222,6 @@
       <div class="main-content">
         <!-- UI Content Section 1 Start-->
         <div class="content-section" id="generalControlSection" data-table-type="linter-realtime-monitor">
-        <div class="section-header">
           <div class="table-title">
             <img src="images/icons/development.svg" alt="פאנל בקרה כללי" class="table-icon">
             פאנל בקרה כללי
@@ -352,7 +350,6 @@
         <div class="content-section" id="fileMappingSection" data-table-type="linter-realtime-monitor">
           <div class="section-header">
             <div class="table-title">
-              <img src="images/icons/development.svg" alt="מיפוי קבצים" class="table-icon">
               מיפוי קבצים ושליטה
             </div>
             <div class="table-actions">
@@ -517,7 +514,6 @@
           <div class="section-header">
             <div class="table-title">
               <img src="images/icons/scanning.svg" alt="סריקה" class="table-icon">
-              סריקה ושליטה
             </div>
             <div class="table-actions">
               <button class="filter-toggle-btn" onclick="toggleSection('scanningSection')" title="הצג/הסתר סריקה">
@@ -771,7 +767,6 @@
           <div class="section-header">
             <div class="table-title">
             <img src="images/icons/development.svg" alt="תיקונים ופעולות נוספות" class="table-icon">
-            תיקונים ופעולות נוספות
             </div>
             <div class="table-actions">
             <button class="filter-toggle-btn" onclick="toggleSection('fixesSection')" title="הצג/הסתר תיקונים ופעולות נוספות">
@@ -1005,8 +1000,6 @@
         <div class="content-section" id="monitoringSection" data-table-type="linter-realtime-monitor">
           <div class="section-header">
             <div class="table-title">
-            <img src="images/icons/development.svg" alt="ניתור והיסטוריה" class="table-icon">
-            ניתור והיסטוריה
             </div>
             <div class="table-actions">
             <button class="filter-toggle-btn" onclick="toggleSection('monitoringSection')" title="הצג/הסתר ניתור והיסטוריה">
@@ -1240,8 +1233,6 @@
         <div class="content-section" id="progressDetailsSection" data-table-type="linter-realtime-monitor">
           <div class="section-header">
             <div class="table-title">
-            <img src="images/icons/scanning.svg" alt="פירוט סריקה" class="table-icon">
-            פירוט סריקה לפי סוגי קבצים
             </div>
           <div class="table-count" id="progressDetailsCount">0 סוגי קבצים</div>
             <div class="table-actions">
@@ -1286,8 +1277,6 @@
         <div class="content-section" id="problemFilesSection" data-table-type="linter-realtime-monitor">
         <div class="section-header">
           <div class="table-title">
-            <img src="images/icons/alerts.svg" alt="בעיות" class="table-icon">
-            קבצים בעייתיים בסריקה
               </div>
           <div class="table-count" id="problemFilesCount">0 קבצים</div>
           <div class="table-actions">
@@ -1332,7 +1321,6 @@
           <div class="section-header">
             <div class="table-title">
             <img src="images/icons/development.svg" alt="פירוט תיקונים" class="table-icon">
-            פירוט תיקונים
             </div>
           <div class="table-count" id="fixDetailsCount">0 תיקונים</div>
             <div class="table-actions">
@@ -1377,8 +1365,6 @@
           <div class="section-header">
             <div class="table-title">
               <img src="images/icons/development.svg" alt="לוגים" class="table-icon">
-              לוגי Linter
-            <div class="table-count" id="logsCount">טוען...</div>
             <div class="table-actions">
             <button class="refresh-btn" onclick="window.loadIssues && window.loadIssues()" title="רענן לוגים">
               <i class="fas fa-sync"></i> רענן
@@ -1411,7 +1397,6 @@
               </tbody>
             </table>
           </div>
-        </div>
         </div>
         <!-- UI Content Section 9 End-->
         <!-- CONTENT SECTIONS EDITABLE - END -->
@@ -1463,5 +1448,157 @@
     
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Page-specific functionality
+        function generateDetailedLog() {
+            try {
+                const logData = {
+                    timestamp: new Date().toISOString(),
+                    page: 'linter-realtime-monitor',
+                    url: window.location.href,
+                    userAgent: navigator.userAgent,
+                    viewport: {
+                        width: window.innerWidth,
+                        height: window.innerHeight
+                    },
+                    performance: {
+                        loadTime: performance.timing.loadEventEnd - performance.timing.navigationStart,
+                        domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart
+                    },
+                    memory: window.performance.memory ? {
+                        used: window.performance.memory.usedJSHeapSize,
+                        total: window.performance.memory.totalJSHeapSize,
+                        limit: window.performance.memory.jsHeapSizeLimit
+                    } : null,
+                    linterStatus: {
+                        overallStatus: document.getElementById('overallStatus')?.textContent || 'לא נמצא',
+                        mappingTrafficLight: document.getElementById('mappingTrafficLight')?.textContent || 'לא נמצא',
+                        scanningTrafficLight: document.getElementById('scanningTrafficLight')?.textContent || 'לא נמצא',
+                        fixesTrafficLight: document.getElementById('fixesTrafficLight')?.textContent || 'לא נמצא'
+                    },
+                    sections: {
+                        topSection: {
+                            title: 'ניטור Linter בזמן אמת',
+                            visible: !document.getElementById('topSection')?.classList.contains('d-none'),
+                            content: document.getElementById('topSection')?.textContent || 'לא נמצא'
+                        },
+                        generalControlSection: {
+                            title: 'בקרה כללית',
+                            visible: !document.getElementById('generalControlSection')?.classList.contains('d-none'),
+                            content: document.getElementById('generalControlSection')?.textContent || 'לא נמצא'
+                        },
+                        fileMappingSection: {
+                            title: 'מיפוי קבצים',
+                            visible: !document.getElementById('fileMappingSection')?.classList.contains('d-none'),
+                            content: document.getElementById('fileMappingSection')?.textContent || 'לא נמצא'
+                        },
+                        scanningSection: {
+                            title: 'סריקה',
+                            visible: !document.getElementById('scanningSection')?.classList.contains('d-none'),
+                            content: document.getElementById('scanningSection')?.textContent || 'לא נמצא'
+                        },
+                        fixesSection: {
+                            title: 'תיקונים',
+                            visible: !document.getElementById('fixesSection')?.classList.contains('d-none'),
+                            content: document.getElementById('fixesSection')?.textContent || 'לא נמצא'
+                        },
+                        monitoringSection: {
+                            title: 'ניטור',
+                            visible: !document.getElementById('monitoringSection')?.classList.contains('d-none'),
+                            content: document.getElementById('monitoringSection')?.textContent || 'לא נמצא'
+                        },
+                        progressDetailsSection: {
+                            title: 'פירוט התקדמות',
+                            visible: !document.getElementById('progressDetailsSection')?.classList.contains('d-none'),
+                            content: document.getElementById('progressDetailsSection')?.textContent || 'לא נמצא'
+                        },
+                        problemFilesSection: {
+                            title: 'קבצים בעייתיים',
+                            visible: !document.getElementById('problemFilesSection')?.classList.contains('d-none'),
+                            content: document.getElementById('problemFilesSection')?.textContent || 'לא נמצא'
+                        },
+                        fixDetailsSection: {
+                            title: 'פירוט תיקונים',
+                            visible: !document.getElementById('fixDetailsSection')?.classList.contains('d-none'),
+                            content: document.getElementById('fixDetailsSection')?.textContent || 'לא נמצא'
+                        },
+                        logsSection: {
+                            title: 'לוגים',
+                            visible: !document.getElementById('logsSection')?.classList.contains('d-none'),
+                            content: document.getElementById('logsSection')?.textContent || 'לא נמצא'
+                        }
+                    },
+                    console: {
+                        errors: [],
+                        warnings: [],
+                        logs: []
+                    }
+                };
+
+                // Capture console messages
+                const originalError = console.error;
+                const originalWarn = console.warn;
+                const originalLog = console.log;
+
+                console.error = function(...args) {
+                    logData.console.errors.push(args.join(' '));
+                    originalError.apply(console, args);
+                };
+
+                console.warn = function(...args) {
+                    logData.console.warnings.push(args.join(' '));
+                    originalWarn.apply(console, args);
+                };
+
+                console.log = function(...args) {
+                    logData.console.logs.push(args.join(' '));
+                    originalLog.apply(console, args);
+                };
+
+                return JSON.stringify(logData, null, 2);
+            } catch (error) {
+                return `Error generating log: ${error.message}`;
+            }
+        }
+
+        function copyDetailedLog() {
+            try {
+                const logContent = generateDetailedLog();
+                navigator.clipboard.writeText(logContent).then(() => {
+                    if (window.showNotification) {
+                        window.showNotification('לוג מפורט הועתק ללוח', 'success');
+                    } else {
+                        alert('לוג מפורט הועתק ללוח');
+                    }
+                }).catch(err => {
+                    console.error('Failed to copy log:', err);
+                    // Fallback: show in console
+                    console.log('Detailed Log:', logContent);
+                    if (window.showNotification) {
+                        window.showNotification('לוג מפורט הוצג בקונסול', 'info');
+                    } else {
+                        alert('לוג מפורט הוצג בקונסול');
+                    }
+                });
+            } catch (error) {
+                console.error('Error copying log:', error);
+                if (window.showNotification) {
+                    window.showNotification('שגיאה בהעתקת הלוג', 'error');
+                } else {
+                    alert('שגיאה בהעתקת הלוג');
+                }
+            }
+        }
+
+        // Export functions to global scope
+        window.copyDetailedLog = copyDetailedLog;
+        window.generateDetailedLog = generateDetailedLog;
+
+        // Page initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Linter Realtime Monitor page loaded');
+        });
+    </script>
 </body>
 </html>

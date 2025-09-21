@@ -206,7 +206,7 @@
 .summary-card .card-header {
     background: transparent !important;
     border-bottom: none !important;
-    color: inherit !important;
+    color: var(--apple-text-primary, #000000) !important;
 }
 
 .summary-card-value {

@@ -47,18 +47,225 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <!-- Page-Specific CSS - Last to override all previous styles -->
-    <link rel="stylesheet" href="styles/js-map.css?v=v1.0.0">
-    
-    <!-- JS-Map Advanced Styles -->
-    <link rel="stylesheet" href="styles-new/07-trumps/js-map-advanced.css?v=v1.0.0">
+    <!-- Page-Specific CSS - Minimal overrides only -->
+    <style>
+        /* JS-Map specific overrides - minimal styling using existing ITCSS classes */
+        .js-map .stat-card {
+            background: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-color, #dee2e6);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .js-map .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .js-map .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .js-map .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color, #007bff);
+            margin-bottom: 0.5rem;
+        }
+        
+        .js-map .stat-label {
+            color: var(--text-secondary, #6c757d);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        /* System overview stats grid */
+        .js-map .overview-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .js-map .overview-stat-card {
+            background: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-color, #dee2e6);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .js-map .overview-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .js-map .overview-stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .js-map .overview-stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color, #007bff);
+            margin-bottom: 0.5rem;
+        }
+        
+        .js-map .overview-stat-label {
+            color: var(--text-secondary, #6c757d);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        /* Central quick search */
+        .js-map .central-quick-search {
+            margin-top: 1rem;
+        }
+        
+        .js-map .central-search-results {
+            margin-top: 0.5rem;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color, #dee2e6);
+            border-radius: 6px;
+            background: var(--input-bg, #ffffff);
+            display: none;
+        }
+        
+        .js-map .central-search-results.show {
+            display: block;
+        }
+        
+        /* Analysis controls */
+        .js-map .analysis-controls {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--input-bg, #f8f9fa);
+            border-radius: 12px;
+            border: 1px solid var(--border-color, #dee2e6);
+        }
+        
+        .js-map .analysis-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .js-map .analysis-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--success-color, #28a745);
+            background: var(--success-color, #28a745);
+            color: white;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .js-map .analysis-btn:hover {
+            background: var(--success-hover, #218838);
+            border-color: var(--success-hover, #218838);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+        
+        /* Future sections */
+        .js-map .future-section {
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color, #dee2e6);
+            border-radius: 8px;
+            padding: 1rem;
+            background: var(--card-bg, #ffffff);
+        }
+        
+        .js-map .future-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .js-map .development-badge {
+            background: var(--warning-color, #ffc107);
+            color: var(--warning-text, #212529);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .js-map .development-info {
+            color: var(--text-color, #495057);
+        }
+        
+        .js-map .development-features ul {
+            margin: 0.5rem 0;
+            padding-right: 1.5rem;
+        }
+        
+        .js-map .development-features li {
+            margin-bottom: 0.25rem;
+            color: var(--text-secondary, #6c757d);
+        }
+        
+        .js-map .docs-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--primary-color, #007bff);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .js-map .docs-link:hover {
+            background: var(--primary-hover, #0056b3);
+            color: white;
+            text-decoration: none;
+            transform: translateY(-2px);
+        }
+    </style>
 
     <!-- Core scripts - Required order -->
-    <script src="scripts/header-system.js"></script>
-    <script src="scripts/color-scheme-system.js"></script>
-    <script src="scripts/pagination-system.js"></script>
-    <script src="scripts/preferences.js"></script>
+    <!-- Core system scripts - must be loaded first -->
+    <script src="scripts/console-cleanup.js"></script>
+    <script src="scripts/translation-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
     <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/table-mappings.js"></script>
+    <script src="scripts/date-utils.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/linked-items.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/central-refresh-system.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    
+    <!-- Header system -->
+    <script src="scripts/header-system.js"></script>
+    
+    <!-- Color scheme system -->
+    <script src="scripts/color-scheme-system.js"></script>
+    
+    <!-- Preferences system -->
+    <script src="scripts/preferences.js"></script>
+    
+    <!-- JS-Map specific scripts -->
     <script src="scripts/js-map-indexeddb-adapter.js"></script>
 </head>
 
@@ -68,101 +275,122 @@
         <div id="unified-header"></div>
 
         <!-- Page body -->
-    <div class="page-body">
-        <!-- TEMPLATE ZONE LOCKED - DO NOT MODIFY HEADER STRUCTURE -->
-        <!-- Main content limited in width -->
-        <div class="main-content">
-            <!-- CONTENT SECTIONS EDITABLE - START -->
-            <!-- Page Header -->
-            <div class="page-header">
-                <div class="header-content">
-                    <div class="header-text">
-                        <h1>🗺️ מפת JavaScript - TikTrack</h1>
-                        <p>ניתוח מפורט של כל הפונקציות, הקבצים והתלויות במערכת</p>
-                    </div>
-                    <div class="header-actions">
-                    <button class="action-btn primary" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט למערכת">
-                            <i class="fas fa-copy"></i> העתק לוג מפורט
-                        </button>
-                    <button class="action-btn" onclick="window.jsMapSystem && window.jsMapSystem.refreshData()" title="רענן נתונים">
-                        <i class="fas fa-sync-alt"></i> רענן נתונים
-                    </button>
-                    <button class="action-btn danger" onclick="window.jsMapSystem && window.jsMapSystem.clearCache()" title="נקה מטמון">
-                        <i class="fas fa-trash"></i> נקה מטמון
-                    </button>
-                    <button class="action-btn info" onclick="window.jsMapSystem && window.jsMapSystem.performAdvancedAnalysis()" title="ניתוח מתקדם">
-                        <i class="fas fa-chart-line"></i> ניתוח מתקדם
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Tabs Container -->
-            <div class="main-tabs-container">
-                <!-- Tab Navigation -->
-                <div class="tab-navigation">
-                    <button class="tab-btn active" data-tab="statistics" onclick="switchTab('statistics')">
-                        <i class="fas fa-chart-bar"></i> סטטיסטיקות
-                    </button>
-                    <button class="tab-btn" data-tab="functions" onclick="switchTab('functions')">
-                        <i class="fas fa-code"></i> פונקציות
-                    </button>
-                    <button class="tab-btn" data-tab="pages" onclick="switchTab('pages')">
-                        <i class="fas fa-file-alt"></i> עמודים
-                    </button>
-                    <button class="tab-btn" data-tab="dependencies" onclick="switchTab('dependencies')">
-                        <i class="fas fa-project-diagram"></i> תלויות
-                    </button>
-                    <button class="tab-btn" data-tab="analysis" onclick="switchTab('analysis')">
-                        <i class="fas fa-search"></i> ניתוח
-                    </button>
-                    <button class="tab-btn" data-tab="future" onclick="switchTab('future')">
-                        <i class="fas fa-rocket"></i> עתידי
-                    </button>
-                </div>
-
-                <!-- Tab Content -->
-                <div class="tab-content">
-                    <!-- Statistics Tab -->
-                    <div id="statistics-tab" class="tab-panel active">
-                        <div class="tab-header">
-                            <h2><i class="fas fa-chart-bar"></i> סטטיסטיקות מערכת</h2>
-                            <div class="tab-actions">
-                                <button class="action-btn" onclick="refreshStatistics()" title="רענן סטטיסטיקות">
-                                    <i class="fas fa-sync-alt"></i> רענן
-                                </button>
-                                <button class="action-btn" onclick="exportStatistics()" title="ייצוא סטטיסטיקות">
-                                    <i class="fas fa-download"></i> ייצוא
-                                </button>
-                                <button class="action-btn" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט">
+        <div class="page-body">
+            <!-- TEMPLATE ZONE LOCKED - DO NOT MODIFY HEADER STRUCTURE -->
+            <!-- Main content limited in width -->
+            <div class="main-content">
+                <!-- CONTENT SECTIONS EDITABLE - START -->
+                
+                <!-- UI Content Section Top Start-->
+                <div class="top-section">
+                    <div class="section-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h1>🗺️ מפת JavaScript - TikTrack</h1>
+                            <div class="section-header-controls">
+                                <button class="btn btn-outline-primary btn-sm" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט">
                                     <i class="fas fa-copy"></i> העתק לוג
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="window.jsMapSystem && window.jsMapSystem.refreshData()" title="רענן נתונים">
+                                    <i class="fas fa-sync-alt"></i> רענן נתונים
+                                </button>
+                                <button class="btn btn-outline-warning btn-sm" onclick="window.jsMapSystem && window.jsMapSystem.clearCache()" title="נקה מטמון">
+                                    <i class="fas fa-trash"></i> נקה מטמון
+                                </button>
+                                <button class="btn btn-outline-info btn-sm" onclick="window.jsMapSystem && window.jsMapSystem.performAdvancedAnalysis()" title="ניתוח מתקדם">
+                                    <i class="fas fa-chart-line"></i> ניתוח מתקדם
                                 </button>
                             </div>
                         </div>
-                        <div class="tab-body">
-                    <!-- סטטיסטיקות מערכת -->
-                    <div class="system-stats">
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-icon">📄</div>
-                                <div class="stat-value" id="totalPagesCount">-</div>
-                                <div class="stat-label">עמודי HTML</div>
+                    </div>
+                    <div class="section-body">
+                        <div class="info-message">
+                            <h3>🎯 מערכת ניתוח JavaScript מתקדמת</h3>
+                            <p>מערכת מקיפה לניתוח, מיפוי וניהול של כל הפונקציות, הקבצים והתלויות במערכת TikTrack.</p>
+                        </div>
+                        
+                        <!-- סטטיסטיקות מרכזיות למערכת -->
+                        <div class="system-overview-stats">
+                            <div class="overview-stats-grid">
+                                <div class="overview-stat-card">
+                                    <div class="overview-stat-icon">📄</div>
+                                    <div class="overview-stat-value" id="systemTotalPages">-</div>
+                                    <div class="overview-stat-label">עמודי HTML</div>
+                                </div>
+                                <div class="overview-stat-card">
+                                    <div class="overview-stat-icon">📜</div>
+                                    <div class="overview-stat-value" id="systemTotalJsFiles">-</div>
+                                    <div class="overview-stat-label">קבצי JavaScript</div>
+                                </div>
+                                <div class="overview-stat-card">
+                                    <div class="overview-stat-icon">⚙️</div>
+                                    <div class="overview-stat-value" id="systemTotalFunctions">-</div>
+                                    <div class="overview-stat-label">פונקציות כולל</div>
+                                </div>
+                                <div class="overview-stat-card">
+                                    <div class="overview-stat-icon">🌍</div>
+                                    <div class="overview-stat-value" id="systemGlobalFunctions">-</div>
+                                    <div class="overview-stat-label">פונקציות גלובליות</div>
+                                </div>
+                                <div class="overview-stat-card">
+                                    <div class="overview-stat-icon">🔍</div>
+                                    <div class="overview-stat-value" id="systemDuplicates">-</div>
+                                    <div class="overview-stat-label">כפילויות זוהו</div>
+                                </div>
+                                <div class="overview-stat-card">
+                                    <div class="overview-stat-icon">🏠</div>
+                                    <div class="overview-stat-value" id="systemLocalFunctions">-</div>
+                                    <div class="overview-stat-label">פונקציות מקומיות</div>
+                                </div>
                             </div>
-                            <div class="stat-card">
-                                <div class="stat-icon">📜</div>
-                                <div class="stat-value" id="totalJsFilesCount">-</div>
-                                <div class="stat-label">קבצי JS</div>
+                            
+                            <!-- חיפוש מהיר מרכזי -->
+                            <div class="central-quick-search">
+                                <div class="search-box">
+                                    <input type="text" id="centralQuickSearch" placeholder="חיפוש מהיר בפונקציות, עמודים או קבצים..." onkeyup="performCentralQuickSearch(this.value)">
+                                    <button onclick="performCentralQuickSearch(document.getElementById('centralQuickSearch').value)">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                                <div id="centralQuickSearchResults" class="central-search-results"></div>
                             </div>
-                            <div class="stat-card">
-                                <div class="stat-icon">⚙️</div>
-                                <div class="stat-value" id="totalFunctionsCount">-</div>
-                                <div class="stat-label">פונקציות</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon">🌍</div>
-                                <div class="stat-value" id="globalFunctionsCount">-</div>
-                                <div class="stat-label">פונקציות גלובליות</div>
-                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section Top End -->
+
+                <!-- UI Content Section 1 Start-->
+                <div class="content-section" id="section1">
+                    <div class="section-header">
+                        <h2><i class="fas fa-chart-bar"></i> סטטיסטיקות מערכת</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div id="statisticsContent">
+                            <!-- סטטיסטיקות מערכת -->
+                            <div class="system-stats">
+                                <div class="stats-grid">
+                                    <div class="stat-card">
+                                        <div class="stat-icon">📄</div>
+                                        <div class="stat-value" id="totalPagesCount">-</div>
+                                        <div class="stat-label">עמודי HTML</div>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-icon">📜</div>
+                                        <div class="stat-value" id="totalJsFilesCount">-</div>
+                                        <div class="stat-label">קבצי JS</div>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-icon">⚙️</div>
+                                        <div class="stat-value" id="totalFunctionsCount">-</div>
+                                        <div class="stat-label">פונקציות</div>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-icon">🌍</div>
+                                        <div class="stat-value" id="globalFunctionsCount">-</div>
+                                        <div class="stat-label">פונקציות גלובליות</div>
+                                    </div>
                                     <div class="stat-card">
                                         <div class="stat-icon">🔍</div>
                                         <div class="stat-value" id="duplicatesCount">-</div>
@@ -172,57 +400,49 @@
                                         <div class="stat-icon">🏠</div>
                                         <div class="stat-value" id="localFunctionsCount">-</div>
                                         <div class="stat-label">פונקציות מקומיות</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- חיפוש מהיר -->
+                            <div class="quick-search">
+                                <div class="search-box">
+                                    <input type="text" id="quickSearch" placeholder="חיפוש מהיר בפונקציות..." onkeyup="performQuickSearch(this.value)">
+                                    <button onclick="performQuickSearch(document.getElementById('quickSearch').value)">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                                <div id="quickSearchResults" class="search-results"></div>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- חיפוש מהיר -->
-                    <div class="quick-search">
-                        <div class="search-box">
-                            <input type="text" id="quickSearch" placeholder="חיפוש מהיר בפונקציות..." onkeyup="performQuickSearch(this.value)">
-                            <button onclick="performQuickSearch(document.getElementById('quickSearch').value)">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                        <div id="quickSearchResults" class="search-results"></div>
+                </div>
+                <!-- UI Content Section 1 End -->
+
+                <!-- UI Content Section 2 Start-->
+                <div class="content-section" id="section2">
+                    <div class="section-header">
+                        <h2><i class="fas fa-code"></i> פונקציות JavaScript</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
                     </div>
-                        </div>
+                    <div class="section-body">
+                        <div id="functionsContent">
+                            <!-- כפתורי מצבי תצוגה -->
+                            <div class="view-mode-controls">
+                                <div class="view-mode-buttons">
+                                    <button class="view-mode-btn active" data-mode="cards" onclick="setViewMode('cards')" title="תצוגת כרטיסים">
+                                        <i class="fas fa-th"></i> כרטיסים
+                                    </button>
+                                    <button class="view-mode-btn" data-mode="list" onclick="setViewMode('list')" title="תצוגת רשימה">
+                                        <i class="fas fa-list"></i> רשימה
+                                    </button>
+                                    <button class="view-mode-btn" data-mode="table" onclick="setViewMode('table')" title="תצוגת טבלה">
+                                        <i class="fas fa-table"></i> טבלה
+                                    </button>
+                                </div>
                             </div>
-                    
-                    <!-- Functions Tab -->
-                    <div id="functions-tab" class="tab-panel">
-                        <div class="tab-header">
-                            <h2><i class="fas fa-code"></i> פונקציות JavaScript</h2>
-                            <div class="tab-actions">
-                                <button class="action-btn" onclick="refreshFunctions()" title="רענן פונקציות">
-                                    <i class="fas fa-sync-alt"></i> רענן
-                                </button>
-                                <button class="action-btn" onclick="exportFunctions()" title="ייצוא פונקציות">
-                                    <i class="fas fa-download"></i> ייצוא
-                                </button>
-                                <button class="action-btn" onclick="toggleFunctionsDropdown()" title="חיפוש מתקדם">
-                                    <i class="fas fa-search"></i> חיפוש
-                                </button>
-                                <button class="action-btn" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט">
-                                    <i class="fas fa-copy"></i> העתק לוג
-                                </button>
-                            </div>
-                        </div>
-                        <div class="tab-body">
-                    <!-- כפתורי מצבי תצוגה -->
-                    <div class="view-mode-controls">
-                        <div class="view-mode-buttons">
-                            <button class="view-mode-btn active" data-mode="cards" onclick="setViewMode('cards')" title="תצוגת כרטיסים">
-                                <i class="fas fa-th"></i> כרטיסים
-                            </button>
-                            <button class="view-mode-btn" data-mode="list" onclick="setViewMode('list')" title="תצוגת רשימה">
-                                <i class="fas fa-list"></i> רשימה
-                            </button>
-                            <button class="view-mode-btn" data-mode="table" onclick="setViewMode('table')" title="תצוגת טבלה">
-                                <i class="fas fa-table"></i> טבלה
-                            </button>
-                        </div>
-                    </div>
 
                             <!-- Functions Tabs -->
                             <div class="functions-tabs-container">
@@ -240,82 +460,60 @@
                                     <div class="loading-spinner"></div>
                                     טוען פונקציות...
                                 </div>
-                    </div>
-                </div>
-            </div>
-
-                    <!-- Pages Tab -->
-                    <div id="pages-tab" class="tab-panel">
-                        <div class="tab-header">
-                            <h2><i class="fas fa-file-alt"></i> מיפוי עמודים</h2>
-                            <div class="tab-actions">
-                                <button class="action-btn" onclick="refreshPages()" title="רענן מיפוי עמודים">
-                                    <i class="fas fa-sync-alt"></i> רענן
-                                </button>
-                                <button class="action-btn" onclick="exportPages()" title="ייצוא מיפוי עמודים">
-                                    <i class="fas fa-download"></i> ייצוא
-                                </button>
-                                <button class="action-btn" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט">
-                                    <i class="fas fa-copy"></i> העתק לוג
-                    </button>
-                </div>
-                        </div>
-                        <div class="tab-body">
-                            <div id="pageMappingContent">
-                        <div class="loading">
-                            <div class="loading-spinner"></div>
-                                    טוען מיפוי עמודים...
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-                    <!-- Dependencies Tab -->
-                    <div id="dependencies-tab" class="tab-panel">
-                        <div class="tab-header">
-                            <h2><i class="fas fa-project-diagram"></i> ניתוח תלויות</h2>
-                            <div class="tab-actions">
-                                <button class="action-btn" onclick="refreshDependencies()" title="רענן ניתוח תלויות">
-                                    <i class="fas fa-sync-alt"></i> רענן
-                                </button>
-                                <button class="action-btn" onclick="exportDependencies()" title="ייצוא ניתוח תלויות">
-                                    <i class="fas fa-download"></i> ייצוא
-                                </button>
-                                <button class="action-btn" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט">
-                                    <i class="fas fa-copy"></i> העתק לוג
-                    </button>
-                </div>
-                        </div>
-                        <div class="tab-body">
-                    <div id="dependenciesContent">
-                        <div class="loading">
-                            <div class="loading-spinner"></div>
-                                    טוען ניתוח תלויות...
-                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Analysis Tab -->
-                    <div id="analysis-tab" class="tab-panel">
-                        <div class="tab-header">
-                            <h2><i class="fas fa-search"></i> ניתוח מתקדם</h2>
-                            <div class="tab-actions">
-                                <button class="action-btn" onclick="refreshAnalysis()" title="רענן ניתוח">
-                                    <i class="fas fa-sync-alt"></i> רענן
-                                </button>
-                                <button class="action-btn" onclick="exportAnalysis()" title="ייצוא ניתוח">
-                                    <i class="fas fa-download"></i> ייצוא
-                                </button>
-                                <button class="action-btn" onclick="generateReport()" title="יצירת דוח מפורט">
-                                    <i class="fas fa-file-alt"></i> דוח
-                                </button>
-                                <button class="action-btn" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט">
-                                    <i class="fas fa-copy"></i> העתק לוג
-                                </button>
                 </div>
-            </div>
-                        <div class="tab-body">
+                <!-- UI Content Section 2 End -->
+
+                <!-- UI Content Section 3 Start-->
+                <div class="content-section" id="section3">
+                    <div class="section-header">
+                        <h2><i class="fas fa-file-alt"></i> מיפוי עמודים</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div id="pageMappingContent">
+                            <div class="loading">
+                                <div class="loading-spinner"></div>
+                                טוען מיפוי עמודים...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 3 End -->
+
+                <!-- UI Content Section 4 Start-->
+                <div class="content-section" id="section4">
+                    <div class="section-header">
+                        <h2><i class="fas fa-project-diagram"></i> ניתוח תלויות</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div id="dependenciesContent">
+                            <div class="loading">
+                                <div class="loading-spinner"></div>
+                                טוען ניתוח תלויות...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- UI Content Section 4 End -->
+
+                <!-- UI Content Section 5 Start-->
+                <div class="content-section" id="section5">
+                    <div class="section-header">
+                        <h2><i class="fas fa-search"></i> ניתוח מתקדם</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div id="analysisContent">
                             <!-- Analysis Controls -->
                             <div class="analysis-controls">
                                 <div class="analysis-buttons">
@@ -327,8 +525,8 @@
                                     </button>
                                     <button class="analysis-btn" onclick="syncGlobalFunctions()" title="סנכרון פונקציות גלובליות">
                                         <i class="fas fa-sync"></i> סנכרון גלובלי
-                    </button>
-                </div>
+                                    </button>
+                                </div>
                             </div>
 
                             <!-- Duplicates Analysis Results -->
@@ -341,31 +539,26 @@
 
                             <!-- Local Functions Analysis Results -->
                             <div id="localFunctionsContent" style="margin-top: 20px;">
-                        <div class="loading">
-                            <div class="loading-spinner"></div>
+                                <div class="loading">
+                                    <div class="loading-spinner"></div>
                                     לחץ על "פונקציות מקומיות" כדי להתחיל
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+                <!-- UI Content Section 5 End -->
 
-                    <!-- Future Features Tab -->
-                    <div id="future-tab" class="tab-panel">
-                        <div class="tab-header">
-                            <h2><i class="fas fa-rocket"></i> תכונות עתידיות</h2>
-                            <div class="tab-actions">
-                                <button class="action-btn" onclick="refreshFutureFeatures()" title="רענן תכונות עתידיות">
-                                    <i class="fas fa-sync-alt"></i> רענן
-                                </button>
-                                <button class="action-btn" onclick="exportFutureFeatures()" title="ייצוא תכונות עתידיות">
-                                    <i class="fas fa-download"></i> ייצוא
-                                </button>
-                                <button class="action-btn" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט">
-                                    <i class="fas fa-copy"></i> העתק לוג
-                                </button>
-                            </div>
-                        </div>
-                        <div class="tab-body">
+                <!-- UI Content Section 6 Start-->
+                <div class="content-section" id="section6">
+                    <div class="section-header">
+                        <h2><i class="fas fa-rocket"></i> תכונות עתידיות</h2>
+                        <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
+                            <span class="section-toggle-icon">▼</span>
+                        </button>
+                    </div>
+                    <div class="section-body">
+                        <div id="futureContent">
                             <!-- ניתוח פונקציות כפולות ודומות -->
                             <div class="future-section">
                                 <div class="future-section-header">
@@ -383,24 +576,6 @@
                                                 <li>ניתוח שימוש בפונקציות דומות</li>
                                                 <li>דוחות מפורטים להעתקה</li>
                                             </ul>
-                                        </div>
-                                    </div>
-                                    <div class="development-preview">
-                                        <h4>🔮 תצוגה מקדימה:</h4>
-                                        <div class="mock-content">
-                                            <div class="mock-duplicate-analysis">
-                                                <h5>ניתוח כפילויות (דמה)</h5>
-                                                <div class="mock-item">
-                                                    <span class="mock-function">createModal()</span>
-                                                    <span class="mock-similarity">דמיון: 95%</span>
-                                                    <span class="mock-files">main.js, ui-utils.js</span>
-                                                </div>
-                                                <div class="mock-item">
-                                                    <span class="mock-function">formatDate()</span>
-                                                    <span class="mock-similarity">דמיון: 87%</span>
-                                                    <span class="mock-files">utils.js, date-helpers.js</span>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -425,24 +600,6 @@
                                             </ul>
                                         </div>
                                     </div>
-                                    <div class="development-preview">
-                                        <h4>🔮 תצוגה מקדימה:</h4>
-                                        <div class="mock-content">
-                                            <div class="mock-local-analysis">
-                                                <h5>פונקציות מקומיות (דמה)</h5>
-                                                <div class="mock-item">
-                                                    <span class="mock-page">accounts.html</span>
-                                                    <span class="mock-function">validateAccount()</span>
-                                                    <span class="mock-status">מומלץ להעביר</span>
-                                                </div>
-                                                <div class="mock-item">
-                                                    <span class="mock-page">trades.html</span>
-                                                    <span class="mock-function">calculateProfit()</span>
-                                                    <span class="mock-status">קיים גלובלית</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
 
@@ -463,26 +620,6 @@
                                                 <li>ניהול גיבויים ושחזור</li>
                                                 <li>ניקוי אוטומטי של נתונים ישנים</li>
                                             </ul>
-                                        </div>
-                                    </div>
-                                    <div class="development-preview">
-                                        <h4>🔮 תצוגה מקדימה:</h4>
-                                        <div class="mock-content">
-                                            <div class="mock-storage-stats">
-                                                <h5>סטטיסטיקות אחסון (דמה)</h5>
-                                                <div class="mock-stat">
-                                                    <span class="mock-label">גודל כולל:</span>
-                                                    <span class="mock-value">2.4 MB</span>
-                                                </div>
-                                                <div class="mock-stat">
-                                                    <span class="mock-label">ניתוחים שמורים:</span>
-                                                    <span class="mock-value">15</span>
-                                                </div>
-                                                <div class="mock-stat">
-                                                    <span class="mock-label">גיבויים:</span>
-                                                    <span class="mock-value">3</span>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -507,103 +644,66 @@
                                             </ul>
                                         </div>
                                     </div>
-                                    <div class="development-preview">
-                                        <h4>🔮 תצוגה מקדימה:</h4>
-                                        <div class="mock-content">
-                                            <div class="mock-architecture-check">
-                                                <h5>בדיקת ארכיטקטורה (דמה)</h5>
-                                                <div class="mock-check">
-                                                    <span class="mock-rule">אין פונקציות ב-HTML</span>
-                                                    <span class="mock-status pass">✅ עובר</span>
-                                                </div>
-                                                <div class="mock-check">
-                                                    <span class="mock-rule">CSS חיצוני בלבד</span>
-                                                    <span class="mock-status pass">✅ עובר</span>
-                                                </div>
-                                                <div class="mock-check">
-                                                    <span class="mock-rule">מבנה תיקיות תקין</span>
-                                                    <span class="mock-status warning">⚠️ אזהרה</span>
-                                                </div>
-                                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                                </div>
+                            </div>
 
                             <!-- קישור לדוקומנטציה -->
                             <div class="development-docs">
                                 <a href="documentation/frontend/JS_MAP_SYSTEM_SPECIFICATION.md" target="_blank" class="docs-link">
                                     📖 קרא את הדוקומנטציה המלאה
                                 </a>
-                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <!-- UI Content Section 6 End -->
+
             </div>
-
-
-
+            <!-- CONTENT SECTIONS EDITABLE - END -->
         </div>
-        <!-- CONTENT SECTIONS EDITABLE - END -->
-    </div>
 
-    <!-- Back to Top Button -->
-    <button class="back-to-top" id="backToTopBtn" onclick="scrollToTop()" title="חזור לראש העמוד">
-        <i class="fas fa-arrow-up"></i>
-    </button>
+        <!-- Back to Top Button -->
+        <button class="back-to-top" id="backToTopBtn" onclick="scrollToTop()" title="חזור לראש העמוד">
+            <i class="fas fa-arrow-up"></i>
+        </button>
 
-    <!-- Function Modal -->
-    <div id="functionModal" class="function-modal">
-        <div class="function-modal-content">
-            <div class="function-modal-header">
-                <h3 class="function-modal-title" id="modalFunctionName"></h3>
-                <button class="function-modal-close" onclick="closeFunctionModal()">&times;</button>
-            </div>
-            <div class="function-modal-body">
-                <div class="function-annotations" id="modalAnnotations"></div>
-                <div class="function-code" id="modalCode"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Function Calls Modal -->
-    <div id="functionCallsModal" class="function-modal">
-        <div class="function-modal-content">
-            <div class="function-modal-header">
-                <h3 class="function-modal-title" id="modalFunctionCallsTitle"></h3>
-                <button class="function-modal-close" onclick="closeFunctionCallsModal()">&times;</button>
-            </div>
-            <div class="function-modal-body">
-                <div id="functionCallsContent"></div>
+        <!-- Function Modal -->
+        <div id="functionModal" class="function-modal">
+            <div class="function-modal-content">
+                <div class="function-modal-header">
+                    <h3 class="function-modal-title" id="modalFunctionName"></h3>
+                    <button class="function-modal-close" onclick="closeFunctionModal()">&times;</button>
+                </div>
+                <div class="function-modal-body">
+                    <div class="function-annotations" id="modalAnnotations"></div>
+                    <div class="function-code" id="modalCode"></div>
+                </div>
             </div>
         </div>
-    </div>
 
+        <!-- Function Calls Modal -->
+        <div id="functionCallsModal" class="function-modal">
+            <div class="function-modal-content">
+                <div class="function-modal-header">
+                    <h3 class="function-modal-title" id="modalFunctionCallsTitle"></h3>
+                    <button class="function-modal-close" onclick="closeFunctionCallsModal()">&times;</button>
+                </div>
+                <div class="function-modal-body">
+                    <div id="functionCallsContent"></div>
+                </div>
+            </div>
+        </div>
 
-    <!-- Core System Scripts - Required order -->
-    <script src="scripts/table-mappings.js"></script>
-    <script src="scripts/date-utils.js"></script>
-    <script src="scripts/tables.js"></script>
-    <script src="scripts/page-utils.js"></script>
-    <script src="scripts/main.js"></script>
-    <script src="scripts/console-cleanup.js"></script>
-    <script src="scripts/translation-utils.js"></script>
-    <script src="scripts/data-utils.js"></script>
-    <script src="scripts/linked-items.js"></script>
+        <!-- Core System Scripts - Required order -->
+        <!-- Page Scripts - JS Map System (Split into modules) -->
+        <script src="scripts/js-map-core.js"></script>
+        <script src="scripts/js-map-ui.js"></script>
+        <script src="scripts/js-map-analysis.js"></script>
+        <script src="scripts/js-map-utils.js"></script>
+        <script src="scripts/js-map.js"></script>
 
-    <!-- Notification System - Required for showNotification -->
-    <script src="scripts/notification-system.js"></script>
-
-    <!-- Page Scripts - JS Map System (Split into modules) -->
-    <script src="scripts/js-map-core.js"></script>
-    <script src="scripts/js-map-ui.js"></script>
-    <script src="scripts/js-map-analysis.js"></script>
-    <script src="scripts/js-map-utils.js"></script>
-    <script src="scripts/js-map.js"></script>
-
-    <!-- Initialize JS-Map System -->
-    <!-- JS-Map System Initializer -->
-    <script src="scripts/js-map-init.js"></script>
+        <!-- Initialize JS-Map System -->
+        <script src="scripts/js-map-init.js"></script>
     </div>
 </body>
 </html>

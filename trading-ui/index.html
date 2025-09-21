@@ -328,18 +328,118 @@
                 <div class="content-section" id="section3">
                     <div class="section-header">
                         <h2>📈 גרפים וניתוח</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-sm btn-primary" onclick="refreshAllCharts()">
+                                <i class="fas fa-sync-alt"></i> רענן גרפים
+                            </button>
+                            <button class="btn btn-sm btn-secondary" onclick="exportAllCharts()">
+                                <i class="fas fa-download"></i> ייצא גרפים
+                            </button>
+                            <a href="/chart-management" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-cog"></i> ניהול גרפים
+                            </a>
+                        </div>
                         <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
                     </div>
                     <div class="section-body">
-                        <div class="info-message">
-                            <h3>🎯 מערכת גרפים חדשה</h3>
-                            <p>הגרפים הועברו לעמוד ניהול גרפים ייעודי לתמיכה טובה יותר וניהול מתקדם.</p>
-                            <div class="action-buttons">
-                                <a href="/chart-management" class="btn btn-primary">
-                                    <i class="fas fa-chart-line"></i> עבור לעמוד ניהול גרפים
-                                </a>
+                        <!-- Charts Grid -->
+                        <div class="row g-4">
+                            <!-- Chart 1: Trades Status -->
+                            <div class="col-lg-6">
+                                <div class="card h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-chart-pie text-primary"></i> סטטוס טריידים
+                                        </h5>
+                                        <div class="chart-actions">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="refreshChart('tradesStatusChart')">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="exportChart('tradesStatusChart')">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container" style="position: relative; height: 300px;">
+                                            <canvas id="tradesStatusChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Chart 2: Performance Over Time -->
+                            <div class="col-lg-6">
+                                <div class="card h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-chart-line text-success"></i> ביצועים לאורך זמן
+                                        </h5>
+                                        <div class="chart-actions">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="refreshChart('performanceChart')">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="exportChart('performanceChart')">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container" style="position: relative; height: 300px;">
+                                            <canvas id="performanceChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Chart 3: Account Distribution -->
+                            <div class="col-lg-6">
+                                <div class="card h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-chart-bar text-warning"></i> התפלגות חשבונות
+                                        </h5>
+                                        <div class="chart-actions">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="refreshChart('accountChart')">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="exportChart('accountChart')">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container" style="position: relative; height: 300px;">
+                                            <canvas id="accountChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Chart 4: Mixed Analytics -->
+                            <div class="col-lg-6">
+                                <div class="card h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-chart-area text-info"></i> אנליטיקה מעורבת
+                                        </h5>
+                                        <div class="chart-actions">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="refreshChart('mixedChart')">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="exportChart('mixedChart')">
+                                                <i class="fas fa-download"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container" style="position: relative; height: 300px;">
+                                            <canvas id="mixedChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -686,6 +786,16 @@
     
     <!-- Global Notification Collector -->
     <script src="scripts/global-notification-collector.js"></script>
+    
+    <!-- Chart System Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="scripts/charts/chart-loader.js"></script>
+    <script src="scripts/charts/chart-theme.js"></script>
+    <script src="scripts/charts/chart-system.js"></script>
+    <script src="scripts/charts/chart-export.js"></script>
+    <script src="scripts/charts/adapters/trades-adapter.js"></script>
+    <script src="scripts/charts/adapters/performance-adapter.js"></script>
+    <script src="scripts/charts/adapters/linter-adapter.js"></script>
     
     <!-- Page-specific script -->
     <script src="scripts/index.js"></script>

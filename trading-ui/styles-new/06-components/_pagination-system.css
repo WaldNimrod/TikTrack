@@ -163,56 +163,8 @@
     }
 }
 
-/* ===== DARK MODE SUPPORT ===== */
-
-@media (prefers-color-scheme: dark) {
-    .pagination-container {
-        background: #2d3748;
-        border-color: #4a5568;
-        color: #e2e8f0;
-    }
-    
-    .items-info {
-        color: #a0aec0;
-    }
-    
-    .page-size-selector {
-        background: #2d3748;
-        border-color: #4a5568;
-        color: #e2e8f0;
-    }
-    
-    .page-size-selector:hover {
-        border-color: #63b3ed;
-        box-shadow: 0 0 0 2px rgba(99, 179, 237, 0.1);
-    }
-    
-    .page-size-selector:focus {
-        border-color: #63b3ed;
-        box-shadow: 0 0 0 2px rgba(99, 179, 237, 0.25);
-    }
-    
-    .pagination-btn {
-        background: #2d3748;
-        border-color: #4a5568;
-        color: #e2e8f0;
-    }
-    
-    .pagination-btn:hover:not(:disabled) {
-        background: #4a5568;
-        border-color: #63b3ed;
-        color: #63b3ed;
-    }
-    
-    .pagination-btn:disabled {
-        background: #4a5568;
-        opacity: 0.5;
-    }
-    
-    .page-info {
-        color: #e2e8f0;
-    }
-}
+/* ===== Light Mode Only - No Dark Mode ===== */
+/* ⚠️ Dark mode removed - all pagination components use light mode colors by default */
 
 /* ===== ANIMATIONS ===== */
 

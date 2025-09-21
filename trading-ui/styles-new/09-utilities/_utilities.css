@@ -76,7 +76,7 @@
 .bg-warning { background-color: var(--color-warning) !important; }
 .bg-info { background-color: var(--color-info) !important; }
 .bg-light { background-color: var(--theme-bg-secondary) !important; }
-.bg-dark { background-color: var(--theme-bg-primary) !important; }
+.bg-dark { background-color: #343a40 !important; }
 
 /* Flex Utilities */
 .flex-row { flex-direction: row !important; }

@@ -4,8 +4,10 @@
  * קובץ זה מכיל את כל המשתנים הגלובליים של המערכת
  * מבוסס על Apple Design System עם התאמה לעברית ו-RTL
  * 
- * @version 1.0.0
- * @lastUpdated January 5, 2025
+ * ⚠️ Dark mode removed - light mode only
+ * 
+ * @version 1.1.0
+ * @lastUpdated January 21, 2025
  */
 
 :root {
@@ -25,8 +27,11 @@
   --apple-gray-10: #2C2C2E;
   --apple-gray-11: #1C1C1E;
   --apple-red: #FF3B30;
+  --apple-red-dark: #D70015;
   --apple-green: #34C759;
+  --apple-green-dark: #248A3D;
   --apple-orange: #FF9500;
+  --apple-orange-dark: #CC7700;
   --apple-yellow: #FFCC02;
   --apple-purple: #AF52DE;
   --apple-pink: #FF2D92;

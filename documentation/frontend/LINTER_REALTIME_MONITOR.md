@@ -338,7 +338,7 @@ const DiagnosticLog = {
                 'elements visibility',
                 'responsive design',
                 'accessibility compliance',
-                'dark mode support'
+                'light mode only (dark mode removed)'
             ]
         }
     },

@@ -5,8 +5,14 @@
  * קובץ זה מגדיר את כל מפתחות הצבעים במערכת בצורה מאוחדת
  * ומאפשר שימוש עקבי בכל העמודים והמודולים
  *
+ * ⚠️ NOTE FOR FUTURE DEVELOPER:
+ * Dark mode support was removed in January 2025 - only light mode is currently supported.
+ * Dark mode will be implemented in a future version.
+ * All dark-related functions and variables have been removed.
+ *
  * @author TikTrack System
- * @version 2.0.0
+ * @version 2.1.0
+ * @lastUpdated January 21, 2025
  * @since 2025-01-09
  */
 
@@ -92,19 +98,16 @@ let STATUS_COLORS = {
   'open': {
     light: '#cce7ff',
     medium: '#0066cc',
-    dark: '#004499',
     border: '#b3d9ff'
   },
   'closed': {
     light: '#e6ccff',
     medium: '#8c00cc',
-    dark: '#660099',
     border: '#d9b3ff'
   },
   'cancelled': {
     light: '#ffe6cc',
     medium: '#ff6600',
-    dark: '#cc4400',
     border: '#ffd9b3'
   }
 };
@@ -192,31 +195,26 @@ let INVESTMENT_TYPE_COLORS = {
   'swing': {
     light: 'rgba(0, 123, 255, 0.1)',
     medium: '#007bff',
-    dark: '#0056b3',
     border: 'rgba(0, 123, 255, 0.3)'
   },
   'investment': {
     light: 'rgba(40, 167, 69, 0.1)',
     medium: '#28a745',
-    dark: '#1e7e34',
     border: 'rgba(40, 167, 69, 0.3)'
   },
   'passive': {
     light: 'rgba(111, 66, 193, 0.1)',
     medium: '#6f42c1',
-    dark: '#5a32a3',
     border: 'rgba(111, 66, 193, 0.3)'
   },
   'day_trading': {
     light: 'rgba(255, 193, 7, 0.1)',
     medium: '#ffc107',
-    dark: '#e0a800',
     border: 'rgba(255, 193, 7, 0.3)'
   },
   'scalping': {
     light: 'rgba(220, 53, 69, 0.1)',
     medium: '#dc3545',
-    dark: '#c82333',
     border: 'rgba(220, 53, 69, 0.3)'
   }
 };
@@ -338,24 +336,8 @@ function hexToRgb(hex) {
   } : null;
 }
 
-/**
- * הכהת צבע
- * Darken color
- * 
- * @param {string} hex - קוד צבע hex
- * @param {number} factor - גורם הכהה (0-1)
- * @returns {string} - צבע מוכהה
- */
-function darkenColor(hex, factor) {
-  const rgb = hexToRgb(hex);
-  if (!rgb) return hex;
-  
-  const r = Math.floor(rgb.r * (1 - factor));
-  const g = Math.floor(rgb.g * (1 - factor));
-  const b = Math.floor(rgb.b * (1 - factor));
-  
-  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-}
+/* ===== Light Mode Only - No Dark Mode ===== */
+/* Dark color functions removed - only light mode supported */
 
 // ===== UTILITY FUNCTIONS =====
 // פונקציות עזר
@@ -681,9 +663,9 @@ function generateEntityCSS() {
 }
 
 .entity-${type}-header {
-  background: linear-gradient(135deg, ${color}, ${darkenColor(color, 20)});
+  background: ${color};
   color: white;
-  border-bottom: 2px solid ${darkenColor(color, 20)};
+  border-bottom: 2px solid ${color};
 }
 
 .entity-${type}-main-header {
@@ -777,9 +759,6 @@ function generateStatusCSS() {
   border-color: ${colors.border};
 }
 
-.status-${status}-dark {
-  color: ${colors.dark};
-}
     `;
   });
 
@@ -819,9 +798,6 @@ function generateStatusCSS() {
   border-color: rgba(108, 117, 125, 0.3);
 }
 
-.status-other-dark {
-  color: #495057;
-}
   `;
 
   return css;
@@ -864,9 +840,6 @@ function generateInvestmentTypeCSS() {
   border-color: ${colors.border};
 }
 
-.investment-type-${type}-dark {
-  color: ${colors.dark};
-}
 
 /* מחלקות קצרות לסוגי השקעה */
 .type-${type} {
@@ -893,9 +866,6 @@ function generateInvestmentTypeCSS() {
   border-color: ${colors.border};
 }
 
-.type-${type}-dark {
-  color: ${colors.dark};
-}
     `;
   });
 
@@ -925,34 +895,43 @@ function generateInvestmentTypeCSS() {
   border-color: rgba(108, 117, 125, 0.3);
 }
 
-.type-other-dark {
-  color: #495057;
-}
   `;
 
   return css;
 }
 
+/* ===== Light Mode Only - No Dark Mode ===== */
+/* Second darkenColor function removed - only light mode supported */
+
 /**
- * הכהת צבע
- * Darken color
- *
- * @param {string} color - קוד הצבע
- * @param {number} percent - אחוז הכהה
- * @returns {string} צבע מוכהה
+ * Darken a color by a given percentage
+ * הכהה צבע באחוז נתון
+ * @param {string} hex - Hex color code
+ * @param {number} percent - Percentage to darken (0-100)
+ * @returns {string} Darkened hex color
  */
-function darkenColor(color, percent) {
-  if (!color || typeof color !== 'string') {
-    return '#6c757d'; // Return default gray if color is invalid
-  }
-  const num = parseInt(color.replace('#', ''), 16);
-  const amt = Math.round(2.55 * percent);
-  const R = (num >> 16) - amt;
-  const G = (num >> 8 & 0x00FF) - amt;
-  const B = (num & 0x0000FF) - amt;
-  return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
-    (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
-    (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+function darkenColor(hex, percent) {
+    // Remove # if present
+    hex = hex.replace('#', '');
+    
+    // Parse RGB values
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    
+    // Darken by reducing each RGB value
+    const factor = (100 - percent) / 100;
+    const newR = Math.round(r * factor);
+    const newG = Math.round(g * factor);
+    const newB = Math.round(b * factor);
+    
+    // Convert back to hex
+    const toHex = (n) => {
+        const hex = n.toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+    };
+    
+    return `#${toHex(newR)}${toHex(newG)}${toHex(newB)}`;
 }
 
 // ===== LEGEND GENERATION =====
@@ -1067,19 +1046,16 @@ const NUMERIC_VALUE_COLORS = {
   positive: {
     light: '#d4edda',      // רקע בהיר לערכים חיוביים
     medium: '#28a745',     // טקסט לערכים חיוביים
-    dark: '#155724',       // טקסט כהה לערכים חיוביים
     border: '#c3e6cb',      // גבול לערכים חיוביים
   },
   negative: {
     light: '#f8d7da',      // רקע בהיר לערכים שליליים
     medium: '#dc3545',     // טקסט לערכים שליליים
-    dark: '#721c24',       // טקסט כהה לערכים שליליים
     border: '#f5c6cb',      // גבול לערכים שליליים
   },
   zero: {
     light: '#e2e3e5',      // רקע לערך אפס
     medium: '#6c757d',     // טקסט לערך אפס
-    dark: '#383d41',       // טקסט כהה לערך אפס
     border: '#d6d8db',      // גבול לערך אפס
   },
 };
@@ -1127,14 +1103,8 @@ function getNumericValueBorderColor(value) {
   return getNumericValueColor(value, 'border');
 }
 
-/**
- * קבלת צבע כהה לערך מספרי
- * @param {number} value - הערך המספרי
- * @returns {string} קוד הצבע
- */
-function getNumericValueDarkColor(value) {
-  return getNumericValueColor(value, 'dark');
-}
+/* ===== Light Mode Only - No Dark Mode ===== */
+/* getNumericValueDarkColor function removed - only light mode supported */
 
 /**
  * בדיקה אם ערך הוא חיובי
@@ -1558,29 +1528,21 @@ function updateCSSVariablesFromPreferences(preferences) {
       if (preferences.valuePositiveColor) {
         document.documentElement.style.setProperty('--numeric-positive-light', preferences.valuePositiveColorLight || 'rgba(0, 144, 81, 0.1)');
         document.documentElement.style.setProperty('--numeric-positive-medium', preferences.valuePositiveColor);
-        document.documentElement.style.setProperty('--numeric-positive-dark', preferences.valuePositiveColorDark || '#096037');
         document.documentElement.style.setProperty('--numeric-positive-border', `rgba(${hexToRgb(preferences.valuePositiveColor)?.r || 0}, ${hexToRgb(preferences.valuePositiveColor)?.g || 144}, ${hexToRgb(preferences.valuePositiveColor)?.b || 81}, 0.3)`);
       }
       if (preferences.valueNegativeColor) {
         document.documentElement.style.setProperty('--numeric-negative-light', preferences.valueNegativeColorLight || 'rgba(181, 18, 0, 0.1)');
         document.documentElement.style.setProperty('--numeric-negative-medium', preferences.valueNegativeColor);
-        document.documentElement.style.setProperty('--numeric-negative-dark', preferences.valueNegativeColorDark || '#850000');
         document.documentElement.style.setProperty('--numeric-negative-border', `rgba(${hexToRgb(preferences.valueNegativeColor)?.r || 181}, ${hexToRgb(preferences.valueNegativeColor)?.g || 18}, ${hexToRgb(preferences.valueNegativeColor)?.b || 0}, 0.3)`);
       }
       if (preferences.valueNeutralColor) {
         document.documentElement.style.setProperty('--numeric-zero-light', preferences.valueNeutralColorLight || 'rgba(96, 96, 96, 0.1)');
         document.documentElement.style.setProperty('--numeric-zero-medium', preferences.valueNeutralColor);
-        document.documentElement.style.setProperty('--numeric-zero-dark', preferences.valueNeutralColorDark || '#6c757d');
         document.documentElement.style.setProperty('--numeric-zero-border', `rgba(${hexToRgb(preferences.valueNeutralColor)?.r || 96}, ${hexToRgb(preferences.valueNeutralColor)?.g || 96}, ${hexToRgb(preferences.valueNeutralColor)?.b || 96}, 0.3)`);
       }
       
-      // עדכון צבעי ערכים מספריים נוספים - Dark/Light variants
-      if (preferences.valuePositiveColorDark) {
-        document.documentElement.style.setProperty('--numeric-positive-dark', preferences.valuePositiveColorDark);
-      }
-      if (preferences.valuePositiveColorLight) {
-        document.documentElement.style.setProperty('--numeric-positive-light', preferences.valuePositiveColorLight);
-      }
+      /* ===== Light Mode Only - No Dark Mode ===== */
+      /* Dark/Light variants removed - only light mode supported */
       
       // עדכון צבעי גרפים
       if (preferences.chartPrimaryColor) {
@@ -1791,63 +1753,16 @@ function updateCSSVariablesFromPreferences(preferences) {
       if (preferences.entityTradeColor) {
         document.documentElement.style.setProperty('--entity-trade-color', preferences.entityTradeColor);
         document.documentElement.style.setProperty('--entity-trade-bg', preferences.entityTradeColorLight || 'rgba(251, 90, 5, 0.1)');
-        document.documentElement.style.setProperty('--entity-trade-text', preferences.entityTradeColorDark || '#752a0b');
+        document.documentElement.style.setProperty('--entity-trade-text', '#752a0b');
         document.documentElement.style.setProperty('--entity-trade-border', `rgba(${hexToRgb(preferences.entityTradeColor)?.r || 251}, ${hexToRgb(preferences.entityTradeColor)?.g || 90}, ${hexToRgb(preferences.entityTradeColor)?.b || 5}, 0.3)`);
       }
       
-      // עדכון צבעי ישויות נוספים - Dark/Light variants
-      if (preferences.entityAccountColorDark) {
-        document.documentElement.style.setProperty('--entity-account-dark', preferences.entityAccountColorDark);
-      }
-      if (preferences.entityAccountColorLight) {
-        document.documentElement.style.setProperty('--entity-account-light', preferences.entityAccountColorLight);
-      }
-      if (preferences.entityAlertColorDark) {
-        document.documentElement.style.setProperty('--entity-alert-dark', preferences.entityAlertColorDark);
-      }
-      if (preferences.entityAlertColorLight) {
-        document.documentElement.style.setProperty('--entity-alert-light', preferences.entityAlertColorLight);
-      }
-      if (preferences.entityCashFlowColorDark) {
-        document.documentElement.style.setProperty('--entity-cash-flow-dark', preferences.entityCashFlowColorDark);
-      }
-      if (preferences.entityCashFlowColorLight) {
-        document.documentElement.style.setProperty('--entity-cash-flow-light', preferences.entityCashFlowColorLight);
-      }
-      if (preferences.entityExecutionColorDark) {
-        document.documentElement.style.setProperty('--entity-execution-dark', preferences.entityExecutionColorDark);
-      }
-      if (preferences.entityExecutionColorLight) {
-        document.documentElement.style.setProperty('--entity-execution-light', preferences.entityExecutionColorLight);
-      }
-      if (preferences.entityNoteColorDark) {
-        document.documentElement.style.setProperty('--entity-note-dark', preferences.entityNoteColorDark);
-      }
-      if (preferences.entityNoteColorLight) {
-        document.documentElement.style.setProperty('--entity-note-light', preferences.entityNoteColorLight);
-      }
-      if (preferences.entityTickerColorDark) {
-        document.documentElement.style.setProperty('--entity-ticker-dark', preferences.entityTickerColorDark);
-      }
-      if (preferences.entityTickerColorLight) {
-        document.documentElement.style.setProperty('--entity-ticker-light', preferences.entityTickerColorLight);
-      }
-      if (preferences.entityTradeColorDark) {
-        document.documentElement.style.setProperty('--entity-trade-dark', preferences.entityTradeColorDark);
-      }
-      if (preferences.entityTradeColorLight) {
-        document.documentElement.style.setProperty('--entity-trade-light', preferences.entityTradeColorLight);
-      }
-      if (preferences.entityTradePlanColorDark) {
-        document.documentElement.style.setProperty('--entity-trade-plan-dark', preferences.entityTradePlanColorDark);
-      }
-      if (preferences.entityTradePlanColorLight) {
-        document.documentElement.style.setProperty('--entity-trade-plan-light', preferences.entityTradePlanColorLight);
-      }
+      /* ===== Light Mode Only - No Dark Mode ===== */
+      /* Entity Dark/Light variants removed - only light mode supported */
     if (preferences.entityTradePlanColor) {
       document.documentElement.style.setProperty('--entity-trade-plan-color', preferences.entityTradePlanColor);
       document.documentElement.style.setProperty('--entity-trade-plan-bg', preferences.entityTradePlanColorLight || 'rgba(255, 169, 0, 0.1)');
-      document.documentElement.style.setProperty('--entity-trade-plan-text', preferences.entityTradePlanColorDark || '#b35d00');
+        document.documentElement.style.setProperty('--entity-trade-plan-text', '#b35d00');
       document.documentElement.style.setProperty('--entity-trade-plan-border', `rgba(${hexToRgb(preferences.entityTradePlanColor)?.r || 255}, ${hexToRgb(preferences.entityTradePlanColor)?.g || 169}, ${hexToRgb(preferences.entityTradePlanColor)?.b || 0}, 0.3)`);
     }
     if (preferences.entityExecutionColor) {
@@ -1859,7 +1774,7 @@ function updateCSSVariablesFromPreferences(preferences) {
     if (preferences.entityAccountColor) {
       document.documentElement.style.setProperty('--entity-account-color', preferences.entityAccountColor);
       document.documentElement.style.setProperty('--entity-account-bg', preferences.entityAccountColorLight || 'rgba(0, 66, 170, 0.1)');
-      document.documentElement.style.setProperty('--entity-account-text', preferences.entityAccountColorDark || '#032e78');
+      document.documentElement.style.setProperty('--entity-account-text', '#032e78');
       document.documentElement.style.setProperty('--entity-account-border', `rgba(${hexToRgb(preferences.entityAccountColor)?.r || 0}, ${hexToRgb(preferences.entityAccountColor)?.g || 66}, ${hexToRgb(preferences.entityAccountColor)?.b || 170}, 0.3)`);
     }
     if (preferences.entityCashFlowColor) {
@@ -2329,7 +2244,6 @@ window.colorSchemeSystem = {
   getNumericValueBackgroundColor,
   getNumericValueTextColor,
   getNumericValueBorderColor,
-  getNumericValueDarkColor,
   isPositiveValue,
   isNegativeValue,
   isZeroValue,

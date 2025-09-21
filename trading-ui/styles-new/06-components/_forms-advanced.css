@@ -47,6 +47,8 @@ html .form-check-input,
   float: none !important;
   margin-inline-start: 0 !important;
   margin-inline-end: 0 !important;
+  width: auto !important;
+  height: auto !important;
 }
 
 .form-check-label,
@@ -65,6 +67,7 @@ html .form-check-label,
   text-align: right !important;
   direction: rtl !important;
   cursor: pointer;
+  color: var(--apple-text-primary, #000000);
 }
 
 /* ===== רדיו באטונים ===== */
@@ -361,3 +364,6 @@ input[type="color"]:focus {
     width: 100%;
   }
 }
+
+/* ===== Light Mode Only - No Dark Mode ===== */
+/* All form elements use light mode colors by default */

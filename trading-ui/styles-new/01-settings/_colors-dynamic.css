@@ -4,8 +4,12 @@
  * קובץ זה מכיל את צבעי הישויות השונות במערכת
  * הצבעים נטענים דינמית מה-API ומעודכנים בזמן אמת
  * 
+ * ⚠️ NOTE FOR FUTURE DEVELOPER:
+ * Dark mode support was removed in January 2025 - only light mode is currently supported.
+ * Dark mode will be implemented in a future version.
+ * 
  * @version 1.0.0
- * @lastUpdated January 5, 2025
+ * @lastUpdated January 21, 2025
  */
 
 :root {

@@ -21,6 +21,9 @@ The TikTrack Chart System is a comprehensive, modular, and high-performance char
     ├── 📄 performance-adapter.js   # Performance data adapter
     ├── 📄 linter-adapter.js        # Linter data adapter
     └── 📄 trades-adapter.js        # Trades data adapter
+
+📁 trading-ui/scripts/
+└── 📄 chart-management.js      # Chart management page functionality
 ```
 
 ### Integration Points | נקודות אינטגרציה
@@ -29,6 +32,18 @@ The TikTrack Chart System is a comprehensive, modular, and high-performance char
 - **Preferences**: Database-driven user preferences
 - **Notifications**: Global notification system
 - **Header System**: Unified header with development tools menu
+- **Chart Management Page**: Dedicated page at `/chart-management`
+
+### Chart Management Page | עמוד ניהול גרפים
+
+The system includes a dedicated chart management page (`chart-management.html`) accessible via the development tools menu. This page provides:
+
+- **Test Charts**: Create and manage test charts with real data
+- **Mixed Charts**: Combine multiple entities and chart types
+- **Export Functionality**: Export charts in various formats
+- **Detailed Logging**: Comprehensive system status logging
+- **Auto-refresh**: Configurable automatic chart updates
+- **Real-time Data**: Integration with live database data
 
 ## 🚀 Quick Start Guide | מדריך התחלה מהירה
 
@@ -121,6 +136,46 @@ Destroys a chart instance.
 
 #### `ChartSystem.getAllCharts()`
 Returns array of all active chart instances.
+
+### Chart Management Page Functions | פונקציות עמוד ניהול גרפים
+
+#### `createTestChart()`
+Creates a test chart with real trades data.
+
+#### `updateTestChart()`
+Updates the test chart with new data.
+
+#### `destroyTestChart()`
+Destroys the test chart.
+
+#### `createPerformanceChart()`
+Creates a performance chart using trades data.
+
+#### `createAccountChart()`
+Creates an account-based chart using trades data.
+
+#### `createMixedChart()`
+Creates a mixed chart combining multiple entities and chart types.
+
+#### `exportTestChart()`
+Exports the current test chart.
+
+#### `refreshAllCharts()`
+Refreshes all active charts.
+
+#### `copyDetailedLog()`
+Copies comprehensive system status to clipboard. This function collects:
+
+- **System Information**: Browser, URL, resolution, timestamp
+- **Chart System Status**: Available systems, initialization status, chart count
+- **Export System Status**: Available formats, quality levels, export status
+- **Page Elements Status**: Total charts, active charts, memory usage
+- **Test Chart Status**: Chart existence, type, data points
+- **Settings**: Current theme, auto-refresh status, export preferences
+- **Console Logs**: Recent console messages and errors
+
+#### `toggleAutoRefresh()`
+Toggles automatic chart refresh functionality.
 
 ### Data Adapters | מתאמי נתונים
 
@@ -407,7 +462,130 @@ async function exportDashboard() {
 }
 ```
 
-### Example 4: Real-time Updates | דוגמה 4: עדכונים בזמן אמת
+### Example 4: Mixed Chart Creation | דוגמה 4: יצירת גרף מעורב
+
+```javascript
+async function createMixedChart() {
+    try {
+        console.log('🔀 Creating mixed chart with multiple entities and types...');
+        
+        if (!window.ChartSystem || !window.TradesAdapter) {
+            throw new Error('Chart system or trades adapter not available');
+        }
+        
+        // Initialize trades adapter
+        const tradesAdapter = new window.TradesAdapter();
+        const rawData = await tradesAdapter.getData();
+        const stats = tradesAdapter.getSummaryStats(rawData);
+        
+        // Create mixed chart data
+        const mixedData = createMixedChartData(rawData, stats);
+        
+        // Create the chart
+        const chart = await window.ChartSystem.create({
+            id: 'mixedChart',
+            type: 'line',
+            container: '#mixedChartContainer',
+            title: 'גרף מעורב - מספר ישויות וסוגים',
+            data: mixedData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, position: 'top' },
+                    title: { 
+                        display: true, 
+                        text: `גרף מעורב - טריידים, חשבונות וביצועים (סה"כ: ${stats.totalTrades})` 
+                    }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        title: { display: true, text: 'כמות / ערך' } 
+                    },
+                    x: { 
+                        title: { display: true, text: 'קטגוריות' } 
+                    }
+                },
+                interaction: { intersect: false, mode: 'index' }
+            }
+        });
+        
+        console.log('✅ Mixed chart created successfully');
+        return chart;
+        
+    } catch (error) {
+        console.error('❌ Error creating mixed chart:', error);
+        throw error;
+    }
+}
+
+function createMixedChartData(rawData, stats) {
+    if (!rawData.data || !Array.isArray(rawData.data)) {
+        return { labels: [], datasets: [] };
+    }
+    
+    const trades = rawData.data;
+    const colorPalette = window.getChartColorPalette ? window.getChartColorPalette() : [
+        '#1e40af', '#28a745', '#ffc107', '#dc3545', '#17a2b8', '#6c757d', '#6f42c1', '#20c997'
+    ];
+    
+    const labels = [
+        'טריידים פתוחים', 'טריידים סגורים', 'טריידים מבוטלים',
+        'חשבונות פעילים', 'ביצועים חיוביים', 'ביצועים שליליים',
+        'סה"כ עסקאות', 'ממוצע P/L'
+    ];
+    
+    const datasets = [
+        {
+            label: 'טריידים לפי סטטוס',
+            data: [
+                trades.filter(t => t.status === 'open').length,
+                trades.filter(t => t.status === 'closed').length,
+                trades.filter(t => t.status === 'cancelled').length,
+                0, 0, 0, 0, 0
+            ],
+            borderColor: colorPalette[0] || '#1e40af',
+            backgroundColor: window.getChartColorWithOpacity ? 
+                window.getChartColorWithOpacity('primary', 0.2) : 'rgba(30, 64, 175, 0.2)',
+            tension: 0.1,
+            fill: false
+        },
+        {
+            label: 'חשבונות ופעילות',
+            data: [
+                0, 0, 0,
+                new Set(trades.map(t => t.account_id)).size,
+                trades.filter(t => t.pnl && parseFloat(t.pnl) > 0).length,
+                trades.filter(t => t.pnl && parseFloat(t.pnl) < 0).length,
+                0, 0
+            ],
+            borderColor: colorPalette[1] || '#28a745',
+            backgroundColor: window.getChartColorWithOpacity ? 
+                window.getChartColorWithOpacity('success', 0.2) : 'rgba(40, 167, 69, 0.2)',
+            tension: 0.1,
+            fill: false
+        },
+        {
+            label: 'סטטיסטיקות כלליות',
+            data: [
+                0, 0, 0, 0, 0, 0,
+                stats.totalTrades,
+                Math.round(stats.averagePL * 100) / 100
+            ],
+            borderColor: colorPalette[2] || '#ffc107',
+            backgroundColor: window.getChartColorWithOpacity ? 
+                window.getChartColorWithOpacity('warning', 0.2) : 'rgba(255, 193, 7, 0.2)',
+            tension: 0.1,
+            fill: false
+        }
+    ];
+    
+    return { labels: labels, datasets: datasets };
+}
+```
+
+### Example 5: Real-time Updates | דוגמה 5: עדכונים בזמן אמת
 
 ```javascript
 class RealTimeChartManager {
@@ -452,6 +630,23 @@ tradesManager.start();
 ```
 
 ## 🐛 Troubleshooting | פתרון בעיות
+
+### Recent Fixes | תיקונים אחרונים
+
+#### Color System Integration | אינטגרציה של מערכת הצבעים
+- **Issue**: Charts displayed in black/gray colors
+- **Solution**: Fixed integration between `ChartTheme` and `color-scheme-system.js`
+- **Implementation**: Added event-driven color updates and proper CSS variable handling
+
+#### JavaScript Errors | שגיאות JavaScript
+- **Issue**: SyntaxError and ReferenceError in chart management page
+- **Solution**: Fixed async/await usage and proper function exports
+- **Implementation**: Wrapped async calls in IIFE and exported all functions to global scope
+
+#### UI Consistency | עקביות ממשק משתמש
+- **Issue**: Page styling inconsistent with rest of site
+- **Solution**: Updated HTML to use Bootstrap classes and ITCSS architecture
+- **Implementation**: Replaced custom CSS with Bootstrap components and removed custom stylesheets
 
 ### Common Issues | בעיות נפוצות
 
@@ -543,6 +738,6 @@ For technical support and questions about the Chart System, please refer to:
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: January 2025  
+**Version**: 1.1.0  
+**Last Updated**: January 21, 2025  
 **Author**: TikTrack Development Team

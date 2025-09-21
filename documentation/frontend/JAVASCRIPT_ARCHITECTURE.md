@@ -2,9 +2,9 @@
 
 ## 📋 Overview
 
-This document describes the comprehensive JavaScript architecture implemented in TikTrack, featuring a modular system with 40+ organized script files and clear separation of concerns.
+This document describes the comprehensive JavaScript architecture implemented in TikTrack, featuring a modular system with 40+ organized script files, clear separation of concerns, and a complete Chart Management System.
 
-**🔄 Last Updated:** September 20, 2025 - Added Global confirm() Replacement System
+**🔄 Last Updated:** January 21, 2025 - Added Chart Management System
 
 ## 🗂️ Global Functions Index
 
@@ -425,10 +425,27 @@ This document describes the comprehensive JavaScript architecture implemented in
 | `window.getSelectedFileTypes()` | Get selected file types |
 | `window.calculateTotalSize()` | Calculate total size |
 
+#### Chart Management System (`chart-management.js`) - **NEW**
+| Function | Description |
+|----------|-------------|
+| `window.createTestChart()` | Create test chart with real data |
+| `window.updateTestChart()` | Update test chart data |
+| `window.destroyTestChart()` | Destroy test chart |
+| `window.createPerformanceChart()` | Create performance chart |
+| `window.createAccountChart()` | Create account chart |
+| `window.createMixedChart()` | Create mixed entity chart |
+| `window.exportTestChart()` | Export test chart |
+| `window.refreshAllCharts()` | Refresh all charts |
+| `window.copyDetailedLog()` | Copy detailed system log |
+| `window.toggleAutoRefresh()` | Toggle auto refresh |
+| `window.ChartSystem` | Global chart system instance |
+| `window.ChartExportSystem` | Global chart export system |
+| `window.TradesAdapter` | Trades data adapter |
+
 ---
 
-**Total Global Functions: 200+**  
-**Last Updated: September 18, 2025**  
+**Total Global Functions: 220+**  
+**Last Updated: January 21, 2025**  
 **Maintained By: TikTrack Development Team**
 
 ## 🚨 **עדכון דחוף - 4 בספטמבר 2025**
@@ -482,6 +499,14 @@ trading-ui/scripts/
     ├── constraint-manager.js      # Constraint manager
     ├── condition-translator.js    # Condition translator
     └── button-icons.js            # Button icon system
+    │
+└── 📊 Chart System Files
+    ├── chart-management.js        # Chart management page
+    ├── chart-system.js            # Core chart system
+    ├── chart-theme.js             # Dynamic color theming
+    ├── chart-export.js            # Chart export functionality
+    ├── trades-adapter.js          # Real data adapter
+    └── chart-loader.js            # Chart loading utilities
 ```
 
 ## 📥 File Loading Order
@@ -911,16 +936,22 @@ Optimized loading order and efficient function organization.
 |-------------|-----------|-------------|
 | **Core Files** | 3 | System foundation |
 | **Utility Files** | 11 | Shared functionality |
-| **Page Files** | 15 | Page-specific logic |
+| **Page Files** | 16 | Page-specific logic |
 | **System Files** | 4 | Advanced systems |
-| **Total** | **33** | Complete system |
+| **Chart System** | 6 | Chart management system |
+| **Total** | **40** | Complete system |
 
-### 📈 Recent Updates (September 19, 2025)
-- **Added:** `project-files-scanner.js` - Global project files scanner
-- **Enhanced:** `linter-realtime-monitor.js` - Comprehensive file scanning (400+ files)
-- **Improved:** Error handling system with 20+ catch blocks
-- **Updated:** File discovery mechanism with caching
-- **Removed:** All dummy data and simulation functions
+### 📈 Recent Updates (January 21, 2025)
+- **Added:** Chart Management System - Complete implementation with 6 new files
+- **Added:** `chart-management.js` - Chart management page functionality
+- **Added:** `chart-system.js` - Core chart system with Chart.js integration
+- **Added:** `chart-theme.js` - Dynamic color theming system
+- **Added:** `chart-export.js` - Chart export functionality
+- **Added:** `trades-adapter.js` - Real data adapter for charts
+- **Enhanced:** Color system integration with user preferences
+- **Updated:** Preferences system with chart-specific settings
+- **Previous:** `project-files-scanner.js` - Global project files scanner
+- **Previous:** `linter-realtime-monitor.js` - Comprehensive file scanning (400+ files)
 
 ## 🔄 Maintenance Guidelines
 
@@ -1031,6 +1062,7 @@ const handled = await window.handleApiResponseWithRefresh(response, {
 
 ## 📚 Related Documentation
 
+- [Chart Management System](CHART_SYSTEM_COMPLETE_GUIDE.md) - **NEW**
 - [Filter System](FILTER_SYSTEM.md)
 - [Number Formatting](NUMBER_FORMATTING.md)
 - [CSS Architecture](../css/CSS_ARCHITECTURE.md)
@@ -1039,6 +1071,6 @@ const handled = await window.handleApiResponseWithRefresh(response, {
 
 ---
 
-**Last Updated**: September 4, 2025  
-**Version**: 2.9.0  
+**Last Updated**: January 21, 2025  
+**Version**: 3.0.0  
 **Maintained By**: TikTrack Development Team

@@ -317,6 +317,88 @@ document.addEventListener('DOMContentLoaded', function() {
     
 });
 
+// ===== פונקציות חסרות מ-onclick attributes =====
+
+/**
+ * הצג/הסתר כל הסקשנים (כולל הסקשן העליון)
+ * Toggle all sections visibility including top section
+ */
+function toggleAllSections() {
+    const sections = document.querySelectorAll('.content-section, .top-section');
+    const toggleIcon = document.querySelector('.top-section .section-toggle-icon');
+
+    if (!sections.length) return;
+
+    // בדיקה אם כל הסקשנים סגורים
+    const allCollapsed = Array.from(sections).every(section => {
+        const sectionBody = section.querySelector('.section-body');
+        return sectionBody && (sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none');
+    });
+
+    // החלטה אם לפתוח או לסגור הכל
+    const shouldOpen = allCollapsed;
+
+    sections.forEach(section => {
+        const sectionBody = section.querySelector('.section-body');
+        if (!sectionBody) return;
+
+        if (shouldOpen) {
+            // פתיחה
+            sectionBody.classList.remove('collapsed');
+            sectionBody.style.display = 'block';
+        } else {
+            // סגירה
+            sectionBody.classList.add('collapsed');
+            sectionBody.style.display = 'none';
+        }
+    });
+
+    // עדכון אייקון
+    if (toggleIcon) {
+        toggleIcon.textContent = shouldOpen ? '▼' : '◀';
+    }
+
+    console.log(`📋 כל הסקשנים ${shouldOpen ? 'נפתחו' : 'נסגרו'}`);
+}
+
+/**
+ * ניקוי מטמון פיתוח
+ * Clear development cache
+ */
+function clearDevelopmentCache(event) {
+    if (event) {
+        event.preventDefault();
+    }
+    
+    console.log('🧹 ניקוי מטמון פיתוח...');
+    
+    // ניקוי localStorage
+    try {
+        localStorage.clear();
+        console.log('✅ localStorage נוקה');
+    } catch (e) {
+        console.error('❌ שגיאה בניקוי localStorage:', e);
+    }
+    
+    // ניקוי sessionStorage
+    try {
+        sessionStorage.clear();
+        console.log('✅ sessionStorage נוקה');
+    } catch (e) {
+        console.error('❌ שגיאה בניקוי sessionStorage:', e);
+    }
+    
+    // התראה למשתמש
+    if (typeof showNotification === 'function') {
+        showNotification('מטמון פיתוח נוקה בהצלחה', 'success');
+    }
+    
+    // רענון הדף
+    setTimeout(() => {
+        window.location.reload();
+    }, 1000);
+}
+
 // Export functions to global scope
 window.switchTableTab = switchTableTab;
 window.updateChartPeriod = updateChartPeriod;
@@ -326,3 +408,7 @@ window.refreshOverview = refreshOverview;
 window.exportOverview = exportOverview;
 window.exportChart = exportChart;
 window.quickAction = quickAction;
+window.toggleAllSections = toggleAllSections;
+window.clearDevelopmentCache = clearDevelopmentCache;
+
+console.log('✅ פונקציות חסרות נוספו לגלובל scope');

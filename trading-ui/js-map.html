@@ -73,7 +73,10 @@
                 <div class="section-header">
                     <h2>🗺️ מפת JavaScript</h2>
                     <div class="header-actions">
-                        <button class="action-btn copy-log-btn" onclick="copyDetailedLog()" title="העתק לוג מפורט של כל הממשקים">
+                        <button class="action-btn refresh-btn" onclick="refreshJsMapData()" title="רענן נתונים מהשרת">
+                            <i class="fas fa-sync-alt"></i> רענן נתונים
+                        </button>
+                        <button class="action-btn copy-log-btn" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט של JS-Map">
                             <i class="fas fa-copy"></i> העתק לוג מפורט
                         </button>
                         <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר סקשן">
@@ -250,6 +253,204 @@
                 </div>
             </div>
             <!-- UI Content Section 4 End -->
+
+            <!-- ======================================== -->
+            <!-- סקשנים לפיתוח עתידי - ממשק דמה -->
+            <!-- ======================================== -->
+            
+            <!-- UI Content Section 5 - ניתוח פונקציות כפולות ודומות (דמה) -->
+            <div class="content-section development-section" id="section5">
+                <div class="section-header">
+                    <h2>🔍 ניתוח פונקציות כפולות ודומות <span class="development-badge">פיתוח עתידי</span></h2>
+                    <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
+                        <span class="section-toggle-icon">▼</span>
+                    </button>
+                </div>
+                <div class="section-body">
+                    <div class="development-content">
+                        <div class="development-info">
+                            <h3>📋 מידע על הפונקציונליות העתידית</h3>
+                            <p>סקשן זה יכלול ניתוח מתקדם של פונקציות כפולות ודומות במערכת, עם המלצות לתיקון ואופטימיזציה.</p>
+                            <div class="development-features">
+                                <h4>🎯 תכונות מתוכננות:</h4>
+                                <ul>
+                                    <li>זיהוי פונקציות כפולות עם דירוג דמיון</li>
+                                    <li>המלצות לתיקון ואיחוד פונקציות</li>
+                                    <li>ניתוח שימוש בפונקציות דומות</li>
+                                    <li>דוחות מפורטים להעתקה</li>
+                                </ul>
+                            </div>
+                            <div class="development-docs">
+                                <a href="documentation/frontend/JS_MAP_SYSTEM_SPECIFICATION.md" target="_blank" class="docs-link">
+                                    📖 קרא את הדוקומנטציה המלאה
+                                </a>
+                            </div>
+                        </div>
+                        <div class="development-preview">
+                            <h4>🔮 תצוגה מקדימה:</h4>
+                            <div class="mock-content">
+                                <div class="mock-duplicate-analysis">
+                                    <h5>ניתוח כפילויות (דמה)</h5>
+                                    <div class="mock-item">
+                                        <span class="mock-function">createModal()</span>
+                                        <span class="mock-similarity">דמיון: 95%</span>
+                                        <span class="mock-files">main.js, ui-utils.js</span>
+                                    </div>
+                                    <div class="mock-item">
+                                        <span class="mock-function">formatDate()</span>
+                                        <span class="mock-similarity">דמיון: 87%</span>
+                                        <span class="mock-files">utils.js, date-helpers.js</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- UI Content Section 5 End -->
+
+            <!-- UI Content Section 6 - זיהוי פונקציות מקומיות (דמה) -->
+            <div class="content-section development-section" id="section6">
+                <div class="section-header">
+                    <h2>🏠 זיהוי פונקציות מקומיות <span class="development-badge">פיתוח עתידי</span></h2>
+                    <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
+                        <span class="section-toggle-icon">▼</span>
+                    </button>
+                </div>
+                <div class="section-body">
+                    <div class="development-content">
+                        <div class="development-info">
+                            <h3>📋 מידע על הפונקציונליות העתידית</h3>
+                            <p>סקשן זה יזהוי פונקציות מקומיות בעמודים ויציע להעביר אותן למערכת הגלובלית.</p>
+                            <div class="development-features">
+                                <h4>🎯 תכונות מתוכננות:</h4>
+                                <ul>
+                                    <li>סריקת פונקציות מקומיות בעמודים</li>
+                                    <li>השוואה עם פונקציות גלובליות קיימות</li>
+                                    <li>המלצות להעברה למערכת הגלובלית</li>
+                                    <li>ניתוח השפעה על ביצועים</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="development-preview">
+                            <h4>🔮 תצוגה מקדימה:</h4>
+                            <div class="mock-content">
+                                <div class="mock-local-analysis">
+                                    <h5>פונקציות מקומיות (דמה)</h5>
+                                    <div class="mock-item">
+                                        <span class="mock-page">accounts.html</span>
+                                        <span class="mock-function">validateAccount()</span>
+                                        <span class="mock-status">מומלץ להעביר</span>
+                                    </div>
+                                    <div class="mock-item">
+                                        <span class="mock-page">trades.html</span>
+                                        <span class="mock-function">calculateProfit()</span>
+                                        <span class="mock-status">קיים גלובלית</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- UI Content Section 6 End -->
+
+            <!-- UI Content Section 7 - ניהול אחסון נתונים (דמה) -->
+            <div class="content-section development-section" id="section7">
+                <div class="section-header">
+                    <h2>💾 ניהול אחסון נתונים <span class="development-badge">פיתוח עתידי</span></h2>
+                    <button class="filter-toggle-btn" onclick="toggleSection('section7')" title="הצג/הסתר סקשן">
+                        <span class="section-toggle-icon">▼</span>
+                    </button>
+                </div>
+                <div class="section-body">
+                    <div class="development-content">
+                        <div class="development-info">
+                            <h3>📋 מידע על הפונקציונליות העתידית</h3>
+                            <p>סקשן זה ינהל את שמירת הנתונים ב-IndexedDB, היסטוריית ניתוחים וגיבויים.</p>
+                            <div class="development-features">
+                                <h4>🎯 תכונות מתוכננות:</h4>
+                                <ul>
+                                    <li>שמירה קבועה של נתוני ניתוח ב-IndexedDB</li>
+                                    <li>היסטוריית ניתוחים קודמים</li>
+                                    <li>ניהול גיבויים ושחזור</li>
+                                    <li>ניקוי אוטומטי של נתונים ישנים</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="development-preview">
+                            <h4>🔮 תצוגה מקדימה:</h4>
+                            <div class="mock-content">
+                                <div class="mock-storage-stats">
+                                    <h5>סטטיסטיקות אחסון (דמה)</h5>
+                                    <div class="mock-stat">
+                                        <span class="mock-label">גודל כולל:</span>
+                                        <span class="mock-value">2.4 MB</span>
+                                    </div>
+                                    <div class="mock-stat">
+                                        <span class="mock-label">ניתוחים שמורים:</span>
+                                        <span class="mock-value">15</span>
+                                    </div>
+                                    <div class="mock-stat">
+                                        <span class="mock-label">גיבויים:</span>
+                                        <span class="mock-value">3</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- UI Content Section 7 End -->
+
+            <!-- UI Content Section 8 - בדיקת ארכיטקטורה (דמה) -->
+            <div class="content-section development-section" id="section8">
+                <div class="section-header">
+                    <h2>🏗️ בדיקת ארכיטקטורה <span class="development-badge">פיתוח עתידי</span></h2>
+                    <button class="filter-toggle-btn" onclick="toggleSection('section8')" title="הצג/הסתר סקשן">
+                        <span class="section-toggle-icon">▼</span>
+                    </button>
+                </div>
+                <div class="section-body">
+                    <div class="development-content">
+                        <div class="development-info">
+                            <h3>📋 מידע על הפונקציונליות העתידית</h3>
+                            <p>סקשן זה יבדוק שהארכיטקטורה של המערכת עומדת בכללים הנדרשים.</p>
+                            <div class="development-features">
+                                <h4>🎯 תכונות מתוכננות:</h4>
+                                <ul>
+                                    <li>זיהוי פונקציות בתוך קבצי HTML</li>
+                                    <li>בדיקת הפרדה בין CSS, JS ו-HTML</li>
+                                    <li>ניתוח מבנה הקבצים והתיקיות</li>
+                                    <li>המלצות לשיפור ארכיטקטורה</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="development-preview">
+                            <h4>🔮 תצוגה מקדימה:</h4>
+                            <div class="mock-content">
+                                <div class="mock-architecture-check">
+                                    <h5>בדיקת ארכיטקטורה (דמה)</h5>
+                                    <div class="mock-check">
+                                        <span class="mock-rule">אין פונקציות ב-HTML</span>
+                                        <span class="mock-status pass">✅ עובר</span>
+                                    </div>
+                                    <div class="mock-check">
+                                        <span class="mock-rule">CSS חיצוני בלבד</span>
+                                        <span class="mock-status pass">✅ עובר</span>
+                                    </div>
+                                    <div class="mock-check">
+                                        <span class="mock-rule">מבנה תיקיות תקין</span>
+                                        <span class="mock-status warning">⚠️ אזהרה</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- UI Content Section 8 End -->
+
         </div>
     </div>
 
@@ -296,7 +497,11 @@
     <script src="scripts/data-utils.js"></script>
     <script src="scripts/linked-items.js"></script>
 
-    <!-- Page Scripts -->
+    <!-- Page Scripts - JS Map System (Split into modules) -->
+    <script src="scripts/js-map-core.js"></script>
+    <script src="scripts/js-map-ui.js"></script>
+    <script src="scripts/js-map-analysis.js"></script>
+    <script src="scripts/js-map-utils.js"></script>
     <script src="scripts/js-map.js"></script>
         </div>
     </div>

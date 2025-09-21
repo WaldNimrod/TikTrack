@@ -219,29 +219,31 @@
 
 /* כפתור פילטר */
 .filter-toggle-btn {
-  background: var(--secondary-color, #6c757d);
-  border: 1px solid var(--border-color, #e9ecef);
-  border-radius: 6px;
-  padding: 0.5rem;
-  color: white;
+  background: white;
+  border: 1px solid var(--secondary-color, #6c757d);
+  border-radius: 50%;
+  padding: 0;
+  color: var(--secondary-color, #6c757d);
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  align-self: center; /* מיושר לאמצע בגובה */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* מסגרת דקה נוספת */
-  margin-inline-start: 0.5rem; /* הפרדה מהכפתורים שלפני */
-  order: 3; /* אחרון בשורה */
+  width: 32px;
+  height: 32px;
+  align-self: center;
+  margin-inline-start: 0.5rem;
+  order: 3;
+  position: relative;
+  top: 0;
+  box-shadow: none;
 }
 
 .filter-toggle-btn:hover {
-  background: var(--primary-color, #007bff);
-  border-color: var(--primary-color, #007bff);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  background: white;
+  border-color: var(--secondary-color, #6c757d);
+  transform: none;
+  box-shadow: none;
 }
 
 /* איקון פעולה */
@@ -264,26 +266,24 @@
 /* Section Toggle Icon */
 .section-toggle-icon {
   transition: transform 0.3s ease;
-  font-size: 0.9rem; /* טיפה יותר גדול */
+  font-size: 0.8rem;
   color: var(--secondary-color, #6c757d);
   font-weight: bold;
-  border: 1px solid var(--secondary-color, #6c757d);
-  border-radius: 50%; /* עגול במקום מרובע */
-  padding: 4px 6px; /* יותר גדול */
-  width: 24px; /* רוחב קבוע */
-  height: 24px; /* גובה קבוע */
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  width: auto;
+  height: auto;
+  display: inline-block;
+  line-height: 1;
 }
 
 .filter-toggle-btn:hover .section-toggle-icon {
   color: var(--secondary-color, #6c757d);
-  border-color: var(--secondary-color, #6c757d);
 }
 
 .filter-toggle-btn.collapsed .section-toggle-icon {
-  transform: rotate(-90deg);
+  transform: rotate(180deg);
 }
 
 /* ===== תיקוני כפתורים ===== */

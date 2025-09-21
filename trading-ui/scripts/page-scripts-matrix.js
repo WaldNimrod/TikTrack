@@ -1415,6 +1415,30 @@ class PageScriptsMatrixSystem {
         }
     }
 
+    toggleSection(sectionId) {
+        console.log(`📂 Toggling section: ${sectionId}`);
+        
+        const section = document.getElementById(sectionId);
+        if (!section) {
+            console.warn(`Section ${sectionId} not found`);
+            return;
+        }
+        
+        const isExpanded = section.classList.contains('expanded');
+        
+        if (isExpanded) {
+            section.classList.remove('expanded');
+            if (window.showNotification) {
+                window.showNotification(`סקשן ${sectionId} הוסתר`, 'info');
+            }
+        } else {
+            section.classList.add('expanded');
+            if (window.showNotification) {
+                window.showNotification(`סקשן ${sectionId} נפתח`, 'info');
+            }
+        }
+    }
+
     async copyDetailedLog() {
         console.log('📋 Copying detailed log...');
         if (window.showNotification) {
@@ -2751,6 +2775,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.backupData = () => window.pageScriptsMatrix.backupData();
     window.cleanupOldData = () => window.pageScriptsMatrix.cleanupOldData();
     window.toggleAllSections = () => window.pageScriptsMatrix.toggleAllSections();
+    window.toggleSection = (sectionId) => window.pageScriptsMatrix.toggleSection(sectionId);
     window.copyDetailedLog = () => window.pageScriptsMatrix.copyDetailedLog();
     
     console.log('✅ Page Scripts Matrix system ready');
@@ -2811,3 +2836,97 @@ setTimeout(() => {
             });
     }
 }, 5000);
+
+/**
+ * Generate detailed log for Page Scripts Matrix
+ */
+function generateDetailedLog() {
+    const timestamp = new Date().toLocaleString('he-IL');
+    const log = [];
+
+    log.push('=== לוג מפורט - מטריצת סקריפטים ועמודים ===');
+    log.push(`זמן יצירה: ${timestamp}`);
+    log.push(`עמוד: ${window.location.href}`);
+    log.push('');
+
+    // סטטוס כללי
+    log.push('--- סטטוס כללי ---');
+    const topSection = document.querySelector('.top-section .section-body');
+    const isTopOpen = topSection && topSection.style.display !== 'none';
+    log.push(`סקשן עליון: ${isTopOpen ? 'פתוח' : 'סגור'}`);
+    
+    // תצוגה מפורטת לפי סקשנים
+    log.push('--- תצוגה מפורטת לפי סקשנים ---');
+    
+    // סקשן עליון - סטטיסטיקות
+    const totalPages = document.getElementById('totalPages')?.textContent || 'לא זמין';
+    const totalScripts = document.getElementById('totalScripts')?.textContent || 'לא זמין';
+    const lastUpdate = document.getElementById('lastUpdate')?.textContent || 'לא זמין';
+    
+    log.push(`סקשן עליון - עמודים במערכת: ${totalPages}`);
+    log.push(`סקשן עליון - קבצי JavaScript: ${totalScripts}`);
+    log.push(`סקשן עליון - עדכון אחרון: ${lastUpdate}`);
+
+    // טבלאות ונתונים
+    log.push('--- טבלאות ונתונים ---');
+    const pageRows = document.querySelectorAll('.page-row');
+    pageRows.forEach((row, index) => {
+        const pageName = row.querySelector('.page-name')?.textContent || 'לא זמין';
+        const jsFiles = row.querySelector('.js-files')?.textContent || 'לא זמין';
+        const status = row.querySelector('.status-badge')?.textContent || 'לא זמין';
+        log.push(`עמוד ${index + 1}: ${pageName} | קבצי JS: ${jsFiles} | סטטוס: ${status}`);
+    });
+
+    // סטטיסטיקות וביצועים
+    log.push('--- סטטיסטיקות וביצועים ---');
+    log.push(`זמן טעינת עמוד: ${Date.now() - performance.timing.navigationStart}ms`);
+    if (window.performance && window.performance.memory) {
+        const memory = window.performance.memory;
+        log.push(`זיכרון בשימוש: ${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB`);
+    }
+
+    // לוגים ושגיאות
+    log.push('--- לוגים ושגיאות ---');
+    if (window.consoleLogs && window.consoleLogs.length > 0) {
+        const recentLogs = window.consoleLogs.slice(-10);
+        recentLogs.forEach(entry => {
+            log.push(`[${entry.timestamp}] ${entry.level}: ${entry.message}`);
+        });
+    } else {
+        log.push('אין לוגים זמינים');
+    }
+
+    // מידע טכני
+    log.push('--- מידע טכני ---');
+    log.push(`User Agent: ${navigator.userAgent}`);
+    log.push(`Language: ${navigator.language}`);
+    log.push(`Platform: ${navigator.platform}`);
+
+    log.push('=== סוף הלוג ===');
+    return log.join('\n');
+}
+
+/**
+ * Copy detailed log to clipboard
+ */
+async function copyDetailedLog() {
+    try {
+        const log = generateDetailedLog();
+        await navigator.clipboard.writeText(log);
+        window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
+        console.log('=== לוג מפורט שהועתק ===');
+        console.log(log);
+        console.log('=== סוף הלוג ===');
+    } catch (error) {
+        console.error('Failed to copy log:', error);
+        window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
+        // Fallback: show in console
+        const log = generateDetailedLog();
+        console.log('=== לוג מפורט (לא הועתק) ===');
+        console.log(log);
+        console.log('=== סוף הלוג ===');
+    }
+}
+
+// ייצוא לגלובל scope
+window.copyDetailedLog = copyDetailedLog;

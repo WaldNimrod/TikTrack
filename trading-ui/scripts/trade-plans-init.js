@@ -16,3 +16,4 @@ document.addEventListener("DOMContentLoaded", () => {
         window.filterSystem.initialize();
     }
 });
+

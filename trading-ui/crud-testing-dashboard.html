@@ -236,12 +236,17 @@
                 <div class="top-section">
                     <div class="section-header">
                         <h1>🧪 דשבורד בדיקות CRUD</h1>
-                        <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
-                        <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                                <i class="fas fa-copy"></i> העתק לוג מפורט
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר כל הסקשנים">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
                         <p><strong>נוצר:</strong> 06/09/2025 04:05</p>

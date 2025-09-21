@@ -53,3 +53,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
     console.log('✅ מודולים הוגדרו לסגירה בלחיצה על הרקע');
 });
+

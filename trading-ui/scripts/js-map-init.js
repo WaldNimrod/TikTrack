@@ -19,3 +19,4 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('❌ Failed to initialize JS-Map system:', error);
     });
 });
+

@@ -317,3 +317,71 @@ button[onclick*="clear"] {
   justify-content: center;
   gap: 0.25rem;
 }
+
+/* ===== BUTTON ICONS ===== */
+/* סגנונות איקונים לכפתורים */
+.btn i,
+button i {
+  font-size: 0.9rem;
+  margin-left: 0.25rem;
+}
+
+/* FontAwesome Icons */
+.fas {
+  font-family: "Font Awesome 5 Free";
+  font-weight: 900;
+  font-style: normal;
+}
+
+.fa-stop:before {
+  content: "\f04d";
+}
+
+.fa-play:before {
+  content: "\f04b";
+}
+
+.fa-pause:before {
+  content: "\f04c";
+}
+
+.fa-clock:before {
+  content: "\f017";
+}
+
+.fa-search-plus:before {
+  content: "\f00e";
+}
+
+.fa-sync:before {
+  content: "\f021";
+}
+
+.fa-trash:before {
+  content: "\f1f8";
+}
+
+.fa-download:before {
+  content: "\f019";
+}
+
+.fa-chart-line:before {
+  content: "\f201";
+}
+
+.fa-chart-bar:before {
+  content: "\f080";
+}
+
+.fa-spinner:before {
+  content: "\f110";
+}
+
+.fa-spin {
+  animation: fa-spin 2s infinite linear;
+}
+
+@keyframes fa-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

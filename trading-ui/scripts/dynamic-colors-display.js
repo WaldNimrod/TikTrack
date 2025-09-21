@@ -640,6 +640,34 @@ function toggleTopSection() {
 }
 
 /**
+ * Toggle all sections visibility
+ */
+function toggleAllSections() {
+    const sections = document.querySelectorAll('.section-content');
+    const toggleBtn = document.querySelector('.filter-toggle-btn');
+    
+    if (!sections.length || !toggleBtn) return;
+    
+    const isCollapsed = sections[0].style.display === 'none' || 
+                       sections[0].classList.contains('collapsed');
+    
+    sections.forEach(section => {
+        if (isCollapsed) {
+            section.style.display = 'block';
+            section.classList.remove('collapsed');
+        } else {
+            section.style.display = 'none';
+            section.classList.add('collapsed');
+        }
+    });
+    
+    // Update button text
+    toggleBtn.innerHTML = isCollapsed ? 
+        '<i class="section-toggle-icon">▼</i>' : 
+        '<i class="section-toggle-icon">▶</i>';
+}
+
+/**
  * Toggle specific section visibility
  */
 function toggleSection(sectionId) {
@@ -664,4 +692,122 @@ function toggleSection(sectionId) {
     }
 }
 
+/**
+ * Generate detailed log for Dynamic Colors Display
+ */
+function generateDetailedLog() {
+    const timestamp = new Date().toLocaleString('he-IL');
+    const log = [];
 
+    log.push('=== לוג מפורט - מערכת הצבעים הדינמית ===');
+    log.push(`זמן יצירה: ${timestamp}`);
+    log.push(`עמוד: ${window.location.href}`);
+    log.push('');
+
+    // סטטוס כללי
+    log.push('--- סטטוס כללי ---');
+    const topSection = document.querySelector('.top-section .section-body');
+    const isTopOpen = topSection && topSection.style.display !== 'none';
+    log.push(`סקשן עליון: ${isTopOpen ? 'פתוח' : 'סגור'}`);
+    
+    // תצוגה מפורטת לפי סקשנים
+    log.push('--- תצוגה מפורטת לפי סקשנים ---');
+    
+    // סקשן 1 - ערכים מספריים
+    const section1 = document.getElementById('section1-content');
+    if (section1) {
+        const isSection1Open = section1.style.display !== 'none';
+        log.push(`סקשן ערכים מספריים: ${isSection1Open ? 'פתוח' : 'סגור'}`);
+        
+        const numericItems = section1.querySelectorAll('.color-item');
+        numericItems.forEach((item, index) => {
+            const label = item.querySelector('.color-label')?.textContent || 'לא זמין';
+            const value = item.querySelector('.color-value')?.textContent || 'לא זמין';
+            log.push(`  פריט ${index + 1}: ${label} = "${value}"`);
+        });
+    }
+
+    // סקשן 2 - ישויות מערכת
+    const section2 = document.getElementById('section2-content');
+    if (section2) {
+        const isSection2Open = section2.style.display !== 'none';
+        log.push(`סקשן ישויות מערכת: ${isSection2Open ? 'פתוח' : 'סגור'}`);
+        
+        const entityItems = section2.querySelectorAll('.color-item');
+        entityItems.forEach((item, index) => {
+            const label = item.querySelector('.color-label')?.textContent || 'לא זמין';
+            const value = item.querySelector('.color-value')?.textContent || 'לא זמין';
+            log.push(`  פריט ${index + 1}: ${label} = "${value}"`);
+        });
+    }
+
+    // סקשן 3 - סטטוסים ומודלים
+    const section3 = document.getElementById('section3-content');
+    if (section3) {
+        const isSection3Open = section3.style.display !== 'none';
+        log.push(`סקשן סטטוסים ומודלים: ${isSection3Open ? 'פתוח' : 'סגור'}`);
+        
+        const statusItems = section3.querySelectorAll('.color-item');
+        statusItems.forEach((item, index) => {
+            const label = item.querySelector('.color-label')?.textContent || 'לא זמין';
+            const value = item.querySelector('.color-value')?.textContent || 'לא זמין';
+            log.push(`  פריט ${index + 1}: ${label} = "${value}"`);
+        });
+    }
+
+    // סטטיסטיקות וביצועים
+    log.push('--- סטטיסטיקות וביצועים ---');
+    log.push(`זמן טעינת עמוד: ${Date.now() - performance.timing.navigationStart}ms`);
+    if (window.performance && window.performance.memory) {
+        const memory = window.performance.memory;
+        log.push(`זיכרון בשימוש: ${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB`);
+    }
+
+    // לוגים ושגיאות
+    log.push('--- לוגים ושגיאות ---');
+    if (window.consoleLogs && window.consoleLogs.length > 0) {
+        const recentLogs = window.consoleLogs.slice(-10);
+        recentLogs.forEach(entry => {
+            log.push(`[${entry.timestamp}] ${entry.level}: ${entry.message}`);
+        });
+    } else {
+        log.push('אין לוגים זמינים');
+    }
+
+    // מידע טכני
+    log.push('--- מידע טכני ---');
+    log.push(`User Agent: ${navigator.userAgent}`);
+    log.push(`Language: ${navigator.language}`);
+    log.push(`Platform: ${navigator.platform}`);
+
+    log.push('=== סוף הלוג ===');
+    return log.join('\n');
+}
+
+/**
+ * Copy detailed log to clipboard
+ */
+async function copyDetailedLog() {
+    try {
+        const log = generateDetailedLog();
+        await navigator.clipboard.writeText(log);
+        window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
+        console.log('=== לוג מפורט שהועתק ===');
+        console.log(log);
+        console.log('=== סוף הלוג ===');
+    } catch (error) {
+        console.error('Failed to copy log:', error);
+        window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
+        // Fallback: show in console
+        const log = generateDetailedLog();
+        console.log('=== לוג מפורט (לא הועתק) ===');
+        console.log(log);
+        console.log('=== סוף הלוג ===');
+    }
+}
+
+// ===== GLOBAL FUNCTION EXPORTS =====
+
+window.toggleAllSections = toggleAllSections;
+window.toggleSection = toggleSection;
+window.copyDetailedLog = copyDetailedLog;

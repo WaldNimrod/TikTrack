@@ -134,6 +134,12 @@ def linter_realtime_monitor() -> Any:
     """Linter realtime monitor page"""
     return send_from_directory(UI_DIR, "linter-realtime-monitor.html")
 
+@pages_bp.route('/chart-management')
+def chart_management() -> Any:
+    """Chart management page"""
+    return send_from_directory(UI_DIR, "chart-management.html")
+
+
 
 # Old external data test routes removed - now using /system-test-center
 

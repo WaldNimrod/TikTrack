@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת JS-Map</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { border: 1px solid #ccc; margin: 10px 0; padding: 10px; }
+        .loading { color: #666; }
+        .content { color: #000; }
+    </style>
+</head>
+<body>
+    <h1>בדיקת JS-Map System</h1>
+    
+    <div class="test-section">
+        <h3>סקשן 1: סטטיסטיקות</h3>
+        <div id="systemStatsContent">
+            <div class="loading">טוען סטטיסטיקות מערכת...</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>סקשן 2: מיפוי עמודים</h3>
+        <div id="pageMappingContent">
+            <div class="loading">טוען מיפוי עמודים...</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>סקשן 3: תלויות</h3>
+        <div id="dependenciesContent">
+            <div class="loading">טוען ניתוח תלויות...</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>סקשן 4: פונקציות</h3>
+        <div id="functionsMapContent">
+            <div class="loading">טוען מפת פונקציות...</div>
+        </div>
+    </div>
+
+    <!-- Load only essential scripts -->
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/js-map.js"></script>
+
+    <!-- Test initialization -->
+    <script>
+        console.log('🔧 Testing JS-Map System...');
+        
+        // Wait for everything to load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM loaded, testing JS-Map...');
+            
+            // Check if function exists
+            if (typeof initializeJsMapPage === 'function') {
+                console.log('✅ initializeJsMapPage function found');
+                
+                // Initialize the system
+                try {
+                    initializeJsMapPage();
+                    console.log('✅ initializeJsMapPage called successfully');
+                } catch (error) {
+                    console.error('❌ Error calling initializeJsMapPage:', error);
+                }
+            } else {
+                console.error('❌ initializeJsMapPage function not found');
+                console.log('Available functions:', Object.keys(window).filter(key => key.includes('JsMap') || key.includes('jsMap')));
+            }
+        });
+    </script>
+</body>
+</html>
+
+

@@ -1076,6 +1076,223 @@ if (document.readyState === 'loading') {
   initializeBackgroundTasks();
 }
 
+// Global functions for onclick handlers - Background Tasks specific
+window.copyDetailedLog = function() {
+  detailedLogGenerator.copyDetailedLog();
+};
+
+window.toggleAllSections = function() {
+  const sections = document.querySelectorAll('.content-section, .top-section .section-body');
+  const toggleIcon = document.querySelector('.header-actions .section-toggle-icon');
+  
+  // Check if any section is open
+  let anyOpen = false;
+  sections.forEach(section => {
+    const body = section.querySelector ? section.querySelector('.section-body') : section;
+    if (body && body.style.display !== 'none') {
+      anyOpen = true;
+    }
+  });
+  
+  // Toggle all sections
+  const shouldShow = !anyOpen;
+  
+  sections.forEach(section => {
+    const body = section.querySelector ? section.querySelector('.section-body') : section;
+    const icon = section.querySelector ? section.querySelector('.section-toggle-icon') : null;
+    if (body) {
+      body.style.display = shouldShow ? 'block' : 'none';
+    }
+    if (icon) {
+      icon.textContent = shouldShow ? '▼' : '▶';
+    }
+  });
+  
+  // Update main toggle icon
+  if (toggleIcon) {
+    toggleIcon.textContent = shouldShow ? '▼' : '▶';
+  }
+};
+
+window.toggleSection = function(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (!section) return;
+  
+  const body = section.querySelector('.section-body');
+  const icon = section.querySelector('.section-toggle-icon');
+  
+  if (body) {
+    const isHidden = body.style.display === 'none';
+    body.style.display = isHidden ? 'block' : 'none';
+    if (icon) {
+      icon.textContent = isHidden ? '▼' : '▶';
+    }
+  }
+};
+
+window.startScheduler = function() {
+  eventHandlers.startScheduler();
+};
+
+window.stopScheduler = function() {
+  eventHandlers.stopScheduler();
+};
+
+window.refreshStatus = function() {
+  eventHandlers.refreshStatus();
+};
+
+window.refreshTasks = function() {
+  eventHandlers.refreshTasks();
+};
+
+window.refreshIndexedDBStats = async function() {
+  try {
+    console.log('📊 Refreshing IndexedDB stats...');
+    const data = await apiService.request('/api/indexeddb/stats');
+    
+    // Update UI with IndexedDB stats
+    const updateElement = (id, value) => {
+      const element = document.getElementById(id);
+      if (element) element.textContent = value;
+    };
+    
+    updateElement('indexeddb-size', data.total_size_mb.toFixed(1));
+    updateElement('indexeddb-max-size', data.max_size_mb);
+    updateElement('indexeddb-usage', data.usage_percentage.toFixed(1) + '%');
+    updateElement('indexeddb-entries', data.total_entries);
+    
+    // Update progress bar color based on usage
+    const usageElement = document.getElementById('indexeddb-usage');
+    const usagePercent = data.usage_percentage;
+    
+    if (usagePercent < 60) {
+      usageElement.className = 'badge bg-success fs-5';
+    } else if (usagePercent < 80) {
+      usageElement.className = 'badge bg-warning fs-5';
+    } else {
+      usageElement.className = 'badge bg-danger fs-5';
+    }
+    
+    console.log(`✅ IndexedDB stats updated: ${data.total_size_mb.toFixed(1)}MB (${data.total_entries} entries)`);
+    utils.showNotification('IndexedDB stats updated', 'success');
+  } catch (error) {
+    console.error('❌ Error updating IndexedDB stats:', error);
+    utils.showNotification(`Error updating stats: ${error.message}`, 'error');
+  }
+};
+
+window.manualIndexedDBCleanup = async function() {
+  try {
+    const maxSize = document.getElementById('maxSizeInput')?.value || '100';
+    console.log(`🧹 Starting manual IndexedDB cleanup (max size: ${maxSize}MB)...`);
+    
+    const data = await apiService.request(`/api/indexeddb/cleanup/${maxSize}`, {
+      method: 'POST'
+    });
+    
+    console.log(`✅ IndexedDB cleanup completed: removed ${data.entries_removed} entries, freed ${data.space_freed_mb}MB`);
+    utils.showNotification(
+      `Cleanup completed: removed ${data.entries_removed} entries (${data.space_freed_mb}MB freed)`,
+      'success'
+    );
+    
+    // Refresh stats after cleanup
+    setTimeout(window.refreshIndexedDBStats, 1000);
+  } catch (error) {
+    console.error('❌ Error in IndexedDB cleanup:', error);
+    utils.showNotification(`Error in cleanup: ${error.message}`, 'error');
+  }
+};
+
+window.createIndexedDBBackup = async function() {
+  try {
+    console.log('💾 Creating IndexedDB backup...');
+    const data = await apiService.request('/api/indexeddb/backup');
+    
+    console.log(`✅ Backup created: ${data.backup_file}`);
+    utils.showNotification(`Backup created: ${data.backup_file}`, 'success');
+  } catch (error) {
+    console.error('❌ Error creating backup:', error);
+    utils.showNotification(`Error creating backup: ${error.message}`, 'error');
+  }
+};
+
+window.restoreIndexedDBBackup = async function() {
+  try {
+    const backupFile = prompt('Enter backup file name:', 'indexeddb_backup_20250118.json');
+    if (!backupFile) return;
+    
+    console.log(`🔄 Restoring from backup: ${backupFile}...`);
+    
+    const data = await apiService.request('/api/indexeddb/restore', {
+      method: 'POST',
+      body: JSON.stringify({ backup_file: backupFile }),
+      headers: { 'Content-Type': 'application/json' }
+    });
+    
+    console.log(`✅ Restore completed: restored ${data.entries_restored} entries`);
+    utils.showNotification(
+      `Restore completed: restored ${data.entries_restored} entries`,
+      'success'
+    );
+    
+    // Refresh stats after restore
+    setTimeout(window.refreshIndexedDBStats, 1000);
+  } catch (error) {
+    console.error('❌ Error restoring from backup:', error);
+    utils.showNotification(`Error restoring: ${error.message}`, 'error');
+  }
+};
+
+window.clearAllIndexedDB = async function() {
+  if (!confirm('⚠️ Are you sure you want to clear all IndexedDB?\nThis action will permanently delete all data!')) {
+    return;
+  }
+  
+  try {
+    console.log('🗑️ Clearing all IndexedDB...');
+    const data = await apiService.request('/api/indexeddb/clear', {
+      method: 'POST'
+    });
+    
+    console.log(`✅ IndexedDB cleared: removed ${data.databases_cleared} databases`);
+    utils.showNotification(
+      `IndexedDB cleared: removed ${data.databases_cleared} databases`,
+      'warning'
+    );
+    
+    // Refresh stats after clear
+    setTimeout(window.refreshIndexedDBStats, 1000);
+  } catch (error) {
+    console.error('❌ Error clearing IndexedDB:', error);
+    utils.showNotification(`Error clearing: ${error.message}`, 'error');
+  }
+};
+
+window.clearLog = function() {
+  const logElement = document.getElementById('console-output');
+  if (logElement) {
+    logElement.textContent = '';
+    console.log('Log cleared');
+  }
+};
+
+window.stopTask = async function(taskName) {
+  try {
+    console.log(`🛑 Stopping task: ${taskName}`);
+    await apiService.request(`/api/v1/background-tasks/tasks/${taskName}/stop`, {
+      method: 'POST'
+    });
+    console.log(`✅ Task ${taskName} stopped successfully`);
+    utils.showNotification(`Task ${taskName} stopped successfully`, 'success');
+    setTimeout(window.refreshStatus, 2000);
+  } catch (error) {
+    console.error(`❌ Error stopping task ${taskName}:`, error);
+    utils.showNotification(`Error stopping task: ${error.message}`, 'error');
+  }
+};
+
 // Export for testing
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -1086,3 +1303,96 @@ if (typeof module !== 'undefined' && module.exports) {
     utils,
   };
 }
+
+/**
+ * Generate detailed log for Background Tasks
+ */
+function generateDetailedLog() {
+    const timestamp = new Date().toLocaleString('he-IL');
+    const log = [];
+
+    log.push('=== לוג מפורט - ניהול משימות רקע ===');
+    log.push(`זמן יצירה: ${timestamp}`);
+    log.push(`עמוד: ${window.location.href}`);
+    log.push('');
+
+    // סטטוס כללי
+    log.push('--- סטטוס כללי ---');
+    const topSection = document.querySelector('.top-section .section-body');
+    const isTopOpen = topSection && topSection.style.display !== 'none';
+    log.push(`סקשן עליון: ${isTopOpen ? 'פתוח' : 'סגור'}`);
+    
+    // תצוגה מפורטת לפי סקשנים
+    log.push('--- תצוגה מפורטת לפי סקשנים ---');
+    
+    // סקשן עליון - סטטיסטיקות משימות
+    const taskStats = document.querySelectorAll('.task-stat');
+    taskStats.forEach((stat, index) => {
+        const label = stat.querySelector('.stat-label')?.textContent || 'לא זמין';
+        const value = stat.querySelector('.stat-value')?.textContent || 'לא זמין';
+        log.push(`סטטיסטיקה ${index + 1}: ${label} = "${value}"`);
+    });
+
+    // טבלאות ונתונים
+    log.push('--- טבלאות ונתונים ---');
+    const taskRows = document.querySelectorAll('.task-row');
+    taskRows.forEach((row, index) => {
+        const taskName = row.querySelector('.task-name')?.textContent || 'לא זמין';
+        const status = row.querySelector('.task-status')?.textContent || 'לא זמין';
+        const lastRun = row.querySelector('.task-last-run')?.textContent || 'לא זמין';
+        log.push(`משימה ${index + 1}: ${taskName} | סטטוס: ${status} | הרצה אחרונה: ${lastRun}`);
+    });
+
+    // סטטיסטיקות וביצועים
+    log.push('--- סטטיסטיקות וביצועים ---');
+    log.push(`זמן טעינת עמוד: ${Date.now() - performance.timing.navigationStart}ms`);
+    if (window.performance && window.performance.memory) {
+        const memory = window.performance.memory;
+        log.push(`זיכרון בשימוש: ${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB`);
+    }
+
+    // לוגים ושגיאות
+    log.push('--- לוגים ושגיאות ---');
+    if (window.consoleLogs && window.consoleLogs.length > 0) {
+        const recentLogs = window.consoleLogs.slice(-10);
+        recentLogs.forEach(entry => {
+            log.push(`[${entry.timestamp}] ${entry.level}: ${entry.message}`);
+        });
+    } else {
+        log.push('אין לוגים זמינים');
+    }
+
+    // מידע טכני
+    log.push('--- מידע טכני ---');
+    log.push(`User Agent: ${navigator.userAgent}`);
+    log.push(`Language: ${navigator.language}`);
+    log.push(`Platform: ${navigator.platform}`);
+
+    log.push('=== סוף הלוג ===');
+    return log.join('\n');
+}
+
+/**
+ * Copy detailed log to clipboard
+ */
+async function copyDetailedLog() {
+    try {
+        const log = generateDetailedLog();
+        await navigator.clipboard.writeText(log);
+        window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
+        console.log('=== לוג מפורט שהועתק ===');
+        console.log(log);
+        console.log('=== סוף הלוג ===');
+    } catch (error) {
+        console.error('Failed to copy log:', error);
+        window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
+        // Fallback: show in console
+        const log = generateDetailedLog();
+        console.log('=== לוג מפורט (לא הועתק) ===');
+        console.log(log);
+        console.log('=== סוף הלוג ===');
+    }
+}
+
+// ייצוא לגלובל scope
+window.copyDetailedLog = copyDetailedLog;

@@ -61,10 +61,7 @@ async function loadInitialData() {
                     // Update statistics display
                     await updateStatisticsDisplay();
                     
-                    // Update charts with loaded data
-                    if (typeof window.addDataPointToCharts === 'function') {
-                        window.addDataPointToCharts(latestScan);
-                    }
+                    // Data loaded successfully - charts will be updated by their respective systems
                     
                     console.log('✅ Initial data loaded successfully');
                 }
@@ -169,6 +166,33 @@ async function updateStatisticsDisplay() {
 }
 
 /**
+ * Get file type from filename
+ * קבלת סוג קובץ משם הקובץ
+ */
+function getFileType(fileName) {
+    const extension = fileName.split('.').pop().toLowerCase();
+    switch (extension) {
+        case 'js':
+        case 'mjs':
+        case 'jsx':
+            return 'js';
+        case 'html':
+        case 'htm':
+            return 'html';
+        case 'css':
+        case 'scss':
+        case 'sass':
+        case 'less':
+            return 'css';
+        case 'py':
+        case 'pyw':
+            return 'python';
+        default:
+            return 'other';
+    }
+}
+
+/**
  * עדכון סטטיסטיקות סוגי קבצים
  * Update file type statistics
  */
@@ -219,7 +243,12 @@ function updateFileTypeStatistics(issues) {
                             stats[type] = { files: 0, errors: 0, warnings: 0 };
                         }
                         stats[type].files = window.projectFiles[type].length;
-                        console.log(`📁 ${type}: ${stats[type].files} files`);
+                        console.log(`📁 ${type}: ${stats[type].files} files (${window.projectFiles[type].length} actual files)`);
+                        
+                        // Debug: Show first few files of each type
+                        if (window.projectFiles[type].length > 0) {
+                            console.log(`📁 ${type} sample files:`, window.projectFiles[type].slice(0, 3));
+                        }
                     }
                 });
             }
@@ -252,7 +281,7 @@ function updateFileTypeStatistics(issues) {
             'js': 'js',
             'html': 'html', 
             'css': 'css',
-            'py': 'py',
+            'python': 'py',  // python -> py for element IDs
             'other': 'other'
         };
         
@@ -280,6 +309,17 @@ function updateFileTypeStatistics(issues) {
             console.log(`✅ Updated ${elementId}WarningsCount to ${stat.warnings}`);
         }
     });
+    
+    // Debug: Log final statistics summary
+    console.log('📊 Final statistics summary:');
+    let totalFiles = 0;
+    Object.keys(stats).forEach(type => {
+        const stat = stats[type];
+        totalFiles += stat.files;
+        console.log(`  ${type}: ${stat.files} files, ${stat.errors} errors, ${stat.warnings} warnings`);
+    });
+    console.log(`📊 Total files across all types: ${totalFiles}`);
+    console.log('📊 updateFileTypeStatistics completed');
 }
 
 /**
@@ -333,6 +373,7 @@ window.loadInitialData = loadInitialData;
 window.updateStatisticsDisplay = updateStatisticsDisplay;
 window.updateFileTypeStatistics = updateFileTypeStatistics;
 window.calculateStorageSize = calculateStorageSize;
+window.getFileType = getFileType;
 
 console.log('📊 Data Collector Module loaded successfully');
 

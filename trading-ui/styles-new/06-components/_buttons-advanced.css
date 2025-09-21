@@ -552,3 +552,95 @@ button.btn-secondary-custom:hover {
 .btn-info, .btn-success, .btn-warning, .btn-danger, .btn-primary, .btn-secondary {
   min-width: 30px;
 }
+
+/* ===== DISABLED BUTTON STATES ===== */
+/* מצבים מושבתים לכפתורים - סגנונות עקביים */
+.btn:disabled.btn-danger {
+  background: #6c757d;
+  color: white;
+  border-color: #6c757d;
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn:disabled.btn-danger:hover {
+  background: #6c757d;
+  color: white;
+  border-color: #6c757d;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn:disabled.btn-primary {
+  background: #6c757d;
+  color: white;
+  border-color: #6c757d;
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn:disabled.btn-primary:hover {
+  background: #6c757d;
+  color: white;
+  border-color: #6c757d;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn:disabled.btn-warning {
+  background: #6c757d;
+  color: white;
+  border-color: #6c757d;
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn:disabled.btn-warning:hover {
+  background: #6c757d;
+  color: white;
+  border-color: #6c757d;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn:disabled.btn-info {
+  background: #6c757d;
+  color: white;
+  border-color: #6c757d;
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn:disabled.btn-info:hover {
+  background: #6c757d;
+  color: white;
+  border-color: #6c757d;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn:disabled.btn-success {
+  background: #6c757d;
+  color: white;
+  border-color: #6c757d;
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn:disabled.btn-success:hover {
+  background: #6c757d;
+  color: white;
+  border-color: #6c757d;
+  transform: none;
+  box-shadow: none;
+}

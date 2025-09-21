@@ -359,6 +359,93 @@ class JsMapSystem {
     }
 
     /**
+     * Update system statistics in the UI
+     * מעדכן את הסטטיסטיקות של המערכת בממשק
+     */
+    updateSystemStats() {
+        console.log('📊 Updating system statistics...');
+        
+        try {
+            // Get system data
+            const pagesCount = this.pageMapping ? Object.keys(this.pageMapping).length : 0;
+            const functionsCount = this.functionsData ? Object.keys(this.functionsData).length : 0;
+            const jsFilesCount = this.functionsData ? new Set(Object.values(this.functionsData).map(f => f.file)).size : 0;
+            
+            // Calculate global functions (functions that appear in multiple files)
+            const globalFunctions = this.calculateGlobalFunctions();
+            
+            // Calculate duplicates
+            const duplicates = this.calculateDuplicates();
+            
+            // Calculate local functions (functions that appear in only one file)
+            const localFunctions = functionsCount - globalFunctions;
+            
+            // Update UI elements
+            this.updateStatCard('systemTotalPages', pagesCount);
+            this.updateStatCard('systemTotalJsFiles', jsFilesCount);
+            this.updateStatCard('systemTotalFunctions', functionsCount);
+            this.updateStatCard('systemGlobalFunctions', globalFunctions);
+            this.updateStatCard('systemDuplicates', duplicates);
+            this.updateStatCard('systemLocalFunctions', localFunctions);
+            
+            console.log('✅ System statistics updated successfully');
+            console.log(`📊 Stats: ${pagesCount} pages, ${jsFilesCount} JS files, ${functionsCount} functions, ${globalFunctions} global, ${duplicates} duplicates, ${localFunctions} local`);
+            
+        } catch (error) {
+            console.error('❌ Error updating system statistics:', error);
+            if (window.showNotification) {
+                window.showNotification('שגיאה בעדכון סטטיסטיקות', 'error', 'שגיאה', 3000);
+            }
+        }
+    }
+    
+    /**
+     * Update a single stat card
+     * מעדכן כרטיס סטטיסטיקה יחיד
+     */
+    updateStatCard(elementId, value) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = value.toString();
+        } else {
+            console.warn(`⚠️ Stat card element not found: ${elementId}`);
+        }
+    }
+    
+    /**
+     * Calculate global functions (appear in multiple files)
+     * מחשב פונקציות גלובליות (מופיעות במספר קבצים)
+     */
+    calculateGlobalFunctions() {
+        if (!this.functionsData) return 0;
+        
+        const functionFiles = {};
+        Object.values(this.functionsData).forEach(func => {
+            if (!functionFiles[func.name]) {
+                functionFiles[func.name] = new Set();
+            }
+            functionFiles[func.name].add(func.file);
+        });
+        
+        return Object.values(functionFiles).filter(files => files.size > 1).length;
+    }
+    
+    /**
+     * Calculate duplicate functions
+     * מחשב פונקציות כפולות
+     */
+    calculateDuplicates() {
+        if (!this.functionsData) return 0;
+        
+        const functionCounts = {};
+        Object.values(this.functionsData).forEach(func => {
+            functionCounts[func.name] = (functionCounts[func.name] || 0) + 1;
+        });
+        
+        return Object.values(functionCounts).filter(count => count > 1).length;
+    }
+
+    /**
      * Refresh system status
      * רענון מצב מערכת
      */

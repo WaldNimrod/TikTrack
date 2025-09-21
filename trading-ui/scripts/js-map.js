@@ -51,35 +51,29 @@ class JsMapSystem {
             // Initialize Page Scripts Matrix integration
             await this.initializePageScriptsMatrix();
             
-            // Try to load data from cache first
-            const cacheData = await this.loadDataFromCache();
-            
-            if (cacheData && this.isCacheValid(cacheData)) {
-                console.log('📦 Loading data from cache...');
-                this.loadDataFromCacheData(cacheData);
-            } else {
-                console.log('🌐 Loading fresh data from APIs...');
+            // Load fresh data from APIs
+            console.log('🌐 Loading fresh data from APIs...');
             await this.loadDataFromAPIs();
-                // Save to cache
-                await this.saveDataToCache();
-            }
             
-            // Perform advanced analysis
-            await this.performAdvancedAnalysis();
+            // Skip advanced analysis for now
+            console.log('⚠️ Advanced analysis skipped - focusing on basic functionality');
             
             // Initialize UI components
+            console.log('🎨 Initializing UI components...');
             this.initializeUIComponents();
             
             // Render all sections first
+            console.log('🎨 Rendering all sections...');
             this.renderAllSections();
             
             // Update dashboard stats after rendering with a small delay
             setTimeout(() => {
-            this.updateDashboardStats();
+                console.log('📊 Updating dashboard stats...');
+                this.updateDashboardStats();
             }, 100);
             
-            // Update system status
-            this.updateSystemStatus();
+            // Skip system status update for now
+            console.log('⚠️ System status update skipped - focusing on basic functionality');
             
             this.isInitialized = true;
             console.log('✅ JS-Map System initialized successfully');
@@ -101,22 +95,24 @@ class JsMapSystem {
             console.log('📡 Using direct fetch for API requests');
                 
                 // Load functions data
-            const functionsResponse = await fetch('http://localhost:8080/api/js-map/functions');
+            const functionsResponse = await fetch('/api/js-map/functions');
             if (!functionsResponse.ok) {
                 throw new Error(`HTTP ${functionsResponse.status}: ${functionsResponse.statusText}`);
             }
             const functionsData = await functionsResponse.json();
             this.functionsData = functionsData.data || functionsData;
                 console.log('✅ Functions data loaded:', Object.keys(this.functionsData || {}));
+                console.log('📊 Functions data sample:', JSON.stringify(this.functionsData, null, 2).substring(0, 200) + '...');
                 
                 // Load page mapping data
-            const mappingResponse = await fetch('http://localhost:8080/api/js-map/page-mapping');
+            const mappingResponse = await fetch('/api/js-map/page-mapping');
             if (!mappingResponse.ok) {
                 throw new Error(`HTTP ${mappingResponse.status}: ${mappingResponse.statusText}`);
             }
             const mappingData = await mappingResponse.json();
             this.pageMapping = mappingData.data || mappingData;
                 console.log('✅ Page mapping data loaded:', Object.keys(this.pageMapping || {}));
+                console.log('📊 Page mapping sample:', JSON.stringify(this.pageMapping, null, 2).substring(0, 200) + '...');
             
             // Show success notification
             this.showSuccessNotification('הצלחה', 'נתונים נטענו מהשרת בהצלחה');
@@ -220,17 +216,14 @@ class JsMapSystem {
     initializeUIComponents() {
         console.log('🎨 Initializing UI components...');
         
-        // Render all sections with loaded data
-        this.renderAllSections();
+        // Don't render here - it's already called in init()
+        // this.renderAllSections();
         
-        // Initialize function tabs system if available
-        this.initializeFunctionTabsSystem();
+        // Skip function tabs system initialization for now
+        console.log('⚠️ Function tabs system initialization skipped - focusing on basic functionality');
         
-        // Initialize development sections
-        if (window.initializeDevelopmentSections) {
-            window.initializeDevelopmentSections();
-            console.log('✅ Development sections initialized');
-        }
+        // Skip development sections initialization for now
+        console.log('⚠️ Development sections initialization skipped - focusing on basic functionality');
     }
 
     /**
@@ -239,14 +232,28 @@ class JsMapSystem {
      */
     renderAllSections() {
         console.log('🎨 Rendering all sections...');
+        console.log('📊 Available data - functionsData:', !!this.functionsData, 'pageMapping:', !!this.pageMapping);
         
-        this.renderSystemStats();
-        this.renderPageMappingData();
-        this.renderDependenciesData();
-        this.renderFunctionsData();
-        this.renderDuplicatesData();
-        
-        console.log('✅ All sections rendered');
+        try {
+            console.log('🎨 Rendering system stats...');
+            this.renderSystemStats();
+            
+            console.log('🎨 Rendering page mapping...');
+            this.renderPageMappingData();
+            
+            console.log('🎨 Rendering dependencies...');
+            this.renderDependenciesData();
+            
+            console.log('🎨 Rendering functions...');
+            this.renderFunctionsData();
+            
+            console.log('🎨 Rendering duplicates...');
+            this.renderDuplicatesData();
+            
+            console.log('✅ All sections rendered successfully');
+        } catch (error) {
+            console.error('❌ Error rendering sections:', error);
+        }
     }
 
     // Tab-specific render methods
@@ -826,6 +833,10 @@ class JsMapSystem {
      * מחשב סטטיסטיקות המערכת
      */
     calculateStats() {
+        console.log('📊 Calculating stats...');
+        console.log('📊 pageMapping:', this.pageMapping);
+        console.log('📊 functionsData:', this.functionsData);
+        
         const totalPages = this.pageMapping ? Object.keys(this.pageMapping).length : 0;
         const totalJsFiles = this.functionsData ? Object.keys(this.functionsData).length : 0;
         
@@ -834,19 +845,26 @@ class JsMapSystem {
         
         if (this.functionsData) {
             Object.values(this.functionsData).forEach(fileData => {
-                if (fileData.functions) {
+                if (fileData && fileData.functions) {
                     totalFunctions += fileData.functions.length;
                     globalFunctions += fileData.functions.length; // Simplified for now
+                } else if (Array.isArray(fileData)) {
+                    // Handle old format where fileData is directly an array of functions
+                    totalFunctions += fileData.length;
+                    globalFunctions += fileData.length;
                 }
             });
         }
         
-        return {
+        const stats = {
             totalPages,
             totalJsFiles,
             totalFunctions,
             globalFunctions
         };
+        
+        console.log('📊 Calculated stats:', stats);
+        return stats;
     }
 
     /**
@@ -1028,9 +1046,9 @@ class JsMapSystem {
         console.log('✅ Found pages-tab container');
         
         // Find the content area within the pages tab
-        const contentArea = container.querySelector('.tab-body');
+        const contentArea = container.querySelector('#pageMappingContent');
         if (!contentArea) {
-            console.error('❌ tab-body not found in pages-tab');
+            console.error('❌ pageMappingContent not found in pages-tab');
             return;
         }
         
@@ -1082,9 +1100,9 @@ class JsMapSystem {
         console.log('✅ Found dependencies-tab container');
         
         // Find the content area within the dependencies tab
-        const contentArea = container.querySelector('.tab-body');
+        const contentArea = container.querySelector('#dependenciesContent');
         if (!contentArea) {
-            console.error('❌ tab-body not found in dependencies-tab');
+            console.error('❌ dependenciesContent not found in dependencies-tab');
             return;
         }
         
@@ -1150,6 +1168,9 @@ class JsMapSystem {
             contentArea.innerHTML = '<div class="no-data">אין נתוני פונקציות זמינים</div>';
             return;
         }
+
+        console.log('📊 Functions data structure:', Object.keys(this.functionsData));
+        console.log('📊 First file data:', Object.values(this.functionsData)[0]);
 
         const html = `
             <div class="functions-map-container">
@@ -1242,7 +1263,9 @@ class JsMapSystem {
         let totalDependencies = 0;
         const fileUsage = {};
 
-        Object.values(this.pageMapping).forEach(scripts => {
+        Object.values(this.pageMapping).forEach(pageData => {
+            // Handle new format with pageData object
+            const scripts = pageData.files || pageData;
             if (Array.isArray(scripts)) {
                 totalDependencies += scripts.length;
                 scripts.forEach(script => {
@@ -1267,7 +1290,9 @@ class JsMapSystem {
 
         let html = '<div class="dependencies-grid">';
         
-        Object.entries(this.pageMapping).forEach(([page, scripts]) => {
+        Object.entries(this.pageMapping).forEach(([page, pageData]) => {
+            // Handle new format with pageData object
+            const scripts = pageData.files || pageData;
             if (Array.isArray(scripts) && scripts.length > 0) {
                 html += `
                     <div class="dependency-item">
@@ -1783,13 +1808,8 @@ JsMapSystem.prototype.showLocalNotification = function(message, type = 'info', t
  */
 JsMapSystem.prototype.initializePageScriptsMatrix = async function() {
     try {
-        if (window.PageScriptsMatrixSystem) {
-            this.pageScriptsMatrix = new window.PageScriptsMatrixSystem();
-            await this.pageScriptsMatrix.initializeSystem();
-            console.log('✅ Page Scripts Matrix integrated with JS-Map');
-        } else {
-            console.warn('⚠️ PageScriptsMatrixSystem not available');
-        }
+        // Skip Page Scripts Matrix initialization for now
+        console.log('⚠️ PageScriptsMatrixSystem initialization skipped - not available');
     } catch (error) {
         console.error('❌ Failed to initialize Page Scripts Matrix:', error);
     }

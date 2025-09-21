@@ -516,15 +516,15 @@
         <div class="content-section" id="scanningSection" data-table-type="linter-realtime-monitor">
           <div class="section-header">
             <div class="table-title">
-            <img src="images/icons/scanning.svg" alt="סריקה" class="table-icon">
-            סריקה
+              <img src="images/icons/scanning.svg" alt="סריקה" class="table-icon">
+              סריקה ושליטה
+            </div>
+            <div class="table-actions">
+              <button class="filter-toggle-btn" onclick="toggleSection('scanningSection')" title="הצג/הסתר סריקה">
+                <span class="section-toggle-icon">▼</span>
+              </button>
+            </div>
           </div>
-          <div class="table-actions">
-            <button class="filter-toggle-btn" onclick="toggleSection('scanningSection')" title="הצג/הסתר סריקה">
-              <span class="section-toggle-icon">▼</span>
-            </button>
-          </div>
-        </div>
 
         <div class="section-body">
           <!-- 1. מידע - Scanning Statistics -->
@@ -560,40 +560,39 @@
               <h3>🎛️ בקרת סריקה</h3>
             </div>
             <div class="section-body">
-            <div class="scanning-controls-grid">
-              <div class="control-group">
-                <label class="control-label">אפשרויות סריקה:</label>
-                <div class="control-options">
-                  <label class="control-option">
-                    <input type="checkbox" id="deepScan" checked>
-                    <span>סריקה עמוקה</span>
-                  </label>
-                  <label class="control-option">
-                    <input type="checkbox" id="includeHidden" checked>
-                    <span>כולל קבצים נסתרים</span>
-                  </label>
+              <div class="card">
+                <div class="monitoring-controls">
+                  <div class="control-group">
+                    <label>אפשרויות סריקה:</label>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="deepScan" checked>
+                      <label class="form-check-label" for="deepScan">סריקה עמוקה</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="includeHidden" checked>
+                      <label class="form-check-label" for="includeHidden">כולל קבצים נסתרים</label>
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <label>מהירות סריקה:</label>
+                    <select class="form-select form-select-sm" id="scanSpeed">
+                      <option value="fast">מהיר</option>
+                      <option value="normal" selected>רגיל</option>
+                      <option value="thorough">יסודי</option>
+                    </select>
+                  </div>
                 </div>
               </div>
-              <div class="control-group">
-                <label class="control-label">מהירות סריקה:</label>
-                <select class="form-select form-select-sm" id="scanSpeed">
-                  <option value="fast">מהיר</option>
-                  <option value="normal" selected>רגיל</option>
-                  <option value="thorough">יסודי</option>
-                </select>
-              </div>
-            </div>
             </div>
 
           <!-- 3. פעולות - Scanning Actions -->
           <div class="scanning-actions-section">
-            <div class="section-header">
-              <h3>▶️ פעולות סריקה</h3>
-            </div>
-            <div class="section-body">
-              <!-- Actions Row - Indicators on left, buttons on right -->
+            <div class="file-discovery-actions">
+              <h6 class="actions-title">
+                <i class="fas fa-search"></i> פעולות סריקה
+              </h6>
               <div class="actions-row">
-                <!-- Action Indicators (Left side) -->
+                <!-- Action Indicators (Left Side) -->
                 <div class="action-indicators">
                   <div class="action-indicator" id="scanningStatusIndicator">
                     <span class="indicator-icon" id="scanningStatusIcon">🔍</span>
@@ -609,7 +608,7 @@
                   </div>
                 </div>
                 
-                <!-- Action Buttons (Right side) -->
+                <!-- Action Buttons (Right Side) -->
                 <div class="action-buttons-grid">
                   <button class="btn btn-primary" id="startScanBtn" onclick="window.startFileScan()">
                     <i class="fas fa-play"></i> התחל סריקה מלאה
@@ -624,6 +623,9 @@
                     <i class="fas fa-clock"></i> תזמן סריקה
                   </button>
                 </div>
+              </div>
+              <div id="scanningProgress" class="file-discovery-progress">
+                <i class="fas fa-spinner fa-spin"></i> סורק קבצים...
               </div>
             </div>
           </div>
@@ -643,43 +645,38 @@
               </div>
             </div>
             
-            <div class="section-header">
-              <h3>📊 התקדמות סריקה</h3>
-            </div>
-          <div class="section-body">
-            
             <h6 class="progress-title">
               <i class="fas fa-chart-line"></i> סטטוס סריקה
             </h6>
             
             <!-- Central Scanning Status Dashboard -->
-            <div class="scanning-dashboard">
+            <div class="mapping-dashboard">
               <!-- Main Status Row -->
               <div class="dashboard-row main-status">
                 <div class="status-card primary">
                   <div class="status-icon">🔍</div>
                   <div class="status-content">
-                    <div class="status-title">קבצים נסרקו</div>
+                    <div class="status-title">סריקה</div>
                     <div class="status-value" id="scannedFilesCount">0</div>
-                    <div class="status-subtitle">קבצים נבדקו</div>
+                    <div class="status-subtitle">קבצים נסרקו</div>
                   </div>
                 </div>
                 
                 <div class="status-card info">
                   <div class="status-icon">⚠️</div>
                   <div class="status-content">
-                    <div class="status-title">שגיאות נמצאו</div>
-                    <div class="status-value" id="scanningErrorsCount">0</div>
-                    <div class="status-subtitle">בעיות זוהו</div>
+                    <div class="status-title">סטטוס סריקה</div>
+                    <div class="status-value" id="scanningStatus">לא בוצעה</div>
+                    <div class="status-subtitle">מצב תהליך</div>
                   </div>
                 </div>
                 
                 <div class="status-card success">
                   <div class="status-icon">⏰</div>
                   <div class="status-content">
-                    <div class="status-title">זמן סריקה</div>
-                    <div class="status-value" id="scanningDuration">טרם בוצעה</div>
-                    <div class="status-subtitle">משך הבדיקה</div>
+                    <div class="status-title">סריקה אחרונה</div>
+                    <div class="status-value" id="lastScanDate">טרם בוצעה</div>
+                    <div class="status-subtitle">זמן פעילות</div>
                   </div>
                 </div>
               </div>
@@ -689,27 +686,27 @@
                 <div class="stats-grid">
                   <div class="stat-item">
                     <div class="stat-label">שגיאות קריטיות</div>
-                    <div class="stat-value" id="criticalErrorsCount">0</div>
+                    <div class="stat-value" id="dashboardCriticalErrorsCount">0</div>
                     <div class="stat-icon">🚨</div>
                   </div>
                   <div class="stat-item">
-                  <div class="stat-label">אזהרות</div>
-                    <div class="stat-value" id="warningsCount">0</div>
+                    <div class="stat-label">אזהרות</div>
+                    <div class="stat-value" id="dashboardWarningsCount">0</div>
                     <div class="stat-icon">⚠️</div>
                   </div>
                   <div class="stat-item">
                     <div class="stat-label">הצעות שיפור</div>
-                    <div class="stat-value" id="suggestionsCount">0</div>
+                    <div class="stat-value" id="dashboardSuggestionsCount">0</div>
                     <div class="stat-icon">💡</div>
                   </div>
                   <div class="stat-item">
                     <div class="stat-label">קבצים תקינים</div>
-                    <div class="stat-value" id="cleanFilesCount">0</div>
+                    <div class="stat-value" id="dashboardCleanFilesCount">0</div>
                     <div class="stat-icon">✅</div>
                   </div>
                   <div class="stat-item">
                     <div class="stat-label">סה"כ נבדק</div>
-                    <div class="stat-value" id="totalScannedCount">0</div>
+                    <div class="stat-value" id="dashboardTotalScannedCount">0</div>
                     <div class="stat-icon">📊</div>
                   </div>
                 </div>
@@ -766,7 +763,6 @@
           </div>
             </div>
           </div>
-        </div>
         </div>
         <!-- UI Content Section 3 End-->
 

@@ -105,7 +105,10 @@ async function updateStatisticsDisplay() {
                 // Get the most recent scan data
                 const latestScan = latestData[latestData.length - 1];
                 
-                // Update global scanning results with loaded data
+                // Initialize or update global scanning results with loaded data
+                if (!window.scanningResults) {
+                    window.scanningResults = {};
+                }
                 window.scanningResults.errors = latestScan.errors || [];
                 window.scanningResults.warnings = latestScan.warnings || [];
                 window.scanningResults.totalFiles = latestScan.metrics?.totalFiles || 0;
@@ -139,6 +142,22 @@ async function updateStatisticsDisplay() {
                 console.log('✅ Statistics display updated');
             } else {
                 console.log('📊 No data available for statistics update');
+                
+                // Show message that no scan has been performed yet
+                const lastScanElement = document.getElementById('lastScanDate');
+                if (lastScanElement) {
+                    lastScanElement.textContent = 'לא בוצעה סריקה';
+                }
+                
+                // Initialize empty scanning results if not exists
+                if (!window.scanningResults) {
+                    window.scanningResults = {
+                        errors: [],
+                        warnings: [],
+                        totalFiles: 0,
+                        scannedFiles: 0
+                    };
+                }
             }
         } else {
             console.log('⚠️ IndexedDB adapter not available for statistics update');
@@ -316,4 +335,6 @@ window.updateFileTypeStatistics = updateFileTypeStatistics;
 window.calculateStorageSize = calculateStorageSize;
 
 console.log('📊 Data Collector Module loaded successfully');
+
+
 

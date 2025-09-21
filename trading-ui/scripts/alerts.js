@@ -2737,3 +2737,42 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+// ===== MISSING FUNCTIONS FOR ONCLICK ATTRIBUTES =====
+
+// Toggle functions
+function toggleTopSection() {
+    if (typeof window.toggleTopSection === 'function') {
+        window.toggleTopSection();
+    } else {
+        console.warn('toggleTopSection function not found');
+    }
+}
+
+function toggleSection(sectionId) {
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection(sectionId);
+    } else {
+        console.warn('toggleSection function not found');
+    }
+}
+
+// Filter functions
+function filterAlertsByRelatedObjectType(type) {
+    if (typeof window.filterAlertsByRelatedObjectType === 'function') {
+        window.filterAlertsByRelatedObjectType(type);
+    } else {
+        console.warn('filterAlertsByRelatedObjectType function not found');
+    }
+}
+
+// ===== GLOBAL EXPORTS =====
+// Export functions to global scope for onclick attributes
+window.toggleTopSection = toggleTopSection;
+window.toggleSection = toggleSection;
+window.filterAlertsByRelatedObjectType = filterAlertsByRelatedObjectType;
+window.loadAlertsData = loadAlertsData;
+window.updateAlertsTable = updateAlertsTable;
+window.showAddAlertModal = showAddAlertModal;
+window.editAlert = editAlert;
+window.deleteAlert = deleteAlert;

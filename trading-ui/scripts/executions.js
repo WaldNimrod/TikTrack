@@ -3581,6 +3581,96 @@ async function updateTickersList(mode, showClosedTrades = false) {
 
 window.updateTickersList = updateTickersList;
 
+// ===== MISSING FUNCTIONS FOR ONCLICK ATTRIBUTES =====
+
+// Toggle functions
+function toggleTopSection() {
+    if (typeof window.toggleTopSection === 'function') {
+        window.toggleTopSection();
+    } else {
+        console.warn('toggleTopSection function not found');
+    }
+}
+
+function toggleExecutionsSection() {
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection('executions');
+    } else {
+        console.warn('toggleSection function not found');
+    }
+}
+
+// Execution CRUD functions
+function saveExecution() {
+    if (typeof window.saveExecution === 'function') {
+        window.saveExecution();
+    } else {
+        console.warn('saveExecution function not found');
+    }
+}
+
+function updateExecution() {
+    if (typeof window.updateExecution === 'function') {
+        window.updateExecution();
+    } else {
+        console.warn('updateExecution function not found');
+    }
+}
+
+function confirmDeleteExecution() {
+    if (typeof window.confirmDeleteExecution === 'function') {
+        window.confirmDeleteExecution();
+    } else {
+        console.warn('confirmDeleteExecution function not found');
+    }
+}
+
+// Navigation functions
+function goToLinkedTrade(mode = 'edit') {
+    if (typeof window.goToLinkedTrade === 'function') {
+        window.goToLinkedTrade(mode);
+    } else {
+        console.warn('goToLinkedTrade function not found');
+    }
+}
+
+function addNewPlan() {
+    if (typeof window.addNewPlan === 'function') {
+        window.addNewPlan();
+    } else {
+        console.warn('addNewPlan function not found');
+    }
+}
+
+function addNewTrade() {
+    if (typeof window.addNewTrade === 'function') {
+        window.addNewTrade();
+    } else {
+        console.warn('addNewTrade function not found');
+    }
+}
+
+function addNewTicker() {
+    if (typeof window.addNewTicker === 'function') {
+        window.addNewTicker();
+    } else {
+        console.warn('addNewTicker function not found');
+    }
+}
+
+// ===== GLOBAL EXPORTS =====
+// Export functions to global scope for onclick attributes
+window.toggleTopSection = toggleTopSection;
+window.toggleExecutionsSection = toggleExecutionsSection;
+window.openExecutionDetails = openExecutionDetails;
+window.saveExecution = saveExecution;
+window.updateExecution = updateExecution;
+window.confirmDeleteExecution = confirmDeleteExecution;
+window.goToLinkedTrade = goToLinkedTrade;
+window.addNewPlan = addNewPlan;
+window.addNewTrade = addNewTrade;
+window.addNewTicker = addNewTicker;
+
 // Modal event listeners for form reset
 document.addEventListener('DOMContentLoaded', function() {
   // Add execution modal - reset form when hidden

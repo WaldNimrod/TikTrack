@@ -32,9 +32,7 @@ window.scanningResults = {
 // Chart and data management
 let chartInstance = null;
 let dataCollectorInstance = null;
-// Global chart renderer instances
-let qualityChartRenderer = null;
-let countsChartRenderer = null;
+// Global chart renderer instances - moved to chart-renderer.js
 let isMonitoring = false;
 let autoRefreshInterval = null;
 let projectFiles = [];
@@ -322,6 +320,8 @@ function loadScanningResultsFromLocalStorage() {
 // Moved to data-collector.js
 
 // Moved to data-collector.js
+
+function updateFileTypeStatistics(issues) {
     console.log('🔄 updateFileTypeStatistics called with issues:', issues ? issues.length : 0);
     console.log('📁 window.projectFiles:', window.projectFiles);
     
@@ -431,7 +431,7 @@ function loadScanningResultsFromLocalStorage() {
         if (fileCountElement) {
             fileCountElement.textContent = stat.files;
             console.log(`✅ Updated ${elementId}FilesCount to ${stat.files}`);
-                } else {
+        } else {
             console.warn(`❌ Element ${elementId}FilesCount not found`);
         }
         
@@ -449,7 +449,7 @@ function loadScanningResultsFromLocalStorage() {
         if (warningCountElement) {
             warningCountElement.textContent = stat.warnings;
             console.log(`✅ Updated ${elementId}WarningsCount to ${stat.warnings}`);
-            } else {
+        } else {
             console.warn(`❌ Element ${elementId}WarningsCount not found`);
         }
     });
@@ -1176,6 +1176,7 @@ async function finishScan() {
     
     // Update last scan date
     lastScanDate = new Date().toISOString();
+    window.scanningResults.lastScanTime = lastScanDate;
     const lastScanElement = document.getElementById('lastScanDate');
     if (lastScanElement) {
         lastScanElement.textContent = new Date().toLocaleString('he-IL');
@@ -1337,7 +1338,26 @@ function setupActionButtons() {
 // ========================================
 
 async function initializeSession() {
-    addLogEntry('INFO', 'מאתחל מערכת לינטר...');
+    // Load initial data from database
+    if (typeof window.loadInitialData === 'function') {
+        await window.loadInitialData();
+    }
+    
+    // Load scanning results from localStorage as backup
+    if (typeof window.loadScanningResultsFromLocalStorage === 'function') {
+        window.loadScanningResultsFromLocalStorage();
+    }
+    
+    // Update statistics display with loaded data
+    if (typeof window.updateStatisticsDisplay === 'function') {
+        await window.updateStatisticsDisplay();
+    }
+    
+    // Check if we have any data and show appropriate message
+    if (!window.scanningResults || (!window.scanningResults.errors.length && !window.scanningResults.warnings.length)) {
+        addLogEntry('INFO', 'לא נמצאו נתוני סריקה - המערכת מוכנה לסריקה ראשונה');
+        console.log('📊 No scan data found - system ready for first scan');
+    }
     
     // Check and update project files
     checkAndUpdateProjectFiles();
@@ -1347,9 +1367,6 @@ async function initializeSession() {
     
     // Load existing logs
     loadLogs();
-    
-    // Load initial data from IndexedDB
-    await updateStatisticsDisplay();
     
     // Initialize UI controls
     initializeControlButtons();
@@ -1398,8 +1415,8 @@ async function initializeSession() {
 function attemptChartRecovery() {
     
     // הגרפים כבר מאותחלים כראוי - אין צורך באתחול חוזר
-    if ((qualityChartRenderer && qualityChartRenderer.isInitialized) && 
-        (countsChartRenderer && countsChartRenderer.isInitialized)) {
+    if ((window.qualityChartRenderer && window.qualityChartRenderer.isInitialized) && 
+        (window.countsChartRenderer && window.countsChartRenderer.isInitialized)) {
         return;
     }
     
@@ -1426,7 +1443,8 @@ function attemptStorageRecovery() {
 function attemptNetworkRecovery() {
     addLogEntry('INFO', 'בודק קישוריות רשת...');
     
-    fetch('/trading-ui/linter-realtime-monitor.html')
+    // בדיקת קישוריות רשת פשוטה
+    fetch('/api/health')
         .then(response => {
             if (response.ok) {
                 // קישוריות הרשת תקינה
@@ -1476,7 +1494,7 @@ function calculateTotalSize() {
 }
 
 async function autoUpdateCharts() {
-    if ((qualityChartRenderer || countsChartRenderer) && typeof window.LinterIndexedDBAdapter !== 'undefined') {
+    if ((window.qualityChartRenderer || window.countsChartRenderer) && typeof window.LinterIndexedDBAdapter !== 'undefined') {
         try {
             const adapter = new window.LinterIndexedDBAdapter();
             await adapter.initialize();
@@ -1502,7 +1520,7 @@ async function autoUpdateCharts() {
 window.refreshChartData = async function() {
     addLogEntry('INFO', 'מרענן נתוני גרפים...');
     
-    if ((qualityChartRenderer || countsChartRenderer) && typeof window.LinterIndexedDBAdapter !== 'undefined') {
+    if ((window.qualityChartRenderer || window.countsChartRenderer) && typeof window.LinterIndexedDBAdapter !== 'undefined') {
         try {
             const adapter = new window.LinterIndexedDBAdapter();
             await adapter.initialize();
@@ -2498,7 +2516,6 @@ async function initializeLinterRealtimeMonitorPage() {
 // ========================================
 
 document.addEventListener('DOMContentLoaded', async function() {
-    addLogEntry('INFO', 'DOM נטען - מאתחל מערכת...');
     await initializeSession();
 });
 
@@ -3095,6 +3112,23 @@ async function discoverProjectFiles() {
             // Update file type statistics immediately with discovered files
             updateFileTypeStatistics([]);
             
+            // Update scanning results with discovered files
+            if (!window.scanningResults) {
+                window.scanningResults = {
+                    errors: [],
+                    warnings: [],
+                    totalFiles: 0,
+                    scannedFiles: 0,
+                    startTime: null,
+                    endTime: null
+                };
+            }
+            
+            // Update total files count with discovered files
+            const totalDiscoveredFiles = Object.values(discoveredFiles).reduce((sum, files) => sum + files.length, 0);
+            window.scanningResults.totalFiles = totalDiscoveredFiles;
+            window.scanningResults.scannedFiles = totalDiscoveredFiles;
+            
             // Force update UI statistics with discovered files
             updateFileTypeCardsProgress();
             
@@ -3104,6 +3138,16 @@ async function discoverProjectFiles() {
             // Use the new state management for logging
             const messages = fileScanningState.getStatsMessage();
             addLogEntry('INFO', messages.discovered);
+            addLogEntry('SUCCESS', `גילוי קבצים הושלם בהצלחה - נמצאו ${totalDiscoveredFiles} קבצים`);
+            addLogEntry('INFO', 'המערכת מוכנה לסריקה - לחץ על "התחל סריקה" כדי לבדוק את הקבצים');
+            
+            // Save updated scanning results to localStorage
+            try {
+                localStorage.setItem('linterScanningResults', JSON.stringify(window.scanningResults));
+                console.log('✅ Saved updated scanning results to localStorage:', window.scanningResults);
+            } catch (error) {
+                console.warn('Failed to save updated scanning results to localStorage:', error);
+            }
             
             // Hide progress indicator
             if (progressElement) {
@@ -3142,8 +3186,32 @@ async function discoverProjectFilesFallback() {
     // Update file type statistics immediately
     updateFileTypeStatistics([]);
     
+    // Update scanning results with discovered files
+    if (!window.scanningResults) {
+        window.scanningResults = {
+            errors: [],
+            warnings: [],
+            totalFiles: 0,
+            scannedFiles: 0,
+            startTime: null,
+            endTime: null
+        };
+    }
+    
     const totalFiles = Object.values(discoveredFiles).reduce((sum, files) => sum + files.length, 0);
+    window.scanningResults.totalFiles = totalFiles;
+    window.scanningResults.scannedFiles = totalFiles;
+    
+    // Save updated scanning results to localStorage
+    try {
+        localStorage.setItem('linterScanningResults', JSON.stringify(window.scanningResults));
+        console.log('✅ Saved fallback scanning results to localStorage:', window.scanningResults);
+    } catch (error) {
+        console.warn('Failed to save fallback scanning results to localStorage:', error);
+    }
+    
     addLogEntry('SUCCESS', `גילוי חלופי הושלם - נמצאו ${totalFiles} קבצים`);
+    addLogEntry('INFO', 'המערכת מוכנה לסריקה - לחץ על "התחל סריקה" כדי לבדוק את הקבצים');
     
     return discoveredFiles;
 }
@@ -3187,44 +3255,44 @@ async function discoverProjectFilesFallback() {
 // Window Object Exports
 // ========================================
 
-window.addLogEntry = addLogEntry;
-window.getSelectedFileTypes = getSelectedFileTypes;
-window.scanJavaScriptFiles = scanJavaScriptFiles;
-window.copyDetailedLog = copyDetailedLog;
 window.discoverProjectFiles = discoverProjectFiles;
 window.startFileScan = startFileScan;
-window.startMonitoring = startMonitoring;
-window.stopMonitoring = stopMonitoring;
-window.initializeCharts = initializeCharts;
-window.updateQualityChart = updateQualityChart;
-window.updateCountsChart = updateCountsChart;
-window.addDataPointToCharts = addDataPointToCharts;
-window.clearCharts = clearCharts;
-window.fixAllIssues = fixAllIssues;
-window.fixAllErrors = fixAllErrors;
-window.fixAllWarnings = fixAllWarnings;
-window.ignoreAllIssues = ignoreAllIssues;
-window.resetFixedIssues = resetFixedIssues;
-// window.refreshChartData is already defined above
-window.clearChartHistory = window.clearChartHistory;
-window.applyChartSettings = window.applyChartSettings;
-window.updateProblemFilesTable = updateProblemFilesTable;
-window.loadIssues = loadIssues;
-window.copyUnresolvedIssuesLog = copyUnresolvedIssuesLog;
-window.toggleAllSections = toggleAllSections;
-window.toggleSection = toggleSection;
-window.runComprehensiveTests = runComprehensiveTests;
-window.runQuickHealthCheck = runQuickHealthCheck;
-window.exportChartData = exportChartData;
-window.clearFiltersBtn = clearFiltersBtn;
-window.updateRealtimeProgress = updateRealtimeProgress;
-window.updateFileTypeCardsProgress = updateFileTypeCardsProgress;
 window.initializeLinterRealtimeMonitorPage = initializeLinterRealtimeMonitorPage;
+
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to chart-renderer.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// window.refreshChartData is already defined above
+// Moved to chart-renderer.js
+// Moved to chart-renderer.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to chart-renderer.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
 // New fix progress functions
-window.updateFixProgressDisplay = updateFixProgressDisplay;
-window.showFixResults = showFixResults;
-window.resetFixProgress = resetFixProgress;
-window.hideFixProgress = hideFixProgress;
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
 
 // Simple display functions - show top 25 items only
 
@@ -3341,11 +3409,11 @@ function updateScanResults() {
 }
 
 // ייבוא הפונקציות החדשות לגלובל scope
-window.toggleTopSection = toggleTopSection;
-window.startFileScan = startFileScan;
-window.fixAllIssues = fixAllIssues;
-window.copyUnresolvedIssuesLog = copyUnresolvedIssuesLog;
-window.updateScanResults = updateScanResults;
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
 
 // ===== פונקציות נוספות שחסרות =====
 
@@ -3513,13 +3581,22 @@ function startRealTimeMonitoring() {
 // Mock function removed - using real scanning functions above
 
 // ייבוא הפונקציות הנוספות לגלובל scope
-window.pauseScan = pauseScan;
-window.stopScan = stopScan;
-window.scheduleScan = scheduleScan;
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
 // window.startQuickScan = startQuickScan; // Mock function removed
-window.startRealTimeMonitoring = startRealTimeMonitoring;
-window.updateFixDetailsTable = updateFixDetailsTable;
-window.updateProgressDetailsTable = updateProgressDetailsTable;
-window.discoverProjectFiles = discoverProjectFiles;
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
+// Moved to log-recovery.js
 
 console.log('✅ פונקציות חסרות נוספו לגלובל scope');
+
+// ========================================
+// Window Object Exports
+// ========================================
+
+window.discoverProjectFiles = discoverProjectFiles;
+window.startFileScan = startFileScan;
+window.initializeLinterRealtimeMonitorPage = initializeLinterRealtimeMonitorPage;
+window.updateFileTypeStatistics = updateFileTypeStatistics;

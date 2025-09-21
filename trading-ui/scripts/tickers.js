@@ -2282,7 +2282,70 @@ function getTypeDisplayName(type) {
   return typeNames[type] || type;
 }
 
-// ייצוא פונקציות לגלובל
+// ===== MISSING FUNCTIONS FOR ONCLICK ATTRIBUTES =====
+
+// Toggle functions
+function toggleTopSection() {
+    if (typeof window.toggleTopSection === 'function') {
+        window.toggleTopSection();
+    } else {
+        console.warn('toggleTopSection function not found');
+    }
+}
+
+function toggleTickersSection() {
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection('tickers');
+    } else {
+        console.warn('toggleSection function not found');
+    }
+}
+
+// Ticker CRUD functions
+function saveTicker() {
+    if (typeof window.saveTicker === 'function') {
+        window.saveTicker();
+    } else {
+        console.warn('saveTicker function not found');
+    }
+}
+
+function updateTicker() {
+    if (typeof window.updateTicker === 'function') {
+        window.updateTicker();
+    } else {
+        console.warn('updateTicker function not found');
+    }
+}
+
+function confirmDeleteTicker() {
+    if (typeof window.confirmDeleteTicker === 'function') {
+        window.confirmDeleteTicker();
+    } else {
+        console.warn('confirmDeleteTicker function not found');
+    }
+}
+
+// Yahoo Finance functions
+function refreshYahooFinanceData() {
+    if (typeof window.refreshYahooFinanceData === 'function') {
+        window.refreshYahooFinanceData();
+    } else {
+        console.warn('refreshYahooFinanceData function not found');
+    }
+}
+
+// ===== GLOBAL EXPORTS =====
+// Export functions to global scope for onclick attributes
 window.filterTickersByType = filterTickersByType;
 window.getTypeDisplayName = getTypeDisplayName;
+window.toggleTopSection = toggleTopSection;
+window.toggleTickersSection = toggleTickersSection;
+window.showAddTickerModal = showAddTickerModal;
+window.saveTicker = saveTicker;
+window.updateTicker = updateTicker;
+window.confirmDeleteTicker = confirmDeleteTicker;
+window.refreshYahooFinanceData = refreshYahooFinanceData;
+window.editTicker = editTicker;
+window.viewTickerDetails = viewTickerDetails;
 

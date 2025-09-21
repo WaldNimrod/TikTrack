@@ -2200,3 +2200,89 @@ function replaceCurrentAttachment() {
   window.replaceAttachmentFlag = true;
 }
 
+// ===== MISSING FUNCTIONS FOR ONCLICK ATTRIBUTES =====
+
+// Toggle functions
+function toggleTopSection() {
+    if (typeof window.toggleTopSection === 'function') {
+        window.toggleTopSection();
+    } else {
+        console.warn('toggleTopSection function not found');
+    }
+}
+
+function toggleMainSection() {
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection('main');
+    } else {
+        console.warn('toggleSection function not found');
+    }
+}
+
+// Note CRUD functions
+function openNoteDetails() {
+    if (typeof window.openNoteDetails === 'function') {
+        window.openNoteDetails();
+    } else {
+        console.warn('openNoteDetails function not found');
+    }
+}
+
+function editNote(id) {
+    if (typeof window.editNote === 'function') {
+        window.editNote(id);
+    } else {
+        console.warn('editNote function not found');
+    }
+}
+
+function deleteNote(id) {
+    if (typeof window.deleteNote === 'function') {
+        window.deleteNote(id);
+    } else {
+        console.warn('deleteNote function not found');
+    }
+}
+
+// Filter functions
+function filterNotesByRelatedObjectType(type) {
+    if (typeof window.filterNotesByRelatedObjectType === 'function') {
+        window.filterNotesByRelatedObjectType(type);
+    } else {
+        console.warn('filterNotesByRelatedObjectType function not found');
+    }
+}
+
+// Text formatting functions
+function formatText(format) {
+    if (typeof window.formatText === 'function') {
+        window.formatText(format);
+    } else {
+        console.warn('formatText function not found');
+    }
+}
+
+// Data loading functions
+function loadNotesData() {
+    if (typeof window.loadNotesData === 'function') {
+        window.loadNotesData();
+    } else {
+        console.warn('loadNotesData function not found');
+    }
+}
+
+// ===== GLOBAL EXPORTS =====
+// Export functions to global scope for onclick attributes
+window.toggleTopSection = toggleTopSection;
+window.toggleMainSection = toggleMainSection;
+window.openNoteDetails = openNoteDetails;
+window.editNote = editNote;
+window.deleteNote = deleteNote;
+window.filterNotesByRelatedObjectType = filterNotesByRelatedObjectType;
+window.formatText = formatText;
+window.loadNotesData = loadNotesData;
+window.addNote = addNote;
+window.uploadFile = uploadFile;
+window.removeCurrentAttachment = removeCurrentAttachment;
+window.replaceCurrentAttachment = replaceCurrentAttachment;
+

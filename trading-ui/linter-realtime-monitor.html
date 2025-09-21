@@ -113,6 +113,9 @@
             ניטור Linter בזמן אמת
           </div>
           <div class="table-actions">
+            <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+              <i class="fas fa-copy"></i> העתק לוג מפורט
+            </button>
             <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור סיכום">
               <span class="filter-icon">▲</span>
             </button>
@@ -124,6 +127,54 @@
           <!-- Active alerts component -->
           <active-alerts></active-alerts>
 
+          <!-- File Type Statistics Cards -->
+          <div class="overview-grid" id="fileTypeStats">
+            <!-- Status Card -->
+            <div class="overview-card primary">
+              <div class="overview-card-icon">💓</div>
+              <div class="overview-card-content">
+                <div class="overview-card-number" id="overallStatus">בדיקה...</div>
+                <div class="overview-card-label">סטטוס מערכת</div>
+              </div>
+            </div>
+
+            <!-- Files Card -->
+            <div class="overview-card info">
+              <div class="overview-card-icon">📁</div>
+              <div class="overview-card-content">
+                <div class="overview-card-number" id="totalFilesStats">0</div>
+                <div class="overview-card-label">קבצים נסרקו</div>
+              </div>
+            </div>
+
+            <!-- Errors Card -->
+            <div class="overview-card warning">
+              <div class="overview-card-icon">⚠️</div>
+              <div class="overview-card-content">
+                <div class="overview-card-number" id="totalErrorsStats">0</div>
+                <div class="overview-card-label">שגיאות נמצאו</div>
+              </div>
+            </div>
+
+            <!-- Warnings Card -->
+            <div class="overview-card success">
+              <div class="overview-card-icon">🔔</div>
+              <div class="overview-card-content">
+                <div class="overview-card-number" id="totalWarningsStats">0</div>
+                <div class="overview-card-label">אזהרות נמצאו</div>
+              </div>
+            </div>
+
+            <!-- Last Scan Card -->
+            <div class="overview-card primary">
+              <div class="overview-card-icon">🕐</div>
+              <div class="overview-card-content">
+                <div class="overview-card-number" id="lastScanDate">טרם בוצעה</div>
+                <div class="overview-card-label">סריקה אחרונה</div>
+              </div>
+            </div>
+          </div>
+
           <div class="info-summary" id="summaryStats">
             <div>סה"כ קבצים: <strong id="totalFiles">0</strong></div>
             <div>שגיאות: <strong id="totalErrors">0</strong></div>
@@ -134,6 +185,132 @@
         </div>
       </div> <!-- End top-section -->
       <!-- UI Content Section 1 End -->
+
+      <!-- Section 0: General Control Panel -->
+      <div class="content-section" id="generalControlSection" data-table-type="linter-realtime-monitor">
+        <div class="section-header">
+          <div class="table-title">
+            <img src="images/icons/development.svg" alt="פאנל בקרה כללי" class="table-icon">
+            פאנל בקרה כללי
+          </div>
+          <div class="table-actions">
+            <button class="filter-toggle-btn" onclick="toggleSection('generalControlSection')" title="הצג/הסתר פאנל בקרה כללי">
+              <span class="section-toggle-icon">▼</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="section-body">
+          <!-- File Type Selection -->
+          <div class="control-panel-section">
+            <h5 class="control-section-title">
+              <i class="fas fa-file-alt"></i> בחירת סוגי קבצים לסריקה:
+            </h5>
+            <div class="file-types-grid">
+              <label class="file-type-option">
+                <input type="checkbox" id="scanJs" checked class="file-type-checkbox">
+                <div class="file-type-info">
+                  <span class="file-type-name js">JavaScript</span>
+                  <br><small class="file-type-extension">.js files</small>
+                  <div class="file-type-count">
+                    <small class="file-type-count-value">
+                      <span id="jsFilesCount">0</span> קבצים |
+                      <span id="jsErrorsCount">0</span> שגיאות |
+                      <span id="jsWarningsCount">0</span> אזהרות
+                    </small>
+                  </div>
+                </div>
+              </label>
+              <label class="file-type-option">
+                <input type="checkbox" id="scanHtml" checked class="file-type-checkbox">
+                <div class="file-type-info">
+                  <span class="file-type-name html">HTML</span>
+                  <br><small class="file-type-extension">.html files</small>
+                  <div class="file-type-count">
+                    <small class="file-type-count-value">
+                      <span id="htmlFilesCount">0</span> קבצים |
+                      <span id="htmlErrorsCount">0</span> שגיאות |
+                      <span id="htmlWarningsCount">0</span> אזהרות
+                    </small>
+                  </div>
+                </div>
+              </label>
+              <label class="file-type-option">
+                <input type="checkbox" id="scanPy" checked class="file-type-checkbox">
+                <div class="file-type-info">
+                  <span class="file-type-name python">Python</span>
+                  <br><small class="file-type-extension">.py files</small>
+                  <div class="file-type-count">
+                    <small class="file-type-count-value">
+                      <span id="pyFilesCount">0</span> קבצים |
+                      <span id="pyErrorsCount">0</span> שגיאות |
+                      <span id="pyWarningsCount">0</span> אזהרות
+                    </small>
+                  </div>
+                </div>
+              </label>
+              <label class="file-type-option">
+                <input type="checkbox" id="scanCss" checked class="file-type-checkbox">
+                <div class="file-type-info">
+                  <span class="file-type-name css">CSS</span>
+                  <br><small class="file-type-extension">.css files</small>
+                  <div class="file-type-count">
+                    <small class="file-type-count-value">
+                      <span id="cssFilesCount">0</span> קבצים |
+                      <span id="cssErrorsCount">0</span> שגיאות |
+                      <span id="cssWarningsCount">0</span> אזהרות
+                    </small>
+                  </div>
+                </div>
+              </label>
+              <label class="file-type-option">
+                <input type="checkbox" id="scanOther" checked class="file-type-checkbox">
+                <div class="file-type-info">
+                  <span class="file-type-name other">אחרים</span>
+                  <br><small class="file-type-extension">.json, .md, .sql</small>
+                  <div class="file-type-count">
+                    <small class="file-type-count-value">
+                      <span id="otherFilesCount">0</span> קבצים |
+                      <span id="otherErrorsCount">0</span> שגיאות |
+                      <span id="otherWarningsCount">0</span> אזהרות
+                    </small>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Scan Options -->
+          <div class="control-panel-section">
+            <h5 class="control-section-title">
+              <i class="fas fa-cog"></i> אפשרויות סריקה:
+            </h5>
+            <div class="scan-options-flex">
+              <label class="scan-option">
+                <input type="checkbox" id="skipBackupFolders" checked class="scan-option-checkbox">
+                <div>
+                  <span class="scan-option-label">דלג על תיקיות גיבוי</span>
+                  <br><small class="scan-option-description">backup/, backups/, *_backup</small>
+                </div>
+              </label>
+              <label class="scan-option">
+                <input type="checkbox" id="skipTestFiles" checked class="scan-option-checkbox">
+                <div>
+                  <span class="scan-option-label">דלג על קבצי בדיקה</span>
+                  <br><small class="scan-option-description">test_*, *_test, spec/</small>
+                </div>
+              </label>
+              <label class="scan-option">
+                <input type="checkbox" id="skipDocumentation" checked class="scan-option-checkbox">
+                <div>
+                  <span class="scan-option-label">דלג על תיעוד</span>
+                  <br><small class="scan-option-description">*.md, *.txt, docs/</small>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div> <!-- End general control section -->
 
       <!-- Main content -->
       <div class="main-content">
@@ -154,170 +331,12 @@
           <div class="section-body">
             <!-- 1. מידע - File Type Statistics -->
             <div class="file-mapping-info-section">
-              <div class="overview-grid" id="fileTypeStats">
-              <!-- Status Card -->
-              <div class="overview-card primary">
-                <div class="overview-card-icon">💓</div>
-                <div class="overview-card-content">
-                  <div class="overview-card-number" id="overallStatus">בדיקה...</div>
-                  <div class="overview-card-label">סטטוס מערכת</div>
-                </div>
+              <!-- File Type Statistics moved to top section -->
             </div>
 
-              <!-- Files Card -->
-              <div class="overview-card info">
-                <div class="overview-card-icon">📁</div>
-                <div class="overview-card-content">
-                  <div class="overview-card-number" id="totalFilesStats">0</div>
-                  <div class="overview-card-label">קבצים נסרקו</div>
-                </div>
-              </div>
-
-              <!-- Errors Card -->
-              <div class="overview-card warning">
-                <div class="overview-card-icon">⚠️</div>
-                <div class="overview-card-content">
-                  <div class="overview-card-number" id="totalErrorsStats">0</div>
-                  <div class="overview-card-label">שגיאות נמצאו</div>
-                </div>
-              </div>
-
-              <!-- Warnings Card -->
-              <div class="overview-card success">
-                <div class="overview-card-icon">🔔</div>
-                <div class="overview-card-content">
-                  <div class="overview-card-number" id="totalWarningsStats">0</div>
-                  <div class="overview-card-label">אזהרות נמצאו</div>
-                </div>
-              </div>
-
-              <!-- Last Scan Card -->
-              <div class="overview-card primary">
-                <div class="overview-card-icon">🕐</div>
-                <div class="overview-card-content">
-                  <div class="overview-card-number" id="lastScanDate">טרם בוצעה</div>
-                  <div class="overview-card-label">סריקה אחרונה</div>
-                </div>
-              </div>
-            </div>
-            </div>
-
-            <!-- 2. ממשקים - Unified Control Panel -->
+            <!-- 2. ממשקים - File Mapping Controls -->
             <div class="file-mapping-controls-section">
-            <div class="section-header">
-              <h3>⚙️ פאנל בקרה מרכזי - Linter</h3>
-              <p>בחר סוגי קבצים, סרוק ותקן אוטומטית</p>
-            </div>
-            <div class="section-body">
-
-            <!-- File Type Selection -->
-            <div class="control-panel-section">
-              <h5 class="control-section-title">
-                <i class="fas fa-file-alt"></i> בחירת סוגי קבצים לסריקה:
-              </h5>
-              <div class="file-types-grid">
-                <label class="file-type-option">
-                  <input type="checkbox" id="scanJs" checked class="file-type-checkbox">
-                  <div class="file-type-info">
-                    <span class="file-type-name js">JavaScript</span>
-                    <br><small class="file-type-extension">.js files</small>
-                    <div class="file-type-count">
-                      <small class="file-type-count-value">
-                        <span id="jsFilesCount">0</span> קבצים |
-                        <span id="jsErrorsCount">0</span> שגיאות |
-                        <span id="jsWarningsCount">0</span> אזהרות
-                      </small>
-                    </div>
-                  </div>
-                </label>
-                <label class="file-type-option">
-                  <input type="checkbox" id="scanHtml" checked class="file-type-checkbox">
-                  <div class="file-type-info">
-                    <span class="file-type-name html">HTML</span>
-                    <br><small class="file-type-extension">.html files</small>
-                    <div class="file-type-count">
-                      <small class="file-type-count-value">
-                        <span id="htmlFilesCount">0</span> קבצים |
-                        <span id="htmlErrorsCount">0</span> שגיאות |
-                        <span id="htmlWarningsCount">0</span> אזהרות
-                      </small>
-                    </div>
-                  </div>
-                </label>
-                <label class="file-type-option">
-                  <input type="checkbox" id="scanPy" checked class="file-type-checkbox">
-                  <div class="file-type-info">
-                    <span class="file-type-name python">Python</span>
-                    <br><small class="file-type-extension">.py files</small>
-                    <div class="file-type-count">
-                      <small class="file-type-count-value">
-                        <span id="pyFilesCount">0</span> קבצים |
-                        <span id="pyErrorsCount">0</span> שגיאות |
-                        <span id="pyWarningsCount">0</span> אזהרות
-                      </small>
-                    </div>
-                  </div>
-                </label>
-                <label class="file-type-option">
-                  <input type="checkbox" id="scanCss" checked class="file-type-checkbox">
-                  <div class="file-type-info">
-                    <span class="file-type-name css">CSS</span>
-                    <br><small class="file-type-extension">.css files</small>
-                    <div class="file-type-count">
-                      <small class="file-type-count-value">
-                        <span id="cssFilesCount">0</span> קבצים |
-                        <span id="cssErrorsCount">0</span> שגיאות |
-                        <span id="cssWarningsCount">0</span> אזהרות
-                      </small>
-                    </div>
-                  </div>
-                </label>
-                <label class="file-type-option">
-                  <input type="checkbox" id="scanOther" checked class="file-type-checkbox">
-                  <div class="file-type-info">
-                    <span class="file-type-name other">אחרים</span>
-                    <br><small class="file-type-extension">.json, .md, .sql</small>
-                    <div class="file-type-count">
-                      <small class="file-type-count-value">
-                        <span id="otherFilesCount">0</span> קבצים |
-                        <span id="otherErrorsCount">0</span> שגיאות |
-                        <span id="otherWarningsCount">0</span> אזהרות
-                      </small>
-                    </div>
-                  </div>
-                </label>
-              </div>
-            </div>
-
-            <!-- Scan Options -->
-            <div class="control-panel-section">
-              <h5 class="control-section-title">
-                <i class="fas fa-cog"></i> אפשרויות סריקה:
-              </h5>
-              <div class="scan-options-flex">
-                <label class="scan-option">
-                  <input type="checkbox" id="skipBackupFolders" checked class="scan-option-checkbox">
-                  <div>
-                    <span class="scan-option-label">דלג על תיקיות גיבוי</span>
-                    <br><small class="scan-option-description">backup/, backups/, *_backup</small>
-                  </div>
-                </label>
-                <label class="scan-option">
-                  <input type="checkbox" id="skipTestFiles" checked class="scan-option-checkbox">
-                  <div>
-                    <span class="scan-option-label">דלג על קבצי בדיקה</span>
-                    <br><small class="scan-option-description">test_*, *_test, spec/</small>
-                  </div>
-                </label>
-                <label class="scan-option">
-                  <input type="checkbox" id="skipDocumentation" checked class="scan-option-checkbox">
-                  <div>
-                    <span class="scan-option-label">דלג על תיעוד</span>
-                    <br><small class="scan-option-description">*.md, *.txt, docs/</small>
-                  </div>
-                </label>
-              </div>
-            </div>
+              <!-- File Mapping Controls moved to General Control Panel -->
             </div>
 
             <!-- 3. פעולות - File Discovery Actions -->
@@ -582,7 +601,7 @@
       <div class="content-section" id="fixesSection" data-table-type="linter-realtime-monitor">
           <div class="section-header">
             <div class="table-title">
-            <img src="images/icons/fix.svg" alt="תיקונים ופעולות נוספות" class="table-icon">
+            <img src="images/icons/development.svg" alt="תיקונים ופעולות נוספות" class="table-icon">
             תיקונים ופעולות נוספות
           </div>
           <div class="table-actions">
@@ -1135,7 +1154,7 @@
       <div class="content-section" id="fixDetailsSection" data-table-type="linter-realtime-monitor">
         <div class="section-header">
           <div class="table-title">
-            <img src="images/icons/fix.svg" alt="פירוט תיקונים" class="table-icon">
+            <img src="images/icons/development.svg" alt="פירוט תיקונים" class="table-icon">
             פירוט תיקונים
           </div>
           <div class="table-count" id="fixDetailsCount">0 תיקונים</div>
@@ -1187,9 +1206,6 @@
             <button class="refresh-btn" onclick="window.loadIssues && window.loadIssues()" title="רענן לוגים">
               <i class="fas fa-sync"></i> רענן
               </button>
-            <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
-              <i class="fas fa-copy"></i> העתק לוג מפורט
-            </button>
             <button class="filter-toggle-btn" onclick="toggleSection('logsSection')" title="הצג/הסתר לוגים">
               <span class="section-toggle-icon">▼</span>
               </button>
@@ -1228,6 +1244,7 @@
     <script src="scripts/translation-utils.js"></script>
     <script src="scripts/data-utils.js"></script>
     <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/auth.js"></script>
     <script src="scripts/table-mappings.js"></script>
     <script src="scripts/date-utils.js"></script>
     <script src="scripts/tables.js"></script>

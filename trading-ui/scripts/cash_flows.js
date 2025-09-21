@@ -1771,13 +1771,48 @@ function showEditCashFlowModal(cashFlowId) {
     }
 }
 
-// ייצוא פונקציות גלובליות נוספות
+// ===== MISSING FUNCTIONS FOR ONCLICK ATTRIBUTES =====
+
+// Toggle functions
+function toggleTopSection() {
+    if (typeof window.toggleTopSection === 'function') {
+        window.toggleTopSection();
+    } else {
+        console.warn('toggleTopSection function not found');
+    }
+}
+
+// Cash Flow CRUD functions
+function editCashFlow(id) {
+    if (typeof window.editCashFlow === 'function') {
+        window.editCashFlow(id);
+    } else {
+        console.warn('editCashFlow function not found');
+    }
+}
+
+function deleteCashFlow(id) {
+    if (typeof window.deleteCashFlow === 'function') {
+        window.deleteCashFlow(id);
+    } else {
+        console.warn('deleteCashFlow function not found');
+    }
+}
+
+// ===== GLOBAL EXPORTS =====
+// Export functions to global scope for onclick attributes
 window.manageExternalIdField = manageExternalIdField;
 window.setupSourceFieldListeners = setupSourceFieldListeners;
 window.initializeExternalIdFields = initializeExternalIdFields;
 window.deleteCashFlow = deleteCashFlow;
 window.showAddCashFlowModal = showAddCashFlowModal;
 window.showEditCashFlowModal = showEditCashFlowModal;
+window.toggleTopSection = toggleTopSection;
+window.editCashFlow = editCashFlow;
+window.loadCashFlowsData = loadCashFlowsData;
+window.updateCashFlowsTable = updateCashFlowsTable;
+window.saveCashFlow = saveCashFlow;
+window.updateCashFlow = updateCashFlow;
 
 // window.showLinkedItemsWarning = showLinkedItemsWarning; // הוסר - הוחלף ב-showLinkedItemsModal
 // window.checkLinkedItemsForCashFlow = checkLinkedItemsForCashFlow; // הוסר - לא נחוץ יותר

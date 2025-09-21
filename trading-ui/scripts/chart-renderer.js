@@ -21,8 +21,8 @@
  */
 
 // Global chart renderer instances
-let qualityChartRenderer = null;
-let countsChartRenderer = null;
+window.qualityChartRenderer = null;
+window.countsChartRenderer = null;
 
 /**
  * אתחול גרפים
@@ -36,9 +36,9 @@ function initializeCharts() {
     }
 
     // Initialize Quality Chart (percentages) - only if not already initialized
-    if (!qualityChartRenderer) {
-        qualityChartRenderer = new QualityChartRenderer('qualityChartContainer');
-        qualityChartRenderer.initialize().then(() => {
+    if (!window.qualityChartRenderer) {
+        window.qualityChartRenderer = new QualityChartRenderer('qualityChartContainer');
+        window.qualityChartRenderer.initialize().then(() => {
             console.log('✅ Quality chart initialized');
         }).catch(error => {
             addLogEntry('ERROR', 'שגיאה באתחול גרף איכות', { error: error.message });
@@ -49,9 +49,9 @@ function initializeCharts() {
     }
 
     // Initialize Counts Chart (numbers) - only if not already initialized
-    if (!countsChartRenderer) {
-        countsChartRenderer = new CountsChartRenderer('countsChartContainer');
-        countsChartRenderer.initialize().then(() => {
+    if (!window.countsChartRenderer) {
+        window.countsChartRenderer = new CountsChartRenderer('countsChartContainer');
+        window.countsChartRenderer.initialize().then(() => {
             console.log('✅ Counts chart initialized');
             loadInitialData();
         }).catch(error => {
@@ -70,9 +70,9 @@ function initializeCharts() {
 function updateQualityChart(data) {
     console.log('🔍 updateQualityChart called with data:', data);
     
-    if (qualityChartRenderer && qualityChartRenderer.isInitialized) {
+    if (window.qualityChartRenderer && window.qualityChartRenderer.isInitialized) {
         console.log('🔍 Calling qualityChartRenderer.updateChart');
-        qualityChartRenderer.updateChart(data);
+        window.qualityChartRenderer.updateChart(data);
     } else {
         console.log('⚠️ Quality chart renderer not ready');
     }
@@ -85,9 +85,9 @@ function updateQualityChart(data) {
 function updateCountsChart(data) {
     console.log('🔍 updateCountsChart called with data:', data);
     
-    if (countsChartRenderer && countsChartRenderer.isInitialized) {
+    if (window.countsChartRenderer && window.countsChartRenderer.isInitialized) {
         console.log('🔍 Calling countsChartRenderer.updateChart');
-        countsChartRenderer.updateChart(data);
+        window.countsChartRenderer.updateChart(data);
     } else {
         console.log('⚠️ Counts chart renderer not ready');
     }
@@ -107,11 +107,11 @@ function addDataPointToCharts(dataPoint) {
  * Clear charts
  */
 function clearCharts() {
-    if (qualityChartRenderer) {
-        qualityChartRenderer.clearChart();
+    if (window.qualityChartRenderer) {
+        window.qualityChartRenderer.clearChart();
     }
-    if (countsChartRenderer) {
-        countsChartRenderer.clearChart();
+    if (window.countsChartRenderer) {
+        window.countsChartRenderer.clearChart();
     }
 }
 

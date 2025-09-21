@@ -37,9 +37,14 @@ class FunctionsTabsSystem {
    */
   setFunctionsData(functionsData) {
     console.log('📊 Setting functions data for tabs system:', Object.keys(functionsData || {}));
+    console.log('FunctionsTabsSystem instance:', this);
+    console.log('setFunctionsData method called with:', functionsData);
+    
     this.functionsData = functionsData || {};
     this.updateTabCounts();
     this.renderTabs();
+    
+    console.log('✅ Functions data set successfully');
   }
 
   /**
@@ -349,6 +354,171 @@ function setViewMode(mode) {
   }
 }
 
+// Export to global scope
+window.setViewMode = setViewMode;
+
+// Tab switching functions for main tabs
+function switchTab(tabName) {
+    console.log('🔄 Switching to tab:', tabName);
+    
+    // Hide all tab panels
+    document.querySelectorAll('.tab-panel').forEach(panel => {
+        panel.classList.remove('active');
+    });
+    
+    // Remove active class from all tab buttons
+    document.querySelectorAll('.tab-navigation .tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show selected tab panel
+    const targetPanel = document.getElementById(`${tabName}-tab`);
+    if (targetPanel) {
+        targetPanel.classList.add('active');
+    }
+    
+    // Add active class to selected tab button
+    const targetBtn = document.querySelector(`[data-tab="${tabName}"]`);
+    if (targetBtn) {
+        targetBtn.classList.add('active');
+    }
+    
+    // Load tab content
+    loadTabContent(tabName);
+    
+    // Show notification
+    if (window.showNotification) {
+        window.showNotification(`עבר לטאב: ${tabName}`, 'info');
+    }
+}
+
+// Load content for specific tab
+function loadTabContent(tabName) {
+    console.log('📊 Loading content for tab:', tabName);
+    
+    if (window.jsMapSystem) {
+        switch (tabName) {
+            case 'statistics':
+                window.jsMapSystem.renderStatistics();
+                break;
+            case 'functions':
+                window.jsMapSystem.renderFunctions();
+                break;
+            case 'pages':
+                window.jsMapSystem.renderPageMapping();
+                break;
+            case 'dependencies':
+                window.jsMapSystem.renderDependencies();
+                break;
+            case 'analysis':
+                window.jsMapSystem.renderAnalysis();
+                break;
+        }
+    }
+}
+
+// Tab-specific refresh functions
+function refreshStatistics() {
+    console.log('🔄 Refreshing statistics...');
+    if (window.jsMapSystem) {
+        window.jsMapSystem.refreshStatistics();
+    }
+}
+
+function refreshFunctions() {
+    console.log('🔄 Refreshing functions...');
+    if (window.jsMapSystem) {
+        window.jsMapSystem.refreshFunctions();
+    }
+}
+
+function refreshPages() {
+    console.log('🔄 Refreshing pages...');
+    if (window.jsMapSystem) {
+        window.jsMapSystem.refreshPages();
+    }
+}
+
+function refreshDependencies() {
+    console.log('🔄 Refreshing dependencies...');
+    if (window.jsMapSystem) {
+        window.jsMapSystem.refreshDependencies();
+    }
+}
+
+function refreshAnalysis() {
+    console.log('🔄 Refreshing analysis...');
+    if (window.jsMapSystem) {
+        window.jsMapSystem.refreshAnalysis();
+    }
+}
+
+// Tab-specific export functions
+function exportStatistics() {
+    console.log('📊 Exporting statistics...');
+    if (window.showNotification) {
+        window.showNotification('ייצוא סטטיסטיקות - פונקציונליות בפיתוח', 'info');
+    }
+}
+
+function exportFunctions() {
+    console.log('📊 Exporting functions...');
+    if (window.showNotification) {
+        window.showNotification('ייצוא פונקציות - פונקציונליות בפיתוח', 'info');
+    }
+}
+
+function exportPages() {
+    console.log('📊 Exporting pages...');
+    if (window.showNotification) {
+        window.showNotification('ייצוא עמודים - פונקציונליות בפיתוח', 'info');
+    }
+}
+
+function exportDependencies() {
+    console.log('📊 Exporting dependencies...');
+    if (window.showNotification) {
+        window.showNotification('ייצוא תלויות - פונקציונליות בפיתוח', 'info');
+    }
+}
+
+function exportAnalysis() {
+    console.log('📊 Exporting analysis...');
+    if (window.showNotification) {
+        window.showNotification('ייצוא ניתוח - פונקציונליות בפיתוח', 'info');
+    }
+}
+
+function refreshFutureFeatures() {
+    console.log('🔄 Refreshing future features...');
+    if (window.showNotification) {
+        window.showNotification('רענון תכונות עתידיות - פונקציונליות בפיתוח', 'info');
+    }
+}
+
+function exportFutureFeatures() {
+    console.log('📊 Exporting future features...');
+    if (window.showNotification) {
+        window.showNotification('ייצוא תכונות עתידיות - פונקציונליות בפיתוח', 'info');
+    }
+}
+
+// Export functions to global scope
+window.switchTab = switchTab;
+window.loadTabContent = loadTabContent;
+window.refreshStatistics = refreshStatistics;
+window.refreshFunctions = refreshFunctions;
+window.refreshPages = refreshPages;
+window.refreshDependencies = refreshDependencies;
+window.refreshAnalysis = refreshAnalysis;
+window.exportStatistics = exportStatistics;
+window.exportFunctions = exportFunctions;
+window.exportPages = exportPages;
+window.exportDependencies = exportDependencies;
+window.exportAnalysis = exportAnalysis;
+window.refreshFutureFeatures = refreshFutureFeatures;
+window.exportFutureFeatures = exportFutureFeatures;
+
 /**
  * Show File Details
  */
@@ -423,16 +593,62 @@ function exportFileAnalysis(fileName, analysis) {
   }
 }
 
-// Initialize UI system immediately
-window.functionsTabsSystem = new FunctionsTabsSystem();
-
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
+// Initialize UI system immediately with better error handling
+try {
+  window.functionsTabsSystem = new FunctionsTabsSystem();
+  console.log('✅ FunctionsTabsSystem instance created');
+  console.log('Available methods:', Object.getOwnPropertyNames(window.functionsTabsSystem));
+  
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('🔄 Initializing FunctionsTabsSystem on DOM ready...');
+      window.functionsTabsSystem.init();
+    });
+  } else {
+    console.log('🔄 Initializing FunctionsTabsSystem immediately...');
     window.functionsTabsSystem.init();
-  });
-} else {
-  window.functionsTabsSystem.init();
+  }
+} catch (error) {
+  console.error('❌ Failed to create FunctionsTabsSystem:', error);
 }
+
+// Add tab switching functionality
+function switchTab(tabName) {
+    console.log('🔄 Switching to tab:', tabName);
+    
+    // Remove active class from all tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Add active class to clicked tab
+    const activeTab = document.querySelector(`[data-tab="${tabName}"]`);
+    if (activeTab) {
+        activeTab.classList.add('active');
+    }
+    
+    // Update content based on tab
+    if (window.functionsTabsSystem) {
+        window.functionsTabsSystem.currentTab = tabName;
+        window.functionsTabsSystem.loadTabContent(tabName);
+    }
+    
+    if (window.showNotification) {
+        window.showNotification(`עבר לטאב: ${tabName}`, 'info');
+    }
+}
+
+// Add click handlers to tab buttons
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tabName = this.getAttribute('data-tab');
+            switchTab(tabName);
+        });
+    });
+});
+
+window.switchTab = switchTab;
 
 console.log('✅ js-map-ui.js loaded successfully');

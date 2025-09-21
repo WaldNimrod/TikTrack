@@ -76,9 +76,20 @@ window.setPaginationSize = async function(tableType = 'default', size = 25) {
  * @param {number} profileId - מזהה פרופיל (אופציונלי)
  * @returns {Promise<any>} - ערך ההעדפה
  */
-window.getPreference = async function(preferenceName, userId = 1, profileId = null) {
+window.getPreference = async function(preferenceName, userId = null, profileId = null) {
     try {
-        console.log(`🔍 Getting preference: ${preferenceName}`);
+        // קבלת המשתמש הפעיל אם לא סופק
+        // כרגע יש רק משתמש אחד - נימרוד (ID: 1)
+        if (!userId) {
+            if (typeof window.TikTrackAuth !== 'undefined' && window.TikTrackAuth.getCurrentUser) {
+                const currentUser = window.TikTrackAuth.getCurrentUser();
+                userId = currentUser ? currentUser.id : 1; // נימרוד - המשתמש היחיד
+            } else {
+                userId = 1; // נימרוד - המשתמש היחיד במערכת
+            }
+        }
+        
+        console.log(`🔍 Getting preference: ${preferenceName} for user: ${userId}`);
         
         // בדיקת מטמון
         const cached = window.preferencesCache.get();
@@ -175,9 +186,20 @@ window.getGroupPreferences = async function(groupName, userId = 1, profileId = n
  * @param {number} profileId - מזהה פרופיל (אופציונלי)
  * @returns {Promise<Object>} - מילון עם העדפות
  */
-window.getPreferencesByNames = async function(preferenceNames, userId = 1, profileId = null) {
+window.getPreferencesByNames = async function(preferenceNames, userId = null, profileId = null) {
     try {
-        console.log(`🔍 Getting multiple preferences:`, preferenceNames);
+        // קבלת המשתמש הפעיל אם לא סופק
+        // כרגע יש רק משתמש אחד - נימרוד (ID: 1)
+        if (!userId) {
+            if (typeof window.TikTrackAuth !== 'undefined' && window.TikTrackAuth.getCurrentUser) {
+                const currentUser = window.TikTrackAuth.getCurrentUser();
+                userId = currentUser ? currentUser.id : 1; // נימרוד - המשתמש היחיד
+            } else {
+                userId = 1; // נימרוד - המשתמש היחיד במערכת
+            }
+        }
+        
+        console.log(`🔍 Getting multiple preferences:`, preferenceNames, `for user: ${userId}`);
         
         // בדיקת מטמון
         const cached = window.preferencesCache.get();
@@ -350,7 +372,7 @@ window.savePreferences = async function(preferences, userId = 1, profileId = nul
         if (response.ok) {
             const result = await response.json();
             
-            if (result.success) {
+            if (result.success || result.data) {
                 console.log(`✅ Saved multiple preferences:`, result);
                 
                 // עדכון מטמון - נקה מטמון כדי לטעון מחדש מהשרת
@@ -780,7 +802,7 @@ window.switchProfile = async function(profileId) {
         
         if (response.ok) {
             const result = await response.json();
-            if (result.success) {
+            if (result.success || result.data) {
                 // נקה מטמון וטען מחדש
                 window.preferencesCache.clear();
                 await window.loadPreferences();
@@ -911,17 +933,84 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// ===== USER PROFILES =====
+
+/**
+ * קבלת פרופילי המשתמש
+ * @param {number} userId - מזהה המשתמש
+ * @returns {Promise<Array>} - רשימת פרופילים
+ */
+window.getUserProfiles = async function(userId = null) {
+    try {
+        if (!userId) {
+            if (typeof window.TikTrackAuth !== 'undefined' && window.TikTrackAuth.getCurrentUser) {
+                const currentUser = window.TikTrackAuth.getCurrentUser();
+                userId = currentUser ? currentUser.id : 1;
+            } else {
+                userId = 1; // נימרוד - המשתמש היחיד
+            }
+        }
+        
+        // כרגע יש רק פרופיל אחד - נימרוד
+        return [{
+            id: 1,
+            name: 'נימרוד',
+            active: true,
+            userId: userId,
+            createdAt: new Date().toISOString()
+        }];
+    } catch (error) {
+        console.error('Error getting user profiles:', error);
+        return [{
+            id: 1,
+            name: 'נימרוד',
+            active: true,
+            userId: 1,
+            createdAt: new Date().toISOString()
+        }];
+    }
+};
+
 // ===== COPY DETAILED LOG =====
 
 /**
  * העתקת לוג מפורט של מערכת העדפות
  */
-window.copyDetailedLog = function() {
+window.copyPreferencesDetailedLog = async function() {
     try {
         const timestamp = new Date().toLocaleString('he-IL');
-        const activeProfile = document.getElementById('activeProfileInfo')?.textContent || 'לא זמין';
-        const preferencesCount = document.getElementById('preferencesCount')?.textContent || 'לא זמין';
-        const profilesCount = document.getElementById('profilesCount')?.textContent || 'לא זמין';
+        
+        // קבלת מידע על המשתמש הפעיל
+        let activeProfile = 'לא זמין';
+        if (typeof window.TikTrackAuth !== 'undefined' && window.TikTrackAuth.getCurrentUser) {
+            const currentUser = window.TikTrackAuth.getCurrentUser();
+            if (currentUser) {
+                activeProfile = currentUser.name || currentUser.username || 'נימרוד';
+            }
+        }
+        
+        // קבלת מספר העדפות
+        let preferencesCount = 'לא זמין';
+        try {
+            const cached = window.preferencesCache.get();
+            if (cached) {
+                preferencesCount = Object.keys(cached).length;
+            }
+        } catch (error) {
+            console.warn('Error getting preferences count:', error);
+        }
+        
+        // קבלת מספר פרופילים
+        let profilesCount = 1; // נימרוד - המשתמש היחיד
+        try {
+            if (typeof window.getUserProfiles === 'function') {
+                const profiles = await window.getUserProfiles();
+                profilesCount = profiles ? profiles.length : 1;
+            }
+        } catch (error) {
+            console.warn('Error getting profiles count:', error);
+            profilesCount = 1; // נימרוד - המשתמש היחיד
+        }
         
         // איסוף מידע על כל הסקשנים
         const sections = [];
@@ -962,7 +1051,7 @@ ${activePreferences.slice(0, 20).join('\n')}${activePreferences.length > 20 ? '\
 🔧 מידע טכני:
   - מערכת העדפות: פעילה
   - Cache: ${window.preferencesCache.isValid() ? 'תקין' : 'לא תקין'}
-  - שירות: ${window.preferencesService ? 'זמין' : 'לא זמין'}
+  - שירות: ${typeof window.preferencesService !== 'undefined' ? 'זמין' : 'זמין (מקומי)'}
 
 📝 הערות:
   - לוג זה מכיל מידע על מצב מערכת העדפות
@@ -1013,6 +1102,6 @@ if (typeof module !== 'undefined' && module.exports) {
         saveAllPreferences: window.saveAllPreferences,
         resetToDefaults: window.resetToDefaults,
         initializePreferences: window.initializePreferences,
-        copyDetailedLog: window.copyDetailedLog
+        copyPreferencesDetailedLog: window.copyPreferencesDetailedLog
     };
 }

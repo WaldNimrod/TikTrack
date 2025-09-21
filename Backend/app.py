@@ -1524,53 +1524,84 @@ def serve_static_files(filename):
 @app.route("/api/v1/files/discover", methods=["GET"])
 @rate_limit_api(requests_per_minute=30)
 def discover_files():
-    """Discover all project files dynamically - static fallback version"""
+    """Discover all project files dynamically based on selected file types"""
     try:
-        # Return static file lists as fallback to avoid signal issues
-        discovered_files = {
-            'js': [
-                'scripts/main.js',
-                'scripts/ui-utils.js',
-                'scripts/notification-system.js',
-                'scripts/tables.js',
-                'scripts/header-system.js',
-                'scripts/color-scheme-system.js',
-                'scripts/linter-realtime-monitor.js',
-                'scripts/project-files-scanner.js',
-                'scripts/quality-chart-renderer.js',
-                'scripts/counts-chart-renderer.js'
-            ],
-            'html': [
-                'index.html',
-                'accounts.html',
-                'trades.html',
-                'tickers.html',
-                'linter-realtime-monitor.html'
-            ],
-            'css': [
-                'styles/main.css',
-                'styles/tables.css',
-                'styles/forms.css',
-                'styles/charts.css'
-            ],
-            'python': [
-                'Backend/app.py',
-                'Backend/dev_server.py',
-                'Backend/models.py'
-            ],
-            'other': [
-                'README.md',
-                'package.json',
-                'requirements.txt'
-            ]
+        # Get selected file types from query parameters
+        selected_types = request.args.get('types', 'js,html,css,python,other').split(',')
+        
+        # Get project root directory (one level up from Backend)
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        logger.info(f"Project root: {project_root}")
+        
+        # Define file type mappings with correct paths from project root
+        file_type_mappings = {
+            'js': {
+                'extensions': ['.js'],
+                'directories': [os.path.join(project_root, 'trading-ui', 'scripts'), os.path.join(project_root, 'scripts')],
+                'exclude_patterns': ['node_modules', '.git', '__pycache__', 'venv', 'env', 'dist', 'build', 'coverage', 'backup', 'temp', 'tmp']
+            },
+            'html': {
+                'extensions': ['.html', '.htm'],
+                'directories': [os.path.join(project_root, 'trading-ui'), project_root],
+                'exclude_patterns': ['node_modules', '.git', '__pycache__', 'venv', 'env', 'dist', 'build', 'coverage', 'backup', 'temp', 'tmp']
+            },
+            'css': {
+                'extensions': ['.css'],
+                'directories': [os.path.join(project_root, 'trading-ui', 'styles'), os.path.join(project_root, 'trading-ui', 'styles-new'), os.path.join(project_root, 'styles')],
+                'exclude_patterns': ['node_modules', '.git', '__pycache__', 'venv', 'env', 'dist', 'build', 'coverage', 'backup', 'temp', 'tmp']
+            },
+            'python': {
+                'extensions': ['.py'],
+                'directories': [os.path.join(project_root, 'Backend'), project_root],
+                'exclude_patterns': ['node_modules', '.git', '__pycache__', 'venv', 'env', 'dist', 'build', 'coverage', 'backup', 'temp', 'tmp']
+            },
+            'other': {
+                'extensions': ['.md', '.json', '.txt', '.yml', '.yaml', '.xml', '.sql', '.sh', '.bat'],
+                'directories': [project_root, os.path.join(project_root, 'documentation'), os.path.join(project_root, 'Backend')],
+                'exclude_patterns': ['node_modules', '.git', '__pycache__', 'venv', 'env', 'dist', 'build', 'coverage', 'backup', 'temp', 'tmp']
+            }
         }
+        
+        discovered_files = {}
+        total_files = 0
+        
+        # Scan each selected file type
+        for file_type in selected_types:
+            if file_type not in file_type_mappings:
+                continue
+                
+            file_type_config = file_type_mappings[file_type]
+            discovered_files[file_type] = []
+            
+            # Scan directories for this file type
+            for directory in file_type_config['directories']:
+                logger.info(f"Scanning directory: {directory}")
+                if os.path.exists(directory):
+                    logger.info(f"Directory exists: {directory}")
+                    for root, dirs, files in os.walk(directory):
+                        # Filter out excluded directories
+                        dirs[:] = [d for d in dirs if not any(pattern in d for pattern in file_type_config['exclude_patterns'])]
+                        
+                        for file in files:
+                            # Check if file has the right extension
+                            if any(file.endswith(ext) for ext in file_type_config['extensions']):
+                                # Create relative path from project root
+                                rel_path = os.path.relpath(os.path.join(root, file), project_root)
+                                # Normalize path separators for web
+                                rel_path = rel_path.replace('\\', '/')
+                                discovered_files[file_type].append(rel_path)
+            
+            # Remove duplicates and sort
+            discovered_files[file_type] = sorted(list(set(discovered_files[file_type])))
+            total_files += len(discovered_files[file_type])
         
         return jsonify({
             "success": True,
             "files": discovered_files,
-            "total_files": sum(len(files) for files in discovered_files.values()),
+            "total_files": total_files,
+            "selected_types": selected_types,
             "discovery_timestamp": datetime.now().isoformat(),
-            "note": "Using static fallback due to signal threading issues"
+            "note": "Dynamic file discovery based on selected types"
         })
         
     except Exception as e:

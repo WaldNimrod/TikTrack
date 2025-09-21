@@ -1,416 +1,355 @@
 /**
- * Log Recovery System - שחזור נתונים מהלוגים
- *
- * @description מחלקה לשחזור נתוני גרף מהלוגים הקיימים
- * @version 1.0.0
- * @since 2025-01-18
+ * ========================================
+ * Log Recovery Module - Linter Realtime Monitor
+ * ========================================
+ * 
+ * מודול ניהול לוגים למערכת ניטור Linter
+ * כולל שחזור לוגים וניהול הודעות
+ * 
+ * תכונות:
+ * - טעינת לוגים
+ * - שחזור לוגים
+ * - ניהול הודעות לוג
+ * - העתקת לוגים מפורטים
+ * 
+ * ========================================
+ * 
+ * מחבר: TikTrack Development Team
+ * תאריך עדכון אחרון: 2025
+ * ========================================
  */
 
 /**
- * @class LogRecovery
- * @description מטפל בשחזור נתונים מהלוגים הקיימים
+ * טעינת לוגים
+ * Load logs
  */
-class LogRecovery {
-    constructor() {
-        this.logPatterns = {
-            scanComplete: /נמצאו (\d+) שגיאות ו-(\d+) אזהרות/,
-            fixComplete: /תוקנו (\d+) שגיאות/,
-            filesScanned: /נסרקו (\d+) קבצים/,
-            qualityScore: /איכות קוד: (\d+(?:\.\d+)?)%/,
-            scanTime: /זמן סריקה: (\d+(?:\.\d+)?)ms/,
-            sessionStart: /session_(\w+)/
-        };
-
-        this.recoveredData = [];
-        this.lastRecoveryTime = null;
-    }
-
-    /**
-     * שחזור נתונים מהלוגים הקיימים
-     * @returns {Promise<Array>} מערך נקודות נתונים משוחזרות
-     */
-    async recoverFromSystemLog() {
-        console.log('🔄 מתחיל שחזור מהלוגים...');
-
-        try {
-            // קריאת הלוגים הקיימים
-            const systemLogs = await this.loadSystemLogs();
-            const recoveredData = [];
-
-            if (systemLogs.length === 0) {
-                console.log('📝 לא נמצאו לוגים לשחזור');
-                return [];
-            }
-
-            // עיבוד הלוגים לפי סשנים
-            const sessions = this.groupLogsBySession(systemLogs);
-
-            for (const [sessionId, sessionLogs] of Object.entries(sessions)) {
-                const sessionData = this.extractSessionData(sessionId, sessionLogs);
-                if (sessionData.length > 0) {
-                    recoveredData.push(...sessionData);
+function loadLogs() {
+    try {
+        const logs = JSON.parse(localStorage.getItem('linterLogs') || '[]');
+        // Just update the display once with all logs, don't call handleLogEntry for each
+        updateLogDisplay();
+        // נטענו רשומות לוג
+        
+        // Try to load scanning results from localStorage as backup
+        const savedResults = localStorage.getItem('linterScanningResults');
+        if (savedResults) {
+            try {
+                const parsedResults = JSON.parse(savedResults);
+                if (parsedResults && (parsedResults.errors?.length > 0 || parsedResults.warnings?.length > 0)) {
+                    window.scanningResults = parsedResults;
+                    console.log('✅ Loaded scanning results from localStorage backup');
                 }
+            } catch (parseError) {
+                console.error('Error parsing saved scanning results:', parseError);
             }
-
-            // מיון לפי timestamp
-            recoveredData.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-
-            this.recoveredData = recoveredData;
-            this.lastRecoveryTime = new Date();
-
-            console.log(`✅ שוחזרו ${recoveredData.length} נקודות נתונים מ-${Object.keys(sessions).length} סשנים`);
-            return recoveredData;
-
-        } catch (error) {
-            console.error('❌ שגיאה בשחזור מהלוגים:', error);
-            return [];
         }
+        
+        console.log('✅ Logs loaded successfully');
+    } catch (error) {
+        console.error('❌ Error loading logs:', error);
+        addLogEntry('ERROR', 'שגיאה בטעינת לוגים', { error: error.message });
     }
+}
 
-    /**
-     * טעינת הלוגים הקיימים
-     * @returns {Promise<Array>} מערך רשומות לוג
-     */
-    async loadSystemLogs() {
-        // בדיקה אם יש לוגים ב-sessionStorage
-        const sessionLogs = this.loadFromSessionStorage();
-
-        // בדיקה אם יש לוגים בקבצים (אם ניתן)
-        const fileLogs = await this.loadFromFiles();
-
-        return [...sessionLogs, ...fileLogs];
-    }
-
-    /**
-     * טעינת לוגים מ-sessionStorage
-     * @returns {Array} רשומות לוג
-     */
-    loadFromSessionStorage() {
-        try {
-            const logs = JSON.parse(sessionStorage.getItem('systemLogs') || '[]');
-            return Array.isArray(logs) ? logs : [];
-        } catch (error) {
-            console.warn('שגיאה בטעינת לוגים מ-sessionStorage:', error);
-            return [];
-        }
-    }
-
-    /**
-     * טעינת לוגים מקבצים (אם זמין)
-     * @returns {Promise<Array>} רשומות לוג מקבצים
-     */
-    async loadFromFiles() {
-        // כאן ניתן להוסיף לוגיקה לטעינת קבצי לוג
-        // בינתיים מחזיר מערך ריק
+/**
+ * קבלת כל רשומות הלוג
+ * Get all log entries
+ */
+function getAllLogEntries() {
+    try {
+        return JSON.parse(localStorage.getItem('linterLogs') || '[]');
+    } catch (error) {
+        console.error('❌ Error getting log entries:', error);
         return [];
     }
+}
 
-    /**
-     * קיבוץ לוגים לפי סשנים
-     * @param {Array} logs - רשומות לוג
-     * @returns {Object} לוגים מקובצים לפי סשן
-     */
-    groupLogsBySession(logs) {
-        const sessions = {};
-
-        logs.forEach(log => {
-            let sessionId = 'default';
-
-            // חיפוש session ID בלוג
-            const sessionMatch = log.message?.match(this.logPatterns.sessionStart);
-            if (sessionMatch) {
-                sessionId = sessionMatch[1];
-            }
-
-            if (!sessions[sessionId]) {
-                sessions[sessionId] = [];
-            }
-
-            sessions[sessionId].push(log);
-        });
-
-        return sessions;
-    }
-
-    /**
-     * חילוץ נתונים מסשן ספציפי
-     * @param {string} sessionId - מזהה הסשן
-     * @param {Array} sessionLogs - לוגי הסשן
-     * @returns {Array} נקודות נתונים משוחזרות
-     */
-    extractSessionData(sessionId, sessionLogs) {
-        const dataPoints = [];
-        let currentScan = null;
-
-        sessionLogs.forEach(log => {
-            const timestamp = new Date(log.timestamp || Date.now());
-
-            // זיהוי התחלת סריקה
-            if (log.message?.includes('סריקה התחילה') || log.message?.includes('Starting scan')) {
-                currentScan = {
-                    timestamp: timestamp.toISOString(),
-                    sessionId,
-                    metrics: {
-                        totalFiles: 0,
-                        errors: 0,
-                        warnings: 0,
-                        qualityScore: 50,
-                        scanDuration: 0
-                    },
-                    source: 'log_recovery'
-                };
-            }
-
-            // חילוץ מספר קבצים שנמצאו
-            const filesMatch = log.message?.match(this.logPatterns.filesScanned);
-            if (filesMatch && currentScan) {
-                currentScan.metrics.totalFiles = parseInt(filesMatch[1]);
-            }
-
-            // חילוץ שגיאות ואזהרות
-            const issuesMatch = log.message?.match(this.logPatterns.scanComplete);
-            if (issuesMatch && currentScan) {
-                currentScan.metrics.errors = parseInt(issuesMatch[1]);
-                currentScan.metrics.warnings = parseInt(issuesMatch[2]);
-
-                // חישוב איכות קוד
-                currentScan.metrics.qualityScore = this.calculateQualityScore(
-                    currentScan.metrics.errors,
-                    currentScan.metrics.warnings
-                );
-            }
-
-            // חילוץ זמן סריקה
-            const timeMatch = log.message?.match(this.logPatterns.scanTime);
-            if (timeMatch && currentScan) {
-                currentScan.metrics.scanDuration = parseFloat(timeMatch[1]);
-            }
-
-            // חילוץ איכות קוד מפורשת
-            const qualityMatch = log.message?.match(this.logPatterns.qualityScore);
-            if (qualityMatch && currentScan) {
-                currentScan.metrics.qualityScore = parseFloat(qualityMatch[1]);
-            }
-
-            // סיום סריקה והוספה לרשימה
-            if (log.message?.includes('סריקה הושלמה') || log.message?.includes('Scan completed')) {
-                if (currentScan) {
-                    dataPoints.push({ ...currentScan });
-                    currentScan = null;
-                }
-            }
-        });
-
-        return dataPoints;
-    }
-
-    /**
-     * חישוב איכות קוד
-     * @param {number} errors - מספר שגיאות
-     * @param {number} warnings - מספר אזהרות
-     * @returns {number} ציון איכות (0-100)
-     */
-    calculateQualityScore(errors, warnings) {
-        const baseScore = 100;
-        const errorPenalty = errors * 5;
-        const warningPenalty = warnings * 2;
-
-        const score = Math.max(0, baseScore - errorPenalty - warningPenalty);
-        return Math.round(score * 10) / 10; // עיגול לעשירית
-    }
-
-    /**
-     * מיזוג נתונים משוחזרים עם נתונים קיימים
-     * @param {Array} existingData - נתונים קיימים
-     * @param {Array} recoveredData - נתונים משוחזרים
-     * @returns {Array} נתונים משולבים
-     */
-    mergeWithExistingData(existingData, recoveredData) {
-        const merged = [...existingData];
-        const existingIds = new Set(existingData.map(item => item.id));
-
-        // הוספת נתונים משוחזרים שלא קיימים
-        recoveredData.forEach(recovered => {
-            if (!existingIds.has(recovered.id)) {
-                merged.push(recovered);
-            }
-        });
-
-        // מיון לפי timestamp
-        merged.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
-
-        console.log(`🔀 מוזגו ${recoveredData.length} נקודות משוחזרות עם ${existingData.length} קיימות`);
-        return merged;
-    }
-
-    /**
-     * וידוא תקינות הנתונים המשוחזרים
-     * @param {Array} data - נתונים לבדיקה
-     * @returns {Array} נתונים תקינים
-     */
-    validateRecoveredData(data) {
-        return data.filter(item => {
-            try {
-                // בדיקת מבנה בסיסי
-                if (!item.timestamp || !item.metrics) {
-                    return false;
-                }
-
-                // בדיקת timestamp תקין
-                const timestamp = new Date(item.timestamp);
-                if (isNaN(timestamp.getTime())) {
-                    return false;
-                }
-
-                // בדיקת metrics
-                const metrics = item.metrics;
-                if (typeof metrics.totalFiles !== 'number' ||
-                    typeof metrics.errors !== 'number' ||
-                    typeof metrics.warnings !== 'number' ||
-                    typeof metrics.qualityScore !== 'number') {
-                    return false;
-                }
-
-                // בדיקת טווחים
-                if (metrics.qualityScore < 0 || metrics.qualityScore > 100) {
-                    return false;
-                }
-
-                if (metrics.totalFiles < 0 || metrics.errors < 0 || metrics.warnings < 0) {
-                    return false;
-                }
-
-                return true;
-
-            } catch (error) {
-                console.warn('נתון משוחזר לא תקין:', item, error);
-                return false;
-            }
-        });
-    }
-
-    /**
-     * ייצוא נתונים משוחזרים לקובץ
-     * @returns {Promise<string>} תוכן הקובץ
-     */
-    async exportToFile() {
-        const data = {
-            recoveredData: this.recoveredData,
-            exportTime: new Date().toISOString(),
-            totalPoints: this.recoveredData.length,
-            lastRecoveryTime: this.lastRecoveryTime
-        };
-
-        return JSON.stringify(data, null, 2);
-    }
-
-    /**
-     * יבוא נתונים מקובץ
-     * @param {string} jsonData - תוכן הקובץ
-     * @returns {Promise<boolean>} האם היבוא הצליח
-     */
-    async importFromFile(jsonData) {
-        try {
-            const data = JSON.parse(jsonData);
-
-            if (data.recoveredData && Array.isArray(data.recoveredData)) {
-                this.recoveredData = this.validateRecoveredData(data.recoveredData);
-                this.lastRecoveryTime = data.lastRecoveryTime ? new Date(data.lastRecoveryTime) : new Date();
-
-                console.log(`📥 יובאו ${this.recoveredData.length} נקודות נתונים מקובץ`);
-                return true;
-            }
-
-            return false;
-
-        } catch (error) {
-            console.error('❌ שגיאה ביבוא מקובץ:', error);
-            return false;
+/**
+ * הוספת רשומת לוג
+ * Add log entry
+ */
+function addLogEntry(level, message, details = {}) {
+    const entry = {
+        timestamp: new Date().toISOString(),
+        level: level,
+        message: message,
+        details: details
+    };
+    
+    // Store in localStorage
+    try {
+        const logs = getAllLogEntries();
+        logs.push(entry);
+        
+        // Keep only last 1000 entries to prevent localStorage overflow
+        if (logs.length > 1000) {
+            logs.splice(0, logs.length - 1000);
         }
-    }
-
-    /**
-     * יצירת גיבוי של הנתונים המשוחזרים
-     * @returns {Promise<void>}
-     */
-    async createBackup() {
-        try {
-            const backupData = await this.exportToFile();
-            const backupName = `log_recovery_backup_${Date.now()}.json`;
-
-            // שמירה ב-localStorage כגיבוי
-            localStorage.setItem(`log_recovery_backup_${Date.now()}`, backupData);
-
-            console.log(`💾 גיבוי נוצר: ${backupName}`);
-            return backupName;
-
-        } catch (error) {
-            console.error('❌ שגיאה ביצירת גיבוי:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * קבלת סטטיסטיקות השחזור
-     * @returns {Object} סטטיסטיקות
-     */
-    getRecoveryStats() {
-        const stats = {
-            totalRecovered: this.recoveredData.length,
-            lastRecoveryTime: this.lastRecoveryTime,
-            dataQuality: this.calculateDataQuality(),
-            timeRange: this.getTimeRange()
-        };
-
-        return stats;
-    }
-
-    /**
-     * חישוב איכות הנתונים המשוחזרים
-     * @returns {number} ציון איכות (0-100)
-     */
-    calculateDataQuality() {
-        if (this.recoveredData.length === 0) {
-            return 0;
-        }
-
-        let qualityScore = 100;
-        const issues = this.recoveredData.filter(item =>
-            !item.metrics ||
-            item.metrics.qualityScore < 30 ||
-            item.metrics.errors > item.metrics.totalFiles * 0.5
-        );
-
-        qualityScore -= (issues.length / this.recoveredData.length) * 30;
-
-        return Math.max(0, Math.round(qualityScore));
-    }
-
-    /**
-     * קבלת טווח זמנים של הנתונים
-     * @returns {Object} טווח זמנים
-     */
-    getTimeRange() {
-        if (this.recoveredData.length === 0) {
-            return null;
-        }
-
-        const timestamps = this.recoveredData.map(item => new Date(item.timestamp));
-        const earliest = new Date(Math.min(...timestamps));
-        const latest = new Date(Math.max(...timestamps));
-
-        return {
-            earliest: earliest.toISOString(),
-            latest: latest.toISOString(),
-            duration: latest - earliest
-        };
+        
+        localStorage.setItem('linterLogs', JSON.stringify(logs));
+        
+        // Handle the log entry
+        handleLogEntry(entry);
+        
+        console.log(`📝 Log entry added: ${level} - ${message}`);
+    } catch (error) {
+        console.error('❌ Error adding log entry:', error);
     }
 }
 
-// ייצוא למערכת גלובלית
-if (typeof window !== 'undefined') {
-    window.LogRecovery = LogRecovery;
+/**
+ * טיפול ברשומת לוג
+ * Handle log entry
+ */
+function handleLogEntry(entry) {
+    // Update log display
+    updateLogDisplay();
+    
+    // Handle different log levels
+    switch (entry.level) {
+        case 'ERROR':
+            handleCriticalError(entry);
+            break;
+        case 'WARNING':
+            handleWarning(entry);
+            break;
+        case 'SUCCESS':
+            handleSuccess(entry);
+            break;
+        case 'INFO':
+            // Just log to console for info messages
+            console.log(`ℹ️ ${entry.message}`);
+            break;
+    }
+    
+    // Monitor performance for relevant entries
+    monitorPerformance(entry);
+    
+    // Monitor security for relevant entries
+    monitorSecurity(entry);
 }
 
-console.log('🔄 LogRecovery system loaded successfully');
+/**
+ * טיפול בשגיאות קריטיות
+ * Handle critical errors
+ */
+function handleCriticalError(entry) {
+    // Show notification
+    if (typeof showNotification === 'function') {
+        showNotification(`שגיאה קריטית: ${entry.message}`, 'error');
+    }
+    
+    // Log to console
+    console.error(`🚨 Critical Error: ${entry.message}`, entry.details);
+    
+    // Attempt recovery if possible
+    if (entry.details && entry.details.recoverable) {
+        attemptRecovery(entry);
+    }
+}
 
+/**
+ * טיפול באזהרות
+ * Handle warnings
+ */
+function handleWarning(entry) {
+    if (typeof showNotification === 'function') {
+        showNotification(`אזהרה: ${entry.message}`, 'warning');
+    }
+    
+    console.warn(`⚠️ Warning: ${entry.message}`, entry.details);
+}
+
+/**
+ * טיפול בהודעות הצלחה
+ * Handle success messages
+ */
+function handleSuccess(entry) {
+    if (typeof showNotification === 'function') {
+        showNotification(entry.message, 'success');
+    }
+    
+    console.log(`✅ Success: ${entry.message}`, entry.details);
+}
+
+/**
+ * ניטור ביצועים
+ * Monitor performance
+ */
+function monitorPerformance(entry) {
+    if (entry.details && entry.details.scanDuration) {
+        const duration = entry.details.scanDuration;
+        if (duration > 30000) { // More than 30 seconds
+            addLogEntry('WARNING', 'סריקה איטית זוהתה', { 
+                duration: duration,
+                performance: 'slow'
+            });
+        }
+    }
+}
+
+/**
+ * ניטור אבטחה
+ * Monitor security
+ */
+function monitorSecurity(entry) {
+    const securityPatterns = [
+        'password', 'token', 'key', 'secret', 'auth'
+    ];
+    
+    const message = entry.message.toLowerCase();
+    const hasSecurityPattern = securityPatterns.some(pattern => 
+        message.includes(pattern)
+    );
+    
+    if (hasSecurityPattern) {
+        addLogEntry('WARNING', 'זוהה תוכן רגיש בלוג', {
+            pattern: 'security-sensitive',
+            message: entry.message
+        });
+    }
+}
+
+/**
+ * עדכון תצוגת לוגים
+ * Update log display
+ */
+function updateLogDisplay() {
+    const logContainer = document.getElementById('logsContainer');
+    if (!logContainer) return;
+    
+    const logs = getAllLogEntries();
+    const recentLogs = logs.slice(-50); // Show last 50 entries
+    
+    // Clear existing content
+    logContainer.innerHTML = '';
+    
+    // Add log entries
+    recentLogs.forEach(log => {
+        const logElement = document.createElement('div');
+        logElement.className = `log-entry log-${log.level.toLowerCase()}`;
+        
+        const timestamp = new Date(log.timestamp).toLocaleString('he-IL');
+        logElement.innerHTML = `
+            <span class="log-timestamp">${timestamp}</span>
+            <span class="log-level">${log.level}</span>
+            <span class="log-message">${log.message}</span>
+        `;
+        
+        logContainer.appendChild(logElement);
+    });
+    
+    // Scroll to bottom
+    logContainer.scrollTop = logContainer.scrollHeight;
+}
+
+/**
+ * העתקת לוג מפורט
+ * Copy detailed log
+ */
+function copyDetailedLog() {
+    const logs = getAllLogEntries();
+    
+    if (logs.length === 0) {
+        if (typeof showNotification === 'function') {
+            showNotification('אין לוגים להעתקה', 'warning');
+        }
+        return;
+    }
+    
+    // Format logs for copying
+    const formattedLogs = logs.map(log => {
+        const timestamp = new Date(log.timestamp).toLocaleString('he-IL');
+        return `[${timestamp}] ${log.level}: ${log.message}`;
+    }).join('\n');
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(formattedLogs).then(() => {
+        if (typeof showNotification === 'function') {
+            showNotification('לוג מפורט הועתק ללוח', 'success');
+        }
+        console.log('✅ Detailed log copied to clipboard');
+    }).catch(error => {
+        console.error('❌ Error copying log:', error);
+        if (typeof showNotification === 'function') {
+            showNotification('שגיאה בהעתקת לוג', 'error');
+        }
+    });
+}
+
+/**
+ * העתקת לוג בעיות לא פתורות
+ * Copy unresolved issues log
+ */
+function copyUnresolvedIssuesLog() {
+    if (!window.scanningResults) {
+        if (typeof showNotification === 'function') {
+            showNotification('אין נתוני סריקה זמינים', 'warning');
+        }
+        return;
+    }
+    
+    const unresolvedIssues = [
+        ...window.scanningResults.errors,
+        ...window.scanningResults.warnings
+    ];
+    
+    if (unresolvedIssues.length === 0) {
+        if (typeof showNotification === 'function') {
+            showNotification('אין בעיות לא פתורות', 'info');
+        }
+        return;
+    }
+    
+    // Format issues for copying
+    const formattedIssues = unresolvedIssues.map(issue => {
+        return `${issue.file}:${issue.line} - ${issue.type.toUpperCase()}: ${issue.message}`;
+    }).join('\n');
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(formattedIssues).then(() => {
+        if (typeof showNotification === 'function') {
+            showNotification('לוג בעיות לא פתורות הועתק ללוח', 'success');
+        }
+        console.log('✅ Unresolved issues log copied to clipboard');
+    }).catch(error => {
+        console.error('❌ Error copying unresolved issues log:', error);
+        if (typeof showNotification === 'function') {
+            showNotification('שגיאה בהעתקת לוג בעיות', 'error');
+        }
+    });
+}
+
+/**
+ * ניסיון שחזור
+ * Attempt recovery
+ */
+function attemptRecovery(entry) {
+    console.log('🔄 Attempting recovery for:', entry.message);
+    
+    // Implement recovery logic based on error type
+    if (entry.details && entry.details.type === 'chart') {
+        if (typeof window.attemptChartRecovery === 'function') {
+            window.attemptChartRecovery();
+        }
+    } else if (entry.details && entry.details.type === 'storage') {
+        if (typeof window.attemptStorageRecovery === 'function') {
+            window.attemptStorageRecovery();
+        }
+    } else if (entry.details && entry.details.type === 'network') {
+        if (typeof window.attemptNetworkRecovery === 'function') {
+            window.attemptNetworkRecovery();
+        }
+    }
+}
+
+// Export functions to global scope
+window.loadLogs = loadLogs;
+window.getAllLogEntries = getAllLogEntries;
+window.addLogEntry = addLogEntry;
+window.handleLogEntry = handleLogEntry;
+window.updateLogDisplay = updateLogDisplay;
+window.copyDetailedLog = copyDetailedLog;
+window.copyUnresolvedIssuesLog = copyUnresolvedIssuesLog;
+
+console.log('📝 Log Recovery Module loaded successfully');

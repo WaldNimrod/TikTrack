@@ -50,16 +50,17 @@ class ProjectFilesScanner {
 
     /**
      * Get all project files with caching
+     * @param {Array} selectedTypes - Array of selected file types
      * @returns {Object} Object containing arrays of files by type
      */
-    async getProjectFiles() {
-        // Check cache first
-        if (this.isCacheValid()) {
+    async getProjectFiles(selectedTypes = null) {
+        // Check cache first (only if no specific types requested)
+        if (this.isCacheValid() && !selectedTypes) {
             return this.cache.files;
         }
 
         // Discover files
-        const discoveredFiles = await this.discoverAllFiles();
+        const discoveredFiles = await this.discoverAllFiles(selectedTypes);
         
         // Update cache
         this.cache.files = discoveredFiles;
@@ -168,9 +169,10 @@ class ProjectFilesScanner {
 
     /**
      * Discover all files in the project dynamically
+     * @param {Array} selectedTypes - Array of selected file types
      * @returns {Object} Object containing arrays of files by type
      */
-    async discoverAllFiles() {
+    async discoverAllFiles(selectedTypes = null) {
         const discoveredFiles = {
             js: [],
             html: [],
@@ -182,7 +184,7 @@ class ProjectFilesScanner {
         try {
             // Try to get files from server API first
             console.log('🔍 Attempting to get files from server API...');
-            const serverFiles = await this.getFilesFromServer();
+            const serverFiles = await this.getFilesFromServer(selectedTypes);
             if (serverFiles && Object.keys(serverFiles).length > 0) {
                 console.log('✅ Server file discovery successful, using dynamic files');
                 return serverFiles;
@@ -222,15 +224,26 @@ class ProjectFilesScanner {
 
     /**
      * Get files from server API
+     * @param {Array} selectedTypes - Array of selected file types
      * @returns {Object} Object containing arrays of files by type
      */
-    async getFilesFromServer() {
+    async getFilesFromServer(selectedTypes = null) {
         try {
             console.log('🔍 Fetching files from server API...');
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 35000); // 35 seconds timeout
             
-            const response = await fetch('/api/v1/files/discover', {
+            // Build query parameters for selected file types
+            let url = '/api/v1/files/discover';
+            if (selectedTypes && selectedTypes.length > 0) {
+                const typesParam = selectedTypes.join(',');
+                url += `?types=${encodeURIComponent(typesParam)}`;
+                console.log('🔍 Requesting specific file types:', selectedTypes);
+            } else {
+                console.log('🔍 Requesting all file types');
+            }
+            
+            const response = await fetch(url, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'

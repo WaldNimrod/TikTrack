@@ -352,3 +352,4 @@ window.destroyPagination = function(tableId) {
     window.PaginationSystem.destroy(tableId);
 };
 
+

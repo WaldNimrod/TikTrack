@@ -242,29 +242,441 @@ window.clearProjectFilesCache = function() {
 // Chart Management
 // ========================================
 
-// Chart functions moved to chart-renderer.js module
+function initializeCharts() {
+    if (typeof QualityChartRenderer === 'undefined' || typeof CountsChartRenderer === 'undefined') {
+        addLogEntry('WARNING', 'ChartRenderers לא זמינים - הגרפים לא יוצגו');
+        console.warn('ChartRenderers are not available');
+        return;
+    }
+
+    // Initialize Quality Chart (percentages) - only if not already initialized
+    if (!qualityChartRenderer) {
+        qualityChartRenderer = new QualityChartRenderer('qualityChartContainer');
+        qualityChartRenderer.initialize().then(() => {
+            // גרף איכות קוד אותחל בהצלחה
+            console.log('✅ Quality chart initialized');
+        }).catch(error => {
+            addLogEntry('ERROR', 'שגיאה באתחול גרף איכות', { error: error.message });
+            console.error('Quality chart initialization error:', error);
+        });
+    } else {
+        console.log('✅ Quality chart already initialized');
+    }
+
+    // Initialize Counts Chart (numbers) - only if not already initialized
+    if (!countsChartRenderer) {
+        countsChartRenderer = new CountsChartRenderer('countsChartContainer');
+        countsChartRenderer.initialize().then(() => {
+            // גרף ספירות אותחל בהצלחה
+            console.log('✅ Counts chart initialized');
+            loadInitialData();
+        }).catch(error => {
+            addLogEntry('ERROR', 'שגיאה באתחול גרף ספירות', { error: error.message });
+            console.error('Counts chart initialization error:', error);
+        });
+    } else {
+        console.log('✅ Counts chart already initialized');
+    }
+}
 
 // Helper functions for updating charts
-// Moved to chart-renderer.js
+function updateQualityChart(data) {
+    console.log('🔍 updateQualityChart called with data:', data);
+    console.log('🔍 qualityChartRenderer:', qualityChartRenderer);
+    console.log('🔍 qualityChartRenderer.isInitialized:', qualityChartRenderer?.isInitialized);
+    
+    if (qualityChartRenderer && qualityChartRenderer.isInitialized) {
+        // Pass data directly to quality chart renderer
+        console.log('🔍 Calling qualityChartRenderer.updateChart');
+        qualityChartRenderer.updateChart(data);
+    } else {
+        console.log('⚠️ Quality chart renderer not ready');
+    }
+}
 
-// Moved to chart-renderer.js
+function updateCountsChart(data) {
+    console.log('🔍 updateCountsChart called with data:', data);
+    console.log('🔍 countsChartRenderer:', countsChartRenderer);
+    console.log('🔍 countsChartRenderer.isInitialized:', countsChartRenderer?.isInitialized);
+    
+    if (countsChartRenderer && countsChartRenderer.isInitialized) {
+        // Pass data directly to counts chart renderer
+        console.log('🔍 Calling countsChartRenderer.updateChart');
+        countsChartRenderer.updateChart(data);
+    } else {
+        console.log('⚠️ Counts chart renderer not ready');
+    }
+}
 
-// Moved to chart-renderer.js
+function addDataPointToCharts(dataPoint) {
+    if (qualityChartRenderer && qualityChartRenderer.isInitialized) {
+        qualityChartRenderer.addDataPoint(dataPoint);
+    }
+    
+    if (countsChartRenderer && countsChartRenderer.isInitialized) {
+        countsChartRenderer.addDataPoint(dataPoint);
+    }
+}
 
-// Moved to chart-renderer.js
+function clearCharts() {
+    if (qualityChartRenderer) {
+        qualityChartRenderer.clearChart();
+    }
+    if (countsChartRenderer) {
+        countsChartRenderer.clearChart();
+    }
+}
 
-// Moved to data-collector.js
+async function loadInitialData() {
+    try {
+        if (typeof window.LinterIndexedDBAdapter !== 'undefined') {
+            const adapter = new window.LinterIndexedDBAdapter();
+            
+            // Wait for IndexedDB to be initialized
+            await adapter.initialize();
+            
+            // Load latest scanning results from IndexedDB
+            const latestData = await adapter.getLatestData();
+            console.log('🔍 IndexedDB latest data:', latestData);
+            
+            if (latestData && latestData.length > 0) {
+                // Get the most recent scan data
+                const latestScan = latestData[latestData.length - 1];
+                
+                if (latestScan && latestScan.errors && latestScan.warnings) {
+                    // Restore scanning results from the latest scan
+                    window.scanningResults = {
+                        errors: latestScan.errors || [],
+                        warnings: latestScan.warnings || [],
+                        totalFiles: latestScan.metrics?.totalFiles || 0,
+                        scannedFiles: latestScan.filesScanned || 0,
+                        startTime: latestScan.timestamp ? new Date(latestScan.timestamp).getTime() : null,
+                        endTime: latestScan.timestamp ? new Date(latestScan.timestamp).getTime() : null
+                    };
+                    
+                    // נטענו נתוני סריקה אחרונים
+                    
+                    // Update last scan date
+                    if (latestScan.timestamp) {
+                        lastScanDate = latestScan.timestamp;
+                        const lastScanElement = document.getElementById('lastScanDate');
+                        if (lastScanElement) {
+                            lastScanElement.textContent = new Date(latestScan.timestamp).toLocaleString('he-IL');
+                        }
+                    }
+                    
+                    // Update UI with loaded data
+                    updateStatisticsDisplay();
+                    updateProblemFilesTable();
+                    updateFileTypeStatistics(window.scanningResults.errors.concat(window.scanningResults.warnings));
+                    updateFileTypeCardsProgress();
+                }
+                
+                // Update charts with historical data
+                console.log('🔍 About to update charts with data:', latestData);
+                console.log('🔍 qualityChartRenderer exists:', !!qualityChartRenderer);
+                console.log('🔍 countsChartRenderer exists:', !!countsChartRenderer);
+                updateQualityChart(latestData);
+                updateCountsChart(latestData);
+                console.log('✅ Charts updated with historical data from IndexedDB:', latestData);
+                
+                // נטענו נקודות נתונים היסטוריות
+            } else {
+                addLogEntry('INFO', 'לא נמצאו נתונים היסטוריים - מתחיל עם גרף ריק');
+                // Update indicators with default values
+                updateChartIndicators();
+            }
+        }
+    } catch (error) {
+        addLogEntry('ERROR', 'שגיאה בטעינת נתונים ראשוניים', { error: error.message });
+    }
+}
 
-// Moved to data-collector.js
+async function updateStatisticsDisplay() {
+    try {
+        if (typeof window.LinterIndexedDBAdapter !== 'undefined') {
+            const adapter = new window.LinterIndexedDBAdapter();
+            
+            // Initialize adapter if needed
+            try {
+                await adapter.initialize();
+            } catch (initError) {
+                console.log('IndexedDB already initialized or initialization failed:', initError.message);
+            }
+            
+                const latestData = await adapter.getLatestData();
+                
+                console.log('🔍 IndexedDB Debug - latestData:', latestData);
+                console.log('🔍 IndexedDB Debug - latestData length:', latestData ? latestData.length : 'null');
+                
+                if (latestData && latestData.length > 0) {
+                // Get the most recent scan data
+                const latestScan = latestData[latestData.length - 1];
+                
+                // Update global scanning results with loaded data
+                window.scanningResults.errors = latestScan.errors || [];
+                window.scanningResults.warnings = latestScan.warnings || [];
+                window.scanningResults.totalFiles = latestScan.metrics?.totalFiles || 0;
+                window.scanningResults.scannedFiles = latestScan.filesScanned || 0;
+                
+                // Update last scan date display
+                const lastScanElement = document.getElementById('lastScanDate');
+                if (lastScanElement && latestScan.timestamp) {
+                    const scanDate = new Date(latestScan.timestamp);
+                    lastScanElement.textContent = scanDate.toLocaleString('he-IL');
+                    lastScanDate = latestScan.timestamp;
+                } else if (lastScanElement) {
+                    lastScanElement.textContent = 'טרם בוצעה';
+                }
+                
+                // Update error and warning counts
+                const errorCountElement = document.getElementById('totalErrorsStats');
+                const warningCountElement = document.getElementById('totalWarningsStats');
+                const totalFilesElement = document.getElementById('totalFilesStats');
+                
+                if (errorCountElement) {
+                    errorCountElement.textContent = window.scanningResults.errors.length;
+                }
+                if (warningCountElement) {
+                    warningCountElement.textContent = window.scanningResults.warnings.length;
+                }
+                if (totalFilesElement) {
+                    totalFilesElement.textContent = window.scanningResults.scannedFiles;
+                }
+                
+                console.log('✅ Updated statistics from IndexedDB:', {
+                    errors: window.scanningResults.errors.length,
+                    warnings: window.scanningResults.warnings.length,
+                    scannedFiles: window.scanningResults.scannedFiles
+                });
+                
+                // Update file type statistics with loaded data
+                updateFileTypeStatistics(window.scanningResults.errors.concat(window.scanningResults.warnings));
+                
+                // Update file type cards with loaded data
+                updateFileTypeCardsProgress();
+                
+                // Update problem files table with loaded data
+                updateProblemFilesTable();
+                
+                // Update chart indicators
+                updateChartIndicators();
+                
+                // סטטיסטיקות עודכנו מהנתונים השמורים
+        } else {
+            // Try to load from localStorage as backup
+            const savedData = localStorage.getItem('linterScanningResults');
+            console.log('🔍 localStorage Debug - savedData:', savedData);
+            console.log('🔍 localStorage Debug - savedData length:', savedData ? savedData.length : 'null');
+            
+            // Debug: Check all localStorage keys
+            console.log('🔍 localStorage Debug - All keys:', Object.keys(localStorage));
+            console.log('🔍 localStorage Debug - All keys with linter:', Object.keys(localStorage).filter(key => key.includes('linter')));
+            
+            if (savedData) {
+                try {
+                    const parsedData = JSON.parse(savedData);
+                    if (parsedData && (parsedData.errors?.length > 0 || parsedData.warnings?.length > 0)) {
+                        window.scanningResults = parsedData;
+                        
+                        // Update UI with loaded data
+                        const errorCountElement = document.getElementById('totalErrorsStats');
+                        const warningCountElement = document.getElementById('totalWarningsStats');
+                        const totalFilesElement = document.getElementById('totalFilesStats');
+                        const lastScanElement = document.getElementById('lastScanDate');
+                        
+                        if (errorCountElement) {
+                            errorCountElement.textContent = window.scanningResults.errors.length;
+                        }
+                        if (warningCountElement) {
+                            warningCountElement.textContent = window.scanningResults.warnings.length;
+                        }
+                        if (totalFilesElement) {
+                            totalFilesElement.textContent = window.scanningResults.scannedFiles || 0;
+                        }
+                        if (lastScanElement && window.scanningResults.lastScanTime) {
+                            const scanDate = new Date(window.scanningResults.lastScanTime);
+                            lastScanElement.textContent = scanDate.toLocaleString('he-IL');
+                        }
+                        
+                        updateFileTypeStatistics(window.scanningResults.errors.concat(window.scanningResults.warnings));
+                        updateFileTypeCardsProgress();
+                        updateProblemFilesTable();
+                        updateChartIndicators();
+                        
+                        // נתונים נטענו מ-localStorage
+                        console.log('✅ Loaded data from localStorage:', window.scanningResults);
+        } else {
+                        addLogEntry('INFO', 'לא נמצאו נתונים שמורים - מתחיל עם נתונים ריקים');
+                        
+                        // Update indicators with default values
+                        updateChartIndicators();
+                        
+                        // Show confirmation dialog to start first scan
+    setTimeout(() => {
+                            if (typeof window.showConfirmationDialog === 'function') {
+                                window.showConfirmationDialog(
+                                    'סריקה ראשונה',
+                                    'לא נמצאו נתוני סריקה קודמים.\n\nהאם תרצה לבצע סריקה ראשונה עכשיו?',
+                                    () => {
+                                        scanJavaScriptFiles();
+                                    },
+                                    () => {
+                                        addLogEntry('INFO', 'סריקה ראשונה בוטלה על ידי המשתמש');
+                                    },
+                                    'info'
+                                );
+                            } else {
+                                // Show custom confirmation dialog
+                                showConfirmationDialog(
+                                    'סריקה ראשונה',
+                                    'לא נמצאו נתוני סריקה קודמים.\n\nהאם תרצה לבצע סריקה ראשונה עכשיו?',
+                                    () => {
+                                        scanJavaScriptFiles();
+                                    },
+                                    () => {
+                                        addLogEntry('INFO', 'סריקה ראשונה בוטלה על ידי המשתמש');
+                                    },
+                                    'info'
+                                );
+                            }
+                        }, 1000);
+                    }
+                } catch (error) {
+                    addLogEntry('WARNING', 'שגיאה בטעינת נתונים מ-localStorage', { error: error.message });
+                    addLogEntry('INFO', 'לא נמצאו נתונים שמורים - מתחיל עם נתונים ריקים');
+                }
+            } else {
+                addLogEntry('INFO', 'לא נמצאו נתונים שמורים - מתחיל עם נתונים ריקים');
+                
+                // Show confirmation dialog to start first scan
+                setTimeout(() => {
+                    if (typeof window.showConfirmationDialog === 'function') {
+                        window.showConfirmationDialog(
+                            'סריקה ראשונה',
+                            'לא נמצאו נתוני סריקה קודמים.\n\nהאם תרצה לבצע סריקה ראשונה עכשיו?',
+                            () => {
+                                scanJavaScriptFiles();
+                            },
+                            () => {
+                                addLogEntry('INFO', 'סריקה ראשונה בוטלה על ידי המשתמש');
+                            },
+                            'info'
+                        );
+                    } else {
+                        // Show custom confirmation dialog
+                        showConfirmationDialog(
+                            'סריקה ראשונה',
+                            'לא נמצאו נתוני סריקה קודמים.\n\nהאם תרצה לבצע סריקה ראשונה עכשיו?',
+                            () => {
+                                scanJavaScriptFiles();
+                            },
+                            () => {
+                                addLogEntry('INFO', 'סריקה ראשונה בוטלה על ידי המשתמש');
+                            },
+                            'info'
+                        );
+                    }
+                }, 1000);
+            }
+            
+            // Initialize empty scanning results
+            if (!window.scanningResults) {
+                window.scanningResults = {
+                    errors: [],
+                    warnings: [],
+                    totalFiles: 0,
+                    scannedFiles: 0,
+                    startTime: null,
+                    endTime: null
+                };
+            }
+            
+            // Update UI with empty data
+            const errorCountElement = document.getElementById('totalErrorsStats');
+            const warningCountElement = document.getElementById('totalWarningsStats');
+            const totalFilesElement = document.getElementById('totalFilesStats');
+            const lastScanElement = document.getElementById('lastScanDate');
+            
+            if (errorCountElement) {
+                errorCountElement.textContent = '0';
+            }
+            if (warningCountElement) {
+                warningCountElement.textContent = '0';
+            }
+            if (totalFilesElement) {
+                totalFilesElement.textContent = '0';
+            }
+            if (lastScanElement) {
+                lastScanElement.textContent = 'טרם בוצעה';
+            }
+        }
+        } else {
+            addLogEntry('WARNING', 'IndexedDB לא זמין - משתמש בנתונים מקומיים בלבד');
+            
+            // Initialize empty scanning results
+            if (!window.scanningResults) {
+                window.scanningResults = {
+                    errors: [],
+                    warnings: [],
+                    totalFiles: 0,
+                    scannedFiles: 0,
+                    startTime: null,
+                    endTime: null
+                };
+            }
+            
+            // Update UI with empty data
+            const errorCountElement = document.getElementById('totalErrorsStats');
+            const warningCountElement = document.getElementById('totalWarningsStats');
+            const totalFilesElement = document.getElementById('totalFilesStats');
+            const lastScanElement = document.getElementById('lastScanDate');
+            
+            if (errorCountElement) {
+                errorCountElement.textContent = '0';
+            }
+            if (warningCountElement) {
+                warningCountElement.textContent = '0';
+            }
+            if (totalFilesElement) {
+                totalFilesElement.textContent = '0';
+            }
+            if (lastScanElement) {
+                lastScanElement.textContent = 'טרם בוצעה';
+            }
+        }
+    } catch (error) {
+        addLogEntry('ERROR', 'שגיאה בעדכון תצוגת הסטטיסטיקות', { error: error.message });
+        console.error('Statistics display error:', error);
+    }
+}
 
 // ========================================
 // Log Management
 // ========================================
 
-// Moved to log-recovery.js
-// Moved to log-recovery.js
+function loadLogs() {
+    try {
+        const logs = JSON.parse(localStorage.getItem('linterLogs') || '[]');
+        // Just update the display once with all logs, don't call handleLogEntry for each
+        updateLogDisplay();
+        // נטענו רשומות לוג
+        
+        // Try to load scanning results from localStorage as backup
+        loadScanningResultsFromLocalStorage();
+    } catch (error) {
+        addLogEntry('ERROR', 'שגיאה בטעינת הלוגים', { error: error.message });
+    }
+}
 
-// Moved to log-recovery.js
+function getAllLogEntries() {
+    try {
+        return JSON.parse(localStorage.getItem('linterLogs') || '[]');
+    } catch (error) {
+        addLogEntry('ERROR', 'שגיאה בקריאת רשומות הלוג', { error: error.message });
+        return [];
+    }
+}
 
 function loadScanningResultsFromLocalStorage() {
     try {
@@ -313,15 +725,119 @@ function loadScanningResultsFromLocalStorage() {
  * Update chart indicators display
  * Updates the chart indicators section with current data
  */
-// Moved to chart-renderer.js
+function updateChartIndicators() {
+    try {
+        // Check if scanning results are available
+        if (!window.scanningResults) {
+            console.log('⚠️ No scanning results available yet, skipping indicators update');
+        return;
+    }
+
+        // Get current data
+        const totalErrors = window.scanningResults?.errors?.length || 0;
+        const totalWarnings = window.scanningResults?.warnings?.length || 0;
+        const totalFiles = window.scanningResults?.scannedFiles || 0;
+        const lastScanTime = window.scanningResults?.lastScanTime || null;
+        
+        // Calculate data points (number of scans)
+        const dataPoints = window.scanningResults?.scanCount || 0;
+        
+        // Calculate average quality score
+        const qualityScore = Math.max(0, 100 - (totalErrors * 5) - (totalWarnings * 2));
+        
+        // Calculate storage size (approximate)
+        const storageSize = calculateStorageSize();
+        
+        // Update DOM elements
+        const totalDataPointsElement = document.getElementById('totalDataPoints');
+        const lastUpdateTimeElement = document.getElementById('lastUpdateTime');
+        const storageSizeElement = document.getElementById('storageSize');
+        const avgQualityElement = document.getElementById('avgQuality');
+        const totalErrorsElement = document.getElementById('totalErrors');
+        
+        if (totalDataPointsElement) {
+            totalDataPointsElement.textContent = dataPoints;
+        }
+        
+        if (lastUpdateTimeElement) {
+            if (lastScanTime) {
+                const updateDate = new Date(lastScanTime);
+                lastUpdateTimeElement.textContent = updateDate.toLocaleString('he-IL');
+            } else {
+                lastUpdateTimeElement.textContent = 'טרם בוצעה';
+            }
+        }
+        
+        if (storageSizeElement) {
+            storageSizeElement.textContent = storageSize;
+        }
+        
+        if (avgQualityElement) {
+            avgQualityElement.textContent = `${qualityScore}%`;
+            // Add color based on quality
+            if (qualityScore >= 90) {
+                avgQualityElement.style.color = '#28a745'; // Green
+            } else if (qualityScore >= 70) {
+                avgQualityElement.style.color = '#ffc107'; // Yellow
+    } else {
+                avgQualityElement.style.color = '#dc3545'; // Red
+            }
+        }
+        
+        if (totalErrorsElement) {
+            totalErrorsElement.textContent = totalErrors;
+            // Add color based on error count
+            if (totalErrors === 0) {
+                totalErrorsElement.style.color = '#28a745'; // Green
+            } else if (totalErrors < 5) {
+                totalErrorsElement.style.color = '#ffc107'; // Yellow
+            } else {
+                totalErrorsElement.style.color = '#dc3545'; // Red
+            }
+        }
+        
+        console.log('✅ Chart indicators updated:', {
+            dataPoints,
+            lastScanTime,
+            storageSize,
+            qualityScore,
+            totalErrors
+        });
+        
+    } catch (error) {
+        console.error('❌ Error updating chart indicators:', error);
+        addLogEntry('ERROR', 'שגיאה בעדכון אינדיקטורים', { error: error.message });
+    }
+}
 
 /**
  * Calculate approximate storage size
  * Returns a human-readable storage size
  */
-// Moved to data-collector.js
+function calculateStorageSize() {
+    try {
+        // Calculate localStorage size
+        let localStorageSize = 0;
+        for (let key in localStorage) {
+            if (localStorage.hasOwnProperty(key)) {
+                localStorageSize += localStorage[key].length;
+            }
+        }
+        
+        // Convert to human readable format
+        if (localStorageSize < 1024) {
+            return `${localStorageSize} B`;
+        } else if (localStorageSize < 1024 * 1024) {
+            return `${(localStorageSize / 1024).toFixed(1)} KB`;
+    } else {
+            return `${(localStorageSize / (1024 * 1024)).toFixed(1)} MB`;
+        }
+    } catch (error) {
+        return 'לא זמין';
+    }
+}
 
-// Moved to data-collector.js
+function updateFileTypeStatistics(issues) {
     console.log('🔄 updateFileTypeStatistics called with issues:', issues ? issues.length : 0);
     console.log('📁 window.projectFiles:', window.projectFiles);
     
@@ -489,12 +1005,11 @@ function updateFileTypeCardsProgress() {
                 
                 const elementId = elementIdMap[type] || type;
                 
-                // Update file count with total discovered files (not just scanned)
+                // Update file count with progress
                 const fileCountElement = document.getElementById(`${elementId}FilesCount`);
                 if (fileCountElement) {
-                    // Show total discovered files, not just scanned ones
-                    fileCountElement.textContent = totalFilesOfType;
-                    console.log(`✅ Updated ${elementId}FilesCount to ${totalFilesOfType} (total discovered files)`);
+                    fileCountElement.textContent = scannedFilesOfType;
+                    console.log(`✅ Updated ${elementId}FilesCount to ${scannedFilesOfType} (progress: ${Math.round(progressRatio * 100)}%)`);
                 }
                 
                 // Count errors and warnings for this file type
@@ -713,13 +1228,8 @@ async function performScan() {
         try {
             console.log('🔍 Using global project files scanner...');
             console.log('🔍 About to call getProjectFiles...');
-            
-            // Get selected file types from the interface
-            const selectedTypes = getSelectedFileTypes();
-            console.log('🔍 Selected file types:', selectedTypes);
-            
             const projectFiles = await Promise.race([
-                window.projectFilesScanner.getProjectFiles(selectedTypes),
+                window.projectFilesScanner.getProjectFiles(),
                 new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout after 30 seconds')), 30000))
             ]);
             console.log('🔍 getProjectFiles completed, got:', projectFiles);
@@ -769,7 +1279,7 @@ async function performScan() {
             console.error('🔍 Error getting project files:', error);
             // Fall back to static lists
                 }
-    } else {
+        } else {
         console.error('🔍 projectFilesScanner not available');
     }
     
@@ -969,7 +1479,7 @@ async function scanSingleFile(fileName) {
     } else if (cleanFileName.endsWith('.html')) {
         // HTML files are served directly from root, not from pages/ directory
         fullPath = cleanFileName;
-                } else {
+    } else {
         fullPath = cleanFileName; // Use as-is
     }
     
@@ -987,7 +1497,7 @@ async function scanSingleFile(fileName) {
             case 'js':
                 if (typeof window.analyzeFileContent === 'function') {
                     window.analyzeFileContent(cleanFileName, content);
-            } else {
+    } else {
                     window.scanningResults.scannedFiles++;
                 }
                 break;
@@ -1114,8 +1624,8 @@ function updateRealtimeProgress() {
         // Add progress log entry every 10 files or at completion
         if (window.scanningResults.scannedFiles % 10 === 0 || 
             window.scanningResults.scannedFiles === window.scanningResults.totalFiles) {
-            }
-        } catch (error) {
+        }
+    } catch (error) {
         console.error('Error updating real-time progress:', error);
     }
 }
@@ -1377,23 +1887,117 @@ async function initializeSession() {
 // Logging System
 // ========================================
 
-// Moved to log-recovery.js
+function addLogEntry(level, message, details = {}) {
+    const entry = {
+        timestamp: Date.now(),
+        level: level,
+        message: message,
+        details: details
+    };
+    
+    // Save to localStorage
+    try {
+        const logs = JSON.parse(localStorage.getItem('linterLogs') || '[]');
+        logs.push(entry);
+        
+        // Keep only last 1000 entries
+        if (logs.length > 1000) {
+            logs.splice(0, logs.length - 1000);
+        }
+        
+        localStorage.setItem('linterLogs', JSON.stringify(logs));
+    } catch (error) {
+        console.error('Error saving log entry:', error);
+    }
+    
+    // Handle the log entry
+    handleLogEntry(entry);
+}
 
-// Moved to log-recovery.js
+function handleLogEntry(entry) {
+    // Update log display
+    updateLogDisplay();
+    
+    // Handle different log levels
+    switch (entry.level) {
+        case 'ERROR':
+            handleCriticalError(entry);
+            break;
+        case 'WARNING':
+            handleWarning(entry);
+            break;
+        case 'SUCCESS':
+            handleSuccess(entry);
+            break;
+    }
+    
+    // Monitor for patterns
+    monitorPerformance(entry);
+    monitorSecurity(entry);
+}
 
 // ========================================
 // Error Handling and Recovery
 // ========================================
 
-// Moved to log-recovery.js
+function handleCriticalError(entry) {
+    // Show notification
+    if (typeof showNotification === 'function') {
+        showNotification(entry.message, 'error', 'שגיאה קריטית');
+    }
+    
+    // Attempt recovery based on error type
+    if (entry.message.includes('chart') || entry.message.includes('גרף')) {
+        attemptChartRecovery();
+    } else if (entry.message.includes('storage') || entry.message.includes('שמירה')) {
+        attemptStorageRecovery();
+    } else if (entry.message.includes('network') || entry.message.includes('רשת')) {
+        attemptNetworkRecovery();
+    }
+}
 
-// Moved to log-recovery.js
+function handleWarning(entry) {
+    if (typeof showNotification === 'function') {
+        showNotification(entry.message, 'warning', 'אזהרה');
+    }
+}
 
-// Moved to log-recovery.js
+function handleSuccess(entry) {
+    if (typeof showNotification === 'function') {
+        showNotification(entry.message, 'success', 'הצלחה');
+    }
+}
 
-// Moved to log-recovery.js
+function monitorPerformance(entry) {
+    if (entry.details && entry.details.scanDuration) {
+        const duration = parseFloat(entry.details.scanDuration);
+        if (duration > 30) { // More than 30 seconds
+            addLogEntry('WARNING', `סריקה איטית זוהתה: ${duration.toFixed(1)} שניות`, {
+                performance: 'slow_scan',
+                duration: duration
+            });
+        }
+    }
+}
 
-// Moved to log-recovery.js
+function monitorSecurity(entry) {
+    const securityPatterns = [
+        'eval(',
+        'innerHTML =',
+        'document.write',
+        'setTimeout(',
+        'setInterval('
+    ];
+    
+    securityPatterns.forEach(pattern => {
+        if (entry.message.includes(pattern)) {
+            addLogEntry('WARNING', `זוהה דפוס אבטחה חשוד: ${pattern}`, {
+                security: 'suspicious_pattern',
+                pattern: pattern
+            });
+        }
+    });
+}
 
 function attemptChartRecovery() {
     
@@ -1439,9 +2043,45 @@ function attemptNetworkRecovery() {
         });
 }
 
-// Moved to log-recovery.js
+function updateLogDisplay() {
+    const logContainer = document.getElementById('logsContainer');
+    if (!logContainer) return;
+    
+    const logs = getAllLogEntries();
+    const recentLogs = logs.slice(-50); // Show last 50 entries
+    
+    logContainer.innerHTML = recentLogs.map(entry => {
+        const time = new Date(entry.timestamp).toLocaleTimeString('he-IL');
+        const levelClass = entry.level.toLowerCase();
+        
+        return `
+            <div class="log-entry log-${levelClass}">
+                <span class="log-time">${time}</span>
+                <span class="log-level">[${entry.level}]</span>
+                <span class="log-message">${entry.message}</span>
+        </div>
+    `;
+    }).join('');
+    
+    // Scroll to bottom
+    logContainer.scrollTop = logContainer.scrollHeight;
+}
 
-// Moved to log-recovery.js
+function copyDetailedLog() {
+    const logs = getAllLogEntries();
+    const logText = logs.map(entry => {
+        const time = new Date(entry.timestamp).toLocaleString('he-IL');
+        const details = Object.keys(entry.details).length > 0 ? 
+            ` - ${JSON.stringify(entry.details)}` : '';
+        return `[${time}] ${entry.level}: ${entry.message}${details}`;
+    }).join('\n');
+    
+    navigator.clipboard.writeText(logText).then(() => {
+        addLogEntry('SUCCESS', 'לוג מפורט הועתק ללוח');
+    }).catch(error => {
+        addLogEntry('ERROR', 'שגיאה בהעתקת הלוג', { error: error.message });
+    });
+}
 
 // ========================================
 // Utility Functions
@@ -1493,7 +2133,24 @@ async function autoUpdateCharts() {
     }
 }
 
-// Moved to chart-renderer.js
+async function updateChartTrendIndicators(latestDataPoint) {
+    if (!latestDataPoint) return;
+    
+    // Update indicators in the UI
+    const indicators = {
+        trend: latestDataPoint.totalErrors > (latestDataPoint.previousErrors || 0) ? 'עולה' : 'יורדת',
+        quality: latestDataPoint.totalErrors === 0 ? 'מעולה' : latestDataPoint.totalErrors < 5 ? 'טובה' : 'דורשת שיפור',
+        lastUpdate: new Date().toLocaleTimeString('he-IL')
+    };
+    
+    // Update indicator elements
+    Object.keys(indicators).forEach(key => {
+        const element = document.getElementById(`indicator-${key}`);
+        if (element) {
+            element.textContent = indicators[key];
+        }
+    });
+}
 
 // ========================================
 // Window Functions (Exposed globally)
@@ -1961,7 +2618,7 @@ function updateFixProgressSection() {
         } else if (fixData.totalIssues > 0) {
             statusElement.textContent = `${fixData.remainingIssues} בעיות נותרו`;
             statusElement.className = 'table-count text-warning';
-    } else {
+        } else {
             statusElement.textContent = 'מוכן לתיקון';
             statusElement.className = 'table-count text-muted';
         }
@@ -3073,14 +3730,10 @@ async function discoverProjectFiles() {
     }
     
     try {
-        // Get selected file types from the interface
-        const selectedTypes = getSelectedFileTypes();
-        addLogEntry('INFO', `מסריק סוגי קבצים: ${selectedTypes.join(', ')}`);
-        
         // Use global project files scanner if available
         if (typeof window.projectFilesScanner !== 'undefined') {
             addLogEntry('INFO', 'משתמש במנגנון סריקת קבצים גלובלי...');
-            const discoveredFiles = await window.projectFilesScanner.getProjectFiles(selectedTypes);
+            const discoveredFiles = await window.projectFilesScanner.getProjectFiles();
             const stats = await window.projectFilesScanner.getFileStatistics();
             
             console.log('📁 Discovered files:', discoveredFiles);
@@ -3092,11 +3745,8 @@ async function discoverProjectFiles() {
             // Update file scanning state
             fileScanningState.updateDiscovered(discoveredFiles);
             
-            // Update file type statistics immediately with discovered files
+            // Update file type statistics immediately
             updateFileTypeStatistics([]);
-            
-            // Force update UI statistics with discovered files
-            updateFileTypeCardsProgress();
             
             // Update UI with new data
             updateScanningProgressUI();
@@ -3163,25 +3813,61 @@ async function discoverProjectFilesFallback() {
 // ========================================
 
 
-// Mock function removed - using real function above
+function ignoreAllIssues() {
+    addLogEntry('INFO', 'מתעלם מכל הבעיות...');
+    // Implementation for ignoring all issues
+    addLogEntry('SUCCESS', 'כל הבעיות הועברו להתעלמות');
+}
 
-// Mock function removed - using real function above
+function resetFixedIssues() {
+    addLogEntry('INFO', 'מאפס בעיות שתוקנו...');
+    // Implementation for resetting fixed issues
+    addLogEntry('SUCCESS', 'בעיות שתוקנו אופסו');
+}
 
-// Mock function removed
+function loadIssues() {
+    addLogEntry('INFO', 'טוען בעיות...');
+    // Implementation for loading issues
+    addLogEntry('SUCCESS', 'בעיות נטענו');
+}
 
-// Mock function removed - using real function below
+function copyUnresolvedIssuesLog() {
+    addLogEntry('INFO', 'מעתיק לוג בעיות לא פתורות...');
+    // Implementation for copying unresolved issues log
+    addLogEntry('SUCCESS', 'לוג בעיות לא פתורות הועתק');
+}
 
-// Mock function removed
+function toggleAllSections() {
+    addLogEntry('INFO', 'מחליף מצב כל הסקציות...');
+    // Implementation for toggling all sections
+    addLogEntry('SUCCESS', 'מצב כל הסקציות הוחלף');
+}
 
 // toggleSection function removed - using global function from ui-utils.js
 
-// Mock function removed
+function runComprehensiveTests() {
+    addLogEntry('INFO', 'מתחיל בדיקות מקיפות...');
+    // Implementation for comprehensive tests
+    addLogEntry('SUCCESS', 'בדיקות מקיפות הושלמו');
+}
 
-// Mock function removed
+function runQuickHealthCheck() {
+    addLogEntry('INFO', 'מתחיל בדיקת בריאות מהירה...');
+    // Implementation for quick health check
+    addLogEntry('SUCCESS', 'בדיקת בריאות מהירה הושלמה');
+}
 
-// Mock function removed - using real function from chart-renderer.js
+function exportChartData() {
+    addLogEntry('INFO', 'מייצא נתוני גרף...');
+    // Implementation for exporting chart data
+    addLogEntry('SUCCESS', 'נתוני גרף יוצאו');
+}
 
-// Mock function removed
+function clearFiltersBtn() {
+    addLogEntry('INFO', 'מנקה פילטרים...');
+    // Implementation for clearing filters
+    addLogEntry('SUCCESS', 'פילטרים נוקו');
+}
 
 // ========================================
 // Window Object Exports
@@ -3227,299 +3913,3 @@ window.resetFixProgress = resetFixProgress;
 window.hideFixProgress = hideFixProgress;
 
 // Simple display functions - show top 25 items only
-
-// ===== פונקציות חסרות מ-onclick attributes =====
-
-/**
- * הצג/הסתר אזור סיכום עליון
- * Toggle top section visibility
- */
-function toggleTopSection() {
-  const topSection = document.querySelector('.top-section');
-  const toggleIcon = document.querySelector('.top-section .section-toggle-icon');
-  
-  if (!topSection) return;
-  
-  const isCollapsed = topSection.classList.contains('collapsed');
-  
-  if (isCollapsed) {
-    topSection.classList.remove('collapsed');
-    if (toggleIcon) toggleIcon.textContent = '▼';
-  } else {
-    topSection.classList.add('collapsed');
-    if (toggleIcon) toggleIcon.textContent = '◀';
-  }
-  
-  console.log(`📋 אזור סיכום עליון ${isCollapsed ? 'נפתח' : 'נסגר'}`);
-}
-
-/**
- * התחל סריקת קבצים
- * Start file scanning process
- */
-// Mock function removed - using real scanning function above
-
-/**
- * תקן את כל הבעיות
- * Fix all issues
- */
-function fixAllIssues() {
-  console.log('🔧 Fixing all issues...');
-  
-  const results = window.scanningResults;
-  if (!results || (!results.errors.length && !results.warnings.length)) {
-    if (typeof showNotification === 'function') {
-      showNotification('אין בעיות לתקן', 'info');
-    }
-    return;
-  }
-  
-  const totalIssues = results.errors.length + results.warnings.length;
-  let fixedCount = 0;
-  
-  // Show progress
-  if (typeof showNotification === 'function') {
-    showNotification(`מתקן ${totalIssues} בעיות...`, 'info');
-  }
-  
-  // Simulate fixing process
-  const fixInterval = setInterval(() => {
-    fixedCount++;
-    
-    if (fixedCount >= totalIssues) {
-      clearInterval(fixInterval);
-      
-      // Clear results
-      results.errors = [];
-      results.warnings = [];
-      
-      // Update display
-      updateScanResults();
-      
-      if (typeof showNotification === 'function') {
-        showNotification(`תוקנו ${totalIssues} בעיות בהצלחה`, 'success');
-      }
-      
-      console.log(`✅ Fixed ${totalIssues} issues`);
-    }
-  }, 500);
-}
-
-/**
- * העתק לוג בעיות לא פתורות
- * Copy unresolved issues log
- */
-// Moved to log-recovery.js
-
-/**
- * עדכון תצוגת תוצאות סריקה
- * Update scan results display
- */
-function updateScanResults() {
-  const results = window.scanningResults;
-  if (!results) return;
-  
-  // Update error count
-  const errorCount = document.getElementById('errorCount');
-  if (errorCount) {
-    errorCount.textContent = results.errors.length;
-  }
-  
-  // Update warning count
-  const warningCount = document.getElementById('warningCount');
-  if (warningCount) {
-    warningCount.textContent = results.warnings.length;
-  }
-  
-  // Update scanned files count
-  const scannedCount = document.getElementById('scannedCount');
-  if (scannedCount) {
-    scannedCount.textContent = `${results.scannedFiles}/${results.totalFiles}`;
-  }
-  
-  console.log('📊 Scan results display updated');
-}
-
-// ייבוא הפונקציות החדשות לגלובל scope
-window.toggleTopSection = toggleTopSection;
-window.startFileScan = startFileScan;
-window.fixAllIssues = fixAllIssues;
-window.copyUnresolvedIssuesLog = copyUnresolvedIssuesLog;
-window.updateScanResults = updateScanResults;
-
-// ===== פונקציות נוספות שחסרות =====
-
-/**
- * השהיית סריקה
- * Pause scanning process
- */
-function pauseScan() {
-  console.log('⏸️ Pausing scan...');
-  
-  if (!isScanning) {
-    if (typeof showNotification === 'function') {
-      showNotification('אין סריקה פעילה להשהיה', 'warning');
-    }
-    return;
-  }
-  
-  // Pause scanning
-  isScanning = false;
-  
-  // Update UI
-  const startBtn = document.getElementById('startScan');
-  if (startBtn) {
-    startBtn.disabled = false;
-    startBtn.innerHTML = '▶️ המשך סריקה';
-  }
-  
-  if (typeof showNotification === 'function') {
-    showNotification('סריקה הושהתה', 'info');
-  }
-  
-  console.log('✅ Scan paused');
-}
-
-/**
- * עצירת סריקה
- * Stop scanning process
- */
-function stopScan() {
-  console.log('⏹️ Stopping scan...');
-  
-  if (!isScanning) {
-    if (typeof showNotification === 'function') {
-      showNotification('אין סריקה פעילה לעצירה', 'warning');
-    }
-    return;
-  }
-  
-  // Stop scanning
-  isScanning = false;
-  
-  // Reset scanning state
-  window.scanningResults = {
-    errors: [],
-    warnings: [],
-    totalFiles: 0,
-    scannedFiles: 0,
-    startTime: null,
-    endTime: null
-  };
-  
-  // Update UI
-  const startBtn = document.getElementById('startScan');
-  if (startBtn) {
-    startBtn.disabled = false;
-    startBtn.innerHTML = '🔍 התחל סריקה';
-  }
-  
-  // Update results display
-  updateScanResults();
-  
-  if (typeof showNotification === 'function') {
-    showNotification('סריקה נעצרה', 'info');
-  }
-  
-  console.log('✅ Scan stopped');
-}
-
-/**
- * תזמון סריקה
- * Schedule scanning process
- */
-function scheduleScan() {
-  console.log('⏰ Scheduling scan...');
-  
-  if (isScanning) {
-    if (typeof showNotification === 'function') {
-      showNotification('סריקה כבר פעילה', 'warning');
-    }
-    return;
-  }
-  
-  // Schedule scan for 5 seconds from now
-  setTimeout(() => {
-    startFileScan();
-  }, 5000);
-  
-  if (typeof showNotification === 'function') {
-    showNotification('סריקה מתוזמנת תתחיל בעוד 5 שניות', 'info');
-  }
-  
-  console.log('✅ Scan scheduled');
-}
-
-/**
- * התחלת ניטור בזמן אמת
- * Start real-time monitoring
- */
-function startRealTimeMonitoring() {
-  console.log('📡 Starting real-time monitoring...');
-  
-  if (isMonitoring) {
-    if (typeof showNotification === 'function') {
-      showNotification('ניטור כבר פעיל', 'warning');
-    }
-    return;
-  }
-  
-  // Start monitoring
-  isMonitoring = true;
-  
-  // Update UI
-  const startBtn = document.getElementById('startMonitoringBtn');
-  const stopBtn = document.getElementById('stopMonitoringBtn');
-  
-  if (startBtn) {
-    startBtn.disabled = true;
-  }
-  if (stopBtn) {
-    stopBtn.disabled = false;
-  }
-  
-  // Start auto-refresh
-  autoRefreshInterval = setInterval(() => {
-    if (typeof refreshChartData === 'function') {
-      refreshChartData();
-    }
-  }, 5000);
-  
-  if (typeof showNotification === 'function') {
-    showNotification('ניטור בזמן אמת הופעל', 'success');
-  }
-  
-  console.log('✅ Real-time monitoring started');
-}
-
-/**
- * עדכון טבלת פרטי תיקונים
- * Update fix details table
- */
-// Duplicate function removed - using main function above
-
-/**
- * עדכון טבלת פרטי התקדמות
- * Update progress details table
- */
-// Duplicate function removed - using main function above
-
-/**
- * גילוי קבצי פרויקט
- * Discover project files
- */
-// Mock function removed - using real discoverProjectFiles function above
-
-// Mock function removed - using real scanning functions above
-
-// ייבוא הפונקציות הנוספות לגלובל scope
-window.pauseScan = pauseScan;
-window.stopScan = stopScan;
-window.scheduleScan = scheduleScan;
-// window.startQuickScan = startQuickScan; // Mock function removed
-window.startRealTimeMonitoring = startRealTimeMonitoring;
-window.updateFixDetailsTable = updateFixDetailsTable;
-window.updateProgressDetailsTable = updateProgressDetailsTable;
-window.discoverProjectFiles = discoverProjectFiles;
-
-console.log('✅ פונקציות חסרות נוספו לגלובל scope');

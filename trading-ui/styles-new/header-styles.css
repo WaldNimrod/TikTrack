@@ -430,38 +430,8 @@
     width: 100%;
 }
 
-/* Filter Toggle Button */
-.filter-toggle-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: white !important;
-    border: none !important;
-    border-radius: 50% !important;
-    color: #ff9c05 !important;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    z-index: 951;
-    box-shadow: none !important;
-    outline: none !important;
-    transform: translateY(5px);
-}
-
-.filter-toggle-btn.collapsed {
-    transform: translateY(20px);
-}
-
-.filter-toggle-btn:not(.collapsed) {
-    transform: translateY(calc(5px + var(--filter-height, 0px) + 10px));
-}
-
-.filter-toggle-btn:not(.collapsed) .filter-arrow {
-    transform: rotate(180deg) translateY(-5px);
-}
+/* Filter Toggle Button - Header specific only */
+/* Note: General section toggle buttons are defined in layout.css */
 
 /* Filters Section */
 .header-filters {

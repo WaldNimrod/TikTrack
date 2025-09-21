@@ -78,6 +78,11 @@ class JsMapSystem {
             this.isInitialized = true;
             console.log('✅ JS-Map System initialized successfully');
             
+            // Update system statistics in UI
+            setTimeout(() => {
+                this.updateSystemStats();
+            }, 200);
+            
         } catch (error) {
             console.error('❌ Failed to initialize JS-Map System:', error);
             this.showErrorNotification('שגיאה באתחול מערכת JS-Map', error.message);

@@ -263,146 +263,133 @@ cleanup_old_analyses()
 
 ## 🎨 ממשק המשתמש
 
-### מבנה העמוד
+### מבנה העמוד - ממשק טאבים מאורגן
 
-#### Top Section - סקשן עליון
+> **עדכון 21 בינואר 2025:** המערכת שודרגה לממשק טאבים מאורגן וקומפקטי עם 6 טאבים עיקריים.
+
+#### מבנה הטאבים החדש
 ```html
-<div class="top-section">
-    <div class="section-header">
-        <h2>🗺️ מפת JavaScript - כלי פיתוח מתקדם</h2>
-        <button class="filter-toggle-btn" onclick="toggleTopSection()">
-            <span class="section-toggle-icon">▼</span>
-        </button>
+<div class="js-map-tabs-container">
+    <!-- Tab Navigation -->
+    <div class="tabs-nav">
+        <button class="tab-btn active" data-tab="statistics">📊 סטטיסטיקות</button>
+        <button class="tab-btn" data-tab="functions">⚙️ פונקציות</button>
+        <button class="tab-btn" data-tab="pages">📄 עמודים</button>
+        <button class="tab-btn" data-tab="dependencies">🔗 תלויות</button>
+        <button class="tab-btn" data-tab="analysis">🔍 ניתוח</button>
+        <button class="tab-btn" data-tab="future">🚀 עתידי</button>
     </div>
-    <div class="section-body">
-        <!-- סטטיסטיקות מערכת -->
-        <!-- חיפוש מהיר -->
-        <!-- כפתורי פעולה מהירה -->
+    
+    <!-- Tab Content -->
+    <div class="tab-content">
+        <!-- Tab 1: Statistics - סטטיסטיקות מערכת -->
+        <div class="tab-panel active" id="statistics-tab">
+            <div class="tab-header">
+                <h3>📊 סטטיסטיקות מערכת JavaScript</h3>
+                <div class="tab-controls">
+                    <button onclick="refreshStatistics()">🔄 רענון</button>
+                    <button onclick="copyJsMapDetailedLog()">📋 לוג מפורט</button>
+                </div>
+            </div>
+            <div class="tab-body">
+                <!-- סטטיסטיקות כלליות -->
+                <!-- חיפוש מהיר -->
+                <!-- כפתורי פעולה מהירה -->
+            </div>
+        </div>
+        
+        <!-- Tab 2: Functions - ניתוח פונקציות -->
+        <div class="tab-panel" id="functions-tab">
+            <div class="tab-header">
+                <h3>⚙️ ניתוח פונקציות JavaScript</h3>
+                <div class="tab-controls">
+                    <button onclick="refreshFunctionsData()">🔄 רענון</button>
+                    <button onclick="exportToCSV()">📊 ייצוא CSV</button>
+                </div>
+            </div>
+            <div class="tab-body">
+                <!-- תת-טאבים: ליבה, UI, נתונים, כלים, הכל -->
+                <!-- רשימת פונקציות עם חיפוש וסינון -->
+                <!-- פרטי פונקציות -->
+            </div>
+        </div>
+        
+        <!-- Tab 3: Pages - מיפוי עמודים -->
+        <div class="tab-panel" id="pages-tab">
+            <div class="tab-header">
+                <h3>📄 מיפוי עמודים לקבצי JS</h3>
+                <div class="tab-controls">
+                    <button onclick="refreshPageMapping()">🔄 רענון</button>
+                    <button onclick="exportToJSON()">📄 ייצוא JSON</button>
+                </div>
+            </div>
+            <div class="tab-body">
+                <!-- טבלת מיפוי עמודים -->
+                <!-- חיפוש וסינון -->
+                <!-- סטטיסטיקות מיפוי -->
+            </div>
+        </div>
+        
+        <!-- Tab 4: Dependencies - ניתוח תלויות -->
+        <div class="tab-panel" id="dependencies-tab">
+            <div class="tab-header">
+                <h3>🔗 ניתוח תלויות בין קבצים</h3>
+                <div class="tab-controls">
+                    <button onclick="refreshDependencies()">🔄 רענון</button>
+                    <button onclick="generateReport()">📝 דוח</button>
+                </div>
+            </div>
+            <div class="tab-body">
+                <!-- מפת תלויות ויזואלית -->
+                <!-- טבלת תלויות מפורטת -->
+                <!-- ניתוח מעגלי תלות -->
+            </div>
+        </div>
+        
+        <!-- Tab 5: Analysis - ניתוח מתקדם -->
+        <div class="tab-panel" id="analysis-tab">
+            <div class="tab-header">
+                <h3>🔍 ניתוח מתקדם וכפילויות</h3>
+                <div class="tab-controls">
+                    <button onclick="analyzeDuplicates()">🔍 ניתוח כפילויות</button>
+                    <button onclick="detectLocalFunctions()">🏠 פונקציות מקומיות</button>
+                </div>
+            </div>
+            <div class="tab-body">
+                <!-- ניתוח פונקציות כפולות -->
+                <!-- זיהוי פונקציות מקומיות -->
+                <!-- המלצות אופטימיזציה -->
+                <!-- כפתורי העתקת לוג -->
+            </div>
+        </div>
+        
+        <!-- Tab 6: Future - תכונות עתידיות -->
+        <div class="tab-panel" id="future-tab">
+            <div class="tab-header">
+                <h3>🚀 תכונות עתידיות מאורגנות</h3>
+                <div class="tab-controls">
+                    <button onclick="syncGlobalFunctions()">🔄 סנכרון גלובלי</button>
+                    <button onclick="generateDetailedReport()">📊 דוח מפורט</button>
+                </div>
+            </div>
+            <div class="tab-body">
+                <!-- ניהול אחסון נתונים (IndexedDB) -->
+                <!-- בדיקת ארכיטקטורה -->
+                <!-- סנכרון עם אינדקס גלובלי -->
+                <!-- תכונות נוספות -->
+            </div>
+        </div>
     </div>
 </div>
 ```
 
-#### Section 1 - מיפוי עמודים
-```html
-<div class="content-section" id="section1">
-    <div class="section-header">
-        <h2>📄 מיפוי עמודים לקבצים JS</h2>
-        <button class="filter-toggle-btn" onclick="toggleSection('section1')">
-            <span class="section-toggle-icon">▼</span>
-        </button>
-    </div>
-    <div class="section-body">
-        <!-- טבלת מיפוי עמודים -->
-        <!-- חיפוש וסינון -->
-        <!-- סטטיסטיקות -->
-    </div>
-</div>
-```
-
-#### Section 2 - ניתוח כפילויות
-```html
-<div class="content-section" id="section2">
-    <div class="section-header">
-        <h2>🔍 ניתוח פונקציות כפולות ודומות</h2>
-        <button class="filter-toggle-btn" onclick="toggleSection('section2')">
-            <span class="section-toggle-icon">▼</span>
-        </button>
-    </div>
-    <div class="section-body">
-        <!-- רשימת כפילויות -->
-        <!-- דירוג דמיון -->
-        <!-- המלצות לתיקון -->
-        <!-- כפתור העתקת לוג -->
-    </div>
-</div>
-```
-
-#### Section 3 - זיהוי פונקציות מקומיות
-```html
-<div class="content-section" id="section3">
-    <div class="section-header">
-        <h2>🏠 זיהוי פונקציות מקומיות</h2>
-        <button class="filter-toggle-btn" onclick="toggleSection('section3')">
-            <span class="section-toggle-icon">▼</span>
-        </button>
-    </div>
-    <div class="section-body">
-        <!-- רשימת פונקציות מקומיות -->
-        <!-- המלצות לפונקציות גלובליות -->
-        <!-- כפתור העתקת לוג -->
-    </div>
-</div>
-```
-
-#### Section 4 - ניתוח תלויות
-```html
-<div class="content-section" id="section4">
-    <div class="section-header">
-        <h2>🔗 ניתוח תלויות בין קבצים</h2>
-        <button class="filter-toggle-btn" onclick="toggleSection('section4')">
-            <span class="section-toggle-icon">▼</span>
-        </button>
-    </div>
-    <div class="section-body">
-        <!-- מפת תלויות -->
-        <!-- טבלת תלויות -->
-        <!-- כפתור העתקת לוג -->
-    </div>
-</div>
-```
-
-#### Section 5 - סטטיסטיקות מערכת
-```html
-<div class="content-section" id="section5">
-    <div class="section-header">
-        <h2>📊 סטטיסטיקות מערכת</h2>
-        <button class="filter-toggle-btn" onclick="toggleSection('section5')">
-            <span class="section-toggle-icon">▼</span>
-        </button>
-    </div>
-    <div class="section-body">
-        <!-- גרפים וטבלאות -->
-        <!-- מדדי איכות קוד -->
-        <!-- המלצות אופטימיזציה -->
-        <!-- כפתור העתקת לוג מפורט -->
-    </div>
-</div>
-```
-
-#### Section 6 - ניהול אחסון נתונים (חדש - 19.9.2025)
-```html
-<div class="content-section" id="section6">
-    <div class="section-header">
-        <h2>💾 ניהול אחסון נתונים</h2>
-        <button class="filter-toggle-btn" onclick="toggleSection('section6')">
-            <span class="section-toggle-icon">▼</span>
-        </button>
-    </div>
-    <div class="section-body">
-        <!-- סטטיסטיקות אחסון -->
-        <!-- היסטוריית ניתוחים -->
-        <!-- ניהול גיבויים -->
-        <!-- כפתורי ניקוי ותחזוקה -->
-    </div>
-</div>
-```
-
-#### Section 7 - בדיקת ארכיטקטורה
-```html
-<div class="content-section" id="section7">
-    <div class="section-header">
-        <h2>🏗️ בדיקת ארכיטקטורה</h2>
-        <button class="filter-toggle-btn" onclick="toggleSection('section7')">
-            <span class="section-toggle-icon">▼</span>
-        </button>
-    </div>
-    <div class="section-body">
-        <!-- בדיקת פונקציות ב-HTML -->
-        <!-- המלצות תיקון -->
-        <!-- כפתור העתקת לוג -->
-    </div>
-</div>
-```
+#### יתרונות ממשק הטאבים החדש:
+- **ארגון טוב יותר** - כל נושא בטאב נפרד
+- **ממשק קומפקטי** - פחות גלילה, יותר יעילות
+- **ניווט מהיר** - מעבר בין טאבים בלחיצה
+- **כפתורי בקרה** - בכל טאב יש כפתורי פעולה רלוונטיים
+- **תמיכה מלאה ב-RTL** - עברית מושלמת
+- **רספונסיבי** - עובד בכל הגדלי מסך
 
 ### רכיבי UI מתקדמים
 

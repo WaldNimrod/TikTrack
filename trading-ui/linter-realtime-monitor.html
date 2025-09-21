@@ -98,13 +98,14 @@
   <!-- General background -->
   <div class="background-wrapper">
 
-    <!-- Unified Header System -->
-    <!-- Unified Header System will create header automatically -->
-    
+  <!-- Unified Header System -->
+  <!-- Unified Header System will create header automatically -->
+
     <!-- Page body - all content after header -->
     <div class="page-body">
-      <!-- UI Content Section 1 Start -->
-      <!-- Linter Realtime Monitor area - top-Section -->
+      <!-- TEMPLATE ZONE LOCKED - DO NOT MODIFY HEADER STRUCTURE -->
+      <!-- CONTENT SECTIONS EDITABLE - START -->
+      <!-- UI Content Section Top Start-->
       <div class="top-section linter-realtime-monitor-page" id="topSection" data-table-type="linter-realtime-monitor">
         <!-- Linter Realtime Monitor header -->
         <div class="section-header entity-development-main-header">
@@ -113,7 +114,7 @@
             ניטור Linter בזמן אמת
           </div>
           <div class="table-actions">
-            <button class="btn btn-outline-primary btn-sm" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+            <button class="btn btn-outline-primary btn-sm" onclick="copyLinterDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
               <i class="fas fa-copy"></i> העתק לוג מפורט
             </button>
             <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור סיכום">
@@ -127,67 +128,101 @@
           <!-- Active alerts component -->
           <active-alerts></active-alerts>
 
-          <!-- File Type Statistics Cards -->
-          <div class="overview-grid" id="fileTypeStats">
-            <!-- Status Card -->
+          <!-- 5 Statistics Elements -->
+          <div class="overview-grid" id="summaryStats">
+            <!-- General System Card -->
             <div class="overview-card primary">
               <div class="overview-card-icon">💓</div>
               <div class="overview-card-content">
                 <div class="overview-card-number" id="overallStatus">בדיקה...</div>
                 <div class="overview-card-label">סטטוס מערכת</div>
+            </div>
+            </div>
+
+            <!-- Phase 1: File Mapping Summary -->
+            <div class="info-summary">
+              <h6 class="summary-title">
+                <span class="traffic-light" id="mappingTrafficLight"></span>
+                מיפוי קבצים
+              </h6>
+              <div class="summary-content">
+                <div class="summary-item">
+                  <span class="summary-label">קבצים ממופים:</span>
+                  <span class="summary-value" id="mappedFilesCount">0</span>
+            </div>
+                <div class="summary-item">
+                  <span class="summary-label">עדכון אחרון:</span>
+                  <span class="summary-value" id="lastMappingUpdate">טרם בוצע</span>
+                </div>
               </div>
             </div>
 
-            <!-- Files Card -->
-            <div class="overview-card info">
-              <div class="overview-card-icon">📁</div>
-              <div class="overview-card-content">
-                <div class="overview-card-number" id="totalFilesStats">0</div>
-                <div class="overview-card-label">קבצים נסרקו</div>
+            <!-- Phase 2: Scanning Summary -->
+            <div class="info-summary">
+              <h6 class="summary-title">
+                <span class="traffic-light" id="scanningTrafficLight"></span>
+                סריקה
+              </h6>
+              <div class="summary-content">
+                <div class="summary-item">
+                  <span class="summary-label">קבצים שנמצאו:</span>
+                  <span class="summary-value" id="discoveredFiles">-</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">קבצים שנבחרו:</span>
+                  <span class="summary-value" id="selectedFiles">-</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">קבצים שנסרקו:</span>
+                  <span class="summary-value" id="scannedFiles">-</span>
+                </div>
               </div>
             </div>
 
-            <!-- Errors Card -->
-            <div class="overview-card warning">
-              <div class="overview-card-icon">⚠️</div>
-              <div class="overview-card-content">
-                <div class="overview-card-number" id="totalErrorsStats">0</div>
-                <div class="overview-card-label">שגיאות נמצאו</div>
+            <!-- Phase 3: Tools & Fixes Summary -->
+            <div class="info-summary">
+              <h6 class="summary-title">
+                <span class="traffic-light" id="fixesTrafficLight"></span>
+                כלים ותיקון
+              </h6>
+              <div class="summary-content">
+                <div class="summary-item">
+                  <span class="summary-label">שגיאות:</span>
+                  <span class="summary-value" id="totalErrorsStats">0</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">אזהרות:</span>
+                  <span class="summary-value" id="totalWarningsStats">0</span>
+                </div>
               </div>
             </div>
 
-            <!-- Warnings Card -->
-            <div class="overview-card success">
-              <div class="overview-card-icon">🔔</div>
-              <div class="overview-card-content">
-                <div class="overview-card-number" id="totalWarningsStats">0</div>
-                <div class="overview-card-label">אזהרות נמצאו</div>
+            <!-- Phase 4: Monitoring & Control Summary -->
+            <div class="info-summary">
+              <h6 class="summary-title">
+                <span class="traffic-light" id="monitoringTrafficLight"></span>
+                ניטור בקרה ולוג
+              </h6>
+              <div class="summary-content">
+                <div class="summary-item">
+                  <span class="summary-label">רשומות לוג:</span>
+                  <span class="summary-value" id="logEntriesCount">0</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">מצב גרפים:</span>
+                  <span class="summary-value" id="chartsStatus">מוכנים</span>
+                </div>
               </div>
             </div>
-
-            <!-- Last Scan Card -->
-            <div class="overview-card primary">
-              <div class="overview-card-icon">🕐</div>
-              <div class="overview-card-content">
-                <div class="overview-card-number" id="lastScanDate">טרם בוצעה</div>
-                <div class="overview-card-label">סריקה אחרונה</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="info-summary" id="summaryStats">
-            <div>סה"כ קבצים: <strong id="totalFiles">0</strong></div>
-            <div>שגיאות: <strong id="totalErrors">0</strong></div>
-            <div>אזהרות: <strong id="totalWarnings">0</strong></div>
-            <div>קבצים נסרקו: <strong id="totalScanned">0</strong></div>
-            <div>תיקונים: <strong id="totalFixes">0</strong></div>
           </div>
         </div>
-      </div> <!-- End top-section -->
-      <!-- UI Content Section 1 End -->
+      </div>
+      <!-- UI Content Section Top End -->
 
-      <!-- Section 0: General Control Panel -->
-      <div class="content-section" id="generalControlSection" data-table-type="linter-realtime-monitor">
+      <!-- Main content -->
+      <div class="main-content">
+        <!-- UI Content Section 1 Start-->
+        <div class="content-section" id="generalControlSection" data-table-type="linter-realtime-monitor">
         <div class="section-header">
           <div class="table-title">
             <img src="images/icons/development.svg" alt="פאנל בקרה כללי" class="table-icon">
@@ -204,7 +239,7 @@
           <!-- File Type Selection -->
           <div class="control-panel-section">
             <h5 class="control-section-title">
-              <i class="fas fa-file-alt"></i> בחירת סוגי קבצים לסריקה:
+              <i class="fas fa-file-alt"></i> בחירת סוגי קבצים לעבודה:
             </h5>
             <div class="file-types-grid">
               <label class="file-type-option">
@@ -310,11 +345,10 @@
             </div>
           </div>
         </div>
-      </div> <!-- End general control section -->
+        </div>
+        <!-- UI Content Section 1 End -->   
 
-      <!-- Main content -->
-      <div class="main-content">
-        <!-- Section 1: File Mapping and Control -->
+        <!-- UI Content Section 2 Start-->
         <div class="content-section" id="fileMappingSection" data-table-type="linter-realtime-monitor">
           <div class="section-header">
             <div class="table-title">
@@ -345,57 +379,141 @@
               <h6 class="actions-title">
                 <i class="fas fa-search-plus"></i> פעולות גילוי קבצים
               </h6>
-              <div class="action-buttons-grid">
-                <button class="btn btn-primary" onclick="window.discoverProjectFiles()">
-                  <i class="fas fa-search-plus"></i> עדכן רשימת קבצים
-                </button>
-                <button class="btn btn-info" onclick="window.refreshFileList()">
-                  <i class="fas fa-sync"></i> רענן מיפוי
-                </button>
-                <button class="btn btn-warning" onclick="window.clearFileCache()">
-                  <i class="fas fa-trash"></i> נקה מטמון
-                </button>
-                <button class="btn btn-success" onclick="window.exportFileList()">
-                  <i class="fas fa-download"></i> ייצא רשימה
-                </button>
-              </div>
+              <div class="actions-row">
+                <!-- Action Indicators (Left Side) -->
+                <div class="action-indicators">
+                  <div class="action-indicator" id="mappingStatusIndicator">
+                    <span class="indicator-icon" id="mappingStatusIcon">📊</span>
+                    <span class="indicator-text" id="mappingStatusText">מערכת מוכנה למיפוי</span>
+                  </div>
+                  <div class="action-indicator" id="performanceStatusIndicator">
+                    <span class="indicator-icon" id="performanceStatusIcon">⚡</span>
+                    <span class="indicator-text" id="performanceStatusText">ביצועים אופטימליים</span>
+                  </div>
+                  <div class="action-indicator" id="securityStatusIndicator">
+                    <span class="indicator-icon" id="securityStatusIcon">🔒</span>
+                    <span class="indicator-text" id="securityStatusText">אבטחת נתונים מובטחת</span>
+                  </div>
+                </div>
+                
+                <!-- Action Buttons (Right Side) -->
+                <div class="action-buttons-grid">
+                  <button class="btn btn-primary" onclick="window.discoverProjectFiles()">
+                    <i class="fas fa-search-plus"></i> עדכן רשימת קבצים
+                  </button>
+                  <button class="btn btn-info" onclick="window.refreshFileList()">
+                    <i class="fas fa-sync"></i> רענן מיפוי
+                  </button>
+                  <button class="btn btn-warning" onclick="window.clearFileCache()">
+                    <i class="fas fa-trash"></i> נקה מטמון
+                  </button>
+                  <button class="btn btn-success" onclick="window.exportFileList()">
+                    <i class="fas fa-download"></i> ייצא רשימה
+              </button>
+            </div>
+          </div>
               <div id="fileDiscoveryProgress" class="file-discovery-progress">
                 <i class="fas fa-spinner fa-spin"></i> מגלה קבצים...
               </div>
             </div>
-                </div>
-              </div>
+            </div>
+          </div>
 
             <!-- 4. משוב התקדמות - File Mapping Progress -->
             <div class="file-mapping-progress-section">
             <div class="section-header">
               <h3>📊 סטטוס מיפוי קבצים</h3>
             </div>
-            <div class="section-body">
+          <div class="section-body">
+              <!-- Progress Bar (Above Title) -->
+              <div class="progress-row" id="mappingProgressRow">
+                <div class="progress-container">
+                  <div class="progress-label">התקדמות מיפוי</div>
+                  <div class="progress-bar-wrapper">
+                    <div class="progress-bar" id="mappingProgressBar">
+                      <div class="progress-fill" id="mappingProgressFill"></div>
+                    </div>
+                    <div class="progress-percentage" id="mappingProgressPercentage">0%</div>
+                  </div>
+              </div>
+            </div>
+
               <h6 class="progress-title">
                 <i class="fas fa-chart-line"></i> סטטוס מיפוי קבצים
               </h6>
-              <div class="progress-indicators">
-                <div class="progress-indicator">
-                  <span class="indicator-label">קבצים זוהו:</span>
-                  <span class="indicator-value" id="mappedFilesCount">0</span>
+              
+              <!-- Central File Mapping Status Dashboard -->
+              <div class="mapping-dashboard">
+                <!-- Main Status Row -->
+                <div class="dashboard-row main-status">
+                  <div class="status-card primary">
+                    <div class="status-icon">🗺️</div>
+                    <div class="status-content">
+                      <div class="status-title">מיפוי קבצים</div>
+                      <div class="status-value" id="mappedFilesCount">0</div>
+                      <div class="status-subtitle">קבצים זוהו</div>
+                    </div>
+                  </div>
+                  
+                  <div class="status-card info">
+                    <div class="status-icon">🔍</div>
+                    <div class="status-content">
+                      <div class="status-title">סטטוס גילוי</div>
+                      <div class="status-value" id="discoveryStatus">לא פעיל</div>
+                      <div class="status-subtitle">מצב תהליך</div>
+                    </div>
+                  </div>
+                  
+                  <div class="status-card success">
+                    <div class="status-icon">⏰</div>
+                    <div class="status-content">
+                      <div class="status-title">עדכון אחרון</div>
+                      <div class="status-value" id="lastMappingUpdate">טרם בוצע</div>
+                      <div class="status-subtitle">זמן פעילות</div>
+                    </div>
+                  </div>
                 </div>
-                <div class="progress-indicator">
-                  <span class="indicator-label">גילוי פעיל:</span>
-                  <span class="indicator-value" id="discoveryStatus">לא פעיל</span>
+                
+                <!-- Detailed Statistics Row -->
+                <div class="dashboard-row detailed-stats">
+            <div class="stats-grid">
+                    <div class="stat-item">
+                      <div class="stat-label">קבצי JavaScript</div>
+                      <div class="stat-value" id="dashboardJsFilesCount">0</div>
+                      <div class="stat-icon">📄</div>
                 </div>
-                <div class="progress-indicator">
-                  <span class="indicator-label">עדכון אחרון:</span>
-                  <span class="indicator-value" id="lastMappingUpdate">טרם בוצע</span>
+                    <div class="stat-item">
+                      <div class="stat-label">קבצי HTML</div>
+                      <div class="stat-value" id="dashboardHtmlFilesCount">0</div>
+                      <div class="stat-icon">🌐</div>
+                    </div>
+                    <div class="stat-item">
+                      <div class="stat-label">קבצי Python</div>
+                      <div class="stat-value" id="dashboardPyFilesCount">0</div>
+                      <div class="stat-icon">🐍</div>
+                    </div>
+                    <div class="stat-item">
+                      <div class="stat-label">קבצי CSS</div>
+                      <div class="stat-value" id="dashboardCssFilesCount">0</div>
+                      <div class="stat-icon">🎨</div>
+                    </div>
+                    <div class="stat-item">
+                      <div class="stat-label">קבצים אחרים</div>
+                      <div class="stat-value" id="dashboardOtherFilesCount">0</div>
+                      <div class="stat-icon">📁</div>
+                    </div>
                 </div>
               </div>
+
+                
+                </div>
             </div>
           </div>
         </div>
-      </div> <!-- End file mapping section -->
+        <!-- UI Content Section 2 End--> 
 
-      <!-- Section 2: Scanning -->
-      <div class="content-section" id="scanningSection" data-table-type="linter-realtime-monitor">
+        <!-- UI Content Section 3 Start-->
+        <div class="content-section" id="scanningSection" data-table-type="linter-realtime-monitor">
           <div class="section-header">
             <div class="table-title">
             <img src="images/icons/scanning.svg" alt="סריקה" class="table-icon">
@@ -473,77 +591,133 @@
               <h3>▶️ פעולות סריקה</h3>
             </div>
             <div class="section-body">
-            <div class="action-buttons-grid">
-              <button class="btn btn-primary" id="startScanBtn" onclick="window.startFileScan()">
-                <i class="fas fa-play"></i> התחל סריקה מלאה
-              </button>
-              <button class="btn btn-warning" id="pauseScanBtn" onclick="window.pauseScan()" disabled>
-                <i class="fas fa-pause"></i> השהייה
-              </button>
-              <button class="btn btn-danger" id="stopScanBtn" onclick="window.stopScan()" disabled>
-                <i class="fas fa-stop"></i> עצור
-              </button>
-              <button class="btn btn-info" onclick="window.scheduleScan()">
-                <i class="fas fa-clock"></i> תזמן סריקה
-              </button>
+              <!-- Actions Row - Indicators on left, buttons on right -->
+              <div class="actions-row">
+                <!-- Action Indicators (Left side) -->
+                <div class="action-indicators">
+                  <div class="action-indicator" id="scanningStatusIndicator">
+                    <span class="indicator-icon" id="scanningStatusIcon">🔍</span>
+                    <span class="indicator-text" id="scanningStatusText">מוכן לסריקה</span>
+                  </div>
+                  <div class="action-indicator" id="scanningPerformanceIndicator">
+                    <span class="indicator-icon" id="scanningPerformanceIcon">⚡</span>
+                    <span class="indicator-text" id="scanningPerformanceText">ביצועים אופטימליים</span>
+                  </div>
+                  <div class="action-indicator" id="scanningQualityIndicator">
+                    <span class="indicator-icon" id="scanningQualityIcon">🎯</span>
+                    <span class="indicator-text" id="scanningQualityText">איכות סריקה גבוהה</span>
+                  </div>
+                </div>
+                
+                <!-- Action Buttons (Right side) -->
+                <div class="action-buttons-grid">
+                  <button class="btn btn-primary" id="startScanBtn" onclick="window.startFileScan()">
+                    <i class="fas fa-play"></i> התחל סריקה מלאה
+                  </button>
+                  <button class="btn btn-warning" id="pauseScanBtn" onclick="window.pauseScan()" disabled>
+                    <i class="fas fa-pause"></i> השהייה
+                  </button>
+                  <button class="btn btn-danger" id="stopScanBtn" onclick="window.stopScan()" disabled>
+                    <i class="fas fa-stop"></i> עצור
+                  </button>
+                  <button class="btn btn-info" onclick="window.scheduleScan()">
+                    <i class="fas fa-clock"></i> תזמן סריקה
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- 4. משוב התקדמות - Scanning Progress -->
           <div class="scanning-progress-section" id="scanningProgressSection">
+            <!-- Progress Bar (Above Title) -->
+            <div class="progress-row" id="scanningProgressRow">
+              <div class="progress-container">
+                <div class="progress-label">התקדמות סריקה</div>
+                <div class="progress-bar-wrapper">
+                  <div class="progress-bar" id="scanningProgressBar">
+                    <div class="progress-fill" id="scanningProgressFill"></div>
+                  </div>
+                  <div class="progress-percentage" id="scanningProgressPercentage">0%</div>
+                </div>
+              </div>
+            </div>
+            
             <div class="section-header">
               <h3>📊 התקדמות סריקה</h3>
             </div>
           <div class="section-body">
             
-            <!-- File Discovery Progress -->
-            <div class="scanning-progress">
-              <div class="row g-3 mb-3">
-                <!-- Discovered Files -->
-                <div class="col-md-4">
-                  <div class="progress-indicator text-center">
-                    <div class="progress-value files-discovered" id="discoveredFiles">-</div>
-                    <div class="progress-label">קבצים שנמצאו</div>
+            <h6 class="progress-title">
+              <i class="fas fa-chart-line"></i> סטטוס סריקה
+            </h6>
+            
+            <!-- Central Scanning Status Dashboard -->
+            <div class="scanning-dashboard">
+              <!-- Main Status Row -->
+              <div class="dashboard-row main-status">
+                <div class="status-card primary">
+                  <div class="status-icon">🔍</div>
+                  <div class="status-content">
+                    <div class="status-title">קבצים נסרקו</div>
+                    <div class="status-value" id="scannedFilesCount">0</div>
+                    <div class="status-subtitle">קבצים נבדקו</div>
                   </div>
                 </div>
                 
-                <!-- Selected Files -->
-                <div class="col-md-4">
-                  <div class="progress-indicator text-center">
-                    <div class="progress-value files-selected" id="selectedFiles">-</div>
-                    <div class="progress-label">קבצים שנבחרו</div>
+                <div class="status-card info">
+                  <div class="status-icon">⚠️</div>
+                  <div class="status-content">
+                    <div class="status-title">שגיאות נמצאו</div>
+                    <div class="status-value" id="scanningErrorsCount">0</div>
+                    <div class="status-subtitle">בעיות זוהו</div>
                   </div>
                 </div>
-
-                <!-- Scanned Files -->
-                <div class="col-md-4">
-                  <div class="progress-indicator text-center">
-                    <div class="progress-value files-scanned" id="scannedFiles">-</div>
-                    <div class="progress-label">קבצים שנסרקו</div>
+                
+                <div class="status-card success">
+                  <div class="status-icon">⏰</div>
+                  <div class="status-content">
+                    <div class="status-title">זמן סריקה</div>
+                    <div class="status-value" id="scanningDuration">טרם בוצעה</div>
+                    <div class="status-subtitle">משך הבדיקה</div>
                   </div>
                 </div>
               </div>
               
-              <!-- Progress Bar -->
-              <div class="mt-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                  <small class="text-muted">התקדמות סריקה:</small>
-                  <small class="text-muted" id="scanningProgressPercent">0%</small>
-                </div>
-                <div class="progress progress-bar-container">
-                  <div class="progress-bar bg-primary" role="progressbar" id="scanningProgressBar" class="progress-bar-dynamic" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+              <!-- Detailed Statistics Row -->
+              <div class="dashboard-row detailed-stats">
+                <div class="stats-grid">
+                  <div class="stat-item">
+                    <div class="stat-label">שגיאות קריטיות</div>
+                    <div class="stat-value" id="criticalErrorsCount">0</div>
+                    <div class="stat-icon">🚨</div>
+                  </div>
+                  <div class="stat-item">
+                  <div class="stat-label">אזהרות</div>
+                    <div class="stat-value" id="warningsCount">0</div>
+                    <div class="stat-icon">⚠️</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">הצעות שיפור</div>
+                    <div class="stat-value" id="suggestionsCount">0</div>
+                    <div class="stat-icon">💡</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">קבצים תקינים</div>
+                    <div class="stat-value" id="cleanFilesCount">0</div>
+                    <div class="stat-icon">✅</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-label">סה"כ נבדק</div>
+                    <div class="stat-value" id="totalScannedCount">0</div>
+                    <div class="stat-icon">📊</div>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <!-- Scanning Results Summary -->
-            <div class="scanning-results-summary mt-4">
-              <h6 class="progress-title">
-                <i class="fas fa-chart-bar"></i> סיכום תוצאות סריקה
-              </h6>
               
-              <div class="row g-3">
-                <div class="col-md-3">
+              <!-- Results Summary Row -->
+              <div class="dashboard-row results-summary">
+                <div class="results-grid">
                   <div class="result-card">
                     <div class="result-card-icon">
                       <i class="fas fa-exclamation-circle text-danger"></i>
@@ -553,9 +727,7 @@
                       <div class="result-card-value" id="scanningTotalErrors">0</div>
                     </div>
                   </div>
-                </div>
-                
-                <div class="col-md-3">
+                  
                   <div class="result-card">
                     <div class="result-card-icon">
                       <i class="fas fa-exclamation-triangle text-warning"></i>
@@ -565,9 +737,7 @@
                       <div class="result-card-value" id="scanningTotalWarnings">0</div>
                     </div>
                   </div>
-                </div>
-                
-                <div class="col-md-3">
+                  
                   <div class="result-card">
                     <div class="result-card-icon">
                       <i class="fas fa-file-code text-info"></i>
@@ -576,10 +746,8 @@
                       <div class="result-card-title">קבצים נסרקו</div>
                       <div class="result-card-value" id="totalScannedFiles">0</div>
                     </div>
-            </div>
-          </div>
-
-                <div class="col-md-3">
+                  </div>
+                  
                   <div class="result-card">
                     <div class="result-card-icon">
                       <i class="fas fa-clock text-secondary"></i>
@@ -591,23 +759,28 @@
                   </div>
                 </div>
               </div>
+
+
+
             </div>
+          </div>
             </div>
           </div>
         </div>
-      </div> <!-- End scanning section -->
+        </div>
+        <!-- UI Content Section 3 End-->
 
-      <!-- Section 3: Fixes and Additional Actions -->
-      <div class="content-section" id="fixesSection" data-table-type="linter-realtime-monitor">
+        <!-- UI Content Section 4 Start-->
+        <div class="content-section" id="fixesSection" data-table-type="linter-realtime-monitor">
           <div class="section-header">
             <div class="table-title">
             <img src="images/icons/development.svg" alt="תיקונים ופעולות נוספות" class="table-icon">
             תיקונים ופעולות נוספות
-          </div>
-          <div class="table-actions">
+            </div>
+            <div class="table-actions">
             <button class="filter-toggle-btn" onclick="toggleSection('fixesSection')" title="הצג/הסתר תיקונים ופעולות נוספות">
               <span class="section-toggle-icon">▼</span>
-            </button>
+              </button>
           </div>
         </div>
 
@@ -730,7 +903,7 @@
             <div class="section-header">
               <h3>📊 התקדמות תיקונים</h3>
             </div>
-            <div class="section-body">
+          <div class="section-body">
             
             <!-- Fix Progress Summary -->
             <div class="fix-progress-summary">
@@ -740,8 +913,8 @@
                   <div class="progress-indicator text-center">
                     <div class="progress-value fixes-completed" id="fixedIssues">0</div>
                     <div class="progress-label">בעיות שתוקנו</div>
-                  </div>
-                </div>
+            </div>
+          </div>
 
                 <!-- Remaining Issues -->
                 <div class="col-md-3">
@@ -824,24 +997,27 @@
                 </div>
               </div>
             </div>
-            </div>
           </div>
         </div>
-      </div> <!-- End fixes section -->
+        </div>
+        </div>
+        </div>
+        </div>
+        <!-- UI Content Section 4 End--> 
 
-      <!-- Section 4: Monitoring and History -->
-      <div class="content-section" id="monitoringSection" data-table-type="linter-realtime-monitor">
-        <div class="section-header">
-          <div class="table-title">
+        <!-- UI Content Section 5 Start-->
+        <div class="content-section" id="monitoringSection" data-table-type="linter-realtime-monitor">
+          <div class="section-header">
+            <div class="table-title">
             <img src="images/icons/development.svg" alt="ניתור והיסטוריה" class="table-icon">
             ניתור והיסטוריה
-          </div>
-          <div class="table-actions">
+            </div>
+            <div class="table-actions">
             <button class="filter-toggle-btn" onclick="toggleSection('monitoringSection')" title="הצג/הסתר ניתור והיסטוריה">
               <span class="section-toggle-icon">▼</span>
-            </button>
+              </button>
+            </div>
           </div>
-        </div>
 
           <div class="section-body">
           <!-- 1. מידע - Monitoring Statistics -->
@@ -890,7 +1066,7 @@
                     <input type="checkbox" id="autoRefresh" checked>
                     <span>רענון אוטומטי</span>
                   </label>
-                </div>
+              </div>
                 <div class="monitoring-interval">
                   <label class="control-label">מרווח רענון:</label>
                   <input type="number" class="form-control form-control-sm form-control-number-small" id="refreshInterval" value="2" min="1" max="30">
@@ -924,8 +1100,8 @@
                     <input type="checkbox" id="showWarnings" checked>
                     <span>אזהרות</span>
                   </label>
-                </div>
               </div>
+            </div>
             </div>
             </div>
 
@@ -1057,12 +1233,15 @@
             </div>
             </div>
           </div>
-          </div>
         </div>
-      </div> <!-- End monitoring section -->
+        </div>
+        </div>
+        </div>
+        </div>
+        <!-- UI Content Section 5 End--> 
 
-      <!-- Section 5: Progress Details Table -->
-      <div class="content-section" id="progressDetailsSection" data-table-type="linter-realtime-monitor">
+        <!-- UI Content Section 6 Start-->
+        <div class="content-section" id="progressDetailsSection" data-table-type="linter-realtime-monitor">
           <div class="section-header">
             <div class="table-title">
             <img src="images/icons/scanning.svg" alt="פירוט סריקה" class="table-icon">
@@ -1104,10 +1283,11 @@
             </table>
               </div>
               </div>
-      </div> <!-- End progress details section -->
+        </div>
+        <!-- UI Content Section 6 End--> 
 
-      <!-- Section 6: Problem Files Table -->
-      <div class="content-section" id="problemFilesSection" data-table-type="linter-realtime-monitor">
+        <!-- UI Content Section 7 Start-->
+        <div class="content-section" id="problemFilesSection" data-table-type="linter-realtime-monitor">
         <div class="section-header">
           <div class="table-title">
             <img src="images/icons/alerts.svg" alt="בעיות" class="table-icon">
@@ -1117,12 +1297,12 @@
           <div class="table-actions">
             <button class="refresh-btn" onclick="window.updateProblemFilesTable && window.updateProblemFilesTable()" title="רענן רשימת קבצים בעייתיים">
               <i class="fas fa-sync"></i> רענן
-            </button>
+                </button>
             <button class="filter-toggle-btn" onclick="toggleSection('problemFilesSection')" title="הצג/הסתר קבצים בעייתיים">
               <span class="section-toggle-icon">▼</span>
-            </button>
+                </button>
+              </div>
             </div>
-        </div>
 
         <div class="section-body">
           <div class="table-responsive">
@@ -1148,27 +1328,28 @@
             </table>
           </div>
         </div>
-      </div> <!-- End problem files section -->
+        </div>
+        <!-- UI Content Section 7 End--> 
 
-      <!-- Section 7: Fix Details Table -->
-      <div class="content-section" id="fixDetailsSection" data-table-type="linter-realtime-monitor">
-        <div class="section-header">
-          <div class="table-title">
+        <!-- UI Content Section 8 Start-->
+        <div class="content-section" id="fixDetailsSection" data-table-type="linter-realtime-monitor">
+          <div class="section-header">
+            <div class="table-title">
             <img src="images/icons/development.svg" alt="פירוט תיקונים" class="table-icon">
             פירוט תיקונים
-          </div>
+            </div>
           <div class="table-count" id="fixDetailsCount">0 תיקונים</div>
-          <div class="table-actions">
+            <div class="table-actions">
             <button class="refresh-btn" onclick="window.updateFixDetailsTable && window.updateFixDetailsTable()" title="רענן פירוט תיקונים">
               <i class="fas fa-sync"></i> רענן
               </button>
             <button class="filter-toggle-btn" onclick="toggleSection('fixDetailsSection')" title="הצג/הסתר פירוט תיקונים">
               <span class="section-toggle-icon">▼</span>
               </button>
-          </div>
             </div>
-            
-        <div class="section-body">
+          </div>
+
+          <div class="section-body">
           <div class="table-responsive">
             <table class="table table-sm table-striped" id="fixDetailsTable">
               <thead class="table-dark">
@@ -1190,17 +1371,17 @@
                 </tr>
               </tbody>
             </table>
+                </div>
           </div>
         </div>
-      </div> <!-- End fix details section -->
+        <!-- UI Content Section 8 End--> 
 
-      <!-- Section 8: Logs -->
-      <div class="content-section" id="logsSection" data-table-type="linter-realtime-monitor">
+        <!-- UI Content Section 9 Start-->
+        <div class="content-section" id="logsSection" data-table-type="linter-realtime-monitor">
           <div class="section-header">
             <div class="table-title">
               <img src="images/icons/development.svg" alt="לוגים" class="table-icon">
               לוגי Linter
-            </div>
             <div class="table-count" id="logsCount">טוען...</div>
             <div class="table-actions">
             <button class="refresh-btn" onclick="window.loadIssues && window.loadIssues()" title="רענן לוגים">
@@ -1211,6 +1392,7 @@
               </button>
             </div>
           </div>
+        </div>
 
           <div class="section-body">
           <div class="table-responsive">
@@ -1232,9 +1414,11 @@
                 </tr>
               </tbody>
             </table>
-            </div>
           </div>
-        </div> <!-- End logs section -->
+        </div>
+        </div>
+        <!-- UI Content Section 9 End-->
+        <!-- CONTENT SECTIONS EDITABLE - END -->
       </div> <!-- End main-content -->
     </div> <!-- End page-body -->
   </div> <!-- End background-wrapper -->
@@ -1262,15 +1446,17 @@
     <script src="scripts/header-system.js"></script>
     
     <!-- Page-specific scripts -->
-    <!-- Chart.js for future graph implementation -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <!-- Chart System Scripts -->
+    <script src="scripts/charts/chart-loader.js"></script>
+    <script src="scripts/charts/chart-theme.js"></script>
+    <script src="scripts/charts/chart-system.js"></script>
+    <script src="scripts/charts/adapters/linter-adapter.js"></script>
+    
+    <!-- Legacy scripts for compatibility -->
     <script src="scripts/indexeddb-adapter.js"></script>
     <script src="scripts/data-collector.js"></script>
     <script src="scripts/log-recovery.js"></script>
-    <script src="scripts/chart-renderer.js"></script>
-    <script src="scripts/quality-chart-renderer.js"></script>
-    <script src="scripts/counts-chart-renderer.js"></script>
+    <!-- Chart renderers will be implemented in future versions -->
     <script src="scripts/project-files-scanner.js"></script>
     <script src="scripts/linter-file-analysis.js"></script>
     <script src="scripts/linter-testing-system.js"></script>

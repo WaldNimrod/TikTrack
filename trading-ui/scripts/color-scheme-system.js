@@ -1482,10 +1482,64 @@ function getColorPreferences() {
     return window.currentPreferences;
   }
 
-  // ברירת מחדל
+  // ברירת מחדל - צבעי מערכת בסיסיים
   return {
-    // הסרנו numericValueColors כי הוא לא קיים במערכת ההעדפות
-    // הסרנו entityColors כי הוא לא קיים במערכת ההעדפות
+    // צבעים ראשיים למערכת הגרפים (6-8 צבעים מרכזיים)
+    primaryColor: '#007bff',        // כחול ראשי - כותרות וכפתורים
+    chartPrimaryColor: '#1e40af',   // כחול כהה - צבע בסיס לגרפים עצמם
+    successColor: '#28a745',        // ירוק - הצלחה, רווחים
+    warningColor: '#ffc107',        // צהוב - אזהרות, ביצועים בינוניים
+    dangerColor: '#dc3545',         // אדום - שגיאות, הפסדים
+    infoColor: '#17a2b8',           // כחול מידע - מידע נוסף
+    secondaryColor: '#6c757d',      // אפור - נתונים משניים
+    
+    // צבעי ישויות לגרפים (מהמערכת הקיימת)
+    entityTradeColor: '#007bff',    // כחול - טריידים
+    entityAccountColor: '#28a745',  // ירוק - חשבונות
+    entityExecutionColor: '#17a2b8', // כחול מידע - ביצועים
+    entityAlertColor: '#ffc107',    // צהוב - התראות
+    entityTickerColor: '#dc3545',   // אדום - טיקרים
+    entityNoteColor: '#6f42c1',     // סגול - הערות
+    
+    // צבעי גרפים מיוחדים
+    chartBackgroundColor: '#ffffff', // לבן - רקע גרפים
+    chartTextColor: '#212529',       // כהה - טקסט גרפים
+    chartGridColor: '#e9ecef',       // אפור בהיר - רשת גרפים
+    chartBorderColor: '#dee2e6',     // אפור - גבול גרפים
+    chartPointColor: '#007bff',      // כחול - נקודות גרפים
+    
+    // צבעי רקע וטקסט
+    cardBackground: '#ffffff',
+    inputBackground: '#ffffff',
+    textColor: '#212529',
+    textMuted: '#6c757d',
+    borderColor: '#dee2e6',
+    
+    // הגדרות גרפים
+    chartAutoRefresh: true,
+    chartRefreshInterval: 60,
+    chartQuality: 'medium',
+    chartAnimations: true,
+    chartInteractive: true,
+    chartShowTooltips: true,
+    chartExportFormat: 'png',
+    chartExportQuality: 'medium',
+    chartExportResolution: '1x',
+    chartExportBackground: true,
+    
+    // צבעי hover
+    primaryHover: '#0056b3',
+    secondaryHover: '#545b62',
+    successHover: '#1e7e34',
+    warningHover: '#e0a800',
+    dangerHover: '#c82333',
+    infoHover: '#138496',
+    
+    // צבעי רקע עם שקיפות
+    successBackground: 'rgba(40, 167, 69, 0.1)',
+    warningBackground: 'rgba(255, 193, 7, 0.1)',
+    dangerBackground: 'rgba(220, 53, 69, 0.1)',
+    infoBackground: 'rgba(23, 162, 184, 0.1)'
   };
 }
 
@@ -1527,6 +1581,58 @@ function updateCSSVariablesFromPreferences(preferences) {
       if (preferences.valuePositiveColorLight) {
         document.documentElement.style.setProperty('--numeric-positive-light', preferences.valuePositiveColorLight);
       }
+      
+      // עדכון צבעי גרפים
+      if (preferences.chartPrimaryColor) {
+        document.documentElement.style.setProperty('--chart-primary-color', preferences.chartPrimaryColor);
+      }
+      if (preferences.chartBackgroundColor) {
+        document.documentElement.style.setProperty('--chart-background-color', preferences.chartBackgroundColor);
+      }
+      if (preferences.chartTextColor) {
+        document.documentElement.style.setProperty('--chart-text-color', preferences.chartTextColor);
+      }
+      if (preferences.chartGridColor) {
+        document.documentElement.style.setProperty('--chart-grid-color', preferences.chartGridColor);
+      }
+      if (preferences.chartBorderColor) {
+        document.documentElement.style.setProperty('--chart-border-color', preferences.chartBorderColor);
+      }
+      if (preferences.chartPointColor) {
+        document.documentElement.style.setProperty('--chart-point-color', preferences.chartPointColor);
+      }
+      
+      // עדכון הגדרות גרפים
+      if (preferences.chartAutoRefresh !== undefined) {
+        document.documentElement.style.setProperty('--chart-auto-refresh', preferences.chartAutoRefresh);
+      }
+      if (preferences.chartRefreshInterval) {
+        document.documentElement.style.setProperty('--chart-refresh-interval', preferences.chartRefreshInterval + 's');
+      }
+      if (preferences.chartQuality) {
+        document.documentElement.style.setProperty('--chart-quality', preferences.chartQuality);
+      }
+      if (preferences.chartAnimations !== undefined) {
+        document.documentElement.style.setProperty('--chart-animations', preferences.chartAnimations);
+      }
+      if (preferences.chartInteractive !== undefined) {
+        document.documentElement.style.setProperty('--chart-interactive', preferences.chartInteractive);
+      }
+      if (preferences.chartShowTooltips !== undefined) {
+        document.documentElement.style.setProperty('--chart-show-tooltips', preferences.chartShowTooltips);
+      }
+      if (preferences.chartExportFormat) {
+        document.documentElement.style.setProperty('--chart-export-format', preferences.chartExportFormat);
+      }
+      if (preferences.chartExportQuality) {
+        document.documentElement.style.setProperty('--chart-export-quality', preferences.chartExportQuality);
+      }
+      if (preferences.chartExportResolution) {
+        document.documentElement.style.setProperty('--chart-export-resolution', preferences.chartExportResolution);
+      }
+      if (preferences.chartExportBackground !== undefined) {
+        document.documentElement.style.setProperty('--chart-export-background', preferences.chartExportBackground);
+      }
       if (preferences.valueNegativeColorDark) {
         document.documentElement.style.setProperty('--numeric-negative-dark', preferences.valueNegativeColorDark);
       }
@@ -1539,10 +1645,80 @@ function updateCSSVariablesFromPreferences(preferences) {
       if (preferences.valueNeutralColorLight) {
         document.documentElement.style.setProperty('--numeric-zero-light', preferences.valueNeutralColorLight);
       }
+      
+      // עדכון צבעי גרפים מיוחדים
+      if (preferences.chartPrimaryColor) {
+        document.documentElement.style.setProperty('--chart-primary-color', preferences.chartPrimaryColor);
+      }
+      if (preferences.chartBackgroundColor) {
+        document.documentElement.style.setProperty('--chart-background-color', preferences.chartBackgroundColor);
+      }
+      if (preferences.chartTextColor) {
+        document.documentElement.style.setProperty('--chart-text-color', preferences.chartTextColor);
+      }
+      if (preferences.chartGridColor) {
+        document.documentElement.style.setProperty('--chart-grid-color', preferences.chartGridColor);
+      }
+      if (preferences.chartBorderColor) {
+        document.documentElement.style.setProperty('--chart-border-color', preferences.chartBorderColor);
+      }
+      if (preferences.chartPointColor) {
+        document.documentElement.style.setProperty('--chart-point-color', preferences.chartPointColor);
+      }
 
     // עדכון צבעים בסיסיים
     if (preferences.primaryColor) {
       document.documentElement.style.setProperty('--primary-color', preferences.primaryColor);
+    }
+    if (preferences.chartPrimaryColor) {
+      document.documentElement.style.setProperty('--chart-primary-color', preferences.chartPrimaryColor);
+    }
+    if (preferences.chartBackgroundColor) {
+      document.documentElement.style.setProperty('--chart-background-color', preferences.chartBackgroundColor);
+    }
+    if (preferences.chartTextColor) {
+      document.documentElement.style.setProperty('--chart-text-color', preferences.chartTextColor);
+    }
+    if (preferences.chartGridColor) {
+      document.documentElement.style.setProperty('--chart-grid-color', preferences.chartGridColor);
+    }
+    if (preferences.chartBorderColor) {
+      document.documentElement.style.setProperty('--chart-border-color', preferences.chartBorderColor);
+    }
+    if (preferences.chartPointColor) {
+      document.documentElement.style.setProperty('--chart-point-color', preferences.chartPointColor);
+    }
+    
+    // עדכון הגדרות גרפים
+    if (preferences.chartAutoRefresh !== undefined) {
+      document.documentElement.style.setProperty('--chart-auto-refresh', preferences.chartAutoRefresh ? 'true' : 'false');
+    }
+    if (preferences.chartRefreshInterval) {
+      document.documentElement.style.setProperty('--chart-refresh-interval', preferences.chartRefreshInterval + 's');
+    }
+    if (preferences.chartQuality) {
+      document.documentElement.style.setProperty('--chart-quality', preferences.chartQuality);
+    }
+    if (preferences.chartAnimations !== undefined) {
+      document.documentElement.style.setProperty('--chart-animations', preferences.chartAnimations ? 'true' : 'false');
+    }
+    if (preferences.chartInteractive !== undefined) {
+      document.documentElement.style.setProperty('--chart-interactive', preferences.chartInteractive ? 'true' : 'false');
+    }
+    if (preferences.chartShowTooltips !== undefined) {
+      document.documentElement.style.setProperty('--chart-show-tooltips', preferences.chartShowTooltips ? 'true' : 'false');
+    }
+    if (preferences.chartExportFormat) {
+      document.documentElement.style.setProperty('--chart-export-format', preferences.chartExportFormat);
+    }
+    if (preferences.chartExportQuality) {
+      document.documentElement.style.setProperty('--chart-export-quality', preferences.chartExportQuality);
+    }
+    if (preferences.chartExportResolution) {
+      document.documentElement.style.setProperty('--chart-export-resolution', preferences.chartExportResolution);
+    }
+    if (preferences.chartExportBackground !== undefined) {
+      document.documentElement.style.setProperty('--chart-export-background', preferences.chartExportBackground ? 'true' : 'false');
     }
     if (preferences.secondaryColor) {
       document.documentElement.style.setProperty('--secondary-color', preferences.secondaryColor);
@@ -1558,6 +1734,57 @@ function updateCSSVariablesFromPreferences(preferences) {
     }
     if (preferences.dangerColor) {
       document.documentElement.style.setProperty('--danger-color', preferences.dangerColor);
+    }
+    
+    // עדכון צבעי רקע וטקסט
+    if (preferences.cardBackground) {
+      document.documentElement.style.setProperty('--card-background', preferences.cardBackground);
+    }
+    if (preferences.inputBackground) {
+      document.documentElement.style.setProperty('--input-background', preferences.inputBackground);
+    }
+    if (preferences.textColor) {
+      document.documentElement.style.setProperty('--text-color', preferences.textColor);
+    }
+    if (preferences.textMuted) {
+      document.documentElement.style.setProperty('--text-muted', preferences.textMuted);
+    }
+    if (preferences.borderColor) {
+      document.documentElement.style.setProperty('--border-color', preferences.borderColor);
+    }
+    
+    // עדכון צבעי hover
+    if (preferences.primaryHover) {
+      document.documentElement.style.setProperty('--primary-hover', preferences.primaryHover);
+    }
+    if (preferences.secondaryHover) {
+      document.documentElement.style.setProperty('--secondary-hover', preferences.secondaryHover);
+    }
+    if (preferences.successHover) {
+      document.documentElement.style.setProperty('--success-hover', preferences.successHover);
+    }
+    if (preferences.warningHover) {
+      document.documentElement.style.setProperty('--warning-hover', preferences.warningHover);
+    }
+    if (preferences.dangerHover) {
+      document.documentElement.style.setProperty('--danger-hover', preferences.dangerHover);
+    }
+    if (preferences.infoHover) {
+      document.documentElement.style.setProperty('--info-hover', preferences.infoHover);
+    }
+    
+    // עדכון צבעי רקע עם שקיפות
+    if (preferences.successBackground) {
+      document.documentElement.style.setProperty('--success-background', preferences.successBackground);
+    }
+    if (preferences.warningBackground) {
+      document.documentElement.style.setProperty('--warning-background', preferences.warningBackground);
+    }
+    if (preferences.dangerBackground) {
+      document.documentElement.style.setProperty('--danger-background', preferences.dangerBackground);
+    }
+    if (preferences.infoBackground) {
+      document.documentElement.style.setProperty('--info-background', preferences.infoBackground);
     }
 
       // עדכון צבעי ישויות - לפי השמות במערכת ההעדפות
@@ -1670,6 +1897,12 @@ function updateCSSVariablesFromPreferences(preferences) {
       negative: preferences.valueNegativeColor
     });
 
+    // Dispatch event to notify chart theme system
+    if (window.dispatchEvent) {
+      window.dispatchEvent(new CustomEvent('colorPreferencesUpdated'));
+    }
+    
+    console.log('✅ CSS Variables updated and chart theme notified');
   } catch (error) {
     console.error('❌ שגיאה בעדכון CSS Variables:', error);
   }

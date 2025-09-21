@@ -1,45 +1,18 @@
-// Index page specific JavaScript
+/**
+ * Index Page JavaScript - TikTrack
+ * עמוד הבית - JavaScript
+ * 
+ * @version 1.0.0
+ * @lastUpdated December 2024
+ * @author TikTrack Development Team
+ */
 
-// Function to wait for Chart.js to load
-function waitForChartJS() {
-    return new Promise((resolve, reject) => {
-        if (typeof Chart !== 'undefined') {
-            resolve();
-            return;
-        }
-        
-        let attempts = 0;
-        const maxAttempts = 50; // 5 seconds max wait
-        
-        const checkChart = () => {
-            attempts++;
-            if (typeof Chart !== 'undefined') {
-                resolve();
-            } else if (attempts >= maxAttempts) {
-                reject(new Error('Chart.js failed to load'));
-            } else {
-                setTimeout(checkChart, 100);
-            }
-        };
-        
-        checkChart();
-    });
-}
+console.log('🏠 Index page JavaScript loaded');
 
-// Chart.js library needed for charts
-if (typeof Chart === 'undefined') {
-    console.log('📊 Chart.js will be loaded dynamically');
-}
-
-// Chart instances
-let performanceChart = null;
-let allocationChart = null;
-let accountsChart = null;
-let riskChart = null;
+// Index page specific variables
 
 // Function to switch between table tabs
 function switchTableTab(tabName) {
-    
     // Hide all table contents
     document.querySelectorAll('.table-content').forEach(table => {
         table.classList.add('d-none');
@@ -60,355 +33,76 @@ function switchTableTab(tabName) {
     event.target.classList.add('active');
 }
 
-// Function to update chart period
-function updateChartPeriod(period) {
-    // Chart update logic would go here
-}
-
-// Function to refresh charts
-function refreshCharts() {
-    initializeCharts();
-}
-
-// Function to initialize all charts
-function initializeCharts() {
-    
-    // Initialize Performance Chart - Simple line chart
-    const performanceCtx = document.getElementById('performanceChart');
-    if (performanceCtx && typeof Chart !== 'undefined') {
-        if (performanceChart) performanceChart.destroy();
-        
-        performanceChart = new Chart(performanceCtx, {
-            type: 'line',
-            data: {
-                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-                datasets: [{
-                    label: 'תיק',
-                    data: [100, 115, 125, 140],
-                    borderColor: '#28a745',
-                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    x: { display: false },
-                    y: { display: false }
-                }
-            }
-        });
-    }
-    
-    // Initialize Allocation Chart - Simple doughnut
-    const allocationCtx = document.getElementById('allocationChart');
-    if (allocationCtx && typeof Chart !== 'undefined') {
-        if (allocationChart) allocationChart.destroy();
-        
-        allocationChart = new Chart(allocationCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['טכנולוגיה', 'פיננסים', 'אחר'],
-                datasets: [{
-                    data: [50, 30, 20],
-                    backgroundColor: ['#28a745', '#007bff', '#ffc107']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                }
-            }
-        });
-    }
-    
-    // Initialize Accounts Chart - Simple bar
-    const accountsCtx = document.getElementById('accountsChart');
-    if (accountsCtx && typeof Chart !== 'undefined') {
-        if (accountsChart) accountsChart.destroy();
-        
-        accountsChart = new Chart(accountsCtx, {
-            type: 'bar',
-            data: {
-                labels: ['USD', 'ILS', 'EUR'],
-                datasets: [{
-                    data: [15, 8, 12],
-                    backgroundColor: ['#28a745', '#007bff', '#ffc107']
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    x: { display: false },
-                    y: { display: false }
-                }
-            }
-        });
-    }
-    
-    // Initialize Risk Chart - Simple scatter
-    const riskCtx = document.getElementById('riskChart');
-    if (riskCtx && typeof Chart !== 'undefined') {
-        if (riskChart) riskChart.destroy();
-        
-        riskChart = new Chart(riskCtx, {
-            type: 'scatter',
-            data: {
-                datasets: [{
-                    data: [
-                        {x: 5, y: 8}, {x: 7, y: 12}, {x: 3, y: 6}, {x: 9, y: 15}
-                    ],
-                    backgroundColor: '#28a745',
-                    pointRadius: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    x: { display: false },
-                    y: { display: false }
-                }
-            }
-        });
-    }
-}
-
-// Function to refresh overview
+// Function to refresh overview data (placeholder)
 function refreshOverview() {
-    // Overview refresh logic would go here
+    console.log('Refreshing overview data...');
+    // Implement data fetching and UI update for overview section
 }
 
-// Function to export overview
+// Function to export overview data (placeholder)
 function exportOverview() {
-    // Export logic would go here
-}
-
-// Function to export specific chart
-function exportChart(chartType) {
-    
-    let chart = null;
-    let filename = '';
-    
-    switch(chartType) {
-        case 'performance':
-            chart = performanceChart;
-            filename = 'performance-chart.png';
-            break;
-        case 'allocation':
-            chart = allocationChart;
-            filename = 'allocation-chart.png';
-            break;
-        case 'accounts':
-            chart = accountsChart;
-            filename = 'accounts-chart.png';
-            break;
-        case 'risk':
-            chart = riskChart;
-            filename = 'risk-chart.png';
-            break;
-        default:
-            return;
-    }
-    
-    if (chart) {
-        // Create download link
-        const link = document.createElement('a');
-        link.download = filename;
-        link.href = chart.toBase64Image();
-        link.click();
-        
-    } else {
-    }
-}
-
-// Function for quick actions
-function quickAction(action) {
-    
-    switch (action) {
-        case 'new-trade':
-            window.location.href = 'trades.html';
-            break;
-        case 'new-alert':
-            window.location.href = 'alerts.html';
-            break;
-        case 'new-account':
-            window.location.href = 'accounts.html';
-            break;
-        case 'export-data':
-            break;
-        case 'reports':
-            break;
-        case 'preferences-new':
-            window.location.href = 'preferences-new.html';
-            break;
-        case 'settings':
-            window.location.href = 'preferences.html';
-            break;
-        case 'documentation':
-            window.open('../JAVASCRIPT_SCRIPTS_ARCHITECTURE.md', '_blank');
-            break;
-        default:
-    }
-}
-
-// Load action buttons for tables
-function loadActionButtons() {
-    
-    if (typeof window.loadTableActionButtons === 'function') {
-        // Load buttons for trades table
-        window.loadTableActionButtons('tradesContainer', 'trade', {
-            showDetails: true,
-            showLinked: true,
-            showEdit: true,
-            showCancel: true,
-            showDelete: true
-        });
-        
-        // Load buttons for alerts table
-        window.loadTableActionButtons('alertsContainer', 'alert', {
-            showDetails: false,
-            showLinked: false,
-            showEdit: true,
-            showCancel: false,
-            showDelete: true
-        });
-        
-        // Load buttons for accounts table
-        window.loadTableActionButtons('accountsContainer', 'account', {
-            showDetails: true,
-            showLinked: false,
-            showEdit: true,
-            showCancel: false,
-            showDelete: false
-        });
-        
-    } else {
-    }
-}
-
-// Initialize page after DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    
-    
-    // Load action buttons after a short delay to ensure UI utils are loaded
-    setTimeout(loadActionButtons, 500);
-    
-    // Initialize charts after Chart.js is loaded
-    waitForChartJS().then(() => {
-        initializeCharts();
-    }).catch(() => {
-        console.warn('Chart.js not available - charts disabled');
-    });
-    
-});
-
-// ===== פונקציות חסרות מ-onclick attributes =====
-
-/**
- * הצג/הסתר כל הסקשנים (כולל הסקשן העליון)
- * Toggle all sections visibility including top section
- */
-function toggleAllSections() {
-    const sections = document.querySelectorAll('.content-section, .top-section');
-    const toggleIcon = document.querySelector('.top-section .section-toggle-icon');
-
-    if (!sections.length) return;
-
-    // בדיקה אם כל הסקשנים סגורים
-    const allCollapsed = Array.from(sections).every(section => {
-        const sectionBody = section.querySelector('.section-body');
-        return sectionBody && (sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none');
-    });
-
-    // החלטה אם לפתוח או לסגור הכל
-    const shouldOpen = allCollapsed;
-
-    sections.forEach(section => {
-        const sectionBody = section.querySelector('.section-body');
-        if (!sectionBody) return;
-
-        if (shouldOpen) {
-            // פתיחה
-            sectionBody.classList.remove('collapsed');
-            sectionBody.style.display = 'block';
-        } else {
-            // סגירה
-            sectionBody.classList.add('collapsed');
-            sectionBody.style.display = 'none';
-        }
-    });
-
-    // עדכון אייקון
-    if (toggleIcon) {
-        toggleIcon.textContent = shouldOpen ? '▼' : '◀';
-    }
-
-    console.log(`📋 כל הסקשנים ${shouldOpen ? 'נפתחו' : 'נסגרו'}`);
-}
-
-/**
- * ניקוי מטמון פיתוח
- * Clear development cache
- */
-function clearDevelopmentCache(event) {
-    if (event) {
-        event.preventDefault();
-    }
-    
-    console.log('🧹 ניקוי מטמון פיתוח...');
-    
-    // ניקוי localStorage
-    try {
-        localStorage.clear();
-        console.log('✅ localStorage נוקה');
-    } catch (e) {
-        console.error('❌ שגיאה בניקוי localStorage:', e);
-    }
-    
-    // ניקוי sessionStorage
-    try {
-        sessionStorage.clear();
-        console.log('✅ sessionStorage נוקה');
-    } catch (e) {
-        console.error('❌ שגיאה בניקוי sessionStorage:', e);
-    }
-    
-    // התראה למשתמש
     if (typeof showNotification === 'function') {
-        showNotification('מטמון פיתוח נוקה בהצלחה', 'success');
+        showNotification('info', 'ייצוא נתוני סקירה יהיה זמין בעתיד');
+    } else {
+        console.log('📤 Export overview data - Future feature');
+    }
+}
+
+// Function for quick actions (placeholder)
+function quickAction(actionType) {
+    if (typeof showNotification === 'function') {
+        showNotification('info', `פעולה מהירה '${actionType}' תהיה זמינה בעתיד`);
+    } else {
+        console.log(`⚡ Quick action: ${actionType} - Future feature`);
+    }
+}
+
+// Function to toggle all sections (placeholder)
+function toggleAllSections() {
+    console.log('Toggling all sections - Future feature');
+    // Implement logic to toggle all collapsible sections
+}
+
+// Function to toggle specific section
+function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    const toggleIcon = section.querySelector('.section-toggle-icon');
+    const content = section.querySelector('.section-body');
+    
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        toggleIcon.textContent = '▼';
+    } else {
+        content.style.display = 'none';
+        toggleIcon.textContent = '▶';
+    }
+}
+
+// Event listener for DOM content loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🏠 Index page initialized');
+    
+    // Initialize overview data
+    refreshOverview();
+    
+    // Setup action buttons
+    const refreshButton = document.querySelector('.btn-primary');
+    if (refreshButton) {
+        refreshButton.addEventListener('click', refreshOverview);
     }
     
-    // רענון הדף
-    setTimeout(() => {
-        window.location.reload();
-    }, 1000);
-}
+    const exportButton = document.querySelector('.btn-secondary');
+    if (exportButton) {
+        exportButton.addEventListener('click', exportOverview);
+    }
+});
 
 // Export functions to global scope
 window.switchTableTab = switchTableTab;
-window.updateChartPeriod = updateChartPeriod;
-window.refreshCharts = refreshCharts;
-window.initializeCharts = initializeCharts;
 window.refreshOverview = refreshOverview;
 window.exportOverview = exportOverview;
-window.exportChart = exportChart;
 window.quickAction = quickAction;
 window.toggleAllSections = toggleAllSections;
-window.clearDevelopmentCache = clearDevelopmentCache;
+window.toggleSection = toggleSection;
 
-console.log('✅ פונקציות חסרות נוספו לגלובל scope');
+console.log('✅ Index page ready');

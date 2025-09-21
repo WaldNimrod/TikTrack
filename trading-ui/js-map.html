@@ -49,6 +49,9 @@
     
     <!-- Page-Specific CSS - Last to override all previous styles -->
     <link rel="stylesheet" href="styles/js-map.css?v=v1.0.0">
+    
+    <!-- JS-Map Advanced Styles -->
+    <link rel="stylesheet" href="styles-new/07-trumps/js-map-advanced.css?v=v1.0.0">
 
     <!-- Core scripts - Required order -->
     <script src="scripts/header-system.js"></script>
@@ -66,25 +69,80 @@
 
         <!-- Page body -->
     <div class="page-body">
+        <!-- TEMPLATE ZONE LOCKED - DO NOT MODIFY HEADER STRUCTURE -->
         <!-- Main content limited in width -->
         <div class="main-content">
-            <!-- Top Section - מפת JavaScript -->
-            <div class="top-section">
-                <div class="section-header">
-                    <h2>🗺️ מפת JavaScript</h2>
+            <!-- CONTENT SECTIONS EDITABLE - START -->
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="header-content">
+                    <div class="header-text">
+                        <h1>🗺️ מפת JavaScript - TikTrack</h1>
+                        <p>ניתוח מפורט של כל הפונקציות, הקבצים והתלויות במערכת</p>
+                    </div>
                     <div class="header-actions">
-                        <button class="action-btn refresh-btn" onclick="refreshJsMapData()" title="רענן נתונים מהשרת">
-                            <i class="fas fa-sync-alt"></i> רענן נתונים
-                        </button>
-                        <button class="action-btn copy-log-btn" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט של JS-Map">
+                    <button class="action-btn primary" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט למערכת">
                             <i class="fas fa-copy"></i> העתק לוג מפורט
                         </button>
-                        <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
+                    <button class="action-btn" onclick="window.jsMapSystem && window.jsMapSystem.refreshData()" title="רענן נתונים">
+                        <i class="fas fa-sync-alt"></i> רענן נתונים
+                    </button>
+                    <button class="action-btn danger" onclick="window.jsMapSystem && window.jsMapSystem.clearCache()" title="נקה מטמון">
+                        <i class="fas fa-trash"></i> נקה מטמון
+                    </button>
+                    <button class="action-btn info" onclick="window.jsMapSystem && window.jsMapSystem.performAdvancedAnalysis()" title="ניתוח מתקדם">
+                        <i class="fas fa-chart-line"></i> ניתוח מתקדם
                         </button>
                     </div>
                 </div>
-                <div class="section-body">
+            </div>
+
+            <!-- Main Tabs Container -->
+            <div class="main-tabs-container">
+                <!-- Tab Navigation -->
+                <div class="tab-navigation">
+                    <button class="tab-btn active" data-tab="statistics" onclick="switchTab('statistics')">
+                        <i class="fas fa-chart-bar"></i> סטטיסטיקות
+                    </button>
+                    <button class="tab-btn" data-tab="functions" onclick="switchTab('functions')">
+                        <i class="fas fa-code"></i> פונקציות
+                    </button>
+                    <button class="tab-btn" data-tab="pages" onclick="switchTab('pages')">
+                        <i class="fas fa-file-alt"></i> עמודים
+                    </button>
+                    <button class="tab-btn" data-tab="dependencies" onclick="switchTab('dependencies')">
+                        <i class="fas fa-project-diagram"></i> תלויות
+                    </button>
+                    <button class="tab-btn" data-tab="analysis" onclick="switchTab('analysis')">
+                        <i class="fas fa-search"></i> ניתוח
+                    </button>
+                    <button class="tab-btn" data-tab="future" onclick="switchTab('future')">
+                        <i class="fas fa-rocket"></i> עתידי
+                    </button>
+                    <button class="tab-btn" data-tab="system" onclick="switchTab('system')">
+                        <i class="fas fa-cogs"></i> מצב מערכת
+                    </button>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <!-- Statistics Tab -->
+                    <div id="statistics-tab" class="tab-panel active">
+                        <div class="tab-header">
+                            <h2><i class="fas fa-chart-bar"></i> סטטיסטיקות מערכת</h2>
+                            <div class="tab-actions">
+                                <button class="action-btn" onclick="refreshStatistics()" title="רענן סטטיסטיקות">
+                                    <i class="fas fa-sync-alt"></i> רענן
+                                </button>
+                                <button class="action-btn" onclick="exportStatistics()" title="ייצוא סטטיסטיקות">
+                                    <i class="fas fa-download"></i> ייצוא
+                                </button>
+                                <button class="action-btn" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט">
+                                    <i class="fas fa-copy"></i> העתק לוג
+                                </button>
+                            </div>
+                        </div>
+                        <div class="tab-body">
                     <!-- סטטיסטיקות מערכת -->
                     <div class="system-stats">
                         <div class="stats-grid">
@@ -108,6 +166,16 @@
                                 <div class="stat-value" id="globalFunctionsCount">-</div>
                                 <div class="stat-label">פונקציות גלובליות</div>
                             </div>
+                                    <div class="stat-card">
+                                        <div class="stat-icon">🔍</div>
+                                        <div class="stat-value" id="duplicatesCount">-</div>
+                                        <div class="stat-label">כפילויות זוהו</div>
+                                    </div>
+                                    <div class="stat-card">
+                                        <div class="stat-icon">🏠</div>
+                                        <div class="stat-value" id="localFunctionsCount">-</div>
+                                        <div class="stat-label">פונקציות מקומיות</div>
+                            </div>
                         </div>
                     </div>
                     
@@ -121,18 +189,29 @@
                         </div>
                         <div id="quickSearchResults" class="search-results"></div>
                     </div>
-                    
-                    <!-- תפריט פונקציות -->
-                    <div class="functions-dropdown">
-                        <button id="functionsDropdown" class="dropdown-toggle" onclick="toggleFunctionsDropdown()">
-                            <i class="fas fa-list"></i> תפריט פונקציות
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                        <div id="functionsDropdownContent" class="dropdown-content">
-                            <!-- תוכן התפריט יטען דינמית -->
                         </div>
                             </div>
                     
+                    <!-- Functions Tab -->
+                    <div id="functions-tab" class="tab-panel">
+                        <div class="tab-header">
+                            <h2><i class="fas fa-code"></i> פונקציות JavaScript</h2>
+                            <div class="tab-actions">
+                                <button class="action-btn" onclick="refreshFunctions()" title="רענן פונקציות">
+                                    <i class="fas fa-sync-alt"></i> רענן
+                                </button>
+                                <button class="action-btn" onclick="exportFunctions()" title="ייצוא פונקציות">
+                                    <i class="fas fa-download"></i> ייצוא
+                                </button>
+                                <button class="action-btn" onclick="toggleFunctionsDropdown()" title="חיפוש מתקדם">
+                                    <i class="fas fa-search"></i> חיפוש
+                                </button>
+                                <button class="action-btn" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט">
+                                    <i class="fas fa-copy"></i> העתק לוג
+                                </button>
+                            </div>
+                        </div>
+                        <div class="tab-body">
                     <!-- כפתורי מצבי תצוגה -->
                     <div class="view-mode-controls">
                         <div class="view-mode-buttons">
@@ -148,310 +227,327 @@
                         </div>
                     </div>
 
-                    <!-- כפתורי פעולה מהירה -->
-                    <div class="quick-actions">
-                        <button class="action-btn" onclick="refreshDashboardData()" title="רענן את כל הנתונים">
-                            <i class="fas fa-sync-alt"></i> רענן נתונים
-                        </button>
-                        <button class="action-btn" onclick="exportToCSV()" title="ייצוא ל-CSV">
-                            <i class="fas fa-file-csv"></i> ייצוא CSV
-                        </button>
-                        <button class="action-btn" onclick="exportToJSON()" title="ייצוא ל-JSON">
-                            <i class="fas fa-file-code"></i> ייצוא JSON
-                    </button>
-                        <button class="action-btn" onclick="generateReport()" title="יצירת דוח מפורט">
-                            <i class="fas fa-file-alt"></i> יצירת דוח
-                    </button>
-                    </div>
-                </div>
-            </div>
-            <!-- UI Content Section Top End -->
-
-            <!-- UI Content Section 1 - סטטיסטיקות מערכת -->
-            <div class="content-section" id="section1">
-                <div class="section-header">
-                    <h2>📊 סטטיסטיקות מערכת</h2>
-                    <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
-                        <span class="section-toggle-icon">▼</span>
-                    </button>
-                </div>
-                <div class="section-body">
-                    <div id="systemStatsContent">
-                        <div class="loading">
-                            <div class="loading-spinner"></div>
-                            <p>טוען סטטיסטיקות מערכת...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- UI Content Section 1 End -->
-
-            <!-- UI Content Section 2 - מיפוי עמודים לקבצי JS -->
-            <div class="content-section" id="section2">
-                <div class="section-header">
-                    <h2>🗺️ מיפוי עמודים לקבצי JS</h2>
-                    <button class="filter-toggle-btn" onclick="toggleSection('section2')" title="הצג/הסתר סקשן">
-                        <span class="section-toggle-icon">▼</span>
-                    </button>
-                </div>
-                <div class="section-body">
-                    <div id="pageMappingContent">
-                        <div class="loading">
-                            <div class="loading-spinner"></div>
-                            <p>טוען מיפוי עמודים...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- UI Content Section 2 End -->
-
-            <!-- UI Content Section 3 - ניתוח תלויות -->
-            <div class="content-section" id="section3">
-                <div class="section-header">
-                    <h2>🔗 ניתוח תלויות</h2>
-                    <button class="filter-toggle-btn" onclick="toggleSection('section3')" title="הצג/הסתר סקשן">
-                        <span class="section-toggle-icon">▼</span>
-                    </button>
-                </div>
-                <div class="section-body">
-                    <div id="dependenciesContent">
-                    <div class="loading">
-                        <div class="loading-spinner"></div>
-                            <p>טוען ניתוח תלויות...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- UI Content Section 3 End -->
-
-            <!-- UI Content Section 4 - מפת פונקציות מפורטת (עם טאבים) -->
-            <div class="content-section" id="section4">
-                <div class="section-header">
-                    <h2>⚙️ מפת פונקציות מפורטת</h2>
-                    <button class="filter-toggle-btn" onclick="toggleSection('section4')" title="הצג/הסתר סקשן">
-                        <span class="section-toggle-icon">▼</span>
-                    </button>
-                </div>
-                <div class="section-body">
-                    <!-- טאבים למפת הפונקציות -->
-                    <div class="functions-tabs-container">
-                        <div class="functions-tabs">
-                            <button class="tab-btn active" data-tab="core">מערכות ליבה</button>
-                            <button class="tab-btn" data-tab="ui">ממשק משתמש</button>
-                            <button class="tab-btn" data-tab="data">ניהול נתונים</button>
-                            <button class="tab-btn" data-tab="utils">כלי עזר</button>
-                            <button class="tab-btn" data-tab="all">הכל</button>
-                </div>
-            </div>
-
-                    <div id="functionsMapContent">
-                    <div class="loading">
-                        <div class="loading-spinner"></div>
-                            <p>טוען מפת פונקציות...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- UI Content Section 4 End -->
-
-            <!-- ======================================== -->
-            <!-- סקשנים לפיתוח עתידי - ממשק דמה -->
-            <!-- ======================================== -->
-            
-            <!-- UI Content Section 5 - ניתוח פונקציות כפולות ודומות (דמה) -->
-            <div class="content-section development-section" id="section5">
-                <div class="section-header">
-                    <h2>🔍 ניתוח פונקציות כפולות ודומות <span class="development-badge">פיתוח עתידי</span></h2>
-                    <button class="filter-toggle-btn" onclick="toggleSection('section5')" title="הצג/הסתר סקשן">
-                        <span class="section-toggle-icon">▼</span>
-                    </button>
-                </div>
-                <div class="section-body">
-                    <div class="development-content">
-                        <div class="development-info">
-                            <h3>📋 מידע על הפונקציונליות העתידית</h3>
-                            <p>סקשן זה יכלול ניתוח מתקדם של פונקציות כפולות ודומות במערכת, עם המלצות לתיקון ואופטימיזציה.</p>
-                            <div class="development-features">
-                                <h4>🎯 תכונות מתוכננות:</h4>
-                                <ul>
-                                    <li>זיהוי פונקציות כפולות עם דירוג דמיון</li>
-                                    <li>המלצות לתיקון ואיחוד פונקציות</li>
-                                    <li>ניתוח שימוש בפונקציות דומות</li>
-                                    <li>דוחות מפורטים להעתקה</li>
-                                </ul>
+                            <!-- Functions Tabs -->
+                            <div class="functions-tabs-container">
+                                <div class="functions-tabs">
+                                    <button class="tab-btn active" data-tab="core">מערכות ליבה</button>
+                                    <button class="tab-btn" data-tab="ui">ממשק משתמש</button>
+                                    <button class="tab-btn" data-tab="data">ניהול נתונים</button>
+                                    <button class="tab-btn" data-tab="utils">כלי עזר</button>
+                                    <button class="tab-btn" data-tab="all">הכל</button>
+                                </div>
                             </div>
+
+                            <div id="functionsContent">
+                                <div class="loading">
+                                    <div class="loading-spinner"></div>
+                                    טוען פונקציות...
+                                </div>
+                    </div>
+                </div>
+            </div>
+
+                    <!-- Pages Tab -->
+                    <div id="pages-tab" class="tab-panel">
+                        <div class="tab-header">
+                            <h2><i class="fas fa-file-alt"></i> מיפוי עמודים</h2>
+                            <div class="tab-actions">
+                                <button class="action-btn" onclick="refreshPages()" title="רענן מיפוי עמודים">
+                                    <i class="fas fa-sync-alt"></i> רענן
+                                </button>
+                                <button class="action-btn" onclick="exportPages()" title="ייצוא מיפוי עמודים">
+                                    <i class="fas fa-download"></i> ייצוא
+                                </button>
+                                <button class="action-btn" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט">
+                                    <i class="fas fa-copy"></i> העתק לוג
+                    </button>
+                </div>
+                        </div>
+                        <div class="tab-body">
+                            <div id="pageMappingContent">
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                                    טוען מיפוי עמודים...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                    <!-- Dependencies Tab -->
+                    <div id="dependencies-tab" class="tab-panel">
+                        <div class="tab-header">
+                            <h2><i class="fas fa-project-diagram"></i> ניתוח תלויות</h2>
+                            <div class="tab-actions">
+                                <button class="action-btn" onclick="refreshDependencies()" title="רענן ניתוח תלויות">
+                                    <i class="fas fa-sync-alt"></i> רענן
+                                </button>
+                                <button class="action-btn" onclick="exportDependencies()" title="ייצוא ניתוח תלויות">
+                                    <i class="fas fa-download"></i> ייצוא
+                                </button>
+                                <button class="action-btn" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט">
+                                    <i class="fas fa-copy"></i> העתק לוג
+                    </button>
+                </div>
+                        </div>
+                        <div class="tab-body">
+                    <div id="dependenciesContent">
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                                    טוען ניתוח תלויות...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analysis Tab -->
+                    <div id="analysis-tab" class="tab-panel">
+                        <div class="tab-header">
+                            <h2><i class="fas fa-search"></i> ניתוח מתקדם</h2>
+                            <div class="tab-actions">
+                                <button class="action-btn" onclick="refreshAnalysis()" title="רענן ניתוח">
+                                    <i class="fas fa-sync-alt"></i> רענן
+                                </button>
+                                <button class="action-btn" onclick="exportAnalysis()" title="ייצוא ניתוח">
+                                    <i class="fas fa-download"></i> ייצוא
+                                </button>
+                                <button class="action-btn" onclick="generateReport()" title="יצירת דוח מפורט">
+                                    <i class="fas fa-file-alt"></i> דוח
+                                </button>
+                                <button class="action-btn" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט">
+                                    <i class="fas fa-copy"></i> העתק לוג
+                                </button>
+                </div>
+            </div>
+                        <div class="tab-body">
+                            <!-- Analysis Controls -->
+                            <div class="analysis-controls">
+                                <div class="analysis-buttons">
+                                    <button class="analysis-btn" onclick="analyzeDuplicates()" title="ניתוח כפילויות">
+                                        <i class="fas fa-copy"></i> ניתוח כפילויות
+                                    </button>
+                                    <button class="analysis-btn" onclick="detectLocalFunctions()" title="זיהוי פונקציות מקומיות">
+                                        <i class="fas fa-home"></i> פונקציות מקומיות
+                                    </button>
+                                    <button class="analysis-btn" onclick="syncGlobalFunctions()" title="סנכרון פונקציות גלובליות">
+                                        <i class="fas fa-sync"></i> סנכרון גלובלי
+                    </button>
+                </div>
+                            </div>
+
+                            <!-- Duplicates Analysis Results -->
+                            <div id="duplicatesContent">
+                                <div class="loading">
+                                    <div class="loading-spinner"></div>
+                                    לחץ על "ניתוח כפילויות" כדי להתחיל
+                                </div>
+                            </div>
+
+                            <!-- Local Functions Analysis Results -->
+                            <div id="localFunctionsContent" style="margin-top: 20px;">
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                                    לחץ על "פונקציות מקומיות" כדי להתחיל
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Future Features Tab -->
+                    <div id="future-tab" class="tab-panel">
+                        <div class="tab-header">
+                            <h2><i class="fas fa-rocket"></i> תכונות עתידיות</h2>
+                            <div class="tab-actions">
+                                <button class="action-btn" onclick="refreshFutureFeatures()" title="רענן תכונות עתידיות">
+                                    <i class="fas fa-sync-alt"></i> רענן
+                                </button>
+                                <button class="action-btn" onclick="exportFutureFeatures()" title="ייצוא תכונות עתידיות">
+                                    <i class="fas fa-download"></i> ייצוא
+                                </button>
+                                <button class="action-btn" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט">
+                                    <i class="fas fa-copy"></i> העתק לוג
+                                </button>
+                            </div>
+                        </div>
+                        <div class="tab-body">
+                            <!-- ניתוח פונקציות כפולות ודומות -->
+                            <div class="future-section">
+                                <div class="future-section-header">
+                                    <h3>🔍 ניתוח פונקציות כפולות ודומות</h3>
+                                    <span class="development-badge">פיתוח עתידי</span>
+                                </div>
+                                <div class="future-content">
+                                    <div class="development-info">
+                                        <p>סקשן זה יכלול ניתוח מתקדם של פונקציות כפולות ודומות במערכת, עם המלצות לתיקון ואופטימיזציה.</p>
+                                        <div class="development-features">
+                                            <h4>🎯 תכונות מתוכננות:</h4>
+                                            <ul>
+                                                <li>זיהוי פונקציות כפולות עם דירוג דמיון</li>
+                                                <li>המלצות לתיקון ואיחוד פונקציות</li>
+                                                <li>ניתוח שימוש בפונקציות דומות</li>
+                                                <li>דוחות מפורטים להעתקה</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="development-preview">
+                                        <h4>🔮 תצוגה מקדימה:</h4>
+                                        <div class="mock-content">
+                                            <div class="mock-duplicate-analysis">
+                                                <h5>ניתוח כפילויות (דמה)</h5>
+                                                <div class="mock-item">
+                                                    <span class="mock-function">createModal()</span>
+                                                    <span class="mock-similarity">דמיון: 95%</span>
+                                                    <span class="mock-files">main.js, ui-utils.js</span>
+                                                </div>
+                                                <div class="mock-item">
+                                                    <span class="mock-function">formatDate()</span>
+                                                    <span class="mock-similarity">דמיון: 87%</span>
+                                                    <span class="mock-files">utils.js, date-helpers.js</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- זיהוי פונקציות מקומיות -->
+                            <div class="future-section">
+                                <div class="future-section-header">
+                                    <h3>🏠 זיהוי פונקציות מקומיות</h3>
+                                    <span class="development-badge">פיתוח עתידי</span>
+                                </div>
+                                <div class="future-content">
+                                    <div class="development-info">
+                                        <p>סקשן זה יזהוי פונקציות מקומיות בעמודים ויציע להעביר אותן למערכת הגלובלית.</p>
+                                        <div class="development-features">
+                                            <h4>🎯 תכונות מתוכננות:</h4>
+                                            <ul>
+                                                <li>סריקת פונקציות מקומיות בעמודים</li>
+                                                <li>השוואה עם פונקציות גלובליות קיימות</li>
+                                                <li>המלצות להעברה למערכת הגלובלית</li>
+                                                <li>ניתוח השפעה על ביצועים</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="development-preview">
+                                        <h4>🔮 תצוגה מקדימה:</h4>
+                                        <div class="mock-content">
+                                            <div class="mock-local-analysis">
+                                                <h5>פונקציות מקומיות (דמה)</h5>
+                                                <div class="mock-item">
+                                                    <span class="mock-page">accounts.html</span>
+                                                    <span class="mock-function">validateAccount()</span>
+                                                    <span class="mock-status">מומלץ להעביר</span>
+                                                </div>
+                                                <div class="mock-item">
+                                                    <span class="mock-page">trades.html</span>
+                                                    <span class="mock-function">calculateProfit()</span>
+                                                    <span class="mock-status">קיים גלובלית</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ניהול אחסון נתונים -->
+                            <div class="future-section">
+                                <div class="future-section-header">
+                                    <h3>💾 ניהול אחסון נתונים</h3>
+                                    <span class="development-badge">פיתוח עתידי</span>
+                                </div>
+                                <div class="future-content">
+                                    <div class="development-info">
+                                        <p>סקשן זה ינהל את שמירת הנתונים ב-IndexedDB, היסטוריית ניתוחים וגיבויים.</p>
+                                        <div class="development-features">
+                                            <h4>🎯 תכונות מתוכננות:</h4>
+                                            <ul>
+                                                <li>שמירה קבועה של נתוני ניתוח ב-IndexedDB</li>
+                                                <li>היסטוריית ניתוחים קודמים</li>
+                                                <li>ניהול גיבויים ושחזור</li>
+                                                <li>ניקוי אוטומטי של נתונים ישנים</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="development-preview">
+                                        <h4>🔮 תצוגה מקדימה:</h4>
+                                        <div class="mock-content">
+                                            <div class="mock-storage-stats">
+                                                <h5>סטטיסטיקות אחסון (דמה)</h5>
+                                                <div class="mock-stat">
+                                                    <span class="mock-label">גודל כולל:</span>
+                                                    <span class="mock-value">2.4 MB</span>
+                                                </div>
+                                                <div class="mock-stat">
+                                                    <span class="mock-label">ניתוחים שמורים:</span>
+                                                    <span class="mock-value">15</span>
+                                                </div>
+                                                <div class="mock-stat">
+                                                    <span class="mock-label">גיבויים:</span>
+                                                    <span class="mock-value">3</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- בדיקת ארכיטקטורה -->
+                            <div class="future-section">
+                                <div class="future-section-header">
+                                    <h3>🏗️ בדיקת ארכיטקטורה</h3>
+                                    <span class="development-badge">פיתוח עתידי</span>
+                                </div>
+                                <div class="future-content">
+                                    <div class="development-info">
+                                        <p>סקשן זה יבדוק שהארכיטקטורה של המערכת עומדת בכללים הנדרשים.</p>
+                                        <div class="development-features">
+                                            <h4>🎯 תכונות מתוכננות:</h4>
+                                            <ul>
+                                                <li>זיהוי פונקציות בתוך קבצי HTML</li>
+                                                <li>בדיקת הפרדה בין CSS, JS ו-HTML</li>
+                                                <li>ניתוח מבנה הקבצים והתיקיות</li>
+                                                <li>המלצות לשיפור ארכיטקטורה</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="development-preview">
+                                        <h4>🔮 תצוגה מקדימה:</h4>
+                                        <div class="mock-content">
+                                            <div class="mock-architecture-check">
+                                                <h5>בדיקת ארכיטקטורה (דמה)</h5>
+                                                <div class="mock-check">
+                                                    <span class="mock-rule">אין פונקציות ב-HTML</span>
+                                                    <span class="mock-status pass">✅ עובר</span>
+                                                </div>
+                                                <div class="mock-check">
+                                                    <span class="mock-rule">CSS חיצוני בלבד</span>
+                                                    <span class="mock-status pass">✅ עובר</span>
+                                                </div>
+                                                <div class="mock-check">
+                                                    <span class="mock-rule">מבנה תיקיות תקין</span>
+                                                    <span class="mock-status warning">⚠️ אזהרה</span>
+                                                </div>
+                                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                            <!-- קישור לדוקומנטציה -->
                             <div class="development-docs">
                                 <a href="documentation/frontend/JS_MAP_SYSTEM_SPECIFICATION.md" target="_blank" class="docs-link">
                                     📖 קרא את הדוקומנטציה המלאה
                                 </a>
-                            </div>
-                        </div>
-                        <div class="development-preview">
-                            <h4>🔮 תצוגה מקדימה:</h4>
-                            <div class="mock-content">
-                                <div class="mock-duplicate-analysis">
-                                    <h5>ניתוח כפילויות (דמה)</h5>
-                                    <div class="mock-item">
-                                        <span class="mock-function">createModal()</span>
-                                        <span class="mock-similarity">דמיון: 95%</span>
-                                        <span class="mock-files">main.js, ui-utils.js</span>
-                                    </div>
-                                    <div class="mock-item">
-                                        <span class="mock-function">formatDate()</span>
-                                        <span class="mock-similarity">דמיון: 87%</span>
-                                        <span class="mock-files">utils.js, date-helpers.js</span>
-                                    </div>
-                                </div>
-                            </div>
+                </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- UI Content Section 5 End -->
 
-            <!-- UI Content Section 6 - זיהוי פונקציות מקומיות (דמה) -->
-            <div class="content-section development-section" id="section6">
-                <div class="section-header">
-                    <h2>🏠 זיהוי פונקציות מקומיות <span class="development-badge">פיתוח עתידי</span></h2>
-                    <button class="filter-toggle-btn" onclick="toggleSection('section6')" title="הצג/הסתר סקשן">
-                        <span class="section-toggle-icon">▼</span>
-                    </button>
-                </div>
-                <div class="section-body">
-                    <div class="development-content">
-                        <div class="development-info">
-                            <h3>📋 מידע על הפונקציונליות העתידית</h3>
-                            <p>סקשן זה יזהוי פונקציות מקומיות בעמודים ויציע להעביר אותן למערכת הגלובלית.</p>
-                            <div class="development-features">
-                                <h4>🎯 תכונות מתוכננות:</h4>
-                                <ul>
-                                    <li>סריקת פונקציות מקומיות בעמודים</li>
-                                    <li>השוואה עם פונקציות גלובליות קיימות</li>
-                                    <li>המלצות להעברה למערכת הגלובלית</li>
-                                    <li>ניתוח השפעה על ביצועים</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="development-preview">
-                            <h4>🔮 תצוגה מקדימה:</h4>
-                            <div class="mock-content">
-                                <div class="mock-local-analysis">
-                                    <h5>פונקציות מקומיות (דמה)</h5>
-                                    <div class="mock-item">
-                                        <span class="mock-page">accounts.html</span>
-                                        <span class="mock-function">validateAccount()</span>
-                                        <span class="mock-status">מומלץ להעביר</span>
-                                    </div>
-                                    <div class="mock-item">
-                                        <span class="mock-page">trades.html</span>
-                                        <span class="mock-function">calculateProfit()</span>
-                                        <span class="mock-status">קיים גלובלית</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- UI Content Section 6 End -->
 
-            <!-- UI Content Section 7 - ניהול אחסון נתונים (דמה) -->
-            <div class="content-section development-section" id="section7">
-                <div class="section-header">
-                    <h2>💾 ניהול אחסון נתונים <span class="development-badge">פיתוח עתידי</span></h2>
-                    <button class="filter-toggle-btn" onclick="toggleSection('section7')" title="הצג/הסתר סקשן">
-                        <span class="section-toggle-icon">▼</span>
-                    </button>
-                </div>
-                <div class="section-body">
-                    <div class="development-content">
-                        <div class="development-info">
-                            <h3>📋 מידע על הפונקציונליות העתידית</h3>
-                            <p>סקשן זה ינהל את שמירת הנתונים ב-IndexedDB, היסטוריית ניתוחים וגיבויים.</p>
-                            <div class="development-features">
-                                <h4>🎯 תכונות מתוכננות:</h4>
-                                <ul>
-                                    <li>שמירה קבועה של נתוני ניתוח ב-IndexedDB</li>
-                                    <li>היסטוריית ניתוחים קודמים</li>
-                                    <li>ניהול גיבויים ושחזור</li>
-                                    <li>ניקוי אוטומטי של נתונים ישנים</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="development-preview">
-                            <h4>🔮 תצוגה מקדימה:</h4>
-                            <div class="mock-content">
-                                <div class="mock-storage-stats">
-                                    <h5>סטטיסטיקות אחסון (דמה)</h5>
-                                    <div class="mock-stat">
-                                        <span class="mock-label">גודל כולל:</span>
-                                        <span class="mock-value">2.4 MB</span>
-                                    </div>
-                                    <div class="mock-stat">
-                                        <span class="mock-label">ניתוחים שמורים:</span>
-                                        <span class="mock-value">15</span>
-                                    </div>
-                                    <div class="mock-stat">
-                                        <span class="mock-label">גיבויים:</span>
-                                        <span class="mock-value">3</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- UI Content Section 7 End -->
-
-            <!-- UI Content Section 8 - בדיקת ארכיטקטורה (דמה) -->
-            <div class="content-section development-section" id="section8">
-                <div class="section-header">
-                    <h2>🏗️ בדיקת ארכיטקטורה <span class="development-badge">פיתוח עתידי</span></h2>
-                    <button class="filter-toggle-btn" onclick="toggleSection('section8')" title="הצג/הסתר סקשן">
-                        <span class="section-toggle-icon">▼</span>
-                    </button>
-                </div>
-                <div class="section-body">
-                    <div class="development-content">
-                        <div class="development-info">
-                            <h3>📋 מידע על הפונקציונליות העתידית</h3>
-                            <p>סקשן זה יבדוק שהארכיטקטורה של המערכת עומדת בכללים הנדרשים.</p>
-                            <div class="development-features">
-                                <h4>🎯 תכונות מתוכננות:</h4>
-                                <ul>
-                                    <li>זיהוי פונקציות בתוך קבצי HTML</li>
-                                    <li>בדיקת הפרדה בין CSS, JS ו-HTML</li>
-                                    <li>ניתוח מבנה הקבצים והתיקיות</li>
-                                    <li>המלצות לשיפור ארכיטקטורה</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="development-preview">
-                            <h4>🔮 תצוגה מקדימה:</h4>
-                            <div class="mock-content">
-                                <div class="mock-architecture-check">
-                                    <h5>בדיקת ארכיטקטורה (דמה)</h5>
-                                    <div class="mock-check">
-                                        <span class="mock-rule">אין פונקציות ב-HTML</span>
-                                        <span class="mock-status pass">✅ עובר</span>
-                                    </div>
-                                    <div class="mock-check">
-                                        <span class="mock-rule">CSS חיצוני בלבד</span>
-                                        <span class="mock-status pass">✅ עובר</span>
-                                    </div>
-                                    <div class="mock-check">
-                                        <span class="mock-rule">מבנה תיקיות תקין</span>
-                                        <span class="mock-status warning">⚠️ אזהרה</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- UI Content Section 8 End -->
 
         </div>
+        <!-- CONTENT SECTIONS EDITABLE - END -->
     </div>
 
     <!-- Back to Top Button -->
@@ -486,6 +582,134 @@
         </div>
     </div>
 
+    <!-- System Status Tab -->
+    <div id="system-tab" class="tab-panel">
+        <div class="tab-header">
+            <h2><i class="fas fa-cogs"></i> מצב מערכת</h2>
+            <div class="tab-actions">
+                <button class="action-btn" onclick="refreshSystemStatus()" title="רענן מצב מערכת">
+                    <i class="fas fa-sync-alt"></i> רענן
+                </button>
+                <button class="action-btn" onclick="exportSystemStatus()" title="ייצוא מצב מערכת">
+                    <i class="fas fa-download"></i> ייצוא
+                </button>
+                <button class="action-btn" onclick="copyJsMapDetailedLog()" title="העתק לוג מפורט">
+                    <i class="fas fa-copy"></i> העתק לוג
+                </button>
+            </div>
+        </div>
+        <div class="tab-body">
+            <!-- System Status Dashboard -->
+            <div class="system-status-dashboard">
+                <!-- Real-time Status -->
+                <div class="status-section">
+                    <h3>📊 סטטוס בזמן אמת</h3>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <div class="status-icon">🟢</div>
+                            <div class="status-info">
+                                <div class="status-label">מערכת מאותחלת</div>
+                                <div class="status-value" id="systemInitialized">בודק...</div>
+                            </div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-icon">📁</div>
+                            <div class="status-info">
+                                <div class="status-label">קבצי JS נטענו</div>
+                                <div class="status-value" id="jsFilesLoaded">בודק...</div>
+                            </div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-icon">📄</div>
+                            <div class="status-info">
+                                <div class="status-label">עמודים ממופים</div>
+                                <div class="status-value" id="pagesMapped">בודק...</div>
+                            </div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-icon">⚙️</div>
+                            <div class="status-info">
+                                <div class="status-label">פונקציות זוהו</div>
+                                <div class="status-value" id="functionsDetected">בודק...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Information -->
+                <div class="status-section">
+                    <h3>🖥️ מידע מערכת</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <strong>URL:</strong> <span id="currentUrl">-</span>
+                        </div>
+                        <div class="info-item">
+                            <strong>זמן טעינה:</strong> <span id="loadTime">-</span>
+                        </div>
+                        <div class="info-item">
+                            <strong>User Agent:</strong> <span id="userAgent">-</span>
+                        </div>
+                        <div class="info-item">
+                            <strong>זמן נוכחי:</strong> <span id="currentTime">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Status -->
+                <div class="status-section">
+                    <h3>💾 סטטוס נתונים</h3>
+                    <div class="data-status-grid">
+                        <div class="data-item">
+                            <div class="data-label">קבצי פונקציות</div>
+                            <div class="data-value" id="functionsFilesCount">-</div>
+                            <div class="data-preview" id="functionsFilesPreview">-</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">עמודים</div>
+                            <div class="data-value" id="pagesCount">-</div>
+                            <div class="data-preview" id="pagesPreview">-</div>
+                        </div>
+                        <div class="data-item">
+                            <div class="data-label">אחסון מקומי</div>
+                            <div class="data-value" id="localStorageStatus">-</div>
+                            <div class="data-preview" id="localStoragePreview">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Actions -->
+                <div class="status-section">
+                    <h3>🔄 פעולות אחרונות</h3>
+                    <div id="recentActions" class="actions-log">
+                        <div class="action-item">
+                            <span class="action-time">-</span>
+                            <span class="action-text">מערכת מאותחלת</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="status-section">
+                    <h3>⚡ פעולות מהירות</h3>
+                    <div class="quick-actions">
+                        <button class="quick-action-btn" onclick="testSystemConnectivity()">
+                            <i class="fas fa-wifi"></i> בדיקת חיבור
+                        </button>
+                        <button class="quick-action-btn" onclick="clearSystemCache()">
+                            <i class="fas fa-trash"></i> ניקוי מטמון
+                        </button>
+                        <button class="quick-action-btn" onclick="reloadSystemData()">
+                            <i class="fas fa-refresh"></i> טעינה מחדש
+                        </button>
+                        <button class="quick-action-btn" onclick="showSystemDiagnostics()">
+                            <i class="fas fa-stethoscope"></i> אבחון מערכת
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Core System Scripts - Required order -->
     <script src="scripts/table-mappings.js"></script>
     <script src="scripts/date-utils.js"></script>
@@ -497,13 +721,19 @@
     <script src="scripts/data-utils.js"></script>
     <script src="scripts/linked-items.js"></script>
 
+    <!-- Notification System - Required for showNotification -->
+    <script src="scripts/notification-system.js"></script>
+
     <!-- Page Scripts - JS Map System (Split into modules) -->
     <script src="scripts/js-map-core.js"></script>
     <script src="scripts/js-map-ui.js"></script>
     <script src="scripts/js-map-analysis.js"></script>
     <script src="scripts/js-map-utils.js"></script>
     <script src="scripts/js-map.js"></script>
-        </div>
+
+    <!-- Initialize JS-Map System -->
+    <!-- JS-Map System Initializer -->
+    <script src="scripts/js-map-init.js"></script>
     </div>
 </body>
 </html>

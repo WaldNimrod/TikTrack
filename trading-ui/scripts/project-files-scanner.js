@@ -338,7 +338,6 @@ class ProjectFilesScanner {
                 'scripts/preferences-page.js',
                 
                 // Utility Files (only existing files)
-                'scripts/chart-renderer.js',
                 'scripts/data-collector.js',
                 'scripts/indexeddb-adapter.js',
                 'scripts/log-recovery.js',

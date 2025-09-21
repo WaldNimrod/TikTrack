@@ -486,37 +486,8 @@
     <script src="scripts/cash_flows.js?v=20250831_2"></script>
 
     <!-- Page initialization -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            initializeCashFlowsPage();
-        });
-    </script>
-    <script>
-        // אתחול מערכת הכותרת החדשה
-        document.addEventListener("DOMContentLoaded", () => {
-            console.log("🔄 Initializing unified header system...");
-            if (window.headerSystem) {
-                window.headerSystem.init();
-            }
-            if (window.filterSystem) {
-                window.filterSystem.initialize();
-            }
-        });
-    </script>
-    <script>
-        // תיקון בעיית aria-hidden במודלים
-        document.addEventListener('DOMContentLoaded', function() {
-            // תיקון למודל עריכה
-            const editModal = document.getElementById('editCashFlowModal');
-            if (editModal) {
-                editModal.addEventListener('hidden.bs.modal', function() {
-                    this.removeAttribute('aria-hidden');
-                });
-            }
-            
-
-        });
-    </script>
+    <!-- Cash Flows Page Initializer -->
+    <script src="scripts/cash-flows-init.js"></script>
 </body>
 
 </html>

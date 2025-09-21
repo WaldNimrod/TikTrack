@@ -1903,6 +1903,31 @@ async function openCssEditor() {
 /**
  * טוגל סקשן
  */
+function toggleAllSections() {
+  const sections = document.querySelectorAll('.section-content');
+  const toggleBtn = document.querySelector('.filter-toggle-btn');
+  
+  if (!sections.length || !toggleBtn) return;
+  
+  const isCollapsed = sections[0].style.display === 'none' || 
+                     sections[0].classList.contains('collapsed');
+  
+  sections.forEach(section => {
+    if (isCollapsed) {
+      section.style.display = 'block';
+      section.classList.remove('collapsed');
+    } else {
+      section.style.display = 'none';
+      section.classList.add('collapsed');
+    }
+  });
+  
+  // Update button text
+  toggleBtn.innerHTML = isCollapsed ? 
+    '<i class="section-toggle-icon">▼</i>' : 
+    '<i class="section-toggle-icon">▶</i>';
+}
+
 function toggleSection(sectionId) {
     const section = document.getElementById(sectionId);
     if (section) {
@@ -2117,6 +2142,8 @@ function copyDetailedLog() {
 }
 
 window.copyDetailedLog = copyDetailedLog;
+window.toggleAllSections = toggleAllSections;
+window.toggleSection = toggleSection;
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
@@ -2132,4 +2159,113 @@ document.addEventListener('DOMContentLoaded', function() {
 window.addEventListener('error', (e) => {
     console.error('❌ שגיאה כללית:', e.error);
 });
+
+/**
+ * Generate detailed log for CSS Management
+ */
+function generateDetailedLog() {
+    const timestamp = new Date().toLocaleString('he-IL');
+    const log = [];
+
+    log.push('=== לוג מפורט - ניהול CSS ===');
+    log.push(`זמן יצירה: ${timestamp}`);
+    log.push(`עמוד: ${window.location.href}`);
+    log.push('');
+
+    // סטטוס כללי
+    log.push('--- סטטוס כללי ---');
+    const topSection = document.querySelector('.top-section .section-body');
+    const isTopOpen = topSection && topSection.style.display !== 'none';
+    log.push(`סקשן עליון: ${isTopOpen ? 'פתוח' : 'סגור'}`);
+    
+    // תצוגה מפורטת לפי סקשנים
+    log.push('--- תצוגה מפורטת לפי סקשנים ---');
+    
+    // סקשן עליון - מידע CSS
+    const infoSummary = document.querySelector('.info-summary');
+    if (infoSummary) {
+        const summaryItems = infoSummary.querySelectorAll('div');
+        summaryItems.forEach((item, index) => {
+            log.push(`סקשן עליון - פריט ${index + 1}: ${item.textContent}`);
+        });
+    }
+
+    // סטטיסטיקות CSS
+    log.push('--- סטטיסטיקות CSS ---');
+    const activeFiles = document.getElementById('activeCssFiles')?.textContent || 'לא זמין';
+    const totalSize = document.getElementById('totalCssSize')?.textContent || 'לא זמין';
+    const totalRules = document.getElementById('totalCssRules')?.textContent || 'לא זמין';
+    
+    log.push(`קבצי CSS פעילים: ${activeFiles}`);
+    log.push(`גודל כולל: ${totalSize}`);
+    log.push(`כללים כולל: ${totalRules}`);
+
+    // קבצי CSS
+    log.push('--- קבצי CSS ---');
+    const cssFiles = [
+        'header-styles.css', '_variables.css', '_colors-dynamic.css', '_colors-semantic.css',
+        '_spacing.css', '_typography.css', '_rtl-logical.css', '_reset.css', '_base.css',
+        '_headings.css', '_links.css', '_forms-base.css', '_buttons-base.css',
+        '_layout.css', '_grid.css', '_buttons-advanced.css', '_tables.css', '_cards.css',
+        '_modals.css', '_notifications.css', '_navigation.css', '_forms-advanced.css',
+        '_badges-status.css', '_entity-colors.css'
+    ];
+    
+    cssFiles.forEach((file, index) => {
+        log.push(`קובץ ${index + 1}: ${file}`);
+    });
+
+    // סטטיסטיקות וביצועים
+    log.push('--- סטטיסטיקות וביצועים ---');
+    log.push(`זמן טעינת עמוד: ${Date.now() - performance.timing.navigationStart}ms`);
+    if (window.performance && window.performance.memory) {
+        const memory = window.performance.memory;
+        log.push(`זיכרון בשימוש: ${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB`);
+    }
+
+    // לוגים ושגיאות
+    log.push('--- לוגים ושגיאות ---');
+    if (window.consoleLogs && window.consoleLogs.length > 0) {
+        const recentLogs = window.consoleLogs.slice(-10);
+        recentLogs.forEach(entry => {
+            log.push(`[${entry.timestamp}] ${entry.level}: ${entry.message}`);
+        });
+    } else {
+        log.push('אין לוגים זמינים');
+    }
+
+    // מידע טכני
+    log.push('--- מידע טכני ---');
+    log.push(`User Agent: ${navigator.userAgent}`);
+    log.push(`Language: ${navigator.language}`);
+    log.push(`Platform: ${navigator.platform}`);
+
+    log.push('=== סוף הלוג ===');
+    return log.join('\n');
+}
+
+/**
+ * Copy detailed log to clipboard
+ */
+async function copyDetailedLog() {
+    try {
+        const log = generateDetailedLog();
+        await navigator.clipboard.writeText(log);
+        window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
+        console.log('=== לוג מפורט שהועתק ===');
+        console.log(log);
+        console.log('=== סוף הלוג ===');
+    } catch (error) {
+        console.error('Failed to copy log:', error);
+        window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
+        // Fallback: show in console
+        const log = generateDetailedLog();
+        console.log('=== לוג מפורט (לא הועתק) ===');
+        console.log(log);
+        console.log('=== סוף הלוג ===');
+    }
+}
+
+// ייצוא לגלובל scope
+window.copyDetailedLog = copyDetailedLog;
 

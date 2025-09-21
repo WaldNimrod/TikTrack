@@ -314,7 +314,7 @@ function initializeErrorTracking() {
 window.toggleAllSections = toggleAllSections;
 window.performQuickSearch = performQuickSearch;
 window.toggleFunctionsDropdown = toggleFunctionsDropdown;
-// window.copyDetailedLog = copyDetailedLog; // REMOVED: Now handled by js-map.js
+// window.copyDetailedLog = copyDetailedLog; // REMOVED: Causes conflicts with other pages
 window.scrollToTop = scrollToTop;
 window.exportDuplicatesReport = exportDuplicatesReport;
 window.refreshDuplicatesAnalysis = refreshDuplicatesAnalysis;

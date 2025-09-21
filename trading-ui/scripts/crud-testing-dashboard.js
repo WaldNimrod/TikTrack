@@ -652,6 +652,59 @@ function copyDetailedLog() {
   }
 }
 
+function toggleTopSection() {
+  if (typeof window.toggleTopSectionGlobal === 'function') {
+    window.toggleTopSectionGlobal();
+  } else {
+    console.warn('פונקציית toggleTopSectionGlobal לא נמצאה ב-main.js');
+  }
+}
+
+function toggleAllSections() {
+  const sections = document.querySelectorAll('.section-content');
+  const toggleBtn = document.querySelector('.filter-toggle-btn');
+  
+  if (!sections.length || !toggleBtn) return;
+  
+  const isCollapsed = sections[0].style.display === 'none' || 
+                     sections[0].classList.contains('collapsed');
+  
+  sections.forEach(section => {
+    if (isCollapsed) {
+      section.style.display = 'block';
+      section.classList.remove('collapsed');
+    } else {
+      section.style.display = 'none';
+      section.classList.add('collapsed');
+    }
+  });
+  
+  // Update button text
+  toggleBtn.innerHTML = isCollapsed ? 
+    '<i class="section-toggle-icon">▼</i>' : 
+    '<i class="section-toggle-icon">▶</i>';
+}
+
+function toggleSection(sectionId) {
+  const section = document.getElementById(sectionId);
+  const toggleBtn = document.querySelector(`[onclick*="${sectionId}"] .section-toggle-icon`);
+  
+  if (!section) return;
+  
+  const isCollapsed = section.style.display === 'none' || 
+                     section.classList.contains('collapsed');
+  
+  if (isCollapsed) {
+    section.style.display = 'block';
+    section.classList.remove('collapsed');
+    if (toggleBtn) toggleBtn.innerHTML = '▼';
+  } else {
+    section.style.display = 'none';
+    section.classList.add('collapsed');
+    if (toggleBtn) toggleBtn.innerHTML = '▶';
+  }
+}
+
 // ייצוא פונקציות ל-window scope
 window.runAllBasicTests = runAllBasicTests;
 window.runAllCRUDTests = runAllCRUDTests;
@@ -665,6 +718,9 @@ window.checkConnection = checkConnection;
 window.markPageComplete = markPageComplete;
 window.markPagePartial = markPagePartial;
 window.copyDetailedLog = copyDetailedLog;
+window.toggleTopSection = toggleTopSection;
+window.toggleAllSections = toggleAllSections;
+window.toggleSection = toggleSection;
 
 // אתחול
 document.addEventListener('DOMContentLoaded', () => {
@@ -681,3 +737,102 @@ document.addEventListener('DOMContentLoaded', () => {
   
   console.log('✅ דף CRUD Testing Dashboard נטען בהצלחה');
 });
+
+/**
+ * Generate detailed log for CRUD Testing Dashboard
+ */
+function generateDetailedLog() {
+    const timestamp = new Date().toLocaleString('he-IL');
+    const log = [];
+
+    log.push('=== לוג מפורט - דשבורד בדיקות CRUD ===');
+    log.push(`זמן יצירה: ${timestamp}`);
+    log.push(`עמוד: ${window.location.href}`);
+    log.push('');
+
+    // סטטוס כללי
+    log.push('--- סטטוס כללי ---');
+    const topSection = document.querySelector('.top-section .section-body');
+    const isTopOpen = topSection && topSection.style.display !== 'none';
+    log.push(`סקשן עליון: ${isTopOpen ? 'פתוח' : 'סגור'}`);
+    
+    // תצוגה מפורטת לפי סקשנים
+    log.push('--- תצוגה מפורטת לפי סקשנים ---');
+    
+    // סקשן עליון
+    const summaryStats = document.getElementById('summaryStats');
+    if (summaryStats) {
+        const summaryItems = summaryStats.querySelectorAll('.summary-item');
+        summaryItems.forEach((item, index) => {
+            const label = item.querySelector('.summary-label')?.textContent || 'לא זמין';
+            const value = item.querySelector('.summary-number')?.textContent || 'לא זמין';
+            log.push(`סקשן עליון - פריט ${index + 1}: ${label} = "${value}"`);
+        });
+    }
+
+    // טבלאות ונתונים
+    log.push('--- טבלאות ונתונים ---');
+    const testResults = document.querySelectorAll('.test-result');
+    testResults.forEach((result, index) => {
+        const pageName = result.querySelector('.page-name')?.textContent || 'לא זמין';
+        const status = result.querySelector('.status-badge')?.textContent || 'לא זמין';
+        const score = result.querySelector('.score')?.textContent || 'לא זמין';
+        log.push(`תוצאה ${index + 1}: ${pageName} | סטטוס: ${status} | ציון: ${score}`);
+    });
+
+    // סטטיסטיקות וביצועים
+    log.push('--- סטטיסטיקות וביצועים ---');
+    if (window.crudTestingDashboard && window.crudTestingDashboard.testStats) {
+        const stats = window.crudTestingDashboard.testStats;
+        log.push(`סה"כ בדיקות: ${stats.total}`);
+        log.push(`עברו: ${stats.passed}`);
+        log.push(`נכשלו: ${stats.failed}`);
+        log.push(`ממתינות: ${stats.pending}`);
+    }
+
+    // לוגים ושגיאות
+    log.push('--- לוגים ושגיאות ---');
+    if (window.consoleLogs && window.consoleLogs.length > 0) {
+        const recentLogs = window.consoleLogs.slice(-10);
+        recentLogs.forEach(entry => {
+            log.push(`[${entry.timestamp}] ${entry.level}: ${entry.message}`);
+        });
+    } else {
+        log.push('אין לוגים זמינים');
+    }
+
+    // מידע טכני
+    log.push('--- מידע טכני ---');
+    log.push(`User Agent: ${navigator.userAgent}`);
+    log.push(`Language: ${navigator.language}`);
+    log.push(`Platform: ${navigator.platform}`);
+    log.push(`Page Load Time: ${Date.now() - performance.timing.navigationStart}ms`);
+
+    log.push('=== סוף הלוג ===');
+    return log.join('\n');
+}
+
+/**
+ * Copy detailed log to clipboard
+ */
+async function copyDetailedLog() {
+    try {
+        const log = generateDetailedLog();
+        await navigator.clipboard.writeText(log);
+        window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
+        console.log('=== לוג מפורט שהועתק ===');
+        console.log(log);
+        console.log('=== סוף הלוג ===');
+    } catch (error) {
+        console.error('Failed to copy log:', error);
+        window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
+        // Fallback: show in console
+        const log = generateDetailedLog();
+        console.log('=== לוג מפורט (לא הועתק) ===');
+        console.log(log);
+        console.log('=== סוף הלוג ===');
+    }
+}
+
+// ייצוא לגלובל scope
+window.copyDetailedLog = copyDetailedLog;

@@ -1082,6 +1082,59 @@ ${detailedLog.consoleLogs.join('\n')}
       }
     }
   }
+
+  /**
+   * Toggle all sections (expand/collapse)
+   * הצג/הסתר כל הסקשנים
+   */
+  static toggleAllSections() {
+    const sections = document.querySelectorAll('.section-content');
+    const toggleBtn = document.querySelector('.filter-toggle-btn');
+    
+    if (!sections.length || !toggleBtn) return;
+    
+    const isCollapsed = sections[0].style.display === 'none' || 
+                       sections[0].classList.contains('collapsed');
+    
+    sections.forEach(section => {
+      if (isCollapsed) {
+        section.style.display = 'block';
+        section.classList.remove('collapsed');
+      } else {
+        section.style.display = 'none';
+        section.classList.add('collapsed');
+      }
+    });
+    
+    // Update button text
+    toggleBtn.innerHTML = isCollapsed ? 
+      '<i class="section-toggle-icon">▼</i>' : 
+      '<i class="section-toggle-icon">▶</i>';
+  }
+
+  /**
+   * Toggle specific section
+   * הצג/הסתר סקשן ספציפי
+   */
+  static toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    const toggleBtn = document.querySelector(`[onclick*="${sectionId}"] .section-toggle-icon`);
+    
+    if (!section) return;
+    
+    const isCollapsed = section.style.display === 'none' || 
+                       section.classList.contains('collapsed');
+    
+    if (isCollapsed) {
+      section.style.display = 'block';
+      section.classList.remove('collapsed');
+      if (toggleBtn) toggleBtn.innerHTML = '▼';
+    } else {
+      section.style.display = 'none';
+      section.classList.add('collapsed');
+      if (toggleBtn) toggleBtn.innerHTML = '▶';
+    }
+  }
 }
 
 // Global functions for button onclick handlers
@@ -1186,6 +1239,8 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Make functions globally available
   window.copyDetailedLog = ExternalDataDashboard.copyDetailedLog;
+  window.toggleAllSections = ExternalDataDashboard.toggleAllSections;
+  window.toggleSection = ExternalDataDashboard.toggleSection;
 });
 
 // Cleanup on page unload
@@ -1194,4 +1249,100 @@ window.addEventListener('beforeunload', () => {
     window.externalDataDashboard.destroy();
   }
 });
+
+/**
+ * Generate detailed log for External Data Dashboard
+ */
+function generateDetailedLog() {
+    const timestamp = new Date().toLocaleString('he-IL');
+    const log = [];
+
+    log.push('=== לוג מפורט - דשבורד נתונים חיצוניים ===');
+    log.push(`זמן יצירה: ${timestamp}`);
+    log.push(`עמוד: ${window.location.href}`);
+    log.push('');
+
+    // סטטוס כללי
+    log.push('--- סטטוס כללי ---');
+    const topSection = document.querySelector('.top-section .section-body');
+    const isTopOpen = topSection && topSection.style.display !== 'none';
+    log.push(`סקשן עליון: ${isTopOpen ? 'פתוח' : 'סגור'}`);
+    
+    // תצוגה מפורטת לפי סקשנים
+    log.push('--- תצוגה מפורטת לפי סקשנים ---');
+    
+    // סקשן עליון - מידע ספקי נתונים
+    const providersCount = document.getElementById('providers-count')?.textContent || 'לא זמין';
+    const activeDataCount = document.getElementById('active-data-count')?.textContent || 'לא זמין';
+    const lastUpdateTime = document.getElementById('last-update-time')?.textContent || 'לא זמין';
+    const overallStatus = document.getElementById('overall-status')?.textContent || 'לא זמין';
+    
+    log.push(`סקשן עליון - ספקי נתונים: ${providersCount}`);
+    log.push(`סקשן עליון - נתונים פעילים: ${activeDataCount}`);
+    log.push(`סקשן עליון - עדכון אחרון: ${lastUpdateTime}`);
+    log.push(`סקשן עליון - סטטוס: ${overallStatus}`);
+
+    // טבלאות ונתונים
+    log.push('--- טבלאות ונתונים ---');
+    const providerRows = document.querySelectorAll('.provider-row');
+    providerRows.forEach((row, index) => {
+        const name = row.querySelector('.provider-name')?.textContent || 'לא זמין';
+        const status = row.querySelector('.provider-status')?.textContent || 'לא זמין';
+        const lastUpdate = row.querySelector('.provider-last-update')?.textContent || 'לא זמין';
+        log.push(`ספק ${index + 1}: ${name} | סטטוס: ${status} | עדכון אחרון: ${lastUpdate}`);
+    });
+
+    // סטטיסטיקות וביצועים
+    log.push('--- סטטיסטיקות וביצועים ---');
+    log.push(`זמן טעינת עמוד: ${Date.now() - performance.timing.navigationStart}ms`);
+    if (window.performance && window.performance.memory) {
+        const memory = window.performance.memory;
+        log.push(`זיכרון בשימוש: ${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB`);
+    }
+
+    // לוגים ושגיאות
+    log.push('--- לוגים ושגיאות ---');
+    if (window.consoleLogs && window.consoleLogs.length > 0) {
+        const recentLogs = window.consoleLogs.slice(-10);
+        recentLogs.forEach(entry => {
+            log.push(`[${entry.timestamp}] ${entry.level}: ${entry.message}`);
+        });
+    } else {
+        log.push('אין לוגים זמינים');
+    }
+
+    // מידע טכני
+    log.push('--- מידע טכני ---');
+    log.push(`User Agent: ${navigator.userAgent}`);
+    log.push(`Language: ${navigator.language}`);
+    log.push(`Platform: ${navigator.platform}`);
+
+    log.push('=== סוף הלוג ===');
+    return log.join('\n');
+}
+
+/**
+ * Copy detailed log to clipboard
+ */
+async function copyDetailedLog() {
+    try {
+        const log = generateDetailedLog();
+        await navigator.clipboard.writeText(log);
+        window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
+        console.log('=== לוג מפורט שהועתק ===');
+        console.log(log);
+        console.log('=== סוף הלוג ===');
+    } catch (error) {
+        console.error('Failed to copy log:', error);
+        window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
+        // Fallback: show in console
+        const log = generateDetailedLog();
+        console.log('=== לוג מפורט (לא הועתק) ===');
+        console.log(log);
+        console.log('=== סוף הלוג ===');
+    }
+}
+
+// ייצוא לגלובל scope
+window.copyDetailedLog = copyDetailedLog;
 

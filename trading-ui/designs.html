@@ -70,18 +70,26 @@
         <!-- Header System -->
         <div id="unified-header"></div>
 
+        <!-- TEMPLATE ZONE LOCKED - DO NOT MODIFY HEADER STRUCTURE -->
+        
         <!-- Page body -->
         <div class="page-body">
             <!-- Main content limited in width -->
             <div class="main-content">
+                <!-- CONTENT SECTIONS EDITABLE - START -->
                 <!-- UI Content Section Top Start-->
                 <div class="top-section">
                     <div class="section-header">
                         <!-- כאן נכנס הכותרת של הסקשן עם כותרת מימין וכפתור פתיחה וסגירה כמו שיש לנו כבר מוגדר בצד שמאל -->
                         <h2>🏠 עמוד עיצובים - כותרת סקשן עליון</h2>
-                        <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר סקשן">
-                            <span class="section-toggle-icon">▼</span>
-                        </button>
+                        <div class="header-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והסטטוס">
+                                <i class="fas fa-copy"></i> העתק לוג מפורט
+                            </button>
+                            <button class="filter-toggle-btn" onclick="toggleAllSections()" title="הצג/הסתר סקשן">
+                                <span class="section-toggle-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="section-body">
                         <!-- כאן נכנס התוכן של גוף הסקשן -->
@@ -136,7 +144,8 @@
                         <h4>תוכן סקשן מספר 3</h4>
                     </div>
                 </div>
-                <!-- UI Content Section 3 End--> 
+                <!-- UI Content Section 3 End-->
+                <!-- CONTENT SECTIONS EDITABLE - END -->
             </div>
         </div>
     </div>
@@ -162,6 +171,6 @@
     <script src="scripts/header-system.js?v=v34_fixes"></script>
     
     <!-- Page-specific scripts will be added here -->
-    <!-- Example: <script src="scripts/page-name.js"></script> -->
+    <script src="scripts/designs.js"></script>
 </body>
 </html>

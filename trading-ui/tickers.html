@@ -511,17 +511,8 @@
     <script src="scripts/color-demo-toggle.js"></script>
     <script src="scripts/central-refresh-system.js"></script>
     <script src="scripts/tickers.js?v=20250904_0049"></script>
-    <script>
-        
-        document.addEventListener("DOMContentLoaded", () => {
-          console.log("🔄 Initializing unified header system...");
-          if (window.headerSystem) {
-            window.headerSystem.init();
-          }
-          if (window.filterSystem) {
-            window.filterSystem.initialize();
-          }
-        });
+    <!-- Tickers Page Initializer -->
+    <script src="scripts/tickers-init.js"></script>
       </script>
   </div> <!-- End background-wrapper -->
 </body>

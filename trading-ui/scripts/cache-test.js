@@ -1090,6 +1090,26 @@ function toggleAllSections() {
     console.log(`📋 כל הסקשנים ${shouldOpen ? 'נפתחו' : 'נסגרו'}`);
 }
 
+function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    const toggleBtn = document.querySelector(`[onclick*="${sectionId}"] .section-toggle-icon`);
+    
+    if (!section) return;
+    
+    const isCollapsed = section.style.display === 'none' || 
+                       section.classList.contains('collapsed');
+    
+    if (isCollapsed) {
+        section.style.display = 'block';
+        section.classList.remove('collapsed');
+        if (toggleBtn) toggleBtn.innerHTML = '▼';
+    } else {
+        section.style.display = 'none';
+        section.classList.add('collapsed');
+        if (toggleBtn) toggleBtn.innerHTML = '▶';
+    }
+}
+
 /**
  * Update analytics display
  */
@@ -1531,3 +1551,98 @@ function updateDependenciesDisplay() {
         `;
     }
 }
+
+/**
+ * Generate detailed log for Cache Test
+ */
+function generateDetailedLog() {
+    const timestamp = new Date().toLocaleString('he-IL');
+    const log = [];
+
+    log.push('=== לוג מפורט - בדיקת מטמון ===');
+    log.push(`זמן יצירה: ${timestamp}`);
+    log.push(`עמוד: ${window.location.href}`);
+    log.push('');
+
+    // סטטוס כללי
+    log.push('--- סטטוס כללי ---');
+    const topSection = document.querySelector('.top-section .section-body');
+    const isTopOpen = topSection && topSection.style.display !== 'none';
+    log.push(`סקשן עליון: ${isTopOpen ? 'פתוח' : 'סגור'}`);
+    
+    // תצוגה מפורטת לפי סקשנים
+    log.push('--- תצוגה מפורטת לפי סקשנים ---');
+    
+    // סקשן עליון - כרטיסי סטטוס
+    const overviewCards = document.querySelectorAll('.overview-card');
+    overviewCards.forEach((card, index) => {
+        const number = card.querySelector('.overview-card-number')?.textContent || 'לא זמין';
+        const label = card.querySelector('.overview-card-label')?.textContent || 'לא זמין';
+        const change = card.querySelector('.overview-card-change')?.textContent || 'לא זמין';
+        log.push(`כרטיס ${index + 1}: ${label} = "${number}" (שינוי: ${change})`);
+    });
+
+    // סטטיסטיקות וביצועים
+    log.push('--- סטטיסטיקות וביצועים ---');
+    const cacheHitRate = document.getElementById('cacheHitRate')?.textContent || 'לא זמין';
+    const cacheSize = document.getElementById('cacheSize')?.textContent || 'לא זמין';
+    const avgResponseTime = document.getElementById('avgResponseTime')?.textContent || 'לא זמין';
+    
+    log.push(`שיעור פגיעות במטמון: ${cacheHitRate}`);
+    log.push(`גודל מטמון: ${cacheSize}`);
+    log.push(`זמן תגובה ממוצע: ${avgResponseTime}`);
+    log.push(`זמן טעינת עמוד: ${Date.now() - performance.timing.navigationStart}ms`);
+
+    // לוגים ושגיאות
+    log.push('--- לוגים ושגיאות ---');
+    if (window.consoleLogs && window.consoleLogs.length > 0) {
+        const recentLogs = window.consoleLogs.slice(-10);
+        recentLogs.forEach(entry => {
+            log.push(`[${entry.timestamp}] ${entry.level}: ${entry.message}`);
+        });
+    } else {
+        log.push('אין לוגים זמינים');
+    }
+
+    // מידע טכני
+    log.push('--- מידע טכני ---');
+    log.push(`User Agent: ${navigator.userAgent}`);
+    log.push(`Language: ${navigator.language}`);
+    log.push(`Platform: ${navigator.platform}`);
+
+    log.push('=== סוף הלוג ===');
+    return log.join('\n');
+}
+
+/**
+ * Copy detailed log to clipboard
+ */
+async function copyDetailedLog() {
+    try {
+        const log = generateDetailedLog();
+        await navigator.clipboard.writeText(log);
+        window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
+        console.log('=== לוג מפורט שהועתק ===');
+        console.log(log);
+        console.log('=== סוף הלוג ===');
+    } catch (error) {
+        console.error('Failed to copy log:', error);
+        window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
+        // Fallback: show in console
+        const log = generateDetailedLog();
+        console.log('=== לוג מפורט (לא הועתק) ===');
+        console.log(log);
+        console.log('=== סוף הלוג ===');
+    }
+}
+
+// ===== GLOBAL FUNCTION EXPORTS =====
+
+window.refreshCacheStatus = refreshCacheStatus;
+window.copyDetailedLog = copyDetailedLog;
+window.toggleAllSections = toggleAllSections;
+window.toggleSection = toggleSection;
+window.clearAllCache = clearAllCache;
+window.clearExpiredCache = clearExpiredCache;
+window.preloadCache = preloadCache;
+window.optimizeCache = optimizeCache;

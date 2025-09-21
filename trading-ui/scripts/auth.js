@@ -148,7 +148,9 @@ function logout() {
 }
 
 function isAuthenticated() {
-  return authToken !== null && currentUser !== null;
+  // כרגע יש רק משתמש אחד - נימרוד
+  // מערכת המשתמשים המלאה היא עתידית
+  return true; // תמיד מחובר (נימרוד)
 }
 
 function getAuthToken() {
@@ -156,7 +158,21 @@ function getAuthToken() {
 }
 
 function getCurrentUser() {
-  return currentUser;
+  // כרגע יש רק משתמש אחד - נימרוד
+  // מערכת המשתמשים המלאה היא עתידית
+  if (currentUser) {
+    return currentUser;
+  }
+  
+  // החזרת משתמש ברירת מחדל (נימרוד)
+  return {
+    id: 1,
+    username: 'nimrod',
+    name: 'נימרוד',
+    email: 'nimrod@tiktrack.com',
+    roles: ['admin', 'user'],
+    isActive: true
+  };
 }
 
 // פונקציה גלובלית לטיפול בטופס התחברות
@@ -214,28 +230,21 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
 
 // פונקציה לבדיקת התחברות בעת טעינת הדף
 function checkAuthentication(onAuthenticated = null, onNotAuthenticated = null) {
-  // טעינת פרטי התחברות שמורים
-  loadSavedCredentials();
+  // כרגע יש רק משתמש אחד - נימרוד
+  // מערכת המשתמשים המלאה היא עתידית
+  currentUser = {
+    id: 1,
+    username: 'nimrod',
+    name: 'נימרוד',
+    email: 'nimrod@tiktrack.com',
+    roles: ['admin', 'user'],
+    isActive: true
+  };
 
-  // בדיקת token קיים
-  const token = localStorage.getItem('authToken');
-  const user = localStorage.getItem('currentUser');
-
-  if (token && user) {
-    authToken = token;
-    currentUser = JSON.parse(user);
-
-    if (onAuthenticated && typeof onAuthenticated === 'function') {
-      onAuthenticated();
-    } else {
-      showDashboard();
-    }
+  if (onAuthenticated && typeof onAuthenticated === 'function') {
+    onAuthenticated();
   } else {
-    if (onNotAuthenticated && typeof onNotAuthenticated === 'function') {
-      onNotAuthenticated();
-    } else {
-      showLogin();
-    }
+    showDashboard();
   }
 }
 

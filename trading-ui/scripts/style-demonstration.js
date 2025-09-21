@@ -254,3 +254,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // REMOVED: setTimeout test - this was causing style changes after page load
     // The toggle functions should only be called by user interaction, not automatically
 });
+
+// ===== GLOBAL EXPORTS =====
+// Export functions to global scope for onclick attributes
+window.toggleAllSections = toggleAllSections;
+window.toggleSection = toggleSection;
+window.toggleTopSection = toggleTopSection;
+window.toggleLayer = toggleLayer;
+window.enableAllStyles = enableAllStyles;
+window.disableAllStyles = disableAllStyles;
+window.resetToDefaults = resetToDefaults;
+window.showStyleInfo = showStyleInfo;
+window.loadDynamicColors = loadDynamicColors;
+window.resetDynamicColors = resetDynamicColors;
+window.openPreferencesPage = openPreferencesPage;
+window.sortTable = sortTable;

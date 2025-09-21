@@ -23,6 +23,140 @@
     overflow: hidden;
 }
 
+/* ===== CONTROL PANEL SECTIONS ===== */
+.control-panel-section {
+    padding: 20px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.control-panel-section:last-child {
+    border-bottom: none;
+}
+
+.control-section-title {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.control-section-title i {
+    color: #007bff;
+}
+
+/* ===== FILE TYPES GRID ===== */
+.file-types-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.file-type-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.file-type-option:hover {
+    background: #e9ecef;
+    border-color: #007bff;
+}
+
+.file-type-option input[type="checkbox"]:checked + .file-type-info {
+    color: #007bff;
+}
+
+.file-type-checkbox {
+    margin-top: 2px;
+}
+
+.file-type-info {
+    flex: 1;
+}
+
+.file-type-name {
+    font-weight: 600;
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.file-type-name.js { color: #f7df1e; }
+.file-type-name.html { color: #e34f26; }
+.file-type-name.python { color: #3776ab; }
+.file-type-name.css { color: #1572b6; }
+.file-type-name.other { color: #6c757d; }
+
+.file-type-extension {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.file-type-count {
+    margin-top: 8px;
+}
+
+.file-type-count-value {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+/* ===== SCAN OPTIONS ===== */
+.scan-options-flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.scan-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+    min-width: 200px;
+}
+
+.scan-option:hover {
+    background: #e9ecef;
+    border-color: #28a745;
+}
+
+.scan-option input[type="checkbox"]:checked + div {
+    color: #28a745;
+}
+
+.scan-option-checkbox {
+    margin-top: 2px;
+}
+
+.scan-option-label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.scan-option-description {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
 /* ===== SUMMARY CARDS CONTAINER ===== */
 .summary-cards-container {
     display: grid;

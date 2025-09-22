@@ -94,6 +94,18 @@
       "dataFailures": true,
       "staleData": false,
       "priceAlerts": true
+    },
+    "categories": {
+      "notifications_development_enabled": true,
+      "notifications_system_enabled": true,
+      "notifications_business_enabled": true,
+      "notifications_performance_enabled": false,
+      "notifications_ui_enabled": true,
+      "console_logs_development_enabled": false,
+      "console_logs_system_enabled": true,
+      "console_logs_business_enabled": true,
+      "console_logs_performance_enabled": false,
+      "console_logs_ui_enabled": true
     }
   },
   

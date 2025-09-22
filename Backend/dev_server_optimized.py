@@ -58,7 +58,7 @@ from routes.api.constraints import constraints_bp
 from routes.api.currencies import currencies_bp
 from routes.api.linked_items import linked_items_bp
 from routes.api.note_relation_types import note_relation_types_bp
-from routes.api.js_map import js_map_bp
+from routes.api.file_scanner import file_scanner_bp
 from routes.pages import pages_bp
 
 # Memory monitoring class

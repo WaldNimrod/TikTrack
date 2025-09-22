@@ -2180,12 +2180,12 @@ JsMapSystem.prototype.analyzeUnusedFiles = function() {
  */
 JsMapSystem.prototype.initializeIndexedDB = async function() {
     try {
-        if (window.JsMapIndexedDBAdapter) {
-            this.indexedDB = new window.JsMapIndexedDBAdapter();
+        if (window.UnifiedIndexedDB) {
+            this.indexedDB = window.UnifiedIndexedDB;
             await this.indexedDB.initialize();
             console.log('✅ IndexedDB initialized for JS-Map');
         } else {
-            console.warn('⚠️ JsMapIndexedDBAdapter not available');
+            console.warn('⚠️ UnifiedIndexedDB not available');
         }
     } catch (error) {
         console.error('❌ Failed to initialize IndexedDB:', error);

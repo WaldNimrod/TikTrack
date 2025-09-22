@@ -101,6 +101,76 @@ function getNotificationIcon(type) {
 }
 
 /**
+ * Check if notification should be shown based on category preferences
+ * NOTIFICATION SYSTEM - Checks user preferences for notification category
+ *
+ * @param {string} category - Category of notification (development, system, business, performance, ui)
+ * @returns {Promise<boolean>} - Whether notification should be shown
+ */
+async function shouldShowNotification(category) {
+  try {
+    const preferenceName = `notifications_${category}_enabled`;
+    const isEnabled = await window.getPreference(preferenceName);
+    return isEnabled === 'true' || isEnabled === true;
+  } catch (error) {
+    console.warn('Failed to check notification preference, showing by default:', error);
+    return true; // Default: show notification
+  }
+}
+
+/**
+ * Check if console log should be written based on category preferences
+ * NOTIFICATION SYSTEM - Checks user preferences for console log category
+ *
+ * @param {string} category - Category of log (development, system, business, performance, ui)
+ * @returns {Promise<boolean>} - Whether log should be written to console
+ */
+async function shouldLogToConsole(category) {
+  try {
+    const preferenceName = `console_logs_${category}_enabled`;
+    const isEnabled = await window.getPreference(preferenceName);
+    return isEnabled === 'true' || isEnabled === true;
+  } catch (error) {
+    console.warn('Failed to check console log preference, logging by default:', error);
+    return true; // Default: write to console
+  }
+}
+
+/**
+ * Log with category support
+ * NOTIFICATION SYSTEM - Logs message to console with category filtering
+ *
+ * @param {string} level - Log level (log, warn, error, info)
+ * @param {string} message - Message to log
+ * @param {string} category - Category of log (development, system, business, performance, ui)
+ * @param {any} details - Additional details to log
+ */
+async function logWithCategory(level, message, category = 'system', details = null) {
+  if (await shouldLogToConsole(category)) {
+    const emoji = getLogEmoji(level);
+    const timestamp = new Date().toLocaleTimeString('he-IL');
+    console[level](`${emoji} [${category.toUpperCase()}] ${timestamp}: ${message}`, details);
+  }
+}
+
+/**
+ * Get emoji for log level
+ * NOTIFICATION SYSTEM - Returns appropriate emoji for log level
+ *
+ * @param {string} level - Log level
+ * @returns {string} Emoji for log level
+ */
+function getLogEmoji(level) {
+  const emojis = {
+    log: '📝',
+    warn: '⚠️',
+    error: '❌',
+    info: 'ℹ️'
+  };
+  return emojis[level] || '📝';
+}
+
+/**
  * Show a notification message
  * NOTIFICATION SYSTEM - Displays system notification to user
  *
@@ -108,8 +178,14 @@ function getNotificationIcon(type) {
  * @param {string} type - Type of notification (success, error, warning, info)
  * @param {string} title - Optional title for the notification
  * @param {number} duration - Optional duration in milliseconds (default: 5000)
+ * @param {string} category - Category of notification (development, system, business, performance, ui)
  */
-function showNotification(message, type = 'info', title = 'מערכת', duration = 5000) {
+async function showNotification(message, type = 'info', title = 'מערכת', duration = 5000, category = 'system') {
+  // Check if notification should be shown based on category preferences
+  if (!(await shouldShowNotification(category))) {
+    return; // Don't show notification if category is disabled
+  }
+  
   // Direct console log to avoid recursion
   console.log(`🔔 ${type.toUpperCase()}: ${title} - ${message}`);
 }
@@ -232,16 +308,15 @@ function hideNotification(notification) {
  * @param {string} title - Success notification title
  * @param {string} message - Success notification message
  * @param {number} duration - Display duration in milliseconds (default: 4000)
+ * @param {string} category - Category of notification (default: 'business')
  */
-function showSuccessNotification(title, message, duration = 4000) {
-  // showSuccessNotification called with
-
+async function showSuccessNotification(title, message, duration = 4000, category = 'business') {
   // Ensure title and message are provided
   const finalTitle = title || 'הצלחה';
   const finalMessage = message || 'הפעולה הושלמה בהצלחה';
 
-  // showSuccessNotification calling showNotification with
-  showNotification(finalMessage, 'success', finalTitle, duration);
+  // showSuccessNotification calling showNotification with category
+  await showNotification(finalMessage, 'success', finalTitle, duration, category);
 }
 
 /**
@@ -251,11 +326,11 @@ function showSuccessNotification(title, message, duration = 4000) {
  * @param {string} title - Error notification title
  * @param {string} message - Error notification message
  * @param {number} duration - Display duration in milliseconds (default: 6000)
+ * @param {string} category - Category of notification (default: 'system')
  */
-function showErrorNotification(title, message, duration = 6000) {
-  // showErrorNotification called with
-  // showErrorNotification calling showNotification with
-  showNotification(message, 'error', title, duration);
+async function showErrorNotification(title, message, duration = 6000, category = 'system') {
+  // showErrorNotification calling showNotification with category
+  await showNotification(message, 'error', title, duration, category);
 }
 
 /**
@@ -265,11 +340,11 @@ function showErrorNotification(title, message, duration = 6000) {
  * @param {string} title - Warning notification title
  * @param {string} message - Warning notification message
  * @param {number} duration - Display duration in milliseconds (default: 5000)
+ * @param {string} category - Category of notification (default: 'system')
  */
-function showWarningNotification(title, message, duration = 5000) {
-  // showWarningNotification called
-  // showWarningNotification calling showNotification
-  showNotification(message, 'warning', title, duration);
+async function showWarningNotification(title, message, duration = 5000, category = 'system') {
+  // showWarningNotification calling showNotification with category
+  await showNotification(message, 'warning', title, duration, category);
 }
 
 /**
@@ -279,11 +354,11 @@ function showWarningNotification(title, message, duration = 5000) {
  * @param {string} title - Info notification title
  * @param {string} message - Info notification message
  * @param {number} duration - Display duration in milliseconds (default: 4000)
+ * @param {string} category - Category of notification (default: 'ui')
  */
-function showInfoNotification(title, message, duration = 4000) {
-  // showInfoNotification called
-  // showInfoNotification calling showNotification
-  showNotification(message, 'info', title, duration);
+async function showInfoNotification(title, message, duration = 4000, category = 'ui') {
+  // showInfoNotification calling showNotification with category
+  await showNotification(message, 'info', title, duration, category);
 }
 
 // WARNING FUNCTIONS MOVED TO warning-system.js
@@ -443,6 +518,12 @@ window.showSuccessNotification = showSuccessNotification;
 window.showErrorNotification = showErrorNotification;
 window.showWarningNotification = showWarningNotification;
 window.showInfoNotification = showInfoNotification;
+
+// Export NOTIFICATION CATEGORIES SYSTEM functions to global scope
+window.shouldShowNotification = shouldShowNotification;
+window.shouldLogToConsole = shouldLogToConsole;
+window.logWithCategory = logWithCategory;
+window.getLogEmoji = getLogEmoji;
 
 // Export GLOBAL NOTIFICATION HISTORY functions
 window.saveNotificationToGlobalHistory = saveNotificationToGlobalHistory;

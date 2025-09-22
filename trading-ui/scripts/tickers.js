@@ -465,22 +465,7 @@ function restoreTickersSectionState() {
 // פונקציות נוספות
 
 // פונקציות לפתיחה/סגירה של סקשנים - משתמשות בפונקציות הגלובליות
-function toggleTopSection() {
-  // קריאה לפונקציה הגלובלית מ-main.js
-  if (typeof window.toggleTopSectionGlobal === 'function') {
-    window.toggleTopSectionGlobal();
-  } else {
-    handleFunctionNotFound('toggleTopSectionGlobal', 'פונקציית פתיחת סקשן עליון לא נמצאה');
-  }
-}
 
-function toggleTickersSection() {
-  if (typeof window.toggleMainSection === 'function') {
-    window.toggleMainSection();
-  } else {
-    handleFunctionNotFound('toggleMainSection', 'פונקציית פתיחת סקשן ראשי לא נמצאה');
-  }
-}
 
 // פונקציות נוספות
 
@@ -2337,6 +2322,138 @@ function refreshYahooFinanceData() {
 
 // ===== GLOBAL EXPORTS =====
 // Export functions to global scope for onclick attributes
+// Detailed Log Functions for Tickers Page
+function generateDetailedLog() {
+    try {
+        const logData = {
+            timestamp: new Date().toISOString(),
+            page: 'tickers',
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            viewport: {
+                width: window.innerWidth,
+                height: window.innerHeight
+            },
+            performance: {
+                loadTime: performance.timing.loadEventEnd - performance.timing.navigationStart,
+                domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart
+            },
+            memory: window.performance.memory ? {
+                used: window.performance.memory.usedJSHeapSize,
+                total: window.performance.memory.totalJSHeapSize,
+                limit: window.performance.memory.jsHeapSizeLimit
+            } : null,
+            tickersStats: {
+                totalTickers: document.getElementById('totalTickers')?.textContent || 'לא נמצא',
+                activeTickers: document.getElementById('activeTickers')?.textContent || 'לא נמצא',
+                latestUpdate: document.getElementById('latestUpdate')?.textContent || 'לא נמצא',
+                oldestUpdate: document.getElementById('oldestUpdate')?.textContent || 'לא נמצא'
+            },
+            sections: {
+                topSection: {
+                    title: 'טיקרים',
+                    visible: !document.querySelector('.top-section')?.classList.contains('d-none'),
+                    alertsCount: document.querySelectorAll('.alert-card').length,
+                    summaryStats: document.getElementById('summaryStats')?.textContent || 'לא נמצא',
+                    colorDemoVisible: !document.getElementById('tickersColorDemo')?.classList.contains('d-none')
+                },
+                contentSection: {
+                    title: 'הטיקרים שלי',
+                    visible: !document.querySelector('.content-section')?.classList.contains('d-none'),
+                    tableRows: document.querySelectorAll('#tickersTable tbody tr').length,
+                    tableData: document.querySelector('#tickersContainer')?.textContent?.substring(0, 300) || 'לא נמצא'
+                }
+            },
+            tableData: {
+                totalRows: document.querySelectorAll('#tickersTable tbody tr').length,
+                headers: Array.from(document.querySelectorAll('#tickersTable thead th')).map(th => th.textContent?.trim()),
+                sortableColumns: document.querySelectorAll('.sortable-header').length,
+                hasData: document.querySelectorAll('#tickersTable tbody tr').length > 0
+            },
+            buttons: {
+                yahooRefreshBtn: document.getElementById('yahooRefreshBtn') ? 'זמין' : 'לא זמין',
+                addTickerBtn: document.getElementById('addTickerBtn') ? 'זמין' : 'לא זמין'
+            },
+            modals: {
+                addModal: document.getElementById('addTickerModal') ? 'זמין' : 'לא זמין',
+                editModal: document.getElementById('editTickerModal') ? 'זמין' : 'לא זמין',
+                deleteModal: document.getElementById('deleteTickerModal') ? 'זמין' : 'לא זמין'
+            },
+            functions: {
+                showAddTickerModal: typeof window.showAddTickerModal === 'function' ? 'זמין' : 'לא זמין',
+                editTicker: typeof window.editTicker === 'function' ? 'זמין' : 'לא זמין',
+                confirmDeleteTicker: typeof window.confirmDeleteTicker === 'function' ? 'זמין' : 'לא זמין',
+                refreshYahooFinanceData: typeof window.refreshYahooFinanceData === 'function' ? 'זמין' : 'לא זמין',
+                toggleTopSection: typeof window.toggleTopSection === 'function' ? 'זמין' : 'לא זמין',
+                toggleTickersSection: typeof window.toggleTickersSection === 'function' ? 'זמין' : 'לא זמין',
+                filterTickersByType: typeof window.filterTickersByType === 'function' ? 'זמין' : 'לא זמין'
+            },
+            dataStatus: {
+                tickersLoaded: window.tickersLoaded || false,
+                tickersDataLength: window.tickersData ? window.tickersData.length : 0
+            },
+            console: {
+                errors: [],
+                warnings: [],
+                logs: []
+            }
+        };
+
+        // Capture console messages
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const originalLog = console.log;
+
+        console.error = function(...args) {
+            logData.console.errors.push(args.join(' '));
+            originalError.apply(console, args);
+        };
+
+        console.warn = function(...args) {
+            logData.console.warnings.push(args.join(' '));
+            originalWarn.apply(console, args);
+        };
+
+        console.log = function(...args) {
+            logData.console.logs.push(args.join(' '));
+            originalLog.apply(console, args);
+        };
+
+        return JSON.stringify(logData, null, 2);
+    } catch (error) {
+        return `Error generating log: ${error.message}`;
+    }
+}
+
+function copyDetailedLog() {
+    try {
+        const logContent = generateDetailedLog();
+        navigator.clipboard.writeText(logContent).then(() => {
+            if (window.showNotification) {
+                window.showNotification('לוג מפורט הועתק ללוח', 'success');
+            } else {
+                alert('לוג מפורט הועתק ללוח');
+            }
+        }).catch(err => {
+            console.error('Failed to copy log:', err);
+            // Fallback: show in console
+            console.log('Detailed Log:', logContent);
+            if (window.showNotification) {
+                window.showNotification('לוג מפורט הוצג בקונסול', 'info');
+            } else {
+                alert('לוג מפורט הוצג בקונסול');
+            }
+        });
+    } catch (error) {
+        console.error('Error copying log:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בהעתקת הלוג', 'error');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}
+
 window.filterTickersByType = filterTickersByType;
 window.getTypeDisplayName = getTypeDisplayName;
 window.toggleTopSection = toggleTopSection;
@@ -2348,4 +2465,6 @@ window.confirmDeleteTicker = confirmDeleteTicker;
 window.refreshYahooFinanceData = refreshYahooFinanceData;
 window.editTicker = editTicker;
 window.viewTickerDetails = viewTickerDetails;
+window.copyDetailedLog = copyDetailedLog;
+window.generateDetailedLog = generateDetailedLog;
 

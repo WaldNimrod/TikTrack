@@ -1139,3 +1139,91 @@ window.copyDetailedLog = copyDetailedLog;
 **עדכון אחרון:** ינואר 2025 (סריקה מעמיקה של designs.html + הערות מפורטות)  
 **גרסה:** 2.2  
 **סטטוס:** פעיל
+
+---
+
+## 🔧 **מטריצת מערכות כלליות - סריקה מקיפה**
+
+### **📋 מקרא צבעים:**
+- 🟢 **ירוק** - מערכת כללית מיושמת במלואה (כולל כל הקריאות אליה)
+- 🔵 **כחול** - יש יישום של המערכת הכללית אבל לא מלא או לא מדויק
+- ⚫ **אפור** - אין צורך במערכת הכללית ואין מערכת דומה או מקבילה מקומית
+- 🟠 **כתום** - יש מערכת מקומית בלבד
+- 🔴 **אדום** - יש מערכת כפולה מתנגשת
+- 🟡 **צהוב זוהר** - משהו אחר - לא ברור או לא מובן או כל דבר שהוא לא בדיוק אחת האופציות
+- 🟣 **סגול** - מערכת מיושמת אבל לא נטענת/לא פעילה
+- 🔵 **כחול בהיר** - מערכת מיושמת אבל יש בעיות ביצועים או שגיאות
+- ⚪ **לבן** - מערכת קיימת אבל לא בשימוש (dead code)
+
+### **📊 מטריצת מערכות כלליות:**
+
+| # | מערכת כללית | דוק' (1-5) | index.html | trade_plans.html | trades.html | research.html | alerts.html | notes.html | accounts.html | tickers.html | executions.html | cash_flows.html | preferences.html | designs.html | css-management.html | cache-test.html | constraints.html | server-monitor.html | linter-realtime-monitor.html | js-map.html |
+|---|-------------|-----------|------------|------------------|-------------|---------------|-------------|------------|---------------|--------------|-----------------|-----------------|------------------|-------------|-------------------|-----------------|------------------|--------------------|---------------------------|-------------|
+| **1. מערכות ליבה קריטיות** | | | | | | | | | | | | | | | | | | | |
+| 1.1 | initializeApplication | 3 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 |
+| 1.2 | initializeCoreSystems | 4 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 |
+| 1.3 | initializeCurrentPage | 3 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 |
+| 1.4 | checkDependencies | 4 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟢 | 🟠 |
+| 1.5 | isModuleAvailable | 3 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 |
+| 1.6 | getSystemInfo | 3 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 |
+| **2. מערכות ממשק משתמש בסיסיות** | | | | | | | | | | | | | | | | | | | |
+| 2.1 | showNotification | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
+| 2.2 | showSuccessNotification | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
+| 2.3 | showErrorNotification | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
+| 2.4 | showWarningNotification | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
+| 2.5 | showInfoNotification | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
+| 2.6 | showModal | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
+| 2.7 | closeModal | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
+| 2.8 | closeModalGlobal | 3 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 |
+| **UI Utilities (ui-utils.js)** | | | | | | | | | | | | | | | | | | | |
+| showModal | | | | | | | | | | | | | | | | | | | |
+| calculateStopPrice | | | | | | | | | | | | | | | | | | | |
+| calculateTargetPrice | | | | | | | | | | | | | | | | | | | |
+| calculatePercentageFromPrice | | | | | | | | | | | | | | | | | | | |
+| updatePricesFromPercentages | | | | | | | | | | | | | | | | | | | |
+| updatePercentagesFromPrices | | | | | | | | | | | | | | | | | | | |
+| formatPercentage | | | | | | | | | | | | | | | | | | | |
+| formatPrice | | | | | | | | | | | | | | | | | | | | |
+| cancelItem | | | | | | | | | | | | | | | | | | | |
+| performItemCancellation | | | | | | | | | | | | | | | | | | | |
+| toggleTopSection | 5 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 |
+| toggleMainSection | 5 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 |
+| toggleSection | 5 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 |
+| toggleAllSections | | | | | | | | | | | | | | | | | | | |
+| restoreSectionStates | | | | | | | | | | | | | | | | | | | |
+| enhancedTableRefresh | | | | | | | | | | | | | | | | | | | |
+| handleApiResponseWithRefresh | | | | | | | | | | | | | | | | | | | |
+| getPageDataFunctions | | | | | | | | | | | | | | | | | | | |
+| autoRefreshCurrentPage | | | | | | | | | | | | | | | | | | | |
+| showSecondConfirmationModal | | | | | | | | | | | | | | | | | | | |
+| generateActionButtons | | | | | | | | | | | | | | | | | | | |
+| loadTableActionButtons | | | | | | | | | | | | | | | | | | | |
+| viewTickerDetails | | | | | | | | | | | | | | | | | | | |
+| viewLinkedItems | | | | | | | | | | | | | | | | | | | |
+| editTicker | | | | | | | | | | | | | | | | | | | |
+| cancelTicker | | | | | | | | | | | | | | | | | | | |
+| restoreTicker | | | | | | | | | | | | | | | | | | | |
+| deleteTicker | | | | | | | | | | | | | | | | | | | |
+| loadSectionStates | | | | | | | | | | | | | | | | | | | |
+| **Notification System (notification-system.js)** | | | | | | | | | | | | | | | | | | | |
+| showNotification | | | | | | | | | | | | | | | | | | | |
+| showSuccessNotification | | | | | | | | | | | | | | | | | | | |
+| showErrorNotification | | | | | | | | | | | | | | | | | | | |
+| showWarningNotification | | | | | | | | | | | | | | | | | | | |
+| showInfoNotification | | | | | | | | | | | | | | | | | | | |
+| **Table System (tables.js)** | | | | | | | | | | | | | | | | | | | |
+| sortTableData | 3 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 |
+| sortTable | 5 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 |
+| closeModal | | | | | | | | | | | | | | | | | | | |
+| **Preferences System (preferences.js)** | | | | | | | | | | | | | | | | | | | |
+| getPreference | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
+| savePreference | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
+| getAllUserPreferences | | | | | | | | | | | | | | | | | | | |
+| loadPreferences | | | | | | | | | | | | | | | | | | | |
+| initializePreferences | | | | | | | | | | | | | | | | | | | |
+
+### **📝 הערות חשובות:**
+- עמודת "דוק' (1-5)" מציינת את רמת הדוקומנטציה של כל מערכת (1 = חסר לחלוטין, 5 = מעולה)
+- כל תא במטריצה צריך להיות מסומן בצבע המתאים לפי המקרא
+- יש לעבוד מערכת מערכת ולא עמוד עמוד
+- לכל מערכת יש לקרוא תחילה את הדוקומנטציה שלה

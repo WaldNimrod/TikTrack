@@ -409,7 +409,7 @@
               </button>
             </div>
           </div>
-              <div id="fileDiscoveryProgress" class="file-discovery-progress">
+              <div id="fileDiscoveryProgress" class="file-discovery-progress" style="display: none;">
                 <i class="fas fa-spinner fa-spin"></i> מגלה קבצים...
               </div>
             </div>
@@ -620,7 +620,7 @@
                   </button>
                 </div>
               </div>
-              <div id="scanningProgress" class="file-discovery-progress">
+              <div id="scanningProgress" class="file-discovery-progress" style="display: none;">
                 <i class="fas fa-spinner fa-spin"></i> סורק קבצים...
               </div>
             </div>
@@ -1416,7 +1416,6 @@
     <script src="scripts/linked-items.js"></script>
     <script src="scripts/page-utils.js"></script>
     <script src="scripts/central-refresh-system.js"></script>
-    <script src="scripts/main.js"></script>
     
     <!-- Notification System Scripts -->
     <script src="scripts/notification-system.js"></script>
@@ -1433,6 +1432,8 @@
     <script src="scripts/charts/chart-system.js"></script>
     <script src="scripts/charts/adapters/linter-adapter.js"></script>
     
+    <!-- Global File Mapping System -->
+    <script src="scripts/global-file-mapping-system.js"></script>
     <!-- Legacy scripts for compatibility -->
     <script src="scripts/indexeddb-adapter.js"></script>
     <script src="scripts/data-collector.js"></script>

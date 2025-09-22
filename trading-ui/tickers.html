@@ -78,6 +78,9 @@
                 הוסף טיקר
               </button>
               <div class="action-separator"></div>
+              <button class="btn btn-sm btn-outline-primary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והטיקרים">
+                <i class="fas fa-copy"></i> העתק לוג מפורט
+              </button>
               <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור עיצובים">
                 <span class="filter-icon">▲</span>
               </button>
@@ -116,7 +119,7 @@
       <div class="main-content">
 
         <!-- Tickers area - content-section -->
-        <div class="content-section tickers-page" data-section="tickers">
+        <div class="content-section tickers-page" id="tickers" data-section="tickers">
           <!-- Tickers header -->
           <div class="section-header">
             <div class="table-title">
@@ -488,7 +491,6 @@
     <script src="scripts/linked-items.js"></script>
 
     <script src="scripts/page-utils.js"></script>
-    <script src="scripts/main.js"></script>
     <script src="scripts/header-system.js?v=20250115_level3_fix"></script>
     <!-- alerts.js הוסר - לא נחוץ בעמוד זה -->
     <script src="scripts/alert-service.js"></script>

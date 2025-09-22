@@ -17,16 +17,10 @@ let testChart = null;
 
 // Function to toggle section visibility
 function toggleSection(sectionId) {
-    const section = document.getElementById(sectionId);
-    const toggleIcon = section.querySelector('.section-toggle-icon');
-    const content = section.querySelector('.section-content');
-    
-    if (content.style.display === 'none') {
-        content.style.display = 'block';
-        toggleIcon.textContent = '▼';
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection(sectionId);
     } else {
-        content.style.display = 'none';
-        toggleIcon.textContent = '▶';
+        console.warn('toggleSection function not found');
     }
 }
 
@@ -115,7 +109,7 @@ async function createNewChart() {
         console.log('📊 Creating new chart...');
         
         if (!window.ChartSystem) {
-        showLocalNotification('מערכת הגרפים לא זמינה', 'error');
+        window.showNotification('מערכת הגרפים לא זמינה', 'error');
             return;
         }
         
@@ -172,13 +166,13 @@ async function createNewChart() {
         // Refresh status
         refreshChartsStatus();
         
-        showLocalNotification(`גרף חדש נוצר בהצלחה: ${chartId}`, 'success');
+        window.showNotification(`גרף חדש נוצר בהצלחה: ${chartId}`, 'success');
         
         console.log('✅ New chart created:', chartId);
         
     } catch (error) {
         console.error('❌ Error creating chart:', error);
-        showLocalNotification(`שגיאה ביצירת גרף: ${error.message}`, 'error');
+        window.showNotification(`שגיאה ביצירת גרף: ${error.message}`, 'error');
     }
 }
 
@@ -195,7 +189,7 @@ function refreshAllCharts() {
     // For now, just refresh the status
     refreshChartsStatus();
     
-    showLocalNotification('כל הגרפים רוענו בהצלחה', 'success');
+    window.showNotification('כל הגרפים רוענו בהצלחה', 'success');
     
     console.log('✅ All charts refreshed');
 }
@@ -211,7 +205,7 @@ function destroyAllCharts() {
         
         refreshChartsStatus();
         
-        showLocalNotification('כל הגרפים נמחקו בהצלחה', 'success');
+        window.showNotification('כל הגרפים נמחקו בהצלחה', 'success');
         
         console.log('✅ All charts destroyed');
     }
@@ -221,7 +215,7 @@ function destroyAllCharts() {
 function refreshChart(chartIndex) {
     console.log(`🔄 Refreshing chart ${chartIndex}...`);
     
-    showLocalNotification(`רענון גרף ${chartIndex + 1} - Future feature`, 'info');
+    window.showNotification(`רענון גרף ${chartIndex + 1} - Future feature`, 'info');
 }
 
 // Function to export specific chart
@@ -230,7 +224,7 @@ async function exportChart(chartIndex) {
         console.log(`📤 Exporting chart ${chartIndex}...`);
         
         if (!window.ChartExportSystem) {
-            showLocalNotification('מערכת ייצוא גרפים לא זמינה', 'error');
+            window.showNotification('מערכת ייצוא גרפים לא זמינה', 'error');
             return;
         }
         
@@ -249,7 +243,7 @@ async function exportChart(chartIndex) {
         
     } catch (error) {
         console.error(`❌ Error exporting chart ${chartIndex}:`, error);
-        showLocalNotification(`שגיאה בייצוא גרף ${chartIndex + 1}: ${error.message}`, 'error');
+        window.showNotification(`שגיאה בייצוא גרף ${chartIndex + 1}: ${error.message}`, 'error');
     }
 }
 
@@ -264,7 +258,7 @@ function destroyChart(chartIndex) {
             refreshChartsStatus();
         }
         
-        showLocalNotification(`גרף ${chartIndex + 1} נמחק בהצלחה`, 'success');
+        window.showNotification(`גרף ${chartIndex + 1} נמחק בהצלחה`, 'success');
         
         console.log(`✅ Chart ${chartIndex} destroyed`);
     }
@@ -278,7 +272,7 @@ function changeChartTheme(themeName) {
         window.ChartSystem.setTheme({ name: themeName });
     }
     
-    showLocalNotification(`נושא הגרפים שונה ל: ${themeName}`, 'success');
+    window.showNotification(`נושא הגרפים שונה ל: ${themeName}`, 'success');
 }
 
 // Function to toggle auto refresh
@@ -324,7 +318,7 @@ async function exportAllCharts() {
         console.log('📤 Exporting all charts...');
         
         if (!window.ChartExportSystem) {
-            showLocalNotification('מערכת ייצוא גרפים לא זמינה', 'error');
+            window.showNotification('מערכת ייצוא גרפים לא זמינה', 'error');
             return;
         }
         
@@ -340,7 +334,7 @@ async function exportAllCharts() {
         
     } catch (error) {
         console.error('❌ Error exporting all charts:', error);
-        showLocalNotification(`שגיאה בייצוא כל הגרפים: ${error.message}`, 'error');
+        window.showNotification(`שגיאה בייצוא כל הגרפים: ${error.message}`, 'error');
     }
 }
 
@@ -350,7 +344,7 @@ async function exportSelectedCharts() {
         console.log('📤 Exporting selected charts...');
         
         if (!window.ChartExportSystem) {
-            showLocalNotification('מערכת ייצוא גרפים לא זמינה', 'error');
+            window.showNotification('מערכת ייצוא גרפים לא זמינה', 'error');
             return;
         }
         
@@ -358,7 +352,7 @@ async function exportSelectedCharts() {
         const selectedCharts = [0, 1]; // Demo: export first two charts
         
         if (selectedCharts.length === 0) {
-            showLocalNotification('לא נבחרו גרפים לייצוא', 'warning');
+            window.showNotification('לא נבחרו גרפים לייצוא', 'warning');
             return;
         }
         
@@ -375,7 +369,7 @@ async function exportSelectedCharts() {
         
     } catch (error) {
         console.error('❌ Error exporting selected charts:', error);
-        showLocalNotification(`שגיאה בייצוא גרפים נבחרים: ${error.message}`, 'error');
+        window.showNotification(`שגיאה בייצוא גרפים נבחרים: ${error.message}`, 'error');
     }
 }
 
@@ -388,7 +382,7 @@ async function createTestChart() {
         console.log('🧪 Creating test chart with real trades data...');
         
         if (!window.ChartSystem) {
-        showLocalNotification('מערכת הגרפים לא זמינה', 'error');
+        window.showNotification('מערכת הגרפים לא זמינה', 'error');
             return;
         }
         
@@ -399,7 +393,7 @@ async function createTestChart() {
         
         // Check if TradesAdapter is available
         if (!window.TradesAdapter) {
-        showLocalNotification('מתאם נתוני טריידים לא זמין', 'error');
+        window.showNotification('מתאם נתוני טריידים לא זמין', 'error');
             return;
         }
         
@@ -451,13 +445,13 @@ async function createTestChart() {
         // Refresh status
         refreshChartsStatus();
         
-        showLocalNotification(`גרף בדיקה נוצר עם ${stats.totalTrades} טריידים אמיתיים`, 'success');
+        window.showNotification(`גרף בדיקה נוצר עם ${stats.totalTrades} טריידים אמיתיים`, 'success');
         
         console.log('✅ Test chart created with real trades data:', stats);
         
     } catch (error) {
         console.error('❌ Error creating test chart:', error);
-        showLocalNotification(`שגיאה ביצירת גרף בדיקה: ${error.message}`, 'error');
+        window.showNotification(`שגיאה ביצירת גרף בדיקה: ${error.message}`, 'error');
     }
 }
 
@@ -467,12 +461,12 @@ async function updateTestChart() {
         console.log('🔄 Updating test chart with fresh data...');
         
         if (!testChart) {
-        showLocalNotification('אין גרף בדיקה לעדכון', 'warning');
+        window.showNotification('אין גרף בדיקה לעדכון', 'warning');
             return;
         }
         
         if (!window.TradesAdapter) {
-        showLocalNotification('מתאם נתוני טריידים לא זמין', 'error');
+        window.showNotification('מתאם נתוני טריידים לא זמין', 'error');
             return;
         }
         
@@ -490,13 +484,13 @@ async function updateTestChart() {
         // Update the chart
         await window.ChartSystem.update('testChart', newData);
         
-        showLocalNotification(`גרף בדיקה עודכן עם ${stats.totalTrades} טריידים`, 'success');
+        window.showNotification(`גרף בדיקה עודכן עם ${stats.totalTrades} טריידים`, 'success');
         
         console.log('✅ Test chart updated with fresh trades data');
         
     } catch (error) {
         console.error('❌ Error updating test chart:', error);
-        showLocalNotification(`שגיאה בעדכון גרף בדיקה: ${error.message}`, 'error');
+        window.showNotification(`שגיאה בעדכון גרף בדיקה: ${error.message}`, 'error');
     }
 }
 
@@ -506,7 +500,7 @@ async function createPerformanceChart() {
         console.log('📈 Creating performance chart with real trades data...');
         
         if (!window.ChartSystem || !window.TradesAdapter) {
-        showLocalNotification('מערכת הגרפים או מתאם הטריידים לא זמין', 'error');
+        window.showNotification('מערכת הגרפים או מתאם הטריידים לא זמין', 'error');
             return;
         }
         
@@ -575,13 +569,13 @@ async function createPerformanceChart() {
         // Refresh status
         refreshChartsStatus();
         
-        showLocalNotification(`גרף ביצועים נוצר עם ${stats.totalTrades} טריידים`, 'success');
+        window.showNotification(`גרף ביצועים נוצר עם ${stats.totalTrades} טריידים`, 'success');
         
         console.log('✅ Performance chart created with real trades data');
         
     } catch (error) {
         console.error('❌ Error creating performance chart:', error);
-        showLocalNotification(`שגיאה ביצירת גרף ביצועים: ${error.message}`, 'error');
+        window.showNotification(`שגיאה ביצירת גרף ביצועים: ${error.message}`, 'error');
     }
 }
 
@@ -591,7 +585,7 @@ async function createAccountChart() {
         console.log('👥 Creating account chart with real trades data...');
         
         if (!window.ChartSystem || !window.TradesAdapter) {
-        showLocalNotification('מערכת הגרפים או מתאם הטריידים לא זמין', 'error');
+        window.showNotification('מערכת הגרפים או מתאם הטריידים לא זמין', 'error');
             return;
         }
         
@@ -646,13 +640,13 @@ async function createAccountChart() {
         // Refresh status
         refreshChartsStatus();
         
-        showLocalNotification(`גרף חשבונות נוצר עם ${stats.totalTrades} טריידים`, 'success');
+        window.showNotification(`גרף חשבונות נוצר עם ${stats.totalTrades} טריידים`, 'success');
         
         console.log('✅ Account chart created with real trades data');
         
     } catch (error) {
         console.error('❌ Error creating account chart:', error);
-        showLocalNotification(`שגיאה ביצירת גרף חשבונות: ${error.message}`, 'error');
+        window.showNotification(`שגיאה ביצירת גרף חשבונות: ${error.message}`, 'error');
     }
 }
 
@@ -662,7 +656,7 @@ async function createMixedChart() {
         console.log('🔀 Creating mixed chart with multiple entities and types...');
         
         if (!window.ChartSystem || !window.TradesAdapter) {
-            showLocalNotification('מערכת הגרפים או מתאם הטריידים לא זמין', 'error');
+            window.showNotification('מערכת הגרפים או מתאם הטריידים לא זמין', 'error');
             return;
         }
         
@@ -727,12 +721,12 @@ async function createMixedChart() {
         // Refresh status
         refreshChartsStatus();
         
-        showLocalNotification(`גרף מעורב נוצר עם ${stats.totalTrades} טריידים מכמה ישויות`, 'success');
+        window.showNotification(`גרף מעורב נוצר עם ${stats.totalTrades} טריידים מכמה ישויות`, 'success');
         console.log('✅ Mixed chart created successfully');
         
     } catch (error) {
         console.error('❌ Error creating mixed chart:', error);
-        showLocalNotification(`שגיאה ביצירת גרף מעורב: ${error.message}`, 'error');
+        window.showNotification(`שגיאה ביצירת גרף מעורב: ${error.message}`, 'error');
     }
 }
 
@@ -819,12 +813,12 @@ async function exportTestChart() {
         console.log('📤 Exporting test chart...');
         
         if (!testChart) {
-            showLocalNotification('אין גרף בדיקה לייצוא', 'warning');
+            window.showNotification('אין גרף בדיקה לייצוא', 'warning');
             return;
         }
         
         if (!window.ChartExportSystem) {
-            showLocalNotification('מערכת ייצוא גרפים לא זמינה', 'error');
+            window.showNotification('מערכת ייצוא גרפים לא זמינה', 'error');
             return;
         }
         
@@ -852,7 +846,7 @@ async function exportTestChart() {
         
     } catch (error) {
         console.error('❌ Error exporting test chart:', error);
-        showLocalNotification(`שגיאה בייצוא גרף בדיקה: ${error.message}`, 'error');
+        window.showNotification(`שגיאה בייצוא גרף בדיקה: ${error.message}`, 'error');
     }
 }
 
@@ -862,7 +856,7 @@ async function destroyTestChart() {
         console.log('🗑️ Destroying test chart...');
         
         if (!testChart) {
-        showLocalNotification('אין גרף בדיקה למחיקה', 'warning');
+        window.showNotification('אין גרף בדיקה למחיקה', 'warning');
             return;
         }
         
@@ -876,56 +870,17 @@ async function destroyTestChart() {
         // Refresh status
         refreshChartsStatus();
         
-        showLocalNotification('גרף בדיקה נמחק בהצלחה', 'success');
+        window.showNotification('גרף בדיקה נמחק בהצלחה', 'success');
         
         console.log('✅ Test chart destroyed successfully');
         
     } catch (error) {
         console.error('❌ Error destroying test chart:', error);
-        showLocalNotification(`שגיאה במחיקת גרף בדיקה: ${error.message}`, 'error');
+        window.showNotification(`שגיאה במחיקת גרף בדיקה: ${error.message}`, 'error');
     }
 }
 
-// Local notification function for this page only
-function showLocalNotification(message, type = 'info') {
-    // Try to use global notification system first
-    if (typeof window.showNotification === 'function') {
-        window.showNotification(message, type);
-        return;
-    }
-    
-    // Fallback to local notification if global system not available
-    console.log(`📢 ${type.toUpperCase()}: ${message}`);
-    
-    // Create a simple notification element
-    const notification = document.createElement('div');
-    notification.className = `local-notification ${type}`;
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8'};
-        color: white;
-        padding: 15px 20px;
-        border-radius: 5px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        z-index: 10000;
-        max-width: 400px;
-        font-family: Arial, sans-serif;
-        font-size: 14px;
-        line-height: 1.4;
-    `;
-    
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
-    }, 5000);
-}
+// Use global notification system directly
 
 // Function to copy detailed log
 async function copyDetailedLog() {
@@ -1075,7 +1030,7 @@ async function copyDetailedLog() {
         // Show success message using local notification
         const successMsg = `לוג מפורט הועתק ללוח!\n\n📊 מידע על הלוג:\n• זמן יצירה: ${new Date().toLocaleString('he-IL')}\n• גודל: ${logText.length} תווים\n• מקור: מערכת ניהול גרפים TikTrack`;
         
-        showLocalNotification(successMsg, 'success');
+        window.showNotification(successMsg, 'success');
         
         console.log('✅ Detailed log copied to clipboard');
         
@@ -1084,7 +1039,7 @@ async function copyDetailedLog() {
         
         const errorMsg = `שגיאה בהעתקת לוג: ${error.message}\n\n🔧 פתרונות אפשריים:\n• בדוק את החיבור לשרת\n• נסה לרענן את הדף\n• פנה לתמיכה טכנית`;
         
-        showLocalNotification(errorMsg, 'error');
+        window.showNotification(errorMsg, 'error');
     } finally {
         // Reset button
         const copyBtn = document.querySelector('.copy-log-btn');

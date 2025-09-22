@@ -134,12 +134,7 @@ function handleLogEntry(entry) {
  * Handle critical errors
  */
 function handleCriticalError(entry) {
-    // Show notification
-    if (typeof showNotification === 'function') {
-        showNotification(`שגיאה קריטית: ${entry.message}`, 'error');
-    }
-    
-    // Log to console
+    // Direct console log to avoid recursion
     console.error(`🚨 Critical Error: ${entry.message}`, entry.details);
     
     // Attempt recovery if possible
@@ -153,10 +148,7 @@ function handleCriticalError(entry) {
  * Handle warnings
  */
 function handleWarning(entry) {
-    if (typeof showNotification === 'function') {
-        showNotification(`אזהרה: ${entry.message}`, 'warning');
-    }
-    
+    // Direct console log to avoid recursion
     console.warn(`⚠️ Warning: ${entry.message}`, entry.details);
 }
 
@@ -165,10 +157,7 @@ function handleWarning(entry) {
  * Handle success messages
  */
 function handleSuccess(entry) {
-    if (typeof showNotification === 'function') {
-        showNotification(entry.message, 'success');
-    }
-    
+    // Direct console log to avoid recursion
     console.log(`✅ Success: ${entry.message}`, entry.details);
 }
 
@@ -251,9 +240,7 @@ function copyDetailedLog() {
     const logs = getAllLogEntries();
     
     if (logs.length === 0) {
-        if (typeof showNotification === 'function') {
-            showNotification('אין לוגים להעתקה', 'warning');
-        }
+        console.warn('⚠️ No logs available for copying');
         return;
     }
     
@@ -265,15 +252,9 @@ function copyDetailedLog() {
     
     // Copy to clipboard
     navigator.clipboard.writeText(formattedLogs).then(() => {
-        if (typeof showNotification === 'function') {
-            showNotification('לוג מפורט הועתק ללוח', 'success');
-        }
         console.log('✅ Detailed log copied to clipboard');
     }).catch(error => {
         console.error('❌ Error copying log:', error);
-        if (typeof showNotification === 'function') {
-            showNotification('שגיאה בהעתקת לוג', 'error');
-        }
     });
 }
 
@@ -283,9 +264,7 @@ function copyDetailedLog() {
  */
 function copyUnresolvedIssuesLog() {
     if (!window.scanningResults) {
-        if (typeof showNotification === 'function') {
-            showNotification('אין נתוני סריקה זמינים', 'warning');
-        }
+        console.warn('⚠️ No scanning data available');
         return;
     }
     
@@ -295,9 +274,7 @@ function copyUnresolvedIssuesLog() {
     ];
     
     if (unresolvedIssues.length === 0) {
-        if (typeof showNotification === 'function') {
-            showNotification('אין בעיות לא פתורות', 'info');
-        }
+        console.log('ℹ️ No unresolved issues found');
         return;
     }
     
@@ -308,15 +285,9 @@ function copyUnresolvedIssuesLog() {
     
     // Copy to clipboard
     navigator.clipboard.writeText(formattedIssues).then(() => {
-        if (typeof showNotification === 'function') {
-            showNotification('לוג בעיות לא פתורות הועתק ללוח', 'success');
-        }
         console.log('✅ Unresolved issues log copied to clipboard');
     }).catch(error => {
         console.error('❌ Error copying unresolved issues log:', error);
-        if (typeof showNotification === 'function') {
-            showNotification('שגיאה בהעתקת לוג בעיות', 'error');
-        }
     });
 }
 

@@ -2780,11 +2780,141 @@ function sortTable(columnIndex) {
   }
 }
 
+// Detailed Log Functions for Accounts Page
+function generateDetailedLog() {
+    try {
+        const logData = {
+            timestamp: new Date().toISOString(),
+            page: 'accounts',
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            viewport: {
+                width: window.innerWidth,
+                height: window.innerHeight
+            },
+            performance: {
+                loadTime: performance.timing.loadEventEnd - performance.timing.navigationStart,
+                domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart
+            },
+            memory: window.performance.memory ? {
+                used: window.performance.memory.usedJSHeapSize,
+                total: window.performance.memory.totalJSHeapSize,
+                limit: window.performance.memory.jsHeapSizeLimit
+            } : null,
+            accountsStats: {
+                totalAccounts: document.getElementById('totalAccounts')?.textContent || 'לא נמצא',
+                activeAccounts: document.getElementById('activeAccounts')?.textContent || 'לא נמצא',
+                totalValue: document.getElementById('totalValue')?.textContent || 'לא נמצא',
+                totalProfit: document.getElementById('totalProfit')?.textContent || 'לא נמצא',
+                newAlertsCount: document.getElementById('newAlertsCount')?.textContent || 'לא נמצא'
+            },
+            sections: {
+                topSection: {
+                    title: 'חשבונות',
+                    visible: !document.querySelector('.top-section')?.classList.contains('d-none'),
+                    alertsCount: document.querySelectorAll('.alert-card').length,
+                    summaryStats: document.getElementById('summaryStats')?.textContent || 'לא נמצא',
+                    colorDemoVisible: !document.getElementById('accountsColorDemo')?.classList.contains('d-none')
+                },
+                contentSection: {
+                    title: 'החשבונות שלי',
+                    visible: !document.querySelector('.content-section')?.classList.contains('d-none'),
+                    tableRows: document.querySelectorAll('#accountsTable tbody tr').length,
+                    tableData: document.querySelector('#accountsContainer')?.textContent?.substring(0, 300) || 'לא נמצא'
+                }
+            },
+            tableData: {
+                totalRows: document.querySelectorAll('#accountsTable tbody tr').length,
+                headers: Array.from(document.querySelectorAll('#accountsTable thead th')).map(th => th.textContent?.trim()),
+                sortableColumns: document.querySelectorAll('.sortable-header').length,
+                hasData: document.querySelectorAll('#accountsTable tbody tr').length > 0
+            },
+            modals: {
+                addModal: document.getElementById('addAccountModal') ? 'זמין' : 'לא זמין',
+                editModal: document.getElementById('editAccountModal') ? 'זמין' : 'לא זמין',
+                deleteModal: document.getElementById('deleteAccountModal') ? 'זמין' : 'לא זמין'
+            },
+            functions: {
+                showAddAccountModal: typeof window.showAddAccountModal === 'function' ? 'זמין' : 'לא זמין',
+                editAccount: typeof window.editAccount === 'function' ? 'זמין' : 'לא זמין',
+                deleteAccount: typeof window.deleteAccount === 'function' ? 'זמין' : 'לא זמין',
+                toggleTopSection: typeof window.toggleTopSection === 'function' ? 'זמין' : 'לא זמין',
+                loadAccountsFromServer: typeof window.loadAccountsFromServer === 'function' ? 'זמין' : 'לא זמין',
+                updateAccountsTable: typeof window.updateAccountsTable === 'function' ? 'זמין' : 'לא זמין',
+                sortTable: typeof window.sortTable === 'function' ? 'זמין' : 'לא זמין'
+            },
+            dataStatus: {
+                accountsLoaded: window.accountsLoaded || false,
+                currenciesLoaded: window.currenciesLoaded || false,
+                accountsDataLength: window.accountsData ? window.accountsData.length : 0,
+                currenciesDataLength: window.currenciesData ? window.currenciesData.length : 0
+            },
+            console: {
+                errors: [],
+                warnings: [],
+                logs: []
+            }
+        };
+
+        // Capture console messages
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const originalLog = console.log;
+
+        console.error = function(...args) {
+            logData.console.errors.push(args.join(' '));
+            originalError.apply(console, args);
+        };
+
+        console.warn = function(...args) {
+            logData.console.warnings.push(args.join(' '));
+            originalWarn.apply(console, args);
+        };
+
+        console.log = function(...args) {
+            logData.console.logs.push(args.join(' '));
+            originalLog.apply(console, args);
+        };
+
+        return JSON.stringify(logData, null, 2);
+    } catch (error) {
+        return `Error generating log: ${error.message}`;
+    }
+}
+
+function copyDetailedLog() {
+    try {
+        const logContent = generateDetailedLog();
+        navigator.clipboard.writeText(logContent).then(() => {
+            if (window.showNotification) {
+                window.showNotification('לוג מפורט הועתק ללוח', 'success');
+            } else {
+                alert('לוג מפורט הועתק ללוח');
+            }
+        }).catch(err => {
+            console.error('Failed to copy log:', err);
+            // Fallback: show in console
+            console.log('Detailed Log:', logContent);
+            if (window.showNotification) {
+                window.showNotification('לוג מפורט הוצג בקונסול', 'info');
+            } else {
+                alert('לוג מפורט הוצג בקונסול');
+            }
+        });
+    } catch (error) {
+        console.error('Error copying log:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בהעתקת הלוג', 'error');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}
+
 // Define function as global
 window.sortTable = sortTable;
+window.copyDetailedLog = copyDetailedLog;
+window.generateDetailedLog = generateDetailedLog;
 
 // סיום הקובץ
 console.log('✅ accounts.js נטען בהצלחה');
-
-// End of file marker
-}

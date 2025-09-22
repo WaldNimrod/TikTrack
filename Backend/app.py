@@ -1537,7 +1537,7 @@ def discover_files():
         file_type_mappings = {
             'js': {
                 'extensions': ['.js'],
-                'directories': [os.path.join(project_root, 'trading-ui', 'scripts'), os.path.join(project_root, 'scripts')],
+                'directories': [os.path.join(project_root, 'trading-ui', 'scripts')],
                 'exclude_patterns': ['node_modules', '.git', '__pycache__', 'venv', 'env', 'dist', 'build', 'coverage', 'backup', 'temp', 'tmp']
             },
             'html': {
@@ -1589,6 +1589,11 @@ def discover_files():
                                 rel_path = os.path.relpath(os.path.join(root, file), project_root)
                                 # Normalize path separators for web
                                 rel_path = rel_path.replace('\\', '/')
+                                
+                                # For trading-ui files, remove the trading-ui/ prefix since server serves from trading-ui/
+                                if rel_path.startswith('trading-ui/'):
+                                    rel_path = rel_path[11:]  # Remove 'trading-ui/' prefix
+                                
                                 discovered_files[file_type].append(rel_path)
             
             # Remove duplicates and sort

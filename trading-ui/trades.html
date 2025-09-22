@@ -68,7 +68,6 @@
     <script src="scripts/linked-items.js"></script>
     <script src="scripts/page-utils.js"></script>
     <script src="scripts/color-scheme-system.js"></script>
-    <script src="scripts/main.js"></script>
     
     <!-- Page-specific Files -->
     <script src="scripts/button-icons.js"></script>
@@ -115,6 +114,9 @@
             מעקב טריידים
           </div>
           <div class="table-actions">
+            <button class="btn btn-sm btn-outline-primary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והטריידים">
+              <i class="fas fa-copy"></i> העתק לוג מפורט
+            </button>
             <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור מעקב טריידים">
               <span class="filter-icon">▲</span>
             </button>
@@ -154,7 +156,7 @@
       <div class="main-content">
 
         <!-- אזור הטריידים שלי - content-section -->
-        <div class="content-section tracking-page">
+        <div class="content-section tracking-page" id="main">
           <!-- כותרת הטריידים שלי -->
           <div class="section-header entity-trade-main-header">
             <div class="table-title">
@@ -176,7 +178,7 @@
               </button>
 
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור הטריידים שלי">
+              <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור הטריידים שלי">
                 <span class="filter-icon">▲</span>
               </button>
             </div>

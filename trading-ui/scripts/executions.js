@@ -2092,13 +2092,13 @@ window.toggleExecutionsSection = toggleExecutionsSection;
 window.restoreExecutionsSectionState = restoreExecutionsSectionState;
 
 // פונקציה לסגירה/פתיחה של top-section
-window.toggleTopSection = function() {
-  if (typeof window.toggleTopSectionGlobal === 'function') {
-    window.toggleTopSectionGlobal();
+function toggleTopSection() {
+  if (typeof window.toggleTopSection === 'function') {
+    window.toggleTopSection();
   } else {
-    handleFunctionNotFound('toggleTopSectionGlobal');
+    console.warn('toggleTopSection function not found');
   }
-};
+}
 
 // פונקציה לאיפוס פילטרים וטעינה מחדש
 // resetAllFiltersAndReloadData() - לא בשימוש, הוסרה
@@ -2150,12 +2150,12 @@ window.goToNote = goToNote;
 function sortTable(columnIndex) {
   // sortTable נקראה עבור עמודה
 
-  if (typeof window.sortTable === 'function') {
-    window.sortTable(
-      'executions',
+  if (typeof window.sortTableData === 'function') {
+    window.sortTableData(
       columnIndex,
       window.executionsData || [],
-      updateExecutionsTableMain,
+      'executions',
+      updateExecutionsTableMain
     );
   } else {
     handleFunctionNotFound('sortTable');

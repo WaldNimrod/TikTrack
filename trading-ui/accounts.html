@@ -109,6 +109,9 @@
             חשבונות
           </div>
           <div class="table-actions">
+            <button class="btn btn-sm btn-outline-primary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והחשבונות">
+              <i class="fas fa-copy"></i> העתק לוג מפורט
+            </button>
             <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור סיכום">
               <span class="filter-icon">▲</span>
             </button>
@@ -164,7 +167,7 @@
               </button>
 
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר אזור חשבונות">
+              <button class="filter-toggle-btn" onclick="toggleSection('accountsMainSection')" title="הצג/הסתר אזור חשבונות">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
@@ -262,7 +265,6 @@
     <script src="scripts/tables.js"></script>
     <script src="scripts/linked-items.js"></script>
     <script src="scripts/page-utils.js"></script>
-    <script src="scripts/main.js"></script>
     <script src="scripts/entity-details-modal.js"></script>
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/warning-system.js"></script>

@@ -619,23 +619,10 @@ function initializeSectionToggles() {
  * Toggle top section visibility
  */
 function toggleTopSection() {
-    const topSection = document.querySelector('.top-section');
-    const toggleIcon = document.querySelector('.top-section .section-toggle-icon');
-
-    if (topSection && toggleIcon) {
-        const isExpanded = topSection.classList.contains('expanded') || topSection.querySelector('.section-body').style.display !== 'none';
-
-        if (isExpanded) {
-            // Collapse
-            topSection.querySelector('.section-body').style.display = 'none';
-            topSection.classList.remove('expanded');
-            toggleIcon.textContent = '▶';
-        } else {
-            // Expand
-            topSection.querySelector('.section-body').style.display = 'block';
-            topSection.classList.add('expanded');
-            toggleIcon.textContent = '▼';
-        }
+    if (typeof window.toggleTopSection === 'function') {
+        window.toggleTopSection();
+    } else {
+        console.warn('toggleTopSection function not found');
     }
 }
 
@@ -643,52 +630,21 @@ function toggleTopSection() {
  * Toggle all sections visibility
  */
 function toggleAllSections() {
-    const sections = document.querySelectorAll('.section-content');
-    const toggleBtn = document.querySelector('.filter-toggle-btn');
-    
-    if (!sections.length || !toggleBtn) return;
-    
-    const isCollapsed = sections[0].style.display === 'none' || 
-                       sections[0].classList.contains('collapsed');
-    
-    sections.forEach(section => {
-        if (isCollapsed) {
-            section.style.display = 'block';
-            section.classList.remove('collapsed');
-        } else {
-            section.style.display = 'none';
-            section.classList.add('collapsed');
-        }
-    });
-    
-    // Update button text
-    toggleBtn.innerHTML = isCollapsed ? 
-        '<i class="section-toggle-icon">▼</i>' : 
-        '<i class="section-toggle-icon">▶</i>';
+    if (typeof window.toggleAllSections === 'function') {
+        window.toggleAllSections();
+    } else {
+        console.warn('toggleAllSections function not found');
+    }
 }
 
 /**
  * Toggle specific section visibility
  */
 function toggleSection(sectionId) {
-    const section = document.getElementById(sectionId);
-    const toggleIcon = section ? section.querySelector('.section-toggle-icon') : null;
-
-    if (section && toggleIcon) {
-        const sectionBody = section.querySelector('.section-body');
-        const isExpanded = section.classList.contains('expanded') || (sectionBody && sectionBody.style.display !== 'none');
-
-        if (isExpanded) {
-            // Collapse
-            if (sectionBody) sectionBody.style.display = 'none';
-            section.classList.remove('expanded');
-            toggleIcon.textContent = '▶';
-        } else {
-            // Expand
-            if (sectionBody) sectionBody.style.display = 'block';
-            section.classList.add('expanded');
-            toggleIcon.textContent = '▼';
-        }
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection(sectionId);
+    } else {
+        console.warn('toggleSection function not found');
     }
 }
 

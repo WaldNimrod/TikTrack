@@ -1350,47 +1350,18 @@ function copyDetailedLog() {
 }
 
 function toggleAllSections() {
-  const sections = document.querySelectorAll('.section-content');
-  const toggleBtn = document.querySelector('.filter-toggle-btn');
-  
-  if (!sections.length || !toggleBtn) return;
-  
-  const isCollapsed = sections[0].style.display === 'none' || 
-                     sections[0].classList.contains('collapsed');
-  
-  sections.forEach(section => {
-    if (isCollapsed) {
-      section.style.display = 'block';
-      section.classList.remove('collapsed');
-    } else {
-      section.style.display = 'none';
-      section.classList.add('collapsed');
-    }
-  });
-  
-  // Update button text
-  toggleBtn.innerHTML = isCollapsed ? 
-    '<i class="section-toggle-icon">▼</i>' : 
-    '<i class="section-toggle-icon">▶</i>';
+  if (typeof window.toggleAllSections === 'function') {
+    window.toggleAllSections();
+  } else {
+    console.warn('toggleAllSections function not found');
+  }
 }
 
 function toggleSection(sectionId) {
-  const section = document.getElementById(sectionId);
-  const toggleBtn = document.querySelector(`[onclick*="${sectionId}"] .section-toggle-icon`);
-  
-  if (!section) return;
-  
-  const isCollapsed = section.style.display === 'none' || 
-                     section.classList.contains('collapsed');
-  
-  if (isCollapsed) {
-    section.style.display = 'block';
-    section.classList.remove('collapsed');
-    if (toggleBtn) toggleBtn.innerHTML = '▼';
+  if (typeof window.toggleSection === 'function') {
+    window.toggleSection(sectionId);
   } else {
-    section.style.display = 'none';
-    section.classList.add('collapsed');
-    if (toggleBtn) toggleBtn.innerHTML = '▶';
+    console.warn('toggleSection function not found');
   }
 }
 

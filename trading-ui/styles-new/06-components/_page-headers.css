@@ -37,7 +37,7 @@
 /* עמוד תזרים מזומנים - ירוק טורקיז */
 .cash-flows-page .section-header,
 .cash-flows-page .top-section .section-header {
-  border-bottom: 2px solid var(--entity-cash-flow-color, #20c997) !important;
+  border-bottom: 2px solid var(--entity-cash-flow-color, #20c997);
 }
 
 /* עמוד עסקאות - כחול טורקיז */
@@ -165,35 +165,35 @@
 
 /* ===== סגנונות כותרות דינמיות ===== */
 .entity-account-main-header {
-  border-bottom: 2px solid var(--entity-account-color, #28a745) !important;
+  border-bottom: 2px solid var(--entity-account-color, #28a745);
 }
 
 .entity-trade-main-header {
-  border-bottom: 2px solid var(--entity-trade-color, #007bff) !important;
+  border-bottom: 2px solid var(--entity-trade-color, #007bff);
 }
 
 .entity-alert-main-header {
-  border-bottom: 2px solid var(--entity-alert-color, #ff9c05) !important;
+  border-bottom: 2px solid var(--entity-alert-color, #ff9c05);
 }
 
 .entity-cash-flow-main-header {
-  border-bottom: 2px solid var(--entity-cash-flow-color, #20c997) !important;
+  border-bottom: 2px solid var(--entity-cash-flow-color, #20c997);
 }
 
 .entity-note-main-header {
-  border-bottom: 2px solid var(--entity-note-color, #6f42c1) !important;
+  border-bottom: 2px solid var(--entity-note-color, #6f42c1);
 }
 
 .entity-ticker-main-header {
-  border-bottom: 2px solid var(--entity-ticker-color, #dc3545) !important;
+  border-bottom: 2px solid var(--entity-ticker-color, #dc3545);
 }
 
 .entity-execution-main-header {
-  border-bottom: 2px solid var(--entity-execution-color, #17a2b8) !important;
+  border-bottom: 2px solid var(--entity-execution-color, #17a2b8);
 }
 
 .entity-trade-plan-main-header {
-  border-bottom: 2px solid var(--entity-trade-plan-color, #0056b3) !important;
+  border-bottom: 2px solid var(--entity-trade-plan-color, #0056b3);
 }
 
 

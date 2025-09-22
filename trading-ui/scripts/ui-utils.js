@@ -846,52 +846,76 @@ async function autoRefreshCurrentPage(operationName = 'פעולה') {
  * Handles opening/closing of top sections across all pages
  */
 window.toggleTopSection = function () {
+  console.log('🔧 toggleTopSection called');
   const currentPath = window.location.pathname;
+  console.log(`🔍 Current path: ${currentPath}`);
 
   // Special handling for notes page
   if (currentPath.includes('/notes')) {
+    console.log('🔍 Special handling for notes page');
     const section = document.getElementById('notesTopSection');
     const toggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
     const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
 
+    console.log(`🔍 Notes section found:`, section ? 'YES' : 'NO');
+    console.log(`🔍 Toggle button found:`, toggleBtn ? 'YES' : 'NO');
+    console.log(`🔍 Icon found:`, icon ? 'YES' : 'NO');
+
     if (section && toggleBtn) {
       const isHidden = section.style.display === 'none';
+      console.log(`🔍 Current state - isHidden: ${isHidden}`);
+      
       section.style.display = isHidden ? 'block' : 'none';
+      console.log(`✅ Notes top section ${isHidden ? 'EXPANDED' : 'COLLAPSED'}`);
 
       // Update icon only
       if (icon) {
-        icon.textContent = isHidden ? '▲' : '▼';
+        const newIcon = isHidden ? '▲' : '▼';
+        icon.textContent = newIcon;
+        console.log(`🎨 Icon updated to: "${newIcon}"`);
       }
 
       // Save state
       localStorage.setItem('notesTopSectionHidden', !isHidden);
+      console.log(`💾 State saved: notesTopSectionHidden = ${!isHidden}`);
     }
     return;
   }
 
   // Regular handling for other pages
+  console.log('🔍 Regular handling for other pages');
   const section = document.querySelector('.top-section .section-body');
   const toggleBtn = document.querySelector('.top-section button[onclick*="toggleTopSection"]');
   const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
   
+  console.log(`🔍 Top section found:`, section ? 'YES' : 'NO');
+  console.log(`🔍 Toggle button found:`, toggleBtn ? 'YES' : 'NO');
+  console.log(`🔍 Icon found:`, icon ? 'YES' : 'NO');
+  
   if (section) {
     const isCollapsed = section.classList.contains('collapsed') || section.style.display === 'none';
+    console.log(`🔍 Current state - isCollapsed: ${isCollapsed}, display: "${section.style.display}"`);
 
     if (isCollapsed) {
       section.classList.remove('collapsed');
       section.style.display = 'block';
+      console.log(`✅ Top section EXPANDED`);
     } else {
       section.classList.add('collapsed');
       section.style.display = 'none';
+      console.log(`✅ Top section COLLAPSED`);
     }
 
     // Update icon
     if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
+      const newIcon = isCollapsed ? '▲' : '▼';
+      icon.textContent = newIcon;
+      console.log(`🎨 Icon updated to: "${newIcon}"`);
     }
 
     // Determine localStorage key based on current page
     let storageKey = 'topSectionCollapsed';
+    console.log(`🔍 Determining storage key for path: ${currentPath}`);
 
     if (currentPath.includes('/alerts')) {
       storageKey = 'alertsTopSectionCollapsed';
@@ -919,64 +943,19 @@ window.toggleTopSection = function () {
       storageKey = 'topSectionCollapsed';
     }
 
+    console.log(`🔍 Using storage key: "${storageKey}"`);
+
     // Save state to localStorage
     localStorage.setItem(storageKey, !isCollapsed);
+    console.log(`💾 State saved: ${storageKey} = ${!isCollapsed}`);
+  } else {
+    console.log(`⚠️ No top section found`);
   }
+  
+  console.log(`✅ toggleTopSection completed`);
 };
 
-/**
- * Toggle main section (content section with tables)
- * Handles opening/closing of main content sections across all pages
- */
-window.toggleMainSection = function () {
-  const currentPath = window.location.pathname;
-
-  // Special handling for notes page
-  if (currentPath.includes('/notes')) {
-    const section = document.getElementById('notesMainSection');
-    const toggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
-    const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
-
-    if (section && toggleBtn) {
-      const isHidden = section.style.display === 'none';
-      section.style.display = isHidden ? 'block' : 'none';
-
-      // Update icon only
-      if (icon) {
-        icon.textContent = isHidden ? '▲' : '▼';
-      }
-
-      // Save state
-      localStorage.setItem('notesMainSectionHidden', !isHidden);
-    }
-    return;
-  }
-
-  // Regular handling for other pages
-  const section = document.querySelector('.content-section .section-body');
-  const toggleBtn = document.querySelector('.content-section button[onclick*="toggleMainSection"]');
-  const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
-
-  if (section) {
-    const isCollapsed = section.classList.contains('collapsed') || section.style.display === 'none';
-
-    if (isCollapsed) {
-      section.classList.remove('collapsed');
-      section.style.display = 'block';
-    } else {
-      section.classList.add('collapsed');
-      section.style.display = 'none';
-    }
-
-    // Update icon
-    if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
-    }
-
-    // Save state
-    localStorage.setItem('mainSectionHidden', section.style.display === 'none');
-  }
-};
+// toggleMainSection function removed - use toggleSection('main') instead
 
 /**
  * Toggle specific section by ID
@@ -984,30 +963,45 @@ window.toggleMainSection = function () {
  * @param {string} sectionId - The ID of the section to toggle
  */
 window.toggleSection = function (sectionId) {
+  console.log(`🔧 toggleSection called with sectionId: "${sectionId}"`);
   
   const section = document.getElementById(sectionId) || document.querySelector(`[data-section="${sectionId}"]`);
+  console.log(`🔍 Section found:`, section ? 'YES' : 'NO', section ? `(ID: ${section.id || 'no-id'}, data-section: ${section.getAttribute('data-section') || 'no-data-section'})` : '');
+  
   const sectionBody = section ? section.querySelector('.section-body') : null;
+  console.log(`🔍 Section body found:`, sectionBody ? 'YES' : 'NO');
+  
   const toggleBtn = section ? section.querySelector('button[onclick*="toggleSection"]') : null;
+  console.log(`🔍 Toggle button found:`, toggleBtn ? 'YES' : 'NO');
+  
   const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
+  console.log(`🔍 Icon found:`, icon ? 'YES' : 'NO');
   
   if (sectionBody) {
     const isCollapsed = sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none';
+    console.log(`🔍 Current state - isCollapsed: ${isCollapsed}, display: "${sectionBody.style.display}"`);
 
     if (isCollapsed) {
       sectionBody.classList.remove('collapsed');
       sectionBody.style.display = 'block';
+      console.log(`✅ Section "${sectionId}" EXPANDED`);
     } else {
       sectionBody.classList.add('collapsed');
       sectionBody.style.display = 'none';
+      console.log(`✅ Section "${sectionId}" COLLAPSED`);
     }
 
     // Update icon
     if (icon) {
-      icon.textContent = sectionBody.style.display === 'none' ? '▼' : '▲';
+      const newIcon = sectionBody.style.display === 'none' ? '▼' : '▲';
+      icon.textContent = newIcon;
+      console.log(`🎨 Icon updated to: "${newIcon}"`);
     }
 
     // Save state
-    localStorage.setItem(`${sectionId}SectionHidden`, sectionBody.style.display === 'none');
+    const isHidden = sectionBody.style.display === 'none';
+    localStorage.setItem(`${sectionId}SectionHidden`, isHidden);
+    console.log(`💾 State saved to localStorage: ${sectionId}SectionHidden = ${isHidden}`);
     
   } else {
     console.warn(`❌ Section ${sectionId} not found`);
@@ -1019,17 +1013,26 @@ window.toggleSection = function (sectionId) {
  * Handles opening/closing of all content sections at once
  */
 window.toggleAllSections = function () {
+  console.log(`🔧 toggleAllSections called`);
+  
   const sections = document.querySelectorAll('.content-section, .top-section');
+  console.log(`🔍 Found ${sections.length} sections to toggle`);
+  
   const allCollapsed = Array.from(sections).every(section => {
     const sectionBody = section.querySelector('.section-body');
     return sectionBody && (sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none');
   });
+  
+  console.log(`🔍 All sections are collapsed: ${allCollapsed}`);
+  console.log(`🎯 Action: ${allCollapsed ? 'EXPANDING all sections' : 'COLLAPSING all sections'}`);
 
-  sections.forEach(section => {
+  sections.forEach((section, index) => {
     const sectionId = section.getAttribute('data-section') || section.id;
     const sectionBody = section.querySelector('.section-body');
     const toggleBtn = section.querySelector('button[onclick*="toggleSection"]');
     const icon = toggleBtn ? toggleBtn.querySelector('.section-toggle-icon, .filter-icon, .filter-arrow') : null;
+
+    console.log(`🔧 Processing section ${index + 1}/${sections.length}: ID="${sectionId}"`);
 
     if (sectionBody) {
       if (allCollapsed) {
@@ -1037,20 +1040,27 @@ window.toggleAllSections = function () {
         sectionBody.classList.remove('collapsed');
         sectionBody.style.display = 'block';
         if (icon) { icon.textContent = '▲'; }
+        console.log(`✅ Section "${sectionId}" EXPANDED`);
       } else {
         // Close all sections
         sectionBody.classList.add('collapsed');
         sectionBody.style.display = 'none';
         if (icon) { icon.textContent = '▼'; }
+        console.log(`✅ Section "${sectionId}" COLLAPSED`);
       }
 
       // Save state
       if (sectionId) {
-        localStorage.setItem(`${sectionId}SectionHidden`, sectionBody.style.display === 'none');
+        const isHidden = sectionBody.style.display === 'none';
+        localStorage.setItem(`${sectionId}SectionHidden`, isHidden);
+        console.log(`💾 State saved for "${sectionId}": ${isHidden}`);
       }
+    } else {
+      console.log(`⚠️ No section body found for section "${sectionId}"`);
     }
   });
-
+  
+  console.log(`✅ toggleAllSections completed - processed ${sections.length} sections`);
 };
 
 /**
@@ -1207,7 +1217,6 @@ window.showSecondConfirmationModal = showSecondConfirmationModal;
 
 // Export section toggle system functions
 window.toggleTopSection = window.toggleTopSection;
-window.toggleMainSection = window.toggleMainSection;
 window.toggleSection = window.toggleSection;
 window.toggleAllSections = window.toggleAllSections;
 window.restoreSectionStates = window.restoreSectionStates;
@@ -1341,6 +1350,119 @@ function toggleTopSection() {
   console.log(`✅ Top section ${isVisible ? 'collapsed' : 'expanded'}`);
 }
 
+/**
+ * Toggle any section by ID
+ * Generic function that works with all section types
+ * @param {string} sectionId - The ID of the section to toggle
+ */
+function toggleSection(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (!section) {
+    console.warn(`⚠️ Section ${sectionId} not found`);
+    return;
+  }
+  
+  // Handle special cases for development sections
+  if (section.classList.contains('development-section')) {
+    if (typeof window.toggleDevelopmentSection === 'function') {
+      window.toggleDevelopmentSection(sectionId);
+      return;
+    }
+  }
+  
+  // Find the toggle button and icon
+  const toggleBtn = document.querySelector(`[onclick*="${sectionId}"]`);
+  const toggleIcon = section.querySelector('.section-toggle-icon') || 
+                    (toggleBtn ? toggleBtn.querySelector('.section-toggle-icon') : null);
+  
+  // Find the content area to toggle
+  const sectionBody = section.querySelector('.section-body') ||
+                     section.querySelector('.section-content') ||
+                     section.querySelector('.content');
+  
+  if (!sectionBody) {
+    console.warn(`⚠️ No content area found in section ${sectionId}`);
+    return;
+  }
+  
+  // Determine current state
+  const isCollapsed = sectionBody.style.display === 'none' || 
+                     section.classList.contains('collapsed');
+  
+  // Toggle visibility
+  if (isCollapsed) {
+    // Expand
+    sectionBody.style.display = 'block';
+    section.classList.remove('collapsed');
+    section.classList.add('expanded');
+    if (toggleIcon) toggleIcon.textContent = '▼';
+    console.log(`📂 Expanded section: ${sectionId}`);
+  } else {
+    // Collapse
+    sectionBody.style.display = 'none';
+    section.classList.add('collapsed');
+    section.classList.remove('expanded');
+    if (toggleIcon) toggleIcon.textContent = '▶';
+    console.log(`📁 Collapsed section: ${sectionId}`);
+  }
+  
+  // Save state to localStorage
+  localStorage.setItem(`${sectionId}_collapsed`, (!isCollapsed).toString());
+}
+
+// toggleMainSection function removed - use toggleSection('main') instead
+
+/**
+ * Toggle all sections on the page
+ * Generic function that toggles all collapsible sections
+ */
+function toggleAllSections() {
+  // Find all possible section types
+  const contentSections = document.querySelectorAll('.content-section, .top-section');
+  const sectionContents = document.querySelectorAll('.section-content');
+  
+  // Combine all sections
+  const allSections = [...contentSections, ...sectionContents];
+  
+  if (!allSections.length) {
+    console.warn('⚠️ No sections found to toggle');
+    return;
+  }
+  
+  // Check if all sections are collapsed
+  const allCollapsed = allSections.every(section => {
+    const sectionBody = section.querySelector('.section-body, .section-content');
+    return sectionBody && (
+      sectionBody.style.display === 'none' || 
+      section.classList.contains('collapsed')
+    );
+  });
+  
+  // Toggle all sections
+  allSections.forEach(section => {
+    const sectionBody = section.querySelector('.section-body, .section-content');
+    const toggleBtn = section.querySelector('.filter-toggle-btn, [onclick*="toggle"]');
+    const icon = section.querySelector('.section-toggle-icon, .filter-icon');
+    
+    if (sectionBody) {
+      if (allCollapsed) {
+        // Expand all
+        sectionBody.style.display = 'block';
+        section.classList.remove('collapsed');
+        section.classList.add('expanded');
+        if (icon) icon.textContent = '▼';
+      } else {
+        // Collapse all
+        sectionBody.style.display = 'none';
+        section.classList.add('collapsed');
+        section.classList.remove('expanded');
+        if (icon) icon.textContent = '▶';
+      }
+    }
+  });
+  
+  console.log(`📂 All sections ${allCollapsed ? 'expanded' : 'collapsed'}`);
+}
 
 /**
  * Load section states from localStorage
@@ -1367,7 +1489,8 @@ function loadSectionStates() {
 
 // Export functions to global scope
 window.toggleTopSection = toggleTopSection;
-// toggleSection and toggleAllSections are already exported above as window.toggleSection and window.toggleAllSections
+window.toggleSection = toggleSection;
+window.toggleAllSections = toggleAllSections;
 window.toggleSectionGlobal = window.toggleSection;
 window.toggleAllSectionsGlobal = window.toggleAllSections;
 window.loadSectionStates = loadSectionStates;

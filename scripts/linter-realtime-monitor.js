@@ -3919,14 +3919,22 @@ function copyUnresolvedIssuesLog() {
 
 function toggleAllSections() {
     addLogEntry('INFO', 'מחליף מצב כל הסקציות...');
-    // Implementation for toggling all sections
-    addLogEntry('SUCCESS', 'מצב כל הסקציות הוחלף');
+    if (typeof window.toggleAllSections === 'function') {
+        window.toggleAllSections();
+        addLogEntry('SUCCESS', 'מצב כל הסקציות הוחלף');
+    } else {
+        addLogEntry('ERROR', 'פונקציית toggleAllSections לא זמינה');
+    }
 }
 
 function toggleSection(sectionId) {
     addLogEntry('INFO', `מחליף מצב סקציה: ${sectionId}`);
-    // Implementation for toggling specific section
-    addLogEntry('SUCCESS', `מצב סקציה ${sectionId} הוחלף`);
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection(sectionId);
+        addLogEntry('SUCCESS', `מצב סקציה ${sectionId} הוחלף`);
+    } else {
+        addLogEntry('ERROR', 'פונקציית toggleSection לא זמינה');
+    }
 }
 
 function runComprehensiveTests() {
@@ -3981,8 +3989,7 @@ window.applyChartSettings = window.applyChartSettings;
 window.updateProblemFilesTable = updateProblemFilesTable;
 window.loadIssues = loadIssues;
 window.copyUnresolvedIssuesLog = copyUnresolvedIssuesLog;
-window.toggleAllSections = toggleAllSections;
-window.toggleSection = toggleSection;
+// toggleAllSections and toggleSection exports removed - use global functions directly
 window.runComprehensiveTests = runComprehensiveTests;
 window.runQuickHealthCheck = runQuickHealthCheck;
 window.exportChartData = exportChartData;

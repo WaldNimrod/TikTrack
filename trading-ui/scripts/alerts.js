@@ -2233,39 +2233,7 @@ if (typeof window.toggleTopSection !== 'function') {
   };
 }
 
-if (typeof window.toggleMainSection !== 'function') {
-  window.toggleMainSection = function () {
-    const contentSections = document.querySelectorAll('.content-section');
-    const alertsSection = contentSections[0]; // הסקשן הראשון - התראות
-
-    if (!alertsSection) {
-      // console.error('❌ לא נמצא סקשן התראות');
-      return;
-    }
-
-    const sectionBody = alertsSection.querySelector('.section-body');
-    const toggleBtn = alertsSection.querySelector('button[onclick="toggleMainSection()"]');
-    const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-    if (sectionBody) {
-      const isCollapsed = sectionBody.style.display === 'none';
-
-      if (isCollapsed) {
-        sectionBody.style.display = 'block';
-      } else {
-        sectionBody.style.display = 'none';
-      }
-
-      // עדכון האייקון
-      if (icon) {
-        icon.textContent = isCollapsed ? '▲' : '▼';
-      }
-
-      // שמירת המצב ב-localStorage
-      localStorage.setItem('alertsSectionCollapsed', !isCollapsed);
-    }
-  };
-}
+// toggleMainSection fallback removed - use toggleSection('main') instead
 
 // פונקציה כללית לסגירה/פתיחה של סקשנים
 if (typeof window.toggleSection !== 'function') {
@@ -2767,6 +2735,139 @@ function filterAlertsByRelatedObjectType(type) {
 }
 
 // ===== GLOBAL EXPORTS =====
+// Detailed Log Functions for Alerts Page
+function generateDetailedLog() {
+    try {
+        const logData = {
+            timestamp: new Date().toISOString(),
+            page: 'alerts',
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            viewport: {
+                width: window.innerWidth,
+                height: window.innerHeight
+            },
+            performance: {
+                loadTime: performance.timing.loadEventEnd - performance.timing.navigationStart,
+                domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart
+            },
+            memory: window.performance.memory ? {
+                used: window.performance.memory.usedJSHeapSize,
+                total: window.performance.memory.totalJSHeapSize,
+                limit: window.performance.memory.jsHeapSizeLimit
+            } : null,
+            alertsStats: {
+                totalAlerts: document.getElementById('totalAlerts')?.textContent || 'לא נמצא',
+                activeAlerts: document.getElementById('activeAlerts')?.textContent || 'לא נמצא',
+                newAlerts: document.getElementById('newAlerts')?.textContent || 'לא נמצא',
+                todayAlerts: document.getElementById('todayAlerts')?.textContent || 'לא נמצא',
+                weekAlerts: document.getElementById('weekAlerts')?.textContent || 'לא נמצא'
+            },
+            sections: {
+                topSection: {
+                    title: 'התראות - סקירה כללית',
+                    visible: !document.getElementById('topSection')?.classList.contains('d-none'),
+                    alertsCount: document.querySelectorAll('.alert-card').length,
+                    summaryStats: document.getElementById('summaryStats')?.textContent || 'לא נמצא',
+                    colorDemoVisible: !document.getElementById('alertsColorDemo')?.style.display === 'none'
+                },
+                section1: {
+                    title: 'ניהול התראות',
+                    visible: !document.getElementById('section1')?.classList.contains('d-none'),
+                    tableRows: document.querySelectorAll('#alertsTable tbody tr').length,
+                    tableData: document.querySelector('#alertsContainer')?.textContent?.substring(0, 300) || 'לא נמצא'
+                }
+            },
+            tableData: {
+                totalRows: document.querySelectorAll('#alertsTable tbody tr').length,
+                headers: Array.from(document.querySelectorAll('#alertsTable thead th')).map(th => th.textContent?.trim()),
+                sortableColumns: document.querySelectorAll('.sortable-header').length,
+                hasData: document.querySelectorAll('#alertsTable tbody tr').length > 0
+            },
+            filters: {
+                allButton: document.querySelector('button[data-type="all"]') ? 'זמין' : 'לא זמין',
+                accountButton: document.querySelector('button[data-type="account"]') ? 'זמין' : 'לא זמין',
+                tradeButton: document.querySelector('button[data-type="trade"]') ? 'זמין' : 'לא זמין',
+                tradePlanButton: document.querySelector('button[data-type="trade_plan"]') ? 'זמין' : 'לא זמין',
+                tickerButton: document.querySelector('button[data-type="ticker"]') ? 'זמין' : 'לא זמין',
+                activeFilter: document.querySelector('.btn.active')?.textContent || 'לא נמצא'
+            },
+            modals: {
+                addModal: document.getElementById('addAlertModal') ? 'זמין' : 'לא זמין',
+                editModal: document.getElementById('editAlertModal') ? 'זמין' : 'לא זמין',
+                deleteModal: document.getElementById('deleteAlertModal') ? 'זמין' : 'לא זמין'
+            },
+            functions: {
+                showAddAlertModal: typeof window.showAddAlertModal === 'function' ? 'זמין' : 'לא זמין',
+                editAlert: typeof window.editAlert === 'function' ? 'זמין' : 'לא זמין',
+                deleteAlert: typeof window.deleteAlert === 'function' ? 'זמין' : 'לא זמין',
+                toggleTopSection: typeof window.toggleTopSection === 'function' ? 'זמין' : 'לא זמין',
+                toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין',
+                filterAlertsByRelatedObjectType: typeof window.filterAlertsByRelatedObjectType === 'function' ? 'זמין' : 'לא זמין',
+                sortTableData: typeof window.sortTableData === 'function' ? 'זמין' : 'לא זמין'
+            },
+            console: {
+                errors: [],
+                warnings: [],
+                logs: []
+            }
+        };
+
+        // Capture console messages
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const originalLog = console.log;
+
+        console.error = function(...args) {
+            logData.console.errors.push(args.join(' '));
+            originalError.apply(console, args);
+        };
+
+        console.warn = function(...args) {
+            logData.console.warnings.push(args.join(' '));
+            originalWarn.apply(console, args);
+        };
+
+        console.log = function(...args) {
+            logData.console.logs.push(args.join(' '));
+            originalLog.apply(console, args);
+        };
+
+        return JSON.stringify(logData, null, 2);
+    } catch (error) {
+        return `Error generating log: ${error.message}`;
+    }
+}
+
+function copyDetailedLog() {
+    try {
+        const logContent = generateDetailedLog();
+        navigator.clipboard.writeText(logContent).then(() => {
+            if (window.showNotification) {
+                window.showNotification('לוג מפורט הועתק ללוח', 'success');
+            } else {
+                alert('לוג מפורט הועתק ללוח');
+            }
+        }).catch(err => {
+            console.error('Failed to copy log:', err);
+            // Fallback: show in console
+            console.log('Detailed Log:', logContent);
+            if (window.showNotification) {
+                window.showNotification('לוג מפורט הוצג בקונסול', 'info');
+            } else {
+                alert('לוג מפורט הוצג בקונסול');
+            }
+        });
+    } catch (error) {
+        console.error('Error copying log:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בהעתקת הלוג', 'error');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}
+
 // Export functions to global scope for onclick attributes
 window.toggleTopSection = toggleTopSection;
 window.toggleSection = toggleSection;
@@ -2776,3 +2877,5 @@ window.updateAlertsTable = updateAlertsTable;
 window.showAddAlertModal = showAddAlertModal;
 window.editAlert = editAlert;
 window.deleteAlert = deleteAlert;
+window.copyDetailedLog = copyDetailedLog;
+window.generateDetailedLog = generateDetailedLog;

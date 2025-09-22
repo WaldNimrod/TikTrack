@@ -183,19 +183,14 @@ class ProjectFilesScanner {
 
         try {
             // Try to get files from server API first
-            // Attempting to get files from server API
+            console.log('🔍 Attempting to get files from server API...');
             const serverFiles = await this.getFilesFromServer(selectedTypes);
             if (serverFiles && Object.keys(serverFiles).length > 0) {
-                // Server file discovery successful, using dynamic files
+                console.log('✅ Server file discovery successful, using dynamic files');
                 return serverFiles;
             }
         } catch (error) {
-            // Log error silently - no local notifications
-            
-            // Show notification to user
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('warning', '⚠️ השרת לא זמין');
-            }
+            console.warn('❌ Failed to get files from server, trying local API:', error);
         }
 
         try {
@@ -205,24 +200,12 @@ class ProjectFilesScanner {
                 return localFiles;
             }
         } catch (error) {
-            // Log error silently - no local notifications
-            
-            // Show notification to user
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('warning', '⚠️ גילוי קבצים מקומי נכשל');
-            }
+            console.warn('Failed to get files from local API, falling back to static list:', error);
         }
 
-        // No static fallback - show recovery confirmation dialog
-        // Server not available - showing recovery confirmation
-        
-        // Show warning message and feedback in UI
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('warning', '⚠️ המערכת לא יכולה לגלות קבצים כרגע');
-        }
-        
-        // Show confirmation window via notification system
-        return await this.showRecoveryConfirmation();
+        // No static fallback - use IndexedDB recovery instead
+        console.log('⚠️ Server not available - attempting IndexedDB recovery');
+        return await this.attemptIndexedDBRecovery();
     }
 
     /**
@@ -232,7 +215,7 @@ class ProjectFilesScanner {
      */
     async getFilesFromServer(selectedTypes = null) {
         try {
-            // Fetching files from server API
+            console.log('🔍 Fetching files from server API...');
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 35000); // 35 seconds timeout
             
@@ -241,39 +224,51 @@ class ProjectFilesScanner {
             if (selectedTypes && selectedTypes.length > 0) {
                 const typesParam = selectedTypes.join(',');
                 url += `?types=${encodeURIComponent(typesParam)}`;
-                // Requesting specific file types
+                console.log('🔍 Requesting specific file types:', selectedTypes);
             } else {
-                // Requesting all file types
+                console.log('🔍 Requesting all file types');
             }
             
-            // Make the actual API call
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 signal: controller.signal
             });
             
             clearTimeout(timeoutId);
 
-            // Response status
+            console.log('🔍 Response status:', response.status);
             if (!response.ok) {
                 throw new Error(`Server responded with status: ${response.status}`);
             }
 
             const data = await response.json();
-            // Server response data
+            console.log('🔍 Server response data:', data);
+            console.log('🔍 Data success:', data.success);
+            console.log('🔍 Data files:', data.files);
             
             if (data.success && data.files) {
-                // Server file discovery successful
+                console.log(`✅ Server file discovery successful: ${data.total_files} files found`);
+                console.log('📊 File breakdown:', {
+                    js: data.files.js?.length || 0,
+                    html: data.files.html?.length || 0,
+                    css: data.files.css?.length || 0,
+                    python: data.files.python?.length || 0,
+                    other: data.files.other?.length || 0
+                });
                 return data.files;
             } else {
                 console.error('❌ Server returned invalid response:', data);
                 throw new Error('Server returned invalid response');
             }
         } catch (error) {
-            // Log error silently - no local notifications
+            if (error.name === 'AbortError') {
+                console.error('❌ Server file discovery timed out after 35 seconds');
+            } else {
+                console.error('❌ Server file discovery failed:', error);
+            }
             return null;
         }
     }
@@ -294,124 +289,9 @@ class ProjectFilesScanner {
             // This could be implemented with a local server or other method
             return null;
         } catch (error) {
-            // Log error silently - no local notifications
-            
-            // Show notification to user
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('warning', '⚠️ גילוי קבצים מקומי נכשל');
-            }
-            
+            console.warn('Local file discovery failed:', error);
             return null;
         }
-    }
-
-    /**
-     * Show recovery confirmation dialog
-     * @returns {Object} Object containing arrays of files by type
-     */
-    async showRecoveryConfirmation() {
-        return new Promise((resolve) => {
-            // Check if there's a saved mapping in IndexedDB first
-            this.getLastFileMappingFromIndexedDB().then(lastMapping => {
-                if (lastMapping && lastMapping.files) {
-                    // Show confirmation dialog
-                    const date = new Date(lastMapping.timestamp).toLocaleString('he-IL');
-                    const message = `נמצא מיפוי קבצים שמור מ-${date}. האם לשחזר מיפוי זה?`;
-                    
-                    // Use global confirmation dialog
-                    if (typeof window.showConfirmationDialog === 'function') {
-                        window.showConfirmationDialog(
-                            'שחזור מיפוי קבצים',
-                            message,
-                            () => {
-                                // User chose Yes - restore from last saved scan
-                                // User chose to restore from last saved scan
-                                
-                                if (typeof window.showNotification === 'function') {
-                                    window.showNotification('success', `✅ שחזור מיפוי קבצים מהסריקה האחרונה (${date})`);
-                                }
-                                
-                                resolve(lastMapping.files);
-                            },
-                            () => {
-                                // User chose No - display page with relevant feedback
-                                // User chose not to restore
-                                
-                                if (typeof window.showNotification === 'function') {
-                                    window.showNotification('info', 'ℹ️ מיפוי קבצים לא שוחזר - המערכת מוכנה למיפוי חדש');
-                                }
-                                
-                                resolve({
-                                    js: [],
-                                    html: [],
-                                    css: [],
-                                    python: [],
-                                    other: []
-                                });
-                            },
-                            'warning'
-                        );
-                    } else {
-                        // Fallback to native confirm if global dialog not available
-                        if (confirm(message)) {
-                            // User chose Yes - restore from last saved scan
-                            console.log('✅ User chose to restore from last saved scan');
-                            
-                            if (typeof window.showNotification === 'function') {
-                                window.showNotification('success', `✅ שחזור מיפוי קבצים מהסריקה האחרונה (${date})`);
-                            }
-                            
-                            resolve(lastMapping.files);
-                        } else {
-                            // User chose No - display page with relevant feedback
-                            console.log('❌ User chose not to restore');
-                            
-                            if (typeof window.showNotification === 'function') {
-                                window.showNotification('info', 'ℹ️ מיפוי קבצים לא שוחזר - המערכת מוכנה למיפוי חדש');
-                            }
-                            
-                            resolve({
-                                js: [],
-                                html: [],
-                                css: [],
-                                python: [],
-                                other: []
-                            });
-                        }
-                    }
-                } else {
-                    // No saved data available
-                    console.log('❌ No saved file mapping found');
-                    
-                    if (typeof window.showNotification === 'function') {
-                        window.showNotification('warning', '⚠️ אין מיפוי קבצים שמור - בצע מיפוי ראשון');
-                    }
-                    
-                    resolve({
-                        js: [],
-                        html: [],
-                        css: [],
-                        python: [],
-                        other: []
-                    });
-                }
-            }).catch(error => {
-                // Recovery failed or no data available
-                console.error('❌ Recovery check failed:', error);
-                
-                if (typeof window.showNotification === 'function') {
-                    window.showNotification('error', '❌ לא ניתן לבדוק מיפוי שמור - בצע מיפוי חדש');
-                }
-                
-                resolve({
-                    js: [],
-                    html: [],
-                    css: [],
-                    python: [],
-                    other: []
-                });
-            });
-        });
     }
 
     /**
@@ -441,11 +321,8 @@ class ProjectFilesScanner {
                     other: lastMapping.files.other?.length || 0
                 });
                 
-                // Show recovery notification via global system
-                if (typeof window.showNotification === 'function') {
-                    const date = new Date(lastMapping.timestamp).toLocaleString('he-IL');
-                    window.showNotification('success', `✅ שחזור מיפוי קבצים מהסריקה האחרונה (${date})`);
-                }
+                // Show recovery notification
+                this.showRecoveryNotification(lastMapping.timestamp);
                 
                 return lastMapping.files;
             } else {
@@ -455,11 +332,8 @@ class ProjectFilesScanner {
         } catch (error) {
             console.error('❌ IndexedDB recovery failed:', error);
             
-            // Show error notification via global system
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('warning', '⚠️ אין מיפוי קבצים שמור - בצע מיפוי ראשון');
-            }
-            
+            // Show error notification
+            this.showRecoveryErrorNotification(error.message);
             
             // Return empty structure
             return {
@@ -508,8 +382,38 @@ class ProjectFilesScanner {
         });
     }
     
+    /**
+     * Show recovery notification
+     * @param {string} timestamp - Timestamp of recovered mapping
+     */
+    showRecoveryNotification(timestamp) {
+        const date = new Date(timestamp).toLocaleString('he-IL');
+        const message = `✅ שחזור מיפוי קבצים מהסריקה האחרונה (${date})`;
+        
+        // Show in notification system
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('success', message);
+        }
+        
+        // Show in console
+        console.log('📢 ' + message);
+    }
     
-
+    /**
+     * Show recovery error notification
+     * @param {string} errorMessage - Error message
+     */
+    showRecoveryErrorNotification(errorMessage) {
+        const message = `❌ לא ניתן לשחזר מיפוי קבצים: ${errorMessage}`;
+        
+        // Show in notification system
+        if (typeof window.showNotification === 'function') {
+            window.showNotification('error', message);
+        }
+        
+        // Show in console
+        console.error('📢 ' + message);
+    }
 
     /**
      * Check if file should be included
@@ -572,3 +476,4 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 console.log('✅ Project Files Scanner loaded successfully');
+

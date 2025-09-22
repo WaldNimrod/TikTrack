@@ -16,41 +16,11 @@
  * Toggle all sections visibility
  */
 function toggleAllSections() {
-  const sections = document.querySelectorAll('.content-section, .top-section');
-  const toggleIcon = document.querySelector('.top-section .section-toggle-icon');
-  
-  if (!sections.length) return;
-  
-  // בדיקה אם כל הסקשנים סגורים
-  const allCollapsed = Array.from(sections).every(section => {
-    const sectionBody = section.querySelector('.section-body');
-    return sectionBody && (sectionBody.classList.contains('collapsed') || sectionBody.style.display === 'none');
-  });
-  
-  // החלטה אם לפתוח או לסגור הכל
-  const shouldOpen = allCollapsed;
-  
-  sections.forEach(section => {
-    const sectionBody = section.querySelector('.section-body');
-    if (!sectionBody) return;
-    
-    if (shouldOpen) {
-      // פתיחה
-      sectionBody.classList.remove('collapsed');
-      sectionBody.style.display = 'block';
-    } else {
-      // סגירה
-      sectionBody.classList.add('collapsed');
-      sectionBody.style.display = 'none';
-    }
-  });
-  
-  // עדכון אייקון
-  if (toggleIcon) {
-    toggleIcon.textContent = shouldOpen ? '▼' : '◀';
+  if (typeof window.toggleAllSections === 'function') {
+    window.toggleAllSections();
+  } else {
+    console.warn('toggleAllSections function not found');
   }
-  
-  console.log(`📋 כל הסקשנים ${shouldOpen ? 'נפתחו' : 'נסגרו'}`);
 }
 
 /**

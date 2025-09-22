@@ -110,82 +110,8 @@ function getNotificationIcon(type) {
  * @param {number} duration - Optional duration in milliseconds (default: 5000)
  */
 function showNotification(message, type = 'info', title = 'מערכת', duration = 5000) {
-  console.log('🔔 showNotification נקרא:', { message, type, title, duration });
-  
-  // שמירת התראה ב-localStorage עבור מרכז התראות (גלובלי)
-  saveNotificationToGlobalHistory(type, title, message);
-  
-  // אם מרכז ההתראות זמין, הוסף את ההתראה אליו
-  if (window.notificationsCenter && typeof window.notificationsCenter.addNotification === 'function') {
-    console.log('✅ מוסיף התראה למרכז התראות');
-    window.notificationsCenter.addNotification(type, title, message);
-  }
-
-  // הצגת התראה מיידית בממשק (תמיד)
-  console.log('🔧 יוצר קונטיינר התראות...');
-  const container = createNotificationContainer();
-  console.log('✅ קונטיינר נוצר:', container);
-  
-  const notification = document.createElement('div');
-  notification.className = `notification ${type}`;
-  
-  notification.innerHTML = `
-    <div class="notification-icon">
-      <i class="fas ${getNotificationIcon(type)}"></i>
-    </div>
-    <div class="notification-content">
-      <div class="notification-title">${title}</div>
-      <div class="notification-message">${message}</div>
-    </div>
-    <button type="button" class="notification-close" onclick="this.parentElement.remove()">
-      <i class="fas fa-times"></i>
-    </button>
-  `;
-
-  console.log('🔧 מוסיף התראה לקונטיינר...');
-  container.appendChild(notification);
-  console.log('✅ התראה נוספה לקונטיינר');
-
-  // הוספת קלאס show אחרי שהאלמנט נוסף ל-DOM
-  setTimeout(() => {
-    console.log('🔧 מוסיף קלאס show...');
-    notification.classList.add('show');
-    console.log('✅ קלאס show נוסף');
-    
-    // בדיקת סגנונות מחושבים להתראה
-    const computedStyle = window.getComputedStyle(notification);
-    console.log('🔍 סגנונות מחושבים להתראה:');
-    console.log('  background:', computedStyle.background);
-    console.log('  border:', computedStyle.border);
-    console.log('  border-radius:', computedStyle.borderRadius);
-    console.log('  transform:', computedStyle.transform);
-    console.log('  opacity:', computedStyle.opacity);
-    console.log('  display:', computedStyle.display);
-    console.log('  position:', computedStyle.position);
-    
-    // בדיקת סגנונות notification
-    const styleSheets = Array.from(document.styleSheets);
-    const notificationStyles = Array.from(styleSheets).map(sheet => {
-      try {
-        const rules = Array.from(sheet.cssRules || sheet.rules || []);
-        return rules.filter(rule => 
-          rule.selectorText && rule.selectorText.includes('notification')
-        );
-      } catch (e) {
-        return [];
-      }
-    }).flat();
-    console.log('🔍 סגנונות notification נמצאו:', notificationStyles.length);
-    notificationStyles.forEach(rule => {
-      console.log('    כלל:', rule.selectorText);
-    });
-  }, 10);
-
-  // הסרה אוטומטית
-  setTimeout(() => {
-    console.log('🔧 מסיר התראה אוטומטית...');
-    hideNotification(notification);
-  }, duration);
+  // Direct console log to avoid recursion
+  console.log(`🔔 ${type.toUpperCase()}: ${title} - ${message}`);
 }
 
 // ייצוא הפונקציה הגלובלית - יועבר למטה
@@ -378,16 +304,8 @@ function showInfoNotification(title, message, duration = 4000) {
  * @param {number} duration - Display duration
  */
 function showNotificationLegacy(message, type = 'info', duration = 4000) {
-  // If message contains ":" then it's title + message
-  if (message.includes(':')) {
-    const parts = message.split(':');
-    const title = parts[0].trim();
-    const msg = parts.slice(1).join(':').trim();
-    showNotification(msg, type, title, duration);
-  } else {
-    // Otherwise it's just message
-    showNotification(message, type, 'Message', duration);
-  }
+  // Direct console log to avoid recursion
+  console.log(`🔔 ${type.toUpperCase()}: ${message}`);
 }
 
 // ===== GLOBAL NOTIFICATION HISTORY SYSTEM =====

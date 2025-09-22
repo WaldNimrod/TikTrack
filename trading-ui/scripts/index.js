@@ -63,26 +63,8 @@ function quickAction(actionType) {
     }
 }
 
-// Function to toggle all sections (placeholder)
-function toggleAllSections() {
-    console.log('Toggling all sections - Future feature');
-    // Implement logic to toggle all collapsible sections
-}
-
-// Function to toggle specific section
-function toggleSection(sectionId) {
-    const section = document.getElementById(sectionId);
-    const toggleIcon = section.querySelector('.section-toggle-icon');
-    const content = section.querySelector('.section-body');
-    
-    if (content.style.display === 'none') {
-        content.style.display = 'block';
-        toggleIcon.textContent = '▼';
-    } else {
-        content.style.display = 'none';
-        toggleIcon.textContent = '▶';
-    }
-}
+// toggleAllSections function removed - use global window.toggleAllSections directly
+// toggleSection function removed - use global window.toggleSection directly
 
 // Chart Management Functions
 async function createTradesStatusChart() {
@@ -449,13 +431,159 @@ window.switchTableTab = switchTableTab;
 window.refreshOverview = refreshOverview;
 window.exportOverview = exportOverview;
 window.quickAction = quickAction;
-window.toggleAllSections = toggleAllSections;
-window.toggleSection = toggleSection;
+// toggleAllSections and toggleSection exports removed - use global functions directly
 
 // Chart functions
 window.refreshAllCharts = refreshAllCharts;
 window.refreshChart = refreshChart;
 window.exportChart = exportChart;
 window.exportAllCharts = exportAllCharts;
+
+// Detailed Log Functions for Index Page
+function generateDetailedLog() {
+    try {
+        const logData = {
+            timestamp: new Date().toISOString(),
+            page: 'index',
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            viewport: {
+                width: window.innerWidth,
+                height: window.innerHeight
+            },
+            performance: {
+                loadTime: performance.timing.loadEventEnd - performance.timing.navigationStart,
+                domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart
+            },
+            memory: window.performance.memory ? {
+                used: window.performance.memory.usedJSHeapSize,
+                total: window.performance.memory.totalJSHeapSize,
+                limit: window.performance.memory.jsHeapSizeLimit
+            } : null,
+            dashboardStats: {
+                portfolioValue: document.querySelector('.hero-stat-number')?.textContent || 'לא נמצא',
+                return: document.querySelectorAll('.hero-stat-number')[1]?.textContent || 'לא נמצא',
+                tradesCount: document.querySelectorAll('.hero-stat-number')[2]?.textContent || 'לא נמצא',
+                alertsCount: document.querySelectorAll('.hero-stat-number')[3]?.textContent || 'לא נמצא',
+                todayChange: document.querySelectorAll('.hero-stat-number')[4]?.textContent || 'לא נמצא',
+                successRate: document.querySelectorAll('.hero-stat-number')[5]?.textContent || 'לא נמצא'
+            },
+            sections: {
+                topSection: {
+                    title: 'דף הבית - סקירה כללית',
+                    visible: !document.getElementById('topSection')?.classList.contains('d-none'),
+                    heroTitle: document.querySelector('.hero-title')?.textContent || 'לא נמצא',
+                    heroSubtitle: document.querySelector('.hero-subtitle')?.textContent || 'לא נמצא'
+                },
+                section1: {
+                    title: 'סקירה כללית',
+                    visible: !document.getElementById('section1')?.classList.contains('d-none'),
+                    content: document.getElementById('section1')?.textContent?.substring(0, 200) || 'לא נמצא'
+                },
+                section2: {
+                    title: 'סקירה כללית',
+                    visible: !document.getElementById('section2')?.classList.contains('d-none'),
+                    content: document.getElementById('section2')?.textContent?.substring(0, 200) || 'לא נמצא'
+                },
+                section3: {
+                    title: 'גרפים וניתוח',
+                    visible: !document.getElementById('section3')?.classList.contains('d-none'),
+                    content: document.getElementById('section3')?.textContent?.substring(0, 200) || 'לא נמצא'
+                },
+                section4: {
+                    title: 'טבלאות מפורטות',
+                    visible: !document.getElementById('section4')?.classList.contains('d-none'),
+                    content: document.getElementById('section4')?.textContent?.substring(0, 200) || 'לא נמצא'
+                },
+                section5: {
+                    title: 'פעולות מהירות',
+                    visible: !document.getElementById('section5')?.classList.contains('d-none'),
+                    content: document.getElementById('section5')?.textContent?.substring(0, 200) || 'לא נמצא'
+                },
+                section6: {
+                    title: 'סטטיסטיקות מתקדמות',
+                    visible: !document.getElementById('section6')?.classList.contains('d-none'),
+                    content: document.getElementById('section6')?.textContent?.substring(0, 200) || 'לא נמצא'
+                }
+            },
+            charts: {
+                tradesStatusChart: window.homeCharts?.tradesStatusChart ? 'מוכן' : 'לא מוכן',
+                performanceChart: window.homeCharts?.performanceChart ? 'מוכן' : 'לא מוכן',
+                accountChart: window.homeCharts?.accountChart ? 'מוכן' : 'לא מוכן',
+                mixedChart: window.homeCharts?.mixedChart ? 'מוכן' : 'לא מוכן'
+            },
+            quickLinks: {
+                preferences: document.querySelector('a[href="preferences.html"]') ? 'זמין' : 'לא זמין',
+                settings: document.querySelector('a[title="הגדרות"]') ? 'זמין' : 'לא זמין',
+                help: document.querySelector('a[title="עזרה"]') ? 'זמין' : 'לא זמין',
+                messages: document.querySelector('a[title="הודעות"]') ? 'זמין' : 'לא זמין',
+                cache: document.querySelector('a[title="ניקוי מטמון"]') ? 'זמין' : 'לא זמין',
+                profile: document.querySelector('a[title="פרופיל"]') ? 'זמין' : 'לא זמין'
+            },
+            console: {
+                errors: [],
+                warnings: [],
+                logs: []
+            }
+        };
+
+        // Capture console messages
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const originalLog = console.log;
+
+        console.error = function(...args) {
+            logData.console.errors.push(args.join(' '));
+            originalError.apply(console, args);
+        };
+
+        console.warn = function(...args) {
+            logData.console.warnings.push(args.join(' '));
+            originalWarn.apply(console, args);
+        };
+
+        console.log = function(...args) {
+            logData.console.logs.push(args.join(' '));
+            originalLog.apply(console, args);
+        };
+
+        return JSON.stringify(logData, null, 2);
+    } catch (error) {
+        return `Error generating log: ${error.message}`;
+    }
+}
+
+function copyDetailedLog() {
+    try {
+        const logContent = generateDetailedLog();
+        navigator.clipboard.writeText(logContent).then(() => {
+            if (window.showNotification) {
+                window.showNotification('לוג מפורט הועתק ללוח', 'success');
+            } else {
+                alert('לוג מפורט הועתק ללוח');
+            }
+        }).catch(err => {
+            console.error('Failed to copy log:', err);
+            // Fallback: show in console
+            console.log('Detailed Log:', logContent);
+            if (window.showNotification) {
+                window.showNotification('לוג מפורט הוצג בקונסול', 'info');
+            } else {
+                alert('לוג מפורט הוצג בקונסול');
+            }
+        });
+    } catch (error) {
+        console.error('Error copying log:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בהעתקת הלוג', 'error');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}
+
+// Export log functions to global scope
+window.copyDetailedLog = copyDetailedLog;
+window.generateDetailedLog = generateDetailedLog;
 
 console.log('✅ Index page ready');

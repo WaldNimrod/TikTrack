@@ -506,30 +506,17 @@ function handleDataLoadError(error, tableType) {
  * Toggle top section visibility
  */
 function toggleTopSection() {
-  const topSection = document.querySelector('.top-section');
-  if (topSection) {
-    const sectionBody = topSection.querySelector('.section-body');
-    if (sectionBody) {
-      sectionBody.style.display = sectionBody.style.display === 'none' ? 'block' : 'none';
+    if (typeof window.toggleTopSection === 'function') {
+        window.toggleTopSection();
+    } else {
+        console.warn('toggleTopSection function not found');
     }
-  }
 }
 
 /**
  * Toggle main section visibility
  */
-function toggleMainSection() {
-  const mainContent = document.querySelector('.main-content');
-  if (mainContent) {
-    const sections = mainContent.querySelectorAll('.content-section');
-    sections.forEach(section => {
-      const sectionBody = section.querySelector('.section-body');
-      if (sectionBody) {
-        sectionBody.style.display = sectionBody.style.display === 'none' ? 'block' : 'none';
-      }
-    });
-  }
-}
+// toggleMainSection function removed - use toggleSection('main') instead
 
 /**
  * Add new record (placeholder function)
@@ -707,7 +694,7 @@ window.initDatabaseDisplay = initDatabaseDisplay;
 window.loadTableData = loadTableData;
 window.filterTableData = filterTableData;
 window.toggleTopSection = toggleTopSection;
-window.toggleMainSection = toggleMainSection;
+// toggleMainSection export removed - use toggleSection('main') instead
 window.addRecord = addRecord;
 window.sortTable = sortTable;
 window.editRecord = editRecord;

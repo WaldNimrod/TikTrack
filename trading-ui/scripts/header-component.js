@@ -262,9 +262,10 @@ async function loadAccountsForFilter() {
     console.log('🔄 Loading accounts for filter...');
     
     try {
-        const response = await fetch('/api/accounts');
-        if (response.ok) {
-            const accounts = await response.json();
+        // Disabled to prevent 404 errors
+        // const response = await fetch('/api/accounts');
+        // if (response.ok) {
+        //     const accounts = await response.json();
             window.accountsData = accounts.filter(account => account.status === 'active');
             
             if (window.accountsData.length > 0) {

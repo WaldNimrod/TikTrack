@@ -4,7 +4,7 @@
 
 This document describes the comprehensive JavaScript architecture implemented in TikTrack, featuring a modular system with 40+ organized script files, clear separation of concerns, and a complete Chart Management System.
 
-**🔄 Last Updated:** January 21, 2025 - Added Chart Management System
+**🔄 Last Updated:** September 22, 2025 - Added Unified IndexedDB System Specification
 
 ## 🗂️ Global Functions Index
 
@@ -444,9 +444,59 @@ This document describes the comprehensive JavaScript architecture implemented in
 
 ---
 
-**Total Global Functions: 220+**  
+**Total Global Functions: 250+**  
 **Last Updated: January 21, 2025**  
 **Maintained By: TikTrack Development Team**
+
+### 🆕 Additional Global Systems - **NEW DISCOVERIES**
+
+#### JS-Map Utilities (`js-map-utils.js`) - **NEW**
+|| Function | Description |
+||----------|-------------|
+|| `window.toggleAllSections()` | Toggle all JS-Map sections |
+|| `window.performQuickSearch()` | Perform quick search in functions |
+|| `window.toggleFunctionsDropdown()` | Toggle functions dropdown |
+|| `window.scrollToTop()` | Scroll to top of page |
+|| `window.exportDuplicatesReport()` | Export duplicates report |
+|| `window.initializeErrorTracking()` | Initialize error tracking system |
+
+#### Color Scheme System (`color-scheme-system.js`) - **NEW**
+|| Function | Description |
+||----------|-------------|
+|| `window.getEntityColor(entity)` | Get color for entity type |
+|| `window.getStatusColor(status)` | Get color for status |
+|| `window.getNumericValueColor(value)` | Get color for numeric value |
+|| `window.updateCSSVariablesFromPreferences()` | Update CSS variables from preferences |
+|| `window.initializeColorScheme()` | Initialize color scheme system |
+|| `window.applyColorScheme(scheme)` | Apply color scheme |
+
+#### System Management (`system-management.js`) - **NEW**
+|| Function | Description |
+||----------|-------------|
+|| `window.getSystemStatus()` | Get system status |
+|| `window.checkSystemHealth()` | Check system health |
+|| `window.restartSystem()` | Restart system |
+|| `window.updateSystemConfig()` | Update system configuration |
+|| `window.getSystemMetrics()` | Get system metrics |
+
+#### Pagination System (`pagination-system.js`) - **NEW**
+|| Function | Description |
+||----------|-------------|
+|| `window.initializePagination()` | Initialize pagination |
+|| `window.updatePagination()` | Update pagination |
+|| `window.goToPage(page)` | Go to specific page |
+|| `window.nextPage()` | Go to next page |
+|| `window.previousPage()` | Go to previous page |
+|| `window.setPageSize(size)` | Set page size |
+
+#### Central Refresh System (`central-refresh-system.js`) - **NEW**
+|| Function | Description |
+||----------|-------------|
+|| `window.refreshAllData()` | Refresh all data |
+|| `window.refreshPageData()` | Refresh page data |
+|| `window.scheduleRefresh()` | Schedule refresh |
+|| `window.cancelRefresh()` | Cancel refresh |
+|| `window.getRefreshStatus()` | Get refresh status |
 
 ## 🚨 **עדכון דחוף - 4 בספטמבר 2025**
 **בעיה קריטית זוהתה במערכת הנתונים החיצוניים** - הנתונים נאספים מ-Yahoo Finance API אבל לא נשמרים בבסיס הנתונים. המערכת 90% מושלמת עם בעיה אחת קריטית שצריכה פתרון.
@@ -507,6 +557,15 @@ trading-ui/scripts/
     ├── chart-export.js            # Chart export functionality
     ├── trades-adapter.js          # Real data adapter
     └── chart-loader.js            # Chart loading utilities
+    │
+└── 🆕 Additional Global Systems
+    ├── js-map-utils.js           # JS-Map specific utilities
+    ├── color-scheme-system.js     # Dynamic color scheme management
+    ├── system-management.js       # System health and management
+    ├── pagination-system.js       # Global pagination system
+    ├── central-refresh-system.js  # Centralized refresh management
+    ├── global-file-mapping-system.js # Global file mapping and scanning system
+    └── 🆕 UNIFIED_INDEXEDDB_SPECIFICATION.md # Unified IndexedDB System Specification
 ```
 
 ## 📥 File Loading Order
@@ -939,7 +998,22 @@ Optimized loading order and efficient function organization.
 | **Page Files** | 16 | Page-specific logic |
 | **System Files** | 4 | Advanced systems |
 | **Chart System** | 6 | Chart management system |
-| **Total** | **40** | Complete system |
+| **Additional Systems** | 5 | Newly discovered systems |
+| **Total** | **45** | Complete system |
+
+## 🎨 CSS Architecture Integration
+
+### Small Row Cards - Generic Component
+The system includes a generic component for small cards displayed in rows:
+
+| **Class Name** | **Purpose** | **File Location** |
+|----------------|-------------|-------------------|
+| `.small-row-card` | Small cards in rows | `_cards.css` |
+| `.small-row-card-label` | Card labels | `_cards.css` |
+| `.small-row-card-value` | Card values | `_cards.css` |
+| `.small-row-card-icon` | Card icons | `_cards.css` |
+
+**Usage**: Used in JS-Map page for statistics display and can be reused in other pages that need similar small card layouts.
 
 ### 📈 Recent Updates (January 21, 2025)
 - **Added:** Chart Management System - Complete implementation with 6 new files
@@ -950,6 +1024,12 @@ Optimized loading order and efficient function organization.
 - **Added:** `trades-adapter.js` - Real data adapter for charts
 - **Enhanced:** Color system integration with user preferences
 - **Updated:** Preferences system with chart-specific settings
+- **NEW:** Additional Global Systems - 5 newly discovered systems
+- **NEW:** `js-map-utils.js` - JS-Map specific utilities
+- **NEW:** `color-scheme-system.js` - Dynamic color scheme management
+- **NEW:** `system-management.js` - System health and management
+- **NEW:** `pagination-system.js` - Global pagination system
+- **NEW:** `central-refresh-system.js` - Centralized refresh management
 - **Previous:** `project-files-scanner.js` - Global project files scanner
 - **Previous:** `linter-realtime-monitor.js` - Comprehensive file scanning (400+ files)
 

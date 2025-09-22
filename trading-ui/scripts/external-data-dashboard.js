@@ -1138,13 +1138,13 @@ ${detailedLog.consoleLogs.join('\n')}
 }
 
 // Global functions for button onclick handlers
-window.toggleTopSection = function() {
-  if (typeof window.toggleTopSectionGlobal === 'function') {
-    window.toggleTopSectionGlobal();
+function toggleTopSection() {
+  if (typeof window.toggleTopSection === 'function') {
+    window.toggleTopSection();
   } else {
-    console.warn('פונקציית toggleTopSectionGlobal לא נמצאה ב-main.js');
+    console.warn('toggleTopSection function not found');
   }
-};
+}
 
 window.testProvider = function(providerId) {
   // console.log('🧪 Testing provider:', providerId);

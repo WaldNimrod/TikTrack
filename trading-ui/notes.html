@@ -70,6 +70,9 @@
             הערות
           </div>
           <div class="table-actions">
+            <button class="btn btn-sm btn-outline-primary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים וההערות">
+              <i class="fas fa-copy"></i> העתק לוג מפורט
+            </button>
             <button class="filter-toggle-btn" onclick="toggleTopSection()" title="Show/hide notes area">
               <span class="filter-icon">▲</span>
             </button>
@@ -96,7 +99,7 @@
       <div class="main-content">
 
         <!-- Notes area - content-section -->
-        <div class="content-section notes-page">
+        <div class="content-section notes-page" id="main">
           <!-- Notes header -->
           <div class="section-header">
             <div class="table-title">
@@ -149,7 +152,7 @@
               </button>
               
               <div class="action-separator"></div>
-              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור הערות">
+              <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור הערות">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
@@ -544,7 +547,6 @@
   <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/central-refresh-system.js"></script>
     <script src="scripts/entity-details-modal.js"></script>
-    <script src="scripts/main.js"></script>
     <script src="scripts/related-object-filters.js"></script>
     <script src="scripts/header-system.js?v=20250115_level3_fix"></script>
     <script src="scripts/validation-utils.js"></script>

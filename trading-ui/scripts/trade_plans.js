@@ -2722,7 +2722,7 @@ window.restoreDesignsSectionState = restoreDesignsSectionState;
 
 // Adding toggle functions to global scope
 window.toggleTopSection = toggleTopSection;
-window.toggleMainSection = toggleMainSection;
+// toggleMainSection export removed - use toggleSection('main') instead
 window.restorePlanningSectionState = restorePlanningSectionState;
 
 
@@ -2758,67 +2758,14 @@ function setupSortableHeadersLocal() {
 
 // פונקציות לפתיחה/סגירה של סקשנים
 function toggleTopSection() {
-  const topSection = document.querySelector('.top-section');
-
-  if (!topSection) {
-    handleElementNotFound('top-section', 'CRITICAL');
-    return;
-  }
-
-  const sectionBody = topSection.querySelector('.section-body');
-  const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-  if (sectionBody) {
-    const isCollapsed = sectionBody.style.display === 'none';
-
-    if (isCollapsed) {
-      sectionBody.style.display = 'block';
+    if (typeof window.toggleTopSection === 'function') {
+        window.toggleTopSection();
     } else {
-      sectionBody.style.display = 'none';
+        console.warn('toggleTopSection function not found');
     }
-
-    // עדכון האייקון
-    if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
-    }
-
-    // שמירת המצב ב-localStorage
-    localStorage.setItem('planningTopSectionCollapsed', !isCollapsed);
-  }
 }
 
-function toggleMainSection() {
-  const contentSections = document.querySelectorAll('.content-section');
-  const planningSection = contentSections[0]; // הסקשן הראשון - תכנונים
-
-  if (!planningSection) {
-    handleElementNotFound('planning section', 'CRITICAL');
-    return;
-  }
-
-  const sectionBody = planningSection.querySelector('.section-body');
-  const toggleBtn = planningSection.querySelector('button[onclick="toggleMainSection()"]');
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-  if (sectionBody) {
-    const isCollapsed = sectionBody.style.display === 'none';
-
-    if (isCollapsed) {
-      sectionBody.style.display = 'block';
-    } else {
-      sectionBody.style.display = 'none';
-    }
-
-    // עדכון האייקון
-    if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
-    }
-
-    // שמירת המצב ב-localStorage
-    localStorage.setItem('planningMainSectionCollapsed', !isCollapsed);
-  }
-}
+// toggleMainSection function removed - use toggleSection('main') instead
 
 // פונקציה לשחזור מצב הסגירה
 function restorePlanningSectionState() {
@@ -2846,7 +2793,7 @@ function restorePlanningSectionState() {
 
   if (planningSection) {
     const sectionBody = planningSection.querySelector('.section-body');
-    const toggleBtn = planningSection.querySelector('button[onclick="toggleMainSection()"]');
+    const toggleBtn = planningSection.querySelector('button[onclick="toggleSection(\'main\')"]');
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
     if (sectionBody && planningCollapsed) {
@@ -3185,6 +3132,131 @@ if (typeof loadTradePlansData === 'function') {
 } else {
   handleFunctionNotFound('loadTradePlansData', 'פונקציית טעינת נתוני תכנונים לא נמצאה בסוף הקובץ');
 }
+
+// Detailed Log Functions for Trade Plans Page
+function generateDetailedLog() {
+    try {
+        const logData = {
+            timestamp: new Date().toISOString(),
+            page: 'trade_plans',
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            viewport: {
+                width: window.innerWidth,
+                height: window.innerHeight
+            },
+            performance: {
+                loadTime: performance.timing.loadEventEnd - performance.timing.navigationStart,
+                domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart
+            },
+            memory: window.performance.memory ? {
+                used: window.performance.memory.usedJSHeapSize,
+                total: window.performance.memory.totalJSHeapSize,
+                limit: window.performance.memory.jsHeapSizeLimit
+            } : null,
+            planningStats: {
+                totalDesigns: document.getElementById('totalDesigns')?.textContent || 'לא נמצא',
+                totalInvestment: document.getElementById('totalInvestment')?.textContent || 'לא נמצא',
+                avgInvestment: document.getElementById('avgInvestment')?.textContent || 'לא נמצא',
+                totalProfit: document.getElementById('totalProfit')?.textContent || 'לא נמצא'
+            },
+            sections: {
+                topSection: {
+                    title: 'תכנון טריידים והשקעות',
+                    visible: !document.querySelector('.top-section')?.classList.contains('d-none'),
+                    alertsCount: document.querySelectorAll('.alert-card').length,
+                    summaryStats: document.getElementById('summaryStats')?.textContent || 'לא נמצא'
+                },
+                contentSection: {
+                    title: 'התכנונים שלי',
+                    visible: !document.querySelector('.content-section')?.classList.contains('d-none'),
+                    tableRows: document.querySelectorAll('#trade_plansTable tbody tr').length,
+                    tableData: document.querySelector('#trade_plansContainer')?.textContent?.substring(0, 300) || 'לא נמצא'
+                }
+            },
+            tableData: {
+                totalRows: document.querySelectorAll('#trade_plansTable tbody tr').length,
+                headers: Array.from(document.querySelectorAll('#trade_plansTable thead th')).map(th => th.textContent?.trim()),
+                sortableColumns: document.querySelectorAll('.sortable-header').length,
+                hasData: document.querySelectorAll('#trade_plansTable tbody tr').length > 0
+            },
+            modals: {
+                addModal: document.getElementById('addTradePlanModal') ? 'זמין' : 'לא זמין',
+                editModal: document.getElementById('editTradePlanModal') ? 'זמין' : 'לא זמין',
+                deleteModal: document.getElementById('deleteTradePlanModal') ? 'זמין' : 'לא זמין'
+            },
+            functions: {
+                openAddTradePlanModal: typeof window.openAddTradePlanModal === 'function' ? 'זמין' : 'לא זמין',
+                showAddTradePlanModal: typeof window.showAddTradePlanModal === 'function' ? 'זמין' : 'לא זמין',
+                toggleTopSection: typeof window.toggleTopSection === 'function' ? 'זמין' : 'לא זמין',
+                toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין',
+                sortTable: typeof window.sortTable === 'function' ? 'זמין' : 'לא זמין'
+            },
+            console: {
+                errors: [],
+                warnings: [],
+                logs: []
+            }
+        };
+
+        // Capture console messages
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const originalLog = console.log;
+
+        console.error = function(...args) {
+            logData.console.errors.push(args.join(' '));
+            originalError.apply(console, args);
+        };
+
+        console.warn = function(...args) {
+            logData.console.warnings.push(args.join(' '));
+            originalWarn.apply(console, args);
+        };
+
+        console.log = function(...args) {
+            logData.console.logs.push(args.join(' '));
+            originalLog.apply(console, args);
+        };
+
+        return JSON.stringify(logData, null, 2);
+    } catch (error) {
+        return `Error generating log: ${error.message}`;
+    }
+}
+
+function copyDetailedLog() {
+    try {
+        const logContent = generateDetailedLog();
+        navigator.clipboard.writeText(logContent).then(() => {
+            if (window.showNotification) {
+                window.showNotification('לוג מפורט הועתק ללוח', 'success');
+            } else {
+                alert('לוג מפורט הועתק ללוח');
+            }
+        }).catch(err => {
+            console.error('Failed to copy log:', err);
+            // Fallback: show in console
+            console.log('Detailed Log:', logContent);
+            if (window.showNotification) {
+                window.showNotification('לוג מפורט הוצג בקונסול', 'info');
+            } else {
+                alert('לוג מפורט הוצג בקונסול');
+            }
+        });
+    } catch (error) {
+        console.error('Error copying log:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בהעתקת הלוג', 'error');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}
+
+// Export log functions to global scope
+window.copyDetailedLog = copyDetailedLog;
+window.generateDetailedLog = generateDetailedLog;
 
 // קריאה ב-DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function() {

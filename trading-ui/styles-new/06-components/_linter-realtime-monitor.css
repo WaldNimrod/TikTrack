@@ -204,9 +204,9 @@
 
 /* Fix for card-header black background issue */
 .summary-card .card-header {
-    background: transparent !important;
-    border-bottom: none !important;
-    color: var(--apple-text-primary, #000000) !important;
+    background: transparent ;
+    border-bottom: none ;
+    color: var(--apple-text-primary, #000000) ;
 }
 
 .summary-card-value {
@@ -442,7 +442,7 @@
 }
 
 .progress-row.hidden {
-    display: none !important;
+    display: none ;
 }
 
 /* ===== MAPPING DASHBOARD STYLES ===== */
@@ -797,40 +797,7 @@
     gap: 15px;
 }
 
-.stat-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 15px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-    transition: all 0.2s ease;
-}
-
-.stat-item:hover {
-    background: #e9ecef;
-    border-color: #007bff;
-}
-
-.stat-icon {
-    font-size: 1.5rem;
-}
-
-.stat-label {
-    flex: 1;
-    font-size: 0.9rem;
-    color: #495057;
-    font-weight: 500;
-}
-
-.stat-value {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: #007bff;
-    min-width: 30px;
-    text-align: center;
-}
+/* stat-item styles moved to global _cards.css file */
 
 /* Progress Bar Row */
 .progress-row {
@@ -1034,9 +1001,7 @@
         gap: 10px;
     }
     
-    .stat-item {
-        padding: 12px;
-    }
+    /* stat-item responsive styles moved to global _cards.css file */
     
     .actions-row {
         flex-direction: column;

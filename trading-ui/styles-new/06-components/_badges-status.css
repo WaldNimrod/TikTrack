@@ -3,145 +3,145 @@
 /* אלמנט הראש נשמר בנפרד */
 
 .status-badge::before {
-content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: -100% !important;
-  width: 100% !important;
-  height: 100% !important;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent) !important;
-  transition: left 0.5s ease !important;
+content: '' ;
+  position: absolute ;
+  top: 0 ;
+  left: -100% ;
+  width: 100% ;
+  height: 100% ;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent) ;
+  transition: left 0.5s ease ;
 }
 
 .status-badge:hover::before {
-left: 100% !important;
+left: 100% ;
 }
 
 .priority-badge::before {
-content: '' !important;
-  position: absolute !important;
-  top: 0 !important;
-  left: -100% !important;
-  width: 100% !important;
-  height: 100% !important;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent) !important;
-  transition: left 0.5s ease !important;
+content: '' ;
+  position: absolute ;
+  top: 0 ;
+  left: -100% ;
+  width: 100% ;
+  height: 100% ;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent) ;
+  transition: left 0.5s ease ;
 }
 
 .priority-badge:hover::before {
-left: 100% !important;
+left: 100% ;
 }
 
 .priority-badge.priority-high {
-background: linear-gradient(135deg, rgba(244, 67, 54, 0.2) 0%, rgba(229, 57, 53, 0.2) 100%) !important;
-  color: #d32f2f !important;
-  box-shadow: 0 2px 6px rgba(244, 67, 54, 0.1) !important;
+background: linear-gradient(135deg, rgba(244, 67, 54, 0.2) 0%, rgba(229, 57, 53, 0.2) 100%) ;
+  color: #d32f2f ;
+  box-shadow: 0 2px 6px rgba(244, 67, 54, 0.1) ;
 }
 
 .priority-badge.priority-medium {
-background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(255, 143, 0, 0.2) 100%) !important;
-  color: #f57c00 !important;
-  box-shadow: 0 2px 6px rgba(255, 152, 0, 0.1) !important;
+background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(255, 143, 0, 0.2) 100%) ;
+  color: #f57c00 ;
+  box-shadow: 0 2px 6px rgba(255, 152, 0, 0.1) ;
 }
 
 .priority-badge.priority-low {
-background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(67, 160, 71, 0.2) 100%) !important;
-  color: #388e3c !important;
-  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.1) !important;
+background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(67, 160, 71, 0.2) 100%) ;
+  color: #388e3c ;
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.1) ;
 }
 
 .numeric-text-negative {
-color: var(--numeric-negative-medium) !important;
+color: var(--numeric-negative-medium) ;
   font-weight: 600;
 }
 
 .numeric-text-zero {
-color: var(--numeric-zero-medium) !important;
+color: var(--numeric-zero-medium) ;
 }
 
 .profit-positive {
-color: var(--numeric-positive-medium) !important;
+color: var(--numeric-positive-medium) ;
   font-weight: 600;
 }
 
 .profit-negative {
-color: var(--numeric-negative-medium) !important;
+color: var(--numeric-negative-medium) ;
   font-weight: 600;
 }
 
 .side-long:hover {
-background: rgba(111, 66, 193, 0.15) !important;
-  transform: translateY(-1px) !important;
+background: rgba(111, 66, 193, 0.15) ;
+  transform: translateY(-1px) ;
 }
 
 .side-short {
-color: var(--color-danger) !important;
-  font-weight: 600 !important;
-  font-size: 0.9rem !important;
-  padding: 0.25rem 0.5rem !important;
-  border-radius: 6px !important;
-  background: color-mix(in srgb, var(--color-danger) 10%, transparent) !important;
-  display: inline-block !important;
-  transition: all 0.3s ease !important;
+color: var(--color-danger) ;
+  font-weight: 600 ;
+  font-size: 0.9rem ;
+  padding: 0.25rem 0.5rem ;
+  border-radius: 6px ;
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent) ;
+  display: inline-block ;
+  transition: all 0.3s ease ;
 }
 
 .side-short:hover {
-background: color-mix(in srgb, var(--color-danger) 15%, transparent) !important;
-  transform: translateY(-1px) !important;
+background: color-mix(in srgb, var(--color-danger) 15%, transparent) ;
+  transform: translateY(-1px) ;
 }
 
 .type-investment {
-color: var(--color-success) !important;
-  font-weight: 600 !important;
-  font-size: 0.9rem !important;
-  padding: 0.25rem 0.5rem !important;
-  border-radius: 6px !important;
-  background: color-mix(in srgb, var(--color-success) 10%, transparent) !important;
-  display: inline-block !important;
-  transition: all 0.3s ease !important;
+color: var(--color-success) ;
+  font-weight: 600 ;
+  font-size: 0.9rem ;
+  padding: 0.25rem 0.5rem ;
+  border-radius: 6px ;
+  background: color-mix(in srgb, var(--color-success) 10%, transparent) ;
+  display: inline-block ;
+  transition: all 0.3s ease ;
 }
 
 .type-investment:hover {
-background: color-mix(in srgb, var(--color-success) 15%, transparent) !important;
-  transform: translateY(-1px) !important;
+background: color-mix(in srgb, var(--color-success) 15%, transparent) ;
+  transform: translateY(-1px) ;
 }
 
 .type-stock {
-color: #007bff !important;
-  font-weight: 600 !important;
-  font-size: 0.9rem !important;
-  padding: 0.25rem 0.5rem !important;
-  border-radius: 6px !important;
-  background: rgba(0, 123, 255, 0.1) !important;
-  display: inline-block !important;
-  transition: all 0.3s ease !important;
+color: #007bff ;
+  font-weight: 600 ;
+  font-size: 0.9rem ;
+  padding: 0.25rem 0.5rem ;
+  border-radius: 6px ;
+  background: rgba(0, 123, 255, 0.1) ;
+  display: inline-block ;
+  transition: all 0.3s ease ;
 }
 
 .type-etf {
-color: var(--color-success) !important;
-  font-weight: 600 !important;
-  font-size: 0.9rem !important;
-  padding: 0.25rem 0.5rem !important;
-  border-radius: 6px !important;
-  background: color-mix(in srgb, var(--color-success) 10%, transparent) !important;
-  display: inline-block !important;
-  transition: all 0.3s ease !important;
+color: var(--color-success) ;
+  font-weight: 600 ;
+  font-size: 0.9rem ;
+  padding: 0.25rem 0.5rem ;
+  border-radius: 6px ;
+  background: color-mix(in srgb, var(--color-success) 10%, transparent) ;
+  display: inline-block ;
+  transition: all 0.3s ease ;
 }
 
 .type-etf:hover {
-background: color-mix(in srgb, var(--color-success) 15%, transparent) !important;
-  transform: translateY(-1px) !important;
+background: color-mix(in srgb, var(--color-success) 15%, transparent) ;
+  transform: translateY(-1px) ;
 }
 
 .type-crypto {
-color: #6f42c1 !important;
-  font-weight: 600 !important;
-  font-size: 0.9rem !important;
-  padding: 0.25rem 0.5rem !important;
-  border-radius: 6px !important;
-  background: rgba(111, 66, 193, 0.1) !important;
-  display: inline-block !important;
-  transition: all 0.3s ease !important;
+color: #6f42c1 ;
+  font-weight: 600 ;
+  font-size: 0.9rem ;
+  padding: 0.25rem 0.5rem ;
+  border-radius: 6px ;
+  background: rgba(111, 66, 193, 0.1) ;
+  display: inline-block ;
+  transition: all 0.3s ease ;
 }
 
 .triggered-badge.triggered-yes {

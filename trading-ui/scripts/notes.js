@@ -251,70 +251,8 @@ function deleteNote(id) {
 }
 
 // פונקציות לפתיחה/סגירה של סקשנים
-function toggleTopSection() {
-  const topSection = document.querySelector('.top-section');
 
-  if (!topSection) {
-    handleElementNotFound('toggleTopSection', 'לא נמצא top-section');
-    return;
-  }
-
-  const sectionBody = topSection.querySelector('.section-body');
-  const toggleBtn = topSection.querySelector('button[onclick="toggleTopSection()"]');
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-  if (sectionBody) {
-    const isCollapsed = sectionBody.style.display === 'none';
-
-    if (isCollapsed) {
-      sectionBody.style.display = 'block';
-    } else {
-      sectionBody.style.display = 'none';
-    }
-
-    // עדכון האייקון
-    if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
-    }
-
-    // שמירת המצב ב-localStorage
-    localStorage.setItem('notesTopSectionHidden', !isCollapsed);
-  }
-}
-
-function toggleMainSection() {
-
-  const contentSections = document.querySelectorAll('.content-section');
-
-  const notesSection = contentSections[0]; // הסקשן הראשון - הערות
-
-  if (!notesSection) {
-    handleElementNotFound('toggleMainSection', 'לא נמצא סקשן הערות');
-    return;
-  }
-
-  const sectionBody = notesSection.querySelector('.section-body');
-  const toggleBtn = notesSection.querySelector('button[onclick="toggleMainSection()"]');
-  const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
-
-  if (sectionBody) {
-    const isCollapsed = sectionBody.style.display === 'none';
-
-    if (isCollapsed) {
-      sectionBody.style.display = 'block';
-    } else {
-      sectionBody.style.display = 'none';
-    }
-
-    // עדכון האייקון
-    if (icon) {
-      icon.textContent = isCollapsed ? '▲' : '▼';
-    }
-
-    // שמירת המצב ב-localStorage
-    localStorage.setItem('notesMainSectionHidden', !isCollapsed);
-  }
-}
+// toggleMainSection function removed - use toggleSection('main') instead
 
 // פונקציה לשחזור מצב הסגירה
 function restoreNotesSectionState() {
@@ -342,7 +280,7 @@ function restoreNotesSectionState() {
 
   if (notesSection) {
     const sectionBody = notesSection.querySelector('.section-body');
-    const toggleBtn = notesSection.querySelector('button[onclick="toggleMainSection()"]');
+    const toggleBtn = notesSection.querySelector('button[onclick="toggleSection(\'main\')"]');
     const icon = toggleBtn ? toggleBtn.querySelector('.filter-icon') : null;
 
     if (sectionBody && notesCollapsed) {
@@ -361,7 +299,7 @@ window.openNoteDetails = openNoteDetails;
 window.editNote = editNote;
 window.deleteNote = deleteNote;
 window.toggleTopSection = toggleTopSection;
-window.toggleMainSection = toggleMainSection;
+// toggleMainSection export removed - use toggleSection('main') instead
 window.restoreNotesSectionState = restoreNotesSectionState;
 
 // פונקציה לטעינת נתונים
@@ -2211,13 +2149,7 @@ function toggleTopSection() {
     }
 }
 
-function toggleMainSection() {
-    if (typeof window.toggleSection === 'function') {
-        window.toggleSection('main');
-    } else {
-        console.warn('toggleSection function not found');
-    }
-}
+// toggleMainSection function removed - use toggleSection('main') instead
 
 // Note CRUD functions
 function openNoteDetails() {
@@ -2274,9 +2206,140 @@ function loadNotesData() {
 // ===== GLOBAL EXPORTS =====
 // Export functions to global scope for onclick attributes
 window.toggleTopSection = toggleTopSection;
-window.toggleMainSection = toggleMainSection;
+// toggleMainSection export removed - use toggleSection('main') instead
 window.openNoteDetails = openNoteDetails;
 window.editNote = editNote;
+// Detailed Log Functions for Notes Page
+function generateDetailedLog() {
+    try {
+        const logData = {
+            timestamp: new Date().toISOString(),
+            page: 'notes',
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            viewport: {
+                width: window.innerWidth,
+                height: window.innerHeight
+            },
+            performance: {
+                loadTime: performance.timing.loadEventEnd - performance.timing.navigationStart,
+                domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart
+            },
+            memory: window.performance.memory ? {
+                used: window.performance.memory.usedJSHeapSize,
+                total: window.performance.memory.totalJSHeapSize,
+                limit: window.performance.memory.jsHeapSizeLimit
+            } : null,
+            notesStats: {
+                totalNotes: document.getElementById('totalNotes')?.textContent || 'לא נמצא',
+                activeNotes: document.getElementById('activeNotes')?.textContent || 'לא נמצא',
+                recentNotes: document.getElementById('recentNotes')?.textContent || 'לא נמצא',
+                totalLinks: document.getElementById('totalLinks')?.textContent || 'לא נמצא'
+            },
+            sections: {
+                topSection: {
+                    title: 'הערות',
+                    visible: !document.querySelector('.top-section')?.classList.contains('d-none'),
+                    alertsCount: document.querySelectorAll('.alert-card').length,
+                    summaryStats: document.getElementById('summaryStats')?.textContent || 'לא נמצא'
+                },
+                contentSection: {
+                    title: 'ההערות שלי',
+                    visible: !document.querySelector('.content-section')?.classList.contains('d-none'),
+                    tableRows: document.querySelectorAll('#notesTable tbody tr').length,
+                    tableData: document.querySelector('#notesContainer')?.textContent?.substring(0, 300) || 'לא נמצא'
+                }
+            },
+            tableData: {
+                totalRows: document.querySelectorAll('#notesTable tbody tr').length,
+                headers: Array.from(document.querySelectorAll('#notesTable thead th')).map(th => th.textContent?.trim()),
+                sortableColumns: document.querySelectorAll('.sortable-header').length,
+                hasData: document.querySelectorAll('#notesTable tbody tr').length > 0
+            },
+            filters: {
+                allButton: document.querySelector('button[data-type="all"]') ? 'זמין' : 'לא זמין',
+                accountButton: document.querySelector('button[data-type="account"]') ? 'זמין' : 'לא זמין',
+                tradeButton: document.querySelector('button[data-type="trade"]') ? 'זמין' : 'לא זמין',
+                tradePlanButton: document.querySelector('button[data-type="trade_plan"]') ? 'זמין' : 'לא זמין',
+                tickerButton: document.querySelector('button[data-type="ticker"]') ? 'זמין' : 'לא זמין',
+                activeFilter: document.querySelector('.btn.active')?.textContent || 'לא נמצא'
+            },
+            modals: {
+                addModal: document.getElementById('addNoteModal') ? 'זמין' : 'לא זמין',
+                editModal: document.getElementById('editNoteModal') ? 'זמין' : 'לא זמין',
+                deleteModal: document.getElementById('deleteNoteModal') ? 'זמין' : 'לא זמין'
+            },
+            functions: {
+                addNote: typeof window.addNote === 'function' ? 'זמין' : 'לא זמין',
+                editNote: typeof window.editNote === 'function' ? 'זמין' : 'לא זמין',
+                deleteNote: typeof window.deleteNote === 'function' ? 'זמין' : 'לא זמין',
+                toggleTopSection: typeof window.toggleTopSection === 'function' ? 'זמין' : 'לא זמין',
+                filterNotesByRelatedObjectType: typeof window.filterNotesByRelatedObjectType === 'function' ? 'זמין' : 'לא זמין',
+                uploadFile: typeof window.uploadFile === 'function' ? 'זמין' : 'לא זמין',
+                formatText: typeof window.formatText === 'function' ? 'זמין' : 'לא זמין'
+            },
+            console: {
+                errors: [],
+                warnings: [],
+                logs: []
+            }
+        };
+
+        // Capture console messages
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const originalLog = console.log;
+
+        console.error = function(...args) {
+            logData.console.errors.push(args.join(' '));
+            originalError.apply(console, args);
+        };
+
+        console.warn = function(...args) {
+            logData.console.warnings.push(args.join(' '));
+            originalWarn.apply(console, args);
+        };
+
+        console.log = function(...args) {
+            logData.console.logs.push(args.join(' '));
+            originalLog.apply(console, args);
+        };
+
+        return JSON.stringify(logData, null, 2);
+    } catch (error) {
+        return `Error generating log: ${error.message}`;
+    }
+}
+
+function copyDetailedLog() {
+    try {
+        const logContent = generateDetailedLog();
+        navigator.clipboard.writeText(logContent).then(() => {
+            if (window.showNotification) {
+                window.showNotification('לוג מפורט הועתק ללוח', 'success');
+            } else {
+                alert('לוג מפורט הועתק ללוח');
+            }
+        }).catch(err => {
+            console.error('Failed to copy log:', err);
+            // Fallback: show in console
+            console.log('Detailed Log:', logContent);
+            if (window.showNotification) {
+                window.showNotification('לוג מפורט הוצג בקונסול', 'info');
+            } else {
+                alert('לוג מפורט הוצג בקונסול');
+            }
+        });
+    } catch (error) {
+        console.error('Error copying log:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בהעתקת הלוג', 'error');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}
+
 window.deleteNote = deleteNote;
 window.filterNotesByRelatedObjectType = filterNotesByRelatedObjectType;
 window.formatText = formatText;
@@ -2285,4 +2348,6 @@ window.addNote = addNote;
 window.uploadFile = uploadFile;
 window.removeCurrentAttachment = removeCurrentAttachment;
 window.replaceCurrentAttachment = replaceCurrentAttachment;
+window.copyDetailedLog = copyDetailedLog;
+window.generateDetailedLog = generateDetailedLog;
 

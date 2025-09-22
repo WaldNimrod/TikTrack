@@ -697,7 +697,7 @@ class HeaderSystem {
                         <!-- כלי פיתוח -->
                         <li><a class="tiktrack-dropdown-item" href="/page-scripts-matrix">📄 מטריקס JS</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/js-map">🗺️ מפת JS</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/linter-realtime-monitor">🔍 דשבורד Linter</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/linter-realtime-monitor.html">🔍 דשבורד Linter</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/chart-management">📊 ניהול גרפים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/css-management">🎨 מנהל CSS</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/crud-testing-dashboard">🧪 בדיקות CRUD</a></li>
@@ -4756,6 +4756,8 @@ async function clearDevelopmentCache(event) {
           clearedLocalStorage++;
         }
       });
+      
+      console.log(`🗑️ נוקה ${clearedLocalStorage} פריטים מ-localStorage`);
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות localStorage:', e);
     }
@@ -4764,6 +4766,7 @@ async function clearDevelopmentCache(event) {
     try {
       const sessionKeys = Object.keys(sessionStorage);
       sessionStorage.clear();
+      console.log(`🗑️ נוקה ${sessionKeys.length} פריטים מ-sessionStorage`);
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות sessionStorage:', e);
     }
@@ -4772,18 +4775,21 @@ async function clearDevelopmentCache(event) {
     try {
       if ('indexedDB' in window) {
         const databases = await indexedDB.databases();
+        let clearedDatabases = 0;
         for (const db of databases) {
           if (db.name && !db.name.includes('system')) {
             await indexedDB.deleteDatabase(db.name);
+            clearedDatabases++;
           }
         }
+        console.log(`🗑️ נוקה ${clearedDatabases} מסדי נתונים מ-IndexedDB`);
       }
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות IndexedDB:', e);
     }
 
     // ===== שלב 2: ניקוי Cache של השרת =====
-    const response = await fetch('/api/v1/cache/clear', {
+    const response = await fetch('/api/cache/clear', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -4792,6 +4798,7 @@ async function clearDevelopmentCache(event) {
 
     if (response.ok) {
       const result = await response.json();
+      console.log('✅ Cache של השרת נוקה בהצלחה:', result.message);
     } else {
       console.warn('⚠️ לא ניתן לנקות Cache של השרת:', response.status);
     }
@@ -4800,9 +4807,12 @@ async function clearDevelopmentCache(event) {
     try {
       if ('serviceWorker' in navigator) {
         const registrations = await navigator.serviceWorker.getRegistrations();
+        let clearedWorkers = 0;
         for (const registration of registrations) {
           await registration.unregister();
+          clearedWorkers++;
         }
+        console.log(`🗑️ נוקה ${clearedWorkers} Service Workers`);
       }
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות Service Workers:', e);
@@ -4815,6 +4825,7 @@ async function clearDevelopmentCache(event) {
         await Promise.all(
           cacheNames.map(cacheName => caches.delete(cacheName)),
         );
+        console.log(`🗑️ נוקה ${cacheNames.length} Cache API entries`);
       }
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות Cache API:', e);
@@ -4824,6 +4835,7 @@ async function clearDevelopmentCache(event) {
     try {
       if ('applicationCache' in window) {
         window.applicationCache.update();
+        console.log('🗑️ Application Cache עודכן');
       }
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות Application Cache:', e);
@@ -4834,6 +4846,7 @@ async function clearDevelopmentCache(event) {
       // ניקוי cache של fetch requests
       if (window.fetch && window.fetch.cache) {
         window.fetch.cache.clear();
+        console.log('🗑️ Fetch cache נוקה');
       }
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות Fetch cache:', e);
@@ -4843,13 +4856,32 @@ async function clearDevelopmentCache(event) {
     try {
       // ניקוי cache של תמונות
       const images = document.querySelectorAll('img');
+      let refreshedImages = 0;
       images.forEach(img => {
         if (img.src) {
           img.src = img.src + '?t=' + Date.now();
+          refreshedImages++;
         }
       });
+      console.log(`🗑️ רענן ${refreshedImages} תמונות`);
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות תמונות:', e);
+    }
+
+    // ===== שלב 8: ניקוי Cache של JavaScript Files =====
+    try {
+      // ניקוי cache של JavaScript files
+      const scripts = document.querySelectorAll('script[src]');
+      let refreshedScripts = 0;
+      scripts.forEach(script => {
+        if (script.src && !script.src.includes('?t=')) {
+          script.src = script.src + '?t=' + Date.now();
+          refreshedScripts++;
+        }
+      });
+      console.log(`🗑️ רענן ${refreshedScripts} JavaScript files`);
+    } catch (e) {
+      console.warn('⚠️ לא ניתן לנקות JavaScript files:', e);
     }
 
     // ===== הצגת הודעת הצלחה =====

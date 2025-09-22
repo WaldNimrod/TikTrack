@@ -2455,8 +2455,8 @@ function setupSortEventListeners() {
   sortButtons.forEach(button => {
     button.addEventListener('click', function () {
       const columnIndex = parseInt(this.getAttribute('data-sort-column'));
-      if (typeof window.sortTable === 'function') {
-        window.sortTable(columnIndex, window.tradesData || [], 'trades', window.updateTradesTable);
+      if (typeof window.sortTableData === 'function') {
+        window.sortTableData(columnIndex, window.tradesData || [], 'trades', window.updateTradesTable);
       } else {
         if (typeof handleFunctionNotFound === 'function') {
           handleFunctionNotFound('sortTable');
@@ -3129,4 +3129,138 @@ function confirmDeleteTrade(tradeId) {
     }
   }
 }
+
+// Detailed Log Functions for Trades Page
+function generateDetailedLog() {
+    try {
+        const logData = {
+            timestamp: new Date().toISOString(),
+            page: 'trades',
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+            viewport: {
+                width: window.innerWidth,
+                height: window.innerHeight
+            },
+            performance: {
+                loadTime: performance.timing.loadEventEnd - performance.timing.navigationStart,
+                domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart
+            },
+            memory: window.performance.memory ? {
+                used: window.performance.memory.usedJSHeapSize,
+                total: window.performance.memory.totalJSHeapSize,
+                limit: window.performance.memory.jsHeapSizeLimit
+            } : null,
+            tradesStats: {
+                totalTrades: document.getElementById('totalTrades')?.textContent || 'לא נמצא',
+                openTrades: document.getElementById('openTrades')?.textContent || 'לא נמצא',
+                closedTrades: document.getElementById('closedTrades')?.textContent || 'לא נמצא',
+                totalPL: document.getElementById('totalPL')?.textContent || 'לא נמצא'
+            },
+            sections: {
+                topSection: {
+                    title: 'מעקב טריידים',
+                    visible: !document.querySelector('.top-section')?.classList.contains('d-none'),
+                    alertsCount: document.querySelectorAll('.alert-card').length,
+                    summaryStats: document.getElementById('summaryStats')?.textContent || 'לא נמצא',
+                    colorDemoVisible: !document.getElementById('tradesColorDemo')?.style.display === 'none'
+                },
+                contentSection: {
+                    title: 'הטריידים שלי',
+                    visible: !document.querySelector('.content-section')?.classList.contains('d-none'),
+                    tableRows: document.querySelectorAll('#tradesTable tbody tr').length,
+                    tableData: document.querySelector('#tradesContainer')?.textContent?.substring(0, 300) || 'לא נמצא'
+                }
+            },
+            tableData: {
+                totalRows: document.querySelectorAll('#tradesTable tbody tr').length,
+                headers: Array.from(document.querySelectorAll('#tradesTable thead th')).map(th => th.textContent?.trim()),
+                sortableColumns: document.querySelectorAll('.sortable-header').length,
+                hasData: document.querySelectorAll('#tradesTable tbody tr').length > 0,
+                selectedRows: document.querySelectorAll('#tradesTable tbody tr.selected').length
+            },
+            modals: {
+                addModal: document.getElementById('addTradeModal') ? 'זמין' : 'לא זמין',
+                editModal: document.getElementById('editTradeModal') ? 'זמין' : 'לא זמין',
+                deleteModal: document.getElementById('deleteTradeModal') ? 'זמין' : 'לא זמין',
+                linkedItemsModal: document.getElementById('linkedItemsModal') ? 'זמין' : 'לא זמין'
+            },
+            functions: {
+                showAddTradeModal: typeof window.showAddTradeModal === 'function' ? 'זמין' : 'לא זמין',
+                editTradeRecord: typeof window.editTradeRecord === 'function' ? 'זמין' : 'לא זמין',
+                deleteTradeRecord: typeof window.deleteTradeRecord === 'function' ? 'זמין' : 'לא זמין',
+                toggleTopSection: typeof window.toggleTopSection === 'function' ? 'זמין' : 'לא זמין',
+                toggleSection: typeof window.toggleSection === 'function' ? 'זמין' : 'לא זמין',
+                sortTableData: typeof window.sortTableData === 'function' ? 'זמין' : 'לא זמין'
+            },
+            buttons: {
+                addTradeBtn: document.getElementById('addTradeBtn') ? 'זמין' : 'לא זמין',
+                editTradeBtn: document.getElementById('editTradeBtn') ? 'זמין' : 'לא זמין',
+                deleteTradeBtn: document.getElementById('deleteTradeBtn') ? 'זמין' : 'לא זמין'
+            },
+            console: {
+                errors: [],
+                warnings: [],
+                logs: []
+            }
+        };
+
+        // Capture console messages
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const originalLog = console.log;
+
+        console.error = function(...args) {
+            logData.console.errors.push(args.join(' '));
+            originalError.apply(console, args);
+        };
+
+        console.warn = function(...args) {
+            logData.console.warnings.push(args.join(' '));
+            originalWarn.apply(console, args);
+        };
+
+        console.log = function(...args) {
+            logData.console.logs.push(args.join(' '));
+            originalLog.apply(console, args);
+        };
+
+        return JSON.stringify(logData, null, 2);
+    } catch (error) {
+        return `Error generating log: ${error.message}`;
+    }
+}
+
+function copyDetailedLog() {
+    try {
+        const logContent = generateDetailedLog();
+        navigator.clipboard.writeText(logContent).then(() => {
+            if (window.showNotification) {
+                window.showNotification('לוג מפורט הועתק ללוח', 'success');
+            } else {
+                alert('לוג מפורט הועתק ללוח');
+            }
+        }).catch(err => {
+            console.error('Failed to copy log:', err);
+            // Fallback: show in console
+            console.log('Detailed Log:', logContent);
+            if (window.showNotification) {
+                window.showNotification('לוג מפורט הוצג בקונסול', 'info');
+            } else {
+                alert('לוג מפורט הוצג בקונסול');
+            }
+        });
+    } catch (error) {
+        console.error('Error copying log:', error);
+        if (window.showNotification) {
+            window.showNotification('שגיאה בהעתקת הלוג', 'error');
+        } else {
+            alert('שגיאה בהעתקת הלוג');
+        }
+    }
+}
+
+// Export log functions to global scope
+window.copyDetailedLog = copyDetailedLog;
+window.generateDetailedLog = generateDetailedLog;
 

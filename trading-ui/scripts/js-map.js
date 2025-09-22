@@ -53,7 +53,7 @@ class JsMapSystem {
             
             // Load fresh data from APIs
             console.log('🌐 Loading fresh data from APIs...');
-            await this.loadDataFromAPIs();
+            await this.loadDataFromAPIs(true); // Show notification on initial load
             
             // Skip advanced analysis for now
             console.log('⚠️ Advanced analysis skipped - focusing on basic functionality');
@@ -85,7 +85,9 @@ class JsMapSystem {
             
         } catch (error) {
             console.error('❌ Failed to initialize JS-Map System:', error);
-            this.showErrorNotification('שגיאה באתחול מערכת JS-Map', error.message);
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה באתחול מערכת JS-Map', error.message);
+            }
         }
     }
 
@@ -93,38 +95,34 @@ class JsMapSystem {
      * Load data from APIs using existing global systems
      * טוען נתונים מה-APIs באמצעות מערכות כלליות קיימות
      */
-    async loadDataFromAPIs() {
+    async loadDataFromAPIs(showNotification = false) {
         console.log('🔄 Loading data from APIs...');
         
         try {
             console.log('📡 Using direct fetch for API requests');
                 
                 // Load functions data
-            const functionsResponse = await fetch('/api/js-map/functions');
-            if (!functionsResponse.ok) {
-                throw new Error(`HTTP ${functionsResponse.status}: ${functionsResponse.statusText}`);
-            }
-            const functionsData = await functionsResponse.json();
+            const functionsData = await window.apiCall('/api/js-map/functions');
             this.functionsData = functionsData.data || functionsData;
                 console.log('✅ Functions data loaded:', Object.keys(this.functionsData || {}));
                 console.log('📊 Functions data sample:', JSON.stringify(this.functionsData, null, 2).substring(0, 200) + '...');
                 
                 // Load page mapping data
-            const mappingResponse = await fetch('/api/js-map/page-mapping');
-            if (!mappingResponse.ok) {
-                throw new Error(`HTTP ${mappingResponse.status}: ${mappingResponse.statusText}`);
-            }
-            const mappingData = await mappingResponse.json();
+            const mappingData = await window.apiCall('/api/js-map/page-mapping');
             this.pageMapping = mappingData.data || mappingData;
                 console.log('✅ Page mapping data loaded:', Object.keys(this.pageMapping || {}));
                 console.log('📊 Page mapping sample:', JSON.stringify(this.pageMapping, null, 2).substring(0, 200) + '...');
             
-            // Show success notification
-            this.showSuccessNotification('הצלחה', 'נתונים נטענו מהשרת בהצלחה');
+            // Show success notification for API data only when requested
+            if (showNotification && window.showSuccessNotification) {
+                window.showSuccessNotification('הצלחה', 'נתונים נטענו מהשרת בהצלחה');
+            }
             
         } catch (error) {
             console.error('❌ Failed to load data from APIs:', error);
-            this.showErrorNotification('שגיאה', `שגיאה בטעינת נתונים: ${error.message}`);
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה', `שגיאה בטעינת נתונים: ${error.message}`);
+            }
             
             // Use fallback data for development
             this.loadFallbackData();
@@ -139,33 +137,24 @@ class JsMapSystem {
         console.log('🔄 Using direct fetch as fallback...');
         
         try {
-            const [functionsResponse, mappingResponse] = await Promise.all([
-                fetch('/api/js-map/functions'),
-                fetch('/api/js-map/page-mapping')
+            const [functionsData, mappingData] = await Promise.all([
+                window.apiCall('/api/js-map/functions'),
+                window.apiCall('/api/js-map/page-mapping')
             ]);
 
-            if (functionsResponse.ok) {
-                const functionsData = await functionsResponse.json();
                 this.functionsData = functionsData.data || functionsData;
-                console.log('✅ Functions data loaded via fetch:', Object.keys(this.functionsData || {}));
-            } else {
-                console.warn('⚠️ Functions API returned:', functionsResponse.status);
-            }
+            console.log('✅ Functions data loaded via apiCall:', Object.keys(this.functionsData || {}));
 
-            if (mappingResponse.ok) {
-                const mappingData = await mappingResponse.json();
                 this.pageMapping = mappingData.data || mappingData;
-                console.log('✅ Page mapping data loaded via fetch:', Object.keys(this.pageMapping || {}));
-            } else {
-                console.warn('⚠️ Page mapping API returned:', mappingResponse.status);
-            }
+            console.log('✅ Page mapping data loaded via apiCall:', Object.keys(this.pageMapping || {}));
 
-            // Show success notification
-            this.showSuccessNotification('הצלחה', 'נתונים נטענו מהשרת (מצב fallback)');
+            // No notification here - fallback is silent
 
         } catch (error) {
             console.error('❌ Fallback fetch failed:', error);
-            this.showErrorNotification('שגיאה', `שגיאה בטעינת נתונים (fallback): ${error.message}`);
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה', `שגיאה בטעינת נתונים (fallback): ${error.message}`);
+            }
             this.loadFallbackData();
         }
     }
@@ -208,7 +197,7 @@ class JsMapSystem {
         };
 
         console.log('✅ Fallback data loaded with', Object.keys(this.functionsData).length, 'files and', Object.keys(this.pageMapping).length, 'pages');
-        this.showSuccessNotification('מידע', 'נתוני דמה נטענו - השרת לא זמין');
+        // No notification for fallback data - it's expected in development
     }
 
     /**
@@ -221,8 +210,6 @@ class JsMapSystem {
         // Don't render here - it's already called in init()
         // this.renderAllSections();
         
-        // Skip function tabs system initialization for now
-        console.log('⚠️ Function tabs system initialization skipped - focusing on basic functionality');
         
         // Skip development sections initialization for now
         console.log('⚠️ Development sections initialization skipped - focusing on basic functionality');
@@ -247,8 +234,8 @@ class JsMapSystem {
             this.renderDependenciesData();
             
             console.log('🎨 Rendering functions...');
-            this.renderFunctionsData();
-            
+        this.renderFunctionsData();
+        
             console.log('🎨 Rendering duplicates...');
             this.renderDuplicatesData();
             
@@ -258,7 +245,6 @@ class JsMapSystem {
         }
     }
 
-    // Tab-specific render methods
     renderStatistics() {
         console.log('📊 Rendering statistics...');
         this.updateDashboardStats();
@@ -284,51 +270,16 @@ class JsMapSystem {
         this.renderDuplicatesData();
     }
 
-    /**
-     * Update tab data when switching tabs
-     * מעדכן נתוני טאב בעת מעבר בין טאבים
-     */
-    updateTabData(tabName) {
-        console.log(`🔄 Updating tab data for: ${tabName}`);
-        
-        try {
-            switch(tabName) {
-                case 'statistics':
-                    this.renderStatistics();
-                    break;
-                case 'functions':
-                    this.renderFunctions();
-                    break;
-                case 'pages':
-        this.renderPageMapping();
-                    break;
-                case 'dependencies':
-        this.renderDependencies();
-                    break;
-                case 'analysis':
-                    this.renderAnalysis();
-                    break;
-                case 'future':
-                    this.renderFutureFeatures();
-                    break;
-                default:
-                    console.warn(`⚠️ Unknown tab: ${tabName}`);
-            }
-        } catch (error) {
-            console.error(`❌ Failed to update tab data for ${tabName}:`, error);
-        }
-    }
 
     /**
-     * Render future features tab
-     * מציג טאב פיצ'רים עתידיים
+     * Render future features
+     * מציג פיצ'רים עתידיים
      */
     renderFutureFeatures() {
         console.log('🚧 Rendering future features...');
         // This is handled by the HTML content
     }
 
-    // Tab-specific refresh methods
     refreshStatistics() {
         console.log('🔄 Refreshing statistics...');
         this.loadDataFromAPIs();
@@ -367,7 +318,7 @@ class JsMapSystem {
      * Update system statistics in the UI
      * מעדכן את הסטטיסטיקות של המערכת בממשק
      */
-    updateSystemStats() {
+    updateSystemStats(isManual = false) {
         console.log('📊 Updating system statistics...');
         
         try {
@@ -396,11 +347,15 @@ class JsMapSystem {
             console.log('✅ System statistics updated successfully');
             console.log(`📊 Stats: ${pagesCount} pages, ${jsFilesCount} JS files, ${functionsCount} functions, ${globalFunctions} global, ${duplicates} duplicates, ${localFunctions} local`);
             
+            // Show success notification only when called manually
+            if (isManual) {
+                if (window.showNotification) {
+                    window.showNotification('סטטיסטיקות מערכת עודכנו בהצלחה', 'success', 'הצלחה', 2000);
+                }
+            }
+            
         } catch (error) {
             console.error('❌ Error updating system statistics:', error);
-            if (window.showNotification) {
-                window.showNotification('שגיאה בעדכון סטטיסטיקות', 'error', 'שגיאה', 3000);
-            }
         }
     }
     
@@ -454,13 +409,10 @@ class JsMapSystem {
      * Refresh system status
      * רענון מצב מערכת
      */
-    refreshSystemStatus() {
+    async refreshSystemStatus() {
         console.log('🔄 Refreshing system status...');
-        this.updateSystemStatus();
+        await this.updateSystemStatus();
         this.addRecentAction('רענון מצב מערכת');
-        if (window.showNotification) {
-            window.showNotification('מצב מערכת עודכן', 'success', 'הצלחה', 2000);
-        }
     }
 
     /**
@@ -481,9 +433,6 @@ class JsMapSystem {
         URL.revokeObjectURL(url);
         
         this.addRecentAction('ייצוא מצב מערכת');
-        if (window.showNotification) {
-            window.showNotification('מצב מערכת יוצא בהצלחה', 'success', 'הצלחה', 3000);
-        }
     }
 
     /**
@@ -494,23 +443,13 @@ class JsMapSystem {
         console.log('🌐 Testing system connectivity...');
         try {
             const startTime = Date.now();
-            const response = await fetch('/api/js-map/functions');
+            const response = await window.apiCall('/api/js-map/functions');
             const endTime = Date.now();
             const responseTime = endTime - startTime;
             
-            if (response.ok) {
-                if (window.showNotification) {
-                    window.showNotification(`חיבור תקין (${responseTime}ms)`, 'success', 'הצלחה', 3000);
-                }
-                this.addRecentAction(`בדיקת חיבור - ${responseTime}ms`);
-            } else {
-                throw new Error(`HTTP ${response.status}`);
-            }
+            this.addRecentAction(`בדיקת חיבור - ${responseTime}ms`);
         } catch (error) {
             console.error('❌ Connectivity test failed:', error);
-            if (window.showNotification) {
-                window.showNotification('בדיקת חיבור נכשלה', 'error', 'שגיאה', 3000);
-            }
             this.addRecentAction('בדיקת חיבור נכשלה');
         }
     }
@@ -519,35 +458,21 @@ class JsMapSystem {
      * Clear system cache
      * ניקוי מטמון מערכת
      */
-    clearSystemCache() {
+    async clearSystemCache() {
         console.log('🗑️ Clearing system cache...');
         try {
-            // Clear localStorage
-            const keys = Object.keys(localStorage);
-            keys.forEach(key => {
-                if (key.startsWith('jsMap') || key.startsWith('js-map')) {
-                    localStorage.removeItem(key);
-                }
-            });
-            
-            // Clear sessionStorage
-            const sessionKeys = Object.keys(sessionStorage);
-            sessionKeys.forEach(key => {
-                if (key.startsWith('jsMap') || key.startsWith('js-map')) {
-                    sessionStorage.removeItem(key);
-                }
-            });
-            
-            if (window.showNotification) {
-                window.showNotification('מטמון נוקה בהצלחה', 'success', 'הצלחה', 3000);
+        // Clear JS-Map localStorage
+        const keys = Object.keys(localStorage);
+        keys.forEach(key => {
+            if (key.startsWith('jsMap') || key.startsWith('js-map')) {
+                localStorage.removeItem(key);
             }
+        });
+            
             this.addRecentAction('ניקוי מטמון');
             this.updateSystemStatus();
         } catch (error) {
             console.error('❌ Failed to clear cache:', error);
-            if (window.showNotification) {
-                window.showNotification('שגיאה בניקוי מטמון', 'error', 'שגיאה', 3000);
-            }
         }
     }
 
@@ -560,15 +485,9 @@ class JsMapSystem {
         try {
             await this.loadDataFromAPIs();
             this.updateSystemStatus();
-            if (window.showNotification) {
-                window.showNotification('נתונים נטענו מחדש', 'success', 'הצלחה', 3000);
-            }
             this.addRecentAction('טעינה מחדש של נתונים');
         } catch (error) {
             console.error('❌ Failed to reload data:', error);
-            if (window.showNotification) {
-                window.showNotification('שגיאה בטעינה מחדש', 'error', 'שגיאה', 3000);
-            }
         }
     }
 
@@ -613,9 +532,6 @@ class JsMapSystem {
         // Copy function
         window.copyDiagnostics = () => {
             navigator.clipboard.writeText(JSON.stringify(diagnostics, null, 2));
-            if (window.showNotification) {
-                window.showNotification('אבחון הועתק ללוח', 'success', 'הצלחה', 2000);
-            }
         };
         
         this.addRecentAction('הצגת אבחון מערכת');
@@ -625,8 +541,8 @@ class JsMapSystem {
      * Update system status display
      * עדכון תצוגת מצב מערכת
      */
-    updateSystemStatus() {
-        const status = this.getSystemStatus();
+    async updateSystemStatus() {
+        const status = await this.getSystemStatus();
         
         // Update status values
         const systemInitialized = document.getElementById('systemInitialized');
@@ -648,7 +564,7 @@ class JsMapSystem {
         if (currentUrl) currentUrl.textContent = status.system.url;
         if (loadTime) loadTime.textContent = status.system.loadTime;
         if (userAgent) userAgent.textContent = status.system.userAgent.substring(0, 50) + '...';
-        if (currentTime) currentTime.textContent = new Date().toLocaleString('he-IL');
+        if (currentTime) currentTime.textContent = window.formatDateTime(new Date());
         
         // Update data status
         const functionsFilesCount = document.getElementById('functionsFilesCount');
@@ -670,7 +586,7 @@ class JsMapSystem {
      * Get system status
      * קבלת מצב מערכת
      */
-    getSystemStatus() {
+    async getSystemStatus() {
         const startTime = performance.timing?.loadEventEnd || Date.now();
         const loadTime = startTime - (performance.timing?.navigationStart || 0);
         
@@ -692,22 +608,64 @@ class JsMapSystem {
                 pages: this.pageMappingData ? Object.keys(this.pageMappingData).slice(0, 10) : []
             },
             storage: {
-                hasData: Object.keys(localStorage).some(key => key.startsWith('jsMap') || key.startsWith('js-map')),
-                keys: Object.keys(localStorage).filter(key => key.startsWith('jsMap') || key.startsWith('js-map'))
+                hasData: this.checkLocalStorageData(),
+                keys: this.getLocalStorageKeys()
             }
         };
+    }
+
+    /**
+     * Check if localStorage data exists
+     * בדיקת קיום נתוני localStorage
+     */
+    checkLocalStorageData() {
+        try {
+            const keys = Object.keys(localStorage);
+            return keys.some(key => key.startsWith('jsMap') || key.startsWith('js-map'));
+        } catch (error) {
+            console.warn('Error checking localStorage data:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Get localStorage keys
+     * קבלת מפתחות localStorage
+     */
+    getLocalStorageKeys() {
+        try {
+            const keys = Object.keys(localStorage);
+            return keys.filter(key => key.startsWith('jsMap') || key.startsWith('js-map'));
+        } catch (error) {
+            console.warn('Error getting localStorage keys:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Check if localStorage key exists
+     * בדיקת קיום מפתח localStorage
+     */
+    checkLocalStorageKeyExists(key) {
+        try {
+            const value = localStorage.getItem(key);
+            return value !== null ? 'קיים' : 'לא קיים';
+        } catch (error) {
+            console.warn(`Error checking localStorage key ${key}:`, error);
+            return 'לא זמין';
+        }
     }
 
     /**
      * Get system diagnostics
      * קבלת אבחון מערכת
      */
-    getSystemDiagnostics() {
+    async getSystemDiagnostics() {
         return {
             timestamp: new Date().toISOString(),
             url: window.location.href,
             userAgent: navigator.userAgent,
-            systemStatus: this.getSystemStatus(),
+            systemStatus: await this.getSystemStatus(),
             performance: {
                 memory: performance.memory ? {
                     used: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) + 'MB',
@@ -721,12 +679,8 @@ class JsMapSystem {
                 } : 'לא זמין'
             },
             localStorage: {
-                keys: Object.keys(localStorage),
-                jsMapKeys: Object.keys(localStorage).filter(key => key.startsWith('jsMap') || key.startsWith('js-map'))
-            },
-            sessionStorage: {
-                keys: Object.keys(sessionStorage),
-                jsMapKeys: Object.keys(sessionStorage).filter(key => key.startsWith('jsMap') || key.startsWith('js-map'))
+                keys: this.getLocalStorageKeys(),
+                jsMapKeys: this.getLocalStorageKeys()
             },
             windowObjects: {
                 jsMapSystem: !!window.jsMapSystem,
@@ -744,7 +698,7 @@ class JsMapSystem {
         if (!actionsLog) return;
         
         const now = new Date();
-        const timeStr = now.toLocaleTimeString('he-IL');
+        const timeStr = window.formatTimeOnly(now);
         
         const actionItem = document.createElement('div');
         actionItem.className = 'action-item';
@@ -764,8 +718,7 @@ class JsMapSystem {
     async analyzeDuplicates() {
         console.log('🔍 Starting duplicates analysis...');
         try {
-            const response = await fetch('/api/js-map/analyze-duplicates');
-            const result = await response.json();
+            const result = await window.apiCall('/api/js-map/analyze-duplicates');
             
             if (result.status === 'success') {
                 console.log('✅ Duplicates analysis completed:', result.data);
@@ -779,17 +732,13 @@ class JsMapSystem {
             }
         } catch (error) {
             console.error('❌ Failed to analyze duplicates:', error);
-            if (window.showNotification) {
-                window.showNotification('שגיאה בניתוח כפילויות', 'error', 'שגיאה', 3000);
-            }
         }
     }
 
     async detectLocalFunctions() {
         console.log('🏠 Starting local functions detection...');
         try {
-            const response = await fetch('/api/js-map/detect-local-functions');
-            const result = await response.json();
+            const result = await window.apiCall('/api/js-map/detect-local-functions');
             
             if (result.status === 'success') {
                 console.log('✅ Local functions detection completed:', result.data);
@@ -803,9 +752,6 @@ class JsMapSystem {
             }
         } catch (error) {
             console.error('❌ Failed to detect local functions:', error);
-            if (window.showNotification) {
-                window.showNotification('שגיאה בזיהוי פונקציות מקומיות', 'error', 'שגיאה', 3000);
-            }
         }
     }
 
@@ -967,11 +913,17 @@ class JsMapSystem {
             });
         }
         
+        // Calculate duplicates and local functions
+        const duplicates = this.calculateDuplicates();
+        const localFunctions = totalFunctions - globalFunctions;
+        
         const stats = {
             totalPages,
             totalJsFiles,
             totalFunctions,
-            globalFunctions
+            globalFunctions,
+            duplicates,
+            localFunctions
         };
         
         console.log('📊 Calculated stats:', stats);
@@ -992,43 +944,6 @@ class JsMapSystem {
         }
     }
 
-    /**
-     * Initialize function tabs system with retry mechanism
-     * מאתחל מערכת טאבים של פונקציות עם מנגנון ניסיון חוזר
-     */
-    initializeFunctionTabsSystem() {
-        console.log('🔄 Initializing function tabs system...');
-        
-        const maxRetries = 20;
-        let retries = 0;
-        
-        const tryInitialize = () => {
-            console.log(`🔍 Checking functionsTabsSystem availability (${retries + 1}/${maxRetries})...`);
-            console.log('window.functionsTabsSystem exists:', !!window.functionsTabsSystem);
-            console.log('setFunctionsData method exists:', !!(window.functionsTabsSystem && typeof window.functionsTabsSystem.setFunctionsData === 'function'));
-            
-            if (window.functionsTabsSystem && typeof window.functionsTabsSystem.setFunctionsData === 'function') {
-                try {
-                    window.functionsTabsSystem.setFunctionsData(this.functionsData);
-                    console.log('✅ Function tabs system initialized successfully');
-                    return;
-                } catch (error) {
-                    console.error('❌ Error calling setFunctionsData:', error);
-                }
-            }
-            
-            retries++;
-            if (retries < maxRetries) {
-                console.log(`⏳ Waiting for functionsTabsSystem... (${retries}/${maxRetries})`);
-                setTimeout(tryInitialize, 200);
-            } else {
-                console.warn('⚠️ functionsTabsSystem not available after retries');
-                console.log('Available methods on functionsTabsSystem:', window.functionsTabsSystem ? Object.getOwnPropertyNames(window.functionsTabsSystem) : 'undefined');
-            }
-        };
-        
-        tryInitialize();
-    }
 
     /**
      * Show error notification using global system
@@ -1039,18 +954,6 @@ class JsMapSystem {
             window.showNotification(message, 'error', title, 8000);
         } else {
             console.error(`${title}: ${message}`);
-        }
-    }
-
-    /**
-     * Show success notification using global system
-     * מציג הודעת הצלחה באמצעות המערכת הכללית
-     */
-    showSuccessNotification(title, message) {
-        if (window.showNotification) {
-            window.showNotification(title, message, 'success');
-        } else {
-            console.log(`${title}: ${message}`);
         }
     }
 
@@ -1075,7 +978,9 @@ class JsMapSystem {
             
         } catch (error) {
             console.error('❌ Failed to refresh data:', error);
-            this.showErrorNotification('שגיאה', `שגיאה ברענון נתונים: ${error.message}`);
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה', `שגיאה ברענון נתונים: ${error.message}`);
+            }
         }
     }
 
@@ -1086,57 +991,22 @@ class JsMapSystem {
     renderSystemStats() {
         console.log('📊 Rendering system statistics...');
         
-        // Try to find the statistics tab content
-        const container = document.getElementById('statisticsContent');
-        if (!container) {
-            console.error('❌ statisticsContent container not found');
-            return;
-        }
-        
-        console.log('✅ Found statisticsContent container');
+        // Statistics are now displayed in the top section, no need to find a separate container
         
         // Update the stat cards directly in the HTML structure
         this.updateDashboardStats();
 
         const stats = this.calculateStats();
         
-        const html = `
-            <div class="system-stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">📄</div>
-                    <div class="stat-number">${stats.totalPages}</div>
-                    <div class="stat-label">עמודי HTML</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">📁</div>
-                    <div class="stat-number">${stats.totalJsFiles}</div>
-                    <div class="stat-label">קבצי JavaScript</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">⚙️</div>
-                    <div class="stat-number">${stats.totalFunctions}</div>
-                    <div class="stat-label">פונקציות JavaScript</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🌐</div>
-                    <div class="stat-number">${stats.globalFunctions}</div>
-                    <div class="stat-label">פונקציות גלובליות</div>
-                </div>
-            </div>
-            
-            <div class="stats-details">
-                <h4>📋 פירוט נוסף:</h4>
-                <ul>
-                    <li>עמודים פעילים: <strong>${stats.totalPages}</strong></li>
-                    <li>קבצי JS פעילים: <strong>${stats.totalJsFiles}</strong></li>
-                    <li>פונקציות כולל: <strong>${stats.totalFunctions}</strong></li>
-                    <li>פונקציות גלובליות: <strong>${stats.globalFunctions}</strong></li>
-                </ul>
-            </div>
-        `;
-
-        container.innerHTML = html;
-        console.log('✅ System statistics rendered successfully');
+        // Update individual stat cards without replacing the entire HTML
+        this.updateStatCard('systemTotalPages', stats.totalPages);
+        this.updateStatCard('systemTotalJsFiles', stats.totalJsFiles);
+        this.updateStatCard('systemTotalFunctions', stats.totalFunctions);
+        this.updateStatCard('systemGlobalFunctions', stats.globalFunctions);
+        this.updateStatCard('systemDuplicates', stats.duplicates || 0);
+        this.updateStatCard('systemLocalFunctions', stats.localFunctions || 0);
+        
+        console.log('✅ System statistics updated successfully');
     }
 
     /**
@@ -1210,15 +1080,15 @@ class JsMapSystem {
                 <h4>🔗 ניתוח תלויות בין קבצים</h4>
                 
                 <div class="dependencies-summary">
-                    <div class="stat-card">
-                        <div class="stat-icon">📊</div>
-                        <div class="stat-number">${this.calculateDependenciesStats().totalDependencies}</div>
-                        <div class="stat-label">תלויות כולל</div>
+                    <div class="small-row-card">
+                        <div class="small-row-card-label">תלויות כולל</div>
+                        <div class="small-row-card-value">${this.calculateDependenciesStats().totalDependencies}</div>
+                        <div class="small-row-card-icon">📊</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">🎯</div>
-                        <div class="stat-number">${this.calculateDependenciesStats().mostUsedFile}</div>
-                        <div class="stat-label">הקובץ הנפוץ ביותר</div>
+                    <div class="small-row-card">
+                        <div class="small-row-card-label">הקובץ הנפוץ ביותר</div>
+                        <div class="small-row-card-value">${this.calculateDependenciesStats().mostUsedFile}</div>
+                        <div class="small-row-card-icon">🎯</div>
                     </div>
                 </div>
                 
@@ -1268,15 +1138,15 @@ class JsMapSystem {
                 <h4>⚙️ מפת פונקציות מפורטת</h4>
                 
                 <div class="functions-summary">
-                    <div class="stat-card">
-                        <div class="stat-icon">📁</div>
-                        <div class="stat-number">${Object.keys(this.functionsData).length}</div>
-                        <div class="stat-label">קבצים</div>
+                    <div class="small-row-card">
+                        <div class="small-row-card-label">קבצים</div>
+                        <div class="small-row-card-value">${Object.keys(this.functionsData).length}</div>
+                        <div class="small-row-card-icon">📁</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">⚙️</div>
-                        <div class="stat-number">${this.calculateTotalFunctions()}</div>
-                        <div class="stat-label">פונקציות</div>
+                    <div class="small-row-card">
+                        <div class="small-row-card-label">פונקציות</div>
+                        <div class="small-row-card-value">${this.calculateTotalFunctions()}</div>
+                        <div class="small-row-card-icon">⚙️</div>
                     </div>
                 </div>
                 
@@ -1297,13 +1167,14 @@ class JsMapSystem {
     renderDuplicatesData() {
         console.log('🔍 Rendering duplicates analysis...');
         
-        const container = document.getElementById('duplicatesContent');
+        // Duplicates analysis is now part of the advanced analysis section
+        const container = document.getElementById('analysisContent');
         if (!container) {
-            console.error('❌ duplicatesContent container not found');
+            console.log('⚠️ analysisContent container not found, skipping duplicates rendering');
             return;
         }
         
-        console.log('✅ Found duplicatesContent container');
+        console.log('✅ Found analysisContent container for duplicates');
         
         // Use the container directly since it's already the content area
         const contentArea = container;
@@ -1313,15 +1184,15 @@ class JsMapSystem {
                 <h4>🔍 ניתוח כפילויות</h4>
                 
                 <div class="duplicates-summary">
-                    <div class="stat-card">
-                        <div class="stat-icon">🔍</div>
-                        <div class="stat-number">0</div>
-                        <div class="stat-label">כפילויות נמצאו</div>
+                    <div class="small-row-card">
+                        <div class="small-row-card-label">כפילויות נמצאו</div>
+                        <div class="small-row-card-value">0</div>
+                        <div class="small-row-card-icon">🔍</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">⚠️</div>
-                        <div class="stat-number">0</div>
-                        <div class="stat-label">המלצות לתיקון</div>
+                    <div class="small-row-card">
+                        <div class="small-row-card-label">המלצות לתיקון</div>
+                        <div class="small-row-card-value">0</div>
+                        <div class="small-row-card-icon">⚠️</div>
                     </div>
                 </div>
                 
@@ -1471,30 +1342,10 @@ function initializeJsMapPage() {
  * מציג/מסתיר סקשן
  */
 function toggleSection(sectionId) {
-    const section = document.getElementById(sectionId);
-    if (!section) return;
-    
-    // Check if this is a development section
-    if (section.classList.contains('development-section')) {
-        if (window.toggleDevelopmentSection) {
-            window.toggleDevelopmentSection(sectionId);
-        }
-        return;
-    }
-    
-    const body = section.querySelector('.section-body');
-    const icon = section.querySelector('.section-toggle-icon');
-    
-    if (body && icon) {
-        if (body.style.display === 'none' || body.style.display === '') {
-            body.style.display = 'block';
-            icon.textContent = '▼';
-            console.log(`📂 Opened section: ${sectionId}`);
+    if (typeof window.toggleSection === 'function') {
+        window.toggleSection(sectionId);
         } else {
-            body.style.display = 'none';
-            icon.textContent = '▶';
-            console.log(`📁 Closed section: ${sectionId}`);
-        }
+        console.warn('toggleSection function not found');
     }
 }
 
@@ -1513,16 +1364,13 @@ async function copyJsMapDetailedLog() {
         }
         
         // Show loading notification using local method
-        if (window.showNotification) {
-            window.showNotification('מייצר לוג מפורט...', 'info', 'מערכת', 3000);
-        }
         
         // Get additional data from server
         let serverData = {};
         try {
             const [functionsResponse, mappingResponse] = await Promise.all([
-                fetch('http://localhost:8080/api/js-map/functions').then(r => r.json()),
-                fetch('http://localhost:8080/api/js-map/page-mapping').then(r => r.json())
+                window.apiCall('http://localhost:8080/api/js-map/functions'),
+                window.apiCall('http://localhost:8080/api/js-map/page-mapping')
             ]);
             
             serverData = {
@@ -1538,7 +1386,7 @@ async function copyJsMapDetailedLog() {
         
         const logData = {
             system: 'JS-Map',
-            timestamp: new Date().toLocaleString('he-IL'),
+            timestamp: window.formatDateTime(new Date()),
             url: window.location.href,
             userAgent: navigator.userAgent,
             systemStatus: {
@@ -1550,8 +1398,8 @@ async function copyJsMapDetailedLog() {
             },
             serverData: serverData,
             localStorage: {
-                jsMapData: localStorage.getItem('jsMapData') ? 'קיים' : 'לא קיים',
-                jsMapStats: localStorage.getItem('jsMapStats') ? 'קיים' : 'לא קיים'
+                jsMapData: system.checkLocalStorageKeyExists('jsMapData'),
+                jsMapStats: system.checkLocalStorageKeyExists('jsMapStats')
             },
             errors: system.errors || [],
             performance: {
@@ -1607,58 +1455,17 @@ ${JSON.stringify(logData, null, 2)}`;
         
         // Show error notification using local method
         const system = window.jsMapSystem;
-        if (window.showNotification) {
-            window.showNotification(`שגיאה ביצירת הלוג: ${error.message}`, 'error', 'שגיאה', 8000);
-        }
     }
 }
 
-function switchTab(tabName) {
-    console.log(`🔄 Switching to tab: ${tabName}`);
-    
-    // Hide all tab contents
-    const tabContents = document.querySelectorAll('.tab-content');
-    tabContents.forEach(content => {
-        content.style.display = 'none';
-    });
-    
-    // Remove active class from all tab buttons
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    tabButtons.forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    // Show selected tab content
-    const selectedContent = document.getElementById(`${tabName}Content`);
-    if (selectedContent) {
-        selectedContent.style.display = 'block';
-    }
-    
-    // Add active class to selected tab button
-    const selectedButton = document.querySelector(`[data-tab="${tabName}"]`);
-    if (selectedButton) {
-        selectedButton.classList.add('active');
-    }
-    
-    // Update data if needed
-            if (window.jsMapSystem) {
-        window.jsMapSystem.updateTabData(tabName);
-            }
-}
         
 function refreshStatistics() {
     console.log('📊 Refreshing statistics...');
     
             if (window.jsMapSystem) {
         window.jsMapSystem.refreshData();
-        if (window.showNotification) {
-            window.showNotification('מידע', 'סטטיסטיקות רוענו בהצלחה', 'success', 3000);
-        }
     } else {
         console.error('❌ jsMapSystem not available');
-        if (window.showNotification) {
-            window.showNotification('שגיאה', 'מערכת JS-Map לא זמינה', 'error');
-        }
     }
 }
 
@@ -1783,9 +1590,6 @@ JsMapSystem.prototype.showLogModal = function(logText) {
         if (document.execCommand('copy')) {
             // Note: 'this' context is lost in onclick, need to get system reference
             const system = window.jsMapSystem;
-            if (window.showNotification) {
-                window.showNotification('לוג הועתק ללוח בהצלחה!', 'success', 'הצלחה', 3000);
-            }
         }
     };
     
@@ -1822,9 +1626,6 @@ JsMapSystem.prototype.showLogModal = function(logText) {
     
     console.log('✅ Log modal displayed');
     
-    if (window.showNotification) {
-        window.showNotification('לוג מפורט מוצג בחלון נפרד', 'info', 'מידע', 3000);
-    }
 }
 
 // Note: Using global notification system instead of local notifications
@@ -1845,7 +1646,7 @@ JsMapSystem.prototype.getDetailedUIInfo = function() {
             const quickActions = topSection.querySelectorAll('.btn');
             uiInfo += `  • כפתורי פעולה מהירה: ${quickActions.length}\n`;
             
-            const statCards = topSection.querySelectorAll('.stat-card, .overview-stat-card');
+            const statCards = topSection.querySelectorAll('.stat-card, .overview-stat-card, .overview-card, .small-row-card');
             uiInfo += `  • כרטיסי סטטיסטיקה: ${statCards.length}\n`;
             
             const searchBox = topSection.querySelector('.central-quick-search');
@@ -1878,18 +1679,13 @@ JsMapSystem.prototype.getDetailedUIInfo = function() {
                     // Count content elements
                     if (body) {
                         const tables = body.querySelectorAll('table');
-                        const cards = body.querySelectorAll('.card, .stat-card, .overview-stat-card');
+                        const cards = body.querySelectorAll('.card, .stat-card, .overview-stat-card, .small-row-card');
                         const buttons = body.querySelectorAll('.btn, button');
                         const lists = body.querySelectorAll('ul, ol');
-                        const tabsInSection = body.querySelectorAll('.tab-btn, [data-tab]');
-                        
                         uiInfo += `    - טבלאות: ${tables.length}\n`;
                         uiInfo += `    - כרטיסים: ${cards.length}\n`;
                         uiInfo += `    - כפתורים: ${buttons.length}\n`;
                         uiInfo += `    - רשימות: ${lists.length}\n`;
-                        if (tabsInSection.length > 0) {
-                            uiInfo += `    - טאבים בסקשן: ${tabsInSection.length}\n`;
-                        }
                     
                     // Check for specific content
                     if (body.textContent.trim() === '' || body.textContent.trim() === 'טוען...') {
@@ -1902,60 +1698,20 @@ JsMapSystem.prototype.getDetailedUIInfo = function() {
             }
         });
         
-        // 3. Tab System Information (if exists)
-        uiInfo += '\n🗂️ מערכת טאבים:\n';
-        const tabButtons = document.querySelectorAll('.tab-btn, [data-tab], button[data-tab]');
-        const tabContents = document.querySelectorAll('.tab-content');
-        const functionsTabsContainer = document.querySelector('.functions-tabs-container');
-        console.log('🔍 Debug: Found tab buttons:', tabButtons.length, tabButtons);
-        console.log('🔍 Debug: Found functions tabs container:', !!functionsTabsContainer);
-        console.log('🔍 Debug: All elements with data-tab:', document.querySelectorAll('[data-tab]').length);
-        console.log('🔍 Debug: All button elements:', document.querySelectorAll('button').length);
-        console.log('🔍 Debug: All elements with class tab-btn:', document.querySelectorAll('.tab-btn').length);
-        console.log('🔍 Debug: All elements with class functions-tabs:', document.querySelectorAll('.functions-tabs').length);
         
-        if (tabButtons.length > 0) {
-            uiInfo += `  • כפתורי טאבים: ${tabButtons.length}\n`;
-            tabButtons.forEach((btn, index) => {
-                const tabName = btn.dataset.tab || btn.textContent.trim();
-                const isActive = btn.classList.contains('active');
-                uiInfo += `    - טאב ${index + 1}: "${tabName}" (${isActive ? 'פעיל' : 'לא פעיל'})\n`;
-            });
-        } else {
-            uiInfo += `  • כפתורי טאבים: 0 (לא נמצאו)\n`;
-            if (functionsTabsContainer) {
-                uiInfo += `  • קונטיינר טאבים: נמצא (functions-tabs-container)\n`;
-            } else {
-                uiInfo += `  • קונטיינר טאבים: לא נמצא\n`;
-            }
-        }
-        
-        if (tabContents.length > 0) {
-            uiInfo += `  • תוכן טאבים: ${tabContents.length}\n`;
-            tabContents.forEach((content, index) => {
-                const isVisible = content.style.display !== 'none';
-                const contentLength = content.textContent.trim().length;
-                uiInfo += `    - תוכן ${index + 1}: ${isVisible ? 'גלוי' : 'מוסתר'} (${contentLength} תווים)\n`;
-            });
-        } else {
-            uiInfo += `  • תוכן טאבים: 0 (לא נמצאו)\n`;
-        }
-        
-        // 4. Form Elements
+        // 3. Form Elements
         uiInfo += '\n📝 אלמנטי טופס:\n';
         const inputs = document.querySelectorAll('input, select, textarea');
         const forms = document.querySelectorAll('form');
-        console.log('🔍 Debug: Found inputs:', inputs.length, inputs);
         uiInfo += `  • שדות קלט: ${inputs.length}\n`;
         uiInfo += `  • טפסים: ${forms.length}\n`;
         
-        // 5. Interactive Elements
+        // 4. Interactive Elements
         uiInfo += '\n🖱️ אלמנטים אינטראקטיביים:\n';
         const clickableElements = document.querySelectorAll('button, .btn, a, [onclick]');
-        console.log('🔍 Debug: Found clickable elements:', clickableElements.length);
         uiInfo += `  • אלמנטים ניתנים ללחיצה: ${clickableElements.length}\n`;
         
-        // 6. Data Tables
+        // 5. Data Tables
         uiInfo += '\n📊 טבלאות נתונים:\n';
         const dataTables = document.querySelectorAll('table');
         uiInfo += `  • טבלאות: ${dataTables.length}\n`;
@@ -1965,22 +1721,22 @@ JsMapSystem.prototype.getDetailedUIInfo = function() {
             uiInfo += `    - טבלה ${index + 1}: ${rows.length} שורות, ${cells.length} תאים\n`;
         });
         
-        // 7. Notifications
+        // 6. Notifications
         uiInfo += '\n🔔 התראות:\n';
         const notifications = document.querySelectorAll('.notification, .alert, .toast');
         uiInfo += `  • התראות פעילות: ${notifications.length}\n`;
         
-        // 8. Modal Dialogs
+        // 7. Modal Dialogs
         uiInfo += '\n🪟 חלונות מודאליים:\n';
         const modals = document.querySelectorAll('.modal, .dialog');
         uiInfo += `  • חלונות מודאליים: ${modals.length}\n`;
         
-        // 9. Loading States
+        // 8. Loading States
         uiInfo += '\n⏳ מצבי טעינה:\n';
         const loadingElements = document.querySelectorAll('[class*="loading"], [class*="spinner"], .fa-spinner');
         uiInfo += `  • אלמנטי טעינה: ${loadingElements.length}\n`;
         
-        // 10. Error States
+        // 9. Error States
         uiInfo += '\n❌ מצבי שגיאה:\n';
         const errorElements = document.querySelectorAll('[class*="error"], [class*="danger"], .text-danger');
         uiInfo += `  • אלמנטי שגיאה: ${errorElements.length}\n`;
@@ -2536,14 +2292,8 @@ JsMapSystem.prototype.clearCache = async function() {
         await this.indexedDB.deleteSystemStats('js_map_cache');
         console.log('🗑️ Cache cleared successfully');
         
-        if (window.showNotification) {
-            window.showNotification('המטמון נוקה בהצלחה', 'success', 'מטמון', 3000);
-        }
     } catch (error) {
         console.error('❌ Failed to clear cache:', error);
-        if (window.showNotification) {
-            window.showNotification('שגיאה בניקוי המטמון', 'error', 'שגיאה', 3000);
-        }
     }
 }
 
@@ -2570,14 +2320,8 @@ JsMapSystem.prototype.refreshData = async function() {
         
         console.log('✅ Data refreshed successfully');
         
-        if (window.showNotification) {
-            window.showNotification('נתונים רוענו בהצלחה', 'success', 'רענון', 3000);
-        }
     } catch (error) {
         console.error('❌ Failed to refresh data:', error);
-        if (window.showNotification) {
-            window.showNotification('שגיאה ברענון הנתונים', 'error', 'שגיאה', 3000);
-        }
     }
 }
 
@@ -2592,9 +2336,6 @@ function refreshJsMapData() {
         window.jsMapSystem.refreshData();
     } else {
         console.error('❌ jsMapSystem not available');
-        if (window.showNotification) {
-            window.showNotification('שגיאה', 'מערכת JS-Map לא זמינה', 'error');
-        }
     }
 }
 
@@ -2643,9 +2384,6 @@ function toggleDevelopmentSection(sectionId) {
             console.log(`🔧 Opened development section: ${sectionId}`);
             
             // Show development notification
-            if (window.showNotification) {
-                window.showNotification('🚧 פיתוח עתידי', 'פונקציונליות זו בפיתוח עתידי. ראה דוקומנטציה לפרטים נוספים.', 'info');
-            }
         } else {
             sectionBody.style.display = 'none';
             toggleIcon.textContent = '▶';
@@ -2774,28 +2512,21 @@ JsMapSystem.prototype.detectLocalFunctions = async function() {
 JsMapSystem.prototype.syncGlobalFunctions = async function() {
     try {
         console.log('🔄 Starting global functions sync...');
-        const response = await fetch('/api/js-map/sync-global-functions', {
+        const result = await window.apiCall('/api/js-map/sync-global-functions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             }
         });
-        const result = await response.json();
         
         if (result.status === 'success') {
             console.log('✅ Global functions sync completed:', result.data);
-            if (window.showNotification) {
-                window.showNotification('סנכרון פונקציות גלובליות הושלם בהצלחה', 'success', 'הצלחה', 3000);
-            }
             return result.data;
         } else {
             throw new Error(result.error || 'Unknown error');
         }
     } catch (error) {
         console.error('❌ Failed to sync global functions:', error);
-        if (window.showNotification) {
-            window.showNotification('שגיאה בסנכרון פונקציות גלובליות', 'error', 'שגיאה', 3000);
-        }
         throw error;
     }
 };
@@ -2911,8 +2642,8 @@ JsMapSystem.prototype.findGlobalAlternative = function(functionName, globalFunct
 
 JsMapSystem.prototype.generateDetailedLogContent = function() {
     let log = `=== JS-Map Analysis Report ===\n`;
-    log += `Date: ${new Date().toLocaleDateString('he-IL')}\n`;
-    log += `Time: ${new Date().toLocaleTimeString('he-IL')}\n\n`;
+    log += `Date: ${window.formatDate(new Date())}\n`;
+    log += `Time: ${window.formatTimeOnly(new Date())}\n\n`;
     
     log += `System Statistics:\n`;
     log += `- Total JS Files: ${Object.keys(this.functionsData || {}).length}\n`;
@@ -2947,7 +2678,6 @@ window.refreshDashboardData = refreshJsMapData; // Alias
 window.exportToCSV = exportToCSV;
 window.exportToJSON = exportToJSON;
 window.generateReport = generateReport;
-window.switchTab = switchTab;
 window.refreshStatistics = refreshStatistics;
 
 // Export new analysis functions
@@ -2997,15 +2727,17 @@ window.exportAnalysis = function() {
 // System Statistics Functions
 window.updateSystemStats = function() {
     if (window.jsMapSystem) {
-        return window.jsMapSystem.updateSystemStats();
+        window.jsMapSystem.updateSystemStats(true); // true = manual call
+        return true;
     }
     console.error('❌ jsMapSystem not available');
+    return false;
 };
 
 // System Status Functions
-window.refreshSystemStatus = function() {
+window.refreshSystemStatus = async function() {
     if (window.jsMapSystem) {
-        return window.jsMapSystem.refreshSystemStatus();
+        return await window.jsMapSystem.refreshSystemStatus();
     }
     console.error('❌ jsMapSystem not available');
 };
@@ -3024,9 +2756,9 @@ window.testSystemConnectivity = function() {
     console.error('❌ jsMapSystem not available');
 };
 
-window.clearSystemCache = function() {
+window.clearSystemCache = async function() {
     if (window.jsMapSystem) {
-        return window.jsMapSystem.clearSystemCache();
+        return await window.jsMapSystem.clearSystemCache();
     }
     console.error('❌ jsMapSystem not available');
 };

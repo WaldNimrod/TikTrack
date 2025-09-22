@@ -695,7 +695,7 @@
 .system-check-results-container .card-header {
   background: var(--apple-blue-light);
   border-bottom: 1px solid var(--apple-blue);
-  border-radius: var(--apple-radius-medium) var(--apple-radius-medium) 0 0 !important;
+  border-radius: var(--apple-radius-medium) var(--apple-radius-medium) 0 0 ;
 }
 
 .system-check-results-container .card-header h5 {
@@ -714,32 +714,32 @@
 
 /* Summary Cards */
 .system-check-results-container .card.border-success {
-  border-color: var(--apple-green) !important;
+  border-color: var(--apple-green) ;
 }
 
 .system-check-results-container .card.border-warning {
-  border-color: var(--apple-orange) !important;
+  border-color: var(--apple-orange) ;
 }
 
 .system-check-results-container .card.border-danger {
-  border-color: #dc3545 !important;
+  border-color: #dc3545 ;
 }
 
 .system-check-results-container .card.border-info {
-  border-color: var(--apple-blue) !important;
+  border-color: var(--apple-blue) ;
 }
 
 /* Accordion Styling */
 .system-check-results-container .accordion-item {
   border: 1px solid var(--apple-border-light);
-  border-radius: var(--apple-radius-small) !important;
+  border-radius: var(--apple-radius-small) ;
   margin-bottom: 0.5rem;
 }
 
 .system-check-results-container .accordion-button {
   background: var(--apple-bg-secondary);
   border: none;
-  border-radius: var(--apple-radius-small) !important;
+  border-radius: var(--apple-radius-small) ;
   font-weight: 500;
   padding: 0.75rem 1rem;
 }
@@ -762,20 +762,20 @@
 
 /* Status Icons */
 .system-check-results-container .text-success {
-  color: var(--apple-green-dark) !important;
+  color: var(--apple-green-dark) ;
 }
 
 .system-check-results-container .text-warning {
-  color: var(--apple-orange-dark) !important;
+  color: var(--apple-orange-dark) ;
 }
 
 .system-check-results-container .text-danger {
-  color: #dc3545 !important;
+  color: #dc3545 ;
 }
 
 /* Details Pre */
 .system-check-results-container pre {
-  background: var(--apple-bg-secondary) !important;
+  background: var(--apple-bg-secondary) ;
   border: 1px solid var(--apple-border-light);
   border-radius: var(--apple-radius-small);
   font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;

@@ -105,6 +105,9 @@
               הוסף
             </button>
             <div class="action-separator"></div>
+            <button class="btn btn-sm btn-outline-primary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים והתכנונים">
+              <i class="fas fa-copy"></i> העתק לוג מפורט
+            </button>
             <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר אזור עיצובים">
               <span class="filter-icon">▲</span>
             </button>
@@ -133,7 +136,7 @@
       <!-- Main content -->
       <div class="main-content">
         <!-- My planning area - content-section -->
-        <div class="content-section planning-page">
+        <div class="content-section planning-page" id="main">
           <!-- My planning header -->
           <div class="section-header">
             <div class="table-title">
@@ -149,7 +152,7 @@
                 <img src="images/icons/trade_plans.svg" alt="הוסף" class="action-icon"
                   style="width: 16px; height: 16px;"> הוסף
               </button>
-              <button class="filter-toggle-btn" onclick="toggleMainSection()" title="הצג/הסתר אזור התכנונים שלי">
+              <button class="filter-toggle-btn" onclick="toggleSection('main')" title="הצג/הסתר אזור התכנונים שלי">
                 <span class="filter-icon">▲</span>
               </button>
             </div>
@@ -690,7 +693,6 @@
   <script src="scripts/linked-items.js"></script>
 
   <script src="scripts/page-utils.js"></script>
-  <script src="scripts/main.js"></script>
   <script src="scripts/header-system.js?v=20250115_level3_fix"></script>
   <script src="scripts/alert-service.js"></script>
   <script src="scripts/active-alerts-component.js?v=20250830_1"></script>

@@ -27,10 +27,14 @@ function toggleSection(sectionId) {
 
 // Sorting functions
 function sortTable(columnIndex, tableId) {
-    if (typeof window.sortTable === 'function') {
-        window.sortTable(columnIndex, tableId);
+    if (typeof window.sortTableData === 'function') {
+        // Get data based on tableId and call global function
+        const data = getTableDataById(tableId);
+        if (data) {
+            window.sortTableData(columnIndex, data, tableId, updateTableDisplay);
+        }
     } else {
-        console.warn('sortTable function not found');
+        console.warn('sortTableData function not found');
     }
 }
 

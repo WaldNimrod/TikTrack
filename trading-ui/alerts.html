@@ -105,9 +105,14 @@
       <div class="top-section" id="topSection">
         <div class="section-header">
           <h2>🔔 התראות - סקירה כללית</h2>
-          <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
-            <span class="section-toggle-icon">▼</span>
-          </button>
+          <div class="section-actions">
+            <button class="btn btn-sm btn-outline-primary" onclick="copyDetailedLog()" title="העתק לוג מפורט עם כל הנתונים וההתראות">
+              <i class="fas fa-copy"></i> העתק לוג מפורט
+            </button>
+            <button class="filter-toggle-btn" onclick="toggleTopSection()" title="הצג/הסתר סקשן">
+              <span class="section-toggle-icon">▼</span>
+            </button>
+          </div>
         </div>
         <div class="section-body">
           <!-- Color Scheme Demo for Alerts -->
@@ -485,7 +490,6 @@
 
     <!-- Modular files -->
     <script src="scripts/ui-utils.js"></script>
-    <script src="scripts/main.js"></script>
     <script src="scripts/notification-system.js"></script>
     <script src="scripts/warning-system.js"></script>
     <script src="scripts/header-system.js?v=v37_alerts_colors"></script>

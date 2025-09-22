@@ -9,18 +9,7 @@
  * @date 2025
  */
 
-// Notification function - uses global notification system
-// This function is a wrapper that calls the global showNotification function
-function showNotification(message, type = 'info', title = 'מערכת', duration = 5000) {
-    // Check if global notification system is available and it's not this function
-    if (typeof window.showNotification === 'function' && window.showNotification !== showNotification) {
-        // Call the global notification system
-        window.showNotification(message, type, title, duration);
-    } else {
-        // Fallback to console.log if global system is not available
-        console.log(`[${type.toUpperCase()}] ${title}: ${message}`);
-    }
-}
+// Use global notification system directly
 
 // Style File Control Functions
 // Store disabled styles for restoration

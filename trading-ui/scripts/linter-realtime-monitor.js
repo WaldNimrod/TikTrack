@@ -214,14 +214,37 @@ async function initializeLinterSystem() {
         // Setup event listeners
         setupEventListeners();
         
+        // Load existing file mapping from IndexedDB
+        try {
+            await loadExistingFileMapping();
+        } catch (error) {
+            console.error('❌ Failed to load existing file mapping:', error);
+            addLogEntry('WARNING', '⚠️ לא ניתן לטעון מיפוי קיים מבסיס הנתונים');
+        }
+        
         // Update file mapping status display
         updateFileMappingStatus();
         
         // Auto-discover files on page load
-    setTimeout(() => {
+        console.log('🚀 Setting up auto-discovery timer...');
+        addLogEntry('INFO', '🕐 מגדיר טיימר לגילוי קבצים אוטומטי...');
+        
+        setTimeout(() => {
             console.log('🚀 Auto-discovering files on page load...');
-            discoverProjectFiles();
+            addLogEntry('INFO', '🚀 מתחיל גילוי קבצים אוטומטי בטעינת הדף...');
+            discoverProjectFiles().catch(error => {
+                console.error('❌ Auto-discovery failed:', error);
+                addLogEntry('ERROR', `❌ גילוי קבצים אוטומטי נכשל: ${error.message}`);
+            });
         }, 1000);
+        
+        // Also try immediate discovery as fallback
+        console.log('🚀 Also trying immediate discovery...');
+        addLogEntry('INFO', '🚀 מנסה גם גילוי קבצים מיידי...');
+        discoverProjectFiles().catch(error => {
+            console.error('❌ Immediate discovery failed:', error);
+            addLogEntry('ERROR', `❌ גילוי קבצים מיידי נכשל: ${error.message}`);
+        });
         
         console.log('✅ Linter system initialized');
     } catch (error) {
@@ -348,6 +371,63 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 // ========================================
+// Load Existing File Mapping
+// ========================================
+
+/**
+ * טען מיפוי קבצים קיים מ-IndexedDB
+ */
+async function loadExistingFileMapping() {
+    console.log('🔍 ===== LOAD EXISTING FILE MAPPING =====');
+    try {
+        // Check if UnifiedIndexedDB is available
+        if (!window.UnifiedIndexedDB || typeof window.UnifiedIndexedDB.getFileMapping !== 'function') {
+            console.warn('⚠️ UnifiedIndexedDB not ready yet - skipping file mapping load');
+            return;
+        }
+        
+        // Initialize UnifiedIndexedDB if not already initialized
+        if (!window.UnifiedIndexedDB.isInitialized) {
+            console.log('🔄 Initializing UnifiedIndexedDB...');
+            await window.UnifiedIndexedDB.initialize();
+            console.log('✅ UnifiedIndexedDB initialized successfully');
+        }
+        
+        // Try to load existing file mapping
+        const savedMapping = await window.UnifiedIndexedDB.getFileMapping();
+        console.log('📊 Saved file mapping from IndexedDB:', savedMapping);
+        
+        if (savedMapping && savedMapping.files) {
+            // Restore file mapping to memory
+            window.projectFiles = savedMapping.files;
+            console.log('✅ File mapping restored from IndexedDB:', Object.keys(savedMapping.files));
+            
+            // Calculate total files
+            let totalFiles = 0;
+            Object.keys(savedMapping.files).forEach(type => {
+                if (savedMapping.files[type] && Array.isArray(savedMapping.files[type])) {
+                    totalFiles += savedMapping.files[type].length;
+                }
+            });
+            
+            console.log(`✅ Restored ${totalFiles} files from IndexedDB mapping`);
+            addLogEntry('INFO', `📊 נטען מיפוי קבצים קיים מ-IndexedDB (${totalFiles} קבצים)`);
+            
+            // Update UI immediately
+            updateFileMappingStatus();
+            updateFileTypeStatistics([]);
+            
+        } else {
+            console.log('📊 No existing file mapping found in IndexedDB');
+        }
+        
+    } catch (error) {
+        console.error('❌ Failed to load existing file mapping:', error);
+        addLogEntry('WARNING', `⚠️ שגיאה בטעינת מיפוי קיים: ${error.message}`);
+    }
+}
+
+// ========================================
 // Scan Results Check After Mapping
 // ========================================
 
@@ -426,14 +506,31 @@ async function discoverProjectFiles() {
     }
     
     try {
-        // Use global project files scanner if available
-        if (typeof window.projectFilesScanner !== 'undefined') {
-            addLogEntry('INFO', 'משתמש במנגנון סריקת קבצים גלובלי...');
-            const discoveredFiles = await window.projectFilesScanner.getProjectFiles(['js', 'html', 'css', 'python', 'other']);
-            const stats = await window.projectFilesScanner.getFileStatistics();
-            
-            console.log('📁 Discovered files:', discoveredFiles);
-            console.log('📊 File statistics:', stats);
+        // Call server API directly
+        addLogEntry('INFO', 'קורא ל-API של השרת לגילוי קבצים...');
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 seconds timeout
+        
+        const response = await fetch('/api/file-scanner/files', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        const discoveredFiles = data.files || {};
+        
+        console.log('📁 Discovered files from API:', discoveredFiles);
+        console.log('📊 Discovery timestamp:', data.discovery_timestamp);
             
             // Store in global variable for backward compatibility
             window.projectFiles = discoveredFiles;
@@ -511,16 +608,7 @@ async function discoverProjectFiles() {
                 console.warn('Failed to save updated scanning results to localStorage:', error);
             }
             
-            return discoveredFiles;
-                } else {
-            addLogEntry('ERROR', '❌ מנגנון סריקת קבצים גלובלי לא זמין');
-            addLogEntry('WARNING', '⚠️ המערכת לא יכולה לגלות קבצים כרגע');
-            
-            // Show notification to user
-            addLogEntry('ERROR', '❌ מנגנון סריקת קבצים לא זמין');
-            
-            return await discoverProjectFilesFallback();
-        }
+        return discoveredFiles;
     } catch (error) {
         console.error('❌ Error in discoverProjectFiles:', error);
         addLogEntry('ERROR', `❌ שגיאה בגילוי קבצים: ${error.message}`);
@@ -698,19 +786,19 @@ function toggleSection(sectionId) {
 
 function refreshFileList() {
   if (window.showInfoNotification) {
-    window.showInfoNotification('רענון רשימת קבצים', 'רשימת הקבצים תתעדכן בעתיד');
+    window.showInfoNotification('רענון רשימת קבצים', 'רשימת הקבצים תתעדכן בעתיד', 4000, 'development');
   }
 }
 
 function clearFileCache() {
   if (window.showInfoNotification) {
-    window.showInfoNotification('ניקוי מטמון קבצים', 'מטמון הקבצים ינוקה בעתיד');
+    window.showInfoNotification('ניקוי מטמון קבצים', 'מטמון הקבצים ינוקה בעתיד', 4000, 'development');
   }
 }
 
 function exportFileList() {
   if (window.showInfoNotification) {
-    window.showInfoNotification('ייצוא רשימת קבצים', 'רשימת הקבצים תייצא בעתיד');
+    window.showInfoNotification('ייצוא רשימת קבצים', 'רשימת הקבצים תייצא בעתיד', 4000, 'development');
   }
 }
 
@@ -796,6 +884,9 @@ async function scanJavaScriptFiles() {
             await scanSingleFile(fileName);
             // Only count as scanned if no error occurred
             window.scanningResults.scannedFiles++;
+            
+            // Update dashboard statistics after each file is scanned
+            updateScanningDetailedStats();
         } catch (error) {
             console.error(`❌ Error scanning file ${fileName}:`, error);
             // Only add to errors if it's not a 404 (file not found)
@@ -929,6 +1020,8 @@ async function scanSingleFile(fileName) {
         // Update UI with real-time progress - ONLY if actually scanning
         if (window.scanningResults && window.scanningResults.scannedFiles > 0) {
             updateRealtimeProgress();
+            // Also update dashboard statistics in real-time
+            updateScanningDetailedStats();
         }
         
         console.log('✅ File scanned successfully:', fileName);
@@ -939,6 +1032,8 @@ async function scanSingleFile(fileName) {
         // Don't count as scanned if there was an error - ONLY if actually scanning
         if (window.scanningResults && window.scanningResults.scannedFiles > 0) {
             updateRealtimeProgress();
+            // Also update dashboard statistics in real-time
+            updateScanningDetailedStats();
         }
         console.log('📄 ===== END SCAN SINGLE FILE (ERROR) =====');
     }
@@ -1248,7 +1343,8 @@ function updateFileMappingStatus() {
     
     // Update lastMappingUpdate (appears in multiple places)
     const lastMappingUpdateElements = document.querySelectorAll('#lastMappingUpdate');
-    const mappingUpdateText = (window.scanningResults && window.scanningResults.totalFiles > 0) ? 
+    const hasMappedFiles = window.projectFiles && Object.keys(window.projectFiles).length > 0;
+    const mappingUpdateText = hasMappedFiles ? 
         new Date().toLocaleString('he-IL', {
             year: 'numeric',
             month: '2-digit',
@@ -1654,11 +1750,11 @@ function updateMappingTrafficLight() {
     }
     
     const hasDiscoveredFiles = window.projectFiles && Object.keys(window.projectFiles).length > 0;
-    const isMappingActive = window.scanningResults && window.scanningResults.totalFiles > 0;
+    const isMappingComplete = hasDiscoveredFiles; // Mapping is complete when we have project files
     
     console.log('🚦 updateMappingTrafficLight:', {
         hasDiscoveredFiles,
-        isMappingActive,
+        isMappingComplete,
         projectFiles: window.projectFiles,
         scanningResults: window.scanningResults
     });
@@ -1666,14 +1762,10 @@ function updateMappingTrafficLight() {
     // Remove all status classes
     light.classList.remove('status-gray', 'status-orange', 'status-green', 'status-red');
     
-    if (hasDiscoveredFiles && isMappingActive) {
+    if (isMappingComplete) {
         // Mapping completed successfully
         light.classList.add('status-green');
         console.log('✅ Mapping traffic light set to GREEN');
-    } else if (isMappingActive) {
-        // Mapping in progress
-        light.classList.add('status-orange');
-        console.log('🟠 Mapping traffic light set to ORANGE');
     } else {
         // No mapping done yet
         light.classList.add('status-gray');
@@ -2240,6 +2332,7 @@ window.discoverProjectFiles = discoverProjectFiles;
 window.updateFileMappingStatus = updateFileMappingStatus;
 window.startFileScan = startFileScan;
 window.checkExistingScanResults = checkExistingScanResults;
+window.loadExistingFileMapping = loadExistingFileMapping;
 // window.copyDetailedLog = copyDetailedLog; // REMOVED: Development mechanism - page-specific only
 // window.copyLinterDetailedLog = copyDetailedLog; // REMOVED: Development mechanism - page-specific only
 window.toggleTopSection = toggleTopSection;

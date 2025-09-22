@@ -1132,7 +1132,7 @@ async function checkLinkedItemsBeforeDeleteTicker(tickerId) {
         return true;
       } else {
         if (typeof window.showNotification === 'function') {
-          window.showNotification('אזהרה', 'יש פריטים מקושרים לטיקר זה', 'warning');
+          window.showNotification('יש פריטים מקושרים לטיקר זה', 'warning', 'אזהרה', 5000, 'business');
         }
         return true;
       }
@@ -1172,7 +1172,7 @@ async function checkLinkedItemsBeforeCancelTicker(tickerId) {
         return true;
       } else {
         if (typeof window.showNotification === 'function') {
-          window.showNotification('אזהרה', 'יש פריטים מקושרים לטיקר זה', 'warning');
+          window.showNotification('יש פריטים מקושרים לטיקר זה', 'warning', 'אזהרה', 5000, 'business');
         }
         return true;
       }

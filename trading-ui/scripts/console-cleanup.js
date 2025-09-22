@@ -42,17 +42,17 @@ function suppressConsoleMessages() {
     const logSystem = {
       log: (...args) => {
         if (typeof window.showNotification === 'function') {
-          window.showNotification(args.join(' '), 'info');
+          window.showNotification(args.join(' '), 'info', 'מידע', 4000, 'system');
         }
       },
       warn: (...args) => {
         if (typeof window.showNotification === 'function') {
-          window.showNotification(args.join(' '), 'warning');
+          window.showNotification(args.join(' '), 'warning', 'אזהרה', 5000, 'system');
         }
       },
       error: (...args) => {
         if (typeof window.showNotification === 'function') {
-          window.showNotification(args.join(' '), 'error');
+          window.showNotification(args.join(' '), 'error', 'שגיאה', 6000, 'system');
         }
       },
     };

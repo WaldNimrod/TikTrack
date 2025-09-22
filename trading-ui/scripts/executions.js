@@ -980,7 +980,7 @@ async function saveExecution() {
 
       if (typeof window.showSuccessNotification === 'function') {
         // Calling showSuccessNotification
-        window.showSuccessNotification('הצלחה', 'עסקה חדשה נוספה בהצלחה למערכת');
+        window.showSuccessNotification('הצלחה', 'עסקה חדשה נוספה בהצלחה למערכת', 4000, 'business');
       } else {
         handleSystemError(new Error('showSuccessNotification not available'), 'מערכת התראות');
       }
@@ -1128,7 +1128,7 @@ async function updateExecution() {
 
       if (typeof window.showSuccessNotification === 'function') {
         // Calling showSuccessNotification
-        window.showSuccessNotification('הצלחה', 'עסקה עודכנה בהצלחה במערכת');
+        window.showSuccessNotification('הצלחה', 'עסקה עודכנה בהצלחה במערכת', 4000, 'business');
       } else {
         handleSystemError(new Error('showSuccessNotification not available'), 'מערכת התראות');
       }
@@ -1236,7 +1236,7 @@ async function confirmDeleteExecution(_id) {
 
       if (typeof window.showSuccessNotification === 'function') {
         // Calling showSuccessNotification
-        window.showSuccessNotification('הצלחה', 'עסקה נמחקה בהצלחה מהמערכת');
+        window.showSuccessNotification('הצלחה', 'עסקה נמחקה בהצלחה מהמערכת', 4000, 'business');
       } else {
         handleSystemError(new Error('showSuccessNotification not available'), 'מערכת התראות');
       }

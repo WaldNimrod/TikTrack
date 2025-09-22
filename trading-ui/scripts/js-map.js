@@ -102,13 +102,13 @@ class JsMapSystem {
             console.log('📡 Using direct fetch for API requests');
                 
                 // Load functions data
-            const functionsData = await window.apiCall('/api/js-map/functions');
+            const functionsData = await window.apiCall('/api/file-scanner/functions');
             this.functionsData = functionsData.data || functionsData;
                 console.log('✅ Functions data loaded:', Object.keys(this.functionsData || {}));
                 console.log('📊 Functions data sample:', JSON.stringify(this.functionsData, null, 2).substring(0, 200) + '...');
                 
                 // Load page mapping data
-            const mappingData = await window.apiCall('/api/js-map/page-mapping');
+            const mappingData = await window.apiCall('/api/file-scanner/page-mapping');
             this.pageMapping = mappingData.data || mappingData;
                 console.log('✅ Page mapping data loaded:', Object.keys(this.pageMapping || {}));
                 console.log('📊 Page mapping sample:', JSON.stringify(this.pageMapping, null, 2).substring(0, 200) + '...');
@@ -138,8 +138,8 @@ class JsMapSystem {
         
         try {
             const [functionsData, mappingData] = await Promise.all([
-                window.apiCall('/api/js-map/functions'),
-                window.apiCall('/api/js-map/page-mapping')
+                window.apiCall('/api/file-scanner/functions'),
+                window.apiCall('/api/file-scanner/page-mapping')
             ]);
 
                 this.functionsData = functionsData.data || functionsData;
@@ -350,7 +350,7 @@ class JsMapSystem {
             // Show success notification only when called manually
             if (isManual) {
                 if (window.showNotification) {
-                    window.showNotification('סטטיסטיקות מערכת עודכנו בהצלחה', 'success', 'הצלחה', 2000);
+                    window.showNotification('סטטיסטיקות מערכת עודכנו בהצלחה', 'success', 'הצלחה', 2000, 'system');
                 }
             }
             
@@ -443,7 +443,7 @@ class JsMapSystem {
         console.log('🌐 Testing system connectivity...');
         try {
             const startTime = Date.now();
-            const response = await window.apiCall('/api/js-map/functions');
+            const response = await window.apiCall('/api/file-scanner/functions');
             const endTime = Date.now();
             const responseTime = endTime - startTime;
             
@@ -718,7 +718,7 @@ class JsMapSystem {
     async analyzeDuplicates() {
         console.log('🔍 Starting duplicates analysis...');
         try {
-            const result = await window.apiCall('/api/js-map/analyze-duplicates');
+            const result = await window.apiCall('/api/file-scanner/duplicates');
             
             if (result.status === 'success') {
                 console.log('✅ Duplicates analysis completed:', result.data);
@@ -738,7 +738,7 @@ class JsMapSystem {
     async detectLocalFunctions() {
         console.log('🏠 Starting local functions detection...');
         try {
-            const result = await window.apiCall('/api/js-map/detect-local-functions');
+            const result = await window.apiCall('/api/file-scanner/local-functions');
             
             if (result.status === 'success') {
                 console.log('✅ Local functions detection completed:', result.data);
@@ -951,7 +951,7 @@ class JsMapSystem {
      */
     showErrorNotification(title, message) {
         if (window.showNotification) {
-            window.showNotification(message, 'error', title, 8000);
+            window.showNotification(message, 'error', title, 8000, 'system');
         } else {
             console.error(`${title}: ${message}`);
         }
@@ -1034,19 +1034,43 @@ class JsMapSystem {
 
         let html = '<div class="page-mapping-container">';
         html += '<h4>📄 מיפוי עמודים לקבצי JavaScript</h4>';
+        
+        // Add summary statistics
+        const totalPages = Object.keys(this.pageMapping).length;
+        const totalScripts = Object.values(this.pageMapping).reduce((sum, scripts) => {
+            return sum + (Array.isArray(scripts) ? scripts.length : 0);
+        }, 0);
+        
+        html += `<div class="mapping-summary">
+            <div class="summary-stats">
+                <span class="stat-item">
+                    <i class="fas fa-file-alt"></i>
+                    <strong>${totalPages}</strong> עמודים
+                </span>
+                <span class="stat-item">
+                    <i class="fas fa-code"></i>
+                    <strong>${totalScripts}</strong> קבצי JS
+                </span>
+            </div>
+        </div>`;
+        
         html += '<div class="mapping-list">';
 
         Object.entries(this.pageMapping).forEach(([page, scripts]) => {
+            const scriptCount = Array.isArray(scripts) ? scripts.length : 0;
             html += `
                 <div class="mapping-item">
-                    <div class="page-name">
-                        <i class="fas fa-file-alt"></i>
-                        <strong>${page}</strong>
-                    </div>
-                    <div class="scripts-list">
-                        ${Array.isArray(scripts) ? scripts.map(script => 
-                            `<span class="script-tag">${script}</span>`
-                        ).join('') : 'אין קבצי JS'}
+                    <div class="page-info">
+                        <div class="page-name">
+                            <i class="fas fa-file-alt"></i>
+                            <strong>${page}</strong>
+                            <span class="script-count">(${scriptCount} קבצים)</span>
+                        </div>
+                        <div class="scripts-list">
+                            ${Array.isArray(scripts) ? scripts.map(script => 
+                                `<span class="script-tag" title="קובץ JavaScript">${script}</span>`
+                            ).join('') : '<span class="no-scripts">אין קבצי JS</span>'}
+                        </div>
                     </div>
                 </div>
             `;
@@ -1055,6 +1079,108 @@ class JsMapSystem {
         html += '</div></div>';
         contentArea.innerHTML = html;
         console.log('✅ Page mapping rendered successfully');
+    }
+
+    /**
+     * Refresh page mapping data
+     * מרענן נתוני מיפוי עמודים
+     */
+    async refreshPageMapping() {
+        console.log('🔄 Refreshing page mapping data...');
+        
+        try {
+            // Show loading state
+            const container = document.getElementById('pageMappingContent');
+            if (container) {
+                container.innerHTML = `
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        מרענן מיפוי עמודים...
+                    </div>
+                `;
+            }
+
+            // Load fresh data from server
+            const mappingData = await window.apiCall('/api/file-scanner/page-mapping');
+            this.pageMapping = mappingData.data || mappingData;
+            
+            console.log('✅ Page mapping data refreshed:', Object.keys(this.pageMapping || {}));
+
+            // Re-render the section
+            this.renderPageMappingData();
+            
+            // Show success notification
+            if (window.showSuccessNotification) {
+                window.showSuccessNotification('הצלחה', 'מיפוי עמודים רוענן בהצלחה');
+            }
+
+        } catch (error) {
+            console.error('❌ Failed to refresh page mapping:', error);
+            
+            // Show error notification
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה', `שגיאה ברענון מיפוי עמודים: ${error.message}`);
+            }
+            
+            // Restore previous content
+            if (container) {
+                container.innerHTML = '<div class="no-data">שגיאה בטעינת נתונים</div>';
+            }
+        }
+    }
+
+    /**
+     * Export page mapping data
+     * מייצא נתוני מיפוי עמודים
+     */
+    exportPageMapping() {
+        console.log('📥 Exporting page mapping data...');
+        
+        if (!this.pageMapping || Object.keys(this.pageMapping).length === 0) {
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה', 'אין נתוני מיפוי לייצוא');
+            }
+            return;
+        }
+
+        try {
+            // Create export data
+            const exportData = {
+                timestamp: new Date().toISOString(),
+                totalPages: Object.keys(this.pageMapping).length,
+                totalScripts: Object.values(this.pageMapping).reduce((sum, scripts) => {
+                    return sum + (Array.isArray(scripts) ? scripts.length : 0);
+                }, 0),
+                pageMapping: this.pageMapping
+            };
+
+            // Create and download JSON file
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `page-mapping-${new Date().toISOString().split('T')[0]}.json`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            console.log('✅ Page mapping exported successfully');
+            
+            // Show success notification
+            if (window.showSuccessNotification) {
+                window.showSuccessNotification('הצלחה', 'מיפוי עמודים יוצא בהצלחה');
+            }
+
+        } catch (error) {
+            console.error('❌ Failed to export page mapping:', error);
+            
+            // Show error notification
+            if (window.showErrorNotification) {
+                window.showErrorNotification('שגיאה', `שגיאה בייצוא מיפוי עמודים: ${error.message}`);
+            }
+        }
     }
 
     /**
@@ -1114,13 +1240,13 @@ class JsMapSystem {
     renderFunctionsData() {
         console.log('⚙️ Rendering functions data...');
         
-        const container = document.getElementById('functionsContent');
+        const container = document.getElementById('functionsListContent');
         if (!container) {
-            console.error('❌ functionsContent container not found');
+            console.error('❌ functionsListContent container not found');
             return;
         }
         
-        console.log('✅ Found functionsContent container');
+        console.log('✅ Found functionsListContent container');
         
         // Use the container directly since it's already the content area
         const contentArea = container;
@@ -1369,8 +1495,8 @@ async function copyJsMapDetailedLog() {
         let serverData = {};
         try {
             const [functionsResponse, mappingResponse] = await Promise.all([
-                window.apiCall('http://localhost:8080/api/js-map/functions'),
-                window.apiCall('http://localhost:8080/api/js-map/page-mapping')
+                window.apiCall('http://localhost:8080/api/file-scanner/functions'),
+                window.apiCall('http://localhost:8080/api/file-scanner/page-mapping')
             ]);
             
             serverData = {
@@ -1790,6 +1916,41 @@ JsMapSystem.prototype.performAdvancedAnalysis = async function() {
         console.log('✅ Advanced analysis completed');
     } catch (error) {
         console.error('❌ Failed to perform advanced analysis:', error);
+    }
+}
+
+/**
+ * Global functions for page mapping actions
+ * פונקציות גלובליות לפעולות מיפוי עמודים
+ */
+
+/**
+ * Refresh page mapping data
+ * מרענן נתוני מיפוי עמודים
+ */
+async function refreshPageMapping() {
+    if (window.jsMapSystem) {
+        await window.jsMapSystem.refreshPageMapping();
+    } else {
+        console.error('❌ JS-Map System not initialized');
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', 'מערכת JS-Map לא מאותחלת');
+        }
+    }
+}
+
+/**
+ * Export page mapping data
+ * מייצא נתוני מיפוי עמודים
+ */
+function exportPageMapping() {
+    if (window.jsMapSystem) {
+        window.jsMapSystem.exportPageMapping();
+    } else {
+        console.error('❌ JS-Map System not initialized');
+        if (window.showErrorNotification) {
+            window.showErrorNotification('שגיאה', 'מערכת JS-Map לא מאותחלת');
+        }
     }
 }
 
@@ -2512,7 +2673,7 @@ JsMapSystem.prototype.detectLocalFunctions = async function() {
 JsMapSystem.prototype.syncGlobalFunctions = async function() {
     try {
         console.log('🔄 Starting global functions sync...');
-        const result = await window.apiCall('/api/js-map/sync-global-functions', {
+        const result = await window.apiCall('/api/file-scanner/sync-global-functions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

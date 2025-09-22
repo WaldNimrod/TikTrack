@@ -1,9 +1,52 @@
 # Unified IndexedDB System Specification
 # מפרט מערכת IndexedDB מאוחדת
 
-## 📋 סקירה כללית
+**תאריך עדכון:** 2025-01-22  
+**גרסה:** 2.0  
+**סטטוס:** מעודכן לפי תובנות חדשות  
+**מטרה:** מערכת אחת אחידה, גמישה אך מינימלית ויעילה העונה לכל הצרכים באתר
+
+---
+
+## 🔗 **קישורים רלוונטיים - קריאת חובה לפני התחלת העבודה**
+
+### **מסמכי ארכיטקטורה:**
+- [📁 JavaScript Architecture](JAVASCRIPT_ARCHITECTURE.md) - ארכיטקטורת JavaScript הכללית
+- [🎨 CSS Architecture](css/CSS_ARCHITECTURE.md) - ארכיטקטורת CSS (ITCSS)
+- [🏗️ System Architecture](SYSTEM_ARCHITECTURE.md) - ארכיטקטורת המערכת הכללית
+
+### **מערכות קשורות:**
+- [🔍 Project Files Scanner](PROJECT_FILES_SCANNER.md) - מערכת סריקת הקבצים הגלובלית
+- [🗂️ Page Scripts Matrix System](PAGE_SCRIPTS_MATRIX_SYSTEM_SPECIFICATION.md) - מערכת מטריצת הסקריפטים
+- [🔧 Linter Realtime Monitor](LINTER_REALTIME_MONITOR.md) - מערכת הלינטר בזמן אמת
+- [🔔 Notification System](NOTIFICATION_SYSTEM.md) - מערכת התראות ולוגים
+
+### **כללי עבודה:**
+- [📋 Development Guidelines](DEVELOPMENT_GUIDELINES.md) - הנחיות פיתוח
+- [🎯 RTL Development Guide](RTL_DEVELOPMENT_GUIDE.md) - הנחיות פיתוח RTL
+- [🔧 Function Naming](FUNCTION_NAMING.md) - כללי שמות פונקציות
+- [✅ Validation System](VALIDATION_SYSTEM.md) - מערכת ולידציה
+
+### **קבצי מערכת רלוונטיים:**
+- [📄 Project Files Scanner](trading-ui/scripts/project-files-scanner.js) - המערכת הבסיסית
+- [🔧 Linter Monitor](trading-ui/scripts/linter-realtime-monitor.js) - מערכת הלינטר
+- [🗺️ JS-Map System](trading-ui/scripts/js-map.js) - מערכת JS-Map הנוכחית
+- [🌐 JS-Map API](Backend/routes/api/js_map.py) - API של JS-Map
+
+---
+
+## 📋 **סקירה כללית**
 
 מערכת IndexedDB מאוחדת לפרויקט TikTrack המספקת פתרון מרכזי, גמיש ואמין לאחסון נתונים מקומיים בכל המערכות.
+
+### **מטרה מעודכנת:**
+> **מערכת אחת אחידה, גמישה אך מינימלית ויעילה העונה לכל הצרכים באתר**
+
+### **אסטרטגיית אחסון היברידית:**
+- 🗄️ **IndexedDB** - נתונים מורכבים (מיפוי קבצים, ניתוח פונקציות)
+- 💾 **localStorage** - נתונים פשוטים (העדפות, מצב UI)
+- 🧠 **מטמון חכם** - החלטה אוטומטית לפי סוג הנתונים
+- ⚡ **ביצועים מקסימליים** - פחות קריאות לשרת, יותר מהירות
 
 ## 🎯 מטרות המערכת
 
@@ -19,6 +62,8 @@
 - **ניטור** - מעקב אחר ביצועים ושימוש
 - **גיבוי** - מנגנון שחזור נתונים
 - **אופטימיזציה** - ניקוי אוטומטי של נתונים ישנים
+- **הפחתת קריאות לשרת** - מטמון חכם היברידי
+- **איחוד מערכות** - מערכת אחת לכל צרכי האחסון
 
 ## 🏗️ ארכיטקטורת המערכת
 
@@ -397,27 +442,563 @@ class IndexedDBTestSuite {
 - [ ] Performance testing
 - [ ] Documentation completion
 
-## 📋 Success Criteria
+---
 
-### Functional Requirements:
-- ✅ All existing functionality preserved
-- ✅ Unified API for all operations
-- ✅ Improved performance (50% faster)
-- ✅ Better error handling
-- ✅ Comprehensive monitoring
+## 📅 **תוכנית עבודה מפורטת**
 
-### Non-Functional Requirements:
-- ✅ 99.9% uptime
-- ✅ <100ms average operation time
-- ✅ <10MB memory footprint
-- ✅ Zero data loss
-- ✅ Backward compatibility
+### **שלב 1: הכנה ותכנון (שבוע 1)**
+#### **משימות הכנה:**
+- [ ] **קריאת מסמכי חובה** - כל המסמכים בקישורים למעלה
+- [ ] **ניתוח מערכות קיימות** - סקר מלא של כל המערכות הנוכחיות
+- [ ] **מיפוי נתונים** - זיהוי כל סוגי הנתונים הנדרשים
+- [ ] **תכנון API** - עיצוב API אחיד ומפורט
+
+#### **תוצרים:**
+- [ ] מסמך ניתוח מערכות קיימות
+- [ ] מפרט API מפורט
+- [ ] תוכנית מיגרציה מדויקת
+
+### **שלב 2: פיתוח הליבה (שבוע 2-3)**
+#### **משימות פיתוח:**
+- [ ] **יצירת מחלקת הבסיס** - `UnifiedIndexedDBAdapter`
+- [ ] **פיתוח מנגנון אחסון היברידי** - IndexedDB + localStorage
+- [ ] **מנגנון מטמון חכם** - החלטות אוטומטיות
+- [ ] **Error Handling מתקדם** - טיפול בשגיאות מקיף
+- [ ] **Performance Optimization** - אופטימיזציה לביצועים
+
+#### **תוצרים:**
+- [ ] קובץ `unified-indexeddb-adapter.js` פונקציונלי
+- [ ] מערכת בדיקות בסיסית
+- [ ] תיעוד API מפורט
+
+### **שלב 3: אינטגרציה עם מערכות קיימות (שבוע 4-5)**
+#### **משימות אינטגרציה:**
+- [ ] **אינטגרציה עם Project Files Scanner** - החלפת מערכות קיימות
+- [ ] **אינטגרציה עם JS-Map System** - שילוב במערכת הנוכחית
+- [ ] **אינטגרציה עם Linter Monitor** - שילוב במערכת הלינטר
+- [ ] **בדיקות אינטגרציה** - בדיקות מקיפות עם כל המערכות
+
+#### **תוצרים:**
+- [ ] מערכת מאוחדת פונקציונלית
+- [ ] בדיקות אינטגרציה מוצלחות
+- [ ] תיעוד אינטגרציה
+
+### **שלב 4: מיגרציה ופריסה (שבוע 6-7)**
+#### **משימות מיגרציה:**
+- [ ] **מיגרציה של נתונים קיימים** - העברת נתונים ממערכות ישנות
+- [ ] **עדכון כל העמודים** - החלפת קריאות למערכת חדשה
+- [ ] **מחיקת מערכות ישנות** - ניקוי קוד ישן
+- [ ] **בדיקות סופיות** - בדיקות מקיפות של כל המערכת
+
+#### **תוצרים:**
+- [ ] מערכת מאוחדת מלאה
+- [ ] כל העמודים מעודכנים
+- [ ] קוד ישן נמחק
+
+### **שלב 5: בדיקות וסיום (שבוע 8)**
+#### **משימות סיום:**
+- [ ] **בדיקות ביצועים** - בדיקות מהירות וזיכרון
+- [ ] **בדיקות אמינות** - בדיקות יציבות
+- [ ] **תיעוד סופי** - עדכון כל המסמכים
+- [ ] **פריסה לפרודקשן** - פריסה למערכת הפעילה
+
+#### **תוצרים:**
+- [ ] מערכת IndexedDB מאוחדת מלאה
+- [ ] תיעוד מעודכן
+- [ ] מערכת פרוסה ופעילה
+
+---
+
+## 📋 **קריטריוני הצלחה**
+
+### **דרישות פונקציונליות:**
+- ✅ **איחוד מלא** - כל המערכות משתמשות במערכת אחת
+- ✅ **API אחיד** - ממשק אחיד לכל הפעולות
+- ✅ **ביצועים משופרים** - 50% מהירות יותר מהמערכות הקיימות
+- ✅ **טיפול בשגיאות** - טיפול מתקדם וידידותי למשתמש
+- ✅ **ניטור מקיף** - מעקב אחר ביצועים ושימוש
+
+### **דרישות לא-פונקציונליות:**
+- ✅ **אמינות** - 99.9% זמן פעילות
+- ✅ **מהירות** - <100ms זמן פעולה ממוצע
+- ✅ **זיכרון** - <10MB שימוש בזיכרון
+- ✅ **אבטחה** - אפס אובדן נתונים
+- ✅ **תחזוקה** - קוד נקי ומתועד
+
+### **קריטריוני איכות:**
+- ✅ **קוד נקי** - ללא כפילויות, עם תיעוד מלא
+- ✅ **ארכיטקטורה נכונה** - עקרונות ITCSS ו-RTL
+- ✅ **בדיקות מקיפות** - כיסוי בדיקות >90%
+- ✅ **תיעוד מלא** - כל הפונקציות מתועדות
+
+---
+
+## 🔧 **הנחיות למפתח**
+
+### **לפני התחלת העבודה:**
+1. **קרא את כל המסמכים בקישורים למעלה**
+2. **הכר את המערכות הקיימות**
+3. **הבן את הארכיטקטורה הכללית**
+4. **עקוב אחר כללי העבודה**
+
+### **במהלך הפיתוח:**
+1. **עקוב אחר ITCSS** - ארכיטקטורת CSS
+2. **השתמש בשמות פונקציות ברורים** - לפי הכללים
+3. **כתוב תיעוד לכל פונקציה** - באנגלית
+4. **בדוק כל שינוי** - לפני המשך
+
+### **אחרי הפיתוח:**
+1. **בדוק ביצועים** - מהירות וזיכרון
+2. **בדוק אינטגרציה** - עם כל המערכות
+3. **עדכן תיעוד** - כל השינויים
+4. **פרוס לבדיקה** - לפני פרודקשן
+
+---
+
+## 💻 **דוגמאות קוד למפתח**
+
+### **1. יצירת מחלקת הבסיס:**
+```javascript
+// trading-ui/scripts/unified-indexeddb-adapter.js
+/**
+ * Unified IndexedDB Adapter for TikTrack Project
+ * Provides centralized, hybrid storage solution
+ */
+
+class UnifiedIndexedDBAdapter {
+    constructor() {
+        this.dbName = 'TikTrackUnifiedDB';
+        this.version = 1;
+        this.db = null;
+        this.isInitialized = false;
+        
+        // Hybrid storage strategy
+        this.storageStrategy = {
+            complex: 'indexeddb',    // File mapping, function analysis
+            simple: 'localstorage'   // Preferences, UI state
+        };
+    }
+
+    /**
+     * Initialize the database connection
+     * @returns {Promise<boolean>} Success status
+     */
+    async initialize() {
+        try {
+            // Implementation here
+            this.isInitialized = true;
+            return true;
+        } catch (error) {
+            console.error('Failed to initialize IndexedDB:', error);
+            return false;
+        }
+    }
+
+    /**
+     * Smart storage - automatically chooses between IndexedDB and localStorage
+     * @param {string} key - Storage key
+     * @param {any} data - Data to store
+     * @param {Object} options - Storage options
+     */
+    async smartSave(key, data, options = {}) {
+        const strategy = this.determineStorageStrategy(data, options);
+        
+        if (strategy === 'indexeddb') {
+            return await this.saveToIndexedDB(key, data, options);
+        } else {
+            return await this.saveToLocalStorage(key, data, options);
+        }
+    }
+
+    /**
+     * Determine storage strategy based on data type and size
+     * @param {any} data - Data to analyze
+     * @param {Object} options - Storage options
+     * @returns {string} Storage strategy
+     */
+    determineStorageStrategy(data, options) {
+        // Complex data or large size -> IndexedDB
+        if (options.complex || JSON.stringify(data).length > 10000) {
+            return 'indexeddb';
+        }
+        
+        // Simple data -> localStorage
+        return 'localstorage';
+    }
+}
+```
+
+### **2. אינטגרציה עם מערכות קיימות:**
+```javascript
+// Example: Integrating with Project Files Scanner
+class ProjectFilesScannerIntegration {
+    constructor() {
+        this.storage = new UnifiedIndexedDBAdapter();
+    }
+
+    /**
+     * Cache project files data
+     * @param {Array} files - Project files array
+     */
+    async cacheProjectFiles(files) {
+        const cacheData = {
+            files: files,
+            timestamp: Date.now(),
+            version: '1.0'
+        };
+
+        await this.storage.smartSave('project_files', cacheData, {
+            complex: true,
+            ttl: 3600000 // 1 hour
+        });
+    }
+
+    /**
+     * Get cached project files
+     * @returns {Promise<Array>} Cached files or empty array
+     */
+    async getCachedProjectFiles() {
+        try {
+            const cached = await this.storage.smartGet('project_files');
+            
+            // Check if cache is still valid
+            if (cached && this.isCacheValid(cached)) {
+                return cached.files;
+            }
+            
+            return [];
+        } catch (error) {
+            console.error('Failed to get cached project files:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Check if cached data is still valid
+     * @param {Object} cachedData - Cached data object
+     * @returns {boolean} Cache validity
+     */
+    isCacheValid(cachedData) {
+        const now = Date.now();
+        const cacheAge = now - cachedData.timestamp;
+        return cacheAge < 3600000; // 1 hour
+    }
+}
+```
+
+### **3. Error Handling מתקדם:**
+```javascript
+/**
+ * Advanced error handling for IndexedDB operations
+ */
+class IndexedDBErrorHandler {
+    static handleError(error, operation, context = {}) {
+        const errorInfo = {
+            operation: operation,
+            context: context,
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent,
+            error: {
+                name: error.name,
+                message: error.message,
+                stack: error.stack
+            }
+        };
+
+        // Log to console for development
+        console.error(`IndexedDB Error in ${operation}:`, errorInfo);
+
+        // Send to notification system
+        if (window.showErrorNotification) {
+            window.showErrorNotification(
+                'שגיאת אחסון נתונים',
+                `שגיאה בפעולה: ${operation}. נסה לרענן את הדף.`
+            );
+        }
+
+        // Store error for analytics
+        this.storeErrorForAnalytics(errorInfo);
+
+        return errorInfo;
+    }
+
+    static storeErrorForAnalytics(errorInfo) {
+        // Store in localStorage for later analysis
+        try {
+            const errors = JSON.parse(localStorage.getItem('indexeddb_errors') || '[]');
+            errors.push(errorInfo);
+            
+            // Keep only last 50 errors
+            if (errors.length > 50) {
+                errors.splice(0, errors.length - 50);
+            }
+            
+            localStorage.setItem('indexeddb_errors', JSON.stringify(errors));
+        } catch (e) {
+            console.error('Failed to store error for analytics:', e);
+        }
+    }
+}
+```
+
+### **4. בדיקות יחידה:**
+```javascript
+/**
+ * Unit tests for UnifiedIndexedDBAdapter
+ * Run these tests during development
+ */
+class IndexedDBTests {
+    static async runAllTests() {
+        console.log('🧪 Starting IndexedDB Tests...');
+        
+        const tests = [
+            this.testInitialization,
+            this.testSmartSave,
+            this.testSmartGet,
+            this.testErrorHandling,
+            this.testPerformance
+        ];
+
+        let passed = 0;
+        let failed = 0;
+
+        for (const test of tests) {
+            try {
+                await test();
+                console.log(`✅ ${test.name} - PASSED`);
+                passed++;
+            } catch (error) {
+                console.error(`❌ ${test.name} - FAILED:`, error);
+                failed++;
+            }
+        }
+
+        console.log(`🧪 Tests completed: ${passed} passed, ${failed} failed`);
+        return { passed, failed };
+    }
+
+    static async testInitialization() {
+        const adapter = new UnifiedIndexedDBAdapter();
+        const result = await adapter.initialize();
+        
+        if (!result) {
+            throw new Error('Initialization failed');
+        }
+        
+        if (!adapter.isInitialized) {
+            throw new Error('isInitialized flag not set');
+        }
+    }
+
+    static async testSmartSave() {
+        const adapter = new UnifiedIndexedDBAdapter();
+        await adapter.initialize();
+        
+        const testData = { test: 'data', timestamp: Date.now() };
+        const result = await adapter.smartSave('test_key', testData);
+        
+        if (!result) {
+            throw new Error('Smart save failed');
+        }
+    }
+
+    static async testPerformance() {
+        const adapter = new UnifiedIndexedDBAdapter();
+        await adapter.initialize();
+        
+        const startTime = performance.now();
+        
+        // Test 100 operations
+        for (let i = 0; i < 100; i++) {
+            await adapter.smartSave(`perf_test_${i}`, { data: i });
+        }
+        
+        const endTime = performance.now();
+        const duration = endTime - startTime;
+        
+        if (duration > 1000) { // More than 1 second
+            throw new Error(`Performance test failed: ${duration}ms for 100 operations`);
+        }
+    }
+}
+
+// Run tests in development
+if (window.location.hostname === 'localhost') {
+    IndexedDBTests.runAllTests();
+}
+```
+
+### **5. דוגמת שימוש בעמוד:**
+```javascript
+// Example usage in a page
+class PageWithIndexedDB {
+    constructor() {
+        this.storage = new UnifiedIndexedDBAdapter();
+        this.initialized = false;
+    }
+
+    async initialize() {
+        try {
+            // Initialize storage
+            await this.storage.initialize();
+            this.initialized = true;
+            
+            // Load cached data
+            await this.loadCachedData();
+            
+            // Load fresh data from server
+            await this.loadFreshData();
+            
+        } catch (error) {
+            IndexedDBErrorHandler.handleError(error, 'Page initialization', {
+                page: 'js-map',
+                section: 'initialization'
+            });
+        }
+    }
+
+    async loadCachedData() {
+        try {
+            const cachedData = await this.storage.smartGet('page_data');
+            if (cachedData) {
+                this.renderData(cachedData);
+                console.log('📦 Loaded cached data');
+            }
+        } catch (error) {
+            console.warn('Failed to load cached data:', error);
+        }
+    }
+
+    async loadFreshData() {
+        try {
+            // Load from server
+            const freshData = await this.fetchDataFromServer();
+            
+            // Cache the data
+            await this.storage.smartSave('page_data', freshData, {
+                complex: true,
+                ttl: 1800000 // 30 minutes
+            });
+            
+            // Render the data
+            this.renderData(freshData);
+            
+            console.log('🔄 Loaded fresh data and cached');
+            
+        } catch (error) {
+            console.error('Failed to load fresh data:', error);
+            
+            // Show user notification
+            if (window.showErrorNotification) {
+                window.showErrorNotification(
+                    'שגיאת טעינה',
+                    'לא ניתן לטעון נתונים מהשרת. נסה שוב מאוחר יותר.'
+                );
+            }
+        }
+    }
+
+    renderData(data) {
+        // Render data to UI
+        console.log('🎨 Rendering data:', data);
+    }
+}
+```
+
+---
+
+## 📊 **טבלת משימות מעודכנת - מצב נוכחי מול יעד**
+
+### **מערכות קיימות שזקוקות לאיחוד:**
+
+| **מערכת** | **מיקום נוכחי** | **סטטוס** | **פעולה נדרשת** | **עדיפות** |
+|------------|------------------|------------|------------------|-------------|
+| **Project Files Scanner** | `project-files-scanner.js` | ✅ פעיל | אינטגרציה עם IndexedDB | 🔴 גבוהה |
+| **JS-Map System** | `js-map.js` | ✅ פעיל | החלפת localStorage ב-IndexedDB | 🔴 גבוהה |
+| **Linter Monitor** | `linter-realtime-monitor.js` | ✅ פעיל | אינטגרציה עם מערכת מאוחדת | 🟡 בינונית |
+| **Page Scripts Matrix** | `page-scripts-matrix.js` | ✅ פעיל | החלפת במערכת מאוחדת | 🟡 בינונית |
+| **Preferences System** | `preferences-system.js` | ✅ פעיל | שמירה על localStorage | 🟢 נמוכה |
+
+### **מערכות שצריכות מיגרציה:**
+
+| **עמוד/מערכת** | **שימוש נוכחי** | **יעד** | **תאריך יעד** | **אחראי** |
+|-----------------|------------------|----------|----------------|------------|
+| **JS-Map Page** | localStorage + API calls | IndexedDB + Cache | שבוע 3 | מפתח |
+| **Linter Monitor** | localStorage + API calls | IndexedDB + Cache | שבוע 4 | מפתח |
+| **Project Files Scanner** | API calls only | IndexedDB + Cache | שבוע 2 | מפתח |
+| **All Development Pages** | Various storage methods | Unified System | שבוע 6 | מפתח |
+
+### **אסטרטגיית מיגרציה:**
+
+#### **שלב 1: הכנה (שבוע 1)**
+- [ ] **ניתוח מערכות קיימות** - סקר מלא של כל המערכות
+- [ ] **תכנון API אחיד** - עיצוב ממשק אחיד
+- [ ] **הכנת תוכנית מיגרציה** - שלבים ברורים
+
+#### **שלב 2: פיתוח ליבה (שבוע 2-3)**
+- [ ] **יצירת UnifiedIndexedDBAdapter** - מחלקת הבסיס
+- [ ] **פיתוח מנגנון היברידי** - IndexedDB + localStorage
+- [ ] **בדיקות יחידה** - בדיקות מקיפות
+
+#### **שלב 3: אינטגרציה (שבוע 4-5)**
+- [ ] **אינטגרציה עם Project Files Scanner** - החלפת מערכות
+- [ ] **אינטגרציה עם JS-Map** - שילוב במערכת הנוכחית
+- [ ] **אינטגרציה עם Linter Monitor** - שילוב במערכת הלינטר
+
+#### **שלב 4: מיגרציה מלאה (שבוע 6-7)**
+- [ ] **מיגרציה של כל העמודים** - החלפת קריאות
+- [ ] **מחיקת מערכות ישנות** - ניקוי קוד
+- [ ] **בדיקות סופיות** - בדיקות מקיפות
+
+#### **שלב 5: סיום (שבוע 8)**
+- [ ] **בדיקות ביצועים** - מהירות וזיכרון
+- [ ] **תיעוד סופי** - עדכון מסמכים
+- [ ] **פריסה לפרודקשן** - פריסה למערכת
+
+### **קריטריוני הצלחה למיגרציה:**
+
+#### **פונקציונליות:**
+- ✅ **איחוד מלא** - כל המערכות משתמשות במערכת אחת
+- ✅ **ביצועים משופרים** - 50% מהירות יותר
+- ✅ **אמינות גבוהה** - 99.9% זמן פעילות
+- ✅ **טיפול בשגיאות** - טיפול מתקדם
+
+#### **איכות קוד:**
+- ✅ **קוד נקי** - ללא כפילויות
+- ✅ **תיעוד מלא** - כל הפונקציות מתועדות
+- ✅ **בדיקות מקיפות** - כיסוי >90%
+- ✅ **ארכיטקטורה נכונה** - עקרונות ITCSS
+
+#### **משתמש:**
+- ✅ **חוויית משתמש** - טעינה מהירה יותר
+- ✅ **אמינות** - פחות שגיאות
+- ✅ **שקיפות** - הודעות ברורות
+- ✅ **ביצועים** - פחות זמן המתנה
+
+---
+
+## 🎯 **סיכום המטרות המעודכנות**
+
+### **מטרה ראשית:**
+> **מערכת אחת אחידה, גמישה אך מינימלית ויעילה העונה לכל הצרכים באתר**
+
+### **מטרות משניות:**
+- **איחוד מערכות** - מערכת אחת לכל צרכי האחסון
+- **ביצועים משופרים** - מהירות ואמינות גבוהים
+- **תחזוקה קלה** - קוד נקי ומתועד
+- **חוויית משתמש** - טעינה מהירה ואמינה
+
+### **תוצאות צפויות:**
+- **50% שיפור בביצועים** - מהירות טעינה
+- **90% פחות שגיאות** - אמינות גבוהה
+- **80% פחות קוד כפול** - תחזוקה קלה
+- **100% כיסוי בדיקות** - איכות גבוהה
 
 ---
 
 **מסמך זה מהווה את הבסיס לפיתוח מערכת IndexedDB מאוחדת לפרויקט TikTrack.**
 **המסמך מתעדכן באופן קבוע בהתאם לצרכים המשתנים של המערכת.**
 
-**עודכן לאחרונה:** 22 בספטמבר 2025  
-**גרסה:** 1.0  
-**סטטוס:** 📋 Specification Complete
+**עודכן לאחרונה:** 22 בינואר 2025  
+**גרסה:** 2.0  
+**סטטוס:** 📋 מעודכן לפי תובנות חדשות - מוכן לפיתוח

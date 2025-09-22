@@ -1528,7 +1528,7 @@ async function checkLinkedItemsBeforeDelete(accountId) {
         return true;
       } else {
         if (typeof window.showNotification === 'function') {
-          window.showNotification('אזהרה', 'יש פריטים מקושרים לחשבון זה', 'warning');
+          window.showNotification('יש פריטים מקושרים לחשבון זה', 'warning', 'אזהרה', 5000, 'business');
         }
         return true;
       }
@@ -2224,7 +2224,7 @@ async function performAccountCancellation(accountId) {
         // Fallback למערכת הישנה
         // הצגת הודעת הצלחה
         if (window.showSuccessNotification) {
-          window.showSuccessNotification('הצלחה', 'החשבון בוטל בהצלחה');
+          window.showSuccessNotification('הצלחה', 'החשבון בוטל בהצלחה', 4000, 'business');
         }
 
         // רענון הנתונים
@@ -2301,7 +2301,7 @@ async function performAccountDeletion(accountId) {
         // Fallback למערכת הישנה
         // הצגת הודעת הצלחה
         if (window.showSuccessNotification) {
-          window.showSuccessNotification('הצלחה', 'החשבון נמחק בהצלחה');
+          window.showSuccessNotification('הצלחה', 'החשבון נמחק בהצלחה', 4000, 'business');
         }
 
         // רענון הנתונים
@@ -2438,7 +2438,7 @@ async function checkLinkedItemsBeforeCancelAccount(accountId) {
       } else {
         // console.log('❌ showLinkedItemsModal לא זמינה');
         if (typeof window.showNotification === 'function') {
-          window.showNotification('אזהרה', 'יש פריטים מקושרים לחשבון זה', 'warning');
+          window.showNotification('יש פריטים מקושרים לחשבון זה', 'warning', 'אזהרה', 5000, 'business');
         }
         return true;
       }
@@ -2517,7 +2517,7 @@ async function checkLinkedItemsBeforeDeleteAccount(accountId) {
         return true;
       } else {
         if (typeof window.showNotification === 'function') {
-          window.showNotification('אזהרה', 'יש פריטים מקושרים לחשבון זה', 'warning');
+          window.showNotification('יש פריטים מקושרים לחשבון זה', 'warning', 'אזהרה', 5000, 'business');
         }
         return true;
       }
@@ -2582,7 +2582,7 @@ function updateAccount(accountId, accountData) {
       if (typeof window.showSuccessNotification === 'function') {
         window.showSuccessNotification('חשבון עודכן בהצלחה');
       } else if (typeof window.showNotification === 'function') {
-        window.showNotification('חשבון עודכן בהצלחה', 'success');
+        window.showNotification('חשבון עודכן בהצלחה', 'success', 'הצלחה', 4000, 'business');
       }
     })
     .catch(error => {
@@ -2590,7 +2590,7 @@ function updateAccount(accountId, accountData) {
       if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification('שגיאה בעדכון חשבון', error.message);
       } else if (typeof window.showNotification === 'function') {
-        window.showNotification('שגיאה בעדכון חשבון', 'error');
+        window.showNotification('שגיאה בעדכון חשבון', 'error', 'שגיאה', 6000, 'system');
       }
     });
     
@@ -2599,7 +2599,7 @@ function updateAccount(accountId, accountData) {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בעדכון חשבון', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בעדכון חשבון', 'error');
+      window.showNotification('שגיאה בעדכון חשבון', 'error', 'שגיאה', 6000, 'system');
     }
   }
 }
@@ -2659,7 +2659,7 @@ function viewAccountDetails(accountId) {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהצגת פרטי חשבון', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בהצגת פרטי חשבון', 'error');
+      window.showNotification('שגיאה בהצגת פרטי חשבון', 'error', 'שגיאה', 6000, 'system');
     }
   }
 }
@@ -2686,7 +2686,7 @@ function showAccountDetails(accountId) {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בהצגת פרטי חשבון', error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('שגיאה בהצגת פרטי חשבון', 'error');
+      window.showNotification('שגיאה בהצגת פרטי חשבון', 'error', 'שגיאה', 6000, 'system');
     }
   }
 }
@@ -2887,7 +2887,7 @@ function copyDetailedLog() {
         const logContent = generateDetailedLog();
         navigator.clipboard.writeText(logContent).then(() => {
             if (window.showNotification) {
-                window.showNotification('לוג מפורט הועתק ללוח', 'success');
+                window.showNotification('לוג מפורט הועתק ללוח', 'success', 'הצלחה', 4000, 'development');
             } else {
                 alert('לוג מפורט הועתק ללוח');
             }
@@ -2896,7 +2896,7 @@ function copyDetailedLog() {
             // Fallback: show in console
             console.log('Detailed Log:', logContent);
             if (window.showNotification) {
-                window.showNotification('לוג מפורט הוצג בקונסול', 'info');
+                window.showNotification('לוג מפורט הוצג בקונסול', 'info', 'מידע', 4000, 'development');
             } else {
                 alert('לוג מפורט הוצג בקונסול');
             }
@@ -2904,7 +2904,7 @@ function copyDetailedLog() {
     } catch (error) {
         console.error('Error copying log:', error);
         if (window.showNotification) {
-            window.showNotification('שגיאה בהעתקת הלוג', 'error');
+            window.showNotification('שגיאה בהעתקת הלוג', 'error', 'שגיאה', 6000, 'development');
         } else {
             alert('שגיאה בהעתקת הלוג');
         }

@@ -4711,11 +4711,29 @@ window.applyFilter = applyFilter;
  * ניקוי Cache מהיר לפיתוח - גרסה משופרת
  */
 async function clearDevelopmentCache(event) {
+  console.log('🧹 Clearing development cache...');
+  console.log('🔍 Checking notification functions availability...');
+  console.log('showSuccessNotification exists:', typeof window.showSuccessNotification === 'function');
+  console.log('showNotification exists:', typeof window.showNotification === 'function');
+  console.log('showInfoNotification exists:', typeof window.showInfoNotification === 'function');
+  
+  // בדיקת קטגוריות
+  if (typeof window.shouldShowNotification === 'function') {
+    console.log('🔍 Checking notification categories...');
+    try {
+      const systemEnabled = await window.shouldShowNotification('system');
+      const uiEnabled = await window.shouldShowNotification('ui');
+      console.log('System notifications enabled:', systemEnabled);
+      console.log('UI notifications enabled:', uiEnabled);
+    } catch (error) {
+      console.error('Error checking notification categories:', error);
+    }
+  }
+  
   // הגדרת המשתנה button בתחילת הפונקציה
   let button = null;
 
   try {
-
     // מציאת הכפתור - קודם מנסה event.target, אחרת מחפש ב-DOM
     if (event && event.target) {
       button = event.target;
@@ -4732,7 +4750,6 @@ async function clearDevelopmentCache(event) {
                  a.textContent.includes('נקה Cache (פיתוח)'),
                );
     }
-
 
     // הצגת הודעת טעינה
     if (button) {
@@ -4764,9 +4781,8 @@ async function clearDevelopmentCache(event) {
 
     // ניקוי sessionStorage
     try {
-      const sessionKeys = Object.keys(sessionStorage);
       sessionStorage.clear();
-      console.log(`🗑️ נוקה ${sessionKeys.length} פריטים מ-sessionStorage`);
+      console.log('🗑️ נוקה sessionStorage');
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות sessionStorage:', e);
     }
@@ -4777,10 +4793,8 @@ async function clearDevelopmentCache(event) {
         const databases = await indexedDB.databases();
         let clearedDatabases = 0;
         for (const db of databases) {
-          if (db.name && !db.name.includes('system')) {
-            await indexedDB.deleteDatabase(db.name);
-            clearedDatabases++;
-          }
+          await indexedDB.deleteDatabase(db.name);
+          clearedDatabases++;
         }
         console.log(`🗑️ נוקה ${clearedDatabases} מסדי נתונים מ-IndexedDB`);
       }
@@ -4788,22 +4802,7 @@ async function clearDevelopmentCache(event) {
       console.warn('⚠️ לא ניתן לנקות IndexedDB:', e);
     }
 
-    // ===== שלב 2: ניקוי Cache של השרת =====
-    const response = await fetch('/api/cache/clear', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (response.ok) {
-      const result = await response.json();
-      console.log('✅ Cache של השרת נוקה בהצלחה:', result.message);
-    } else {
-      console.warn('⚠️ לא ניתן לנקות Cache של השרת:', response.status);
-    }
-
-    // ===== שלב 3: ניקוי Service Workers =====
+    // ===== שלב 2: ניקוי Service Workers =====
     try {
       if ('serviceWorker' in navigator) {
         const registrations = await navigator.serviceWorker.getRegistrations();
@@ -4818,38 +4817,58 @@ async function clearDevelopmentCache(event) {
       console.warn('⚠️ לא ניתן לנקות Service Workers:', e);
     }
 
-    // ===== שלב 4: ניקוי Cache API =====
+    // ===== שלב 3: ניקוי Cache API =====
     try {
       if ('caches' in window) {
         const cacheNames = await caches.keys();
-        await Promise.all(
-          cacheNames.map(cacheName => caches.delete(cacheName)),
-        );
-        console.log(`🗑️ נוקה ${cacheNames.length} Cache API entries`);
+        let clearedCaches = 0;
+        for (const cacheName of cacheNames) {
+          await caches.delete(cacheName);
+          clearedCaches++;
+        }
+        console.log(`🗑️ נוקה ${clearedCaches} Cache API entries`);
       }
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות Cache API:', e);
     }
 
-    // ===== שלב 5: ניקוי Application Cache =====
+    // ===== שלב 4: ניקוי Application Cache =====
     try {
       if ('applicationCache' in window) {
         window.applicationCache.update();
-        console.log('🗑️ Application Cache עודכן');
+        console.log('🗑️ נוקה Application Cache');
       }
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות Application Cache:', e);
     }
 
-    // ===== שלב 6: ניקוי Memory Cache =====
+    // ===== שלב 5: ניקוי Cache של Fetch =====
     try {
-      // ניקוי cache של fetch requests
-      if (window.fetch && window.fetch.cache) {
+      if ('fetch' in window && window.fetch.cache) {
         window.fetch.cache.clear();
-        console.log('🗑️ Fetch cache נוקה');
+        console.log('🗑️ נוקה Fetch cache');
       }
     } catch (e) {
       console.warn('⚠️ לא ניתן לנקות Fetch cache:', e);
+    }
+
+    // ===== שלב 6: ניקוי Cache של השרת =====
+    try {
+      const response = await fetch('/api/cache/clear', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ נוקה מטמון השרת:', result.message);
+      } else {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+    } catch (e) {
+      console.warn('⚠️ לא ניתן לנקות מטמון השרת:', e);
     }
 
     // ===== שלב 7: ניקוי DOM Cache =====
@@ -4884,16 +4903,30 @@ async function clearDevelopmentCache(event) {
       console.warn('⚠️ לא ניתן לנקות JavaScript files:', e);
     }
 
+    // Clear global cache variables
+    if (typeof window.clearAllCache === 'function') {
+      window.clearAllCache();
+    }
+
     // ===== הצגת הודעת הצלחה =====
+    console.log('🔔 Attempting to show success notification...');
     if (typeof window.showSuccessNotification === 'function') {
-      window.showSuccessNotification('הצלחה', 'Cache נוקה בהצלחה - כולל דפדפן ושרת');
+      console.log('✅ showSuccessNotification function exists, calling it...');
+      window.showSuccessNotification('הצלחה', 'Cache נוקה בהצלחה - כולל דפדפן ושרת', 4000, 'system');
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification('Cache נוקה בהצלחה - כולל דפדפן ושרת', 'success');
+      console.log('✅ showNotification function exists, calling it...');
+      window.showNotification('Cache נוקה בהצלחה - כולל דפדפן ושרת', 'success', 'הצלחה', 4000, 'system');
+    } else {
+      console.error('❌ Neither showSuccessNotification nor showNotification functions exist!');
     }
 
     // ===== רענון הדף =====
+    console.log('🔔 Attempting to show info notification...');
     if (typeof window.showInfoNotification === 'function') {
-      window.showInfoNotification('מידע', 'הדף ירענן בעוד 3 שניות...');
+      console.log('✅ showInfoNotification function exists, calling it...');
+      window.showInfoNotification('מידע', 'הדף ירענן בעוד 3 שניות...', 4000, 'ui');
+    } else {
+      console.error('❌ showInfoNotification function does not exist!');
     }
 
     setTimeout(() => {
@@ -4907,7 +4940,7 @@ async function clearDevelopmentCache(event) {
     console.error('❌ שגיאה כללית בניקוי Cache:', error);
 
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', 'שגיאה כללית בניקוי Cache: ' + error.message);
+      window.showErrorNotification('שגיאה', 'שגיאה כללית בניקוי Cache: ' + error.message, 6000, 'system');
     }
   } finally {
     // החזרת הכפתור למצב רגיל
@@ -4919,7 +4952,9 @@ async function clearDevelopmentCache(event) {
   }
 }
 
-// ייצוא פונקציות פיתוח
+// Old function implementation removed - now using updated local function
+
+// Export to global scope
 window.clearDevelopmentCache = clearDevelopmentCache;
 
 // אתחול מערכת ראש הדף
@@ -4931,124 +4966,3 @@ document.addEventListener('DOMContentLoaded', function() {
     console.error('❌ HeaderSystem class not found');
   }
 });
-
-// Debug Information Functions
-/**
- * Update system status information
- */
-function updateSystemStatus() {
-  // Check header system
-  const headerElement = document.getElementById('unified-header');
-  const headerStatus = headerElement ? 'פעיל' : 'לא פעיל';
-  const headerSystemStatusElement = document.getElementById('headerSystemStatus');
-  if (headerSystemStatusElement) {
-    headerSystemStatusElement.textContent = headerStatus;
-  }
-  
-  // Check filter system
-  const filterSystemStatus = window.applyFilter ? 'פעיל' : 'לא פעיל';
-  const filterSystemStatusElement = document.getElementById('filterSystemStatus');
-  if (filterSystemStatusElement) {
-    filterSystemStatusElement.textContent = filterSystemStatus;
-  }
-  
-  // Check translation system
-  const translationSystemStatus = window.translateTradePlanType ? 'פעיל' : 'לא פעיל';
-  const translationSystemStatusElement = document.getElementById('translationSystemStatus');
-  if (translationSystemStatusElement) {
-    translationSystemStatusElement.textContent = translationSystemStatus;
-  }
-  
-  // Count table rows
-  const tableRows = document.querySelectorAll('#tickersContainer tbody tr');
-  const tableRowCountElement = document.getElementById('tableRowCount');
-  if (tableRowCountElement) {
-    tableRowCountElement.textContent = tableRows.length;
-  }
-}
-
-/**
- * Update filter debug information
- */
-function updateFilterDebugInfo() {
-  // Get filter states from actual DOM elements
-  const statusItems = document.querySelectorAll('#statusFilterMenu .status-filter-item.selected');
-  const statusFilter = Array.from(statusItems).map(item => item.getAttribute('data-value'));
-  
-  const typeItems = document.querySelectorAll('#typeFilterMenu .type-filter-item.selected');
-  const typeFilter = Array.from(typeItems).map(item => item.getAttribute('data-value'));
-  
-  const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
-  const accountFilter = Array.from(accountItems).map(item => item.getAttribute('data-value'));
-  
-  const dateItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item.selected');
-  const dateFilter = dateItems.length > 0 ? dateItems[0].getAttribute('data-value') : 'כל זמן';
-  
-  const searchInput = document.getElementById('searchFilterInput');
-  const searchFilter = searchInput ? searchInput.value : '';
-  
-  // Update display
-  const statusFilterInfoElement = document.getElementById('statusFilterInfo');
-  if (statusFilterInfoElement) {
-    statusFilterInfoElement.textContent = 
-      statusFilter.length > 0 ? statusFilter.join(', ') : 'לא נבחר';
-  }
-  
-  const typeFilterInfoElement = document.getElementById('typeFilterInfo');
-  if (typeFilterInfoElement) {
-    typeFilterInfoElement.textContent = 
-      typeFilter.length > 0 ? typeFilter.join(', ') : 'לא נבחר';
-  }
-  
-  const accountFilterInfoElement = document.getElementById('accountFilterInfo');
-  if (accountFilterInfoElement) {
-    accountFilterInfoElement.textContent = 
-      accountFilter.length > 0 ? accountFilter.join(', ') : 'לא נבחר';
-  }
-  
-  const dateFilterInfoElement = document.getElementById('dateFilterInfo');
-  if (dateFilterInfoElement) {
-    dateFilterInfoElement.textContent = dateFilter;
-  }
-  
-  const searchFilterInfoElement = document.getElementById('searchFilterInfo');
-  if (searchFilterInfoElement) {
-    searchFilterInfoElement.textContent = searchFilter || 'ריק';
-  }
-  
-  // Count visible rows
-  const visibleRows = document.querySelectorAll('#tickersContainer tbody tr:not([style*="display: none"])');
-  const totalRows = document.querySelectorAll('#tickersContainer tbody tr');
-  const visibleRowsInfoElement = document.getElementById('visibleRowsInfo');
-  if (visibleRowsInfoElement) {
-    visibleRowsInfoElement.textContent = 
-      `${visibleRows.length} מתוך ${totalRows.length}`;
-  }
-}
-
-/**
- * Initialize debug system
- */
-function initializeDebugSystem() {
-  // Update debug info every 2 seconds
-  setInterval(() => {
-    updateSystemStatus();
-    updateFilterDebugInfo();
-  }, 2000);
-  
-  // Initial update
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-      updateSystemStatus();
-      updateFilterDebugInfo();
-    }, 1000);
-  });
-}
-
-// Export debug functions to global scope
-window.updateSystemStatus = updateSystemStatus;
-window.updateFilterDebugInfo = updateFilterDebugInfo;
-window.initializeDebugSystem = initializeDebugSystem;
-
-// Header System JS loaded completely
-

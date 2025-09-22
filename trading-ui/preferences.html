@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
     <title>העדפות - TikTrack</title>
     
     
@@ -289,6 +290,81 @@
                                 <label class="form-check-label" for="notifyOnStopLoss">
                                     התראה על stop loss
                                 </label>
+                </div>
+                
+                <!-- הגדרות קטגוריות התראות -->
+                <div class="notification-categories-section">
+                    <h6 class="text-muted mb-3">קטגוריות התראות:</h6>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-2">התראות מערכת:</h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="notifications_development_enabled" checked>
+                                <label class="form-check-label" for="notifications_development_enabled">
+                                    התראות פיתוח
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="notifications_system_enabled" checked>
+                                <label class="form-check-label" for="notifications_system_enabled">
+                                    התראות מערכת
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="notifications_business_enabled" checked>
+                                <label class="form-check-label" for="notifications_business_enabled">
+                                    התראות עסקיות
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="notifications_performance_enabled">
+                                <label class="form-check-label" for="notifications_performance_enabled">
+                                    התראות ביצועים
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="notifications_ui_enabled" checked>
+                                <label class="form-check-label" for="notifications_ui_enabled">
+                                    התראות ממשק משתמש
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6 class="text-success mb-2">לוגים לקונסול:</h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="console_logs_development_enabled">
+                                <label class="form-check-label" for="console_logs_development_enabled">
+                                    לוגי פיתוח
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="console_logs_system_enabled" checked>
+                                <label class="form-check-label" for="console_logs_system_enabled">
+                                    לוגי מערכת
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="console_logs_business_enabled" checked>
+                                <label class="form-check-label" for="console_logs_business_enabled">
+                                    לוגי עסקיים
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="console_logs_performance_enabled">
+                                <label class="form-check-label" for="console_logs_performance_enabled">
+                                    לוגי ביצועים
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="console_logs_ui_enabled" checked>
+                                <label class="form-check-label" for="console_logs_ui_enabled">
+                                    לוגי ממשק משתמש
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                     </div>
                   </div>
@@ -861,9 +937,12 @@
   
     <!-- 🔒 LOCKED TEMPLATE ZONE 5 - Core Scripts (DO NOT MODIFY) -->
     <script src="scripts/main.js"></script>
+    <script src="scripts/global-favicon.js"></script>
     <script src="scripts/ui-utils.js"></script>
     <script src="scripts/data-utils.js"></script>
     <script src="scripts/notification-system.js"></script>
+    <script src="scripts/notification-category-detector.js"></script>
+    <script src="scripts/notification-migration-system.js"></script>
   <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/page-utils.js"></script>

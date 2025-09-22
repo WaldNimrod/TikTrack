@@ -645,7 +645,7 @@ async function performTradeCancellation(tradeId) {
     } else {
       // Fallback למערכת הישנה
       // הצלחה
-      window.showSuccessNotification('הצלחה', 'טרייד בוטל בהצלחה!');
+      window.showSuccessNotification('הצלחה', 'טרייד בוטל בהצלחה!', 4000, 'business');
       // רענון הטבלה
       await loadTradesData();
     }
@@ -754,7 +754,7 @@ async function performTradeDeletion(tradeId) {
     } else {
       // Fallback למערכת הישנה
       // הצלחה
-      window.showSuccessNotification('הצלחה', 'טרייד נמחק בהצלחה!');
+      window.showSuccessNotification('הצלחה', 'טרייד נמחק בהצלחה!', 4000, 'business');
       // רענון הטבלה
       await loadTradesData();
     }
@@ -1234,7 +1234,7 @@ async function saveEditTradeData() {
     } else {
       // Fallback למערכת הישנה
       // הצלחה
-      window.showSuccessNotification('הצלחה', 'טרייד עודכן בהצלחה!');
+      window.showSuccessNotification('הצלחה', 'טרייד עודכן בהצלחה!', 4000, 'business');
       // רענון הטבלה
       await loadTradesData();
     }
@@ -1530,7 +1530,7 @@ async function saveNewTradeRecord() {
         await window.centralRefresh.showSuccessAndRefresh('trades', 'טרייד נשמר בהצלחה!');
       } else {
         // Fallback למערכת הישנה
-        window.showSuccessNotification('הצלחה', 'טרייד נשמר בהצלחה!');
+        window.showSuccessNotification('הצלחה', 'טרייד נשמר בהצלחה!', 4000, 'business');
         // רענון הטבלה
         loadTradesData();
       }
@@ -2102,7 +2102,7 @@ async function checkLinkedItemsBeforeDelete(tradeId) {
         return true;
       } else {
         if (typeof window.showNotification === 'function') {
-          window.showNotification('אזהרה', 'יש פריטים מקושרים לטרייד זה', 'warning');
+          window.showNotification('יש פריטים מקושרים לטרייד זה', 'warning', 'אזהרה', 5000, 'business');
         }
         return true;
       }
@@ -2144,7 +2144,7 @@ async function checkLinkedItemsBeforeCancel(tradeId) {
         return true;
       } else {
         if (typeof window.showNotification === 'function') {
-          window.showNotification('אזהרה', 'יש פריטים מקושרים לטרייד זה', 'warning');
+          window.showNotification('יש פריטים מקושרים לטרייד זה', 'warning', 'אזהרה', 5000, 'business');
         }
         return true;
       }

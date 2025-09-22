@@ -186,8 +186,76 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
     return; // Don't show notification if category is disabled
   }
   
-  // Direct console log to avoid recursion
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  notification.innerHTML = `
+    <div class="notification-content">
+      <div class="notification-icon">
+        <i class="fas ${getNotificationIcon(type)}"></i>
+      </div>
+      <div class="notification-text">
+        <div class="notification-title">${title}</div>
+        <div class="notification-message">${message}</div>
+      </div>
+      <button class="notification-close" onclick="this.parentElement.parentElement.remove()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  `;
+
+  // Add to page
+  let container = document.getElementById('notification-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'notification-container';
+    container.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      max-width: 400px;
+    `;
+    document.body.appendChild(container);
+  }
+  
+  container.appendChild(notification);
+
+  // Trigger animation
+  setTimeout(() => {
+    notification.classList.add('show');
+  }, 10);
+
+  // Auto remove after duration
+  setTimeout(() => {
+    if (notification.parentElement) {
+      notification.classList.add('hide');
+      setTimeout(() => {
+        if (notification.parentElement) {
+          notification.remove();
+        }
+      }, 300); // Wait for animation
+    }
+  }, duration);
+
+  // Save to global history
+  saveNotificationToGlobalHistory(type, title, message);
+
+  // Console log for debugging
   console.log(`🔔 ${type.toUpperCase()}: ${title} - ${message}`);
+}
+
+/**
+ * Get notification icon based on type
+ */
+function getNotificationIcon(type) {
+  switch (type) {
+    case 'success': return 'fa-check-circle';
+    case 'error': return 'fa-exclamation-circle';
+    case 'warning': return 'fa-exclamation-triangle';
+    case 'info': return 'fa-info-circle';
+    default: return 'fa-info-circle';
+  }
 }
 
 // ייצוא הפונקציה הגלובלית - יועבר למטה
@@ -555,6 +623,13 @@ window.notificationSystem = {
   createNotificationContainer,
   hideNotification,
   getNotificationIcon,
+  
+  // NOTIFICATION CATEGORIES SYSTEM functions
+  shouldShowNotification,
+  shouldLogToConsole,
+  logWithCategory,
+  getLogEmoji,
+  
   // WARNING SYSTEM functions moved to warning-system.js
   // showValidationWarning, showConfirmationDialog, showDeleteWarning
 

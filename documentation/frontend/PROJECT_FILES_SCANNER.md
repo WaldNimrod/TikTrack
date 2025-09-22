@@ -72,9 +72,10 @@ const stats = await window.getFileStatistics();
 
 #### `clearProjectFilesCache()`
 ```javascript
-window.clearProjectFilesCache();
+await window.clearProjectFilesCache();
 ```
 **Purpose**: Clear the cache and force fresh discovery
+**Note**: Now clears both localStorage and Unified IndexedDB
 
 ### Global Instance
 
@@ -96,9 +97,10 @@ class ProjectFilesScanner {
 
 ### Caching Strategy
 - **Cache Duration**: 24 hours
-- **Storage**: localStorage with fallback
+- **Storage**: localStorage for immediate access + Unified IndexedDB for persistent storage
 - **Validation**: Automatic cache validation
 - **Refresh**: Automatic refresh when cache expires
+- **Persistence**: File mappings saved to Unified IndexedDB for recovery
 
 ### File Discovery Process
 1. **Cache Check**: Check if valid cache exists
@@ -254,6 +256,13 @@ const fileType = window.projectFilesScanner.getFileType('script.js');
 - **Maintainability**: Clean, organized code
 
 ## 📝 Version History
+
+### v1.1.0 (January 20, 2025)
+- **Unified IndexedDB Integration**: Migrated to Unified IndexedDB system
+- **Persistent Storage**: File mappings saved to Unified IndexedDB for recovery
+- **Dual Storage**: localStorage for immediate access + IndexedDB for persistence
+- **Improved Recovery**: Better file mapping recovery from IndexedDB
+- **Code Cleanup**: Removed duplicate IndexedDB code
 
 ### v1.0.0 (September 19, 2025)
 - **Initial Release**: Complete project files scanner

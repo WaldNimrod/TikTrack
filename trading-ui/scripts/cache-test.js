@@ -345,7 +345,7 @@ function updateCacheEntriesTable() {
 // ===== CACHE MANAGEMENT FUNCTIONS =====
 
 /**
- * Clear all cache
+ * Clear all cache - calls global function
  */
 async function clearAllCache() {
     if (!confirm('האם אתה בטוח שברצונך לנקות את כל המטמון?')) {
@@ -353,46 +353,47 @@ async function clearAllCache() {
     }
     
     try {
-        const response = await fetch('/api/v1/cache/clear', { method: 'POST' });
-        if (response.ok) {
-            if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('הצלחה', 'כל המטמון נוקה בהצלחה');
+        // Call global clearAllCache function
+        if (typeof window.clearAllCache === 'function') {
+            window.clearAllCache();
+            
+            // Also clear server-side cache
+            const response = await fetch('/api/cache/clear', { method: 'POST' });
+            if (response.ok) {
+                if (typeof window.showSuccessNotification === 'function') {
+                    window.showSuccessNotification('הצלחה', 'כל המטמון נוקה בהצלחה');
+                }
+                await loadCacheStatus();
+                await loadCacheEntries();
+            } else {
+                throw new Error(`HTTP ${response.status}`);
             }
-            await loadCacheStatus();
-            await loadCacheEntries();
         } else {
-            throw new Error(`HTTP ${response.status}`);
-      }
+            throw new Error('Global clearAllCache function not available');
+        }
     } catch (error) {
         console.error('❌ Error clearing cache:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בניקוי המטמון: ' + error.message);
         }
     }
-  }
+}
 
   /**
  * Clear expired cache
  */
 async function clearExpiredCache() {
-    try {
-        const response = await fetch('/api/v1/cache/clear', { method: 'POST' });
-        if (response.ok) {
-            const result = await response.json();
-            if (typeof window.showSuccessNotification === 'function') {
-                window.showSuccessNotification('הצלחה', 'נוקו ערכי מטמון פגי תוקף');
-            }
-            await loadCacheEntries();
-        } else {
-            throw new Error(`HTTP ${response.status}`);
-      }
-    } catch (error) {
-        console.error('❌ Error clearing expired cache:', error);
+    // Call global clearExpiredCache function
+    if (typeof window.clearExpiredCache === 'function') {
+        await window.clearExpiredCache();
+        await loadCacheEntries();
+    } else {
+        console.error('❌ Global clearExpiredCache function not available');
         if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'שגיאה בניקוי מטמון פג תוקף - השרת לא זמין');
+            window.showErrorNotification('שגיאה', 'פונקציית ניקוי מטמון פג תוקף לא זמינה');
         }
     }
-  }
+}
 
   /**
  * Preload cache
@@ -870,8 +871,8 @@ function getCurrentPageName() {
 window.getCurrentPageName = getCurrentPageName;
 window.initializeCacheTest = initializeCacheTest;
 window.refreshCacheStatus = refreshCacheStatus;
-window.clearAllCache = clearAllCache;
-window.clearExpiredCache = clearExpiredCache;
+// clearAllCache is now handled by global function in central-refresh-system.js
+// clearExpiredCache is now handled by global function in central-refresh-system.js
 window.preloadCache = preloadCache;
 window.optimizeCache = optimizeCache;
 window.updateAnalytics = updateAnalytics;
@@ -1579,13 +1580,13 @@ async function copyDetailedLog() {
     try {
         const log = generateDetailedLog();
         await navigator.clipboard.writeText(log);
-        window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
+        window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success', 'הצלחה', 4000, 'development');
         console.log('=== לוג מפורט שהועתק ===');
         console.log(log);
         console.log('=== סוף הלוג ===');
     } catch (error) {
         console.error('Failed to copy log:', error);
-        window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
+        window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error', 'שגיאה', 6000, 'development');
         // Fallback: show in console
         const log = generateDetailedLog();
         console.log('=== לוג מפורט (לא הועתק) ===');
@@ -1600,7 +1601,7 @@ window.refreshCacheStatus = refreshCacheStatus;
 window.copyDetailedLog = copyDetailedLog;
 window.toggleAllSections = toggleAllSections;
 window.toggleSection = toggleSection;
-window.clearAllCache = clearAllCache;
-window.clearExpiredCache = clearExpiredCache;
+// clearAllCache is now handled by global function in central-refresh-system.js
+// clearExpiredCache is now handled by global function in central-refresh-system.js
 window.preloadCache = preloadCache;
 window.optimizeCache = optimizeCache;

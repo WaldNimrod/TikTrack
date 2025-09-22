@@ -495,7 +495,7 @@ async function performItemCancellation(itemType, itemId, _itemName) {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification(`שגיאה בביטול ${getItemTypeDisplayName(itemType)}`, error.message);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification(`שגיאה בביטול ${getItemTypeDisplayName(itemType)}`, 'error');
+      window.showNotification(`שגיאה בביטול ${getItemTypeDisplayName(itemType)}`, 'error', 'שגיאה', 6000, 'system');
     }
   }
 }

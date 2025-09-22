@@ -59,7 +59,7 @@ class PageScriptsMatrixSystem {
      */
     async loadScanResults() {
         try {
-            const response = await fetch('/api/page-scripts-matrix/scan-results');
+            const response = await fetch('/api/file-scanner/scan');
             if (response.ok) {
                 const data = await response.json();
                 this.scanData = data.data;
@@ -308,7 +308,7 @@ class PageScriptsMatrixSystem {
     async loadJavaScriptFilesList() {
         try {
             console.log('🔧 Fetching files list from API...');
-            const response = await fetch('/api/js-map/files-list');
+            const response = await fetch('/api/file-scanner/files');
             console.log('🔧 API response status:', response.status);
             
             if (response.ok) {
@@ -438,7 +438,7 @@ class PageScriptsMatrixSystem {
         
         try {
             // Try to get file content
-            const response = await fetch(`/api/js-map/file-content?file=${filename}`);
+            const response = await fetch(`/api/file-scanner/file-content?file=${filename}`);
             if (response.ok) {
                 const content = await response.text();
                 const lines = content.split('\n').length;
@@ -798,7 +798,7 @@ class PageScriptsMatrixSystem {
             console.log('📊 Loading real system statistics from API...');
             
             // Get real scan results from the advanced scanning system
-            const scanResponse = await fetch('/api/page-scripts-matrix/scan-results');
+            const scanResponse = await fetch('/api/file-scanner/scan');
             if (!scanResponse.ok) {
                 throw new Error(`Scan API failed: ${scanResponse.status}`);
             }
@@ -809,7 +809,7 @@ class PageScriptsMatrixSystem {
             const { pages, scripts, metadata } = scanData.data;
             
             // Get files list for categorization
-            const filesResponse = await fetch('/api/js-map/files-list');
+            const filesResponse = await fetch('/api/file-scanner/files');
             const files = filesResponse.ok ? await filesResponse.json() : [];
             
             // Categorize files using real data
@@ -1630,7 +1630,7 @@ class PageScriptsMatrixSystem {
         try {
             // Step 1: Get real scan data
             this.updateProgress(progressBar, statusText, 10, 'טוען נתוני סריקה אמיתיים...');
-            const scanResponse = await fetch('/api/page-scripts-matrix/scan-results');
+            const scanResponse = await fetch('/api/file-scanner/scan');
             if (!scanResponse.ok) {
                 throw new Error(`Failed to get scan data: ${scanResponse.status}`);
             }
@@ -1697,7 +1697,7 @@ class PageScriptsMatrixSystem {
             
             try {
                 // Get file content for real dependency analysis
-                const response = await fetch(`/api/js-map/file-content?file=${encodeURIComponent(script.name)}`);
+                const response = await fetch(`/api/file-scanner/file-content?file=${encodeURIComponent(script.name)}`);
                 if (response.ok) {
                     const content = await response.text();
                     const fileDeps = this.extractRealDependencies(script.name, content);
@@ -1873,7 +1873,7 @@ class PageScriptsMatrixSystem {
      */
     async analyzeSingleFile(filename) {
         try {
-            const response = await fetch(`/api/js-map/file-content?file=${encodeURIComponent(filename)}`);
+            const response = await fetch(`/api/file-scanner/file-content?file=${encodeURIComponent(filename)}`);
             if (response.ok) {
                 const content = await response.text();
                 
@@ -2377,7 +2377,7 @@ class PageScriptsMatrixSystem {
      */
     async loadArchitectureDataFromAPI() {
         try {
-            const response = await fetch('/api/js-map/architecture-check');
+            const response = await fetch('/api/file-scanner/architecture-check');
             if (response.ok) {
                 const data = await response.json();
                 return data.data || {};
@@ -2471,7 +2471,7 @@ class PageScriptsMatrixSystem {
         for (let i = 0; i < Math.min(5, files.length); i++) {
             const file = files[i];
             try {
-                const response = await fetch(`/api/js-map/file-content?file=${encodeURIComponent(file)}`);
+                const response = await fetch(`/api/file-scanner/file-content?file=${encodeURIComponent(file)}`);
                 if (response.ok) {
                     const data = await response.json();
                     const content = data.data?.content || '';
@@ -2807,7 +2807,7 @@ setTimeout(() => {
     const container = document.getElementById('jsFilesContent');
     if (container && container.innerHTML.includes('טוען')) {
         console.log('🔧 Ultimate fallback: direct API call...');
-        fetch('/api/js-map/files-list')
+        fetch('/api/file-scanner/files')
             .then(response => response.json())
             .then(files => {
                 console.log('🔧 Ultimate fallback loaded:', files.length, 'files');

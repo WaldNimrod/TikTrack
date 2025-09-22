@@ -66,8 +66,8 @@ class ProjectFilesScanner {
         this.cache.files = discoveredFiles;
         this.cache.timestamp = Date.now();
         
-        // Save to localStorage
-        this.saveToLocalStorage();
+        // Save to localStorage and Unified IndexedDB
+        await this.saveToLocalStorage();
         
         return discoveredFiles;
     }
@@ -118,11 +118,24 @@ class ProjectFilesScanner {
     /**
      * Clear project files cache
      */
-    clearCache() {
+    async clearCache() {
         this.cache.files = null;
         this.cache.timestamp = null;
+        
+        // Clear localStorage
         localStorage.removeItem('projectFiles');
         localStorage.removeItem('projectFilesTimestamp');
+        
+        // Clear from Unified IndexedDB
+        try {
+            if (window.UnifiedIndexedDB) {
+                await window.UnifiedIndexedDB.deleteSystemStats('file_mapping_last');
+            }
+        } catch (error) {
+            console.warn('Failed to clear file mapping from UnifiedIndexedDB:', error);
+        }
+        
+        console.log('🗑️ Project files cache cleared');
     }
 
     /**
@@ -139,12 +152,18 @@ class ProjectFilesScanner {
     }
 
     /**
-     * Save cache to localStorage
+     * Save cache to localStorage and Unified IndexedDB
      */
-    saveToLocalStorage() {
+    async saveToLocalStorage() {
         try {
+            // Save to localStorage for immediate access
             localStorage.setItem('projectFiles', JSON.stringify(this.cache.files));
             localStorage.setItem('projectFilesTimestamp', this.cache.timestamp.toString());
+            
+            // Save to Unified IndexedDB for persistent storage
+            if (this.cache.files) {
+                await this.saveFileMappingToIndexedDB(this.cache.files);
+            }
         } catch (error) {
             console.warn('Failed to save project files cache:', error);
         }
@@ -237,7 +256,7 @@ class ProjectFilesScanner {
             const timeoutId = setTimeout(() => controller.abort(), 35000); // 35 seconds timeout
             
             // Build query parameters for selected file types
-            let url = '/api/v1/files/discover';
+            let url = '/api/file-scanner/files';
             if (selectedTypes && selectedTypes.length > 0) {
                 const typesParam = selectedTypes.join(',');
                 url += `?types=${encodeURIComponent(typesParam)}`;
@@ -473,39 +492,45 @@ class ProjectFilesScanner {
     }
     
     /**
-     * Get last file mapping from IndexedDB
+     * Get last file mapping from Unified IndexedDB
      * @returns {Object} Last saved file mapping
      */
     async getLastFileMappingFromIndexedDB() {
-        return new Promise((resolve, reject) => {
-            const request = indexedDB.open('TikTrackFileMapping', 1);
+        try {
+            if (!window.UnifiedIndexedDB) {
+                throw new Error('UnifiedIndexedDB not available');
+            }
             
-            request.onerror = () => {
-                reject(new Error('Failed to open IndexedDB'));
+            const lastMapping = await window.UnifiedIndexedDB.getSystemStats('file_mapping_last');
+            return lastMapping;
+        } catch (error) {
+            console.warn('Failed to get last mapping from UnifiedIndexedDB:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Save file mapping to Unified IndexedDB
+     * @param {Object} files - File mapping data to save
+     */
+    async saveFileMappingToIndexedDB(files) {
+        try {
+            if (!window.UnifiedIndexedDB) {
+                console.warn('UnifiedIndexedDB not available - cannot save file mapping');
+                return;
+            }
+
+            const mappingData = {
+                files: files,
+                timestamp: Date.now(),
+                version: '1.0.0'
             };
-            
-            request.onsuccess = () => {
-                const db = request.result;
-                const transaction = db.transaction(['fileMappings'], 'readonly');
-                const store = transaction.objectStore('fileMappings');
-                const getRequest = store.get('lastMapping');
-                
-                getRequest.onsuccess = () => {
-                    resolve(getRequest.result);
-                };
-                
-                getRequest.onerror = () => {
-                    reject(new Error('Failed to get last mapping from IndexedDB'));
-                };
-            };
-            
-            request.onupgradeneeded = () => {
-                const db = request.result;
-                if (!db.objectStoreNames.contains('fileMappings')) {
-                    db.createObjectStore('fileMappings');
-                }
-            };
-        });
+
+            await window.UnifiedIndexedDB.saveSystemStats('file_mapping_last', mappingData);
+            console.log('✅ File mapping saved to UnifiedIndexedDB successfully');
+        } catch (error) {
+            console.error('❌ Failed to save file mapping to UnifiedIndexedDB:', error);
+        }
     }
     
     
@@ -565,6 +590,13 @@ class ProjectFilesScanner {
 
 // Create global instance
 window.projectFilesScanner = new ProjectFilesScanner();
+
+// Global convenience functions
+window.getProjectFiles = () => window.projectFilesScanner.getProjectFiles();
+window.getFilesByType = (type) => window.projectFilesScanner.getFilesByType(type);
+window.getTotalFileCount = () => window.projectFilesScanner.getTotalFileCount();
+window.getFileStatistics = () => window.projectFilesScanner.getFileStatistics();
+window.clearProjectFilesCache = () => window.projectFilesScanner.clearCache();
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {

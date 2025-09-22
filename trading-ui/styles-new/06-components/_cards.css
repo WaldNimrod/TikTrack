@@ -90,6 +90,131 @@
   text-align: center;
 }
 
+/* Page Mapping Styles */
+.page-mapping-container {
+  padding: 20px;
+}
+
+.mapping-summary {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.summary-stats {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.summary-stats .stat-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  font-size: 0.9rem;
+}
+
+.summary-stats .stat-item i {
+  color: #007bff;
+  font-size: 1rem;
+}
+
+.summary-stats .stat-item strong {
+  color: #495057;
+  font-weight: 600;
+}
+
+.mapping-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.mapping-item {
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s ease;
+}
+
+.mapping-item:hover {
+  border-color: #007bff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+}
+
+.page-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.page-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #495057;
+}
+
+.page-name i {
+  color: #007bff;
+  font-size: 1.1rem;
+}
+
+.script-count {
+  font-size: 0.8rem;
+  color: #6c757d;
+  font-weight: 400;
+  margin-right: 5px;
+}
+
+.scripts-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.script-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #e3f2fd;
+  color: #1976d2;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid #bbdefb;
+  transition: all 0.2s ease;
+}
+
+.script-tag:hover {
+  background: #bbdefb;
+  border-color: #90caf9;
+}
+
+.no-scripts {
+  color: #6c757d;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.no-data {
+  text-align: center;
+  padding: 40px;
+  color: #6c757d;
+  font-size: 1.1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
 /* כרטיסי התראות - מבוסס על index.css */
 .alert-card {
   background: #ffffff;

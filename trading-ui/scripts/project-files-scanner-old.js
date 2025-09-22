@@ -225,7 +225,7 @@ class ProjectFilesScanner {
             const timeoutId = setTimeout(() => controller.abort(), 35000); // 35 seconds timeout
             
             // Build query parameters for selected file types
-            let url = '/api/v1/files/discover';
+            let url = '/api/file-scanner/files';
             if (selectedTypes && selectedTypes.length > 0) {
                 const typesParam = selectedTypes.join(',');
                 url += `?types=${encodeURIComponent(typesParam)}`;

@@ -399,7 +399,7 @@ class RealtimeNotificationsClient {
     if (typeof window.showInfoNotification === 'function') {
       window.showInfoNotification(title, message, duration);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification(message, 'info', title, duration);
+      window.showNotification(message, 'info', title, duration, 'system');
     } else {
       // console.log(`[INFO] ${title}: ${message}`);
     }
@@ -409,7 +409,7 @@ class RealtimeNotificationsClient {
     if (typeof window.showSuccessNotification === 'function') {
       window.showSuccessNotification(title, message, duration);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification(message, 'success', title, duration);
+      window.showNotification(message, 'success', title, duration, 'business');
     } else {
       // console.log(`[SUCCESS] ${title}: ${message}`);
     }
@@ -419,7 +419,7 @@ class RealtimeNotificationsClient {
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification(title, message, duration);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification(message, 'error', title, duration);
+      window.showNotification(message, 'error', title, duration, 'system');
     } else {
       // console.log(`[ERROR] ${title}: ${message}`);
     }
@@ -429,7 +429,7 @@ class RealtimeNotificationsClient {
     if (typeof window.showWarningNotification === 'function') {
       window.showWarningNotification(title, message, duration);
     } else if (typeof window.showNotification === 'function') {
-      window.showNotification(message, 'warning', title, duration);
+      window.showNotification(message, 'warning', title, duration, 'system');
     } else {
       // console.log(`[WARNING] ${title}: ${message}`);
     }

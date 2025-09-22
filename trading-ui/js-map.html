@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
     <title>מפת JavaScript - TikTrack</title>
 
     <!-- Google Fonts -->
@@ -30,7 +31,7 @@
     <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=v1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=v1.0.0">
     <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=v1.0.0">
-    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=v1.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=v1.0.2">
     <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=v1.0.1">
     <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=v1.0.1">
     <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=v1.0.0">
@@ -55,6 +56,7 @@
     <script src="scripts/console-cleanup.js"></script>
     <script src="scripts/translation-utils.js"></script>
     <script src="scripts/data-utils.js"></script>
+    <script src="scripts/global-favicon.js"></script>
     <script src="scripts/ui-utils.js"></script>
     <script src="scripts/table-mappings.js"></script>
     <script src="scripts/date-utils.js"></script>
@@ -178,6 +180,17 @@
                 <div class="content-section" id="section1">
                     <div class="section-header">
                         <h2><i class="fas fa-file-alt"></i> מיפוי עמודים</h2>
+                        
+                        <!-- כפתורי פעולה -->
+                        <div class="section-actions">
+                            <button class="btn btn-sm btn-outline-primary" onclick="refreshPageMapping()" title="רענן מיפוי עמודים">
+                                <i class="bi bi-arrow-clockwise"></i> רענן
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="exportPageMapping()" title="ייצא מיפוי עמודים">
+                                <i class="fas fa-download"></i> ייצא
+                            </button>
+                        </div>
+                        
                         <button class="filter-toggle-btn" onclick="toggleSection('section1')" title="הצג/הסתר סקשן">
                             <span class="section-toggle-icon">▼</span>
                         </button>
@@ -238,6 +251,14 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <!-- Duplicates Analysis Results -->
+                            <div id="duplicatesContent" style="margin-top: 20px;">
+                                <div class="loading">
+                                    <div class="loading-spinner"></div>
+                                    טוען ניתוח כפילויות...
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -269,7 +290,7 @@
                     </div>
 
 
-                            <div id="functionsContent">
+                            <div id="functionsListContent">
                         <div class="loading">
                             <div class="loading-spinner"></div>
                                     טוען פונקציות...
@@ -461,7 +482,7 @@
     <script src="scripts/js-map-ui.js"></script>
     <script src="scripts/js-map-analysis.js"></script>
     <script src="scripts/js-map-utils.js"></script>
-    <script src="scripts/js-map.js?v=v1.0.7"></script>
+        <script src="scripts/js-map.js?v=v1.0.9"></script>
 
     <!-- Initialize JS-Map System -->
         <script src="scripts/js-map-init.js"></script>

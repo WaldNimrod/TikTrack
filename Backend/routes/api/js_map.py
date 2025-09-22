@@ -244,6 +244,38 @@ def get_page_mapping():
                 'last_modified': None,
                 'file_sizes': {},
                 'dependencies': ['ui-utils.js']
+            },
+            'linter-realtime-monitor.html': {
+                'files': ['linter-realtime-monitor.js', 'header-system.js', 'simple-filter.js'],
+                'page_type': 'development',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': []
+            },
+            'chart-management.html': {
+                'files': ['chart-management.js', 'header-system.js', 'simple-filter.js'],
+                'page_type': 'development',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': []
+            },
+            'css-management.html': {
+                'files': ['css-management.js', 'header-system.js', 'simple-filter.js'],
+                'page_type': 'development',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': []
+            },
+            'crud-testing-dashboard.html': {
+                'files': ['crud-testing-dashboard.js', 'header-system.js', 'simple-filter.js'],
+                'page_type': 'development',
+                'functions_count': 0,
+                'last_modified': None,
+                'file_sizes': {},
+                'dependencies': []
             }
         }
         

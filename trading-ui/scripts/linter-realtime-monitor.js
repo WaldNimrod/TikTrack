@@ -374,7 +374,7 @@ async function checkExistingScanResults() {
         // 2. בדוק אם קיימת סריקה בבסיס הנתונים
         console.log('🔍 Step 2: Checking for scan results in IndexedDB...');
         try {
-            const savedScanResults = await window.GlobalFileMapping.getScanningResults();
+            const savedScanResults = await window.UnifiedIndexedDB.getScanningResults();
             console.log('📊 Saved scan results from IndexedDB:', savedScanResults);
             
             if (savedScanResults && savedScanResults.scannedFiles > 0 && savedScanResults.lastScanTime) {
@@ -443,12 +443,12 @@ async function discoverProjectFiles() {
             addLogEntry('INFO', '💾 שומר מיפוי קבצים ל-IndexedDB...');
             
             try {
-                // Check if GlobalFileMapping is available and ready
-                if (!window.GlobalFileMapping || typeof window.GlobalFileMapping.saveFileMapping !== 'function') {
-                    console.warn('⚠️ GlobalFileMapping not ready yet - skipping IndexedDB save');
+                // Check if UnifiedIndexedDB is available and ready
+                if (!window.UnifiedIndexedDB || typeof window.UnifiedIndexedDB.saveFileMapping !== 'function') {
+                    console.warn('⚠️ UnifiedIndexedDB not ready yet - skipping IndexedDB save');
                     addLogEntry('WARNING', '⚠️ מערכת שמירת מיפוי לא מוכנה - דילוג על שמירה');
                 } else {
-                    const saveResult = await window.GlobalFileMapping.saveFileMapping(discoveredFiles, 'linter-realtime-monitor');
+                    const saveResult = await window.UnifiedIndexedDB.saveFileMapping(discoveredFiles, 'linter-realtime-monitor');
                     console.log('✅ File mapping saved to IndexedDB successfully:', saveResult);
                     addLogEntry('SUCCESS', `✅ מיפוי קבצים נשמר בהצלחה ל-IndexedDB (${saveResult.totalFiles} קבצים)`);
                     
@@ -726,7 +726,7 @@ async function scanJavaScriptFiles() {
         addLogEntry('WARNING', '⚠️ לא נמצאו קבצים בזיכרון - מנסה לשחזר מ-IndexedDB...');
         
         try {
-            const savedMapping = await window.GlobalFileMapping.getFileMapping();
+            const savedMapping = await window.UnifiedIndexedDB.getFileMapping();
             if (savedMapping && savedMapping.files) {
                 // השתמש במערכת ההודעות הגלובלית שלנו
                 addLogEntry('INFO', `📊 נמצא מיפוי קבצים שמור מ-${savedMapping.timestamp} (${savedMapping.totalFiles} קבצים)`);
@@ -1024,7 +1024,7 @@ async function finishScan() {
                 console.log('✅ Saved scanning results to localStorage');
                 
                 // Also save to IndexedDB for reliable fallback using global system
-                await window.GlobalFileMapping.saveScanningResults(window.scanningResults, 'linter-realtime-monitor');
+                await window.UnifiedIndexedDB.saveScanningResults(window.scanningResults, 'linter-realtime-monitor');
                 console.log('✅ Saved scanning results to IndexedDB');
             } catch (error) {
                 console.warn('Failed to save scanning results:', error);

@@ -25,14 +25,14 @@
  */
 async function loadInitialData() {
     try {
-        if (typeof window.LinterIndexedDBAdapter !== 'undefined') {
-            const adapter = new window.LinterIndexedDBAdapter();
+        if (typeof window.UnifiedIndexedDB !== 'undefined') {
+            const adapter = window.UnifiedIndexedDB;
             
             // Wait for IndexedDB to be initialized
             await adapter.initialize();
             
             // Load latest scanning results from IndexedDB
-            const latestData = await adapter.getLatestData();
+            const latestData = await adapter.getLinterHistory();
             console.log('🔍 IndexedDB latest data:', latestData);
             
             if (latestData && latestData.length > 0) {
@@ -83,8 +83,8 @@ async function loadInitialData() {
  */
 async function updateStatisticsDisplay() {
     try {
-        if (typeof window.LinterIndexedDBAdapter !== 'undefined') {
-            const adapter = new window.LinterIndexedDBAdapter();
+        if (typeof window.UnifiedIndexedDB !== 'undefined') {
+            const adapter = window.UnifiedIndexedDB;
             
             // Initialize adapter if needed
             try {

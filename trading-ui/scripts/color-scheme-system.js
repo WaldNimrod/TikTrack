@@ -230,7 +230,7 @@ let INVESTMENT_TYPE_COLORS = {
  */
 function loadEntityColorsFromPreferences(preferences) {
   // הסרנו את preferences.entityColors כי הוא לא קיים במערכת ההעדפות
-  // במקום זה משתמשים במשתנים ספציפיים: entityTradeColor, entityAccountColor וכו'
+  // במקום זה משתמשים במשתנים ספציפיים: entityTradeColor, entityTradingAccountColor וכו'
   
   // יצירת CSS דינמי
   generateAndApplyEntityCSS();
@@ -1465,7 +1465,7 @@ function getColorPreferences() {
     
     // צבעי ישויות לגרפים (מהמערכת הקיימת)
     entityTradeColor: '#007bff',    // כחול - טריידים
-    entityAccountColor: '#28a745',  // ירוק - חשבונות
+    entityTradingAccountColor: '#28a745',  // ירוק - חשבונות
     entityExecutionColor: '#17a2b8', // כחול מידע - ביצועים
     entityAlertColor: '#ffc107',    // צהוב - התראות
     entityTickerColor: '#dc3545',   // אדום - טיקרים
@@ -1771,11 +1771,11 @@ function updateCSSVariablesFromPreferences(preferences) {
       document.documentElement.style.setProperty('--entity-execution-text', preferences.entityExecutionColorDark || '#688016');
       document.documentElement.style.setProperty('--entity-execution-border', `rgba(${hexToRgb(preferences.entityExecutionColor)?.r || 169}, ${hexToRgb(preferences.entityExecutionColor)?.g || 206}, ${hexToRgb(preferences.entityExecutionColor)?.b || 26}, 0.3)`);
     }
-    if (preferences.entityAccountColor) {
-      document.documentElement.style.setProperty('--entity-account-color', preferences.entityAccountColor);
-      document.documentElement.style.setProperty('--entity-account-bg', preferences.entityAccountColorLight || 'rgba(0, 66, 170, 0.1)');
-      document.documentElement.style.setProperty('--entity-account-text', '#032e78');
-      document.documentElement.style.setProperty('--entity-account-border', `rgba(${hexToRgb(preferences.entityAccountColor)?.r || 0}, ${hexToRgb(preferences.entityAccountColor)?.g || 66}, ${hexToRgb(preferences.entityAccountColor)?.b || 170}, 0.3)`);
+    if (preferences.entityTradingAccountColor) {
+      document.documentElement.style.setProperty('--entity-trading-account-color', preferences.entityTradingAccountColor);
+      document.documentElement.style.setProperty('--entity-trading-account-bg', preferences.entityTradingAccountColorLight || 'rgba(0, 66, 170, 0.1)');
+      document.documentElement.style.setProperty('--entity-trading-account-text', '#032e78');
+      document.documentElement.style.setProperty('--entity-trading-account-border', `rgba(${hexToRgb(preferences.entityTradingAccountColor)?.r || 0}, ${hexToRgb(preferences.entityTradingAccountColor)?.g || 66}, ${hexToRgb(preferences.entityTradingAccountColor)?.b || 170}, 0.3)`);
     }
     if (preferences.entityCashFlowColor) {
       document.documentElement.style.setProperty('--entity-cash-flow-color', preferences.entityCashFlowColor);
@@ -1807,7 +1807,7 @@ function updateCSSVariablesFromPreferences(preferences) {
       primary: preferences.primaryColor,
       secondary: preferences.secondaryColor,
       trade: preferences.entityTradeColor,
-      account: preferences.entityAccountColor,
+      trading_account: preferences.entityTradingAccountColor,
       positive: preferences.valuePositiveColor,
       negative: preferences.valueNegativeColor
     });
@@ -1896,7 +1896,7 @@ async function loadColorPreferences() {
       // במקום זה משתמשים במשתנים ספציפיים: valuePositiveColor, valueNegativeColor וכו'
 
       // הסרנו את preferences.entityColors כי הוא לא קיים במערכת ההעדפות
-      // במקום זה משתמשים במשתנים ספציפיים: entityTradeColor, entityAccountColor וכו'
+      // במקום זה משתמשים במשתנים ספציפיים: entityTradeColor, entityTradingAccountColor וכו'
 
       // עדכון CSS Variables
       updateCSSVariablesFromPreferences(preferences);

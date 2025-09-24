@@ -18,7 +18,7 @@ Database Schema:
 - Proper foreign key relationships with related_item_id
 
 API Endpoints:
-- GET /api/v1/linked-items/<entity_type>/<entity_id>
+- GET /api/linked-items/<entity_type>/<entity_id>
   Returns: {child_entities: [], parent_entities: [], total_counts}
 
 Author: Tik.track Development Team
@@ -46,7 +46,7 @@ from .base_entity_utils import BaseEntityUtils
 logger = logging.getLogger(__name__)
 
 # Create blueprint
-linked_items_bp = Blueprint('linked_items', __name__, url_prefix='/api/v1/linked-items')
+linked_items_bp = Blueprint('linked_items', __name__, url_prefix='/api/linked-items')
 
 # Initialize base API (linked_items is complex, so we'll use it selectively)
 

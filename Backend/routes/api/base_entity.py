@@ -416,7 +416,7 @@ class BaseEntityAPI:
             "data": data,
             "message": message,
             "timestamp": datetime.now().isoformat(),
-            "version": "v1"
+            "version": "1.0"
         }
     
     def _error_response(self, message: str) -> Dict:
@@ -433,7 +433,7 @@ class BaseEntityAPI:
             "status": "error",
             "error": {"message": message},
             "timestamp": datetime.now().isoformat(),
-            "version": "v1"
+            "version": "1.0"
         }
     
     def _validate_required_fields(self, data: Dict, required_fields: List[str]) -> bool:

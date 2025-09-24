@@ -23,14 +23,14 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-quotes_v1_bp = Blueprint('quotes_v1', __name__, url_prefix='/api/v1')
+quotes_v1_bp = Blueprint('quotes_v1', __name__, url_prefix='/api')
 
 # Initialize base API (quotes is complex, so we'll use it selectively)
 
 @quotes_v1_bp.route('/quotes/batch', methods=['GET'])
 def get_quotes_batch():
     """
-    GET /api/v1/quotes/batch?ticker_ids=... 
+    GET /api/quotes/batch?ticker_ids=... 
     
     As specified in Section 5.1 of External Data Integration Specification:
     - Preferred for UI
@@ -44,7 +44,7 @@ def get_quotes_batch():
             return jsonify({
                 "status": "error", 
                 "error": "ticker_ids parameter is required",
-                "message": "Usage: /api/v1/quotes/batch?ticker_ids=1,2,3"
+                "message": "Usage: /api/quotes/batch?ticker_ids=1,2,3"
             }), 400
         
         # Parse ticker IDs
@@ -121,7 +121,7 @@ def get_quotes_batch():
 @quotes_v1_bp.route('/quotes/<int:ticker_id>', methods=['GET'])  
 def get_quote(ticker_id: int):
     """
-    GET /api/v1/quotes/{ticker_id}
+    GET /api/quotes/{ticker_id}
     
     As specified in Section 5.1 of External Data Integration Specification:
     - Returns single quote for ticker
@@ -186,7 +186,7 @@ def get_quote(ticker_id: int):
 @quotes_v1_bp.route('/user/preferences', methods=['GET'])
 def get_user_preferences():
     """
-    GET /api/v1/user/preferences
+    GET /api/user/preferences
     
     As specified in Section 5.2 of External Data Integration Specification:
     - Returns timezone and refresh_overrides_json
@@ -234,7 +234,7 @@ def get_user_preferences():
 @quotes_v1_bp.route('/user/preferences', methods=['PUT'])
 def update_user_preferences():
     """
-    PUT /api/v1/user/preferences
+    PUT /api/user/preferences
     
     As specified in Section 5.2 of External Data Integration Specification:
     - Updates timezone and/or refresh_overrides_json

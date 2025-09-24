@@ -88,14 +88,14 @@ function selectTypeOption(value) {
     document.getElementById('typeFilterMenu').classList.remove('show');
 }
 
-function toggleAccountFilter() {
-    const menu = document.getElementById('accountFilterMenu');
+function toggleTradingAccountFilter() {
+    const menu = document.getElementById('tradingAccountFilterMenu');
     menu.classList.toggle('show');
 }
 
 function selectAccountOption(value) {
     document.getElementById('selectedAccount').textContent = value;
-    document.getElementById('accountFilterMenu').classList.remove('show');
+    document.getElementById('tradingAccountFilterMenu').classList.remove('show');
 }
 
 function toggleTypeFilter() {
@@ -148,10 +148,10 @@ function selectTypeOption(value) {
     saveFilterState();
 }
 
-function toggleAccountFilter() {
-    console.log('🔧 toggleAccountFilter called');
-    const menu = document.getElementById('accountFilterMenu');
-    console.log('📋 accountFilterMenu element:', menu);
+function toggleTradingAccountFilter() {
+    console.log('🔧 toggleTradingAccountFilter called');
+    const menu = document.getElementById('tradingAccountFilterMenu');
+    console.log('📋 tradingAccountFilterMenu element:', menu);
     if (menu) {
         menu.classList.toggle('show');
         
@@ -175,7 +175,7 @@ function toggleAccountFilter() {
             zIndex: window.getComputedStyle(menu).zIndex
         });
     } else {
-        console.error('❌ accountFilterMenu not found');
+        console.error('❌ tradingAccountFilterMenu not found');
     }
 }
 
@@ -198,7 +198,7 @@ function selectAccountOption(value) {
     }
     
     // סגירת התפריט
-    document.getElementById('accountFilterMenu').classList.remove('show');
+    document.getElementById('tradingAccountFilterMenu').classList.remove('show');
     
     // שמירת מצב
     saveFilterState();
@@ -242,7 +242,7 @@ async function loadAccountsForFilter() {
 
 // עדכון אפשרויות פילטר החשבונות
 function updateAccountFilterOptions() {
-    const accountMenu = document.getElementById('accountFilterMenu');
+    const accountMenu = document.getElementById('tradingAccountFilterMenu');
     if (!accountMenu || !window.accountsData) return;
     
     // ניקוי אפשרויות קיימות (למעט "הכל")
@@ -267,7 +267,7 @@ function updateAccountFilterOptions() {
 
 // fallback למצב שלא נטענים חשבונות
 function useAccountFilterFallback() {
-    const accountMenu = document.getElementById('accountFilterMenu');
+    const accountMenu = document.getElementById('tradingAccountFilterMenu');
     if (!accountMenu) return;
     
     // הוספת אפשרויות fallback בהתאם לטבלה
@@ -533,7 +533,7 @@ window.toggleFilterSection = toggleFilterSection;
 window.toggleSection = toggleFilterSection; // Backward compatibility
 window.toggleStatusFilter = toggleStatusFilter;
 window.toggleTypeFilter = toggleTypeFilter;
-window.toggleAccountFilter = toggleAccountFilter;
+window.toggleTradingAccountFilter = toggleTradingAccountFilter;
 window.toggleDateRangeFilter = toggleDateRangeFilter;
 window.selectStatusOption = selectStatusOption;
 window.selectTypeOption = selectTypeOption;

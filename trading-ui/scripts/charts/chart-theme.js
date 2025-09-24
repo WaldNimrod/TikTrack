@@ -180,7 +180,7 @@ class ChartTheme {
                 chartExportBackground: this.dynamicColors.chartExportBackground,
                 // Entity colors for charts
                 entityTradeColor: this.dynamicColors.entityTradeColor || this.dynamicColors.primaryColor,
-                entityAccountColor: this.dynamicColors.entityAccountColor || this.dynamicColors.successColor
+                entityTradingAccountColor: this.dynamicColors.entityTradingAccountColor || this.dynamicColors.successColor
             };
         }
         
@@ -212,7 +212,7 @@ class ChartTheme {
             chartExportBackground: 'var(--chart-export-background)',
             // Entity colors for charts
             entityTradeColor: 'var(--primary-color)',
-            entityAccountColor: 'var(--success-color)'
+            entityTradingAccountColor: 'var(--success-color)'
         };
     }
 
@@ -245,7 +245,7 @@ class ChartTheme {
                 this.dynamicColors.infoColor || '#17a2b8',
                 this.dynamicColors.secondaryColor || '#6c757d',
                 this.dynamicColors.entityTradeColor || this.dynamicColors.primaryColor || '#007bff',
-                this.dynamicColors.entityAccountColor || this.dynamicColors.successColor || '#28a745'
+                this.dynamicColors.entityTradingAccountColor || this.dynamicColors.successColor || '#28a745'
             ];
         }
         

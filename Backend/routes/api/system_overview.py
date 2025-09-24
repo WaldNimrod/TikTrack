@@ -100,7 +100,7 @@ def get_system_overview():
             'status': 'success',
             'data': overview,
             'message': 'System overview retrieved successfully',
-            'version': 'v1'
+            'version': '1.0'
         }), 200
         
     except Exception as e:
@@ -108,7 +108,7 @@ def get_system_overview():
         return jsonify({
             'status': 'error',
             'error': {'message': f'Failed to get system overview: {str(e)}'},
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
 @system_overview_bp.route('/health', methods=['GET'])

@@ -1,5 +1,5 @@
 from .api.tickers import tickers_bp
-from .api.accounts import accounts_bp
+from .api.trading_accounts import trading_accounts_bp
 from .api.trades import trades_bp
 from .api.trade_plans import trade_plans_bp
 from .api.alerts import alerts_bp
@@ -12,7 +12,7 @@ from .pages import pages_bp
 
 __all__ = [
     'tickers_bp',
-    'accounts_bp', 
+    'trading_accounts_bp', 
     'trades_bp',
     'trade_plans_bp',
     'alerts_bp',

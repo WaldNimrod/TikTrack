@@ -2314,7 +2314,7 @@ async function loadUserPreferences() {
         console.log('✅ Using API preferences');
         return preferences;
       }
-    } catch (v1Error) {
+    } catch (migrationError) {
       console.log('🔄 API not available, trying local config...');
     }
     

@@ -35,14 +35,14 @@ def migrate_user_preferences():
         
         # מהטבלה user_preferences
         cursor.execute("SELECT * FROM user_preferences WHERE user_id = 1")
-        v1_structured = cursor.fetchone()
+        legacy_structured = cursor.fetchone()
         
-        if v1_structured:
+        if legacy_structured:
             # קבל את שמות העמודות
             cursor.execute("PRAGMA table_info(user_preferences)")
             columns = [col[1] for col in cursor.fetchall()]
-            v1_data = dict(zip(columns, v1_structured))
-            print(f"✅ Found structured V1 data: {len(v1_data)} fields")
+            legacy_data = dict(zip(columns, legacy_structured))
+            print(f"✅ Found structured V1 data: {len(legacy_data)} fields")
         else:
             print("❌ No structured V1 data found")
             return False
@@ -77,40 +77,40 @@ def migrate_user_preferences():
         now = datetime.utcnow().isoformat()
         
         # ערכים בסיסיים מV1
-        primary_currency = v1_data.get('primary_currency', json_data.get('primaryCurrency', 'USD'))
-        timezone = v1_data.get('timezone', json_data.get('timezone', 'Asia/Jerusalem'))
-        default_stop_loss = v1_data.get('default_stop_loss', json_data.get('defaultStopLoss', 5.0))
-        default_target_price = v1_data.get('default_target_price', json_data.get('defaultTargetPrice', 10.0))
-        default_commission = v1_data.get('default_commission', json_data.get('defaultCommission', 1.0))
+        primary_currency = legacy_data.get('primary_currency', json_data.get('primaryCurrency', 'USD'))
+        timezone = legacy_data.get('timezone', json_data.get('timezone', 'Asia/Jerusalem'))
+        default_stop_loss = legacy_data.get('default_stop_loss', json_data.get('defaultStopLoss', 5.0))
+        default_target_price = legacy_data.get('default_target_price', json_data.get('defaultTargetPrice', 10.0))
+        default_commission = legacy_data.get('default_commission', json_data.get('defaultCommission', 1.0))
         
         # פילטרים
-        default_status_filter = v1_data.get('default_status_filter', json_data.get('defaultStatusFilter', 'open'))
-        default_type_filter = v1_data.get('default_type_filter', json_data.get('defaultTypeFilter', 'swing'))
-        default_account_filter = v1_data.get('default_account_filter', json_data.get('defaultAccountFilter', 'all'))
-        default_date_range_filter = v1_data.get('default_date_range_filter', json_data.get('defaultDateRangeFilter', 'this_week'))
-        default_search_filter = v1_data.get('default_search_filter', json_data.get('defaultSearchFilter', ''))
+        default_status_filter = legacy_data.get('default_status_filter', json_data.get('defaultStatusFilter', 'open'))
+        default_type_filter = legacy_data.get('default_type_filter', json_data.get('defaultTypeFilter', 'swing'))
+        default_account_filter = legacy_data.get('default_account_filter', json_data.get('defaultAccountFilter', 'all'))
+        default_date_range_filter = legacy_data.get('default_date_range_filter', json_data.get('defaultDateRangeFilter', 'this_week'))
+        default_search_filter = legacy_data.get('default_search_filter', json_data.get('defaultSearchFilter', ''))
         
         # נתונים חיצוניים
-        primary_data_provider = v1_data.get('primary_data_provider', json_data.get('primaryDataProvider', 'yahoo'))
-        secondary_data_provider = v1_data.get('secondary_data_provider', json_data.get('secondaryDataProvider', 'google'))
-        cache_ttl = v1_data.get('cache_ttl', json_data.get('cacheTTL', 5))
-        max_batch_size = v1_data.get('max_batch_size', json_data.get('maxBatchSize', 25))
-        request_delay = v1_data.get('request_delay', json_data.get('requestDelay', 200))
-        retry_attempts = v1_data.get('retry_attempts', json_data.get('retryAttempts', 2))
-        retry_delay = v1_data.get('retry_delay', json_data.get('retryDelay', 5))
+        primary_data_provider = legacy_data.get('primary_data_provider', json_data.get('primaryDataProvider', 'yahoo'))
+        secondary_data_provider = legacy_data.get('secondary_data_provider', json_data.get('secondaryDataProvider', 'google'))
+        cache_ttl = legacy_data.get('cache_ttl', json_data.get('cacheTTL', 5))
+        max_batch_size = legacy_data.get('max_batch_size', json_data.get('maxBatchSize', 25))
+        request_delay = legacy_data.get('request_delay', json_data.get('requestDelay', 200))
+        retry_attempts = legacy_data.get('retry_attempts', json_data.get('retryAttempts', 2))
+        retry_delay = legacy_data.get('retry_delay', json_data.get('retryDelay', 5))
         
-        show_percentage_changes = v1_data.get('show_percentage_changes', json_data.get('showPercentageChanges', True))
-        show_volume = v1_data.get('show_volume', json_data.get('showVolume', True))
-        notify_on_data_failures = v1_data.get('notify_on_data_failures', json_data.get('notifyOnDataFailures', True))
-        notify_on_stale_data = v1_data.get('notify_on_stale_data', json_data.get('notifyOnStaleData', False))
+        show_percentage_changes = legacy_data.get('show_percentage_changes', json_data.get('showPercentageChanges', True))
+        show_volume = legacy_data.get('show_volume', json_data.get('showVolume', True))
+        notify_on_data_failures = legacy_data.get('notify_on_data_failures', json_data.get('notifyOnDataFailures', True))
+        notify_on_stale_data = legacy_data.get('notify_on_stale_data', json_data.get('notifyOnStaleData', False))
         
         # קונסול
-        console_cleanup_interval = v1_data.get('console_cleanup_interval', json_data.get('consoleCleanupInterval', 60000))
+        console_cleanup_interval = legacy_data.get('console_cleanup_interval', json_data.get('consoleCleanupInterval', 60000))
         # המר מ-milliseconds ל-seconds אם נדרש
         if console_cleanup_interval > 1000:
             console_cleanup_interval = int(console_cleanup_interval / 1000)
         
-        verbose_logging = v1_data.get('verbose_logging', json_data.get('verboseLogging', False))
+        verbose_logging = legacy_data.get('verbose_logging', json_data.get('verboseLogging', False))
         
         # JSON fields - צור מערכת צבעים מאוחדת
         color_scheme = {}
@@ -191,7 +191,7 @@ def migrate_user_preferences():
                 old_value, new_value, changed_by, change_reason
             ) VALUES (1, 1, 'migrate_from_v1', ?, ?, 1, 'Automated migration from V1 to V2')
         """, (
-            json.dumps({'v1_fields': len(v1_data) + len(json_data)}),
+            json.dumps({'legacy_fields': len(legacy_data) + len(json_data)}),
             json.dumps({'migrated_at': now})
         ))
         

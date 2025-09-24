@@ -121,7 +121,7 @@ def create_swagger_models(api: Api) -> Dict[str, Any]:
     trade_model = api.model('Trade', {
         'id': fields.Integer(example=1),
         'ticker_id': fields.Integer(example=1),
-        'account_id': fields.Integer(example=1),
+        'trading_account_id': fields.Integer(example=1),
         'type': fields.String(example='buy'),
         'quantity': fields.Float(example=100.0),
         'price': fields.Float(example=150.0),
@@ -133,7 +133,7 @@ def create_swagger_models(api: Api) -> Dict[str, Any]:
     
     trade_create = api.model('TradeCreate', {
         'ticker_id': fields.Integer(required=True, example=1),
-        'account_id': fields.Integer(required=True, example=1),
+        'trading_account_id': fields.Integer(required=True, example=1),
         'type': fields.String(required=True, example='buy'),
         'quantity': fields.Float(required=True, example=100.0),
         'price': fields.Float(required=True, example=150.0),

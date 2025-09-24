@@ -93,7 +93,7 @@ class DatabaseRecreator:
             )
         """)
         
-        # 4. Accounts table
+        # 4. Trading Accounts table
         cursor.execute("""
             CREATE TABLE accounts (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -329,9 +329,9 @@ class DatabaseRecreator:
         
         # 4. Insert sample accounts
         accounts = [
-            ('Main Account', 1, 'active', 10000.00, 15000.00, 5000.00, 'Primary trading account'),
-            ('Secondary Account', 1, 'active', 5000.00, 7500.00, 2500.00, 'Secondary trading account'),
-            ('Demo Account', 1, 'active', 1000.00, 1200.00, 200.00, 'Demo account for testing')
+            ('Main Trading Account', 1, 'active', 10000.00, 15000.00, 5000.00, 'Primary trading account'),
+            ('Secondary Trading Account', 1, 'active', 5000.00, 7500.00, 2500.00, 'Secondary trading account'),
+            ('Demo Trading Account', 1, 'active', 1000.00, 1200.00, 200.00, 'Demo trading account for testing')
         ]
         cursor.executemany(
             "INSERT INTO accounts (name, currency_id, status, cash_balance, total_value, total_pl, notes) VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -393,7 +393,7 @@ class DatabaseRecreator:
         # 9. Insert sample cash flows
         cash_flows = [
             (1, 'deposit', 10000.00, datetime.now() - timedelta(days=30), 'Initial deposit', 1, 1.000000, 'manual'),
-            (2, 'deposit', 5000.00, datetime.now() - timedelta(days=25), 'Account funding', 1, 1.000000, 'manual'),
+            (2, 'deposit', 5000.00, datetime.now() - timedelta(days=25), 'Trading Account funding', 1, 1.000000, 'manual'),
             (1, 'dividend', 50.00, datetime.now() - timedelta(days=5), 'AAPL dividend', 1, 1.000000, 'manual'),
             (1, 'fee', -10.00, datetime.now() - timedelta(days=1), 'Trading fee', 1, 1.000000, 'manual')
         ]
@@ -542,7 +542,7 @@ class DatabaseRecreator:
             (plan_status_constraint_id, 'closed', 'סגור', 1, 2),
             (plan_status_constraint_id, 'cancelled', 'בוטל', 1, 3),
             
-            # Account status
+            # Trading Account status
             (account_status_constraint_id, 'active', 'פעיל', 1, 1),
             (account_status_constraint_id, 'inactive', 'לא פעיל', 1, 2),
             (account_status_constraint_id, 'closed', 'סגור', 1, 3),

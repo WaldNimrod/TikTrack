@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 class TradePlan(BaseModel):
     __tablename__ = "trade_plans"
     
-    account_id = Column(Integer, ForeignKey('accounts.id'), nullable=False)
+    trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=False)
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=False)
     investment_type = Column(String(20), default='swing', nullable=False)  # NOT NULL per constraints
     side = Column(String(10), default='Long', nullable=False)  # NOT NULL per constraints
@@ -26,7 +26,7 @@ class TradePlan(BaseModel):
     cancel_reason = Column(String(500), nullable=True)
     
     # Relationships
-    account = relationship("TradingAccount", back_populates="trade_plans")
+    trading_account = relationship("TradingAccount", back_populates="trade_plans")
     ticker = relationship("Ticker")
     trades = relationship("Trade", back_populates="trade_plan")
     # Notes relationship removed - notes now use related_type and related_id
@@ -66,19 +66,19 @@ class TradePlan(BaseModel):
             result['ticker'] = {'id': self.ticker_id, 'symbol': f'Ticker_{self.ticker_id}', 'name': f'Ticker {self.ticker_id}'}
         
         try:
-            if hasattr(self, 'account') and self.account:
-                logger.info(f"Trade plan {self.id}: Using loaded account relationship")
+            if hasattr(self, 'trading_account') and self.trading_account:
+                logger.info(f"Trade plan {self.id}: Using loaded trading_account relationship")
                 result['account'] = {
-                    'id': self.account.id,
-                    'name': self.account.name
+                    'id': self.trading_account.id,
+                    'name': self.trading_account.name
                 }
             else:
-                logger.info(f"Trade plan {self.id}: TradingAccount relationship not loaded, using account_id")
-                result['account'] = {'id': self.account_id, 'name': f'TradingAccount_{self.account_id}'}
+                logger.info(f"Trade plan {self.id}: TradingAccount relationship not loaded, using trading_account_id")
+                result['account'] = {'id': self.trading_account_id, 'name': f'TradingAccount_{self.trading_account_id}'}
         except Exception as e:
             logger.error(f"Trade plan {self.id}: Error with account relationship: {str(e)}")
-            # If there's a problem with the account relationship, use account_id
-            result['account'] = {'id': self.account_id, 'name': f'TradingAccount_{self.account_id}'}
+            # If there's a problem with the account relationship, use trading_account_id
+            result['account'] = {'id': self.trading_account_id, 'name': f'TradingAccount_{self.trading_account_id}'}
         
         return result
     

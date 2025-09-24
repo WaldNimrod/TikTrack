@@ -1,5 +1,0 @@
-=== Database Backup Information ===
-Backup Date: Sat Sep 20 01:44:39 IDT 2025
-Source Database: Backend/db/simpleTrade_new.db
-Database Size:  21M
-Tables Count: 33

@@ -13,7 +13,7 @@ logger.info("Trade model loaded - opened_at fix applied")
 class Trade(BaseModel):
     __tablename__ = "trades"
     
-    account_id = Column(Integer, ForeignKey('accounts.id'), nullable=False)
+    trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=False)
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=False)
     trade_plan_id = Column(Integer, ForeignKey('trade_plans.id'), nullable=True)  # Allow NULL for trades without plans
     status = Column(String(20), default='open', nullable=True)
@@ -42,7 +42,7 @@ class Trade(BaseModel):
             # Return all necessary fields for the frontend
             result = {
                 "id": self.id,
-                "account_id": self.account_id,
+                "trading_account_id": self.trading_account_id,
                 "ticker_id": self.ticker_id,
                 "trade_plan_id": self.trade_plan_id,
                 "status": self.status,
@@ -60,7 +60,7 @@ class Trade(BaseModel):
                 result["account_name"] = self.account.name
                 logger.info(f"Trade {self.id}: Using loaded account name: {self.account.name}")
             else:
-                result["account_name"] = f'TradingAccount_{self.account_id}' if self.account_id else 'Unknown TradingAccount'
+                result["account_name"] = f'TradingAccount_{self.trading_account_id}' if self.trading_account_id else 'Unknown TradingAccount'
                 logger.info(f"Trade {self.id}: Using fallback account name: {result['account_name']}")
             
             if hasattr(self, 'ticker') and self.ticker:
@@ -86,7 +86,7 @@ class Trade(BaseModel):
             # Return absolute minimal data if there's an error
             return {
                 "id": getattr(self, 'id', None),
-                "account_id": getattr(self, 'account_id', None),
+                "trading_account_id": getattr(self, 'trading_account_id', None),
                 "ticker_id": getattr(self, 'ticker_id', None),
                 "status": getattr(self, 'status', 'unknown'),
                 "account_name": "Unknown TradingAccount",

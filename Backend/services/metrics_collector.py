@@ -196,7 +196,7 @@ class MetricsCollector:
             result = db.execute(text("SELECT COUNT(*) as open FROM trades WHERE status = 'open'"))
             open_trades = result.fetchone()[0]
             
-            # Account metrics
+            # TradingAccount metrics
             result = db.execute(text("SELECT COUNT(*) as total FROM accounts"))
             total_accounts = result.fetchone()[0]
             

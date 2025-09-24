@@ -442,7 +442,7 @@ function getNotificationIcon(type) {
  * @returns {Object} Linked items data
  */
 async function loadLinkedItemsData(itemType, itemId) {
-  const response = await fetch(`/api/v1/linked-items/${itemType}/${itemId}`);
+  const response = await fetch(`/api/linked-items/${itemType}/${itemId}`);
 
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);

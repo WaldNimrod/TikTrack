@@ -20,7 +20,7 @@ class TickerDetailsModule extends BaseEntityModule {
             console.log(`📡 טוען נתוני טיקר #${tickerId}`);
             
             // טעינת נתוני הטיקר
-            const tickerResponse = await fetch(`/api/v1/tickers/${tickerId}`);
+            const tickerResponse = await fetch(`/api/tickers/${tickerId}`);
             if (!tickerResponse.ok) {
                 throw new Error(`שגיאה בטעינת טיקר: ${tickerResponse.status}`);
             }
@@ -61,7 +61,7 @@ class TickerDetailsModule extends BaseEntityModule {
             
             try {
                 // טעינת טריידים (אם יש API)
-                const tradesResponse = await fetch(`/api/v1/trades/?ticker_id=${tickerId}`);
+                const tradesResponse = await fetch(`/api/trades/?ticker_id=${tickerId}`);
                 if (tradesResponse.ok) {
                     const tradesResult = await tradesResponse.json();
                     if (tradesResult.status === 'success') {
@@ -74,7 +74,7 @@ class TickerDetailsModule extends BaseEntityModule {
             
             try {
                 // טעינת התראות (אם יש API)
-                const alertsResponse = await fetch(`/api/v1/alerts/?ticker_id=${tickerId}`);
+                const alertsResponse = await fetch(`/api/alerts/?ticker_id=${tickerId}`);
                 if (alertsResponse.ok) {
                     const alertsResult = await alertsResponse.json();
                     if (alertsResult.status === 'success') {

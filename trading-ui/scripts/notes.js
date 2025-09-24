@@ -309,7 +309,7 @@ async function loadNotesData() {
   try {
     // קריאה לשרת לקבלת נתוני הערות
     console.log('📡 קריאה לשרת לקבלת נתוני הערות...');
-    const response = await fetch('/api/v1/notes/');
+    const response = await fetch('/api/notes/');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -361,10 +361,10 @@ async function loadNotesData() {
     };
 
     const [accounts, trades, tradePlans, tickers] = await Promise.all([
-      loadDataSafely('/api/v1/accounts/', 'חשבונות'),
-      loadDataSafely('/api/v1/trades/', 'טריידים'),
-      loadDataSafely('/api/v1/trade_plans/', 'תוכניות'),
-      loadDataSafely('/api/v1/tickers/', 'טיקרים'),
+      loadDataSafely('/api/accounts/', 'חשבונות'),
+      loadDataSafely('/api/trades/', 'טריידים'),
+      loadDataSafely('/api/trade_plans/', 'תוכניות'),
+      loadDataSafely('/api/tickers/', 'טיקרים'),
     ]);
 
     // שמירת הנתונים ב-window לסינון
@@ -736,7 +736,7 @@ function showEditNoteModal(noteId) {
 
 async function loadNoteData(noteId) {
   try {
-    const response = await fetch(`/api/v1/notes/${noteId}`);
+    const response = await fetch(`/api/notes/${noteId}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -783,10 +783,10 @@ async function loadModalData() {
   try {
     // טעינת נתונים במקביל
     const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-      fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/trades/').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
     ]);
 
     const accounts = Array.isArray(accountsResponse.data) ? accountsResponse.data : [];
@@ -937,7 +937,7 @@ async function populateEditSelectByType(relationType, selectedId) {
 
     switch (parseInt(relationType)) {
     case 1: { // חשבון
-      const accountsResponse = await fetch('/api/v1/accounts/');
+      const accountsResponse = await fetch('/api/accounts/');
       const accountsData = await accountsResponse.json();
       data = Array.isArray(accountsData.data) ? accountsData.data : [];
       displayField = 'name';
@@ -945,7 +945,7 @@ async function populateEditSelectByType(relationType, selectedId) {
       break;
     }
     case 2: { // טרייד
-      const tradesResponse = await fetch('/api/v1/trades/');
+      const tradesResponse = await fetch('/api/trades/');
       const tradesData = await tradesResponse.json();
       data = Array.isArray(tradesData.data) ? tradesData.data : [];
       displayField = 'id';
@@ -953,7 +953,7 @@ async function populateEditSelectByType(relationType, selectedId) {
       break;
     }
     case 3: { // תוכנית
-      const plansResponse = await fetch('/api/v1/trade_plans/');
+      const plansResponse = await fetch('/api/trade_plans/');
       const plansData = await plansResponse.json();
       data = Array.isArray(plansData.data) ? plansData.data : [];
       displayField = 'id';
@@ -961,7 +961,7 @@ async function populateEditSelectByType(relationType, selectedId) {
       break;
     }
     case 4: { // טיקר
-      const tickersResponse = await fetch('/api/v1/tickers/');
+      const tickersResponse = await fetch('/api/tickers/');
       const tickersData = await tickersResponse.json();
       data = Array.isArray(tickersData.data) ? tickersData.data : [];
       displayField = 'symbol';
@@ -1131,7 +1131,7 @@ async function saveNote() {
       related_id: parseInt(relatedId),
     };
 
-    const response = await fetch('/api/v1/notes/', {
+    const response = await fetch('/api/notes/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1237,7 +1237,7 @@ async function updateNoteFromModal() {
         formData.append('remove_attachment', 'true');
       }
 
-      response = await fetch(`/api/v1/notes/${noteId}`, {
+      response = await fetch(`/api/notes/${noteId}`, {
         method: 'PUT',
         body: formData,
       });
@@ -1249,7 +1249,7 @@ async function updateNoteFromModal() {
         related_id: parseInt(relatedId),
       };
 
-      response = await fetch(`/api/v1/notes/${noteId}`, {
+      response = await fetch(`/api/notes/${noteId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1342,7 +1342,7 @@ async function deleteNoteFromServer(noteId) {
 
   while (retryCount < maxRetries) {
     try {
-      const response = await fetch(`/api/v1/notes/${noteId}`, {
+      const response = await fetch(`/api/notes/${noteId}`, {
         method: 'DELETE',
       });
 
@@ -1978,7 +1978,7 @@ function viewNote(noteId) {
 // פונקציה לטעינת נתוני הערה לצפייה
 async function loadNoteForViewing(noteId) {
   try {
-    const response = await fetch(`/api/v1/notes/${noteId}`);
+    const response = await fetch(`/api/notes/${noteId}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -2011,7 +2011,7 @@ async function loadNoteForViewing(noteId) {
       }
 
       attachmentElement.innerHTML = `
-        <a href="/api/v1/notes/files/${fileName}" target="_blank" class="btn btn-sm btn-outline-primary">
+        <a href="/api/notes/files/${fileName}" target="_blank" class="btn btn-sm btn-outline-primary">
           ${fileIcon} ${fileName}
         </a>
       `;
@@ -2084,7 +2084,7 @@ function displayCurrentAttachment(attachment) {
       <div style="display: flex; align-items: center; gap: 8px;">
         <span>${fileIcon}</span>
         <span>${fileName}</span>
-        <a href="/api/v1/notes/files/${fileName}" 
+        <a href="/api/notes/files/${fileName}" 
            target="_blank" 
            class="btn btn-sm btn-outline-primary" 
            style="margin-right: auto;">

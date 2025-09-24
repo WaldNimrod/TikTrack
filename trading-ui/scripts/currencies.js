@@ -94,7 +94,7 @@ function showDeleteCurrencyModal(id) {
 async function loadCurrencies() {
   try {
 
-    const response = await fetch('http://localhost:8080/api/v1/currencies/');
+    const response = await fetch('http://localhost:8080/api/currencies/');
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
@@ -144,7 +144,7 @@ async function confirmDeleteCurrency() {
       }
     }
 
-    const response = await fetch(`http://localhost:8080/api/v1/currencies/${id}`, {
+    const response = await fetch(`http://localhost:8080/api/currencies/${id}`, {
       method: 'DELETE',
     });
 
@@ -177,7 +177,7 @@ async function confirmDeleteCurrency() {
  */
 async function checkLinkedItemsBeforeDelete(currencyId) {
   try {
-    const response = await fetch(`/api/v1/linked-items/currency/${currencyId}`);
+    const response = await fetch(`/api/linked-items/currency/${currencyId}`);
 
     if (!response.ok) {
       // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם המחיקה

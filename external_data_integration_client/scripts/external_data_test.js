@@ -11,7 +11,7 @@
 
 class ExternalDataTester {
     constructor() {
-        this.apiBaseUrl = '/api/v1';
+        this.apiBaseUrl = '/api';
         this.logEntries = [];
         this.isLoading = false;
         

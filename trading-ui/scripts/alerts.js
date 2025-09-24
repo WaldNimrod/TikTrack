@@ -177,7 +177,7 @@ function getDemoAlertsData() {
 async function loadAlertsData() {
   console.log('📊 טעינת נתוני התראות מהשרת...');
   try {
-    const response = await fetch('/api/v1/alerts/');
+    const response = await fetch('/api/alerts/');
     console.log('📊 תגובת שרת:', response.status, response.ok);
 
     if (!response.ok) {
@@ -396,10 +396,10 @@ function updateAlertsTable(alerts) {
   const loadAdditionalData = async () => {
     try {
       const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-        fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
-        fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
-        fetch('/api/v1/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
-        fetch('/api/v1/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
+        fetch('/api/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
+        fetch('/api/trades/').then(r => r.json()).catch(() => ({ data: [] })),
+        fetch('/api/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
+        fetch('/api/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
       ]);
 
       accounts = (accountsResponse.data || accountsResponse || []).filter(item => Array.isArray(item) ? true : typeof item === 'object');
@@ -879,10 +879,10 @@ async function loadModalData() {
     // טעינת נתונים במקביל
     // console.log('🔧 Loading modal data...');
     const [accountsResponse, tradesResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-      fetch('/api/v1/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/trades/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
-      fetch('/api/v1/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/accounts/').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/trades/').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/trade_plans/').then(r => r.json()).catch(() => ({ data: [] })),
+      fetch('/api/tickers/').then(r => r.json()).catch(() => ({ data: [] })),
     ]);
 
     // וידוא שהנתונים הם מערכים
@@ -1556,18 +1556,18 @@ async function saveAlert() {
   // שולח התראה חדשה
   // console.log('🔧 === SAVING ALERT ===');
   // console.log('🔧 Alert data:', alertData);
-  // console.log('🔧 Request URL:', '/api/v1/alerts/');
+  // console.log('🔧 Request URL:', '/api/alerts/');
   // console.log('🔧 Request method:', 'POST');
   // console.log('🔧 Request body:', JSON.stringify(alertData, null, 2));
 
   try {
     console.log('🔧 === SAVING ALERT ===');
     console.log('🔧 Alert data:', alertData);
-    console.log('🔧 Request URL:', '/api/v1/alerts/');
+    console.log('🔧 Request URL:', '/api/alerts/');
     console.log('🔧 Request method:', 'POST');
     console.log('🔧 Request body:', JSON.stringify(alertData, null, 2));
 
-    const response = await fetch('/api/v1/alerts/', {
+    const response = await fetch('/api/alerts/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -2011,7 +2011,7 @@ async function updateAlert() {
   // console.log('- is_triggered:', alertData.is_triggered);
 
   try {
-    const response = await fetch(`/api/v1/alerts/${alertId}`, {
+    const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -2091,7 +2091,7 @@ async function confirmDeleteAlert(alertId) {
   // console.log('🔄 confirmDeleteAlert נקראה עבור ID:', alertId);
 
   try {
-    const response = await fetch(`/api/v1/alerts/${alertId}`, {
+    const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'DELETE',
     });
 
@@ -2235,23 +2235,7 @@ if (typeof window.toggleTopSection !== 'function') {
 
 // toggleMainSection fallback removed - use toggleSection('main') instead
 
-// פונקציה כללית לסגירה/פתיחה של סקשנים
-if (typeof window.toggleSection !== 'function') {
-  window.toggleSection = function (sectionId) {
-    const section = document.getElementById(sectionId);
-    if (section) {
-      const body = section.querySelector('.section-body');
-      const icon = section.querySelector('.section-toggle-icon');
-      if (body) {
-        const isHidden = body.style.display === 'none';
-        body.style.display = isHidden ? 'block' : 'none';
-        if (icon) {
-          icon.textContent = isHidden ? '▼' : '▲';
-        }
-      }
-    }
-  };
-}
+// toggleSection function removed - using global version from ui-utils.js
 
   // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {
@@ -2455,7 +2439,7 @@ async function reactivateAlert(alertId) {
   }
 
   try {
-    const response = await fetch(`/api/v1/alerts/${alertId}`, {
+    const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

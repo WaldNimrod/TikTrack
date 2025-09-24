@@ -54,7 +54,7 @@ async function loadCurrenciesFromServer() {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch('http://127.0.0.1:8080/api/v1/currencies/', {
+    const response = await fetch('http://127.0.0.1:8080/api/currencies/', {
       method: 'GET',
       headers,
     });
@@ -1355,7 +1355,7 @@ async function cancelAccount(accountId, accountName) {
 
   try {
     // בדיקה אם יש טריידים פתוחים
-    const tradesResponse = await fetch(`/api/v1/trades/?trading_account_id=${accountId}&status=open`);
+    const tradesResponse = await fetch(`/api/trades/?trading_account_id=${accountId}&status=open`);
     if (tradesResponse.ok) {
       const tradesData = await tradesResponse.json();
       const openTrades = tradesData.data || tradesData || [];
@@ -1508,7 +1508,7 @@ async function deleteAccount(accountId, accountName) {
  */
 async function checkLinkedItemsBeforeDelete(accountId) {
   try {
-    const response = await fetch(`/api/v1/linked-items/account/${accountId}`);
+    const response = await fetch(`/api/linked-items/account/${accountId}`);
 
     if (!response.ok) {
       // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם המחיקה
@@ -2367,7 +2367,7 @@ async function checkLinkedItemsBeforeCancelAccount(accountId) {
     // console.log('🔍 בדיקת פריטים מקושרים לחשבון:', accountId);
 
     // בדיקה ישירה של טריידים פעילים (סטטוס 'open')
-    const tradesResponse = await fetch(`/api/v1/trades/?trading_account_id=${accountId}&status=open`);
+    const tradesResponse = await fetch(`/api/trades/?trading_account_id=${accountId}&status=open`);
     if (tradesResponse.ok) {
       const tradesData = await tradesResponse.json();
       const openTrades = tradesData.data || tradesData || [];
@@ -2410,7 +2410,7 @@ async function checkLinkedItemsBeforeCancelAccount(accountId) {
     }
 
     // בדיקה של פריטים מקושרים אחרים (לא טריידים פעילים)
-    const response = await fetch(`/api/v1/linked-items/account/${accountId}`);
+    const response = await fetch(`/api/linked-items/account/${accountId}`);
 
     if (!response.ok) {
       // console.log('❌ לא ניתן לבדוק פריטים מקושרים, ממשיכים עם הביטול');
@@ -2459,7 +2459,7 @@ async function checkLinkedItemsBeforeCancelAccount(accountId) {
 async function checkLinkedItemsBeforeDeleteAccount(accountId) {
   try {
     // בדיקה ישירה של טריידים פעילים (סטטוס 'open')
-    const tradesResponse = await fetch(`/api/v1/trades/?trading_account_id=${accountId}&status=open`);
+    const tradesResponse = await fetch(`/api/trades/?trading_account_id=${accountId}&status=open`);
     if (tradesResponse.ok) {
       const tradesData = await tradesResponse.json();
       const openTrades = tradesData.data || tradesData || [];
@@ -2497,7 +2497,7 @@ async function checkLinkedItemsBeforeDeleteAccount(accountId) {
     }
 
     // בדיקה של פריטים מקושרים אחרים (לא טריידים פעילים)
-    const response = await fetch(`/api/v1/linked-items/account/${accountId}`);
+    const response = await fetch(`/api/linked-items/account/${accountId}`);
 
     if (!response.ok) {
       // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם המחיקה

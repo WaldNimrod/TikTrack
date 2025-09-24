@@ -226,7 +226,7 @@ class ActiveAlertsComponent extends HTMLElement {
     this.isLoading = true;
     try {
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const response = await fetch(`${base}/api/v1/alerts/unread`);
+      const response = await fetch(`${base}/api/alerts/unread`);
       if (!response.ok) {throw new Error(`HTTP ${response.status}`);}
 
       const apiData = await response.json();
@@ -466,7 +466,7 @@ class ActiveAlertsComponent extends HTMLElement {
     try {
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const res = await fetch(
-        `${base}/api/v1/alerts/${alertId}/mark-read`,
+        `${base}/api/alerts/${alertId}/mark-read`,
         {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },

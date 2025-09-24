@@ -3620,7 +3620,7 @@ function resetFixedIssues() {
 async function saveFixedFile(fileName, content) {
     try {
         // Try to save via backend API first
-        const response = await fetch('/api/v1/files/save', {
+        const response = await fetch('/api/files/save', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

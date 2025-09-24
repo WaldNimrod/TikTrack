@@ -11,7 +11,7 @@ console.log('📊 Trades Data Adapter initialized');
 
 class TradesAdapter {
     constructor(config = {}) {
-        this.dataSource = config.dataSource || '/api/v1/trades/';
+        this.dataSource = config.dataSource || '/api/trades/';
         this.cache = new Map();
         this.cacheTimeout = 30000; // 30 seconds
     }

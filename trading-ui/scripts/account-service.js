@@ -39,7 +39,7 @@ function clearCache() {
  */
 async function getAccounts() {
   try {
-    const response = await fetch('/api/v1/accounts/');
+    const response = await fetch('/api/accounts/');
     if (response.ok) {
       const data = await response.json();
       const accounts = data.data || data || [];
@@ -81,7 +81,7 @@ async function getAccountsByStatus(status) {
 async function cancelAccount(accountId) {
   // ביטול חשבון
 
-  const response = await fetch(`/api/v1/accounts/${accountId}`, {
+  const response = await fetch(`/api/accounts/${accountId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status: 'cancelled' }),
@@ -106,7 +106,7 @@ async function cancelAccount(accountId) {
 async function reactivateAccount(accountId) {
   // הפעלה מחדש של חשבון
 
-  const response = await fetch(`/api/v1/accounts/${accountId}`, {
+  const response = await fetch(`/api/accounts/${accountId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status: 'open' }),
@@ -130,7 +130,7 @@ async function reactivateAccount(accountId) {
  */
 async function getAccountById(accountId) {
   try {
-    const response = await fetch(`/api/v1/accounts/${accountId}`);
+    const response = await fetch(`/api/accounts/${accountId}`);
     if (response.ok) {
       const data = await response.json();
       return data.data || data;

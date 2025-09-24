@@ -266,7 +266,7 @@ async function showEditExecutionModal(id) {
     // בדיקה אם יש טרייד מקושר
     if (execution.trade_id) {
       console.log('🔍 [EDIT MODAL] מחפש טרייד מקושר ID:', execution.trade_id);
-      const tradesResponse = await fetch('/api/v1/trades/');
+      const tradesResponse = await fetch('/api/trades/');
       const responseData = await tradesResponse.json();
       const trades = responseData.data || responseData || [];
       
@@ -286,7 +286,7 @@ async function showEditExecutionModal(id) {
     // אם לא נמצא טרייד, נבדוק תכנונים
     if (!linkedObject) {
       try {
-        const plansResponse = await fetch('/api/v1/trade_plans/');
+        const plansResponse = await fetch('/api/trade_plans/');
         if (plansResponse.ok) {
           const plansData = await plansResponse.json();
           const plans = plansData.data || plansData || [];
@@ -958,7 +958,7 @@ async function saveExecution() {
     };
 
 
-    const response = await fetch('/api/v1/executions', {
+    const response = await fetch('/api/executions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1106,7 +1106,7 @@ async function updateExecution() {
     };
 
 
-    const response = await fetch(`/api/v1/executions/${id}`, {
+    const response = await fetch(`/api/executions/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -1219,7 +1219,7 @@ async function confirmDeleteExecution(_id) {
 
   try {
     // Making DELETE request
-    const response = await fetch(`/api/v1/executions/${executionId}`, {
+    const response = await fetch(`/api/executions/${executionId}`, {
       method: 'DELETE',
     });
     // DELETE response status
@@ -1295,7 +1295,7 @@ async function showExecutionLinkedItemsModal(executionId, _errorData) {
 
   // טעינת נתונים מקושרים מהשרת
   try {
-    const response = await fetch(`http://127.0.0.1:8080/api/v1/executions/${executionId}/linked-items`);
+    const response = await fetch(`http://127.0.0.1:8080/api/executions/${executionId}/linked-items`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -1334,7 +1334,7 @@ async function loadLinkedItemsDetails(executionId, _errorData = null) {
 
   try {
     // קריאה ל-API לקבלת פרטי הפריטים המקושרים
-    const response = await fetch(`/api/v1/executions/${executionId}/linked-items`);
+    const response = await fetch(`/api/executions/${executionId}/linked-items`);
 
     if (response.ok) {
       const data = await response.json();
@@ -1372,7 +1372,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
   try {
     // טעינת טריידים
     try {
-      const tradesResponse = await fetch('/api/v1/trades/');
+      const tradesResponse = await fetch('/api/trades/');
       if (tradesResponse.ok) {
         const linkedTradesData = await tradesResponse.json();
         const trades = linkedTradesData.data || linkedTradesData || [];
@@ -1384,7 +1384,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
 
     // טעינת תכנונים
     try {
-      const plansResponse = await fetch('/api/v1/trade_plans/');
+      const plansResponse = await fetch('/api/trade_plans/');
       if (plansResponse.ok) {
         const plansData = await plansResponse.json();
         const plans = plansData.data || plansData || [];
@@ -1396,7 +1396,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
 
     // טעינת התראות
     try {
-      const alertsResponse = await fetch('/api/v1/alerts/');
+      const alertsResponse = await fetch('/api/alerts/');
       if (alertsResponse.ok) {
         const alertsData = await alertsResponse.json();
         const alerts = alertsData.data || alertsData || [];
@@ -1409,7 +1409,7 @@ async function loadLinkedItemsFromMultipleSources(executionId) {
 
     // טעינת הערות
     try {
-      const notesResponse = await fetch('/api/v1/notes/');
+      const notesResponse = await fetch('/api/notes/');
       if (notesResponse.ok) {
         const notesData = await notesResponse.json();
         const notes = notesData.data || notesData || [];
@@ -1667,7 +1667,7 @@ async function loadExecutionsData() {
   try {
     // טעינת נתוני עסקעות
 
-    const response = await fetch('/api/v1/executions/?_t=' + Date.now());
+    const response = await fetch('/api/executions/?_t=' + Date.now());
     if (response.ok) {
       const data = await response.json();
       executionsData = data.data || data;
@@ -1745,7 +1745,7 @@ async function updateExecutionsTableMain(executions) {
 
   try {
     const [tradesResponse, tickersResponse] = await Promise.all([
-      fetch('/api/v1/trades/').then(r => {
+      fetch('/api/trades/').then(r => {
         if (r.ok) {
           return r.json();
         } else {
@@ -1753,7 +1753,7 @@ async function updateExecutionsTableMain(executions) {
           return { data: [] };
         }
       }).catch(() => ({ data: [] })),
-      fetch('/api/v1/tickers/').then(r => {
+      fetch('/api/tickers/').then(r => {
         if (r.ok) {
           return r.json();
         } else {
@@ -2326,7 +2326,7 @@ async function loadActiveTradesForTicker(mode = 'add', _showClosedTrades = false
 
   try {
     // טעינת טריידים
-    const tradesResponse = await fetch('/api/v1/trades/');
+    const tradesResponse = await fetch('/api/trades/');
     const tickerTradesData = await tradesResponse.json();
     const trades = tickerTradesData.data || tickerTradesData || [];
 
@@ -3002,7 +3002,7 @@ function setupExecutionsFilterFunctions() {
       applyAccountFilterWithTradesData(namesArray);
     } else {
       // טעינת נתוני טריידים כדי לקבל את שמות החשבונות
-      fetch('/api/v1/trades/')
+      fetch('/api/trades/')
         .then(response => response.json())
         .then(data => {
           tradesData = data.data || [];
@@ -3169,7 +3169,7 @@ window.loadExecutionsData = async function() {
 
     // טעינת נתוני טריידים לטובת פילטר החשבונות
     try {
-      const response = await fetch('/api/v1/trades/');
+      const response = await fetch('/api/trades/');
       const data = await response.json();
       tradesData = data.data || [];
       // Loaded trades data for account filter
@@ -3272,12 +3272,12 @@ async function loadTickersSummaryData() {
 
   try {
     // טעינת טיקרים
-    const tickersResponse = await fetch('/api/v1/tickers/');
+    const tickersResponse = await fetch('/api/tickers/');
     const tickersData = await tickersResponse.json();
     const allTickers = tickersData.data || tickersData || [];
 
     // טעינת טריידים
-    const tradesResponse = await fetch('/api/v1/trades/');
+    const tradesResponse = await fetch('/api/trades/');
     const summaryTradesData = await tradesResponse.json();
     const trades = summaryTradesData.data || summaryTradesData || [];
 
@@ -3517,12 +3517,12 @@ async function updateTickersList(mode, showClosedTrades = false) {
 
   try {
     // טעינת כל הטיקרים
-    const tickersResponse = await fetch('/api/v1/tickers/');
+    const tickersResponse = await fetch('/api/tickers/');
     const tickersData = await tickersResponse.json();
     const allTickers = tickersData.data || tickersData || [];
 
     // טעינת טריידים
-    const tradesResponse = await fetch('/api/v1/trades/');
+    const tradesResponse = await fetch('/api/trades/');
     const tickersTradesData = await tradesResponse.json();
     const trades = tickersTradesData.data || tickersTradesData || [];
 

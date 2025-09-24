@@ -374,7 +374,7 @@
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="accounts-tab" data-bs-toggle="tab" data-bs-target="#accounts" type="button" role="tab">
+                                <button class="nav-link" id="trading_accounts-tab" data-bs-toggle="tab" data-bs-target="#trading_accounts" type="button" role="tab">
                                     🏦 חשבונות
                                 </button>
                             </li>
@@ -665,7 +665,7 @@
                             <!-- סיום טאב טריידים -->
 
                             <!-- טאב חשבונות -->
-                            <div class="tab-pane fade" id="accounts" role="tabpanel">
+                            <div class="tab-pane fade" id="trading_accounts" role="tabpanel">
                                 <div class="page-test-card" id="pageCardAccounts">
                                     <div class="page-header critical">
                                         <div class="page-title">
@@ -681,16 +681,16 @@
                                             <a href="/trading_accounts" target="_blank" class="btn btn-primary">
                                                 <i class="fas fa-external-link-alt"></i> פתח עמוד
                                             </a>
-                                            <button class="btn btn-info btn-sm" onclick="runBasicTest('accounts', '/accounts')">
+                                            <button class="btn btn-info btn-sm" onclick="runBasicTest('trading_accounts', '/trading_accounts')">
                                                 <i class="fas fa-play"></i> בדיקה בסיסית
                                             </button>
-                                            <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('accounts', '/api/accounts/')">
+                                            <button class="btn btn-secondary btn-sm" onclick="runCRUDTest('trading_accounts', '/api/trading-accounts/')">
                                                 <i class="fas fa-database"></i> בדיקת CRUD
                                             </button>
-                                            <button class="btn btn-success" onclick="markPageComplete('accounts')">
+                                            <button class="btn btn-success" onclick="markPageComplete('trading_accounts')">
                                                 <i class="fas fa-check"></i> סיימתי בדיקה
                                             </button>
-                                            <button class="btn btn-warning" onclick="markPagePartial('accounts')">
+                                            <button class="btn btn-warning" onclick="markPagePartial('trading_accounts')">
                                                 <i class="fas fa-exclamation"></i> יש בעיות
                                             </button>
                                         </div>

@@ -1834,7 +1834,7 @@ async function loadColorPreferences() {
 
     // נסה ראשית מערכת העדפות
     try {
-      const newResponse = await fetch('/api/v1/preferences/user');
+      const newResponse = await fetch('/api/preferences/user');
       if (newResponse.ok) {
         const newData = await newResponse.json();
         if (newData.success && newData.data.preferences) {
@@ -1886,7 +1886,7 @@ async function loadColorPreferences() {
 
     // Fallback ל-legacy
     console.log('🔄 Using legacy color preferences (fallback)');
-    const response = await fetch('/api/v1/preferences/user');
+    const response = await fetch('/api/preferences/user');
     if (response.ok) {
       const data = await response.json();
       const preferences = data.data || data;

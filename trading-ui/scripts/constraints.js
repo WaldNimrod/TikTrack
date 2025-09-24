@@ -13,7 +13,7 @@ let constraintsMonitor;
 // ===== CONSTRAINTS MONITOR CLASS =====
 class ConstraintsMonitor {
     constructor() {
-        this.apiBase = 'http://localhost:8080/api/v1/constraints';
+        this.apiBase = 'http://localhost:8080/api/constraints';
         this.constraints = [];
         this.tables = [];
         this.currentLayer = 'overview';

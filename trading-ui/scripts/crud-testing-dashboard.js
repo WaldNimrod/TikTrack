@@ -343,16 +343,16 @@ class CRUDTestingDashboard {
     console.log('🚀 ביצוע כל בדיקות CRUD...');
     
     const apis = [
-      { name: 'trades', url: '/api/v1/trades/' },
-      { name: 'accounts', url: '/api/v1/accounts/' },
-      { name: 'alerts', url: '/api/v1/alerts/' },
-      { name: 'tickers', url: '/api/v1/tickers/' },
-      { name: 'executions', url: '/api/v1/executions/' },
-      { name: 'cash_flows', url: '/api/v1/cash_flows/' },
-      { name: 'trade_plans', url: '/api/v1/trade_plans/' },
-      { name: 'constraints', url: '/api/v1/constraints/' },
-      { name: 'notes', url: '/api/v1/notes/' },
-      { name: 'preferences', url: '/api/v1/preferences/user' }
+      { name: 'trades', url: '/api/trades/' },
+      { name: 'accounts', url: '/api/accounts/' },
+      { name: 'alerts', url: '/api/alerts/' },
+      { name: 'tickers', url: '/api/tickers/' },
+      { name: 'executions', url: '/api/executions/' },
+      { name: 'cash_flows', url: '/api/cash_flows/' },
+      { name: 'trade_plans', url: '/api/trade_plans/' },
+      { name: 'constraints', url: '/api/constraints/' },
+      { name: 'notes', url: '/api/notes/' },
+      { name: 'preferences', url: '/api/preferences/user' }
     ];
     
     for (const api of apis) {
@@ -368,16 +368,16 @@ class CRUDTestingDashboard {
     console.log('🚀 בדיקת כל החיבורים...');
     
     const connections = [
-      { name: 'trades', url: '/api/v1/trades/' },
-      { name: 'accounts', url: '/api/v1/accounts/' },
-      { name: 'alerts', url: '/api/v1/alerts/' },
-      { name: 'tickers', url: '/api/v1/tickers/' },
-      { name: 'executions', url: '/api/v1/executions/' },
-      { name: 'cash_flows', url: '/api/v1/cash_flows/' },
-      { name: 'trade_plans', url: '/api/v1/trade_plans/' },
-      { name: 'constraints', url: '/api/v1/constraints/' },
-      { name: 'notes', url: '/api/v1/notes/' },
-      { name: 'preferences', url: '/api/v1/preferences/user' }
+      { name: 'trades', url: '/api/trades/' },
+      { name: 'accounts', url: '/api/accounts/' },
+      { name: 'alerts', url: '/api/alerts/' },
+      { name: 'tickers', url: '/api/tickers/' },
+      { name: 'executions', url: '/api/executions/' },
+      { name: 'cash_flows', url: '/api/cash_flows/' },
+      { name: 'trade_plans', url: '/api/trade_plans/' },
+      { name: 'constraints', url: '/api/constraints/' },
+      { name: 'notes', url: '/api/notes/' },
+      { name: 'preferences', url: '/api/preferences/user' }
     ];
     
     for (const connection of connections) {

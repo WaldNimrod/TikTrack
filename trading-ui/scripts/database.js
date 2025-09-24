@@ -115,7 +115,7 @@ async function loadTableData(tableType) {
  */
 async function fetchTableData(tableType) {
   try {
-    const response = await fetch(`/api/v1/${tableType}/`);
+    const response = await fetch(`/api/${tableType}/`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

@@ -2915,10 +2915,29 @@ function copyDetailedLog() {
     }
 }
 
+// פונקציה לטעינת חשבונות לפילטר (נדרשת על ידי header-system.js)
+function getAccounts() {
+    return new Promise((resolve, reject) => {
+        if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
+            // החזרת רק חשבונות פעילים
+            const activeAccounts = window.trading_accountsData.filter(account => account.status === 'open');
+            resolve(activeAccounts);
+        } else {
+            // אם אין נתונים, נטען אותם
+            loadTradingAccountsFromServer().then(() => {
+                const activeAccounts = window.trading_accountsData ? 
+                    window.trading_accountsData.filter(account => account.status === 'open') : [];
+                resolve(activeAccounts);
+            }).catch(reject);
+        }
+    });
+}
+
 // Define function as global
 window.sortTable = sortTable;
 window.copyDetailedLog = copyDetailedLog;
 window.generateDetailedLog = generateDetailedLog;
+window.getAccounts = getAccounts;
 
 // סיום הקובץ
 console.log('✅ trading_accounts.js נטען בהצלחה');

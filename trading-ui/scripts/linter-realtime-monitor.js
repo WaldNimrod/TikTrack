@@ -796,13 +796,6 @@ function toggleTopSection() {
                     }
                 }
 
-function toggleSection(sectionId) {
-  if (typeof window.toggleSection === 'function') {
-    window.toggleSection(sectionId);
-            } else {
-    console.warn('toggleSection function not found');
-  }
-}
 
 function refreshFileList() {
   if (window.showInfoNotification) {
@@ -2393,7 +2386,7 @@ window.loadExistingFileMapping = loadExistingFileMapping;
 // window.copyDetailedLog = copyDetailedLog; // REMOVED: Development mechanism - page-specific only
 // window.copyLinterDetailedLog = copyDetailedLog; // REMOVED: Development mechanism - page-specific only
 window.toggleTopSection = toggleTopSection;
-window.toggleSection = toggleSection;
+// window.toggleSection export removed - using global version from ui-utils.js
 window.refreshFileList = refreshFileList;
 window.clearFileCache = clearFileCache;
 window.exportFileList = exportFileList;

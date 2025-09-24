@@ -1357,16 +1357,9 @@ function toggleAllSections() {
   }
 }
 
-function toggleSection(sectionId) {
-  if (typeof window.toggleSection === 'function') {
-    window.toggleSection(sectionId);
-  } else {
-    console.warn('toggleSection function not found');
-  }
-}
 
 window.toggleAllSections = toggleAllSections;
-window.toggleSection = toggleSection;
+// window.toggleSection export removed - using global version from ui-utils.js
 
 /**
  * Generate detailed log for Constraints Monitor

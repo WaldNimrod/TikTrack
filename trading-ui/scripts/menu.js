@@ -530,7 +530,7 @@ function clearFiltersManually() {
 // ===== Global Export =====
 // ייצוא פונקציות לגלובל
 window.toggleFilterSection = toggleFilterSection;
-window.toggleSection = toggleFilterSection; // Backward compatibility
+// window.toggleSection export removed - using global version from ui-utils.js // Backward compatibility
 window.toggleStatusFilter = toggleStatusFilter;
 window.toggleTypeFilter = toggleTypeFilter;
 window.toggleTradingAccountFilter = toggleTradingAccountFilter;

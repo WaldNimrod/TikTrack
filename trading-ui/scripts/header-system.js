@@ -2761,7 +2761,7 @@ class HeaderSystem {
   async loadAccountsForFilter() {
     try {
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const response = await fetch(`${base}/api/accounts`);
+      const response = await fetch(`${base}/api/trading-accounts`);
 
       if (!response.ok) {throw new Error(`HTTP ${response.status}`);}
 

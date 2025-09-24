@@ -1583,7 +1583,7 @@ window.refreshDependencies = refreshDependencies;
 window.validateDependencies = validateDependencies;
 window.optimizeDependencies = optimizeDependencies;
 window.toggleAllSections = toggleAllSections;
-window.toggleSection = toggleSection;
+// window.toggleSection export removed - using global version from ui-utils.js
 window.updateAnalyticsDisplay = updateAnalyticsDisplay;
 window.updateDependenciesDisplay = updateDependenciesDisplay;
 
@@ -2290,7 +2290,7 @@ async function copyDetailedLog() {
 window.refreshCacheStatus = refreshCacheStatus;
 window.copyDetailedLog = copyDetailedLog;
 window.toggleAllSections = toggleAllSections;
-window.toggleSection = toggleSection;
+// window.toggleSection export removed - using global version from ui-utils.js
 // clearAllCache is now handled by global function in central-refresh-system.js
 // clearExpiredCache is now handled by global function in central-refresh-system.js
 window.preloadCache = preloadCache;

@@ -1911,13 +1911,6 @@ function toggleAllSections() {
   }
 }
 
-function toggleSection(sectionId) {
-    if (typeof window.toggleSection === 'function') {
-        window.toggleSection(sectionId);
-    } else {
-        console.warn('toggleSection function not found');
-    }
-}
 
 /**
  * טעינת רשימת קבצי CSS אמיתיים
@@ -2045,7 +2038,7 @@ window.createNewCssFileFromModal = createNewCssFileFromModal;
 window.createNewCssFile = createNewCssFile;
 window.createCssFileFromTemplate = createCssFileFromTemplate;
 window.openCssEditor = openCssEditor;
-window.toggleSection = toggleSection;
+// window.toggleSection export removed - using global version from ui-utils.js
 window.showBackupDialog = showBackupDialog;
 window.proceedWithBackup = proceedWithBackup;
 window.createCssBackup = createCssBackup;
@@ -2116,7 +2109,7 @@ function copyDetailedLog() {
 
 window.copyDetailedLog = copyDetailedLog;
 window.toggleAllSections = toggleAllSections;
-window.toggleSection = toggleSection;
+// window.toggleSection export removed - using global version from ui-utils.js
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {

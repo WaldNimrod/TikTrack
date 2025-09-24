@@ -155,9 +155,9 @@ class ButtonTester:
             'preferences': {
                 'name': 'העדפות V1',
                 'crud_endpoints': [
-                    ('GET', '/api/v1/preferences/', 'טעינת העדפות'),
-                    ('POST', '/api/v1/preferences/', 'שמירת העדפות'),
-                    ('POST', '/api/v1/preferences/reset', 'איפוס העדפות'),
+                    ('GET', '/api/preferences/', 'טעינת העדפות'),
+                    ('POST', '/api/preferences/', 'שמירת העדפות'),
+                    ('POST', '/api/preferences/reset', 'איפוס העדפות'),
                 ],
                 'ui_buttons': [
                     'שמור העדפות',

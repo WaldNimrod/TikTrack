@@ -284,7 +284,7 @@ GET /api/tickers/
         }
     ],
     "message": "Tickers retrieved successfully",
-    "version": "v1"
+    "version": "1.0"
 }
 ```
 

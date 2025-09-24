@@ -16,13 +16,6 @@ let isAutoRefreshEnabled = false;
 let testChart = null;
 
 // Function to toggle section visibility
-function toggleSection(sectionId) {
-    if (typeof window.toggleSection === 'function') {
-        window.toggleSection(sectionId);
-    } else {
-        console.warn('toggleSection function not found');
-    }
-}
 
 // Function to refresh charts status
 function refreshChartsStatus() {
@@ -1130,7 +1123,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Export functions to global scope
-window.toggleSection = toggleSection;
+// window.toggleSection export removed - using global version from ui-utils.js
 window.refreshChartsStatus = refreshChartsStatus;
 window.createNewChart = createNewChart;
 window.refreshAllCharts = refreshAllCharts;

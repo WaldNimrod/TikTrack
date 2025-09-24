@@ -25,13 +25,6 @@ function toggleAllSections() {
 /**
  * Toggle specific section visibility
  */
-function toggleSection(sectionId) {
-    if (typeof window.toggleSection === 'function') {
-        window.toggleSection(sectionId);
-    } else {
-        console.warn('toggleSection function not found');
-    }
-}
 
 /**
  * Generate detailed log for Designs page
@@ -140,7 +133,7 @@ async function copyDetailedLog() {
 // ===== GLOBAL FUNCTION EXPORTS =====
 
 window.toggleAllSections = toggleAllSections;
-window.toggleSection = toggleSection;
+// window.toggleSection export removed - using global version from ui-utils.js
 window.copyDetailedLog = copyDetailedLog;
 
 console.log('✅ Designs page script ready');

@@ -2701,13 +2701,6 @@ function toggleTopSection() {
     }
 }
 
-function toggleSection(sectionId) {
-    if (typeof window.toggleSection === 'function') {
-        window.toggleSection(sectionId);
-    } else {
-        console.warn('toggleSection function not found');
-    }
-}
 
 // Filter functions
 function filterAlertsByRelatedObjectType(type) {
@@ -2854,7 +2847,7 @@ function copyDetailedLog() {
 
 // Export functions to global scope for onclick attributes
 window.toggleTopSection = toggleTopSection;
-window.toggleSection = toggleSection;
+// window.toggleSection export removed - using global version from ui-utils.js
 window.filterAlertsByRelatedObjectType = filterAlertsByRelatedObjectType;
 window.loadAlertsData = loadAlertsData;
 window.updateAlertsTable = updateAlertsTable;

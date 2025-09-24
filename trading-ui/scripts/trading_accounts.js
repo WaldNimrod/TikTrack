@@ -2810,14 +2810,14 @@ function generateDetailedLog() {
             },
             sections: {
                 topSection: {
-                    title: 'חשבונות',
+                    title: 'חשבונות מסחר',
                     visible: !document.querySelector('.top-section')?.classList.contains('d-none'),
                     alertsCount: document.querySelectorAll('.alert-card').length,
                     summaryStats: document.getElementById('summaryStats')?.textContent || 'לא נמצא',
                     colorDemoVisible: !document.getElementById('trading_accountsColorDemo')?.classList.contains('d-none')
                 },
                 contentSection: {
-                    title: 'החשבונות שלי',
+                    title: 'חשבונות המסחר שלי',
                     visible: !document.querySelector('.content-section')?.classList.contains('d-none'),
                     tableRows: document.querySelectorAll('#trading_accountsTable tbody tr').length,
                     tableData: document.querySelector('#trading_accountsContainer')?.textContent?.substring(0, 300) || 'לא נמצא'
@@ -2830,14 +2830,18 @@ function generateDetailedLog() {
                 hasData: document.querySelectorAll('#trading_accountsTable tbody tr').length > 0
             },
             modals: {
-                addModal: document.getElementById('addAccountModal') ? 'זמין' : 'לא זמין',
-                editModal: document.getElementById('editAccountModal') ? 'זמין' : 'לא זמין',
-                deleteModal: document.getElementById('deleteAccountModal') ? 'זמין' : 'לא זמין'
+                addModal: document.getElementById('addTradingAccountModal') ? 'זמין' : 'לא זמין',
+                editModal: document.getElementById('editTradingAccountModal') ? 'זמין' : 'לא זמין',
+                deleteModal: document.getElementById('deleteTradingAccountModal') ? 'זמין' : 'לא זמין'
             },
             functions: {
                 showAddTradingAccountModal: typeof window.showAddTradingAccountModal === 'function' ? 'זמין' : 'לא זמין',
-                editAccount: typeof window.editAccount === 'function' ? 'זמין' : 'לא זמין',
-                deleteAccount: typeof window.deleteAccount === 'function' ? 'זמין' : 'לא זמין',
+                showEditAccountModalById: typeof window.showEditAccountModalById === 'function' ? 'זמין' : 'לא זמין',
+                deleteAccountWithLinkedItemsCheck: typeof window.deleteAccountWithLinkedItemsCheck === 'function' ? 'זמין' : 'לא זמין',
+                cancelAccountWithLinkedItemsCheck: typeof window.cancelAccountWithLinkedItemsCheck === 'function' ? 'זמין' : 'לא זמין',
+                restoreAccount: typeof window.restoreAccount === 'function' ? 'זמין' : 'לא זמין',
+                saveNewAccount: typeof window.saveNewAccount === 'function' ? 'זמין' : 'לא זמין',
+                saveEditAccount: typeof window.saveEditAccount === 'function' ? 'זמין' : 'לא זמין',
                 toggleTopSection: typeof window.toggleTopSection === 'function' ? 'זמין' : 'לא זמין',
                 loadTradingAccountsFromServer: typeof window.loadTradingAccountsFromServer === 'function' ? 'זמין' : 'לא זמין',
                 updateTradingAccountsTable: typeof window.updateTradingAccountsTable === 'function' ? 'זמין' : 'לא זמין',

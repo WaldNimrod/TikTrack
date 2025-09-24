@@ -13,7 +13,7 @@ def create_swagger_models(api: Api) -> Dict[str, Any]:
         'data': fields.Raw(required=True),
         'message': fields.String(example='Operation completed successfully'),
         'timestamp': fields.String(example='2025-01-15T10:30:00Z'),
-        'version': fields.String(example='v1')
+        'version': fields.String(example='1.0')
     })
     
     error_response = api.model('ErrorResponse', {
@@ -24,7 +24,7 @@ def create_swagger_models(api: Api) -> Dict[str, Any]:
             'details': fields.Raw(example={'field': 'symbol', 'issue': 'Symbol is required'})
         })),
         'timestamp': fields.String(example='2025-01-15T10:30:00Z'),
-        'version': fields.String(example='v1')
+        'version': fields.String(example='1.0')
     })
     
     # Auth models
@@ -46,7 +46,7 @@ def create_swagger_models(api: Api) -> Dict[str, Any]:
         })),
         'message': fields.String(example='Login successful'),
         'timestamp': fields.String(example='2025-01-15T10:30:00Z'),
-        'version': fields.String(example='v1')
+        'version': fields.String(example='1.0')
     })
     
     # Ticker models

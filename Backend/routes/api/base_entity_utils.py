@@ -188,7 +188,7 @@ class BaseEntityUtils:
             "status": status,
             "data": data,
             "timestamp": datetime.now().isoformat(),
-            "version": "v1"
+            "version": "1.0"
         }
         
         if message:
@@ -215,7 +215,7 @@ class BaseEntityUtils:
                 "message": message,
                 "timestamp": datetime.now().isoformat()
             },
-            "version": "v1"
+            "version": "1.0"
         }
         
         if error_code:

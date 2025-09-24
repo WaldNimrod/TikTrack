@@ -3,7 +3,7 @@ Unified File Scanner API Routes
 ==============================
 
 API endpoints for unified file discovery, mapping, and analysis
-Replaces: js_map.py, page_scripts_matrix.py, and /api/v1/files/discover
+Replaces: js_map.py, page_scripts_matrix.py, and /api/files/discover
 
 Features:
 - File discovery and scanning
@@ -356,7 +356,7 @@ def generate_reports(files_data: Dict[str, List[str]], functions_data: Dict[str,
 def get_files():
     """
     Get list of all project files
-    Replaces: /api/v1/files/discover, /api/js-map/files-list, /api/page-scripts-matrix/scan-results
+    Replaces: /api/files/discover, /api/js-map/files-list, /api/page-scripts-matrix/scan-results
     """
     try:
         selected_types = request.args.get('types', 'js,html,css,python,other').split(',')

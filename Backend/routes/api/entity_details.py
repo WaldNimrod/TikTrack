@@ -47,14 +47,14 @@ def get_supported_entity_types():
             "status": "success",
             "data": entity_types,
             "message": "Supported entity types retrieved successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error getting entity types: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve entity types"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
 
 @entity_details_bp.route('/<string:entity_type>/<int:entity_id>', methods=['GET'])
@@ -337,8 +337,8 @@ def update_entity_details(entity_type: str, entity_id: int):
         # This could be enhanced to provide a unified update interface
         return jsonify({
             "success": False,
-            "error": {"message": f"Use /api/v1/{entity_type}s/{entity_id} for updates"},
-            "redirect": f"/api/v1/{entity_type}s/{entity_id}",
+            "error": {"message": f"Use /api/{entity_type}s/{entity_id} for updates"},
+            "redirect": f"/api/{entity_type}s/{entity_id}",
             "version": "1.0"
         }), 302
         
@@ -375,8 +375,8 @@ def delete_entity_details(entity_type: str, entity_id: int):
         # This could be enhanced to provide a unified deletion interface
         return jsonify({
             "success": False,
-            "error": {"message": f"Use /api/v1/{entity_type}s/{entity_id} for deletion"},
-            "redirect": f"/api/v1/{entity_type}s/{entity_id}",
+            "error": {"message": f"Use /api/{entity_type}s/{entity_id} for deletion"},
+            "redirect": f"/api/{entity_type}s/{entity_id}",
             "version": "1.0"
         }), 302
         

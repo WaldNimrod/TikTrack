@@ -33,7 +33,7 @@ from .base_entity_utils import BaseEntityUtils
 logger = logging.getLogger(__name__)
 
 # Create blueprint
-query_optimization_bp = Blueprint('query_optimization', __name__, url_prefix='/api/v1/query-optimization')
+query_optimization_bp = Blueprint('query_optimization', __name__, url_prefix='/api/query-optimization')
 
 # Initialize base API (query optimization is complex, so we'll use it selectively)
 
@@ -66,7 +66,7 @@ def get_query_optimization_status():
         return jsonify({
             'status': 'error',
             'error': {'message': f'Failed to get status: {str(e)}'},
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
 

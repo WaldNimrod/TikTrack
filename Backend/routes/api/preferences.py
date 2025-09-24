@@ -25,7 +25,7 @@ from .base_entity_utils import BaseEntityUtils
 logger = logging.getLogger(__name__)
 
 # Create blueprint
-preferences_bp = Blueprint('preferences', __name__, url_prefix='/api/v1/preferences')
+preferences_bp = Blueprint('preferences', __name__, url_prefix='/api/preferences')
 
 # Initialize base API (preferences is complex, so we'll use it selectively)
 

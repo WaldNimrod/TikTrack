@@ -38,20 +38,20 @@ def switch_to_old_css():
                 'status': 'success',
                 'message': 'עבר למערכת CSS ישנה בהצלחה',
                 'data': {'output': result.stdout},
-                'version': 'v1'
+                'version': '1.0'
             }), 200
         else:
             return jsonify({
                 'status': 'error',
                 'error': {'message': 'שגיאה במעבר למערכת CSS ישנה', 'details': result.stderr},
-                'version': 'v1'
+                'version': '1.0'
             }), 500
             
     except Exception as e:
         return jsonify({
             'status': 'error',
             'error': {'message': 'שגיאה פנימית במעבר למערכת CSS ישנה', 'details': str(e)},
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
 @css_management_bp.route('/switch-to-new', methods=['POST'])

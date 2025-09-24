@@ -30,7 +30,7 @@ from .base_entity_utils import BaseEntityUtils
 logger = logging.getLogger(__name__)
 
 # Create blueprint
-cache_management_bp = Blueprint('cache_management', __name__, url_prefix='/api/v1/cache')
+cache_management_bp = Blueprint('cache_management', __name__, url_prefix='/api/cache')
 
 # Initialize base API (cache management is complex, so we'll use it selectively)
 
@@ -46,14 +46,14 @@ def get_cache_statistics():
             'status': 'success',
             'data': stats,
             'message': 'Cache statistics retrieved successfully',
-            'version': 'v1'
+            'version': '1.0'
         }), 200
     except Exception as e:
         logger.error(f"Failed to get cache stats: {e}")
         return jsonify({
             'status': 'error',
             'error': {'message': f'Failed to get cache statistics: {str(e)}'},
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
 
@@ -68,14 +68,14 @@ def check_cache_health():
             'status': 'success',
             'data': health,
             'message': 'Cache health check completed successfully',
-            'version': 'v1'
+            'version': '1.0'
         }), 200
     except Exception as e:
         logger.error(f"Failed to check cache health: {e}")
         return jsonify({
             'status': 'error',
             'error': {'message': f'Failed to check cache health: {str(e)}'},
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
 
@@ -123,14 +123,14 @@ def get_cache_status():
             'status': 'success',
             'data': status_info,
             'message': 'Cache status retrieved successfully',
-            'version': 'v1'
+            'version': '1.0'
         }), 200
     except Exception as e:
         logger.error(f"Failed to get cache status: {e}")
         return jsonify({
             'status': 'error',
             'error': {'message': f'Failed to get cache status: {str(e)}'},
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
 

@@ -339,7 +339,7 @@ def get_server_status() -> Any:
         return jsonify({
             'status': 'error',
             'error': {'message': f'Error getting server status: {str(e)}'},
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
 @server_management_bp.route('/system/info', methods=['GET'])
@@ -392,7 +392,7 @@ def get_system_info() -> Any:
         return jsonify({
             'status': 'error',
             'error': {'message': f'Error getting system info: {str(e)}'},
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
 @server_management_bp.route('/mode-history', methods=['GET'])

@@ -147,7 +147,7 @@ window.userPreferences.primaryCurrency
 fetch('/api/v2/preferences/') 
 
 // 5. V1 API Direct
-fetch('/api/v1/preferences/')
+fetch('/api/preferences/')
 
 // 6. localStorage
 localStorage.getItem('preference_primaryCurrency')

@@ -358,14 +358,14 @@ curl -X POST http://localhost:8080/api/external-data/yahoo/quotes \
   -d '{"symbols": ["AAPL", "VOO"]}'
 
 # בדיקת יצירת ticker עם נתונים חיצוניים
-curl -X POST http://localhost:8080/api/v1/tickers \
+curl -X POST http://localhost:8080/api/tickers \
   -H "Content-Type: application/json" \
   -d '{"symbol": "TEST_DATA", "name": "Test Ticker", "asset_type": "stock"}'
 ```
 
 **הבדל חשוב בין ה-endpoints:**
 - **Yahoo Finance quotes** (`/api/external-data/yahoo/quotes`) - עובד נכון ושומר נתונים
-- **יצירת טיקרים** (`/api/v1/tickers`) - לא שומר נתונים למרות שקורא לאותו `YahooFinanceAdapter`
+- **יצירת טיקרים** (`/api/tickers`) - לא שומר נתונים למרות שקורא לאותו `YahooFinanceAdapter`
 
 **השערה לבעיה**: ייתכן שיש הבדל ב-database session או ב-transaction management בין שני ה-endpoints.
 
@@ -380,7 +380,7 @@ curl -X POST http://localhost:8080/api/external-data/yahoo/quotes \
 sqlite3 Backend/db/simpleTrade_new.db "SELECT * FROM market_data_quotes ORDER BY fetched_at DESC LIMIT 1;"
 
 # 3. יצירת ticker חדש עם אותו סמל
-curl -X POST http://localhost:8080/api/v1/tickers \
+curl -X POST http://localhost:8080/api/tickers \
   -H "Content-Type: application/json" \
   -d '{"symbol": "AAPL", "name": "Apple Inc", "asset_type": "stock"}'
 
@@ -393,12 +393,12 @@ sqlite3 Backend/db/simpleTrade_new.db "SELECT * FROM market_data_quotes ORDER BY
 2. **בדיקת מספר טיקרים נוכחי**: רשם את המספר
 3. **הוספת ticker חדש**: השתמש בטופס ההוספה
 4. **בדיקה מיידית**: הטבלה אמורה להתעדכן אוטומטית
-5. **בדיקת cache**: `curl http://localhost:8080/api/v1/cache/stats`
+5. **בדיקת cache**: `curl http://localhost:8080/api/cache/stats`
 
 ### **בדיקה 2: Cache Performance**
 1. **מדידת זמן טעינה ראשונה**: רשם את הזמן
 2. **רענון העמוד**: הזמן אמור להיות מהיר יותר
-3. **בדיקת cache hit rate**: `curl http://localhost:8080/api/v1/cache/stats`
+3. **בדיקת cache hit rate**: `curl http://localhost:8080/api/cache/stats`
 
 ### **בדיקה 3: Dependency Chain**
 1. **יצירת ticker עם linked items**
@@ -579,7 +579,7 @@ curl -X POST http://localhost:8080/api/external-data/yahoo/quotes \
 sqlite3 Backend/db/simpleTrade_new.db "SELECT * FROM market_data_quotes ORDER BY fetched_at DESC LIMIT 1;"
 
 # 3. יצירת ticker חדש עם אותו סמל
-curl -X POST http://localhost:8080/api/v1/tickers \
+curl -X POST http://localhost:8080/api/tickers \
   -H "Content-Type: application/json" \
   -d '{"symbol": "AAPL", "name": "Apple Inc", "asset_type": "stock"}'
 

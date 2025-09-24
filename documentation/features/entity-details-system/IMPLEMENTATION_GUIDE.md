@@ -532,7 +532,7 @@ console.log('Current data:', currentData);
 #### קוד בדיקה:
 ```javascript
 // בדיקת API
-fetch('/api/v1/executions/123')
+fetch('/api/executions/123')
   .then(response => response.json())
   .then(data => console.log('API response:', data))
   .catch(error => console.error('API error:', error));

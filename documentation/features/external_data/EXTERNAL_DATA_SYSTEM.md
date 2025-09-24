@@ -102,7 +102,7 @@ External Data Integration
 
 ### **Data Flow (Current Implementation)**
 1. **User Interface** → Requests ticker data from unified API endpoint ✅
-2. **Tickers API** → `/api/v1/tickers/` returns tickers with integrated market data ✅
+2. **Tickers API** → `/api/tickers/` returns tickers with integrated market data ✅
 3. **TickerService** → Joins tickers with latest market data quotes ✅
 4. **MarketDataQuote** → Latest price data from external providers ✅
 5. **Yahoo Finance Adapter** → Calculates daily change when not provided by Yahoo ✅
@@ -261,7 +261,7 @@ chartPreviousClose: 147.75
 
 ### **Primary API - Unified Tickers with Market Data**
 ```
-GET /api/v1/tickers/
+GET /api/tickers/
 ```
 **Description**: Returns all tickers with integrated market data (price, change, volume) in a single response.
 
@@ -291,12 +291,12 @@ GET /api/v1/tickers/
 ### **Secondary APIs - Direct Market Data Access**
 ```
 GET /api/external-data/quotes/{ticker_id}    # Direct quote access
-GET /api/v1/market-data/status               # System status
-GET /api/v1/market-data/refresh              # Manual refresh
-POST /api/v1/quotes/{ticker_id}/refresh      # Refresh specific ticker
+GET /api/market-data/status               # System status
+GET /api/market-data/refresh              # Manual refresh
+POST /api/quotes/{ticker_id}/refresh      # Refresh specific ticker
 ```
 
-**Note**: The unified `/api/v1/tickers/` endpoint is the recommended approach for better performance.
+**Note**: The unified `/api/tickers/` endpoint is the recommended approach for better performance.
 
 ---
 

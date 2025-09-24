@@ -538,6 +538,6 @@ curl http://localhost:8080/api/external-data/status/cache
 
 ### 🚀 **מערכת העדפות**
 - **גישה:** `http://localhost:5000/preferences.html`
-- **API:** `/api/v1/preferences/*` 
+- **API:** `/api/preferences/*` 
 - **תיעוד מלא:** `PREFERENCES_IMPLEMENTATION_REPORT.md`
 - **מדריך מיגרציה:** `Backend/scripts/simple_migrate.py`

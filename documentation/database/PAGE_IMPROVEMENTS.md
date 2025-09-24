@@ -150,7 +150,7 @@ The open/close status of sections was saved globally for all pages, causing conf
 - ✅ `/api/executions` - Returns correct fields without `updated_at`
 - ✅ `/api/cash_flows` - Returns Account Name
 - ✅ `/api/notes` - Returns `related_type_name`
-- ✅ `/api/v1/accounts/` - Returns correct fields
+- ✅ `/api/accounts/` - Returns correct fields
 
 ### 2. Display Testing
 - ✅ All tables load without errors

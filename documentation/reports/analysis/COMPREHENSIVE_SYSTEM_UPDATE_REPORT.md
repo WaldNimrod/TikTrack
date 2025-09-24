@@ -211,11 +211,11 @@ Last commit: f300869 - Complete documentation update ✅
 - **ניטור שרת**: `http://localhost:8080/server-monitor`
 
 ### **📡 API Endpoints:**
-- **Cache Stats**: `/api/v1/cache/stats`
-- **Cache Health**: `/api/v1/cache/health`  
-- **Cache Clear**: `/api/v1/cache/clear`
-- **Cache Invalidate**: `/api/v1/cache/invalidate`
-- **Cache Status**: `/api/v1/cache/status`
+- **Cache Stats**: `/api/cache/stats`
+- **Cache Health**: `/api/cache/health`  
+- **Cache Clear**: `/api/cache/clear`
+- **Cache Invalidate**: `/api/cache/invalidate`
+- **Cache Status**: `/api/cache/status`
 
 ### **📚 דוקומנטציה:**
 - **מדריך מוניטורינג**: `documentation/development/CACHE_MONITORING_USER_GUIDE.md`

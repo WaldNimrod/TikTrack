@@ -84,10 +84,10 @@ SELECT COUNT(*) FROM tickers WHERE active_trades = 1;
 ### **API Usage**
 ```bash
 # Validate constraint
-curl -X GET "http://localhost:8080/api/v1/constraints/active-trades/validate"
+curl -X GET "http://localhost:8080/api/constraints/active-trades/validate"
 
 # Fix constraint issues
-curl -X POST "http://localhost:8080/api/v1/constraints/active-trades/fix"
+curl -X POST "http://localhost:8080/api/constraints/active-trades/fix"
 ```
 
 ## 🔍 **Validation and Monitoring**
@@ -159,10 +159,10 @@ python3 scripts/test_active_trades_constraint.py
 ### **Troubleshooting**
 ```bash
 # Check constraint status
-curl -X GET "http://localhost:8080/api/v1/constraints/active-trades/validate"
+curl -X GET "http://localhost:8080/api/constraints/active-trades/validate"
 
 # Fix any issues
-curl -X POST "http://localhost:8080/api/v1/constraints/active-trades/fix"
+curl -X POST "http://localhost:8080/api/constraints/active-trades/fix"
 
 # Manual update of specific ticker
 python3 -c "
@@ -188,7 +188,7 @@ update_ticker_open_status(ticker_id)
 ### **Dynamic Constraints Display**
 The database page now displays constraints dynamically from the API:
 
-- **Real-time Loading**: Constraints are loaded from `/api/v1/constraints/` endpoint
+- **Real-time Loading**: Constraints are loaded from `/api/constraints/` endpoint
 - **Automatic Updates**: Constraints list updates automatically when page loads
 - **Visual Indicators**: Different constraint types have distinct colors and icons:
   - `NOT_NULL` - Red with ⚠ icon
@@ -214,7 +214,7 @@ The database page now displays constraints dynamically from the API:
 
 ### **Validation Endpoint**
 ```
-GET /api/v1/constraints/active-trades/validate
+GET /api/constraints/active-trades/validate
 ```
 
 **Response:**
@@ -232,7 +232,7 @@ GET /api/v1/constraints/active-trades/validate
 
 ### **Fix Endpoint**
 ```
-POST /api/v1/constraints/active-trades/fix
+POST /api/constraints/active-trades/fix
 ```
 
 **Response:**

@@ -98,7 +98,7 @@ MAX_HEALTH_CHECKS=6           # Number of health check rounds
 ### What's Tested
 1. **Main Page**: `GET /` (HTTP 200)
 2. **API Health**: `GET /api/health` (HTTP 200)
-3. **Database**: `GET /api/v1/accounts/` (HTTP 200)
+3. **Database**: `GET /api/accounts/` (HTTP 200)
 
 ### Success Criteria
 - **Minimum Success Rate**: 80% (15/18 checks)

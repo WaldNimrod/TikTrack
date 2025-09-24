@@ -93,19 +93,19 @@ trading-ui/external_data_integration_client/
 
 #### 1. בדיקת משתמש ברירת מחדל
 ```bash
-curl -s http://localhost:8080/api/v1/users/default | jq
+curl -s http://localhost:8080/api/users/default | jq
 ```
 **תוצאה**: ✅ משתמש nimrod (ID: 1) נמצא ופעיל
 
 #### 2. בדיקת העדפות משתמש
 ```bash
-curl -s http://localhost:8080/api/v1/preferences/ | jq
+curl -s http://localhost:8080/api/preferences/ | jq
 ```
 **תוצאה**: ✅ העדפות נטענות עם ברירות מחדל
 
 #### 3. בדיקת שמירת העדפות
 ```bash
-curl -s -X POST http://localhost:8080/api/v1/preferences/ \
+curl -s -X POST http://localhost:8080/api/preferences/ \
   -H "Content-Type: application/json" \
   -d '{"preferences": {"defaultStopLoss": 15}}' | jq
 ```
@@ -113,7 +113,7 @@ curl -s -X POST http://localhost:8080/api/v1/preferences/ \
 
 #### 4. בדיקת איפוס העדפות
 ```bash
-curl -s -X POST http://localhost:8080/api/v1/preferences/reset | jq
+curl -s -X POST http://localhost:8080/api/preferences/reset | jq
 ```
 **תוצאה**: ✅ העדפות מאופסות לברירות מחדל
 

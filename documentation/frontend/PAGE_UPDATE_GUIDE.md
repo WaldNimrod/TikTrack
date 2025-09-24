@@ -203,7 +203,7 @@ Bootstrap חייב להיטען לפני CSS שלנו כדי ש-CSS שלנו י�
 
 <!-- TikTrack ITCSS Main CSS - אחרי Bootstrap כדי לדרוס אותו -->
 <!-- CSS Architecture: ראו documentation/frontend/CSS_ARCHITECTURE_GUIDE.md -->
-<link rel="stylesheet" href="styles-new/main.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/main.css?v=1.0.0">
 
 <!-- Header Styles - נפרד מ-ITCSS -->
 <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_level3_fix">
@@ -305,13 +305,13 @@ console.log('Notification styles:', {
 
 2. **קובץ CSS**:
 ```html
-<link href="styles-new/06-components/_notifications.css?v=v1.0.1" rel="stylesheet">
+<link href="styles-new/06-components/_notifications.css?v=1.0.1" rel="stylesheet">
 ```
 
 3. **קבצי JavaScript**:
 ```html
 <!-- מערכת התראות בסיסית -->
-<script src="scripts/notification-system.js?v=v1.0.0"></script>
+<script src="scripts/notification-system.js?v=1.0.0"></script>
 
 <!-- אוסף התראות גלובלי (חדש - ספטמבר 2025) -->
 <script src="scripts/global-notification-collector.js"></script>
@@ -320,9 +320,9 @@ console.log('Notification styles:', {
 4. **סדר טעינה נכון**:
 ```html
 <!-- הסקריפטים חייבים להיטען לפני קבצי העמוד -->
-<script src="scripts/notification-system.js?v=v1.0.0"></script>
+<script src="scripts/notification-system.js?v=1.0.0"></script>
 <script src="scripts/global-notification-collector.js"></script>
-<script src="scripts/[PAGE].js?v=v1.0.0"></script>
+<script src="scripts/[PAGE].js?v=1.0.0"></script>
 ```
 
 #### פונקציות זמינות:
@@ -924,29 +924,29 @@ cp trading-ui/designs.html trading-ui/[page-name]-template.html
 <!-- Unified CSS -->
 <!-- CSS Files - אחרי Bootstrap כדי לדרוס אותו -->
 <!-- 🔄 MAJOR ARCHITECTURE CHANGE - September 2025: Individual <link> tags instead of @import -->
-<link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/03-generic/_base.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/04-elements/_links.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/06-components/_tables.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/06-components/_cards.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/06-components/_modals.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=v1.0.1">
-<link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=v1.0.0">
-<link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=v1.0.0">
+<link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/03-generic/_base.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/04-elements/_links.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_tables.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_cards.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_modals.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=1.0.1">
+<link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=1.0.0">
+<link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
 
 <!-- Header Styles -->
 <link rel="stylesheet" href="styles-new/header-styles.css?v=v38_fixed">

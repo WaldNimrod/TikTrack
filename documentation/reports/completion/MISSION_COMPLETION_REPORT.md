@@ -234,7 +234,7 @@
 1. השתמש במצב development (TTL 10s) לפיתוח מהיר
 2. השתמש ב-cache clear בצורך לעדכונים מיידיים
 3. עקוב אחר logs לdiagnostics
-4. השתמש ב-`/api/v1/cache/stats` לmonitoring
+4. השתמש ב-`/api/cache/stats` לmonitoring
 
 ### **🏭 לייצור:**
 1. השתמש במצב production (TTL 5min) לביצועים
@@ -243,9 +243,9 @@
 4. הגדר alerting על cache health issues
 
 ### **📊 לניטור:**
-- **Cache Stats**: `/api/v1/cache/stats`
-- **Cache Health**: `/api/v1/cache/health`  
-- **Cache Clear**: `/api/v1/cache/clear`
+- **Cache Stats**: `/api/cache/stats`
+- **Cache Health**: `/api/cache/health`  
+- **Cache Clear**: `/api/cache/clear`
 - **Logs**: `tail -f Backend/logs/app.log | grep cache`
 
 ## 🎊 **סיכום**

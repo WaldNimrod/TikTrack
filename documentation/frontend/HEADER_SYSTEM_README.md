@@ -1206,7 +1206,7 @@ Status and Type filters support multiple selections:
 
 #### Reset Button (↻)
 - Resets all filters to user preferences from server
-- Fetches defaults from `/api/v1/preferences/`
+- Fetches defaults from `/api/preferences/`
 - Translates English values to Hebrew
 - Updates all filter displays
 

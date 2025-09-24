@@ -300,7 +300,7 @@ GET /uploads/{file_id}
 
 ## Versioning
 API versioning is handled through the URL path:
-- Current version: `/api/v1/`
+- Current version: `/api/`
 - Future versions: `/api/v2/`, `/api/v3/`, etc.
 
 ## Testing
@@ -321,7 +321,7 @@ Use the provided test endpoints for development:
 import requests
 
 # Get all trades
-response = requests.get('http://localhost:8080/api/v1/trades')
+response = requests.get('http://localhost:8080/api/trades')
 trades = response.json()['data']
 
 # Create new trade
@@ -332,13 +332,13 @@ new_trade = {
     "entry_price": 150.00,
     "quantity": 100
 }
-response = requests.post('http://localhost:8080/api/v1/trades', json=new_trade)
+response = requests.post('http://localhost:8080/api/trades', json=new_trade)
 ```
 
 ### JavaScript Example
 ```javascript
 // Get all constraints
-fetch('/api/v1/constraints')
+fetch('/api/constraints')
     .then(response => response.json())
     .then(data => {
         console.log('Constraints:', data.data);
@@ -356,7 +356,7 @@ const newConstraint = {
     ]
 };
 
-fetch('/api/v1/constraints', {
+fetch('/api/constraints', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(newConstraint)

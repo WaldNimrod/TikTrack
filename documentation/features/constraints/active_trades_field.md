@@ -231,10 +231,10 @@ logger.info(f"Updated ticker {ticker.symbol} active_trades to: {ticker.active_tr
 ### API Endpoints
 ```bash
 # Get all tickers with active trades
-GET /api/v1/tickers/?active_trades=true
+GET /api/tickers/?active_trades=true
 
 # Get specific ticker status
-GET /api/v1/tickers/3
+GET /api/tickers/3
 ```
 
 ### Database Queries

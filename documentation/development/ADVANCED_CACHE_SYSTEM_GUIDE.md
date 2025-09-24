@@ -202,12 +202,12 @@ def create_my_entity():
 ### **נתונים ישנים?**
 1. בדוק TTL - אולי צריך להקטין
 2. בדוק שה-cache מתבטל אחרי שינויים
-3. נסה cache clear ידני: `/api/v1/cache/clear`
+3. נסה cache clear ידני: `/api/cache/clear`
 
 ### **ביצועים איטיים?**
-1. בדוק cache hit rate: `/api/v1/cache/stats`
+1. בדוק cache hit rate: `/api/cache/stats`
 2. הגדל TTL לנתונים פחות קריטיים
-3. בדוק memory usage: `/api/v1/cache/health`
+3. בדוק memory usage: `/api/cache/health`
 
 ## 🔬 מעקב וניטור
 
@@ -218,11 +218,11 @@ def create_my_entity():
 - **מדריך מפורט**: `documentation/development/CACHE_MONITORING_USER_GUIDE.md`
 
 ### **📡 API Endpoints לניטור:**
-- **`/api/v1/cache/stats`** - סטטיסטיקות cache
-- **`/api/v1/cache/health`** - בריאות המערכת
-- **`/api/v1/cache/status`** - מצב כללי
-- **`/api/v1/cache/clear`** - ניקוי cache
-- **`/api/v1/cache/invalidate`** - invalidation לפי dependency
+- **`/api/cache/stats`** - סטטיסטיקות cache
+- **`/api/cache/health`** - בריאות המערכת
+- **`/api/cache/status`** - מצב כללי
+- **`/api/cache/clear`** - ניקוי cache
+- **`/api/cache/invalidate`** - invalidation לפי dependency
 
 ### **📊 מדדי הצלחה:**
 - **Hit Rate** > 80%

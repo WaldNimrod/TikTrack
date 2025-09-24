@@ -248,11 +248,11 @@ window.cacheTestSystem.logLevel = 'error';
 - **פתרון**: וודא שהשרת רץ על port 8080
 
 ### **📋 רשימת endpoints שהמערכת משתמשת:**
-- **`/api/v1/cache/stats`** - סטטיסטיקות cache
-- **`/api/v1/cache/health`** - בריאות המערכת  
-- **`/api/v1/cache/status`** - מצב כללי
-- **`/api/v1/cache/clear`** - ניקוי cache
-- **`/api/v1/cache/invalidate`** - ביטול לפי dependency
+- **`/api/cache/stats`** - סטטיסטיקות cache
+- **`/api/cache/health`** - בריאות המערכת  
+- **`/api/cache/status`** - מצב כללי
+- **`/api/cache/clear`** - ניקוי cache
+- **`/api/cache/invalidate`** - ביטול לפי dependency
 
 ## 🎯 מדדי הצלחה למעקב
 
@@ -370,7 +370,7 @@ window.cacheTestSystem.logLevel = 'error';
 
 ### **🔗 קישורים חשובים:**
 - **עמוד המוניטורינג**: `http://localhost:8080/cache-test`
-- **API Documentation**: `http://localhost:8080/api/v1/cache/`
+- **API Documentation**: `http://localhost:8080/api/cache/`
 - **GitHub Issues**: לדיווח על בעיות
 
 ---

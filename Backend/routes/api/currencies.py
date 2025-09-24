@@ -15,7 +15,7 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-currencies_bp = Blueprint('currencies', __name__, url_prefix='/api/v1/currencies')
+currencies_bp = Blueprint('currencies', __name__, url_prefix='/api/currencies')
 
 # Initialize base API (currencies uses direct SQLite, so we'll use it selectively)
 
@@ -57,14 +57,14 @@ def get_currencies():
             "status": "success",
             "data": result,
             "message": "רשימת המטבעות נטענה בהצלחה",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error getting currencies: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה בטעינת רשימת המטבעות"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
 
 @currencies_bp.route('/<int:currency_id>', methods=['GET'])
@@ -92,20 +92,20 @@ def get_currency(currency_id: int):
                 "status": "success",
                 "data": currency_dict,
                 "message": "פרטי המטבע נטענו בהצלחה",
-                "version": "v1"
+                "version": "1.0"
             })
         
         return jsonify({
             "status": "error",
             "error": {"message": "Currency not found"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error getting currency {currency_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה בטעינת פרטי המטבע"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
 
 @currencies_bp.route('/', methods=['POST'])
@@ -123,14 +123,14 @@ def create_currency():
             return jsonify({
                 "status": "error",
                 "error": {"message": "סמל מטבע הוא שדה חובה"},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         if not name:
             return jsonify({
                 "status": "error",
                 "error": {"message": "שם מטבע הוא שדה חובה"},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # וולידציה של תבנית סמל מטבע - בדיוק 3 אותיות גדולות
@@ -138,7 +138,7 @@ def create_currency():
             return jsonify({
                 "status": "error",
                 "error": {"message": "סמל מטבע חייב להיות בדיוק 3 אותיות אנגליות גדולות (למשל: USD, EUR, ILS). אסור להשתמש במספרים או אותיות קטנות."},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # וולידציה של אורך שם מטבע
@@ -146,7 +146,7 @@ def create_currency():
             return jsonify({
                 "status": "error",
                 "error": {"message": "שם מטבע לא יכול להיות יותר מ-25 תווים. נסה שם קצר יותר."},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # וולידציה של שער דולר
@@ -156,13 +156,13 @@ def create_currency():
                 return jsonify({
                     "status": "error",
                     "error": {"message": "שער דולר חייב להיות מספר חיובי גדול מ-0. נסה מספר עם נקודה עשרונית (למשל: 1.5)."},
-                    "version": "v1"
+                    "version": "1.0"
                 }), 400
         except (ValueError, TypeError):
             return jsonify({
                 "status": "error",
                 "error": {"message": "שער דולר חייב להיות מספר תקין. נסה מספר עם נקודה עשרונית (למשל: 1.5)."},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         conn = get_db_connection()
@@ -175,7 +175,7 @@ def create_currency():
             return jsonify({
                 "status": "error",
                 "error": {"message": "סמל מטבע זה כבר קיים במערכת"},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         cursor.execute(
@@ -197,14 +197,14 @@ def create_currency():
                 'created_at': None  # Will be set by database default
             },
             "message": "מטבע נוסף בהצלחה",
-            "version": "v1"
+            "version": "1.0"
         }), 201
     except Exception as e:
         logger.error(f"Error creating currency: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה פנימית בשרת"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
 
 @currencies_bp.route('/<int:currency_id>', methods=['PUT'])
@@ -217,7 +217,7 @@ def update_currency(currency_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "לא ניתן לערוך רשומת בסיס מוגנת"},
-                "version": "v1"
+                "version": "1.0"
             }), 403
         
         data = request.get_json()
@@ -230,14 +230,14 @@ def update_currency(currency_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "סמל מטבע הוא שדה חובה"},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         if not name:
             return jsonify({
                 "status": "error",
                 "error": {"message": "שם מטבע הוא שדה חובה"},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # וולידציה של תבנית סמל מטבע - בדיוק 3 אותיות גדולות
@@ -245,7 +245,7 @@ def update_currency(currency_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "סמל מטבע חייב להיות בדיוק 3 אותיות אנגליות גדולות (למשל: USD, EUR, ILS). אסור להשתמש במספרים או אותיות קטנות."},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # וולידציה של אורך שם מטבע
@@ -253,7 +253,7 @@ def update_currency(currency_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "שם מטבע לא יכול להיות יותר מ-25 תווים. נסה שם קצר יותר."},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # וולידציה של שער דולר
@@ -264,13 +264,13 @@ def update_currency(currency_id: int):
                     return jsonify({
                         "status": "error",
                         "error": {"message": "שער דולר חייב להיות מספר חיובי גדול מ-0. נסה מספר עם נקודה עשרונית (למשל: 1.5)."},
-                        "version": "v1"
+                        "version": "1.0"
                     }), 400
             except (ValueError, TypeError):
                 return jsonify({
                     "status": "error",
                     "error": {"message": "שער דולר חייב להיות מספר תקין. נסה מספר עם נקודה עשרונית (למשל: 1.5)."},
-                    "version": "v1"
+                    "version": "1.0"
                 }), 400
         
         conn = get_db_connection()
@@ -283,7 +283,7 @@ def update_currency(currency_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "המטבע לא נמצא במערכת"},
-                "version": "v1"
+                "version": "1.0"
             }), 404
         
         # בדיקה אם סמל המטבע כבר קיים (למעט המטבע הנוכחי)
@@ -293,7 +293,7 @@ def update_currency(currency_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "סמל מטבע זה כבר קיים במערכת"},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # Update currency
@@ -320,14 +320,14 @@ def update_currency(currency_id: int):
                 'usd_rate': usd_rate
             },
             "message": "מטבע עודכן בהצלחה",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error updating currency {currency_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה פנימית בשרת"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
 
 @currencies_bp.route('/dropdown', methods=['GET'])
@@ -354,14 +354,14 @@ def get_currencies_dropdown():
             "status": "success",
             "data": result,
             "message": "רשימת המטבעות לתפריט נפתח נטענה בהצלחה",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error getting currencies for dropdown: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה בטעינת רשימת המטבעות לתפריט נפתח"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
 
 @currencies_bp.route('/<int:currency_id>', methods=['DELETE'])
@@ -374,7 +374,7 @@ def delete_currency(currency_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "לא ניתן למחוק רשומת בסיס מוגנת"},
-                "version": "v1"
+                "version": "1.0"
             }), 403
         
         conn = get_db_connection()
@@ -387,7 +387,7 @@ def delete_currency(currency_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "Currency not found"},
-                "version": "v1"
+                "version": "1.0"
             }), 404
         
         # Delete currency
@@ -398,12 +398,12 @@ def delete_currency(currency_id: int):
         return jsonify({
             "status": "success",
             "message": "Currency deleted successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error deleting currency {currency_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה במחיקת המטבע"},
-            "version": "v1"
+            "version": "1.0"
         }), 500

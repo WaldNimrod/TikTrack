@@ -12,7 +12,7 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-accounts_bp = Blueprint('accounts', __name__, url_prefix='/api/v1/accounts')
+accounts_bp = Blueprint('accounts', __name__, url_prefix='/api/accounts')
 
 # Initialize base API
 base_api = BaseEntityAPI('accounts', AccountService, 'accounts')
@@ -38,14 +38,14 @@ def get_open_accounts():
             "status": "success",
             "data": [account.to_dict() for account in accounts],
             "message": "Open accounts retrieved successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error getting open accounts: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve open accounts"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
 
 @accounts_bp.route('/<int:account_id>', methods=['GET'])
@@ -72,7 +72,7 @@ def create_account():
             "status": "success",
             "data": account.to_dict(),
             "message": "Account created successfully",
-            "version": "v1"
+            "version": "1.0"
         }), 201
     except ValueError as e:
         # Validation errors - return 400 Bad Request
@@ -82,7 +82,7 @@ def create_account():
             "error_code": "VALIDATION_ERROR",
             "message": str(e),
             "details": "The provided data is invalid",
-            "version": "v1"
+            "version": "1.0"
         }), 400
     except Exception as e:
         # Server errors - return 500 Internal Server Error
@@ -92,7 +92,7 @@ def create_account():
             "error_code": "INTERNAL_ERROR",
             "message": "An internal error occurred",
             "details": "The server encountered an unexpected error",
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -112,12 +112,12 @@ def update_account(account_id: int):
                 "status": "success",
                 "data": account.to_dict(),
                 "message": "Account updated successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "Account not found"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except ValueError as e:
         # Validation errors - return 400 Bad Request
@@ -127,7 +127,7 @@ def update_account(account_id: int):
             "error_code": "VALIDATION_ERROR",
             "message": str(e),
             "details": "The provided data is invalid",
-            "version": "v1"
+            "version": "1.0"
         }), 400
     except Exception as e:
         # Server errors - return 500 Internal Server Error
@@ -137,7 +137,7 @@ def update_account(account_id: int):
             "error_code": "INTERNAL_ERROR",
             "message": "An internal error occurred",
             "details": "The server encountered an unexpected error",
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -153,14 +153,14 @@ def get_account_open_trades(account_id: int):
             "status": "success",
             "data": open_trades,
             "message": "Open trades retrieved successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error getting open trades for account {account_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve open trades"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -179,7 +179,7 @@ def delete_account(account_id: int):
                 "error": {
                     "message": "לא ניתן למחוק את החשבון האחרון במערכת. חייב להיות לפחות חשבון אחד."
                 },
-                "version": "v1"
+                "version": "1.0"
             }), 403
         
         # Check if there are open trades
@@ -191,7 +191,7 @@ def delete_account(account_id: int):
                     "message": "Cannot delete account with open trades",
                     "open_trades": open_trades
                 },
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # Try to delete (this will check for all linked items)
@@ -203,7 +203,7 @@ def delete_account(account_id: int):
             return jsonify({
                 "status": "success",
                 "message": "Account deleted successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         
         # If deletion failed, it means there are linked items
@@ -212,14 +212,14 @@ def delete_account(account_id: int):
             "error": {
                 "message": "Cannot delete account - it has linked trades, executions, or other items"
             },
-            "version": "v1"
+            "version": "1.0"
         }), 400
     except Exception as e:
         logger.error(f"Error deleting account {account_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -236,19 +236,19 @@ def get_account_stats(account_id: int):
                 "status": "success",
                 "data": stats,
                 "message": "Account stats retrieved successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "Account not found"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error getting account stats {account_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve account stats"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()

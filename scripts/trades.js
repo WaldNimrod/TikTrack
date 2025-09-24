@@ -256,7 +256,7 @@ function addInvestmentTypeColorLegend() {
  * כולל טיפול בשגיאות ועדכון המשתנה הגלובלי
  *
  * תכונות:
- * - קריאה ל-API `/api/v1/trades/`
+ * - קריאה ל-API `/api/trades/`
  * - טיפול בשגיאות רשת
  * - עדכון המשתנה הגלובלי window.tradesData
  * - עדכון הטבלה עם הנתונים החדשים
@@ -268,7 +268,7 @@ async function loadTradesData() {
   try {
 
 
-    const response = await fetch('/api/v1/trades/');
+    const response = await fetch('/api/trades/');
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -513,7 +513,7 @@ async function cancelTradeRecord(tradeId) {
     // קבלת פרטי הטרייד לצורך הודעת האישור
     let tradeDetails = '';
     try {
-      const response = await fetch(`/api/v1/trades/${tradeId}`);
+      const response = await fetch(`/api/trades/${tradeId}`);
       if (response.ok) {
         const tradeData = await response.json();
         const trade = tradeData.data;
@@ -628,7 +628,7 @@ async function performTradeCancellation(tradeId) {
     }
     
     // שליחה לשרת
-    const response = await fetch(`/api/v1/trades/${tradeId}/cancel`, {
+    const response = await fetch(`/api/trades/${tradeId}/cancel`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cancel_reason: 'בוטל על ידי המשתמש' }),
@@ -738,7 +738,7 @@ async function performTradeDeletion(tradeId) {
     }
     
     // שליחה לשרת
-    const response = await fetch(`/api/v1/trades/${tradeId}`, {
+    const response = await fetch(`/api/trades/${tradeId}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
     });
@@ -860,9 +860,9 @@ async function loadEditTradeModalData(trade) {
   try {
     // טעינת חשבונות, תוכניות טרייד וטיקרים
     const [accountsResponse, tradePlansResponse, tickersResponse] = await Promise.all([
-      fetch('/api/v1/accounts/'),
-      fetch('/api/v1/trade_plans/'),
-      fetch('/api/v1/tickers/'),
+      fetch('/api/accounts/'),
+      fetch('/api/trade_plans/'),
+      fetch('/api/tickers/'),
     ]);
 
     if (!accountsResponse.ok || !tradePlansResponse.ok || !tickersResponse.ok) {
@@ -1217,7 +1217,7 @@ async function saveEditTradeData() {
     }
 
     // שליחה לשרת
-    const response = await fetch(`/api/v1/trades/${formData.id}`, {
+    const response = await fetch(`/api/trades/${formData.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData),
@@ -1514,7 +1514,7 @@ async function saveNewTradeRecord() {
   };
 
   try {
-    const response = await fetch('/api/v1/trades/', {
+    const response = await fetch('/api/trades/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1581,11 +1581,11 @@ async function loadModalData() {
   try {
 
     // טעינת חשבונות
-    const accountsResponse = await fetch('/api/v1/accounts/');
+    const accountsResponse = await fetch('/api/accounts/');
     const accounts = await accountsResponse.json();
 
     // טעינת תוכניות טרייד
-    const tradePlansResponse = await fetch('/api/v1/trade_plans/');
+    const tradePlansResponse = await fetch('/api/trade_plans/');
     const tradePlans = await tradePlansResponse.json();
 
     // מילוי רשימת חשבונות - רק חשבונות פתוחים
@@ -1720,7 +1720,7 @@ async function updateTickerFromTradePlan(tradePlanId) {
       if (tickerId) {
         // טוען מחיר לטיקר ID
         try {
-          const tickerResponse = await fetch(`/api/v1/tickers/${tickerId}`);
+          const tickerResponse = await fetch(`/api/tickers/${tickerId}`);
           // תגובת API
           if (tickerResponse.ok) {
             const tickerData = await tickerResponse.json();
@@ -2082,7 +2082,7 @@ window.deleteTradeRecord = deleteTradeRecord;              // מחיקת טרי�
  */
 async function checkLinkedItemsBeforeDelete(tradeId) {
   try {
-    const response = await fetch(`/api/v1/linked-items/trade/${tradeId}`);
+    const response = await fetch(`/api/linked-items/trade/${tradeId}`);
 
     if (!response.ok) {
       // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם המחיקה
@@ -2124,7 +2124,7 @@ async function checkLinkedItemsBeforeDelete(tradeId) {
  */
 async function checkLinkedItemsBeforeCancel(tradeId) {
   try {
-    const response = await fetch(`/api/v1/linked-items/trade/${tradeId}`);
+    const response = await fetch(`/api/linked-items/trade/${tradeId}`);
 
     if (!response.ok) {
       // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם הביטול
@@ -2401,7 +2401,7 @@ async function loadTradePlanDates() {
     const planId = link.getAttribute('data-plan-id');
     if (planId) {
       try {
-        const response = await fetch(`/api/v1/trade_plans/${planId}`);
+        const response = await fetch(`/api/trade_plans/${planId}`);
         if (response.ok) {
           const data = await response.json();
           if (data.status === 'success' && data.data) {
@@ -2503,7 +2503,7 @@ async function validateTradePlanChange(newTradePlanId, tradeData) {
   try {
     // קבלת פרטי התוכנית החדשה
     const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const url = `${base}/api/v1/trade_plans/${newTradePlanId}`;
+    const url = `${base}/api/trade_plans/${newTradePlanId}`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -2680,8 +2680,8 @@ async function validateTickerChange(newTickerId, tradeData) {
   try {
     // קבלת פרטי הטיקר המקורי והחדש
     const [originalTickerResponse, newTickerResponse] = await Promise.all([
-      fetch(`/api/v1/tickers/${originalTickerId}`),
-      fetch(`/api/v1/tickers/${updatedTickerId}`),
+      fetch(`/api/tickers/${originalTickerId}`),
+      fetch(`/api/tickers/${updatedTickerId}`),
     ]);
 
     if (!originalTickerResponse.ok || !newTickerResponse.ok) {
@@ -2776,7 +2776,7 @@ async function validateTradePlanDate(tradePlanId, tradeData) {
 
   try {
     // קבלת פרטי תוכנית הטרייד
-    const response = await fetch(`/api/v1/trade_plans/${tradePlanId}`);
+    const response = await fetch(`/api/trade_plans/${tradePlanId}`);
     if (!response.ok) {
       throw new Error('שגיאה בקבלת פרטי תוכנית טרייד');
     }
@@ -2823,7 +2823,7 @@ async function updateEditTradeTickerFromPlan(tradePlanId) {
 
   try {
     // קבלת פרטי התוכנית
-    const response = await fetch(`/api/v1/trade_plans/${tradePlanId}`);
+    const response = await fetch(`/api/trade_plans/${tradePlanId}`);
     if (!response.ok) {
       throw new Error('שגיאה בקבלת פרטי תוכנית טרייד');
     }
@@ -2894,7 +2894,7 @@ async function updateEditTradePriceFromTicker(tickerId) {
   }
 
   try {
-    const response = await fetch(`/api/v1/tickers/${tickerId}`);
+    const response = await fetch(`/api/tickers/${tickerId}`);
     if (response.ok) {
       const tickerData = await response.json();
       const ticker = tickerData.data;
@@ -2956,7 +2956,7 @@ async function reactivateTrade(tradeId) {
     }
 
     const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const response = await fetch(`${base}/api/v1/trades/${tradeId}`, {
+    const response = await fetch(`${base}/api/trades/${tradeId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

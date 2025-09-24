@@ -285,7 +285,7 @@ function restoreCashFlowsSectionState() {
 async function loadCashFlows() {
   try {
 
-    const response = await fetch('http://localhost:8080/api/v1/cash_flows/');
+    const response = await fetch('http://localhost:8080/api/cash_flows/');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -604,7 +604,7 @@ async function deleteCashFlow(id) {
     }
 
     // שליחת בקשת מחיקה
-    const response = await fetch(`http://localhost:8080/api/v1/cash_flows/${id}`, {
+    const response = await fetch(`http://localhost:8080/api/cash_flows/${id}`, {
       method: 'DELETE',
     });
 
@@ -712,7 +712,7 @@ const editCashFlowValidationRules = {
  */
 async function loadCurrenciesFromServer() {
   try {
-    const response = await fetch('http://localhost:8080/api/v1/currencies/dropdown');
+    const response = await fetch('http://localhost:8080/api/currencies/dropdown');
     if (response.ok) {
       const result = await response.json();
       if (result.status === 'success') {
@@ -737,7 +737,7 @@ async function loadCurrenciesFromServer() {
  */
 async function loadAccountsForCashFlow() {
   try {
-    const response = await fetch('http://localhost:8080/api/v1/accounts/');
+    const response = await fetch('http://localhost:8080/api/accounts/');
     if (response.ok) {
       const result = await response.json();
       if (result.status === 'success') {
@@ -778,7 +778,7 @@ async function loadAccountsForCashFlow() {
  */
 async function loadAccountsForEditCashFlow() {
   try {
-    const response = await fetch('http://localhost:8080/api/v1/accounts/');
+    const response = await fetch('http://localhost:8080/api/accounts/');
     if (response.ok) {
       const result = await response.json();
       if (result.status === 'success') {
@@ -1557,7 +1557,7 @@ async function saveCashFlow() {
       return;
     }
 
-    const response = await fetch('http://localhost:8080/api/v1/cash_flows/', {
+    const response = await fetch('http://localhost:8080/api/cash_flows/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1668,7 +1668,7 @@ async function updateCashFlow() {
       return;
     }
 
-    const response = await fetch(`http://localhost:8080/api/v1/cash_flows/${id}`, {
+    const response = await fetch(`http://localhost:8080/api/cash_flows/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

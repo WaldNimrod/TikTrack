@@ -290,14 +290,14 @@ class EntityDetailsAPI {
      */
     async fetchFromExistingEndpoints(entityType, entityId) {
         const endpointMappings = {
-            ticker: `/api/v1/tickers/${entityId}`,
-            trade: `/api/v1/trades/${entityId}`,
-            trade_plan: `/api/v1/trade_plans/${entityId}`,
-            execution: `/api/v1/executions/${entityId}`,
-            account: `/api/v1/accounts/${entityId}`,
-            alert: `/api/v1/alerts/${entityId}`,
-            cash_flow: `/api/v1/cash_flows/${entityId}`,
-            note: `/api/v1/notes/${entityId}`
+            ticker: `/api/tickers/${entityId}`,
+            trade: `/api/trades/${entityId}`,
+            trade_plan: `/api/trade_plans/${entityId}`,
+            execution: `/api/executions/${entityId}`,
+            account: `/api/accounts/${entityId}`,
+            alert: `/api/alerts/${entityId}`,
+            cash_flow: `/api/cash_flows/${entityId}`,
+            note: `/api/notes/${entityId}`
         };
 
         const endpoint = endpointMappings[entityType];
@@ -519,7 +519,7 @@ class EntityDetailsAPI {
      */
     async getLinkedItems(entityType, entityId) {
         try {
-            const url = `/api/v1/linked-items/${entityType}/${entityId}`;
+            const url = `/api/linked-items/${entityType}/${entityId}`;
             console.log(`🔗 Fetching linked items from: ${url}`);
             
             const response = await fetch(url, {
@@ -625,7 +625,7 @@ class EntityDetailsAPI {
      */
     async getCurrencyData(currencyId) {
         try {
-            const url = `/api/v1/currencies/${currencyId}`;
+            const url = `/api/currencies/${currencyId}`;
             console.log(`💰 Fetching currency data from: ${url}`);
             
             const response = await fetch(url, {

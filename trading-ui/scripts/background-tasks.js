@@ -47,7 +47,7 @@ const logSystem = {
 };
 
 // API endpoints
-const API_BASE = '/api/v1/background-tasks';
+const API_BASE = '/api/background-tasks';
 const API_ENDPOINTS = {
   status: `${API_BASE}/`,
   tasks: `${API_BASE}/tasks`,
@@ -1281,7 +1281,7 @@ window.clearLog = function() {
 window.stopTask = async function(taskName) {
   try {
     console.log(`🛑 Stopping task: ${taskName}`);
-    await apiService.request(`/api/v1/background-tasks/tasks/${taskName}/stop`, {
+    await apiService.request(`/api/background-tasks/tasks/${taskName}/stop`, {
       method: 'POST'
     });
     console.log(`✅ Task ${taskName} stopped successfully`);

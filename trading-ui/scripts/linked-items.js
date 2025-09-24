@@ -1212,7 +1212,7 @@ function checkLinkedItems(itemId, itemType = null) {
 function exportLinkedItemsData(itemType, itemId) {
   try {
     // קבלת הנתונים מהשרת
-    fetch(`/api/v1/linked-items/${itemType}/${itemId}`)
+    fetch(`/api/linked-items/${itemType}/${itemId}`)
       .then(response => response.json())
       .then(data => {
         // יצירת CSV
@@ -1527,7 +1527,7 @@ function getStatusBadge(status) {
  */
 async function loadLinkedItemsData(itemType, itemId) {
   try {
-    const response = await fetch(`/api/v1/linked-items/${itemType}/${itemId}`);
+    const response = await fetch(`/api/linked-items/${itemType}/${itemId}`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

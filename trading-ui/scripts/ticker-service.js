@@ -49,7 +49,7 @@ function clearCache() {
  */
 async function getTickers() {
   try {
-    const response = await fetch('/api/v1/tickers/');
+    const response = await fetch('/api/tickers/');
     if (response.ok) {
       const data = await response.json();
       const tickers = data.data || data || [];
@@ -71,7 +71,7 @@ async function getTickers() {
  */
 async function getTrades() {
   try {
-    const response = await fetch('/api/v1/trades/');
+    const response = await fetch('/api/trades/');
     if (response.ok) {
       const data = await response.json();
       const trades = data.data || data || [];
@@ -93,7 +93,7 @@ async function getTrades() {
  */
 async function getTradePlans() {
   try {
-    const response = await fetch('/api/v1/trade_plans/');
+    const response = await fetch('/api/trade_plans/');
     if (response.ok) {
       const data = await response.json();
       const plans = data.data || data || [];
@@ -374,7 +374,7 @@ function updateTickerSelect(selectId, tickers, placeholder = 'בחר טיקר...
  */
 async function loadTickersForTradePlan() {
   try {
-    const response = await fetch('/api/v1/tickers/');
+    const response = await fetch('/api/tickers/');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

@@ -270,7 +270,7 @@ async function cancelAlert(alertId) {
       window.clearCacheBeforeCRUD('alerts', 'cancel');
     }
     
-    const response = await fetch(`/api/v1/alerts/${alertId}`, {
+    const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -328,7 +328,7 @@ async function deleteAlert(alertId) {
       window.clearCacheBeforeCRUD('alerts', 'delete');
     }
     
-    const response = await fetch(`/api/v1/alerts/${alertId}`, {
+    const response = await fetch(`/api/alerts/${alertId}`, {
       method: 'DELETE',
     });
 

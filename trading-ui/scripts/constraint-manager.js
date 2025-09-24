@@ -17,7 +17,7 @@ let constraintManager;
 
 class ConstraintManager {
   constructor() {
-    this.apiBase = 'http://localhost:8080/api/v1/constraints';
+    this.apiBase = 'http://localhost:8080/api/constraints';
     this.currentConstraint = null;
     this.constraints = [];
     this.tables = [];

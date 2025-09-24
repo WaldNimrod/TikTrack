@@ -67,7 +67,7 @@ window.loadColorsForPreferences = async function() {
             try {
                 // Try to get preference by name
                 const preferenceName = colorKey || id;
-                const response = await fetch(`/api/v1/preferences/user/preference?name=${preferenceName}&user_id=1`);
+                const response = await fetch(`/api/preferences/user/preference?name=${preferenceName}&user_id=1`);
                 
                 if (response.ok) {
                     const result = await response.json();
@@ -267,7 +267,7 @@ async function initializeInfoSummary() {
         
         // Load preferences count
         try {
-            const response = await fetch('/api/v1/preferences/user?user_id=1');
+            const response = await fetch('/api/preferences/user?user_id=1');
             if (response.ok) {
                 const result = await response.json();
                 if (result.success && result.data.preferences) {
@@ -309,7 +309,7 @@ async function initializeInfoSummary() {
 
         // Load groups count
         try {
-            const response = await fetch('/api/v1/preferences/groups');
+            const response = await fetch('/api/preferences/groups');
             if (response.ok) {
                 const result = await response.json();
                 if (result.success && result.data.groups) {
@@ -321,7 +321,7 @@ async function initializeInfoSummary() {
                 }
             } else {
                 // Fallback: count groups from preferences
-                const response2 = await fetch('/api/v1/preferences/user?user_id=1');
+                const response2 = await fetch('/api/preferences/user?user_id=1');
                 if (response2.ok) {
                     const result2 = await response2.json();
                     if (result2.success && result2.data.preferences) {

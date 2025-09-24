@@ -207,7 +207,7 @@ const tickerTypeColors = {
  */
 async function loadCurrenciesData() {
   try {
-    const response = await fetch('/api/v1/currencies/');
+    const response = await fetch('/api/currencies/');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -362,7 +362,7 @@ async function updateActiveTradesField() {
 
   try {
     // טעינת טריידים מהשרת
-    const tradesResponse = await fetch('/api/v1/trades/');
+    const tradesResponse = await fetch('/api/trades/');
     if (!tradesResponse.ok) {
       // console.warn('⚠️ Could not load trades for active_trades update');
       return;
@@ -400,7 +400,7 @@ async function updateActiveTradesField() {
  */
 async function updateTickerActiveTradesStatus(tickerId) {
   try {
-    const response = await fetch(`/api/v1/tickers/${tickerId}/update-active-trades`, {
+    const response = await fetch(`/api/tickers/${tickerId}/update-active-trades`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -425,7 +425,7 @@ async function updateTickerActiveTradesStatus(tickerId) {
  */
 async function updateAllActiveTradesStatuses() {
   try {
-    const response = await fetch('/api/v1/tickers/update-all-active-trades', {
+    const response = await fetch('/api/tickers/update-all-active-trades', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -673,7 +673,7 @@ async function saveTicker() {
       remarks: remarks || null,
     };
 
-    const response = await fetch('/api/v1/tickers', {
+    const response = await fetch('/api/tickers', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -759,7 +759,7 @@ async function saveTicker() {
  * עדכון טיקר קיים
  *
  * כולל ולידציה של פריטים מקושרים באמצעות המערכת הכללית:
- * - API: /api/v1/linked-items/ticker/{id}
+ * - API: /api/linked-items/ticker/{id}
  * - פונקציה: window.showLinkedItemsWarning('ticker', id)
  * - מונע ביטול כאשר יש פריטים פתוחים
  *
@@ -818,7 +818,7 @@ async function updateTicker() {
     try {
 
       // שימוש ב-API הכללי לקבלת פריטים מקושרים
-      const response = await fetch(`/api/v1/linked-items/ticker/${id}`);
+      const response = await fetch(`/api/linked-items/ticker/${id}`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -843,7 +843,7 @@ async function updateTicker() {
         if (window.showLinkedItemsModal) {
           // טעינת נתוני פריטים מקושרים
           try {
-            const response = await fetch(`/api/v1/linked-items/ticker/${id}`);
+            const response = await fetch(`/api/linked-items/ticker/${id}`);
             if (response.ok) {
               const data = await response.json();
               window.showLinkedItemsModal(data, 'ticker', id);
@@ -888,7 +888,7 @@ async function updateTicker() {
       remarks: remarks || null,
     };
 
-    const response = await fetch(`/api/v1/tickers/${id}`, {
+    const response = await fetch(`/api/tickers/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -955,7 +955,7 @@ async function cancelTicker(id) {
     // קבלת פרטי הטיקר לצורך הודעת האישור
     let tickerDetails = '';
     try {
-      const response = await fetch(`/api/v1/tickers/${id}`);
+      const response = await fetch(`/api/tickers/${id}`);
       if (response.ok) {
         const tickerData = await response.json();
         const ticker = tickerData.data;
@@ -1037,7 +1037,7 @@ async function checkLinkedItemsAndCancelTicker(tickerId) {
 async function performTickerCancellation(tickerId) {
   try {
     // שליחה לשרת
-    const response = await fetch(`/api/v1/tickers/${tickerId}/cancel`, {
+    const response = await fetch(`/api/tickers/${tickerId}/cancel`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cancel_reason: 'בוטל על ידי המשתמש' }),
@@ -1070,7 +1070,7 @@ async function performTickerCancellation(tickerId) {
           // הצגת אזהרת פריטים מקושרים
           if (window.showLinkedItemsModal) {
             try {
-              const response = await fetch(`/api/v1/linked-items/ticker/${tickerId}`);
+              const response = await fetch(`/api/linked-items/ticker/${tickerId}`);
               if (response.ok) {
                 const data = await response.json();
                 window.showLinkedItemsModal(data, 'ticker', tickerId);
@@ -1125,7 +1125,7 @@ async function performTickerCancellation(tickerId) {
  */
 async function checkLinkedItemsBeforeDeleteTicker(tickerId) {
   try {
-    const response = await fetch(`/api/v1/linked-items/ticker/${tickerId}`);
+    const response = await fetch(`/api/linked-items/ticker/${tickerId}`);
 
     if (!response.ok) {
       // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם המחיקה
@@ -1165,7 +1165,7 @@ async function checkLinkedItemsBeforeDeleteTicker(tickerId) {
  */
 async function checkLinkedItemsBeforeCancelTicker(tickerId) {
   try {
-    const response = await fetch(`/api/v1/linked-items/ticker/${tickerId}`);
+    const response = await fetch(`/api/linked-items/ticker/${tickerId}`);
 
     if (!response.ok) {
       // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם הביטול
@@ -1221,7 +1221,7 @@ async function updateAllTickerStatuses() {
 
 
   try {
-    const response = await fetch('/api/v1/tickers/update-all-statuses', {
+    const response = await fetch('/api/tickers/update-all-statuses', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1271,7 +1271,7 @@ async function performCancelTicker(id) {
   }
 
   try {
-    const response = await fetch(`/api/v1/tickers/${id}`, {
+    const response = await fetch(`/api/tickers/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -1385,7 +1385,7 @@ async function reactivateTicker(tickerId) {
       throw new Error('טיקר לא נמצא');
     }
 
-    const response = await fetch(`/api/v1/tickers/${tickerId}`, {
+    const response = await fetch(`/api/tickers/${tickerId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -1456,7 +1456,7 @@ async function checkLinkedItemsAndDeleteTicker(tickerId) {
 async function performTickerDeletion(tickerId) {
   try {
     // שליחה לשרת
-    const response = await fetch(`/api/v1/tickers/${tickerId}`, {
+    const response = await fetch(`/api/tickers/${tickerId}`, {
       method: 'DELETE',
     });
 
@@ -1488,7 +1488,7 @@ async function performTickerDeletion(tickerId) {
           // הצגת אזהרת פריטים מקושרים
           if (window.showLinkedItemsModal) {
             try {
-              const response = await fetch(`/api/v1/linked-items/ticker/${tickerId}`);
+              const response = await fetch(`/api/linked-items/ticker/${tickerId}`);
               if (response.ok) {
                 const data = await response.json();
                 window.showLinkedItemsModal(data, 'ticker', tickerId);
@@ -1539,7 +1539,7 @@ async function confirmDeleteTicker(id) {
   const tickerInfo = ticker ? `${ticker.symbol} - ${ticker.name}` : `טיקר ${id}`;
 
   try {
-    const response = await fetch(`/api/v1/tickers/${id}`, {
+    const response = await fetch(`/api/tickers/${id}`, {
       method: 'DELETE',
     });
 
@@ -1599,7 +1599,7 @@ async function confirmDeleteTicker(id) {
           // הצגת אזהרת פריטים מקושרים לפני מחיקה
           try {
             if (window.showLinkedItemsModal) {
-              const response = await fetch(`/api/v1/linked-items/ticker/${id}`);
+              const response = await fetch(`/api/linked-items/ticker/${id}`);
               if (response.ok) {
                 const data = await response.json();
                 window.showLinkedItemsModal(data, 'ticker', id);
@@ -1673,7 +1673,7 @@ async function loadTickersData() {
       await loadCurrenciesData();
     }
 
-    const response = await fetch(`/api/v1/tickers/?_t=${Date.now()}`);
+    const response = await fetch(`/api/tickers/?_t=${Date.now()}`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

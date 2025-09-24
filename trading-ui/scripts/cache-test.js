@@ -363,7 +363,7 @@ async function loadCacheEntries() {
         // Load from API (skip if not available)
         let apiEntries = [];
         try {
-            const response = await fetch('/api/v1/cache/stats');
+            const response = await fetch('/api/cache/stats');
             if (response.ok) {
                 const result = await response.json();
                 apiEntries = Array.isArray(result.data) ? result.data : [];
@@ -1274,13 +1274,13 @@ ${(cacheData.entries?.total_entries || cacheData.status?.total_entries || 0) > 0
 
 🚨 שגיאות HTTP:
 --------------
-${cacheData.status ? '✅ GET /api/v1/cache/stats → 200 OK' : '❌ GET /api/v1/cache/stats → 404 NOT FOUND'}
-${cacheData.entries ? '✅ GET /api/v1/cache/stats → 200 OK' : '❌ GET /api/v1/cache/stats → 404 NOT FOUND'}
-✅ POST /api/v1/cache/clear → 200 OK
-✅ POST /api/v1/cache/clear → 200 OK
-✅ POST /api/v1/cache/clear → 200 OK
-✅ GET /api/v1/cache/stats → 200 OK
-✅ GET /api/v1/cache/stats → 200 OK
+${cacheData.status ? '✅ GET /api/cache/stats → 200 OK' : '❌ GET /api/cache/stats → 404 NOT FOUND'}
+${cacheData.entries ? '✅ GET /api/cache/stats → 200 OK' : '❌ GET /api/cache/stats → 404 NOT FOUND'}
+✅ POST /api/cache/clear → 200 OK
+✅ POST /api/cache/clear → 200 OK
+✅ POST /api/cache/clear → 200 OK
+✅ GET /api/cache/stats → 200 OK
+✅ GET /api/cache/stats → 200 OK
 ✅ Chart.js source map → תוקן
 
 =====================================
@@ -1405,7 +1405,7 @@ function setupEventListeners() {
  */
 async function loadDependencies() {
     try {
-        const response = await fetch('/api/v1/cache/stats');
+        const response = await fetch('/api/cache/stats');
         if (response.ok) {
             const result = await response.json();
             // Map the API response to our expected structure
@@ -1455,7 +1455,7 @@ async function loadDependencies() {
  */
 async function loadAnalytics() {
     try {
-        const response = await fetch("/api/v1/cache/stats");
+        const response = await fetch("/api/cache/stats");
         if (response.ok) {
             const result = await response.json();
             // Map the API response to our expected structure
@@ -1757,13 +1757,7 @@ function toggleAllSections() {
     }
 }
 
-function toggleSection(sectionId) {
-    if (typeof window.toggleSection === 'function') {
-        window.toggleSection(sectionId);
-    } else {
-        console.warn('toggleSection function not found');
-    }
-}
+// toggleSection function removed - using global version from ui-utils.js
 
 /**
  * Update analytics display

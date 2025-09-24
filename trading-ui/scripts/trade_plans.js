@@ -640,7 +640,7 @@ async function saveEditTradePlan() {
 
     // שליחה לשרת
     const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const response = await fetch(`${base}/api/v1/trade_plans/${formData.id}`, {
+    const response = await fetch(`${base}/api/trade_plans/${formData.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -693,7 +693,7 @@ async function checkLinkedItemsBeforeCancel(tradePlanId) {
   try {
     // בדיקת פריטים מקושרים דרך API הכללי
     const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const response = await fetch(`${base}/api/v1/linked-items/trade_plan/${tradePlanId}`);
+    const response = await fetch(`${base}/api/linked-items/trade_plan/${tradePlanId}`);
 
     if (!response.ok) {
       // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם הביטול
@@ -762,7 +762,7 @@ async function reactivateTradePlan(tradePlanId) {
     }
 
     const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const response = await fetch(`${base}/api/v1/trade_plans/${tradePlanId}`, {
+    const response = await fetch(`${base}/api/trade_plans/${tradePlanId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -891,7 +891,7 @@ function openDeleteTradePlanModal(tradePlanId) {
 async function cancelTradePlan(tradePlanId) {
   try {
     const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const response = await fetch(`${base}/api/v1/trade_plans/${tradePlanId}/cancel`, {
+    const response = await fetch(`${base}/api/trade_plans/${tradePlanId}/cancel`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1050,7 +1050,7 @@ async function loadTradePlansData() {
     } else {
       // Fallback: load data directly from API
       console.log('🔄 Loading trade plans data directly from API...');
-      const response = await fetch('/api/v1/trade_plans/');
+      const response = await fetch('/api/trade_plans/');
       
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -1885,7 +1885,7 @@ async function saveNewTradePlan() {
   }
 
   try {
-    const response = await fetch('/api/v1/trade_plans/', {
+    const response = await fetch('/api/trade_plans/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1989,7 +1989,7 @@ function editTradePlan(designId) {
 async function deleteTradePlan(tradePlanId) {
   try {
     const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-    const response = await fetch(`${base}/api/v1/trade_plans/${tradePlanId}`, {
+    const response = await fetch(`${base}/api/trade_plans/${tradePlanId}`, {
       method: 'DELETE',
     });
 
@@ -2028,7 +2028,7 @@ async function deleteTradePlan(tradePlanId) {
       // הצגת חלון מקושרים באמצעות המערכת הכללית
       if (typeof window.showLinkedItemsModal === 'function') {
         try {
-          const response = await fetch(`/api/v1/linked-items/trade_plan/${tradePlanId}`);
+          const response = await fetch(`/api/linked-items/trade_plan/${tradePlanId}`);
           if (response.ok) {
             const data = await response.json();
             window.showLinkedItemsModal(data, 'trade_plan', tradePlanId);
@@ -2303,7 +2303,7 @@ async function loadUserPreferences() {
     }
     
     // Fallback ל-API     try {
-      const newResponse = await fetch('/api/v1/preferences/user');
+      const newResponse = await fetch('/api/preferences/user');
       if (newResponse.ok) {
         const newData = await newResponse.json();
         if (newData.success && newData.data.preferences) {
@@ -2323,7 +2323,7 @@ async function loadUserPreferences() {
     
     // Fallback ל-API
     try {
-      const response = await fetch('/api/v1/preferences/user');
+      const response = await fetch('/api/preferences/user');
       if (response.ok) {
         const preferences = await response.json();
         console.log('✅ Using API preferences');
@@ -2334,7 +2334,7 @@ async function loadUserPreferences() {
     }
     
     // Fallback אחרון - קובץ JSON מקומי (legacy)
-    const response = await fetch('/api/v1/preferences/user');
+    const response = await fetch('/api/preferences/user');
     if (response.ok) {
       const preferences = await response.json();
       console.log('🔄 Using local JSON preferences (legacy)');

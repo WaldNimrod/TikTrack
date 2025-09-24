@@ -731,7 +731,7 @@ class NotificationsCenter {
       };
 
       // שליחה לשרת לשמירה בקובץ לוג
-      fetch('/api/v1/logs/notification', {
+      fetch('/api/logs/notification', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

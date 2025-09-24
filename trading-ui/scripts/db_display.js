@@ -134,8 +134,8 @@ async function loadTableData(tableType) {
  */
 async function fetchTableData(tableType) {
   try {
-    console.log(`🌐 Fetching data for ${tableType} from /api/v1/${tableType}/`);
-    const response = await fetch(`/api/v1/${tableType}/`);
+    console.log(`🌐 Fetching data for ${tableType} from /api/${tableType}/`);
+    const response = await fetch(`/api/${tableType}/`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

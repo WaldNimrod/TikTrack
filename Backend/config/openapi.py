@@ -11,7 +11,7 @@ def create_api():
         version='1.0',
         description='TikTrack Trading Application API',
         doc='/api/docs',
-        prefix='/api/v1',
+        prefix='/api',
         authorizations={
             'apikey': {
                 'type': 'apiKey',

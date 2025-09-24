@@ -6,10 +6,10 @@ This module provides API endpoints for managing SQLite WAL files
 to ensure data consistency and prevent deleted records from reappearing.
 
 Endpoints:
-    GET /api/v1/wal/status - Get WAL status and health
-    POST /api/v1/wal/checkpoint - Force WAL checkpoint
-    POST /api/v1/wal/cleanup - Clean up WAL files
-    GET /api/v1/wal/health - Get WAL health report
+    GET /api/wal/status - Get WAL status and health
+    POST /api/wal/checkpoint - Force WAL checkpoint
+    POST /api/wal/cleanup - Clean up WAL files
+    GET /api/wal/health - Get WAL health report
 
 Author: TikTrack Development Team
 Version: 1.0

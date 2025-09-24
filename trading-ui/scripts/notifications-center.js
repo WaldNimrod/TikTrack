@@ -1042,121 +1042,6 @@ function getTypeIcon(type) {
 }
 
 // פונקציה להעתקת לוג מפורט עם כל הנתונים והסטטוס
-function copyDetailedLog() {
-  try {
-    console.log('📋 יצירת לוג מפורט...');
-    
-    let log = '=== לוג מפורט - מרכז התראות TikTrack ===\n\n';
-    log += `📅 תאריך: ${new Date().toLocaleString('he-IL')}\n`;
-    log += `🌐 URL: ${window.location.href}\n`;
-    log += `👤 User Agent: ${navigator.userAgent}\n\n`;
-    
-    // סטטוס חיבור
-    log += '🔗 סטטוס חיבור:\n';
-    log += `WebSocket: ${window.realtimeNotificationsClient?.isConnected() ? 'מחובר' : 'לא מחובר'}\n`;
-    log += `WebSocket Status: ${document.getElementById('websocketStatus')?.textContent || 'לא ידוע'}\n`;
-    log += `זמן חיבור: ${document.getElementById('connectionTime')?.textContent || 'לא ידוע'}\n`;
-    log += `הודעות נשלחו: ${document.getElementById('messagesSent')?.textContent || '0'}\n`;
-    log += `סטטוס מערכת: ${document.getElementById('overallStatus')?.textContent || 'לא ידוע'}\n\n`;
-    
-    // סקירה כללית
-    log += '📊 סקירה כללית:\n';
-    log += `התראות פעילות: ${document.getElementById('activeAlertsCount')?.textContent || '0'}\n`;
-    log += `הודעות חדשות: ${document.getElementById('newMessagesCount')?.textContent || '0'}\n`;
-    log += `עדכון אחרון: ${document.getElementById('lastUpdateTime')?.textContent || '-'}\n`;
-    log += `סטטוס: ${document.getElementById('systemStatus')?.textContent || 'לא ידוע'}\n\n`;
-    
-    // הגדרות התראות הועברו למערכת ההעדפות הגלובלית
-    log += '⚙️ הגדרות:\n';
-    log += 'הגדרות התראות זמינות בעמוד העדפות המשתמש\n\n';
-    
-    // סטטיסטיקות
-    log += '📊 סטטיסטיקות:\n';
-    log += `✅ הצלחות: ${document.getElementById('successCount')?.textContent || '0'}\n`;
-    log += `❌ שגיאות: ${document.getElementById('errorCount')?.textContent || '0'}\n`;
-    log += `⚠️ אזהרות: ${document.getElementById('warningCount')?.textContent || '0'}\n`;
-    log += `ℹ️ הודעות מידע: ${document.getElementById('infoCount')?.textContent || '0'}\n\n`;
-    
-    // היסטוריה גלובלית עם סינון
-    const currentFilter = document.getElementById('historyFilter')?.value || 'all';
-    const currentPageFilter = document.getElementById('pageFilter')?.value || 'all';
-    
-    log += `📚 היסטוריית התראות (גלובלית) - סינון: ${currentFilter}, עמוד: ${currentPageFilter}:\n`;
-    try {
-      if (typeof window.loadGlobalNotificationHistory === 'function') {
-        const globalHistory = window.loadGlobalNotificationHistory();
-        if (globalHistory && globalHistory.length > 0) {
-          // סינון לפי סוג ועמוד
-          let filteredHistory = globalHistory;
-          
-          if (currentFilter !== 'all') {
-            filteredHistory = filteredHistory.filter(n => n.type === currentFilter);
-          }
-          
-          if (currentPageFilter !== 'all') {
-            filteredHistory = filteredHistory.filter(n => n.page === currentPageFilter);
-          }
-          
-          filteredHistory.slice(0, 50).forEach((notification, index) => {
-            const page = notification.page || 'לא ידוע';
-            const time = notification.time ? new Date(notification.time).toLocaleString('he-IL') : 'לא ידוע';
-            const typeIcon = getTypeIcon(notification.type);
-            log += `${index + 1}. ${typeIcon} [${notification.type.toUpperCase()}] ${notification.title}: ${notification.message} | עמוד: ${page} | ${time}\n`;
-          });
-          
-          if (filteredHistory.length > 50) {
-            log += `... ועוד ${filteredHistory.length - 50} התראות\n`;
-          }
-          
-          if (filteredHistory.length === 0) {
-            log += 'אין התראות המתאימות לסינון הפעיל\n';
-        }
-      } else {
-          log += 'אין היסטוריית התראות גלובלית\n';
-      }
-    } else {
-        log += 'פונקציית טעינת היסטוריה גלובלית לא זמינה\n';
-      }
-    } catch (error) {
-      log += `שגיאה בטעינת היסטוריה גלובלית: ${error.message}\n`;
-    }
-    log += '\n';
-    
-    // פילטרים
-    log += '🔍 פילטרים:\n';
-    log += `פילטר סוג: ${document.getElementById('historyFilter')?.value || 'כל ההתראות'}\n`;
-    log += `פילטר זמן: ${document.getElementById('historyPeriod')?.value || '24 שעות אחרונות'}\n\n`;
-    
-    // מידע נוסף
-    log += '🔧 מידע נוסף:\n';
-    log += `גודל localStorage: ${JSON.stringify(localStorage).length} תווים\n`;
-    log += `זמן טעינת דף: ${performance.timing ? (performance.timing.loadEventEnd - performance.timing.navigationStart) + 'ms' : 'לא זמין'}\n`;
-    log += `זיכרון זמין: ${navigator.deviceMemory ? navigator.deviceMemory + 'GB' : 'לא זמין'}\n`;
-    log += `חיבור: ${navigator.onLine ? 'מחובר' : 'לא מחובר'}\n\n`;
-    
-    log += '=== סוף לוג מפורט ===';
-    
-    // העתקה ללוח
-    navigator.clipboard.writeText(log).then(() => {
-      console.log('✅ לוג מפורט הועתק ללוח בהצלחה');
-      if (typeof window.showSuccessNotification === 'function') {
-        window.showSuccessNotification('העתקה ללוח', 'לוג מפורט הועתק ללוח בהצלחה', 3000);
-      }
-    }).catch(err => {
-      console.error('❌ שגיאה בהעתקה ללוח:', err);
-      // Fallback - הצגת הלוג בחלון נפרד
-      const newWindow = window.open('', '_blank');
-      newWindow.document.write(`<pre style="direction: rtl; text-align: right; font-family: monospace; white-space: pre-wrap;">${log}</pre>`);
-      newWindow.document.title = 'לוג מפורט - מרכז התראות';
-    });
-    
-  } catch (error) {
-    console.error('❌ שגיאה ביצירת לוג מפורט:', error);
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה', 'שגיאה ביצירת לוג מפורט: ' + error.message, 5000);
-    }
-  }
-}
 
 // פונקציה להעתקת התראות ללוח
 async function copyNotificationsToClipboard() {
@@ -1424,29 +1309,13 @@ function toggleTopSection() {
     }
 }
 
-function toggleAllSections() {
-    const sections = document.querySelectorAll('.content-section .section-body, .top-section .section-body');
-    let allHidden = true;
-    
-    sections.forEach(section => {
-        if (section.style.display !== 'none') {
-            allHidden = false;
-        }
-    });
-    
-    sections.forEach(section => {
-        section.style.display = allHidden ? '' : 'none';
-    });
-    
-    console.log(`✅ All sections ${allHidden ? 'expanded' : 'collapsed'}`);
-}
 
 // toggleSection function removed - using global version from ui-utils.js
 
 // ייצוא פונקציות ל-window scope
 window.copyNotificationsToClipboard = copyNotificationsToClipboard;
 window.copyFilteredHistoryToClipboard = copyFilteredHistoryToClipboard;
-window.copyDetailedLog = copyDetailedLog;
+// window.copyDetailedLog export removed - using global version from system-management.js
 window.clearHistory = clearHistory;
 window.refreshNotifications = refreshNotifications;
 window.filterHistory = filterHistory;
@@ -1492,13 +1361,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Make functions globally available
   window.copyNotificationsToClipboard = copyNotificationsToClipboard;
-  window.copyDetailedLog = copyDetailedLog;
+  // window.copyDetailedLog export removed - using global version from system-management.js
   window.testSuccessNotification = testSuccessNotification;
   window.testErrorNotification = testErrorNotification;
   window.testWarningNotification = testWarningNotification;
   window.testInfoNotification = testInfoNotification;
   window.toggleTopSection = toggleTopSection;
-  window.toggleAllSections = toggleAllSections;
+  // window.toggleAllSections export removed - using global version from ui-utils.js
   // window.toggleSection export removed - using global version from ui-utils.js
 
   console.log('✅ דף מרכז התראות נטען בהצלחה (v1.0.9 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed + Settings Fix + AutoRefresh Fix)');
@@ -1659,24 +1528,6 @@ async function generateDetailedLog() {
 /**
  * Copy detailed log to clipboard
  */
-async function copyDetailedLog() {
-    try {
-        const log = await generateDetailedLog();
-        await navigator.clipboard.writeText(log);
-        window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
-        console.log('=== לוג מפורט שהועתק ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    } catch (error) {
-        console.error('Failed to copy log:', error);
-        window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
-        // Fallback: show in console
-        const log = await generateDetailedLog();
-        console.log('=== לוג מפורט (לא הועתק) ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    }
-}
 
 // ייצוא לגלובל scope
-window.copyDetailedLog = copyDetailedLog;
+// window.copyDetailedLog export removed - using global version from system-management.js

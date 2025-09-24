@@ -533,44 +533,6 @@ function addRecord() {
  * @param {number} columnIndex - The column index to sort by
  * @param {string} tableType - The table type identifier
  */
-function sortTable(columnIndex, tableType) {
-  if (!tableData[tableType] || tableData[tableType].length === 0) {
-    return;
-  }
-
-  const data = [...tableData[tableType]];
-  const tableMapping = window.TABLE_COLUMN_MAPPINGS?.[tableType];
-
-  if (!tableMapping) {
-    // console.error(`❌ No table mapping found for ${tableType}`);
-    return;
-  }
-
-  // Get the field name for the column
-  const fieldName = tableMapping[columnIndex];
-  if (!fieldName) {
-    // console.error(`❌ Invalid column index: ${columnIndex}`);
-    return;
-  }
-
-  // Sort the data
-  data.sort((a, b) => {
-    const aVal = a[fieldName];
-    const bVal = b[fieldName];
-
-    if (aVal === null || aVal === undefined) {return 1;}
-    if (bVal === null || bVal === undefined) {return -1;}
-
-    if (typeof aVal === 'number' && typeof bVal === 'number') {
-      return aVal - bVal;
-    }
-
-    return String(aVal).localeCompare(String(bVal), 'he');
-  });
-
-  // Update the display with sorted data
-  updateTableDisplay(data, tableType);
-}
 
 // ===== ACTION FUNCTIONS =====
 
@@ -626,66 +588,6 @@ function deleteRecord(tableType, recordId) {
 /**
  * Copy detailed log with all data and status
  */
-function copyDetailedLog() {
-  console.log('📋 Copying detailed log');
-  
-  let logText = '=== Database Display Log ===\n';
-  logText += `Date: ${new Date().toLocaleString('he-IL')}\n\n`;
-  
-  // Add summary stats
-  logText += '--- Summary Statistics ---\n';
-  const statsMapping = {
-    'accounts': 'חשבונות',
-    'trades': 'טריידים', 
-    'tickers': 'טיקרים',
-    'trade_plans': 'תוכניות מסחר',
-    'alerts': 'התראות',
-    'cash_flows': 'תזרימי מזומנים'
-  };
-  
-  Object.entries(statsMapping).forEach(([key, name]) => {
-    const data = tableData[key] || [];
-    logText += `${name}: ${data.length} רשומות\n`;
-  });
-  
-  logText += '\n--- Detailed Data ---\n';
-  
-  // Add detailed data for each table
-  Object.entries(tableData).forEach(([tableType, data]) => {
-    const tableName = statsMapping[tableType] || tableType;
-    logText += `\n=== ${tableName} (${data.length} רשומות) ===\n`;
-    
-    if (data.length > 0) {
-      // Add first few records as sample
-      const sampleSize = Math.min(3, data.length);
-      for (let i = 0; i < sampleSize; i++) {
-        logText += `Record ${i + 1}: ${JSON.stringify(data[i], null, 2)}\n`;
-      }
-      if (data.length > sampleSize) {
-        logText += `... and ${data.length - sampleSize} more records\n`;
-      }
-    } else {
-      logText += 'No data available\n';
-    }
-  });
-  
-  // Copy to clipboard
-  navigator.clipboard.writeText(logText).then(() => {
-    if (typeof showNotification === 'function') {
-      showNotification('הלוג הועתק ללוח!', 'success');
-    } else {
-      alert('הלוג הועתק ללוח!');
-    }
-    console.log('✅ Log copied to clipboard');
-  }).catch(err => {
-    console.error('❌ Failed to copy log:', err);
-    if (typeof showNotification === 'function') {
-      showNotification('שגיאה בהעתקת הלוג', 'error');
-    } else {
-      alert('שגיאה בהעתקת הלוג');
-    }
-  });
-}
 
 // ===== GLOBAL EXPORTS =====
 
@@ -696,10 +598,10 @@ window.filterTableData = filterTableData;
 window.toggleTopSection = toggleTopSection;
 // toggleMainSection export removed - use toggleSection('main') instead
 window.addRecord = addRecord;
-window.sortTable = sortTable;
+// window.sortTable export removed - using global version from tables.js
 window.editRecord = editRecord;
 window.deleteRecord = deleteRecord;
-window.copyDetailedLog = copyDetailedLog;
+// window.copyDetailedLog export removed - using global version from system-management.js
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {

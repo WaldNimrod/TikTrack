@@ -1144,19 +1144,6 @@ window.confirmDeleteCashFlow = confirmDeleteCashFlow;
  *
  * @requires window.sortTableData - פונקציה גלובלית מ-main.js
  */
-function sortTable(columnIndex) {
-
-  if (typeof window.sortTableData === 'function') {
-    window.sortTableData(
-      columnIndex,
-      window.cashFlowsData || [],
-      'cash_flows',
-      updateCashFlowsTable,
-    );
-  } else {
-    handleFunctionNotFound('sortTableData', 'פונקציית סידור טבלה לא נמצאה');
-  }
-}
 
 /**
  * שחזור מצב סידור - שימוש בפונקציה גלובלית
@@ -1172,7 +1159,7 @@ function restoreSortState() {
 }
 
 // הגדרת הפונקציה כגלובלית
-window.sortTable = sortTable;
+// window.sortTable export removed - using global version from tables.js
 
 // ========================================
 // פונקציות לניהול שדה מזהה חיצוני

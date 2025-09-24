@@ -15,13 +15,6 @@
  * הצג/הסתר כל הסקשנים
  * Toggle all sections visibility
  */
-function toggleAllSections() {
-  if (typeof window.toggleAllSections === 'function') {
-    window.toggleAllSections();
-  } else {
-    console.warn('toggleAllSections function not found');
-  }
-}
 
 /**
  * חיפוש מהיר בפונקציות
@@ -281,10 +274,10 @@ function initializeErrorTracking() {
 }
 
 // Export functions to global scope
-window.toggleAllSections = toggleAllSections;
+// window.toggleAllSections export removed - using global version from ui-utils.js
 window.performQuickSearch = performQuickSearch;
 window.toggleFunctionsDropdown = toggleFunctionsDropdown;
-// window.copyDetailedLog = copyDetailedLog; // REMOVED: Causes conflicts with other pages
+// // window.copyDetailedLog export removed - using global version from system-management.js // REMOVED: Causes conflicts with other pages
 window.scrollToTop = scrollToTop;
 window.exportDuplicatesReport = exportDuplicatesReport;
 window.refreshDuplicatesAnalysis = refreshDuplicatesAnalysis;

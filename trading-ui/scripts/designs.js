@@ -14,13 +14,6 @@ console.log('🎨 Designs page script loaded');
 /**
  * Toggle all sections visibility
  */
-function toggleAllSections() {
-    if (typeof window.toggleAllSections === 'function') {
-        window.toggleAllSections();
-    } else {
-        console.warn('toggleAllSections function not found');
-    }
-}
 
 /**
  * Toggle specific section visibility
@@ -111,29 +104,11 @@ function generateDetailedLog() {
 /**
  * Copy detailed log to clipboard
  */
-async function copyDetailedLog() {
-    try {
-        const log = generateDetailedLog();
-        await navigator.clipboard.writeText(log);
-        window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
-        console.log('=== לוג מפורט שהועתק ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    } catch (error) {
-        console.error('Failed to copy log:', error);
-        window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
-        // Fallback: show in console
-        const log = generateDetailedLog();
-        console.log('=== לוג מפורט (לא הועתק) ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    }
-}
 
 // ===== GLOBAL FUNCTION EXPORTS =====
 
-window.toggleAllSections = toggleAllSections;
+// window.toggleAllSections export removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
-window.copyDetailedLog = copyDetailedLog;
+// window.copyDetailedLog export removed - using global version from system-management.js
 
 console.log('✅ Designs page script ready');

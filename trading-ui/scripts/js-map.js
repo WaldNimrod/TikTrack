@@ -2831,7 +2831,7 @@ window.toggleDevelopmentSection = toggleDevelopmentSection;
 
 // Export log and refresh functions
 window.copyJsMapDetailedLog = copyJsMapDetailedLog;
-// window.copyDetailedLog = copyJsMapDetailedLog; // REMOVED: Causes conflicts with other pages
+// // window.copyDetailedLog export removed - using global version from system-management.js // REMOVED: Causes conflicts with other pages
 
 // Export missing functions to global scope
 window.refreshJsMapData = refreshJsMapData;

@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ===== GLOBAL EXPORTS =====
 // Export functions to global scope for onclick attributes
-window.toggleAllSections = toggleAllSections;
+// window.toggleAllSections export removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
 window.toggleTopSection = toggleTopSection;
 window.toggleLayer = toggleLayer;
@@ -257,4 +257,4 @@ window.showStyleInfo = showStyleInfo;
 window.loadDynamicColors = loadDynamicColors;
 window.resetDynamicColors = resetDynamicColors;
 window.openPreferencesPage = openPreferencesPage;
-window.sortTable = sortTable;
+// window.sortTable export removed - using global version from tables.js

@@ -980,66 +980,6 @@ async function clearUnifiedIndexedDB() {
 /**
  * Copy detailed log to clipboard
  */
-function copyDetailedLog() {
-    try {
-        const logData = {
-            timestamp: new Date().toLocaleString(),
-            page: window.location.href,
-            cacheStatus: cacheData.status,
-            cacheEntries: cacheData.entries,
-            dependencies: cacheData.dependencies,
-            analytics: cacheData.analytics,
-            userAgent: navigator.userAgent,
-            language: navigator.language,
-            platform: navigator.platform
-        };
-        
-        const logText = `=== לוג מפורט - בדיקת מטמון ===
-זמן יצירה: ${logData.timestamp}
-עמוד: ${logData.page}
-
---- סטטוס כללי ---
-סקשן עליון: פתוח
-
---- תצוגה מפורטת לפי סקשנים ---
-כרטיס 1: שיעור פגיעות במטמון = "${logData.cacheStatus?.hitRate || 'N/A'}%" (שינוי: ${logData.cacheStatus?.hitRateChange || 0}%)
-כרטיס 2: גודל מטמון = "${formatBytes(logData.cacheStatus?.size || 0)}" (שינוי: ${formatBytes(logData.cacheStatus?.sizeChange || 0)})
-כרטיס 3: זמן תגובה ממוצע = "${logData.cacheStatus?.avgResponseTime || 'N/A'}ms" (שינוי: ${logData.cacheStatus?.responseTimeChange || 0}ms)
-כרטיס 4: סך בקשות = "${logData.cacheStatus?.totalRequests || 'N/A'}" (שינוי: ${logData.cacheStatus?.requestsChange || 0})
-
---- סטטיסטיקות וביצועים ---
-שיעור פגיעות במטמון: ${logData.cacheStatus?.hitRate || 'N/A'}%
-גודל מטמון: ${formatBytes(logData.cacheStatus?.size || 0)}
-זמן תגובה ממוצע: ${logData.cacheStatus?.avgResponseTime || 'N/A'}ms
-זמן טעינת עמוד: ${performance.now().toFixed(0)}ms
-
---- לוגים ושגיאות ---
-${logData.cacheEntries?.length > 0 ? 'יש לוגים זמינים' : 'אין לוגים זמינים'}
-
---- מידע טכני ---
-User Agent: ${logData.userAgent}
-Language: ${logData.language}
-Platform: ${logData.platform}
-
-=== סוף הלוג ===`;
-
-        navigator.clipboard.writeText(logText).then(() => {
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('לוג מפורט הועתק ללוח', 'success', 'העתקה', 2000, 'system');
-            }
-        }).catch(() => {
-            if (typeof window.showNotification === 'function') {
-                window.showNotification('שגיאה בהעתקת הלוג', 'error', 'שגיאה', 3000, 'system');
-            }
-        });
-        
-    } catch (error) {
-        console.error('❌ Error copying detailed log:', error);
-        if (typeof window.showNotification === 'function') {
-            window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error', 'שגיאה', 5000, 'system');
-        }
-    }
-}
 
 /**
  * Force refresh all displays
@@ -1133,7 +1073,7 @@ window.comprehensiveSystemCheck = comprehensiveSystemCheck;
 window.refreshUnifiedIndexedDBStats = refreshUnifiedIndexedDBStats;
 window.clearUnifiedIndexedDB = clearUnifiedIndexedDB;
 window.clearObjectStore = clearObjectStore;
-window.copyDetailedLog = copyDetailedLog;
+// window.copyDetailedLog export removed - using global version from system-management.js
 window.forceRefreshAllDisplays = forceRefreshAllDisplays;
 window.debugCacheData = debugCacheData;
 window.forceUpdateMainDisplay = forceUpdateMainDisplay;
@@ -1194,110 +1134,6 @@ function filterCacheEntries() {
 /**
  * Copy detailed log to clipboard
  */
-async function copyDetailedLog() {
-    try {
-        const logText = `🧪 Cache Test System - דוח מפורט
-=====================================
-
-📅 תאריך: ${new Date().toLocaleString('he-IL')}
-🌐 עמוד: cache-test
-📊 סטטוס: מערכת בדיקה פעילה
-
-📋 סקשנים:
------------
-1. סקירת סטטוס מטמון: ${cacheData.status ? '✅ פעיל' : '❌ לא זמין'}
-   - Hit Rate: ${cacheData.status?.hitRate ? cacheData.status.hitRate.toFixed(2) + '%' : 'N/A'}
-   - גודל מטמון: ${cacheData.status ? formatBytes(cacheData.status.size) : 'N/A'}
-   - זמן תגובה ממוצע: ${cacheData.status?.avgResponseTime || 'N/A'}ms
-   - סך בקשות: ${cacheData.status?.totalRequests || 'N/A'}
-
-2. ניהול מטמון: ✅ פעיל (API calls)
-   - TTL כללי: ${cacheData.status?.ttl?.general || 'N/A'}s
-   - TTL חיצוני: ${cacheData.status?.ttl?.external || 'N/A'}s
-   - TTL סטטי: ${cacheData.status?.ttl?.static || 'N/A'}s
-   - מטמון פעיל: ${cacheData.status?.active ? 'כן' : 'לא'}
-   - מטמון אופטימלי: ${cacheData.status?.optimized ? 'כן' : 'לא'}
-
-3. ניתוח מטמון: ${(cacheData.analytics || cacheData.status) ? '✅ פעיל' : '❌ לא זמין'}
-   - Hit Rate: ${(cacheData.analytics?.hit_rate_percent || cacheData.status?.hitRate || 0).toFixed(2)}%
-   - ציון יעילות: ${(cacheData.analytics?.hit_rate_percent || cacheData.status?.hitRate || 0).toFixed(2)}
-   - איכות: ${(cacheData.analytics?.hit_rate_percent || cacheData.status?.hitRate || 0) > 80 ? 'Excellent' : (cacheData.analytics?.hit_rate_percent || cacheData.status?.hitRate || 0) > 50 ? 'Good' : 'Needs improvement'}
-   - המלצות: 3
-
-4. רשימת ערכי מטמון: ${cacheData.entries?.total_entries > 0 ? '✅ פעיל' : '❌ ריק/לא זמין'}
-   - סך ערכים: ${cacheData.entries?.total_entries || 0}
-   - מצב: ${cacheData.entries?.total_entries > 0 ? 'נתונים זמינים' : 'אין נתונים - השרת לא זמין'}
-
-5. תלויות מטמון: ${(cacheData.dependencies || cacheData.status) ? '✅ פעיל' : '❌ לא זמין'}
-   - סך ערכי מטמון: ${(cacheData.dependencies?.total_entries || cacheData.status?.total_entries || 0)}
-   - ערכי מטמון פעילים: ${(cacheData.dependencies?.total_entries || cacheData.status?.total_entries || 0) - (cacheData.dependencies?.expired_entries || cacheData.status?.expired_entries || 0)}
-   - ערכי מטמון פגי תוקף: ${cacheData.dependencies?.expired_entries || cacheData.status?.expired_entries || 0}
-   - פעולות ביטול: ${cacheData.dependencies?.stats?.invalidations || cacheData.status?.stats?.invalidations || 0}
-
-🚨 בעיות זוהו:
---------------
-${cacheData.status ? '✅ API endpoints למטמון מוכנים' : '❌ API endpoints למטמון לא זמינים'}
-${(cacheData.analytics || cacheData.status) ? '✅ ניתוח מטמון מוכן' : '❌ ניתוח מטמון לא זמין'}
-${(cacheData.dependencies || cacheData.status) ? '✅ תלויות מטמון מוכנות' : '❌ תלויות מטמון לא זמינות'}
-${(cacheData.entries?.total_entries || cacheData.status?.total_entries || 0) > 0 ? '✅ ערכי מטמון זמינים' : '❌ אין ערכי מטמון'}
-
-💡 המלצות:
------------
-• השרת מוכן ומתפקד
-• כל ה-API endpoints זמינים
-• הממשק פונקציונלי במלואו
-• המערכת מוכנה לשימוש
-
-🔧 כפתורים פונקציונליים:
--------------------------
-✅ רענן סטטוס - עובד (API)
-✅ נקה כל המטמון - עובד (API)
-✅ נקה מטמון פג תוקף - עובד (API)
-✅ טען מטמון מראש - עובד (API)
-✅ אופטמז מטמון - עובד (API)
-✅ חיפוש במטמון - עובד (local)
-✅ פילטרים - עובד (local)
-✅ העתק לוג מפורט - עובד
-✅ דוח ניתוח - עובד (API)
-✅ בדיקת תלויות - עובד (API)
-✅ אופטימיזציית תלויות - עובד (API)
-
-📝 הערות טכניות:
------------------
-- המערכת עובדת עם API calls אמיתיים
-- כל הכפתורים פונקציונליים
-- הממשק מוכן ומתפקד במלואו
-- כל ה-backend endpoints זמינים
-- הוסרו כל נתוני הדמה כפי שביקשת
-- המערכת מציגה נתונים אמיתיים מהשרת
-- תוקנו כל השגיאות שהיו קיימות
-
-🚨 שגיאות HTTP:
---------------
-${cacheData.status ? '✅ GET /api/cache/stats → 200 OK' : '❌ GET /api/cache/stats → 404 NOT FOUND'}
-${cacheData.entries ? '✅ GET /api/cache/stats → 200 OK' : '❌ GET /api/cache/stats → 404 NOT FOUND'}
-✅ POST /api/cache/clear → 200 OK
-✅ POST /api/cache/clear → 200 OK
-✅ POST /api/cache/clear → 200 OK
-✅ GET /api/cache/stats → 200 OK
-✅ GET /api/cache/stats → 200 OK
-✅ Chart.js source map → תוקן
-
-=====================================
-דוח נוצר על ידי מערכת בדיקת מטמון TikTrack`;
-
-        await navigator.clipboard.writeText(logText);
-        
-        if (typeof window.showSuccessNotification === 'function') {
-            window.showSuccessNotification('הצלחה', 'לוג מפורט הועתק ללוח');
-      }
-    } catch (error) {
-        console.error('❌ Error copying log:', error);
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'שגיאה בהעתקת הלוג: ' + error.message);
-        }
-    }
-}
 
 // ===== HELPER FUNCTIONS =====
 
@@ -1574,7 +1410,7 @@ window.optimizeCache = optimizeCache;
 window.updateAnalytics = updateAnalytics;
 window.searchCacheEntries = searchCacheEntries;
 window.filterCacheEntries = filterCacheEntries;
-window.copyDetailedLog = copyDetailedLog;
+// window.copyDetailedLog export removed - using global version from system-management.js
 window.viewCacheEntry = viewCacheEntry;
 window.refreshCacheEntry = refreshCacheEntry;
 window.deleteCacheEntry = deleteCacheEntry;
@@ -1582,7 +1418,7 @@ window.generateAnalyticsReport = generateAnalyticsReport;
 window.refreshDependencies = refreshDependencies;
 window.validateDependencies = validateDependencies;
 window.optimizeDependencies = optimizeDependencies;
-window.toggleAllSections = toggleAllSections;
+// window.toggleAllSections export removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
 window.updateAnalyticsDisplay = updateAnalyticsDisplay;
 window.updateDependenciesDisplay = updateDependenciesDisplay;
@@ -1749,13 +1585,6 @@ async function optimizeDependencies() {
   /**
  * Toggle all sections
  */
-function toggleAllSections() {
-    if (typeof window.toggleAllSections === 'function') {
-        window.toggleAllSections();
-    } else {
-        console.warn('toggleAllSections function not found');
-    }
-}
 
 // toggleSection function removed - using global version from ui-utils.js
 
@@ -2266,30 +2095,12 @@ function generateDetailedLog() {
 /**
  * Copy detailed log to clipboard
  */
-async function copyDetailedLog() {
-    try {
-        const log = generateDetailedLog();
-        await navigator.clipboard.writeText(log);
-        window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success', 'הצלחה', 4000, 'development');
-        console.log('=== לוג מפורט שהועתק ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    } catch (error) {
-        console.error('Failed to copy log:', error);
-        window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error', 'שגיאה', 6000, 'development');
-        // Fallback: show in console
-        const log = generateDetailedLog();
-        console.log('=== לוג מפורט (לא הועתק) ===');
-        console.log(log);
-        console.log('=== סוף הלוג ===');
-    }
-}
 
 // ===== GLOBAL FUNCTION EXPORTS =====
 
 window.refreshCacheStatus = refreshCacheStatus;
-window.copyDetailedLog = copyDetailedLog;
-window.toggleAllSections = toggleAllSections;
+// window.copyDetailedLog export removed - using global version from system-management.js
+// window.toggleAllSections export removed - using global version from ui-utils.js
 // window.toggleSection export removed - using global version from ui-utils.js
 // clearAllCache is now handled by global function in central-refresh-system.js
 // clearExpiredCache is now handled by global function in central-refresh-system.js

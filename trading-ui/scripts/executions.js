@@ -2147,20 +2147,6 @@ window.goToNote = goToNote;
  *
  * @requires window.sortTableData - פונקציה גלובלית מ-main.js
  */
-function sortTable(columnIndex) {
-  // sortTable נקראה עבור עמודה
-
-  if (typeof window.sortTableData === 'function') {
-    window.sortTableData(
-      columnIndex,
-      window.executionsData || [],
-      'executions',
-      updateExecutionsTableMain
-    );
-  } else {
-    handleFunctionNotFound('sortTable');
-  }
-}
 
 /**
  * שחזור מצב סידור - שימוש בפונקציה גלובלית
@@ -2177,7 +2163,7 @@ function restoreSortState() {
 }
 
 // הגדרת הפונקציה כגלובלית
-window.sortTable = sortTable;
+// window.sortTable export removed - using global version from tables.js
 
 // אתחול הדף
 document.addEventListener('DOMContentLoaded', function () {

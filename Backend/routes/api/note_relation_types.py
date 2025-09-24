@@ -15,7 +15,7 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-note_relation_types_bp = Blueprint('note_relation_types', __name__, url_prefix='/api/v1/note_relation_types')
+note_relation_types_bp = Blueprint('note_relation_types', __name__, url_prefix='/api/note_relation_types')
 
 # Initialize base API (note_relation_types uses direct SQLite, so we'll use it selectively)
 
@@ -55,14 +55,14 @@ def get_note_relation_types():
             "status": "success",
             "data": result,
             "message": "רשימת סוגי הקישור נטענה בהצלחה",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error getting note relation types: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה בטעינת רשימת סוגי הקישור"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
 
 @note_relation_types_bp.route('/<int:type_id>', methods=['GET'])
@@ -88,20 +88,20 @@ def get_note_relation_type(type_id: int):
                 "status": "success",
                 "data": note_type_dict,
                 "message": "פרטי סוג הקישור נטענו בהצלחה",
-                "version": "v1"
+                "version": "1.0"
             })
         
         return jsonify({
             "status": "error",
             "error": {"message": "Note relation type not found"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error getting note relation type {type_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה בטעינת פרטי סוג הקישור"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
 
 @note_relation_types_bp.route('/', methods=['POST'])
@@ -116,7 +116,7 @@ def create_note_relation_type():
             return jsonify({
                 "status": "error",
                 "error": {"message": "סוג קישור הוא שדה חובה. יש להזין שם לסוג הקישור."},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # וולידציה של אורך סוג קישור
@@ -124,7 +124,7 @@ def create_note_relation_type():
             return jsonify({
                 "status": "error",
                 "error": {"message": "סוג קישור לא יכול להיות יותר מ-20 תווים. נסה שם קצר יותר."},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # וולידציה של תבנית סוג קישור - רק אותיות, מספרים וקווים תחתונים
@@ -132,7 +132,7 @@ def create_note_relation_type():
             return jsonify({
                 "status": "error",
                 "error": {"message": "סוג קישור חייב להכיל רק אותיות אנגליות, מספרים וקווים תחתונים. אסור להשתמש ברווחים או תווים מיוחדים."},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         conn = get_db_connection()
@@ -155,14 +155,14 @@ def create_note_relation_type():
                 'created_at': None  # Will be set by database default
             },
             "message": "סוג קישור נוסף בהצלחה",
-            "version": "v1"
+            "version": "1.0"
         }), 201
     except Exception as e:
         logger.error(f"Error creating note relation type: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
 
 @note_relation_types_bp.route('/<int:type_id>', methods=['PUT'])
@@ -177,7 +177,7 @@ def update_note_relation_type(type_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "סוג קישור הוא שדה חובה. יש להזין שם לסוג הקישור."},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # וולידציה של אורך סוג קישור
@@ -185,7 +185,7 @@ def update_note_relation_type(type_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "סוג קישור לא יכול להיות יותר מ-20 תווים. נסה שם קצר יותר."},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # וולידציה של תבנית סוג קישור - רק אותיות, מספרים וקווים תחתונים
@@ -193,7 +193,7 @@ def update_note_relation_type(type_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "סוג קישור חייב להכיל רק אותיות אנגליות, מספרים וקווים תחתונים. אסור להשתמש ברווחים או תווים מיוחדים."},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         conn = get_db_connection()
@@ -206,7 +206,7 @@ def update_note_relation_type(type_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "סוג קישור לא נמצא במערכת"},
-                "version": "v1"
+                "version": "1.0"
             }), 404
         
         # Update note relation type
@@ -225,14 +225,14 @@ def update_note_relation_type(type_id: int):
                 'note_relation_type': note_relation_type
             },
             "message": "סוג קישור עודכן בהצלחה",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error updating note relation type {type_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה בעדכון סוג קישור"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
 
 @note_relation_types_bp.route('/<int:type_id>', methods=['DELETE'])
@@ -249,7 +249,7 @@ def delete_note_relation_type(type_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "Note relation type not found"},
-                "version": "v1"
+                "version": "1.0"
             }), 404
         
         # Delete note relation type
@@ -260,12 +260,12 @@ def delete_note_relation_type(type_id: int):
         return jsonify({
             "status": "success",
             "message": "סוג קישור נמחק בהצלחה",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error deleting note relation type {type_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה במחיקת סוג קישור"},
-            "version": "v1"
+            "version": "1.0"
         }), 500

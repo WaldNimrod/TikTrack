@@ -1,8 +1,8 @@
 """
-Account Model - Data Access Layer for Account Entity
+TradingAccount Model - Data Access Layer for Trading Account Entity
 
-This module defines the Account SQLAlchemy model, representing the accounts table
-in the database. The model includes all account-related fields and relationships
+This module defines the TradingAccount SQLAlchemy model, representing the trading_accounts table
+in the database. The model includes all trading account-related fields and relationships
 with other entities in the system.
 
 Author: TikTrack Development Team
@@ -24,7 +24,7 @@ from typing import Dict, Any, Optional
 
 class TradingAccount(BaseModel):
     """
-    Account model representing a trading account in the system.
+    TradingAccount model representing a trading account in the system.
     
     This model matches the actual database table structure exactly as defined
     in the backend architecture documentation.

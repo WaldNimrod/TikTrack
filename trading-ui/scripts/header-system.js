@@ -3304,7 +3304,7 @@ const SUPPORTED_CONTAINERS = [
   'tradesContainer',
   'tradePlansContainer',
   'trade_plansContainer',
-  'accountsContainer',
+  'tradingAccountsContainer',
   'alertsContainer',
   'cashFlowsContainer',
   'executionsContainer',
@@ -3920,7 +3920,7 @@ function getFilterConfig(filterType) {
     'status': {
       columnName: 'סטטוס',
       containerIdKeywords: ['status', 'Status', 'סטטוס'],
-      knownContainers: ['tradesContainer', 'tradePlansContainer', 'trade_plansContainer', 'alertsContainer', 'executionsContainer', 'accountsContainer', 'tickersContainer', 'cashFlowsContainer', 'notesContainer'],
+      knownContainers: ['tradesContainer', 'tradePlansContainer', 'trade_plansContainer', 'alertsContainer', 'executionsContainer', 'tradingAccountsContainer', 'tickersContainer', 'cashFlowsContainer', 'notesContainer'],
       cellValues: ['פתוח', 'סגור', 'מבוטל'],
       dataField: 'status',
     },
@@ -3949,7 +3949,7 @@ function getFilterConfig(filterType) {
     'search': {
       columnName: 'search',
       containerIdKeywords: ['search', 'search'],
-      knownContainers: ['tradesContainer', 'tradePlansContainer', 'trade_plansContainer', 'alertsContainer', 'executionsContainer', 'accountsContainer', 'tickersContainer', 'cashFlowsContainer', 'notesContainer'],
+      knownContainers: ['tradesContainer', 'tradePlansContainer', 'trade_plansContainer', 'alertsContainer', 'executionsContainer', 'tradingAccountsContainer', 'tickersContainer', 'cashFlowsContainer', 'notesContainer'],
       cellValues: [],
       dataField: 'search',
       searchAllColumns: true,

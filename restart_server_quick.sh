@@ -229,7 +229,7 @@ test_api() {
     fi
     
     # Test API endpoint
-    local api_status=$(curl -s -o /dev/null -w "%{http_code}" "http://$SERVER_HOST:$SERVER_PORT/api/v1/accounts/")
+    local api_status=$(curl -s -o /dev/null -w "%{http_code}" "http://$SERVER_HOST:$SERVER_PORT/api/accounts/")
     if [ "$api_status" = "200" ]; then
         log_success "API is working (HTTP $api_status)"
         return 0

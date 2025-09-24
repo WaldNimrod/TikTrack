@@ -151,7 +151,7 @@ def migrate_user_preferences():
                 notify_on_data_failures, notify_on_stale_data,
                 console_cleanup_interval, verbose_logging,
                 color_scheme_json, opacity_settings_json, refresh_overrides_json,
-                migrated_from_v1, migration_date, version
+                migrated_from_legacy, migration_date, version
             ) VALUES (
                 1, 1,
                 ?, ?,
@@ -189,7 +189,7 @@ def migrate_user_preferences():
             INSERT INTO preference_history (
                 user_id, profile_id, change_type, 
                 old_value, new_value, changed_by, change_reason
-            ) VALUES (1, 1, 'migrate_from_v1', ?, ?, 1, 'Automated migration from V1 to V2')
+            ) VALUES (1, 1, 'migrate_from_legacy', ?, ?, 1, 'Automated migration from legacy to V2')
         """, (
             json.dumps({'legacy_fields': len(legacy_data) + len(json_data)}),
             json.dumps({'migrated_at': now})
@@ -245,7 +245,7 @@ def verify_migration():
         # בדוק V2
         cursor.execute("""
             SELECT primary_currency, timezone, default_stop_loss, 
-                   migrated_from_v1, migration_date 
+                   migrated_from_legacy, migration_date 
             FROM user_preferences_v2 WHERE user_id = 1
         """)
         v2_result = cursor.fetchone()
@@ -280,7 +280,7 @@ def verify_migration():
         # בדוק היסטוריה
         cursor.execute("""
             SELECT change_type, change_reason, created_at 
-            FROM preference_history WHERE user_id = 1 AND change_type = 'migrate_from_v1'
+            FROM preference_history WHERE user_id = 1 AND change_type = 'migrate_from_legacy'
         """)
         history_result = cursor.fetchone()
         

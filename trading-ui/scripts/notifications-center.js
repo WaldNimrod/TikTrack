@@ -44,7 +44,7 @@ class NotificationsCenter {
   }
 
   async init() {
-    console.log('🚀 אתחול מרכז התראות... (v1.1.0 - Connected to Global Preferences System)');
+    console.log('🚀 אתחול מרכז התראות... (1.1.0 - Connected to Global Preferences System)');
 
     // טעינת העדפות התראות מהמערכת הגלובלית
     await this.loadNotificationPreferences();
@@ -67,7 +67,7 @@ class NotificationsCenter {
     // רענון אוטומטי
     this.startAutoRefresh();
 
-    console.log('✅ מרכז התראות אותחל בהצלחה (v1.0.9 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed + Settings Fix + AutoRefresh Fix)');
+    console.log('✅ מרכז התראות אותחל בהצלחה (1.0.9 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed + Settings Fix + AutoRefresh Fix)');
   }
 
   initUI() {
@@ -1337,7 +1337,7 @@ window.addNotification = function(type, title, message, time = 'now') {
 
 // אתחול
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 טעינת דף מרכז התראות... (v1.0.9 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed + Settings Fix + AutoRefresh Fix)');
+  console.log('🚀 טעינת דף מרכז התראות... (1.0.9 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed + Settings Fix + AutoRefresh Fix)');
 
   // אתחול HeaderSystem
   if (window.headerSystem && !window.headerSystem.isInitialized) {
@@ -1370,7 +1370,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // window.toggleAllSections export removed - using global version from ui-utils.js
   // window.toggleSection export removed - using global version from ui-utils.js
 
-  console.log('✅ דף מרכז התראות נטען בהצלחה (v1.0.9 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed + Settings Fix + AutoRefresh Fix)');
+  console.log('✅ דף מרכז התראות נטען בהצלחה (1.0.9 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed + Settings Fix + AutoRefresh Fix)');
 });
 
 /**

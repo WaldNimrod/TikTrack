@@ -26,7 +26,7 @@ class TradePlan(BaseModel):
     cancel_reason = Column(String(500), nullable=True)
     
     # Relationships
-    account = relationship("Account", back_populates="trade_plans")
+    account = relationship("TradingAccount", back_populates="trade_plans")
     ticker = relationship("Ticker")
     trades = relationship("Trade", back_populates="trade_plan")
     # Notes relationship removed - notes now use related_type and related_id

@@ -669,7 +669,7 @@ class HeaderSystem {
                       <ul class="tiktrack-dropdown-menu">
                         <li><a class="tiktrack-dropdown-item" href="/alerts">התראות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/notes">הערות</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/accounts">חשבונות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/trading_accounts">חשבונות מסחר</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/tickers">טיקרים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/executions">עסקאות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/cash_flows">תזרימי מזומנים</a></li>
@@ -2761,7 +2761,7 @@ class HeaderSystem {
   async loadAccountsForFilter() {
     try {
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const response = await fetch(`${base}/api/v1/accounts`);
+      const response = await fetch(`${base}/api/accounts`);
 
       if (!response.ok) {throw new Error(`HTTP ${response.status}`);}
 
@@ -4651,7 +4651,7 @@ async function getCurrentPreference(key) {
     
     // עדיפות ראשונה - מערכת העדפות
     try {
-      const response = await fetch('/api/v1/preferences/user');
+      const response = await fetch('/api/preferences/user');
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.data.preferences) {
@@ -4702,7 +4702,7 @@ async function getCurrentPreference(key) {
     }
     
     // Fallback ל-API
-    const response = await fetch('/api/v1/preferences/user');
+    const response = await fetch('/api/preferences/user');
     if (response.ok) {
       const preferences = await response.json();
       console.log(`✅ Found preference ${key}: ${preferences[key]}`);

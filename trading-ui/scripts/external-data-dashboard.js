@@ -1240,7 +1240,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Make functions globally available
   window.copyDetailedLog = ExternalDataDashboard.copyDetailedLog;
   window.toggleAllSections = ExternalDataDashboard.toggleAllSections;
-  window.toggleSection = ExternalDataDashboard.toggleSection;
+  // window.toggleSection export removed - using global version from ui-utils.js
 });
 
 // Cleanup on page unload

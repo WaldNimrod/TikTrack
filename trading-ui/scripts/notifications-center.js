@@ -1441,25 +1441,7 @@ function toggleAllSections() {
     console.log(`✅ All sections ${allHidden ? 'expanded' : 'collapsed'}`);
 }
 
-function toggleSection(sectionId) {
-  const section = document.getElementById(sectionId);
-  if (section) {
-    const sectionBody = section.querySelector('.section-body');
-    if (sectionBody) {
-      if (sectionBody.style.display === 'none') {
-        sectionBody.style.display = '';
-        console.log(`✅ Section ${sectionId} expanded`);
-      } else {
-        sectionBody.style.display = 'none';
-        console.log(`✅ Section ${sectionId} collapsed`);
-      }
-    } else {
-      console.warn(`❌ Section body not found for ${sectionId}`);
-    }
-  } else {
-    console.warn(`❌ Section ${sectionId} not found`);
-  }
-}
+// toggleSection function removed - using global version from ui-utils.js
 
 // ייצוא פונקציות ל-window scope
 window.copyNotificationsToClipboard = copyNotificationsToClipboard;
@@ -1517,7 +1499,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.testInfoNotification = testInfoNotification;
   window.toggleTopSection = toggleTopSection;
   window.toggleAllSections = toggleAllSections;
-  window.toggleSection = toggleSection;
+  // window.toggleSection export removed - using global version from ui-utils.js
 
   console.log('✅ דף מרכז התראות נטען בהצלחה (v1.0.9 - Fixed + Debug + Settings + Filter + Stats + Layout - Live Removed + Settings Fix + AutoRefresh Fix)');
 });

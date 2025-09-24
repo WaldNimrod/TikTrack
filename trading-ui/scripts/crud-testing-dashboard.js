@@ -668,13 +668,6 @@ function toggleAllSections() {
   }
 }
 
-function toggleSection(sectionId) {
-  if (typeof window.toggleSection === 'function') {
-    window.toggleSection(sectionId);
-  } else {
-    console.warn('toggleSection function not found');
-  }
-}
 
 // ייצוא פונקציות ל-window scope
 window.runAllBasicTests = runAllBasicTests;
@@ -691,7 +684,7 @@ window.markPagePartial = markPagePartial;
 window.copyDetailedLog = copyDetailedLog;
 window.toggleTopSection = toggleTopSection;
 window.toggleAllSections = toggleAllSections;
-window.toggleSection = toggleSection;
+// window.toggleSection export removed - using global version from ui-utils.js
 
 // אתחול
 document.addEventListener('DOMContentLoaded', () => {

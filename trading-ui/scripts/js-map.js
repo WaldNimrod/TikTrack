@@ -1467,13 +1467,6 @@ function initializeJsMapPage() {
  * Toggle section visibility
  * מציג/מסתיר סקשן
  */
-function toggleSection(sectionId) {
-    if (typeof window.toggleSection === 'function') {
-        window.toggleSection(sectionId);
-        } else {
-        console.warn('toggleSection function not found');
-    }
-}
 
 /**
  * Copy detailed log using global system
@@ -2832,7 +2825,7 @@ JsMapSystem.prototype.generateDetailedLogContent = function() {
 window.initializeJsMapPage = initializeJsMapPage;
 
 // Export section toggle functions
-window.toggleSection = toggleSection;
+// window.toggleSection export removed - using global version from ui-utils.js
 window.initializeDevelopmentSections = initializeDevelopmentSections;
 window.toggleDevelopmentSection = toggleDevelopmentSection;
 

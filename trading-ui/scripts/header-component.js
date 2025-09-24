@@ -514,7 +514,7 @@ function initializeHeaderComponent() {
 // ===== Global Exports =====
 
 // Export functions globally for backward compatibility
-window.toggleSection = toggleFilterSection;
+// window.toggleSection export removed - using global version from ui-utils.js
 window.toggleFilterSection = toggleFilterSection;
 window.toggleStatusFilter = toggleStatusFilter;
 window.toggleTypeFilter = toggleTypeFilter;

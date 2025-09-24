@@ -1217,7 +1217,7 @@ window.showSecondConfirmationModal = showSecondConfirmationModal;
 
 // Export section toggle system functions
 window.toggleTopSection = window.toggleTopSection;
-window.toggleSection = window.toggleSection;
+// window.toggleSection export removed - using global version from ui-utils.js
 window.toggleAllSections = window.toggleAllSections;
 window.restoreSectionStates = window.restoreSectionStates;
 
@@ -1489,7 +1489,7 @@ function loadSectionStates() {
 
 // Export functions to global scope
 window.toggleTopSection = toggleTopSection;
-window.toggleSection = toggleSection;
+// window.toggleSection export removed - using global version from ui-utils.js
 window.toggleAllSections = toggleAllSections;
 window.toggleSectionGlobal = window.toggleSection;
 window.toggleAllSectionsGlobal = window.toggleAllSections;

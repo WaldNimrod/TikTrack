@@ -436,7 +436,8 @@ window.checkPreferencesServiceHealth = async function() {
     try {
         console.log(`🔍 Checking preferences service health`);
         
-        const response = await fetch('/api/preferences/health');
+        const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
+        const response = await fetch(`${base}/api/preferences/health`);
         if (response.ok) {
             const result = await response.json();
             console.log(`✅ Preferences service is healthy:`, result.data);

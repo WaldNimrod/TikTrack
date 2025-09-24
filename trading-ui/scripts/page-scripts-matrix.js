@@ -2775,7 +2775,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.backupData = () => window.pageScriptsMatrix.backupData();
     window.cleanupOldData = () => window.pageScriptsMatrix.cleanupOldData();
     window.toggleAllSections = () => window.pageScriptsMatrix.toggleAllSections();
-    window.toggleSection = (sectionId) => window.pageScriptsMatrix.toggleSection(sectionId);
+    // window.toggleSection export removed - using global version from ui-utils.js
     window.copyDetailedLog = () => window.pageScriptsMatrix.copyDetailedLog();
     
     console.log('✅ Page Scripts Matrix system ready');

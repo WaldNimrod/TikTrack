@@ -313,4 +313,4 @@ window.toggleTickersSection = toggleTickersSection;
 window.loadActionButtons = loadActionButtons;
 window.loadRealData = loadRealData;
 window.toggleTopSection = toggleTopSection;
-window.toggleSection = toggleSection;
+// window.toggleSection export removed - using global version from ui-utils.js

@@ -246,7 +246,7 @@ GET    /api/v2/preferences/export/{profile_id}    # יצוא פרופיל
 POST   /api/v2/preferences/import                 # יבוא פרופיל
 GET    /api/v2/preferences/history/{profile_id}   # היסטוריית שינויים
 POST   /api/v2/preferences/validate               # בדיקת תקינות
-GET    /api/v2/preferences/compatibility/v1       # בדיקת תאימות V1
+GET    /api/preferences/compatibility/v1       # בדיקת תאימות V1
 ```
 
 ---

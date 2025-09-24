@@ -6,25 +6,25 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class TradingAccountService:
+class TradingTradingAccountService:
     @staticmethod
-    def get_all(db: Session) -> List[TradingAccount]:
-        """Get all trading accounts"""
-        return db.query(TradingAccount).all()
+    def get_all(db: Session) -> List[TradingTradingAccount]:
+        """Get all trading_accounts"""
+        return db.query(TradingTradingAccount).all()
     
     @staticmethod
-    def get_by_id(db: Session, trading_account_id: int) -> Optional[TradingAccount]:
-        """Get trading account by ID"""
-        return db.query(TradingAccount).filter(TradingAccount.id == trading_account_id).first()
+    def get_by_id(db: Session, trading_trading_trading_account_id: int) -> Optional[TradingTradingAccount]:
+        """Get trading_account by ID"""
+        return db.query(TradingTradingAccount).filter(TradingTradingAccount.id == trading_trading_trading_account_id).first()
     
     @staticmethod
-    def get_open_accounts(db: Session) -> List[TradingAccount]:
-        """Get all open trading accounts"""
+    def get_open_trading_accounts(db: Session) -> List[TradingAccount]:
+        """Get all open trading_accounts"""
         return db.query(TradingAccount).filter(TradingAccount.status == 'open').all()
     
     @staticmethod
     def create(db: Session, data: Dict[str, Any]) -> TradingAccount:
-        """Create new trading account"""
+        """Create new trading_account"""
         # Validate that all fields exist in the TradingAccount model
         allowed_fields = {'name', 'currency_id', 'status', 'cash_balance', 'total_value', 'total_pl', 'notes'}
         invalid_fields = set(data.keys()) - allowed_fields
@@ -40,21 +40,21 @@ class TradingAccountService:
         db.add(trading_account)
         db.commit()
         db.refresh(trading_account)
-        logger.info(f"Created trading account: {trading_account.name}")
+        logger.info(f"Created trading_account: {trading_account.name}")
         return trading_account
     
     @staticmethod
-    def update(db: Session, trading_account_id: int, data: Dict[str, Any]) -> Optional[TradingAccount]:
-        """Update trading account"""
-        logger.info(f"Updating trading account {trading_account_id} with data: {data}")
-        trading_account = db.query(TradingAccount).filter(TradingAccount.id == trading_account_id).first()
+    def update(db: Session, trading_trading_account_id: int, data: Dict[str, Any]) -> Optional[TradingAccount]:
+        """Update trading_account"""
+        logger.info(f"Updating trading_account {trading_trading_account_id} with data: {data}")
+        trading_account = db.query(TradingAccount).filter(TradingAccount.id == trading_trading_account_id).first()
         if not trading_account:
-            logger.error(f"Trading account {trading_account_id} not found")
+            logger.error(f"TradingAccount {trading_trading_account_id} not found")
             return None
         
         # Validate data against dynamic constraints (excluding current ID for unique checks)
-        logger.info(f"Validating data with exclude_id={trading_account_id}")
-        is_valid, errors = ValidationService.validate_data(db, 'trading_accounts', data, exclude_id=trading_account_id)
+        logger.info(f"Validating data with exclude_id={trading_trading_account_id}")
+        is_valid, errors = ValidationService.validate_data(db, 'trading_accounts', data, exclude_id=trading_trading_account_id)
         logger.info(f"Validation result: valid={is_valid}, errors={errors}")
         if not is_valid:
             raise ValueError(f"Validation failed: {'; '.join(errors)}")
@@ -64,67 +64,67 @@ class TradingAccountService:
                 setattr(trading_account, key, value)
         db.commit()
         db.refresh(trading_account)
-        logger.info(f"Updated trading account: {trading_account.name}")
+        logger.info(f"Updated trading_account: {trading_account.name}")
         return trading_account
     
     @staticmethod
-    def delete(db: Session, trading_account_id: int) -> bool:
-        """Delete trading account"""
+    def delete(db: Session, trading_trading_account_id: int) -> bool:
+        """Delete trading_account"""
         from models.trade import Trade
         from models.execution import Execution
         
-        trading_account = db.query(TradingAccount).filter(TradingAccount.id == trading_account_id).first()
+        trading_account = db.query(TradingAccount).filter(TradingAccount.id == trading_trading_account_id).first()
         if not trading_account:
             return False
         
         # הגנה על החשבון האחרון
         all_trading_accounts = db.query(TradingAccount).all()
         if len(all_trading_accounts) == 1:
-            logger.warning(f"Cannot delete trading account {trading_account_id}: it is the last trading account in the system")
+            logger.warning(f"Cannot delete trading_account {trading_trading_account_id}: it is the last trading_account in the system")
             return False
         
         # Check for linked trades
-        trades = db.query(Trade).filter(Trade.trading_account_id == trading_account_id).all()
+        trades = db.query(Trade).filter(Trade.trading_trading_account_id == trading_trading_account_id).all()
         if trades:
-            logger.warning(f"Cannot delete trading account {trading_account_id}: has {len(trades)} linked trades")
+            logger.warning(f"Cannot delete trading_account {trading_trading_account_id}: has {len(trades)} linked trades")
             return False
         
         # Check for linked executions (through trades)
-        executions = db.query(Execution).join(Trade).filter(Trade.trading_account_id == trading_account_id).all()
+        executions = db.query(Execution).join(Trade).filter(Trade.trading_trading_account_id == trading_trading_account_id).all()
         if executions:
-            logger.warning(f"Cannot delete trading account {trading_account_id}: has {len(executions)} linked executions")
+            logger.warning(f"Cannot delete trading_account {trading_trading_account_id}: has {len(executions)} linked executions")
             return False
         
         # Safe to delete
         db.delete(trading_account)
         db.commit()
-        logger.info(f"Deleted trading account: {trading_account.name}")
+        logger.info(f"Deleted trading_account: {trading_account.name}")
         return True
     
     @staticmethod
-    def get_stats(db: Session, trading_account_id: int) -> Dict[str, Any]:
-        """Get trading account statistics"""
+    def get_stats(db: Session, trading_trading_account_id: int) -> Dict[str, Any]:
+        """Get trading_account statistics"""
         from models.trade import Trade
         from models.cash_flow import CashFlow
         
-        trading_account = db.query(TradingAccount).filter(TradingAccount.id == trading_account_id).first()
+        trading_account = db.query(TradingAccount).filter(TradingAccount.id == trading_trading_account_id).first()
         if not trading_account:
             return {}
         
         # Trade statistics
-        trades = db.query(Trade).filter(Trade.trading_account_id == trading_account_id).all()
+        trades = db.query(Trade).filter(Trade.trading_trading_account_id == trading_trading_account_id).all()
         open_trades = [t for t in trades if t.status == 'open']
         closed_trades = [t for t in trades if t.status == 'closed']
         
         # Cash flow statistics
-        cash_flows = db.query(CashFlow).filter(CashFlow.trading_account_id == trading_account_id).all()
+        cash_flows = db.query(CashFlow).filter(CashFlow.trading_trading_account_id == trading_trading_account_id).all()
         
         total_pl = sum(trade.total_pl for trade in trades)
         realized_pl = sum(trade.total_pl for trade in closed_trades)
         unrealized_pl = sum(trade.total_pl for trade in open_trades)
         
         return {
-            'trading_account_id': trading_account_id,
+            'trading_trading_account_id': trading_trading_account_id,
             'total_trades': len(trades),
             'open_trades': len(open_trades),
             'closed_trades': len(closed_trades),
@@ -136,29 +136,29 @@ class TradingAccountService:
         }
     
     @staticmethod
-    def update_account_values(db: Session, trading_account_id: int) -> bool:
-        """Update trading account values"""
+    def update_trading_account_values(db: Session, trading_trading_account_id: int) -> bool:
+        """Update trading_account values"""
         from models.trade import Trade
         
-        trading_account = db.query(TradingAccount).filter(TradingAccount.id == trading_account_id).first()
+        trading_account = db.query(TradingAccount).filter(TradingAccount.id == trading_trading_account_id).first()
         if not trading_account:
             return False
         
         # Recalculate values
-        trades = db.query(Trade).filter(Trade.trading_account_id == trading_account_id).all()
+        trades = db.query(Trade).filter(Trade.trading_trading_account_id == trading_trading_account_id).all()
         total_pl = sum(trade.total_pl for trade in trades)
         
-        # Update trading account
+        # Update trading_account
         trading_account.total_pl = total_pl
         db.commit()
-        logger.info(f"Updated trading account values for: {trading_account.name}")
+        logger.info(f"Updated trading_account values for: {trading_account.name}")
         return True
     
 
     
     @staticmethod
-    def get_open_trades(db: Session, trading_account_id: int) -> List[Dict[str, Any]]:
-        """Get open trades for trading account"""
+    def get_open_trades(db: Session, trading_trading_account_id: int) -> List[Dict[str, Any]]:
+        """Get open trades for trading_account"""
         from models.trade import Trade
         from models.ticker import Ticker
         
@@ -166,7 +166,7 @@ class TradingAccountService:
         trades = db.query(Trade, Ticker).join(
             Ticker, Trade.ticker_id == Ticker.id
         ).filter(
-            Trade.trading_account_id == trading_account_id,
+            Trade.trading_trading_account_id == trading_trading_account_id,
             Trade.status == 'open'
         ).all()
         
@@ -184,5 +184,5 @@ class TradingAccountService:
                 'notes': trade.notes
             })
         
-        logger.info(f"Found {len(open_trades)} open trades for trading account {trading_account_id}")
+        logger.info(f"Found {len(open_trades)} open trades for trading_account {trading_trading_account_id}")
         return open_trades

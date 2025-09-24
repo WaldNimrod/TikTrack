@@ -12,7 +12,7 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-trades_bp = Blueprint('trades', __name__, url_prefix='/api/v1/trades')
+trades_bp = Blueprint('trades', __name__, url_prefix='/api/trades')
 
 # Initialize base API
 base_api = BaseEntityAPI('trades', TradeService, 'trades')
@@ -76,14 +76,14 @@ def get_trades():
             "status": "success",
             "data": trade_dicts,
             "message": "Trades retrieved successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error getting trades: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve trades"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
 
 @trades_bp.route('/<int:trade_id>', methods=['GET'])
@@ -105,14 +105,14 @@ def get_trades_by_account(account_id: int):
             "status": "success",
             "data": [trade.to_dict() for trade in trades],
             "message": "Account trades retrieved successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error getting trades for account {account_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve account trades"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -138,14 +138,14 @@ def create_trade():
             "status": "success",
             "data": trade.to_dict(),
             "message": "Trade created successfully",
-            "version": "v1"
+            "version": "1.0"
         }), 201
     except Exception as e:
         logger.error(f"Error creating trade: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         db.close()
@@ -177,7 +177,7 @@ def update_trade(trade_id: int):
                     "status": "success",
                     "data": trade_dict,
                     "message": "Trade updated successfully",
-                    "version": "v1"
+                    "version": "1.0"
                 })
             except Exception as e:
                 logger.error(f"Error converting trade to dict: {str(e)}")
@@ -198,19 +198,19 @@ def update_trade(trade_id: int):
                     "status": "success",
                     "data": basic_data,
                     "message": "Trade updated successfully (basic data only)",
-                    "version": "v1"
+                    "version": "1.0"
                 })
         return jsonify({
             "status": "error",
             "error": {"message": "Trade not found"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error updating trade {trade_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         db.close()
@@ -229,19 +229,19 @@ def close_trade(trade_id: int):
                 "status": "success",
                 "data": trade.to_dict(),
                 "message": "Trade closed successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "Trade not found or already closed"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error closing trade {trade_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         if db:
@@ -262,19 +262,19 @@ def cancel_trade(trade_id: int):
                 "status": "success",
                 "data": trade.to_dict(),
                 "message": "Trade cancelled successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "Trade not found or already cancelled"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error cancelling trade {trade_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         if db:
@@ -291,7 +291,7 @@ def delete_trade(trade_id: int):
             return jsonify({
                 "status": "success",
                 "message": "Trade deleted successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         
         # If deletion failed, it means there are linked items or trade not found
@@ -300,14 +300,14 @@ def delete_trade(trade_id: int):
             "error": {
                 "message": "Cannot delete trade - it has linked executions or other items"
             },
-            "version": "v1"
+            "version": "1.0"
         }), 400
     except Exception as e:
         logger.error(f"Error deleting trade {trade_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         db.close()
@@ -323,14 +323,14 @@ def get_trade_summary():
             "status": "success",
             "data": summary,
             "message": "Trade summary retrieved successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error getting trade summary: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve trade summary"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()

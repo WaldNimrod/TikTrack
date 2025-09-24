@@ -1,13 +1,13 @@
 """
-TradingAccount Model - Data Access Layer for Trading Account Entity
+Account Model - Data Access Layer for Account Entity
 
-This module defines the TradingAccount SQLAlchemy model, representing the trading_accounts table
-in the database. The model includes all trading account-related fields and relationships
+This module defines the Account SQLAlchemy model, representing the accounts table
+in the database. The model includes all account-related fields and relationships
 with other entities in the system.
 
 Author: TikTrack Development Team
 Version: 1.0
-Last Updated: 2025-09-24
+Last Updated: 2025-08-16
 
 🚨 CRITICAL REMINDERS:
 - This is the MODEL LAYER - data structure only
@@ -24,7 +24,7 @@ from typing import Dict, Any, Optional
 
 class TradingAccount(BaseModel):
     """
-    TradingAccount model representing a trading account in the system.
+    Account model representing a trading account in the system.
     
     This model matches the actual database table structure exactly as defined
     in the backend architecture documentation.
@@ -46,31 +46,31 @@ class TradingAccount(BaseModel):
     # Currency relationship
     currency = relationship("Currency", back_populates="trading_accounts")
     
-    # Each trading account can have multiple trades
+    # Each account can have multiple trades
     trades = relationship("Trade", back_populates="trading_account", cascade="all, delete-orphan")
     
-    # Each trading account can have multiple trade plans
+    # Each account can have multiple trade plans
     trade_plans = relationship("TradePlan", back_populates="trading_account", cascade="all, delete-orphan")
     
-    # Each trading account can have multiple alerts (through related_type_id and related_id)
-    # alerts = relationship("Alert", back_populates="trading_account", cascade="all, delete-orphan")
+    # Each account can have multiple alerts (through related_type_id and related_id)
+    # alerts = relationship("Alert", back_populates="account", cascade="all, delete-orphan")
     
-    # Each trading account can have multiple cash flows
+    # Each account can have multiple cash flows
     cash_flows = relationship("CashFlow", back_populates="trading_account", cascade="all, delete-orphan")
     
     # Notes relationship removed - notes now use related_type and related_id
     
     def __repr__(self) -> str:
-        """String representation of the TradingAccount object."""
+        """String representation of the Account object."""
         currency_symbol = self.currency.symbol if self.currency else 'USD'
-        return f"<TradingAccount(name='{self.name}', currency_id='{self.currency_id}', status='{self.status}')>"
+        return f"<Account(name='{self.name}', currency_id='{self.currency_id}', status='{self.status}')>"
     
     def to_dict(self) -> Dict[str, Any]:
         """
-        Convert TradingAccount object to dictionary for JSON serialization.
+        Convert Account object to dictionary for JSON serialization.
         
         Returns:
-            dict: Dictionary representation of the trading account
+            dict: Dictionary representation of the account
         """
         return {
             'id': self.id,
@@ -88,12 +88,12 @@ class TradingAccount(BaseModel):
     
     def is_active(self) -> bool:
         """
-        Check if the trading account is active.
+        Check if the account is active.
         
         Note: All status values are now in English:
-        - 'open': Trading account is active and operational
-        - 'closed': Trading account is closed but can be reopened
-        - 'cancelled': Trading account is permanently cancelled
+        - 'open': Account is active and operational
+        - 'closed': Account is closed but can be reopened
+        - 'cancelled': Account is permanently cancelled
         """
         return self.status == 'open'
     
@@ -106,8 +106,8 @@ class TradingAccount(BaseModel):
         }
     
     @classmethod
-    def is_last_trading_account(cls, db_session) -> bool:
-        """Check if this is the last trading account in the system"""
+    def is_last_account(cls, db_session) -> bool:
+        """Check if this is the last account in the system"""
         from sqlalchemy.orm import Session
         if isinstance(db_session, Session):
             count = db_session.query(cls).count()
@@ -115,9 +115,9 @@ class TradingAccount(BaseModel):
         return False
     
     def can_be_deleted(self, db_session) -> bool:
-        """Check if this trading account can be deleted (not the last trading account)"""
-        return not self.is_last_trading_account(db_session)
+        """Check if this account can be deleted (not the last account)"""
+        return not self.is_last_account(db_session)
     
     def is_protected(self, db_session) -> bool:
-        """Check if this trading account is protected from deletion (last trading account)"""
-        return self.is_last_trading_account(db_session)
+        """Check if this account is protected from deletion (last account)"""
+        return self.is_last_account(db_session)

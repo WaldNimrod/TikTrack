@@ -12,7 +12,7 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-alerts_bp = Blueprint('alerts', __name__, url_prefix='/api/v1/alerts')
+alerts_bp = Blueprint('alerts', __name__, url_prefix='/api/alerts')
 
 # Initialize base API
 base_api = BaseEntityAPI('alerts', AlertService, 'alerts')
@@ -48,14 +48,14 @@ def create_alert():
             "status": "success",
             "data": alert.to_dict(),
             "message": "Alert created successfully",
-            "version": "v1"
+            "version": "1.0"
         }), 201
     except Exception as e:
         logger.error(f"Error creating alert: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         db.close()
@@ -71,21 +71,21 @@ def update_alert(alert_id: int):
             "status": "success",
             "data": alert.to_dict(),
             "message": "Alert updated successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except ValueError as e:
         logger.error(f"Alert not found {alert_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error updating alert {alert_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         db.close()
@@ -99,14 +99,14 @@ def delete_alert(alert_id: int):
         return jsonify({
             "status": "success",
             "message": "Alert deleted successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except ValueError as e:
         logger.error(f"Alert not found {alert_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error deleting alert {alert_id}: {str(e)}")
@@ -115,7 +115,7 @@ def delete_alert(alert_id: int):
         return jsonify({
             "status": "error",
             "error": {"message": f"Failed to delete alert: {str(e)}"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -130,21 +130,21 @@ def mark_as_triggered(alert_id: int):
             "status": "success",
             "data": alert.to_dict(),
             "message": "Alert triggered successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except ValueError as e:
         logger.error(f"Alert not found {alert_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error triggering alert {alert_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         db.close()
@@ -159,14 +159,14 @@ def get_unread_alerts():
             "status": "success",
             "data": alerts,
             "message": "Unread alerts retrieved successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error getting unread alerts: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve unread alerts"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -183,21 +183,21 @@ def mark_read(alert_id: int):
             "status": "success",
             "data": alert.to_dict(),
             "message": "Alert marked as read successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except ValueError as e:
         logger.error(f"Alert not found {alert_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error marking alert {alert_id} as read: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         db.close()
@@ -212,21 +212,21 @@ def reactivate_alert(alert_id: int):
             "status": "success",
             "data": alert.to_dict(),
             "message": "Alert reactivated successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except ValueError as e:
         logger.error(f"Alert not found {alert_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error reactivating alert {alert_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         db.close()
@@ -241,21 +241,21 @@ def cancel_alert(alert_id: int):
             "status": "success",
             "data": alert.to_dict(),
             "message": "Alert cancelled successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except ValueError as e:
         logger.error(f"Alert not found {alert_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error cancelling alert {alert_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         db.close()
@@ -271,21 +271,21 @@ def get_alerts_by_entity(entity_type: str, entity_id: int):
             "status": "success",
             "data": [alert.to_dict() for alert in alerts],
             "message": f"Alerts for {entity_type} {entity_id} retrieved successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except ValueError as e:
         logger.error(f"Entity not found {entity_type} {entity_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error getting alerts for {entity_type} {entity_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()

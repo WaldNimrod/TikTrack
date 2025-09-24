@@ -20,7 +20,7 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-notes_bp = Blueprint('notes', __name__, url_prefix='/api/v1/notes')
+notes_bp = Blueprint('notes', __name__, url_prefix='/api/notes')
 
 # Initialize base API (Note doesn't have a service, so we'll use the model directly)
 # For now, we'll skip the base API for notes due to its complexity
@@ -159,14 +159,14 @@ def get_notes():
             return jsonify({
                 "status": "error",
                 "error": {"message": f"Database error: {str(sql_error)}"},
-                "version": "v1"
+                "version": "1.0"
             }), 500
             
         return jsonify({
             "status": "success",
             "data": notes_list,
             "message": "Notes retrieved successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"❌ Error getting notes: {str(e)}")
@@ -175,7 +175,7 @@ def get_notes():
         return jsonify({
             "status": "error",
             "error": {"message": f"Failed to retrieve notes: {str(e)}"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         if 'db' in locals():
@@ -192,19 +192,19 @@ def get_note(note_id: int):
                 "status": "success",
                 "data": note.to_dict(),
                 "message": "Note retrieved successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "Note not found"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error getting note {note_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve note"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -228,7 +228,7 @@ def create_note():
                     return jsonify({
                         "status": "error",
                         "error": {"message": "File too large. Maximum size is 512KB"},
-                        "version": "v1"
+                        "version": "1.0"
                     }), 400
                 
                 attachment_filename = save_uploaded_file(file)
@@ -236,7 +236,7 @@ def create_note():
                     return jsonify({
                         "status": "error",
                         "error": {"message": "Invalid file type. Allowed: JPG, PNG, GIF, PDF"},
-                        "version": "v1"
+                        "version": "1.0"
                     }), 400
             
             # Get data from form data
@@ -256,7 +256,7 @@ def create_note():
             return jsonify({
                 "status": "error",
                 "error": {"message": "Note must have related_type_id and related_id"},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # Validate related_type_id
@@ -265,7 +265,7 @@ def create_note():
             return jsonify({
                 "status": "error",
                 "error": {"message": "Invalid related_type_id. Must be: 1 (account), 2 (trade), 3 (trade_plan), or 4 (ticker)"},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # Create note with new structure
@@ -288,7 +288,7 @@ def create_note():
             return jsonify({
                 "status": "error",
                 "error": {"message": f"Note validation failed: {error_message}"},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         note = Note(**note_data)
@@ -299,7 +299,7 @@ def create_note():
             "status": "success",
             "data": note.to_dict(),
             "message": "Note created successfully",
-            "version": "v1"
+            "version": "1.0"
         }), 201
     except Exception as e:
         logger.error(f"Error creating note: {str(e)}")
@@ -309,7 +309,7 @@ def create_note():
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         if db:
@@ -347,7 +347,7 @@ def update_note(note_id: int):
                         return jsonify({
                             "status": "error",
                             "error": {"message": "File too large. Maximum size is 512KB"},
-                            "version": "v1"
+                            "version": "1.0"
                         }), 400
                     
                     attachment_filename = save_uploaded_file(file)
@@ -357,7 +357,7 @@ def update_note(note_id: int):
                         return jsonify({
                             "status": "error",
                             "error": {"message": "Invalid file type. Allowed: JPG, PNG, GIF, PDF"},
-                            "version": "v1"
+                            "version": "1.0"
                         }), 400
                 
                 # Get data from form data
@@ -372,7 +372,7 @@ def update_note(note_id: int):
                     return jsonify({
                         "status": "error",
                         "error": {"message": "Invalid related_type_id. Must be: 1, 2, 3, or 4"},
-                        "version": "v1"
+                        "version": "1.0"
                     }), 400
             else:
                 logger.info("📋 Processing JSON data")
@@ -390,7 +390,7 @@ def update_note(note_id: int):
                     return jsonify({
                         "status": "error",
                         "error": {"message": "Invalid related_type_id. Must be: 1, 2, 3, or 4"},
-                        "version": "v1"
+                        "version": "1.0"
                     }), 400
             
             # Determine relation using related_type_id and related_id
@@ -399,7 +399,7 @@ def update_note(note_id: int):
                 return jsonify({
                     "status": "error",
                     "error": {"message": "Note must have related_type_id and related_id"},
-                    "version": "v1"
+                    "version": "1.0"
                 }), 400
             
             logger.info(f"🔍 Determining relation - related_type_id: {related_type_id}, related_id: {related_id}")
@@ -430,7 +430,7 @@ def update_note(note_id: int):
                 return jsonify({
                     "status": "error",
                     "error": {"message": f"Note validation failed: {error_message}"},
-                    "version": "v1"
+                    "version": "1.0"
                 }), 400
             
             # Update fields
@@ -464,13 +464,13 @@ def update_note(note_id: int):
                 "status": "success",
                 "data": note.to_dict(),
                 "message": "Note updated successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         logger.error(f"❌ Note not found: {note_id}")
         return jsonify({
             "status": "error",
             "error": {"message": "Note not found"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"❌ Error updating note {note_id}: {str(e)}")
@@ -485,7 +485,7 @@ def update_note(note_id: int):
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         if db:
@@ -509,19 +509,19 @@ def delete_note(note_id: int):
             return jsonify({
                 "status": "success",
                 "message": "Note deleted successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "Note not found"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error deleting note {note_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -535,14 +535,14 @@ def cleanup_files():
             "status": "success",
             "message": f"Cleaned up {deleted_count} orphaned files",
             "deleted_count": deleted_count,
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error in cleanup endpoint: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 500
 
 @notes_bp.route('/files/<filename>', methods=['GET', 'DELETE'])
@@ -557,7 +557,7 @@ def handle_file(filename: str):
             return jsonify({
                 "status": "error",
                 "error": {"message": "File not found"},
-                "version": "v1"
+                "version": "1.0"
             }), 404
     elif request.method == 'DELETE':
         """Delete single file (for maintenance purposes)"""
@@ -566,18 +566,18 @@ def handle_file(filename: str):
                 return jsonify({
                     "status": "success",
                     "message": "File deleted successfully",
-                    "version": "v1"
+                    "version": "1.0"
                 })
             else:
                 return jsonify({
                     "status": "error",
                     "error": {"message": "File not found or could not be deleted"},
-                    "version": "v1"
+                    "version": "1.0"
                 }), 404
         except Exception as e:
             logger.error(f"Error deleting file {filename}: {str(e)}")
             return jsonify({
                 "status": "error",
                 "error": {"message": str(e)},
-                "version": "v1"
+                "version": "1.0"
             }), 500

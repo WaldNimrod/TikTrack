@@ -31,7 +31,7 @@ constraint_service = ConstraintService()
 
 logger = logging.getLogger(__name__)
 
-@constraints_bp.route('/api/v1/constraints/', methods=['GET'])
+@constraints_bp.route('/api/constraints/', methods=['GET'])
 @api_endpoint(cache_ttl=300, rate_limit=60)
 @handle_database_session()
 @cache_for(ttl=300)  # Cache for 5 minutes - constraints don't change frequently
@@ -57,7 +57,7 @@ def get_constraints():
             'message': message,
             'data': constraints,
             'count': len(constraints),
-            'version': 'v1'
+            'version': '1.0'
         }), 200
         
     except Exception as e:
@@ -65,10 +65,10 @@ def get_constraints():
         return jsonify({
             'status': 'error',
             'message': f'Error retrieving constraints: {str(e)}',
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
-@constraints_bp.route('/api/v1/constraints/table/<table_name>', methods=['GET'])
+@constraints_bp.route('/api/constraints/table/<table_name>', methods=['GET'])
 def get_table_constraints(table_name: str):
     """
     Get all constraints for a specific table
@@ -85,7 +85,7 @@ def get_table_constraints(table_name: str):
             'data': constraints,
             'count': len(constraints),
             'table_name': table_name,
-            'version': 'v1'
+            'version': '1.0'
         }), 200
         
     except Exception as e:
@@ -93,10 +93,10 @@ def get_table_constraints(table_name: str):
         return jsonify({
             'status': 'error',
             'message': f'Error retrieving constraints for table {table_name}: {str(e)}',
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
-@constraints_bp.route('/api/v1/constraints/column/<table_name>/<column_name>', methods=['GET'])
+@constraints_bp.route('/api/constraints/column/<table_name>/<column_name>', methods=['GET'])
 def get_column_constraints(table_name: str, column_name: str):
     """
     Get all constraints for a specific column
@@ -115,7 +115,7 @@ def get_column_constraints(table_name: str, column_name: str):
             'count': len(constraints),
             'table_name': table_name,
             'column_name': column_name,
-            'version': 'v1'
+            'version': '1.0'
         }), 200
         
     except Exception as e:
@@ -123,10 +123,10 @@ def get_column_constraints(table_name: str, column_name: str):
         return jsonify({
             'status': 'error',
             'message': f'Error retrieving constraints for {table_name}.{column_name}: {str(e)}',
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
-@constraints_bp.route('/api/v1/constraints/validate', methods=['POST'])
+@constraints_bp.route('/api/constraints/validate', methods=['POST'])
 def validate_field():
     """
     Validate a field value against its constraints
@@ -145,7 +145,7 @@ def validate_field():
             return jsonify({
                 'status': 'error',
                 'message': 'Request body is required',
-                'version': 'v1'
+                'version': '1.0'
             }), 400
         
         table_name = data.get('table')
@@ -156,7 +156,7 @@ def validate_field():
             return jsonify({
                 'status': 'error',
                 'message': 'Table name and column name are required',
-                'version': 'v1'
+                'version': '1.0'
             }), 400
         
         is_valid, error_message = constraint_service.validate_field_value(table_name, column_name, value)
@@ -170,7 +170,7 @@ def validate_field():
                 'column_name': column_name,
                 'value': value
             },
-            'version': 'v1'
+            'version': '1.0'
         }), 200
         
     except Exception as e:
@@ -178,10 +178,10 @@ def validate_field():
         return jsonify({
             'status': 'error',
             'message': f'Error validating field: {str(e)}',
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
-@constraints_bp.route('/api/v1/constraints/enum/<table_name>/<column_name>', methods=['GET'])
+@constraints_bp.route('/api/constraints/enum/<table_name>/<column_name>', methods=['GET'])
 def get_enum_values(table_name: str, column_name: str):
     """
     Get enum values for a specific column
@@ -200,7 +200,7 @@ def get_enum_values(table_name: str, column_name: str):
             'count': len(enum_values),
             'table_name': table_name,
             'column_name': column_name,
-            'version': 'v1'
+            'version': '1.0'
         }), 200
         
     except Exception as e:
@@ -208,10 +208,10 @@ def get_enum_values(table_name: str, column_name: str):
         return jsonify({
             'status': 'error',
             'message': f'Error retrieving enum values for {table_name}.{column_name}: {str(e)}',
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
-@constraints_bp.route('/api/v1/constraints/', methods=['POST'])
+@constraints_bp.route('/api/constraints/', methods=['POST'])
 def add_constraint():
     """
     Add a new constraint
@@ -239,7 +239,7 @@ def add_constraint():
             return jsonify({
                 'status': 'error',
                 'message': 'Request body is required',
-                'version': 'v1'
+                'version': '1.0'
             }), 400
         
         required_fields = ['table_name', 'column_name', 'constraint_type', 'constraint_name', 'constraint_definition']
@@ -248,7 +248,7 @@ def add_constraint():
                 return jsonify({
                     'status': 'error',
                     'message': f'Field {field} is required',
-                    'version': 'v1'
+                    'version': '1.0'
                 }), 400
         
         success, message = constraint_service.add_constraint(data)
@@ -258,13 +258,13 @@ def add_constraint():
                 'status': 'success',
                 'message': message,
                 'data': data,
-                'version': 'v1'
+                'version': '1.0'
             }), 201
         else:
             return jsonify({
                 'status': 'error',
                 'message': message,
-                'version': 'v1'
+                'version': '1.0'
             }), 400
         
     except Exception as e:
@@ -272,10 +272,10 @@ def add_constraint():
         return jsonify({
             'status': 'error',
             'message': f'Error adding constraint: {str(e)}',
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
-@constraints_bp.route('/api/v1/constraints/<int:constraint_id>', methods=['PUT'])
+@constraints_bp.route('/api/constraints/<int:constraint_id>', methods=['PUT'])
 def update_constraint(constraint_id: int):
     """
     Update an existing constraint
@@ -290,7 +290,7 @@ def update_constraint(constraint_id: int):
             return jsonify({
                 'status': 'error',
                 'message': 'Request body is required',
-                'version': 'v1'
+                'version': '1.0'
             }), 400
         
         success, message = constraint_service.update_constraint(constraint_id, data)
@@ -300,13 +300,13 @@ def update_constraint(constraint_id: int):
                 'status': 'success',
                 'message': message,
                 'constraint_id': constraint_id,
-                'version': 'v1'
+                'version': '1.0'
             }), 200
         else:
             return jsonify({
                 'status': 'error',
                 'message': message,
-                'version': 'v1'
+                'version': '1.0'
             }), 400
         
     except Exception as e:
@@ -314,10 +314,10 @@ def update_constraint(constraint_id: int):
         return jsonify({
             'status': 'error',
             'message': f'Error updating constraint: {str(e)}',
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
-@constraints_bp.route('/api/v1/constraints/<int:constraint_id>', methods=['DELETE'])
+@constraints_bp.route('/api/constraints/<int:constraint_id>', methods=['DELETE'])
 def delete_constraint(constraint_id: int):
     """
     Delete a constraint (soft delete)
@@ -333,13 +333,13 @@ def delete_constraint(constraint_id: int):
                 'status': 'success',
                 'message': message,
                 'constraint_id': constraint_id,
-                'version': 'v1'
+                'version': '1.0'
             }), 200
         else:
             return jsonify({
                 'status': 'error',
                 'message': message,
-                'version': 'v1'
+                'version': '1.0'
             }), 400
         
     except Exception as e:
@@ -347,10 +347,10 @@ def delete_constraint(constraint_id: int):
         return jsonify({
             'status': 'error',
             'message': f'Error deleting constraint: {str(e)}',
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
-@constraints_bp.route('/api/v1/constraints/tables', methods=['GET'])
+@constraints_bp.route('/api/constraints/tables', methods=['GET'])
 def get_tables_with_constraints():
     """
     Get list of tables that have constraints defined
@@ -363,7 +363,7 @@ def get_tables_with_constraints():
             'message': 'Retrieved tables with constraints',
             'data': tables,
             'count': len(tables),
-            'version': 'v1'
+            'version': '1.0'
         }), 200
         
     except Exception as e:
@@ -371,10 +371,10 @@ def get_tables_with_constraints():
         return jsonify({
             'status': 'error',
             'message': f'Error retrieving tables with constraints: {str(e)}',
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
-@constraints_bp.route('/api/v1/constraints/health', methods=['GET'])
+@constraints_bp.route('/api/constraints/health', methods=['GET'])
 def health_check():
     """
     Health check for constraints API
@@ -392,7 +392,7 @@ def health_check():
                 'total_constraints': total_constraints,
                 'service_status': 'operational'
             },
-            'version': 'v1'
+            'version': '1.0'
         }), 200
         
     except Exception as e:
@@ -400,10 +400,10 @@ def health_check():
         return jsonify({
             'status': 'error',
             'message': f'Constraints API health check failed: {str(e)}',
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
-@constraints_bp.route('/api/v1/constraints/active-trades/validate', methods=['GET'])
+@constraints_bp.route('/api/constraints/active-trades/validate', methods=['GET'])
 def validate_active_trades_constraint():
     """
     Validate active_trades constraint for all tickers
@@ -419,7 +419,7 @@ def validate_active_trades_constraint():
                 'errors': errors
             },
             'message': f'Active trades constraint validation completed. Found {len(errors)} errors.',
-            'version': 'v1'
+            'version': '1.0'
         }), 200
         
     except Exception as e:
@@ -427,10 +427,10 @@ def validate_active_trades_constraint():
         return jsonify({
             'status': 'error',
             'message': f'Error validating active_trades constraint: {str(e)}',
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
-@constraints_bp.route('/api/v1/constraints/active-trades/fix', methods=['POST'])
+@constraints_bp.route('/api/constraints/active-trades/fix', methods=['POST'])
 def fix_active_trades_constraint():
     """
     Fix active_trades constraint for all tickers
@@ -445,13 +445,13 @@ def fix_active_trades_constraint():
                     'fixed_count': fixed_count
                 },
                 'message': f'Fixed active_trades for {fixed_count} tickers',
-                'version': 'v1'
+                'version': '1.0'
             }), 200
         else:
             return jsonify({
                 'status': 'error',
                 'message': 'Failed to fix active_trades constraint',
-                'version': 'v1'
+                'version': '1.0'
             }), 500
         
     except Exception as e:
@@ -459,5 +459,5 @@ def fix_active_trades_constraint():
         return jsonify({
             'status': 'error',
             'message': f'Error fixing active_trades constraint: {str(e)}',
-            'version': 'v1'
+            'version': '1.0'
         }), 500

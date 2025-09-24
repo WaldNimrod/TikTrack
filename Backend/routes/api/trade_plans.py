@@ -12,7 +12,7 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-trade_plans_bp = Blueprint('trade_plans', __name__, url_prefix='/api/v1/trade_plans')
+trade_plans_bp = Blueprint('trade_plans', __name__, url_prefix='/api/trade_plans')
 
 # Initialize base API
 base_api = BaseEntityAPI('trade_plans', TradePlanService, 'trade_plans')
@@ -45,14 +45,14 @@ def get_trade_plans_by_account(account_id: int):
             "status": "success",
             "data": [plan.to_dict() for plan in plans],
             "message": "Account trade plans retrieved successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error getting trade plans for account {account_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה בטעינת תכנונים לחשבון"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -68,14 +68,14 @@ def create_trade_plan():
             "status": "success",
             "data": plan.to_dict(),
             "message": "Trade plan created successfully",
-            "version": "v1"
+            "version": "1.0"
         }), 201
     except Exception as e:
         logger.error(f"Error creating trade plan: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         db.close()
@@ -92,19 +92,19 @@ def update_trade_plan(plan_id: int):
                 "status": "success",
                 "data": plan.to_dict(),
                 "message": "Trade plan updated successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "תכנון לא נמצא"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error updating trade plan {plan_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         db.close()
@@ -123,19 +123,19 @@ def cancel_trade_plan(plan_id: int):
                 "status": "success",
                 "data": plan.to_dict(),
                 "message": "Trade plan cancelled successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "תכנון לא נמצא או שכבר מבוטל"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error cancelling trade plan {plan_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         if db:
@@ -152,19 +152,19 @@ def activate_trade_plan(plan_id: int):
                 "status": "success",
                 "data": plan.to_dict(),
                 "message": "Trade plan activated successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "תכנון לא נמצא או שכבר פעיל"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error activating trade plan {plan_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         db.close()
@@ -180,14 +180,14 @@ def get_trade_plan_summary():
             "status": "success",
             "data": summary,
             "message": "Trade plan summary retrieved successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error getting trade plan summary: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "שגיאה בטעינת סיכום תכנונים"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -202,14 +202,14 @@ def can_cancel_trade_plan(plan_id: int):
             "status": "success",
             "data": cancel_check,
             "message": "Trade plan cancellation check completed",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error checking if trade plan {plan_id} can be cancelled: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         db.close()
@@ -226,7 +226,7 @@ def delete_trade_plan(plan_id: int):
             return jsonify({
                 "status": "success",
                 "message": "Trade plan deleted successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         
         # If deletion failed, it means there are linked items or plan not found
@@ -235,14 +235,14 @@ def delete_trade_plan(plan_id: int):
             "error": {
                 "message": "לא ניתן למחוק תכנון זה - יש פריטים מקושרים אליו"
             },
-            "version": "v1"
+            "version": "1.0"
         }), 400
     except Exception as e:
         logger.error(f"Error deleting trade plan {plan_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         db.close()

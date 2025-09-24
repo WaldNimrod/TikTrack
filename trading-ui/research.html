@@ -54,29 +54,28 @@
     <!-- Header Styles - Separate CSS file (Exception to unified CSS system) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=v33_green_orange">
     
-    <!-- Research Page Specific Styles - Now included in ITCSS individual files -->
-    <script src="scripts/table-mappings.js"></script>
-    <script src="scripts/date-utils.js"></script>
+    <!-- 🔄 NEW UNIFIED INITIALIZATION SYSTEM -->
+    <!-- Core Systems -->
+    <script src="scripts/global-favicon.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/system-management.js"></script>
+    <script src="scripts/notification-category-detector.js"></script>
+    <script src="scripts/notification-migration-system.js"></script>
+    <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/tables.js"></script>
-    <script src="scripts/linked-items.js"></script>
     <script src="scripts/page-utils.js"></script>
     <script src="scripts/central-refresh-system.js"></script>
-    <script src="scripts/preferences.js"></script>
-          <script src="scripts/color-scheme-system.js"></script>
-    <script src="scripts/global-favicon.js"></script>
-    <script src="scripts/header-system.js?v=20250115_level3_fix"></script>
-  <script src="scripts/notification-system.js"></script>
-    <script src="scripts/system-management.js"></script>
-  <script src="scripts/global-notification-collector.js"></script>
-  <script src="scripts/validation-utils.js"></script>
     <script src="scripts/research.js"></script>
-  
+    
+    <!-- New Unified Initialization System -->
+    <script src="scripts/application-initializer.js"></script>
+    <script src="scripts/page-initialization-configs.js"></script>
+    <script src="scripts/unified-app-initializer.js"></script>
 
-    <!-- Page initialization -->
-    <script>
-      // אתחול הדף
-      document.addEventListener('DOMContentLoaded', function () {
-        console.log('🚀 טעינת דף תחקיר עם מערכת ראש דף חדשה...');
+    <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
+    <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
 
         // אתחול HeaderSystem
         if (window.headerSystem && !window.headerSystem.isInitialized) {

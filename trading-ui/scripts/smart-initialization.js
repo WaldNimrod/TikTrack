@@ -361,3 +361,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('❌ Smart auto-initialization failed:', error);
     }
 });
+

@@ -322,12 +322,14 @@ window.appInitializer.registerStageFunction('page', async (pageConfig) => {
         window.setupSortableHeaders();
     }
     
-    // Execute custom initializers
-    for (const customInit of pageConfig.customInitializers) {
-        if (typeof customInit === 'function') {
-            await customInit(pageConfig);
+        // Execute custom initializers
+        if (pageConfig.customInitializers && Array.isArray(pageConfig.customInitializers)) {
+            for (const customInit of pageConfig.customInitializers) {
+                if (typeof customInit === 'function') {
+                    await customInit(pageConfig);
+                }
+            }
         }
-    }
     
     console.log('✅ Page Systems initialized');
 }, { name: 'PageSystemsInit', required: false });

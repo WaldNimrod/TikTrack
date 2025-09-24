@@ -207,28 +207,28 @@ The new unified initialization system replaces 111 DOMContentLoaded listeners ac
 ### 🎯 Preferences Page (`preferences-page.js`)
 | Function | Description |
 |----------|-------------|
-| `window.loadAccountsForPreferences()` | Load accounts for preferences page |
+| `window.loadTradingAccountsForPreferences()` | Load trading accounts for preferences page |
 | `window.loadColorsForPreferences()` | Load colors for preferences page |
 | `window.validateCurrency(selectElement)` | Validate currency selection |
 | `window.initializePreferencesPage()` | Initialize preferences page |
 
 ### 📊 Entity Service Functions
 
-#### Accounts (`accounts.js`)
+#### Trading Accounts (`trading_accounts.js`)
 | Function | Description |
 |----------|-------------|
-| `window.loadAccountsFromServer()` | Load accounts from server |
-| `window.loadAllAccountsFromServer()` | Load all accounts from server |
-| `window.loadDefaultAccounts()` | Load default accounts |
-| `window.loadAccountsData()` | Load accounts data |
-| `window.updateAccountsTable(accounts)` | Update accounts table |
-| `window.loadAccounts()` | Load accounts |
-| `window.loadAccountsDataFromAPI()` | Load accounts data from API |
-| `window.addAccountToAPI(accountData)` | Add account to API |
-| `window.updateAccountInAPI(accountId, accountData)` | Update account in API |
-| `window.deleteAccountFromAPI(accountId)` | Delete account from API |
-| `window.checkLinkedItemsBeforeDelete(accountId)` | Check linked items before delete |
-| `window.loadAccountsDataForAccountsPage()` | Load accounts data for accounts page |
+| `window.loadTradingAccountsFromServer()` | Load trading accounts from server |
+| `window.loadAllTradingAccountsFromServer()` | Load all trading accounts from server |
+| `window.loadDefaultTradingAccounts()` | Load default trading accounts |
+| `window.loadTradingAccountsData()` | Load trading accounts data |
+| `window.updateTradingAccountsTable(tradingAccounts)` | Update trading accounts table |
+| `window.loadTradingAccounts()` | Load trading accounts |
+| `window.loadTradingAccountsDataFromAPI()` | Load trading accounts data from API |
+| `window.addTradingAccountToAPI(tradingAccountData)` | Add trading account to API |
+| `window.updateTradingAccountInAPI(tradingAccountId, tradingAccountData)` | Update trading account in API |
+| `window.deleteTradingAccountFromAPI(tradingAccountId)` | Delete trading account from API |
+| `window.checkLinkedItemsBeforeDeleteTradingAccount(tradingAccountId)` | Check linked items before delete trading account |
+| `window.loadTradingAccountsDataForTradingAccountsPage()` | Load trading accounts data for trading accounts page |
 
 #### Tickers (`tickers.js`)
 | Function | Description |
@@ -337,10 +337,10 @@ The new unified initialization system replaces 111 DOMContentLoaded listeners ac
 |----------|-------------|
 | `window.resetFiltersManually()` | Reset filters manually |
 | `window.clearAllFilters()` | Clear all filters |
-| `window.loadAccountsForFilter()` | Load accounts for filter |
-| `window.updateAccountFilterOptions()` | Update account filter options |
-| `window.useAccountFilterFallback()` | Use account filter fallback |
-| `window.getAccountIdByName(accountName)` | Get account ID by name |
+| `window.loadTradingAccountsForFilter()` | Load trading accounts for filter |
+| `window.updateTradingAccountFilterOptions()` | Update trading account filter options |
+| `window.useTradingAccountFilterFallback()` | Use trading account filter fallback |
+| `window.getTradingAccountIdByName(tradingAccountName)` | Get trading account ID by name |
 
 #### Header System (`header-system.js`)
 | Function | Description |
@@ -348,20 +348,20 @@ The new unified initialization system replaces 111 DOMContentLoaded listeners ac
 | `window.HeaderSystem` | Header system class |
 | `window.resetFiltersManually()` | Reset filters manually |
 | `window.clearAllFilters()` | Clear all filters |
-| `window.loadAccountsForFilter()` | Load accounts for filter |
-| `window.updateAccountFilterOptions()` | Update account filter options |
-| `window.useAccountFilterFallback()` | Use account filter fallback |
-| `window.getAccountIdByName(accountName)` | Get account ID by name |
+| `window.loadTradingAccountsForFilter()` | Load trading accounts for filter |
+| `window.updateTradingAccountFilterOptions()` | Update trading account filter options |
+| `window.useTradingAccountFilterFallback()` | Use trading account filter fallback |
+| `window.getTradingAccountIdByName(tradingAccountName)` | Get trading account ID by name |
 
 #### Menu System (`menu.js`)
 | Function | Description |
 |----------|-------------|
 | `window.resetFiltersManually()` | Reset filters manually |
 | `window.clearFiltersManually()` | Clear filters manually |
-| `window.loadAccountsForFilter()` | Load accounts for filter |
-| `window.updateAccountFilterOptions()` | Update account filter options |
-| `window.useAccountFilterFallback()` | Use account filter fallback |
-| `window.getAccountIdByName(accountName)` | Get account ID by name |
+| `window.loadTradingAccountsForFilter()` | Load trading accounts for filter |
+| `window.updateTradingAccountFilterOptions()` | Update trading account filter options |
+| `window.useTradingAccountFilterFallback()` | Use trading account filter fallback |
+| `window.getTradingAccountIdByName(tradingAccountName)` | Get trading account ID by name |
 
 ### 🛠️ Utility Functions
 

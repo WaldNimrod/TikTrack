@@ -109,8 +109,8 @@ function formatCurrencyWithCommas(amount, currency = '') {
 const currencyDisplay = getCashFlowCurrencyDisplay(cashFlow.currency_id);
 // Result: 'USD - US Dollar' or 'Not Selected'
 
-// In accounts.js
-const balanceDisplay = formatCurrencyWithCommas(account.balance, account.currency);
+// In trading_accounts.js
+const balanceDisplay = formatCurrencyWithCommas(tradingAccount.balance, tradingAccount.currency);
 // Result: '1,234.56 USD' or '1,234.56'
 ```
 
@@ -144,8 +144,8 @@ function colorAmountByValue(amount) {
 const formattedAmount = formatNumberWithCommas(cashFlow.amount);
 // Result: '1,234.56' → '1,234.56'
 
-// In accounts.js
-const amountClass = colorAmountByValue(account.balance);
+// In trading_accounts.js
+const amountClass = colorAmountByValue(tradingAccount.balance);
 // Result: positive → 'text-success', negative → 'text-danger'
 ```
 
@@ -161,7 +161,7 @@ function renderCashFlowsTable(cashFlows) {
     cashFlows.forEach(cashFlow => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${cashFlow.account_name}</td>
+            <td>${cashFlow.trading_account_name}</td>
             <td>${translateAlertCondition(cashFlow.type)}</td>
             <td class="${colorAmountByValue(cashFlow.amount)}">
                 ${formatCurrencyWithCommas(cashFlow.amount)}
@@ -185,7 +185,7 @@ function renderAlertsTable(alerts) {
     alerts.forEach(alert => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${alert.account_name}</td>
+            <td>${alert.trading_account_name}</td>
             <td>${translateAlertCondition(alert.condition_attribute)}</td>
             <td>${translateTradeStatus(alert.status)}</td>
             <td>${alert.message}</td>
@@ -195,11 +195,11 @@ function renderAlertsTable(alerts) {
 }
 ```
 
-### Accounts Module Integration
+### Trading Accounts Module Integration
 ```javascript
-// In accounts.js
-function renderAccountsTable(accounts) {
-    const tbody = document.getElementById('accountsTableBody');
+// In trading_accounts.js
+function renderTradingAccountsTable(tradingAccounts) {
+    const tbody = document.getElementById('tradingAccountsTableBody');
     tbody.innerHTML = '';
     
     accounts.forEach(account => {

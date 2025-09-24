@@ -27,7 +27,7 @@
 |-----|-----|--------|-------------|
 | performanceChart | line | ביצועי תיק | דמה |
 | allocationChart | doughnut | הקצאה | דמה |
-| accountsChart | bar | חשבונות | דמה |
+| tradingAccountsChart | bar | חשבונות מסחר | דמה |
 | riskChart | scatter | סיכון | דמה |
 
 #### linter-realtime-monitor.html (דשבורד Linter)

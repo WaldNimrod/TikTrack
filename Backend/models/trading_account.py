@@ -61,13 +61,13 @@ class TradingAccount(BaseModel):
     # Notes relationship removed - notes now use related_type and related_id
     
     def __repr__(self) -> str:
-        """String representation of the Account object."""
+        """String representation of the TradingAccount object."""
         currency_symbol = self.currency.symbol if self.currency else 'USD'
-        return f"<Account(name='{self.name}', currency_id='{self.currency_id}', status='{self.status}')>"
+        return f"<TradingAccount(name='{self.name}', currency_id='{self.currency_id}', status='{self.status}')>"
     
     def to_dict(self) -> Dict[str, Any]:
         """
-        Convert Account object to dictionary for JSON serialization.
+        Convert TradingAccount object to dictionary for JSON serialization.
         
         Returns:
             dict: Dictionary representation of the account
@@ -91,9 +91,9 @@ class TradingAccount(BaseModel):
         Check if the account is active.
         
         Note: All status values are now in English:
-        - 'open': Account is active and operational
-        - 'closed': Account is closed but can be reopened
-        - 'cancelled': Account is permanently cancelled
+        - 'open': TradingAccount is active and operational
+        - 'closed': TradingAccount is closed but can be reopened
+        - 'cancelled': TradingAccount is permanently cancelled
         """
         return self.status == 'open'
     

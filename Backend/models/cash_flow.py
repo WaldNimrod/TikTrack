@@ -17,7 +17,7 @@ class CashFlow(BaseModel):
     external_id = Column(String(100), nullable=True, default='0')
     
     # Relationships
-    account = relationship("Account", back_populates="cash_flows")
+    account = relationship("TradingAccount", back_populates="cash_flows")
     currency = relationship("Currency", back_populates="cash_flows")
     
     def __repr__(self) -> str:

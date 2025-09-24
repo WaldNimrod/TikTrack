@@ -23,7 +23,7 @@
             border-collapse: collapse; 
             width: 100%; 
             font-size: 10px;
-            min-width: 1200px;
+            min-width: 1400px;
         }
         
         th, td { 
@@ -43,7 +43,7 @@
         
         /* עמודות מערכת - רוחב קבוע */
         th:nth-child(1), td:nth-child(1) { width: 30px; } /* # */
-        th:nth-child(2), td:nth-child(2) { width: 120px; text-align: right; } /* מערכת */
+        th:nth-child(2), td:nth-child(2) { width: 140px; text-align: right; } /* מערכת */
         th:nth-child(3), td:nth-child(3) { width: 40px; } /* דוק' */
         
         /* עמודות עמודים - רוחב מינימלי */
@@ -73,6 +73,13 @@
         
         h1 { font-size: 18px; margin-bottom: 10px; }
         h2 { font-size: 14px; margin-bottom: 8px; }
+        
+        .summary {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -212,267 +219,49 @@
                 <td class="orange">🟠</td>
                 <td class="orange">🟠</td>
             </tr>
-            
-            <!-- מערכות ממשק משתמש בסיסיות -->
-            <tr class="header-row">
-                <td colspan="21"><strong>2. מערכות ממשק משתמש בסיסיות</strong></td>
+            <tr>
+                <td>1.5</td>
+                <td>isModuleAvailable</td>
+                <td>3</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
             </tr>
             <tr>
-                <td>2.1</td>
-                <td>showNotification</td>
-                <td>5</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
+                <td>1.6</td>
+                <td>getSystemInfo</td>
+                <td>3</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
+                <td class="orange">🟠</td>
             </tr>
-            <tr>
-                <td>2.2</td>
-                <td>showSuccessNotification</td>
-                <td>5</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-            </tr>
-            
-            <!-- UI Utilities -->
-            <tr class="header-row">
-                <td colspan="21"><strong>3. UI Utilities (ui-utils.js)</strong></td>
-            </tr>
-            <tr>
-                <td>3.1</td>
-                <td>toggleTopSection</td>
-                <td>5</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-            </tr>
-            <tr>
-                <td>3.2</td>
-                <td>toggleMainSection</td>
-                <td>5</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="gray">⚫</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="gray">⚫</td>
-                <td class="gray">⚫</td>
-                <td class="green">🟢</td>
-                <td class="gray">⚫</td>
-                <td class="gray">⚫</td>
-                <td class="gray">⚫</td>
-                <td class="gray">⚫</td>
-                <td class="gray">⚫</td>
-                <td class="gray">⚫</td>
-                <td class="gray">⚫</td>
-                <td class="gray">⚫</td>
-                <td class="gray">⚫</td>
-                <td class="gray">⚫</td>
-            </tr>
-            <tr>
-                <td>3.3</td>
-                <td>toggleSection</td>
-                <td>5</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-            </tr>
-            <tr>
-                <td>3.4</td>
-                <td>toggleAllSections</td>
-                <td>5</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-            </tr>
-            
-            <!-- Table System -->
-            <tr class="header-row">
-                <td colspan="21"><strong>4. Table System (tables.js)</strong></td>
-            </tr>
-            <tr>
-                <td>4.1</td>
-                <td>sortTableData</td>
-                <td>5</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-            </tr>
-            <tr>
-                <td>4.2</td>
-                <td>sortTable</td>
-                <td>5</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-            </tr>
-            
-            <!-- Cache Management System -->
-            <tr class="header-row">
-                <td colspan="21"><strong>5. Cache Management System</strong></td>
-            </tr>
-            <tr>
-                <td>5.1</td>
-                <td>clearAllCache</td>
-                <td>5</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-            </tr>
-            <tr>
-                <td>5.2</td>
-                <td>clearDevelopmentCache</td>
-                <td>5</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-                <td class="green">🟢</td>
-            </tr>
-        </tbody>
-        </table>
-    </div>
-
-    <h2>סיכום סטטוס:</h2>
-    <ul>
-        <li><strong>🟢 מערכות מיושמות במלואה:</strong> showNotification, toggleSection, toggleAllSections, sortTableData, clearAllCache</li>
-        <li><strong>🟠 מערכות שצריכות תיקון:</strong> initializeApplication, initializeCoreSystems, initializeCurrentPage</li>
-        <li><strong>⚫ מערכות לא רלוונטיות:</strong> toggleMainSection (בחלק מהעמודים)</li>
-    </ul>
-
-    <p><strong>עדכון אחרון:</strong> 24 בספטמבר 2025</p>
-</body>
-</html>

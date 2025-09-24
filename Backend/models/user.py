@@ -58,7 +58,7 @@ class User(BaseModel):
     updated_at = Column(DateTime, nullable=True)
     
     # Relationships - will be added when we implement user system in next phase
-    # accounts = relationship("Account", back_populates="user")
+    # accounts = relationship("TradingAccount", back_populates="user")
     # trades = relationship("Trade", back_populates="user")
     # alerts = relationship("Alert", back_populates="user")
     # notes = relationship("Note", back_populates="user")

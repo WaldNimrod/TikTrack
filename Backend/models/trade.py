@@ -27,7 +27,7 @@ class Trade(BaseModel):
     notes = Column(String(500), nullable=True)
     
     # Relationships
-    account = relationship("Account", back_populates="trades")
+    account = relationship("TradingAccount", back_populates="trades")
     ticker = relationship("Ticker")
     trade_plan = relationship("TradePlan", back_populates="trades")
     executions = relationship("Execution", back_populates="trade")
@@ -60,7 +60,7 @@ class Trade(BaseModel):
                 result["account_name"] = self.account.name
                 logger.info(f"Trade {self.id}: Using loaded account name: {self.account.name}")
             else:
-                result["account_name"] = f'Account_{self.account_id}' if self.account_id else 'Unknown Account'
+                result["account_name"] = f'TradingAccount_{self.account_id}' if self.account_id else 'Unknown TradingAccount'
                 logger.info(f"Trade {self.id}: Using fallback account name: {result['account_name']}")
             
             if hasattr(self, 'ticker') and self.ticker:
@@ -89,7 +89,7 @@ class Trade(BaseModel):
                 "account_id": getattr(self, 'account_id', None),
                 "ticker_id": getattr(self, 'ticker_id', None),
                 "status": getattr(self, 'status', 'unknown'),
-                "account_name": "Unknown Account",
+                "account_name": "Unknown TradingAccount",
                 "ticker_symbol": "Unknown Ticker",
                 "error": str(e)
             }

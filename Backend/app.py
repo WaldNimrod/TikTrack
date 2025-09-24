@@ -25,7 +25,7 @@ No connection to testing system!
 
 📊 Routes:
     /api/health              # Health check
-    /api/accounts            # Accounts
+    /api/trading-accounts    # Trading Accounts
     /api/trades              # Trades
     /api/tickers             # Tickers
     /api/trade_plans         # Plans
@@ -1185,7 +1185,7 @@ def update_all_tickers_open_status() -> None:
 
 
 
-# Accounts API routes are now handled by blueprints
+# Trading Accounts API routes are now handled by blueprints
 
 # User roles API routes are now handled by blueprints
 

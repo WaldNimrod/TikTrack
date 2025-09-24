@@ -73,12 +73,12 @@ class TradePlan(BaseModel):
                     'name': self.account.name
                 }
             else:
-                logger.info(f"Trade plan {self.id}: Account relationship not loaded, using account_id")
-                result['account'] = {'id': self.account_id, 'name': f'Account_{self.account_id}'}
+                logger.info(f"Trade plan {self.id}: TradingAccount relationship not loaded, using account_id")
+                result['account'] = {'id': self.account_id, 'name': f'TradingAccount_{self.account_id}'}
         except Exception as e:
             logger.error(f"Trade plan {self.id}: Error with account relationship: {str(e)}")
             # If there's a problem with the account relationship, use account_id
-            result['account'] = {'id': self.account_id, 'name': f'Account_{self.account_id}'}
+            result['account'] = {'id': self.account_id, 'name': f'TradingAccount_{self.account_id}'}
         
         return result
     

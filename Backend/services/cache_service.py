@@ -277,7 +277,7 @@ class CacheManager:
         Cache accounts data
         
         Args:
-            accounts_data (list): Accounts data to cache
+            accounts_data (list): TradingAccounts data to cache
             ttl (int): Time to live in seconds
         """
         cache_service.set("accounts_all", accounts_data, ttl)

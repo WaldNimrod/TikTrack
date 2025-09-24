@@ -6,7 +6,7 @@ from typing import Dict, Any, Optional
 class CashFlow(BaseModel):
     __tablename__ = "cash_flows"
     
-    account_id = Column(Integer, ForeignKey('accounts.id'), nullable=False)
+    trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=False)
     type = Column(String(50), nullable=False, default='deposit')  # ENUM: deposit, withdrawal, transfer, fee, dividend, interest
     amount = Column(Float, nullable=False)  # RANGE: amount != 0
     date = Column(Date, nullable=True)

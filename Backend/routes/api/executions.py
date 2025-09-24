@@ -13,7 +13,7 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-executions_bp = Blueprint('executions', __name__, url_prefix='/api/v1/executions')
+executions_bp = Blueprint('executions', __name__, url_prefix='/api/executions')
 
 # Create a simple service class for executions
 class ExecutionService:
@@ -66,7 +66,7 @@ def create_execution():
             return jsonify({
                 "status": "error",
                 "error": {"message": f"Execution validation failed: {error_message}"},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         logger.info(f"Creating execution with data: {data}")
@@ -87,14 +87,14 @@ def create_execution():
             "status": "success",
             "data": execution.to_dict(),
             "message": "Execution created successfully",
-            "version": "v1"
+            "version": "1.0"
         }), 201
     except Exception as e:
         logger.error(f"Error creating execution: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         db.close()
@@ -117,7 +117,7 @@ def update_execution(execution_id: int):
                 return jsonify({
                     "status": "error",
                     "error": {"message": f"Execution validation failed: {error_message}"},
-                    "version": "v1"
+                    "version": "1.0"
                 }), 400
             
             # Convert date string to datetime object if provided
@@ -137,19 +137,19 @@ def update_execution(execution_id: int):
                 "status": "success",
                 "data": execution.to_dict(),
                 "message": "Execution updated successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "Execution not found"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error updating execution {execution_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         db.close()
@@ -167,19 +167,19 @@ def delete_execution(execution_id: int):
             return jsonify({
                 "status": "success",
                 "message": "Execution deleted successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "Execution not found"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error deleting execution {execution_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()

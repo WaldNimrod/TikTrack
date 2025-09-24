@@ -24,7 +24,7 @@
     <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css">
     <link rel="stylesheet" href="styles-new/06-components/_modals.css">
     <link rel="stylesheet" href="styles-new/06-components/_page-headers.css">
-    <link rel="stylesheet" href="styles-new/header-styles.css">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
     
     <style>
         .test-section {
@@ -84,7 +84,12 @@
     </style>
 </head>
 <body>
-    <div class="container-fluid">
+    <!-- unified-header ייווצר כאן אוטומטית -->
+    <div id="unified-header"></div>
+    
+    <div class="page-body">
+        <div class="main-content">
+            <div class="container-fluid">
         <!-- Header -->
         <div class="row">
             <div class="col-12">
@@ -391,6 +396,12 @@
             }, 1000);
         });
     </script>
+    
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
 

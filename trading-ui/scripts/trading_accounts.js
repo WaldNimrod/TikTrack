@@ -417,8 +417,6 @@ function updateTradingAccountsTable(trading_accounts) {
         ${account.status === 'cancelled' ?
     `<button class="btn btn-sm btn-outline-success" onclick="restoreTradingAccount(${account.id}, '${account.name || 'Unknown'}')" title="החזר חשבון"><span class="reactivate-icon">✓</span></button>` :
     `<button class="btn btn-sm btn-warning" onclick="cancelTradingAccountWithLinkedItemsCheck(${account.id}, '${account.name || 'Unknown'}')" title="בטל חשבון">❌</button>`
-}
-        <button class="btn btn-sm btn-danger" onclick="deleteTradingAccountWithLinkedItemsCheck(${account.id}, '${account.name || 'Unknown'}')" title="מחק חשבון">
           🗑️
         </button>
       </td>

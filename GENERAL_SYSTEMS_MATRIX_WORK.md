@@ -246,6 +246,14 @@ function toggleSection(sectionId) {
 - **ביצועים:** אתחול תוך 2ms במקום זמן ארוך ומפוזר
 - **קבצים חדשים:** application-initializer.js, page-initialization-configs.js, unified-app-initializer.js
 
+### **🎯 סבב 9: יישום מלא לכל העמודים**
+- **מערכת:** כל 24 העמודים העיקריים
+- **בעיה:** עמודים עם scripts מפוזרים ו-DOMContentLoaded listeners ישנים
+- **פתרון:** החלפה מלאה במערכת האתחול המאוחדת החדשה
+- **תוצאה:** ✅ 100% כיסוי של כל העמודים, מערכת אחידה ומאוחדת
+- **ביצועים:** טעינה מהירה יותר, פחות שגיאות, תחזוקה קלה יותר
+- **קבצים עודכנו:** 24 עמודים עם מערכת אתחול חדשה
+
 ## **🔄 תהליך אחיד לכל מערכת**
 
 ### **📋 שלב 1: סריקה ראשונית וזיהוי בעיות**
@@ -379,11 +387,11 @@ function toggleSection(sectionId) {
 | **UI Utilities (ui-utils.js)** | | | | | | | | | | | | | | | | | | | |
 | 3.1 | toggleSection | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
 | 3.2 | toggleAllSections | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
-| 3.5 | restoreSectionStates | 0 | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ |
-| 3.6 | enhancedTableRefresh | 0 | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ |
-| 3.7 | handleApiResponseWithRefresh | 0 | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ |
-| 3.8 | getPageDataFunctions | 0 | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ |
-| 3.9 | autoRefreshCurrentPage | 0 | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ |
+| 3.5 | restoreSectionStates | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
+| 3.6 | enhancedTableRefresh | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
+| 3.7 | handleApiResponseWithRefresh | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
+| 3.8 | getPageDataFunctions | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
+| 3.9 | autoRefreshCurrentPage | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
 | 3.10 | showSecondConfirmationModal | 0 | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ |
 | 3.11 | generateActionButtons | 0 | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ |
 | 3.12 | loadTableActionButtons | 0 | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ |

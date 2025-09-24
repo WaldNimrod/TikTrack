@@ -130,12 +130,12 @@ def test_migration_completeness():
         
         # השווה V1 ו-V2
         cursor.execute("SELECT primary_currency, default_stop_loss, default_status_filter FROM user_preferences WHERE user_id = 1")
-        v1_data = cursor.fetchone()
+        legacy_data = cursor.fetchone()
         
         cursor.execute("SELECT primary_currency, default_stop_loss, default_status_filter FROM user_preferences_v2 WHERE user_id = 1")
         v2_data = cursor.fetchone()
         
-        if not v1_data:
+        if not legacy_data:
             print("⚠️ No V1 data to compare")
             return True
         
@@ -145,17 +145,17 @@ def test_migration_completeness():
         
         # השווה ערכים מפתח
         comparisons = [
-            ('Currency', v1_data[0], v2_data[0]),
-            ('Stop Loss', v1_data[1], v2_data[1]),
-            ('Status Filter', v1_data[2], v2_data[2])
+            ('Currency', legacy_data[0], v2_data[0]),
+            ('Stop Loss', legacy_data[1], v2_data[1]),
+            ('Status Filter', legacy_data[2], v2_data[2])
         ]
         
         all_match = True
-        for name, v1_val, v2_val in comparisons:
-            if str(v1_val) == str(v2_val):
-                print(f"✅ {name}: {v1_val} ➜ {v2_val}")
+        for name, legacy_val, v2_val in comparisons:
+            if str(legacy_val) == str(v2_val):
+                print(f"✅ {name}: {legacy_val} ➜ {v2_val}")
             else:
-                print(f"❌ {name}: {v1_val} ≠ {v2_val}")
+                print(f"❌ {name}: {legacy_val} ≠ {v2_val}")
                 all_match = False
         
         return all_match

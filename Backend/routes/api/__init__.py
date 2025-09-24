@@ -1,7 +1,7 @@
 # API routes package
 
 # Import all blueprints for easy access
-from .accounts import accounts_bp
+from .trading_accounts import trading_accounts_bp
 from .alerts import alerts_bp
 from .background_tasks import background_tasks_bp
 from .cache_management import cache_management_bp
@@ -39,7 +39,7 @@ from .base_entity_decorators import (
 
 __all__ = [
     # Blueprints
-    'accounts_bp',
+    'trading_accounts_bp',
     'alerts_bp',
     'background_tasks_bp',
     'cache_management_bp',

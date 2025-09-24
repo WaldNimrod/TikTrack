@@ -15,7 +15,7 @@ Date: August 2025
 from sqlalchemy.orm import Session
 from models.currency import Currency
 from models.ticker import Ticker
-from models.account import Account
+from models.trading_account import TradingAccount
 from models.trade import Trade
 from models.trade_plan import TradePlan
 from models.cash_flow import CashFlow
@@ -308,7 +308,7 @@ class CurrencyService:
             return True
         
         # Check in accounts table
-        account_count = db.query(Account).filter(Account.currency == currency_id).count()
+        account_count = db.query(TradingAccount).filter(TradingAccount.currency == currency_id).count()
         if account_count > 0:
             return True
         
@@ -394,7 +394,7 @@ class CurrencyService:
         """
         return {
             'tickers': db.query(Ticker).filter(Ticker.currency == currency_id).count(),
-            'accounts': db.query(Account).filter(Account.currency == currency_id).count(),
+            'accounts': db.query(TradingAccount).filter(TradingAccount.currency == currency_id).count(),
             'trades': db.query(Trade).filter(Trade.currency == currency_id).count(),
             'trade_plans': db.query(TradePlan).filter(TradePlan.currency == currency_id).count(),
             'cash_flows': db.query(CashFlow).filter(CashFlow.currency == currency_id).count()

@@ -1212,6 +1212,8 @@ document.addEventListener('DOMContentLoaded', () => {
  * Toggle top section visibility
  * Used for the main top section of each page
  */
+function toggleTopSection(sectionId = 'top-section') {
+  const section = document.getElementById(sectionId);
   if (!section) {
     console.warn(`⚠️ Section ${sectionId} not found`);
     return;

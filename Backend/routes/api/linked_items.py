@@ -70,7 +70,7 @@ def get_entity_types():
         entity_types = {
             'account': {
                 'id': 1,
-                'name': 'Account',
+                'name': 'TradingAccount',
                 'description': 'Trading accounts',
                 'can_have_children': True,
                 'can_have_parents': False
@@ -212,7 +212,7 @@ def get_child_entities(cursor, entity_type: str, entity_id: int) -> List[Dict[st
             child_entities.extend(get_trade_child_entities(cursor, entity_id))
             
         elif entity_type == 'account':
-            # Accounts can have trades, cash_flows, notes
+            # TradingAccounts can have trades, cash_flows, notes
             child_entities.extend(get_account_child_entities(cursor, entity_id))
             
         elif entity_type == 'ticker':
@@ -403,7 +403,7 @@ def get_trade_child_entities(cursor, trade_id: int) -> List[Dict[str, Any]]:
     
     return children
 
-# Account child entities
+# TradingAccount child entities
 def get_account_child_entities(cursor, account_id: int) -> List[Dict[str, Any]]:
     """Get child entities for an account"""
     children = []

@@ -15,7 +15,7 @@ from .external_data import ExternalDataProvider, MarketDataQuote, DataRefreshLog
 __all__ = [
     'BaseModel',
     'Ticker',
-    'Account', 
+    'TradingAccount', 
     'TradePlan',
     'Trade',
     'Alert',

@@ -67,7 +67,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- TikTrack ITCSS Main CSS - אחרי Bootstrap -->
-    <link rel="stylesheet" href="styles-new/main.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/main.css?v=1.0.0">
 
     <!-- Header Styles - נפרד מ-ITCSS -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_level3_fix">
@@ -79,7 +79,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Page-Specific CSS - אחרון -->
-    <link rel="stylesheet" href="styles-new/07-trumps/[page-name].css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/07-trumps/[page-name].css?v=1.0.0">
 </head>
 
 <body>
@@ -267,11 +267,11 @@
     <!-- CSS לפי סדר הנכון -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles-new/main.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/main.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_level3_fix">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="styles-new/07-trumps/js-map-advanced.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/07-trumps/js-map-advanced.css?v=1.0.0">
 </head>
 
 <body>
@@ -375,11 +375,11 @@ function generateReport() { /* ... */ }
     <!-- CSS לפי סדר הנכון -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles-new/main.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/main.css?v=1.0.0">
     <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_level3_fix">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="styles-new/07-trumps/page-scripts-matrix.css?v=v1.0.0">
+    <link rel="stylesheet" href="styles-new/07-trumps/page-scripts-matrix.css?v=1.0.0">
 </head>
 
 <body>

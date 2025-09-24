@@ -343,7 +343,7 @@ npm run dev:production
 #### **ניקוי ידני:**
 ```bash
 npm run cache:clear
-curl -X POST http://localhost:8080/api/v1/cache/clear
+curl -X POST http://localhost:8080/api/cache/clear
 ```
 
 #### **ניקוי דרך Restart:**
@@ -459,7 +459,7 @@ pip install -r requirements.txt
 
 ### גישה למערכת
 - **ממשק משתמש**: http://127.0.0.1:8080
-- **API**: http://127.0.0.1:8080/api/v1/
+- **API**: http://127.0.0.1:8080/api/
 - **בדיקות מידע חיצוני**: http://127.0.0.1:8080/external-data-test
 
 ## מבנה הפרויקט
@@ -501,11 +501,11 @@ TikTrackApp/
 ## API Reference
 
 ### נתיבי API ראשיים
-- `GET /api/v1/accounts/` - רשימת חשבונות
-- `GET /api/v1/trades/` - רשימת טריידים
-- `GET /api/v1/alerts/` - רשימת התראות
-- `GET /api/v1/cash_flows/` - רשימת תזרימי מזומן
-- `GET /api/v1/tickers/` - רשימת טיקרים
+- `GET /api/accounts/` - רשימת חשבונות
+- `GET /api/trades/` - רשימת טריידים
+- `GET /api/alerts/` - רשימת התראות
+- `GET /api/cash_flows/` - רשימת תזרימי מזומן
+- `GET /api/tickers/` - רשימת טיקרים
 
 ### נתיבי בדיקה
 - `GET /external-data-test` - בדיקת מידע חיצוני

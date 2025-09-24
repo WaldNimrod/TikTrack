@@ -90,16 +90,16 @@ python external_data_integration_server/testing/integration_tests.py
 ## 📊 API Endpoints
 
 ### Market Data API
-- `GET /api/v1/market-data/status` - סטטוס מערכת
-- `POST /api/v1/market-data/refresh` - רענון ידני
-- `GET /api/v1/market-data/providers` - רשימת ספקים
-- `GET /api/v1/market-data/logs` - לוגים
+- `GET /api/market-data/status` - סטטוס מערכת
+- `POST /api/market-data/refresh` - רענון ידני
+- `GET /api/market-data/providers` - רשימת ספקים
+- `GET /api/market-data/logs` - לוגים
 
 ### Quotes API
-- `GET /api/v1/quotes/{ticker_id}` - מחיר לטיקר
-- `GET /api/v1/quotes/batch` - מחירים למספר טיקרים
-- `GET /api/v1/quotes/{ticker_id}/history` - היסטוריית מחירים
-- `POST /api/v1/quotes/{ticker_id}/refresh` - רענון מחיר
+- `GET /api/quotes/{ticker_id}` - מחיר לטיקר
+- `GET /api/quotes/batch` - מחירים למספר טיקרים
+- `GET /api/quotes/{ticker_id}/history` - היסטוריית מחירים
+- `POST /api/quotes/{ticker_id}/refresh` - רענון מחיר
 
 ## ⚠️ הערות חשובות
 
@@ -111,7 +111,7 @@ python external_data_integration_server/testing/integration_tests.py
 
 ## 📝 תיעוד נוסף
 
-- [מסמך האפיון המלא](../EXTERNAL_DATA_INTEGRATION_SPECIFICATION_v1.3.1.md)
+- [מסמך האפיון המלא](../EXTERNAL_DATA_INTEGRATION_SPECIFICATION_1.3.1.md)
 - [מדריך פיתוח](documentation/DEVELOPMENT_GUIDE.md) (עתידי)
 - [מדריך בדיקות](documentation/TESTING_GUIDE.md) (עתידי)
 

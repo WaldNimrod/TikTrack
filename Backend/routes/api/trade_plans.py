@@ -44,7 +44,7 @@ def get_trade_plans_by_account(account_id: int):
         return jsonify({
             "status": "success",
             "data": [plan.to_dict() for plan in plans],
-            "message": "Account trade plans retrieved successfully",
+            "message": "TradingAccount trade plans retrieved successfully",
             "version": "1.0"
         })
     except Exception as e:

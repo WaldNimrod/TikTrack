@@ -66,22 +66,22 @@ invalidate_cache('trades')
 
 ### סטטיסטיקות Cache
 ```
-GET /api/v1/cache/stats
+GET /api/cache/stats
 ```
 
 ### בדיקת בריאות
 ```
-GET /api/v1/cache/health
+GET /api/cache/health
 ```
 
 ### ניקוי Cache
 ```
-POST /api/v1/cache/clear
+POST /api/cache/clear
 ```
 
 ### Invalidation לפי Dependency
 ```
-POST /api/v1/cache/invalidate
+POST /api/cache/invalidate
 {
     "dependency": "tickers"
 }
@@ -89,7 +89,7 @@ POST /api/v1/cache/invalidate
 
 ### מידע על המערכת
 ```
-GET /api/v1/cache/info
+GET /api/cache/info
 ```
 
 ## דף בדיקה

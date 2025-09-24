@@ -104,7 +104,7 @@ def get_trades_by_account(account_id: int):
         return jsonify({
             "status": "success",
             "data": [trade.to_dict() for trade in trades],
-            "message": "Account trades retrieved successfully",
+            "message": "TradingAccount trades retrieved successfully",
             "version": "1.0"
         })
     except Exception as e:

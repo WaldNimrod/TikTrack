@@ -24,7 +24,7 @@ from models.trade_plan import TradePlan
 from models.note import Note
 from models.alert import Alert
 from models.execution import Execution
-from models.account import Account
+from models.trading_account import TradingAccount
 from utils.performance_monitor import monitor_database_query
 import logging
 
@@ -104,7 +104,7 @@ class QueryOptimizer:
     
     @staticmethod
     @monitor_database_query("get_accounts_with_trades")
-    def get_accounts_with_trades(db: Session) -> List[Account]:
+    def get_accounts_with_trades(db: Session) -> List[TradingAccount]:
         """
         Get accounts with their trades using lazy loading
         
@@ -112,11 +112,11 @@ class QueryOptimizer:
             db (Session): Database session
             
         Returns:
-            List[Account]: List of accounts with trades loaded
+            List[TradingAccount]: List of accounts with trades loaded
         """
-        return db.query(Account).options(
-            joinedload(Account.trades).joinedload(Trade.executions),
-            joinedload(Account.currency)
+        return db.query(TradingAccount).options(
+            joinedload(TradingAccount.trades).joinedload(Trade.executions),
+            joinedload(TradingAccount.currency)
         ).all()
     
     @staticmethod
@@ -211,8 +211,8 @@ class QueryOptimizer:
             Trade.price,
             Trade.status,
             Ticker.name.label('ticker_name'),
-            Account.name.label('account_name')
-        ).join(Ticker).join(Account)
+            TradingAccount.name.label('account_name')
+        ).join(Ticker).join(TradingAccount)
         
         if ticker_id:
             query = query.filter(Trade.ticker_id == ticker_id)

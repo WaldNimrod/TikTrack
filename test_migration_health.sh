@@ -4,7 +4,7 @@ echo "1. בדיקת בסיס נתונים..."
 sqlite3 Backend/db/simpleTrade_new.db "SELECT COUNT(*) FROM accounts;" | xargs -I {} echo "   ✅ יש {} חשבונות במערכת"
 
 echo "2. בדיקת API..."
-STATUS=$(curl -s http://localhost:8080/api/v1/accounts/ | jq -r '.status' 2>/dev/null)
+STATUS=$(curl -s http://localhost:8080/api/accounts/ | jq -r '.status' 2>/dev/null)
 if [ "$STATUS" = "success" ]; then
     echo "   ✅ API עובד תקין"
 else

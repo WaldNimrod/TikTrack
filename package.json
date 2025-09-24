@@ -24,7 +24,7 @@
     "dev:normal": "TIKTRACK_DEV_MODE=true TIKTRACK_CACHE_DISABLED=false ./restart quick",
     "dev:no-cache": "TIKTRACK_DEV_MODE=true TIKTRACK_CACHE_DISABLED=true ./restart quick",
     "dev:production": "TIKTRACK_DEV_MODE=false TIKTRACK_CACHE_DISABLED=false ./restart quick",
-    "cache:clear": "curl -X POST http://localhost:8080/api/v1/cache/clear",
+    "cache:clear": "curl -X POST http://localhost:8080/api/cache/clear",
     "css:build": "cat trading-ui/styles-new/main.css > trading-ui/dist/main.css",
     "css:watch": "watch 'npm run css:build' trading-ui/styles-new/",
     "css:minify": "cleancss -o trading-ui/dist/main.min.css trading-ui/dist/main.css",

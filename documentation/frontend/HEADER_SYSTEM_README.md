@@ -19,7 +19,6 @@ The TikTrack Header System is a comprehensive navigation and filtering solution 
 - **Main Files**: 
   - `trading-ui/scripts/header-system.js` - Main header system (TO BE UPDATED)
   - `trading-ui/scripts/filter-system.js` - Global filter system (EXISTING)
-  - `trading-ui/scripts/main.js` - Global utilities and initialization
 - **Test Page**: `trading-ui/test-header-only.html` - Reference implementation
 
 ### 2. **Bootstrap 5 Integration - COMPLETED**
@@ -52,7 +51,6 @@ trading-ui/
 ├── scripts/
 │   ├── header-system.js         # Main header system (UPDATED)
 │   ├── filter-system.js         # Global filter system (EXISTING)
-│   └── main.js                  # Global utilities (EXISTING)
 ├── styles-new/
 │   ├── 01-settings/             # CSS variables and settings
 │   ├── 03-generic/              # Reset and base styles
@@ -444,7 +442,6 @@ To add the new header system to any page:
     <!-- Load JavaScript in correct order -->
     <script src="scripts/filter-system.js"></script>
     <script src="scripts/header-component.js"></script>
-    <script src="scripts/main.js"></script>
 </body>
 </html>
 ```
@@ -1425,7 +1422,6 @@ The new header component integrates with the existing global filter system witho
 
 #### **Existing Filter System Files (UNCHANGED)**
 - `trading-ui/scripts/filter-system.js` - Global filter system (EXISTING)
-- `trading-ui/scripts/main.js` - Global utilities (EXISTING)
 
 #### **How Integration Works**
 The new header component delegates filter operations to the existing system:

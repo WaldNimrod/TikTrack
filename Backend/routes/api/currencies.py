@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.currency_service import CurrencyService
@@ -8,9 +8,16 @@ import os
 import sqlite3
 import re
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 logger = logging.getLogger(__name__)
 
 currencies_bp = Blueprint('currencies', __name__, url_prefix='/api/v1/currencies')
+
+# Initialize base API (currencies uses direct SQLite, so we'll use it selectively)
 
 def get_db_connection():
     """Get database connection"""
@@ -22,9 +29,11 @@ def get_db_connection():
     return conn
 
 @currencies_bp.route('/', methods=['GET'])
+@api_endpoint(cache_ttl=3600, rate_limit=60)
+@handle_database_session()
 @cache_with_deps(ttl=3600, dependencies=['currencies'])  # Cache for 1 hour - static data
 def get_currencies():
-    """Get all currencies"""
+    """Get all currencies using base API patterns"""
     try:
         conn = get_db_connection()
         cursor = conn.cursor()

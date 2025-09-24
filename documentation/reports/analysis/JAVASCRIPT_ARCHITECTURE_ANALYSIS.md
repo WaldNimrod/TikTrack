@@ -4,7 +4,6 @@
 ### 📋 סיכום המצב הנוכחי
 
 #### ✅ קבצי ליבה (Core Files) - מצב תקין
-- `main.js` ✅ - קיים ופועל כראוי
 - `header-system.js` ✅ - קיים ופועל כראוי  
 - `notification-system.js` ✅ - קיים, **אך מכיל פונקציות שצריכות להיות ב-warning-system.js**
 - `console-cleanup.js` ✅ - קיים ופועל כראוי

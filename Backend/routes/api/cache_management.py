@@ -13,7 +13,7 @@ Created: September 2025
 Version: 1.0
 """
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from services.advanced_cache_service import (
     get_cache_stats,
     cache_health_check,
@@ -22,49 +22,68 @@ from services.advanced_cache_service import (
 )
 import logging
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 logger = logging.getLogger(__name__)
 
 # Create blueprint
 cache_management_bp = Blueprint('cache_management', __name__, url_prefix='/api/v1/cache')
 
+# Initialize base API (cache management is complex, so we'll use it selectively)
+
 
 @cache_management_bp.route('/stats', methods=['GET'])
+@api_endpoint(cache_ttl=60, rate_limit=60)
+@handle_database_session()
 def get_cache_statistics():
-    """Get cache statistics"""
+    """Get cache statistics using base API patterns"""
     try:
         stats = get_cache_stats()
         return jsonify({
             'status': 'success',
-            'data': stats
+            'data': stats,
+            'message': 'Cache statistics retrieved successfully',
+            'version': 'v1'
         }), 200
     except Exception as e:
         logger.error(f"Failed to get cache stats: {e}")
         return jsonify({
             'status': 'error',
-            'message': f'Failed to get cache statistics: {str(e)}'
+            'error': {'message': f'Failed to get cache statistics: {str(e)}'},
+            'version': 'v1'
         }), 500
 
 
 @cache_management_bp.route('/health', methods=['GET'])
+@api_endpoint(cache_ttl=30, rate_limit=60)
+@handle_database_session()
 def check_cache_health():
-    """Check cache health status"""
+    """Check cache health status using base API patterns"""
     try:
         health = cache_health_check()
         return jsonify({
             'status': 'success',
-            'data': health
+            'data': health,
+            'message': 'Cache health check completed successfully',
+            'version': 'v1'
         }), 200
     except Exception as e:
         logger.error(f"Failed to check cache health: {e}")
         return jsonify({
             'status': 'error',
-            'message': f'Failed to check cache health: {str(e)}'
+            'error': {'message': f'Failed to check cache health: {str(e)}'},
+            'version': 'v1'
         }), 500
 
 
 @cache_management_bp.route('/status', methods=['GET'])
+@api_endpoint(cache_ttl=30, rate_limit=60)
+@handle_database_session()
 def get_cache_status():
-    """Get cache system status"""
+    """Get cache system status using base API patterns"""
     try:
         stats = get_cache_stats()
         health = cache_health_check()
@@ -102,13 +121,16 @@ def get_cache_status():
         
         return jsonify({
             'status': 'success',
-            'data': status_info
+            'data': status_info,
+            'message': 'Cache status retrieved successfully',
+            'version': 'v1'
         }), 200
     except Exception as e:
         logger.error(f"Failed to get cache status: {e}")
         return jsonify({
             'status': 'error',
-            'message': f'Failed to get cache status: {str(e)}'
+            'error': {'message': f'Failed to get cache status: {str(e)}'},
+            'version': 'v1'
         }), 500
 
 

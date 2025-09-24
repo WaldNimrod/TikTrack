@@ -55,7 +55,6 @@
 ```
 trading-ui/scripts/
 ├── header-system.js          # מערכת הכותרת המאוחדת
-├── main.js                   # פונקציות גלובליות
 ├── tables.js                 # פונקציות טבלאות
 ├── translation-utils.js      # פונקציות תרגום
 ├── data-utils.js            # פונקציות נתונים

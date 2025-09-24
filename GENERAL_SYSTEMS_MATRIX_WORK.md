@@ -211,6 +211,7 @@ function toggleSection(sectionId) {
 - **פעולות:**
   - תיקון הפונקציה הכללית ב-`tables.js`
   - תיקון 4 קריאות שגויות
+  - הוספת פונקציות גלובליות חסרות: `loadTableData`, `refreshTable`
   - בדיקת תקינות
 - **תוצאה:** 🟢 מערכת כללית מיושמת במלואה
 
@@ -396,11 +397,12 @@ function toggleSection(sectionId) {
 | 5.3 | getAllUserPreferences | 0 | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ |
 | 5.4 | loadPreferences | 0 | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ |
 | 5.5 | initializePreferences | 0 | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ | ⚫ |
-| **IndexedDB System** | | | | | | | | | | | | | | | | | | | |
-| 6.1 | initializeIndexedDB | 4 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 |
-| 6.2 | saveToIndexedDB | 4 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 |
-| 6.3 | getFromIndexedDB | 4 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 |
-| 6.4 | clearIndexedDB | 4 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 | 🟠 |
+| **Unified IndexedDB System** | | | | | | | | | | | | | | | | | | | |
+| 6.1 | UnifiedIndexedDB | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
+| 6.2 | saveFileMapping | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
+| 6.3 | saveNotificationHistory | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
+| 6.4 | saveHeaderState | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
+| 6.5 | saveLinterScanningResults | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
 | **File Mapping System** | | | | | | | | | | | | | | | | | | | |
 | 7.1 | discoverProjectFiles | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
 | 7.2 | saveFileMapping | 5 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 | 🟢 |
@@ -419,16 +421,18 @@ function toggleSection(sectionId) {
 - לכל מערכת יש לקרוא תחילה את הדוקומנטציה שלה
 
 ### **🆕 מערכות חדשות שנוספו:**
-1. **IndexedDB System** - מערכת אחסון מקומי מתקדמת
-   - `initializeIndexedDB` - אתחול מסד נתונים מקומי
-   - `saveToIndexedDB` - שמירת נתונים למסד מקומי
-   - `getFromIndexedDB` - קבלת נתונים מהמסד המקומי
-   - `clearIndexedDB` - ניקוי מסד נתונים מקומי
-
-2. **File Mapping System** - מערכת מיפוי קבצי הפרויקט
-   - `discoverProjectFiles` - גילוי קבצי הפרויקט
+1. **Unified IndexedDB System** - מערכת אחסון מקומי מאוחדת ומתקדמת
+   - `UnifiedIndexedDB` - מתאם מרכזי לכל מערכות האחסון
    - `saveFileMapping` - שמירת מיפוי קבצים
-   - `getFileMapping` - קבלת מיפוי קבצים
+   - `saveNotificationHistory` - שמירת היסטוריית התראות
+   - `saveHeaderState` - שמירת מצב כותרת ופילטרים
+   - `saveLinterScanningResults` - שמירת תוצאות סריקת Linter
+   - **מיגרציה הושלמה:** File Mapping, Notification, Header, Linter Monitor
+
+2. **File Mapping System** - מערכת מיפוי קבצי הפרויקט (מיגרציה הושלמה)
+   - `discoverProjectFiles` - גילוי קבצי הפרויקט
+   - `saveFileMapping` - שמירת מיפוי קבצים (עכשיו דרך UnifiedIndexedDB)
+   - `getFileMapping` - קבלת מיפוי קבצים (עכשיו דרך UnifiedIndexedDB)
    - `updateFileMappingStatus` - עדכון סטטוס מיפוי
 
 3. **Cache Management System** - מערכת ניהול מטמון
@@ -548,6 +552,15 @@ function toggleSection(sectionId) {
   2. **תיקון linter-realtime-monitor.js**: הסרת ייצואים שגרמו לקונפליקט
   3. **הוספת לוגים מפורטים**: לכל פונקציות toggle כדי לעזור באיתור בעיות
   4. **ניקוי cache**: עדכון זמן הקובץ כדי לכפות רענון בדפדפן
+
+### **🎯 עדכון סטטוס - תיקון אינסוף רקורסיה במערכת האתחול (הושלם):**
+- **לפני:** אינסוף רקורסיה ב-overrideNativeConfirm, restoreAllSectionStates, ו-showNotificationSmart
+- **אחרי:** 🟢 (אין רקורסיה, פונקציות עובדות נכון)
+- **פעולות שבוצעו:**
+  1. **תיקון main.js**: הסרת קריאות רקורסיביות ב-overrideNativeConfirm ו-restoreAllSectionStates
+  2. **תיקון notification-category-detector.js**: הוספת בדיקות למניעת רקורסיה ב-showNotificationSmart
+  3. **הוספת fallback functions**: לכל הפונקציות כדי למנוע רקורסיה
+  4. **בדיקת תקינות**: וידוא שהפונקציות עובדות ללא רקורסיה
 
 ### **🚨 בעיות קריטיות שזוהו:**
 1. ~~**toggleSection:** אין פונקציה כללית, 14 קבצים קוראים לפונקציה שלא קיימת!~~ ✅ **תוקן**

@@ -14,7 +14,7 @@ Version: 2.0
 Date: September 2025
 """
 
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request, current_app, g
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 import logging
@@ -22,6 +22,11 @@ from services.background_tasks import BackgroundTaskManager
 from utils.performance_monitor import monitor_performance
 from utils.error_handlers import handle_database_error, handle_validation_error
 from services.advanced_cache_service import cache_for, invalidate_cache
+
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
@@ -36,12 +41,16 @@ def set_background_task_manager(manager):
 # Create blueprint
 background_tasks_bp = Blueprint('background_tasks', __name__, url_prefix='/api/v1/background-tasks')
 
+# Initialize base API (background tasks is complex, so we'll use it selectively)
+
 @background_tasks_bp.route('/', methods=['GET'])
+@api_endpoint(cache_ttl=30, rate_limit=60)
+@handle_database_session()
 @monitor_performance("background_tasks_status")
 # @cache_for(ttl=30)  # Cache disabled - status needs to be real-time for testing
 def get_background_tasks_status():
     """
-    Get comprehensive background tasks status
+    Get comprehensive background tasks status using base API patterns
     
     Returns:
         JSON: Complete system status including tasks, scheduler, and performance metrics
@@ -78,13 +87,19 @@ def get_background_tasks_status():
             'memory_usage': background_task_manager.get_memory_usage() if hasattr(background_task_manager, 'get_memory_usage') else 'N/A'
         }
         
-        return jsonify(status)
+        return jsonify({
+            'status': 'success',
+            'data': status,
+            'message': 'Background tasks status retrieved successfully',
+            'version': 'v1'
+        })
         
     except Exception as e:
         logger.error(f"Error getting background tasks status: {e}")
         return jsonify({
-            'error': 'Failed to get background tasks status',
-            'details': str(e)
+            'status': 'error',
+            'error': {'message': f'Failed to get background tasks status: {str(e)}'},
+            'version': 'v1'
         }), 500
 
 @background_tasks_bp.route('/tasks', methods=['GET'])

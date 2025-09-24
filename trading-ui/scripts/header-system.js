@@ -56,7 +56,9 @@ class HeaderSystem {
     this.setupEventListeners();
 
     // טעינת מצב שמור
-    this.loadSavedState();
+    this.loadSavedState().catch(error => {
+      console.warn('Failed to load saved state:', error);
+    });
 
     this.isInitialized = true;
   }
@@ -1142,8 +1144,8 @@ class HeaderSystem {
 
 
     // שחזור מצב הפילטרים הספציפיים
-    setTimeout(() => {
-      HeaderSystem.restoreFilterStates();
+    setTimeout(async () => {
+      await HeaderSystem.restoreFilterStates();
     }, 100);
 
     // שחזור מצב הסקשנים
@@ -1341,11 +1343,13 @@ class HeaderSystem {
     updateDateRangeFilterDisplayText();
 
     // שמירת מצב הפילטרים
-    HeaderSystem.saveFilterStates();
+    HeaderSystem.saveFilterStates().catch(error => {
+      console.warn('Failed to save filter states:', error);
+    });
   }
 
   // שמירת מצב הפילטרים הספציפיים
-  static saveFilterStates() {
+  static async saveFilterStates() {
     const filterStates = {
       status: [],
       type: [],
@@ -1395,15 +1399,53 @@ class HeaderSystem {
       filterStates.search = searchInput.value;
     }
 
-    localStorage.setItem('filterStates', JSON.stringify(filterStates));
+    // שמירה ל-UnifiedIndexedDB
+    if (window.UnifiedIndexedDB) {
+      try {
+        await window.UnifiedIndexedDB.saveFilterStates(filterStates, 'header-system');
+      } catch (error) {
+        console.warn('Failed to save filter states to UnifiedIndexedDB:', error);
+      }
+    }
+
+    // Fallback ל-localStorage
+    try {
+      localStorage.setItem('filterStates', JSON.stringify(filterStates));
+    } catch (error) {
+      console.warn('Failed to save filter states to localStorage:', error);
+    }
   }
 
   // שחזור מצב הפילטרים הספציפיים
-  static restoreFilterStates() {
-    const savedStates = localStorage.getItem('filterStates');
-    if (savedStates) {
+  static async restoreFilterStates() {
+    let filterStates = null;
+    
+    // טעינה מ-UnifiedIndexedDB
+    if (window.UnifiedIndexedDB) {
       try {
-        const filterStates = JSON.parse(savedStates);
+        const savedData = await window.UnifiedIndexedDB.getFilterStates();
+        if (savedData) {
+          filterStates = savedData;
+        }
+      } catch (error) {
+        console.warn('Failed to load filter states from UnifiedIndexedDB:', error);
+      }
+    }
+    
+    // Fallback ל-localStorage
+    if (!filterStates) {
+      try {
+        const savedStates = localStorage.getItem('filterStates');
+        if (savedStates) {
+          filterStates = JSON.parse(savedStates);
+        }
+      } catch (error) {
+        console.warn('Failed to load filter states from localStorage:', error);
+      }
+    }
+    
+    if (filterStates) {
+      try {
 
         // שחזור פילטר סטטוס
         if (filterStates.status && filterStates.status.length > 0) {
@@ -1604,21 +1646,58 @@ class HeaderSystem {
 
 
 
-  loadSavedState() {
-    const savedState = localStorage.getItem('headerState');
-    if (savedState) {
-      const state = JSON.parse(savedState);
-      this.isFilterCollapsed = state.isFilterCollapsed || false;
-
+  async loadSavedState() {
+    let state = null;
+    
+    // טעינה מ-UnifiedIndexedDB
+    if (window.UnifiedIndexedDB) {
+      try {
+        const savedData = await window.UnifiedIndexedDB.getHeaderState();
+        if (savedData) {
+          state = savedData;
+        }
+      } catch (error) {
+        console.warn('Failed to load header state from UnifiedIndexedDB:', error);
+      }
     }
-
+    
+    // Fallback ל-localStorage
+    if (!state) {
+      try {
+        const savedState = localStorage.getItem('headerState');
+        if (savedState) {
+          state = JSON.parse(savedState);
+        }
+      } catch (error) {
+        console.warn('Failed to load header state from localStorage:', error);
+      }
+    }
+    
+    if (state) {
+      this.isFilterCollapsed = state.isFilterCollapsed || false;
+    }
   }
 
-  saveState() {
+  async saveState() {
     const state = {
       isFilterCollapsed: this.isFilterCollapsed,
     };
-    localStorage.setItem('headerState', JSON.stringify(state));
+    
+    // שמירה ל-UnifiedIndexedDB
+    if (window.UnifiedIndexedDB) {
+      try {
+        await window.UnifiedIndexedDB.saveHeaderState(state, 'header-system');
+      } catch (error) {
+        console.warn('Failed to save header state to UnifiedIndexedDB:', error);
+      }
+    }
+    
+    // Fallback ל-localStorage
+    try {
+      localStorage.setItem('headerState', JSON.stringify(state));
+    } catch (error) {
+      console.warn('Failed to save header state to localStorage:', error);
+    }
   }
 
   // פונקציה לעדכון חשבונות בפילטר

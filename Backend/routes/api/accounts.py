@@ -1,43 +1,38 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.account_service import AccountService
 from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 logger = logging.getLogger(__name__)
 
 accounts_bp = Blueprint('accounts', __name__, url_prefix='/api/v1/accounts')
 
+# Initialize base API
+base_api = BaseEntityAPI('accounts', AccountService, 'accounts')
+
 @accounts_bp.route('/', methods=['GET'])
-@cache_for(ttl=60)  # Cache for 1 minute - accounts don't change frequently
+@api_endpoint(cache_ttl=60, rate_limit=60)
+@handle_database_session()
 def get_accounts():
-    """Get all accounts"""
-    try:
-        db: Session = next(get_db())
-        accounts = AccountService.get_all(db)
-        return jsonify({
-            "status": "success",
-            "data": [account.to_dict() for account in accounts],
-            "message": "Accounts retrieved successfully",
-            "version": "v1"
-        })
-    except Exception as e:
-        logger.error(f"Error getting accounts: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": f"Failed to retrieve accounts: {str(e)}"},
-            "version": "v1"
-        }), 500
-    finally:
-        db.close()
+    """Get all accounts using base API"""
+    db: Session = g.db
+    response, status_code = base_api.get_all(db)
+    return jsonify(response), status_code
 
 @accounts_bp.route('/open', methods=['GET'])
-@cache_for(ttl=60)  # Cache for 1 minute
+@api_endpoint(cache_ttl=60, rate_limit=60)
+@handle_database_session()
 def get_open_accounts():
-    """Get all open accounts"""
+    """Get all open accounts - custom implementation"""
     try:
-        db: Session = next(get_db())
+        db: Session = g.db
         accounts = AccountService.get_open_accounts(db)
         return jsonify({
             "status": "success",
@@ -52,37 +47,15 @@ def get_open_accounts():
             "error": {"message": "Failed to retrieve open accounts"},
             "version": "v1"
         }), 500
-    finally:
-        db.close()
 
 @accounts_bp.route('/<int:account_id>', methods=['GET'])
-@cache_for(ttl=120)  # Cache for 2 minutes - individual accounts
+@api_endpoint(cache_ttl=120, rate_limit=60)
+@handle_database_session()
 def get_account(account_id: int):
-    """Get account by ID"""
-    try:
-        db: Session = next(get_db())
-        account = AccountService.get_by_id(db, account_id)
-        if account:
-            return jsonify({
-                "status": "success",
-                "data": account.to_dict(),
-                "message": "Account retrieved successfully",
-                "version": "v1"
-            })
-        return jsonify({
-            "status": "error",
-            "error": {"message": "Account not found"},
-            "version": "v1"
-        }), 404
-    except Exception as e:
-        logger.error(f"Error getting account {account_id}: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": "Failed to retrieve account"},
-            "version": "v1"
-        }), 500
-    finally:
-        db.close()
+    """Get account by ID using base API"""
+    db: Session = g.db
+    response, status_code = base_api.get_by_id(db, account_id)
+    return jsonify(response), status_code
 
 @accounts_bp.route('/', methods=['POST'])
 def create_account():

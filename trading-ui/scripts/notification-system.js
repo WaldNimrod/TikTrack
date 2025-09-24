@@ -110,8 +110,19 @@ function getNotificationIcon(type) {
 async function shouldShowNotification(category) {
   try {
     const preferenceName = `notifications_${category}_enabled`;
+    console.log(`🔍 Checking preference: ${preferenceName}`);
+    
+    if (typeof window.getPreference !== 'function') {
+      console.warn('getPreference function not available, showing notification by default');
+      return true;
+    }
+    
     const isEnabled = await window.getPreference(preferenceName);
-    return isEnabled === 'true' || isEnabled === true;
+    console.log(`🔍 Preference ${preferenceName} value:`, isEnabled, typeof isEnabled);
+    
+    const result = isEnabled === 'true' || isEnabled === true;
+    console.log(`🔍 Should show notification for ${category}:`, result);
+    return result;
   } catch (error) {
     console.warn('Failed to check notification preference, showing by default:', error);
     return true; // Default: show notification
@@ -182,56 +193,212 @@ function getLogEmoji(level) {
  */
 async function showNotification(message, type = 'info', title = 'מערכת', duration = 5000, category = 'system') {
   // Check if notification should be shown based on category preferences
-  if (!(await shouldShowNotification(category))) {
-    return; // Don't show notification if category is disabled
+  // Only check if category is explicitly provided (not default 'system')
+  console.log(`🔔 showNotification called: "${message}", type: ${type}, category: ${category}`);
+  
+  if (category && category !== 'system') {
+    try {
+      const shouldShow = await shouldShowNotification(category);
+      console.log(`🔍 Category ${category} enabled:`, shouldShow);
+      if (!shouldShow) {
+        console.log(`❌ Notification blocked for category: ${category}`);
+        return; // Don't show notification if category is disabled
+      }
+    } catch (error) {
+      console.warn('Failed to check notification category, showing anyway:', error);
+      // Continue to show notification if category check fails
+    }
+  } else {
+    console.log(`✅ Showing notification (category: ${category})`);
   }
   
   // Create notification element
   const notification = document.createElement('div');
   notification.className = `notification notification-${type}`;
   notification.innerHTML = `
-    <div class="notification-content">
-      <div class="notification-icon">
-        <i class="fas ${getNotificationIcon(type)}"></i>
-      </div>
-      <div class="notification-text">
-        <div class="notification-title">${title}</div>
-        <div class="notification-message">${message}</div>
-      </div>
-      <button class="notification-close" onclick="this.parentElement.parentElement.remove()">
-        <i class="fas fa-times"></i>
-      </button>
+    <div class="notification-icon">
+      <i class="fas ${getNotificationIcon(type)}"></i>
     </div>
+    <div class="notification-content">
+      <div class="notification-title">${title}</div>
+      <div class="notification-message">${message}</div>
+    </div>
+    <button class="notification-close" onclick="this.parentElement.remove()">
+      <i class="fas fa-times"></i>
+    </button>
   `;
+
+  // Debug: Log notification element details
+  console.log('🔍 DEBUG: Notification element created:', {
+    element: notification,
+    className: notification.className,
+    type: type,
+    innerHTML: notification.innerHTML.substring(0, 200) + '...'
+  });
+
+  // Debug: Check computed styles
+  setTimeout(() => {
+    const computedStyle = window.getComputedStyle(notification);
+    const titleElement = notification.querySelector('.notification-title');
+    const messageElement = notification.querySelector('.notification-message');
+    const iconElement = notification.querySelector('.notification-icon');
+    
+    console.log('🔍 DEBUG: Computed styles after creation:', {
+      notification: {
+        backgroundColor: computedStyle.backgroundColor,
+        color: computedStyle.color,
+        borderColor: computedStyle.borderColor,
+        display: computedStyle.display,
+        opacity: computedStyle.opacity
+      },
+      title: titleElement ? {
+        color: window.getComputedStyle(titleElement).color,
+        fontSize: window.getComputedStyle(titleElement).fontSize,
+        fontWeight: window.getComputedStyle(titleElement).fontWeight
+      } : 'No title element',
+      message: messageElement ? {
+        color: window.getComputedStyle(messageElement).color,
+        fontSize: window.getComputedStyle(messageElement).fontSize
+      } : 'No message element',
+      icon: iconElement ? {
+        color: window.getComputedStyle(iconElement).color,
+        fontSize: window.getComputedStyle(iconElement).fontSize
+      } : 'No icon element'
+    });
+    
+    // Debug: Check if CSS file is loaded
+    const stylesheets = Array.from(document.styleSheets);
+    const notificationCSS = stylesheets.find(sheet => {
+      try {
+        return sheet.href && sheet.href.includes('_notifications.css');
+      } catch (e) {
+        return false;
+      }
+    });
+    console.log('🔍 DEBUG: CSS file check:', {
+      totalStylesheets: stylesheets.length,
+      notificationCSSLoaded: !!notificationCSS,
+      notificationCSSUrl: notificationCSS ? notificationCSS.href : 'Not found'
+    });
+    
+    // Debug: Check CSS rules
+    if (notificationCSS) {
+      try {
+        const rules = Array.from(notificationCSS.cssRules || notificationCSS.rules || []);
+        const notificationRules = rules.filter(rule => 
+          rule.selectorText && rule.selectorText.includes('.notification')
+        );
+        console.log('🔍 DEBUG: CSS rules check:', {
+          totalRules: rules.length,
+          notificationRules: notificationRules.length,
+          notificationSelectors: notificationRules.map(rule => rule.selectorText)
+        });
+        
+        // Debug: Check specific rules
+        const titleRulesDebug = rules.filter(rule => 
+          rule.selectorText && rule.selectorText.includes('.notification-title')
+        );
+        const messageRulesDebug = rules.filter(rule => 
+          rule.selectorText && rule.selectorText.includes('.notification-message')
+        );
+        console.log('🔍 DEBUG: Specific rules check:', {
+          titleRules: titleRulesDebug.length,
+          messageRules: messageRulesDebug.length,
+          titleSelectors: titleRulesDebug.map(rule => rule.selectorText),
+          messageSelectors: messageRulesDebug.map(rule => rule.selectorText)
+        });
+        
+        // Debug: Check if !important rules are loaded
+        const importantRules = rules.filter(rule => 
+          rule.cssText && rule.cssText.includes('!important')
+        );
+        console.log('🔍 DEBUG: Important rules check:', {
+          importantRulesCount: importantRules.length,
+          importantRules: importantRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 100))
+        });
+        
+        // Debug: Check specific color rules
+        const colorRules = rules.filter(rule => 
+          rule.cssText && (rule.cssText.includes('color:') || rule.cssText.includes('color :'))
+        );
+        console.log('🔍 DEBUG: Color rules check:', {
+          colorRulesCount: colorRules.length,
+          colorRules: colorRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 150))
+        });
+        
+        // Debug: Check if our specific rules are loaded
+        const ourRules = rules.filter(rule => 
+          rule.cssText && (rule.cssText.includes('#1a1a1a') || rule.cssText.includes('#666'))
+        );
+        console.log('🔍 DEBUG: Our specific rules check:', {
+          ourRulesCount: ourRules.length,
+          ourRules: ourRules.map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 150))
+        });
+        
+        // Debug: Check the actual computed colors
+        console.log('🔍 DEBUG: Actual computed colors:', {
+          titleColor: titleElement ? window.getComputedStyle(titleElement).color : 'No title',
+          messageColor: messageElement ? window.getComputedStyle(messageElement).color : 'No message',
+          iconColor: iconElement ? window.getComputedStyle(iconElement).color : 'No icon'
+        });
+        
+        // Debug: Check specific CSS rules for our selectors
+        const titleRulesDetailed = rules.filter(rule => 
+          rule.selectorText && rule.selectorText.includes('.notification-title')
+        );
+        const messageRulesDetailed = rules.filter(rule => 
+          rule.selectorText && rule.selectorText.includes('.notification-message')
+        );
+        console.log('🔍 DEBUG: Detailed CSS rules:', {
+          titleRules: titleRulesDetailed.map(rule => rule.selectorText + ' -> ' + rule.cssText),
+          messageRules: messageRulesDetailed.map(rule => rule.selectorText + ' -> ' + rule.cssText)
+        });
+        
+        // Debug: Check if Bootstrap is overriding our styles
+        const bootstrapRules = rules.filter(rule => 
+          rule.selectorText && (rule.selectorText.includes('.text-') || rule.selectorText.includes('.text-') || rule.selectorText.includes('body') || rule.selectorText.includes('*'))
+        );
+        console.log('🔍 DEBUG: Bootstrap/Global rules that might override:', {
+          bootstrapRulesCount: bootstrapRules.length,
+          bootstrapRules: bootstrapRules.slice(0, 5).map(rule => rule.selectorText + ' -> ' + rule.cssText.substring(0, 100))
+        });
+      } catch (e) {
+        console.log('🔍 DEBUG: Cannot access CSS rules:', e.message);
+      }
+    }
+  }, 100);
 
   // Add to page
   let container = document.getElementById('notification-container');
   if (!container) {
     container = document.createElement('div');
     container.id = 'notification-container';
-    container.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
-      max-width: 400px;
-    `;
+    container.className = 'notification-container';
     document.body.appendChild(container);
+    console.log('🔍 DEBUG: Created notification container:', container);
   }
   
   container.appendChild(notification);
+  console.log('🔍 DEBUG: Notification added to container:', {
+    container: container,
+    notification: notification,
+    containerChildren: container.children.length
+  });
 
   // Trigger animation
   setTimeout(() => {
     notification.classList.add('show');
+    console.log('🔍 DEBUG: Animation triggered, notification classes:', notification.className);
   }, 10);
 
   // Auto remove after duration
   setTimeout(() => {
     if (notification.parentElement) {
+      console.log('🔍 DEBUG: Starting notification removal, classes:', notification.className);
       notification.classList.add('hide');
       setTimeout(() => {
         if (notification.parentElement) {
+          console.log('🔍 DEBUG: Removing notification from DOM');
           notification.remove();
         }
       }, 300); // Wait for animation
@@ -239,7 +406,9 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
   }, duration);
 
   // Save to global history
-  saveNotificationToGlobalHistory(type, title, message);
+  saveNotificationToGlobalHistory(type, title, message).catch(error => {
+    console.warn('Failed to save notification to global history:', error);
+  });
 
   // Console log for debugging
   console.log(`🔔 ${type.toUpperCase()}: ${title} - ${message}`);
@@ -376,9 +545,9 @@ function hideNotification(notification) {
  * @param {string} title - Success notification title
  * @param {string} message - Success notification message
  * @param {number} duration - Display duration in milliseconds (default: 4000)
- * @param {string} category - Category of notification (default: 'business')
+ * @param {string} category - Category of notification (default: 'system')
  */
-async function showSuccessNotification(title, message, duration = 4000, category = 'business') {
+async function showSuccessNotification(title, message, duration = 4000, category = 'system') {
   // Ensure title and message are provided
   const finalTitle = title || 'הצלחה';
   const finalMessage = message || 'הפעולה הושלמה בהצלחה';
@@ -422,9 +591,9 @@ async function showWarningNotification(title, message, duration = 5000, category
  * @param {string} title - Info notification title
  * @param {string} message - Info notification message
  * @param {number} duration - Display duration in milliseconds (default: 4000)
- * @param {string} category - Category of notification (default: 'ui')
+ * @param {string} category - Category of notification (default: 'system')
  */
-async function showInfoNotification(title, message, duration = 4000, category = 'ui') {
+async function showInfoNotification(title, message, duration = 4000, category = 'system') {
   // showInfoNotification calling showNotification with category
   await showNotification(message, 'info', title, duration, category);
 }
@@ -454,13 +623,13 @@ function showNotificationLegacy(message, type = 'info', duration = 4000) {
 // ===== GLOBAL NOTIFICATION HISTORY SYSTEM =====
 /**
  * Save notification to global history for notifications center
- * NOTIFICATION SYSTEM - Saves all notifications to localStorage for global access
+ * NOTIFICATION SYSTEM - Saves all notifications to UnifiedIndexedDB for global access
  *
  * @param {string} type - Notification type
  * @param {string} title - Notification title
  * @param {string} message - Notification message
  */
-function saveNotificationToGlobalHistory(type, title, message) {
+async function saveNotificationToGlobalHistory(type, title, message) {
   try {
     // יצירת אובייקט התראה
     const notification = {
@@ -474,30 +643,33 @@ function saveNotificationToGlobalHistory(type, title, message) {
       url: window.location.href
     };
 
-    // טעינת היסטוריה קיימת
-    let globalHistory = [];
+    // שמירה ל-UnifiedIndexedDB
+    if (window.UnifiedIndexedDB && window.UnifiedIndexedDB.isInitialized) {
+      await window.UnifiedIndexedDB.saveNotificationHistory(notification, 'notification-system');
+    } else if (window.UnifiedIndexedDB && !window.UnifiedIndexedDB.isInitialized) {
+      console.warn('UnifiedIndexedDB לא מאותחל עדיין, מדלג על שמירה');
+    }
+
+    // Fallback ל-localStorage במקרה של בעיה
     try {
+      let globalHistory = [];
       const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
       if (savedHistory) {
         globalHistory = JSON.parse(savedHistory);
-      }
-    } catch (e) {
-      console.warn('שגיאה בטעינת היסטוריית התראות:', e);
     }
 
-    // הוספת התראה חדשה לתחילת הרשימה
     globalHistory.unshift(notification);
-
-    // הגבלת גודל ההיסטוריה (100 התראות אחרונות)
     if (globalHistory.length > 100) {
       globalHistory = globalHistory.slice(0, 100);
     }
 
-    // שמירה ל-localStorage
     localStorage.setItem('tiktrack_global_notifications_history', JSON.stringify(globalHistory));
+    } catch (e) {
+      console.warn('שגיאה בשמירת fallback ל-localStorage:', e);
+    }
 
     // עדכון סטטיסטיקות גלובליות
-    updateGlobalNotificationStats(globalHistory);
+    await updateGlobalNotificationStats();
 
     console.log('✅ התראה נשמרה להיסטוריה גלובלית');
   } catch (error) {
@@ -508,11 +680,30 @@ function saveNotificationToGlobalHistory(type, title, message) {
 /**
  * Update global notification statistics
  * NOTIFICATION SYSTEM - Updates global stats for notifications center
- *
- * @param {Array} history - Global notification history
  */
-function updateGlobalNotificationStats(history) {
+async function updateGlobalNotificationStats() {
   try {
+    let history = [];
+    
+    // טעינת היסטוריה מ-UnifiedIndexedDB
+    if (window.UnifiedIndexedDB && window.UnifiedIndexedDB.isInitialized) {
+      history = await window.UnifiedIndexedDB.getNotificationHistory();
+    } else if (window.UnifiedIndexedDB && !window.UnifiedIndexedDB.isInitialized) {
+      console.warn('UnifiedIndexedDB לא מאותחל עדיין, מדלג על טעינת היסטוריה');
+    }
+    
+    // Fallback ל-localStorage
+    if (history.length === 0) {
+      try {
+        const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
+        if (savedHistory) {
+          history = JSON.parse(savedHistory);
+        }
+      } catch (e) {
+        console.warn('שגיאה בטעינת היסטוריה מ-localStorage:', e);
+      }
+    }
+
     const stats = {
       success: history.filter(n => n.type === 'success').length,
       error: history.filter(n => n.type === 'error').length,
@@ -522,7 +713,17 @@ function updateGlobalNotificationStats(history) {
       lastUpdated: Date.now()
     };
 
+    // שמירה ל-UnifiedIndexedDB
+    if (window.UnifiedIndexedDB) {
+      await window.UnifiedIndexedDB.saveNotificationStats(stats, 'notification-system');
+    }
+
+    // Fallback ל-localStorage
+    try {
     localStorage.setItem('tiktrack_global_notifications_stats', JSON.stringify(stats));
+    } catch (e) {
+      console.warn('שגיאה בשמירת סטטיסטיקות ל-localStorage:', e);
+    }
   } catch (error) {
     console.warn('שגיאה בעדכון סטטיסטיקות גלובליות:', error);
   }
@@ -532,10 +733,21 @@ function updateGlobalNotificationStats(history) {
  * Load global notification history
  * NOTIFICATION SYSTEM - Loads global history for notifications center
  *
- * @returns {Array} Global notification history
+ * @returns {Promise<Array>} Global notification history
  */
-function loadGlobalNotificationHistory() {
+async function loadGlobalNotificationHistory() {
   try {
+    // טעינה מ-UnifiedIndexedDB
+    if (window.UnifiedIndexedDB && window.UnifiedIndexedDB.isInitialized) {
+      const history = await window.UnifiedIndexedDB.getNotificationHistory();
+      if (history && history.length > 0) {
+        return history;
+      }
+    } else if (window.UnifiedIndexedDB && !window.UnifiedIndexedDB.isInitialized) {
+      console.warn('UnifiedIndexedDB לא מאותחל עדיין, מדלג על טעינת היסטוריה');
+    }
+    
+    // Fallback ל-localStorage
     const savedHistory = localStorage.getItem('tiktrack_global_notifications_history');
     return savedHistory ? JSON.parse(savedHistory) : [];
   } catch (error) {
@@ -548,10 +760,21 @@ function loadGlobalNotificationHistory() {
  * Load global notification statistics
  * NOTIFICATION SYSTEM - Loads global stats for notifications center
  *
- * @returns {Object} Global notification statistics
+ * @returns {Promise<Object>} Global notification statistics
  */
-function loadGlobalNotificationStats() {
+async function loadGlobalNotificationStats() {
   try {
+    // טעינה מ-UnifiedIndexedDB
+    if (window.UnifiedIndexedDB && window.UnifiedIndexedDB.isInitialized) {
+      const stats = await window.UnifiedIndexedDB.getNotificationStats();
+      if (stats) {
+        return stats;
+      }
+    } else if (window.UnifiedIndexedDB && !window.UnifiedIndexedDB.isInitialized) {
+      console.warn('UnifiedIndexedDB לא מאותחל עדיין, מדלג על טעינת סטטיסטיקות');
+    }
+    
+    // Fallback ל-localStorage
     const savedStats = localStorage.getItem('tiktrack_global_notifications_stats');
     if (savedStats) {
       return JSON.parse(savedStats);

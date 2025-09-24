@@ -361,7 +361,6 @@ window.toggleTopSection = function() {
   if (typeof window.toggleTopSectionGlobal === 'function') {
     window.toggleTopSectionGlobal();
   } else {
-    console.warn('פונקציית toggleTopSectionGlobal לא נמצאה ב-main.js');
   }
 };
 

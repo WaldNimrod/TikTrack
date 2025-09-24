@@ -126,10 +126,10 @@ class ProjectFilesScanner {
         localStorage.removeItem('projectFiles');
         localStorage.removeItem('projectFilesTimestamp');
         
-        // Clear from Unified IndexedDB
+        // Clear from Unified IndexedDB directly (avoiding recursive call)
         try {
-            if (window.UnifiedIndexedDB) {
-                await window.UnifiedIndexedDB.deleteSystemStats('file_mapping_last');
+            if (window.UnifiedIndexedDB && typeof window.UnifiedIndexedDB.clearStore === 'function') {
+                await window.UnifiedIndexedDB.clearStore('fileMappings');
             }
         } catch (error) {
             console.warn('Failed to clear file mapping from UnifiedIndexedDB:', error);
@@ -284,9 +284,9 @@ class ProjectFilesScanner {
             const data = await response.json();
             // Server response data
             
-            if (data.success && data.files) {
+            if (data.status === 'success' && data.data) {
                 // Server file discovery successful
-                return data.files;
+                return data.data;
             } else {
                 console.error('❌ Server returned invalid response:', data);
                 throw new Error('Server returned invalid response');
@@ -501,7 +501,7 @@ class ProjectFilesScanner {
                 throw new Error('UnifiedIndexedDB not available');
             }
             
-            const lastMapping = await window.UnifiedIndexedDB.getSystemStats('file_mapping_last');
+            const lastMapping = await window.UnifiedIndexedDB.getFileMapping();
             return lastMapping;
         } catch (error) {
             console.warn('Failed to get last mapping from UnifiedIndexedDB:', error);
@@ -526,7 +526,7 @@ class ProjectFilesScanner {
                 version: '1.0.0'
             };
 
-            await window.UnifiedIndexedDB.saveSystemStats('file_mapping_last', mappingData);
+                await window.UnifiedIndexedDB.saveFileMapping(mappingData.files, 'project-files-scanner');
             console.log('✅ File mapping saved to UnifiedIndexedDB successfully');
         } catch (error) {
             console.error('❌ Failed to save file mapping to UnifiedIndexedDB:', error);

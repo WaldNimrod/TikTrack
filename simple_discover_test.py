@@ -11,7 +11,7 @@ from datetime import datetime
 app = Flask(__name__)
 CORS(app)
 
-@app.route("/api/v1/files/discover", methods=["GET"])
+@app.route("/api/file-scanner/files", methods=["GET"])
 def discover_files():
     """Discover all project files dynamically - simple version"""
     try:

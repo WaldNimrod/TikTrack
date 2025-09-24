@@ -542,4 +542,96 @@ window.tables = {
 // ייצוא פונקציית sortTable גלובלית
 window.sortTable = sortTable;
 
+/**
+ * Global function for loading table data
+ * Generic implementation that can be used across all pages
+ *
+ * @param {string} tableType - Type of table to load
+ * @param {Function} updateFunction - Function to call with loaded data
+ * @returns {Promise<Array>} Loaded data
+ */
+window.loadTableData = async function(tableType, updateFunction) {
+  try {
+    console.log(`📊 Loading data for table type: ${tableType}`);
+    
+    // Show loading state if function exists
+    if (typeof window.showLoadingState === 'function') {
+      window.showLoadingState();
+    }
+    
+    // Fetch data from server
+    const response = await fetch(`/api/data/${tableType}`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log(`✅ Loaded ${data.length} records for ${tableType}`);
+    
+    // Call update function if provided
+    if (typeof updateFunction === 'function') {
+      updateFunction(data);
+    }
+    
+    // Hide loading state if function exists
+    if (typeof window.hideLoadingState === 'function') {
+      window.hideLoadingState();
+    }
+    
+    return data;
+  } catch (error) {
+    console.error(`❌ Error loading table data for ${tableType}:`, error);
+    
+    // Show error notification if function exists
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', `שגיאה בטעינת נתוני ${tableType}: ${error.message}`);
+    }
+    
+    // Hide loading state if function exists
+    if (typeof window.hideLoadingState === 'function') {
+      window.hideLoadingState();
+    }
+    
+    throw error;
+  }
+};
+
+/**
+ * Global function for refreshing table data
+ * Generic implementation that reloads current table data
+ *
+ * @param {string} tableType - Type of table to refresh
+ * @param {Function} updateFunction - Function to call with refreshed data
+ * @returns {Promise<Array>} Refreshed data
+ */
+window.refreshTable = async function(tableType, updateFunction) {
+  try {
+    console.log(`🔄 Refreshing table: ${tableType}`);
+    
+    // Clear any cached data for this table type
+    if (window.tableData && window.tableData[tableType]) {
+      delete window.tableData[tableType];
+    }
+    
+    // Reload data
+    const data = await window.loadTableData(tableType, updateFunction);
+    
+    // Show success notification if function exists
+    if (typeof window.showSuccessNotification === 'function') {
+      window.showSuccessNotification('הצלחה', `טבלת ${tableType} רועננה בהצלחה`);
+    }
+    
+    return data;
+  } catch (error) {
+    console.error(`❌ Error refreshing table ${tableType}:`, error);
+    
+    // Show error notification if function exists
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', `שגיאה ברענון טבלת ${tableType}: ${error.message}`);
+    }
+    
+    throw error;
+  }
+};
+
 // Tables.js loaded successfully

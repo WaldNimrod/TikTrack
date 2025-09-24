@@ -1802,16 +1802,23 @@ JsMapSystem.prototype.getDetailedUIInfo = function() {
                 const isExpanded = body && body.style.display !== 'none';
                 uiInfo += `    - פתוח: ${isExpanded ? 'כן' : 'לא'}\n`;
                 
-                    // Count content elements
-                    if (body) {
-                        const tables = body.querySelectorAll('table');
-                        const cards = body.querySelectorAll('.card, .stat-card, .overview-stat-card, .small-row-card');
-                        const buttons = body.querySelectorAll('.btn, button');
-                        const lists = body.querySelectorAll('ul, ol');
-                        uiInfo += `    - טבלאות: ${tables.length}\n`;
-                        uiInfo += `    - כרטיסים: ${cards.length}\n`;
-                        uiInfo += `    - כפתורים: ${buttons.length}\n`;
-                        uiInfo += `    - רשימות: ${lists.length}\n`;
+                // Count content elements
+                if (body) {
+                    const tables = body.querySelectorAll('table');
+                    const cards = body.querySelectorAll('.card, .stat-card, .overview-stat-card, .small-row-card');
+                    const buttons = body.querySelectorAll('.btn, button');
+                    const lists = body.querySelectorAll('ul, ol');
+                    uiInfo += `    - טבלאות: ${tables.length}\n`;
+                    uiInfo += `    - כרטיסים: ${cards.length}\n`;
+                    uiInfo += `    - כפתורים: ${buttons.length}\n`;
+                    uiInfo += `    - רשימות: ${lists.length}\n`;
+                }
+                
+                // Count header buttons (section actions)
+                const headerButtons = header.querySelectorAll('.section-actions .btn, .section-actions button');
+                if (headerButtons.length > 0) {
+                    uiInfo += `    - כפתורי כותרת: ${headerButtons.length}\n`;
+                }
                     
                     // Check for specific content
                     if (body.textContent.trim() === '' || body.textContent.trim() === 'טוען...') {

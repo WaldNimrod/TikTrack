@@ -10,17 +10,24 @@ Version: 1.0
 Date: January 2025
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, g
 from services.preferences_service import preferences_service
 from typing import Any, Dict, List
 import logging
 import json
 from datetime import datetime
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 logger = logging.getLogger(__name__)
 
 # Create blueprint
 preferences_bp = Blueprint('preferences', __name__, url_prefix='/api/v1/preferences')
+
+# Initialize base API (preferences is complex, so we'll use it selectively)
 
 # ============================================================================
 # User Preferences Endpoints

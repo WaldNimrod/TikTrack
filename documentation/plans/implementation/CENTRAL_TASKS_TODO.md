@@ -140,7 +140,6 @@
 - **מבנה מודולרי מוצע**:
   ```
   trading-ui/scripts/header/
-  ├── header-main.js          # מחלקה ראשית ותיאום
   ├── navigation/
   │   ├── menu-handler.js     # טיפול בתפריטים
   │   ├── active-state.js     # ניהול מצב פעיל

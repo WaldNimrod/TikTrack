@@ -32,16 +32,23 @@ Recent Updates:
 - Improved performance with optimized queries
 """
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from typing import Dict, List, Any, Optional
 from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
+
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
 
 # Setup logging
 logger = logging.getLogger(__name__)
 
 # Create blueprint
 linked_items_bp = Blueprint('linked_items', __name__, url_prefix='/api/v1/linked-items')
+
+# Initialize base API (linked_items is complex, so we'll use it selectively)
 
 def get_db_connection():
     """Get database connection"""
@@ -134,9 +141,11 @@ def get_entity_types():
 
 
 @linked_items_bp.route('/<entity_type>/<int:entity_id>', methods=['GET'])
+@api_endpoint(cache_ttl=60, rate_limit=60)
+@handle_database_session()
 def get_linked_items(entity_type: str, entity_id: int) -> Dict[str, Any]:
     """
-    Get linked items for a specific entity
+    Get linked items for a specific entity using base API patterns
     
     Args:
         entity_type: Type of entity (trade, account, ticker, alert, etc.)

@@ -24,7 +24,6 @@
 ### Frontend
 - **קובץ ראשי**: `trading-ui/scripts/filter-system.js`
 - **קובץ כותרת**: `trading-ui/scripts/header-system.js`
-- **תלויות**: `tables.js`, `main.js`, `ui-utils.js`
 
 ### Backend
 - **API**: `Backend/routes/api/accounts.py` (לפילטר חשבונות)
@@ -370,7 +369,6 @@ window.resetFiltersManually();
 
 ### Frontend Dependencies
 - `tables.js` - פונקציות טבלאות
-- `main.js` - פונקציות גלובליות
 - `ui-utils.js` - פונקציות ממשק משתמש
 - `notification-system.js` - מערכת התראות
 

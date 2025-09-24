@@ -1,66 +1,41 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.alert_service import AlertService
 from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 logger = logging.getLogger(__name__)
 
 alerts_bp = Blueprint('alerts', __name__, url_prefix='/api/v1/alerts')
 
+# Initialize base API
+base_api = BaseEntityAPI('alerts', AlertService, 'alerts')
+
 @alerts_bp.route('/', methods=['GET'])
-@cache_for(ttl=60)  # Cache for 1 minute - alerts don't change frequently
+@api_endpoint(cache_ttl=60, rate_limit=60)
+@handle_database_session()
 def get_alerts():
-    """Get all alerts"""
-    try:
-        db: Session = next(get_db())
-        alerts = AlertService.get_all(db)
-        return jsonify({
-            "status": "success",
-            "data": [alert.to_dict() for alert in alerts],
-            "message": "Alerts retrieved successfully",
-            "version": "v1"
-        })
-    except Exception as e:
-        logger.error(f"Error getting alerts: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": "Failed to retrieve alerts"},
-            "version": "v1"
-        }), 500
-    finally:
-        db.close()
+    """Get all alerts using base API"""
+    db: Session = g.db
+    response, status_code = base_api.get_all(db)
+    return jsonify(response), status_code
 
  
 
 @alerts_bp.route('/<int:alert_id>', methods=['GET'])
+@api_endpoint(cache_ttl=60, rate_limit=60)
+@handle_database_session()
 def get_alert(alert_id: int):
-    """Get alert by ID"""
-    try:
-        db: Session = next(get_db())
-        alert = AlertService.get_by_id(db, alert_id)
-        if alert:
-            return jsonify({
-                "status": "success",
-                "data": alert.to_dict(),
-                "message": "Alert retrieved successfully",
-                "version": "v1"
-            })
-        return jsonify({
-            "status": "error",
-            "error": {"message": "Alert not found"},
-            "version": "v1"
-        }), 404
-    except Exception as e:
-        logger.error(f"Error getting alert {alert_id}: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": "Failed to retrieve alert"},
-            "version": "v1"
-        }), 500
-    finally:
-        db.close()
+    """Get alert by ID using base API"""
+    db: Session = g.db
+    response, status_code = base_api.get_by_id(db, alert_id)
+    return jsonify(response), status_code
 
 @alerts_bp.route('/', methods=['POST'])
 def create_alert():

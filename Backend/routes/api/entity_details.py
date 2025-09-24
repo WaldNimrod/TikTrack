@@ -16,7 +16,7 @@ Version: 1.0.0
 Date: September 4, 2025
 """
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.entity_details_service import EntityDetailsService
@@ -24,28 +24,37 @@ from services.advanced_cache_service import cache_for, invalidate_cache
 import logging
 from typing import Dict, Any, Optional
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 logger = logging.getLogger(__name__)
 
 entity_details_bp = Blueprint('entity_details', __name__, url_prefix='/api/entity-details')
 
+# Initialize base API (entity details is complex, so we'll use it selectively)
+
 @entity_details_bp.route('/types', methods=['GET'])
+@api_endpoint(cache_ttl=3600, rate_limit=60)
+@handle_database_session()
 @cache_for(ttl=3600)  # Cache for 1 hour - rarely changes
 def get_supported_entity_types():
-    """Get list of supported entity types"""
+    """Get list of supported entity types using base API patterns"""
     try:
         entity_types = EntityDetailsService.get_supported_entity_types()
         return jsonify({
-            "success": True,
+            "status": "success",
             "data": entity_types,
             "message": "Supported entity types retrieved successfully",
-            "version": "1.0"
+            "version": "v1"
         })
     except Exception as e:
         logger.error(f"Error getting entity types: {str(e)}")
         return jsonify({
-            "success": False,
+            "status": "error",
             "error": {"message": "Failed to retrieve entity types"},
-            "version": "1.0"
+            "version": "v1"
         }), 500
 
 @entity_details_bp.route('/<string:entity_type>/<int:entity_id>', methods=['GET'])

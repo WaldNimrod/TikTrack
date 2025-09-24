@@ -5,7 +5,7 @@ Server Management API Routes
 API endpoints for server management and configuration
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, g
 import subprocess
 import os
 import logging
@@ -14,11 +14,18 @@ import time
 from datetime import datetime
 from typing import Any, Dict
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 # Create blueprint
 server_management_bp = Blueprint('server_management', __name__, url_prefix='/api/server')
 
 # Configure logging
 logger = logging.getLogger(__name__)
+
+# Initialize base API (server management is complex, so we'll use it selectively)
 
 # Global variable to track restart status
 restart_status = {
@@ -285,9 +292,11 @@ def get_current_server_mode() -> Any:
         }), 500
 
 @server_management_bp.route('/status', methods=['GET'])
+@api_endpoint(cache_ttl=30, rate_limit=60)
+@handle_database_session()
 def get_server_status() -> Any:
     """
-    Get comprehensive server status including mode information
+    Get comprehensive server status including mode information using base API patterns
     """
     try:
         from config.settings import DEVELOPMENT_MODE, CACHE_DISABLED, DEFAULT_CACHE_TTL
@@ -329,13 +338,16 @@ def get_server_status() -> Any:
         logger.error(f'Error getting server status: {e}')
         return jsonify({
             'status': 'error',
-            'message': f'Error getting server status: {str(e)}'
+            'error': {'message': f'Error getting server status: {str(e)}'},
+            'version': 'v1'
         }), 500
 
 @server_management_bp.route('/system/info', methods=['GET'])
+@api_endpoint(cache_ttl=60, rate_limit=60)
+@handle_database_session()
 def get_system_info() -> Any:
     """
-    Get detailed system information
+    Get detailed system information using base API patterns
     """
     try:
         import platform
@@ -379,7 +391,8 @@ def get_system_info() -> Any:
         logger.error(f'Error getting system info: {e}')
         return jsonify({
             'status': 'error',
-            'message': f'Error getting system info: {str(e)}'
+            'error': {'message': f'Error getting system info: {str(e)}'},
+            'version': 'v1'
         }), 500
 
 @server_management_bp.route('/mode-history', methods=['GET'])

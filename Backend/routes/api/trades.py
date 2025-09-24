@@ -1,25 +1,34 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.trade_service import TradeService
 from services.advanced_cache_service import cache_for, cache_with_deps, invalidate_cache
 import logging
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 logger = logging.getLogger(__name__)
 
 trades_bp = Blueprint('trades', __name__, url_prefix='/api/v1/trades')
 
+# Initialize base API
+base_api = BaseEntityAPI('trades', TradeService, 'trades')
+
 @trades_bp.route('/', methods=['GET'])
-@cache_with_deps(ttl=30, dependencies=['trades'])  # Cache for 30 seconds - critical data
+@api_endpoint(cache_ttl=30, dependencies=['trades'], rate_limit=60)
+@handle_database_session()
 def get_trades():
-    """Get all trades with filtering options"""
+    """Get all trades with filtering options - enhanced with market data"""
+    db: Session = g.db
+    
+    # Get filtering parameters
+    account_id = request.args.get('account_id', type=int)
+    status = request.args.get('status')
+    
     try:
-        db: Session = next(get_db())
-        
-        # Get filtering parameters
-        account_id = request.args.get('account_id', type=int)
-        status = request.args.get('status')
-        
         # If there are filtering parameters, use appropriate function
         if account_id and status:
             logger.info(f"Filtering trades by account_id={account_id} and status={status}")
@@ -76,37 +85,15 @@ def get_trades():
             "error": {"message": "Failed to retrieve trades"},
             "version": "v1"
         }), 500
-    finally:
-        db.close()
 
 @trades_bp.route('/<int:trade_id>', methods=['GET'])
-@cache_with_deps(ttl=60, dependencies=['trades'])  # Cache for 1 minute - individual trades
+@api_endpoint(cache_ttl=60, dependencies=['trades'], rate_limit=60)
+@handle_database_session()
 def get_trade(trade_id: int):
-    """Get trade by ID"""
-    try:
-        db: Session = next(get_db())
-        trade = TradeService.get_by_id(db, trade_id)
-        if trade:
-            return jsonify({
-                "status": "success",
-                "data": trade.to_dict(),
-                "message": "Trade retrieved successfully",
-                "version": "v1"
-            })
-        return jsonify({
-            "status": "error",
-            "error": {"message": "Trade not found"},
-            "version": "v1"
-        }), 404
-    except Exception as e:
-        logger.error(f"Error getting trade {trade_id}: {str(e)}")
-        return jsonify({
-            "status": "error",
-            "error": {"message": "Failed to retrieve trade"},
-            "version": "v1"
-        }), 500
-    finally:
-        db.close()
+    """Get trade by ID using base API"""
+    db: Session = g.db
+    response, status_code = base_api.get_by_id(db, trade_id)
+    return jsonify(response), status_code
 
 @trades_bp.route('/account/<int:account_id>', methods=['GET'])
 def get_trades_by_account(account_id: int):

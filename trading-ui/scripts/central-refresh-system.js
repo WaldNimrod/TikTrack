@@ -299,6 +299,45 @@ class CentralRefreshSystem {
       case 'trades':
         // לא נוגעים ב-tradesData, רק בפילטרים
         break;
+      case 'fileMappings':
+        // ניקוי מטמון מקומי עבור fileMappings
+        if (window.projectFiles) {
+          window.projectFiles = {};
+        }
+        break;
+      case 'notifications':
+        // ניקוי מטמון מקומי עבור notifications
+        if (window.notificationHistory) {
+          window.notificationHistory = [];
+        }
+        if (window.notificationStats) {
+          window.notificationStats = {};
+        }
+        break;
+      case 'header':
+        // ניקוי מטמון מקומי עבור header
+        if (window.headerState) {
+          window.headerState = {};
+        }
+        if (window.filterStates) {
+          window.filterStates = {};
+        }
+        if (window.sectionStates) {
+          window.sectionStates = {};
+        }
+        if (window.accountsData) {
+          window.accountsData = {};
+        }
+        break;
+      case 'linter':
+        // ניקוי מטמון מקומי עבור linter
+        if (window.scanningResults) {
+          window.scanningResults = {};
+        }
+        if (window.linterLogEntries) {
+          window.linterLogEntries = [];
+        }
+        break;
     }
   }
 
@@ -376,6 +415,115 @@ class CentralRefreshSystem {
       case 'research':
         if (window.researchData) {
           window.researchData = [];
+        }
+        break;
+        
+      case 'fileMappings':
+        // ניקוי מטמון IndexedDB עבור fileMappings
+        if (window.UnifiedIndexedDB && typeof window.UnifiedIndexedDB.clearStore === 'function') {
+          window.UnifiedIndexedDB.clearStore('fileMappings').catch(error => {
+            console.warn('⚠️ Failed to clear fileMappings from IndexedDB:', error);
+          });
+        }
+        // ניקוי מטמון מקומי
+        if (window.projectFiles) {
+          window.projectFiles = {};
+        }
+        if (window.projectFilesScanner) {
+          window.projectFilesScanner.clearCache().catch(error => {
+            console.warn('⚠️ Failed to clear project files scanner cache:', error);
+          });
+        }
+        break;
+        
+      case 'notifications':
+        // ניקוי מטמון IndexedDB עבור notifications
+        if (window.UnifiedIndexedDB && typeof window.UnifiedIndexedDB.clearStore === 'function') {
+          window.UnifiedIndexedDB.clearStore('notificationHistory').catch(error => {
+            console.warn('⚠️ Failed to clear notificationHistory from IndexedDB:', error);
+          });
+          window.UnifiedIndexedDB.clearStore('notificationStats').catch(error => {
+            console.warn('⚠️ Failed to clear notificationStats from IndexedDB:', error);
+          });
+        }
+        // ניקוי מטמון מקומי
+        if (window.notificationHistory) {
+          window.notificationHistory = [];
+        }
+        if (window.notificationStats) {
+          window.notificationStats = {};
+        }
+        // ניקוי localStorage fallback
+        try {
+          localStorage.removeItem('tiktrack_global_notifications_history');
+          localStorage.removeItem('tiktrack_global_notifications_stats');
+        } catch (e) {
+          console.warn('⚠️ Failed to clear notification localStorage:', e);
+        }
+        break;
+        
+      case 'header':
+        // ניקוי מטמון IndexedDB עבור header
+        if (window.UnifiedIndexedDB && typeof window.UnifiedIndexedDB.clearStore === 'function') {
+          window.UnifiedIndexedDB.clearStore('headerStates').catch(error => {
+            console.warn('⚠️ Failed to clear headerStates from IndexedDB:', error);
+          });
+          window.UnifiedIndexedDB.clearStore('filterStates').catch(error => {
+            console.warn('⚠️ Failed to clear filterStates from IndexedDB:', error);
+          });
+          window.UnifiedIndexedDB.clearStore('sectionStates').catch(error => {
+            console.warn('⚠️ Failed to clear sectionStates from IndexedDB:', error);
+          });
+          window.UnifiedIndexedDB.clearStore('accountsData').catch(error => {
+            console.warn('⚠️ Failed to clear accountsData from IndexedDB:', error);
+          });
+        }
+        // ניקוי מטמון מקומי
+        if (window.headerState) {
+          window.headerState = {};
+        }
+        if (window.filterStates) {
+          window.filterStates = {};
+        }
+        if (window.sectionStates) {
+          window.sectionStates = {};
+        }
+        if (window.accountsData) {
+          window.accountsData = {};
+        }
+        // ניקוי localStorage fallback
+        try {
+          localStorage.removeItem('headerState');
+          localStorage.removeItem('filterStates');
+          localStorage.removeItem('tiktrack_accounts');
+        } catch (e) {
+          console.warn('⚠️ Failed to clear header localStorage:', e);
+        }
+        break;
+        
+      case 'linter':
+        // ניקוי מטמון IndexedDB עבור linter
+        if (window.UnifiedIndexedDB && typeof window.UnifiedIndexedDB.clearStore === 'function') {
+          window.UnifiedIndexedDB.clearStore('linterScanningResults').catch(error => {
+            console.warn('⚠️ Failed to clear linterScanningResults from IndexedDB:', error);
+          });
+          window.UnifiedIndexedDB.clearStore('linterLogEntries').catch(error => {
+            console.warn('⚠️ Failed to clear linterLogEntries from IndexedDB:', error);
+          });
+        }
+        // ניקוי מטמון מקומי
+        if (window.scanningResults) {
+          window.scanningResults = {};
+        }
+        if (window.linterLogEntries) {
+          window.linterLogEntries = [];
+        }
+        // ניקוי localStorage fallback
+        try {
+          localStorage.removeItem('linterScanningResults');
+          localStorage.removeItem('linterLogEntries');
+        } catch (e) {
+          console.warn('⚠️ Failed to clear linter localStorage:', e);
         }
         break;
     }
@@ -539,7 +687,7 @@ window.showSuccessAndRefresh = (pageType, message, options) => window.centralRef
 window.refreshAllPages = (options) => window.centralRefresh.refreshAllPages(options);
 window.clearRefreshCache = (pageType) => window.centralRefresh.clearCache(pageType);
 window.clearGlobalCache = (pageType) => window.centralRefresh.clearGlobalCache(pageType);
-window.clearCacheBeforeCRUD = (pageType) => window.centralRefresh.clearCacheBeforeCRUD(pageType);
+window.clearCacheBeforeCRUD = (pageType, operation = 'full', itemId = null) => window.centralRefresh.clearCacheBeforeCRUD(pageType, operation, itemId);
 window.getRefreshStats = () => window.centralRefresh.getStats();
 
 // פונקציה לניקוי מטמון מלא

@@ -16,17 +16,26 @@ Version: 1.0
 Date: September 2025
 """
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from utils.wal_manager import get_wal_manager
 import logging
+
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
 wal_bp = Blueprint('wal', __name__, url_prefix='/api/v1/wal')
 
+# Initialize base API (wal_management is complex, so we'll use it selectively)
+
 @wal_bp.route('/status', methods=['GET'])
+@api_endpoint(cache_ttl=60, rate_limit=60)
+@handle_database_session()
 def get_wal_status():
-    """Get WAL status and information"""
+    """Get WAL status and information using base API patterns"""
     try:
         wal_manager = get_wal_manager()
         wal_info = wal_manager.get_wal_info()

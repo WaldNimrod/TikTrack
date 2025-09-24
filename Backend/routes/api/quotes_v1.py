@@ -3,7 +3,7 @@ API v1 Routes for Quotes - Compliant with External Data Integration Specificatio
 Implements the exact API endpoints specified in Section 5.1 of the specification
 """
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from datetime import datetime, timezone
@@ -16,9 +16,16 @@ from models.user import User
 # UserPreferences model removed - using new dynamic preferences system
 from services.user_service import UserService
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 logger = logging.getLogger(__name__)
 
 quotes_v1_bp = Blueprint('quotes_v1', __name__, url_prefix='/api/v1')
+
+# Initialize base API (quotes is complex, so we'll use it selectively)
 
 @quotes_v1_bp.route('/quotes/batch', methods=['GET'])
 def get_quotes_batch():

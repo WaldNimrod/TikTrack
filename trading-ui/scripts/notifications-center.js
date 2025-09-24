@@ -30,6 +30,12 @@ class NotificationsCenter {
       error: 0,
       warning: 0,
       info: 0,
+      // קטגוריות חדשות
+      system: 0,
+      business: 0,
+      ui: 0,
+      development: 0,
+      performance: 0,
     };
 
     this.init().catch(error => {
@@ -1153,7 +1159,7 @@ function copyDetailedLog() {
 }
 
 // פונקציה להעתקת התראות ללוח
-function copyNotificationsToClipboard() {
+async function copyNotificationsToClipboard() {
   console.log('🔍 copyNotificationsToClipboard נקרא!');
   try {
     if (!window.notificationsCenter) {
@@ -1180,6 +1186,14 @@ function copyNotificationsToClipboard() {
     log += `❌ שגיאה: ${stats.error}\n`;
     log += `⚠️ אזהרה: ${stats.warning}\n`;
     log += `ℹ️ מידע: ${stats.info}\n\n`;
+    
+    // סטטיסטיקות קטגוריות
+    log += '📂 סטטיסטיקות קטגוריות:\n';
+    log += `🔧 מערכת: ${stats.system || 0}\n`;
+    log += `💼 עסקי: ${stats.business || 0}\n`;
+    log += `🎨 ממשק משתמש: ${stats.ui || 0}\n`;
+    log += `⚙️ פיתוח: ${stats.development || 0}\n`;
+    log += `⚡ ביצועים: ${stats.performance || 0}\n\n`;
 
     log += `🔔 התראות פעילות (${notifications.length}):\n`;
     if (notifications.length > 0) {
@@ -1201,6 +1215,23 @@ function copyNotificationsToClipboard() {
       log += 'אין היסטוריית התראות\n\n';
     }
 
+    // העדפות קטגוריות
+    log += '⚙️ העדפות קטגוריות:\n';
+    try {
+      if (typeof window.getPreference === 'function') {
+        const categories = ['system', 'business', 'ui', 'development', 'performance'];
+        categories.forEach(category => {
+          const enabled = window.getPreference(`notifications_${category}_enabled`);
+          log += `📂 ${category}: ${enabled ? 'מופעל' : 'כבוי'}\n`;
+        });
+      } else {
+        log += 'פונקציית העדפות לא זמינה\n';
+      }
+    } catch (error) {
+      log += `שגיאה בקריאת העדפות: ${error.message}\n`;
+    }
+    log += '\n';
+    
     log += '🔗 חיבור WebSocket:\n';
     log += `סטטוס: ${window.realtimeNotificationsClient?.socket?.connected ? 'מחובר' : 'לא מחובר'}\n`;
     log += `סטטוס WebSocket: ${document.getElementById('websocketStatus')?.textContent || 'לא ידוע'}\n`;
@@ -1208,12 +1239,59 @@ function copyNotificationsToClipboard() {
     log += `הודעות נשלחו: ${document.getElementById('messagesSent')?.textContent || '0'}\n`;
     log += `סטטוס מערכת: ${document.getElementById('overallStatus')?.textContent || 'לא ידוע'}\n`;
     
+    // מידע על מערכת הקטגוריות
+    log += '🔧 מערכת קטגוריות:\n';
+    log += `זיהוי אוטומטי: ${typeof window.detectCategory === 'function' ? 'זמין' : 'לא זמין'}\n`;
+    log += `פונקציות חכמות: ${typeof window.showNotificationSmart === 'function' ? 'זמין' : 'לא זמין'}\n`;
+    log += `מערכת מיגרציה: ${typeof window.migrateNotificationCalls === 'function' ? 'זמין' : 'לא זמין'}\n`;
+    log += `מערכת בדיקות: ${typeof window.notificationSystemTester === 'object' ? 'זמין' : 'לא זמין'}\n`;
+    
+    // בדיקת פונקציות ספציפיות
+    if (typeof window.notificationSystemTester === 'object') {
+      try {
+        const quickTest = await window.notificationSystemTester.quickTest();
+        log += `בדיקה מהירה: הצליחה\n`;
+        log += `פונקציות בסיסיות: ${quickTest.basicFunctions}\n`;
+        log += `פונקציות חכמות: ${quickTest.smartFunctions}\n`;
+        log += `קטגוריות מופעלות: ${quickTest.enabledCategories}\n`;
+      } catch (error) {
+        log += `בדיקה מהירה: נכשלה - ${error.message}\n`;
+      }
+    }
+    log += '\n';
+    
     log += '\n📊 מידע טכני:\n';
     log += `זמן יצירת הלוג: ${new Date().toLocaleString('he-IL')}\n`;
     log += `גרסת דפדפן: ${navigator.userAgent.split(' ').slice(-2).join(' ')}\n`;
     log += `רזולוציה מסך: ${window.screen.width}x${window.screen.height}\n`;
     log += `גודל חלון: ${window.innerWidth}x${window.innerHeight}\n`;
     log += `זמן אמת: ${new Date().toISOString()}\n`;
+    
+    // מידע על מערכת הקטגוריות החדשה
+    log += '\n🔧 מערכת קטגוריות חדשה:\n';
+    log += `גרסה: 2.0.5\n`;
+    log += `תאריך עדכון: 23.09.2025\n`;
+    log += `סטטוס: פעיל\n`;
+    log += `קטגוריות זמינות: system, business, ui, development, performance\n`;
+    log += `זיהוי אוטומטי: פעיל\n`;
+    log += `מיגרציה: זמינה\n`;
+    log += `בדיקות: זמינות\n`;
+    
+    // מידע על העדפות קטגוריות
+    log += '\n⚙️ העדפות קטגוריות:\n';
+    try {
+      if (typeof window.getPreference === 'function') {
+        const categories = ['system', 'business', 'ui', 'development', 'performance'];
+        categories.forEach(category => {
+          const enabled = window.getPreference(`notifications_${category}_enabled`);
+          log += `📂 ${category}: ${enabled ? 'מופעל' : 'כבוי'}\n`;
+        });
+      } else {
+        log += 'פונקציית העדפות לא זמינה\n';
+      }
+    } catch (error) {
+      log += `שגיאה בקריאת העדפות: ${error.message}\n`;
+    }
     
     log += '\n=== סוף לוג ===';
     
@@ -1332,26 +1410,54 @@ function testInfoNotification() {
 }
 
 function toggleTopSection() {
-    if (typeof window.toggleTopSection === 'function') {
-        window.toggleTopSection();
+    const topSection = document.querySelector('.top-section .section-body');
+    if (topSection) {
+        if (topSection.style.display === 'none') {
+            topSection.style.display = '';
+            console.log('✅ Top section expanded');
+        } else {
+            topSection.style.display = 'none';
+            console.log('✅ Top section collapsed');
+        }
     } else {
-        console.warn('toggleTopSection function not found');
+        console.warn('❌ Top section not found');
     }
 }
 
 function toggleAllSections() {
-  if (typeof window.toggleAllSections === 'function') {
-    window.toggleAllSections();
-  } else {
-    console.warn('toggleAllSections function not found');
-  }
+    const sections = document.querySelectorAll('.content-section .section-body, .top-section .section-body');
+    let allHidden = true;
+    
+    sections.forEach(section => {
+        if (section.style.display !== 'none') {
+            allHidden = false;
+        }
+    });
+    
+    sections.forEach(section => {
+        section.style.display = allHidden ? '' : 'none';
+    });
+    
+    console.log(`✅ All sections ${allHidden ? 'expanded' : 'collapsed'}`);
 }
 
 function toggleSection(sectionId) {
-  if (typeof window.toggleSection === 'function') {
-    window.toggleSection(sectionId);
+  const section = document.getElementById(sectionId);
+  if (section) {
+    const sectionBody = section.querySelector('.section-body');
+    if (sectionBody) {
+      if (sectionBody.style.display === 'none') {
+        sectionBody.style.display = '';
+        console.log(`✅ Section ${sectionId} expanded`);
+      } else {
+        sectionBody.style.display = 'none';
+        console.log(`✅ Section ${sectionId} collapsed`);
+      }
+    } else {
+      console.warn(`❌ Section body not found for ${sectionId}`);
+    }
   } else {
-    console.warn('toggleSection function not found');
+    console.warn(`❌ Section ${sectionId} not found`);
   }
 }
 
@@ -1419,11 +1525,11 @@ document.addEventListener('DOMContentLoaded', () => {
 /**
  * Generate detailed log for Notifications Center
  */
-function generateDetailedLog() {
+async function generateDetailedLog() {
     const timestamp = new Date().toLocaleString('he-IL');
     const log = [];
 
-    log.push('=== לוג מפורט - מרכז התראות ===');
+    log.push('=== לוג מפורט - מרכז התראות TikTrack ===');
     log.push(`זמן יצירה: ${timestamp}`);
     log.push(`עמוד: ${window.location.href}`);
     log.push('');
@@ -1434,26 +1540,92 @@ function generateDetailedLog() {
     const isTopOpen = topSection && topSection.style.display !== 'none';
     log.push(`סקשן עליון: ${isTopOpen ? 'פתוח' : 'סגור'}`);
     
-    // תצוגה מפורטת לפי סקשנים
-    log.push('--- תצוגה מפורטת לפי סקשנים ---');
+    // סטטיסטיקות התראות מהממשק
+    log.push('--- סטטיסטיקות התראות ---');
+    log.push(`הודעות הצלחה: ${document.getElementById('successCount')?.textContent || '0'}`);
+    log.push(`שגיאות: ${document.getElementById('errorCount')?.textContent || '0'}`);
+    log.push(`אזהרות: ${document.getElementById('warningCount')?.textContent || '0'}`);
+    log.push(`הודעות מידע: ${document.getElementById('infoCount')?.textContent || '0'}`);
     
-    // סקשן עליון - סטטיסטיקות התראות
-    const notificationStats = document.querySelectorAll('.notification-stat');
-    notificationStats.forEach((stat, index) => {
-        const label = stat.querySelector('.stat-label')?.textContent || 'לא זמין';
-        const value = stat.querySelector('.stat-value')?.textContent || 'לא זמין';
-        log.push(`סטטיסטיקה ${index + 1}: ${label} = "${value}"`);
-    });
+    // סטטוס חיבור
+    log.push('--- סטטוס חיבור ---');
+    log.push(`סטטוס מערכת: ${document.getElementById('overallStatus')?.textContent || 'לא ידוע'}`);
+    log.push(`WebSocket: ${document.getElementById('websocketStatus')?.textContent || 'לא ידוע'}`);
+    log.push(`זמן חיבור: ${document.getElementById('connectionTime')?.textContent || 'לא ידוע'}`);
+    log.push(`הודעות נשלחו: ${document.getElementById('messagesSent')?.textContent || '0'}`);
+    
+    // סקירה כללית
+    log.push('--- סקירה כללית ---');
+    log.push(`התראות פעילות: ${document.getElementById('activeAlertsCount')?.textContent || '0'}`);
+    log.push(`הודעות חדשות: ${document.getElementById('newMessagesCount')?.textContent || '0'}`);
+    log.push(`עדכון אחרון: ${document.getElementById('lastUpdateTime')?.textContent || 'לא ידוע'}`);
+    log.push(`סטטוס: ${document.getElementById('systemStatus')?.textContent || 'לא ידוע'}`);
 
-    // טבלאות ונתונים
-    log.push('--- טבלאות ונתונים ---');
-    const notificationRows = document.querySelectorAll('.notification-row');
-    notificationRows.forEach((row, index) => {
-        const type = row.querySelector('.notification-type')?.textContent || 'לא זמין';
-        const message = row.querySelector('.notification-message')?.textContent || 'לא זמין';
-        const timestamp = row.querySelector('.notification-timestamp')?.textContent || 'לא זמין';
-        log.push(`התראה ${index + 1}: ${type} | הודעה: ${message} | זמן: ${timestamp}`);
-    });
+    // היסטוריית התראות
+    log.push('--- היסטוריית התראות ---');
+    const historyContainer = document.getElementById('notificationHistory');
+    const historyItems = historyContainer?.querySelectorAll('.history-item') || [];
+    if (historyItems.length === 0) {
+        log.push('אין היסטוריית התראות');
+    } else {
+        historyItems.forEach((item, index) => {
+            const type = item.querySelector('.notification-type')?.textContent || 'לא ידוע';
+            const title = item.querySelector('.notification-title')?.textContent || 'ללא כותרת';
+            const time = item.querySelector('.notification-time')?.textContent || 'ללא זמן';
+            log.push(`${index + 1}. [${type}] ${title} - ${time}`);
+        });
+    }
+    
+    // פילטרים פעילים
+    log.push('--- פילטרים פעילים ---');
+    log.push(`פילטר סוג: ${document.getElementById('historyFilter')?.value || 'כל ההתראות'}`);
+    log.push(`פילטר עמוד: ${document.getElementById('pageFilter')?.value || 'כל העמודים'}`);
+    log.push(`פילטר זמן: ${document.getElementById('historyPeriod')?.value || '24 שעות אחרונות'}`);
+
+    // סטטיסטיקות קטגוריות
+    log.push('--- סטטיסטיקות קטגוריות ---');
+    log.push(`system: ${window.notificationsCenter?.stats?.system || 0}`);
+    log.push(`business: ${window.notificationsCenter?.stats?.business || 0}`);
+    log.push(`ui: ${window.notificationsCenter?.stats?.ui || 0}`);
+    log.push(`development: ${window.notificationsCenter?.stats?.development || 0}`);
+    log.push(`performance: ${window.notificationsCenter?.stats?.performance || 0}`);
+
+    // העדפות קטגוריות
+    log.push('--- העדפות קטגוריות ---');
+    try {
+        if (typeof window.getPreference === 'function') {
+            const categories = ['system', 'business', 'ui', 'development', 'performance'];
+            for (const category of categories) {
+                const notificationEnabled = await window.getPreference(`notifications_${category}_enabled`);
+                const consoleEnabled = await window.getPreference(`console_logs_${category}_enabled`);
+                log.push(`${category}: התראות=${notificationEnabled ? 'מופעל' : 'מבוטל'}, קונסול=${consoleEnabled ? 'מופעל' : 'מבוטל'}`);
+            }
+        } else {
+            log.push('מערכת העדפות לא זמינה');
+        }
+    } catch (error) {
+        log.push(`שגיאה בטעינת העדפות: ${error.message}`);
+    }
+
+    // מערכת קטגוריות חדשה
+    log.push('--- מערכת קטגוריות חדשה ---');
+    log.push(`detectCategory זמין: ${typeof window.detectCategory === 'function' ? 'כן' : 'לא'}`);
+    log.push(`showNotificationSmart זמין: ${typeof window.showNotificationSmart === 'function' ? 'כן' : 'לא'}`);
+    log.push(`migrateNotificationCalls זמין: ${typeof window.migrateNotificationCalls === 'function' ? 'כן' : 'לא'}`);
+    log.push(`notificationSystemTester זמין: ${typeof window.notificationSystemTester === 'object' ? 'כן' : 'לא'}`);
+
+    // בדיקת פונקציות ספציפיות
+    if (typeof window.notificationSystemTester === 'object' && window.notificationSystemTester.quickTest) {
+        try {
+            const testResults = await window.notificationSystemTester.quickTest();
+            log.push('--- תוצאות בדיקה מהירה ---');
+            log.push(`פונקציות בסיסיות: ${testResults.basicFunctions ? 'זמינות' : 'לא זמינות'}`);
+            log.push(`פונקציות חכמות: ${testResults.smartFunctions ? 'זמינות' : 'לא זמינות'}`);
+            log.push(`קטגוריות מופעלות: ${testResults.enabledCategories.join(', ')}`);
+        } catch (error) {
+            log.push(`שגיאה בבדיקה מהירה: ${error.message}`);
+        }
+    }
 
     // סטטיסטיקות וביצועים
     log.push('--- סטטיסטיקות וביצועים ---');
@@ -1479,6 +1651,24 @@ function generateDetailedLog() {
     log.push(`User Agent: ${navigator.userAgent}`);
     log.push(`Language: ${navigator.language}`);
     log.push(`Platform: ${navigator.platform}`);
+    log.push(`רזולוציה מסך: ${screen.width}x${screen.height}`);
+    log.push(`גודל חלון: ${window.innerWidth}x${window.innerHeight}`);
+    log.push(`זמן אמת: ${new Date().toISOString()}`);
+
+    // סטטוס סקשנים
+    log.push('--- סטטוס סקשנים ---');
+    const section1 = document.getElementById('section1');
+    const section2 = document.getElementById('section2');
+    log.push(`סקשן 1 (סקירה כללית): ${section1?.classList.contains('collapsed') ? 'סגור' : 'פתוח'}`);
+    log.push(`סקשן 2 (היסטוריית התראות): ${section2?.classList.contains('collapsed') ? 'סגור' : 'פתוח'}`);
+
+    // WebSocket מידע
+    if (window.realtimeNotificationsClient) {
+        log.push('--- מידע WebSocket ---');
+        log.push(`חיבור פעיל: ${window.realtimeNotificationsClient.isConnected() ? 'כן' : 'לא'}`);
+        log.push(`מספר חיבורים: ${window.realtimeNotificationsClient.connectionCount || 0}`);
+        log.push(`זמן חיבור: ${window.realtimeNotificationsClient.connectionTime || 'לא זמין'}`);
+    }
 
     log.push('=== סוף הלוג ===');
     return log.join('\n');
@@ -1489,7 +1679,7 @@ function generateDetailedLog() {
  */
 async function copyDetailedLog() {
     try {
-        const log = generateDetailedLog();
+        const log = await generateDetailedLog();
         await navigator.clipboard.writeText(log);
         window.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
         console.log('=== לוג מפורט שהועתק ===');
@@ -1499,7 +1689,7 @@ async function copyDetailedLog() {
         console.error('Failed to copy log:', error);
         window.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
         // Fallback: show in console
-        const log = generateDetailedLog();
+        const log = await generateDetailedLog();
         console.log('=== לוג מפורט (לא הועתק) ===');
         console.log(log);
         console.log('=== סוף הלוג ===');

@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from models.note_relation_type import NoteRelationType
@@ -8,9 +8,16 @@ import os
 import sqlite3
 import re
 
+# Import base classes
+from .base_entity import BaseEntityAPI
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_utils import BaseEntityUtils
+
 logger = logging.getLogger(__name__)
 
 note_relation_types_bp = Blueprint('note_relation_types', __name__, url_prefix='/api/v1/note_relation_types')
+
+# Initialize base API (note_relation_types uses direct SQLite, so we'll use it selectively)
 
 def get_db_connection():
     """Get database connection"""
@@ -22,9 +29,11 @@ def get_db_connection():
     return conn
 
 @note_relation_types_bp.route('/', methods=['GET'])
+@api_endpoint(cache_ttl=600, rate_limit=60)
+@handle_database_session()
 @cache_for(ttl=600)  # Cache for 10 minutes - note relation types don't change
 def get_note_relation_types():
-    """Get all note relation types"""
+    """Get all note relation types using base API patterns"""
     try:
         conn = get_db_connection()
         cursor = conn.cursor()

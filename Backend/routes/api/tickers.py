@@ -5,12 +5,12 @@ This module contains all API endpoints for managing tickers in the system.
 Includes CRUD operations, linked items checking and more.
 
 Endpoints:
-    GET /api/v1/tickers/ - Get all tickers
-    GET /api/v1/tickers/<id> - Get ticker by ID
-    POST /api/v1/tickers/ - Create new ticker
-    PUT /api/v1/tickers/<id> - Update ticker
-    DELETE /api/v1/tickers/<id> - Delete ticker
-    GET /api/v1/tickers/<id>/linked-items - Check linked items
+    GET /api/tickers/ - Get all tickers
+    GET /api/tickers/<id> - Get ticker by ID
+    POST /api/tickers/ - Create new ticker
+    PUT /api/tickers/<id> - Update ticker
+    DELETE /api/tickers/<id> - Delete ticker
+    GET /api/tickers/<id>/linked-items - Check linked items
 
 Author: TikTrack Development Team
 Version: 1.0
@@ -32,7 +32,7 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-tickers_bp = Blueprint('tickers', __name__, url_prefix='/api/v1/tickers')
+tickers_bp = Blueprint('tickers', __name__, url_prefix='/api/tickers')
 
 # Initialize base API
 base_api = BaseEntityAPI('tickers', TickerService, 'tickers')
@@ -71,14 +71,14 @@ def get_tickers():
             "status": "success",
             "data": tickers_data,
             "message": "Tickers retrieved successfully",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error getting tickers: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve tickers"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
 
 @tickers_bp.route('/<int:ticker_id>', methods=['GET'])
@@ -110,19 +110,19 @@ def get_ticker(ticker_id: int):
                 "status": "success",
                 "data": ticker_dict,
                 "message": "Ticker retrieved successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "Ticker not found"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error getting ticker {ticker_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve ticker"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
 
 @tickers_bp.route('/<int:ticker_id>/linked-items', methods=['GET'])
@@ -138,7 +138,7 @@ def check_linked_items(ticker_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "Ticker not found"},
-                "version": "v1"
+                "version": "1.0"
             }), 404
         
         print(f"Ticker found: {ticker.symbol}")
@@ -156,14 +156,14 @@ def check_linked_items(ticker_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": f"Failed to check linked items: {str(e)}"},
-                "version": "v1"
+                "version": "1.0"
             }), 500
         
         return jsonify({
             "status": "success",
             "data": linked_items,
             "message": "Linked items check completed",
-            "version": "v1"
+            "version": "1.0"
         })
     except Exception as e:
         logger.error(f"Error checking linked items for ticker {ticker_id}: {str(e)}")
@@ -173,7 +173,7 @@ def check_linked_items(ticker_id: int):
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to check linked items"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -189,7 +189,7 @@ def create_ticker():
             return jsonify({
                 "status": "error",
                 "error": {"message": "Invalid JSON data"},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # Get database session first
@@ -258,7 +258,7 @@ def create_ticker():
                     "volume": quote_data.volume if quote_data else None
                 } if quote_data else None
             },
-            "version": "v1"
+            "version": "1.0"
         }
         
         return jsonify(response_data), 201
@@ -267,7 +267,7 @@ def create_ticker():
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         if db:
@@ -284,7 +284,7 @@ def update_ticker(ticker_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "Invalid JSON data"},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         db: Session = next(get_db())
@@ -295,7 +295,7 @@ def update_ticker(ticker_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "Ticker not found"},
-                "version": "v1"
+                "version": "1.0"
             }), 404
         
         # Check active_trades constraint - prevent cancellation if ticker has active trades
@@ -320,7 +320,7 @@ def update_ticker(ticker_id: int):
                 return jsonify({
                     "status": "error",
                     "error": {"message": "Cannot cancel ticker with active trades. Please close all open trades first."},
-                    "version": "v1"
+                    "version": "1.0"
                 }), 400
         
         # Update ticker
@@ -330,19 +330,19 @@ def update_ticker(ticker_id: int):
                 "status": "success",
                 "data": ticker.to_dict(),
                 "message": "Ticker updated successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "Ticker not found"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error updating ticker {ticker_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         if db:
@@ -361,7 +361,7 @@ def delete_ticker(ticker_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "Ticker not found"},
-                "version": "v1"
+                "version": "1.0"
             }), 404
         
         # Check active_trades constraint - prevent deletion if ticker has active trades
@@ -369,7 +369,7 @@ def delete_ticker(ticker_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "Cannot delete ticker with active trades. Please close all open trades first."},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # Check linked items
@@ -378,7 +378,7 @@ def delete_ticker(ticker_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "Cannot delete ticker with linked items (trades, trade plans, notes, or alerts)"},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # Delete ticker
@@ -390,21 +390,21 @@ def delete_ticker(ticker_id: int):
             response_data = {
                 "status": "success",
                 "message": "Ticker deleted successfully",
-                "version": "v1"
+                "version": "1.0"
             }
             
             return jsonify(response_data)
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to delete ticker"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     except Exception as e:
         logger.error(f"Error deleting ticker {ticker_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -420,7 +420,7 @@ def update_active_trades(ticker_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "Ticker not found"},
-                "version": "v1"
+                "version": "1.0"
             }), 404
         
         # Check if there are active plans or trades for this ticker
@@ -449,7 +449,7 @@ def update_active_trades(ticker_id: int):
             "status": "success",
             "data": ticker.to_dict(),
             "message": "Active trades field updated successfully",
-            "version": "v1"
+            "version": "1.0"
         })
         
     except Exception as e:
@@ -457,7 +457,7 @@ def update_active_trades(ticker_id: int):
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -509,7 +509,7 @@ def update_all_active_trades():
                 "total_tickers": len(tickers)
             },
             "message": f"Updated active_trades for {updated_count} tickers",
-            "version": "v1"
+            "version": "1.0"
         })
         
     except Exception as e:
@@ -517,7 +517,7 @@ def update_all_active_trades():
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -534,7 +534,7 @@ def update_ticker_status_auto(ticker_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "Ticker not found"},
-                "version": "v1"
+                "version": "1.0"
             }), 404
         
         # Update ticker status automatically
@@ -546,13 +546,13 @@ def update_ticker_status_auto(ticker_id: int):
                 "status": "success",
                 "data": updated_ticker.to_dict(),
                 "message": "Ticker status updated automatically",
-                "version": "v1"
+                "version": "1.0"
             })
         else:
             return jsonify({
                 "status": "error",
                 "error": {"message": "Failed to update ticker status"},
-                "version": "v1"
+                "version": "1.0"
             }), 500
         
     except Exception as e:
@@ -560,7 +560,7 @@ def update_ticker_status_auto(ticker_id: int):
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -586,7 +586,7 @@ def update_all_statuses_auto():
                 "tickers": [ticker.to_dict() for ticker in tickers]
             },
             "message": f"Updated status for {updated_count} tickers automatically",
-            "version": "v1"
+            "version": "1.0"
         })
         
     except Exception as e:
@@ -594,7 +594,7 @@ def update_all_statuses_auto():
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -615,7 +615,7 @@ def cancel_ticker(ticker_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "Ticker not found"},
-                "version": "v1"
+                "version": "1.0"
             }), 404
         
         # Check if ticker is already cancelled
@@ -623,7 +623,7 @@ def cancel_ticker(ticker_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "Ticker is already cancelled"},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # Check active_trades constraint - prevent cancellation if ticker has active trades
@@ -646,7 +646,7 @@ def cancel_ticker(ticker_id: int):
             return jsonify({
                 "status": "error",
                 "error": {"message": "Cannot cancel ticker with active trades. Please close all open trades first."},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         # Update ticker status to cancelled
@@ -661,13 +661,13 @@ def cancel_ticker(ticker_id: int):
                 "status": "success",
                 "data": updated_ticker.to_dict(),
                 "message": "Ticker cancelled successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         else:
             return jsonify({
                 "status": "error",
                 "error": {"message": "Failed to cancel ticker"},
-                "version": "v1"
+                "version": "1.0"
             }), 500
         
     except Exception as e:
@@ -675,7 +675,7 @@ def cancel_ticker(ticker_id: int):
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         if db:

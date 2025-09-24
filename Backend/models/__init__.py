@@ -1,6 +1,5 @@
 from .base import BaseModel
 from .ticker import Ticker
-from .account import Account
 from .trade_plan import TradePlan
 from .trade import Trade
 from .alert import Alert

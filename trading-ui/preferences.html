@@ -935,7 +935,8 @@
                 <!-- Admin interface will be loaded here -->
         <!-- UI Content Section 7 End--> 
   
-    <!-- 🔒 LOCKED TEMPLATE ZONE 5 - Core Scripts (DO NOT MODIFY) -->
+    <!-- 🔄 NEW UNIFIED INITIALIZATION SYSTEM -->
+    <!-- Core Systems -->
     <script src="scripts/global-favicon.js"></script>
     <script src="scripts/ui-utils.js"></script>
     <script src="scripts/data-utils.js"></script>
@@ -943,27 +944,18 @@
     <script src="scripts/system-management.js"></script>
     <script src="scripts/notification-category-detector.js"></script>
     <script src="scripts/notification-migration-system.js"></script>
-  <script src="scripts/global-notification-collector.js"></script>
+    <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/tables.js"></script>
     <script src="scripts/page-utils.js"></script>
     <script src="scripts/central-refresh-system.js"></script>
-    <script src="scripts/color-scheme-system.js"></script>
-    <script src="scripts/header-system.js"></script>
-    <script src="scripts/accounts.js"></script>
     <script src="scripts/preferences.js"></script>
-    <script src="scripts/preferences-admin.js"></script>
-    <script src="scripts/preferences-page.js"></script>
+    
+    <!-- New Unified Initialization System -->
+    <script src="scripts/application-initializer.js"></script>
+    <script src="scripts/page-initialization-configs.js"></script>
+    <script src="scripts/unified-app-initializer.js"></script>
 
     <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            console.log("⚙️ Preferences page loaded successfully");
-            if (typeof window.initializePreferencesPage === "function") {
-                window.initializePreferencesPage();
-            } else {
-                console.warn("⚠️ initializePreferencesPage function not available");
-            }
-        });
-    </script>
+    <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
 </body>
 </html>

@@ -447,3 +447,4 @@ window.addEventListener('unhandledrejection', (event) => {
         window.showNotification('❌ Promise rejection occurred', 'error');
     }
 });
+

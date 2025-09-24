@@ -22,12 +22,12 @@ console.log('📁 trading_accounts.js נטען - מתחיל אתחול');
  * - Sorting uses global window.sortTableData() function
  *
  * תכולת הקובץ:
- * - loadTradingAccountsFromServer: טעינת חשבונות מסחר מהשרת
- * - updateTradingAccountsTable: עדכון טבלת חשבונות מסחר
- * - showAddTradingAccountModal: הצגת מודל הוספת חשבון מסחר
- * - createTradingAccount: יצירת חשבון מסחר חדש
- * - updateTradingAccountFromModal: עדכון חשבון מסחר קיים
- * - deleteTradingAccount: מחיקת חשבון מסחר
+ * - loadAccountsFromServer: טעינת חשבונות מהשרת
+ * - updateAccountsTable: עדכון טבלת חשבונות
+ * - showAddAccountModal: הצגת מודל הוספת חשבון
+ * - createAccount: יצירת חשבון חדש
+ * - updateAccountFromModal: עדכון חשבון קיים
+ * - deleteAccount: מחיקת חשבון
  * - פונקציות ניהול חשבונות מלאות (CRUD, מודלים, מחיקה, ביטול)
  *
  * שימוש: נטען רק בעמוד trading_accounts.html לניהול חשבונות
@@ -82,7 +82,7 @@ async function loadCurrenciesFromServer() {
 }
 
 // פונקציה עזר להצגת מטבע (לא בשימוש כרגע)
-// function getCurrencyDisplay(tradingAccount) {
+// function getCurrencyDisplay(account) {
 //   if (account.currency_symbol) {
 //     // אם יש סמל מטבע מהשרת
 //     switch (account.currency_symbol) {
@@ -118,7 +118,7 @@ async function loadCurrenciesFromServer() {
 // }
 
 // פונקציה ליצירת אפשרויות מטבע בטופס
-function generateCurrencyOptions(tradingAccount = null) {
+function generateCurrencyOptions(account = null) {
   // generateCurrencyOptions STARTED
   // Currencies data
   // Currencies loaded
@@ -127,14 +127,14 @@ function generateCurrencyOptions(tradingAccount = null) {
     // No currencies data, using default
     // אם אין מטבעות, נחזיר ברירת מחדל
     return `
-      <option value="1" ${tradingAccount && tradingAccount.currency_id === 1 ? 'selected' : ''}>דולר אמריקאי (USD)</option>
+      <option value="1" ${account && account.currency_id === 1 ? 'selected' : ''}>דולר אמריקאי (USD)</option>
     `;
   }
 
   const options = window.currenciesData.map(currency => {
-    const isSelected = tradingAccount && (
-      tradingAccount.currency_id === currency.id ||
-      tradingAccount.currency_symbol === currency.symbol
+    const isSelected = account && (
+      account.currency_id === currency.id ||
+      account.currency_symbol === currency.symbol
     );
 
     return `<option value="${currency.id}" ${isSelected ? 'selected' : ''}>${currency.name} (${currency.symbol})</option>`;
@@ -147,7 +147,7 @@ function generateCurrencyOptions(tradingAccount = null) {
 
 // פונקציה לטעינת חשבונות מהשרת
 async function loadTradingAccountsFromServer() {
-  console.log('🚀🚀🚀 loadTradingAccountsFromServer התחיל 🚀🚀🚀');
+  console.log('🚀🚀🚀 loadAccountsFromServer התחיל 🚀🚀🚀');
   try {
     // בדיקה אם יש token שמור
     const token = localStorage.getItem('authToken');
@@ -179,23 +179,23 @@ async function loadTradingAccountsFromServer() {
       console.log('📊 נתונים גולמיים מהשרת:', responseData);
 
       // טיפול במבנה התשובה - יכול להיות ישירות מערך או בתוך data
-      const allTradingAccounts = responseData.data || responseData;
-      console.log('📊 כל החשבונות המסחר:', allTradingAccounts.length, 'חשבונות');
+      const allAccounts = responseData.data || responseData;
+      console.log('📊 כל החשבונות:', allAccounts.length, 'חשבונות');
 
       // סינון רק חשבונות בסטטוס open
-      const openTradingAccounts = allTradingAccounts.filter(account => account.status === 'open');
-      console.log('📊 חשבונות מסחר פתוחים:', openTradingAccounts.length, 'חשבונות');
+      const openAccounts = allAccounts.filter(account => account.status === 'open');
+      console.log('📊 חשבונות פתוחים:', openAccounts.length, 'חשבונות');
       
-      window.trading_accountsData = openTradingAccounts;
+      window.trading_accountsData = openAccounts;
       window.trading_accountsLoaded = true;
 
       // קריאה לעדכון התפריט
       if (typeof window.updateTradingAccountFilterMenu === 'function') {
-        window.updateTradingAccountFilterMenu(openTradingAccounts);
+        window.updateTradingAccountFilterMenu(openAccounts);
       }
 
       // החזרת הנתונים לטעינה חוזרת
-      return openTradingAccounts;
+      return openAccounts;
     } else {
       console.warn('⚠️ תגובת שרת לא תקינה:', response.status);
       loadDefaultTradingAccounts();
@@ -203,7 +203,7 @@ async function loadTradingAccountsFromServer() {
 
   } catch (error) {
     console.error('❌ שגיאה בטעינת חשבונות מהשרת:', error);
-    loadDefaultTradingAccounts();
+    loadDefaultAccounts();
   }
 }
 
@@ -226,25 +226,25 @@ async function loadAllTradingAccountsFromServer() {
 
     if (response.ok) {
       const responseData = await response.json();
-      const allTradingAccounts = responseData.data || responseData;
+      const allAccounts = responseData.data || responseData;
 
       // סינון רק חשבונות בסטטוס open
-      const openTradingAccounts = allTradingAccounts.filter(account => account.status === 'open');
+      const openAccounts = allAccounts.filter(account => account.status === 'open');
 
       // שמירת החשבונות הפתוחים במשתנה גלובלי
-      window.allTradingAccountsData = openTradingAccounts;
-      window.trading_accountsData = openTradingAccounts; // גם עבור הפילטר
+      window.allAccountsData = openAccounts;
+      window.trading_accountsData = openAccounts; // גם עבור הפילטר
 
       // עדכון הפילטר עם החשבונות הפתוחים (אם הפונקציה קיימת)
       if (typeof window.updateTradingAccountFilterMenu === 'function') {
-        window.updateTradingAccountFilterMenu(openTradingAccounts);
+        window.updateTradingAccountFilterMenu(openAccounts);
       } else {
-        // updateTradingAccountFilterMenu not available yet, trying direct update
+        // updateAccountFilterMenu not available yet, trying direct update
         // ניסיון לעדכן ישירות
       }
 
       // החזרת הנתונים לטעינה חוזרת
-      return openTradingAccounts;
+      return openAccounts;
     } else {
       // Error loading all trading_accounts from server, status
       return [];
@@ -261,39 +261,39 @@ function loadDefaultTradingAccounts() {
   // Loading default trading_accounts - no dummy data
   window.trading_accountsData = [];
   window.trading_accountsLoaded = true;
-  if (typeof window.updateTradingAccountFilterMenu === 'function') {
+  if (typeof window.updateAccountFilterMenu === 'function') {
     window.updateTradingAccountFilterMenu(window.trading_accountsData);
   }
 }
 
 // הפונקציות הכלליות לפילטר חשבונות הועברו ל-grid-filters.js
 
-// פונקציה לקבלת חשבונות מסחר נטענים - הועברה ל-trading-account-service.js
-// function getTradingAccounts() {
+// פונקציה לקבלת חשבונות נטענים - הועברה ל-trading-account-service.js
+// function getAccounts() {
 //   return window.trading_accountsData || [];
 // }
 
-// פונקציה לבדיקה אם חשבונות המסחר נטענו - הועברה ל-trading-account-service.js
-// function isTradingAccountsLoaded() {
+// פונקציה לבדיקה אם החשבונות נטענו - הועברה ל-trading-account-service.js
+// function isAccountsLoaded() {
 //   return window.trading_accountsLoaded || false;
 // }
 
-// פונקציה לטעינת נתוני חשבונות מסחר מהשרת
+// פונקציה לטעינת נתוני חשבונות מהשרת
 async function loadTradingAccountsData() {
-  console.log('🚀🚀🚀 loadTradingAccountsData התחיל 🚀🚀🚀');
+  console.log('🚀🚀🚀 loadAccountsData התחיל 🚀🚀🚀');
   try {
-    // טוען נתוני חשבונות מסחר מהשרת
+    // טוען נתוני חשבונות מהשרת
 
     // בדיקה אם יש פונקציה apiCall זמינה
     if (typeof window.apiCall === 'function') {
       console.log('📡 משתמש ב-apiCall');
       const response = await window.apiCall('/api/trading-accounts/');
       const trading_accounts = response.data || response;
-      console.log('📊 חשבונות מסחר מ-apiCall:', trading_accounts.length, 'חשבונות');
+      console.log('📊 חשבונות מ-apiCall:', trading_accounts.length, 'חשבונות');
       // חשבונות שהתקבלו
       return trading_accounts;
     } else {
-      console.log('📡 apiCall לא זמין - משתמש ב-loadTradingAccountsFromServer');
+      console.log('📡 apiCall לא זמין - משתמש ב-loadAccountsFromServer');
       // קריאה ישירה ל-API
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const response = await fetch(`${base}/api/trading-accounts/`);
@@ -318,15 +318,15 @@ async function loadTradingAccountsData() {
  * @param {Array} trading_accounts - מערך של חשבונות
  *
  * @example
- * updateTradingAccountsTable(trading_accounts);
+ * updateAccountsTable(trading_accounts);
  */
 function updateTradingAccountsTable(trading_accounts) {
-  console.log('🚀🚀🚀 updateTradingAccountsTable התחיל עם', trading_accounts ? trading_accounts.length : 0, 'חשבונות 🚀🚀🚀');
+  console.log('🚀🚀🚀 updateAccountsTable התחיל עם', trading_accounts ? trading_accounts.length : 0, 'חשבונות 🚀🚀🚀');
   
   // בדיקה שהפרמטר תקין
   if (!trading_accounts || !Array.isArray(trading_accounts)) {
     console.error('❌ פרמטר חשבונות לא תקין:', trading_accounts);
-    handleValidationError('updateTradingAccountsTable', 'פרמטר חשבונות לא תקין');
+    handleValidationError('updateAccountsTable', 'פרמטר חשבונות לא תקין');
     return;
   }
 
@@ -434,7 +434,7 @@ function updateTradingAccountsTable(trading_accounts) {
   console.log('✅ טבלת חשבונות עודכנה בהצלחה עם', trading_accounts.length, 'חשבונות');
   console.log('🔍 tbody.innerHTML אחרי עדכון:', tbody.innerHTML.length, 'תווים');
   console.log('🔍 מספר שורות בטבלה:', tbody.children.length);
-  // END UPDATE TRADING ACCOUNTS TABLE
+  // END UPDATE ACCOUNTS TABLE
 }
 
 /**
@@ -446,8 +446,8 @@ async function loadTradingAccounts() {
     // טוען חשבונות
 
     // קריאה לפונקציה מ-trading_accounts.js
-    if (typeof window.loadTradingAccountsDataFromAPI === 'function') {
-      const trading_accounts = await window.loadTradingAccountsDataFromAPI();
+    if (typeof window.loadAccountsDataFromAPI === 'function') {
+      const trading_accounts = await window.loadAccountsDataFromAPI();
       updateTradingAccountsTable(trading_accounts);
     } else {
       const trading_accounts = await loadTradingAccountsData();
@@ -484,30 +484,30 @@ function updateTradingAccountFilterDisplayText() {
     return;
   }
 
-  const tradingAccountMenu = appHeader.shadowRoot.getElementById('tradingAccountFilterMenu');
-  if (!tradingAccountMenu) {
+  const accountMenu = appHeader.shadowRoot.getElementById('accountFilterMenu');
+  if (!accountMenu) {
     return;
   }
 
-  const tradingAccountToggle = appHeader.shadowRoot.getElementById('tradingAccountFilterToggle');
-  if (!tradingAccountToggle) {
+  const accountToggle = appHeader.shadowRoot.getElementById('accountFilterToggle');
+  if (!accountToggle) {
     return;
   }
 
-  const selectedText = tradingAccountToggle.querySelector('.selected-trading-account-text');
+  const selectedText = accountToggle.querySelector('.selected-trading-account-text');
   if (!selectedText) {
     return;
   }
 
   // קבלת החשבונות הנבחרים
-  const selectedTradingAccounts = window.selectedTradingAccountsForFilter || [];
+  const selectedAccounts = window.selectedAccountsForFilter || [];
 
-  if (selectedTradingAccounts.length === 0) {
+  if (selectedAccounts.length === 0) {
     selectedText.textContent = 'כל החשבונות';
-  } else if (selectedTradingAccounts.length === 1) {
-    selectedText.textContent = selectedTradingAccounts[0];
+  } else if (selectedAccounts.length === 1) {
+    selectedText.textContent = selectedAccounts[0];
   } else {
-    selectedText.textContent = `${selectedTradingAccounts.length} נבחרו`;
+    selectedText.textContent = `${selectedAccounts.length} נבחרו`;
   }
 }
 
@@ -515,10 +515,10 @@ function updateTradingAccountFilterDisplayText() {
 window.loadTradingAccountsFromServer = loadTradingAccountsFromServer;
 window.loadAllTradingAccountsFromServer = loadAllTradingAccountsFromServer;
 window.loadDefaultTradingAccounts = loadDefaultTradingAccounts;
-// הערה: updateTradingAccountFilterMenu מיוצאת מ-grid-filters.js
+// הערה: updateAccountFilterMenu מיוצאת מ-grid-filters.js
 window.updateTradingAccountFilterDisplayText = updateTradingAccountFilterDisplayText;
-// window.getTradingAccounts = getTradingAccounts; // הועבר ל-trading-account-service.js
-// window.isTradingAccountsLoaded = isTradingAccountsLoaded; // הועבר ל-trading-account-service.js
+// window.getAccounts = getAccounts; // הועבר ל-trading-account-service.js
+// window.isAccountsLoaded = isAccountsLoaded; // הועבר ל-trading-account-service.js
 window.loadTradingAccountsData = loadTradingAccountsData;
 window.updateTradingAccountsTable = updateTradingAccountsTable;
 window.loadTradingAccounts = loadTradingAccounts;
@@ -539,27 +539,27 @@ window.checkTradingAccountsStatus = function () {
 
   const appHeader = document.querySelector('app-header');
   if (appHeader) {
-    const tradingAccountMenu = appHeader.shadowRoot.getElementById('tradingAccountFilterMenu');
-    if (tradingAccountMenu) {
-      const items = tradingAccountMenu.querySelectorAll('.trading-account-filter-item');
-      // TradingAccount menu items count
+    const accountMenu = appHeader.shadowRoot.getElementById('accountFilterMenu');
+    if (accountMenu) {
+      const items = accountMenu.querySelectorAll('.trading-account-filter-item');
+      // Account menu items count
       items.forEach(() => {
         // const accountName = item.getAttribute('data-account'); // Not used
         // Item details
       });
     } else {
-      // TradingAccount menu not found in shadow DOM
+      // Account menu not found in shadow DOM
     }
   } else {
     // App header not found
   }
-  // END TRADING ACCOUNTS STATUS CHECK
+  // END ACCOUNTS STATUS CHECK
 };
 
 // פונקציה זמנית לעדכון תפריט החשבונות
-window.updateTradingAccountFilterMenuDirectly = function (trading_accounts) {
-  // UPDATE TRADING ACCOUNT FILTER MENU DIRECTLY
-  // TradingAccounts received
+window.updateAccountFilterMenuDirectly = function (trading_accounts) {
+  // UPDATE ACCOUNT FILTER MENU DIRECTLY
+  // Accounts received
 
   // חיפוש התפריט בתוך האפ-הדר (Shadow DOM)
   const appHeader = document.querySelector('app-header');
@@ -567,42 +567,42 @@ window.updateTradingAccountFilterMenuDirectly = function (trading_accounts) {
     return;
   }
 
-  const tradingAccountMenu = appHeader.shadowRoot.getElementById('tradingAccountFilterMenu');
-  if (!tradingAccountMenu) {
+  const accountMenu = appHeader.shadowRoot.getElementById('accountFilterMenu');
+  if (!accountMenu) {
     return;
   }
 
   // ניקוי התפריט הקיים
-  tradingAccountMenu.innerHTML = '';
+  accountMenu.innerHTML = '';
 
   // הוספת אופציית "כל החשבונות"
-  const allTradingAccountsItem = document.createElement('div');
-  allTradingAccountsItem.className = 'trading-account-filter-item selected';
-  allTradingAccountsItem.setAttribute('data-account', 'all');
-  allTradingAccountsItem.innerHTML = `
+  const allAccountsItem = document.createElement('div');
+  allAccountsItem.className = 'trading-account-filter-item selected';
+  allAccountsItem.setAttribute('data-account', 'all');
+  allAccountsItem.innerHTML = `
     <span class="option-text">כל החשבונות</span>
     <span class="check-mark">✓</span>
   `;
-  tradingAccountMenu.appendChild(allTradingAccountsItem);
+  accountMenu.appendChild(allAccountsItem);
 
   // הוספת החשבונות מהשרת
   if (trading_accounts && trading_accounts.length > 0) {
     trading_accounts.forEach(account => {
-      const tradingAccountItem = document.createElement('div');
-      tradingAccountItem.className = 'trading-account-filter-item';
-      tradingAccountItem.setAttribute('data-account', account.id || account.name);
-      tradingAccountItem.innerHTML = `
+      const accountItem = document.createElement('div');
+      accountItem.className = 'trading-account-filter-item';
+      accountItem.setAttribute('data-account', account.id || account.name);
+      accountItem.innerHTML = `
         <span class="option-text">${account.name || account.account_name || 'Unknown'}</span>
         <span class="check-mark">✓</span>
       `;
-      tradingAccountMenu.appendChild(tradingAccountItem);
+      accountMenu.appendChild(accountItem);
     });
   }
 
 };
 
 // פונקציה גלובלית לבדיקה מהירה
-window.debugTradingAccountsFilter = function () {
+window.debugAccountsFilter = function () {
   // בדיקת מצב החשבונות
   window.checkTradingAccountsStatus();
 
@@ -611,11 +611,11 @@ window.debugTradingAccountsFilter = function () {
     .then(response => response.json())
     .then(data => {
       const trading_accounts = data.data || data;
-      const openTradingAccounts = trading_accounts.filter(acc => acc.status === 'open');
+      const openAccounts = trading_accounts.filter(acc => acc.status === 'open');
 
       // ניסיון לעדכן תפריט ישירות
       if (typeof window.updateTradingAccountFilterMenu === 'function') {
-        window.updateTradingAccountFilterMenu(openTradingAccounts);
+        window.updateTradingAccountFilterMenu(openAccounts);
       }
     })
     .catch(() => {
@@ -654,10 +654,10 @@ if (typeof loadCurrenciesFromServer === 'function') {
  */
 function showAddTradingAccountModal() {
   // בדיקה אם יש מודל קיים בדף
-  const modalElement = document.getElementById('tradingAccountModal');
+  const modalElement = document.getElementById('accountModal');
   if (modalElement) {
     // איפוס הטופס
-    const form = document.getElementById('tradingAccountForm');
+    const form = document.getElementById('accountForm');
     if (form) {
       form.reset();
     }
@@ -681,7 +681,7 @@ function showAddTradingAccountModal() {
 
       // אתחול וולידציה בפתיחת המודל
       if (window.initializeValidation) {
-        window.initializeValidation('tradingAccountForm');
+        window.initializeValidation('accountForm');
       }
     } catch (error) {
       handleSystemError(error, 'יצירת/הצגת מודל חדש');
@@ -692,9 +692,9 @@ function showAddTradingAccountModal() {
 /**
  * יצירת מודל חשבון
  * @param {string} mode - 'add' או 'edit'
- * @param {Object} tradingAccount - אובייקט החשבון המסחר לעריכה (רק במצב edit)
+ * @param {Object} account - אובייקט החשבון לעריכה (רק במצב edit)
  */
-function createTradingAccountModal(mode, tradingAccount = null) {
+function createTradingAccountModal(mode, account = null) {
 
   const isEdit = mode === 'edit';
   const title = isEdit ? 'עריכת חשבון' : 'הוספת חשבון חדש';
@@ -702,9 +702,9 @@ function createTradingAccountModal(mode, tradingAccount = null) {
 
   const modal = document.createElement('div');
   modal.className = 'modal fade';
-  modal.id = 'tradingAccountModal';
+  modal.id = 'accountModal';
   modal.setAttribute('tabindex', '-1');
-  modal.setAttribute('aria-labelledby', 'tradingAccountModalLabel');
+  modal.setAttribute('aria-labelledby', 'accountModalLabel');
   modal.setAttribute('aria-hidden', 'true');
   modal.setAttribute('data-bs-backdrop', 'true');
 
@@ -712,11 +712,11 @@ function createTradingAccountModal(mode, tradingAccount = null) {
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header linkedItems_modal-header-colored">
-          <h5 class="modal-title" id="tradingAccountModalLabel">${title}</h5>
+          <h5 class="modal-title" id="accountModalLabel">${title}</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form id="tradingAccountForm">
+          <form id="accountForm">
             <div class="row">
               <div class="col-md-6">
                 <div class="mb-3">
@@ -731,7 +731,7 @@ function createTradingAccountModal(mode, tradingAccount = null) {
                   <label for="accountCurrency" class="form-label">מטבע *</label>
                   <select class="form-select" id="accountCurrency" name="currency_id" required>
                     <option value="">בחר מטבע</option>
-                    ${generateCurrencyOptions(tradingAccount)}
+                    ${generateCurrencyOptions(account)}
                   </select>
                   <div class="invalid-feedback" id="currencyError"></div>
                 </div>
@@ -853,16 +853,16 @@ function createTradingAccountModal(mode, tradingAccount = null) {
 
 /**
  * בדיקת תקינות נתוני חשבון מקיפה
- * @param {Object} tradingAccountData - נתוני החשבון המסחר
+ * @param {Object} accountData - נתוני החשבון
  * @returns {Object} - תוצאה עם isValid ו-message
  */
-function validateTradingAccountData(tradingAccountData) {
+function validateTradingAccountData(accountData) {
   // בדיקת שם החשבון
-  if (!tradingAccountData.name || tradingAccountData.name.trim() === '') {
+  if (!accountData.name || accountData.name.trim() === '') {
     return { isValid: false, message: 'שם החשבון הוא שדה חובה' };
   }
 
-  const trimmedName = tradingAccountData.name.trim();
+  const trimmedName = accountData.name.trim();
 
   if (trimmedName.length < 3) {
     return { isValid: false, message: 'שם החשבון חייב להכיל לפחות 3 תווים' };
@@ -879,17 +879,17 @@ function validateTradingAccountData(tradingAccountData) {
   }
 
   // בדיקת מטבע
-  if (!tradingAccountData.currency_id || tradingAccountData.currency_id === '') {
+  if (!accountData.currency_id || accountData.currency_id === '') {
     return { isValid: false, message: 'יש לבחור מטבע' };
   }
 
   // בדיקת סטטוס
-  if (tradingAccountData.status && !['open', 'closed'].includes(tradingAccountData.status)) {
+  if (accountData.status && !['open', 'closed'].includes(accountData.status)) {
     return { isValid: false, message: 'סטטוס חשבון לא תקין - רק פתוח או סגור מותרים' };
   }
 
   // בדיקת יתרת מזומן
-  const cashBalance = tradingAccountData.cash_balance;
+  const cashBalance = accountData.cash_balance;
   if (cashBalance !== null && cashBalance !== undefined && cashBalance !== '') {
     const numBalance = parseFloat(cashBalance);
     if (isNaN(numBalance)) {
@@ -904,7 +904,7 @@ function validateTradingAccountData(tradingAccountData) {
   }
 
   // בדיקת ערך כולל
-  const totalValue = tradingAccountData.total_value;
+  const totalValue = accountData.total_value;
   if (totalValue !== null && totalValue !== undefined && totalValue !== '') {
     const numValue = parseFloat(totalValue);
     if (isNaN(numValue)) {
@@ -919,7 +919,7 @@ function validateTradingAccountData(tradingAccountData) {
   }
 
   // בדיקת רווח/הפסד כולל
-  const totalPl = tradingAccountData.total_pl;
+  const totalPl = accountData.total_pl;
   if (totalPl !== null && totalPl !== undefined && totalPl !== '') {
     const numPl = parseFloat(totalPl);
     if (isNaN(numPl)) {
@@ -934,7 +934,7 @@ function validateTradingAccountData(tradingAccountData) {
   }
 
   // בדיקת הערות
-  if (tradingAccountData.notes && tradingAccountData.notes.length > 1000) {
+  if (accountData.notes && accountData.notes.length > 1000) {
     return { isValid: false, message: 'הערות ארוכות מדי (מקסימום 1,000 תווים)' };
   }
 
@@ -956,9 +956,9 @@ function showFormError(message) {
 /**
  * פונקציה לשמירת חשבון
  * @param {string} mode - 'add' או 'edit'
- * @param {number} tradingAccountId - מזהה החשבון המסחר (רק במצב edit)
+ * @param {number} accountId - מזהה החשבון (רק במצב edit)
  */
-async function saveTradingAccount(mode, tradingAccountId = null) {
+async function saveTradingAccount(mode, accountId = null) {
   try {
     // ניקוי מטמון לפני פעולת CRUD - הוספה/עריכה
     if (window.clearCacheBeforeCRUD) {
@@ -966,7 +966,7 @@ async function saveTradingAccount(mode, tradingAccountId = null) {
     }
     
     // איסוף נתונים מהטופס
-    const form = document.getElementById('tradingAccountForm');
+    const form = document.getElementById('accountForm');
     const formData = new FormData(form);
 
     const accountData = {
@@ -988,7 +988,7 @@ async function saveTradingAccount(mode, tradingAccountId = null) {
     if (mode === 'add') {
       await addTradingAccountToAPI(accountData);
     } else {
-      await updateTradingAccountInAPI(tradingAccountId, accountData);
+      await updateTradingAccountInAPI(accountId, accountData);
     }
 
     // רענון הנתונים לפני סגירת המודל
@@ -1016,7 +1016,7 @@ async function saveTradingAccount(mode, tradingAccountId = null) {
       }
 
       // רק אם הרענון הצליח, נסגור את המודל
-      const modal = document.getElementById('tradingAccountModal');
+      const modal = document.getElementById('accountModal');
       if (modal) {
         const bootstrapModal = bootstrap.Modal.getInstance(modal);
         if (bootstrapModal) {
@@ -1048,7 +1048,7 @@ async function saveTradingAccount(mode, tradingAccountId = null) {
 
 /**
  * הוספת חשבון ל-API
- * @param {Object} tradingAccountData - נתוני החשבון המסחר
+ * @param {Object} accountData - נתוני החשבון
  */
 async function addTradingAccountToAPI(accountData) {
   try {
@@ -1076,12 +1076,12 @@ async function addTradingAccountToAPI(accountData) {
 
 /**
  * עדכון חשבון ב-API
- * @param {number} tradingAccountId - מזהה החשבון המסחר
- * @param {Object} tradingAccountData - נתוני החשבון המסחר
+ * @param {number} accountId - מזהה החשבון
+ * @param {Object} accountData - נתוני החשבון
  */
-async function updateTradingAccountInAPI(tradingAccountId, accountData) {
+async function updateTradingAccountInAPI(accountId, accountData) {
   try {
-    const response = await fetch(`/api/trading-accounts/${tradingAccountId}`, {
+    const response = await fetch(`/api/trading-accounts/${accountId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -1109,23 +1109,23 @@ async function updateTradingAccountInAPI(tradingAccountId, accountData) {
  */
 /**
  * הצגת מודל עריכת חשבון לפי ID
- * @param {number} tradingAccountId - מזהה החשבון המסחר
+ * @param {number} accountId - מזהה החשבון
  */
-async function showEditTradingAccountModalById(tradingAccountId) {
+async function showEditTradingAccountModalById(accountId) {
   // בדיקה שהפרמטר תקין
-  if (!tradingAccountId) {
-    handleValidationError('showEditTradingAccountModalById', 'מזהה חשבון מסחר לא תקין');
+  if (!accountId) {
+    handleValidationError('showEditAccountModalById', 'מזהה חשבון לא תקין');
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה', 'מזהה חשבון לא תקין');
     } else {
-      handleValidationError('showEditTradingAccountModalById', 'מזהה חשבון מסחר לא תקין');
+      handleValidationError('showEditAccountModalById', 'מזהה חשבון לא תקין');
     }
     return;
   }
 
   try {
     // טעינת נתוני החשבון מהשרת
-    const response = await fetch(`/api/trading-accounts/${tradingAccountId}`);
+    const response = await fetch(`/api/trading-accounts/${accountId}`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -1182,14 +1182,14 @@ function showEditTradingAccountModal(account) {
 /**
  * עדכון חשבון קיים - הוסר כי לא בשימוש
  */
-// async function updateTradingAccountFromModal() { ... }
+// async function updateAccountFromModal() { ... }
 
 /**
  * טעינת נתוני חשבונות מ-API
  * @returns {Promise<Array>} מערך של חשבונות
  */
 async function loadTradingAccountsDataFromAPI() {
-  console.log('🚀🚀🚀 loadTradingAccountsDataFromAPI התחיל 🚀🚀🚀');
+  console.log('🚀🚀🚀 loadAccountsDataFromAPI התחיל 🚀🚀🚀');
   try {
     console.log('📡 שליחת בקשה ל-API:', '/api/trading-accounts/');
     const response = await fetch('/api/trading-accounts/');
@@ -1216,7 +1216,7 @@ async function loadTradingAccountsDataFromAPI() {
     }
 
   } catch (error) {
-    console.error('❌ שגיאה ב-loadTradingAccountsDataFromAPI:', error);
+    console.error('❌ שגיאה ב-loadAccountsDataFromAPI:', error);
     handleApiError('שגיאה בקריאה ל-API', error.message);
     throw error;
   }
@@ -1224,12 +1224,12 @@ async function loadTradingAccountsDataFromAPI() {
 
 /**
  * מחיקת חשבון מהשרת
- * @param {number} tradingAccountId - מזהה החשבון המסחר
+ * @param {number} accountId - מזהה החשבון
  * @param {string} accountName - שם החשבון
  */
-async function deleteTradingAccountFromAPI(tradingAccountId, accountName) {
+async function deleteTradingAccountFromAPI(accountId, accountName) {
   try {
-    const response = await fetch(`/api/trading-accounts/${tradingAccountId}`, {
+    const response = await fetch(`/api/trading-accounts/${accountId}`, {
       method: 'DELETE',
     });
 
@@ -1254,10 +1254,10 @@ async function deleteTradingAccountFromAPI(tradingAccountId, accountName) {
 
 /**
  * ביטול חשבון (שינוי סטטוס למבוטל)
- * @param {number} tradingAccountId - מזהה החשבון המסחר
+ * @param {number} accountId - מזהה החשבון
  * @param {string} accountName - שם החשבון
  */
-async function cancelTradingAccount(tradingAccountId, accountName) {
+async function cancelTradingAccount(accountId, accountName) {
 
   // בדיקה ראשונה
   if (window.showCancelWarning) {
@@ -1355,7 +1355,7 @@ async function cancelTradingAccount(tradingAccountId, accountName) {
 
   try {
     // בדיקה אם יש טריידים פתוחים
-    const tradesResponse = await fetch(`/api/trades/?trading_account_id=${tradingAccountId}&status=open`);
+    const tradesResponse = await fetch(`/api/trades/?trading_account_id=${accountId}&status=open`);
     if (tradesResponse.ok) {
       const tradesData = await tradesResponse.json();
       const openTrades = tradesData.data || tradesData || [];
@@ -1366,7 +1366,7 @@ async function cancelTradingAccount(tradingAccountId, accountName) {
       }
     }
 
-    const response = await fetch(`/api/trading-accounts/${tradingAccountId}`, {
+    const response = await fetch(`/api/trading-accounts/${accountId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -1400,18 +1400,18 @@ async function cancelTradingAccount(tradingAccountId, accountName) {
 
 /**
  * מחיקת חשבון
- * @param {number} tradingAccountId - מזהה החשבון המסחר
+ * @param {number} accountId - מזהה החשבון
  * @param {string} accountName - שם החשבון
  */
-async function deleteTradingAccount(tradingAccountId, accountName) {
+async function deleteTradingAccount(accountId, accountName) {
   // ניקוי מטמון לפני פעולת CRUD - מחיקה
   if (window.clearCacheBeforeCRUD) {
     window.clearCacheBeforeCRUD('trading_accounts', 'delete');
   }
 
   // בדיקת פריטים מקושרים לפני מחיקה
-  if (typeof window.checkLinkedItemsBeforeDeleteTradingAccount === 'function') {
-    const hasLinkedItems = await window.checkLinkedItemsBeforeDeleteTradingAccount(tradingAccountId);
+  if (typeof window.checkLinkedItemsBeforeDelete === 'function') {
+    const hasLinkedItems = await window.checkLinkedItemsBeforeDelete(accountId);
     if (hasLinkedItems) {
       return; // הפונקציה תטפל בהצגת המודול
     }
@@ -1420,7 +1420,7 @@ async function deleteTradingAccount(tradingAccountId, accountName) {
   // אישור מהמשתמש
   if (typeof window.showDeleteWarning === 'function') {
     const confirmed = await new Promise(resolve => {
-      window.showDeleteWarning('account', tradingAccountId, 'חשבון',
+      window.showDeleteWarning('account', accountId, 'חשבון',
         () => resolve(true),
         () => resolve(false),
       );
@@ -1468,7 +1468,7 @@ async function deleteTradingAccount(tradingAccountId, accountName) {
   }
 
   try {
-    const response = await fetch(`/api/trading-accounts/${tradingAccountId}`, {
+    const response = await fetch(`/api/trading-accounts/${accountId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -1503,7 +1503,43 @@ async function deleteTradingAccount(tradingAccountId, accountName) {
   }
 }
 
-// הפונקציה הועברה למטה - גרסה מפורטת יותר
+/**
+ * בדיקת פריטים מקושרים לפני מחיקה
+ */
+async function checkLinkedItemsBeforeDelete(accountId) {
+  try {
+    const response = await fetch(`/api/linked-items/account/${accountId}`);
+
+    if (!response.ok) {
+      // אם לא ניתן לבדוק פריטים מקושרים, ממשיכים עם המחיקה
+      return false;
+    }
+
+    const linkedItemsData = await response.json();
+    const childEntities = linkedItemsData.child_entities || [];
+    // const parentEntities = linkedItemsData.parent_entities || []; // לא בשימוש
+
+    // בדיקה רק אם יש פריטים שמקושרים אל החשבון (child entities)
+    // parent entities הם פריטים שהחשבון מקושר אליהם (מטבע) - לא רלוונטי למחיקה
+    if (childEntities.length > 0) {
+      // יש פריטים מקושרים - הצגת חלון מקושרים
+      if (typeof window.showLinkedItemsModal === 'function') {
+        window.showLinkedItemsModal(linkedItemsData, 'account', accountId);
+        return true;
+      } else {
+        if (typeof window.showNotification === 'function') {
+          window.showNotification('יש פריטים מקושרים לחשבון זה', 'warning', 'אזהרה', 5000, 'business');
+        }
+        return true;
+      }
+    }
+
+    return false;
+  } catch (error) {
+    handleSystemError(error, 'בדיקת פריטים מקושרים');
+    return false;
+  }
+}
 
 /**
  * הצגת הודעת הצלחה
@@ -1529,16 +1565,16 @@ function showErrorMessage(message) {
 
 // פונקציות עזר - הועברו ל-ui-utils.js
 
-function confirmDeleteTradingAccount(tradingAccountId, accountName) {
-  deleteTradingAccount(tradingAccountId, accountName);
+function confirmDeleteTradingAccount(accountId, accountName) {
+  deleteTradingAccount(accountId, accountName);
 }
 
-// function checkLinkedItems(tradingAccountId) { // הוסר - הוחלף ב-checkLinkedItemsBeforeDelete
+// function checkLinkedItems(accountId) { // הוסר - הוחלף ב-checkLinkedItemsBeforeDelete
 //   // פונקציה פשוטה לבדיקת פריטים מקושרים
 //   return Promise.resolve({ hasLinkedItems: false, items: [] });
 // }
 
-function showOpenTradesWarning(tradingAccountId, accountName) {
+function showOpenTradesWarning(accountId, accountName) {
   if (typeof window.showWarningNotification === 'function') {
     window.showWarningNotification('אזהרה', `יש עסקאות פתוחות בחשבון "${accountName}". לא ניתן למחוק חשבון עם עסקאות פעילות.`);
   } else {
@@ -1554,8 +1590,8 @@ window.showEditTradingAccountModal = showEditTradingAccountModal;
 window.showEditTradingAccountModalById = showEditTradingAccountModalById;
 window.cancelTradingAccount = cancelTradingAccount;
 window.deleteTradingAccount = deleteTradingAccount;
-window.showTradingAccountSuccessMessage = showSuccessMessage;
-window.showTradingAccountErrorMessage = showErrorMessage;
+window.showSuccessMessage = showSuccessMessage;
+window.showErrorMessage = showErrorMessage;
 window.showSecondConfirmationModal = showSecondConfirmationModal;
 window.confirmDeleteTradingAccount = confirmDeleteTradingAccount;
 // window.checkLinkedItems = checkLinkedItems; // הוסר - הוחלף ב-checkLinkedItemsBeforeDelete
@@ -1565,7 +1601,7 @@ window.deleteTradingAccountFromAPI = deleteTradingAccountFromAPI;
 window.loadTradingAccountsDataFromAPI = loadTradingAccountsDataFromAPI;
 window.addTradingAccountToAPI = addTradingAccountToAPI;
 window.updateTradingAccountInAPI = updateTradingAccountInAPI;
-window.checkLinkedItemsBeforeDeleteTradingAccount = checkLinkedItemsBeforeDeleteTradingAccount;  // בדיקת אובייקטים מקושרים למחיקה
+window.checkLinkedItemsBeforeDelete = checkLinkedItemsBeforeDelete;  // בדיקת אובייקטים מקושרים למחיקה
 window.createTradingAccountModal = createTradingAccountModal;
 window.saveTradingAccount = saveTradingAccount;
 window.validateTradingAccountData = validateTradingAccountData;
@@ -1837,35 +1873,35 @@ function updateTradingAccountFilterMenu(trading_accounts) {
     return;
   }
 
-  const tradingAccountMenu = appHeader.shadowRoot.getElementById('tradingAccountFilterMenu');
-  if (!tradingAccountMenu) {
+  const accountMenu = appHeader.shadowRoot.getElementById('accountFilterMenu');
+  if (!accountMenu) {
     return;
   }
 
   // ניקוי התפריט הקיים
-  tradingAccountMenu.innerHTML = '';
+  accountMenu.innerHTML = '';
 
   // הוספת אופציית "כל החשבונות"
-  const allTradingAccountsItem = document.createElement('div');
-  allTradingAccountsItem.className = 'trading-account-filter-item selected';
-  allTradingAccountsItem.setAttribute('data-account', 'all');
-  allTradingAccountsItem.innerHTML = `
+  const allAccountsItem = document.createElement('div');
+  allAccountsItem.className = 'trading-account-filter-item selected';
+  allAccountsItem.setAttribute('data-account', 'all');
+  allAccountsItem.innerHTML = `
     <span class="option-text">כל החשבונות</span>
     <span class="check-mark">✓</span>
   `;
-  tradingAccountMenu.appendChild(allTradingAccountsItem);
+  accountMenu.appendChild(allAccountsItem);
 
   // הוספת החשבונות מהשרת
   if (trading_accounts && trading_accounts.length > 0) {
     trading_accounts.forEach(account => {
-      const tradingAccountItem = document.createElement('div');
-      tradingAccountItem.className = 'trading-account-filter-item';
-      tradingAccountItem.setAttribute('data-account', account.id || account.name);
-      tradingAccountItem.innerHTML = `
+      const accountItem = document.createElement('div');
+      accountItem.className = 'trading-account-filter-item';
+      accountItem.setAttribute('data-account', account.id || account.name);
+      accountItem.innerHTML = `
         <span class="option-text">${account.name || account.account_name || 'Unknown'}</span>
         <span class="check-mark">✓</span>
       `;
-      tradingAccountMenu.appendChild(tradingAccountItem);
+      accountMenu.appendChild(accountItem);
     });
   }
 }
@@ -1921,12 +1957,12 @@ document.addEventListener('DOMContentLoaded', function () {
   if (window.location.pathname.includes('/trading_accounts')) {
     console.log('🎯 נמצאים בדף החשבונות - מתחיל טעינת נתונים');
     // טעינת נתוני חשבונות
-    if (typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function') {
-      console.log('📡 קורא ל-loadTradingAccountsDataForTradingAccountsPage');
-      window.loadTradingAccountsDataForTradingAccountsPage();
+    if (typeof window.loadAccountsDataForAccountsPage === 'function') {
+      console.log('📡 קורא ל-loadAccountsDataForAccountsPage');
+      window.loadAccountsDataForAccountsPage();
     } else {
-      console.error('❌ loadTradingAccountsDataForTradingAccountsPage לא נמצאה');
-      handleFunctionNotFound('loadTradingAccountsDataForTradingAccountsPage', 'פונקציית טעינת נתוני חשבונות מסחר לא נמצאה');
+      console.error('❌ loadAccountsDataForAccountsPage לא נמצאה');
+      handleFunctionNotFound('loadAccountsDataForAccountsPage', 'פונקציית טעינת נתוני חשבונות לא נמצאה');
     }
 
     // שחזור מצב הסקשנים
@@ -1944,15 +1980,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 /**
  * ביטול חשבון עם בדיקת פריטים מקושרים
- * @param {number} tradingAccountId - מזהה החשבון המסחר
+ * @param {number} accountId - מזהה החשבון
  * @param {string} accountName - שם החשבון
  */
-async function cancelTradingAccountWithLinkedItemsCheck(tradingAccountId, _accountName) {
+async function cancelTradingAccountWithLinkedItemsCheck(accountId, _accountName) {
   try {
     // קבלת פרטי החשבון לצורך הודעת האישור
     let accountDetails = '';
     try {
-      const response = await fetch(`/api/trading-accounts/${tradingAccountId}`);
+      const response = await fetch(`/api/trading-accounts/${accountId}`);
       if (response.ok) {
         const accountData = await response.json();
         const account = accountData.data;
@@ -1969,7 +2005,7 @@ async function cancelTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
         `האם אתה בטוח שברצונך לבטל חשבון זה?${accountDetails}`,
         async () => {
           // המשתמש אישר - בדיקת מקושרים ואז ביצוע הביטול
-          await checkLinkedItemsAndCancelTradingAccount(tradingAccountId);
+          await checkLinkedItemsAndCancelTradingAccount(accountId);
         },
         () => {
           // המשתמש ביטל - לא עושים כלום
@@ -1991,7 +2027,7 @@ async function cancelTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
       } else if (!window.confirm(`האם אתה בטוח שברצונך לבטל חשבון זה?${accountDetails}`)) {
         return;
       }
-      await checkLinkedItemsAndCancelTradingAccount(tradingAccountId);
+      await checkLinkedItemsAndCancelTradingAccount(accountId);
     }
 
   } catch (error) {
@@ -2004,15 +2040,15 @@ async function cancelTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
 
 /**
  * מחיקת חשבון עם בדיקת פריטים מקושרים
- * @param {number} tradingAccountId - מזהה החשבון המסחר
+ * @param {number} accountId - מזהה החשבון
  * @param {string} accountName - שם החשבון
  */
-async function deleteTradingAccountWithLinkedItemsCheck(tradingAccountId, _accountName) {
+async function deleteTradingAccountWithLinkedItemsCheck(accountId, _accountName) {
   try {
     // קבלת פרטי החשבון לצורך הודעת האישור
     let accountDetails = '';
     try {
-      const response = await fetch(`/api/trading-accounts/${tradingAccountId}`);
+      const response = await fetch(`/api/trading-accounts/${accountId}`);
       if (response.ok) {
         const accountData = await response.json();
         const account = accountData.data;
@@ -2029,7 +2065,7 @@ async function deleteTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
         `האם אתה בטוח שברצונך למחוק חשבון זה?${accountDetails}`,
         async () => {
           // המשתמש אישר - בדיקת מקושרים ואז ביצוע המחיקה
-          await checkLinkedItemsAndDeleteTradingAccount(tradingAccountId);
+          await checkLinkedItemsAndDeleteTradingAccount(accountId);
         },
         () => {
           // המשתמש ביטל - לא עושים כלום
@@ -2051,7 +2087,7 @@ async function deleteTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
       } else if (!window.confirm(`האם אתה בטוח שברצונך למחוק חשבון זה?${accountDetails}`)) {
         return;
       }
-      await checkLinkedItemsAndDeleteTradingAccount(tradingAccountId);
+      await checkLinkedItemsAndDeleteTradingAccount(accountId);
     }
 
   } catch (error) {
@@ -2064,10 +2100,10 @@ async function deleteTradingAccountWithLinkedItemsCheck(tradingAccountId, _accou
 
 /**
  * החזרת חשבון מבוטל לסטטוס סגור
- * @param {number} tradingAccountId - מזהה החשבון המסחר
+ * @param {number} accountId - מזהה החשבון
  * @param {string} accountName - שם החשבון
  */
-async function restoreTradingAccount(tradingAccountId, accountName) {
+async function restoreTradingAccount(accountId, accountName) {
   // ניקוי מטמון לפני פעולת CRUD - עריכה
   if (window.clearCacheBeforeCRUD) {
     window.clearCacheBeforeCRUD('trading_accounts', 'edit');
@@ -2101,7 +2137,7 @@ async function restoreTradingAccount(tradingAccountId, accountName) {
   }
 
   try {
-    const response = await fetch(`/api/trading-accounts/${tradingAccountId}`, {
+    const response = await fetch(`/api/trading-accounts/${accountId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -2142,16 +2178,16 @@ async function restoreTradingAccount(tradingAccountId, accountName) {
 /**
  * בדיקת מקושרים וביצוע ביטול חשבון
  */
-async function checkLinkedItemsAndCancelTradingAccount(tradingAccountId) {
+async function checkLinkedItemsAndCancelTradingAccount(accountId) {
   try {
     // בדיקה אם יש פריטים מקושרים לפני ביטול
-    const hasLinkedItems = await checkLinkedItemsBeforeCancelTradingAccount(tradingAccountId);
+    const hasLinkedItems = await checkLinkedItemsBeforeCancelTradingAccount(accountId);
     if (hasLinkedItems) {
       return; // הפונקציה תטפל בהצגת המודול
     }
 
     // אין מקושרים - ביצוע הביטול
-    await performTradingAccountCancellation(tradingAccountId);
+    await performTradingAccountCancellation(accountId);
 
   } catch (error) {
     handleSystemError(error, 'בדיקת מקושרים');
@@ -2164,7 +2200,7 @@ async function checkLinkedItemsAndCancelTradingAccount(tradingAccountId) {
 /**
  * ביצוע הביטול בפועל
  */
-async function performTradingAccountCancellation(tradingAccountId) {
+async function performTradingAccountCancellation(accountId) {
   try {
     // ניקוי מטמון לפני פעולת CRUD - ביטול
     if (window.clearCacheBeforeCRUD) {
@@ -2172,7 +2208,7 @@ async function performTradingAccountCancellation(tradingAccountId) {
     }
     
     // שליחה לשרת
-    const response = await fetch(`/api/trading-accounts/${tradingAccountId}`, {
+    const response = await fetch(`/api/trading-accounts/${accountId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: 'cancelled' }),
@@ -2192,8 +2228,8 @@ async function performTradingAccountCancellation(tradingAccountId) {
         }
 
         // רענון הנתונים
-        if (typeof loadTradingAccountsDataForTradingAccountsPage === 'function') {
-          await loadTradingAccountsDataForTradingAccountsPage();
+        if (typeof loadAccountsDataForAccountsPage === 'function') {
+          await loadAccountsDataForAccountsPage();
         } else if (typeof window.loadTradingAccountsData === 'function') {
           const trading_accounts = await window.loadTradingAccountsData();
           if (typeof window.updateTradingAccountsTable === 'function') {
@@ -2251,7 +2287,7 @@ async function performTradingAccountDeletion(accountId) {
     }
     
     // שליחה לשרת
-    const response = await fetch(`/api/trading-accounts/${tradingAccountId}`, {
+    const response = await fetch(`/api/trading-accounts/${accountId}`, {
       method: 'DELETE',
     });
 
@@ -2269,8 +2305,8 @@ async function performTradingAccountDeletion(accountId) {
         }
 
         // רענון הנתונים
-        if (typeof loadTradingAccountsDataForTradingAccountsPage === 'function') {
-          await loadTradingAccountsDataForTradingAccountsPage();
+        if (typeof loadAccountsDataForAccountsPage === 'function') {
+          await loadAccountsDataForAccountsPage();
         } else if (typeof window.loadTradingAccountsData === 'function') {
           const trading_accounts = await window.loadTradingAccountsData();
           if (typeof window.updateTradingAccountsTable === 'function') {
@@ -2331,7 +2367,7 @@ async function checkLinkedItemsBeforeCancelTradingAccount(accountId) {
     // console.log('🔍 בדיקת פריטים מקושרים לחשבון:', accountId);
 
     // בדיקה ישירה של טריידים פעילים (סטטוס 'open')
-    const tradesResponse = await fetch(`/api/trades/?trading_account_id=${tradingAccountId}&status=open`);
+    const tradesResponse = await fetch(`/api/trades/?trading_account_id=${accountId}&status=open`);
     if (tradesResponse.ok) {
       const tradesData = await tradesResponse.json();
       const openTrades = tradesData.data || tradesData || [];
@@ -2423,7 +2459,7 @@ async function checkLinkedItemsBeforeCancelTradingAccount(accountId) {
 async function checkLinkedItemsBeforeDeleteTradingAccount(accountId) {
   try {
     // בדיקה ישירה של טריידים פעילים (סטטוס 'open')
-    const tradesResponse = await fetch(`/api/trades/?trading_account_id=${tradingAccountId}&status=open`);
+    const tradesResponse = await fetch(`/api/trades/?trading_account_id=${accountId}&status=open`);
     if (tradesResponse.ok) {
       const tradesData = await tradesResponse.json();
       const openTrades = tradesData.data || tradesData || [];
@@ -2510,8 +2546,8 @@ function getTradingAccountName(accountId) {
 
 /**
  * עדכון חשבון קיים
- * @param {number} tradingAccountId - מזהה החשבון המסחר
- * @param {Object} tradingAccountData - נתוני החשבון המסחר החדשים
+ * @param {number} accountId - מזהה החשבון
+ * @param {Object} accountData - נתוני החשבון החדשים
  */
 function updateTradingAccount(accountId, accountData) {
   try {
@@ -2571,7 +2607,7 @@ function updateTradingAccount(accountId, accountData) {
 /**
  * צפייה בפרטי חשבון
  * מציג חלון עם פרטים מפורטים של החשבון
- * @param {number} tradingAccountId - מזהה החשבון המסחר
+ * @param {number} accountId - מזהה החשבון
  */
 function viewTradingAccountDetails(accountId) {
   try {
@@ -2630,7 +2666,7 @@ function viewTradingAccountDetails(accountId) {
 
 /**
  * הצגת פרטי חשבון באמצעות מודול פרטי ישות
- * @param {number} tradingAccountId - מזהה החשבון המסחר
+ * @param {number} accountId - מזהה החשבון
  */
 function showTradingAccountDetails(accountId) {
   try {
@@ -2717,9 +2753,9 @@ let trading_accountsCurrentSortDirection = 'asc';
  * @param {number} columnIndex - column index for sorting (0-6)
  * 
  * @requires window.sortTableData - global function from main.js
- * @requires window.filteredTradingAccountsData - filtered data
+ * @requires window.filteredAccountsData - filtered data
  * @requires trading_accountsData - original data
- * @requires updateTradingAccountsTable - function to update table
+ * @requires updateAccountsTable - function to update table
  * 
  * @since 2.0
  */
@@ -2904,4 +2940,3 @@ window.getTradingAccounts = getTradingAccounts;
 
 // סיום הקובץ
 console.log('✅ trading_accounts.js נטען בהצלחה');
-}

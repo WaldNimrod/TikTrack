@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת מערכת אתחול - Preferences</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- TikTrack CSS -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-dynamic.css?v=1.0.1">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=1.0.1">
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=1.0.3">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=1.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=1.0.1">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=20250923_fixed_colors_v2">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=1.0.0">
+    
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=20250115_level3_fix">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center mb-4">
+                    <i class="fas fa-cogs text-primary"></i>
+                    בדיקת מערכת אתחול - Preferences
+                </h1>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-info-circle text-info"></i>
+                            מידע על המערכת
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="systemInfo">
+                            <p class="text-muted">טוען מידע על המערכת...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-line text-success"></i>
+                            ביצועים
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="performanceInfo">
+                            <p class="text-muted">טוען מידע על ביצועים...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-list text-warning"></i>
+                            מערכות זמינות
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="systemsInfo">
+                            <p class="text-muted">טוען מידע על מערכות...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-bug text-danger"></i>
+                            לוגים ושגיאות
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="logsInfo">
+                            <p class="text-muted">טוען לוגים...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button class="btn btn-primary" onclick="testPreferencesInit()">
+                        <i class="fas fa-play"></i>
+                        בדוק אתחול Preferences
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearLogs()">
+                        <i class="fas fa-trash"></i>
+                        נקה לוגים
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts - Same as preferences.html -->
+    <script src="scripts/global-favicon.js"></script>
+    <script src="scripts/ui-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/system-management.js"></script>
+    <script src="scripts/notification-category-detector.js"></script>
+    <script src="scripts/notification-migration-system.js"></script>
+    <script src="scripts/global-notification-collector.js"></script>
+    <script src="scripts/tables.js"></script>
+    <script src="scripts/page-utils.js"></script>
+    <script src="scripts/central-refresh-system.js"></script>
+    <script src="scripts/preferences.js"></script>
+    
+    <!-- New Unified Initialization System -->
+    <script src="scripts/application-initializer.js"></script>
+    <script src="scripts/page-initialization-configs.js"></script>
+    <script src="scripts/unified-app-initializer.js"></script>
+    
+    <script>
+        // Test functions
+        function testPreferencesInit() {
+            console.log('🧪 Testing preferences initialization...');
+            
+            // Reset and test
+            if (window.unifiedAppInit) {
+                window.unifiedAppInit.reset();
+                window.initializeUnifiedApp().then(status => {
+                    updateSystemInfo(status);
+                }).catch(error => {
+                    console.error('❌ Test failed:', error);
+                    updateErrorInfo(error);
+                });
+            } else {
+                console.error('❌ Unified app initializer not available');
+                updateErrorInfo('Unified app initializer not available');
+            }
+        }
+        
+        function updateSystemInfo(status) {
+            const systemInfoDiv = document.getElementById('systemInfo');
+            systemInfoDiv.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>סטטוס:</strong> ${status.initialized ? '✅ מאותחל' : '❌ לא מאותחל'}</p>
+                        <p><strong>בתהליך:</strong> ${status.inProgress ? '⏳ כן' : '✅ לא'}</p>
+                        <p><strong>עמוד:</strong> ${status.pageInfo ? status.pageInfo.name : 'לא זוהה'}</p>
+                        <p><strong>סוג עמוד:</strong> ${status.pageInfo ? status.pageInfo.type : 'לא זוהה'}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>מערכות זמינות:</strong> ${status.availableSystems ? status.availableSystems.length : 0}</p>
+                        <p><strong>מאתחלים מותאמים:</strong> ${status.customInitializers || 0}</p>
+                        <p><strong>מטפלי שגיאות:</strong> ${status.errorHandlers || 0}</p>
+                    </div>
+                </div>
+            `;
+            
+            updatePerformanceInfo(status.performanceMetrics);
+            updateSystemsInfo(status.availableSystems);
+        }
+        
+        function updatePerformanceInfo(metrics) {
+            const performanceDiv = document.getElementById('performanceInfo');
+            if (metrics && metrics.totalTime) {
+                performanceDiv.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>זמן כולל:</strong> ${metrics.totalTime}ms</p>
+                            <p><strong>זמן זיהוי:</strong> ${metrics.stageTimes.detect || 0}ms</p>
+                            <p><strong>זמן הכנה:</strong> ${metrics.stageTimes.prepare || 0}ms</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>זמן ביצוע:</strong> ${metrics.stageTimes.execute || 0}ms</p>
+                            <p><strong>זמן השלמה:</strong> ${metrics.stageTimes.finalize || 0}ms</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                performanceDiv.innerHTML = '<p class="text-muted">אין מידע על ביצועים</p>';
+            }
+        }
+        
+        function updateSystemsInfo(systems) {
+            const systemsDiv = document.getElementById('systemsInfo');
+            if (systems && systems.length > 0) {
+                const systemsList = systems.map(system => 
+                    `<span class="badge bg-success me-1">${system}</span>`
+                ).join('');
+                systemsDiv.innerHTML = `<p>${systemsList}</p>`;
+            } else {
+                systemsDiv.innerHTML = '<p class="text-muted">אין מערכות זמינות</p>';
+            }
+        }
+        
+        function updateErrorInfo(error) {
+            const logsDiv = document.getElementById('logsInfo');
+            logsDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <strong>שגיאה:</strong> ${error.message || error}
+                </div>
+            `;
+        }
+        
+        function clearLogs() {
+            document.getElementById('logsInfo').innerHTML = '<p class="text-muted">לוגים נוקו</p>';
+            console.clear();
+        }
+        
+        // Auto-test on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                testPreferencesInit();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
+

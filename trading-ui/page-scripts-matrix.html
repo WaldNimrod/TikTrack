@@ -249,102 +249,30 @@
       <!-- UI Content Section 6 End -->
 
     <!-- Core System Scripts -->
-    <script src="scripts/console-cleanup.js"></script>
-    <script src="scripts/translation-utils.js"></script>
-    <script src="scripts/data-utils.js"></script>
+    <!-- 🔄 NEW UNIFIED INITIALIZATION SYSTEM -->
+    <!-- Core Systems -->
     <script src="scripts/global-favicon.js"></script>
     <script src="scripts/ui-utils.js"></script>
-    <script src="scripts/table-mappings.js"></script>
-    <script src="scripts/date-utils.js"></script>
+    <script src="scripts/data-utils.js"></script>
+    <script src="scripts/notification-system.js"></script>
+    <script src="scripts/system-management.js"></script>
+    <script src="scripts/notification-category-detector.js"></script>
+    <script src="scripts/notification-migration-system.js"></script>
+    <script src="scripts/global-notification-collector.js"></script>
     <script src="scripts/tables.js"></script>
-    <script src="scripts/linked-items.js"></script>
     <script src="scripts/page-utils.js"></script>
     <script src="scripts/central-refresh-system.js"></script>
+    <script src="scripts/page-scripts-matrix.js"></script>
     
-    <!-- Preferences System Script -->
-    <script src="scripts/preferences.js"></script>
-    
-    <!-- Notification System Scripts -->
-    <script src="scripts/notification-system.js"></script>
-    <script src="scripts/warning-system.js"></script>
-    <script src="scripts/global-notification-collector.js"></script>
-    
-    <!-- Header System Script -->
-    <script src="scripts/header-system.js"></script>
+    <!-- New Unified Initialization System -->
+    <script src="scripts/application-initializer.js"></script>
+    <script src="scripts/page-initialization-configs.js"></script>
+    <script src="scripts/unified-app-initializer.js"></script>
 
     <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
-    <!-- ======================================================== -->
-    <!-- Page-specific JavaScript for page-scripts-matrix -->
-    <script src="scripts/page-scripts-matrix.js"></script>
-    <script>
-        // Page initialization - September 2025
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🗺️ Page Scripts Matrix loaded successfully');
-
-            // Use global functions from ui-utils.js instead of local ones
-            if (typeof initializeSections === 'function') {
-                initializeSections();
-            }
-
-            // Initialize page-specific functionality if needed
-            if (typeof initializePageScriptsMatrix === 'function') {
-                initializePageScriptsMatrix();
-            }
-
-            // Set page-specific preferences using global function
-            if (typeof setPagePreferences === 'function') {
-                setPagePreferences('page-scripts-matrix', {
-                    sections: ['section1', 'section2', 'section3', 'section4', 'section5', 'section6'],
-                    defaultExpanded: ['section1']
-                });
-            }
-
-            // Initialize scan interface
-            initializeScanInterface();
-        });
-
-        // Initialize scan interface for updating the matrix
-        function initializeScanInterface() {
-            // Add scan button after the top section header (not inside it)
-            const topSection = document.querySelector('.top-section');
-            if (topSection && !document.getElementById('scan-filesystem-btn')) {
-                const scanButton = document.createElement('button');
-                scanButton.id = 'scan-filesystem-btn';
-                scanButton.className = 'btn btn-primary btn-sm me-3';
-                scanButton.innerHTML = '<i class="fas fa-search"></i> סריקת קבצים';
-                scanButton.onclick = scanFilesystem;
-                scanButton.style.marginTop = '10px';
-                scanButton.style.marginBottom = '10px';
-                // Insert after the section-header, before the section-body
-                const sectionBody = topSection.querySelector('.section-body');
-                if (sectionBody) {
-                    topSection.insertBefore(scanButton, sectionBody);
-                } else {
-                    topSection.appendChild(scanButton);
-                }
-            }
-        }
-
-        // Scan filesystem and update matrix
-        function scanFilesystem() {
-            console.log('🔍 Starting filesystem scan...');
-
-            if (typeof showNotification === 'function') {
-                showNotification('מתחיל סריקה של מערכת הקבצים...', 'info');
-            }
-
-            // Here you would implement the actual scanning logic
-            // For now, just show a placeholder
-            setTimeout(() => {
-                if (typeof showNotification === 'function') {
-                    showNotification('סריקה הושלמה! טבלה עודכנה בהתאם.', 'success');
-                }
-                console.log('✅ Filesystem scan completed');
-            }, 2000);
-        }
-
-        // Quick action functions are now handled by page-scripts-matrix.js
-    </script>
+    <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
+    <!-- 🔓 TEMPLATE ZONE 6 - Page-Specific Scripts (ADD NEW SCRIPTS HERE) -->
+    <!-- No manual DOMContentLoaded listener needed - handled by unified system -->
     <!-- ===== CONTENT SECTIONS END (EDITABLE) ===== -->
     </div>
     <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT END (EDITABLE) ===== -->

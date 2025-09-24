@@ -39,7 +39,7 @@ def set_background_task_manager(manager):
     background_task_manager = manager
 
 # Create blueprint
-background_tasks_bp = Blueprint('background_tasks', __name__, url_prefix='/api/v1/background-tasks')
+background_tasks_bp = Blueprint('background_tasks', __name__, url_prefix='/api/background-tasks')
 
 # Initialize base API (background tasks is complex, so we'll use it selectively)
 
@@ -91,7 +91,7 @@ def get_background_tasks_status():
             'status': 'success',
             'data': status,
             'message': 'Background tasks status retrieved successfully',
-            'version': 'v1'
+            'version': '1.0'
         })
         
     except Exception as e:
@@ -99,7 +99,7 @@ def get_background_tasks_status():
         return jsonify({
             'status': 'error',
             'error': {'message': f'Failed to get background tasks status: {str(e)}'},
-            'version': 'v1'
+            'version': '1.0'
         }), 500
 
 @background_tasks_bp.route('/tasks', methods=['GET'])
@@ -598,15 +598,15 @@ def not_found(error):
     return jsonify({
         'error': 'Background tasks API endpoint not found',
         'available_endpoints': [
-            'GET /api/v1/background-tasks/',
-            'GET /api/v1/background-tasks/tasks',
-            'GET /api/v1/background-tasks/tasks/<task_name>',
-            'POST /api/v1/background-tasks/tasks/<task_name>/execute',
-            'POST /api/v1/background-tasks/tasks/<task_name>/toggle',
-            'POST /api/v1/background-tasks/scheduler/start',
-            'POST /api/v1/background-tasks/scheduler/stop',
-            'GET /api/v1/background-tasks/history',
-            'GET /api/v1/background-tasks/analytics'
+            'GET /api/background-tasks/',
+            'GET /api/background-tasks/tasks',
+            'GET /api/background-tasks/tasks/<task_name>',
+            'POST /api/background-tasks/tasks/<task_name>/execute',
+            'POST /api/background-tasks/tasks/<task_name>/toggle',
+            'POST /api/background-tasks/scheduler/start',
+            'POST /api/background-tasks/scheduler/stop',
+            'GET /api/background-tasks/history',
+            'GET /api/background-tasks/analytics'
         ]
     }), 404
 

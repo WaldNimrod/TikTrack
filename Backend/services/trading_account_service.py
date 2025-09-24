@@ -6,16 +6,16 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-class TradingTradingAccountService:
+class TradingAccountService:
     @staticmethod
-    def get_all(db: Session) -> List[TradingTradingAccount]:
+    def get_all(db: Session) -> List[TradingAccount]:
         """Get all trading_accounts"""
-        return db.query(TradingTradingAccount).all()
+        return db.query(TradingAccount).all()
     
     @staticmethod
-    def get_by_id(db: Session, trading_trading_trading_account_id: int) -> Optional[TradingTradingAccount]:
+    def get_by_id(db: Session, trading_trading_trading_account_id: int) -> Optional[TradingAccount]:
         """Get trading_account by ID"""
-        return db.query(TradingTradingAccount).filter(TradingTradingAccount.id == trading_trading_trading_account_id).first()
+        return db.query(TradingAccount).filter(TradingAccount.id == trading_trading_trading_account_id).first()
     
     @staticmethod
     def get_open_trading_accounts(db: Session) -> List[TradingAccount]:

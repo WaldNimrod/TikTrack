@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Favicon will be set by global-favicon.js -->
     <title>בדיקת JS-Map</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=v6.0.0">
+    
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; }
         .test-section { border: 1px solid #ccc; margin: 10px 0; padding: 10px; }
@@ -14,7 +21,12 @@
     <script src="scripts/global-favicon.js"></script>
 </head>
 <body>
-    <h1>בדיקת JS-Map System</h1>
+    <!-- unified-header ייווצר כאן אוטומטית -->
+    <div id="unified-header"></div>
+    
+    <div class="page-body">
+        <div class="main-content">
+            <h1>בדיקת JS-Map System</h1>
     
     <div class="test-section">
         <h3>סקשן 1: סטטיסטיקות</h3>
@@ -43,10 +55,15 @@
             <div class="loading">טוען מפת פונקציות...</div>
         </div>
     </div>
+        </div>
+    </div>
 
     <!-- Load only essential scripts -->
     <script src="scripts/data-utils.js"></script>
     <script src="scripts/js-map.js"></script>
+    
+    <!-- Header System Script -->
+    <script src="scripts/header-system.js?v=v6.0.0"></script>
 
     <!-- Test initialization -->
     <script>

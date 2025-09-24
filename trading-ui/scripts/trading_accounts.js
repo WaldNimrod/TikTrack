@@ -330,7 +330,7 @@ function updateTradingAccountsTable(trading_accounts) {
     return;
   }
 
-  const tbody = document.querySelector('#trading_accountsTable tbody');
+  let tbody = document.querySelector('#trading_accountsTable tbody');
   if (!tbody) {
     console.warn('⚠️ לא נמצא tbody לטבלת חשבונות - ייתכן שהדף לא נטען עדיין');
     console.log('🔍 חיפוש אלטרנטיבי...');

@@ -14,7 +14,7 @@ from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
 
-cash_flows_bp = Blueprint('cash_flows', __name__, url_prefix='/api/v1/cash_flows')
+cash_flows_bp = Blueprint('cash_flows', __name__, url_prefix='/api/cash_flows')
 
 # Create a service class for cash flows
 class CashFlowService:
@@ -82,19 +82,19 @@ def get_cash_flow(cash_flow_id: int):
                 "status": "success",
                 "data": cf_dict,
                 "message": "Cash flow retrieved successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "Cash flow not found"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error getting cash flow {cash_flow_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to retrieve cash flow"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -129,7 +129,7 @@ def create_cash_flow():
                 return jsonify({
                     "status": "error",
                     "error": {"message": "Invalid date format. Use YYYY-MM-DD"},
-                    "version": "v1"
+                    "version": "1.0"
                 }), 400
         
         # Validate data against constraints
@@ -141,7 +141,7 @@ def create_cash_flow():
             return jsonify({
                 "status": "error",
                 "error": {"message": f"Cash flow validation failed: {error_message}"},
-                "version": "v1"
+                "version": "1.0"
             }), 400
         
         cash_flow = CashFlow(**data)
@@ -161,14 +161,14 @@ def create_cash_flow():
             "status": "success",
             "data": cf_dict,
             "message": "Cash flow created successfully",
-            "version": "v1"
+            "version": "1.0"
         }), 201
     except Exception as e:
         logger.error(f"Error creating cash flow: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": str(e)},
-            "version": "v1"
+            "version": "1.0"
         }), 400
     finally:
         db.close()
@@ -203,7 +203,7 @@ def update_cash_flow(cash_flow_id: int):
                     return jsonify({
                         "status": "error",
                         "error": {"message": "Invalid date format. Use YYYY-MM-DD"},
-                        "version": "v1"
+                        "version": "1.0"
                     }), 400
             
             # Validate data against constraints
@@ -215,7 +215,7 @@ def update_cash_flow(cash_flow_id: int):
                 return jsonify({
                     "status": "error",
                     "error": {"message": f"Cash flow validation failed: {error_message}"},
-                    "version": "v1"
+                    "version": "1.0"
                 }), 400
             
             for key, value in data.items():
@@ -237,19 +237,19 @@ def update_cash_flow(cash_flow_id: int):
                 "status": "success",
                 "data": cf_dict,
                 "message": "Cash flow updated successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "Cash flow not found"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error updating cash flow {cash_flow_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to update cash flow"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
@@ -267,19 +267,19 @@ def delete_cash_flow(cash_flow_id: int):
             return jsonify({
                 "status": "success",
                 "message": "Cash flow deleted successfully",
-                "version": "v1"
+                "version": "1.0"
             })
         return jsonify({
             "status": "error",
             "error": {"message": "Cash flow not found"},
-            "version": "v1"
+            "version": "1.0"
         }), 404
     except Exception as e:
         logger.error(f"Error deleting cash flow {cash_flow_id}: {str(e)}")
         return jsonify({
             "status": "error",
             "error": {"message": "Failed to delete cash flow"},
-            "version": "v1"
+            "version": "1.0"
         }), 500
     finally:
         db.close()
